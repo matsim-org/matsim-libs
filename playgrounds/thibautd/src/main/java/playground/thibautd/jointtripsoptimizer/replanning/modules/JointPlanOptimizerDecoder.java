@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -113,13 +114,14 @@ public class JointPlanOptimizerDecoder {
 			int numJointEpisodes,
 			int numEpisodes) {
 
-		Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
+		//Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
 		List<Activity> lastActivities = plan.getLastActivities();
 		int currentPlannedBit = 0;
 		int currentDurationGene = numJointEpisodes;
 		Map<String, Integer> currentPlanElementAssociation =
 			new HashMap<String, Integer>();
 		LegTravelTimeEstimator currentLegTTEstimator;
+		boolean sharedRideUnexamined = true;
 
 		this.optimizeToggle = configGroup.getOptimizeToggle();
 
@@ -155,20 +157,32 @@ public class JointPlanOptimizerDecoder {
 		for (PlanElement pe : plan.getPlanElements()) {
 			// associate shared legs to "planned" bits
 			if ((pe instanceof Leg)) {
-				if ((((JointLeg) pe).getJoint())&&
-						(this.optimizeToggle)) {
-					if (!alreadyDetermined.containsKey(pe)) {
-						// associate a "toggle" bit
-						currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
-						// remember the bit's position for linked activities
-						for (JointActing linked : 
-								((JointActing) pe).getLinkedElements().values()) {
-							alreadyDetermined.put((PlanElement) linked, currentPlannedBit);
-						}
-						currentPlannedBit++;
-					} else {
-						currentPlanElementAssociation.put(TOGGLE_CHROM, alreadyDetermined.get(pe));
-					}
+				//if ((((JointLeg) pe).getJoint())&&
+				//		(this.optimizeToggle)) {
+				//	if (!alreadyDetermined.containsKey(pe)) {
+				//		// associate a "toggle" bit
+				//		currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
+				//		// remember the bit's position for linked activities
+				//		for (JointActing linked : 
+				//				((JointActing) pe).getLinkedElements().values()) {
+				//			alreadyDetermined.put((PlanElement) linked, currentPlannedBit);
+				//		}
+				//		currentPlannedBit++;
+				//	} else {
+				//		currentPlanElementAssociation.put(TOGGLE_CHROM, alreadyDetermined.get(pe));
+				//	}
+				//}
+				if ((this.optimizeToggle)&&
+						(((JointLeg) pe).getJoint())&&
+						(!((JointLeg) pe).getMode().equals(TransportMode.car))&&
+						(sharedRideUnexamined)) {
+					//passenger leg: associate toggle chromosome
+					currentPlanElementAssociation.put(TOGGLE_CHROM, currentPlannedBit);
+					currentPlannedBit++;
+					sharedRideUnexamined = false;
+				}
+				else if ((this.optimizeToggle)&&(!((JointLeg) pe).getJoint())) {
+					sharedRideUnexamined = true;
 				}
 				else {
 					continue;
@@ -396,8 +410,6 @@ public class JointPlanOptimizerDecoder {
 		individualValues.addToIndexInChromosome(1);
 	}
 
-	//TODO: take into account the fact that PU access legs can be shared
-	//normally not a problem (in this case, planned in the plan joint act)
 	private void planPuAccessLeg(
 			final List<PlanElement> planElements,
 			final PlanElement currentElement,
