@@ -25,7 +25,7 @@ public class ZPopulationGenerator {
 		/*
 		 * Create population from sample input data.  
 		 */
-		Scenario scenario = createPopulationFromCensusFile("../matsimExamples/tutorial/demandgeneration_zurich/input_sample_zurich.txt");
+		Scenario scenario = createPopulationFromCensusFile("./input/input_sample_zurich.txt");
 
 		/*
 		 * Write population to file.

@@ -21,7 +21,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 public class PPopulationGenerator implements Runnable {
 
-	private static Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
+	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 
 	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
@@ -38,13 +38,22 @@ public class PPopulationGenerator implements Runnable {
 	public void run() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		population = scenario.getPopulation();
+		fillZoneData();
 		generatePopulation();
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		populationWriter.write("./input/population.xml");
 	}
 
+	private void fillZoneData() {
+		// Add the locations you want to use here.
+		// (with proper coordinates)
+		zoneGeometries.put("home1", scenario.createCoord(0, 1));
+		zoneGeometries.put("work1", scenario.createCoord(50, 0));
+	}
+
 	private void generatePopulation() {
-		generateHomeWorkHomeTrips("P", "B", 20);
+		generateHomeWorkHomeTrips("home1", "work1", 20); // create 20 trips from zone 'home1' to 'work1'
+		//... generate more trips here
 	}
 
 	private void generateHomeWorkHomeTrips(String from, String to, int quantity) {
@@ -53,8 +62,8 @@ public class PPopulationGenerator implements Runnable {
 			Coord sink = zoneGeometries.get(to);
 			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.car));
 			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = ct.transform(shoot(source));
-			Coord workLocation = ct.transform(shoot(sink));
+			Coord homeLocation = shoot(ct.transform(source));
+			Coord workLocation = shoot(ct.transform(sink));
 			plan.addActivity(createHome(homeLocation));
 			plan.addLeg(createDriveLeg());
 			plan.addActivity(createWork(workLocation));
@@ -71,6 +80,8 @@ public class PPopulationGenerator implements Runnable {
 	}
 
 	private Coord shoot(Coord source) {
+		// Insert code here to blur the input coordinate.
+		// For example, add a random number to the x and y coordinates.
 		return source;
 	}
 
