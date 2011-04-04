@@ -60,7 +60,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 		
 		
 		testSchedule t = new testSchedule();
-		t.runTest();
+		t.testScheduleMethods();
 		
 		//*****************************************
 		
@@ -345,10 +345,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 	
 	
 	public void mapHubsTest(Controler controler, HubLinkMapping hubLinkMapping){
-		/*LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution, 
-		HubLinkMapping hubLinkMapping, 
-		Controler controler){*/
-	
+		
 	
 		double maxX=5000;
 		double minX=-20000;
@@ -427,8 +424,7 @@ public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int n
 			}
 		}
 		return pricing;
-	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
+	
 		
 	}
 

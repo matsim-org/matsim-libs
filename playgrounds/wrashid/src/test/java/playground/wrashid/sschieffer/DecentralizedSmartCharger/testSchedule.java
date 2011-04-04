@@ -15,7 +15,7 @@ public class testSchedule extends TestCase{
 	
 	
 	
-	public void runTest(){
+	public void testScheduleMethods(){
 		s= setDummySchedule();
 		
 		s.printSchedule();
@@ -41,6 +41,10 @@ public class testSchedule extends TestCase{
 		assertEquals(0, s.timeIsInWhichInterval(0));
 		
 		assertEquals(1, s.numberOfDrivingTimes());
+		
+		assertEquals(s.sameTimeIntervalsInThisSchedule(s), true);
+		assertEquals(s.sameTimeIntervalsInThisSchedule(s2), false);
+		
 	}
 	
 	
