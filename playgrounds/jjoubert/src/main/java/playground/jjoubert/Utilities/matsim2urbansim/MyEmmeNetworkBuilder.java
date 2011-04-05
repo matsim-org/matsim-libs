@@ -39,6 +39,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
 /**
  * Reads node and link DBF files (that have been converted to TAB-delimited 
  * text files) generated from Emme transport models.
+ * <p/>
+ * Keyword(s): emme/2
+ * 
  * @author jjoubert *
  */
 public class MyEmmeNetworkBuilder {
