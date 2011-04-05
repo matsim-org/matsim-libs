@@ -34,6 +34,10 @@ public class VspExperimentalConfigGroup extends Module {
 	public static final String GROUP_NAME = "vspExperimental";
 	
 	// ---
+	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes" ;
+	private boolean removingUnneccessaryPlanAttributes = false ;
+
+	// ---
 
 	@Deprecated
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
@@ -82,15 +86,21 @@ public class VspExperimentalConfigGroup extends Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(USE_ACTIVITY_DURATIONS, "Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
-		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION + "', '" + END_TIME_ONLY + "'") ;
+		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION 
+				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
+		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION 
+				+ "', '" + END_TIME_ONLY + "'") ;
+		
+		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not yet implemented) will remove plan attributes that are presumably not used, such as " +
+				"activityStartTime. default=false") ;
 
 		map.put(INPUT_MZ05_FILE, "Set this filename of MZ05 daily analysis");
 
-		map.put(MODES_FOR_SUBTOURMODECHOICE, "set the traffic mode option for subTourModeChoice");
-		map.put(CHAIN_BASED_MODES, "set chainBasedModes, e.g. \"car,bike\", \"car\"");
+		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice");
+		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes, e.g. \"car,bike\", \"car\"");
 
-		map.put(OFFSET_WALK, "set offset for mode \"walk\" in leg scoring function");
+		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
+				"set offset for mode \"walk\" in leg scoring function");
 		
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		return map;
@@ -112,6 +122,8 @@ public class VspExperimentalConfigGroup extends Module {
 			}
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
 			setActivityDurationInterpretation(value) ;
+		} else if ( REMOVING_UNNECESSARY_PLAN_ATTRIBUTES.equalsIgnoreCase(key)) {
+			setRemovingUnneccessaryPlanAttributes(Boolean.parseBoolean(value)) ;
 		} else if ( COLORING.equalsIgnoreCase(key) ) {
 			setColoring( value ) ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key)) {
@@ -135,6 +147,8 @@ public class VspExperimentalConfigGroup extends Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 //		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
+		
+		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
 
 		map.put(INPUT_MZ05_FILE, getInputMZ05File() ) ;
 
@@ -143,7 +157,7 @@ public class VspExperimentalConfigGroup extends Module {
 
 //		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
 		
-		map.put(COLORING, getChainBasedModes() ) ;
+		map.put(COLORING, getColoring() ) ;
 		return map;
 	}
 
@@ -200,6 +214,14 @@ public class VspExperimentalConfigGroup extends Module {
 
 	public void setActivityDurationInterpretation(String activityDurationInterpretation) {
 		this.activityDurationInterpretation = activityDurationInterpretation;
+	}
+
+	public boolean isRemovingUnneccessaryPlanAttributes() {
+		return removingUnneccessaryPlanAttributes;
+	}
+
+	public void setRemovingUnneccessaryPlanAttributes(boolean removingUnneccessaryPlanAttributes) {
+		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
 	}
 
 }
