@@ -38,6 +38,11 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
 import org.matsim.core.utils.collections.Tuple;
 
+/**
+ * Keyword(s): emme/2
+ * 
+ * @author balmer
+ */
 public class NetworkAddEmmeManeuverRestrictions {
 
 	//////////////////////////////////////////////////////////////////////
