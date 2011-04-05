@@ -34,6 +34,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -65,8 +66,8 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 			int numEpisodes,
 			ScoringFunctionFactory scoringFunctionFactory) {
 		super();
-		this.decoder = new JointPlanOptimizerDecoder(plan, configGroup, legTravelTimeEstimatorFactory,
-				routingAlgorithm, network, numJointEpisodes, numEpisodes);
+		this.decoder = (new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
+				routingAlgorithm, network, numJointEpisodes, numEpisodes)).createDecoder();
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 

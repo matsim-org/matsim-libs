@@ -22,7 +22,9 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
 
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -57,14 +59,17 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
  * @author thibautd
  */
 public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
+	private static final Logger log =
+		Logger.getLogger(ToggleDecoder.class);
+
 
 	private static String DEFAULT_REMP_MODE = TransportMode.pt;
 
 	private final JointPlan plan;
 	private final Map<PlanElement, Tuple<PlanElement, PlanElement>> sharedRideOD =
-		new TreeMap<PlanElement, Tuple<PlanElement, PlanElement>>();
+		new HashMap<PlanElement, Tuple<PlanElement, PlanElement>>();
 	private final Map<PlanElement, Integer> associatedGene =
-		new TreeMap<PlanElement, Integer>();
+		new HashMap<PlanElement, Integer>();
 	private final List<IdLeg> unaffectedLegs =
 		new ArrayList<IdLeg>();
 
@@ -150,7 +155,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		for (Plan individualPlan : this.plan.getIndividualPlans().values()) {
 			currentPlanElements = individualPlan.getPlanElements();
-			for (i = 0; i <= currentPlanElements.size(); i++) {
+			for (i = 0; i < currentPlanElements.size(); i++) {
 				currentPlanElement = currentPlanElements.get(i);
 
 				if (currentPlanElement instanceof JointLeg) {
@@ -260,7 +265,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	private Map<Id, List<PlanElement>> decodeToggle(final IChromosome chromosome) {
 		List<Boolean> geneValues = extractGeneValues(chromosome);
 		Map<Id, List<PlanElement>> constructedIndividualPlans =
-			new TreeMap<Id, List<PlanElement>>();
+			new HashMap<Id, List<PlanElement>>();
 		List<PlanElement> currentList;
 
 		this.unaffectedLegs.clear();
@@ -297,7 +302,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	 */
 	private JointPlan createCoherentPlan(final Map<Id, List<PlanElement>> incoherentPlan) {
 		List<PlanElement> plannedSharedLegs = identifySharedLegs(incoherentPlan);
-		Map<Id, PlanImpl> constructedIndividualPlans = new TreeMap<Id, PlanImpl>();
+		Map<Id, PlanImpl> constructedIndividualPlans = new HashMap<Id, PlanImpl>();
 
 		for (Map.Entry<Id, List<PlanElement>> individualPlan :
 				incoherentPlan.entrySet()) {
@@ -412,7 +417,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 				return 1;
 			}
 		}
-		else if (incorrectPlan.get(i+1) instanceof JointActivity) {
+		else if ((i < incorrectPlan.size() - 1) &&
+				(incorrectPlan.get(i+1) instanceof JointActivity)) {
 			// case of an unaffected shared leg
 			correctPlan.add(new JointActivity(act));
 			correctPlan.add(new JointLeg(DEFAULT_REMP_MODE, act.getPerson()));

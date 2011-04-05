@@ -25,12 +25,13 @@ import java.util.List;
 import org.jgap.IChromosome;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
 
 /**
  * Modular decoder, decoding each "dimension" one after the other.
  * @author thibautd
  */
-public class JointPlanOptimizerPipedDecoder {
+public class JointPlanOptimizerPipedDecoder implements JointPlanOptimizerDecoder {
 	private final List<JointPlanOptimizerDimensionDecoder> decoders =
 		new ArrayList<JointPlanOptimizerDimensionDecoder>();
 	private final JointPlan plan;
@@ -50,6 +51,7 @@ public class JointPlanOptimizerPipedDecoder {
 	/**
 	 * execute the decoders in the order they were added.
 	 */
+	@Override
 	public JointPlan decode(IChromosome chromosome) {
 		JointPlan outputPlan = this.plan;
 

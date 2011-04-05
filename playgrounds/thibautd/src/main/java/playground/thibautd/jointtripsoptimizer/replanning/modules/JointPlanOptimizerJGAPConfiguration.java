@@ -38,7 +38,6 @@ import org.jgap.InvalidConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -94,10 +93,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		this.optimizeToggle = configGroup.getOptimizeToggle();
 
-		if (this.optimizeToggle) {
-			throw new UnsupportedOperationException("toggle optimization possibly"
-					+" broken: temporarily unsupported.");
-		}
+		//if (this.optimizeToggle) {
+		//	throw new UnsupportedOperationException("toggle optimization possibly"
+		//			+" broken: temporarily unsupported.");
+		//}
 		// get info on the plan structure
 		this.countEpisodes(plan);
 
@@ -225,7 +224,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						(pe instanceof JointLeg)&&
 						(((JointLeg) pe).getJoint())&&
 						//(!alreadyExamined.contains(pe))
-						(((JointLeg) pe).getMode().equals(TransportMode.car))&&
+						(((JointLeg) pe).getMode().equals(JointActingTypes.PASSENGER))&&
 						(!sharedRideExamined)
 						) {
 					// we are on the first shared ride of a passenger ride
