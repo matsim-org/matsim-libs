@@ -36,17 +36,19 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Translates emme networks into matsim networks.
- *
+ * <p/>
  * Uses the "emme network export" result as input, NOT the GIS export.
- *
+ * <p/>
  * A serious problem is that there is not enough info in the headers of the emme files:
  * (column counting starts at 0!!!)
  * - link "length" (column # 3) is in arbitrary units, connected to rest of system only through freespeed value
  * - Column # 8-10 are user-defined BUT contain freespeed, capacity, ... in arbitrary order and units
  *   (connected to rest of system through user-defined volume-delay functions)
- *
+ * <p/>
+ * Keyword(s): emme/2
+ * 
  * @author nagel
- *
+ * 
  */
 public class NetworkEmme2Matsim {
 	private static final Logger log = Logger.getLogger(NetworkEmme2Matsim.class);
