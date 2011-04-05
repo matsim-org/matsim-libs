@@ -59,6 +59,7 @@ import playground.johannes.socialnetworks.sim.analysis.TravelDistanceTask;
 import playground.johannes.socialnetworks.sim.interaction.PseudoSim;
 import playground.johannes.socialnetworks.sim.locationChoice.ActivityChoice2;
 import playground.johannes.socialnetworks.sim.locationChoice.ActivityMover;
+import playground.johannes.socialnetworks.sim.locationChoice.NegatedGibbsPlanSelector;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
@@ -87,6 +88,7 @@ public class Simulator {
 	
 	private SocialGraph socialNetwork;
 	
+	private NegatedGibbsPlanSelector selector;
 //	private final Random random;
 	
 	public static void main(String args[]) {
@@ -114,6 +116,7 @@ public class Simulator {
 	public Simulator(Config config, Network network, Population population, Random random, SocialGraph graph) {
 		this.network = network;
 		this.population = population;
+		this.socialNetwork = graph;
 //		this.random = random;
 		
 		pseudoSim = new PseudoSim();
@@ -125,7 +128,8 @@ public class Simulator {
 		
 		
 		strategyManager = new StrategyManager();
-//		strategyManager.setPlanSelectorForRemoval(new NegatedGibbsPlanSelector(100.0, new Random(rndSeed)));
+		selector = new NegatedGibbsPlanSelector(10000.0, random);
+		strategyManager.setPlanSelectorForRemoval(selector);
 
 		strategyManager.setMaxPlansPerAgent(1);
 //		PlanStrategy keepSelected = new PlanStrategyImpl(new BestPlanSelector());
@@ -179,6 +183,7 @@ public class Simulator {
 	}
 	
 	public void step() {
+		selector.notifyIterationStarts(null);
 		/*
 		 * get new state
 		 */
@@ -205,6 +210,7 @@ public class Simulator {
 				}
 			}
 		}
+		selector.notifyIterationEnds(null);
 		
 		logger.info(String.format("Average selected plan score = %1$s.", score_selected/(double)cnt_selected));
 		logger.info(String.format("Average unselected plan score = %1$s.", score/(double)cnt));

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
@@ -49,7 +50,7 @@ public class EducationTask extends ModuleAnalyzerTask<Education> {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if (getOutputDirectory() != null) {
 			try {
 				SocialGraph graph = (SocialGraph) g;

@@ -34,14 +34,10 @@ import org.matsim.contrib.sna.math.LinearDiscretizer;
 public class EdgeLengthTask extends AnalyzerTask {
 
 	public static final String KEY = "d";
-	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-	}
 
 	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		EdgeLength edgeLenght = new EdgeLength();
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		EdgeLength edgeLenght = EdgeLength.getInstance();
 		
 		DescriptiveStatistics stats = edgeLenght.statistics(graph.getEdges());
 		printStats(stats, KEY);

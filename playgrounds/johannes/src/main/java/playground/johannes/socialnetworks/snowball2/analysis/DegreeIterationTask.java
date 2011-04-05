@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -46,7 +47,7 @@ public class DegreeIterationTask extends ModuleAnalyzerTask<Degree> {
 	private static final Logger logger = Logger.getLogger(DegreeIterationTask.class);
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		TIntObjectHashMap<Set<SampledVertex>> verticesIt = new TIntObjectHashMap<Set<SampledVertex>>();
 		TIntObjectHashMap<Set<SampledVertex>> verticesItAcc = new TIntObjectHashMap<Set<SampledVertex>>();
 		

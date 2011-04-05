@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialPropertyDegreeTask.java
+ * TransitivityAccessibilityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.analysis;
+package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.DummyDiscretizer;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.analysis.Age;
 
 /**
  * @author illenberger
  *
  */
-public class SocialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
+public class TransitivityAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 
-	private Discretizer discretizer = new DummyDiscretizer();
+	private TObjectDoubleHashMap<Vertex> accessValues;
 	
-	public void setDiscretizer(Discretizer discretizer) {
-		this.discretizer = discretizer;
+	public TransitivityAccessibilityTask(Accessibility module) {
+		setModule(module);
+	}
+	
+	public void setAccessValues(TObjectDoubleHashMap<Vertex> accessValues) {
+		this.accessValues = accessValues;
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
-		if(outputDirectoryNotNull()) {
-			try {
-				SocialGraph graph = (SocialGraph) g;
-				/*
-				 * age-degree correlation
-				 */
-				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(Age.getInstance(), module, graph.getVertices(), discretizer);
-				TXTWriter.writeMap(correl, "k", "age", getOutputDirectory() + "/age_k.mean.txt");
-				
-				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Age.getInstance(), module, graph.getVertices(), discretizer);
-				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "/age_k.table.txt");
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+		if(accessValues == null) {
+			accessValues = module.values(graph.getVertices());
 		}
 		
+		TObjectDoubleHashMap<Vertex> localClustering = Transitivity.getInstance().values(graph.getVertices());
+		
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 50, 200);
+		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(localClustering, accessValues,	discretizer);
+		
+		try {
+			TXTWriter.writeMap(correl, "A", "c_local_mean", getOutputDirectory() + "c_local_mean_A.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

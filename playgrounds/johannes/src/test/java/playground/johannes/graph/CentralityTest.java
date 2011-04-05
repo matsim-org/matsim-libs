@@ -52,8 +52,8 @@ public class CentralityTest extends TestCase {
 		centrality.init(graph);
 		System.out.println("Took " + (System.currentTimeMillis() - time));
 		
-		System.out.println("Closeness = " + centrality.closenessDistribution().mean());
-		System.out.println("Betweenness =" + centrality.vertexBetweennessDistribution().mean());
+		System.out.println("Closeness = " + centrality.closenessDistribution().getMean());
+		System.out.println("Betweenness =" + centrality.vertexBetweennessDistribution().getMean());
 		System.out.println("Diameter = " + centrality.diameter());
 		System.out.println("Radius = " + centrality.radius());
 	}

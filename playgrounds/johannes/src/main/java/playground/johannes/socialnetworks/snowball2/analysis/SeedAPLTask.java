@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalyzerTaskArray.java
+ * SeedAPLTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.socialnetworks.snowball2.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
+import gnu.trove.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class AnalyzerTaskArray extends AnalyzerTask {
+public class SeedAPLTask extends AnalyzerTask {
 
-	private Map<String, AnalyzerTask> analyzers;
+	public static String KEY = "seed_apl";
 	
-	public AnalyzerTaskArray() {
-		analyzers = new LinkedHashMap<String, AnalyzerTask>();
-		
-	}
+	private List<Vertex> seeds;
 	
-	public void addAnalyzerTask(AnalyzerTask task, String key) {
-		analyzers.put(key, task);
-	}
 	@Override
-	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		for(Entry<String, AnalyzerTask> entry : analyzers.entrySet()) {
-			try {
-				String output = String.format("%1$s/%2$s/", getOutputDirectory(), entry.getKey());
-				new File(output).mkdirs();
-				GraphAnalyzer.analyze(graph, entry.getValue(), output);
-			} catch (IOException e) {
-				e.printStackTrace();
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> results) {
+		if(seeds == null) {
+			seeds = new ArrayList<Vertex>(graph.getVertices().size());
+			for(Vertex vertex : graph.getVertices()) {
+				Integer it = ((SampledVertex)vertex).getIterationSampled();
+				if(it != null && it == 0) {
+					seeds.add(vertex);
+				}
 			}
 		}
-
+		
+		AdjacencyMatrix<Vertex> y = new AdjacencyMatrix<Vertex>(graph);
+		Dijkstra dijkstra = new Dijkstra(y);
+		
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		for(int i = 0; i < seeds.size(); i++) {
+			int idx_i = y.getIndex(seeds.get(i));
+			dijkstra.run(idx_i, -1);
+			for(int j = i + 1; j < seeds.size(); j++) {
+				int idx_j = y.getIndex(seeds.get(j));
+				TIntArrayList path = dijkstra.getPath(idx_i, idx_j);
+				if(path != null) {
+					stats.addValue(path.size());
+				}
+			}
+		}
+		
+		results.put(KEY, stats);
+		printStats(stats, KEY);
 	}
 
 }

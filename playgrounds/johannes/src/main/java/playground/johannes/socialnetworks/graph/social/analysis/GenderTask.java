@@ -47,11 +47,7 @@ public class GenderTask extends ModuleAnalyzerTask<Gender> {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
-	}
-
-	@Override
-	public void analyzeStats(Graph g, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SocialGraph graph = (SocialGraph) g;
 		
 		Map<SocialVertex, String> values = module.values(graph.getVertices());

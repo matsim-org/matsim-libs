@@ -38,6 +38,14 @@ import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
  */
 public class EdgeLength extends AbstractEdgeProperty {
 
+	private static EdgeLength instance;
+	
+	public static EdgeLength getInstance() {
+		if(instance == null)
+			instance = new EdgeLength();
+		return instance;
+	}
+	
 	private DistanceCalculator distanceCalculator;
 	
 	public void setDistanceCalculator(DistanceCalculator calculator) {

@@ -67,7 +67,7 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if(outputDirectoryNotNull()) {
 			try {
 				SpatialGraph graph = (SpatialGraph) g;

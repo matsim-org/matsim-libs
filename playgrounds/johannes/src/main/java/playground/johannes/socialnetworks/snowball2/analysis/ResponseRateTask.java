@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledGraph;
@@ -36,10 +37,12 @@ import org.matsim.contrib.sna.snowball.analysis.SnowballStatistics;
 public class ResponseRateTask extends AnalyzerTask {
 
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> stats) {
 		SampledGraph graph = (SampledGraph) g;
 		
-		stats.put("responseRate", SnowballStatistics.getInstance().responseRateTotal(graph.getVertices(), SnowballStatistics.getInstance().lastIteration(graph.getVertices())));
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		ds.addValue(SnowballStatistics.getInstance().responseRateTotal(graph.getVertices(), SnowballStatistics.getInstance().lastIteration(graph.getVertices())));
+		stats.put("responseRate", ds);
 		
 		if(getOutputDirectory() != null) {
 			try {

@@ -66,7 +66,7 @@ public class SpatialPropertyAccessibilityTask extends ModuleAnalyzerTask<LogAcce
 	}
 
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if (outputDirectoryNotNull()) {
 			try {
 				SpatialGraph graph = (SpatialGraph) g;

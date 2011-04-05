@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
@@ -51,7 +52,7 @@ public class OverlapTask extends AnalyzerTask {
 	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
 	 */
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SocialSampledGraphProjection<SocialGraph, SocialVertex, SocialEdge> graph = (SocialSampledGraphProjection<SocialGraph, SocialVertex, SocialEdge>) g;
 		
 		Map<SampledVertexDecorator<SocialVertex>, Set> vertices = new HashMap<SampledVertexDecorator<SocialVertex>, Set>();

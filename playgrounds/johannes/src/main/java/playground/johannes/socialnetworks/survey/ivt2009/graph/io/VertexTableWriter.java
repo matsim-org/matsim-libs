@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.GraphUtils;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -135,7 +136,7 @@ public class VertexTableWriter {
 		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/edgelist.txt"));
 		
 		SeedConnectionTask task = new SeedConnectionTask();
-		Map<String, Double> map = new HashMap<String, Double>();
+		Map<String, DescriptiveStatistics> map = new HashMap<String, DescriptiveStatistics>();
 		Set<Edge> edges = new HashSet<Edge>();
 		Set<Edge> yellowEdges = new HashSet<Edge>();
 		task.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/noH/");

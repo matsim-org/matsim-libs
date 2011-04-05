@@ -38,7 +38,7 @@ import playground.johannes.socialnetworks.graph.social.SocialEdge;
 public class FrequencyTask extends AnalyzerTask {
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics distr = new Frequency().statistics((Set<SocialEdge>) graph.getEdges());
 		
 		if(getOutputDirectory() != null) {

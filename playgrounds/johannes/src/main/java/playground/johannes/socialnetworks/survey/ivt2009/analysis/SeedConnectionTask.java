@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.matrix.Dijkstra;
@@ -51,7 +51,7 @@ public class SeedConnectionTask extends AnalyzerTask {
 
 	public Set<List<SampledVertexDecorator<SocialVertex>>> pathSet = new HashSet<List<SampledVertexDecorator<SocialVertex>>>();
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> stats) {
 		Set<SampledVertex> seedSet = (Set<SampledVertex>) SnowballPartitions.createSampledPartition((Set<? extends SampledVertex>)graph.getVertices(), 0);
 		List<SampledVertex> seeds = new ArrayList<SampledVertex>(seedSet);
 		
@@ -99,8 +99,12 @@ public class SeedConnectionTask extends AnalyzerTask {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		stats.put(NUM_CONNECTS, new Double(nConnects));
-		stats.put("apl", total/(double)nConnects);
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		ds.addValue(new Double(nConnects));
+		stats.put(NUM_CONNECTS, ds);
+		ds = new DescriptiveStatistics();
+		ds.addValue(total/(double)nConnects);
+		stats.put("apl", ds);
 		
 		if(getOutputDirectory() != null) {
 			try {

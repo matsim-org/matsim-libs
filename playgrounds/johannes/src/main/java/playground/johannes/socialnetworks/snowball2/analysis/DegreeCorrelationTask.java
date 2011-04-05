@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
@@ -45,7 +46,7 @@ public class DegreeCorrelationTask extends ModuleAnalyzerTask<Degree> {
 	 * @see playground.johannes.socialnetworks.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
 	 */
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		TIntObjectHashMap<TIntArrayList> map = new TIntObjectHashMap<TIntArrayList>();
 		int maxValues = 0;
 		for(Vertex vertex : graph.getVertices()) {

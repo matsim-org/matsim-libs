@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalyzerTaskArray.java
+ * ProbaTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.studies.locChoice;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import java.util.Random;
 
 /**
  * @author illenberger
  *
  */
-public class AnalyzerTaskArray extends AnalyzerTask {
+public class ProbaTest {
 
-	private Map<String, AnalyzerTask> analyzers;
-	
-	public AnalyzerTaskArray() {
-		analyzers = new LinkedHashMap<String, AnalyzerTask>();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Random random = new Random();
 		
-	}
-	
-	public void addAnalyzerTask(AnalyzerTask task, String key) {
-		analyzers.put(key, task);
-	}
-	@Override
-	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		for(Entry<String, AnalyzerTask> entry : analyzers.entrySet()) {
-			try {
-				String output = String.format("%1$s/%2$s/", getOutputDirectory(), entry.getKey());
-				new File(output).mkdirs();
-				GraphAnalyzer.analyze(graph, entry.getValue(), output);
-			} catch (IOException e) {
-				e.printStackTrace();
+		double t0 = Double.MAX_VALUE;
+		for(int i = 0; i < 100000; i++) {
+			double t1 = Double.POSITIVE_INFINITY;
+			
+			boolean accept = false;
+			while(!accept) {
+				double x = random.nextDouble() + 1;
+				double y = Math.pow(x, -1.5);
+				
+				if(y > random.nextDouble()) {
+					accept = true;
+					t1 = x;
+				}
+			}
+			
+			if(t1 < t0) {
+				t0 = t1;
+				System.out.println(String.format("[%1$s] %2$s", i, t1));
 			}
 		}
 

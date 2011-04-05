@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
@@ -53,7 +54,7 @@ public class FilteredAnalyzerTask extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		for(Entry<String, GraphFilter<Graph>> entry : filters.entrySet()) {
 			logger.info(String.format("Applying filter \"%1$s\"...", entry.getKey()));
 			

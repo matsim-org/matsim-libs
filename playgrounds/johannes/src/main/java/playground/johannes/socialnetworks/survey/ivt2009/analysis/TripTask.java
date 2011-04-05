@@ -43,17 +43,8 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
  */
 public class TripTask extends AnalyzerTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		EdgeLength edgeLength = new EdgeLength();
 		TObjectDoubleHashMap<Edge> edgeLengths = edgeLength.values(graph.getEdges());
 		

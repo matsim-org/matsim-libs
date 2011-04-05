@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.math.Distribution;
 
@@ -48,7 +49,7 @@ public class EdgeTypeTask extends SocioMatrixTask {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if(getOutputDirectory() != null) {
 			TObjectIntHashMap<String> distr = new TObjectIntHashMap<String>();
 			
@@ -78,7 +79,7 @@ public class EdgeTypeTask extends SocioMatrixTask {
 				
 				for(Entry<String, Distribution> entry : lenDistr.entrySet()) {
 					Distribution d = entry.getValue();
-					stats.put("d_mean_" + entry.getKey(), d.mean());
+					addSingleValue("d_mean_" + entry.getKey(), d.mean(), statsMap);
 					Distribution.writeHistogram(d.absoluteDistribution(1000), String.format("%1$s/d_%2$s.txt", getOutputDirectory(), entry.getKey()));
 					Distribution.writeHistogram(d.absoluteDistributionLog2(1000), String.format("%1$s/d_%2$s.log.txt", getOutputDirectory(), entry.getKey()));
 					

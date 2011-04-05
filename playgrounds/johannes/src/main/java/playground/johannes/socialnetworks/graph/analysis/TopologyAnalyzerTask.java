@@ -20,11 +20,9 @@
 package playground.johannes.socialnetworks.graph.analysis;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
@@ -57,9 +55,6 @@ public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 		if(output != null)
 			task.setOutputDirectoy(output);
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/stats.txt");
+		GraphAnalyzer.analyze(graph, task, output);
 	}
 }

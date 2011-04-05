@@ -52,11 +52,7 @@ public class GenderAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-	}
-
-	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if(outputDirectoryNotNull()) {
 			
 			TObjectDoubleHashMap<Vertex> xVals = new TObjectDoubleHashMap<Vertex>(graph.getVertices().size());

@@ -25,6 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.Degree;
@@ -47,7 +48,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if(outputDirectoryNotNull()) {
 			SpatialGraph graph = (SpatialGraph) g;
 			

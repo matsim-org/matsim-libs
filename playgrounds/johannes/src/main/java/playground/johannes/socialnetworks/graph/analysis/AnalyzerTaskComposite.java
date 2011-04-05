@@ -51,15 +51,9 @@ public class AnalyzerTaskComposite extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		for(AnalyzerTask task : tasks)
-			task.analyze(graph, stats);
-	}
-
-	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		for(AnalyzerTask task : tasks)
-			task.analyzeStats(graph, statsMap);
+			task.analyze(graph, statsMap);
 	}
 
 }

@@ -21,15 +21,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.util.Set;
 
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DistanceTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -41,9 +34,9 @@ import com.vividsolutions.jts.geom.Point;
 public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObsSpatialAnalyzerTask(Set<Point> points, Geometry boundary) {
-		DistanceTask distanceTask = new DistanceTask();
-		distanceTask.setModule(ObservedDistance.getInstance());
-		addTask(distanceTask);
+//		EdgeLengthTask distanceTask = new EdgeLengthTask();
+//		distanceTask.setModule(EdgeLength.getInstance());
+		addTask(new EdgeLengthTask());
 		
 //		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
 //		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());

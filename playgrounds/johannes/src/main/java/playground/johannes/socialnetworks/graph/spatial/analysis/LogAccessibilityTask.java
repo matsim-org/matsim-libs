@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -59,7 +60,7 @@ public class LogAccessibilityTask extends ModuleAnalyzerTask<LogAccessibility> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if(getOutputDirectory() != null) {
 			
 			if(graphAsChoiceSet) {

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
@@ -43,17 +44,17 @@ public class GraphAnalyzerTest extends TestCase {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, new TopologyAnalyzerTask());
+		Map<String, DescriptiveStatistics> stats = GraphAnalyzer.analyze(graph, new TopologyAnalyzerTask());
 		
-		assertEquals(7.1462, stats.get(DegreeTask.MEAN_DEGREE), 0.0001);
-		assertEquals(19.0, stats.get(DegreeTask.MAX_DEGREE));
-		assertEquals(0.0, stats.get(DegreeTask.MIN_DEGREE));
+		assertEquals(7.1462, stats.get(DegreeTask.KEY).getMean(), 0.0001);
+		assertEquals(19.0, stats.get(DegreeTask.KEY).getMax());
+		assertEquals(0.0, stats.get(DegreeTask.KEY).getMin());
 		
-		assertEquals(0.0018, stats.get(DegreeTask.DEGREE_CORRELATION), 0.0001);
+		assertEquals(0.0018, stats.get("r_k").getMean(), 0.0001);
 		
-		assertEquals(0.0008, stats.get(TransitivityTask.MEAN_LOCAL_CLUSTERING), 0.0001);
-		assertEquals(1.0, stats.get(TransitivityTask.MAX_LOCAL_CLUSTERING));
-		assertEquals(0.0, stats.get(TransitivityTask.MIN_LOCAL_CLUSTERING));
-		assertEquals(0.0008, stats.get(TransitivityTask.GLOBAL_CLUSTERING_COEFFICIENT), 0.0001);
+		assertEquals(0.0008, stats.get(TransitivityTask.KEY).getMean(), 0.0001);
+		assertEquals(1.0, stats.get(TransitivityTask.KEY).getMax());
+		assertEquals(0.0, stats.get(TransitivityTask.KEY).getMin());
+		assertEquals(0.0008, stats.get("c_global").getMean(), 0.0001);
 	}
 }

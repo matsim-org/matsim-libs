@@ -65,7 +65,7 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 	}
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		Accessibility access = module;
 //		access.setTargets(destinations);
 

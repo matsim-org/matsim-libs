@@ -53,11 +53,7 @@ public class AgeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-	}
-
-	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if (outputDirectoryNotNull()) {
 			SpatialGraph spatialGraph = (SpatialGraph) graph;
 			

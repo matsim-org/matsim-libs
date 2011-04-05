@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
@@ -42,7 +43,7 @@ import com.vividsolutions.jts.geom.Point;
 public class GyrationRadiusTask extends AnalyzerTask {
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		try {
 			GyrationRadius radius = new GyrationRadius();
 			Distribution distr = new Distribution();

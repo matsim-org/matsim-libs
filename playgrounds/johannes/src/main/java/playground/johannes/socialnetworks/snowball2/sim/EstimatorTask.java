@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -50,7 +50,7 @@ public class EstimatorTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> stats) {
 		TIntDoubleHashMap probas = new TIntDoubleHashMap(graph.getVertices().size());
 		TIntIntHashMap counts = new TIntIntHashMap(graph.getVertices().size());
 
@@ -67,7 +67,9 @@ public class EstimatorTask extends AnalyzerTask {
 					N_estim += 1 / p;
 			}
 		}
-		stats.put("N_estim", N_estim);
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		ds.addValue(N_estim);
+		stats.put("N_estim", ds);
 		
 		double M_estim = 0;
 		for (Edge edge : graph.getEdges()) {
@@ -82,8 +84,9 @@ public class EstimatorTask extends AnalyzerTask {
 				}
 			}
 		}
-		
-		stats.put("M_estim", M_estim);
+		ds = new DescriptiveStatistics();
+		ds.addValue(M_estim);
+		stats.put("M_estim", ds);
 		
 		TIntDoubleIterator it = probas.iterator();
 		for (int i = 0; i < probas.size(); i++) {

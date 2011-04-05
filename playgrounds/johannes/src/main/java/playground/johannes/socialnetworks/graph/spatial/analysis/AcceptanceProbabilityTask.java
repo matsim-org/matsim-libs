@@ -67,7 +67,7 @@ public class AcceptanceProbabilityTask extends ModuleAnalyzerTask<AcceptanceProb
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if(getOutputDirectory() != null) {
 			
 			if(graphAsChoiceSet) {

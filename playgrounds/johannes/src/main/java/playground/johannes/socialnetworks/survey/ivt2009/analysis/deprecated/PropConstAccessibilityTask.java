@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -62,7 +63,7 @@ public class PropConstAccessibilityTask extends ModuleAnalyzerTask<AcceptPropCon
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		GravityCostFunction function = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
 		function.setDiscretizer(new LinearDiscretizer(1.0));
 		Accessibility accessibility = new Accessibility(function);

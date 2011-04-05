@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -37,7 +38,7 @@ public class CivilStatusTask extends SocioMatrixTask {
 	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
 	 */
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SocialGraph graph = (SocialGraph) g;
 		CivilStatus cstatus = new CivilStatus();
 		double[][] matrix = cstatus.socioMatrix(graph);

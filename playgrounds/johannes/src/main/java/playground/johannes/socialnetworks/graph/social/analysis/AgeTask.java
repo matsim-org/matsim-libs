@@ -49,15 +49,10 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 		setKey("age");
 		setModule(module);
 	}
-	
-	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics stats = module.statistics(graph.getVertices());
 		statsMap.put(key, stats);
 		printStats(stats, key);

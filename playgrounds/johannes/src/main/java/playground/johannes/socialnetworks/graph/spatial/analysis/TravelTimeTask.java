@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.matsim.api.core.v01.network.Network;
@@ -66,7 +67,7 @@ public class TravelTimeTask extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SpatialGraph graph = (SpatialGraph) g;
 		
 		try {

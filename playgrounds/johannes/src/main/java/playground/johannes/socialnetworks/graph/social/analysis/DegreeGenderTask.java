@@ -24,6 +24,7 @@ import gnu.trove.TObjectDoubleIterator;
 
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -41,7 +42,7 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 	private static final Logger logger = Logger.getLogger(ModuleAnalyzerTask.class);
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 //		SocialGraph graph = (SocialGraph) g;
 		
 		int sumMale = 0;

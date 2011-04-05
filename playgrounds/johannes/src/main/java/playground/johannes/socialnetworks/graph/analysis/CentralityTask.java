@@ -23,10 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.math.Distribution;
 
 /**
  * @author illenberger
@@ -36,18 +36,22 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 
 	private static final Logger logger = Logger.getLogger(CentralityTask.class);
 	
-	public static final String MEAN_CLOSENESS = "close_mean";
+	public static final String CLOSENESS = "closeness"; 
 	
-	public static final String MIN_CLOSENESS = "close_min";
+//	public static final String MEAN_CLOSENESS = "close_mean";
+//	
+//	public static final String MIN_CLOSENESS = "close_min";
+//	
+//	public static final String MAX_CLOSENESS = "close_max";
 	
-	public static final String MAX_CLOSENESS = "close_max";
+	public static final String BETWEENNESS = "betweenness";
 	
-	public static final String MEAN_BETWEENNESS = "between_mean";
-	
-	public static final String MIN_BETWEENNESS = "between_min";
-	
-	public static final String MAX_BETWEENNESS = "between_max";
-	
+//	public static final String MEAN_BETWEENNESS = "between_mean";
+//	
+//	public static final String MIN_BETWEENNESS = "between_min";
+//	
+//	public static final String MAX_BETWEENNESS = "between_max";
+//	
 	public static final String DIAMETER = "diameter";
 	
 	public static final String RADIUS = "radius";
@@ -57,35 +61,39 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		module.init(graph);
 		
-		Distribution cDistr = module.closenessDistribution();
-		double c_mean = cDistr.mean();
-		double c_min = cDistr.min();
-		double c_max = cDistr.max();
-		stats.put(MEAN_CLOSENESS, c_mean);
-		stats.put(MIN_CLOSENESS, c_min);
-		stats.put(MAX_CLOSENESS, c_max);
-		logger.info(String.format("close_mean = %1$.4f, close_min = %2$.4f, close_max = %3$.4f", c_mean, c_min, c_max));
+		DescriptiveStatistics cDistr = module.closenessDistribution();
+//		double c_mean = cDistr.mean();
+//		double c_min = cDistr.min();
+//		double c_max = cDistr.max();
+//		stats.put(MEAN_CLOSENESS, c_mean);
+//		stats.put(MIN_CLOSENESS, c_min);
+//		stats.put(MAX_CLOSENESS, c_max);
+		statsMap.put(CLOSENESS, cDistr);
+		printStats(cDistr, CLOSENESS);
+//		logger.info(String.format("close_mean = %1$.4f, close_min = %2$.4f, close_max = %3$.4f", c_mean, c_min, c_max));
 		
-		Distribution bDistr = module.vertexBetweennessDistribution();
-		double b_mean = bDistr.mean();
-		double b_min = bDistr.min();
-		double b_max = bDistr.max();
-		stats.put(MEAN_BETWEENNESS, b_mean);
-		stats.put(MIN_BETWEENNESS, b_min);
-		stats.put(MAX_BETWEENNESS, b_max);
-		logger.info(String.format("between_mean = %1$s, between_min = %2$s, between_max = %4$s", b_mean, b_min, b_max));
+		DescriptiveStatistics bDistr = module.vertexBetweennessDistribution();
+//		double b_mean = bDistr.mean();
+//		double b_min = bDistr.min();
+//		double b_max = bDistr.max();
+//		stats.put(MEAN_BETWEENNESS, b_mean);
+//		stats.put(MIN_BETWEENNESS, b_min);
+//		stats.put(MAX_BETWEENNESS, b_max);
+		statsMap.put(BETWEENNESS, bDistr);
+		printStats(bDistr, BETWEENNESS);
+//		logger.info(String.format("between_mean = %1$s, between_min = %2$s, between_max = %4$s", b_mean, b_min, b_max));
 		
-		stats.put(DIAMETER, new Double(module.diameter()));
-		stats.put(RADIUS, new Double(module.radius()));
+		addSingleValue(DIAMETER, module.diameter(), statsMap);
+		addSingleValue(RADIUS, new Double(module.radius()), statsMap);
 		logger.info(String.format("diameter = %1$s, radius = %2$s", module.diameter(), module.radius()));
 		
 		if(getOutputDirectory() != null) {
 			try {
-				writeHistograms(cDistr, 1.0, false, "close");
-				writeHistograms(bDistr, 1.0, false, "between");
+				writeHistograms(cDistr, "close", 100, 100);
+				writeHistograms(bDistr, "between", 100, 100);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

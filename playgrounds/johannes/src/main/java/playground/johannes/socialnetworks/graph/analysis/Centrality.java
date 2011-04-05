@@ -22,12 +22,12 @@ package playground.johannes.socialnetworks.graph.analysis;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TObjectDoubleHashMap;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphUtils;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.math.Distribution;
 
 import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
 
@@ -47,14 +47,18 @@ public class Centrality {
 		mCentrality.run(y);
 	}
 	
-	public Distribution closenessDistribution() {
-		return new Distribution(mCentrality.getVertexCloseness());
+	public DescriptiveStatistics closenessDistribution() {
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		for(double val : mCentrality.getVertexCloseness()) {
+			ds.addValue(val);
+		}
+		return ds;
 	}
 	
-	public Distribution vertexBetweennessDistribution() {
-		Distribution distr = new Distribution();
+	public DescriptiveStatistics vertexBetweennessDistribution() {
+		DescriptiveStatistics distr = new DescriptiveStatistics();
 		for(int i = 0; i < mCentrality.getVertexBetweenness().length; i++) {
-			distr.add(mCentrality.getVertexBetweenness()[i]);
+			distr.addValue(mCentrality.getVertexBetweenness()[i]);
 		}
 		return distr;
 	}

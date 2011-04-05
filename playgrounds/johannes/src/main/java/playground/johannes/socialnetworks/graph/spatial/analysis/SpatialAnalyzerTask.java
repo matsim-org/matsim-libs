@@ -20,7 +20,6 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
@@ -59,11 +58,7 @@ public class SpatialAnalyzerTask extends AnalyzerTaskComposite {
 		if(output != null)
 			task.setOutputDirectoy(output);
 		
-		Map<String, Double> stats = GraphAnalyzer.analyze(graph, task);
-		
-		if(output != null)
-			GraphAnalyzer.writeStats(stats, output + "/summary.txt");
-	
+		GraphAnalyzer.analyze(graph, task, output);
 	}
 
 }

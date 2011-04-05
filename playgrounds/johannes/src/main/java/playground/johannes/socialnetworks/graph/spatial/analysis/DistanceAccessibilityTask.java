@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -61,7 +62,7 @@ public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if(getOutputDirectory() != null) {
 			SpatialGraph spatialGraph = (SpatialGraph) graph;
 			/*

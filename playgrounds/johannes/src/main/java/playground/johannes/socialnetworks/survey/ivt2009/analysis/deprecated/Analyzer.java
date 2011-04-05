@@ -139,22 +139,22 @@ public class Analyzer {
 	private static void analyze(SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph, ZoneLayer zones, Set<Point> choiceSet, Network network, String output, Geometry boundary) {
 		ObservedAnalyzerTask task = new ObservedAnalyzerTask(zones, choiceSet, network, boundary);
 		task.setOutputDirectoy(output);
-		
-		try {
-			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, task), output + "/stats.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		EstimatedAnalyzerTask estimTask = new EstimatedAnalyzerTask(graph);
-		output = output + "/estim";
-		new File(output).mkdirs();
-		estimTask.setOutputDirectoy(output);
-		try {
-			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, estimTask), output + "/stats.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		
+//		try {
+////			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, task), output + "/stats.txt");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		EstimatedAnalyzerTask estimTask = new EstimatedAnalyzerTask(graph);
+//		output = output + "/estim";
+//		new File(output).mkdirs();
+//		estimTask.setOutputDirectoy(output);
+//		try {
+////			GraphAnalyzer.writeStats(GraphAnalyzer.analyze(graph, estimTask), output + "/stats.txt");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 }

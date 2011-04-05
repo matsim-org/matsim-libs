@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
@@ -49,7 +50,7 @@ public class WaveSizeTask extends AnalyzerTask {
 	public static final String NUM_SAMPLED = "sampled";
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> stats) {
 		TIntIntHashMap detected = new TIntIntHashMap();
 		TIntIntHashMap sampled = new TIntIntHashMap();
 		for(Vertex v : graph.getVertices()) {
@@ -105,10 +106,10 @@ public class WaveSizeTask extends AnalyzerTask {
 			sampledEdgesTotal += it.value();
 		}
 		
-		stats.put(NUM_DETECTED, new Double(detectedTotal));
-		stats.put(NUM_SAMPLED, new Double(sampledTotal));
-		stats.put("detectedEdges", new Double(detectedEdgesTotal));
-		stats.put("sampledEdges", new Double(sampledEdgesTotal));
+		addSingleValue(NUM_DETECTED, detectedTotal, stats);
+		addSingleValue(NUM_SAMPLED, sampledTotal, stats);
+		addSingleValue("detectedEdges", detectedEdgesTotal, stats);
+		addSingleValue("sampledEdges", sampledEdgesTotal, stats);
 		
 		
 		logger.info(String.format("%1$s vertices sampled, %2$s vertices detected.", sampledTotal, detectedTotal));

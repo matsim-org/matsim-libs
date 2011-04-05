@@ -23,17 +23,29 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author illenberger
  *
  */
-public class NegatedGibbsPlanSelector implements PlanSelector {
+public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsListener, IterationEndsListener {
 
 	private final double beta;
 	
 	private final Random random;
+	
+	private double scoreAccept;
+	
+	private double scoreReject;
+	
+	private int cntAccept;
+	
+	private int cntReject;
 	
 	public NegatedGibbsPlanSelector(double beta, Random random) {
 		this.beta = beta;
@@ -42,6 +54,7 @@ public class NegatedGibbsPlanSelector implements PlanSelector {
 	
 	@Override
 	public Plan selectPlan(Person person) {
+		
 		if(person.getPlans().size() > 2)
 			throw new IllegalArgumentException("Person has more than two plan!");
 		
@@ -70,13 +83,34 @@ public class NegatedGibbsPlanSelector implements PlanSelector {
 			/*
 			 * accept, i.e., remove the old plan
 			 */
+			cntAccept++;
+			scoreAccept += oldPlan.getScore();
 			return oldPlan;
 		} else {
 			/*
 			 * reject, i.e., remove the new plan
 			 */
+			cntReject++;
+			scoreReject += newPlan.getScore();
 			return newPlan;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		System.err.println(String.format("Score of accepted plans: %1$s. (%2$s)", scoreAccept/(double)cntAccept, cntAccept));
+		System.err.println(String.format("Score of rejected plans: %1$s. (%2$s)", scoreReject/(double)cntReject, cntReject));
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		scoreReject = 0;
+		scoreAccept = 0;
+		cntAccept = 0;
+		cntReject = 0;
 	}
 
 }

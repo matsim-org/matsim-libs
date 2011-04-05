@@ -26,6 +26,7 @@ import gnu.trove.TObjectDoubleIterator;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -34,7 +35,6 @@ import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
@@ -54,21 +54,21 @@ public class EdgeLengthAccessibilityTask extends ModuleAnalyzerTask<Accessibilit
 	}
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if (accessValues == null)
 			accessValues = module.values(graph.getVertices());
 
-		TObjectDoubleHashMap<Vertex> edgeLengthMean = EdgeLengthMean.getInstance().values(graph.getVertices());
+//		TObjectDoubleHashMap<Vertex> edgeLengthMean = EdgeLengthMean.getInstance().values(graph.getVertices());
 
 		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 50, 200);
-		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(edgeLengthMean, accessValues,
-				discretizer);
+//		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(edgeLengthMean, accessValues,
+//				discretizer);
 		
-		try {
-			TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.txt");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		TObjectDoubleHashMap<Edge> lengths = new EdgeLength().values(graph.getEdges());
 		double[] xVals = new double[lengths.size() * 2];
@@ -93,10 +93,10 @@ public class EdgeLengthAccessibilityTask extends ModuleAnalyzerTask<Accessibilit
 			k++;
 		}
 		
-		correl = Correlations.mean(xVals, yVals, discretizer);
+		TDoubleDoubleHashMap correl = Correlations.mean(xVals, yVals, discretizer);
 		
 		try {
-			TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A2.txt");
+			TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

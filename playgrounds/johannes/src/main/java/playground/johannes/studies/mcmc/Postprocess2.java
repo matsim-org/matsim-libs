@@ -20,10 +20,15 @@
 package playground.johannes.studies.mcmc;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TDoubleObjectIterator;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.contrib.sna.util.TXTWriter;
@@ -34,21 +39,25 @@ import org.matsim.core.config.MatsimConfigReader;
  * @author illenberger
  *
  */
-public class Postprocess {
+public class Postprocess2 {
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run317/";
-		String statsPath = "10000000000/social/statistics.txt";
-		String key = "r_age";
-//		String key = "r_gender";
-		String thetaKey = "theta_age";
-//		String thetaKey = "theta_gender";
+		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run318/";
+		String statsPath = "1000000000/topo/statistics.txt";
+//		String key = "r_age";
+		String key1 = "c_global";
+		String key2 = "n_vertex";
 		
-		TDoubleDoubleHashMap values = new TDoubleDoubleHashMap();
+//		String thetaKey = "theta_age";
+		String thetaKey = "theta_distance";
+		
+//		TDoubleObjectHashMap<TDoubleDoubleHashMap> table = new TDoubleObjectHashMap<TDoubleDoubleHashMap>();
+//		TDoubleDoubleHashMap values = new TDoubleDoubleHashMap();
+		KeyMatrix<Double> matrix = new KeyMatrix<Double>();
 		
 		Config config = new Config();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
@@ -62,12 +71,15 @@ public class Postprocess {
 				 * read value
 				 */
 				BufferedReader reader = new BufferedReader(new FileReader(statsFile));
-				double val = Double.NaN;
+				double val1 = Double.NaN;
+				double val2 = Double.NaN;
 				String line = null;
 				while((line = reader.readLine()) != null) {
 					String tokens[] = line.split("\t");
-					if(tokens[0].equals(key)) {
-						val = Double.parseDouble(tokens[1]);
+					if(tokens[0].equals(key1)) {
+						val1 = Double.parseDouble(tokens[1]);
+					} else if(tokens[0].equals(key2)) {
+						val2 = Double.parseDouble(tokens[1]);
 					}
 				}
 				/*
@@ -75,14 +87,16 @@ public class Postprocess {
 				 */		
 				configReader.readFile(String.format("%1$s/output/%2$s/config.xml", rootDir, runDir));
 				double theta = Double.parseDouble(config.getParam("ergm", thetaKey));
-				
-				values.put(theta, val);
+				/*
+				 * 
+				 */
+				matrix.putValue(val1, -theta, val2);
 			} else {
 				System.err.println(String.format("No stats file: %1$s", statsFileName));
 			}
 		}
 		
-		TXTWriter.writeMap(values, "theta", "value", String.format("%1$s/analysis/%2$s.txt", rootDir, key));
+		matrix.write(String.format("%1$s/output/c_global.txt", rootDir));
 	}
 
 }

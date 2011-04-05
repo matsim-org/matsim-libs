@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.snowball2.sim;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -92,6 +93,9 @@ public class ConnectionSampleAnalyzer extends SampleAnalyzer {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					
+					File file = makeDirectories(String.format("%1$s/connect.%2$s", getRootDirectory(), count));
+					analyze(sampler.getSampledGraph(), file.getAbsolutePath());
 				}
 			}
 		}

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
@@ -47,7 +48,7 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 	}
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if (getOutputDirectory() != null) {
 			SampledGraph sampledGraph = (SampledGraph) graph;
 			List<?> partitions = SnowballPartitions.createSampledPartitions(sampledGraph.getVertices());

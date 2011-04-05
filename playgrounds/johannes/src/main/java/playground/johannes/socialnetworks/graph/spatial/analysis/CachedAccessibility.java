@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EdgeCosts.java
+ * CachedAccessibility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,52 +19,36 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.util.HashSet;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.spatial.generators.EdgeCostFunction;
+import playground.johannes.socialnetworks.graph.analysis.CachedVertexProperty;
 
 /**
  * @author illenberger
  *
  */
-public class EdgeCosts {
+public class CachedAccessibility extends Accessibility {
 
-	private EdgeCostFunction costFunction;
+	private CachedVertexProperty cache;
 	
-	public EdgeCosts(EdgeCostFunction costFunction) {
-		this.costFunction = costFunction;
+	public CachedAccessibility(Accessibility accessibility) {
+		super(null);
+		cache = new CachedVertexProperty(accessibility);
 	}
-	
-	public Distribution distribution(Set<? extends SpatialVertex> vertices) {
-		Distribution distribution = new Distribution();
-		
-		Set<SpatialEdge> touched = new HashSet<SpatialEdge>();
-		for(SpatialVertex v : vertices) {
-			for(int i = 0; i < v.getEdges().size(); i++) {
-				if(touched.add(v.getEdges().get(i)))
-					distribution.add(costFunction.edgeCost(v, v.getNeighbours().get(i)));
-			}
-		}
-		
-		return distribution;
+
+	@Override
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
+		return cache.values(vertices);
 	}
-	
-	public Distribution vertexCostsSum(Set<? extends SpatialVertex> vertices) {
-		Distribution distr = new Distribution();
-		for(SpatialVertex vertex : vertices) {
-			double sum = 0;
-			for(SpatialVertex neighbor : vertex.getNeighbours()) {
-				sum += costFunction.edgeCost(vertex, neighbor);
-			}
-			
-			distr.add(sum);
-		}
-		
-		return distr;
+
+	@Override
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
+		return cache.statistics(vertices);
 	}
+
 }

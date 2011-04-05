@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.analysis.Components;
@@ -39,7 +40,7 @@ import org.matsim.contrib.sna.util.TXTWriter;
 public class ComponentsSeedTask extends AnalyzerTask {
 
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if (outputDirectoryNotNull()) {
 			List<Set<SampledVertex>> comps = new Components().components(graph);
 			TDoubleDoubleHashMap map = new TDoubleDoubleHashMap();

@@ -41,13 +41,9 @@ public class EdgeLengthSumTask extends ModuleAnalyzerTask<AbstractSpatialPropert
 		setModule(module);
 		setKey("d_sum");
 	}
-	
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-	}
 
 	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics stats = module.statistics(graph.getVertices());
 		statsMap.put(key, stats);
 		printStats(stats, key);

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
@@ -48,11 +49,8 @@ import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColor
  */
 public class AgeHomophilyTask extends AnalyzerTask {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.sna.graph.analysis.AnalyzerTask#analyze(org.matsim.contrib.sna.graph.Graph, java.util.Map)
-	 */
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		SocialGraph graph = (SocialGraph) g;
 		
 		final TObjectDoubleHashMap<SocialVertex> values = new TObjectDoubleHashMap<SocialVertex>();

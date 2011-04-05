@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
@@ -63,7 +64,7 @@ public class NormConstAcceptPropConstTask extends ModuleAnalyzerTask<Accessibili
 	}
 	
 	@Override
-	public void analyze(Graph g, Map<String, Double> stats) {
+	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
 		if(outputDirectoryNotNull()) {
 			SpatialGraph graph = (SpatialGraph) g;
 			Accessibility norm = new Accessibility(new GravityCostFunction(1.6, 0));

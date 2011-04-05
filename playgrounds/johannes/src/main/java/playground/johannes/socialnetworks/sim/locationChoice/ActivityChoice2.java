@@ -56,9 +56,9 @@ public class ActivityChoice2 implements PlanStrategyModule {
 	
 	private final ActivityMover mover;
 //	
-//	private DescriptiveStatistics dists;
+	private DescriptiveStatistics dists;
 //	
-//	private DistanceCalculator distCalc = new CartesianDistanceCalculator();
+	private DistanceCalculator distCalc = new CartesianDistanceCalculator();
 	
 	public ActivityChoice2(SocialGraph graph, ActivityMover mover, Random random) {
 		vertexMapping = new HashMap<Person, SocialVertex>(graph.getVertices().size());
@@ -72,7 +72,7 @@ public class ActivityChoice2 implements PlanStrategyModule {
 	
 	@Override
 	public void prepareReplanning() {
-//		dists = new DescriptiveStatistics();
+		dists = new DescriptiveStatistics();
 	}
 
 	@Override
@@ -103,20 +103,20 @@ public class ActivityChoice2 implements PlanStrategyModule {
 			 */
 			mover.moveActivity(plan, idx, link);
 
-//			double d = distCalc.distance(v_i.getPoint(), v_j.getPoint());
-//			dists.addValue(d);
+			double d = distCalc.distance(v_i.getPoint(), v_j.getPoint());
+			dists.addValue(d);
 		}
 	}
 
 	@Override
 	public void finishReplanning() {
-//		TDoubleDoubleHashMap hist = Histogram.createHistogram(dists, FixedSampleSizeDiscretizer.create(dists.getValues(), 1, 50), true);
-//		try {
-//			TXTWriter.writeMap(hist, "d", "p", "/Users/jillenberger/Work/socialnets/locationChoice/output/choice.txt");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(dists, FixedSampleSizeDiscretizer.create(dists.getValues(), 1, 50), true);
+		try {
+			TXTWriter.writeMap(hist, "d", "p", "/Users/jillenberger/Work/socialnets/locationChoice/output/choice.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

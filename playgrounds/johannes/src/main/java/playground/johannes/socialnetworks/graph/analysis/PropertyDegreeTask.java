@@ -40,7 +40,7 @@ import org.matsim.contrib.sna.util.TXTWriter;
 public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 	
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		if (outputDirectoryNotNull()) {
 			try {
 				TDoubleDoubleHashMap map = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
