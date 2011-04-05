@@ -69,21 +69,21 @@ public abstract class AnalyzerTask {
 		return output;
 	}
 
-	/**
-	 * Performs specific analysis on a graph and returns the results stored in a
-	 * map, where the key denotes the indicator (e.g. "k_mean") and the value
-	 * the numerical value of the indicator.
-	 * 
-	 * @param graph
-	 *            a graph
-	 * @param stats
-	 *            a map where the results of the analysis are stored.
-	 */
-	abstract public void analyze(Graph graph, Map<String, Double> stats);
+//	/**
+//	 * Performs specific analysis on a graph and returns the results stored in a
+//	 * map, where the key denotes the indicator (e.g. "k_mean") and the value
+//	 * the numerical value of the indicator.
+//	 * 
+//	 * @param graph
+//	 *            a graph
+//	 * @param stats
+//	 *            a map where the results of the analysis are stored.
+//	 */
+//	public void analyze(Graph graph, Map<String, Double> stats) {
+//	
+//	}
 	
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		
-	}
+	public abstract void analyze(Graph graph, Map<String, DescriptiveStatistics> results);
 
 	protected void printStats(DescriptiveStatistics stats, String key) {
 		logger.info(String.format("Statistics for property %1$s:\n\tmean = %2$.4f, min = %3$.4f, max = %4$.4f, N = %5$s, Var = %6$.4f", 
@@ -157,5 +157,11 @@ public abstract class AnalyzerTask {
 			logger.warn("No output directory specified.");
 			return false;
 		}
+	}
+	
+	protected void addSingleValue(String key, double value, Map<String, DescriptiveStatistics> stats) {
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		ds.addValue(value);
+		stats.put(key, ds);
 	}
 }

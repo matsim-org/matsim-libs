@@ -109,8 +109,8 @@ public abstract class SampleAnalyzer implements SamplerListener {
 				/*
 				 * Analyze.
 				 */
-				Map<String, Double> stats = GraphAnalyzer.analyze(graph, task.getValue());
-				GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
+				GraphAnalyzer.analyze(graph, task.getValue(), file.getAbsolutePath());
+//				GraphAnalyzer.writeStats(stats, file.getAbsolutePath() + "/stats.txt");
 			}
 			
 			Logger.getRootLogger().setLevel(level);

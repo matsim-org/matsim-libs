@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph.analysis;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -38,6 +37,8 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 
 	public static final Logger logger = Logger.getLogger(TransitivityTask.class);
 
+	public static final String KEY = "c";
+	
 	public static final String MEAN_LOCAL_CLUSTERING = "c_local_mean";
 
 	public static final String MIN_LOCAL_CLUSTERING = "c_local_min";
@@ -51,7 +52,7 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	 * used for analysis.
 	 */
 	public TransitivityTask() {
-		setKey("c");
+		setKey(KEY);
 		setModule(Transitivity.getInstance());
 	}
 
@@ -67,35 +68,35 @@ public class TransitivityTask extends ModuleAnalyzerTask<Transitivity> {
 	 * @param stats
 	 *            a map where the results of the analysis are stored.
 	 */
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-		DescriptiveStatistics distr = module.localClusteringDistribution(graph.getVertices());
-		double c_mean = distr.getMean();
-		double c_max = distr.getMax();
-		double c_min = distr.getMin();
-		stats.put(MEAN_LOCAL_CLUSTERING, c_mean);
-		stats.put(MAX_LOCAL_CLUSTERING, c_max);
-		stats.put(MIN_LOCAL_CLUSTERING, c_min);
+//	@Override
+//	public void analyze(Graph graph, Map<String, Double> stats) {
+//		DescriptiveStatistics distr = module.localClusteringDistribution(graph.getVertices());
+//		double c_mean = distr.getMean();
+//		double c_max = distr.getMax();
+//		double c_min = distr.getMin();
+//		stats.put(MEAN_LOCAL_CLUSTERING, c_mean);
+//		stats.put(MAX_LOCAL_CLUSTERING, c_max);
+//		stats.put(MIN_LOCAL_CLUSTERING, c_min);
+//
+//		double c_global = module.globalClusteringCoefficient(graph);
+//		stats.put(GLOBAL_CLUSTERING_COEFFICIENT, c_global);
+//
+//		logger.info(String.format(
+//				"c_local_mean = %1$.4f, c_local_max = %2$.4f, c_local_min = %3$.4f, c_global = %4$.4f.", c_mean, c_max,
+//				c_min, c_global));
+//
+//		if (getOutputDirectory() != null) {
+//			try {
+//				writeHistograms(distr, new LinearDiscretizer(0.05), "c_local", false);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
-		double c_global = module.globalClusteringCoefficient(graph);
-		stats.put(GLOBAL_CLUSTERING_COEFFICIENT, c_global);
-
-		logger.info(String.format(
-				"c_local_mean = %1$.4f, c_local_max = %2$.4f, c_local_min = %3$.4f, c_global = %4$.4f.", c_mean, c_max,
-				c_min, c_global));
-
-		if (getOutputDirectory() != null) {
-			try {
-				writeHistograms(distr, new LinearDiscretizer(0.05), "c_local", false);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		String subKey = key + "_local";
 		
 		DescriptiveStatistics stats = module.statistics(graph.getVertices());

@@ -47,15 +47,15 @@ public class GraphAnalyzer {
 	 *            an analyzer task.
 	 * @return the results of the analyzer.
 	 */
-	public static Map<String, Double> analyze(Graph graph, AnalyzerTask task) {
-		Map<String, Double> stats = new LinkedHashMap<String, Double>();
-		task.analyze(graph, stats);
-		return stats;
-	}
+//	public static Map<String, Double> analyze(Graph graph, AnalyzerTask task) {
+//		Map<String, Double> stats = new LinkedHashMap<String, Double>();
+//		task.analyze(graph, stats);
+//		return stats;
+//	}
 
-	public static Map<String, DescriptiveStatistics> analyzeStats(Graph graph, AnalyzerTask task) {
+	public static Map<String, DescriptiveStatistics> analyze(Graph graph, AnalyzerTask task) {
 		Map<String, DescriptiveStatistics> statsMap = new LinkedHashMap<String, DescriptiveStatistics>();
-		task.analyzeStats(graph, statsMap);
+		task.analyze(graph, statsMap);
 		return statsMap;
 	}
 	/**
@@ -74,10 +74,10 @@ public class GraphAnalyzer {
 	 */
 	public static void analyze(Graph graph, AnalyzerTask task, String output) throws IOException {
 		task.setOutputDirectoy(output);
-		Map<String, Double> stats = analyze(graph, task);
-		writeStats(stats, String.format("%1$s/summary.txt", output));
+//		Map<String, Double> stats = analyze(graph, task);
+//		writeStats(stats, String.format("%1$s/summary.txt", output));
 		
-		Map<String, DescriptiveStatistics> statsMap = analyzeStats(graph, task);
+		Map<String, DescriptiveStatistics> statsMap = analyze(graph, task);
 		writeStatistics(statsMap, String.format("%1$s/statistics.txt", output));
 	}
 

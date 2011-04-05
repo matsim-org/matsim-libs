@@ -46,17 +46,17 @@ public class GraphSizeTask extends AnalyzerTask {
 	 * @param stats
 	 *            a map where the results of the analysis are stored.
 	 */
-	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
-//		int n_vertex = graph.getVertices().size();
-//		int n_edge = graph.getEdges().size();
-//		stats.put(NUM_VERTICES, new Double(n_vertex));
-//		stats.put(NUM_EDGES, new Double(n_edge));
-//		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
-	}
+//	@Override
+//	public void analyze(Graph graph, Map<String, Double> stats) {
+////		int n_vertex = graph.getVertices().size();
+////		int n_edge = graph.getEdges().size();
+////		stats.put(NUM_VERTICES, new Double(n_vertex));
+////		stats.put(NUM_EDGES, new Double(n_edge));
+////		logger.info(String.format("%1$s = %2$s, %3$s = %4$s", NUM_VERTICES, n_vertex, NUM_EDGES, n_edge));
+//	}
 
 	@Override
-	public void analyzeStats(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		stats.addValue(graph.getVertices().size());
 		statsMap.put(NUM_VERTICES, stats);

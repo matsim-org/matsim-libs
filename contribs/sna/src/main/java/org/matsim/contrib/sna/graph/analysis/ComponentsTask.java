@@ -60,10 +60,10 @@ public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 	 *            a map where the results of the analysis are stored.
 	 */
 	@Override
-	public void analyze(Graph graph, Map<String, Double> stats) {
+	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics distr = module.distribution(graph);
 		double numComponents = distr.getN();
-		stats.put(NUM_COMPONENTS, new Double(numComponents));
+		addSingleValue(NUM_COMPONENTS, numComponents, statsMap);
 
 		logger.info(String.format("%1$s disconnected components.", numComponents));
 		
