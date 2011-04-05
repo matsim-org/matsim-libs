@@ -73,6 +73,10 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 					} else {
 						throw new IllegalStateException("should not happen") ;
 					}
+					
+					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+						act.setStartTime(Time.UNDEFINED_TIME) ;
+					}
 
 					
 					
