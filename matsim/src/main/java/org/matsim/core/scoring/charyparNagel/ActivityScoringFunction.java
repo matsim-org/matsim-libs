@@ -105,7 +105,8 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
+			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
+					"(module name=\"planCalcScore\" in the config file).");
 		}
 
 		double tmpScore = 0.0;
@@ -209,7 +210,8 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
+			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
+					"(module name=\"planCalcScore\" in the config file).");
 		}
 
 		double openingTime = actParams.getOpeningTime();
