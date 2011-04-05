@@ -35,7 +35,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 public class RunMunich {
 	
 	static String configFile = "../../detailedEval/testRuns/input/config.xml";
-	static String zone30Shape = "../../detailedEval/policies/zone30.shp";
+	static String zone30Shape = "../../detailedEval/policies/mobilTUM/zone30.shp";
 	static boolean considerZone30 = true;
 	
 

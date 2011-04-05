@@ -36,7 +36,7 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 public class NetworkMatsim2Shape {
 	
 	private static String filePath = "../../detailedEval/Net/";
-	private static String networkName = "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes";
+	private static String networkName = "network-86-85-87-84_simplified---withLanes";
 //	private static String networkName = "../policies/network-86-85-87-84_simplified---withLanes_zone30";
 	private static String inFileType = ".xml";
 //	private static String inFileType = ".xml.gz";

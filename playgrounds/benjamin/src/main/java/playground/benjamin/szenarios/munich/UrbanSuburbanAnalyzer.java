@@ -60,7 +60,7 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run24/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run30/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	
 	private static String netFile = runDirectory + "output_network.xml.gz";
