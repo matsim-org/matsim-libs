@@ -109,8 +109,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	private IdLeg createId() {
-		currentLegId++;
-		return new IdLeg(currentLegId);
+		return new IdLeg(currentLegId++);
 	}
 
 	/*
