@@ -110,6 +110,9 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 * Add this as a ControllerListener
 		 */
 		controller.addControlerListener(this);
+		// yyyy this is aside effect.  Is this what we want?
+		// It seems to me that we had agreed to avoid side effects.  kai, apr'11
+
 	}
 
 	private void setControllerParameters(Controler controller) {

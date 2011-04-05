@@ -56,6 +56,8 @@ public class TutorialWithinDayController {
 			 * Configure Controller for usage with WithinDay modules.
 			 */
 			new WithinDayControllerListener(controller);
+			// yyyy this will register the listener with the control(l)er as a side effect.  Is this what we want?
+			// It seems to me that we had agreed to avoid side effects.  kai, apr'11
 			
 			controller.run();
 		}
