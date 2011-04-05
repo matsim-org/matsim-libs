@@ -44,7 +44,7 @@ import org.matsim.core.utils.io.IOUtils;
  * - link "length" (column # 3) is in arbitrary units, connected to rest of system only through freespeed value
  * - Column # 8-10 are user-defined BUT contain freespeed, capacity, ... in arbitrary order and units
  *   (connected to rest of system through user-defined volume-delay functions)
- * <p/>
+ * <p/>vadocva
  * Keyword(s): emme/2
  * 
  * @author nagel
