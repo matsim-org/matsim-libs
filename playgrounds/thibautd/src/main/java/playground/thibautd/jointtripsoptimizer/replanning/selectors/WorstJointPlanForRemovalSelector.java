@@ -20,11 +20,9 @@
 package playground.thibautd.jointtripsoptimizer.replanning.selectors;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;

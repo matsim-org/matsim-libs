@@ -53,7 +53,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	private Person person;
 	//is set only if the trip is joint
-	private JointLeg associatedIndividualLeg = null;
+	// private JointLeg associatedIndividualLeg = null;
 	
 	/*
 	 * =========================================================================
@@ -105,7 +105,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	private void constructFromJointLeg(JointLeg leg) {
 		this.linkedLegsIds.addAll(leg.getLinkedElementsIds());
 		this.isDriver = leg.getIsDriver();
-		this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
+		//this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
 		this.person = leg.getPerson();
 	}
 
@@ -233,21 +233,21 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * =========================================================================
 	 */
 
-	/**
-	 * For shared rides, returns a default individual leg.
-	 * Used in the optimisation, to allow quick affectation/desaffectation of
-	 * shared rides.
-	 * All trips associated to a shared ride (Act-PU, PU-DO, DO-Act) should return
-	 * the same leg.
-	 * @todo: make compatible with sequence optimisation
-	 */
-	public JointLeg getAssociatedIndividualLeg() {
-		return this.associatedIndividualLeg;
-	}
+	///**
+	// * For shared rides, returns a default individual leg.
+	// * Used in the optimisation, to allow quick affectation/desaffectation of
+	// * shared rides.
+	// * All trips associated to a shared ride (Act-PU, PU-DO, DO-Act) should return
+	// * the same leg.
+	// * @todo: make compatible with sequence optimisation
+	// */
+	//public JointLeg getAssociatedIndividualLeg() {
+	//	return this.associatedIndividualLeg;
+	//}
 
-	public void setAssociatedIndividualLeg(JointLeg leg) {
-		this.associatedIndividualLeg = leg;
-	}
+	//public void setAssociatedIndividualLeg(JointLeg leg) {
+	//	this.associatedIndividualLeg = leg;
+	//}
 
 	public boolean getIsDriver() {
 		return this.isDriver;

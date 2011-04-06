@@ -136,11 +136,11 @@ public class JointPlan implements Plan {
 			for (JointLeg leg : legsToLink) {
 				if (leg.getMode().equals(TransportMode.car)) {
 					leg.setIsDriver(true);
-					leg.setAssociatedIndividualLeg(
-							new JointLeg(leg.getMode(), leg.getPerson()));
-				} else {
-					leg.setAssociatedIndividualLeg(
-							new JointLeg(TransportMode.pt, leg.getPerson()));
+				//	leg.setAssociatedIndividualLeg(
+				//			new JointLeg(leg.getMode(), leg.getPerson()));
+				//} else {
+				//	leg.setAssociatedIndividualLeg(
+				//			new JointLeg(TransportMode.pt, leg.getPerson()));
 				}
 				for (JointLeg linkedLeg : legsToLink) {
 					if (leg != linkedLeg) {
