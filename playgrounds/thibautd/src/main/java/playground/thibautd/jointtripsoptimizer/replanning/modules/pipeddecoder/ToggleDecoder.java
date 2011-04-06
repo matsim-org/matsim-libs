@@ -62,7 +62,6 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	private static final Logger log =
 		Logger.getLogger(ToggleDecoder.class);
 
-
 	private static String DEFAULT_REMP_MODE = TransportMode.pt;
 
 	private final JointPlan plan;
@@ -180,6 +179,9 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		}
 	}
 
+	/**
+	 * checks if a leg is an access leg to a passenger ride.
+	 */
 	private boolean isAccessLeg(
 			final PlanElement currentPlanElement,
 			final List<PlanElement> currentPlanElements,
@@ -199,6 +201,9 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		return ((JointLeg) pe).getMode().equals(JointActingTypes.PASSENGER);
 	}
 
+	/**
+	 * checks if a leg is an egress leg from a passenger ride.
+	 */
 	private boolean isEgressLeg(
 			final PlanElement currentPlanElement,
 			final List<PlanElement> currentPlanElements,
@@ -235,8 +240,9 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 			throw new IllegalArgumentException("the toggle decoder must be run first");
 		}
 
-		JointPlan outputPlan = createCoherentPlan(decodeToggle(chromosome));
-		return outputPlan;
+		//JointPlan outputPlan = createCoherentPlan(decodeToggle(chromosome));
+		//return outputPlan;
+		return createCoherentPlan(decodeToggle(chromosome));
 	}
 
 	/**
@@ -436,11 +442,22 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		int index;
 		PlanElement pickUp;
 
+		//is it useful for this leg?
+		index = this.plan.getPlanElements().indexOf(leg);
+		pickUp = this.plan.getPlanElements().get(index - 1);
+		if ((!leg.getIsDriver()) &&
+					(pickUp == this.sharedRideOD.get(leg).getFirst())) {
+			// the individual to which this PU is useful travels
+			return true;
+		}
+
+		//The PU does not correspond to this leg. Perhaps another planned leg?
 		for (JointLeg linkedLeg : leg.getLinkedElements().values()) {
 			if (plannedSharedLegs.contains(linkedLeg)) {
 				index = this.plan.getPlanElements().indexOf(linkedLeg);
 				pickUp = this.plan.getPlanElements().get(index - 1);
-				if (pickUp == this.sharedRideOD.get(linkedLeg).getFirst()) {
+				if ((!linkedLeg.getIsDriver()) &&
+							(pickUp == this.sharedRideOD.get(linkedLeg).getFirst())) {
 					// the individual to which this PU is useful travels
 					return true;
 				}
@@ -457,11 +474,21 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		int index;
 		PlanElement dropOff;
 
+		//is it useful for this leg?
+		index = this.plan.getPlanElements().indexOf(leg);
+		dropOff = this.plan.getPlanElements().get(index + 1);
+		if ((!leg.getIsDriver()) &&
+				(dropOff == this.sharedRideOD.get(leg).getSecond())) {
+			return true;
+		}
+
+		//The DO does not correspond to this leg. Perhaps another planned leg?
 		for (JointLeg linkedLeg : leg.getLinkedElements().values()) {
 			if (plannedSharedLegs.contains(linkedLeg)) {
 				index = this.plan.getPlanElements().indexOf(linkedLeg);
 				dropOff = this.plan.getPlanElements().get(index + 1);
-				if (dropOff == this.sharedRideOD.get(linkedLeg).getSecond()) {
+				if ((!linkedLeg.getIsDriver()) &&
+						(dropOff == this.sharedRideOD.get(linkedLeg).getSecond())) {
 					// the individual to which this DO is useful travels
 					return true;
 				}

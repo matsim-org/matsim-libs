@@ -94,6 +94,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		this.legId = jointLeg.getId();
 		constructFromJointLeg(jointLeg);
 	}
+
 	//TODO
 	/**
 	 * Creates a shared JointLeg and sets the "replacement" individual leg.
