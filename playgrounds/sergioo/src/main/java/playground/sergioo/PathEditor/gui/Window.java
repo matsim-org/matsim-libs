@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -63,10 +64,11 @@ public class Window extends JFrame implements ActionListener {
 		}
 	}
 	public enum Tool {
-		ADD("Add",0,0,4,1,"add"),
-		REMOVE("Remove",0,1,4,1,"remove"),
-		ROUTE("Route",4,0,2,2,"route"),
-		UNDO("Undo",6,0,2,2,"undo"),
+		ADD("Add",0,0,2,1,"add"),
+		REMOVE("Remove",0,1,2,1,"remove"),
+		REMOVE_FROM("Remove From",2,0,2,1,"removeFrom"),
+		REMOVE_TO("Remove To",2,1,2,1,"removeTo"),
+		ROUTE("Route",4,0,4,2,"route"),
 		INCREASE_DISTANCE("+Distance",8,0,2,1,"incDistance"),
 		DECREASE_DISTANCE("-Distance",8,1,2,1,"decDistance"),
 		INCREASE_NUM_CANDIDATES("+Candidates",10,0,2,1,"incCandidates"),
@@ -92,8 +94,8 @@ public class Window extends JFrame implements ActionListener {
 	//Constants
 	private static int GAPX = 50;
 	private static int GAPY = 120;
-	public static int MAX_WIDTH = 1280-GAPX;
-	public static int MAX_HEIGHT = 800-GAPY;
+	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
+	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().width-GAPY;
 	public static int FRAMESIZE = 50;
 	
 	//Attributes
@@ -261,6 +263,16 @@ public class Window extends JFrame implements ActionListener {
 			routePath.removeLink(selectedLinkIndex);
 		if(selectedLinkIndex==routePath.links.size())
 			selectedLinkIndex = -1;
+	}
+	public void removeFrom() {
+		if(selectedLinkIndex!=-1)
+			routePath.removeLinksFrom(selectedLinkIndex);
+		selectedLinkIndex = -1;
+	}
+	public void removeTo() {
+		if(selectedLinkIndex!=-1)
+			routePath.removeLinksTo(selectedLinkIndex);
+		selectedLinkIndex = -1;
 	}
 	public void route() {
 		if(selectedLinkIndex!=-1)

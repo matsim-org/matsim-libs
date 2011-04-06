@@ -166,7 +166,20 @@ public class RoutePath {
 		}	
 	}
 	public void addShortestPath(int indexI) {
-		//TODO
+		if(indexI<links.size()-1) {
+			TravelTime timeFunction = new TravelTime() {	
+				public double getLinkTravelTime(Link link, double time) {
+					return link.getLength()/link.getFreespeed();
+				}
+			};
+			LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
+			Path path = leastCostPathCalculator.calcLeastCostPath(links.get(indexI).getToNode(), links.get(indexI+1).getFromNode(), 0);
+			int i=1;
+			for(Link link:path.links) {
+				links.add(indexI+i,link);
+				i++;
+			}
+		}
 	}
 	public void calculatePath() {
 		links.clear();
