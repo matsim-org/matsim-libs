@@ -108,7 +108,6 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			i = j;
 		}
 		this.score += lineSwitchCnt * this.utilityOfLineSwitch;
-		log.debug("pid="+this.plan.getPerson().getId().toString()+": lineSwitchCnt="+lineSwitchCnt+"; "+(lineSwitchCnt * this.utilityOfLineSwitch)+" added to plan score.");
 	}
 
 	@Override
