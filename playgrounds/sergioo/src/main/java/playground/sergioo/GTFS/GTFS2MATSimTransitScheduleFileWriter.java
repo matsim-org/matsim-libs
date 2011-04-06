@@ -600,9 +600,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 					for(Trip trip:route.getTrips().values())
 						addNewLinksSequence(trip, true, route.getRouteType(), r);
 				else
-					for(Entry<String,Trip> trip:route.getTrips().entrySet()) {
+					for(Entry<String,Trip> trip:route.getTrips().entrySet())
 						calculateBusLinksSequence(trip, false, route, r);
-					}
 		}
 	}
 	/**
@@ -762,6 +761,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				link.setAllowedModes(modes);
 			}
 			tripEntry.getValue().setRoute(links);
+			System.out.println("Finished "+tripEntry.getKey());
 		}	
 	}
 	@Override

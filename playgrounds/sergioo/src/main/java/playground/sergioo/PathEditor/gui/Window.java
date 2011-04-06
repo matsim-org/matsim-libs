@@ -318,7 +318,6 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void save() {
 		finish  = true;
-		
 		this.setVisible(false);
 	}
 	public Collection<Coord> getPoints() {
