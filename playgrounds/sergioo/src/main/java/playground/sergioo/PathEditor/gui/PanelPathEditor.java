@@ -26,6 +26,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -39,7 +41,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.PathEditor.gui.Window.Option;
 
-public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener {
+public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	/**
 	 * 
 	 */
@@ -50,18 +52,18 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Window window;
 	private Color backgroundColor = Color.WHITE;
 	private Color pointsColor = Color.BLUE;
-	private Color pointsColor2 = Color.GREEN;
+	private Color pointsColor2 = Color.BLACK;
 	private Color linesColor = Color.GRAY;
+	private Color linesColor2 = Color.ORANGE;
 	private Color selectedColor = Color.RED;
 	private int pointsSize = 1;
 	private Stroke pointsStroke = new BasicStroke(1);
 	private Stroke linesStroke = new BasicStroke(1);
 	private Stroke selectedStroke = new BasicStroke(2);
 	private boolean wait;
-
 	private int iniX;
-
 	private int iniY;
+	private boolean withStops = false;
 	
 	//Methods
 	public PanelPathEditor(Window window) {
@@ -71,6 +73,8 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		calculateBoundaries();
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addKeyListener(this);
+		setFocusable(true);
 	}
 	private void calculateBoundaries() {
 		double xMin=Double.POSITIVE_INFINITY, yMin=Double.POSITIVE_INFINITY, xMax=Double.NEGATIVE_INFINITY, yMax=Double.NEGATIVE_INFINITY;
@@ -101,10 +105,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())+pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())-pointsSize);
 			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())-pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())+pointsSize);
 		}
-		g2.setColor(pointsColor2);
-		for(Coord point:window.getStopPoints()) {
-			g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
-			g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
+		if(withStops) {
+			g2.setColor(pointsColor2);
+			for(Coord point:window.getStopPoints()) {
+				g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
+				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
+			}
 		}
 	}
 	private void paintLines(Graphics2D g2) {
@@ -115,6 +121,15 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 					camera.getIntY(link.getFromNode().getCoord().getY()),
 					camera.getIntX(link.getToNode().getCoord().getX()),
 					camera.getIntY(link.getToNode().getCoord().getY()));
+		if(withStops) {
+			g2.setColor(linesColor2);
+			g2.setStroke(selectedStroke);
+			for(Link link:window.getStopLinks())
+				g2.drawLine(camera.getIntX(link.getFromNode().getCoord().getX()),
+						camera.getIntY(link.getFromNode().getCoord().getY()),
+						camera.getIntX(link.getToNode().getCoord().getX()),
+						camera.getIntY(link.getToNode().getCoord().getY()));
+		}
 	}
 	private void paintSelected(Graphics2D g2) {
 		g2.setColor(selectedColor);
@@ -128,21 +143,33 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			Shape circle = new Ellipse2D.Double(camera.getIntX(link.getToNode().getCoord().getX())-pointsSize*3,camera.getIntY(link.getToNode().getCoord().getY())-pointsSize*3,pointsSize*6,pointsSize*6);
 			g2.fill(circle);
 		}
+		if(withStops) {		
+			Coord stop=window.getSelectedStop();
+			if(stop!=null) {
+				g2.drawLine(camera.getIntX(stop.getX())-2*pointsSize, camera.getIntY(stop.getY()), camera.getIntX(stop.getX())+2*pointsSize, camera.getIntY(stop.getY()));
+				g2.drawLine(camera.getIntX(stop.getX()), camera.getIntY(stop.getY())-2*pointsSize, camera.getIntX(stop.getX()), camera.getIntY(stop.getY())+2*pointsSize);
+			}
+		}
 	}
 	public void waitSecondCoord() {
 		wait = true;
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		this.requestFocus();
 		if(wait) {
 			window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
 			wait=false;
 		}
 		else {
-			if(window.getOption().equals(Option.SELECT) && e.getButton()==MouseEvent.BUTTON1)
+			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
 				window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.SELECT) && e.getButton()==MouseEvent.BUTTON3)
+			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
 				window.unselectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
+				window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
+				window.unselectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
 				camera.zoomIn(e.getX(), e.getY());
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
@@ -176,6 +203,29 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		
+	}
+	@Override
+	public void keyTyped(KeyEvent e) {
+		switch(e.getKeyChar()) {
+		case '+':
+			window.increaseSelectedLink();
+			break;
+		case '-':
+			window.decreaseSelectedLink();
+			break;
+		case 's':
+			withStops = !withStops;
+			break;
+		}
+		repaint();
+	}
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {
 		
 	}
 	

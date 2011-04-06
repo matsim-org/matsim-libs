@@ -2,6 +2,7 @@ package playground.sergioo.GTFS;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -27,11 +28,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -45,6 +43,11 @@ import playground.sergioo.PathEditor.gui.Window;
 
 public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter {
 	
+	//Constants
+	/**
+	 * Pre-processed information files
+	 */
+	private final static File[] PREFILES = {new File("./data/paths/fixedStops.txt"),new File("./data/paths/bases.txt"),new File("./data/paths/finishedTrips.txt")};
 	//Attributes
 	/**
 	 * The folder root of the GTFS files
@@ -78,6 +81,14 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * The time format 
 	 */
 	private SimpleDateFormat timeFormat;
+	/**
+	 * Paths that are bases for calculate others
+	 */
+	private Map<String, String[]> bases;
+	/**
+	 * Trips with established paths
+	 */
+	private Map<String, String[]> finishedTrips;
 	
 	//Methods
 	/**
@@ -492,10 +503,10 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	public void processTrip(String[] parts, int[] indices, int r) {
 		Route route = routes[r].get(parts[indices[0]]);
 		if(parts.length==5) {
-			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), shapes[r].get(parts[indices[3]])));
+			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), shapes[r].get(parts[indices[3]]),route));
 		}
 		else
-			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), null));
+			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), null, route));
 	}
 	public void processStopTime(String[] parts, int[] indices, int r) {
 		for(Route actualRoute:routes[r].values()) {
@@ -527,8 +538,9 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	}
 	/**
 	 * From the loaded information calculates all the necessary information for MATSim
+	 * @throws IOException 
 	 */
-	private void calculateUnknownInformation() {
+	private void calculateUnknownInformation() throws IOException {
 		//New Stops according to the modes
 		for(int r=0; r<roots.length; r++)
 			for(Route route:routes[r].values())
@@ -553,44 +565,46 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							stopTime.getValue().setStopId(newStopId);
 						}
 		//Links
-		TravelMinCost costFunction = new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return link.getLength();
+		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[1]));
+		String line = reader.readLine();
+		while(line!=null) {
+			String[] links = reader.readLine().split(";");
+			bases.put(line, links);
+			line = reader.readLine();
+		}
+		reader.close();
+		reader = new BufferedReader(new FileReader(PREFILES[2]));
+		line = reader.readLine();
+		while(line!=null) {
+			String[] links = reader.readLine().split(";");
+			finishedTrips.put(line, links);
+			line = reader.readLine();
+		}
+		reader.close();
+		for(int r=0; r<roots.length; r++) {
+			if(r==0) {
+				bases = new HashMap<String, String[]>();
+				finishedTrips = new HashMap<String, String[]>();
+				reader = new BufferedReader(new FileReader(PREFILES[0]));
+				line = reader.readLine();
+				while(line!=null) {
+					Stop stop = stops[r].get(line);
+					stop.setLinkId(reader.readLine());
+					stop.setFixedLinkId();
+					line = reader.readLine();
+				}
+				reader.close();
 			}
-			public double getLinkMinimumTravelCost(Link link) {
-				return link.getLength();
-			}
-		};
-		PreProcessEuclidean preProcessData = new PreProcessEuclidean(costFunction);
-		preProcessData.run(network);
-		for(int r=0; r<roots.length; r++)
 			for(Route route:routes[r].values())
 				if(!route.getRouteType().wayType.equals(Route.WayTypes.ROAD))
 					for(Trip trip:route.getTrips().values())
 						addNewLinksSequence(trip, true, route.getRouteType(), r);
 				else
 					for(Entry<String,Trip> trip:route.getTrips().entrySet()) {
-						calculateBusLinksSequence(trip.getValue(), false, route.getRouteType(), r, preProcessData);
-						System.out.println("ya! "+trip.getKey());
+						calculateBusLinksSequence(trip, false, route, r);
 					}
-		//Stops link references
-		for(int r=0; r<roots.length; r++)
-			for(Stop stop:stops[r].values())
-				stop.setLinkId(getNearestLinkMode(network,stop.getRouteType().name,(CoordImpl)stop.getPoint()).getId().toString());
-	}
-	private Link getNearestLinkMode(Network network2, String mode, CoordImpl point) {
-		double nearestDistance = Double.POSITIVE_INFINITY;
-		Link nearestLink = null;
-		for(Link link:network.getLinks().values()) {
-			double distance = ((LinkImpl)link).calcDistance(point);
-			if(link.getAllowedModes().contains(mode) && distance<nearestDistance) {
-				nearestDistance = distance;
-				nearestLink = link;
-			}
 		}
-		return nearestLink;
 	}
-
 	/**
 	 * Methods for write a new or calculated sequence of links for a trip
 	 * @param trip
@@ -680,8 +694,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			}
 		}
 	}
-	private void calculateBusLinksSequence(Trip trip, boolean withShape, Route.RouteTypes routeType, int r, PreProcessEuclidean preProcessData) {
-		Shape shape = trip.getShape();
+	private void calculateBusLinksSequence(Entry<String,Trip> tripEntry, boolean withShape, Route route, int r) throws IOException {
+		Shape shape = tripEntry.getValue().getShape();
 		if(withShape && shape!=null) {
 			/*SimpleMapMatcher simpleMapMatching = new SimpleMapMatcher(new ArrayList<Coord>(shape.getPoints().values()),network,"Car");
 			List<Link> links = simpleMapMatching.getBestRoute();
@@ -693,17 +707,61 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			}*/
 		}
 		else {
-			Window window = new Window(network,trip,stops[r]);
-			window.setVisible(true);
-			while(!window.isFinish());
-			List<Link> links = window.getLinks();
+			List<Link> links;
+			String[] linksS = finishedTrips.get(tripEntry.getKey());
+			if(linksS==null) {
+				Window window;
+				String baseId = route.getShortName()+(tripEntry.getKey().contains("_1")?"_1":"_2");
+				linksS = bases.get(baseId);
+				boolean withBase = false;
+				if(linksS==null)
+					window = new Window(network,tripEntry.getValue(),stops[r]);
+				else {
+					window = new Window(network,tripEntry.getValue(),stops[r],linksS);
+					withBase = true;
+				}
+				window.setVisible(true);
+				while(!window.isFinish());
+				links = window.getLinks();
+				PrintWriter writer = new PrintWriter(new FileWriter(PREFILES[0],true));
+				for(StopTime stopTime: tripEntry.getValue().getStopTimes().values()) {
+					Stop stop = stops[r].get(stopTime.getStopId());
+					if(!stop.isFixedLinkId()) {
+						stop.setFixedLinkId();
+						writer.println(stopTime.getStopId());
+						writer.println(stop.getLinkId());
+					}
+				}
+				writer.close();
+				if(!withBase) {
+					writer = new PrintWriter(new FileWriter(PREFILES[1],true));
+					writer.println(baseId);
+					String linksT = "";
+					for(Link link:links)
+						linksT+=link.getId()+";";
+					writer.println(linksT);
+					writer.close();
+				}
+				writer = new PrintWriter(new FileWriter(PREFILES[2],true));
+				writer.println(tripEntry.getKey());
+				String linksT = "";
+				for(Link link:links)
+					linksT+=link.getId()+";";
+				writer.println(linksT);
+				writer.close();
+				window.setVisible(false);
+			}
+			else {
+				links = new ArrayList<Link>();
+				for(String link:linksS)
+					links.add(network.getLinks().get(link));
+			}
 			for(Link link:links) {
 				Set<String> modes = new HashSet<String>(link.getAllowedModes());
-				modes.add(routeType.name);
+				modes.add(route.getRouteType().name);
 				link.setAllowedModes(modes);
 			}
-			trip.setRoute(links);
-			window.setVisible(false);
+			tripEntry.getValue().setRoute(links);
 		}	
 	}
 	@Override
@@ -771,7 +829,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							this.writeEndTag("routeProfile");
 							//Route
 							this.writeStartTag("route", new ArrayList<Tuple<String,String>>());
-							for(Link link:trip.getValue().getRoute()) {
+							for(Link link:trip.getValue().getLinks()) {
 								List<Tuple<String,String>> linkAtts = new ArrayList<Tuple<String,String>>();
 								linkAtts.add(new Tuple<String, String>("refId", link.getId().toString()));
 								this.writeStartTag("link", linkAtts, true);

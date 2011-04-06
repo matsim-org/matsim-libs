@@ -26,16 +26,16 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -47,15 +47,20 @@ import playground.sergioo.GTFS.Stop;
 import playground.sergioo.GTFS.Trip;
 import playground.sergioo.PathEditor.kernel.RoutePath;
 
-public class Window extends JFrame implements ActionListener, KeyListener {
+public class Window extends JFrame implements ActionListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	//Enumerations
 	public enum Option {
-		SELECT,
-		ZOOM;
+		SELECT_LINK("<html>S<br/>E<br/>L<br/>E<br/>C<br/>T<br/> <br/>L<br/>I<br/>N<br/>K</html>"),
+		SELECT_STOP("<html>S<br/>E<br/>L<br/>E<br/>C<br/>T<br/> <br/>S<br/>T<br/>O<br/>P</html>"),
+		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		public String caption;
+		private Option(String caption) {
+			this.caption = caption;
+		}
 	}
 	public enum Tool {
 		ADD("Add",0,0,4,1,"add"),
@@ -65,10 +70,12 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		INCREASE_DISTANCE("+Distance",8,0,2,1,"incDistance"),
 		DECREASE_DISTANCE("-Distance",8,1,2,1,"decDistance"),
 		INCREASE_NUM_CANDIDATES("+Candidates",10,0,2,1,"incCandidates"),
-		DECREASE_NUM_CANDIDATES("-Candidates",10,1,2,1,"decDistance"),
-		CALCULATE("Calculate!",12,0,4,2,"calculate"),
-		IS_OK("Is ok?",16,0,4,2,"isOk"),
-		SAVE("Save",20,0,4,2,"save");
+		DECREASE_NUM_CANDIDATES("-Candidates",10,1,2,1,"decCandidates"),
+		ADD_LINK_STOP("Add link to stop",12,0,2,1,"addLinkStop"),
+		REMOVE_LINK_STOP("Remove link to stop",12,1,2,1,"removeLinkStop"),
+		CALCULATE("Calculate!",14,0,4,2,"calculate"),
+		IS_OK("Is ok?",18,0,4,2,"isOk"),
+		SAVE("Save",22,0,4,2,"save");
 		String caption;
 		int gx;int gy;
 		int sx;int sy;
@@ -83,8 +90,10 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	//Constants
-	public static int MAX_WIDTH = 1920;
-	public static int MAX_HEIGHT = 800;
+	private static int GAPX = 50;
+	private static int GAPY = 120;
+	public static int MAX_WIDTH = 1920-GAPX;
+	public static int MAX_HEIGHT = 1080-GAPY;
 	public static int FRAMESIZE = 50;
 	
 	//Attributes
@@ -94,17 +103,22 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	private RoutePath routePath;
 	private RoutePath previous;
 	private Option option;
-	private int selectedIndex = -1;
+	private int selectedLinkIndex = -1;
 	private boolean finish = false;
+	private String selectedStopId = "";
+	private JLabel lblLink;
+	private JLabel lblStop;
+	private JLabel lblDistance;
+	private JLabel lblNumCandidate;
 	
 	//Methods
 	public Window(Network network, Trip trip, Map<String,Stop> stops) {
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		routePath = new RoutePath(network, trip, stops);
-		option = Option.SELECT;
+		option = Option.SELECT_LINK;
 		panel = new PanelPathEditor(this);
-		this.setSize(width, height+280);
+		this.setSize(width+GAPX, height+GAPY);
 		this.add(panel, BorderLayout.CENTER);
 		JPanel toolsPanel = new JPanel();
 		toolsPanel.setLayout(new GridBagLayout());
@@ -121,15 +135,71 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 		}
 		this.add(toolsPanel, BorderLayout.NORTH);
 		JPanel buttonsPanel = new JPanel();
-		buttonsPanel.setLayout(new GridLayout(1,Option.values().length));
+		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
 		for(Option option:Option.values()) {
-			JButton optionButton = new JButton(option.name());
+			JButton optionButton = new JButton(option.caption);
 			optionButton.setActionCommand(option.name());
 			optionButton.addActionListener(this);
 			buttonsPanel.add(optionButton);
 		}
-		this.add(buttonsPanel, BorderLayout.SOUTH);
-		addKeyListener(this);
+		this.add(buttonsPanel, BorderLayout.EAST);
+		JPanel infoPanel = new JPanel();
+		lblLink=new JLabel("");
+		lblStop=new JLabel("");
+		lblDistance=new JLabel(routePath.getMinDistance()*6371000*Math.PI/180+"");
+		lblNumCandidate=new JLabel(routePath.getNumCandidates()+"");
+		infoPanel.setLayout(new GridLayout(1,4));
+		infoPanel.add(lblLink);
+		infoPanel.add(lblStop);
+		infoPanel.add(lblDistance);
+		infoPanel.add(lblNumCandidate);
+		this.add(infoPanel, BorderLayout.SOUTH);
+	}
+	public Window(Network network, Trip trip, Map<String, Stop> stops,String[] linksS) {
+		this.setLocation(0,0);
+		this.setLayout(new BorderLayout());
+		List<Link> links = new ArrayList<Link>();
+		for(String link:linksS)
+			links.add(network.getLinks().get(link));
+		routePath = new RoutePath(network, trip, stops, links);
+		option = Option.SELECT_LINK;
+		panel = new PanelPathEditor(this);
+		this.setSize(width+GAPX, height+GAPY);
+		this.add(panel, BorderLayout.CENTER);
+		JPanel toolsPanel = new JPanel();
+		toolsPanel.setLayout(new GridBagLayout());
+		for(Tool tool:Tool.values()) {
+			JButton toolButton = new JButton(tool.caption);
+			toolButton.setActionCommand(tool.name());
+			toolButton.addActionListener(this);
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = tool.gx;
+			gbc.gridy = tool.gy;
+			gbc.gridwidth = tool.sx;
+			gbc.gridheight = tool.sy;
+			toolsPanel.add(toolButton,gbc);
+		}
+		this.add(toolsPanel, BorderLayout.NORTH);
+		JPanel buttonsPanel = new JPanel();
+		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
+		for(Option option:Option.values()) {
+			JButton optionButton = new JButton(option.caption);
+			optionButton.setActionCommand(option.name());
+			optionButton.addActionListener(this);
+			buttonsPanel.add(optionButton);
+		}
+		this.add(buttonsPanel, BorderLayout.EAST);
+		JPanel infoPanel = new JPanel();
+		lblLink=new JLabel("");
+		lblStop=new JLabel("");
+		lblDistance=new JLabel(routePath.getMinDistance()*6371000*Math.PI/180+"");
+		lblNumCandidate=new JLabel(routePath.getNumCandidates()+"");
+		infoPanel.setLayout(new GridLayout(1,4));
+		infoPanel.add(lblLink);
+		infoPanel.add(lblStop);
+		infoPanel.add(lblDistance);
+		infoPanel.add(lblNumCandidate);
+		this.add(infoPanel, BorderLayout.SOUTH);
 	}
 	public boolean isFinish() {
 		return finish;
@@ -162,29 +232,39 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 			}
 	}
 	public void selectLink(double x, double y) {
-		selectedIndex = routePath.getIndexNearestLink(x, y);
+		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
+		lblLink.setText(routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
 	}
 	public void unselectLink(double x, double y) {
-		selectedIndex = -1;
+		selectedLinkIndex = -1;
+		lblLink.setText("");
+	}
+	public void selectStop(double x, double y) {
+		selectedStopId = routePath.getIdNearestStop(x, y);
+		lblStop.setText(selectedStopId);
+	}
+	public void unselectStop(double x, double y) {
+		selectedStopId = "";
+		lblStop.setText("");
 	}
 	public void add() {
 		panel.waitSecondCoord();
 	}
 	public void add(Coord second) {
-		if(selectedIndex!=-1) {
-			routePath.addLink(selectedIndex, second);
-			selectedIndex++;
+		if(selectedLinkIndex!=-1) {
+			routePath.addLink(selectedLinkIndex, second);
+			selectedLinkIndex++;
 		}
 	}
 	public void remove() {
-		if(selectedIndex!=-1)
-			routePath.removeLink(selectedIndex);
-		if(selectedIndex==routePath.links.size())
-			selectedIndex = -1;
+		if(selectedLinkIndex!=-1)
+			routePath.removeLink(selectedLinkIndex);
+		if(selectedLinkIndex==routePath.links.size())
+			selectedLinkIndex = -1;
 	}
 	public void route() {
-		if(selectedIndex!=-1)
-			routePath.addShortestPath(selectedIndex);
+		if(selectedLinkIndex!=-1)
+			routePath.addShortestPath(selectedLinkIndex);
 	}
 	public void undo() {
 		if(previous!=null) {
@@ -194,25 +274,39 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	}
 	public void incDistance() {
 		routePath.increaseMinDistance();
+		lblDistance.setText(routePath.getMinDistance()*6371000*Math.PI/180+"");
 	}
 	public void decDistance() {
 		routePath.decreaseMinDistance();
+		lblDistance.setText(routePath.getMinDistance()*6371000*Math.PI/180+"");
 	}
 	public void incCandidates() {
 		routePath.increaseNumCandidates();
+		lblNumCandidate.setText(routePath.getNumCandidates()+"");
 	}
 	public void decCandidates() {
 		routePath.decreaseNumCandidates();
+		lblNumCandidate.setText(routePath.getNumCandidates()+"");
+	}
+	public void addLinkStop() {
+		if(selectedLinkIndex!=-1 && !selectedStopId.equals(""))
+			routePath.addLinkStop(selectedLinkIndex,selectedStopId);
+	}
+	public void romeveLinkStop() {
+		if(!selectedStopId.equals(""))
+			routePath.removeLinkStop(selectedStopId);
 	}
 	public void calculate() {
+		routePath.initStops();
 		routePath.calculatePath();
 	}
 	public void isOk() {
-		selectedIndex = routePath.isPathJoined();
-		JOptionPane.showMessageDialog(this, selectedIndex==-1?"Yes!":"No");
+		selectedLinkIndex = routePath.isPathJoined();
+		JOptionPane.showMessageDialog(this, selectedLinkIndex==-1?"Yes!":"No");
 	}
 	public void save() {
 		finish  = true;
+		
 		this.setVisible(false);
 	}
 	public Collection<Coord> getPoints() {
@@ -224,30 +318,24 @@ public class Window extends JFrame implements ActionListener, KeyListener {
 	public List<Link> getLinks() {
 		return routePath.getLinks();
 	}
+	public Collection<Link> getStopLinks() {
+		return routePath.getStopLinks();
+	}
 	public Link getSelectedLink() {
-		return selectedIndex==-1?null:routePath.getLink(selectedIndex);
+		return selectedLinkIndex==-1?null:routePath.getLink(selectedLinkIndex);
 	}
-	@Override
-	public void keyTyped(KeyEvent e) {
-		if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
-			selectedIndex++;
-			if(selectedIndex==routePath.getLinks().size())
-				selectedIndex=-1;
-		}
-		else if(e.getKeyCode()==KeyEvent.VK_LEFT) {
-			selectedIndex--;
-			if(selectedIndex<0)
-				selectedIndex=-1;
-		}
-		panel.repaint();
+	public Coord getSelectedStop() {
+		return selectedStopId==""?null:routePath.getStop(selectedStopId);
 	}
-	@Override
-	public void keyPressed(KeyEvent e) {
-		
+	public void increaseSelectedLink() {
+		selectedLinkIndex++;
+		if(selectedLinkIndex==routePath.getLinks().size())
+			selectedLinkIndex=-1;
 	}
-	@Override
-	public void keyReleased(KeyEvent e) {
-		
+	public void decreaseSelectedLink() {
+		selectedLinkIndex--;
+		if(selectedLinkIndex<0)
+			selectedLinkIndex=-1;
 	}
 	
 }

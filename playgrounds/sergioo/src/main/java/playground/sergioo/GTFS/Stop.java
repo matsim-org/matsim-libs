@@ -14,6 +14,10 @@ public class Stop {
 	 */
 	private String linkId;
 	/**
+	 * Is fixed the link Id
+	 */
+	private boolean fixedLinkId = false;
+	/**
 	 * The name
 	 */
 	private String name;
@@ -48,7 +52,20 @@ public class Stop {
 	 * @param linkId the linkId to set
 	 */
 	public void setLinkId(String linkId) {
-		this.linkId = linkId;
+		if(!fixedLinkId)
+			this.linkId = linkId;
+	}
+	/**
+	 * @return the fixedLinkId
+	 */
+	public boolean isFixedLinkId() {
+		return fixedLinkId;
+	}
+	/**
+	 * Fixes the link id
+	 */
+	public void setFixedLinkId() {
+		this.fixedLinkId = true;
 	}
 	/**
 	 * @return the point
