@@ -69,7 +69,7 @@ public class CleanNetwork {
 //		new NetworkWriteAsTable(args[1]).run(subNetwork);
 //		new NetworkWriter(subNetwork).write(args[1]+"/network.xml.gz");
 
-		new NetworkWriteAsTable(args[1]).run(scenario.getNetwork());
+		new NetworkWriteAsTable(args[1],5.0).run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(args[1]+"/network.xml.gz");
 	}
 
