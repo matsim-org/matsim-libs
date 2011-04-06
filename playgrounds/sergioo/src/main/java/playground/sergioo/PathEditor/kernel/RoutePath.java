@@ -44,6 +44,7 @@ public class RoutePath {
 	private int numCandidates = 6;
 	private boolean withAngleShape = false;
 	private boolean withCostShape = false;
+	private boolean withInsideStops = false;
 	private PreProcessEuclidean preProcessData;
 	
 	//Methods
@@ -133,6 +134,15 @@ public class RoutePath {
 	}
 	public void removeLink(int index) {
 		links.remove(index);
+	}
+	public void removeLinksFrom(int index) {
+		int size=links.size();
+		for(int i=index; i<size; i++)
+			links.remove(index);
+	}
+	public void removeLinksTo(int index) {
+		for(int i=0; i<=index; i++)
+			links.remove(0);
 	}
 	public void addLink(int index, Coord second) {
 		Link link = links.get(index);
@@ -251,22 +261,24 @@ public class RoutePath {
 			if(link.getAllowedModes().contains(mode)) {
 				Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 				Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-				Vector2D linkSegment = new Vector2D(fromPoint, toPoint);
-				if(!withAngleShape || shape==null || linkSegment.getAngleTo(shape.getVector(coord))<Math.PI/16) {
-					double distance = ((LinkImpl)link).calcDistance(coord);
-					if(distance<minDistance) {
-						int i=0;
-						for(; i<nearestDistances.size() && distance<nearestDistances.get(i); i++);
-						if(i>0 || nearestLinks.size()<numCandidates) {
-							nearestDistances.add(i, distance);
-							nearestLinks.add(i, link);
-							if(nearestLinks.size()>numCandidates) {
-								nearestDistances.remove(0);
-								nearestLinks.remove(0);
+				Vector2D linkVector = new Vector2D(fromPoint, toPoint);
+				Line2D linkSegment = new Line2D(fromPoint, toPoint);
+				if(!withInsideStops || linkSegment.isNearestInside(new Point2D(coord.getX(),coord.getY())))
+					if(!withAngleShape || shape==null || linkVector.getAngleTo(shape.getVector(coord))<Math.PI/16) {
+						double distance = ((LinkImpl)link).calcDistance(coord);
+						if(distance<minDistance) {
+							int i=0;
+							for(; i<nearestDistances.size() && distance<nearestDistances.get(i); i++);
+							if(i>0 || nearestLinks.size()<numCandidates) {
+								nearestDistances.add(i, distance);
+								nearestLinks.add(i, link);
+								if(nearestLinks.size()>numCandidates) {
+									nearestDistances.remove(0);
+									nearestLinks.remove(0);
+								}
 							}
 						}
 					}
-				}
 			}
 		return nearestLinks;	
 	}

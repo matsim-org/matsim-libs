@@ -101,6 +101,9 @@ public class Line2D {
 		else
 			return false;
 	}
+	public boolean isNearestInside(Point2D p) {
+		return isInside2(getNearestPoint(p));
+	}
 	public PointPosition getPointPosition(Point2D p) {
 		Point2D nearest = getNearestPoint(p);
 		double length = this.getLength();

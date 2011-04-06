@@ -92,8 +92,8 @@ public class Window extends JFrame implements ActionListener {
 	//Constants
 	private static int GAPX = 50;
 	private static int GAPY = 120;
-	public static int MAX_WIDTH = 1920-GAPX;
-	public static int MAX_HEIGHT = 1080-GAPY;
+	public static int MAX_WIDTH = 1280-GAPX;
+	public static int MAX_HEIGHT = 800-GAPY;
 	public static int FRAMESIZE = 50;
 	
 	//Attributes
