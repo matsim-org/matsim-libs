@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.PathEditor.gui.Window.Option;
+import util.geometry.Point2D;
 
 public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	/**
@@ -154,28 +155,42 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	public void waitSecondCoord() {
 		wait = true;
 	}
+	public void centerCamera(double x, double y) {
+		camera.centerCamera(x, y);
+	}
+	public Point2D getCenter() {
+		return camera.getCenter();
+	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
-		if(wait) {
-			window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
-			wait=false;
+		if(e.getClickCount()==2) {
+			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		}
 		else {
-			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(e.getX(), e.getY());
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(e.getX(), e.getY());
+			if(wait) {
+				window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
+				wait=false;
+			}
+			else {
+				if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
+					window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
+					window.unselectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
+					window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
+					window.unselectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
+					camera.zoomIn(e.getX(), e.getY());
+				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
+					camera.zoomOut(e.getX(), e.getY());
+			}
 		}
 		repaint();
+	}
+	public void withStops() {
+		withStops = true;
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {

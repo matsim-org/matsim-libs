@@ -43,10 +43,13 @@ import javax.swing.JPanel;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.GTFS.Stop;
 import playground.sergioo.GTFS.Trip;
 import playground.sergioo.PathEditor.kernel.RoutePath;
+import util.geometry.Point2D;
 
 public class Window extends JFrame implements ActionListener {
 	/**
@@ -95,7 +98,7 @@ public class Window extends JFrame implements ActionListener {
 	private static int GAPX = 50;
 	private static int GAPY = 120;
 	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
-	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().width-GAPY;
+	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
 	public static int FRAMESIZE = 50;
 	
 	//Attributes
@@ -106,15 +109,15 @@ public class Window extends JFrame implements ActionListener {
 	private RoutePath previous;
 	private Option option;
 	private int selectedLinkIndex = -1;
-	private boolean finish = false;
 	private String selectedStopId = "";
 	private JLabel lblLink;
 	private JLabel lblStop;
 	private JLabel lblDistance;
 	private JLabel lblNumCandidate;
-	
+	public List<Link> links;
 	//Methods
-	public Window(Network network, Trip trip, Map<String,Stop> stops) {
+	public Window(Network network, Trip trip, Map<String,Stop> stops, List<Link> links) {
+		this.links = links;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		routePath = new RoutePath(network, trip, stops);
@@ -157,12 +160,13 @@ public class Window extends JFrame implements ActionListener {
 		infoPanel.add(lblNumCandidate);
 		this.add(infoPanel, BorderLayout.SOUTH);
 	}
-	public Window(Network network, Trip trip, Map<String, Stop> stops,String[] linksS) {
+	public Window(Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE) {
+		this.links = linksE;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		List<Link> links = new ArrayList<Link>();
 		for(String link:linksS)
-			links.add(network.getLinks().get(link));
+			links.add(network.getLinks().get(new IdImpl(link)));
 		routePath = new RoutePath(network, trip, stops, links);
 		option = Option.SELECT_LINK;
 		panel = new PanelPathEditor(this);
@@ -202,9 +206,6 @@ public class Window extends JFrame implements ActionListener {
 		infoPanel.add(lblDistance);
 		infoPanel.add(lblNumCandidate);
 		this.add(infoPanel, BorderLayout.SOUTH);
-	}
-	public boolean isFinish() {
-		return finish;
 	}
 	public Option getOption() {
 		return option;
@@ -313,31 +314,63 @@ public class Window extends JFrame implements ActionListener {
 		routePath.calculatePath();
 	}
 	public void isOk() {
+		Point2D center = panel.getCenter();
+		Coord coord = new CoordImpl(center.getX(), center.getY());
 		selectedLinkIndex = routePath.isPathJoined();
 		if(selectedLinkIndex==-1) {
 			selectedLinkIndex = routePath.isPathWithoutUs();
 			if(selectedLinkIndex==-1) {
-				selectedStopId = routePath.allStopsWithLink();
-				if(selectedStopId.equals("")) {
-					selectedStopId = routePath.allStopsWithCorrectLink();
-					if(selectedStopId.equals(""))
-						JOptionPane.showMessageDialog(this, "Yes!!!");
-					else
-						JOptionPane.showMessageDialog(this, "No, the stop doesn't have a correct link");
+				selectedLinkIndex = routePath.isPathWithoutRepeatedLink();
+				if(selectedLinkIndex==-1) {
+					panel.withStops();
+					selectedStopId = routePath.allStopsWithLink();
+					if(selectedStopId.equals("")) {
+						selectedStopId = routePath.allStopsWithCorrectLink();
+						if(selectedStopId.equals("")) {
+							selectedStopId = routePath.allStopsWithInRouteLink();
+							if(selectedStopId.equals("")) {
+								selectedLinkIndex = routePath.isFirstLinkWithStop();
+								if(selectedLinkIndex==-1) {
+									JOptionPane.showMessageDialog(this, "Yes!!!");
+								}
+								else {
+									JOptionPane.showMessageDialog(this, "No, the first link is not related to a stop");
+									routePath.getLink(selectedLinkIndex).getCoord();
+								}
+							}
+							else {
+								JOptionPane.showMessageDialog(this, "No, the stop doesn't have a link inside the path");
+								coord=routePath.getStop(selectedStopId);
+							}					
+						}
+						else {
+							JOptionPane.showMessageDialog(this, "No, the stop doesn't have a correct link");
+							coord=routePath.getStop(selectedStopId);
+						}
+					}
+					else {
+						JOptionPane.showMessageDialog(this, "No, the stop doesn't have a link");
+						coord = routePath.getStop(selectedStopId);
+					}
 				}
-				else
-					JOptionPane.showMessageDialog(this, "No, the stop doesn't have a link");
+				else {
+					JOptionPane.showMessageDialog(this, "No, the path has a repeated link");
+					coord = routePath.getLink(selectedLinkIndex).getCoord();
+				}
 			}
-			else
+			else {
 				JOptionPane.showMessageDialog(this, "No, the path has a U turn");
+				coord = routePath.getLink(selectedLinkIndex).getCoord();
+			}
 		}
-		else
+		else {
 			JOptionPane.showMessageDialog(this, "No, the path is not joined");
-		
+			coord = routePath.getLink(selectedLinkIndex).getCoord();
+		}
+		panel.centerCamera(coord.getX(), coord.getY());
 	}
 	public void save() {
-		finish  = true;
-		this.setVisible(false);
+		links.addAll(routePath.getLinks());
 	}
 	public Collection<Coord> getPoints() {
 		return routePath.getShapePoints();
@@ -361,11 +394,13 @@ public class Window extends JFrame implements ActionListener {
 		selectedLinkIndex++;
 		if(selectedLinkIndex==routePath.getLinks().size())
 			selectedLinkIndex=-1;
+		lblLink.setText(selectedLinkIndex==-1?"":routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
 	}
 	public void decreaseSelectedLink() {
 		selectedLinkIndex--;
 		if(selectedLinkIndex<0)
 			selectedLinkIndex=-1;
+		lblLink.setText(selectedLinkIndex==-1?"":routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
 	}
 	
 }
