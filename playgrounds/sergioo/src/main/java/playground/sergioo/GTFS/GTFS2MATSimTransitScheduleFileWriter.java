@@ -565,6 +565,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							stopTime.getValue().setStopId(newStopId);
 						}
 		//Links
+		bases = new HashMap<String, String[]>();
+		finishedTrips = new HashMap<String, String[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[1]));
 		String line = reader.readLine();
 		while(line!=null) {
@@ -583,8 +585,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		reader.close();
 		for(int r=0; r<roots.length; r++) {
 			if(r==0) {
-				bases = new HashMap<String, String[]>();
-				finishedTrips = new HashMap<String, String[]>();
 				reader = new BufferedReader(new FileReader(PREFILES[0]));
 				line = reader.readLine();
 				while(line!=null) {
@@ -721,6 +721,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				}
 				window.setVisible(true);
 				while(!window.isFinish());
+				System.out.println("ya 1");
 				links = window.getLinks();
 				PrintWriter writer = new PrintWriter(new FileWriter(PREFILES[0],true));
 				for(StopTime stopTime: tripEntry.getValue().getStopTimes().values()) {
@@ -732,15 +733,23 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 					}
 				}
 				writer.close();
+				System.out.println("ya 2");
 				if(!withBase) {
 					writer = new PrintWriter(new FileWriter(PREFILES[1],true));
 					writer.println(baseId);
 					String linksT = "";
-					for(Link link:links)
+					String[] linksA = new String[links.size()];
+					int i=0;
+					for(Link link:links) {
 						linksT+=link.getId()+";";
+						linksA[i] = link.getId().toString();
+						i++;
+					}
 					writer.println(linksT);
 					writer.close();
+					bases.put(baseId, linksA);
 				}
+				System.out.println("ya 3");
 				writer = new PrintWriter(new FileWriter(PREFILES[2],true));
 				writer.println(tripEntry.getKey());
 				String linksT = "";
@@ -748,12 +757,12 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 					linksT+=link.getId()+";";
 				writer.println(linksT);
 				writer.close();
-				window.setVisible(false);
+				System.out.println("ya 4");
 			}
 			else {
 				links = new ArrayList<Link>();
 				for(String link:linksS)
-					links.add(network.getLinks().get(link));
+					links.add(network.getLinks().get(new IdImpl(link)));
 			}
 			for(Link link:links) {
 				Set<String> modes = new HashSet<String>(link.getAllowedModes());

@@ -195,21 +195,21 @@ public class RoutePath {
 		Stop prevStop = null,nextStop = null;
 		if(next.hasNext()) {
 			Path bestPath=null;
+			prevStop = stops.get(prev.next().getStopId());
+			nextStop = stops.get(next.next().getStopId());
 			for(int numCandidates = this.numCandidates;bestPath==null;numCandidates++) {
-				prevStop = stops.get(prev.next().getStopId());
-				nextStop = stops.get(next.next().getStopId());
 				if(prevStop.getLinkId()!=null) {
 					prevLL=new ArrayList<Link>();
 					prevLL.add(network.getLinks().get(new IdImpl(prevStop.getLinkId())));
 				}
 				else
-					prevLL=getBestLinksMode(network,"Car", prevStop.getPoint(),trip.getShape());
+					prevLL=getBestLinksMode(network,"Car", prevStop.getPoint(),trip.getShape(),numCandidates);
 				if(nextStop.getLinkId()!=null) {
 					nextLL=new ArrayList<Link>();
 					nextLL.add(network.getLinks().get(new IdImpl(nextStop.getLinkId())));
 				}
 				else
-					nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape());
+					nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape(),numCandidates);
 				List<Tuple<Path,Link[]>> paths = new ArrayList<Tuple<Path,Link[]>>();
 				for(int i=0; i<prevLL.size(); i++)
 					for(int j=0; j<nextLL.size(); j++) {
@@ -237,62 +237,65 @@ public class RoutePath {
 		}
 		for(;next.hasNext();) {
 			Path bestPath=null;
-			for(int numCandidates = this.numCandidates;bestPath==null;numCandidates++) {
-				nextStop = stops.get(next.next().getStopId());
-				if(nextStop.getLinkId()!=null) {
-					nextLL=new ArrayList<Link>();
-					nextLL.add(network.getLinks().get(new IdImpl(nextStop.getLinkId())));
-				}
-				else
-					nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape());
-				List<Tuple<Path,Link>> paths = new ArrayList<Tuple<Path,Link>>();
-				for(int i=0; i<nextLL.size(); i++) {
-					LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
-					Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextLL.get(i).getToNode(), 0);
-					if(path.links.contains(nextLL.get(i)))
-						paths.add(new Tuple<Path,Link>(path,nextLL.get(i))); 
-				}	
-				double shortestDistance = Double.POSITIVE_INFINITY;
-				for(Tuple<Path,Link> tuple:paths) {
-					double distance = calculateDistance(tuple.getFirst(),prevStop.getPoint(),nextStop.getPoint(),prevL);
-					if(bestPath==null||distance<shortestDistance) {
-						shortestDistance = distance;
-					 	bestPath = tuple.getFirst();
-					 	nextStop.setLinkId(tuple.getSecond().getId().toString());
+			nextStop = stops.get(next.next().getStopId());
+			if(nextStop.getLinkId()!=null) {
+				Link nextL = network.getLinks().get(new IdImpl(nextStop.getLinkId()));
+				LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
+				bestPath = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
+				bestPath.links.add(nextL);
+			}
+			else
+				for(int numCandidates = this.numCandidates;bestPath==null;numCandidates++) {
+					nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape(),numCandidates);
+					List<Tuple<Path,Link>> paths = new ArrayList<Tuple<Path,Link>>();
+					for(int i=0; i<nextLL.size(); i++) {
+						LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
+						Path path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextLL.get(i).getToNode(), 0);
+						if(path.links.contains(nextLL.get(i)))
+							paths.add(new Tuple<Path,Link>(path,nextLL.get(i))); 
+					}	
+					double shortestDistance = Double.POSITIVE_INFINITY;
+					for(Tuple<Path,Link> tuple:paths) {
+						double distance = calculateDistance(tuple.getFirst(),prevStop.getPoint(),nextStop.getPoint(),prevL);
+						if(bestPath==null||distance<shortestDistance) {
+							shortestDistance = distance;
+						 	bestPath = tuple.getFirst();
+						 	nextStop.setLinkId(tuple.getSecond().getId().toString());
+						}
 					}
 				}
-			}
 			links.addAll(bestPath.links);
 			prevL = bestPath.links.get(bestPath.links.size()-1);
 			prevStop = nextStop;
 		}
 	}
-	private List<Link> getBestLinksMode(Network network, String mode, Coord coord, Shape shape) {
+	private List<Link> getBestLinksMode(Network network, String mode, Coord coord, Shape shape, int numCandidates) {
 		List<Double> nearestDistances = new ArrayList<Double>();
 		List<Link> nearestLinks = new ArrayList<Link>();
-		for(Link link:network.getLinks().values())
-			if(link.getAllowedModes().contains(mode)) {
-				Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-				Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-				Vector2D linkVector = new Vector2D(fromPoint, toPoint);
-				Line2D linkSegment = new Line2D(fromPoint, toPoint);
-				if(!withInsideStops || linkSegment.isNearestInside(new Point2D(coord.getX(),coord.getY())))
-					if(!withAngleShape || shape==null || linkVector.getAngleTo(shape.getVector(coord))<Math.PI/16) {
-						double distance = ((LinkImpl)link).calcDistance(coord);
-						if(distance<minDistance) {
-							int i=0;
-							for(; i<nearestDistances.size() && distance<nearestDistances.get(i); i++);
-							if(i>0 || nearestLinks.size()<numCandidates) {
-								nearestDistances.add(i, distance);
-								nearestLinks.add(i, link);
-								if(nearestLinks.size()>numCandidates) {
-									nearestDistances.remove(0);
-									nearestLinks.remove(0);
+		for(double minDistance=this.minDistance;nearestLinks.size()==0;minDistance+=MIN_DISTANCE_DELTA)
+			for(Link link:network.getLinks().values())
+				if(link.getAllowedModes().contains(mode)) {
+					Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+					Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+					Vector2D linkVector = new Vector2D(fromPoint, toPoint);
+					Line2D linkSegment = new Line2D(fromPoint, toPoint);
+					if(!withInsideStops || linkSegment.isNearestInside(new Point2D(coord.getX(),coord.getY())))
+						if(!withAngleShape || shape==null || linkVector.getAngleTo(shape.getVector(coord))<Math.PI/16) {
+							double distance = ((LinkImpl)link).calcDistance(coord);
+							if(distance<minDistance) {
+								int i=0;
+								for(; i<nearestDistances.size() && distance<nearestDistances.get(i); i++);
+								if(i>0 || nearestLinks.size()<numCandidates) {
+									nearestDistances.add(i, distance);
+									nearestLinks.add(i, link);
+									if(nearestLinks.size()>numCandidates) {
+										nearestDistances.remove(0);
+										nearestLinks.remove(0);
+									}
 								}
 							}
 						}
-					}
-			}
+				}
 		return nearestLinks;	
 	}
 	private double calculateDistance(Path path, Coord prevStop, Coord nextStop, Link prevL) {
@@ -318,10 +321,35 @@ public class RoutePath {
 		return distance;
 	}
 	public int isPathJoined() {
-		for(int i=0; i<links.size()-2; i++)
+		for(int i=0; i<links.size()-1; i++)
 			if(!links.get(i).getToNode().equals(links.get(i+1).getFromNode()))
 				return i;
 		return -1;
+	}
+	public int isPathWithoutUs() {
+		for(int i=0; i<links.size()-1; i++)
+			if(links.get(i).getFromNode().equals(links.get(i+1).getToNode()))
+				return i;
+		return -1;
+	}
+	public String allStopsWithLink() {
+		for(StopTime stopTime: trip.getStopTimes().values())
+			if(stops.get(stopTime.getStopId()).getLinkId()==null)
+				return stopTime.getStopId();
+		return "";
+	}
+	public String allStopsWithCorrectLink() {
+		for(StopTime stopTime: trip.getStopTimes().values()) {
+			Stop stop = stops.get(stopTime.getStopId());
+			Link link = network.getLinks().get(new IdImpl(stop.getLinkId()));
+			Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			Line2D linkLine = new Line2D(fromPoint, toPoint);
+			Point2D point = new Point2D(stop.getPoint().getX(),stop.getPoint().getY());
+			if(!linkLine.isNearestInside(point))
+				return stopTime.getStopId();
+		}
+		return "";
 	}
 	public void increaseMinDistance() {
 		minDistance += MIN_DISTANCE_DELTA;

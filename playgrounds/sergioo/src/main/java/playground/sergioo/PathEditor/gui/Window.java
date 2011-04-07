@@ -304,7 +304,7 @@ public class Window extends JFrame implements ActionListener {
 		if(selectedLinkIndex!=-1 && !selectedStopId.equals(""))
 			routePath.addLinkStop(selectedLinkIndex,selectedStopId);
 	}
-	public void romeveLinkStop() {
+	public void removeLinkStop() {
 		if(!selectedStopId.equals(""))
 			routePath.removeLinkStop(selectedStopId);
 	}
@@ -314,7 +314,26 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void isOk() {
 		selectedLinkIndex = routePath.isPathJoined();
-		JOptionPane.showMessageDialog(this, selectedLinkIndex==-1?"Yes!":"No");
+		if(selectedLinkIndex==-1) {
+			selectedLinkIndex = routePath.isPathWithoutUs();
+			if(selectedLinkIndex==-1) {
+				selectedStopId = routePath.allStopsWithLink();
+				if(selectedStopId.equals("")) {
+					selectedStopId = routePath.allStopsWithCorrectLink();
+					if(selectedStopId.equals(""))
+						JOptionPane.showMessageDialog(this, "Yes!!!");
+					else
+						JOptionPane.showMessageDialog(this, "No, the stop doesn't have a correct link");
+				}
+				else
+					JOptionPane.showMessageDialog(this, "No, the stop doesn't have a link");
+			}
+			else
+				JOptionPane.showMessageDialog(this, "No, the path has a U turn");
+		}
+		else
+			JOptionPane.showMessageDialog(this, "No, the path is not joined");
+		
 	}
 	public void save() {
 		finish  = true;
