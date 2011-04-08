@@ -190,8 +190,9 @@ public class CreateSelectedPlansTables {
 				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
 				Activity firstActivity = selectedPlanImpl.getFirstActivity();
 				if (firstActivity.getType().substring(0,1).equals("h")) {
-					out.write(firstActivity.getCoord().getX()+"\t");
-					out.write(firstActivity.getCoord().getY()+"\t");
+					Coord c = firstActivity.getCoord();
+					out.write(c.getX()+"\t");
+					out.write(c.getY()+"\t");
 					out.write(firstActivity.getLinkId()+"\t");
 				}
 				else {
