@@ -172,18 +172,16 @@ public class WithinDayControler extends Controler {
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
+		this.getEvents().addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
+		this.getEvents().addHandler(linkReplanningMap);
 		fosl.addSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();

@@ -232,9 +232,8 @@ public class EvacuationControler extends MultiModalControler {
 		/*
 		 * Create ActivityReplanningMap here and reuse it for both duringActivityReplanners!
 		 */
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents(), sim);
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
+		this.getEvents().addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
 
 		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
@@ -252,9 +251,8 @@ public class EvacuationControler extends MultiModalControler {
 		/*
 		 * Create LegReplanningMap here and reuse it for all three duringLegReplanners!
 		 */
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), this.getQueueSimulationListener());
-//		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents(), sim);
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
+		this.getEvents().addHandler(linkReplanningMap);
 		fosl.addSimulationListener(linkReplanningMap);
 
 		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
