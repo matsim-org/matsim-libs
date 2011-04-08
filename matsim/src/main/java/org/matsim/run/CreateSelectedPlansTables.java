@@ -189,17 +189,18 @@ public class CreateSelectedPlansTables {
 				Plan selectedPlan = person.getSelectedPlan();
 				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
 				Activity firstActivity = selectedPlanImpl.getFirstActivity();
+				String link_id = "-";
 				if (firstActivity.getType().substring(0,1).equals("h")) {
 					Coord c = firstActivity.getCoord();
 					out.write(c.getX()+"\t");
 					out.write(c.getY()+"\t");
-					String link_id = firstActivity.getLinkId()+"\t";
-					out.write(link_id);
+					link_id = firstActivity.getLinkId();
 				}
 				else {
 					// no home activity in the plan -> no home activity in the knowledge
-					out.write("-\t-\t-\t");
+					out.write("-\t-\t");
 				}
+				out.write(link_id+"\t");
 
 				// plan0 ----------------------------------------------
 				out.write(selectedPlan.getScore()+"\t");
