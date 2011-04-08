@@ -103,19 +103,11 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 	
 	private static final Logger log = Logger.getLogger(WithinDayControllerListener.class);
 	
-	public WithinDayControllerListener(Controler controller) {
-		setControllerParameters(controller);
-		
-		/*
-		 * Add this as a ControllerListener
-		 */
-		controller.addControlerListener(this);
-		// yyyy this is a side effect.  Is this what we want?
-		// It seems to me that we had agreed to avoid side effects.  kai, apr'11
-
+	public WithinDayControllerListener() {
+		log.info("Please call setControllerParameters(Controler controller) so configure the Controller.");
 	}
 
-	private void setControllerParameters(Controler controller) {
+	public void setControllerParameters(Controler controller) {
 		/*
 		 * Use WithinDayLinkImpls. They can carry some additional information
 		 * like their current TravelTime.
@@ -167,9 +159,11 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 * They identify, when an agent is going to end an activity and when an
 		 * agent might be able to leave a link.
 		 */
-		activityReplanningMap = new ActivityReplanningMap(event.getControler().getEvents());
+		activityReplanningMap = new ActivityReplanningMap();
+		event.getControler().getEvents().addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
-		linkReplanningMap = new LinkReplanningMap(event.getControler().getEvents());
+		linkReplanningMap = new LinkReplanningMap();
+		event.getControler().getEvents().addHandler(linkReplanningMap);
 		fosl.addSimulationListener(linkReplanningMap);
 		
 		/*

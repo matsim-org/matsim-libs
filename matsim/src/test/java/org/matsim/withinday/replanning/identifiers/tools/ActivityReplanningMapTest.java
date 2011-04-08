@@ -65,7 +65,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			ActivityReplanningMap arp = new ActivityReplanningMap(event.getControler().getEvents());
+			ActivityReplanningMap arp = new ActivityReplanningMap();
+			event.getControler().getEvents().addHandler(arp);
 			MobsimListenerForTests listener = new MobsimListenerForTests(arp);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(arp);

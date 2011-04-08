@@ -65,7 +65,8 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			LinkReplanningMap lrp = new LinkReplanningMap(event.getControler().getEvents());
+			LinkReplanningMap lrp = new LinkReplanningMap();
+			event.getControler().getEvents().addHandler(lrp);
 			MobsimListenerForTests listener = new MobsimListenerForTests(lrp);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(lrp);

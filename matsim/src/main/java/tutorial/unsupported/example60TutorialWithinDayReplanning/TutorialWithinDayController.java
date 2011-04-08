@@ -51,13 +51,18 @@ public class TutorialWithinDayController {
 		} else {
 			final Controler controller = new EvacuationQSimControler(args);
 			controller.setOverwriteFiles(true);
+
+			// perform only a single iteration
+			controller.getConfig().controler().setLastIteration(0);
 			
 			/*
 			 * Configure Controller for usage with WithinDay modules.
 			 */
-			new WithinDayControllerListener(controller);
-			// yyyy this will register the listener with the control(l)er as a side effect.  Is this what we want?
+			WithinDayControllerListener withinDayControllerListener = new WithinDayControllerListener();
+			withinDayControllerListener.setControllerParameters(controller);
+			// yyyy this will register the listener with the control(l)er as a side effect. Is this what we want?
 			// It seems to me that we had agreed to avoid side effects.  kai, apr'11
+			// Adapted the code. cdobler, apr'11
 			
 			controller.run();
 		}

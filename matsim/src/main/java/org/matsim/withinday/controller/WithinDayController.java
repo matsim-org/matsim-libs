@@ -63,15 +63,11 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 
 /**
- * Thimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
-is Controller should give an Example what is needed to run
- * Simulations with WithinDayReplanning.
+ * This controller should give an example what is needed to run
+ * simulations with WithinDayReplanning.
  *
- * The Path to a Config File is needed as Argument to run the
- * Simulation.
- *
- * Additional Parameters have to be set in the WithinDayControler
- * Class. Here we just add the Knowledge Component.
+ * The path to a config file is needed as argument to run the
+ * simulation.
  *
  * By default "test/scenarios/berlin/config.xml" should work.
  *
@@ -160,7 +156,8 @@ public class WithinDayController extends Controler {
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
 		this.rfi.addInitialReplanner(this.initialReplanner.getId(), this.pInitialReplanning);
 		
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap(this.getEvents());
+		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
+		this.getEvents().addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -168,7 +165,8 @@ public class WithinDayController extends Controler {
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
 		this.rfi.addDuringActivityReplanner(this.duringActivityReplanner.getId(), this.pDuringActivityReplanning);
 		
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap(this.getEvents());
+		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
+		this.getEvents().addHandler(linkReplanningMap);
 		fosl.addSimulationListener(linkReplanningMap);
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();

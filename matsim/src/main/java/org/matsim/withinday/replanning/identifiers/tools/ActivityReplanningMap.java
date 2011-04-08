@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
@@ -75,31 +74,9 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * The events only contain a PersonId.
 	 */
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
-
-//	public ActivityReplanningMap() {
-//		log.warn("ActivityReplanningMap is initialized with empty constructor. " +
-//				"Please ensure that it is added as Handler to an EventsManager and as Listener to " +
-//				"a ObserableSimulation!");
-//		init();
-//	}
 	
-	// simulationListeners... the List used in the Controller!
-//	public ActivityReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
-//		eventsManager.addHandler(this);
-//		simulationListeners.add(this);
-//		init();
-//	}
-
-	public ActivityReplanningMap(EventsManager eventsManager) {
-		log.warn("ActivityReplanningMap is initialized without a MobSim. " +
-				"Please ensure that it is added as a Listener to an ObserableSimulation!");
-		eventsManager.addHandler(this);
-		init();
-	}
-	
-	public ActivityReplanningMap(EventsManager eventsManager, Netsim mobsim) {
-		eventsManager.addHandler(this);
-		mobsim.addQueueSimulationListeners(this);
+	public ActivityReplanningMap() {
+		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		init();
 	}
 	

@@ -33,7 +33,6 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -87,27 +86,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
-
-	// simulationListeners... the List used in the Controller!
-//	public LinkReplanningMap(EventsManager eventsManager, List<SimulationListener> simulationListeners) {
-//		eventsManager.addHandler(this);
-//		simulationListeners.add(this);
-//		init();
-//	}
 	
-	public LinkReplanningMap(EventsManager eventsManager) {
-		log.warn("LinkReplanningMap is initialized without a MobSim. " +
-			"Please ensure that it is added as a Listener to an ObserableSimulation!");
-		eventsManager.addHandler(this);
+	public LinkReplanningMap() {
+		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		init();
 	}
-	
-	public LinkReplanningMap(EventsManager eventsManager, Netsim sim) {
-		eventsManager.addHandler(this);
-		sim.addQueueSimulationListeners(this);
-		init();
-	}
-	
+		
 	private void init() {
 		this.replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}
