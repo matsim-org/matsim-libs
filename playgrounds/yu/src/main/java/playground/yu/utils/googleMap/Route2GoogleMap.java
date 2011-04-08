@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PathSizeScoringFunction.java
+ * Route2GoogleMap.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,63 +18,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general2;
+/**
+ * 
+ */
+package playground.yu.utils.googleMap;
 
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.yu.choiceSetGeneration.PathSizeFromPlanChoiceSet;
-
-public class PathSizeScoringFunction implements BasicScoring {
-
-	private Plan plan;
+/**
+ * shows routes in google maps with google map static API supporting latitude &
+ * longitude (xx.xxxxxx) or WGS84 formats
+ * 
+ * @author yu
+ * 
+ */
+public class Route2GoogleMap {
+	/** converts coordinate system to WGS84 */
+	private CoordinateTransformation coordTransform;
+	private NetworkRoute route;
 	private Network network;
-	private ScoringParameters scoringParams;
 
-	private double lnPathSizeAttr;
-
-	public PathSizeScoringFunction(Plan plan, Network network, Config config) {
-		this.plan = plan;
+	public Route2GoogleMap(String fromSystem, Network network,
+			NetworkRoute route) {
+		coordTransform = TransformationFactory.getCoordinateTransformation(
+				fromSystem, TransformationFactory.WGS84);
 		this.network = network;
-		scoringParams = new ScoringParameters(config);
-
-		double PS = calculatePathSize();
-		if (PS < 0d) {
-			throw new RuntimeException(
-					"Path-size should be bigger than 0.0, and smaller than or equal to 1.0!!!");
-		}
-		lnPathSizeAttr = Math.log(PS);
+		this.route = route;
 	}
 
-	public double getLnPathSizeAttr() {
-		return lnPathSizeAttr;
+	public String getPath4googleMap() {
+		Id startLinkId = route.getStartLinkId();
+		String startMarkers = null;
+
+		List<Id> linkIds = route.getLinkIds();
+		Id endLinkId = route.getEndLinkId();
+		// TODO
+		return null;
+	}
+
+	protected String createMarker(Id linkId) {
+		// TODO
+		return null;
 	}
 
 	/**
-	 * @return path-size of plan
+	 * @param args
 	 */
-	protected double calculatePathSize() {
-		PathSizeFromPlanChoiceSet psfpcs = new PathSizeFromPlanChoiceSet(
-				network, plan.getPerson().getPlans());
-		return psfpcs.getPlanPathSize(plan);
-	}
-
-	@Override
-	public void finish() {
+	public static void main(String[] args) {
 
 	}
-
-	/***/
-	@Override
-	public double getScore() {
-		return scoringParams.betaLnPathSize * lnPathSizeAttr;
-	}
-
-	@Override
-	public void reset() {
-
-	}
-
 }

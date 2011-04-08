@@ -19,12 +19,12 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general2;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalFrejingerScoring;
 
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ScoringEvent;
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
@@ -37,23 +37,21 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author yu
  * 
  */
-public abstract class PlansScoring4PC2 implements StartupListener,
-		ScoringListener, IterationStartsListener {
+public class PlansScoring4PC_mnl2 extends PlansScoring4PC2 implements
+		StartupListener, ScoringListener, IterationStartsListener {
+	private final static Logger log = Logger
+			.getLogger(PlansScoring4PC_mnl2.class);
 
-	protected Events2Score4PC2 planScorer;
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		Controler ctl = event.getControler();
 
-	public abstract void notifyStartup(final StartupEvent event);
+		planScorer = new Events2Score4PC_mnl2(ctl.getConfig(), ctl
+				.getScoringFunctionFactory(), ctl.getPopulation());
 
-	public Events2Score4PC2 getPlanScorer() {
-		return planScorer;
-	}
+		log.debug("PlansScoring4PC_mnl2 loaded ScoringFunctionFactory");
 
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-		planScorer.reset(event.getIteration());
-	}
-
-	public void notifyScoring(final ScoringEvent event) {
-		planScorer.finish();
+		ctl.getEvents().addHandler(planScorer);
 	}
 
 }
