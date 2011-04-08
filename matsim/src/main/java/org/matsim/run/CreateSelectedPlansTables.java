@@ -193,7 +193,8 @@ public class CreateSelectedPlansTables {
 					Coord c = firstActivity.getCoord();
 					out.write(c.getX()+"\t");
 					out.write(c.getY()+"\t");
-					out.write(firstActivity.getLinkId()+"\t");
+					String link_id = firstActivity.getLinkId()+"\t";
+					out.write(link_id);
 				}
 				else {
 					// no home activity in the plan -> no home activity in the knowledge
