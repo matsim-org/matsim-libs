@@ -59,6 +59,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	private final double SINGLE_CO_RATE;
 	private final int N_BOOL;
 	private final int N_DOUBLE;
+	private final int N_MODE;
 
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 
@@ -71,6 +72,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			JointReplanningConfigGroup configGroup,
 			int numBooleanGenes,
 			int numDoubleGenes,
+			int numModeGenes,
 			List<Integer> nDurationGenes
 			) {
 		this.WHOLE_CO_RATE = configGroup.getWholeCrossOverProbability();
@@ -78,6 +80,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		this.SINGLE_CO_RATE = configGroup.getSingleCrossOverProbability();
 		this.N_BOOL = numBooleanGenes;
 		this.N_DOUBLE = numDoubleGenes;
+		this.N_MODE = numModeGenes;
 		this.DAY_DURATION = config.getDayDuration();
 		this.nDurationGenes.clear();
 		this.nDurationGenes.addAll(nDurationGenes);
@@ -107,6 +110,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			mate2 = (IChromosome) a_population.getChromosome(index2).clone();
 
 			doBooleanCrossOver(mate1, mate2);
+			doModeCrossOver(mate1, mate2);
 			if (i < numOfWholeCo) {
 				doDoubleWholeCrossOver(mate1, mate2);
 			}
@@ -140,6 +144,29 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			}
 		}
 	}
+
+	/**
+	 * Performs a uniform cross-over on the mode genes.
+	 */
+	private final void doModeCrossOver(IChromosome mate1, IChromosome mate2) {
+		Object value1;
+		Object value2;
+
+		// loop over boolean genes
+		for (int i=this.N_BOOL + this.N_DOUBLE;
+				i < this.N_BOOL + this.N_DOUBLE + this.N_MODE;
+				i++) {
+			value1 = mate1.getGene(i).getAllele();
+			value2 = mate2.getGene(i).getAllele();
+
+			// exchange values with proba O.5
+			if (this.randomGenerator.nextInt(2) == 0) {
+				mate1.getGene(i).setAllele(value2);
+				mate2.getGene(i).setAllele(value1);
+			}
+		}
+	}
+
 
 	/**
 	 * Performs a "GENOCOP-like" "Whole arithmetical cross-over" on the double

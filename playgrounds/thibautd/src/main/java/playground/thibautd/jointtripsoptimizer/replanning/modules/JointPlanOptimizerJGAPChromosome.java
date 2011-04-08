@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -34,10 +38,14 @@ import org.jgap.RandomGenerator;
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPChromosome extends Chromosome {
+	private static final Logger log =
+		Logger.getLogger(JointPlanOptimizerJGAPChromosome.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final int nBooleanGenes;
 	private final int nDoubleGenes;
+	private final int nModeGenes;
 	private final double dayDuration;
 
 	public JointPlanOptimizerJGAPChromosome(Configuration a_configuration, Gene[] genes) throws InvalidConfigurationException {
@@ -47,6 +55,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		try {
 			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
 			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
+			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
 			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
 		} catch (ClassCastException e) {
 			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
@@ -61,6 +70,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		try {
 			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
 			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
+			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
 			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
 		} catch (ClassCastException e) {
 			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
@@ -157,7 +167,6 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	 */
 	public IChromosome randomInitialJointPlanOptimizerJGAPChromosome()
 			throws InvalidConfigurationException {
-
 		// Sanity check: make sure the given configuration isn't null.
 		// -----------------------------------------------------------
 		if (getConfiguration() == null) {
@@ -192,8 +201,9 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		//IChromosome sampleChromosome = getConfiguration().getSampleChromosome();
 		//Gene[] sampleGenes = sampleChromosome.getGenes();
 		//Gene[] newGenes = new Gene[sampleGenes.length];
-		Gene[] newGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes];
+		Gene[] newGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes + this.nModeGenes];
 		DoubleGene newDoubleGene;
+		JointPlanOptimizerJGAPModeGene newModeGene;
 		Double[] randomDurations = new Double[this.nDoubleGenes + 1];
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		double scalingFactor = 0d;
@@ -217,6 +227,21 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 			newDoubleGene.setAllele(scalingFactor * randomDurations[j]);
 
 			newGenes[this.nBooleanGenes + j] = newDoubleGene;
+		}
+
+		if (this.nModeGenes > 0) {
+			log.warn("initializing a mode chrom!");
+			List<String> possibleModes = ((JointPlanOptimizerJGAPModeGene) 
+					this.getGene(this.nBooleanGenes + this.nDoubleGenes)).getListValue();
+			for (int j=0; j < this.nModeGenes; j++) {
+				//TODO create and initialize to a random value
+				newModeGene = new JointPlanOptimizerJGAPModeGene(
+						this.getConfiguration(),
+						possibleModes);
+				newModeGene.setToRandomValue(generator);
+				newGenes[this.nBooleanGenes + this.nDoubleGenes + j] =
+					newModeGene;
+			}
 		}
 
 		// Finally, construct the new chromosome with the new random

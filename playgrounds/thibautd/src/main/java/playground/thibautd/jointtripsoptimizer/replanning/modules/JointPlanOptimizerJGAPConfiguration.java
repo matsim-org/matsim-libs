@@ -69,6 +69,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	//TODO: make final
 	private int numEpisodes;
 	private int numToggleGenes;
+	private int numModeGenes;
 	/**
 	 * stores the number of duration genes relatives to each individual plan in
 	 * the joint plan.
@@ -129,7 +130,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addNaturalSelector(selector, false);
 
 			// Chromosome: construction
-			Gene[] sampleGenes = new Gene[this.numToggleGenes + this.numEpisodes];
+			Gene[] sampleGenes =
+				new Gene[this.numToggleGenes + this.numEpisodes +this.numModeGenes];
 			for (int i=0; i < this.numToggleGenes; i++) {
 				sampleGenes[i] = new BooleanGene(this);
 			}
@@ -138,8 +140,16 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				//sampleGenes[i] = new IntegerGene(this, 0, numTimeIntervals);
 				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
 			}
+			for (int i=this.numToggleGenes + this.numEpisodes;
+					i < this.numToggleGenes + this.numEpisodes + this.numModeGenes;
+					i++) {
+				sampleGenes[i] =
+					new JointPlanOptimizerJGAPModeGene(this, configGroup.getAvailableModes());
+			}
 
-			log.debug("duration genes: "+this.numEpisodes+", toggle chromosomes: "+this.numToggleGenes);
+			log.debug("duration genes: "+this.numEpisodes+
+					", toggle genes: "+this.numToggleGenes+
+					", mode genes: "+this.numModeGenes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size
@@ -173,6 +183,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						configGroup,
 						this.numToggleGenes,
 						this.numEpisodes,
+						this.numModeGenes,
 						this.nDurationGenes) );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
@@ -203,6 +214,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		this.numEpisodes = 0;
 		this.numToggleGenes = 0;
+		this.numModeGenes = 0;
 		this.nDurationGenes.clear();
 
 		for (Id id : ids) {
@@ -254,13 +266,17 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		return this.numToggleGenes;
 	}
 
+	public int getNumModeGenes() {
+		return this.numModeGenes;
+	}
+
 	/**
 	 * to avoid multiplying the places where the day duration is defined.
 	 * Not very elegant, should be moved somewhere else, for example in the config
 	 * group.
 	 */
 	public double getDayDuration() {
-		return this.numToggleGenes;
+		return DAY_DUR;
 	}
 }
 

@@ -130,6 +130,9 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 						//mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
 						mutateDouble((DoubleGene) geneToMute, freeSpace);
 					}
+					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
+						geneToMute.setToRandomValue(this.randomGenerator);
+					}
 				}
 			}
 			copyOfChromosome = null;

@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.run.config;
 
+import java.lang.reflect.Field;
 import java.lang.String;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 /**
@@ -41,7 +45,8 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String POP_SIZE = "gaPopulationSize";
 	/**
-	 * the drop-off activity duration, in time intervals
+	 * the drop-off activity duration, in seconds
+	 * NOT USED
 	 */
 	private static final String DO_DUR = "dropOffDuration";
 	private static final String MUTATION_PROB = "mutationProbability";
@@ -53,11 +58,13 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
 	private static final String SELECTION_THRESHOLD = "bestSelectionThreshold";
 	private static final String PLOT_FITNESS = "plotFitnessEvolution";
+	private static final String OPTIMIZE_MODE = "modeToOptimize";
+	private static final String AVAIL_MODES = "availableModes";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
 	private int populationSize = 10;
-	private int dropOffDuration = 0;
+	private double dropOffDuration = 0;
 	private double mutationProb = 0.1;
 	private double wholeCrossOverProb = 0.5;
 	private double simpleCrossOverProb = 0.5;
@@ -67,6 +74,8 @@ public class JointReplanningConfigGroup extends Module {
 	private boolean optimizeToggle = false;
 	private double selectionThreshold = 0.1d;
 	private boolean plotFitness = false;
+	private boolean optimizeMode = false;
+	private List<String> availableModes = null;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -116,6 +125,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(PLOT_FITNESS)) {
 			this.setPlotFitness(value);
 		}
+		else if (param_name.equals(OPTIMIZE_MODE)) {
+			this.setModeToOptimize(value);
+		}
+		else if (param_name.equals(AVAIL_MODES)) {
+			this.setAvailableModes(value);
+		}
 	}
 
 	@Override
@@ -156,6 +171,13 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(PLOT_FITNESS)) {
 			return String.valueOf(this.getPlotFitness());
 		}
+		else if (param_name.equals(OPTIMIZE_MODE)) {
+			return String.valueOf(this.getModeToOptimize());
+		}
+		else if (param_name.equals(AVAIL_MODES)) {
+			//TODO: do not produce an "inputable" value
+			return String.valueOf(this.getAvailableModes());
+		}
 		return null;
 	}
 
@@ -174,6 +196,8 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, OPTIMIZE_TOGGLE);
 		this.addParameterToMap(map, SELECTION_THRESHOLD);
 		this.addParameterToMap(map, PLOT_FITNESS);
+		this.addParameterToMap(map, OPTIMIZE_MODE);
+		this.addParameterToMap(map, AVAIL_MODES);
 		return map;
 	}
 
@@ -199,12 +223,12 @@ public class JointReplanningConfigGroup extends Module {
 		this.populationSize = Integer.parseInt(populationSize);
 	}
 
-	public int getDropOffDuration() {
+	public double getDropOffDuration() {
 		return this.dropOffDuration;
 	}
 	
 	public void setDropOffDuration(String dropOffDuration) {
-		this.dropOffDuration = Integer.parseInt(dropOffDuration);
+		this.dropOffDuration = Double.valueOf(dropOffDuration);
 	}
 
 	public double getMutationProbability() {
@@ -325,6 +349,65 @@ public class JointReplanningConfigGroup extends Module {
 			throw new IllegalArgumentException("value for "+
 					OPTIMIZE_TOGGLE+" must be \"true\" or \"false\"");
 		}
+	}
+
+	public List<String> getAvailableModes() {
+		if (this.availableModes == null) {
+			log.warn("modes available for the optimisation initialized to the "+
+					"set of all available values");
+			this.availableModes = getAllModes();
+		}
+		return this.availableModes;
+	}
+
+	public void setAvailableModes(String value) {
+		String[] modes = value.split(",");
+
+		//List<String> allModes = getAllModes();
+		this.availableModes = new ArrayList<String>();
+
+		for (String mode : modes) {
+		//	if (allModes.contains(mode)) {
+			try {
+				this.availableModes.add((String)
+						TransportMode.class.getField(mode).get(null));
+			}
+			//else {
+			catch (NoSuchFieldException e) {
+				throw new IllegalArgumentException("unrecognized mode: "+mode);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("error while iterating over "+
+						"TransportMode fields");
+			}
+		}
+	}
+
+	private static List<String> getAllModes() {
+		List<String> out = new ArrayList<String>();
+
+		//iterate over all public fields of transport mode
+		//TODO: more precise catches.
+		for (Field field : TransportMode.class.getFields()) {
+			try {
+				out.add((String) field.get(null));
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("error while iterating over "+
+						"TransportMode fields");
+			}
+		}
+
+		return out;
+	}
+
+	public void setModeToOptimize(String value) {
+		this.optimizeMode = Boolean.valueOf(value);
+	}
+
+	public boolean getModeToOptimize() {
+		return this.optimizeMode;
 	}
 }
 
