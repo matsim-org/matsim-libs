@@ -25,8 +25,10 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -184,10 +186,13 @@ public class CreateSelectedPlansTables {
 				out.write((person.isEmployed() ? "yes" : "no")+"\t");
 
 
-				if (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getType().substring(0,1).equals("h")) {
-					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord().getX()+"\t");
-					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord().getY()+"\t");
-					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getLinkId()+"\t");
+				Plan selectedPlan = person.getSelectedPlan();
+				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
+				Activity firstActivity = selectedPlanImpl.getFirstActivity();
+				if (firstActivity.getType().substring(0,1).equals("h")) {
+					out.write(firstActivity.getCoord().getX()+"\t");
+					out.write(firstActivity.getCoord().getY()+"\t");
+					out.write(firstActivity.getLinkId()+"\t");
 				}
 				else {
 					// no home activity in the plan -> no home activity in the knowledge
@@ -195,7 +200,7 @@ public class CreateSelectedPlansTables {
 				}
 
 				// plan0 ----------------------------------------------
-				out.write(person.getSelectedPlan().getScore()+"\t");
+				out.write(selectedPlan.getScore()+"\t");
 				out.write(this.getTravelTime(person)+"\t");
 				this.sumPlanTraveltime[0]+=this.getTravelTime(person);
 
