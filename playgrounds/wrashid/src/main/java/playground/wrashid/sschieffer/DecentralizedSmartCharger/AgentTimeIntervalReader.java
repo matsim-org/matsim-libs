@@ -73,7 +73,7 @@ public class AgentTimeIntervalReader {
 		
 		
 		System.out.println("controlling optimal vs nonOptimal charging times");
-		schedule = checkTimesWithHubSubAndOptimalTimes(schedule);
+		schedule = checkTimesWithHubSubAndOptimalTimes(schedule, id);
 		//schedule.printSchedule();
 		
 		System.out.println("calculating Joules per Interval");
@@ -149,8 +149,10 @@ public class AgentTimeIntervalReader {
 	}
 	
 	
-	public Schedule checkIntervalForSubAndOptimalIntervals(TimeInterval t){
+	public Schedule checkIntervalForSubAndOptimalIntervals(TimeInterval t, Id id){
+		
 		Schedule newSchedule= new Schedule();
+		
 		if(t.isDriving()){
 			newSchedule.addTimeInterval(t);
 			return newSchedule;
@@ -160,7 +162,11 @@ public class AgentTimeIntervalReader {
 			ParkingInterval thisParkingInterval= (ParkingInterval)t;
 			
 			Id idLink= thisParkingInterval.getLocation();
-			Schedule loadDistributionSchedule= DecentralizedSmartCharger.myHubLoadReader.getLoadDistributionScheduleForHubId(idLink);
+			
+			Schedule loadDistributionSchedule;
+		
+			loadDistributionSchedule= DecentralizedSmartCharger.myHubLoadReader.getLoadDistributionScheduleForHubId(id, idLink);
+		
 			
 			double startParking= t.getStartTime();
 			double endParking= t.getEndTime();
@@ -173,9 +179,11 @@ public class AgentTimeIntervalReader {
 			
 			// if start and end are in same loadDistributionInterval
 			if(intervalStart==intervalEnd){
+				
 				thisParkingInterval.setParkingOptimalBoolean(lstart.isOptimal());
 				newSchedule.addTimeInterval(t);
 				return newSchedule;
+				
 			}else{
 				// if start and end are NOT in same loadDistributionInterval
 				
@@ -217,13 +225,14 @@ public class AgentTimeIntervalReader {
 	}
 	
 	
-	public Schedule checkTimesWithHubSubAndOptimalTimes( Schedule schedule){
+	
+	public Schedule checkTimesWithHubSubAndOptimalTimes( Schedule schedule, Id id){
 		Schedule newSchedule= new Schedule();	
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			
 			TimeInterval t= schedule.timesInSchedule.get(i);
-			Schedule checkedTimeIntervalSchedule= checkIntervalForSubAndOptimalIntervals(t);
+			Schedule checkedTimeIntervalSchedule= checkIntervalForSubAndOptimalIntervals(t, id);
 			
 			for(int j=0; j<checkedTimeIntervalSchedule.getNumberOfEntries();j++){
 				newSchedule.addTimeInterval(checkedTimeIntervalSchedule.timesInSchedule.get(j));
@@ -246,10 +255,10 @@ public class AgentTimeIntervalReader {
 				
 				PolynomialFunction p= 
 					DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
+							id,
 							idLink, 
 							thisParkingInterval);
-				
-							
+					
 				//Integrate from start to End
 				double joulesInInterval=DecentralizedSmartCharger.functionIntegrator.integrate(p, 
 						thisParkingInterval.getStartTime(), 

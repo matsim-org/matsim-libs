@@ -26,9 +26,10 @@ public class ParkingInterval extends TimeInterval {
 	
 	private double requiredChargingDuration=-1;
 	private Id linkId;
-	
 	private double joulesInTimeInterval;
+	private Schedule parkingChargingSchedule=null;
 	
+	private Schedule chargingSchedule=null;
 	
 	private boolean optimal; // true if in optimal loadDistributionInterval
 	
@@ -43,6 +44,25 @@ public class ParkingInterval extends TimeInterval {
 	public ParkingInterval(double start, double end, Id linkId){
 		super(start, end);
 		this.linkId=linkId;
+	}
+	
+	
+	
+	public void setChargingSchedule(Schedule chargingSchedule){
+		// TODO automatically generate parkingChargingSchedule and assign
+		
+		this.chargingSchedule=chargingSchedule;
+	}
+	
+	
+	public void setParkingChargingSchedule(Schedule parkingChargingSchedule){
+		this.parkingChargingSchedule=parkingChargingSchedule;
+	}
+	
+	
+	
+	public Schedule getChargingSchedule(){
+		return chargingSchedule;
 	}
 	
 	

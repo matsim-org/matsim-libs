@@ -24,6 +24,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
+import org.matsim.api.core.v01.Id;
 
 
 public class ChargingSlotDistributor {
@@ -51,7 +52,7 @@ public class ChargingSlotDistributor {
 	 * @throws IllegalArgumentException
 	 * @throws OptimizationException
 	 */
-	public Schedule distribute(Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
+	public Schedule distribute(Id agentId, Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
 		Schedule chargingScheduleAgent = new Schedule();
 		
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
@@ -61,31 +62,39 @@ public class ChargingSlotDistributor {
 				ParkingInterval p= (ParkingInterval) t;
 				double chargingTime=p.getRequiredChargingDuration();
 				
-				PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(p.getLocation(),
+				PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
+						agentId, //agentId
+						p.getLocation(),
 						p);
+				//Id agentId, Id idLink, TimeInterval t
 				
-				
-				//System.out.println("assign charging schedule between "+ p.getStartTime() + " to"+ p.getEndTime()+ " for "+ chargingTime+ " seconds");
-				
-				// if too constricted the distribution will not work, overlaps!!!
 				if(p.getIntervalLength()*0.7 <chargingTime){
 					
 					double diff= p.getIntervalLength()-chargingTime;
 					double startRand= Math.random()*diff;
 					//(System.out.println("assign charging time "+ startRand + " to "+  startRand+chargingTime);
-					chargingScheduleAgent.addTimeInterval(new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime));
+					
+					ChargingInterval c= new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime);
+					chargingScheduleAgent.addTimeInterval(c);
+					
+					Schedule chargingScheduleForParkingInterval= new Schedule();
+					chargingScheduleForParkingInterval.addTimeInterval(c);
+					p.setChargingSchedule(chargingScheduleForParkingInterval);
 					
 				}else{
-					chargingScheduleAgent.mergeSchedules(assignChargingScheduleForParkingInterval(func, 
+					
+					Schedule chargingScheduleForParkingInterval=assignChargingScheduleForParkingInterval(func, 
 							p.getJoulesInInterval(), 
 							p.getStartTime(), 
 							p.getEndTime(), 
-							chargingTime));
+							chargingTime);
+					
+					p.setChargingSchedule(chargingScheduleForParkingInterval);
+					
+					chargingScheduleAgent.mergeSchedules(chargingScheduleForParkingInterval);
 				}
 				
 			}
-			
-			
 		}
 	
 		return chargingScheduleAgent;

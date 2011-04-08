@@ -32,6 +32,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 
 
 /**
@@ -43,7 +44,7 @@ public class Schedule {
 	
 	double totalJoulesInOptimalParkingTimes=0;
 	double totalJoulesInSubOptimalParkingTimes=0;
-	
+	private double startingSOC;
 	
 	LinkedList<TimeInterval> timesInSchedule= new LinkedList<TimeInterval>();
 	
@@ -52,6 +53,25 @@ public class Schedule {
 		
 	}
 	
+	
+	public void clearJoules(){
+		totalJoulesInOptimalParkingTimes=0;
+		totalJoulesInSubOptimalParkingTimes=0;
+		clearJoulesInIntervals();
+		
+	}
+	
+	
+	private void clearJoulesInIntervals(){
+		for(int i=0; i<getNumberOfEntries(); i++){
+			TimeInterval t = timesInSchedule.get(i);
+			
+			if(t.isParking()){
+				((ParkingInterval) t).setJoulesInPotentialChargingInterval(0.0);
+				
+			}
+		}
+	}
 	
 	
 	
@@ -93,6 +113,19 @@ public class Schedule {
 	}
 	
 	
+	
+	
+	public double getTotalTimeOfIntervalsInSchedule(){
+		double totalTime=0;
+		
+		for(int i=0; i<getNumberOfEntries();i++){
+			totalTime=totalTime+timesInSchedule.get(i).getIntervalLength();
+		} 
+		return totalTime;
+	}
+	
+	
+	
 	public void addTimeInterval(TimeInterval t){
 		timesInSchedule.add(t);
 	}
@@ -113,6 +146,10 @@ public class Schedule {
 		return timesInSchedule.size();
 	}
 	
+	public double getStartingSOC(){
+		return startingSOC;
+	}
+	
 	
 	public void mergeSchedules(Schedule schedule2){
 		for(int i=0; i< schedule2.getNumberOfEntries(); i++){
@@ -121,6 +158,12 @@ public class Schedule {
 		
 		this.sort();
 	}
+	
+	
+	public void setStartingSOC(double SOC){
+		startingSOC=SOC;
+	}
+	
 	
 	public void visualizeLoadDistribution(String name) throws IOException{
 		XYSeriesCollection loadDistributionIntervals = new XYSeriesCollection();
@@ -310,6 +353,54 @@ public class Schedule {
 		
 	}
 	
+	
+	
+	public void insertChargingIntervalsIntoParkingIntervalSchedule(Schedule intervalsToPutIn){
+		
+		for(int i=0; i<intervalsToPutIn.getNumberOfEntries(); i++){
+			TimeInterval t= intervalsToPutIn.timesInSchedule.get(i);
+			int interval= intervalIsInWhichTimeInterval(t);
+			
+			
+			double start=timesInSchedule.get(interval).getStartTime();//currently in schedule
+			double end=timesInSchedule.get(interval).getEndTime();
+			
+			Id linkId = ((ParkingInterval) timesInSchedule.get(interval)).getLocation();
+			boolean type= ((ParkingInterval) timesInSchedule.get(interval)).isInSystemOptimalChargingTime();
+				
+			deleteIntervalAtEntry(interval);
+			
+			//before 
+			if(t.getStartTime()>start){
+				ParkingInterval p= new ParkingInterval(start, t.getStartTime(), linkId);
+				p.setParkingOptimalBoolean(type);
+				p.setRequiredChargingDuration(0);
+				addTimeInterval(p);
+			}
+			
+			//charging
+			if(t.getStartTime()>start){
+				ChargingInterval p= new ChargingInterval(t.getStartTime(),t.getEndTime());
+				
+				addTimeInterval(p);
+			}
+			
+			//after
+			if(end>t.getEndTime()){
+				ParkingInterval p= new ParkingInterval(t.getEndTime(),end, linkId);
+				p.setParkingOptimalBoolean(type);
+				p.setRequiredChargingDuration(0);
+				addTimeInterval(p);
+			}
+			sort();
+		}
+		
+	}
+	
+	
+	public void deleteIntervalAtEntry(int i){
+		timesInSchedule.remove(i);
+	}
 	
 	
 }

@@ -101,9 +101,12 @@ public class DecentralizedSmartCharger {
 	public static HubLoadDistributionReader myHubLoadReader;
 	public static ChargingSlotDistributor myChargingSlotDistributor;
 	public static AgentTimeIntervalReader myAgentTimeReader;
+	public static V2G myV2G;
 	
 	private LinkedListValueHashMap<Id, Schedule> agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
 	private LinkedListValueHashMap<Id, Schedule> agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
+	
+	private LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts;
 	
 	public double MINCHARGINGLENGTH;
 	
@@ -127,12 +130,16 @@ public class DecentralizedSmartCharger {
 	final public static DrawingSupplier supplier = new DefaultDrawingSupplier();
 	
 	
-	public LinkedListValueHashMap<Id, Vehicle> vehicles;
+	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
 	
 	private double gasJoulesPerLiter;
 	private double emissionPerLiterEngine;
+	private double gasPricePerLiter;
+	private double compensationPerKWHRegulationUp;
+	private double compensationPerKWHRegulationDown;
+	
 	
 	private double batterySizeEV;
 	private double batterySizePHEV;
@@ -153,7 +160,8 @@ public class DecentralizedSmartCharger {
 			EnergyConsumptionPlugin energyConsumptionPlugin,
 			String outputPath,
 			double gasJoulesPerLiter,
-			double emissionPerLiterEngine			
+			double emissionPerLiterEngine,
+			double gasPricePerLiter
 			
 	) throws IOException, OptimizationException{
 		
@@ -164,6 +172,7 @@ public class DecentralizedSmartCharger {
 		gaussNewtonOptimizer.setMaxIterations(10000000);		
 		gaussNewtonOptimizer.setConvergenceChecker(checker);		
 		optimizer=gaussNewtonOptimizer;
+		
 		polyFit= new PolynomialFitter(24, optimizer);
 		
 			
@@ -173,6 +182,7 @@ public class DecentralizedSmartCharger {
 		
 		this.gasJoulesPerLiter=gasJoulesPerLiter;
 		this.emissionPerLiterEngine=emissionPerLiterEngine;
+		this.gasPricePerLiter=gasPricePerLiter;
 		
 		try {
 			
@@ -212,6 +222,57 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
+	
+	
+	
+	public void setAgentContracts(LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts){
+		this.agentContracts= agentContracts;
+	}
+	
+	
+	public boolean isAgentRegulationUp(Id id){
+		return agentContracts.getValue(id).isUp();
+	}
+	
+	
+	
+	public boolean isAgentRegulationDown(Id id){
+		return agentContracts.getValue(id).isDown();
+	}
+	
+	
+	
+	public static boolean hasAgentPHEV(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new PlugInHybridElectricVehicle(new IdImpl(1)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	public static  boolean hasAgentEV(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new ElectricVehicle(null, new IdImpl(1)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	public static boolean hasAgentCombustionVehicle(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new ConventionalVehicle(null, new IdImpl(2)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	
 	public void initializeLP(double buffer){
 		lpev=new LPEV(buffer);
 		lpphev=new LPPHEV();
@@ -234,18 +295,129 @@ public class DecentralizedSmartCharger {
 			HubLinkMapping hubLinkMapping, 
 			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
 			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution) throws OptimizationException, IOException, InterruptedException{
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,
+			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
+			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping) throws OptimizationException, IOException, InterruptedException{
 		
 		// check if pricing and deterministic have same time intervals
+		
+		double gasPriceInCostPerSecond; // cost/second = cost/liter * liter/joules * joules/second
+		
+		double averageWattCarBattery= //24kW - 4.88*10°7 Joules/2000s
+		gasPriceInCostPerSecond=gasPricePerLiter * 1/gasJoulesPerLiter * 24000;
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
 				deterministicHubLoadDistribution,
 				stochasticHubLoadDistribution,
-				pricingHubDistribution);
+				pricingHubDistribution,
+				locationSourceMapping,
+				agentVehicleSourceMapping,
+				gasPriceInCostPerSecond);
 	}
 	
+	
+	public void initializeAndRunV2G(
+			double compensationPerKWHRegulationUp,
+			double compensationPerKWHRegulationDown) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
+		this.compensationPerKWHRegulationDown=compensationPerKWHRegulationDown;
+		this.compensationPerKWHRegulationUp=compensationPerKWHRegulationUp;
+		myV2G= new V2G(this);
+		checkVehicleSources();
+		//TODO all other sources
+		
+	}
+	
+	
+	
+	private void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+		
+		if(myHubLoadReader.agentVehicleSourceMapping.size()!=0){
+			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){
+				
+				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
+				if(hasAgentCombustionVehicle(id)==false){
+					
+					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					
+					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
+						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
+						PolynomialFunction func= electricSourceInterval.getPolynomialFunction();
+						
+						double joulesFromSource= functionIntegrator.integrate(func, electricSourceInterval.getStartTime(), electricSourceInterval.getEndTime());
+						
+						
+						
+						if(joulesFromSource<0 && isAgentRegulationUp(id)){
+							
+							double compensationPerJouleRegulationUp= compensationPerKWHRegulationUp*1/(1000*3600);
+							double compensation= joulesFromSource*compensationPerJouleRegulationUp;
+							
+							String type;
+							
+							double batterySize; 
+							double batteryMin;
+							double batteryMax;
+							
+							if(hasAgentPHEV(id)){
+								
+								//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
+								batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
+								batteryMin=batteryMinPHEV; //dummy
+								batteryMax=batteryMaxPHEV; 
+								
+								type="PHEVReschedule";
+								
+							}else{
+								
+								//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
+													
+								batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
+								batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
+								batteryMax=batteryMaxEV; 
+								
+								type="EVReschedule";
+							}
+							
+							
+							
+							
+							myV2G.regulationUp(id, 
+										electricSourceInterval, 
+										agentParkingAndDrivingSchedules.getValue(id), 
+										compensation,
+										joulesFromSource,
+										hasAgentEV(id),
+										type,
+										lpev,
+										lpphev,
+										batterySize, 
+										batteryMin,
+										batteryMax);
+							
+							
+							
+						}else{
+							
+							if(isAgentRegulationDown(id)){
+								//regulationDownEV or PHEV
+								//TODO
+							}
+							
+						}
+						
+						
+					}
+					
+				}
+								
+			}
+		}
+		//TODO Visualize changes due to V2G... keep record of he switched, he earned
+	}
+	
+	
 	
 	/**
 	 * get agent schedules, find required charging times, assign charging times
@@ -261,9 +433,10 @@ public class DecentralizedSmartCharger {
 		readAgentSchedules();
 		findRequiredChargingTimes();
 		assignChargingTimes();
+		combineChargingParkingAndDrivingSchedule();
 		findChargingDistribution();
 		
-		calculateChargingCosts();
+		calculateChargingCostsAllAgents();
 		
 		
 	}
@@ -379,9 +552,7 @@ public class DecentralizedSmartCharger {
 			/*
 			 * IF COMBUSTION
 			 */
-			if(vehicles.getValue(id).getClass().equals(
-					new ConventionalVehicle(null, new IdImpl(2)).getClass())){
-				
+			if(hasAgentCombustionVehicle(id)){
 								
 				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
 				double consumption = lpcombustion.getDrivingConsumption();
@@ -391,11 +562,11 @@ public class DecentralizedSmartCharger {
 				EMISSIONCOUNTER+= emissionContribution;
 				agentsWithCombustion.add(id);
 				type="combustion";
+				
 			}else{
 				/*
 				 * EV OR PHEV
 				 */
-				
 				
 				double joulesFromEngine=0;
 				
@@ -403,8 +574,7 @@ public class DecentralizedSmartCharger {
 				double batteryMin;
 				double batteryMax; 
 				
-				if(vehicles.getValue(id).getClass().equals(
-						new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
+				if(hasAgentPHEV(id)){
 					
 					//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
 					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
@@ -412,6 +582,7 @@ public class DecentralizedSmartCharger {
 					batteryMax=batteryMaxPHEV; 
 					agentsWithPHEV.add(id);
 					type="PHEV";
+					
 				}else{
 					
 					//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
@@ -436,8 +607,7 @@ public class DecentralizedSmartCharger {
 					
 				}else{					
 					//if fails, try PHEV
-					if(vehicles.getValue(id).getClass().equals(
-							new ElectricVehicle(null, new IdImpl(1)).getClass())){
+					if(hasAgentEV(id)){
 						
 						chargingFailureEV.add(id);
 					}
@@ -477,7 +647,7 @@ public class DecentralizedSmartCharger {
 			System.out.println("Assign charging times agent "+ id.toString());
 			
 			
-			Schedule chargingSchedule=myChargingSlotDistributor.distribute(agentParkingAndDrivingSchedules.getValue(id));
+			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.getValue(id));
 			
 			
 			agentChargingSchedules.put(id, chargingSchedule);
@@ -1064,6 +1234,17 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
+	public double joulesExtraConsumptionToGasCosts(double joules){
+		
+		double mass=1/(gasJoulesPerLiter)*joules; // 1kgBenzin/43MJ= xkg/joules
+		
+		double cost= gasPricePerLiter*mass; // xx CHF/liter 
+				
+		return cost;
+	}
+	
+	
+	
 	/**
 	 * // for each agent
 		// loop over assigned charging times
@@ -1073,35 +1254,72 @@ public class DecentralizedSmartCharger {
 	 * @throws FunctionEvaluationException
 	 * @throws IllegalArgumentException
 	 */
-	public void calculateChargingCosts() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void calculateChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		for(Id id : controler.getPopulation().getPersons().keySet()){
-						
-			double totalCost=0;
-			Schedule s= agentChargingSchedules.getValue(id);
 			
-			for(int i=0; i<s.getNumberOfEntries();i++){
-				
-				TimeInterval t = s.timesInSchedule.get(i); //charging time
-				
-				Schedule parkAndDrive= agentParkingAndDrivingSchedules.getValue(id);
-				
-				int pos= parkAndDrive.intervalIsInWhichTimeInterval(t);
-				
-				Id linkId = ((ParkingInterval)parkAndDrive.timesInSchedule.get(pos)).getLocation();
-				
-				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
-				
-				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
-				
-			}
+			Schedule s= agentParkingAndDrivingSchedules.getValue(id);
 			
-			agentChargingCosts.put(id, totalCost);
-		}
+			agentChargingCosts.put(id,calculateChargingCostForAgentSchedule(s) );
+		}		
+		
 		
 	}
 	
 	
+	
+	public double calculateChargingCostForAgentSchedule(Schedule s) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		double totalCost=0;
+		
+		for(int i=0; i<s.getNumberOfEntries();i++){
+			
+			TimeInterval t = s.timesInSchedule.get(i); //charging time
+			
+			if(t.isParking() && ((ParkingInterval)t).getChargingSchedule()!=null){
+				Id linkId = ((ParkingInterval)t).getLocation();
+				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
+				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
+			}
+			
+			if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
+				totalCost +=  joulesExtraConsumptionToGasCosts(((DrivingInterval)t).getExtraConsumption());
+			}
+			
+		}
+		return totalCost;
+	}
+	
+	
+	
+	
+	
+	public void combineChargingParkingAndDrivingSchedule(){
+		
+		for(Id id : controler.getPopulation().getPersons().keySet()){
+						
+			Schedule parkAndDrive= agentParkingAndDrivingSchedules.getValue(id);
+			
+			
+			for(int i=0; i<parkAndDrive.getNumberOfEntries(); i++){
+				
+				TimeInterval t = parkAndDrive.timesInSchedule.get(i);
+				
+				if(t.isParking()&& ((ParkingInterval)t).getChargingSchedule()!=null){
+					//if this interval has charging assigned
+					
+					Schedule newSubSchedule= new Schedule();
+					newSubSchedule.addTimeInterval(t);
+					
+					newSubSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(((ParkingInterval)t).getChargingSchedule());
+					
+					((ParkingInterval)t).setParkingChargingSchedule(newSubSchedule);
+					
+				}
+				
+			}
+			
+		}
+	}
 	
 	
 }

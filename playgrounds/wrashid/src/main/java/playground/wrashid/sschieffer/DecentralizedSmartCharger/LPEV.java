@@ -118,6 +118,71 @@ public class LPEV {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	public Schedule solveLPReschedule(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
+		
+		this.batteryMax=batteryMax;
+		this.batteryMin=batteryMin;
+		this.batterySize=batterySize;
+		
+		
+		setUpLP(schedule, id, batterySize, batteryMin, batteryMax, startingSOC);
+		int status = solver.solve();
+        
+        if(status!=0){
+        	String text = solver.getStatustext(status);
+        	System.out.println("Status text: "+ text); 
+        	// status=0--> OPTIMAL
+        	// 2 --> INFEASIBLE
+        	return null; 
+        }
+        
+      
+		
+		try {
+			
+			
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
+			solver.printLp();
+			
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
+			solver.printObjective();
+			
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
+			solver.printTableau();
+		} catch (Exception e) {	    
+		}
+		
+		
+		schedule= update();
+		System.out.println("updated schedule with required charging times:");
+		schedule.printSchedule();
+		visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
+		
+		printLPSolution();
+		
+		solver.deleteLp();
+		
+		return schedule;
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * sets objective, inequalities and bounds on solution
 	 * @param schedule
@@ -129,15 +194,6 @@ public class LPEV {
 		personId=id;
 		
 		
-		
-		/*
-		 * TODObattery buffer... related to contract type
-		and EV things not working... wrong impId???
-		 * TODO
-		 * TODO
-		 * TODO
-		 * =Main.vehicles.getValue(personId).
-		 */
 		
 		System.out.println("LP summary for agent"+ id.toString());
 		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
@@ -172,6 +228,57 @@ public class LPEV {
 		
 		
 	}
+	
+	
+	
+	
+	
+	
+	private void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
+		this.schedule=schedule;
+		personId=id;
+		
+		
+		
+		System.out.println("LP summary for agent"+ id.toString());
+		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
+		System.out.println("Starting SOC: "+ startingSOC);
+		
+		
+		numberOfVariables= schedule.getNumberOfEntries()+1;
+		
+		solver = LpSolve.makeLp(0, numberOfVariables);
+		
+		setObjectiveFunction();
+		
+		
+		
+		for(int i=0; i<schedule.getNumberOfEntries(); i++){
+			String inequality=setInEqualityBatteryConstraint(i);
+			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
+			solver.strAddConstraint(inequality, LpSolve.GE, batterySize*batteryMin);
+			
+		}
+		
+		
+		// setDrivingConsumptionSmallerSOC Inequality
+		for(int i=0; i<schedule.numberOfDrivingTimes();i++){
+			setDrivingConsumptionSmallerSOC(i,  buffer);
+			
+		}
+		
+		
+		//upper & lower bounds
+		setLowerAndUpperBoundsWithStartingSOC(batterySize, batteryMin, batteryMax, startingSOC);
+		
+		
+		
+	}
+	
+	
+	
+	
+	
 	
 	
 	
@@ -314,6 +421,37 @@ public class LPEV {
 	
 	
 	
+	/**
+	 * sets lower and upper bounds on all variables: 
+	 * SOC= given Starting SOC,
+	 * 0 <t< parking timeS
+	 * 
+	 * @param batterySize
+	 * @param batteryMin
+	 * @param batteryMax
+	 * @throws LpSolveException
+	 */
+	private void setLowerAndUpperBoundsWithStartingSOC(double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
+		solver.setLowbo(1, startingSOC);
+		solver.setUpbo(1, startingSOC);
+		
+		for(int i=2; i<=numberOfVariables; i++){
+			if(schedule.timesInSchedule.get(i-2).isParking()){
+				solver.setLowbo(i, 0);
+				solver.setUpbo(i, schedule.timesInSchedule.get(i-2).getIntervalLength());
+			}else{
+				// Driving times
+				solver.setLowbo(i, 1);
+				solver.setUpbo(i, 1);
+			}
+			
+		}
+	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * adds constraint to LP problem
@@ -346,6 +484,7 @@ public class LPEV {
 				objectiveStr=objectiveStr.concat("0 ");
 			}
 		}
+		
 		DrivingInterval d= (DrivingInterval)schedule.timesInSchedule.get(pos);
 		solver.strAddConstraint(objectiveStr, 
 				LpSolve.GE, 
@@ -362,6 +501,9 @@ public class LPEV {
 	 */
 	public Schedule update() throws LpSolveException{
 		double[] solution = solver.getPtrVariables();
+		
+		schedule.setStartingSOC(solution[0]);
+		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){
 				((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(solution[i+1]);
