@@ -68,8 +68,9 @@ public class testDecentralizedSmartCharger extends TestCase{
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
 		
 		final double optimalPrice=0.1;
-		final double suboptimalPrice=0.15;
-		
+		final double suboptimalPrice=optimalPrice*3;
+		final double gasPrice=optimalPrice*2;
+			
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
 		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
@@ -79,7 +80,6 @@ public class testDecentralizedSmartCharger extends TestCase{
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		
-				
 		final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
 		
 		final double phev=1.0;
@@ -88,6 +88,8 @@ public class testDecentralizedSmartCharger extends TestCase{
 		
 		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
 		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		
 		
 		final double bufferBatteryCharge=0.0;
 		
@@ -124,6 +126,12 @@ public class testDecentralizedSmartCharger extends TestCase{
 				
 				try {
 					
+					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= new LinkedListValueHashMap<Integer, Schedule>();
+					//hub/LoadDIstributionSchedule
+					
+					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= new LinkedListValueHashMap<Id, Schedule>();
+					
+					
 					mapHubsTest(controler,hubLinkMapping);
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
@@ -132,7 +140,8 @@ public class testDecentralizedSmartCharger extends TestCase{
 							e.getEnergyConsumptionPlugin(),
 							outputPath, 
 							gasJoulesPerLiter,
-							emissionPerLiterEngine
+							emissionPerLiterEngine,
+							gasPrice
 							);
 					
 					myDecentralizedSmartCharger.setBatteryConstants(
@@ -154,8 +163,9 @@ public class testDecentralizedSmartCharger extends TestCase{
 							hubLinkMapping, 
 							deterministicHubLoadDistribution,
 							stochasticHubLoadDistribution,
-							pricingHubDistribution);
-					
+							pricingHubDistribution,
+							locationSourceMapping,
+							agentVehicleSourceMapping);
 					
 					//*****************************************
 					//*****************************************
@@ -222,12 +232,29 @@ public class testDecentralizedSmartCharger extends TestCase{
 					Parking Interval 	 start: 62490.0	  end: 86400.0	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -3.3411427243079994E14
 					*/
 					
+					
+					
+					
+					V2G myV2G= new V2G(testDecentralizedSmartCharger.myDecentralizedSmartCharger);
+					
+					Schedule cutSchedule= myV2G.cutScheduleAtTime(agentOne, s, 30000.0);
+					
+					assertEquals(cutSchedule.getNumberOfEntries(), 3);
+					assertEquals(cutSchedule.timesInSchedule.get(2).getEndTime(), 30000.0);
+					assertEquals( ((ParkingInterval)cutSchedule.timesInSchedule.get(2)).getLocation() ,
+							((ParkingInterval)s.timesInSchedule.get(2)).getLocation());
+					
+					
+					
+					
+					
+					
 					//*****************************************
 					//*****************************************
 					
 					myDecentralizedSmartCharger.assignChargingTimes();
 					
-					PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(p5th.getLocation(),
+					PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(agentOne,p5th.getLocation(),
 							p5th);
 					
 					Schedule sAssigned = myDecentralizedSmartCharger.myChargingSlotDistributor.assignChargingScheduleForParkingInterval(

@@ -18,6 +18,8 @@ public class testSchedule extends TestCase{
 	public void testScheduleMethods(){
 		s= setDummySchedule();
 		
+		assertEquals(50, s.getTotalTimeOfIntervalsInSchedule());
+		
 		s.printSchedule();
 		
 		// first entry as created in dummy schedule
@@ -45,6 +47,23 @@ public class testSchedule extends TestCase{
 		assertEquals(s.sameTimeIntervalsInThisSchedule(s), true);
 		assertEquals(s.sameTimeIntervalsInThisSchedule(s2), false);
 		
+		
+		
+		System.out.println("Test Insert Charging Schedule intob bigParkingInterval method");
+		Schedule testInsertChargingSchedule= setBigDummySchedule();
+		System.out.println("parkinInterval");
+		testInsertChargingSchedule.printSchedule();
+		
+		System.out.println("to insert");
+		setDummyChargingSchedule().printSchedule();
+		
+		System.out.println("result");
+		testInsertChargingSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(setDummyChargingSchedule());
+		testInsertChargingSchedule.printSchedule();
+		
+		assertEquals(5, testInsertChargingSchedule.getNumberOfEntries());
+		assertEquals(testInsertChargingSchedule.timesInSchedule.get(0).getIntervalLength(), 5.0);
+		assertEquals(testInsertChargingSchedule.timesInSchedule.get(4).getIntervalLength(), 50.0);
 	}
 	
 	
@@ -60,6 +79,29 @@ public class testSchedule extends TestCase{
 		s1.addTimeInterval(new ParkingInterval(15, 30, null));
 		
 		return s1;
+	}
+	
+	
+	public Schedule setDummyChargingSchedule(){
+		Schedule s1= new Schedule();
+		
+		s1.addTimeInterval(new ChargingInterval(30, 50));
+		s1.addTimeInterval(new ChargingInterval(5, 10));
+		
+		s1.sort();
+		
+		return s1;
+	}
+	
+	
+	public Schedule setBigDummySchedule(){
+		Schedule s1= new Schedule();
+		ParkingInterval p= new ParkingInterval(0, 100, null);
+		
+		s1.addTimeInterval(p);
+		
+		return s1;
+		
 	}
 	
 	public TimeInterval setDummyInterval(){
