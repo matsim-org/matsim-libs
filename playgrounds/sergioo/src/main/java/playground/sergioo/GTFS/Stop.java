@@ -50,10 +50,23 @@ public class Stop {
 	}
 	/**
 	 * @param linkId the linkId to set
+	 * @return 
 	 */
-	public void setLinkId(String linkId) {
-		if(!fixedLinkId)
+	public boolean setLinkId(String linkId) {
+		if(!fixedLinkId) {
 			this.linkId = linkId;
+			return true;
+		}
+		else
+			return false;
+	}
+	/**
+	 * @param linkId the linkId to set
+	 * @return 
+	 */
+	public void forceSetLinkId(String linkId) {
+		fixedLinkId = true;
+		this.linkId = linkId;
 	}
 	/**
 	 * @return the fixedLinkId

@@ -2,6 +2,7 @@ package playground.sergioo.PathEditor.kernel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,15 @@ public class RoutePath {
 			String linkId = stops.get(stopTime.getStopId()).getLinkId();
 			if(linkId!=null)
 				links.add(network.getLinks().get(new IdImpl(linkId)));
+		}
+		return links;
+	}
+	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
+		Collection<Link> links =  new HashSet<Link>();
+		for(Link link:network.getLinks().values()) {
+			Coord linkCenter = link.getCoord();
+			if(xMin-10*minDistance<linkCenter.getX()&&yMin-10*minDistance<linkCenter.getY()&&xMax+10*minDistance>linkCenter.getX()&&yMax+10*minDistance>linkCenter.getY())
+				links.add(link);
 		}
 		return links;
 	}
@@ -383,8 +393,10 @@ public class RoutePath {
 			Point2D point = new Point2D(stop.getPoint().getX(),stop.getPoint().getY());
 			if(!linkLine.isNearestInside(point)) {
 				int pos=getLinkPosition(link.getId().toString());
-				if(pos==-1 || pos==links.size()-1)
+				if(pos==-1)
 					return stopTime.getStopId();
+				if(pos==links.size()-1)
+					return "";
 				Link link2 = links.get(pos+1);
 				fromPoint = new Point2D(link2.getFromNode().getCoord().getX(), link2.getFromNode().getCoord().getY());
 				toPoint = new Point2D(link2.getToNode().getCoord().getX(), link2.getToNode().getCoord().getY());
@@ -428,8 +440,11 @@ public class RoutePath {
 		for(StopTime stopTime: trip.getStopTimes().values())
 			stops.get(stopTime.getStopId()).setLinkId(null);
 	}
-	public void addLinkStop(int selectedLinkIndex, String selectedStopId) {
-		stops.get(selectedStopId).setLinkId(getLink(selectedLinkIndex).getId().toString());
+	public boolean addLinkStop(int selectedLinkIndex, String selectedStopId) {
+		return stops.get(selectedStopId).setLinkId(getLink(selectedLinkIndex).getId().toString());
+	}
+	public void forceAddLinkStop(int selectedLinkIndex, String selectedStopId) {
+		stops.get(selectedStopId).forceSetLinkId(getLink(selectedLinkIndex).getId().toString());
 	}
 	public void removeLinkStop(String selectedStopId) {
 		stops.get(selectedStopId).setLinkId(null);

@@ -715,9 +715,9 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				boolean withBase = false;
 				links = new ArrayList<Link>();
 				if(linksS==null)
-					window = new Window(network,tripEntry.getValue(),stops[r],links);
+					window = new Window(tripEntry.getKey(), network,tripEntry.getValue(),stops[r],links,this, r);
 				else {
-					window = new Window(network,tripEntry.getValue(),stops[r],linksS,links);
+					window = new Window(tripEntry.getKey(), network,tripEntry.getValue(),stops[r],linksS,links,this, r);
 					withBase = true;
 				}
 				window.setVisible(true);
@@ -773,6 +773,51 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			tripEntry.getValue().setRoute(links);
 			System.out.println("Finished "+tripEntry.getKey());
 		}	
+	}
+	public void restartTripsStops(String selectedStopId, int r) throws IOException {
+		PrintWriter writer = new PrintWriter(PREFILES[0]);
+		for(Entry<String,Stop> stopE: stops[r].entrySet()) {
+			if(stopE.getValue().isFixedLinkId()) {
+				writer.println(stopE.getKey());
+				writer.println(stopE.getValue().getLinkId());
+			}
+		}
+		writer.close();
+		String baseId = null;
+		writer = new PrintWriter(PREFILES[2]);
+		for(Entry<String,String[]> fTripE:finishedTrips.entrySet()) {
+			boolean isOk = true;
+			for(Entry<String,Route> routeE:routes[r].entrySet()) {
+				Trip trip = routeE.getValue().getTrips().get(fTripE.getKey());
+				if(trip!=null)
+					for(StopTime stopTime:trip.getStopTimes().values()) {
+						if(stopTime.getStopId().equals(selectedStopId)) {
+							isOk=false;
+							baseId = routeE.getValue().getShortName()+(fTripE.getKey().contains("_1")?"_1":"_2");
+						}
+					}
+			}
+			if(isOk) {
+				writer.println(fTripE.getKey());
+				String linksT = "";
+				for(String link:fTripE.getValue())
+					linksT+=link+";";
+				writer.println(linksT);
+			}
+			else {
+				bases.remove(baseId);
+			}
+		}
+		writer.close();
+		writer = new PrintWriter(PREFILES[1]);
+		for(Entry<String,String[]> baseE:bases.entrySet()) {
+			writer.println(baseE.getKey());
+			String linksT = "";
+			for(String link:baseE.getValue())
+				linksT+=link+";";
+			writer.println(linksT);
+		}
+		writer.close();
 	}
 	@Override
 	/**

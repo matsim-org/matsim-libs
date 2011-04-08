@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.sergioo.GTFS.GTFS2MATSimTransitScheduleFileWriter;
 import playground.sergioo.GTFS.Stop;
 import playground.sergioo.GTFS.Trip;
 import playground.sergioo.PathEditor.kernel.RoutePath;
@@ -115,8 +117,18 @@ public class Window extends JFrame implements ActionListener {
 	private JLabel lblDistance;
 	private JLabel lblNumCandidate;
 	public List<Link> links;
+	private GTFS2MATSimTransitScheduleFileWriter writer;
+	private int r;
+	private JButton saveButton;
+	private boolean us = true;
+	private boolean reps = true;
+	
 	//Methods
-	public Window(Network network, Trip trip, Map<String,Stop> stops, List<Link> links) {
+	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle(title);
+		this.r = r;
+		this.writer = writer;
 		this.links = links;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
@@ -130,6 +142,10 @@ public class Window extends JFrame implements ActionListener {
 		for(Tool tool:Tool.values()) {
 			JButton toolButton = new JButton(tool.caption);
 			toolButton.setActionCommand(tool.name());
+			if(tool.equals(Tool.SAVE)) {
+				saveButton = toolButton;
+				saveButton.setEnabled(false);
+			}
 			toolButton.addActionListener(this);
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = tool.gx;
@@ -138,6 +154,7 @@ public class Window extends JFrame implements ActionListener {
 			gbc.gridheight = tool.sy;
 			toolsPanel.add(toolButton,gbc);
 		}
+		
 		this.add(toolsPanel, BorderLayout.NORTH);
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
@@ -160,7 +177,10 @@ public class Window extends JFrame implements ActionListener {
 		infoPanel.add(lblNumCandidate);
 		this.add(infoPanel, BorderLayout.SOUTH);
 	}
-	public Window(Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE) {
+	public Window(String title, Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
+		setTitle(title);
+		this.r = r;
+		this.writer = writer;
 		this.links = linksE;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
@@ -177,6 +197,10 @@ public class Window extends JFrame implements ActionListener {
 		for(Tool tool:Tool.values()) {
 			JButton toolButton = new JButton(tool.caption);
 			toolButton.setActionCommand(tool.name());
+			if(tool.equals(Tool.SAVE)) {
+				saveButton = toolButton;
+				saveButton.setEnabled(false);
+			}
 			toolButton.addActionListener(this);
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = tool.gx;
@@ -303,7 +327,18 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void addLinkStop() {
 		if(selectedLinkIndex!=-1 && !selectedStopId.equals(""))
-			routePath.addLinkStop(selectedLinkIndex,selectedStopId);
+			if(!routePath.addLinkStop(selectedLinkIndex,selectedStopId)) {
+				int res = JOptionPane.showConfirmDialog(this, "This is a fixed stop, are you sure do you want to change?");
+				if(res == JOptionPane.YES_OPTION) {
+					routePath.forceAddLinkStop(selectedLinkIndex,selectedStopId);
+					try {
+						writer.restartTripsStops(selectedStopId,r);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					JOptionPane.showMessageDialog(this, "Restart the program");
+				}
+			}
 	}
 	public void removeLinkStop() {
 		if(!selectedStopId.equals(""))
@@ -313,14 +348,20 @@ public class Window extends JFrame implements ActionListener {
 		routePath.initStops();
 		routePath.calculatePath();
 	}
+	public void changeUs() {
+		us =!us;
+	}
+	public void changeReps() {
+		reps  = !reps;
+	}
 	public void isOk() {
 		Point2D center = panel.getCenter();
 		Coord coord = new CoordImpl(center.getX(), center.getY());
 		selectedLinkIndex = routePath.isPathJoined();
 		if(selectedLinkIndex==-1) {
-			selectedLinkIndex = routePath.isPathWithoutUs();
+			selectedLinkIndex = us?routePath.isPathWithoutUs():-1;
 			if(selectedLinkIndex==-1) {
-				selectedLinkIndex = routePath.isPathWithoutRepeatedLink();
+				selectedLinkIndex = reps?routePath.isPathWithoutRepeatedLink():-1;
 				if(selectedLinkIndex==-1) {
 					panel.withStops();
 					selectedStopId = routePath.allStopsWithLink();
@@ -332,6 +373,8 @@ public class Window extends JFrame implements ActionListener {
 								selectedLinkIndex = routePath.isFirstLinkWithStop();
 								if(selectedLinkIndex==-1) {
 									JOptionPane.showMessageDialog(this, "Yes!!!");
+									saveButton.setEnabled(true);
+									return;
 								}
 								else {
 									JOptionPane.showMessageDialog(this, "No, the first link is not related to a stop");
@@ -367,6 +410,7 @@ public class Window extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(this, "No, the path is not joined");
 			coord = routePath.getLink(selectedLinkIndex).getCoord();
 		}
+		saveButton.setEnabled(false);
 		panel.centerCamera(coord.getX(), coord.getY());
 	}
 	public void save() {
@@ -401,6 +445,9 @@ public class Window extends JFrame implements ActionListener {
 		if(selectedLinkIndex<0)
 			selectedLinkIndex=-1;
 		lblLink.setText(selectedLinkIndex==-1?"":routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
+	}
+	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
+		return routePath.getNetworkLinks(xMin, yMin, xMax, yMax);
 	}
 	
 }
