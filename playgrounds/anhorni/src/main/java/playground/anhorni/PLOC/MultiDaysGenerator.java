@@ -72,26 +72,20 @@ public class MultiDaysGenerator {
 	}
 	
 	private void generatePlan(List<Integer> keyList, double limit) {
-		int cnt = 0;
 		for (Integer id : keyList) {
 			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(new IdImpl(id));
 
 			// copy person -------
-			PersonImpl pTmp = new PersonImpl(new IdImpl(cnt));
+			PersonImpl pTmp = new PersonImpl(new IdImpl(id));
 			// copy person -------
 			
 			boolean worker = false;
 			if (this.randomNumberGenerator.nextDouble() < limit) {
 				worker = true;
 			}
-			int homeId = 1;
-			if ((Integer)p.getCustomAttributes().get("townId") == 1) {
-				homeId = 8;
-			}
-			PlanImpl plan = singlePlanGenerator.generatePlan(homeId, worker, p);
+			PlanImpl plan = singlePlanGenerator.generatePlan(worker, p);
 			pTmp.addPlan(plan);
 			scenarioWriteOut.getPopulation().addPerson(pTmp);
-			cnt++;
 		}
 	}
 	

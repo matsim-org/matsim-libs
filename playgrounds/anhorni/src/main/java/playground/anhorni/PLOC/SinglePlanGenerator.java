@@ -36,17 +36,21 @@ public class SinglePlanGenerator {
 		this.facilities = facilities;
 	}
 	
-	public PlanImpl generatePlan(int homeIndex, boolean worker, PersonImpl p) {
+	public PlanImpl generatePlan(boolean worker, PersonImpl p) {
 		PlanImpl plan;
-		if (worker) plan = generateWorkPlan(homeIndex, p);
-		else plan = generateNonWorkPlan(homeIndex); 
+		if (worker) plan = generateWorkPlan(p);
+		else plan = generateNonWorkPlan(p); 
 		return plan;
 	}
 	
-	private PlanImpl generateNonWorkPlan(int homeIndex) {
+	private PlanImpl generateNonWorkPlan(PersonImpl p) {
 		
+		int homeIndex = 1;
 		int facilityIndex = 1;
-		if (homeIndex == 8) facilityIndex = 2;
+		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
+			homeIndex = 8;
+			facilityIndex = 2;
+		}
 		Id facilityId = new IdImpl(facilityIndex);
 		
 		PlanImpl plan = new PlanImpl();
@@ -82,10 +86,13 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateWorkPlan(int homeIndex, PersonImpl p) {
-		
+	private PlanImpl generateWorkPlan(PersonImpl p) {
+		int homeIndex = 1;
 		int facilityIndex = 1;
-		if (homeIndex == 8) facilityIndex = 2;
+		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
+			homeIndex = 8;
+			facilityIndex = 2;
+		}
 		Id facilityId = new IdImpl(facilityIndex);
 		
 		PlanImpl plan = new PlanImpl();
