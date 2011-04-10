@@ -36,10 +36,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -69,11 +71,12 @@ public class Window extends JFrame implements ActionListener {
 		}
 	}
 	public enum Tool {
-		ADD("Add",0,0,2,1,"add"),
-		REMOVE("Remove",0,1,2,1,"remove"),
-		REMOVE_FROM("Remove From",2,0,2,1,"removeFrom"),
-		REMOVE_TO("Remove To",2,1,2,1,"removeTo"),
-		ROUTE("Route",4,0,4,2,"route"),
+		ADD("Add first",0,0,2,1,"addFirst"),
+		ADD_NEXT("Add next",0,1,2,1,"addNext"),
+		ROUTE("Route",2,0,2,1,"route"),
+		REMOVE("Remove",2,1,2,1,"remove"),
+		REMOVE_FROM("Remove From",4,0,4,1,"removeFrom"),
+		REMOVE_TO("Remove To",4,1,4,1,"removeTo"),
 		INCREASE_DISTANCE("+Distance",8,0,2,1,"incDistance"),
 		DECREASE_DISTANCE("-Distance",8,1,2,1,"decDistance"),
 		INCREASE_NUM_CANDIDATES("+Candidates",10,0,2,1,"incCandidates"),
@@ -96,6 +99,29 @@ public class Window extends JFrame implements ActionListener {
 			this.function = function;
 		}
 	}
+	public enum Check {
+		SHAPE_COST("Shape cost","ShapeCost"),
+		INSIDE_STOPS("Stops inside","InsideStops"),
+		ANGLE_SHAPE("Angle shape","AngleShape");
+		String caption;
+		String text;
+		private Check(String caption,String text) {
+			this.caption = caption;
+			this.text = text;
+		}
+	}
+	public enum Label {
+		LINK("LinkText"),
+		STOP("StopText"),
+		MIN_DISTANCE("MinDistanceText"),
+		NUM_CANDIDATES("NumCandidatesText"),
+		US("Us"),
+		REPS("Reps");
+		String text;
+		private Label(String text) {
+			this.text = text;
+		}
+	}
 	//Constants
 	private static int GAPX = 50;
 	private static int GAPY = 120;
@@ -112,70 +138,17 @@ public class Window extends JFrame implements ActionListener {
 	private Option option;
 	private int selectedLinkIndex = -1;
 	private String selectedStopId = "";
-	private JLabel lblLink;
-	private JLabel lblStop;
-	private JLabel lblDistance;
-	private JLabel lblNumCandidate;
 	public List<Link> links;
 	private GTFS2MATSimTransitScheduleFileWriter writer;
 	private int r;
 	private JButton saveButton;
-	private boolean us = true;
-	private boolean reps = true;
+	private JLabel[] labels;
+	private JCheckBox[] checks;
+	private boolean first;
 	
 	//Methods
 	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle(title);
-		this.r = r;
-		this.writer = writer;
-		this.links = links;
-		this.setLocation(0,0);
-		this.setLayout(new BorderLayout());
-		routePath = new RoutePath(network, trip, stops);
-		option = Option.SELECT_LINK;
-		panel = new PanelPathEditor(this);
-		this.setSize(width+GAPX, height+GAPY);
-		this.add(panel, BorderLayout.CENTER);
-		JPanel toolsPanel = new JPanel();
-		toolsPanel.setLayout(new GridBagLayout());
-		for(Tool tool:Tool.values()) {
-			JButton toolButton = new JButton(tool.caption);
-			toolButton.setActionCommand(tool.name());
-			if(tool.equals(Tool.SAVE)) {
-				saveButton = toolButton;
-				saveButton.setEnabled(false);
-			}
-			toolButton.addActionListener(this);
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = tool.gx;
-			gbc.gridy = tool.gy;
-			gbc.gridwidth = tool.sx;
-			gbc.gridheight = tool.sy;
-			toolsPanel.add(toolButton,gbc);
-		}
-		
-		this.add(toolsPanel, BorderLayout.NORTH);
-		JPanel buttonsPanel = new JPanel();
-		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
-		for(Option option:Option.values()) {
-			JButton optionButton = new JButton(option.caption);
-			optionButton.setActionCommand(option.name());
-			optionButton.addActionListener(this);
-			buttonsPanel.add(optionButton);
-		}
-		this.add(buttonsPanel, BorderLayout.EAST);
-		JPanel infoPanel = new JPanel();
-		lblLink=new JLabel("");
-		lblStop=new JLabel("");
-		lblDistance=new JLabel(routePath.getMinDistance()*6371000*Math.PI/180+"");
-		lblNumCandidate=new JLabel(routePath.getNumCandidates()+"");
-		infoPanel.setLayout(new GridLayout(1,4));
-		infoPanel.add(lblLink);
-		infoPanel.add(lblStop);
-		infoPanel.add(lblDistance);
-		infoPanel.add(lblNumCandidate);
-		this.add(infoPanel, BorderLayout.SOUTH);
+		this(title,network,trip,stops,null,links,writer,r);
 	}
 	public Window(String title, Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
 		setTitle(title);
@@ -184,10 +157,14 @@ public class Window extends JFrame implements ActionListener {
 		this.links = linksE;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		List<Link> links = new ArrayList<Link>();
-		for(String link:linksS)
-			links.add(network.getLinks().get(new IdImpl(link)));
-		routePath = new RoutePath(network, trip, stops, links);
+		if(linksS==null)
+			routePath = new RoutePath(network, trip, stops);
+		else {
+			List<Link> links = new ArrayList<Link>();
+			for(String link:linksS)
+				links.add(network.getLinks().get(new IdImpl(link)));
+			routePath = new RoutePath(network, trip, stops, links);
+		}
 		option = Option.SELECT_LINK;
 		panel = new PanelPathEditor(this);
 		this.setSize(width+GAPX, height+GAPY);
@@ -220,66 +197,110 @@ public class Window extends JFrame implements ActionListener {
 		}
 		this.add(buttonsPanel, BorderLayout.EAST);
 		JPanel infoPanel = new JPanel();
-		lblLink=new JLabel("");
-		lblStop=new JLabel("");
-		lblDistance=new JLabel(routePath.getMinDistance()*6371000*Math.PI/180+"");
-		lblNumCandidate=new JLabel(routePath.getNumCandidates()+"");
-		infoPanel.setLayout(new GridLayout(1,4));
-		infoPanel.add(lblLink);
-		infoPanel.add(lblStop);
-		infoPanel.add(lblDistance);
-		infoPanel.add(lblNumCandidate);
+		infoPanel.setLayout(new BorderLayout());
+		JPanel labelsPanel = new JPanel();
+		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labels = new JLabel[Label.values().length];
+		int l=0;
+		for(Label label:Label.values()) {
+			try {
+				Method m = RoutePath.class.getMethod("get"+label.text, new Class[] {});
+				labels[l]=new JLabel(m.invoke(routePath, new Object[]{}).toString());
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			labelsPanel.add(labels[l]);
+			l++;
+		}
+		infoPanel.add(labelsPanel, BorderLayout.CENTER);
+		JPanel checksPanel = new JPanel();
+		checksPanel.setLayout(new GridLayout(1,Check.values().length));
+		checksPanel.setBorder(new TitledBorder("Algorithm options"));
+		checks = new JCheckBox[Check.values().length];
+		int c=0;
+		for(Check check:Check.values()) {
+			checks[c]=new JCheckBox(check.caption);
+			checks[c].addActionListener(this);
+			checks[c].setActionCommand(check.text);
+			checksPanel.add(checks[c]);
+			try {
+				Method m = RoutePath.class.getMethod("isWith"+check.text, new Class[] {});
+				checks[c].setSelected((Boolean) m.invoke(routePath, new Object[]{}));
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		infoPanel.add(checksPanel, BorderLayout.WEST);
 		this.add(infoPanel, BorderLayout.SOUTH);
 	}
 	public Option getOption() {
 		return option;
 	}
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		for(Option option:Option.values())
-			if(e.getActionCommand().equals(option.name()))
-				this.option = option;
-		for(Tool tool:Tool.values())
-			if(e.getActionCommand().equals(tool.name())) {
-				try {
-					Method m = Window.class.getMethod(tool.function, new Class[] {});
-					m.invoke(this, new Object[]{});
-				} catch (SecurityException e1) {
-					e1.printStackTrace();
-				} catch (NoSuchMethodException e1) {
-					e1.printStackTrace();
-				} catch (IllegalArgumentException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				} catch (InvocationTargetException e1) {
-					e1.printStackTrace();
-				}
-				panel.repaint();
-			}
+	public String refreshLink() {
+		return routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")";
+	}
+	public String refreshStop() {
+		return selectedStopId+"("+routePath.getIndexStop(selectedStopId)+")";
+	}
+	public String refreshDistance() {
+		return Math.round(routePath.getMinDistance()*6371000*Math.PI/180)+"";
+	}
+	public String refreshNumCandidates() {
+		return routePath.getNumCandidates()+"";
+	}
+	public String refreshUs() {
+		return Boolean.toString(routePath.getUs());
+	}
+	public String refreshReps() {
+		return Boolean.toString(routePath.getReps());
 	}
 	public void selectLink(double x, double y) {
 		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
-		lblLink.setText(routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
+		labels[Label.LINK.ordinal()].setText(refreshLink());
 	}
 	public void unselectLink(double x, double y) {
 		selectedLinkIndex = -1;
-		lblLink.setText("");
+		labels[Label.LINK.ordinal()].setText("");
 	}
 	public void selectStop(double x, double y) {
 		selectedStopId = routePath.getIdNearestStop(x, y);
-		lblStop.setText(selectedStopId);
+		labels[Label.STOP.ordinal()].setText(refreshStop());
 	}
 	public void unselectStop(double x, double y) {
 		selectedStopId = "";
-		lblStop.setText("");
+		labels[Label.STOP.ordinal()].setText("");
 	}
-	public void add() {
+	public void addFirst() {
 		panel.waitSecondCoord();
+		first = true;
+	}
+	public void addNext() {
+		panel.waitSecondCoord();
+		first = false;
 	}
 	public void add(Coord second) {
-		if(selectedLinkIndex!=-1) {
-			routePath.addLink(selectedLinkIndex, second);
+		if(first) {
+			routePath.addLinkFirst(second);
+			selectedLinkIndex = 0;
+		}
+		else if(selectedLinkIndex!=-1) {
+			routePath.addLinkNext(selectedLinkIndex, second);
 			selectedLinkIndex++;
 		}
 	}
@@ -311,19 +332,19 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void incDistance() {
 		routePath.increaseMinDistance();
-		lblDistance.setText(routePath.getMinDistance()*6371000*Math.PI/180+"");
+		labels[Label.MIN_DISTANCE.ordinal()].setText(refreshDistance());
 	}
 	public void decDistance() {
 		routePath.decreaseMinDistance();
-		lblDistance.setText(routePath.getMinDistance()*6371000*Math.PI/180+"");
+		labels[Label.MIN_DISTANCE.ordinal()].setText(refreshDistance());
 	}
 	public void incCandidates() {
 		routePath.increaseNumCandidates();
-		lblNumCandidate.setText(routePath.getNumCandidates()+"");
+		labels[Label.NUM_CANDIDATES.ordinal()].setText(refreshNumCandidates());
 	}
 	public void decCandidates() {
 		routePath.decreaseNumCandidates();
-		lblNumCandidate.setText(routePath.getNumCandidates()+"");
+		labels[Label.NUM_CANDIDATES.ordinal()].setText(refreshNumCandidates());
 	}
 	public void addLinkStop() {
 		if(selectedLinkIndex!=-1 && !selectedStopId.equals(""))
@@ -349,19 +370,21 @@ public class Window extends JFrame implements ActionListener {
 		routePath.calculatePath();
 	}
 	public void changeUs() {
-		us =!us;
+		routePath.setUs(!routePath.getUs());
+		labels[Label.US.ordinal()].setText(refreshUs());
 	}
 	public void changeReps() {
-		reps  = !reps;
+		routePath.setUs(!routePath.getReps());
+		labels[Label.REPS.ordinal()].setText(refreshReps());
 	}
 	public void isOk() {
 		Point2D center = panel.getCenter();
 		Coord coord = new CoordImpl(center.getX(), center.getY());
 		selectedLinkIndex = routePath.isPathJoined();
 		if(selectedLinkIndex==-1) {
-			selectedLinkIndex = us?routePath.isPathWithoutUs():-1;
+			selectedLinkIndex = routePath.getUs()?routePath.isPathWithoutUs():-1;
 			if(selectedLinkIndex==-1) {
-				selectedLinkIndex = reps?routePath.isPathWithoutRepeatedLink():-1;
+				selectedLinkIndex = routePath.getReps()?routePath.isPathWithoutRepeatedLink():-1;
 				if(selectedLinkIndex==-1) {
 					panel.withStops();
 					selectedStopId = routePath.allStopsWithLink();
@@ -438,16 +461,56 @@ public class Window extends JFrame implements ActionListener {
 		selectedLinkIndex++;
 		if(selectedLinkIndex==routePath.getLinks().size())
 			selectedLinkIndex=-1;
-		lblLink.setText(selectedLinkIndex==-1?"":routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
+		labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
 	}
 	public void decreaseSelectedLink() {
 		selectedLinkIndex--;
 		if(selectedLinkIndex<0)
 			selectedLinkIndex=-1;
-		lblLink.setText(selectedLinkIndex==-1?"":routePath.getLink(selectedLinkIndex).getId()+"("+selectedLinkIndex+")");
+		labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
 	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
 		return routePath.getNetworkLinks(xMin, yMin, xMax, yMax);
 	}
-	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		for(Option option:Option.values())
+			if(e.getActionCommand().equals(option.name()))
+				this.option = option;
+		for(Check check:Check.values())
+			if(e.getActionCommand().equals(check.text)) {
+				try {
+					Method m = RoutePath.class.getMethod("setWith"+check.text, new Class[] {});
+					m.invoke(routePath, new Object[]{});
+				} catch (SecurityException e1) {
+					e1.printStackTrace();
+				} catch (NoSuchMethodException e1) {
+					e1.printStackTrace();
+				} catch (IllegalArgumentException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+				}
+			}
+		for(Tool tool:Tool.values())
+			if(e.getActionCommand().equals(tool.name())) {
+				try {
+					Method m = Window.class.getMethod(tool.function, new Class[] {});
+					m.invoke(this, new Object[]{});
+				} catch (SecurityException e1) {
+					e1.printStackTrace();
+				} catch (NoSuchMethodException e1) {
+					e1.printStackTrace();
+				} catch (IllegalArgumentException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+				}
+				panel.repaint();
+			}
+	}
 }

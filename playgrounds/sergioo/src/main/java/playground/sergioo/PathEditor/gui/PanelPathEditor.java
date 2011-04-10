@@ -124,13 +124,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		}
 		if(withStops) {
 			g2.setColor(pointsColor2);
-			boolean first=true;
 			for(Coord point:window.getStopPoints()) {
-				if(first) {
-					first = false;
-					Shape circle = new Ellipse2D.Double(camera.getIntX(point.getX())-pointsSize*3,camera.getIntY(point.getY())-pointsSize*3,pointsSize*6,pointsSize*6);
-					g2.fill(circle);
-				}
 				g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
 				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
 			}
