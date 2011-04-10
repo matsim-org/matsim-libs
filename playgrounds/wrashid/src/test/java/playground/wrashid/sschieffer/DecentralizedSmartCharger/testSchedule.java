@@ -1,5 +1,8 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.api.core.v01.Id;
 
 import junit.framework.TestCase;
@@ -14,11 +17,19 @@ public class testSchedule extends TestCase{
 	}
 	
 	
-	
-	public void testScheduleMethods(){
+	public void testGetTotalTimeOfIntervalsInSchedule(){
 		s= setDummySchedule();
-		
-		assertEquals(50, s.getTotalTimeOfIntervalsInSchedule());
+		s.sort();
+		//******************************
+		//getTotalTimeOfIntervalsInSchedule()
+		//******************************
+		double total= s.getTotalTimeOfIntervalsInSchedule();
+		assertEquals(50.0, total);
+	}
+	
+	
+	public void testSort(){
+		s= setDummySchedule();
 		
 		s.printSchedule();
 		
@@ -27,8 +38,19 @@ public class testSchedule extends TestCase{
 		
 		s.sort();
 		assertEquals(0.0, s.timesInSchedule.get(0).getStartTime());
-		
+	}
+	
+	
+	public void testTotalConsumption(){
+		s= setDummySchedule();
+		s.sort();
 		assertEquals(s.getTotalConsumption(), 100.0);
+	}
+	
+	
+	public void testMergeOverLapTimeIsInWhichInterval(){
+		s= setDummySchedule();
+		s.sort();
 		
 		Schedule s2= new Schedule();
 		s2.addTimeInterval(setDummyInterval());
@@ -46,9 +68,10 @@ public class testSchedule extends TestCase{
 		
 		assertEquals(s.sameTimeIntervalsInThisSchedule(s), true);
 		assertEquals(s.sameTimeIntervalsInThisSchedule(s2), false);
-		
-		
-		
+	}
+	
+	
+	public void testInsertChargingSchedule(){
 		System.out.println("Test Insert Charging Schedule intob bigParkingInterval method");
 		Schedule testInsertChargingSchedule= setBigDummySchedule();
 		System.out.println("parkinInterval");
@@ -67,6 +90,72 @@ public class testSchedule extends TestCase{
 	}
 	
 	
+	public void testAddLoadDistributionIntervalToExistingLoadDistributionSchedule() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		Schedule loads= setDummyLoadDistributionSchedule(); // 0-20  and 40-50
+		System.out.println("Start:");
+		loads.printSchedule();
+		
+		
+		// **************
+		// NO OVERLAP
+		//**************
+		LoadDistributionInterval noOverlap= new LoadDistributionInterval(20, 30, new PolynomialFunction( new double[]{-10}), false);
+		
+		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(noOverlap);
+		System.out.println("After insertion of noOverlap LoadInterval");
+		loads.printSchedule();
+		assertEquals(3, loads.getNumberOfEntries());
+		
+		
+		// **************
+		// OVERLAP case 1
+		//**************
+		loads= setDummyLoadDistributionSchedule(); 
+		LoadDistributionInterval withinFirst= new LoadDistributionInterval(10, 20, new PolynomialFunction( new double[]{-5}), false);
+		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(withinFirst);
+		System.out.println("After insertion of Overlap LoadInterval");
+		loads.printSchedule();
+		assertEquals(3, loads.getNumberOfEntries());
+		PolynomialFunction func=((LoadDistributionInterval)loads.timesInSchedule.get(1)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], 5.0);
+		
+		
+		// **************
+		// OVERLAP CAse 2
+		//**************
+		loads= setDummyLoadDistributionSchedule(); 
+		LoadDistributionInterval withinFirstAndEmptyInterval= new LoadDistributionInterval(10, 30, new PolynomialFunction( new double[]{-5}), false);
+		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(withinFirstAndEmptyInterval);
+		System.out.println("After insertion of long Overlap LoadInterval");
+		loads.printSchedule();
+		assertEquals(4, loads.getNumberOfEntries());
+		func=((LoadDistributionInterval)loads.timesInSchedule.get(1)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], 5.0);
+		func=((LoadDistributionInterval)loads.timesInSchedule.get(2)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], -5.0);
+		func=((LoadDistributionInterval)loads.timesInSchedule.get(3)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], 10.0);
+		
+	}
+	
+	
+	public void testScheduleMethods() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		testGetTotalTimeOfIntervalsInSchedule();
+		
+		testSort();
+		
+		testTotalConsumption();
+		
+		testMergeOverLapTimeIsInWhichInterval();
+		
+		testInsertChargingSchedule();
+		
+		testAddLoadDistributionIntervalToExistingLoadDistributionSchedule();
+		
+	}
+	
+	
 	
 	
 	
@@ -75,7 +164,7 @@ public class testSchedule extends TestCase{
 		
 		s1.addTimeInterval(new ParkingInterval(30, 50, null));
 		s1.addTimeInterval(new ParkingInterval(0, 10, null));
-		s1.addTimeInterval(new DrivingInterval(10,15, 100) );
+		s1.addTimeInterval(new DrivingInterval(10,15, 100.0) );
 		s1.addTimeInterval(new ParkingInterval(15, 30, null));
 		
 		return s1;
@@ -109,6 +198,14 @@ public class testSchedule extends TestCase{
 		return new ParkingInterval(50, 70, null);
 		
 		
+	}
+	
+	
+	public Schedule setDummyLoadDistributionSchedule(){
+		Schedule s1= new Schedule();
+		s1.addTimeInterval(new LoadDistributionInterval(0.0, 20.0, new PolynomialFunction(new double[]{10}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(40.0, 50.0, new PolynomialFunction(new double[]{10}), true));
+		return s1;
 	}
 	
 }

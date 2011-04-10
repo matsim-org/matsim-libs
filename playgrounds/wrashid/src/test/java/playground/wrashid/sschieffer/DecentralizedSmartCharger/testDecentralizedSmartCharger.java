@@ -233,21 +233,14 @@ public class testDecentralizedSmartCharger extends TestCase{
 					*/
 					
 					
+					//*****************************************
+					//*****************************************
+					//******TEST V2G
+					//*****************************************
 					
+					testV2G myTestV2G = new testV2G();
 					
-					V2G myV2G= new V2G(testDecentralizedSmartCharger.myDecentralizedSmartCharger);
-					
-					Schedule cutSchedule= myV2G.cutScheduleAtTime(agentOne, s, 30000.0);
-					
-					assertEquals(cutSchedule.getNumberOfEntries(), 3);
-					assertEquals(cutSchedule.timesInSchedule.get(2).getEndTime(), 30000.0);
-					assertEquals( ((ParkingInterval)cutSchedule.timesInSchedule.get(2)).getLocation() ,
-							((ParkingInterval)s.timesInSchedule.get(2)).getLocation());
-					
-					
-					
-					
-					
+					myTestV2G.testAllV2G();
 					
 					//*****************************************
 					//*****************************************
@@ -455,6 +448,9 @@ public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int n
 		
 	}
 
+	
+	
+	
 
 	
 }
