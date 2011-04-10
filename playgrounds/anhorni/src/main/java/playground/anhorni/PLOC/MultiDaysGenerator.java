@@ -53,11 +53,11 @@ public class MultiDaysGenerator {
 		for (Id id : staticPopulation.getPersons().keySet()) {
 			keyList.add(Integer.parseInt(id.toString()));
 		}
-		double share[] = {0.9, 0.8, 0.7, 0.6, 0.5};
+		
 		for (int i = 0; i < 5; i++) {
-			double limit = share[2];
+			double limit = MultiplerunsControler.share[2];
 			if (temporalVar) {
-				limit = share[i];
+				limit = MultiplerunsControler.share[i];
 			}
 			Collections.shuffle(keyList, randomNumberGenerator);
 			

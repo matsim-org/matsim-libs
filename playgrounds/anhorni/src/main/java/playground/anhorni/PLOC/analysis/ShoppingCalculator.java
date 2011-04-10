@@ -42,15 +42,19 @@ public class ShoppingCalculator implements ShutdownListener {
 	
 	private double totalExpenditurePerFacilityPerHour[][];
 	private ObjectAttributes personAttributes;
+	private boolean temporalVar;
+	private int day;
 	
 	public void notifyShutdown(ShutdownEvent event) {
 		this.evaluate(event);
 		this.printStatistics(event);
 	}
 	
-	public ShoppingCalculator(ObjectAttributes personAttributes) {
+	public ShoppingCalculator(ObjectAttributes personAttributes, boolean temporalVar, int day) {
 		this.totalExpenditurePerFacilityPerHour = new double[MultiplerunsControler.shoppingFacilities.length][24];
 		this.personAttributes = personAttributes;
+		this.temporalVar = temporalVar;
+		this.day = day;
 	}
 	
 	private void evaluate(ShutdownEvent event) {
@@ -62,6 +66,10 @@ public class ShoppingCalculator implements ShutdownListener {
 				if (act.getType().equals("s")) {
 					shopLocIndex = ArrayUtils.indexOf(MultiplerunsControler.shoppingFacilities, Integer.parseInt(act.getFacilityId().toString()));
 					double expenditure = (Double) this.personAttributes.getAttribute(p.getId().toString(), "expenditure");
+					
+					if (temporalVar) {
+						expenditure *= MultiplerunsControler.dayExpenditureFactor[day];
+					}
 					double arrivalTime = ((LegImpl)actslegs.get(j-1)).getArrivalTime();
 					int startTime = (int) (((arrivalTime) / 3600.0) % 24);
 					this.totalExpenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;

@@ -41,6 +41,8 @@ public class MultiplerunsControler {
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 	
 	public static int shoppingFacilities[] = {1, 2, 4, 5, 6, 7, 8, 9};
+	public static double dayExpenditureFactor[] = {0.8, 0.9, 1.0, 1.1, 1.2};
+	public static double share[] = {0.9, 0.8, 0.7, 0.6, 0.5};
 	
     public static void main (final String[] args) { 
     	MultiplerunsControler runControler = new MultiplerunsControler();
@@ -76,6 +78,8 @@ public class MultiplerunsControler {
     			config[0] = "src/main/java/playground/anhorni/input/PLOC/3towns/runs/run"+ runIndex + "/day" + i + "/config.xml";
 	    		controler = new SingleRunControler(config);	 
 	    		controler.setPersonAttributes(this.personAttributes);
+	    		controler.setTempVar(configReader.isTemporalVar());
+	    		controler.setDay(i);
 	        	controler.run();
     		}
     	}

@@ -30,9 +30,19 @@ import playground.anhorni.PLOC.analysis.ShoppingCalculator;
 public class SingleRunControler extends Controler {
 	
 	private ObjectAttributes personAttributes;
+	private int day;
+	private boolean tempVar;
 		
 	public SingleRunControler(final String[] args) {
 		super(args);	
+	}
+	
+	public void setDay(int day) {
+		this.day = day;
+	}
+	
+	public void setTempVar(boolean tempVar) {
+		this.tempVar = tempVar;
 	}
 	
 	public void setPersonAttributes(ObjectAttributes personAttributes) {
@@ -46,7 +56,7 @@ public class SingleRunControler extends Controler {
     
     public void run() {
     	super.setOverwriteFiles(true);
-    	super.addControlerListener(new ShoppingCalculator(this.personAttributes));
+    	super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
     	super.run();
     }
     
