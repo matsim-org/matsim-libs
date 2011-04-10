@@ -48,6 +48,20 @@ public class LoadDistributionInterval  extends TimeInterval
 	}
 	
 	
+	public boolean overlap(LoadDistributionInterval other){
+		boolean check=false;
+		if( (other.getStartTime()>=getStartTime() && other.getStartTime()<getEndTime()) 
+				||
+				(other.getEndTime()>getStartTime() && other.getEndTime()<=getEndTime())){
+			check=true;
+		}
+		return check;
+	}
+	
+	public LoadDistributionInterval clone(){
+		LoadDistributionInterval clone= new LoadDistributionInterval(start, end, p, optimal);
+		return clone;
+	}
 	
 	
 	public void makeXYSeries(){

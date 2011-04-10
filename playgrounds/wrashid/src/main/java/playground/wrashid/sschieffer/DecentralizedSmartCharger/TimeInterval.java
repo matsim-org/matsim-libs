@@ -38,6 +38,17 @@ public abstract class TimeInterval implements Comparable{
 		return end;
 	}
 	
+	
+	public boolean overlap(TimeInterval other){
+		boolean check=false;
+		if( (other.getStartTime()>=getStartTime() && other.getStartTime()<getEndTime()) 
+				||
+				(other.getEndTime()>getStartTime() && other.getEndTime()<=getEndTime())){
+			check=true;
+		}
+		return check;
+	}
+	
 	/**
 	 * returns 1 if this object starts later
 	 * returns -1 if this starts before

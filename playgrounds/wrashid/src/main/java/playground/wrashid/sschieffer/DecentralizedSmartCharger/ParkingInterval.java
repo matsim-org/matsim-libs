@@ -48,10 +48,16 @@ public class ParkingInterval extends TimeInterval {
 	
 	
 	
+	
+	
 	public void setChargingSchedule(Schedule chargingSchedule){
-		// TODO automatically generate parkingChargingSchedule and assign
 		
 		this.chargingSchedule=chargingSchedule;
+		
+		Schedule newParkingChargingSchedule = new Schedule();
+		newParkingChargingSchedule.addTimeInterval(this);
+		newParkingChargingSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(chargingSchedule);
+		setParkingChargingSchedule(newParkingChargingSchedule);
 	}
 	
 	

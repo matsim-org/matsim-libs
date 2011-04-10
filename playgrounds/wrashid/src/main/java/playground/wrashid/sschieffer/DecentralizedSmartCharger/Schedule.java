@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -221,8 +224,8 @@ public class Schedule {
 		for(int i=0; i<timesInSchedule.size(); i++){
 			TimeInterval thisT= timesInSchedule.get(i);
 			
-			if(   (t.getStartTime()>=thisT.getStartTime()  && t.getStartTime()<=thisT.getEndTime())
-					|| (t.getEndTime()>=thisT.getStartTime()  && t.getEndTime()<=thisT.getEndTime())){
+			if(   (t.getStartTime()>=thisT.getStartTime()  && t.getStartTime()<thisT.getEndTime())
+					|| (t.getEndTime()>thisT.getStartTime()  && t.getEndTime()<=thisT.getEndTime())){
 				//if overlap
 				overlap=true;
 			}
@@ -398,9 +401,110 @@ public class Schedule {
 	}
 	
 	
+	public void addLoadDistributionIntervalToExistingLoadDistributionSchedule(LoadDistributionInterval loadToAdd) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		//LinkedList<Integer> toDelete = new LinkedList<Integer>();
+		
+		if (overlapWithTimeInterval(loadToAdd)){
+			Schedule newSchedule=new Schedule();
+			
+			LoadDistributionInterval loadLeftToAdd= loadToAdd.clone();
+			
+			for(int i=0; i<getNumberOfEntries();i++){
+				LoadDistributionInterval t=  (LoadDistributionInterval)timesInSchedule.get(i);
+				
+				if( t.overlap(loadLeftToAdd) ){
+					
+					// interval Before LoadLeftToAdd
+					if(t.getStartTime()<loadLeftToAdd.getStartTime()){
+						newSchedule.addTimeInterval(new LoadDistributionInterval(t.getStartTime(), loadLeftToAdd.getStartTime(),
+								t.getPolynomialFunction() , 
+								t.isOptimal()));
+					}
+					
+					
+					
+					if(loadLeftToAdd.getEndTime()>t.getEndTime()){
+						// NOT fully in	
+						//overlappingPart till interval End
+						
+						PolynomialFunction combinedFunc= t.getPolynomialFunction().add(loadLeftToAdd.getPolynomialFunction());
+						boolean newOptimal;
+						if(DecentralizedSmartCharger.functionIntegrator.integrate(combinedFunc, 
+								loadLeftToAdd.getStartTime(), 
+								t.getEndTime())>=0){
+							newOptimal=true;
+						}else{
+							newOptimal=false;
+						}
+						
+						//add overlapping new LoadINterval
+						newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getStartTime(),
+								t.getEndTime(),
+								combinedFunc , 
+								newOptimal));
+						
+						//update loadLeftTOAdd
+						loadLeftToAdd=new LoadDistributionInterval(t.getEndTime(), 
+								loadLeftToAdd.getEndTime(), 
+								loadLeftToAdd.getPolynomialFunction(), 
+								loadLeftToAdd.isOptimal());
+						
+					}else{
+						PolynomialFunction combinedFunc= t.getPolynomialFunction().add(loadLeftToAdd.getPolynomialFunction());
+						boolean newOptimal;
+						if(DecentralizedSmartCharger.functionIntegrator.integrate(combinedFunc, 
+								loadLeftToAdd.getStartTime(), 
+								loadLeftToAdd.getEndTime())>=0){
+							newOptimal=true;
+						}else{
+							newOptimal=false;
+						}
+						
+						newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getStartTime(),
+								loadLeftToAdd.getEndTime(),
+								combinedFunc , 
+								newOptimal));
+						
+						if(loadLeftToAdd.getEndTime()<t.getEndTime()){
+							newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getEndTime(),
+									t.getEndTime(),
+									t.getPolynomialFunction() , 
+									t.isOptimal()));
+						}
+						loadLeftToAdd= new LoadDistributionInterval(0, 0, null, false);
+					}
+					
+				}else{
+					newSchedule.addTimeInterval(t);
+				}
+				
+			}	
+			
+			if(loadLeftToAdd.getIntervalLength()>0){
+				newSchedule.addTimeInterval(loadLeftToAdd);
+			}
+			
+			this.timesInSchedule= newSchedule.timesInSchedule;
+			sort();
+		}else{//if no overlap between schedule and interval
+			addTimeInterval(loadToAdd.clone());
+			sort();
+			
+		}
+	}
+	
+	
+	
+	
+	
+	
 	public void deleteIntervalAtEntry(int i){
 		timesInSchedule.remove(i);
 	}
+	
+	
+	
 	
 	
 }

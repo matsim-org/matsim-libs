@@ -303,8 +303,8 @@ public class DecentralizedSmartCharger {
 		
 		double gasPriceInCostPerSecond; // cost/second = cost/liter * liter/joules * joules/second
 		
-		double averageWattCarBattery= //24kW - 4.88*10°7 Joules/2000s
-		gasPriceInCostPerSecond=gasPricePerLiter * 1/gasJoulesPerLiter * 24000;
+		double averageWattCarBattery= 24000;//24kW - 4.88*10°7 Joules/2000s
+		gasPriceInCostPerSecond=gasPricePerLiter * 1/gasJoulesPerLiter * averageWattCarBattery;
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
@@ -347,43 +347,39 @@ public class DecentralizedSmartCharger {
 						
 						double joulesFromSource= functionIntegrator.integrate(func, electricSourceInterval.getStartTime(), electricSourceInterval.getEndTime());
 						
+						String type;
 						
+						double batterySize; 
+						double batteryMin;
+						double batteryMax;
+						
+						if(hasAgentPHEV(id)){
+							
+							//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
+							batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
+							batteryMin=batteryMinPHEV; //dummy
+							batteryMax=batteryMaxPHEV; 
+							
+							type="PHEVReschedule";
+							
+						}else{
+							
+							//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
+												
+							batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
+							batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
+							batteryMax=batteryMaxEV; 
+							
+							type="EVReschedule";
+						}
 						
 						if(joulesFromSource<0 && isAgentRegulationUp(id)){
 							
 							double compensationPerJouleRegulationUp= compensationPerKWHRegulationUp*1/(1000*3600);
-							double compensation= joulesFromSource*compensationPerJouleRegulationUp;
-							
-							String type;
-							
-							double batterySize; 
-							double batteryMin;
-							double batteryMax;
-							
-							if(hasAgentPHEV(id)){
-								
-								//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
-								batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
-								batteryMin=batteryMinPHEV; //dummy
-								batteryMax=batteryMaxPHEV; 
-								
-								type="PHEVReschedule";
-								
-							}else{
-								
-								//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
-													
-								batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
-								batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
-								batteryMax=batteryMaxEV; 
-								
-								type="EVReschedule";
-							}
+							double compensation= Math.abs(joulesFromSource)*compensationPerJouleRegulationUp;
 							
 							
-							
-							
-							myV2G.regulationUp(id, 
+							myV2G.regulationUpVehicleLoad(id, 
 										electricSourceInterval, 
 										agentParkingAndDrivingSchedules.getValue(id), 
 										compensation,
@@ -398,11 +394,25 @@ public class DecentralizedSmartCharger {
 							
 							
 							
-						}else{
+						}else{// joulesFromSource>0
 							
 							if(isAgentRegulationDown(id)){
-								//regulationDownEV or PHEV
-								//TODO
+								double compensationPerJouleRegulationDown= compensationPerKWHRegulationDown*1/(1000*3600);
+								double compensation= joulesFromSource*compensationPerJouleRegulationDown;
+								
+								
+								myV2G.regulationDownVehicleLoad(id, 
+										electricSourceInterval, 
+										agentParkingAndDrivingSchedules.getValue(id), 
+										compensation,
+										joulesFromSource,
+										hasAgentEV(id),
+										type,
+										lpev,
+										lpphev,
+										batterySize, 
+										batteryMin,
+										batteryMax);
 							}
 							
 						}
