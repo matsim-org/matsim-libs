@@ -93,8 +93,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private static String TAG_ONEWAY = "oneway";
 	private static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
 
-	private final Map<String, OsmNode> nodes = new HashMap<String, OsmNode>();
-	private final Map<String, OsmWay> ways = new HashMap<String, OsmWay>();
+	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
+	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
@@ -316,10 +316,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
 		}
 
-		Iterator<Entry<String, OsmWay>> it = this.ways.entrySet().iterator();
+		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<String, OsmWay> entry = it.next();
-			for (String nodeId : entry.getValue().nodes) {
+			Entry<Long, OsmWay> entry = it.next();
+			for (Long nodeId : entry.getValue().nodes) {
 				if (this.nodes.get(nodeId) == null) {
 					it.remove();
 					break;
@@ -338,9 +338,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				this.nodes.get(way.nodes.get(0)).ways++;
 				this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
 
-				for (String nodeId : way.nodes) {
+				for (Long nodeId : way.nodes) {
 					OsmNode node = this.nodes.get(nodeId);
-					if(this.hierarchyLayers.isEmpty()){
+					if (this.hierarchyLayers.isEmpty()) {
 						node.used = true;
 						node.ways++;
 					} else {
@@ -399,7 +399,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				Node nn = this.network.getFactory().createNode(node.id, node.coord);
+				Node nn = this.network.getFactory().createNode(new IdImpl(node.id), node.coord);
 				this.network.addNode(nn);
 			}
 		}
@@ -459,7 +459,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			return;
 		}
 
-		String origId = Long.toString(way.id);
 		double nofLanes = defaults.lanes;
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
@@ -540,10 +539,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
-		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
+		Id fromId = new IdImpl(fromNode.id);
+		Id toId = new IdImpl(toNode.id);
+		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
+			String origId = Long.toString(way.id);
 
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id));
+				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
@@ -555,7 +557,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id));
+				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
@@ -592,12 +594,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private static class OsmNode {
-		public final Id id;
+		public final long id;
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
 
-		public OsmNode(final Id id, final Coord coord) {
+		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
 			this.coord = coord;
 		}
@@ -605,7 +607,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	private static class OsmWay {
 		public final long id;
-		public final List<String> nodes = new ArrayList<String>(4);
+		public final List<Long> nodes = new ArrayList<Long>(4);
 		public final Map<String, String> tags = new HashMap<String, String>(4);
 		public int hierarchy = -1;
 
@@ -636,8 +638,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private class OsmXmlParser extends MatsimXmlParser {
 
 		private OsmWay currentWay = null;
-		private final Map<String, OsmNode> nodes;
-		private final Map<String, OsmWay> ways;
+		private final Map<Long, OsmNode> nodes;
+		private final Map<Long, OsmWay> ways;
 		/*package*/ final Counter nodeCounter = new Counter("node ");
 		/*package*/ final Counter wayCounter = new Counter("way ");
 		private final CoordinateTransformation transform;
@@ -646,7 +648,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		private boolean mergeNodes = false;
 		private boolean collectNodes = false;
 
-		public OsmXmlParser(final Map<String, OsmNode> nodes, final Map<String, OsmWay> ways, final CoordinateTransformation transform) {
+		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways, final CoordinateTransformation transform) {
 			super();
 			this.nodes = nodes;
 			this.ways = ways;
@@ -671,14 +673,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ("node".equals(name)) {
 				if (this.loadNodes) {
-					String idString = StringCache.get(atts.getValue("id"));
-					Id id = new IdImpl(idString);
+					Long id = Long.valueOf(atts.getValue("id"));
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(idString, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
+					this.nodes.put(id, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
-					OsmNode node = this.nodes.get(atts.getValue("id"));
+					OsmNode node = this.nodes.get(Long.valueOf(atts.getValue("id")));
 					if (node != null) {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
@@ -691,8 +692,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
 			} else if ("nd".equals(name)) {
 				if (this.currentWay != null) {
-					String nodeId = StringCache.get(atts.getValue("ref"));
-					this.currentWay.nodes.add(nodeId);
+					this.currentWay.nodes.add(Long.parseLong(atts.getValue("ref")));
 				}
 			} else if ("tag".equals(name)) {
 				if (this.currentWay != null) {
@@ -722,7 +722,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 						used = true;
 					} else {
 						for (OsmFilter osmFilter : OsmNetworkReader.this.hierarchyLayers) {
-							for (String nodeId : this.currentWay.nodes) {
+							for (Long nodeId : this.currentWay.nodes) {
 								OsmNode node = this.nodes.get(nodeId);
 								if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
 									used = true;
@@ -737,11 +737,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 				if (used) {
 					if (this.collectNodes) {
-						for (String id : this.currentWay.nodes) {
-							this.nodes.put(id, new OsmNode(new IdImpl(id), new CoordImpl(0, 0)));
+						for (long id : this.currentWay.nodes) {
+							this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
 						}
 					} else if (this.loadWays) {
-						this.ways.put(Long.toString(this.currentWay.id), this.currentWay);
+						this.ways.put(this.currentWay.id, this.currentWay);
 						this.wayCounter.incCounter();
 					}
 				}
