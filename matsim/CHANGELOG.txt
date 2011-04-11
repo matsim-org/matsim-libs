@@ -19,7 +19,9 @@ Changes:
   - 
 
 - Feature improvements:
-  - 
+  - Major memory improvements in OsmNetworkReader by using Long instead of String for osm-ids (r14944)
+  - dump of configuration to logfile now uses os-specific line endings, making the dump reabable on Windows (r14945, #168)
+  - transit router now exposes additional attributes for configuration to config-file (r14860)
 
 - BugFixes:
   - 
