@@ -56,12 +56,27 @@ public class Main {
 		final double optimalPrice=0.4275/(3600); // cost/second - CAREFUL would have to implement different multipliers for high speed or regular connection
 		final double suboptimalPrice=optimalPrice*3; // cost/second    
 		final double gasPricePerLiter= 0.25;
+		final double compensationPerKWHRegulationUp=optimalPrice*1.1;
+		final double compensationPerKWHRegulationDown=optimalPrice*0.9;
+		
+		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
+		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		
+		final double bufferBatteryCharge=0.0;
+		
+		final double batterySizeEV= 17*3600*1000; 
+		final double batterySizePHEV= 17*3600*1000; 
+		final double batteryMinEV= 0.1; 
+		final double batteryMinPHEV= 0.1; 
+		final double batteryMaxEV= 0.9; 
+		final double batteryMaxPHEV= 0.9; 
+		
 		
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
 		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
 		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
-		
 		
 		
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
@@ -73,20 +88,6 @@ public class Main {
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
-		
-		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-		
-		
-		
-		final double bufferBatteryCharge=0.0;
-		
-		final double batterySizeEV= 17*3600*1000; 
-		final double batterySizePHEV= 17*3600*1000; 
-		final double batteryMinEV= 0.1; 
-		final double batteryMinPHEV= 0.1; 
-		final double batteryMaxEV= 0.9; 
-		final double batteryMaxPHEV= 0.9; 
 		
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
@@ -272,13 +273,22 @@ public class Main {
 						System.out.println("Total emissions [kg]" +
 								myDecentralizedSmartCharger.getTotalEmissions());
 						
-						myDecentralizedSmartCharger.clearResults();
+						
 					}
 					
 					
 					
+					//*****************************************
+					//V2G
+					//*****************************************
+					myDecentralizedSmartCharger.initializeAndRunV2G(
+							compensationPerKWHRegulationUp, 
+							compensationPerKWHRegulationDown);
 					
-					
+					//*****************************************
+					//END
+					//*****************************************
+					myDecentralizedSmartCharger.clearResults();
 					
 				} catch (Exception e1) {
 					

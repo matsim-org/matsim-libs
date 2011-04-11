@@ -73,6 +73,7 @@ public class LPPHEV {
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
+		System.out.println("LP PHEV for Agent: "+ id.toString()); 
 		
 		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
 		solver.solve();
@@ -83,24 +84,24 @@ public class LPPHEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"objective.txt");
+			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"objective.txt");
 			solver.printObjective();
 			
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"tableau.txt");
-			solver.printTableau();
+			solver.printTableau();*/
 		} catch (Exception e) {	    
 		}
 		
 		
 		schedule= update();
-		System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();
+		/*System.out.println("updated schedule with required charging times:");
+		schedule.printSchedule();*/
 		
-		printLPSolution();
+		//printLPSolution();
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
-		System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
-		
+		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
+		*/
 		visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
 		
 		solver.deleteLp();
@@ -114,6 +115,8 @@ public class LPPHEV {
 	
 	
 	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
+		
+		System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
@@ -138,14 +141,14 @@ public class LPPHEV {
 		
 		
 		schedule= update();
-		System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();
+		/*System.out.println("updated schedule with required charging times:");
+		schedule.printSchedule();*/
 		
-		printLPSolution();
+		//printLPSolution();
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
-		System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
-		
+		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
+		*/
 		visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
 		
 		solver.deleteLp();
@@ -168,7 +171,7 @@ public class LPPHEV {
 		personId=id;
 		
 		
-		System.out.println("LP summary for agent"+ id.toString());
+		//System.out.println("LP summary for agent"+ id.toString());
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -202,7 +205,7 @@ public class LPPHEV {
 		personId=id;
 		
 		
-		System.out.println("LP summary for agent"+ id.toString());
+		//System.out.println("LP summary for agent"+ id.toString());
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -444,8 +447,8 @@ public class LPPHEV {
 	 */
 	public void	printLPSolution() throws LpSolveException{
 		double[] solution = solver.getPtrVariables();
-		System.out.println("Charging times from LP:");
-		System.out.println("Starting SOC: "+ solution[0]);
+		/*System.out.println("Charging times from LP:");
+		System.out.println("Starting SOC: "+ solution[0]);*/
 		
 		double optimalChargingParking=0;
 		double suboptimalChargingParking=0;
@@ -465,9 +468,9 @@ public class LPPHEV {
 			}
 		}
 		
-		System.out.println("Total Charging in Optimal Time: " + optimalChargingParking);
+		/*System.out.println("Total Charging in Optimal Time: " + optimalChargingParking);
 		System.out.println("Total Charging in Suboptimal Time: " + suboptimalChargingParking);
-		
+		*/
 		
 	}
 	

@@ -37,7 +37,7 @@ public class V2G {
 			double batteryMin,
 			double batteryMax) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
 		
-		double currentSOC=getSOCAtTime(agentId, agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
+		double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
 		
 		currentSOC=currentSOC+joules;
 		
@@ -60,7 +60,7 @@ public class V2G {
 			Schedule answerScheduleAfterElectricSourceInterval=null;
 			
 			
-			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(secondHalf);
+			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 			
 			double costReschedule= calcCostForRescheduling(answerScheduleAfterElectricSourceInterval,
 					secondHalf, 
@@ -90,6 +90,11 @@ public class V2G {
 						agentParkingDrivingSchedule, 
 						electricSourceInterval);
 			}
+		}else{
+			// no regulation
+			attributeSuperfluousVehicleLoadsToGridIfPossible(agentId, 
+					agentParkingDrivingSchedule, 
+					electricSourceInterval);
 		}
 	}
 	
@@ -135,7 +140,7 @@ public class V2G {
 		
 			
 			
-			double currentSOC=getSOCAtTime(agentId, agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
+			double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
 			currentSOC=currentSOC - Math.abs(joules);//joulesFromSource<0
 			
 			Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
@@ -145,7 +150,7 @@ public class V2G {
 			secondHalf.setStartingSOC(currentSOC);
 			Schedule answerScheduleAfterElectricSourceInterval=null;
 			
-			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(secondHalf);
+			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 			double costReschedule= calcCostForRescheduling(answerScheduleAfterElectricSourceInterval,
 					secondHalf, 
 					agentId, 
@@ -183,7 +188,27 @@ public class V2G {
 	
 	
 	
-	
+	/**
+	 * reassembles updated agentParkingandDriving Schedule from original Schedule,
+	 * the rescheduled part during the electric stochastic load
+	 * and the newly scheduled part after the electric stochastic load;
+	 * saves the reassembled schedule back into AgentParkingAndDrivingSchedules
+	 * 
+	 * AND
+	 * 
+	 * updates charging costs in ChargingCostsForAgents
+	 * 
+	 * @param agentId
+	 * @param answerScheduleAfterElectricSourceInterval
+	 * @param agentParkingDrivingSchedule
+	 * @param electricSourceInterval
+	 * @param costKeeping
+	 * @param costReschedule
+	 * @throws MaxIterationsExceededException
+	 * @throws OptimizationException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
 	public void reschedule(Id agentId, 
 			Schedule answerScheduleAfterElectricSourceInterval,
 			Schedule agentParkingDrivingSchedule,
@@ -215,47 +240,63 @@ public class V2G {
 	}
 	
 	
+	
+	
 	public void attributeSuperfluousVehicleLoadsToGridIfPossible(Id agentId, 
 			Schedule agentParkingDrivingSchedule, 
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule agentDuringLoad= 
-			cutChargingScheduleAtTimeSecondHalf(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
+			cutScheduleAtTimeSecondHalf(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
 		
-		agentDuringLoad= cutChargingScheduleAtTime(agentDuringLoad, electricSourceInterval.getEndTime());
+		agentDuringLoad= cutScheduleAtTime(agentDuringLoad, electricSourceInterval.getEndTime());
 		
 		
 		for(int i=0; i<agentDuringLoad.getNumberOfEntries();i++){
 			TimeInterval agentInterval= agentDuringLoad.timesInSchedule.get(i);
 			
-			if(agentInterval.isParking()){
-				//IF PARKING
-				//
-				int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
-						((ParkingInterval)agentInterval).getLocation());
+			// if overlap between agentInterval && electricSource
+			LoadDistributionInterval overlapAgentAndElectricSource=
+				agentInterval.ifOverlapWithLoadDistributionIntervalReturnOverlap(electricSourceInterval);
+			
+			if(overlapAgentAndElectricSource!=null){
 				
-				Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(hubId);
-				if (hubSchedule.overlapWithTimeInterval(electricSourceInterval)){
-					//if there is overlap
+				if(agentInterval.isParking()){
+					//IF PARKING
+					//
+					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
+							((ParkingInterval)agentInterval).getLocation());
 					
-					hubSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(electricSourceInterval);
+//					System.out.println("hubSchedule before:");
 					
+					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(hubId);
+//					hubSchedule.printSchedule();
+//					
+					if (hubSchedule.overlapWithTimeInterval(overlapAgentAndElectricSource)){
+						//if there is overlap
+						
+						hubSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(overlapAgentAndElectricSource);
+						
+						
+					}else{
+						hubSchedule.addTimeInterval(overlapAgentAndElectricSource);
+						hubSchedule.sort();
+					}
 					
+					System.out.println("hubSchedule after adding superfluous loads:");
+					hubSchedule.printSchedule();
 				}else{
-					hubSchedule.addTimeInterval(electricSourceInterval);
-					hubSchedule.sort();
+					//IF NOT PARKING - ENERGY LOST
+					//save as impossible request for Joules
+					double lost= mySmartCharger.functionIntegrator.integrate(
+							overlapAgentAndElectricSource.getPolynomialFunction(),
+							overlapAgentAndElectricSource.getStartTime(),
+							overlapAgentAndElectricSource.getEndTime());
+					
+					agentElectricSourcesFailureinJoules.put(agentId, Math.abs(lost));
 				}
-				
-			}else{
-				//IF NOT PARKING - ENERGY LOST
-				//save as impossible request for Joules
-				double lost= mySmartCharger.functionIntegrator.integrate(
-						electricSourceInterval.getPolynomialFunction(),
-						agentInterval.getStartTime(),
-						agentInterval.getEndTime());
-				
-				agentElectricSourcesFailureinJoules.put(agentId, Math.abs(lost));
 			}
+			
 		}
 	}
 	
@@ -284,7 +325,7 @@ public class V2G {
 				System.out.println("Reschedule was not possible!");
 				costReschedule= 10000000000000000000000000000.0;
 			}else{
-				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(answerScheduleAfterElectricSourceInterval)-compensation;
+				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
 			}
 			
 			
@@ -301,7 +342,7 @@ public class V2G {
 				System.out.println("Reschedule was not possible!");
 				costReschedule= 10000000000000000000000000000.0;
 			}else{
-				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(answerScheduleAfterElectricSourceInterval)-compensation;
+				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
 			}
 			
 		}
@@ -311,12 +352,15 @@ public class V2G {
 	
 	
 	
-	public double getSOCAtTime(Id id, Schedule agentParkingDrivingSchedule, double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		Schedule cutSchedule=cutScheduleAtTimeFirstHalfAndReassignJoules(id, agentParkingDrivingSchedule, time);
+	public double getSOCAtTime(Schedule agentParkingDrivingSchedule, double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		System.out.println("Schedule to compute SOC at time:"+ time);
+		Schedule cutSchedule=cutScheduleAtTime(agentParkingDrivingSchedule, time);
 		
+		System.out.println("Schedule CUT compute SOC at time:");
+		cutSchedule.printSchedule();
 		double SOCAtStart=agentParkingDrivingSchedule.getStartingSOC();
 		
-		for(int i=0; i<=cutSchedule.getNumberOfEntries(); i++){
+		for(int i=0; i<cutSchedule.getNumberOfEntries(); i++){
 			TimeInterval t= cutSchedule.timesInSchedule.get(i);
 			if(t.isDriving()){
 				SOCAtStart=SOCAtStart - ((DrivingInterval) t).getConsumption();
@@ -389,10 +433,14 @@ public class V2G {
 		TimeInterval lastInterval= agentParkingDrivingSchedule.timesInSchedule.get(interval);
 		if (lastInterval.isDriving()){
 			
-			firstHalf.addTimeInterval(new DrivingInterval(lastInterval.getStartTime(), 
+			DrivingInterval d= new DrivingInterval(lastInterval.getStartTime(), 
 					time, 
 					((DrivingInterval)lastInterval).getConsumption() * (time- lastInterval.getStartTime())/lastInterval.getIntervalLength()
-					));
+					);
+			if(d.getIntervalLength()>0){
+				firstHalf.addTimeInterval(d);
+			}
+			
 		}else{
 			
 				
@@ -413,8 +461,10 @@ public class V2G {
 					p.setRequiredChargingDuration(0);
 				}
 					
+				if(p.getIntervalLength()>0){
+					firstHalf.addTimeInterval(p);
+				}
 				
-				firstHalf.addTimeInterval(p);
 				
 			
 		}
@@ -434,9 +484,15 @@ public class V2G {
 		TimeInterval firstInterval= agentParkingDrivingSchedule.timesInSchedule.get(interval);
 		if (firstInterval.isDriving()){
 			
-			secondHalf.addTimeInterval(new DrivingInterval(time, firstInterval.getEndTime(), 
+			DrivingInterval d= new DrivingInterval(time, firstInterval.getEndTime(), 
 					((DrivingInterval)firstInterval).getConsumption() * (firstInterval.getEndTime()-time )/firstInterval.getIntervalLength()
-					));
+			);
+			if(d.getIntervalLength()>0){
+				secondHalf.addTimeInterval(d);
+			}
+			
+			
+			
 		}else{
 			
 				
@@ -448,17 +504,19 @@ public class V2G {
 				
 				if(((ParkingInterval)firstInterval).getChargingSchedule()!= null){
 					p.setChargingSchedule(
-							cutChargingScheduleAtTime(((ParkingInterval)firstInterval).getChargingSchedule(),
+							cutChargingScheduleAtTimeSecondHalf(((ParkingInterval)firstInterval).getChargingSchedule(),
 									time
 							));
 				}else{
 					p.setRequiredChargingDuration(0);
 				}
 				
-				
+				if(p.getIntervalLength()>0){
+					secondHalf.addTimeInterval(p);
+				}
 							
 				
-				secondHalf.addTimeInterval(p);
+				
 				
 			
 		}

@@ -359,12 +359,19 @@ public class Schedule {
 	
 	
 	public void insertChargingIntervalsIntoParkingIntervalSchedule(Schedule intervalsToPutIn){
+		//
+//		System.out.println("InsertChargingInterval: Schedule into which toinsert:");
+//		printSchedule();
+//		System.out.println("InsertChargingInterval: ChargingSChedule to insert:");
+//		intervalsToPutIn.printSchedule();
+		
+		
 		
 		for(int i=0; i<intervalsToPutIn.getNumberOfEntries(); i++){
 			TimeInterval t= intervalsToPutIn.timesInSchedule.get(i);
 			int interval= intervalIsInWhichTimeInterval(t);
 			
-			
+			//chck value of interval
 			double start=timesInSchedule.get(interval).getStartTime();//currently in schedule
 			double end=timesInSchedule.get(interval).getEndTime();
 			

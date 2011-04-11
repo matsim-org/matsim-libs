@@ -73,7 +73,7 @@ public class LPEV {
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
 		
-		
+		System.out.println("LP EV for Agent: "+ id.toString()); 
 		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
 		int status = solver.solve();
         
@@ -93,21 +93,21 @@ public class LPEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent"+ personId.toString()+"objective.txt");
-			solver.printObjective();
-			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent"+ personId.toString()+"tableau.txt");
-			solver.printTableau();
+//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent"+ personId.toString()+"objective.txt");
+//			solver.printObjective();
+//			
+//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\EV\\LP_agent"+ personId.toString()+"tableau.txt");
+//			solver.printTableau();
 		} catch (Exception e) {	    
 		}
 		
 		
 		schedule= update();
-		System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();
+		/*System.out.println("updated schedule with required charging times:");
+		schedule.printSchedule();*/
 		visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
 		
-		printLPSolution();
+//		printLPSolution();
 		
 		solver.deleteLp();
 		
@@ -125,6 +125,9 @@ public class LPEV {
 	
 	
 	public Schedule solveLPReschedule(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
+		
+		
+		System.out.println("LP EV Resolve for Agent: "+ id.toString()); 
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
@@ -160,11 +163,11 @@ public class LPEV {
 		
 		
 		schedule= update();
-		System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();
+//		System.out.println("updated schedule with required charging times:");
+//		schedule.printSchedule();
 		visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
 		
-		printLPSolution();
+//		printLPSolution();
 		
 		solver.deleteLp();
 		
@@ -195,9 +198,9 @@ public class LPEV {
 		
 		
 		
-		System.out.println("LP summary for agent"+ id.toString());
-		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
-		
+//		System.out.println("LP summary for agent"+ id.toString());
+//		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
+//		
 		
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
@@ -240,10 +243,10 @@ public class LPEV {
 		
 		
 		
-		System.out.println("LP summary for agent"+ id.toString());
-		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
-		System.out.println("Starting SOC: "+ startingSOC);
-		
+//		System.out.println("LP summary for agent"+ id.toString());
+//		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
+//		System.out.println("Starting SOC: "+ startingSOC);
+//		
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -523,9 +526,9 @@ public class LPEV {
 	 */
 	public void	printLPSolution() throws LpSolveException{
 		double[] solution = solver.getPtrVariables();
-		System.out.println("Charging times from LP:");
-		System.out.println("Starting SOC: "+ solution[0]);
-		
+//		System.out.println("Charging times from LP:");
+//		System.out.println("Starting SOC: "+ solution[0]);
+//		
 		double optimalChargingParking=0;
 		double suboptimalChargingParking=0;
 		
@@ -544,10 +547,10 @@ public class LPEV {
 			}
 		}
 		
-		System.out.println("Total Charging in Optimal Time: " + optimalChargingParking);
-		System.out.println("Total Charging in Suboptimal Time: " + suboptimalChargingParking);
+//		System.out.println("Total Charging in Optimal Time: " + optimalChargingParking);
+//		System.out.println("Total Charging in Suboptimal Time: " + suboptimalChargingParking);
+//		
 		
-		//TODO STORE RESULTS and feed into utility?
 	}
 	
 	

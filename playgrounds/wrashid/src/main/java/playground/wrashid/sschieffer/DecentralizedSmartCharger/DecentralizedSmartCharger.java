@@ -196,6 +196,12 @@ public class DecentralizedSmartCharger {
 	
 	
 	
+	public void setAgentContracts(LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts){
+		this.agentContracts= agentContracts;
+	}
+
+
+
 	/**
 	 * Define batteryConstants
 	 * 
@@ -225,72 +231,27 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public void setAgentContracts(LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts){
-		this.agentContracts= agentContracts;
-	}
-	
-	
-	public boolean isAgentRegulationUp(Id id){
-		return agentContracts.getValue(id).isUp();
-	}
-	
-	
-	
-	public boolean isAgentRegulationDown(Id id){
-		return agentContracts.getValue(id).isDown();
-	}
-	
-	
-	
-	public static boolean hasAgentPHEV(Id id){
-		
-		Vehicle v= vehicles.getValue(id);
-		
-		if(v.getClass().equals(new PlugInHybridElectricVehicle(new IdImpl(1)).getClass() )){
-			return true;
-		}else{return false;}
-	}
-	
-	
-	public static  boolean hasAgentEV(Id id){
-		
-		Vehicle v= vehicles.getValue(id);
-		
-		if(v.getClass().equals(new ElectricVehicle(null, new IdImpl(1)).getClass() )){
-			return true;
-		}else{return false;}
-	}
-	
-	
-	public static boolean hasAgentCombustionVehicle(Id id){
-		
-		Vehicle v= vehicles.getValue(id);
-		
-		if(v.getClass().equals(new ConventionalVehicle(null, new IdImpl(2)).getClass() )){
-			return true;
-		}else{return false;}
-	}
-	
-	
-	
 	public void initializeLP(double buffer){
 		lpev=new LPEV(buffer);
 		lpphev=new LPPHEV();
 		lpcombustion= new LPCombustion();
 	}
-	
-	
+
+
+
 	public void initializeChargingSlotDistributor(double minChargingLength){
 		this.MINCHARGINGLENGTH=minChargingLength; 
 		myChargingSlotDistributor=new ChargingSlotDistributor(minChargingLength);
 	}
-	
-	
-	
+
+
+
 	public void setLinkedListValueHashMapVehicles(LinkedListValueHashMap<Id, Vehicle> vehicles){
 		this.vehicles=vehicles;
 	}
-	
+
+
+
 	public void initializeHubLoadDistributionReader(
 			HubLinkMapping hubLinkMapping, 
 			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
@@ -315,8 +276,292 @@ public class DecentralizedSmartCharger {
 				agentVehicleSourceMapping,
 				gasPriceInCostPerSecond);
 	}
+
+
+
+	/**
+	 * get agent schedules, find required charging times, assign charging times
+	 * 
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws LpSolveException
+	 * @throws OptimizationException
+	 * @throws IOException
+	 */
+	public void run() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+		readAgentSchedules();
+		findRequiredChargingTimes();
+		assignChargingTimes();
+		
+		findChargingDistribution();
+		
+		calculateChargingCostsAllAgents();
+		
+		
+	}
+
+
+
+	/***********************************************
+	 * CALCULATIONS
+	 * **********************************************
+	 */
 	
 	
+	/**
+	 * Loops over all agents
+	 * Calls AgentChargingTimeReader to read in their schedule
+	 * saves the schedule in agentParkingAndDrivingSchedules
+	 * @throws IllegalArgumentException 
+	 * @throws FunctionEvaluationException 
+	 * @throws MaxIterationsExceededException 
+	 */
+	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		for (Id id : controler.getPopulation().getPersons().keySet()){
+			System.out.println("getAgentSchedule: "+ id.toString());
+			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
+			
+		}		
+		
+	}
+
+
+
+	/***********************************************
+	 * CALCULATIONS
+	 * **********************************************
+	 */
+	
+	
+	public void findRequiredChargingTimes() throws LpSolveException, IOException{
+		
+		System.out.println("Find required charging times - LP");
+		
+		for (Id id : controler.getPopulation().getPersons().keySet()){
+			
+			String type="";
+			/*
+			 * IF COMBUSTION
+			 */
+			if(hasAgentCombustionVehicle(id)){
+								
+				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
+				double consumption = lpcombustion.getDrivingConsumption();
+				
+				double emissionContribution= joulesToEmissionInKg(consumption);
+				// get entire driving Joules and transform to emissions
+				EMISSIONCOUNTER+= emissionContribution;
+				agentsWithCombustion.add(id);
+				type="combustion";
+				
+			}else{
+				/*
+				 * EV OR PHEV
+				 */
+				
+				double joulesFromEngine=0;
+				
+				double batterySize;
+				double batteryMin;
+				double batteryMax; 
+				
+				if(hasAgentPHEV(id)){
+					
+					//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
+					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
+					batteryMin=batteryMinPHEV; //dummy
+					batteryMax=batteryMaxPHEV; 
+					agentsWithPHEV.add(id);
+					type="PHEV";
+					
+				}else{
+					
+					//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
+										
+					batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
+					batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
+					batteryMax=batteryMaxEV; 
+					
+					agentsWithEV.add(id);
+					type="EV";
+				}
+				
+				//try EV first
+				
+				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
+				if (s !=null){
+					// if successful --> save
+					
+					agentParkingAndDrivingSchedules.put(id, s);
+					EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine); // still 0
+					
+					
+				}else{					
+					//if fails, try PHEV
+					if(hasAgentEV(id)){
+						
+						chargingFailureEV.add(id);
+					}
+					
+										
+					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
+					agentParkingAndDrivingSchedules.put(id, s);
+					
+					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
+					EMISSIONCOUNTER+= joulesToEmissionInKg(joulesFromEngine);
+					
+				}
+				
+			}
+		}
+	}
+
+
+
+	/**
+	 * passes schedule with required charging information to
+	 * ChargingSlotDistributor to obtain exact charging Slots
+	 * Saves charging slots in agentChargignSchedule
+	 * @throws IllegalArgumentException 
+	 * @throws FunctionEvaluationException 
+	 * @throws MaxIterationsExceededException 
+	 * @throws IOException 
+	 * @throws OptimizationException 
+	 */
+	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException, OptimizationException{
+		
+				
+		for (Id id : controler.getPopulation().getPersons().keySet()){
+			
+		
+			System.out.println("Assign charging times agent "+ id.toString());
+			
+			
+			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.getValue(id));
+			
+			
+			agentChargingSchedules.put(id, chargingSchedule);
+			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.getValue(id), 
+					chargingSchedule, 
+					id);
+		}
+		
+		printGraphChargingTimesAllAgents();
+		
+	}
+
+
+
+	/**
+	 * COUNT of charging, driving and parking agents at first second of each minute over the day;
+	 * update of loadAfterDetermisticChargingDecicion according to charging habits of agents
+	 * 
+	 * @throws IOException
+	 */
+	private void findChargingDistribution() throws IOException{
+		
+		
+		for(int i=0; i<MINUTESPERDAY; i++){
+			double thisSecond= i*SECONDSPERMIN;
+			for(Id id : controler.getPopulation().getPersons().keySet()){
+				
+				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
+				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isParking()){
+					countParking[i]=countParking[i]+1;
+				}
+				
+				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isDriving()){
+					countParking[i]=countDriving[i]+1;
+				}
+				
+				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
+				
+				
+				if(thisAgentCharging.isSecondWithinOneInterval(thisSecond)){
+					
+					countCharging[i]=countCharging[i]+1;
+					
+					// find Hub for this charging and parking Interval
+					interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
+					ParkingInterval p= (ParkingInterval) thisAgentParkAndDrive.timesInSchedule.get(interval);
+					Id linkId = p.getLocation();
+					
+					double wattReduction=p.getChargingSpeed();
+					
+					myHubLoadReader.updateLoadAfterDeterministicChargingDecision(linkId, i, wattReduction);
+					
+				}
+				
+			}
+		}
+		
+		visualizeChargingParkingDrivingDistribution();
+		
+		//visualize Load before and after
+		visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger();
+	}
+
+
+
+	/**
+	 * // for each agent
+		// loop over assigned charging times
+		// find pricing function for it
+		// integrate
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public void calculateChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		for(Id id : controler.getPopulation().getPersons().keySet()){
+			
+			Schedule s= agentParkingAndDrivingSchedules.getValue(id);
+			
+			agentChargingCosts.put(id,calculateChargingCostForAgentSchedule(id, s) );
+		}		
+		
+		
+	}
+
+
+
+	public double calculateChargingCostForAgentSchedule(Id id, Schedule s) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		double totalCost=0;
+		
+		for(int i=0; i<s.getNumberOfEntries();i++){
+			
+			TimeInterval t = s.timesInSchedule.get(i); //charging time
+			
+			if(t.isParking() && ((ParkingInterval)t).getChargingSchedule()!=null){
+				Id linkId = ((ParkingInterval)t).getLocation();
+				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
+				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
+			}
+			
+			if(hasAgentPHEV(id)){
+				if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
+					totalCost +=  joulesExtraConsumptionToGasCosts(((DrivingInterval)t).getExtraConsumption());
+				}
+			}
+			if(hasAgentEV(id)){
+				if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
+					System.out.println("extra consumption EV price calculation ");
+					System.out.println("assigned 100000000000000000000000000000.0 for agent "+ id.toString());
+					totalCost += 100000000000000000000000000000.0; // ???  
+				}
+			}
+			
+		}
+		return totalCost;
+	}
+
+
+
 	public void initializeAndRunV2G(
 			double compensationPerKWHRegulationUp,
 			double compensationPerKWHRegulationDown) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
@@ -328,13 +573,17 @@ public class DecentralizedSmartCharger {
 		//TODO all other sources
 		
 	}
-	
-	
-	
+
+
+
 	private void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
 		if(myHubLoadReader.agentVehicleSourceMapping.size()!=0){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){
+				
+				
+//				System.out.println("Current agent parking driving schedule:");
+//				agentParkingAndDrivingSchedules.getValue(id).printSchedule();
 				
 				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
 				if(hasAgentCombustionVehicle(id)==false){
@@ -426,35 +675,50 @@ public class DecentralizedSmartCharger {
 		}
 		//TODO Visualize changes due to V2G... keep record of he switched, he earned
 	}
-	
-	
-	
-	/**
-	 * get agent schedules, find required charging times, assign charging times
-	 * 
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws OptimizationException
-	 * @throws IOException
-	 */
-	public void run() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
-		readAgentSchedules();
-		findRequiredChargingTimes();
-		assignChargingTimes();
-		combineChargingParkingAndDrivingSchedule();
-		findChargingDistribution();
-		
-		calculateChargingCostsAllAgents();
-		
-		
+
+
+
+	public boolean isAgentRegulationUp(Id id){
+		return agentContracts.getValue(id).isUp();
 	}
 	
 	
-	/*
-	 * GET RESULTS
-	 */
+	
+	public boolean isAgentRegulationDown(Id id){
+		return agentContracts.getValue(id).isDown();
+	}
+	
+	
+	
+	public static boolean hasAgentPHEV(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new PlugInHybridElectricVehicle(new IdImpl(1)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	public static  boolean hasAgentEV(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new ElectricVehicle(null, new IdImpl(1)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	public static boolean hasAgentCombustionVehicle(Id id){
+		
+		Vehicle v= vehicles.getValue(id);
+		
+		if(v.getClass().equals(new ConventionalVehicle(null, new IdImpl(2)).getClass() )){
+			return true;
+		}else{return false;}
+	}
+	
 	
 	
 	public LinkedListValueHashMap<Id, Double> getChargingCostsForAgents(){
@@ -526,152 +790,6 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	/***********************************************
-	 * CALCULATIONS
-	 * **********************************************
-	 */
-	
-	
-	/**
-	 * Loops over all agents
-	 * Calls AgentChargingTimeReader to read in their schedule
-	 * saves the schedule in agentParkingAndDrivingSchedules
-	 * @throws IllegalArgumentException 
-	 * @throws FunctionEvaluationException 
-	 * @throws MaxIterationsExceededException 
-	 */
-	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		for (Id id : controler.getPopulation().getPersons().keySet()){
-			System.out.println("getAgentSchedule: "+ id.toString());
-			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
-			
-		}		
-		
-	}
-	
-	
-	
-	public void findRequiredChargingTimes() throws LpSolveException, IOException{
-		
-		System.out.println("Find required charging times - LP");
-		
-		for (Id id : controler.getPopulation().getPersons().keySet()){
-			
-			String type="";
-			/*
-			 * IF COMBUSTION
-			 */
-			if(hasAgentCombustionVehicle(id)){
-								
-				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
-				double consumption = lpcombustion.getDrivingConsumption();
-				
-				double emissionContribution= joulesToEmissionInKg(consumption);
-				// get entire driving Joules and transform to emissions
-				EMISSIONCOUNTER+= emissionContribution;
-				agentsWithCombustion.add(id);
-				type="combustion";
-				
-			}else{
-				/*
-				 * EV OR PHEV
-				 */
-				
-				double joulesFromEngine=0;
-				
-				double batterySize;
-				double batteryMin;
-				double batteryMax; 
-				
-				if(hasAgentPHEV(id)){
-					
-					//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
-					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
-					batteryMin=batteryMinPHEV; //dummy
-					batteryMax=batteryMaxPHEV; 
-					agentsWithPHEV.add(id);
-					type="PHEV";
-					
-				}else{
-					
-					//ElectricVehicle thisEV= (ElectricVehicle)vehicles.getValue(id);
-										
-					batterySize=batterySizeEV;//thisEV.getBatterySizeInJoule();
-					batteryMin=batteryMinEV;//thisEV.getBatteryMinThresholdInJoule();
-					batteryMax=batteryMaxEV; 
-					
-					agentsWithEV.add(id);
-					type="EV";
-				}
-				
-				//try EV first
-				
-				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
-				if (s !=null){
-					// if successful --> save
-					
-					agentParkingAndDrivingSchedules.put(id, s);
-					EMISSIONCOUNTER= joulesToEmissionInKg(joulesFromEngine); // still 0
-					
-					
-				}else{					
-					//if fails, try PHEV
-					if(hasAgentEV(id)){
-						
-						chargingFailureEV.add(id);
-					}
-					
-										
-					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
-					agentParkingAndDrivingSchedules.put(id, s);
-					
-					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
-					EMISSIONCOUNTER+= joulesToEmissionInKg(joulesFromEngine);
-					
-				}
-				
-			}
-		}
-	}
-	
-	
-	
-	
-	/**
-	 * passes schedule with required charging information to
-	 * ChargingSlotDistributor to obtain exact charging Slots
-	 * Saves charging slots in agentChargignSchedule
-	 * @throws IllegalArgumentException 
-	 * @throws FunctionEvaluationException 
-	 * @throws MaxIterationsExceededException 
-	 * @throws IOException 
-	 * @throws OptimizationException 
-	 */
-	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException, OptimizationException{
-		
-				
-		for (Id id : controler.getPopulation().getPersons().keySet()){
-			
-		
-			System.out.println("Assign charging times agent "+ id.toString());
-			
-			
-			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.getValue(id));
-			
-			
-			agentChargingSchedules.put(id, chargingSchedule);
-			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.getValue(id), 
-					chargingSchedule, 
-					id);
-		}
-		
-		printGraphChargingTimesAllAgents();
-		
-	}
-	
-	
-	
 	public void clearResults(){
 		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
 		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
@@ -683,59 +801,6 @@ public class DecentralizedSmartCharger {
 		agentsWithPHEV=new LinkedList<Id>();
 		agentsWithCombustion=new LinkedList<Id>();
 		
-	}
-
-
-
-	/**
-	 * COUNT of charging, driving and parking agents at first second of each minute over the day;
-	 * update of loadAfterDetermisticChargingDecicion according to charging habits of agents
-	 * 
-	 * @throws IOException
-	 */
-	private void findChargingDistribution() throws IOException{
-		
-		
-		for(int i=0; i<MINUTESPERDAY; i++){
-			double thisSecond= i*SECONDSPERMIN;
-			for(Id id : controler.getPopulation().getPersons().keySet()){
-				
-				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
-				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
-				
-				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isParking()){
-					countParking[i]=countParking[i]+1;
-				}
-				
-				if (thisAgentParkAndDrive.timesInSchedule.get(interval).isDriving()){
-					countParking[i]=countDriving[i]+1;
-				}
-				
-				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
-				
-				
-				if(thisAgentCharging.isSecondWithinOneInterval(thisSecond)){
-					
-					countCharging[i]=countCharging[i]+1;
-					
-					// find Hub for this charging and parking Interval
-					interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
-					ParkingInterval p= (ParkingInterval) thisAgentParkAndDrive.timesInSchedule.get(interval);
-					Id linkId = p.getLocation();
-					
-					double wattReduction=p.getChargingSpeed();
-					
-					myHubLoadReader.updateLoadAfterDeterministicChargingDecision(linkId, i, wattReduction);
-					
-				}
-				
-			}
-		}
-		
-		visualizeChargingParkingDrivingDistribution();
-		
-		//visualize Load before and after
-		visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger();
 	}
 
 
@@ -1255,81 +1320,6 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	/**
-	 * // for each agent
-		// loop over assigned charging times
-		// find pricing function for it
-		// integrate
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 */
-	public void calculateChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-			
-			Schedule s= agentParkingAndDrivingSchedules.getValue(id);
-			
-			agentChargingCosts.put(id,calculateChargingCostForAgentSchedule(s) );
-		}		
-		
-		
-	}
-	
-	
-	
-	public double calculateChargingCostForAgentSchedule(Schedule s) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		double totalCost=0;
-		
-		for(int i=0; i<s.getNumberOfEntries();i++){
-			
-			TimeInterval t = s.timesInSchedule.get(i); //charging time
-			
-			if(t.isParking() && ((ParkingInterval)t).getChargingSchedule()!=null){
-				Id linkId = ((ParkingInterval)t).getLocation();
-				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
-				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
-			}
-			
-			if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
-				totalCost +=  joulesExtraConsumptionToGasCosts(((DrivingInterval)t).getExtraConsumption());
-			}
-			
-		}
-		return totalCost;
-	}
-	
-	
-	
-	
-	
-	public void combineChargingParkingAndDrivingSchedule(){
-		
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-						
-			Schedule parkAndDrive= agentParkingAndDrivingSchedules.getValue(id);
-			
-			
-			for(int i=0; i<parkAndDrive.getNumberOfEntries(); i++){
-				
-				TimeInterval t = parkAndDrive.timesInSchedule.get(i);
-				
-				if(t.isParking()&& ((ParkingInterval)t).getChargingSchedule()!=null){
-					//if this interval has charging assigned
-					
-					Schedule newSubSchedule= new Schedule();
-					newSubSchedule.addTimeInterval(t);
-					
-					newSubSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(((ParkingInterval)t).getChargingSchedule());
-					
-					((ParkingInterval)t).setParkingChargingSchedule(newSubSchedule);
-					
-				}
-				
-			}
-			
-		}
-	}
 	
 	
 }

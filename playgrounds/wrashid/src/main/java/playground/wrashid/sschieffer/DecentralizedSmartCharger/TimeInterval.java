@@ -41,9 +41,9 @@ public abstract class TimeInterval implements Comparable{
 	
 	public boolean overlap(TimeInterval other){
 		boolean check=false;
-		if( (other.getStartTime()>=getStartTime() && other.getStartTime()<getEndTime()) 
+		if( timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(other.getStartTime()) 
 				||
-				(other.getEndTime()>getStartTime() && other.getEndTime()<=getEndTime())){
+				timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(other.getEndTime()) ) {
 			check=true;
 		}
 		return check;
@@ -70,6 +70,54 @@ public abstract class TimeInterval implements Comparable{
 				}
 			}
 	}
+	
+	
+	
+	public LoadDistributionInterval ifOverlapWithLoadDistributionIntervalReturnOverlap(LoadDistributionInterval l){
+		
+		if(timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+				&&
+				timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+			//if start and end in
+			return l;
+			
+		}else{
+			if(timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+					&&
+					!timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+				//if start in and end not in
+				return new LoadDistributionInterval(l.getStartTime(), 
+						getEndTime(), 
+						l.getPolynomialFunction(), 
+						l.isOptimal());
+				
+			}else{
+				if(!timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+						&&
+						timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+					//if start not in and end in
+					return new LoadDistributionInterval(getStartTime(), 
+							l.getEndTime(), 
+							l.getPolynomialFunction(), 
+							l.isOptimal());
+					
+				}else{
+					//nothing in
+					return null;
+				}
+				
+			}
+			
+		}
+	}
+	
+	
+	public boolean timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(double time){
+		if(time>=getStartTime() || time<=getEndTime()){
+			return true;
+		}else{return false;}
+	}
+	
 	
 	public double getIntervalLength(){
 		return end-start;
