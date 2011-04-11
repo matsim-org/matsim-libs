@@ -56,6 +56,7 @@ import playground.andreas.bvgAna.level0.AgentId2PersonMap;
 import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
+import playground.andreas.bvgAna.level1.VehDelayAtStopHistogram;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2LineId2Pulk;
 import playground.andreas.bvgAna.level1.StopId2LineId2PulkData;
@@ -87,7 +88,7 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		String eventsFile = "F:/bvgAna/output/ITERS/it.0/bvgAna.0.events.xml.gz";
+		String eventsFile = "F:/temp/bvg.run128.25pct.100.events.xml.gz";
 		String plansFile = "F:/bvgAna/output/ITERS/it.0/bvgAna.0.plans.xml.gz";
 		String netFile = "F:/bvgAna/input/network.xml";
 		String transitScheduleFile = "F:/bvgAna/input/transitSchedule.xml";
@@ -174,6 +175,9 @@ public class TestMain {
 
 		StopId2MissedVehMap s2mv = new StopId2MissedVehMap(plans);
 		eventsManager.addHandler(s2mv);
+		
+		VehDelayAtStopHistogram dH = new VehDelayAtStopHistogram(24 * 60);
+		eventsManager.addHandler(dH);
 
 		try {
 			reader.parse(eventsFile);
@@ -226,6 +230,9 @@ public class TestMain {
 		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
 
 		TreeMap<Id, StopId2MissedVehMapData> s2mvR = s2mv.getStopId2StopId2MissedVehMapDataMap();
+		
+		dH.dumpToConsole();
+		dH.write("F:/temp/delayHistogram.txt");
 
 		System.out.println("Waiting");
 
