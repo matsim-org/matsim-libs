@@ -37,8 +37,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -179,7 +180,7 @@ public class Wardrop {
 	protected void processEvents(String file) {
 		// Instance which takes over line by line of the events file
 		// and throws events of added types
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		// An example of an events handler which takes
 		// "LinkLeaveEvents" to calculate total volumes per link of the network

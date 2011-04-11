@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerFactoryImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -69,7 +69,7 @@ public class EvacTimeCompare implements AgentDepartureEventHandler, AgentArrival
 
 	public void run() {
 		this.etis = new HashMap<Id, EvacTimeCompare.EvacTimeInfo>();
-		EventsManager ev = new EventsManagerFactoryImpl().createEventsManager();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		new MatsimEventsReader(ev).readFile(r1);
 		HashMap<Id, EvacTimeInfo> etis1 = this.etis;

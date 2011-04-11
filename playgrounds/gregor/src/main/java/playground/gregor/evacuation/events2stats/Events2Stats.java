@@ -29,11 +29,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentMoneyEventHandler {
@@ -51,7 +52,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 		this.numAgents = 0;
 		this.cumUt = 0;
 		this.numUtilityEvents = 0;
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(this);
 		
 		new EventsReaderTXTv1(events).readFile(eventsFile);

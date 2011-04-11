@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerFactoryImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -117,12 +118,12 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
 //		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QNetwork(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()))),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getNetsimNetwork()),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,((EventsManager) EventsUtils.createEventsManager())).getNetsimNetwork()),OTFSnapshotGenerator.MVI_FILE, new OTFFileWriterConnectionManagerFactory());
 	}
 
 
 	public MVISnapshotWriter(ScenarioImpl sc, String mVIFILE) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,new EventsManagerFactoryImpl().createEventsManager()).getNetsimNetwork()),mVIFILE, new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QSim(sc,((EventsManager) EventsUtils.createEventsManager())).getNetsimNetwork()),mVIFILE, new OTFFileWriterConnectionManagerFactory());
 	}
 
 

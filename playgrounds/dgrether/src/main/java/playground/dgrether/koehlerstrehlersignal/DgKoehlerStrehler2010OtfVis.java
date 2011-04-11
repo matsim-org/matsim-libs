@@ -21,7 +21,7 @@ package playground.dgrether.koehlerstrehlersignal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -38,7 +38,7 @@ import playground.dgrether.DgOTFVis;
 public class DgKoehlerStrehler2010OtfVis {
 	
 	private void runFromConfig() {
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 //		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol800;
 //		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario2/config_signals_coordinated.xml";
 		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario5/config_signals_coordinated.xml";

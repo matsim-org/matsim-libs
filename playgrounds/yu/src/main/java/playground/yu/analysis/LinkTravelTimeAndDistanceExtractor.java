@@ -10,12 +10,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -126,7 +127,7 @@ public class LinkTravelTimeAndDistanceExtractor implements
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		LinkTravelTimeAndDistanceExtractor lttade = new LinkTravelTimeAndDistanceExtractor(
 				scenario.getNetwork());

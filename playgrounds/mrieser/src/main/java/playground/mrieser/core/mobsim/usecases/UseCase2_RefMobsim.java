@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.usecases;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -45,7 +45,7 @@ public class UseCase2_RefMobsim {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario scenario = loader.loadScenario();
 		System.out.println("# persons: " + scenario.getPopulation().getPersons().size());
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 //		EventWriterXML ew;
 		/* **************************************************************** */
 

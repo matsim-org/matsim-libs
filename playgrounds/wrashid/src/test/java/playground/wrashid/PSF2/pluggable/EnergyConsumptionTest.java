@@ -21,10 +21,11 @@
 package playground.wrashid.PSF2.pluggable;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -42,7 +43,7 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 
 	private EnergyConsumptionPlugin runWithModel(EnergyConsumptionModel energyConsumptionModel){
 		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		vehicles.put(new IdImpl(1), new PlugInHybridElectricVehicle(new IdImpl(1)));

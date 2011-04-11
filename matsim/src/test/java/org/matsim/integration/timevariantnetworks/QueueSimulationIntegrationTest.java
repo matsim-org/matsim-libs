@@ -28,12 +28,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -83,7 +84,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		plans.addPerson(person2);
 
 		// run the simulation with the timevariant network and the two persons
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
@@ -143,7 +144,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		 * Run the simulation with the time-variant network and the two waves of
 		 * persons. Observe the last person of each wave.
 		 */
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);

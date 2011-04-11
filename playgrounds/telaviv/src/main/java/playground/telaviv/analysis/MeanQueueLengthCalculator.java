@@ -49,7 +49,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -100,7 +100,7 @@ public class MeanQueueLengthCalculator implements LinkEnterEventHandler, LinkLea
 		}
 		
 		log.info("start reading events file...");
-		EventsManager eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		eventsManager.addHandler(this);
 		
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);

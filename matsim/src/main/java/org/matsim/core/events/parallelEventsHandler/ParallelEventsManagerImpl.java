@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -171,7 +172,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		this.threads = new Thread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
 		for (int i = 0; i < numberOfThreads; i++) {
-			events[i] = new EventsManagerImpl();
+			events[i] = (EventsManagerImpl) EventsUtils.createEventsManager();
 		}
 	}
 

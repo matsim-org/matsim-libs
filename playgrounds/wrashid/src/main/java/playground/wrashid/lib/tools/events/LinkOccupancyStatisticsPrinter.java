@@ -2,10 +2,11 @@ package playground.wrashid.lib.tools.events;
 
 import java.util.HashMap;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 
@@ -20,7 +21,7 @@ public class LinkOccupancyStatisticsPrinter implements LinkEnterEventHandler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		EventsManagerImpl eventsManagerImpl = new EventsManagerImpl();
+		EventsManager eventsManagerImpl = (EventsManager) EventsUtils.createEventsManager();
 		
 		LinkOccupancyStatisticsPrinter statistics=new LinkOccupancyStatisticsPrinter();
 		

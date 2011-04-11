@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
@@ -206,7 +206,7 @@ public class OTFVis {
 
 	public static final void playConfig_Swing(String configFileName) {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFileName));
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		QueueSimulation queueSimulation = (QueueSimulation) new QueueSimulationFactory().createMobsim(scenario, events);
 		queueSimulation.addSnapshotWriter(server.getSnapshotReceiver());
@@ -238,7 +238,7 @@ public class OTFVis {
 		}
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
@@ -256,7 +256,7 @@ public class OTFVis {
 	public static final void playNetwork(final String filename) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(filename);
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(filename, server);
 		OTFVisClient client = new OTFVisClient();
@@ -269,7 +269,7 @@ public class OTFVis {
 	public static final void playNetwork_Swing(final String filename) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(filename);
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(filename, server);
 		OTFVisClient client = new OTFVisClient();
@@ -294,7 +294,7 @@ public class OTFVis {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getNetsimNetwork(), eventFile, mviFile, snapshotPeriod);
 		converter.convert(scenario.getConfig());
 	}

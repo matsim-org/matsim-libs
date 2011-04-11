@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -59,7 +59,7 @@ public class PostProcessingEvents2Score {
 		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(popFilename);
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord scoringFactory = new CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
 				scenario.getConfig().planCalcScore());

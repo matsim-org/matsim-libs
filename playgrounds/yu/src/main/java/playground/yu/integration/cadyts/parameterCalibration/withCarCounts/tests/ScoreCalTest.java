@@ -48,8 +48,8 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -299,7 +299,7 @@ public class ScoreCalTest implements AgentArrivalEventHandler,
 
 		ScoreCalTest sct = new ScoreCalTest(scoring, pop);
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(sct);
 		new EventsReaderTXTv1(events).readFile(eventsFilename);
 

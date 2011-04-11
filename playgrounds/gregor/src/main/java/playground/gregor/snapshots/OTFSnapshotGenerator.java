@@ -28,12 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -133,7 +134,7 @@ public class OTFSnapshotGenerator {
 
 		PositionInfo.setLANE_WIDTH(this.scenario.getNetwork().getEffectiveLaneWidth());
 
-		EventsManagerImpl ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		DestinationDependentColorizer d = new DestinationDependentColorizer();
 		ev.addHandler(d);
 		// EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();
@@ -218,7 +219,7 @@ public class OTFSnapshotGenerator {
 		sg.finish();
 	}
 
-	private void triggerEventsReader(EventsManagerImpl ev) {
+	private void triggerEventsReader(EventsManager ev) {
 		if (this.eventsFile.endsWith("txt.gz")) {
 			new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 		} else if (this.eventsFile.endsWith("xml.gz")) {

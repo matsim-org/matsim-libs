@@ -32,9 +32,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -89,7 +90,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.endActivityAndAssumeControl(10);
@@ -128,7 +129,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.initialize();
 		agent.endActivityAndAssumeControl(10);

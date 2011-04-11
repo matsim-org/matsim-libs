@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -113,7 +113,7 @@ public class LegZoneAnalyzer {
 		TravelTimeCalculator travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		if (eventsFile != null) {
 			// We use a new EventsManager where we only register the TravelTimeCalculator.
-			EventsManager eventsManager = new EventsManagerImpl();
+			EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 			eventsManager.addHandler(travelTime);
 			
 			log.info("Processing events file to get initial travel times...");

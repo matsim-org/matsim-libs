@@ -32,8 +32,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,7 +130,7 @@ public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandle
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		String eventsFile = "/home/laemmel/devel/dfg/events.xml";
-		EventsManagerImpl mgr = new EventsManagerImpl();
+		EventsManager mgr = (EventsManager) EventsUtils.createEventsManager();
 		XYZEvents2Plan planGen = new XYZEvents2Plan();
 		mgr.addHandler(planGen);
 		XYZEventsFileReader reader = new XYZEventsFileReader(mgr);

@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
@@ -250,7 +250,7 @@ public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
 	public static void main(String[] args) {
 		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a_opt/m2_out_100a_opt/ITERS/it.1000/1000.events.xml.gz";
 
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		WaitOrSeatInBus wosib = new WaitOrSeatInBus(30);
 		em.addHandler(wosib);
 

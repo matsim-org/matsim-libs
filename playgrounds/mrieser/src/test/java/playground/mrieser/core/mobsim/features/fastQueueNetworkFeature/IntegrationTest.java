@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
 import playground.mrieser.core.mobsim.features.NetworkFeature;
@@ -55,7 +55,7 @@ public class IntegrationTest {
 		Fixture f = new Fixture();
 		Person person1 = f.addPersonWithOneLeg();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector eventsCollector = new EventsCollector();
 		events.addHandler(eventsCollector);
 
@@ -104,7 +104,7 @@ public class IntegrationTest {
 		Fixture f = new Fixture();
 		Person person1 = f.addPersonWithOneLeg();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector eventsCollector = new EventsCollector();
 		events.addHandler(eventsCollector);
 

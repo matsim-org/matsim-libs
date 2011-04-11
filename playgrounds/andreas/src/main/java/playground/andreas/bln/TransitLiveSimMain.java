@@ -9,7 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,7 +59,7 @@ public class TransitLiveSimMain {
 				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		QSim sim = new QSim(scenario, events);
 		sim.getTransitEngine().setUseUmlaeufe(true);
 		OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);

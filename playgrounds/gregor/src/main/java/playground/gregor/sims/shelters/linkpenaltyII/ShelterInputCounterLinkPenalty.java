@@ -24,12 +24,12 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.evacuation.base.Building;
 
@@ -42,12 +42,12 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 
-	private final EventsManagerImpl events;
+	private final EventsManager events;
 
 	private int it;
 
 
-	public ShelterInputCounterLinkPenalty(NetworkImpl network, HashMap<Id,Building> shelterLinkMapping, EventsManagerImpl events) {
+	public ShelterInputCounterLinkPenalty(NetworkImpl network, HashMap<Id,Building> shelterLinkMapping, EventsManager events) {
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;

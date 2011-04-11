@@ -20,7 +20,7 @@
 package playground.mrieser.core.mobsim.fakes;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.MobsimKeepAlive;
@@ -32,7 +32,7 @@ import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
  * @author mrieser
  */
 public class FakeSimEngine implements TimestepMobsimEngine {
-	private final EventsManager em = new EventsManagerImpl();
+	private final EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 	private double time;
 	public int countHandleAgent = 0;
 	public int countRunSim = 0;

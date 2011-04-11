@@ -31,7 +31,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -171,7 +172,7 @@ public class PrivateVehicleSpeedEvaluator {
 				if(inputFolder == null){
 					log.warn("Could not find the events file for Run" + run + "!");
 				} else{
-					EventsManagerImpl events = new EventsManagerImpl();
+					EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 					MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 					events.addHandler(handler);
 
@@ -206,7 +207,7 @@ public class PrivateVehicleSpeedEvaluator {
 			log.info("==============================  Processing private-only events file  ==============================");
 
 			String fileName = root + "Commercial/Input/PrivateOnlyEvents.txt.gz";
-			EventsManagerImpl events = new EventsManagerImpl();
+			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 			MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 			events.addHandler(handler);
 

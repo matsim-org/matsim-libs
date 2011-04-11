@@ -15,9 +15,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -72,7 +73,7 @@ public class QSimIntegrationTest {
 				"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
 				AgentDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, AgentArrivalEvent.class,
 				LinkEnterEvent.class);
@@ -131,7 +132,7 @@ public class QSimIntegrationTest {
 		"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario.getTransitSchedule(), f.scenario.getNetwork(), f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
 				AgentDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, AgentArrivalEvent.class,
 				LinkEnterEvent.class);
@@ -206,7 +207,7 @@ public class QSimIntegrationTest {
 				"</plans>";
 		new PopulationReaderMatsimV4(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
 				AgentDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, AgentArrivalEvent.class,
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
@@ -286,7 +287,7 @@ public class QSimIntegrationTest {
 		"</plans>";
 		new PopulationReaderMatsimV4(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
 				AgentDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, AgentArrivalEvent.class,
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);

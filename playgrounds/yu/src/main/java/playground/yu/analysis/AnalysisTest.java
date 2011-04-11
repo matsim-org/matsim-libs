@@ -30,7 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -147,7 +148,7 @@ public class AnalysisTest {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
@@ -222,7 +223,7 @@ public class AnalysisTest {
 			sr.close();
 			sw2.close();
 
-			QSim qsim = new QSim(scenario2, new EventsManagerImpl());
+			QSim qsim = new QSim(scenario2, ((EventsManager) EventsUtils.createEventsManager()));
 			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."
 							+ (scenario.equals("normal") ? "" : scenario + ".")

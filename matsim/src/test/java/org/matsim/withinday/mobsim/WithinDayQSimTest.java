@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -43,7 +43,7 @@ public class WithinDayQSimTest extends MatsimTestCase {
 	public void testSetAgentFactory() {
 		
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		EventsManager eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();
 		scenario.getConfig().addQSimConfigGroup(qSimConfig);

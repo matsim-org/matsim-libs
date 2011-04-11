@@ -39,11 +39,12 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -88,8 +89,8 @@ public class TravelTimeLinkCompare {
 			e.printStackTrace();
 		}
 		
-		EventsManagerImpl events1 = new EventsManagerImpl();
-		EventsManagerImpl events2 = new EventsManagerImpl();
+		EventsManager events1 = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events2 = (EventsManager) EventsUtils.createEventsManager();
 		
 		EventHandler eh1 = new EventHandler();
 		events1.addHandler(eh1);

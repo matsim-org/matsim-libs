@@ -26,6 +26,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -53,7 +54,7 @@ public abstract class XmlEventsTester extends TestCase {
 		writer.closeFile();
 		assertTrue(new File(eventsFile).exists());
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);

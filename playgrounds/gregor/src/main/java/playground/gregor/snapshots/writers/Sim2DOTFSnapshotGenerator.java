@@ -23,9 +23,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -124,7 +125,7 @@ public class Sim2DOTFSnapshotGenerator {
 		writer.setLabel(LABEL);
 
 		XYZAzimuthSnapshotGenerator sg = new XYZAzimuthSnapshotGenerator(writer);
-		EventsManagerImpl ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(sg);
 		writer.open();
 		try {

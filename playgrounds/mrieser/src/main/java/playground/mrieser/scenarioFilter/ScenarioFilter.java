@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -71,11 +72,11 @@ public class ScenarioFilter {
 	public void filterByLinks(Set<Id> linkIds) {
 		// events
 		log.info("filtering events...");
-		EventsManager writerManager = new EventsManagerImpl();
+		EventsManager writerManager = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterXML xmlWriter = new EventWriterXML(this.eventsFileOut);
 		writerManager.addHandler(xmlWriter);
 		EventsFilterByLink eventsFilter = new EventsFilterByLink(writerManager, linkIds);
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(eventsFilter);
 		new MatsimEventsReader(events).readFile(this.eventsFileIn);
 		xmlWriter.closeFile();

@@ -21,9 +21,10 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -65,7 +66,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 

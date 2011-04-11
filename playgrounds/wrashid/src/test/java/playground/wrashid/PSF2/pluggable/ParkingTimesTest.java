@@ -23,9 +23,10 @@ package playground.wrashid.PSF2.pluggable;
 import java.util.LinkedList;
 
 import org.junit.Ignore;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
@@ -60,7 +61,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	}
 	
 	private ParkingTimesPlugin getParkintTimes(String eventsFile) {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
@@ -76,7 +77,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	
 	public void testWithParkingLocationsFilterHome(){
 		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
@@ -101,7 +102,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	
 	public void testWithParkingLocationsFilterWork(){
 		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		

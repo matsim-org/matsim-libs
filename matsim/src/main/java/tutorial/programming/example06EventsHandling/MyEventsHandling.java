@@ -20,7 +20,7 @@
 package tutorial.programming.example06EventsHandling;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
 
@@ -43,7 +43,7 @@ public class MyEventsHandling {
 		//path to events file
 		String inputFile = "output/ITERS/it.10/10.events.xml.gz";
 		//create an event object
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		//create the handler and add it
 		MyEventHandler1 handler = new MyEventHandler1();
 //		MyEventHandler2 handler = new MyEventHandler2(500);

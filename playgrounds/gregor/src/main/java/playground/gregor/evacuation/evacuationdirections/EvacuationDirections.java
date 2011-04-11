@@ -38,11 +38,12 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -82,7 +83,7 @@ public class EvacuationDirections implements LinkEnterEventHandler{
 		initFeatures();
 		buildStreetMap();
 		for (String ef : this.evs) {
-			EventsManagerImpl events1 = new EventsManagerImpl();
+			EventsManager events1 = (EventsManager) EventsUtils.createEventsManager();
 			events1.addHandler(this);
 			new EventsReaderTXTv1(events1).readFile(ef);
 		}

@@ -42,8 +42,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -165,7 +166,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	public void readEvents(final String eventsFilename,
 			final EventHandler[] handlers) {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		for (EventHandler handler : handlers)
 			events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);

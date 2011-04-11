@@ -26,7 +26,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -118,7 +119,7 @@ public class DDcontroller {
 		}
 
 		if (dosim) {
-			EventsManagerImpl events = new EventsManagerImpl();
+			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
@@ -132,7 +133,7 @@ public class DDcontroller {
 		}
 
 		if (otfvis) {
-		  QSim sim = new QSim(scenario, new EventsManagerImpl());
+		  QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 			NetsimNetwork qnet = sim.getNetsimNetwork();
 
 			String eventFile = "./output/events.txt";

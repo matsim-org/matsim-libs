@@ -20,9 +20,10 @@
 package playground.gregor.evacuation.agentsinshelter;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 
 public class AgentsInShelter implements AgentArrivalEventHandler{
 	
@@ -35,7 +36,7 @@ public class AgentsInShelter implements AgentArrivalEventHandler{
 
 	public int run() {
 		
-		EventsManagerImpl e = new EventsManagerImpl();
+		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		e.addHandler(this);
 		new EventsReaderTXTv1(e).readFile(this.events);
 		

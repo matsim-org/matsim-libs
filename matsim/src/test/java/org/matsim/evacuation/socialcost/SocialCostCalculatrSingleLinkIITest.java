@@ -26,12 +26,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
@@ -54,7 +55,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(60);
 		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
@@ -96,7 +97,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(5);
 		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
@@ -176,7 +177,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(5);
 		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);
@@ -254,7 +255,7 @@ public class SocialCostCalculatrSingleLinkIITest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		f.sc.getConfig().travelTimeCalculator().setTraveltimeBinSize(180);
 		SocialCostCalculatorSingleLinkII scalc = new SocialCostCalculatorSingleLinkII(f.sc, events);

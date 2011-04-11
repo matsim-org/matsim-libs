@@ -21,7 +21,7 @@ package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +56,7 @@ public class FourWaysVisNoLanes {
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
     loader.loadScenario();
     
-    EventsManager events = new EventsManagerImpl();
+    EventsManager events = (EventsManager) EventsUtils.createEventsManager();
     QSim otfVisQSim = new QSim(scenario, events);
     OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
     otfVisQSim.addFeature(queueSimulationFeature);

@@ -4,9 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
@@ -34,7 +35,7 @@ public class NeoLiveMain {
 		try {
 			Transaction tx = scenario.beginTx();
 			try {
-				EventsManagerImpl events = new EventsManagerImpl();
+				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 
 				final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);

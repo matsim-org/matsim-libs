@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -157,7 +157,7 @@ public class CalculateTravelTimes {
 		}
 		else {
 			travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-			EventsManager eventsManager = new EventsManagerImpl();
+			EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 			eventsManager.addHandler((TravelTimeCalculator)travelTime);
 			
 			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);

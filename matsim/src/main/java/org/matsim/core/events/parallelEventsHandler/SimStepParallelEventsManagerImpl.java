@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -71,7 +72,7 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	}
 	
 	private void init() {
-		eventsManager = new EventsManagerImpl();
+		eventsManager = (EventsManagerImpl) EventsUtils.createEventsManager();
 		
 		this.simStepEndBarrier = new CyclicBarrier(2);
 		this.iterationEndBarrier = new CyclicBarrier(2);
@@ -182,7 +183,7 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	
 	private static class ProcessEventsThread extends Thread implements EventsManager {
 		
-		private EventsManagerImpl eventsManager;
+		private EventsManager eventsManager;
 		private CyclicBarrier simStepEndBarrier;
 		private CyclicBarrier iterationEndBarrier;
 		private Queue<Event> eventsQueue;
@@ -196,7 +197,7 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 			this.eventsQueue = new LinkedBlockingQueue<Event>();
 		}
 
-		public void setEventsManager(EventsManagerImpl eventsManager) {
+		public void setEventsManager(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
 		}
 

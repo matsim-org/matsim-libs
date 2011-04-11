@@ -37,9 +37,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -1030,7 +1031,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			qsim = new QSim(scenario, new EventsManagerImpl());
+			qsim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 			NetsimNetwork qnet = qsim.getNetsimNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getNetsimLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getNetsimLink(id2);

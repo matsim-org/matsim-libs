@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -392,7 +392,7 @@ public class CarDepartureHandlerTest {
 			network.addLink(setLinkAttributes(netFactory.createLink(this.ids[3], this.ids[3], this.ids[4]), 500.0, 3600.0, 10.0, 1));
 			network.addLink(setLinkAttributes(netFactory.createLink(this.ids[4], this.ids[4], this.ids[5]), 500.0, 3600.0, 10.0, 1));
 
-			EventsManager events = new EventsManagerImpl();
+			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 			this.sim = new PlanMobsimImpl(this.scenario);
 			this.simEngine = new DefaultTimestepSimEngine(this.sim, events);
 			this.networkFeature = new RefQueueNetworkFeature(network, this.simEngine);

@@ -7,9 +7,10 @@ import java.util.LinkedList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -23,7 +24,7 @@ public class DelayEvalStop {
 
 	
 	public void readEvents(String filename){
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		DelayHandler handler = new DelayHandler(this.treshold);
 		handler.addTermStop("781015.1"); //344 nord
 		//handler.addTermStop("792200.2"); //344 sued aussetzer

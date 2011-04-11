@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.utils.EventsLogger;
 
 import playground.mrieser.core.mobsim.features.NetworkFeature;
@@ -51,7 +51,7 @@ public class IntegrationTest {
 		Fixture f = new Fixture();
 		Person person1 = f.addPersonWithOneLeg();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		/* setup start */
 		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
@@ -91,7 +91,7 @@ public class IntegrationTest {
 		Fixture f = new Fixture();
 		Person person2 = f.addPersonWithTwoLegs();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		/* setup start */
 		PlanMobsimImpl planSim = new PlanMobsimImpl(f.scenario);
@@ -131,7 +131,7 @@ public class IntegrationTest {
 		Fixture f = new Fixture();
 		Person person3 = f.addPersonWithTwoActsOnSameLink();
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(new EventsLogger());
 
 		/* setup start */

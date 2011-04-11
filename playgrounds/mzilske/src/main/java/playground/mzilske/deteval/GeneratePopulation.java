@@ -168,6 +168,9 @@ public class GeneratePopulation {
 				}
 			}
 			int nCar = 0;
+			// TODO: Give people who are the primary user of a car but don't seem to be using it a car anyway.
+			// TODO: Then: Let the subtourmodechoice only select car legs for people who have a car.
+			// TODO: Later: Create only as many cars as households report on owning, let members compete for them.
 			for (Car car : caze.cars) {
 				Id vehicleId;
 				Id primaryUserPersonId;

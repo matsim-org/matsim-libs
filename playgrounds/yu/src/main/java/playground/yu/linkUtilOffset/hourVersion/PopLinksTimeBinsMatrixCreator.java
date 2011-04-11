@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -230,7 +230,7 @@ public class PopLinksTimeBinsMatrixCreator implements LinkLeaveEventHandler {
 		PopLinksTimeBinsMatrixCreator pltbmc = new PopLinksTimeBinsMatrixCreator(
 				network, population, 7, 10);
 		pltbmc.init();
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(pltbmc);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 

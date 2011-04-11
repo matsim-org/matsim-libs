@@ -31,9 +31,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -178,7 +179,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 * 
 	 */
 	private void run() {
-		EventsManagerImpl ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {

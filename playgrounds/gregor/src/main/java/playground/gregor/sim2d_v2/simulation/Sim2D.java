@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -70,7 +69,7 @@ public class Sim2D implements Netsim {
 
 	private static final Logger log = Logger.getLogger(Sim2D.class);
 
-	private EventsManagerImpl events;
+	private EventsManager events;
 	private final Scenario2DImpl scenario;
 
 	private MobsimTimer simTimer;
@@ -98,7 +97,7 @@ public class Sim2D implements Netsim {
 
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 
-	public Sim2D(EventsManagerImpl events, Scenario2DImpl scenario2DData) {
+	public Sim2D(EventsManager events, Scenario2DImpl scenario2DData) {
 		this(events, scenario2DData, new DefaultSim2DEngineFactory());
 	}
 
@@ -106,7 +105,7 @@ public class Sim2D implements Netsim {
 	 * @param events
 	 * @param scenario2dData
 	 */
-	public Sim2D(EventsManagerImpl events, Scenario2DImpl scenario2DData, DefaultSim2DEngineFactory factory) {
+	public Sim2D(EventsManager events, Scenario2DImpl scenario2DData, DefaultSim2DEngineFactory factory) {
 		this.events = events;
 		this.scenario = scenario2DData;
 		init(factory);

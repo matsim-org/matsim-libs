@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 
 public class SteadyStateAnalysis implements LinkLeaveEventHandler{
 	
@@ -29,7 +29,7 @@ public class SteadyStateAnalysis implements LinkLeaveEventHandler{
 
 	private void run(Map<Id, StringBuffer> currentRouteHashs) {
 		this.hashs = currentRouteHashs;
-		EventsManager ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		
 		new EventsReaderTXTv1(ev).readFile(ef);

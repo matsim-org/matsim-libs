@@ -10,11 +10,12 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
@@ -29,7 +30,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network, 60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
@@ -69,7 +70,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network, 60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
@@ -129,7 +130,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network, 60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));
@@ -200,7 +201,7 @@ public class SocialCostCalculatorSingleLinkTest extends TestCase {
 		Fixture f = new Fixture();
 		Controler c = new Controler(f.sc);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(f.network, 60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c, 1));

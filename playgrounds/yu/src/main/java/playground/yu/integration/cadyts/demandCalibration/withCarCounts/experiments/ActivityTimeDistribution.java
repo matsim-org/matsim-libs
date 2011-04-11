@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -367,7 +367,7 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 		String configFilename = "../integration-demandCalibration/test/DestinationUtilOffset/analysis.xml";
 		String outputFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset/DistributionReal";
 		double interval = 600;
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		ActivityTimeDistribution atd = null;
 		atd = new ActivityTimeDistribution(
@@ -403,7 +403,7 @@ public class ActivityTimeDistribution implements ActivityStartEventHandler,
 			DTimeCenterCoords.put(i, gridReader.getCenters());
 		}
 		// events
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		ActivityTimeDistribution atd = null;
 		atd = new ActivityTimeDistribution(new CharyparNagelScoringParameters(

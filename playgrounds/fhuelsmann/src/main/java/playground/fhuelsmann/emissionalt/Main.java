@@ -20,7 +20,7 @@
 
 package playground.fhuelsmann.emissionalt;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 public class Main {
 	
@@ -32,7 +32,7 @@ public class Main {
 		String Hbefa_Traffic = "../../detailedEval/teststrecke/sim/inputEmissions/hbefa_emission_factors.txt";
 
 		//create an event object
-		EventsManager events = new EventsManagerImpl();	
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();	
 
 		//create the handler
 		TravelTimeCalculation handler = new TravelTimeCalculation();

@@ -73,6 +73,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -425,7 +426,7 @@ public class Controler {
 				this.events = new ParallelEventsManagerImpl(numOfThreads);
 			}
 		} else {
-			this.events = new EventsManagerImpl();
+			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		}
 	}
 

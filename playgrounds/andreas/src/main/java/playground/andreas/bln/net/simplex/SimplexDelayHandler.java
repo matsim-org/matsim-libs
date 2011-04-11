@@ -8,8 +8,9 @@ import java.util.LinkedList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -25,7 +26,7 @@ public class SimplexDelayHandler {
 
 	
 	public void readEvents(String filename){
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		Collections.sort(this.timeSteps);
 		
 		this.handlerList = new LinkedList<DelayHandler>();

@@ -28,9 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
@@ -58,7 +59,7 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	 */
 	public Queue<Event> getPhantomPopulation() {
 		this.phantomPopulation = new ConcurrentLinkedQueue<Event>();
-		EventsManagerImpl ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {

@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -120,7 +121,7 @@ public class Simulator {
 //		this.random = random;
 		
 		pseudoSim = new PseudoSim();
-		eventManager = new EventsManagerImpl();
+		eventManager = (EventsManagerImpl) EventsUtils.createEventsManager();
 		
 		scorer = new EventsToScore(population, new CharyparNagelScoringFunctionFactory((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")));
 		eventManager.addHandler(scorer);

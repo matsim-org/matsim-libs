@@ -26,7 +26,8 @@ import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -67,7 +68,7 @@ public class VolumefromEventsOfIters {
 		List<VolumesAnalyzer> vols = new ArrayList<VolumesAnalyzer>();
 		for (int i = 500; i < 505; i++) {
 			System.out.println(">>>>>reading the events...");
-			EventsManagerImpl events = new EventsManagerImpl();
+			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 			VolumesAnalyzer volumes = new VolumesAnalyzer(900, 24 * 3600 - 1,
 					network);
 			events.addHandler(volumes);

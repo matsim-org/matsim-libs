@@ -8,8 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -46,7 +47,7 @@ public class LinkTrafficVolumeExtractor {
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		VolumesAnalyzer va = new VolumesAnalyzer(timeBin, 30 * 3600, network);
 		events.addHandler(va);

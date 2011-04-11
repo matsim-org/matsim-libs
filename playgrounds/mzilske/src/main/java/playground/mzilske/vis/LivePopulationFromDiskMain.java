@@ -2,9 +2,10 @@ package playground.mzilske.vis;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -42,7 +43,7 @@ public class LivePopulationFromDiskMain {
 		new MatsimNetworkReader(scenario).readFile(networkFileName);
 		new MatsimPopulationReader(scenario).readFile(populationFileName);
 		
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		
 		final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);

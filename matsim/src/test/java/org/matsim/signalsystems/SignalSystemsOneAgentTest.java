@@ -25,13 +25,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -114,7 +115,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(this);
 		this.link2EnterTime = 38.0;
 		
@@ -148,7 +149,7 @@ public class SignalSystemsOneAgentTest implements
 		groupData.setDropping(0);
 		groupData.setOnset(100);
 		
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(this);
 		this.link2EnterTime = 100.0;
 		

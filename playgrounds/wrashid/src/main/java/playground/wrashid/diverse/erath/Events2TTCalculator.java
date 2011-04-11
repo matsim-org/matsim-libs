@@ -21,8 +21,9 @@
 package playground.wrashid.diverse.erath;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 
@@ -39,7 +40,7 @@ public class Events2TTCalculator {
 		//TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		//events.addHandler(ttmc);
 		events.addHandler(ttc);
 		

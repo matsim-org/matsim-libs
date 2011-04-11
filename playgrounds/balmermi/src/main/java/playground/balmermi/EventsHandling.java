@@ -21,8 +21,9 @@
 package playground.balmermi;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -36,7 +37,7 @@ public class EventsHandling {
 		System.out.println("MATSim-ANALYSIS: handling events....");
 
 		System.out.println("  reading events and analyzing departure times... ");
-		final EventsManagerImpl events = new EventsManagerImpl();
+		final EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		final LegHistogram analysis = new LegHistogram(binSize);
 		events.addHandler(analysis);
 		new MatsimEventsReader(events).readFile(null /*filename not specified*/);

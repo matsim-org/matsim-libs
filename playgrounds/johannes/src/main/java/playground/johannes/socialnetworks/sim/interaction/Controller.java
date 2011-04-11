@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.graph.analysis.Degree;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PersonImpl;
@@ -106,7 +107,7 @@ public class Controller {
 
 		persons = new ArrayList<Person>(population.getPersons().values());
 
-		eventManager = new EventsManagerImpl();
+		eventManager = (EventsManagerImpl) EventsUtils.createEventsManager();
 		VisitorTracker tracker = new VisitorTracker();
 		eventManager.addHandler(tracker);
 

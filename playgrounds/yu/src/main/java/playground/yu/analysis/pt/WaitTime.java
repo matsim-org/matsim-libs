@@ -15,7 +15,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -201,7 +201,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	public static void main(String[] args) {
 		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_2a/m2_out_2a/ITERS/it.1000/1000.events.xml.gz";
 
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		WaitTime wt = new WaitTime();
 		em.addHandler(wt);
 

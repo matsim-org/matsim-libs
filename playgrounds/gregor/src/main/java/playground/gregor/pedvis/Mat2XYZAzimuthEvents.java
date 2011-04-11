@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
@@ -53,7 +53,7 @@ public class Mat2XYZAzimuthEvents {
 		}
 
 		EventWriterXML writer = new EventWriterXML("/home/laemmel/devel/dfg/events.xml");
-		EventsManager manager = new EventsManagerImpl();
+		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
 		manager.addHandler(writer);
 		EventsFactory fac = manager.getFactory();
 

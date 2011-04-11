@@ -20,9 +20,10 @@
 package playground.dgrether.lanes.laneLayoutTest;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +53,7 @@ public class LaneLayoutTestShowLanes {
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 		loader.loadScenario();
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
 		QSim otfVisQSim = new QSim(sc, events);

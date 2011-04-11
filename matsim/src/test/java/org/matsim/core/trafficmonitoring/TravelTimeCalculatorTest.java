@@ -33,9 +33,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -172,13 +174,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 
-		EventsManagerImpl events2 = new EventsManagerImpl();
+		EventsManager events2 = (EventsManager) EventsUtils.createEventsManager();
 
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, scenario.getConfig().travelTimeCalculator());
 		ttcalc.setTravelTimeAggregator(aggregator);
@@ -294,7 +296,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse(networkFile);
 
-		EventsManagerImpl events = new EventsManagerImpl(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);

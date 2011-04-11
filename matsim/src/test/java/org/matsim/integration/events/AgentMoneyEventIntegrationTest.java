@@ -20,9 +20,10 @@
 
 package org.matsim.integration.events;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -42,7 +43,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		final String eventsFilename = getOutputDirectory() + "events.txt";
 
-		EventsManagerImpl writeEvents = new EventsManagerImpl();
+		EventsManager writeEvents = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFilename);
 		writeEvents.addHandler(writer);
 
@@ -53,7 +54,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// read the events from file
 
-		EventsManagerImpl readEvents = new EventsManagerImpl();
+		EventsManager readEvents = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);
@@ -84,7 +85,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		final String eventsFilename = getOutputDirectory() + "events.xml";
 
-		EventsManagerImpl writeEvents = new EventsManagerImpl();
+		EventsManager writeEvents = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFilename);
 		writeEvents.addHandler(writer);
 
@@ -95,7 +96,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// read the events from file
 
-		EventsManagerImpl readEvents = new EventsManagerImpl();
+		EventsManager readEvents = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);

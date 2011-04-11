@@ -2,7 +2,7 @@ package playground.mzilske.pipeline;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 
 public class EventsManagerTaskManagerFactory extends TaskManagerFactory {
@@ -27,7 +27,7 @@ public class EventsManagerTaskManagerFactory extends TaskManagerFactory {
 				events = new ParallelEventsManagerImpl(numOfThreads);
 			}
 		} else {
-			events = new EventsManagerImpl();
+			events = (EventsManager) EventsUtils.createEventsManager();
 		}
 		
 		return new EventsManagerTaskManager(events);

@@ -20,7 +20,7 @@
 package playground.benjamin.events;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
 import tutorial.programming.example06EventsHandling.MyEventHandler1;
@@ -41,7 +41,7 @@ public class BkEventsHandling {
 		String inputFile = "../matsim/output/multipleIterations/ITERS/it.10/10.events.xml.gz";
 		
 		//create an event object
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		//create the handler
 		MyEventHandler1 handler = new MyEventHandler1();

@@ -8,9 +8,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -23,7 +24,7 @@ public class FilterEventsForCommunity {
 
 	public static void main(String[] args) {
 		String eventsFile = "H:/data/cvs/ivt/studies/switzerland/results/census2000v2/runs/ivtch-10pctcv2-rev9473-run00/ITERS/it.200/200.events.txt.gz";
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		NetworkImpl network = GeneralLib.readNetwork("H:/data/cvs/ivt/studies/switzerland/networks/ivtch/network.xml");
 

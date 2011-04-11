@@ -6,11 +6,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.Module;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -45,7 +46,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 			frs.add(fr);
 		}
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(), frs, events, ec.getBufferSize());
 
 		double delta = Math.pow(10, -6);

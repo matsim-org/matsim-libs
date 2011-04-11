@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
@@ -44,7 +44,7 @@ public class SanralIntegrationTest {
 		c.setCreateGraphs(false);
 		c.run();
 
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector ec = new EventsCollector();
 		em.addHandler(ec);
 		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");

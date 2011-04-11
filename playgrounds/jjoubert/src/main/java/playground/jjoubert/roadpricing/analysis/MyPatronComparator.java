@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -173,7 +173,7 @@ public class MyPatronComparator {
 	 */
 	public List<Map<Id,Integer>> processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList){
 		log.info("Processing events from " + eventsFile);
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		MyPatronLinkEntryHandler eh = new MyPatronLinkEntryHandler(linkList, breakList);
 		em.addHandler(eh);
 		MatsimEventsReader mer = new MatsimEventsReader(em);

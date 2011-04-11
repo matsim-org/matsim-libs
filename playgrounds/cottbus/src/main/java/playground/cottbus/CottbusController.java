@@ -25,9 +25,10 @@ package playground.cottbus;
  */
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -56,7 +57,7 @@ public class CottbusController {
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		Scenario sc = scl.loadScenario();
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		EventsManagerImpl e = new EventsManagerImpl();
+		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(sc, e);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);

@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -124,7 +125,7 @@ public class EventsReadersTest extends MatsimTestCase {
 	}
 
 	public final void testTxtReader() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
@@ -133,7 +134,7 @@ public class EventsReadersTest extends MatsimTestCase {
 	}
 
 	public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
@@ -142,7 +143,7 @@ public class EventsReadersTest extends MatsimTestCase {
 	}
 
 	public final void testAutoFormatReaderTxt() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -151,7 +152,7 @@ public class EventsReadersTest extends MatsimTestCase {
 	}
 
 	public final void testAutoFormatReaderXml() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);

@@ -31,7 +31,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -53,7 +53,7 @@ public class Worker extends Thread implements BasicEventHandler{
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
 
-		this.e = new EventsManagerImpl();
+		this.e = (EventsManager) EventsUtils.createEventsManager();
 		this.e.addHandler(this);
 	}
 

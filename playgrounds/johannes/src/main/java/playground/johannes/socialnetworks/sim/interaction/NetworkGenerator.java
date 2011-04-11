@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PersonImpl;
@@ -110,7 +111,7 @@ public class NetworkGenerator {
 
 		InteractionHandler handler = new InteractionHandler(selector, interactor);
 
-		EventsManagerImpl manager = new EventsManagerImpl();
+		EventsManagerImpl manager = (EventsManagerImpl) EventsUtils.createEventsManager();
 //		manager.
 		manager.addHandler(handler);
 

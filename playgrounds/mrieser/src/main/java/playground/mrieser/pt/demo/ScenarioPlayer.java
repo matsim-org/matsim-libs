@@ -25,7 +25,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -45,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 public class ScenarioPlayer {
 
-	public static void play(final ScenarioImpl scenario, final EventsManagerImpl events) {
+	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final QSim sim = new QSim(scenario, events);
 		sim.addFeature(new OTFVisMobsimFeature(sim));
@@ -75,7 +76,7 @@ public class ScenarioPlayer {
 		new TransitScheduleReaderV1(schedule, network, scenario).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
-		final EventsManagerImpl events = new EventsManagerImpl();
+		final EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 

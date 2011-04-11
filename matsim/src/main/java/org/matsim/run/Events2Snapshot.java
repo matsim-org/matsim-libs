@@ -26,8 +26,9 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.gbl.MatsimRandom;
@@ -51,7 +52,7 @@ public class Events2Snapshot {
 
 	private Config config;
 	private Network network = null;
-	private EventsManagerImpl events = null;
+	private EventsManager events = null;
 	private SnapshotGenerator visualizer = null;
 	private String configfile = null;
 	private String eventsfile;
@@ -189,7 +190,7 @@ public class Events2Snapshot {
 
 	private void prepare() {
 		// create events
-		this.events = new EventsManagerImpl();
+		this.events = (EventsManager) EventsUtils.createEventsManager();
 
 		// create SnapshotGenerator
 		this.visualizer = new SnapshotGenerator(this.network, this.config.getQSimConfigGroup().getSnapshotPeriod(), 

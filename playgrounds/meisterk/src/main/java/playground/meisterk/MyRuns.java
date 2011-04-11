@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -44,7 +45,6 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -509,7 +509,7 @@ public class MyRuns {
 		return population;
 	}
 
-	public static void readEvents(final EventsManagerImpl events, final NetworkImpl network, final String eventsInputFile) {
+	public static void readEvents(final EventsManager events, final NetworkImpl network, final String eventsInputFile) {
 
 		// load test events
 		long startTime, endTime;

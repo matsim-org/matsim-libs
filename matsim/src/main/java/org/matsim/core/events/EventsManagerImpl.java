@@ -111,12 +111,12 @@ public class EventsManagerImpl implements EventsManager {
 
 	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<Class<?>, HandlerInfo[]>(15);
 
-	public long counter = 0;
-	public long nextCounterMsg = 1;
+	private long counter = 0;
+	private long nextCounterMsg = 1;
 
 	private EventsFactory builder;
 
-	public EventsManagerImpl() {
+	protected EventsManagerImpl() {
 		this.builder = new EventsFactoryImpl();
 	}
 
@@ -245,7 +245,7 @@ public class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-	public void computeEvent(final Event event) {
+	private void computeEvent(final Event event) {
 		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
 			synchronized(info.eventHandler) {
 				if (callHandlerFast(info.eventClass, event, info.eventHandler)) {

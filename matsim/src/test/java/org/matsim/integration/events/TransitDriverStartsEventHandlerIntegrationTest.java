@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
@@ -37,7 +37,7 @@ public class TransitDriverStartsEventHandlerIntegrationTest {
 
 	@Test
 	public void testProcessEventIntegration() {
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, new IdImpl("driver"),
 				new IdImpl("veh"), new IdImpl("line"), new IdImpl("route"), new IdImpl("dep"));
 		TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();

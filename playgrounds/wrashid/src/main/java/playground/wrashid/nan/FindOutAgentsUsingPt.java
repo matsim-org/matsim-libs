@@ -4,11 +4,12 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 
 
 public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnterEventHandler {
@@ -22,7 +23,7 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 		FindOutAgentsUsingPt findOutPt=new FindOutAgentsUsingPt();
 		
-		EventsManagerImpl events = new EventsManagerImpl();  //create new object of events-manager class
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
 		
 		events.addHandler(findOutPt);
 		

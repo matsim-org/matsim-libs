@@ -20,7 +20,8 @@
 package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
@@ -42,7 +43,7 @@ public class DenverStarter {
 		
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		Scenario sc = scl.loadScenario();
-		EventsManagerImpl e = new EventsManagerImpl();
+		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(sc, e);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);

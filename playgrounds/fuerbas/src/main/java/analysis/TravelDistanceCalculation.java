@@ -20,7 +20,7 @@
 package analysis;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
 public class TravelDistanceCalculation {
@@ -37,7 +37,7 @@ public class TravelDistanceCalculation {
 		String inputFile = args[0];
 		
 		//create an event object
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		//create the handler
 		TravelDistanceHandler handler = new TravelDistanceHandler();	

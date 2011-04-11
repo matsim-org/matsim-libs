@@ -3,9 +3,10 @@ package playground.wrashid.thelma.psl;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
@@ -32,7 +33,7 @@ public class ExportParkingTimesAndEnergyConsumptions {
 	public static void main(String[] args) {
 		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
 		String networkFile="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		
 		

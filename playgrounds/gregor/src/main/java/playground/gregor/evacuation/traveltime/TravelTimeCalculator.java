@@ -24,9 +24,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.xml.sax.SAXException;
 
 public class TravelTimeCalculator implements AgentArrivalEventHandler {
@@ -38,7 +39,7 @@ public class TravelTimeCalculator implements AgentArrivalEventHandler {
 		String events = "/home/laemmel/devel/allocation/output/ITERS/it.150/150.events.xml.gz";
 		TravelTimeCalculator tt = new TravelTimeCalculator();
 		
-		EventsManagerImpl ev = new EventsManagerImpl();
+		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(tt);
 		try {
 			new EventsReaderXMLv1(ev).parse(events);

@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -54,8 +54,8 @@ public class PotsdamAnalysis implements Runnable {
 		String populationFileName = "output/brandenburg/output_plans.xml";
 		String eventsFile1 = "output/brandenburg/ITERS/it.20/20.events.txt.gz";
 		String eventsFile2 = "output/brandenburg-broken-bridge/ITERS/it.50/50.events.txt.gz";
-		EventsManager before = new EventsManagerImpl();
-		EventsManager after = new EventsManagerImpl();
+		EventsManager before = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager after = (EventsManager) EventsUtils.createEventsManager();
 		
 		
 		String network = "inputs/brandenburg/network.xml";

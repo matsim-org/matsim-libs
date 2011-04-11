@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -51,7 +52,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
@@ -207,7 +208,7 @@ public class TransitQueueSimulationTest {
 
 		scenario.getConfig().addSimulationConfigGroup(new SimulationConfigGroup() ) ;
 		scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
-		QSim sim = new QSim(scenario, new EventsManagerImpl());
+		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 		sim.run();
 		List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
 		assertEquals(5, agents.size());
@@ -271,7 +272,7 @@ public class TransitQueueSimulationTest {
 		population.addPerson(person);
 
 		// run simulation
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		QSim simulation = new QSim(scenario, events);
 		simulation.run();
 
@@ -339,7 +340,7 @@ public class TransitQueueSimulationTest {
 		population.addPerson(person);
 
 		// run simulation
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		QSim simulation = new QSim(scenario, events);
 		simulation.run();
 	}
@@ -454,7 +455,7 @@ public class TransitQueueSimulationTest {
 
 
 		// run simulation
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestHandleStopSimulation simulation = new TestHandleStopSimulation(scenario, events, line, tRoute, departure);
 		simulation.run();
 
@@ -514,7 +515,7 @@ public class TransitQueueSimulationTest {
 		private final TransitRoute route;
 		private final Departure departure;
 
-		protected TestHandleStopSimulation(final ScenarioImpl scenario, final EventsManagerImpl events,
+		protected TestHandleStopSimulation(final ScenarioImpl scenario, final EventsManager events,
 				final TransitLine line, final TransitRoute route, final Departure departure) {
 			super(scenario, events);
 			this.line = line;
@@ -633,7 +634,7 @@ public class TransitQueueSimulationTest {
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		// prepare test
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 
@@ -759,7 +760,7 @@ public class TransitQueueSimulationTest {
 		population.addPerson(person);
 
 		// run sim
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new QSim(scenario, events).run();

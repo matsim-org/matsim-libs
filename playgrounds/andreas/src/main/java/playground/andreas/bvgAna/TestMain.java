@@ -34,9 +34,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -94,7 +95,7 @@ public class TestMain {
 		String transitScheduleFile = "F:/bvgAna/input/transitSchedule.xml";
 		String vehDefinitionFile = "F:/bvgAna/input/vehicles.xml";
 
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());

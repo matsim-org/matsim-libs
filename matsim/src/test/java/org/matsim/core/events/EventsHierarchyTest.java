@@ -23,6 +23,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -35,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class EventsHierarchyTest extends MatsimTestCase {
 	
 	public void testEventsHierarchy() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		TestEventHandler handler = new TestEventHandler();
 		events.addHandler(handler);
 		assertEquals("wrong number of handled events.", 0, handler.counter);

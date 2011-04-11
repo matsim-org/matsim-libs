@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -73,7 +73,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 				this.network,
 				config.travelTimeCalculator());
 
-		this.events = new EventsManagerImpl();
+		this.events = (EventsManager) EventsUtils.createEventsManager();
 		this.events.addHandler(travelTimeCalculator);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);

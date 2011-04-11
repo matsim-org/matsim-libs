@@ -25,8 +25,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -93,7 +94,7 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase {
 
 		net.setNetworkChangeEvents(nc);
 
-		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,false, new EventsManagerImpl());
+		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,false, ((EventsManager) EventsUtils.createEventsManager()));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkGeneralizedTravelCost(l0,Time.UNDEFINED_TIME));
 		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkGeneralizedTravelCost(l1,Time.UNDEFINED_TIME));
 		assertEquals("Risk cost:" , 0. , rcc.getLinkGeneralizedTravelCost(l2,Time.UNDEFINED_TIME));
@@ -158,7 +159,7 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase {
 
 		net.setNetworkChangeEvents(nc);
 
-		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,true, new EventsManagerImpl());
+		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,true, ((EventsManager) EventsUtils.createEventsManager()));
 
 		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkGeneralizedTravelCost(l0,Time.UNDEFINED_TIME));
 		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkGeneralizedTravelCost(l1,Time.UNDEFINED_TIME));

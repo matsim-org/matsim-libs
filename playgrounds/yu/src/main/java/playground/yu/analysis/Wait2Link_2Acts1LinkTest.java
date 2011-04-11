@@ -34,8 +34,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -211,7 +212,7 @@ public class Wait2Link_2Acts1LinkTest {
 		System.out.println("there is " + sal.getPersonCount() + " persons, "
 				+ sal.getActLocCount() + " 2Acts1Link-s!");
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		Wait2Link w2l = new Wait2Link(sal.getAgentLinks(), outputFilename);
 		events.addHandler(w2l);

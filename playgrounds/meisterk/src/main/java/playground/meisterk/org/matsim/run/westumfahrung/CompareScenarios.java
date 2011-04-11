@@ -37,9 +37,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -482,7 +483,7 @@ public class CompareScenarios {
 				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength(scenarioNetworks.get(scenarioName));
 				calcAverageTripLength.run(plansSubPop);
 
-				EventsManagerImpl events = new EventsManagerImpl();
+				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 				CalcLegTimes calcLegTimes = new CalcLegTimes(plansSubPop);
 				events.addHandler(calcLegTimes);

@@ -50,7 +50,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
@@ -219,7 +219,7 @@ public class RunAnalyses {
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
 		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
 
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		em.addHandler(remainSeated);
 		new MatsimEventsReader(em).readFile(eventsFilename);
 		Map<Id, List<StopId2RemainSeatedDataMapData>> remainSeatedMap = remainSeated.getStopId2RemainSeatedDataMap();
@@ -341,7 +341,7 @@ public class RunAnalyses {
 	public void createMissedConnectionStats(Set<Id> agentIds) {
 		AgentId2StopDifferenceMap missedConnections = new AgentId2StopDifferenceMap(this.scenario.getPopulation(), agentIds);
 
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		em.addHandler(missedConnections);
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
@@ -426,7 +426,7 @@ public class RunAnalyses {
 
 		StopId2PersonEnterLeaveVehicleHandler enterLeave = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
 		PersonEnterLeaveVehicle2ActivityHandler enterLeave2Act = new PersonEnterLeaveVehicle2ActivityHandler(agentIds);
-		EventsManager em = new EventsManagerImpl();
+		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		em.addHandler(enterLeave);
 		em.addHandler(enterLeave2Act);
 		new MatsimEventsReader(em).readFile(eventsFilename);

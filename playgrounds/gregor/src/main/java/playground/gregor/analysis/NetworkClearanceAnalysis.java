@@ -36,12 +36,13 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -151,8 +152,8 @@ public class NetworkClearanceAnalysis {
 	}
 
 	private void readEvents() {
-		EventsManagerImpl events1 = new EventsManagerImpl();
-		EventsManagerImpl events2 = new EventsManagerImpl();
+		EventsManager events1 = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events2 = (EventsManager) EventsUtils.createEventsManager();
 		EventsHandler e1 = new EventsHandler(this.linkMapping1);
 		EventsHandler e2 = new EventsHandler(this.linkMapping2);
 		events1.addHandler(e1);

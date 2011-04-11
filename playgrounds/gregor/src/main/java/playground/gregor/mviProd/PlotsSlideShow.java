@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 
 
 public class PlotsSlideShow implements AgentArrivalEventHandler  {
@@ -84,7 +85,7 @@ public class PlotsSlideShow implements AgentArrivalEventHandler  {
 
 
 	private void readEventFile() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventFile);
 		

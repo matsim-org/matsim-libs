@@ -40,10 +40,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -75,7 +76,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 	public void run() {
 		buildQuad();
 
-		EventsManagerImpl  ev = new EventsManagerImpl();
+		EventsManager  ev = (EventsManager) EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 

@@ -25,6 +25,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -162,7 +163,7 @@ public class WithinDayParallelEventsManagerImpl extends EventsManagerImpl implem
 		iterationBarrier = new CyclicBarrier(numberOfThreads + 1);
 		for (int i = 0; i < numberOfThreads; i++)
 		{
-			events[i] = new EventsManagerImpl();
+			events[i] = (EventsManagerImpl) EventsUtils.createEventsManager();
 		}
 	}
 

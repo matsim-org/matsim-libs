@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems.sylvia;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
@@ -53,7 +53,7 @@ public class SylviaOTFVisMain {
 	public void playCottbus(ScenarioImpl scenario){
 		DgOTFVisUtils.preparePopulation4Simulation(scenario);
 		
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		scenario.getConfig().otfVis().setAgentSize(40.0f);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 

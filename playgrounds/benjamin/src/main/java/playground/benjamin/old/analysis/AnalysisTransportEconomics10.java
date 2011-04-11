@@ -32,7 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -155,7 +155,7 @@ public class AnalysisTransportEconomics10 {
 if(config.scenario().isUseRoadpricing()){
 	eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
 	
-	EventsManager events = new EventsManagerImpl();
+	EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 	MoneyEventHandler tollCollectHandler = new MoneyEventHandler();
 	events.addHandler(tollCollectHandler);
 	

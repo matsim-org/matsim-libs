@@ -27,6 +27,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -66,7 +67,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 
 		double depDelay = 0.0;
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		DepartureDelayAverageCalculator testee = new DepartureDelayAverageCalculator(network, TIME_BIN_SIZE);
 		events.addHandler(testee);
 		events.printEventHandlers();

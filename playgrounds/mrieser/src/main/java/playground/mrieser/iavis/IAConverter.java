@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -53,7 +53,7 @@ public class IAConverter {
 
 		new IANetworkWriter().write(s.getNetwork(), OUT_LINKS);
 
-		EventsManager e = new EventsManagerImpl();
+		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		IADrivingWriter driving = new IADrivingWriter(s.getNetwork(), OUT_VEHICLES);
 		e.addHandler(driving);
 		IAActivitiesWriter activities = new IAActivitiesWriter(s, IN_PLANS, OUT_ACTIVITIES);

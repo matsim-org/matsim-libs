@@ -30,10 +30,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -215,7 +216,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	}
 
 	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll, final PlanCalcScoreConfigGroup config) {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
 		events.addHandler(paidToll);
 		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), new CharyparNagelScoringFunctionFactory(config));

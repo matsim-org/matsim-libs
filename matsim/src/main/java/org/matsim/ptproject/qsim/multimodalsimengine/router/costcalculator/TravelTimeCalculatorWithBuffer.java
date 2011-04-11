@@ -40,8 +40,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
@@ -80,7 +80,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		}
 
 		// We use a new EventsManager where we only register the TravelTimeCalculator.
-		EventsManager eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		eventsManager.addHandler(this);
 
 		log.info("Processing events file to get initial travel times...");

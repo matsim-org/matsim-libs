@@ -22,6 +22,7 @@ package org.matsim.core.events;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -36,7 +37,7 @@ public class EventsManagerImplTest {
 	 */
 	@Test
 	public void testProcessEvent_CustomEventHandler() {
-		EventsManagerImpl manager = new EventsManagerImpl();
+		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
 		CountingMyEventHandler handler = new CountingMyEventHandler();
 		manager.addHandler(handler);
 		manager.processEvent(new MyEvent(123.45));
@@ -48,7 +49,7 @@ public class EventsManagerImplTest {
 	 */
 	@Test
 	public void testProcessEvent_ExceptionInEventHandler() {
-		EventsManagerImpl manager = new EventsManagerImpl();
+		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
 		CrashingMyEventHandler handler = new CrashingMyEventHandler();
 		manager.addHandler(handler);
 		try {

@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.controler.Controler;
@@ -20,8 +21,8 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -41,7 +42,7 @@ public class SampleEvents {
 //		String inputEventsFile = "H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
 //		String outputEventsFile = "H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/events sampling/5pct-sample-2-events.txt.txt.gz";
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		EventsFilter eventsFilter = new EventsFilter(outputEventsFile, sampleFraction);
 

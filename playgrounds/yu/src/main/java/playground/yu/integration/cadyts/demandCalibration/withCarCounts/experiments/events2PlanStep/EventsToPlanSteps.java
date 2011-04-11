@@ -45,7 +45,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -274,7 +274,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 			pop.addPerson(person);
 			person.addPlan(new PlanImpl());
 		}
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventsToPlanSteps e2p = new EventsToPlanSteps(net, pop);
 		events.addHandler(e2p);
 		loop: for (int i = 0; i < 10; i++) {

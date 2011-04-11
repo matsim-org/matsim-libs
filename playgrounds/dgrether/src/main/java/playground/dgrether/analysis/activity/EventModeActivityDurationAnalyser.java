@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -95,7 +96,7 @@ public class EventModeActivityDurationAnalyser {
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		events.addHandler(new ActivityDurationHandler(plans));
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 		eventsReader.readFile(EVENTSFILE);

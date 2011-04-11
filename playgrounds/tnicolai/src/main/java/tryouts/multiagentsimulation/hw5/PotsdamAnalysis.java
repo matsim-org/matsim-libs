@@ -20,7 +20,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -51,8 +51,8 @@ public class PotsdamAnalysis implements Runnable {
 	public void run() {
 		String eventsFileBefore = "./tnicolai/configs/brandenburg/events_before.xml.gz";
 		String eventsFileAfter = "./tnicolai/configs/brandenburg/events_after.xml.gz";
-		EventsManager before = new EventsManagerImpl();
-		EventsManager after = new EventsManagerImpl();
+		EventsManager before = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager after = (EventsManager) EventsUtils.createEventsManager();
 		
 		
 		String network = "./tnicolai/configs/brandenburg/network_before.xml";

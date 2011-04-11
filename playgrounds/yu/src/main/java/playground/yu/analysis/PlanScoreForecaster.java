@@ -39,8 +39,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -277,7 +277,7 @@ public class PlanScoreForecaster {
 		TravelTimeCalculator ttc = new TravelTimeCalculatorFactoryImpl()
 				.createTravelTimeCalculator(net, cf.travelTimeCalculator());
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(ttc);
 		new EventsReaderTXTv1(events).readFile(eventsFilename);
 

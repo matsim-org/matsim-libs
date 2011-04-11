@@ -29,8 +29,9 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
@@ -213,7 +214,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	}
 	
 	private void readEvents(String eventFileName){
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(this);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		try {reader.parse(eventFileName);} 

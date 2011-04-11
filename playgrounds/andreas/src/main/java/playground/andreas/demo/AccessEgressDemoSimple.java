@@ -26,10 +26,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -263,7 +264,7 @@ public class AccessEgressDemoSimple {
 	}
 
 	private void runSim() {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(new IdImpl("line A")).getRoutes().get(new IdImpl("A"));
 		VehicleTracker vehTracker = new VehicleTracker();

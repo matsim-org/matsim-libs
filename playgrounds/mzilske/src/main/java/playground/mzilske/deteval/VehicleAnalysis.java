@@ -12,7 +12,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.neo4j.graphdb.Transaction;
 
@@ -44,7 +44,7 @@ public class VehicleAnalysis {
 
 		});
 		final Map<Id, Integer> currentLegs = new HashMap<Id, Integer>();
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		events.addHandler(new AgentDepartureEventHandler() {
 

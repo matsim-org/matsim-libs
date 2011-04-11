@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -53,7 +54,7 @@ public class FourWaysVisNetworkOnly {
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
 		LaneDefinitions laneDefs = scenario.getLaneDefinitions();

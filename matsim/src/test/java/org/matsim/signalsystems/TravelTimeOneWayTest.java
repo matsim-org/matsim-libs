@@ -33,7 +33,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -108,7 +108,7 @@ public class TravelTimeOneWayTest {
 	}
 
 	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(ScenarioImpl scenario){
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 //		events.addHandler(new LogOutputEventHandler());
@@ -165,7 +165,7 @@ public class TravelTimeOneWayTest {
 	
 	private void runTrafficLightIntersection2arms_w_TrafficLight(Scenario scenario){
 		//test with signal systems
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
@@ -178,7 +178,7 @@ public class TravelTimeOneWayTest {
 		
 	
 		//test without signal systems 
-		events = new EventsManagerImpl();
+		events = (EventsManager) EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 		new QSim(scenario, events).run();

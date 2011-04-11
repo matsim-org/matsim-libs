@@ -4,8 +4,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -44,7 +45,7 @@ public class DgOTFVis {
 
 	
 	public void playScenario(Scenario scenario) {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = new QSim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){

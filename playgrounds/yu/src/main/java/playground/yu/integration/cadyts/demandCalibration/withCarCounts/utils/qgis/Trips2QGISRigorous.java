@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -125,7 +125,7 @@ public class Trips2QGISRigorous implements X2QGIS {
 				counts, net, linkUtilOffsets, gridLength, arStartTime,
 				arEndTime);
 
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(tuoExtractor);
 		// /////////////////////////////////

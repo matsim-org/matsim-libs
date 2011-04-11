@@ -27,8 +27,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
 import org.xml.sax.SAXException;
 
 import playground.andreas.P.replan.ScorePlansHandler.ScoreContainer;
@@ -39,7 +40,7 @@ public class ScorePlans {
 	
 	public static TreeMap<Id, Double> scorePlans(String eventsFile, Network net){
 		
-		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		
 		ScorePlansHandler scorePlansHandler = new ScorePlansHandler(net);

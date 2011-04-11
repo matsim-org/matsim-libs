@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.usecases;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -49,7 +49,7 @@ public class UseCase3_TransitMobsim {
 		((NetworkFactoryImpl) loader.getScenario().getNetwork().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
 
 		Scenario scenario = loader.loadScenario();
-		EventsManager events = new EventsManagerImpl();
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		EventWriterXML ew = new EventWriterXML("testEvents.xml");
 		events.addHandler(ew);
 
