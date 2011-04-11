@@ -233,17 +233,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 					*/
 					
 					
-					//*****************************************
-					//*****************************************
-					//******TEST V2G
-					//*****************************************
 					
-					testV2G myTestV2G = new testV2G();
-					
-					myTestV2G.testAllV2G();
-					
-					//*****************************************
-					//*****************************************
 					
 					myDecentralizedSmartCharger.assignChargingTimes();
 					
@@ -287,12 +277,37 @@ public class testDecentralizedSmartCharger extends TestCase{
 					assertEquals(agentsWithPHEV.size(), 100);
 					
 					
-					myDecentralizedSmartCharger.clearResults();
+					
 					//*****************************************
 					//*****************************************
+					//TEST LPPHEV
+					
+					
+					
 					
 					testLPPHEV testLP = new testLPPHEV();
 					testLP.testRunLPPHEV();
+					
+					
+					
+					
+					
+					//*****************************************
+					//*****************************************
+					//******TEST V2G
+					//*****************************************
+					
+					testV2G myTestV2G = new testV2G();
+					
+					myTestV2G.testAllV2G();
+					myTestV2G.testGetSOCAtTime(myDecentralizedSmartCharger, agentOne);
+					
+					//*****************************************
+					//*****************************************
+					
+					
+					myDecentralizedSmartCharger.clearResults();
+					
 					
 				} catch (Exception e1) {
 					
