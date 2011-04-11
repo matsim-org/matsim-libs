@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>ivtExt</artifactId>
   <name>ivt extensions</name>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <description>Extensions used in several scenarios maintained by ivt, ethz. Code in here might sooner or later find its way into contrib or org.matsim.</description>
 </project>

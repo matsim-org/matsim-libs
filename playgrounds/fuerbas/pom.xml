@@ -2,29 +2,29 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>fuerbas</artifactId>
   <name>fuerbas</name>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>sna</artifactId>
-  		<version>0.2.0-SNAPSHOT</version>
+  		<version>0.4.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>johannes</artifactId>
-  		<version>0.2.0-SNAPSHOT</version>
+  		<version>0.4.0-SNAPSHOT</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>benjamin</artifactId>
-  		<version>0.2.0-SNAPSHOT</version>
+  		<version>0.4.0-SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>

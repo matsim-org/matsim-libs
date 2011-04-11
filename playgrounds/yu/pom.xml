@@ -3,41 +3,41 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
 	<artifactId>yu</artifactId>
 	<name>yu</name>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.4.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>dgrether</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.4.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>mrieser</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.4.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.4.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<!--  	<dependency>-->
 		<!--  		<groupId>playground</groupId>-->
 		<!--  		<artifactId>mzilske</artifactId>-->
-		<!--  		<version>0.2.0-SNAPSHOT</version>-->
+		<!--  		<version>0.4.0-SNAPSHOT</version>-->
 		<!--  		<scope>compile</scope>-->
 		<!--  	</dependency>-->
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>meisterk</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.4.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

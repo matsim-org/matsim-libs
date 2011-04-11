@@ -2,18 +2,18 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>duncan</artifactId>
   <name>duncan</name>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>kai</artifactId>
-  		<version>0.2.0-SNAPSHOT</version>
+  		<version>0.4.0-SNAPSHOT</version>
   		<scope>compile</scope>
   	</dependency>
   </dependencies>
