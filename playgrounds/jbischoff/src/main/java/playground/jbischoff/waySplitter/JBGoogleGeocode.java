@@ -1,6 +1,5 @@
 package playground.jbischoff.waySplitter;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,9 +16,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-
 public class JBGoogleGeocode {
-	
+
 	private static final Logger log = Logger.getLogger(JBGoogleGeocode.class);
 	private final static String ENCODING = "UTF-8";
 	private final static String KEY = "xyz";
@@ -39,62 +37,79 @@ public class JBGoogleGeocode {
 		public String toString() {
 			return ("Lat: " + this.lat + ", Lon: " + this.lon);
 		}
-		
-		public Coord getGK4(){
-			CoordinateTransformation coorTransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-					TransformationFactory.DHDN_GK4);
-			Coord coord = coorTransform.transform(new CoordImpl(this.lon, this.lat));
+
+		public Coord getGK4() {
+			CoordinateTransformation coorTransform = TransformationFactory
+					.getCoordinateTransformation(TransformationFactory.WGS84,
+							TransformationFactory.DHDN_GK4);
+			Coord coord = coorTransform.transform(new CoordImpl(this.lon,
+					this.lat));
 			return coord;
-			
+
 		}
 	}
 
+	public Location getLocation(String address) throws IOException,
+			InterruptedException {
 
-	public Location getLocation(String address) throws IOException, InterruptedException {
-		
 		int exitCode = -1;
 		Location location = null;
-		
+		BufferedReader reader;
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				new URL("http://maps.google.com/maps/geo?q=" + URLEncoder.encode(address, ENCODING) + "&output=csv&key=" + KEY).openStream()));
-		
-		String resultingLine;
+		try {
+			reader = new BufferedReader(new InputStreamReader(
 
-		while ((resultingLine = reader.readLine()) != null) {
-			
-			exitCode = Integer.parseInt(resultingLine.substring(0, 3));
+			new URL("http://maps.google.com/maps/geo?q="
+					+ URLEncoder.encode(address, ENCODING) + "&output=csv&key="
+					+ KEY).openStream()));
 
+			String resultingLine;
+
+			while ((resultingLine = reader.readLine()) != null) {
+
+				exitCode = Integer.parseInt(resultingLine.substring(0, 3));
 				count++;
-			// Format: 200,6,42.730070,-73.690570
-			
-			if (resultingLine.contains("403")){
-				exitCode = 403;
+
+				if (resultingLine.contains("403")) {
+					exitCode = 403;
+				}
+
+				if (exitCode == 200) {
+					location = new Location(resultingLine.substring(
+							"200,6,".length(),
+							resultingLine.indexOf(',', "200,6,".length())),
+							resultingLine.substring(
+									resultingLine.indexOf(',',
+											"200,6,".length()) + 1,
+									resultingLine.length()));
+				}
 			}
-			
-			if (exitCode == 200) {
-				location = new Location(resultingLine.substring("200,6,".length(), resultingLine.indexOf(',', "200,6,".length())),
-						resultingLine.substring(resultingLine.indexOf(',', "200,6,".length()) + 1, resultingLine.length()));
-			}
+		} catch (IOException e) {
+			exitCode = 500;
+			log.info("exit code 500");
 		}
-//		}
-//		while (exitCode == 620 || exitCode == 602 || exitCode == 403 );
-		
-		if  (exitCode == 620 ||  exitCode == 403 ) {location = new Location("7","7");
-		log.info("wrote mock");}
-		try{
-		if (location == null) {
-			
-			switch (exitCode) {
+		// }
+		// while (exitCode == 620 || exitCode == 602 || exitCode == 403 );
+
+		if (exitCode == 620 || exitCode == 403 || exitCode == 500) {
+			location = new Location("7", "7");
+			 log.info("wrote mock "+ exitCode+" for "+address + " at "+
+			 count);
+		}
+		try {
+			if (location == null) {
+
+				switch (exitCode) {
 				case 400:
 					throw new IOException("Bad Request - 400");
 				case 403:
 					throw new IOException("Refused - 403");
 				case 500:
-					throw new IOException("Unknown error from Google Encoder - 500");
+					throw new IOException(
+							"Unknown error from Google Encoder - 500");
 				case 601:
 					throw new IOException("Missing query - 601");
-				// don't know what that does mean
+					// don't know what that does mean
 				case 602:
 					throw new IOException("null - 602");
 				case 603:
@@ -106,33 +121,31 @@ public class JBGoogleGeocode {
 				case 620:
 					throw new IOException("Too many queries - 620");
 					// limit is 15000 request per 24h
-			}}} catch (IOException e) {
-				location = new Location("0", "0");
-//				e.printStackTrace();
+				}
 			}
-		
-		
+		} catch (IOException e) {
+			location = new Location("0", "0");
+			// e.printStackTrace();
+		}
+
 		return location;
 	}
 
 	/**
 	 * 
-	 * @param argv 0 - input file, 1 - 0 if first run else 1, 2 - entry to start from
+	 * @param argv
+	 *            0 - input file, 1 - 0 if first run else 1, 2 - entry to start
+	 *            from
 	 * @throws Exception
 	 */
-	public  Coord readGC(String loc) throws Exception {
-		
+	public Coord readGC(String loc) throws Exception {
 
 		int cntRequests = 0;
 
-			
+		cntRequests++;
+		Coord googleOut = this.getLocation(loc).getGK4();
+		// log.info(googleOut + " for " + loc);
 
-			
-								cntRequests++;
-								Coord googleOut = this.getLocation(loc).getGK4();
-//								log.info(googleOut + " for " + loc);
-			
-								
-								return  googleOut;
+		return googleOut;
 	}
 }

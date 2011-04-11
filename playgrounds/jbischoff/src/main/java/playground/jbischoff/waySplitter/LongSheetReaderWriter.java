@@ -59,8 +59,8 @@ public class LongSheetReaderWriter {
 	public void run() throws Exception {
 		this.personMap = new TreeMap<Id, PersonDataElement>();
 		this.wayMap = new TreeMap<Id, List<WayDataElement>>();
-		this.readFile("/Users/JB/Documents/Work/Daten von Andreas/H&P 321 - BVG - Touristenbefragung - Datensatz_utf.csv");
-		this.writeFile("/Users/JB/Documents/Work/Daten von Andreas/bvg_befragung");
+		this.readFile("C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\H&P 321 - BVG - Touristenbefragung - Datensatz.csv");
+		this.writeFile("C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung");
 	}
 
 	void readFile(String filename) throws Exception {
@@ -185,18 +185,21 @@ public class LongSheetReaderWriter {
 	
 	private Coord getGoogleGeocode(String placemark) throws Exception{
 		Coord xy;
-		int i = 0;
-
-		do {
-			i++;
-		xy = jbg.readGC(placemark);
-		if (xy.getX() == 3947011.7307321555 ) {Thread.sleep(1000);
-		};
-		if (i>3) {
-		log.info("Skipping for now:"+ placemark);
-		return new CoordImpl(0,0);}
-		 
-		} while (xy.getX() == 3947011.7307321555 );
+		xy = new CoordImpl(0,0);
+//		int i = 0;
+//		
+//		do {
+//			i++;
+//		xy = jbg.readGC(placemark);
+////		log.info(xy.getX() + "for +"+placemark );
+//		if (xy.getX() == 3947011.7307321555 ) {Thread.sleep(1000);
+////		log.info("sleep");
+//		};
+//		if (i>3) {
+//		log.info("Skipping for now:"+ placemark);
+//		return new CoordImpl(0,0);}
+//		 
+//		} while (xy.getX() == 3947011.7307321555 );
 		return xy;
 	}
 

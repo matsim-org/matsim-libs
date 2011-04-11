@@ -37,6 +37,8 @@ public class TestGC {
 		JBGoogleGeocode jgg = new JBGoogleGeocode();
 		Coord xy = jgg.readGC("asdasas");
 		Coord xZy = jgg.readGC("BERLIN");
+		System.out.println(xy);
+		System.out.println(xZy);	
 	}
 
 }
