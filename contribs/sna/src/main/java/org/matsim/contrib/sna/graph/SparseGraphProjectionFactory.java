@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
-
 /**
  * Implementation of GraphProjectionFactory to create instances of GraphProjection,
  * VertexDecorator and EdgeDecorator.
@@ -38,6 +35,7 @@ public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E e
 	 * 
 	 * @return an edge decorator.
 	 */
+	@Override
 	public EdgeDecorator<E> createEdge(E delegate) {
 		return new EdgeDecorator<E>(delegate);
 	}
@@ -49,6 +47,7 @@ public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E e
 	 * 
 	 * @return an empty graph projection.
 	 */
+	@Override
 	public GraphProjection<G, V, E> createGraph(G delegate) {
 		return new GraphProjection<G, V, E>(delegate);
 	}
@@ -60,6 +59,7 @@ public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E e
 	 * 
 	 * @return a new vertex decorator.
 	 */
+	@Override
 	public VertexDecorator<V> createVertex(V delegate) {
 		return new VertexDecorator<V>(delegate);
 	}

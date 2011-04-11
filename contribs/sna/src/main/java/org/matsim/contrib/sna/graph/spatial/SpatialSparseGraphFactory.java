@@ -24,9 +24,6 @@ import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
-
 import com.vividsolutions.jts.geom.Point;
 
 
@@ -61,6 +58,7 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 	/**
 	 * @see {@link GraphFactory#createEdge()}
 	 */
+	@Override
 	public SpatialSparseEdge createEdge() {
 		return new SpatialSparseEdge();
 	}
@@ -68,6 +66,7 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 	/**
 	 * @see {@link GraphFactory#createGraph()}
 	 */
+	@Override
 	public SpatialSparseGraph createGraph() {
 		return new SpatialSparseGraph(crs);
 	}
@@ -75,6 +74,7 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 	/**
 	 * @throws {@link UnsupportedOperationException}. Use {@link #createVertex(Point)} instead.
 	 */
+	@Override
 	public SpatialSparseVertex createVertex() {
 		throw new UnsupportedOperationException("Cannot create a vertex without spatial information.");
 	}

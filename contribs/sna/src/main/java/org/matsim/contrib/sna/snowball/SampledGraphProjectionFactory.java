@@ -24,8 +24,6 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
 /**
  * A sampled graph projection factory is responsible for instantiating new
  * sampled graph projections, vertex decorators and edge decorators. It does not

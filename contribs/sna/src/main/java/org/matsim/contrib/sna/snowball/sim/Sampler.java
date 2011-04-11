@@ -41,9 +41,6 @@ import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.utils.collections.Tuple;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
-
 /**
  * Representation of a snowball simulation.
  * 
@@ -219,7 +216,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 		/*
 		 * draw the seed vertices
 		 */
-		Set<V> seeds = (Set<V>) seedGenerator.apply(responsive);
+		Set<V> seeds = seedGenerator.apply(responsive);
 		List<TaggedVertex> taggedSeeds = new LinkedList<TaggedVertex>();
 		for (V vertex : seeds) {
 			TaggedVertex taggedVertex = taggedGraph.getVertex(vertex);

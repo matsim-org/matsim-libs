@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.sna.graph;
 
-import visad.data.netcdf.UnsupportedOperationException;
-
-
 /**
  * Implementation of GraphFactory to creates instances of SparseGraph,
  * SparseVertex and SparseEdge.
@@ -37,6 +34,7 @@ public class SparseGraphFactory implements
 	 * 
 	 * @return an empty SparseGraph.
 	 */
+	@Override
 	public SparseGraph createGraph() {
 		return new SparseGraph();
 	}
@@ -46,6 +44,7 @@ public class SparseGraphFactory implements
 	 * 
 	 * @returns an isolated SparseVertex
 	 */
+	@Override
 	public SparseVertex createVertex() {
 		return new SparseVertex();
 	}
@@ -55,6 +54,7 @@ public class SparseGraphFactory implements
 	 * 
 	 * @return an orphaned SparseEdge.
 	 */
+	@Override
 	public SparseEdge createEdge() {
 		return new SparseEdge();
 	}
