@@ -41,8 +41,8 @@ public class MultiplerunsControler {
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 	
 	public static int shoppingFacilities[] = {1, 2, 4, 5, 6, 7, 8, 9};
-	public static double dayExpenditureFactor[] = {0.8, 0.9, 1.0, 1.1, 1.2};
-	public static double share[] = {0.9, 0.8, 0.7, 0.6, 0.5};
+	public static double dayExpenditureFactor[] = {1.0, 1.0, 1.0, 1.0, 1.0};
+	public static double share[] = {0.9, 0.9, 0.9, 0.8, 0.5};
 	
     public static void main (final String[] args) { 
     	MultiplerunsControler runControler = new MultiplerunsControler();

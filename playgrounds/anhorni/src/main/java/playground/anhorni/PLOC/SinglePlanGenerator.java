@@ -31,14 +31,16 @@ import org.matsim.core.population.PlanImpl;
 public class SinglePlanGenerator {
 	
 	private ActivityFacilities facilities;
+	private boolean tempVar;
 	
-	public SinglePlanGenerator(ActivityFacilities facilities) {
+	public SinglePlanGenerator(ActivityFacilities facilities, boolean tempVar) {
 		this.facilities = facilities;
+		this.tempVar = tempVar;
 	}
 	
-	public PlanImpl generatePlan(boolean worker, PersonImpl p) {
+	public PlanImpl generatePlan(boolean worker, PersonImpl p, int day) {
 		PlanImpl plan;
-		if (worker) plan = generateWorkPlan(p);
+		if (worker) plan = generateWorkPlan(p, day);
 		else plan = generateNonWorkPlan(p); 
 		return plan;
 	}
@@ -60,7 +62,7 @@ public class SinglePlanGenerator {
 		
 		actH.setStartTime(0.0);
 		actH.setMaximumDuration(10.0 * 3600.0);
-		actH.setEndTime(10 * 3600);
+		actH.setEndTime(10.0 * 3600.0);
 		
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
@@ -68,7 +70,7 @@ public class SinglePlanGenerator {
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
 		
 		actS.setStartTime(10.0 * 3600.0);
-		actS.setMaximumDuration(90 * 60);
+		actS.setMaximumDuration(90.0 * 60.0);
 		actS.setEndTime(11.5 * 3600);
 		
 		actS.setFacilityId(facilityId);
@@ -86,7 +88,7 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateWorkPlan(PersonImpl p) {
+	private PlanImpl generateWorkPlan(PersonImpl p, int day) {
 		int homeIndex = 1;
 		int facilityIndex = 1;
 		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
@@ -95,14 +97,18 @@ public class SinglePlanGenerator {
 		}
 		Id facilityId = new IdImpl(facilityIndex);
 		
+		double time = 0.0;
+		
 		PlanImpl plan = new PlanImpl();
 		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		
-		actH.setStartTime(0.0);
-		actH.setMaximumDuration(8.0 * 3600.0);
-		actH.setEndTime(8.0 * 3600);
+		actH.setStartTime(time);
+		double maxDuration = 8.0 * 3600.0;
+		actH.setMaximumDuration(maxDuration);
+		time += maxDuration;
+		actH.setEndTime(time);
 		
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
@@ -115,28 +121,38 @@ public class SinglePlanGenerator {
 		actW.setFacilityId(workFacilityId);
 		actW.setCoord(this.facilities.getFacilities().get(workFacilityId).getCoord());
 		
-		actW.setStartTime(8.0 * 3600.0);
-		actW.setMaximumDuration(8.5 * 3600.0);
-		actW.setEndTime(16.5 * 3600.0);
+		actW.setStartTime(time);
+		if (tempVar) {
+			maxDuration = 9.0 * 3600.0;
+			if (day == 4) maxDuration = 7.0 * 3600.0;
+		}
+		else {
+			maxDuration = 8.5 * 3600.0;
+		}
 		
+		time += maxDuration;
+		actW.setMaximumDuration(maxDuration);
+		actW.setEndTime(time);
 		plan.addActivity(actW);	
+		
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
 		actS.setFacilityId(facilityId);
 		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
-		
-		actS.setStartTime(16.5 * 3600.0);
-		actS.setMaximumDuration(90.0 * 60.0);
-		actS.setEndTime(18.0 * 3600);
-		
+		actS.setStartTime(time);
+		maxDuration = 90.0 * 60.0;
+		actS.setMaximumDuration(maxDuration);
+		time += maxDuration;
+		actS.setEndTime(time);
 		plan.addActivity(actS);
+		
 		plan.addLeg(new LegImpl("car"));
 		
 		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
 		actH2.setFacilityId(facilityId);
 		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
-		actH2.setStartTime(18.0 * 3600.0);
+		actH2.setStartTime(time);
 		
 		plan.addActivity(actH2);
 		return plan;

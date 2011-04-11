@@ -41,11 +41,11 @@ public class MultiDaysGenerator {
 		for (int i = 0; i < 1000; i++) {
 			this.randomNumberGenerator.nextDouble();
 		}
-		singlePlanGenerator = new SinglePlanGenerator(scenarioWriteOut.getActivityFacilities());
 		this.staticPopulation = staticPopulation;
 		this.scenarioWriteOut = scenarioWriteOut;
 		this.network = network;
 		this.temporalVar = temporalVar;
+		singlePlanGenerator = new SinglePlanGenerator(scenarioWriteOut.getActivityFacilities(), temporalVar);
 	}
 	
 	public void generatePlans(int runId) {
@@ -54,16 +54,21 @@ public class MultiDaysGenerator {
 			keyList.add(Integer.parseInt(id.toString()));
 		}
 		
-		for (int i = 0; i < 5; i++) {
-			double limit = MultiplerunsControler.share[2];
+		for (int day = 0; day < 5; day++) {
+			
+			double average = 0.0;
+			for (int i = 0; i < 5; i++) {
+				average += MultiplerunsControler.share[i] / 5.0;
+			}
+			double limit = average;
 			if (temporalVar) {
-				limit = MultiplerunsControler.share[i];
+				limit = MultiplerunsControler.share[day];
 			}
 			Collections.shuffle(keyList, randomNumberGenerator);
 			
-			this.generatePlan(keyList, limit);
+			this.generatePlan(keyList, limit, day);
 			
-			String path = Create3TownsScenario.outputFolder + "/runs/run" + runId + "/day" + i;
+			String path = Create3TownsScenario.outputFolder + "/runs/run" + runId + "/day" + day;
 			new File(path).mkdirs();
 			this.adaptForDestinationChoice();
 			this.writePlansAndFacs(path + "/plans.xml", path + "/facilities.xml");
@@ -71,7 +76,7 @@ public class MultiDaysGenerator {
 		}	
 	}
 	
-	private void generatePlan(List<Integer> keyList, double limit) {
+	private void generatePlan(List<Integer> keyList, double limit, int day) {
 		for (Integer id : keyList) {
 			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(new IdImpl(id));
 
@@ -83,7 +88,7 @@ public class MultiDaysGenerator {
 			if (this.randomNumberGenerator.nextDouble() < limit) {
 				worker = true;
 			}
-			PlanImpl plan = singlePlanGenerator.generatePlan(worker, p);
+			PlanImpl plan = singlePlanGenerator.generatePlan(worker, p, day);
 			pTmp.addPlan(plan);
 			scenarioWriteOut.getPopulation().addPerson(pTmp);
 		}
