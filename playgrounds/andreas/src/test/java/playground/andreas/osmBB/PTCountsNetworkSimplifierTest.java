@@ -42,7 +42,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyEmptyNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 		
 		String inNetwork = inputPath + "net.xml.gz";
@@ -81,7 +81,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyPTNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 		
 		String inNetwork = inputPath + "net.xml.gz";
@@ -124,7 +124,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyCountsNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 				
 		String inNetwork = inputPath + "net.xml.gz";
@@ -169,7 +169,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyPTCountsNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 				
 		String inNetwork = inputPath + "net.xml.gz";
@@ -217,7 +217,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyElseNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 		
 		String inNetwork = inputPath + "net.xml.gz";
@@ -269,7 +269,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testSimplifyAllNetwork(){
-		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String inputPath = getClassInputDirectory();
 		String outputPath = getOutputDirectory();
 		
 		String inNetwork = inputPath + "net.xml.gz";
