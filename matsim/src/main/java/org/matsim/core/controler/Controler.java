@@ -348,7 +348,7 @@ public class Controler {
 		if (this.state == ControlerState.Init) {
 			init();
 			this.controlerListenerManager.fireControlerStartupEvent();
-			this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:") ;
+			this.checkConfigConsistencyAndWriteToLog("Config dump before doIterations:");
 			doIterations();
 			shutdown(false);
 		} else {
@@ -651,13 +651,14 @@ public class Controler {
 	 * </ul>
 	 * @param message the message that is written just before the config dump
 	 */
-	private void checkConfigConsistencyAndWriteToLog( final String message ) {
+	private void checkConfigConsistencyAndWriteToLog(final String message) {
 		log.info("Checking consistency of config...");
 		this.config.checkConsistency();
-		log.info( message );
+		log.info(message);
+		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.config).writeStream(new PrintWriter(writer));
-		log.info("\n\n" + writer.getBuffer().toString());
+		new ConfigWriter(this.config).writeStream(new PrintWriter(writer), newline);
+		log.info(newline + newline + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 	}
 

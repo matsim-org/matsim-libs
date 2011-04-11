@@ -26,18 +26,32 @@ import java.util.Map;
 
 public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
+	private String newline = "\n";
+
+	/**
+	 * Sets the string to be used as newline separator (see <code>System.getProperty("line.separator");</code>)
+	 *
+	 * @param newline
+	 */
+	public void setNewline(final String newline) {
+		this.newline = newline;
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// <config ... > ... </config>
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void startConfig(final Config config, final BufferedWriter out) throws IOException {
-		out.write("<config>\n\n");
+		out.write("<config>");
+		out.write(this.newline);
+		out.write(this.newline);
 	}
 
 	@Override
 	public void endConfig(final BufferedWriter out) throws IOException {
-		out.write("</config>\n");
+		out.write("</config>");
+		out.write(this.newline);
 	}
 
 //////////////////////////////////////////////////////////////////////
@@ -50,15 +64,21 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 		Map<String, String> comments = module.getComments();
 
 		out.write("\t<module");
-		out.write(" name=\"" + module.getName() + "\" >\n");
+		out.write(" name=\"" + module.getName() + "\" >");
+		out.write(this.newline);
 
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			if (comments.get(entry.getKey()) != null) {
-				out.write( "\n\t\t<!-- " + comments.get(entry.getKey()) + " -->\n");
+				out.write(this.newline);
+				out.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
+				out.write(this.newline);
 			}
-			out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />\n");
+			out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
+			out.write(this.newline);
 		}
-		out.write("\t</module>\n\n");
+		out.write("\t</module>");
+		out.write(this.newline);
+		out.write(this.newline);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -67,7 +87,8 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
+		out.write("<!-- ====================================================================== -->");
+		out.write(this.newline);
+		out.write(this.newline);
 	}
 }

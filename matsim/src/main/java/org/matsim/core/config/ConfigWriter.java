@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
@@ -60,7 +59,21 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.flush();
 			this.writer = null;
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	public final void writeStream(final java.io.Writer writer, final String newline) {
+		try {
+			if (this.handler instanceof ConfigWriterHandlerImplV1) {
+				((ConfigWriterHandlerImplV1) this.handler).setNewline(newline);
+			}
+			this.writer = new BufferedWriter(writer);
+			write();
+			this.writer.flush();
+			this.writer = null;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -72,7 +85,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -93,16 +106,8 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.flush();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public final String toString() {
-		return super.toString();
-	}
 }
