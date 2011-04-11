@@ -30,28 +30,27 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.testcases.MatsimTestCase;
 
-public class PTCountsNetworkSimplifierTest {
+public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 	
-	static final String inputPath = "F:/simplifyTest/in/";
-	static final String outputPath = "F:/simplifyTest/out/";
 	
 	/**
 	 * Test simple network
 	 */
 	@Test
 	public void testSimplifyEmptyNetwork(){
-		String testName = "empty_";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
 		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
+		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
 		String inVehicles = null;
 		String inCounts = null;
 
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
+		String outNetwork = outputPath + "net.xml.gz";
 		String outSchedule = null;
 		String outCounts = null;
 		
@@ -66,7 +65,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -82,15 +81,16 @@ public class PTCountsNetworkSimplifierTest {
 	 */
 	@Test
 	public void testSimplifyPTNetwork(){
-		String testName = "pt_";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
 		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
-		String inSchedule = PTCountsNetworkSimplifierTest.inputPath + "schedule.xml";
-		String inVehicles = PTCountsNetworkSimplifierTest.inputPath + "vehicles.xml";
+		String inNetwork = inputPath + "net.xml.gz";
+		String inSchedule = inputPath + "schedule.xml.gz";
+		String inVehicles = inputPath + "vehicles.xml.gz";
 		String inCounts = null;
 		
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
-		String outSchedule = PTCountsNetworkSimplifierTest.outputPath + testName + "schedule.xml";
+		String outNetwork = outputPath + "net.xml.gz";
+		String outSchedule = outputPath + "schedule.xml.gz";
 		String outCounts = null;
 		
 		HashMap<String, String> nodeIdToCsNameMap = null;
@@ -104,7 +104,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -124,16 +124,17 @@ public class PTCountsNetworkSimplifierTest {
 	 */
 	@Test
 	public void testSimplifyCountsNetwork(){
-		String testName = "counts_";
-		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
+				
+		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
 		String inVehicles = null;
-		String inCounts = PTCountsNetworkSimplifierTest.inputPath + "counts.xml";
+		String inCounts = inputPath + "counts.xml.gz";
 		
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
+		String outNetwork = outputPath + "net.xml.gz";
 		String outSchedule = null;
-		String outCounts = PTCountsNetworkSimplifierTest.outputPath + testName + "counts.xml";
+		String outCounts = outputPath + "counts.xml.gz";
 		
 		HashMap<String, String> nodeIdToCsNameMap = new HashMap<String, String>();
 		nodeIdToCsNameMap.put("1102", "CS1");
@@ -150,7 +151,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -168,16 +169,17 @@ public class PTCountsNetworkSimplifierTest {
 	 */
 	@Test
 	public void testSimplifyPTCountsNetwork(){
-		String testName = "ptCounts_";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
+				
+		String inNetwork = inputPath + "net.xml.gz";
+		String inSchedule = inputPath + "schedule.xml.gz";
+		String inVehicles = inputPath + "vehicles.xml.gz";
+		String inCounts = inputPath + "counts.xml.gz";
 		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
-		String inSchedule = PTCountsNetworkSimplifierTest.inputPath + "schedule.xml";
-		String inVehicles = PTCountsNetworkSimplifierTest.inputPath + "vehicles.xml";
-		String inCounts = PTCountsNetworkSimplifierTest.inputPath + "counts.xml";
-		
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
-		String outSchedule = PTCountsNetworkSimplifierTest.outputPath + testName + "schedule.xml";
-		String outCounts = PTCountsNetworkSimplifierTest.outputPath + testName + "counts.xml";
+		String outNetwork = outputPath + "net.xml.gz";
+		String outSchedule = outputPath + "schedule.xml.gz";
+		String outCounts = outputPath + "counts.xml.gz";
 		
 		HashMap<String, String> nodeIdToCsNameMap = new HashMap<String, String>();
 		nodeIdToCsNameMap.put("1102", "CS1");
@@ -194,7 +196,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -215,14 +217,15 @@ public class PTCountsNetworkSimplifierTest {
 	 */
 	@Test
 	public void testSimplifyElseNetwork(){
-		String testName = "else_";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
 		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
+		String inNetwork = inputPath + "net.xml.gz";
 		String inSchedule = null;
 		String inVehicles = null;
 		String inCounts = null;
 		
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
+		String outNetwork = outputPath + "net.xml.gz";
 		String outSchedule = null;
 		String outCounts = null;
 		
@@ -243,7 +246,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
@@ -266,16 +269,17 @@ public class PTCountsNetworkSimplifierTest {
 	 */
 	@Test
 	public void testSimplifyAllNetwork(){
-		String testName = "all_";
+		String inputPath = "andreas/src/" + getClassInputDirectory();
+		String outputPath = getOutputDirectory();
 		
-		String inNetwork = PTCountsNetworkSimplifierTest.inputPath + "net.xml";
-		String inSchedule = PTCountsNetworkSimplifierTest.inputPath + "schedule.xml";
-		String inVehicles = PTCountsNetworkSimplifierTest.inputPath + "vehicles.xml";
-		String inCounts = PTCountsNetworkSimplifierTest.inputPath + "counts.xml";
+		String inNetwork = inputPath + "net.xml.gz";
+		String inSchedule = inputPath + "schedule.xml.gz";
+		String inVehicles = inputPath + "vehicles.xml.gz";
+		String inCounts = inputPath + "counts.xml.gz";
 		
-		String outNetwork = PTCountsNetworkSimplifierTest.outputPath + testName + "net.xml";
-		String outSchedule = PTCountsNetworkSimplifierTest.outputPath + testName + "schedule.xml";
-		String outCounts = PTCountsNetworkSimplifierTest.outputPath + testName + "counts.xml";
+		String outNetwork = outputPath + "net.xml.gz";
+		String outSchedule = outputPath + "schedule.xml.gz";
+		String outCounts = outputPath + "counts.xml.gz";
 		
 		HashMap<String, String> nodeIdToCsNameMap = new HashMap<String, String>();
 		nodeIdToCsNameMap.put("1102", "CS1");
@@ -297,7 +301,7 @@ public class PTCountsNetworkSimplifierTest {
 		ptCountNetSimplifier.setMergeLinkStats(false);
 		ptCountNetSimplifier.simplifyPTNetwork();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(outNetwork);
 		
