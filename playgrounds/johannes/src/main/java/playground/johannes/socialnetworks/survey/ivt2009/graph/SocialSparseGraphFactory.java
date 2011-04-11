@@ -25,7 +25,6 @@ import org.matsim.contrib.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
-import visad.data.netcdf.UnsupportedOperationException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -49,14 +48,17 @@ public class SocialSparseGraphFactory implements GraphFactory<SocialSparseGraph,
 			logger.warn("Coordinate reference system has no SRID. Setting SRID to 0.");
 	}
 	
+	@Override
 	public SocialSparseEdge createEdge() {
 		return new SocialSparseEdge();
 	}
 
+	@Override
 	public SocialSparseGraph createGraph() {
 		return new SocialSparseGraph(crs);
 	}
 
+	@Override
 	public SocialSparseVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}

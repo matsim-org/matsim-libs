@@ -31,8 +31,6 @@ import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import visad.jmet.DumpType;
-
 /**
  * @author illenberger
  *

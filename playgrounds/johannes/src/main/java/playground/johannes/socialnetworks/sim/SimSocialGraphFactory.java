@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.sim;
 import org.matsim.contrib.sna.graph.GraphFactory;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
-import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
@@ -30,6 +29,7 @@ import visad.data.netcdf.UnsupportedOperationException;
  */
 public class SimSocialGraphFactory implements GraphFactory<SimSocialGraph, SimSocialVertex, SimSocialEdge>{
 
+	@Override
 	public SimSocialEdge createEdge() {
 		return new SimSocialEdge(0);
 	}
@@ -38,10 +38,12 @@ public class SimSocialGraphFactory implements GraphFactory<SimSocialGraph, SimSo
 		return new SimSocialEdge(created);
 	}
 
+	@Override
 	public SimSocialGraph createGraph() {
 		return new SimSocialGraph();
 	}
 
+	@Override
 	public SimSocialVertex createVertex() {
 		throw new UnsupportedOperationException();
 	}
