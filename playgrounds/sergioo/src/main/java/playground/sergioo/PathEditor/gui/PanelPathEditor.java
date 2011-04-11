@@ -263,6 +263,9 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		case 'r':
 			window.changeReps();
 			break;
+		case 'i':
+			window.changeInStops();
+			break;
 		}
 		repaint();
 	}

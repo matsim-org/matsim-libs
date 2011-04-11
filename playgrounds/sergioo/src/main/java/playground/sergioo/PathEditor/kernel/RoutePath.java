@@ -49,7 +49,10 @@ public class RoutePath {
 	private boolean withInsideStops = true;
 	private boolean us = true;
 	private boolean reps = true;
+	private boolean inStops = true;
 	private PreProcessEuclidean preProcessData;
+
+	
 	
 	//Methods
 	public RoutePath(Network network, Trip trip, Map<String, Stop> stops) {
@@ -95,17 +98,32 @@ public class RoutePath {
 	public void setWithInsideStops() {
 		this.withInsideStops = !withInsideStops;
 	}
-	public boolean getUs() {
+	public boolean isUs() {
 		return us;
 	}
-	public void setUs(boolean us) {
-		this.us = us;
+	public void setUs() {
+		us = !us;
 	}
-	public boolean getReps() {
+	public boolean isReps() {
 		return reps;
 	}
-	public void setReps(boolean reps) {
-		this.reps = reps;
+	public void setReps() {
+		reps = !reps;
+	}
+	public boolean isInStops() {
+		return inStops;
+	}
+	public void setInStops() {
+		inStops = !inStops;
+	}
+	public String getUsText() {
+		return "Us "+us;
+	}
+	public String getRepsText() {
+		return "Reps "+reps;
+	}
+	public String getInsideStopsText() {
+		return "InStops "+inStops;
 	}
 	public String getLinkText() {
 		return "";

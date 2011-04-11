@@ -39,15 +39,11 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.GTFS.Route.RouteTypes;
 import playground.sergioo.PathEditor.gui.Window;
+import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
 
 
 public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter {
 	
-	//Constants
-	/**
-	 * Pre-processed information files
-	 */
-	private final static File[] PREFILES = {new File("./data/paths/fixedStops.txt"),new File("./data/paths/bases.txt"),new File("./data/paths/finishedTrips.txt")};
 	//Attributes
 	/**
 	 * The folder root of the GTFS files
@@ -81,14 +77,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 * The time format 
 	 */
 	private SimpleDateFormat timeFormat;
-	/**
-	 * Paths that are bases for calculate others
-	 */
-	private Map<String, String[]> bases;
-	/**
-	 * Trips with established paths
-	 */
-	private Map<String, String[]> finishedTrips;
 	
 	//Methods
 	/**
@@ -565,43 +553,16 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							stopTime.getValue().setStopId(newStopId);
 						}
 		//Links
-		bases = new HashMap<String, String[]>();
-		finishedTrips = new HashMap<String, String[]>();
-		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[1]));
-		String line = reader.readLine();
-		while(line!=null) {
-			String[] links = reader.readLine().split(";");
-			bases.put(line, links);
-			line = reader.readLine();
-		}
-		reader.close();
-		reader = new BufferedReader(new FileReader(PREFILES[2]));
-		line = reader.readLine();
-		while(line!=null) {
-			String[] links = reader.readLine().split(";");
-			finishedTrips.put(line, links);
-			line = reader.readLine();
-		}
-		reader.close();
+		
 		for(int r=0; r<roots.length; r++) {
 			if(r==0) {
-				reader = new BufferedReader(new FileReader(PREFILES[0]));
-				line = reader.readLine();
-				while(line!=null) {
-					Stop stop = stops[r].get(line);
-					stop.setLinkId(reader.readLine());
-					stop.setFixedLinkId();
-					line = reader.readLine();
-				}
-				reader.close();
+				RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, routes[r], stops[r]);
+				routesPathsGenerator.run();
 			}
 			for(Route route:routes[r].values())
 				if(!route.getRouteType().wayType.equals(Route.WayTypes.ROAD))
 					for(Trip trip:route.getTrips().values())
 						addNewLinksSequence(trip, true, route.getRouteType(), r);
-				else
-					for(Entry<String,Trip> trip:route.getTrips().entrySet())
-						calculateBusLinksSequence(trip, false, route, r);
 		}
 	}
 	/**
@@ -692,132 +653,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				previous = node;
 			}
 		}
-	}
-	private void calculateBusLinksSequence(Entry<String,Trip> tripEntry, boolean withShape, Route route, int r) throws IOException {
-		Shape shape = tripEntry.getValue().getShape();
-		if(withShape && shape!=null) {
-			/*SimpleMapMatcher simpleMapMatching = new SimpleMapMatcher(new ArrayList<Coord>(shape.getPoints().values()),network,"Car");
-			List<Link> links = simpleMapMatching.getBestRoute();
-			trip.setRoute(links);
-			for(Link link:links) {
-				Set<String> modes = new HashSet<String>(link.getAllowedModes());
-				modes.add(routeType.name);
-				link.setAllowedModes(modes);
-			}*/
-		}
-		else {
-			List<Link> links;
-			String[] linksS = finishedTrips.get(tripEntry.getKey());
-			if(linksS==null) {
-				Window window;
-				String baseId = route.getShortName()+(tripEntry.getKey().contains("_1")?"_1":"_2");
-				linksS = bases.get(baseId);
-				boolean withBase = false;
-				links = new ArrayList<Link>();
-				if(linksS==null)
-					window = new Window(tripEntry.getKey(), network,tripEntry.getValue(),stops[r],links,this, r);
-				else {
-					window = new Window(tripEntry.getKey(), network,tripEntry.getValue(),stops[r],linksS,links,this, r);
-					withBase = true;
-				}
-				window.setVisible(true);
-				while(links.size()==0)
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				window.setVisible(false);
-				PrintWriter writer = new PrintWriter(new FileWriter(PREFILES[0],true));
-				for(StopTime stopTime: tripEntry.getValue().getStopTimes().values()) {
-					Stop stop = stops[r].get(stopTime.getStopId());
-					if(!stop.isFixedLinkId()) {
-						stop.setFixedLinkId();
-						writer.println(stopTime.getStopId());
-						writer.println(stop.getLinkId());
-					}
-				}
-				writer.close();
-				if(!withBase) {
-					writer = new PrintWriter(new FileWriter(PREFILES[1],true));
-					writer.println(baseId);
-					String[] linksA = new String[links.size()];
-					int i=0;
-					for(Link link:links) {
-						writer.print(link.getId()+";");
-						linksA[i] = link.getId().toString();
-						i++;
-					}
-					writer.println();
-					writer.close();
-					bases.put(baseId, linksA);
-				}
-				writer = new PrintWriter(new FileWriter(PREFILES[2],true));
-				writer.println(tripEntry.getKey());
-				String linksT = "";
-				for(Link link:links)
-					linksT+=link.getId()+";";
-				writer.println(linksT);
-				writer.close();
-			}
-			else {
-				links = new ArrayList<Link>();
-				for(String link:linksS)
-					links.add(network.getLinks().get(new IdImpl(link)));
-			}
-			for(Link link:links) {
-				Set<String> modes = new HashSet<String>(link.getAllowedModes());
-				modes.add(route.getRouteType().name);
-				link.setAllowedModes(modes);
-			}
-			tripEntry.getValue().setRoute(links);
-			System.out.println("Finished "+tripEntry.getKey());
-		}	
-	}
-	public void restartTripsStops(String selectedStopId, int r) throws IOException {
-		PrintWriter writer = new PrintWriter(PREFILES[0]);
-		for(Entry<String,Stop> stopE: stops[r].entrySet()) {
-			if(stopE.getValue().isFixedLinkId()) {
-				writer.println(stopE.getKey());
-				writer.println(stopE.getValue().getLinkId());
-			}
-		}
-		writer.close();
-		String baseId = null;
-		writer = new PrintWriter(PREFILES[2]);
-		for(Entry<String,String[]> fTripE:finishedTrips.entrySet()) {
-			boolean isOk = true;
-			for(Entry<String,Route> routeE:routes[r].entrySet()) {
-				Trip trip = routeE.getValue().getTrips().get(fTripE.getKey());
-				if(trip!=null)
-					for(StopTime stopTime:trip.getStopTimes().values()) {
-						if(stopTime.getStopId().equals(selectedStopId)) {
-							isOk=false;
-							baseId = routeE.getValue().getShortName()+(fTripE.getKey().contains("_1")?"_1":"_2");
-						}
-					}
-			}
-			if(isOk) {
-				writer.println(fTripE.getKey());
-				String linksT = "";
-				for(String link:fTripE.getValue())
-					linksT+=link+";";
-				writer.println(linksT);
-			}
-			else {
-				bases.remove(baseId);
-			}
-		}
-		writer.close();
-		writer = new PrintWriter(PREFILES[1]);
-		for(Entry<String,String[]> baseE:bases.entrySet()) {
-			writer.println(baseE.getKey());
-			String linksT = "";
-			for(String link:baseE.getValue())
-				linksT+=link+";";
-			writer.println(linksT);
-		}
-		writer.close();
 	}
 	@Override
 	/**

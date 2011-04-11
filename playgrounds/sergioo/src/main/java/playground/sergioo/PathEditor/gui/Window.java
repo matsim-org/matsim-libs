@@ -49,10 +49,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.GTFS.GTFS2MATSimTransitScheduleFileWriter;
 import playground.sergioo.GTFS.Stop;
 import playground.sergioo.GTFS.Trip;
 import playground.sergioo.PathEditor.kernel.RoutePath;
+import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
 import util.geometry.Point2D;
 
 public class Window extends JFrame implements ActionListener {
@@ -115,8 +115,9 @@ public class Window extends JFrame implements ActionListener {
 		STOP("StopText"),
 		MIN_DISTANCE("MinDistanceText"),
 		NUM_CANDIDATES("NumCandidatesText"),
-		US("Us"),
-		REPS("Reps");
+		US("UsText"),
+		REPS("RepsText"),
+		INSIDE_STOPS("InsideStopsText");
 		String text;
 		private Label(String text) {
 			this.text = text;
@@ -139,21 +140,19 @@ public class Window extends JFrame implements ActionListener {
 	private int selectedLinkIndex = -1;
 	private String selectedStopId = "";
 	public List<Link> links;
-	private GTFS2MATSimTransitScheduleFileWriter writer;
-	private int r;
+	private RoutesPathsGenerator routesPathsGenerator;
 	private JButton saveButton;
 	private JLabel[] labels;
 	private JCheckBox[] checks;
 	private boolean first;
 	
 	//Methods
-	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
-		this(title,network,trip,stops,null,links,writer,r);
+	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
+		this(title,network,trip,stops,null,links,routesPathsGenerator);
 	}
-	public Window(String title, Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, GTFS2MATSimTransitScheduleFileWriter writer, int r) {
+	public Window(String title, Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, RoutesPathsGenerator routesPathsGenerator) {
 		setTitle(title);
-		this.r = r;
-		this.writer = writer;
+		this.routesPathsGenerator = routesPathsGenerator;
 		this.links = linksE;
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
@@ -198,29 +197,6 @@ public class Window extends JFrame implements ActionListener {
 		this.add(buttonsPanel, BorderLayout.EAST);
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
-		JPanel labelsPanel = new JPanel();
-		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
-		labels = new JLabel[Label.values().length];
-		int l=0;
-		for(Label label:Label.values()) {
-			try {
-				Method m = RoutePath.class.getMethod("get"+label.text, new Class[] {});
-				labels[l]=new JLabel(m.invoke(routePath, new Object[]{}).toString());
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-			labelsPanel.add(labels[l]);
-			l++;
-		}
-		infoPanel.add(labelsPanel, BorderLayout.CENTER);
 		JPanel checksPanel = new JPanel();
 		checksPanel.setLayout(new GridLayout(1,Check.values().length));
 		checksPanel.setBorder(new TitledBorder("Algorithm options"));
@@ -247,6 +223,30 @@ public class Window extends JFrame implements ActionListener {
 			}
 		}
 		infoPanel.add(checksPanel, BorderLayout.WEST);
+		JPanel labelsPanel = new JPanel();
+		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labelsPanel.setBorder(new TitledBorder("Information"));
+		labels = new JLabel[Label.values().length];
+		int l=0;
+		for(Label label:Label.values()) {
+			try {
+				Method m = RoutePath.class.getMethod("get"+label.text, new Class[] {});
+				labels[l]=new JLabel(m.invoke(routePath, new Object[]{}).toString());
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			labelsPanel.add(labels[l]);
+			l++;
+		}
+		infoPanel.add(labelsPanel, BorderLayout.CENTER);
 		this.add(infoPanel, BorderLayout.SOUTH);
 	}
 	public Option getOption() {
@@ -257,18 +257,6 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public String refreshStop() {
 		return selectedStopId+"("+routePath.getIndexStop(selectedStopId)+")";
-	}
-	public String refreshDistance() {
-		return Math.round(routePath.getMinDistance()*6371000*Math.PI/180)+"";
-	}
-	public String refreshNumCandidates() {
-		return routePath.getNumCandidates()+"";
-	}
-	public String refreshUs() {
-		return Boolean.toString(routePath.getUs());
-	}
-	public String refreshReps() {
-		return Boolean.toString(routePath.getReps());
 	}
 	public void selectLink(double x, double y) {
 		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
@@ -332,19 +320,19 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void incDistance() {
 		routePath.increaseMinDistance();
-		labels[Label.MIN_DISTANCE.ordinal()].setText(refreshDistance());
+		labels[Label.MIN_DISTANCE.ordinal()].setText(routePath.getMinDistanceText());
 	}
 	public void decDistance() {
 		routePath.decreaseMinDistance();
-		labels[Label.MIN_DISTANCE.ordinal()].setText(refreshDistance());
+		labels[Label.MIN_DISTANCE.ordinal()].setText(routePath.getMinDistanceText());
 	}
 	public void incCandidates() {
 		routePath.increaseNumCandidates();
-		labels[Label.NUM_CANDIDATES.ordinal()].setText(refreshNumCandidates());
+		labels[Label.NUM_CANDIDATES.ordinal()].setText(routePath.getNumCandidatesText());
 	}
 	public void decCandidates() {
 		routePath.decreaseNumCandidates();
-		labels[Label.NUM_CANDIDATES.ordinal()].setText(refreshNumCandidates());
+		labels[Label.NUM_CANDIDATES.ordinal()].setText(routePath.getNumCandidatesText());
 	}
 	public void addLinkStop() {
 		if(selectedLinkIndex!=-1 && !selectedStopId.equals(""))
@@ -353,7 +341,7 @@ public class Window extends JFrame implements ActionListener {
 				if(res == JOptionPane.YES_OPTION) {
 					routePath.forceAddLinkStop(selectedLinkIndex,selectedStopId);
 					try {
-						writer.restartTripsStops(selectedStopId,r);
+						routesPathsGenerator.restartTripsStops(selectedStopId);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -370,26 +358,30 @@ public class Window extends JFrame implements ActionListener {
 		routePath.calculatePath();
 	}
 	public void changeUs() {
-		routePath.setUs(!routePath.getUs());
-		labels[Label.US.ordinal()].setText(refreshUs());
+		routePath.setUs();
+		labels[Label.US.ordinal()].setText(routePath.getUsText());
 	}
 	public void changeReps() {
-		routePath.setUs(!routePath.getReps());
-		labels[Label.REPS.ordinal()].setText(refreshReps());
+		routePath.setReps();
+		labels[Label.REPS.ordinal()].setText(routePath.getRepsText());
+	}
+	public void changeInStops() {
+		routePath.setInStops();
+		labels[Label.INSIDE_STOPS.ordinal()].setText(routePath.getInsideStopsText());
 	}
 	public void isOk() {
 		Point2D center = panel.getCenter();
 		Coord coord = new CoordImpl(center.getX(), center.getY());
 		selectedLinkIndex = routePath.isPathJoined();
 		if(selectedLinkIndex==-1) {
-			selectedLinkIndex = routePath.getUs()?routePath.isPathWithoutUs():-1;
+			selectedLinkIndex = routePath.isUs()?routePath.isPathWithoutUs():-1;
 			if(selectedLinkIndex==-1) {
-				selectedLinkIndex = routePath.getReps()?routePath.isPathWithoutRepeatedLink():-1;
+				selectedLinkIndex = routePath.isReps()?routePath.isPathWithoutRepeatedLink():-1;
 				if(selectedLinkIndex==-1) {
 					panel.withStops();
 					selectedStopId = routePath.allStopsWithLink();
 					if(selectedStopId.equals("")) {
-						selectedStopId = routePath.allStopsWithCorrectLink();
+						selectedStopId = routePath.isInStops()?routePath.allStopsWithCorrectLink():"";
 						if(selectedStopId.equals("")) {
 							selectedStopId = routePath.allStopsWithInRouteLink();
 							if(selectedStopId.equals("")) {
