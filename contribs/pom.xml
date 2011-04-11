@@ -13,12 +13,27 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<modules>
@@ -35,7 +50,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
+			<version>4.8.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -64,6 +79,7 @@
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>
 							<artifactId>cobertura-maven-plugin</artifactId>
+							<version>2.4</version>
 							<configuration>
 								<formats>
 									<format>xml</format>
@@ -78,7 +94,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-pmd-plugin</artifactId>
-						<version>2.4</version>
+						<version>2.5</version>
 						<configuration>
 							<targetJdk>1.6</targetJdk>
 						</configuration>
@@ -89,13 +105,14 @@
 						<version>2.0</version>
 					</plugin>
 					<plugin>
-	        	<groupId>org.codehaus.mojo</groupId>
-	        	<artifactId>findbugs-maven-plugin</artifactId>
-	        	<configuration>
-	          	<effort>Max</effort>
-	          	<threshold>Low</threshold>
-	        	</configuration>
-	      	</plugin>
+	        			<groupId>org.codehaus.mojo</groupId>
+			        	<artifactId>findbugs-maven-plugin</artifactId>
+			        	<version>2.3.2</version>
+	    		    	<configuration>
+		          			<effort>Max</effort>
+				          	<threshold>Low</threshold>
+	    		    	</configuration>
+			      	</plugin>
 				</plugins>
 			</reporting>
 		</profile>
