@@ -16,5 +16,10 @@
 		<version>0.2.0-SNAPSHOT</version>
 		<scope>compile</scope>
 	</dependency>
-</dependencies>
+    	<dependency>
+    		<groupId>Jama</groupId>
+    		<artifactId>Jama</artifactId>
+    		<version>1.0.2</version>
+    	</dependency>
+  </dependencies>
 </project>

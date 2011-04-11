@@ -32,5 +32,10 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/kabeja/kabeja-0.4.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>Jama</groupId>
+			<artifactId>Jama</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
 </project>

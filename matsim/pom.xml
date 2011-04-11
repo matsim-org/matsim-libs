@@ -372,9 +372,9 @@
 		</dependency>
 		<!--End of jaxb 2.1.7 dependencies -->
 		<dependency>
-			<groupId>edu.ucar.unidata.netcdf-java</groupId>
-			<artifactId>netcdfAll</artifactId>
-			<version>4.0.0</version>
+			<groupId>edu.ucar</groupId>
+			<artifactId>netcdf</artifactId>
+			<version>4.2.20</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -394,7 +394,7 @@
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.0.7</version>
+			<version>1.0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>com.lowagie</groupId>
@@ -404,13 +404,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
+			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jcommon</artifactId>
-			<version>1.0.9</version>
+			<version>1.0.15</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
