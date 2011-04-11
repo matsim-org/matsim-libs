@@ -186,7 +186,7 @@ public class PTCountsNetworkSimplifier {
 		}
 		
 		log.info("Writing network to " + this.netOutFile);
-		new NetworkWriter(this.network).write(this.netOutFile + "_not_cleaned.xml");
+		new NetworkWriter(this.network).write(this.netOutFile + "_not_cleaned.xml.gz");
 		try {
 			if(this.usePT){
 				log.info("Writing transit schedule to " + this.scheduleOutFile);
@@ -198,7 +198,7 @@ public class PTCountsNetworkSimplifier {
 			}
 			log.info("Running network cleaner... Result may not be consistent with countsfile");
 			scenario = null; this.network = null; osmScenario = null; osmConfig = null; osmLoader = null;
-			new NetworkCleaner().run(this.netOutFile + "_not_cleaned.xml", this.netOutFile);
+			new NetworkCleaner().run(this.netOutFile + "_not_cleaned.xml.gz", this.netOutFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
