@@ -1,7 +1,6 @@
 package playground.andreas.P;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -10,7 +9,7 @@ import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
@@ -30,10 +29,6 @@ public class PControler extends Controler {
 	private final static Logger log = Logger.getLogger(PControler.class);
 
 	private boolean useOTFVis = false;
-	
-	public PControler(Config config) {
-		super(config);
-	}
 	
 	public PControler(ScenarioImpl scenario) {
 		super(scenario);
@@ -77,7 +72,7 @@ public class PControler extends Controler {
 		String configFile = args[0];
 		Config config;
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < Integer.parseInt(args[1]); i++) {
 			
 			// reading the config file:
 			config = ConfigUtils.loadConfig(configFile);
@@ -102,8 +97,7 @@ public class PControler extends Controler {
 			}
 			
 			// reading the scenario (based on the config):
-			ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
-			ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
+			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 			
 			PControler tc = new PControler(sc);
 
