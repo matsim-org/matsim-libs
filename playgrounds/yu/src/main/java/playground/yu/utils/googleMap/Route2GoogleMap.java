@@ -59,7 +59,7 @@ public class Route2GoogleMap extends X2GoogleMap {
 	private Network network;
 	private String pathColor = this.DEFAULT_PATH_COLOR;
 	private int weight = this.DEFAULT_WEIGHT;
-	protected static String NETWORK_ROUTE_TRANSPARENCY = "aa",
+	static String NETWORK_ROUTE_TRANSPARENCY = "aa",
 			GENERIC_ROUTE_TRANSPARENCY = "44";
 
 	/**
