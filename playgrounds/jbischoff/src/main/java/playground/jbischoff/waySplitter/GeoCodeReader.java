@@ -29,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author jbischoff
@@ -42,12 +41,17 @@ public class GeoCodeReader implements Runnable {
 	public void run() {
 		JBGoogleGeocode gg = new JBGoogleGeocode();
 		FileReader fr;
-		String inf = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung_ways.csv";
-		String out = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\ways";
+
+		String inf = "/Users/JB/Documents/Work/Daten von Andreas/bvg_befragung_ways.csv";
+		String out = "/Users/JB/Documents/Work/Daten von Andreas/bvg_befragung_ways";
+
+//		String inf = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung_ways.csv";
+//		String out = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\ways";
+
 		try {
 			fr = new FileReader(new File(inf));
 			BufferedReader br = new BufferedReader(fr);
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(out+"_koord.csv")));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(out+"_koord2.csv")));
 			
 			
 			String line = null;
@@ -55,7 +59,8 @@ public class GeoCodeReader implements Runnable {
 			while ((line = br.readLine()) != null) {
 				String[] r = line.split(";");
 				
-				if (l>0){
+				if (l>500)
+					if (l<1500){
 //				Coord xy = gg.readGC(r[5]);	
 //				Double x = xy.getX();
 //				Double y = xy.getY();
@@ -76,7 +81,7 @@ public class GeoCodeReader implements Runnable {
 				String newline = "";
 //				for (int i = 0 ; i<31 ; i++) 
 //				persons
-					for (int i = 0 ; i<53 ; i++) 
+					for (int i = 0 ; i<54 ; i++) 
 //				ways
 				{
 					newline = newline +";"+ r[i];
