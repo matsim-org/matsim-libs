@@ -40,6 +40,7 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.xy.DefaultXYDataset;
 
 import org.jgap.GeneticOperator;
 import org.jgap.Population;
@@ -59,16 +60,18 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	static int count = 0;
 	private final int maxIters;
 	private final JointPlanOptimizerJGAPConfiguration jgapConfig;
-	private final String fileName;
+	private final String fileNameBox;
+	private final String fileNameLine;
 	private final int populationSize;
 	private final int chromosomeLength;
-	private int width = 600;
-	private int height = 300;
+	private int width = 800;
+	private int height = 500;
 
 
 
 	//private final List<BoxAndWhiskerItem> boxes;
 	private final DefaultBoxAndWhiskerCategoryDataset boxes;
+	private final double[][] maxFitnesses;
 
 	public JointPlanOptimizerPopulationAnalysisOperator(
 			JointPlanOptimizerJGAPConfiguration jgapConfig,
@@ -81,7 +84,9 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		//this.boxes = new ArrayList<BoxAndWhiskerItem>(maxIters);
 		int currentCount = count++;
 		boxes = new DefaultBoxAndWhiskerCategoryDataset();
-		fileName = outputPath+"/fitnessAnalysis-"+currentCount+".png";
+		maxFitnesses = new double[2][maxIters];
+		fileNameBox = outputPath+"/fitnessBoxPlot-"+currentCount+".png";
+		fileNameLine = outputPath+"/maxFitnessPlot-"+currentCount+".png";
 	}
 
 	@Override
@@ -103,18 +108,38 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 				seriesName,
 				iterNumber);
 
-		//if (iterNumber == this.maxIters) {
-		//	outputFitnessBoxPlots();
-		//}
+		this.maxFitnesses[0][iterNumber - 1] = iterNumber;
+		this.maxFitnesses[1][iterNumber - 1] = a_population.determineFittestChromosome().getFitnessValue();
 	}
 
 	/**
 	 * responsible of writing the graphics to file.
+	 * Allows the output to work with any number of genetic iterations (ie with a
+	 * monitor).
 	 */
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
 		outputFitnessBoxPlots();
+		outputBestFitnessGraph();
+	}
+
+	private void outputBestFitnessGraph() {
+		String title = "best fitness evolution";
+		String xLabel = "iteration";
+		String yLabel = "fitness";
+		boolean legend = false;
+
+		DefaultXYDataset dataset = new DefaultXYDataset();
+		dataset.addSeries(0, this.maxFitnesses);
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, legend, false, false);
+
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileNameLine), chart, width, height);
+		} catch (IOException e) {
+			log.warn("problem while writing output graph");
+		}
 	}
 
 	private void outputFitnessBoxPlots() {
@@ -130,8 +155,9 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 				title, xLabel, yLabel, this.boxes, legend);
 
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width, height);
+			ChartUtilities.saveChartAsPNG(new File(fileNameBox), chart, width, height);
 		} catch (IOException e) {
+			log.warn("problem while writing output graph");
 		}
 		//log.info("writing fitness chart to file... DONE");
 	}
