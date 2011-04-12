@@ -83,8 +83,14 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		this.maxIters = maxIters;
 		//this.boxes = new ArrayList<BoxAndWhiskerItem>(maxIters);
 		int currentCount = count++;
-		boxes = new DefaultBoxAndWhiskerCategoryDataset();
-		maxFitnesses = new double[2][maxIters];
+		this.boxes = new DefaultBoxAndWhiskerCategoryDataset();
+		this.maxFitnesses = new double[2][maxIters];
+
+		for (int i=0; i<maxIters; i++) {
+			this.maxFitnesses[0][i] = Double.NaN;
+			this.maxFitnesses[1][i] = Double.NaN;
+		}
+
 		fileNameBox = outputPath+"/fitnessBoxPlot-"+currentCount+".png";
 		fileNameLine = outputPath+"/maxFitnessPlot-"+currentCount+".png";
 	}
