@@ -28,7 +28,6 @@ import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
 import org.jgap.Gene;
-import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;

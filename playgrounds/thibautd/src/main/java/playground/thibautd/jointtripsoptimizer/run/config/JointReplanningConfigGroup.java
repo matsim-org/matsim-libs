@@ -60,6 +60,10 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String PLOT_FITNESS = "plotFitnessEvolution";
 	private static final String OPTIMIZE_MODE = "modeToOptimize";
 	private static final String AVAIL_MODES = "availableModes";
+	private static final String ITER_MIN_NUM = "minNumberOfGAIterations";
+	private static final String MONITORING_PERIOD = "fitnessMonitoringPeriod";
+	private static final String DO_MONITOR = "fitnessToMonitor";
+	private static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -76,6 +80,10 @@ public class JointReplanningConfigGroup extends Module {
 	private boolean plotFitness = false;
 	private boolean optimizeMode = false;
 	private List<String> availableModes = null;
+	private int minNumberOfIterations = 0;
+	private int monitoringPeriod = 5;
+	private boolean doMonitor = true;
+	private double minImprovement = 1d;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -131,6 +139,19 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(AVAIL_MODES)) {
 			this.setAvailableModes(value);
 		}
+		else if (param_name.equals(ITER_MIN_NUM)) {
+			this.setMinIterations(value);
+		}
+		else if (param_name.equals(MONITORING_PERIOD)) {
+			this.setMonitoringPeriod(value);
+		}
+		else if (param_name.equals(DO_MONITOR)) {
+			this.setFitnessToMonitor(value);
+		}
+		else if (param_name.equals(MIN_IMPROVEMENT)) {
+			this.setMinImprovement(value);
+		}
+
 	}
 
 	@Override
@@ -178,6 +199,18 @@ public class JointReplanningConfigGroup extends Module {
 			//TODO: do not produce an "inputable" value
 			return String.valueOf(this.getAvailableModes());
 		}
+		else if (param_name.equals(ITER_MIN_NUM)) {
+			return String.valueOf(this.getMinIterations());
+		}
+		else if (param_name.equals(MONITORING_PERIOD)) {
+			return String.valueOf(this.getMonitoringPeriod());
+		}
+		else if (param_name.equals(DO_MONITOR)) {
+			return String.valueOf(this.getFitnessToMonitor());
+		}
+		else if (param_name.equals(MIN_IMPROVEMENT)) {
+			return String.valueOf(this.getMinImprovement());
+		}
 		return null;
 	}
 
@@ -198,6 +231,10 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, PLOT_FITNESS);
 		this.addParameterToMap(map, OPTIMIZE_MODE);
 		this.addParameterToMap(map, AVAIL_MODES);
+		this.addParameterToMap(map, ITER_MIN_NUM);
+		this.addParameterToMap(map, MONITORING_PERIOD);
+		this.addParameterToMap(map, DO_MONITOR);
+		this.addParameterToMap(map, MIN_IMPROVEMENT);
 		return map;
 	}
 
@@ -408,6 +445,38 @@ public class JointReplanningConfigGroup extends Module {
 
 	public boolean getModeToOptimize() {
 		return this.optimizeMode;
+	}
+
+	public void setFitnessToMonitor(String value) {
+		this.doMonitor = Boolean.parseBoolean(value);
+	}
+
+	public boolean getFitnessToMonitor() {
+		return this.doMonitor;
+	}
+
+	public void setMinIterations(String value) {
+		this.minNumberOfIterations = Integer.valueOf(value);
+	}
+
+	public int getMinIterations() {
+		return this.minNumberOfIterations;
+	}
+
+	public void setMonitoringPeriod(String value) {
+		this.monitoringPeriod = Integer.valueOf(value);
+	}
+
+	public int getMonitoringPeriod() {
+		return this.monitoringPeriod;
+	}
+
+	public void setMinImprovement(String value) {
+		this.minImprovement = Double.parseDouble(value);
+	}
+
+	public double getMinImprovement() {
+		return this.minImprovement;
 	}
 }
 
