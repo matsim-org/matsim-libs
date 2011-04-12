@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Identifiable;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.LegImpl;
 
 /**
@@ -250,9 +251,11 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	//}
 
 	public boolean getIsDriver() {
-		return this.isDriver;
+		//return this.isDriver;
+		return this.getJoint() && this.getMode().equals(TransportMode.car);
 	}
 
+	@Deprecated
 	public void setIsDriver(boolean isDriver) {
 		this.isDriver = isDriver;
 	}

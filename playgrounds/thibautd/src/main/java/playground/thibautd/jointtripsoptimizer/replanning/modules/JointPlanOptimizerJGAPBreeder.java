@@ -90,10 +90,6 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    // -------------------------------------
 	    applyGeneticOperators(a_conf, pop);
 	    // Reset fitness value of genetically operated chromosomes.
-	    // Normally, this should not be necessary as the Chromosome class
-	    // initializes each newly created chromosome with
-	    // FitnessFunction.NO_FITNESS_VALUE. But who knows which Chromosome
-	    // implementation is used...
 	    // ----------------------------------------------------------------
 	    int currentPopSize = pop.size();
 	    for (int i = originalPopSize; i < currentPopSize; i++) {
@@ -174,4 +170,19 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    return pop;
 	}
 
+	@Override
+	public Object clone() {
+		log.warn("GA breeder cloned. This is unexpected.");
+		return new JointPlanOptimizerJGAPBreeder();
+	}
+
+	@Override
+	public Population getLastPopulation() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Configuration getLastConfiguration() {
+		throw new UnsupportedOperationException();
+	}
 }

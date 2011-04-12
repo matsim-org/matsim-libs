@@ -127,6 +127,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 					copy = new JointPlanOptimizerJGAPChromosome(getConfiguration());
 				}
 				copy.setFitnessValue(m_fitnessValue);
+				//copy.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 			}
 			// Clone constraint checker.
 			// -------------------------
@@ -230,7 +231,6 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		}
 
 		if (this.nModeGenes > 0) {
-			log.warn("initializing a mode chrom!");
 			List<String> possibleModes = ((JointPlanOptimizerJGAPModeGene) 
 					this.getGene(this.nBooleanGenes + this.nDoubleGenes)).getListValue();
 			for (int j=0; j < this.nModeGenes; j++) {

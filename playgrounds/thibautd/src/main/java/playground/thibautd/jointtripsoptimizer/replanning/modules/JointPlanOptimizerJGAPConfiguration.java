@@ -28,6 +28,7 @@ import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
 import org.jgap.Gene;
+import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
@@ -37,10 +38,12 @@ import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
@@ -111,20 +114,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
-			// elitism: unnecessary with BestChromosomesSelector or ThresholdSelector
-			this.setPreservFittestIndividual(true);
-
-
-			// select the best chromosomes
-			// BestChromosomesSelector selector = new BestChromosomesSelector(this);
-			// selector.setDoubletteChromosomesAllowed(false);
-
-			//random choice based on the fitness values
-			//XXX unsatisfied dependencies
-			//WeightedRouletteSelector selector = new WeightedRouletteSelector();
-
-			//random selectors ensurring that a certain proportion of th selected
-			//chromosomes are among the bests, the others beeing selected randomly
+			// this selector ensures that a certain proportion of the genes (named
+			// "Threshold") is selected using a "best first" strategy.
+			// The rest of the new generation is selected randomly, with replacement.
 			ThresholdSelector selector =
 				new ThresholdSelector(this, configGroup.getSelectionThreshold());
 			this.addNaturalSelector(selector, false);
@@ -201,14 +193,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * an episode corresponds to an activity and its eventual access trip.
 	 * a joint episode is an episode which involves a joint trip.
 	 */
-	//TODO: make toggle gene number consistent with the possibility of
-	//several passengers with several O/D.
-	//Done, but to check
 	private void countEpisodes(JointPlan plan) {
+		PlanAnalyzeSubtours analyseSubtours = new PlanAnalyzeSubtours();
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
 		//List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
-		List<PlanElement> currentPlan;
+		Plan currentPlan;
 		int currentNDurationGenes;
 		boolean sharedRideExamined = false;
 
@@ -218,10 +208,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		this.nDurationGenes.clear();
 
 		for (Id id : ids) {
-			currentPlan = plan.getIndividualPlan(id).getPlanElements();
+			currentPlan = plan.getIndividualPlan(id);
 			currentNDurationGenes = 0;
 			//TODO: use indices (and suppress the booleans)
-			for (PlanElement pe : currentPlan) {
+			for (PlanElement pe : currentPlan.getPlanElements()) {
 				// count activities for which duration is optimized
 				if ((pe instanceof JointActivity)&&
 						(!((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP))&&
@@ -251,6 +241,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			currentNDurationGenes--;
 			this.numEpisodes += currentNDurationGenes;
 			this.nDurationGenes.add(currentNDurationGenes);
+
+			//finally, count subtours
+			analyseSubtours.run(currentPlan);
+			this.numModeGenes += analyseSubtours.getNumSubtours();
 		 }
 	 }
 
