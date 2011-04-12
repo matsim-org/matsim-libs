@@ -45,7 +45,7 @@ public class MultiDaysGenerator {
 		this.scenarioWriteOut = scenarioWriteOut;
 		this.network = network;
 		this.temporalVar = temporalVar;
-		singlePlanGenerator = new SinglePlanGenerator(scenarioWriteOut.getActivityFacilities(), temporalVar);
+		singlePlanGenerator = new SinglePlanGenerator(scenarioWriteOut.getActivityFacilities());
 	}
 	
 	public void generatePlans(int runId) {
@@ -53,16 +53,13 @@ public class MultiDaysGenerator {
 		for (Id id : staticPopulation.getPersons().keySet()) {
 			keyList.add(Integer.parseInt(id.toString()));
 		}
-		
 		for (int day = 0; day < 5; day++) {
-			
-			double average = 0.0;
-			for (int i = 0; i < 5; i++) {
-				average += MultiplerunsControler.share[i] / 5.0;
-			}
-			double limit = average;
+			double limit = 0.0;
 			if (temporalVar) {
 				limit = MultiplerunsControler.share[day];
+			}
+			else {
+				limit = this.getAverageShare();
 			}
 			Collections.shuffle(keyList, randomNumberGenerator);
 			
@@ -77,6 +74,7 @@ public class MultiDaysGenerator {
 	}
 	
 	private void generatePlan(List<Integer> keyList, double limit, int day) {
+		int cnt = 0;
 		for (Integer id : keyList) {
 			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(new IdImpl(id));
 
@@ -85,10 +83,24 @@ public class MultiDaysGenerator {
 			// copy person -------
 			
 			boolean worker = false;
-			if (this.randomNumberGenerator.nextDouble() < limit) {
+			if (cnt < limit * keyList.size()) {
 				worker = true;
+				cnt++;
 			}
-			PlanImpl plan = singlePlanGenerator.generatePlan(worker, p, day);
+			boolean shortWorker;
+			// actually on Friday all workers are short workers for the scenario taking into account temporal correlations
+			if (this.temporalVar && day == 4) {
+				shortWorker = true;
+			}
+			// for the average scenario distribute the Friday short workers over all days
+			// only guaranteed to work correctly if work shares decrease during the week
+			else if (!this.temporalVar && cnt < MultiplerunsControler.share[4] / 5.0 * keyList.size()){
+				shortWorker = true;
+			}
+			else {
+				shortWorker = false;
+			}
+			PlanImpl plan = singlePlanGenerator.generatePlan(worker, shortWorker, p);
 			pTmp.addPlan(plan);
 			scenarioWriteOut.getPopulation().addPerson(pTmp);
 		}
@@ -125,5 +137,14 @@ public class MultiDaysGenerator {
 	public void writePlansAndFacs(String plansFile, String facsFile) {	
 		new PopulationWriter(scenarioWriteOut.getPopulation(), network).write(plansFile);
 		new FacilitiesWriter(this.scenarioWriteOut.getActivityFacilities()).write(facsFile);
+	}
+	
+	private double getAverageShare() {
+		// find the average share of workers
+		double averageShare = 0.0;
+		for (int i = 0; i < MultiplerunsControler.share.length; i++) {
+			averageShare += (MultiplerunsControler.share[i] / 5.0);
+		}
+		return averageShare;
 	}
 }

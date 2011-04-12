@@ -31,16 +31,14 @@ import org.matsim.core.population.PlanImpl;
 public class SinglePlanGenerator {
 	
 	private ActivityFacilities facilities;
-	private boolean tempVar;
 	
-	public SinglePlanGenerator(ActivityFacilities facilities, boolean tempVar) {
+	public SinglePlanGenerator(ActivityFacilities facilities) {
 		this.facilities = facilities;
-		this.tempVar = tempVar;
 	}
 	
-	public PlanImpl generatePlan(boolean worker, PersonImpl p, int day) {
+	public PlanImpl generatePlan(boolean worker, boolean shortWorker, PersonImpl p) {
 		PlanImpl plan;
-		if (worker) plan = generateWorkPlan(p, day);
+		if (worker) plan = generateWorkPlan(p, shortWorker);
 		else plan = generateNonWorkPlan(p); 
 		return plan;
 	}
@@ -88,7 +86,7 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateWorkPlan(PersonImpl p, int day) {
+	private PlanImpl generateWorkPlan(PersonImpl p, boolean shortWorker) {
 		int homeIndex = 1;
 		int facilityIndex = 1;
 		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
@@ -122,13 +120,8 @@ public class SinglePlanGenerator {
 		actW.setCoord(this.facilities.getFacilities().get(workFacilityId).getCoord());
 		
 		actW.setStartTime(time);
-		if (tempVar) {
-			maxDuration = 9.0 * 3600.0;
-			if (day == 4) maxDuration = 7.0 * 3600.0;
-		}
-		else {
-			maxDuration = 8.5 * 3600.0;
-		}
+		maxDuration = 9.0 * 3600.0;
+		if (shortWorker) maxDuration = 7.0 * 3600.0;
 		
 		time += maxDuration;
 		actW.setMaximumDuration(maxDuration);
