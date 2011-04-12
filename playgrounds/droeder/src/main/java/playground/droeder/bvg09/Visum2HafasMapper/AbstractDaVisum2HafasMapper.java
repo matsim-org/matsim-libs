@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09;
+package playground.droeder.bvg09.Visum2HafasMapper;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

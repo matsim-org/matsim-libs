@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09.analysis;
+package playground.droeder.Analysis.Trips;
 
 import java.util.ArrayList;
 
@@ -36,14 +36,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author droeder
  *
  */
-public class AnaTrip {
+public class AnalysisTrip {
 	private String type;
 	private Coordinate start;
 	private Coordinate end;
 	private ArrayList<PersonEvent> events;
 	private ArrayList<PlanElement> elements;
 	
-	public AnaTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
+	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
 		this.events = events;
 		this.elements = elements;
 		this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 

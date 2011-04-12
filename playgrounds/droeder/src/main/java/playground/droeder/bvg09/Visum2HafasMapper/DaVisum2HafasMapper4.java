@@ -1,4 +1,4 @@
-package playground.droeder.bvg09;
+package playground.droeder.bvg09.Visum2HafasMapper;
 
 import java.util.HashMap;
 import java.util.ListIterator;

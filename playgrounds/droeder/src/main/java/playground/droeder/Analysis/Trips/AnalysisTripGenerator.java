@@ -17,35 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09.analysis;
-
-import com.vividsolutions.jts.geom.Geometry;
+package playground.droeder.Analysis.Trips;
 
 /**
  * @author droeder
  *
  */
-public final class BvgAnaTripType {
-	
-	private final String b = "Berlin";
-	private final String brb = "Brandenburg";
-	private final String b2brb = "Berlin-Brandenburg";
-	
-	private Geometry g;
-
-	public BvgAnaTripType (Geometry g){
-		this.g = g;
-	}
-	
-	public String getTripLocation(AnaTrip trip){
-		if(g.contains(trip.getStart()) && g.contains(trip.getEnd())){
-			return this.b;
-		}else if(!g.contains(trip.getStart()) && g.contains(trip.getEnd())){
-			return this.b2brb;
-		}else if(g.contains(trip.getStart()) && !g.contains(trip.getEnd())){
-			return this.b2brb;
-		}else {
-			return this.brb;
-		}
-	}
+public class AnalysisTripGenerator {
+	//TODO generateTrips() from BvgTripAnalysisRunner
 }

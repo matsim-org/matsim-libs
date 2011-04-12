@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.bvg09;
+package playground.droeder.bvg09.Visum2HafasMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;

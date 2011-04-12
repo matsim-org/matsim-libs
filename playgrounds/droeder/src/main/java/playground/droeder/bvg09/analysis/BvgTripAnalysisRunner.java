@@ -56,6 +56,10 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
+import playground.droeder.Analysis.Trips.AnalysisTrip;
+import playground.droeder.Analysis.Trips.PlanElementFilter;
+import playground.droeder.Analysis.Trips.TripEventsHandler;
+import playground.droeder.Analysis.Trips.TripTypeCalculator;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -64,10 +68,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TripAnalysis {
-	private Map<String, List<AnaTrip>> tripsByLocation;
+public class BvgTripAnalysisRunner {
+	private Map<String, List<AnalysisTrip>> tripsByLocation;
 	private Geometry zone;
-	private BvgAnaTripType typeAnalyzer;
+	private TripTypeCalculator typeAnalyzer;
 	private Map<Id, ArrayList<PersonEvent>> events;
 	private Map<Id, ArrayList<PlanElement>> planElements;
 	
@@ -89,15 +93,15 @@ public class TripAnalysis {
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
-		TripAnalysis ana = new TripAnalysis(g);
+		BvgTripAnalysisRunner ana = new BvgTripAnalysisRunner(g);
 		ana.run(PLANS, NETWORK, EVENTS, null);
 	}
 	
 	
-	public TripAnalysis (Geometry g){
-		this.tripsByLocation = new HashMap<String, List<AnaTrip>>();
+	public BvgTripAnalysisRunner (Geometry g){
+		this.tripsByLocation = new HashMap<String, List<AnalysisTrip>>();
 		this.zone = g;
-		this.typeAnalyzer = new BvgAnaTripType(g);
+		this.typeAnalyzer = new TripTypeCalculator(g);
 	}
 	
 	public void run(String plans, String network, String events, String out){
@@ -234,7 +238,7 @@ public class TripAnalysis {
 			counter = 0;
 			System.out.println(id);
 			for(ArrayList<PlanElement> pes : splittedElements){
-				AnaTrip trip = new AnaTrip((ArrayList<PersonEvent>) this.events.get(id).subList(counter, pes.size()-1), pes);
+				AnalysisTrip trip = new AnalysisTrip((ArrayList<PersonEvent>) this.events.get(id).subList(counter, pes.size()-1), pes);
 				trip.toString();
 				this.addTrip(trip);
 				counter = pes.size();
@@ -255,10 +259,10 @@ public class TripAnalysis {
 		}
 	}
 	
-	private void addTrip(AnaTrip trip){
+	private void addTrip(AnalysisTrip trip){
 		String location = this.typeAnalyzer.getTripLocation(trip);
 		if(!this.tripsByLocation.containsKey(location)){
-			this.tripsByLocation.put(location, new ArrayList<AnaTrip>());
+			this.tripsByLocation.put(location, new ArrayList<AnalysisTrip>());
 		}
 		this.tripsByLocation.get(location).add(trip);
 	}
