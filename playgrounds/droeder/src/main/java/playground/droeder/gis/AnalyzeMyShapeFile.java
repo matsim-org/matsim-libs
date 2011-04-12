@@ -12,7 +12,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 public class AnalyzeMyShapeFile {
 	
 	public static void main(String[] args) throws IOException{
-		new AnalyzeMyShapeFile().run("D:/VSP/output/BerlinShape/sechwy.shp");
+		new AnalyzeMyShapeFile().run("D:/VSP/BVG09_Auswertung/BerlinSHP/berlin.shp");
 	}
 	
 	

@@ -136,7 +136,7 @@ public class CreateNetworkFromShape {
 				to = this.net.getNodes().get(new IdImpl(c[i].x + "_" + c[i].y));
 				
 				if(!this.net.getLinks().containsKey(id)){
-					l = this.netFac.createLink(id, from.getId(), to.getId());
+					l = this.netFac.createLink(id, from, to);
 //					l.setCapacity(capacity);
 //					l.setFreespeed(freespeed);
 					l.setLength(this.calcLength(from, to));
