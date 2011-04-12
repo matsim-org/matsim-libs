@@ -32,7 +32,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.xml.sax.SAXException;
 
-import playground.droeder.osm.AbstractResizeLinksByCount;
+import playground.droeder.ResizeLinksByCount.AbstractResizeLinksByCount;
 
 /**
  * @author benjamin

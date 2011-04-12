@@ -26,12 +26,12 @@ import java.util.TreeMap;
  * @author droeder
  *
  */
-public class AnalysisTrip {
+public class JournalAnalysisTrip {
 		
 		private SortedMap<Integer, String> values;
 		private int oldSize;
 		
-		public AnalysisTrip(String[] oldTrip){
+		public JournalAnalysisTrip(String[] oldTrip){
 			this.oldSize = oldTrip.length;
 			this.values = new TreeMap<Integer, String>();
 			
@@ -40,7 +40,7 @@ public class AnalysisTrip {
 			}
 		}
 		
-		public AnalysisTrip(String[] oldTrip, boolean toRoot){
+		public JournalAnalysisTrip(String[] oldTrip, boolean toRoot){
 			this.values = new TreeMap<Integer, String>();
 			
 			for(int i = 0; i < oldTrip.length; i++){

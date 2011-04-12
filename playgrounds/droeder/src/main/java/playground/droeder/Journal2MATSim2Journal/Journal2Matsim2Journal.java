@@ -106,12 +106,12 @@ public class Journal2Matsim2Journal {
 	private double startTime = Double.MAX_VALUE;
 	
 	private boolean inFileHasHeader;
-	private AnalysisTrip fileHeader;
+	private JournalAnalysisTrip fileHeader;
 	private Set<String[]> inFileContent;
 	
 	
-	private Map<String, List<AnalysisTrip>> person2ways;
-	private Map<String, List<AnalysisTrip>> person2waysUnrouted;
+	private Map<String, List<JournalAnalysisTrip>> person2ways;
+	private Map<String, List<JournalAnalysisTrip>> person2waysUnrouted;
 	private Map<Id, Set<PersonEvent>> person2Event;
 	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
 	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
@@ -162,7 +162,7 @@ public class Journal2Matsim2Journal {
 
 	private void readJournal() {
 		log.info("read infile");
-		this.fileHeader = new AnalysisTrip(DaFileReader.readFileHeader(this.inFile, this.splitByExpr));
+		this.fileHeader = new JournalAnalysisTrip(DaFileReader.readFileHeader(this.inFile, this.splitByExpr));
 		this.fileHeader.setPtTime("travelTimePT", "transitTimePT", "waitingTimePT");
 		this.fileHeader.setCarTime("carTime");
 		
@@ -172,27 +172,27 @@ public class Journal2Matsim2Journal {
 	
 	private void sortWaysByPerson() {
 		log.info("sort ways by person");
-		this.person2ways = new TreeMap<String, List<AnalysisTrip>>();
-		this.person2waysUnrouted = new TreeMap<String, List<AnalysisTrip>>();
+		this.person2ways = new TreeMap<String, List<JournalAnalysisTrip>>();
+		this.person2waysUnrouted = new TreeMap<String, List<JournalAnalysisTrip>>();
 		String id;
 		for(String[] way : this.inFileContent){
 			id = way[2];
 			
 			// sort ways by coordinates given or not
 			if(this.person2ways.containsKey(id)&& !(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.get(id).add(new AnalysisTrip(way));
+				this.person2ways.get(id).add(new JournalAnalysisTrip(way));
 			}else if(!(way[23].equals("9999999")) && !(way[181].equals("9999999"))){
-				this.person2ways.put(id, new LinkedList<AnalysisTrip>());
-				this.person2ways.get(id).add(new AnalysisTrip(way));
+				this.person2ways.put(id, new LinkedList<JournalAnalysisTrip>());
+				this.person2ways.get(id).add(new JournalAnalysisTrip(way));
 			}else{
 				if(this.person2waysUnrouted.containsKey(id)){
-					AnalysisTrip temp = new AnalysisTrip(way);
+					JournalAnalysisTrip temp = new JournalAnalysisTrip(way);
 					temp.setCarTime(9999999);
 					temp.setPtTime(9999999, 9999999, 9999999);
 					this.person2waysUnrouted.get(id).add(temp);
 				}else{
-					this.person2waysUnrouted.put(id, new LinkedList<AnalysisTrip>());
-					AnalysisTrip temp = new AnalysisTrip(way);
+					this.person2waysUnrouted.put(id, new LinkedList<JournalAnalysisTrip>());
+					JournalAnalysisTrip temp = new JournalAnalysisTrip(way);
 					temp.setCarTime(9999999);
 					temp.setPtTime(9999999, 9999999, 9999999);
 					this.person2waysUnrouted.get(id).add(temp);
@@ -267,7 +267,7 @@ public class Journal2Matsim2Journal {
 		double tripEndTime;
 		
 		// generate plans for all plans/persons coordinates are given
-		for(Entry<String, List<AnalysisTrip>> e : this.person2ways.entrySet()){
+		for(Entry<String, List<JournalAnalysisTrip>> e : this.person2ways.entrySet()){
 			
 			personCar = fac.createPerson(sc.createId(e.getKey() + "_" + TransportMode.car.toString()));
 			planCar = fac.createPlan(); 
@@ -276,7 +276,7 @@ public class Journal2Matsim2Journal {
 			planPt = fac.createPlan();
 			
 			SortedMap<Integer, String> way;
-			Iterator<AnalysisTrip> it = e.getValue().iterator();
+			Iterator<JournalAnalysisTrip> it = e.getValue().iterator();
 			boolean addPerson = true;
 			do{
 				way = it.next().getAll();
@@ -543,7 +543,7 @@ public class Journal2Matsim2Journal {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 			
-			for(Entry<Integer, AnalysisTrip> t : this.preProcessForWriting().entrySet()){
+			for(Entry<Integer, JournalAnalysisTrip> t : this.preProcessForWriting().entrySet()){
 				System.out.print(t.getKey() + this.splitByExpr);
 				for(String s : t.getValue().getAll().values()){
 					writer.write(s + ";");
@@ -567,17 +567,17 @@ public class Journal2Matsim2Journal {
 		
 	}
 
-	private SortedMap<Integer, AnalysisTrip> preProcessForWriting() {
-		SortedMap<Integer, AnalysisTrip> trips = new TreeMap<Integer, AnalysisTrip>();
+	private SortedMap<Integer, JournalAnalysisTrip> preProcessForWriting() {
+		SortedMap<Integer, JournalAnalysisTrip> trips = new TreeMap<Integer, JournalAnalysisTrip>();
 		trips.put(0, this.fileHeader);
 		
-		for(List<AnalysisTrip> l: person2ways.values()){
-			for(AnalysisTrip t : l){
+		for(List<JournalAnalysisTrip> l: person2ways.values()){
+			for(JournalAnalysisTrip t : l){
 				trips.put(Integer.valueOf(t.getElement(1)+1),t);
 			}
 		}
-		for(List<AnalysisTrip> l: person2waysUnrouted.values()){
-			for(AnalysisTrip t : l){
+		for(List<JournalAnalysisTrip> l: person2waysUnrouted.values()){
+			for(JournalAnalysisTrip t : l){
 				trips.put(Integer.valueOf(t.getElement(1)+1),t);
 			}
 		}
