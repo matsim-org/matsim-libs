@@ -60,8 +60,11 @@ public class JAXBUnmaschal {
 	 * unmarschal (read) matsim config
 	 * @return
 	 */
-	public boolean unmaschalMATSimConfig(){
-
+	public MatsimConfigType unmaschalMATSimConfig(){
+		
+		// Java representation of the schema file.
+		MatsimConfigType matsimConfig = null;
+		
 		log.info("Staring unmaschalling MATSim configuration from: " + matsimConfigFile );
 		log.info("...");
 		try{
@@ -97,10 +100,12 @@ public class JAXBUnmaschal {
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(file2XSD == null || !file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " not found!!!");
-				return false;
+				return null;
 			}
 			
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
+			// tnicolai: Todo, print out xsd schema...
+			
 			// create a schema object via the given xsd to validate the MATSim xml config.
 			Schema schema = schemaFactory.newSchema(file2XSD);
 			// set the schema for validation while reading/importing the MATSim xml config.
@@ -112,40 +117,36 @@ public class JAXBUnmaschal {
 			// contains the content of the MATSim config.
 			Object object = unmarschaller.unmarshal(inputFile);
 			
-			// Java representation of the schema file.
-			MatsimConfigType matsimConfig;
-			
 			// The structure of both objects must match.
 			if(object.getClass() == MatsimConfigType.class)
 				matsimConfig = (MatsimConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
 			
-			// creatin MASim config object that contains the values from the xml config file.
-			if(matsimConfig != null){
-				log.info("Creating new MATSim config object to store the values from the xml configuration.");
-				MATSimConfigObject.initMATSimConfigObject(matsimConfig, true);
-			}
+//			// creatin MASim config object that contains the values from the xml config file.
+//			if(matsimConfig != null){
+//				log.info("Creating new MATSim config object to store the values from the xml configuration.");
+//				MATSimConfigObject.initMATSimConfigObject(matsimConfig, true);
+//			}
 		}
 		catch(JAXBException je){
 			je.printStackTrace();
-			return false;
+			return null;
 		}
-//		catch(SAXException se){
-//			se.printStackTrace();
-//			return false;
-//		}
 		catch(IOException ioe){
 			ioe.printStackTrace();
-			return false;
+			return null;
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			return false;
+			return null;
 		}
+		
+		// clean up temp files/dirs
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("... finished unmarschallig");
-		return true;
+		// return initialized object representation of matsim4urbansim config file
+		return matsimConfig;
 	}
 
 }

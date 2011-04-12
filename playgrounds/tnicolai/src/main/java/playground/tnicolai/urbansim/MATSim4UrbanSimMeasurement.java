@@ -48,7 +48,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.MATSimConfigObject;
+import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.MeasurementObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 import playground.toronto.ttimematrix.SpanningTree;
@@ -107,7 +107,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		
 		if(measurements != null){
 			try {
-				if ( config.plans().getInputFile() != null ) 
+				if ( scenario.getConfig().plans().getInputFile() != null ) 
 					oldPopulation = scenario.getPopulation();
 				else
 					oldPopulation = null;
@@ -115,7 +115,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 				newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 				// read urbansim persons.  Generates hwh acts as side effect
 				startTimeReadPersons = System.currentTimeMillis();
-				readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, MATSimConfigObject.getSampeRate() ) ;
+				readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE) ) ) ;
 				endTimeReadPersons = System.currentTimeMillis();
 				oldPopulation=null ;
 				System.gc() ;
@@ -186,7 +186,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		public MeasurementControlerListener( ActivityFacilitiesImpl zones ){
 			measurements = MeasurementObject.getInstance();
 			this.zones = zones;
-			this.travelDataPath = Constants.OPUS_HOME + MATSimConfigObject.getTempDirectory() + "travel_data.csv";
+			this.travelDataPath = Constants.OPUS_HOME + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "travel_data.csv";
 		}
 		
 		public void notifyShutdown(ShutdownEvent event){

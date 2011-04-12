@@ -50,7 +50,7 @@ public class ReadFromUrbansimParcelModel {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModel.class);
 	// year of current urbansim run
 	private final int year;
-
+	
 	/**
 	 * constructor
 	 * @param year of current run

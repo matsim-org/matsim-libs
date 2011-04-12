@@ -35,7 +35,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
-import playground.tnicolai.urbansim.utils.MATSimConfigObject;
+import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
@@ -66,14 +67,10 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 
 		// checking for if this is only a test run
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		if(MATSimConfigObject.isTestRun()){
+		if(scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
 			return;
 		}
-
-		// init scenario and config object
-		scenario = MATSimConfigObject.getScenario();
-		config = MATSimConfigObject.getConfig();
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
@@ -84,8 +81,8 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 			modifyLinks(network, testParam);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( MATSimConfigObject.getYear() );
-		// read urbansim facilities (these are simply those entities that have the coordinates!)
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ) );
+		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
 		

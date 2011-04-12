@@ -141,5 +141,16 @@ public class Constants {
 	public static final int EXCEPTION_OCCURED	= 3;
 	public static final int UNMARSCHALLING_FAILED	= 4;
 	
+	/** MATSim 4 UrbanSim parameter names **/
+	public static final String MATSIM_4_URBANSIM = "matsim4urbansim";
+	public static final String IS_TEST_RUN = "isTestRun";
+	public static final String SAMPLING_RATE = "samplingRate";
+	public static final String TEMP_DIRECTORY = "tempDirectory";
+	public static final String OPUS_HOME_DIRECTORY = "opusHomeDirectory";
+	public static final String YEAR = "year";
+	
+	/** MATSim 4 UrbanSim parameter values as strings **/
+	public static final String TRUE = "true";
+	public static final String FALSE = " false";
 }
 
