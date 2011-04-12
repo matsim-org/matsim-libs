@@ -102,7 +102,7 @@ public class TripAnalysis {
 	
 	public void run(String plans, String network, String events, String out){
 		this.readPlans(plans, network);
-//		this.readEvents(events);
+		this.readEvents(events);
 		this.generateTrips();
 		
 //		this.test();
