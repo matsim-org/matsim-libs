@@ -48,11 +48,11 @@ public class GK4toWGS84toGoogleMapTest {
 
 		System.out.println("http://maps.google.com/maps/api/staticmap?" +
 		// "center="
-				// + a.getY()/* latitude */
-				// + "," + a.getX()/* longitude */
-				// + "&" +
-				// "zoom=16" +
-				"&size=1024x768&markers=color:blue|label:A|" + a.getY()/* latitude */
+		// + a.getY()/* latitude */
+		// + "," + a.getX()/* longitude */
+		// + "&" +
+		// "zoom=16" +
+				"size=1024x768&markers=color:blue|label:A|" + a.getY()/* latitude */
 				+ "," + a.getX()/* longitude */+ "&markers=color:blue|label:B|"
 				+ b.getY()/* latitude */
 				+ "," + b.getX()/* longitude */+ "&markers=color:blue|label:C|"
