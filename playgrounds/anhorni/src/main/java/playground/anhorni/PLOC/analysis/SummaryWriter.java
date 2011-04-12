@@ -37,7 +37,7 @@ public class SummaryWriter {
 	private String path = "src/main/java/playground/anhorni/";
 	private BufferedWriter bufferedWriter = null;	
 	private double avgRuns_totalExpendituresPerFacilityPerHour_AveragedOver5Days[][];
-	private double sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[][];
+	private double devRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[][];
 	
 	private Vector<Run> runs = new Vector<Run>();
 			
@@ -48,7 +48,7 @@ public class SummaryWriter {
     public void run(int numberOfRuns) {
     	this.readRD(numberOfRuns);
     	this.calculateAvgRuns_TotalExpendituresPerFacilityPerHour_AveragedOver5Days();
-    	this.calculateStdDevOfExpenditures();
+    	this.calculateDeviationOfExpenditures();
     	this.write2Summary();
     	
     	log.info("Create single ensemble analyses");
@@ -102,8 +102,8 @@ public class SummaryWriter {
 		}
     }
      
-    private void calculateStdDevOfExpenditures() {
-    	this.sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days = new double[MultiplerunsControler.shoppingFacilities.length][24];
+    private void calculateDeviationOfExpenditures() {
+    	this.devRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days = new double[MultiplerunsControler.shoppingFacilities.length][24];
     	for (int hour = 0; hour < 24; hour++) {
 		    for (int facIndex = 0; facIndex < MultiplerunsControler.shoppingFacilities.length; facIndex++) {
 		    	double sigma = 0.0;
@@ -114,7 +114,7 @@ public class SummaryWriter {
 		    							)/(this.runs.size()));
 	    			}
 	    		}
-		    	sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[facIndex][hour] = Math.sqrt(sigma);
+		    	devRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[facIndex][hour] = Math.sqrt(sigma);
 		    }       
 		}
     }
@@ -126,8 +126,8 @@ public class SummaryWriter {
 			bufferedWriter.write("Hour\t");
 			for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
 				bufferedWriter.append("f" + MultiplerunsControler.shoppingFacilities[i] + "_avg" + "\t" +
-						"f" + MultiplerunsControler.shoppingFacilities[i] + "_sigma" + "\t" +
-						"f" + MultiplerunsControler.shoppingFacilities[i] + "_sigma[%]" + 
+						"f" + MultiplerunsControler.shoppingFacilities[i] + "_deviation" + "\t" +
+						"f" + MultiplerunsControler.shoppingFacilities[i] + "_deviation[%]" + 
 								"\t");
 			}
 			bufferedWriter.newLine();
@@ -138,9 +138,9 @@ public class SummaryWriter {
 					bufferedWriter.write(formatter.format(
 							avgRuns_totalExpendituresPerFacilityPerHour_AveragedOver5Days[i][h]) +"\t");
 					bufferedWriter.write(formatter.format(
-							sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[i][h]) + "\t");
+							devRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[i][h]) + "\t");
 					bufferedWriter.write(formatter.format(
-							100.0* sigmaRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[i][h] / avgRuns_totalExpendituresPerFacilityPerHour_AveragedOver5Days[i][h]) + "\t");
+							100.0* devRuns_totalExpendituresPerFacilityPerHourAveragedOver5Days[i][h] / avgRuns_totalExpendituresPerFacilityPerHour_AveragedOver5Days[i][h]) + "\t");
 				}
 				bufferedWriter.newLine();
 			}
