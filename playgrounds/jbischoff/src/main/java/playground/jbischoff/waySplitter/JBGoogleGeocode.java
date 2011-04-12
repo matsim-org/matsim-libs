@@ -57,11 +57,27 @@ public class JBGoogleGeocode {
 		BufferedReader reader;
 
 		try {
+			if (count == 0){
+
+				reader = new BufferedReader(new InputStreamReader(new URL("http://maps.google.com/maps/geo?q=hoppegarten+&output=csv&key=xyz").openStream()));
+				log.info(reader.readLine());
+				
+				Thread.sleep(1000);
+				
+				
+			}
+			
+//			if (count%10 == 0 ){ 
+//				Thread.sleep(1000);
+//			}
 			reader = new BufferedReader(new InputStreamReader(
 
+					
+					
 			new URL("http://maps.google.com/maps/geo?q="
 					+ URLEncoder.encode(address, ENCODING) + "&output=csv&key="
 					+ KEY).openStream()));
+			
 
 			String resultingLine;
 

@@ -42,8 +42,8 @@ public class GeoCodeReader implements Runnable {
 	public void run() {
 		JBGoogleGeocode gg = new JBGoogleGeocode();
 		FileReader fr;
-		String inf = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung_persons.csv";
-		String out = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\persons";
+		String inf = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\bvg_befragung_ways.csv";
+		String out = "C:\\Users\\Joschka Bischoff\\Desktop\\Daten von Andreas\\ways";
 		try {
 			fr = new FileReader(new File(inf));
 			BufferedReader br = new BufferedReader(fr);
@@ -56,16 +56,29 @@ public class GeoCodeReader implements Runnable {
 				String[] r = line.split(";");
 				
 				if (l>0){
-				Coord xy = gg.readGC(r[5]);	
-				Double x = xy.getX();
-				Double y = xy.getY();
-				r[29] = x.toString();
-				r[30] = y.toString();
+//				Coord xy = gg.readGC(r[5]);	
+//				Double x = xy.getX();
+//				Double y = xy.getY();
+//				r[29] = x.toString();
+//				r[30] = y.toString();
+//					persons
+					
+					Coord xy = gg.readGC(r[21]);	
+					Double x = xy.getX();
+					Double y = xy.getY();
+					r[52] = x.toString();
+					r[53] = y.toString();
+//						ways
+											
 				
 				}
 				l++;
 				String newline = "";
-				for (int i = 0 ; i<31 ; i++){
+//				for (int i = 0 ; i<31 ; i++) 
+//				persons
+					for (int i = 0 ; i<53 ; i++) 
+//				ways
+				{
 					newline = newline +";"+ r[i];
 				}
 				bw.append(newline+"\n");
