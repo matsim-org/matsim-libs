@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis;
+package playground.droeder.Journal2MATSim2Journal;
 
 import java.util.SortedMap;
 import java.util.TreeMap;

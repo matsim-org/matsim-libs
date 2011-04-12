@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.osm;
+package playground.droeder.ResizeLinksByCount;
 
 import java.util.ArrayList;
 import java.util.HashMap;

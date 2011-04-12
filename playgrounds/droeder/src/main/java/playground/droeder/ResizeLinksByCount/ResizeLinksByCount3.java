@@ -1,4 +1,4 @@
-package playground.droeder.osm;
+package playground.droeder.ResizeLinksByCount;
 
 import java.util.Map;
 

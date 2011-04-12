@@ -82,7 +82,6 @@ import org.xml.sax.SAXException;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.AnalysisTrip;
 
 
 /**
