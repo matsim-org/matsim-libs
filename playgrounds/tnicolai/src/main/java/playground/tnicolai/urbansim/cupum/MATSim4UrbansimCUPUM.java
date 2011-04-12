@@ -36,7 +36,6 @@ import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
