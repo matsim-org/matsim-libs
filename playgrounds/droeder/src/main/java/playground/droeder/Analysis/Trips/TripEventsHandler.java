@@ -34,6 +34,10 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
+
+import playground.droeder.DaPaths;
 
 /**
  * @author droeder
@@ -43,6 +47,7 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 										ActivityEndEventHandler, ActivityStartEventHandler{
 
 	private Map<Id, ArrayList<PersonEvent>> events;
+	private EventWriterXML writer = new EventWriterXML( DaPaths.VSP + "BVG09_Auswertung/testEvents.xml.gz");
 	
 	/**
 	 * @param keySet
@@ -67,6 +72,7 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(ActivityStartEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
+			writer.handleEvent(event);
 		}
 	}
 
@@ -74,6 +80,7 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(ActivityEndEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
+			writer.handleEvent(event);
 		}
 	}
 
@@ -81,15 +88,20 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(AgentArrivalEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-		}	}
+			writer.handleEvent(event);
+		}	
+	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-		}	}
+			writer.handleEvent(event);
+		}	
+	}
 
 	public Map<Id, ArrayList<PersonEvent>> getEvents(){
+		writer.closeFile();
 		return this.events;
 	}
 }

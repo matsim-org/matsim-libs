@@ -24,11 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
@@ -37,12 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEvent;
-import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -56,10 +47,10 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.AnalysisTrip;
+import playground.droeder.Analysis.Trips.AnalysisTripSet;
+import playground.droeder.Analysis.Trips.AnalysisTripGenerator;
 import playground.droeder.Analysis.Trips.PlanElementFilter;
 import playground.droeder.Analysis.Trips.TripEventsHandler;
-import playground.droeder.Analysis.Trips.TripTypeCalculator;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -69,11 +60,10 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class BvgTripAnalysisRunner {
-	private Map<String, List<AnalysisTrip>> tripsByLocation;
 	private Geometry zone;
-	private TripTypeCalculator typeAnalyzer;
 	private Map<Id, ArrayList<PersonEvent>> events;
 	private Map<Id, ArrayList<PlanElement>> planElements;
+	private AnalysisTripSet tripSet;
 	
 	
 	
@@ -81,8 +71,8 @@ public class BvgTripAnalysisRunner {
 		final String PATH = DaPaths.VSP + "BVG09_Auswertung/"; 
 		final String IN = PATH + "input/";
 		final String PLANS = PATH + "testPopulation1.xml.gz";
+		final String EVENTS = PATH + "testEvents.xml.gz";
 		final String NETWORK = IN + "network.final.xml.gz";
-		final String EVENTS = IN + "bvg.run128.25pct.100.events.xml.gz";
 		
 		Set<Feature> features = null;
 		try {
@@ -99,42 +89,15 @@ public class BvgTripAnalysisRunner {
 	
 	
 	public BvgTripAnalysisRunner (Geometry g){
-		this.tripsByLocation = new HashMap<String, List<AnalysisTrip>>();
 		this.zone = g;
-		this.typeAnalyzer = new TripTypeCalculator(g);
 	}
 	
 	public void run(String plans, String network, String events, String out){
 		this.readPlans(plans, network);
 		this.readEvents(events);
-		this.generateTrips();
-		
-//		this.test();
+		this.tripSet = AnalysisTripGenerator.calculateTripSet(this.events, this.planElements, this.zone);
 	}
 
-//	private void test(){
-//		for(Entry<Id, ArrayList<PlanElement>> e: this.planElements.entrySet()){
-//			System.out.println(e.getKey().toString());
-//			for(PlanElement pe: e.getValue()){
-//				if(pe instanceof Leg){
-//					System.out.print(((Leg) pe).getMode() + "\t");
-//				}else if (pe instanceof Activity){
-//					System.out.print(((Activity) pe).getType() + "\t");
-//				}
-//			}
-//			System.out.println();
-//			for(PersonEvent pe : this.events.get(e.getKey())){
-//				if(pe instanceof ActivityEvent){
-//					System.out.print(((ActivityEvent) pe).getActType() + "\t");
-//				}else if(pe instanceof AgentEvent){
-//					System.out.print(((AgentEvent) pe).getLegMode()+ "\t");
-//				}
-//			}
-//			System.out.println();
-//			System.out.println();
-//		}
-//	}
-	
 	private void readPlans(String plans, String network){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		try {
@@ -190,81 +153,6 @@ public class BvgTripAnalysisRunner {
 			e.printStackTrace();
 		}
 		this.events = handler.getEvents();
-	}
-	
-	
-	private void generateTrips(){
-		Set<Id> ids = this.planElements.keySet();
-		ArrayList<ArrayList<PlanElement>> splittedElements;
-		ListIterator<PlanElement> elementsIterator;
-
-		ArrayList<PlanElement> temp;
-		PlanElement p;
-		int counter;
-		
-		
-		for(Id id : ids){
-			elementsIterator = this.planElements.get(id).listIterator();
-			splittedElements = new ArrayList<ArrayList<PlanElement>>(); 
-			
-			
-			temp = new ArrayList<PlanElement>();
-			while (elementsIterator.hasNext()){
-				p = elementsIterator.next();
-				
-				if(p instanceof Activity){
-					if(temp.size() == 0){
-						temp.add(p);
-					}else if(((Activity) p).getType().equals("pt interaction")){
-						temp.add(p);
-					}else{
-						temp.add(p);
-						splittedElements.add(temp);
-						temp = new ArrayList<PlanElement>();
-						
-						if(elementsIterator.nextIndex() == this.planElements.get(id).size()){
-							break;
-						}else{
-							elementsIterator.previous();
-						}
-					}
-				}else if(p instanceof Leg){
-					temp.add(p);
-				}
-			}
-			
-			
-			//TODO Test this
-			counter = 0;
-			System.out.println(id);
-			for(ArrayList<PlanElement> pes : splittedElements){
-				AnalysisTrip trip = new AnalysisTrip((ArrayList<PersonEvent>) this.events.get(id).subList(counter, pes.size()-1), pes);
-				trip.toString();
-				this.addTrip(trip);
-				counter = pes.size();
-			}
-			
-//			System.out.println(id);
-//			for(ArrayList<PlanElement> pes : splittedElements){
-//				for(PlanElement pe: pes){
-//					if(pe instanceof Leg){
-//						System.out.print(((Leg) pe).getMode() + "\t");
-//					}else if (pe instanceof Activity){
-//						System.out.print(((Activity) pe).getType() + "\t");
-//					}
-//				}
-//				System.out.println();
-//				System.out.println();
-//			}
-		}
-	}
-	
-	private void addTrip(AnalysisTrip trip){
-		String location = this.typeAnalyzer.getTripLocation(trip);
-		if(!this.tripsByLocation.containsKey(location)){
-			this.tripsByLocation.put(location, new ArrayList<AnalysisTrip>());
-		}
-		this.tripsByLocation.get(location).add(trip);
 	}
 }
 

@@ -20,6 +20,8 @@
 package playground.droeder.Analysis.Trips;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,10 +54,19 @@ public class AnalysisTrip {
 				((Activity) elements.get(elements.size() - 1)).getCoord().getY());
 	}
 	
-	public void analyze(){
+	public Map<String, Double> analyze(){
+		Map<String, Double> temp  = new HashMap<String, Double>();
 		
+		
+		return temp;
 	}
 	
+	protected static Map<String, Double> getEmptyValueMap(){
+		Map<String, Double> temp = new HashMap<String, Double>();
+		
+		//TODO add constants with 0
+		return temp;
+	}
 
 	/**
 	 * @return
