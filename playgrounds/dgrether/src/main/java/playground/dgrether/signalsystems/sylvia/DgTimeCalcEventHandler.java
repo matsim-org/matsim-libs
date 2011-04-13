@@ -44,21 +44,21 @@ import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
+public class DgTimeCalcEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler, LaneEnterEventHandler {
 
-	private static final Logger log = Logger.getLogger(DgTimeCalcHandler.class);
+	private static final Logger log = Logger.getLogger(DgTimeCalcEventHandler.class);
 
 	private Map<Id, Double> arrivaltimesSPN2FB;
 	private Map<Id, Double> arrivaltimesCB2FB;
 
 	private Map<Id, Double> arrivaltimesFB2SPN;
 	private Map<Id, Double> arrivaltimesFB2CB;
-	private Map<Id, Double> ttmap;
+	private Map<Id, Double> personId2TravelTimeMap;
 	private Set<Id> carsPassed;
 	private Set<Id> wannabeadaptiveLanes;
 
-	public DgTimeCalcHandler() {
+	public DgTimeCalcEventHandler() {
 		this.wannabeadaptiveLanes = new HashSet<Id>();
 		this.fillWannaBes();
 		this.reset(0);
@@ -66,7 +66,7 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void reset(int iteration) {
-		this.ttmap = new TreeMap<Id, Double>();
+		this.personId2TravelTimeMap = new TreeMap<Id, Double>();
 		this.carsPassed = new HashSet<Id>();
 		this.arrivaltimesFB2CB = new TreeMap<Id, Double>();
 		this.arrivaltimesFB2SPN = new TreeMap<Id, Double>();
@@ -80,20 +80,20 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Double agentTt = this.ttmap.get(event.getPersonId());
-		this.ttmap.put(event.getPersonId(), agentTt - event.getTime());
+		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
+		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Double agentTt = this.ttmap.get(event.getPersonId());
-		this.ttmap.put(event.getPersonId(), agentTt + event.getTime());
+		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
+		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		Double agentTt = this.ttmap.get(event.getPersonId());
-		this.ttmap.put(event.getPersonId(), agentTt + event.getTime());
+		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
+		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
 	
 		if (event.getPersonId().toString().endsWith("SPN_SDF")) {
 			Double tr = this.arrivaltimesSPN2FB.get(event.getPersonId());
@@ -111,24 +111,23 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 			}
 			else {
 				this.arrivaltimesFB2CB.put(event.getPersonId(), event.getTime());
-
 			}
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		Double agentTt = this.ttmap.get(event.getPersonId());
+		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
 		if (agentTt == null) {
-			this.ttmap.put(event.getPersonId(), 0 - event.getTime());
+			this.personId2TravelTimeMap.put(event.getPersonId(), 0 - event.getTime());
 		}
 		else {
-			this.ttmap.put(event.getPersonId(), agentTt - event.getTime());
+			this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
 		}
 	}
 
 	public Map<Id, Double> getTtmap() {
-		return ttmap;
+		return personId2TravelTimeMap;
 	}
 
 	private void fillWannaBes() {
@@ -164,16 +163,16 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	}
 
 	public void exportArrivalTime(int iteration, String outdir) {
-		String filename = outdir + iteration + ".arrivalTimesFromFB_CB.csv";
+		String filename = outdir + iteration + ".arrival_times_FB_CB.csv";
 		this.exportMaptoCVS(this.arrivaltimesFB2CB, filename);
-		filename = outdir + iteration + ".arrivalTimesFromFB_SPN.csv";
+		filename = outdir + iteration + ".arrival_times_FB_SPN.csv";
 		this.exportMaptoCVS(this.arrivaltimesFB2SPN, filename);
-		filename = outdir + iteration + ".arrivalTimes_CB_FB.csv";
+		filename = outdir + iteration + ".arrival_times_CB_FB.csv";
 		this.exportMaptoCVS(this.arrivaltimesCB2FB, filename);
-		filename = outdir + iteration + ".arrivalTimes_SPN_FB.csv";
+		filename = outdir + iteration + ".arrival_times_SPN_FB.csv";
 		this.exportMaptoCVS(this.arrivaltimesSPN2FB, filename);
 		
-		filename = outdir + iteration + ".latestArrivals.csv";
+		filename = outdir + iteration + ".latest_arrivals.csv";
 		this.exportLatestArrivals(filename);
 	}
 
@@ -235,10 +234,10 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 	public int getAverageTravelTime() {
 
 		Double att = 0.0;
-		for (Entry<Id, Double> entry : ttmap.entrySet()) {
+		for (Entry<Id, Double> entry : personId2TravelTimeMap.entrySet()) {
 			att += entry.getValue();
 		}
-		att = att / ttmap.size();
+		att = att / personId2TravelTimeMap.size();
 		return att.intValue();
 	}
 
@@ -246,7 +245,7 @@ public class DgTimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventH
 		if (this.getPassedAgents() == 0)
 			return 0;
 		Double att = 0.0;
-		for (Entry<Id, Double> entry : ttmap.entrySet()) {
+		for (Entry<Id, Double> entry : personId2TravelTimeMap.entrySet()) {
 			if (this.getPassedCars().contains(entry.getKey())) {
 				att += entry.getValue();
 			}

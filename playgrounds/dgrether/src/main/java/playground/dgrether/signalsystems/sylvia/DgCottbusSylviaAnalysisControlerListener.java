@@ -48,7 +48,7 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 
 	private final static boolean collectGreenSplitInformation = true;
 	
-	private DgTimeCalcHandler timeCalcHandler;
+	private DgTimeCalcEventHandler timeCalcHandler;
 
 	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 
@@ -56,13 +56,51 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	
 	@Override
 	public void notifyStartup(StartupEvent e) {
-		this.timeCalcHandler = new DgTimeCalcHandler();
+		this.timeCalcHandler = new DgTimeCalcEventHandler();
 		e.getControler().getEvents().addHandler(this.timeCalcHandler);
 		if (collectGreenSplitInformation){
 			this.initGreenSplitHandler();
 			e.getControler().getEvents().addHandler(this.signalGreenSplitHandler);
 		}
 	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent e) {
+
+	}
+
+	
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent e) {
+		if (e.getIteration() == 0 || e.getIteration() % 10 == 0){
+			log.info("Analysis of run id: " + e.getControler().getConfig().controler().getRunId());
+			log.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
+					+ this.timeCalcHandler.getPassedAgents());
+			log.info("Average TravelTime for Agents that passed an adaptive signal at least once: "+this.timeCalcHandler.getAverageAdaptiveTravelTime());
+			log.info("Average TT of all Agents " + this.timeCalcHandler.getAverageTravelTime()); 
+			log.info("Latest arrival time at stadium for Agents coming from Cottbus: "+this.timeCalcHandler.getLatestArrivalCBSDF());
+			log.info("Latest arrival time at stadium for Agents coming from SPN: "+this.timeCalcHandler.getLatestArrivalSPNSDF());
+			log.info("Latest home time for agents going from stadium to Cottbus: "+this.timeCalcHandler.getLatestArrivalSDFCB());
+			log.info("Latest home time for agents going from stadium to SPN: "+this.timeCalcHandler.getLatestArrivalSDFSPN());
+			
+			this.timeCalcHandler.exportArrivalTime(e.getIteration(), e.getControler().getControlerIO().getIterationPath(e.getIteration()));
+
+			if (collectGreenSplitInformation){
+				this.writeSignalStats(e);
+			}
+		}
+	}
+	
+	@Override
+	public void notifyShutdown(ShutdownEvent e) {
+	}
+
+	
+	public double getAverageTravelTime(){
+		return this.timeCalcHandler.getAverageTravelTime();
+	}
+
 
 	private void initGreenSplitHandler(){
 		this.signalGreenSplitHandler = new DgSignalGreenSplitHandler();
@@ -73,51 +111,16 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("27"));
 		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("12"));
 	}
-	
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent e) {
-
-	}
-
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent e) {
-		log.info("Analysis of run id: " + e.getControler().getConfig().controler().getRunId());
-		log.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
-				+ this.timeCalcHandler.getPassedAgents());
-		log.info("Average TravelTime for Agents that passed an adaptive signal at least once: "+this.timeCalcHandler.getAverageAdaptiveTravelTime());
-		log.info("Average TT of all Agents " + this.timeCalcHandler.getAverageTravelTime()); 
-		log.info("Latest arrival time at stadium for Agents coming from Cottbus: "+this.timeCalcHandler.getLatestArrivalCBSDF());
-		log.info("Latest arrival time at stadium for Agents coming from SPN: "+this.timeCalcHandler.getLatestArrivalSPNSDF());
-		log.info("Latest home time for agents going from stadium to Cottbus: "+this.timeCalcHandler.getLatestArrivalSDFCB());
-		log.info("Latest home time for agents going from stadium to SPN: "+this.timeCalcHandler.getLatestArrivalSDFSPN());
-
-		this.timeCalcHandler.exportArrivalTime(e.getIteration(), e.getControler().getConfig().controler().getOutputDirectory());
 
 	
-		if (collectGreenSplitInformation){
-			this.writeSignalStats(e);
-		}
-	}
 	
-	
-	public double getAverageTravelTime(){
-		return this.timeCalcHandler.getAverageTravelTime();
-	}
-
-	@Override
-	public void notifyShutdown(ShutdownEvent e) {
-	}
-
-
 	private void writeSignalStats(IterationEndsEvent event){
 		try {
 			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "signal_statistic.csv");
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			String header = "Signal System Id" + SEPARATOR + "Signal Group Id" + SEPARATOR + "Signal Group State" + SEPARATOR + "Time sec.";
-//			TODO write header
+			writer.append(header);
 			for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-				
-				
 				Map<Id, DgSignalGroupAnalysisData> signalGroupMap = signalGreenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
 				for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
 					// logg.info("for signalgroup: "+entry.getKey());

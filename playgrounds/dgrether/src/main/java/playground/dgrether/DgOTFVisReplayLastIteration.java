@@ -1,7 +1,5 @@
 package playground.dgrether;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,7 +21,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -67,7 +64,7 @@ public class DgOTFVisReplayLastIteration {
 		}
 		log.info("using " + currentDirectory + " as base directory...");
 		String newConfigFile = currentDirectory + "lastItLiveConfig.xml";
-		this.handleNoLongerSupportedParameters(configfile, newConfigFile);
+		new DgConfigCleaner().cleanAndWriteConfig(configfile, newConfigFile);
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
@@ -118,7 +115,7 @@ public class DgOTFVisReplayLastIteration {
 
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario sc = loader.loadScenario();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
 		QSim otfVisQSim = new QSim(sc, events);
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
@@ -136,38 +133,6 @@ public class DgOTFVisReplayLastIteration {
 		queueSimulation.setControlerIO(controlerIO);
 		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
 		queueSimulation.run();
-	}
-
-	private void handleNoLongerSupportedParameters(String configfile, String liveConfFile)
-			throws FileNotFoundException, IOException {
-		BufferedReader reader = IOUtils.getBufferedReader(configfile);
-		String line = reader.readLine();
-		BufferedWriter writer = IOUtils.getBufferedWriter(liveConfFile);
-		while (line != null) {
-			if (line.contains("bikeSpeedFactor")) {
-				line = line.replaceAll("bikeSpeedFactor", "bikeSpeed");
-			}
-			else if (line.contains("undefinedModeSpeedFactor")) {
-				line = line.replaceAll("undefinedModeSpeedFactor", "undefinedModeSpeed");
-			}
-			else if (line.contains("walkSpeedFactor")) {
-				line = line.replaceAll("walkSpeedFactor", "walkSpeed");
-			}
-			else if (line.contains("ptScaleFactor") ||
-					line.contains("localDTDBase") ||
-					line.contains("outputSample") ||
-					line.contains("outputVersion") ||
-					line.contains("evacuationTime") ||
-					line.contains("snapshotfile")
-				){
-				line = reader.readLine();
-				continue;
-			}
-			writer.write(line);
-			line = reader.readLine();
-		}
-		reader.close();
-		writer.close();
 	}
 
 	public static final String chooseFile() {

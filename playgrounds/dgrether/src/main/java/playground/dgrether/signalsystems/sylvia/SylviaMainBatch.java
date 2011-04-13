@@ -51,42 +51,38 @@ public class SylviaMainBatch {
 	private static final Logger log = Logger.getLogger(SylviaMainBatch.class);
 	
 	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 * @param args: first: directory containing shared-svn root; second config serving as base config for football runs
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String baseDirectory = DgPaths.REPOS;
-		String configFilename = "";
-		configFilename = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml";
-		if (args != null && args.length == 2){
-			baseDirectory = args[0];
-			configFilename = args[1];
-			log.info("Running CottbusMainBatch with base directory: " + baseDirectory + " and config: " + configFilename);
+		String reposBaseDirectory = args[0];
+		String configFilename = args[1];
+		if (args == null || args.length == 0){
+			reposBaseDirectory = DgPaths.REPOS;
+			configFilename = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/cottbus_sylvia_config.xml"; 
+			log.info("Running CottbusMainBatch with base directory: " + reposBaseDirectory + " and config: " + configFilename);
 		}
-
-		
-		String fixedTimeSignals = baseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/signalControlCottbusT90_v2.0_jb_ba_removed.xml";
-		String sylviaSignals = baseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
-		
-		String footballPlansBase = baseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
-		
+		//configure the signals
+		String fixedTimeSignals = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/scenario-lsa/signalControlCottbusT90_v2.0_jb_ba_removed.xml";
+		String sylviaSignals = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
+		String footballPlansBaseFilename = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
+		//read the config
 		Config baseConfig = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
 		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 
 		String outputDirBase = baseConfig.controler().getOutputDirectory();
 		
+		//start the runs
 		Map<Integer, Double> fixedtimeScale2AverageTTMap = new HashMap<Integer, Double>();
 		Map<Integer, Double> sylviaScale2AverageTTMap = new HashMap<Integer, Double>();
 		
 		for (int scale = 0; scale <= 100; scale = scale + 5){
 			//fixed time control
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
-			baseConfig.controler().setOutputDirectory(outputDirBase + "fixed-time-control_scale_"+scale + "/");
-			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
+			baseConfig.controler().setOutputDirectory(outputDirBase + "fixed-time_scale_"+scale + "/");
+			baseConfig.plans().setInputFile( footballPlansBaseFilename + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
-			baseConfig.controler().setRunId("ft_" + scale);
+			baseConfig.controler().setRunId("fixed-time_scale_" + scale);
 			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
@@ -95,10 +91,10 @@ public class SylviaMainBatch {
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
-			baseConfig.controler().setOutputDirectory(outputDirBase + "sylvia-control_scale_"+ scale + "/");
-			baseConfig.plans().setInputFile( footballPlansBase + scale + ".xml.gz");
+			baseConfig.controler().setOutputDirectory(outputDirBase + "sylvia_scale_"+ scale + "/");
+			baseConfig.plans().setInputFile( footballPlansBaseFilename + scale + ".xml.gz");
 			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
-			baseConfig.controler().setRunId("sv_" + scale);
+			baseConfig.controler().setRunId("sylvia_scale" + scale);
 			
 			controler = new Controler(baseConfig);
 			controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
@@ -108,10 +104,11 @@ public class SylviaMainBatch {
 			sylviaScale2AverageTTMap.put(scale, analysis.getAverageTravelTime());
 		}
 		
-		writeAverageTT(fixedtimeScale2AverageTTMap, outputDirBase + "fixed_time_avg_tt.txt");
+		writeAverageTT(fixedtimeScale2AverageTTMap, outputDirBase + "fixed-time_avg_tt.txt");
 		writeAverageTT(sylviaScale2AverageTTMap, outputDirBase + "sylvia_avg_tt.txt");
 	}
 
+	
 	private static void writeAverageTT(Map<Integer, Double> map, String filename) throws FileNotFoundException, IOException{
 		SortedMap<Integer, Double> sorted = new TreeMap<Integer, Double>();
 		sorted.putAll(map);
