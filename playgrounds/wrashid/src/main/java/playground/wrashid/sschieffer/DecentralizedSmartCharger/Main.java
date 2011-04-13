@@ -431,18 +431,20 @@ public class Main {
 	public static LinkedListValueHashMap<Id, Schedule> makeBullshitAgentVehicleSource(Controler controler){
 		LinkedListValueHashMap<Id, Schedule> agentSource= new LinkedListValueHashMap<Id, Schedule>();
 		
-		Schedule bullShitPlus= new Schedule();
-		Schedule bullShitMinus= new Schedule();
-		PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500});
-		PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500});
 		
-		bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
-		bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
 		//Id
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			if(Math.random()<0.5){
+				Schedule bullShitPlus= new Schedule();
+				PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500.0});
+				bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
 				
+				agentSource.put(id, bullShitPlus);	
 			}else{
+				Schedule bullShitMinus= new Schedule();
+				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});
+				bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
+				
 				agentSource.put(id, bullShitMinus);	
 			}
 			

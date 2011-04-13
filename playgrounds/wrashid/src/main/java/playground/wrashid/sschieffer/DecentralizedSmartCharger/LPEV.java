@@ -67,7 +67,12 @@ public class LPEV {
 	 * @throws LpSolveException
 	 * @throws IOException 
 	 */
-	public Schedule solveLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, String vehicleType) throws LpSolveException, IOException{
+	public Schedule solveLP(Schedule schedule, 
+			Id id, 
+			double batterySize, 
+			double batteryMin, 
+			double batteryMax, 
+			String vehicleType) throws LpSolveException, IOException{
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
@@ -165,7 +170,7 @@ public class LPEV {
 		schedule= update();
 //		System.out.println("updated schedule with required charging times:");
 //		schedule.printSchedule();
-		visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
+		//visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
 		
 //		printLPSolution();
 		
@@ -684,7 +689,7 @@ public void visualizeSOCAgent(double [] solution, String type) throws LpSolveExc
  	            )
  	        );
      	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "SOC_EV_from_"+type+"Agent"+personId.toString()+".png") , chart, 800, 600);
+     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "SOC_of_"+type+"afterLPEV_Agent"+personId.toString()+".png") , chart, 800, 600);
 	  	
 	}
 	

@@ -3,7 +3,9 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -49,6 +51,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.Main;
 
 
 /* *********************************************************************** *
@@ -84,12 +87,17 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class DecentralizedSmartCharger {
 	
 	public DifferentiableMultivariateVectorialOptimizer optimizer;
-	public VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,10000);
+	public VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,-10000);//
+	//(double relativeThreshold, double absoluteThreshold)
+	//In order to perform only relative checks, the absolute tolerance must be set to a negative value. 
+	//In order to perform only absolute checks, the relative tolerance must be set to a negative value.
+	
 	public static SimpsonIntegrator functionIntegrator= new SimpsonIntegrator();
 	public NewtonSolver newtonSolver= new NewtonSolver();	
 	public GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		
 	public static PolynomialFitter polyFit;
+	
 	
 	
 	final public static double SECONDSPERMIN=60;
@@ -169,11 +177,11 @@ public class DecentralizedSmartCharger {
 						
 		this.outputPath=outputPath;		
 		
-		gaussNewtonOptimizer.setMaxIterations(10000000);		
+		gaussNewtonOptimizer.setMaxIterations(100000);		
 		gaussNewtonOptimizer.setConvergenceChecker(checker);		
 		optimizer=gaussNewtonOptimizer;
 		
-		polyFit= new PolynomialFitter(24, optimizer);
+		polyFit= new PolynomialFitter(20, optimizer);
 		
 			
 		myAgentTimeReader= new AgentTimeIntervalReader(
@@ -298,7 +306,7 @@ public class DecentralizedSmartCharger {
 		
 		calculateChargingCostsAllAgents();
 		
-		
+		writeSummary();
 	}
 
 
@@ -354,7 +362,7 @@ public class DecentralizedSmartCharger {
 				// get entire driving Joules and transform to emissions
 				EMISSIONCOUNTER+= emissionContribution;
 				agentsWithCombustion.add(id);
-				type="combustion";
+				type="combustionVehicle";
 				
 			}else{
 				/*
@@ -374,7 +382,7 @@ public class DecentralizedSmartCharger {
 					batteryMin=batteryMinPHEV; //dummy
 					batteryMax=batteryMaxPHEV; 
 					agentsWithPHEV.add(id);
-					type="PHEV";
+					type="PHEVVehicle";
 					
 				}else{
 					
@@ -385,7 +393,7 @@ public class DecentralizedSmartCharger {
 					batteryMax=batteryMaxEV; 
 					
 					agentsWithEV.add(id);
-					type="EV";
+					type="EVVehicle";
 				}
 				
 				//try EV first
@@ -579,15 +587,16 @@ public class DecentralizedSmartCharger {
 		myV2G= new V2G(this);
 		//visualize stochastic load before/after vehicles/ after stochastic
 		//TODO
-		
+		//TODO
+		System.out.println("START CHECKING VEHICLE SOURCES");
 		//check on vehicle sources
 		checkVehicleSources();
 		
 		//calculate connectivity distributions at hubs
-		myHubLoadReader.calculateConnectivityDistributionsAtHubsInHubLoadReader();
-		
+		myHubLoadReader.calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader();
+		System.out.println("START CHECKING STOCHASTIC HUB LOADS");
 		checkHubStochasticLoads();
-		
+		System.out.println("DONE V2G");
 	}
 	
 	
@@ -628,7 +637,7 @@ public class DecentralizedSmartCharger {
 						//*********************************
 						
 						//FINALLY HAVE INTERVAL TO LOOK AT IN THIS ITERATION
-						double start=i*MINCHARGINGLENGTH;
+						double start=stochasticLoad.getStartTime()+i*MINCHARGINGLENGTH;
 						double end= start+bit;
 						
 						LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
@@ -778,7 +787,6 @@ public class DecentralizedSmartCharger {
 					
 					
 					
-					
 				}
 				
 			}
@@ -791,7 +799,7 @@ public class DecentralizedSmartCharger {
 		
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){
-								
+				
 				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
 				if(hasAgentCombustionVehicle(id)==false){
 					
@@ -1130,7 +1138,9 @@ public class DecentralizedSmartCharger {
 				"charging, off-peak parking, peak-parking, driving times", 
 				agentOverview, 
 				PlotOrientation.VERTICAL, 
-				false, true, false);
+				true, 
+				true, 
+				false);
 		
 		
 		chart.setBackgroundPaint(Color.white);
@@ -1544,7 +1554,66 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	
+	private void writeSummary(){
+		try{
+		    // Create file 
+			String title=(outputPath + "summary.html");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    //out.write("Penetration: "+ Main.penetrationPercent+"\n");
+		    out.write("<html>");
+		    out.write("<body>");
+		    
+		    //*************************************
+		    out.write("<h1>Summary of run:  </h1>");
+		  //*************************************
+		  //*************************************
+		    out.write("<p>"); //add where read in ferom.. what file..?
+		  //*************************************
+		    out.write("</br>");
+		    out.write("GAS </br>");
+		   
+		    out.write("Joules Per liter: "+ gasJoulesPerLiter +"</br>");
+		    out.write("Price Per liter: "+ gasPricePerLiter +"</br>");
+		    out.write("Emission Per liter: "+ emissionPerLiterEngine +"</br>");
+		    
+		  //*************************************
+		    out.write("</br>");
+		    out.write("CARS</br>");
+		    out.write("\t PHEV \t EV</br>");
+		    out.write("batterySize: \t"+ batterySizeEV +"\t batterySizePHEV </br>");
+		    out.write("batteryMIN: \t"+ batteryMinEV +"\t batteryMinPHEV </br>");
+		    out.write("batteryMAX: \t"+ batteryMaxEV +"\t batteryMaxPHEV </br>");
+		
+		  //*************************************
+		    out.write("</br>");
+		    out.write("COMPENSATION V2G</br>");
+		    out.write("compensationPerKWHRegulationUp: "+ compensationPerKWHRegulationUp +"</br>");
+		    out.write("compensationPerKWHRegulationDown: "+ compensationPerKWHRegulationDown +"</br>");
+		    
+		  //*************************************
+		    out.write("Minimum charging length: "+ MINCHARGINGLENGTH +"</br>");
+		    
+		    out.write("</p>");
+		    
+		  //*************************************
+		  //*************************************
+			
+		    String pic= outputPath +"connectivityOfAgentsOverDay.png";
+		    
+		    out.write("");
+		    out.write("<a href='"+pic+"' > 	Picture </a>");
+		    out.write("<img src='"+pic+"' alt='connectivity' width='80%'");
+		    //<img src="pulpit.jpg" alt="Pulpit rock" width="304" height="228" /> 
+		  //*************************************
+		    out.write("</body>");
+		    out.write("</html>");   
+		    
+		    
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){}//Catch exception if any
+	}
 	
 	
 }

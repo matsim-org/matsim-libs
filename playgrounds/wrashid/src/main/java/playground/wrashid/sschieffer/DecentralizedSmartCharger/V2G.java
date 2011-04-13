@@ -51,8 +51,8 @@ public class V2G {
 			}
 		}
 		
-		if(currentSOC<batterySize){
-			// regulation !!!
+		
+			//try reschedule
 			Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
 					agentParkingDrivingSchedule, 
 					electricSourceInterval.getEndTime());
@@ -98,12 +98,7 @@ public class V2G {
 						electricSourceInterval);
 				
 			}
-		}else{
-			// no regulation
-			attributeSuperfluousVehicleLoadsToGridIfPossible(agentId, 
-					agentParkingDrivingSchedule, 
-					electricSourceInterval);
-		}
+		
 	}
 	
 	
@@ -403,7 +398,7 @@ public class V2G {
 						}
 					}
 					
-					if(currentSOC<batterySize){
+					
 						// regulation !!!
 						Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
 								agentParkingDrivingSchedule, 
@@ -445,7 +440,7 @@ public class V2G {
 							// no regulation
 							
 						}
-					}
+					
 					
 				}
 				
@@ -462,6 +457,8 @@ public class V2G {
 	
 	
 	/**
+	 * goes through the part of agents schedule which is during  currentStochasticLoadInterval,
+	 * a schedule will be returned of all overlapping segments that are at the specified hub 
 	 * 
 	 * @param hub
 	 * @param agentParkingDrivingSchedule
@@ -528,26 +525,26 @@ public class V2G {
 			double costReschedule) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
 		
 		
-		System.out.println();
-		answerScheduleAfterElectricSourceInterval.printSchedule();
-		
+//		System.out.println();
+//		answerScheduleAfterElectricSourceInterval.printSchedule();
+//		
 		mySmartCharger.getAllAgentChargingSchedules().put(agentId, 
 				mySmartCharger.myChargingSlotDistributor.distribute(agentId, answerScheduleAfterElectricSourceInterval));
 		
 		
 		
-		System.out.println();
-		answerScheduleAfterElectricSourceInterval.printSchedule();
+//		System.out.println();
+//		answerScheduleAfterElectricSourceInterval.printSchedule();
 		//merge with old schedule
 		Schedule rescheduledFirstHalf= cutScheduleAtTime(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
-		System.out.println();
-		rescheduledFirstHalf.printSchedule();
+//		System.out.println();
+//		rescheduledFirstHalf.printSchedule();
 		
 		Schedule rescheduledPart= cutScheduleAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
 		rescheduledPart=cutScheduleAtTimeSecondHalf(rescheduledPart, electricSourceInterval.getStartTime());
 		
-		System.out.println();
-		rescheduledPart.printSchedule();
+//		System.out.println();
+//		rescheduledPart.printSchedule();
 		
 		rescheduledFirstHalf.mergeSchedules(rescheduledPart);
 		rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
@@ -648,6 +645,10 @@ public class V2G {
 			cutScheduleAtTimeSecondHalf(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
 		
 		agentDuringLoad= cutScheduleAtTime(agentDuringLoad, electricSourceInterval.getEndTime());
+		System.out.println("agentDuringLoad:");
+		agentDuringLoad.printSchedule();
+		System.out.println("electricSourceInterval:");
+		electricSourceInterval.printInterval();
 		
 		
 		for(int i=0; i<agentDuringLoad.getNumberOfEntries();i++){
@@ -665,10 +666,10 @@ public class V2G {
 					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
 							((ParkingInterval)agentInterval).getLocation());
 					
-//					System.out.println("hubSchedule before:");
+					System.out.println("hubSchedule before:");
 					
 					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(hubId);
-//					hubSchedule.printSchedule();
+					hubSchedule.printSchedule();
 //					
 					if (hubSchedule.overlapWithTimeInterval(overlapAgentAndElectricSource)){
 						//if there is overlap

@@ -76,7 +76,15 @@ public class LPPHEV {
 		System.out.println("LP PHEV for Agent: "+ id.toString()); 
 		
 		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
-		solver.solve();
+		int status = solver.solve();
+		
+        if(status!=0){
+        	String text = solver.getStatustext(status);
+        	System.out.println("Status text: "+ text); 
+        	// status=0--> OPTIMAL
+        	// 2 --> INFEASIBLE
+        	return null; 
+        }
 		
 		try {
 			
@@ -150,7 +158,7 @@ public class LPPHEV {
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
 		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
 		*/
-		visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
+		//visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
 		
 		solver.deleteLp();
 		
@@ -539,7 +547,13 @@ public class LPPHEV {
 					status=false;
 					lastFalseJoule=statusJoule;
 					
-					ParkingInterval precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);	
+					ParkingInterval precedingP;//only need it for charging speed
+					if(i>0){
+						precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);	
+					}else{
+						//if first entry.. then previous parking interval must have been last one on previous day
+						precedingP= (ParkingInterval)schedule.timesInSchedule.get(schedule.getNumberOfEntries()-1);	
+					}
 					
 					updatePrecedingParkingAndDrivingInterval(schedule, i, energyFromEngine, thisD, precedingP);		 
 					 
@@ -857,7 +871,7 @@ public class LPPHEV {
  	            )
  	        );
      	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "SOC_PHEV_from_"+type+"Agent"+personId.toString()+".png") , chart, 800, 600);
+     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "SOC_of_"+type+"afterLPPHEV_Agent"+personId.toString()+".png") , chart, 800, 600);
 	  	
 	}
 		

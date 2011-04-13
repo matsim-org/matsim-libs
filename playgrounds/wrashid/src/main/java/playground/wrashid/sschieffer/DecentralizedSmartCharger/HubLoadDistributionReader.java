@@ -355,7 +355,7 @@ public class HubLoadDistributionReader {
 	
 	
 	
-	public void calculateConnectivityDistributionsAtHubsInHubLoadReader() throws OptimizationException, IOException{
+	public void calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader() throws OptimizationException, IOException{
 		
 		XYSeriesCollection connectivity= new XYSeriesCollection();
 		
@@ -390,7 +390,7 @@ public class HubLoadDistributionReader {
                         BasicStroke.CAP_ROUND, //int cap
                         BasicStroke.JOIN_ROUND, //int join
                         1.0f, //float miterlimit
-                        new float[] {i*2.0f, i*0.5f}, //float[] dash
+                        new float[] {i*4.0f, i*1f}, //float[] dash
                         0.0f //float dash_phase
                     )
                 );
@@ -423,7 +423,6 @@ public class HubLoadDistributionReader {
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.getValue(i);
 			
 			Schedule sPHEV= new Schedule();
-			
 			for(int j=0; j<s.getNumberOfEntries(); j++){
 				
 				LoadDistributionInterval currentDeterministicLoadInterval= (LoadDistributionInterval)deterministicSchedule.timesInSchedule.get(j);
@@ -440,8 +439,8 @@ public class HubLoadDistributionReader {
 				ArrayList<ChargingInterval> badIntervals= new ArrayList<ChargingInterval> ();
 				
 				checkRoot(currentDeterministicLoadInterval, f,  badIntervals);
-				System.out.println("badIntervals:");
-				printArrayList(badIntervals);
+//				System.out.println("badIntervals:");
+//				printArrayList(badIntervals);
 				
 				
 				if(badIntervals.size()==0){
@@ -508,7 +507,7 @@ public class HubLoadDistributionReader {
 			}
 			
 			sPHEV.sort();
-			sPHEV.printSchedule();
+//			sPHEV.printSchedule();
 					
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
 		}
@@ -745,7 +744,7 @@ public class HubLoadDistributionReader {
 			
 			
 			XYSeries hubDeterministicPHEV= new XYSeries("hub"+i.toString()+"DeterministicPHEV");
-			deterministicHubLoadDistributionPHEVAdjusted.getValue(i).printSchedule();
+			//deterministicHubLoadDistributionPHEVAdjusted.getValue(i).printSchedule();
 			
 			for(int j=0; j<deterministicHubLoadDistributionPHEVAdjusted.getValue(i).getNumberOfEntries(); j++){
 				
