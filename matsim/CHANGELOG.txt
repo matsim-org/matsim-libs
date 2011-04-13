@@ -24,7 +24,7 @@ Changes:
   - transit router now exposes additional attributes for configuration to config-file (r14860)
 
 - BugFixes:
-  - The link to link routing feature could not be enabled via controler config module in xml config. Fixed (r15000)
+  - The link to link routing feature could not be enabled via controler config module in xml config. Fixed (r15002)
 
 - Changes for developers:
 
