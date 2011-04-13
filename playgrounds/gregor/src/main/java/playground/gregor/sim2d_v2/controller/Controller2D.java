@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -28,6 +30,7 @@ import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
+import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
 public class Controller2D extends Controler {
 
@@ -41,7 +44,7 @@ public class Controller2D extends Controler {
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime(9*3600 + 5* 30);
-//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 
 	@Override
@@ -57,12 +60,12 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-//			 this.vis = new PedVisPeekABot(1);
-//			 Link l = this.network.getLinks().get(new IdImpl(0));
-//			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-//			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-//			 this.vis.drawNetwork(network);
-//			 this.events.addHandler(this.vis);
+			 this.vis = new PedVisPeekABot(1);
+			 Link l = this.network.getLinks().get(new IdImpl(0));
+			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+			 this.vis.drawNetwork(network);
+			 this.events.addHandler(this.vis);
 		}
 
 	}

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.gisdebug;
+package playground.gregor.sim2d_v2.helper.gisdebug;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.helper;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,14 +28,14 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v2.io.EnvironmentDistancesWriter;
+import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -85,7 +85,6 @@ public class EnvironmentDistanceVectorsGenerator {
 							this.distancesQuadTree.put(x, y, ed);
 						} catch (Exception e) {
 							e.printStackTrace();
-							// GisDebugger.dump("/home/laemmel/devel/dfg/tmp/staticForcesDbg.shp");
 							throw new RuntimeException(e);
 						}
 
@@ -96,7 +95,6 @@ public class EnvironmentDistanceVectorsGenerator {
 
 		}
 
-		// GisDebugger.dump("/home/laemmel/devel/dfg/tmp/distances.shp");
 	}
 
 	/**
@@ -130,24 +128,8 @@ public class EnvironmentDistanceVectorsGenerator {
 			coords[2] = c2;
 			coords[3] = location;
 
-			int old = ed.getObjects().size();
 			calcAndAddSectorObject(ed, coords);
 
-			// if (ed.getObjects().size() > old) {
-			//
-			// Coordinate[] cooo = new Coordinate[] { ed.getLocation(),
-			// ed.getObjects().get(ed.getObjects().size() - 1),
-			// ed.getLocation(), ed.getLocation() };
-			// LinearRing lr = this.geofac.createLinearRing(cooo);
-			// Polygon ppp = this.geofac.createPolygon(lr, null);
-			// GisDebugger.addGeometry(ppp);
-			// }
-
-			// Coordinate[] sec = new Coordinate[] { ed.getLocation(), c1, c2,
-			// ed.getLocation() };
-			// LinearRing lr0 = this.geofac.createLinearRing(sec);
-			// Polygon ppp0 = this.geofac.createPolygon(lr0, null);
-			// GisDebugger.addGeometry(ppp0);
 
 		}
 
@@ -160,11 +142,6 @@ public class EnvironmentDistanceVectorsGenerator {
 					minC = c;
 				}
 			}
-			Coordinate[] cooo = new Coordinate[] { ed.getLocation(), minC, ed.getLocation(), ed.getLocation() };
-			LinearRing lr = this.geofac.createLinearRing(cooo);
-			Polygon ppp = this.geofac.createPolygon(lr, null);
-			GisDebugger.addGeometry(ppp);
-
 		}
 
 		return ed;
@@ -204,14 +181,14 @@ public class EnvironmentDistanceVectorsGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String shape = "/home/laemmel/devel/dfg/data/testPolygons.shp";
+		String shape = "/Users/laemmel/teach/simpleEnvMultiPolygon.shp";
 		Iterator<Feature> fs = ShapeFileReader.readDataFile(shape).getFeatures().iterator();
 		while (fs.hasNext()) {
 			Feature ft = fs.next();
 			Geometry geo = ft.getDefaultGeometry();
 			QuadTree<EnvironmentDistances> tree = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo).loadDistanceVectors();
 			System.out.println(tree.size());
-			new EnvironmentDistancesWriter().write("/home/laemmel/devel/dfg/data/envDistances.xml.gz", tree);
+			new EnvironmentDistancesWriter().write("/Users/laemmel/teach/simpleEnvDistances.xml.gz", tree);
 		}
 	}
 

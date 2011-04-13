@@ -55,11 +55,11 @@ import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.network.NetworkLoader;
 import playground.gregor.sim2d_v2.network.NetworkLoaderImpl;
 import playground.gregor.sim2d_v2.network.NetworkLoaderImplII;
-import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
 
 import com.vividsolutions.jts.geom.Geometry;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+
+import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
