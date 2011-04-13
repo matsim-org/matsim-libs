@@ -30,7 +30,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -102,28 +101,13 @@ public class PathForceModule implements ForceModule {
 
 		double deltaX = (fromNode.x - agent.getPosition().x) + drivingDir.x * scale;
 		double deltaY = (fromNode.y - agent.getPosition().y) + drivingDir.y * scale;
-		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("0")) {
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + deltaX, agent.getPosition().y + deltaY, 0), 1.f, 0.f, 0.f, 0);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-			System.out.println("pathDist=" + pathDist + " Math.sqrt..."+ Math.sqrt(deltaX*deltaX + deltaY*deltaY));
-			
-		}
-//		double driveX = deltaX * agent.getDesiredVelocity();
-//		double driveY = deltaY * agent.getDesiredVelocity();
-//		
-//		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/Sim2DConfig.tau;
-//		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/Sim2DConfig.tau;
-//		
-//		if (pathDist < Sim2DConfig.Bpath/4) {
-//			return;
-//		}
 		
 		double f = Math.exp(pathDist / Sim2DConfig.Bpath);
 		deltaX *= f;// / pathDist;
 		deltaY *= f;// / pathDist;
 
-		deltaX = Sim2DConfig.Apath * deltaX/ Agent2D.AGENT_WEIGHT;// * Sim2DConfig.TIME_STEP_SIZE;
-		deltaY = Sim2DConfig.Apath * deltaY/ Agent2D.AGENT_WEIGHT;// * Sim2DConfig.TIME_STEP_SIZE;
+		deltaX = Sim2DConfig.Apath * deltaX/ Agent2D.AGENT_WEIGHT;
+		deltaY = Sim2DConfig.Apath * deltaY/ Agent2D.AGENT_WEIGHT;
 
 
 		agent.getForce().incrementX(deltaX);

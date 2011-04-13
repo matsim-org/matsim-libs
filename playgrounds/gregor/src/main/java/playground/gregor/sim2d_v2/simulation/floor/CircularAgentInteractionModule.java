@@ -51,7 +51,6 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	private static final double kappa = 2.4 * 100000;
 	
 	
-//	protected final Map<Agent2D, List<Coordinate>> neighbors = new HashMap<Agent2D, List<Coordinate>>();
 
 	/**
 	 * @param floor
@@ -71,8 +70,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	 */
 	@Override
 	public void run(Agent2D agent) {
-//		List<Coordinate> neighbors = this.neighbors.get(agent);
-		updateForces(agent);//, neighbors);
+		updateForces(agent);
 	}
 
 	/**
@@ -88,9 +86,9 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 		double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
 		double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
+		@SuppressWarnings("unchecked")
 		List<Agent2D> l = this.coordsQuad.query(e);
 		
-		int otherId = 10;
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
@@ -118,29 +116,9 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			fx += xc;
 			fy += yc;
 
-//			if (Sim2DConfig.DEBUG) {
-//				if (agent.getId().toString().equals("0")) {
-//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), other.getPosition(), 0.2f, 0.2f, 0.2f, otherId++);
-//				this.floor.getSim2D().getEventsManager().processEvent(arrow);
-////				
-//			
-////				Coordinate cc = new Coordinate(agent.getPosition().x +  tanX,agent.getPosition().y + tanY,0);
-////				ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), cc, .2f, .2f, .2f, otherId++);
-////				this.floor.getSim2D().getEventsManager().processEvent(arrow2);
-////				System.out.println(tanX + "   " + tanY);
-//				}
-//
-//			}
 
 		}
 
-//		fx /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
-//		fy /= Agent2D.AGENT_WEIGHT * Sim2DConfig.TIME_STEP_SIZE;
-
-//		if (Sim2DConfig.DEBUG) {
-//			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + fx, agent.getPosition().y + fy, 0), 0.5f,0.5f, 1.f, 3);
-//			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-//		}
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
@@ -166,25 +144,6 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			Envelope e = new Envelope(agent.getPosition());
 			this.coordsQuad.insert(e, agent);
 		}
-
-//		this.neighbors.clear();
-//
-//		for (Agent2D agent : this.floor.getAgents()) {
-//			double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
-//			double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
-//			double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
-//			double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
-//			Envelope e = new Envelope(minX, maxX, minY, maxY);
-//			List<Agent2D> l = this.coordsQuad.query(e);
-//			List<Coordinate> n = new ArrayList<Coordinate>();
-//			for (Agent2D a2 : l) {
-//				if (a2.equals(agent)) {
-//					continue;
-//				}
-//				n.add(a2.getPosition());
-//			}
-//			this.neighbors.put(agent, n);
-//		}
 
 	}
 

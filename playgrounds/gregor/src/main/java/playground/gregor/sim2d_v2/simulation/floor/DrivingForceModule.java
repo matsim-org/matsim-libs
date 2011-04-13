@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -86,10 +85,6 @@ public class DrivingForceModule implements ForceModule {
 		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/Sim2DConfig.tau;
 		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/Sim2DConfig.tau;
 
-//		if (Sim2DConfig.DEBUG) {
-//			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + dx , agent.getPosition().y + dy , 0), 0.f, 1.f, 0.f, 1);
-//			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-//		}
 
 		agent.getForce().incrementX(dx);
 		agent.getForce().incrementY(dy);

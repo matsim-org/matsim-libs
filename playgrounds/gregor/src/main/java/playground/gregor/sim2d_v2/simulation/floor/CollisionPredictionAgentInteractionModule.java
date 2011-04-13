@@ -2,7 +2,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.List;
 
-import org.geotools.measure.Angle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -12,7 +11,6 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -21,7 +19,6 @@ DynamicForceModule {
 
 
 	private Floor floor;
-	private Scenario2DImpl scenario;
 
 
 	private final double quadUpdateInterval = 0.1;
@@ -37,7 +34,6 @@ DynamicForceModule {
 
 	public CollisionPredictionAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
-		this.scenario = scenario;
 	}
 
 	@Override
@@ -50,6 +46,7 @@ DynamicForceModule {
 		double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
 		double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
+		@SuppressWarnings("unchecked")
 		List<Agent2D> l = this.coordsQuad.query(e);
 
 		double t_i = getTi(l,agent);
@@ -58,11 +55,6 @@ DynamicForceModule {
 		if (t_i == Double.POSITIVE_INFINITY) {
 			return;
 		}
-		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("1")) {
-			System.out.println("=========");
-			System.out.println("t_i: " + t_i);
-		}
-		
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
 		double stopTime = v_i / t_i;
 		
@@ -86,9 +78,6 @@ DynamicForceModule {
 			
 		}
 		
-		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("1") && Math.abs(fx) > 0.5 ) {
-			System.out.println("======");
-		}
 		
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
@@ -109,13 +98,6 @@ DynamicForceModule {
 		v.x = dPrimeX_ij;
 		v.y = dPrimeY_ij;
 
-		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("1")) {
-			int o = Integer.parseInt(other.getPerson().getId().toString()) * 200;
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), new Coordinate(projectedX,projectedY,0), new Coordinate(projectedOtherX,projectedOtherY,0), 0.f,0.5f, 1.f, 50 + o);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-			int iii = 0;
-			iii++;
-		}
 		
 		return v;
 	}
@@ -157,16 +139,6 @@ DynamicForceModule {
 			return Double.POSITIVE_INFINITY;
 		}
 		ti /= relV;
-		if (Sim2DConfig.DEBUG && agent.getPerson().getId().toString().equals("1")) {
-			int o = Integer.parseInt(other.getPerson().getId().toString()) * 100;
-			ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), other.getPosition(), ls.getEndPoint().getCoordinate(), 0.99f,0.5f, 0.f, 100 + o);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow);
-			ArrowEvent arrow2 = new ArrowEvent(agent.getPerson().getId(),  agent.getPosition(), op.closestPoints()[0], 0.5f,0.99f, 0.f, 101 + o);
-			this.floor.getSim2D().getEventsManager().processEvent(arrow2);
-			phi = phi * (360/(Math.PI*2));
-			System.out.println("other: " + other.getPerson().getId() + " dist:" + op.distance() + " time: " + ti + " phi:" + phi);
-			System.out.println("===========");
-		}
 		return ti;
 
 	}

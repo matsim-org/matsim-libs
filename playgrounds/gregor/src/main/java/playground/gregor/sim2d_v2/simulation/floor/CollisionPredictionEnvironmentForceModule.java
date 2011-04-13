@@ -12,7 +12,6 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 	
-	private Floor floor;
 	private Scenario2DImpl sc;
 	private StaticForceField sff;
 	
@@ -27,7 +26,6 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	 * @param scenario
 	 */
 	public CollisionPredictionEnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
-		this.floor = floor;
 		this.sc = scenario;
 		this.sff = this.sc.getStaticForceField();
 	}

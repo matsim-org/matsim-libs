@@ -33,13 +33,6 @@ public class StaticForceField {
 		this.forceQuad = ret;
 	}
 
-	// /**
-	// * @param distancesQuadTree
-	// */
-	// public StaticForceField(QuadTree<DistanceVector> distancesQuadTree) {
-	// // TODO Auto-generated constructor stub
-	// }
-
 	public ForceLocation getForceLocationWithin(Coordinate location, double range) {
 		if (this.forceQuad.get(location.x, location.y, range).size() > 0) {
 			return this.forceQuad.get(location.x, location.y);
@@ -55,7 +48,4 @@ public class StaticForceField {
 		return this.forceQuad.values();
 	}
 
-	// public void addForce(ForceLocation force) {
-	// this.forceQuad.put(force.getLocation().x, force.getYCoord(), force);
-	// }
 }

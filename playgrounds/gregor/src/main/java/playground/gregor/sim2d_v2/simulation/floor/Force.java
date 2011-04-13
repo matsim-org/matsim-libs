@@ -33,10 +33,6 @@ public class Force {
 	private double vx = 0;
 	private double vy = 0;
 
-//	private double oldFx;
-//	private double oldFy;
-
-	// double fz;
 
 	/* package */double getXComponent() {
 		return this.fx;
@@ -62,13 +58,6 @@ public class Force {
 		this.fy += incrfy;
 	}
 
-//	/* package */double getOldXComponent() {
-//		return this.oldFx;
-//	}
-//
-//	/* package */double getOldYComponent() {
-//		return this.oldFy;
-//	}
 
 	
 	public double getVx() {
