@@ -39,7 +39,7 @@
 						<exclude>**/*PerformanceTest.java</exclude>
 					</excludes>
 					<forkMode>once</forkMode>
-					<argLine>-Xmx200m -Djava.awt.headless=true</argLine>
+					<argLine>-Xmx300m -Djava.awt.headless=true</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
