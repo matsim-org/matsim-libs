@@ -95,22 +95,28 @@ public class Route2GoogleMap extends X2GoogleMap {
 		String endMarkers = createLinkCenterMarker(endLink, "D");
 
 		List<Coord> coords = new ArrayList<Coord>();
-		coords.add(startLink.getFromNode().getCoord());
-		coords.add(startLink.getToNode().getCoord());
 
 		String transparency = "";
 
 		if (route instanceof NetworkRoute) {
+			coords.add(startLink.getFromNode().getCoord());
+			if (!startLink.equals(endLink)) {
+				coords.add(startLink.getToNode().getCoord());
+			}
+
 			List<Id> linkIds = ((NetworkRoute) route).getLinkIds();
 			for (Id linkId : linkIds) {
 				coords.add(links.get(linkId).getToNode().getCoord());
 			}
+			coords.add(endLink.getToNode().getCoord());
+
 			transparency = NETWORK_ROUTE_TRANSPARENCY;
 		} else if (route instanceof GenericRoute) {
+			coords.add(startLink.getCoord());
+			coords.add(endLink.getCoord());
+
 			transparency = GENERIC_ROUTE_TRANSPARENCY;
 		}
-
-		coords.add(endLink.getToNode().getCoord());
 
 		String path = this.createPath(coords, this.pathColor + transparency,
 				this.weight);
@@ -157,14 +163,21 @@ public class Route2GoogleMap extends X2GoogleMap {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				List<PlanElement> pes = plan.getPlanElements();
+				int cnt = 0;
 				for (PlanElement pe : pes) {
 					if (pe instanceof Leg) {
-						System.out
-								.println(new Route2GoogleMap(
-										TransformationFactory.ATLANTIS,
-										network, ((Leg) pe).getRoute())
-										.getRoutePath4googleMap());
+						Route route = ((Leg) pe).getRoute();
+						if (route != null) {
+							System.out.println(new Route2GoogleMap(
+									TransformationFactory.ATLANTIS, network,
+									route).getRoutePath4googleMap());
+						} else {
+							System.err.println("person Id :\t" + person.getId()
+									+ "leg index :\t" + cnt + "Route==null");
+						}
+						cnt++;
 					}
+
 				}
 			}
 		}

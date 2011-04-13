@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
@@ -51,6 +52,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.yu.utils.io.SimpleWriter;
+
 /**
  * @author yu
  * 
@@ -72,6 +75,13 @@ public class Routes2GoogleMap extends X2GoogleMap {
 	 * @return if routes in List have the same OD pair
 	 */
 	protected boolean haveSameODPair() {
+		if (routes.size() == 1) {
+			return true;
+		}
+		if (routes.size() == 0) {
+			throw new RuntimeException(
+					"There is NOT routes in Collection<Route>");
+		}
 		Iterator<Route> it = routes.iterator();
 		Route route = it.next();
 		Id startLinkId = route.getStartLinkId(), endLinkId = route
@@ -113,25 +123,31 @@ public class Routes2GoogleMap extends X2GoogleMap {
 				Route tmpRoute = routeIt.next();
 
 				Link tmpStartLink = links.get(tmpRoute.getStartLinkId());
+				Link tmpEndLink = links.get(tmpRoute.getEndLinkId());
 
 				List<Coord> coords = new ArrayList<Coord>();
-				coords.add(tmpStartLink.getFromNode().getCoord());
-				coords.add(tmpStartLink.getToNode().getCoord());
-
 				String transparency = "";
 
 				if (tmpRoute instanceof NetworkRoute) {
+					coords.add(tmpStartLink.getFromNode().getCoord());
+					if (!tmpStartLink.equals(tmpEndLink)) {
+						coords.add(tmpStartLink.getToNode().getCoord());
+					}
+
 					List<Id> linkIds = ((NetworkRoute) tmpRoute).getLinkIds();
 					for (Id linkId : linkIds) {
 						coords.add(links.get(linkId).getToNode().getCoord());
 					}
+
+					coords.add(tmpEndLink.getToNode().getCoord());
+
 					transparency = Route2GoogleMap.NETWORK_ROUTE_TRANSPARENCY;
 				} else if (tmpRoute instanceof GenericRoute) {
+					coords.add(startLink.getCoord());
+					coords.add(endLink.getCoord());
+
 					transparency = Route2GoogleMap.GENERIC_ROUTE_TRANSPARENCY;
 				}
-
-				Link tmpEndLink = links.get(tmpRoute.getEndLinkId());
-				coords.add(tmpEndLink.getToNode().getCoord());
 
 				Random random = MatsimRandom.getRandom();
 				Integer.toHexString(random.nextInt(256));
@@ -155,54 +171,87 @@ public class Routes2GoogleMap extends X2GoogleMap {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename = "../../matsim/examples/equil/network.xml";
-		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
-		final String outputPlansFilenameBase = "../";
+		final String netFilename, plansFilename, outputPlansFilename;
+		final double outputSample;
+		if (args.length == 4) {
+			netFilename = args[0];
+			plansFilename = args[1];
+			outputPlansFilename = args[2];
+			outputSample = Double.parseDouble(args[3]);
+		} else {
+			netFilename = "../../matsim/examples/equil/network.xml";
+			plansFilename = "../../matsim/examples/equil/plans100.xml";
+			outputPlansFilename = "./tmp.log";
+			outputSample = 1d;
+		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
+		SimpleWriter writer = new SimpleWriter(outputPlansFilename);
+		writer.writeln("person ID\tleg index\tgoogle maps url");
+		writer.flush();
+
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
 
+		Random random = MatsimRandom.getRandom();
 		for (Person person : population.getPersons().values()) {
-			List<? extends Plan> plans = person.getPlans();
-			int size = plans.get(0).getPlanElements().size();// rough
-																// temporarily
-			boolean sameSize = true;
-			for (int i = 1; i < plans.size(); i++) {
-				if (size != plans.get(i).getPlanElements().size()) {
-					sameSize = false;
-					break;
+			if (random.nextDouble() < outputSample) {
+				List<? extends Plan> plans = person.getPlans();
+				int size = plans.get(0).getPlanElements().size();// rough
+																	// temporarily
+				boolean sameSize = true;
+				for (int i = 1; i < plans.size(); i++) {
+					if (size != plans.get(i).getPlanElements().size()) {
+						sameSize = false;
+						break;
+					}
 				}
-			}
 
-			if (sameSize) {
-				Map<Integer, List<Route>> routeMap = new HashMap<Integer, List<Route>>();
-				for (Plan plan : plans) {
+				if (sameSize) {
+					Map<Integer, List<Route>> routeMap = new HashMap<Integer, List<Route>>();
+					for (Plan plan : plans) {
 
-					List<PlanElement> pes = plan.getPlanElements();
-					for (PlanElement pe : pes) {
-						int cnt = 0;
-						if (pe instanceof Leg) {
-							List<Route> routes = routeMap.get(cnt);
-							if (routes == null) {
-								routes = new ArrayList<Route>();
-								routeMap.put(cnt, routes);
+						List<PlanElement> pes = plan.getPlanElements();
+						int cnt = 0;/* caution: position of cnt */
+						for (PlanElement pe : pes) {
+							if (pe instanceof Leg) {
+								List<Route> routes = routeMap.get(cnt);
+								if (routes == null) {
+									routes = new ArrayList<Route>();
+									routeMap.put(cnt, routes);
+								}
+
+								Route route = ((Leg) pe).getRoute();
+								if (route != null) {
+									routes.add(route);
+								} else {
+									System.err.println("person Id :\t"
+											+ person.getId() + "leg index :\t"
+											+ cnt + "Route==null");
+								}
+								cnt++;
 							}
-							routes.add(((Leg) pe).getRoute());
-							cnt++;
+						}
+						for (Entry<Integer, List<Route>> routesEntry : routeMap
+								.entrySet()) {
+							writer.writeln(person.getId()
+									+ "\t"
+									+ routesEntry.getKey()
+									+ "\t"
+									+ new Routes2GoogleMap(
+											TransformationFactory.ATLANTIS,
+											network, routesEntry.getValue())
+											.getRoutesPath4googleMap());
+							writer.flush();
 						}
 					}
 				}
-				for (List<Route> routeList : routeMap.values()) {
-					System.out.println(new Routes2GoogleMap(
-							TransformationFactory.ATLANTIS, network, routeList)
-							.getRoutesPath4googleMap());
-				}
 			}
 		}
+		writer.close();
 	}
 }
