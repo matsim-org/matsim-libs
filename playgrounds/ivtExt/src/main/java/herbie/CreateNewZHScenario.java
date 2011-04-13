@@ -169,7 +169,9 @@ public class CreateNewZHScenario {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
-						if (trees.get(act.getType()) == null) trees.put(act.getType(), this.createActivitiesTree(act.getType()));
+						
+						Utils util = new Utils();
+						if (trees.get(act.getType()) == null) trees.put(act.getType(), util.createActivitiesTree(act.getType(), this.scenario));
 						QuadTree<ActivityFacility> facQuadTree = trees.get(act.getType());
 						
 						// get closest facility.
@@ -221,38 +223,5 @@ public class CreateNewZHScenario {
 	
 	private void write() {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
-	}
-	
-	private QuadTree<ActivityFacility> createActivitiesTree(String activityType) {
-		QuadTree<ActivityFacility> facQuadTree = this.builFacQuadTree(
-				activityType, this.scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));			
-		return facQuadTree;
-	}
-	
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
-		Gbl.startMeasurement();
-		log.info(" building " + type + " facility quad tree");
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
-		}
-		log.info("Quadtree size: " + quadtree.size());
-		return quadtree;
 	}
 }
