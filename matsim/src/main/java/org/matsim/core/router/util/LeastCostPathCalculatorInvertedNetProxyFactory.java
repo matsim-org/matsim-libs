@@ -54,7 +54,8 @@ public class LeastCostPathCalculatorInvertedNetProxyFactory implements
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelCost travelCosts, TravelTime travelTimes) {
 		if (!(travelTimes instanceof LinkToLinkTravelTime)){
-			throw new IllegalStateException("The TravelTimeCalculator must be an instance of LinkToLinkTravelTime" +
+			throw new IllegalStateException("The TravelTime instance must be an instance of LinkToLinkTravelTime" +
+					" but is an instance of " + travelTimes.getClass() + 
 					" if link to link travel times should be used for routing. Check the appropriate config option in the" +
 					" controler config module!");
 		}

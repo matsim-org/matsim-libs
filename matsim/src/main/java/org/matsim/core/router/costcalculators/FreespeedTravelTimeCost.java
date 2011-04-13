@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
@@ -41,7 +42,7 @@ import org.matsim.core.router.util.TravelMinCost;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime {
+public class FreespeedTravelTimeCost implements PersonalizableTravelCost, TravelMinCost, PersonalizableTravelTime, LinkToLinkTravelTime {
 	
 	private static final Logger log = Logger.getLogger(FreespeedTravelTimeCost.class);
 
@@ -102,6 +103,14 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 	@Override
 	public void setPerson(Person person) {
 		// This cost function doesn't change with persons.
+	}
+
+	/**
+	 * If travelling freespeed the turning move travel time is not relevant
+	 */
+	@Override
+	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
+		return this.getLinkTravelTime(fromLink, time);
 	}
 	
 }
