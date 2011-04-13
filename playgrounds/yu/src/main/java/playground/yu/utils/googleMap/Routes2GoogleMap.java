@@ -173,7 +173,7 @@ public class Routes2GoogleMap extends X2GoogleMap {
 	public static void main(String[] args) {
 		final String fromSystem, netFilename, plansFilename, outputPlansFilename;
 		final double outputSample;
-		if (args.length == 4) {
+		if (args.length == 5) {
 			fromSystem = args[0];
 			netFilename = args[1];
 			plansFilename = args[2];
