@@ -24,18 +24,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.AbstractRoute;
 
 /**
  * @author thibautd
  */
 public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable {
+	private static final Logger log =
+		Logger.getLogger(JointLeg.class);
+
 	// must extend LegImpl, as there exist parts of the code (mobsim...) where
 	// legs are casted to LegImpl.
 	//private Leg legDelegate;
@@ -47,7 +54,12 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	private static long currentLegId = 0;
 	private final IdLeg legId;
 
-	private boolean isDriver = false;
+	/**
+	 * to indicate when it is safe to copy the route of the driver leg from
+	 * passenger legs.
+	 */
+	//TODO: find a more parcimonious way of achieving this.
+	private boolean routeToCopy = false;
 	
 	private final List<IdLeg> linkedLegsIds = new ArrayList<IdLeg>();
 	private JointPlan jointPlan = null;
@@ -90,28 +102,80 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		}
 	}
 
+	/**
+	 * "Almost" a copy cosntructor: takes all joint-trip related from a joint
+	 * leg, and all other information (mode, route, etc.) from an individual
+	 * leg. 
+	 * Particularly, the new leg will have the same id as the old one.
+	 */
 	public JointLeg(LegImpl leg, JointLeg jointLeg) {
 		super(leg);
 		this.legId = jointLeg.getId();
 		constructFromJointLeg(jointLeg);
 	}
 
-	//TODO
-	/**
-	 * Creates a shared JointLeg and sets the "replacement" individual leg.
-	 */
-	//public JointLeg() {
-	//}
-
 	private void constructFromJointLeg(JointLeg leg) {
 		this.linkedLegsIds.addAll(leg.getLinkedElementsIds());
-		this.isDriver = leg.getIsDriver();
+		//this.isDriver = leg.getIsDriver();
 		//this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
 		this.person = leg.getPerson();
 	}
 
 	private IdLeg createId() {
 		return new IdLeg(currentLegId++);
+	}
+
+	/*
+	 * ========================================================================
+	 * Overriden LegImpl methods (and related helper methods)
+	 * ========================================================================
+	 */
+	/**
+	 * Returns the associated route.
+	 * In the case of a passenger leg, the route is created at the first call of
+	 * this method, by copying the driver's route.
+	 * <u>This requires the route to be set to null initially for passenger legs,
+	 * as well as the "routeToCopy" method to be called.</u>
+	 * . If the route is not null or the method "routeToCopy" as not been called,
+	 * the route will not be changed (this may be wanted: for example, the joint
+	 * replanning module already creates consistent routes).
+	 */
+	@Override
+	public Route getRoute() {
+		if ( (this.getJoint()) && 
+				(!this.getMode().equals(TransportMode.car)) &&
+				(super.getRoute()==null) &&
+				this.routeToCopy) {
+			//Passenger leg with no route: create it
+			Route route=null;
+
+			for (JointLeg linkedLeg : this.getLinkedElements().values()) {
+				if (linkedLeg.getIsDriver()) {
+					route = linkedLeg.getRoute();
+					break;
+				}
+			}
+
+			if (route==null) {
+				throw new RuntimeException("Driver leg not found");
+			}
+
+			try {
+				route = ((AbstractRoute) route).clone();
+				log.debug("Driver leg has been cloned by passenger leg");
+			} catch (ClassCastException e) {
+				throw new RuntimeException("JointLeg can currently handle only"+
+						" AbstractRoute driver routes.");
+			}
+
+			super.setRoute(route);
+			return route;
+		}
+		return super.getRoute();
+	}
+
+	public void routeToCopy() {
+		this.routeToCopy = true;
 	}
 
 	/*
@@ -122,7 +186,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	/**
 	 * Only <u>shared</u> rides are considered as joint (access to PU and return
-	 * from DO are part of a Joint Episode, but are not joint).
+	 * from DO are part of a Joint Episode, but are <u>not</u> joint).
 	 */
 	@Override
 	public boolean getJoint() {
@@ -234,22 +298,6 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * =========================================================================
 	 */
 
-	///**
-	// * For shared rides, returns a default individual leg.
-	// * Used in the optimisation, to allow quick affectation/desaffectation of
-	// * shared rides.
-	// * All trips associated to a shared ride (Act-PU, PU-DO, DO-Act) should return
-	// * the same leg.
-	// * @todo: make compatible with sequence optimisation
-	// */
-	//public JointLeg getAssociatedIndividualLeg() {
-	//	return this.associatedIndividualLeg;
-	//}
-
-	//public void setAssociatedIndividualLeg(JointLeg leg) {
-	//	this.associatedIndividualLeg = leg;
-	//}
-
 	public boolean getIsDriver() {
 		//return this.isDriver;
 		return this.getJoint() && this.getMode().equals(TransportMode.car);
@@ -257,7 +305,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	@Deprecated
 	public void setIsDriver(boolean isDriver) {
-		this.isDriver = isDriver;
+		//log.warn("deprecated method JointLeg.setIsDriver called. This method "+
+		//		"does not do anything");
 	}
 }
 
