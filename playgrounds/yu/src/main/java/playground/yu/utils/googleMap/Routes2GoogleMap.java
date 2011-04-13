@@ -171,14 +171,16 @@ public class Routes2GoogleMap extends X2GoogleMap {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename, plansFilename, outputPlansFilename;
+		final String fromSystem, netFilename, plansFilename, outputPlansFilename;
 		final double outputSample;
 		if (args.length == 4) {
-			netFilename = args[0];
-			plansFilename = args[1];
-			outputPlansFilename = args[2];
-			outputSample = Double.parseDouble(args[3]);
+			fromSystem = args[0];
+			netFilename = args[1];
+			plansFilename = args[2];
+			outputPlansFilename = args[3];
+			outputSample = Double.parseDouble(args[4]);
 		} else {
+			fromSystem = TransformationFactory.ATLANTIS;
 			netFilename = "../../matsim/examples/equil/network.xml";
 			plansFilename = "../../matsim/examples/equil/plans100.xml";
 			outputPlansFilename = "./tmp.log";
@@ -242,9 +244,8 @@ public class Routes2GoogleMap extends X2GoogleMap {
 									+ "\t"
 									+ routesEntry.getKey()
 									+ "\t"
-									+ new Routes2GoogleMap(
-											TransformationFactory.ATLANTIS,
-											network, routesEntry.getValue())
+									+ new Routes2GoogleMap(fromSystem, network,
+											routesEntry.getValue())
 											.getRoutesPath4googleMap());
 							writer.flush();
 						}
