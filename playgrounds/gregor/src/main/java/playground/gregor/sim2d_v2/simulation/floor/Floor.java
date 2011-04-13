@@ -37,10 +37,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
@@ -74,9 +73,12 @@ public class Floor {
 	private final GeometryFactory geofac = new GeometryFactory();
 
 	private final boolean ms = false;
+	private double sim2DTimeStepSize;
+	private boolean emitXYZAzimuthEvents = true;
 
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
 		this.scenario = scenario;
+		this.sim2DTimeStepSize = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 		this.links = list;
 		this.sim2D = sim;
 
@@ -153,14 +155,14 @@ public class Floor {
 			Force f = agent.getForce();
 			Coordinate oldPos = agent.getPosition();
 
-			f.update();
+			f.update(this.sim2DTimeStepSize,agent.getWeight());
 			validateVelocity(f);
 
 			double vx = f.getVx();
 			double vy = f.getVy();
 
 
-			Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* Sim2DConfig.TIME_STEP_SIZE, oldPos.y + f.getVy()* Sim2DConfig.TIME_STEP_SIZE, 0);
+			Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* this.sim2DTimeStepSize, oldPos.y + f.getVy()* this.sim2DTimeStepSize, 0);
 
 			agent.setCurrentVelocity(vx,vy);
 
@@ -175,7 +177,7 @@ public class Floor {
 			double azimuth = getAzimuth(oldPos, newPos);
 			agent.moveToPostion(newPos);
 
-			if (Sim2DConfig.XYZEvents) {
+			if (this.emitXYZAzimuthEvents ) {
 				XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
 				getSim2D().getEventsManager().processEvent(e);
 			}

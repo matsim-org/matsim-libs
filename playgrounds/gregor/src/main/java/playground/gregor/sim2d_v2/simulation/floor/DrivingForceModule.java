@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -36,9 +36,11 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
  */
 public class DrivingForceModule implements ForceModule {
 
-	private final Scenario2DImpl scenario;
 	private final Floor floor;
 	private HashMap<Id, Coordinate> drivingDirections;
+	
+	// inertia -- needs to be revised
+	private final double tau;
 
 	/**
 	 * @param floor
@@ -46,7 +48,7 @@ public class DrivingForceModule implements ForceModule {
 	 */
 	public DrivingForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
-		this.scenario = scenario;
+		this.tau = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 	}
 
 	/*
@@ -82,8 +84,8 @@ public class DrivingForceModule implements ForceModule {
 		double driveY = d.y * agent.getDesiredVelocity();
 
 
-		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/Sim2DConfig.tau;
-		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/Sim2DConfig.tau;
+		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/this.tau;
+		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/this.tau;
 
 
 		agent.getForce().incrementX(dx);

@@ -21,8 +21,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -35,24 +33,28 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
  */
 public class EnvironmentForceModule implements ForceModule {
 
-	private final Floor floor;
 	private final Scenario2DImpl sc;
-	private final StaticForceField sff;
+	private final StaticEnvironmentDistancesField sff;
 
-	//Helbing constants 
+	//Helbing constant
 	private static final double Bi=0.08;
 	private static final double Ai=1130;
 	private static final double k = 1.2 * 100000;
 	private static final double kappa = 2.4 * 100000;
+
+	
+	private final double sensingRange; 
 
 	/**
 	 * @param floor
 	 * @param scenario
 	 */
 	public EnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
-		this.floor = floor;
 		this.sc = scenario;
 		this.sff = this.sc.getStaticForceField();
+		
+		//sensing range to maximum
+		this.sensingRange = this.sff.getMaxSensingRange(); 
 	}
 
 	/*
@@ -66,16 +68,14 @@ public class EnvironmentForceModule implements ForceModule {
 	public void run(Agent2D agent) {
 		double fx = 0;
 		double fy = 0;
-		int envId = 100;
 
-		ForceLocation fl = this.sff.getForceLocationWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
-		if (fl == null) {
+		EnvironmentDistances ed = this.sff.getEnvironmentDistances(agent.getPosition());
+		if (ed == null) {
 			return;
 		}
-		EnvironmentDistances ed = fl.getEnvironmentDistances();
 		for (Coordinate obj : ed.getObjects()) {
 			double dist = obj.distance(agent.getPosition());
-			if (dist > Sim2DConfig.PNeighborhoddRange) {
+			if (dist > this.sensingRange) {
 				continue;
 			}
 			double dx =(agent.getPosition().x - obj.x) / dist;

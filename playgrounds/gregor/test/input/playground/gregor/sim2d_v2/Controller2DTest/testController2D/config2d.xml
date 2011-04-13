@@ -26,7 +26,7 @@
 	<module name="simulation">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="12:00:00" /> 
+		<!--<param name="endTime" value="00:02:00" />--> 
 		
 
 		<param name = "snapshotperiod"	value = "00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
@@ -55,7 +55,7 @@
 ====================================================================== -->
 
 <module name="sim2d">
-	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvField.xml.gz" />
+	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" />
 	<param name="floorShapeFile" value="&INPUTBASE;/90grad.shp"/>
 	<param name="lsShapeFile" value="&INPUTBASE;/90gradNetwork.shp" />
 </module>

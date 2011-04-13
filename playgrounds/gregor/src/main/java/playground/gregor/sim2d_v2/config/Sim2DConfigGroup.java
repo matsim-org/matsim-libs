@@ -40,14 +40,20 @@ public class Sim2DConfigGroup extends Module {
 	public static final String STATIC_ENV_FIELD_FILE = "staticEnvFieldFile";
 	public static final String FLOOR_SHAPE_FILE = "floorShapeFile";
 	public static final String LS_SHAPE_FILE = "lsShapeFile";
+	public static final String STATIC_FORCE_FIELD_RESOLUTION = "staticForceFieldResolution";
+	public static final String TIME_STEP_SIZE = "timeStepSize";
+	
+	
+	
+	private double staticForceFieldResolution = .05;
+	
+	private double timeStepSize = 1./25;
+	
+	private String staticEnvFieldFile; 
 
-	private String staticEnvFieldFile; // =
-	// "/home/laemmel/devel/dfg/data/staticForceField.xml.gz";
+	private String floorShapeFile; 
 
-	private String floorShapeFile; // =
-	// "/home/laemmel/devel/dfg/data/90grad.shp";
-
-	private String lsShapeFile; // = "/home/laemmel/devel/dfg/data/90grad.shp";
+	private String lsShapeFile;
 
 	public Sim2DConfigGroup(Module sim2d) {
 		super(GROUP_NAME);
@@ -72,10 +78,16 @@ public class Sim2DConfigGroup extends Module {
 			setFloorShapeFile(value);
 		} else if (LS_SHAPE_FILE.equals(key)) {
 			setLSShapeFile(value);
-		} else {
+		}  else if (STATIC_FORCE_FIELD_RESOLUTION.equals(key)) {
+			setStaticForceFieldResolution(value);
+		} else if (TIME_STEP_SIZE.equals(key)) {
+			setTimeStepSize(value);
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
+
+
 
 	@Override
 	public String getValue(final String key) {
@@ -85,9 +97,15 @@ public class Sim2DConfigGroup extends Module {
 			return getFloorShapeFile();
 		} else if (LS_SHAPE_FILE.equals(key)) {
 			return getLSShapeFile();
+		}else if (TIME_STEP_SIZE.equals(key)) {
+			return Double.toString(getTimeStepSize());
+		}else if (STATIC_FORCE_FIELD_RESOLUTION.equals(key)) {
+			return Double.toString(getStaticForceFieldResolution());
 		}
 		throw new IllegalArgumentException(key);
 	}
+
+
 
 	@Override
 	public final TreeMap<String, String> getParams() {
@@ -95,6 +113,8 @@ public class Sim2DConfigGroup extends Module {
 		map.put(LS_SHAPE_FILE, getValue(LS_SHAPE_FILE));
 		map.put(STATIC_ENV_FIELD_FILE, getValue(STATIC_ENV_FIELD_FILE));
 		map.put(FLOOR_SHAPE_FILE, getValue(FLOOR_SHAPE_FILE));
+		map.put(STATIC_FORCE_FIELD_RESOLUTION, getValue(STATIC_FORCE_FIELD_RESOLUTION));
+		map.put(TIME_STEP_SIZE,getValue(TIME_STEP_SIZE));
 		return map;
 	}
 
@@ -142,5 +162,35 @@ public class Sim2DConfigGroup extends Module {
 		this.staticEnvFieldFile = value;
 
 	}
+	
+	/**
+	 *  
+	 * @param value
+	 */
+	private void setTimeStepSize(String value) {
+		this.timeStepSize = Double.parseDouble(value);
+		
+	}
 
+	private void setStaticForceFieldResolution(String value) {
+		this.staticForceFieldResolution = Double.parseDouble(value);
+		
+	}
+
+	
+	/**
+	 * the spatial resolution of the static environmental force field
+	 * @return static force field resolution
+	 */
+	public double getStaticForceFieldResolution() {
+		return this.staticForceFieldResolution;
+	}
+
+	/**
+	 * The time step size for the 2D Simulation (fraction of the simulation time step size)
+	 * @return time step size
+	 */
+	public double getTimeStepSize() {
+		return this.timeStepSize;
+	}
 }

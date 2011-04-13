@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
+import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -38,7 +38,10 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class EnvironmentDistancesWriter extends MatsimXmlWriter {
 
-	public void write(String file, QuadTree<EnvironmentDistances> tree) {
+	public void write(String file, StaticEnvironmentDistancesField fl) {
+		
+		QuadTree<EnvironmentDistances> tree = fl.getEnvironmentDistancesQuadTree();
+		
 		try {
 			openFile(file);
 			super.writeXmlHead();
@@ -47,10 +50,16 @@ public class EnvironmentDistancesWriter extends MatsimXmlWriter {
 			Tuple<String, String> maxY = new Tuple<String, String>("maxY", Double.toString(tree.getMaxNorthing()));
 			Tuple<String, String> minX = new Tuple<String, String>("minX", Double.toString(tree.getMinEasting()));
 			Tuple<String, String> minY = new Tuple<String, String>("minY", Double.toString(tree.getMinNorthing()));
+			
+			Tuple<String, String> sens = new Tuple<String, String>("maxSensingRange", Double.toString(fl.getMaxSensingRange()));
+			Tuple<String, String> res = new Tuple<String, String>("resolution", Double.toString(fl.getStaticEnvironmentDistancesFieldResolution()));
+			
 			attrbs.add(maxX);
 			attrbs.add(maxY);
 			attrbs.add(minX);
 			attrbs.add(minY);
+			attrbs.add(sens);
+			attrbs.add(res);
 
 			writeStartTag("staticEnvField", attrbs);
 			for (EnvironmentDistances ed : tree.values()) {

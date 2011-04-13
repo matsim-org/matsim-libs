@@ -43,7 +43,7 @@ public class Controller2D extends Controler {
 		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime(9*3600 + 5* 30);
+		this.config.getQSimConfigGroup().setEndTime( 5* 60);
 //		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 

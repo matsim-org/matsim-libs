@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.List;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -44,13 +43,14 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
 	protected Quadtree coordsQuad = new Quadtree();
 
-	//Helbing constants 
+	//Helbing constant
 	private static final double Bi=0.08;
 	private static final double Ai=2000;
 	private static final double k = 1.2 * 100000;
 	private static final double kappa = 2.4 * 100000;
 	
-	
+	//Laemmel constant
+	private static final double neighborhoodSensingRange = 5;
 
 	/**
 	 * @param floor
@@ -81,10 +81,10 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
-		double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
-		double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
-		double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
+		double minX = agent.getPosition().x - neighborhoodSensingRange;
+		double maxX = agent.getPosition().x + neighborhoodSensingRange;
+		double minY = agent.getPosition().y - neighborhoodSensingRange;
+		double maxY = agent.getPosition().y + neighborhoodSensingRange;
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
 		@SuppressWarnings("unchecked")
 		List<Agent2D> l = this.coordsQuad.query(e);
@@ -95,7 +95,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			}
 
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist > Sim2DConfig.PNeighborhoddRange) {
+			if (dist > neighborhoodSensingRange) {
 				continue;
 			}
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;

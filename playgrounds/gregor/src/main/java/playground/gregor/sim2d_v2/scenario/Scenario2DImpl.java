@@ -22,16 +22,14 @@ package playground.gregor.sim2d_v2.scenario;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.sim2d_v2.simulation.floor.StaticForceField;
+import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -43,7 +41,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class Scenario2DImpl extends ScenarioImpl {
 
 	private Map<MultiPolygon, List<Link>> mps;
-	private StaticForceField sff;
+	private StaticEnvironmentDistancesField sff;
 	private HashMap<Id, LineString> lsmp;
 
 	/**
@@ -61,7 +59,8 @@ public class Scenario2DImpl extends ScenarioImpl {
 	/**
 	 * @param sff
 	 */
-	public void setStaticForceField(StaticForceField sff) {
+	public void setStaticForceField(StaticEnvironmentDistancesField sff) {
+		//FIXME rename to setStaticEnvironmentDistancesField
 		this.sff = sff;
 
 	}
@@ -70,7 +69,8 @@ public class Scenario2DImpl extends ScenarioImpl {
 	 * 
 	 * @return
 	 */
-	public StaticForceField getStaticForceField() {
+	public StaticEnvironmentDistancesField getStaticForceField() {
+		//FIXME rename to getStaticEnvironmentDistancesField
 		return this.sff;
 	}
 

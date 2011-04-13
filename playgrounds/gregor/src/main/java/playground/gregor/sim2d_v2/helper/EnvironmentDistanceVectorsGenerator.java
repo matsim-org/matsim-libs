@@ -24,12 +24,16 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesWriter;
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
+import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -57,14 +61,23 @@ public class EnvironmentDistanceVectorsGenerator {
 
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	public EnvironmentDistanceVectorsGenerator(MultiPolygon structure) {
-		this.structure = (MultiPolygon) structure.buffer(0);
+	private double res;
+
+	private double sens;
+
+	
+
+	public EnvironmentDistanceVectorsGenerator(MultiPolygon geo,
+			double sensingRange, double res) {
+		this.structure = (MultiPolygon) geo.buffer(0);
+		this.res = res;
+		this.sens = sensingRange;
 	}
 
-	public QuadTree<EnvironmentDistances> loadDistanceVectors() {
+	public StaticEnvironmentDistancesField loadDistanceVectors() {
 		intQuadTree();
 		calculateDistanceVectors();
-		return this.distancesQuadTree;
+		return new StaticEnvironmentDistancesField(this.distancesQuadTree,this.res,this.sens);
 	}
 
 	/**
@@ -73,9 +86,9 @@ public class EnvironmentDistanceVectorsGenerator {
 	private void calculateDistanceVectors() {
 		int loop = 0;
 		int yloop = 0;
-		for (double x = this.envelope.getMinX(); x <= this.envelope.getMaxX(); x += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
+		for (double x = this.envelope.getMinX(); x <= this.envelope.getMaxX(); x += this.res) {
 			log.info("xloop:" + ++loop + "  yloop:" + yloop);
-			for (double y = this.envelope.getMinY(); y <= this.envelope.getMaxY(); y += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
+			for (double y = this.envelope.getMinY(); y <= this.envelope.getMaxY(); y += this.res) {
 				yloop++;
 				Point point = this.geofac.createPoint(new Coordinate(x, y));
 				if (!this.structure.covers(point) && this.structure.distance(point) > 0.05) {
@@ -113,8 +126,8 @@ public class EnvironmentDistanceVectorsGenerator {
 			double cos = Math.cos(alpha);
 			double sin = Math.sin(alpha);
 
-			double x1 = x + cos * Sim2DConfig.MaxWallSensingRange;
-			double y1 = y + sin * Sim2DConfig.MaxWallSensingRange;
+			double x1 = x + cos * sens;
+			double y1 = y + sin * sens;
 			Coordinate c1 = new Coordinate(x1, y1);
 			coords[1] = c1;
 
@@ -122,8 +135,8 @@ public class EnvironmentDistanceVectorsGenerator {
 
 			cos = Math.cos(alpha);
 			sin = Math.sin(alpha);
-			double x2 = x + cos * Sim2DConfig.MaxWallSensingRange;
-			double y2 = y + sin * Sim2DConfig.MaxWallSensingRange;
+			double x2 = x + cos * sens;
+			double y2 = y + sin * sens;
 			Coordinate c2 = new Coordinate(x2, y2);
 			coords[2] = c2;
 			coords[3] = location;
@@ -131,17 +144,6 @@ public class EnvironmentDistanceVectorsGenerator {
 			calcAndAddSectorObject(ed, coords);
 
 
-		}
-
-		if (ed.getObjects().size() > 0) {
-			double minDist = 1000;
-			Coordinate minC = null;
-			for (Coordinate c : ed.getObjects()) {
-				if (c.distance(ed.getLocation()) < minDist) {
-					minDist = c.distance(ed.getLocation());
-					minC = c;
-				}
-			}
 		}
 
 		return ed;
@@ -161,7 +163,7 @@ public class EnvironmentDistanceVectorsGenerator {
 			double fX = tmp[1].x - tmp[0].x;
 			double fY = tmp[1].y - tmp[0].y;
 			double dist = Math.sqrt(Math.pow(fX, 2) + Math.pow(fY, 2));
-			if (dist > Sim2DConfig.MaxWallSensingRange) {
+			if (dist > sens) {
 				throw new RuntimeException("this should not happen!!");
 			} else if (dist <= 0.01) {
 				return;
@@ -181,14 +183,30 @@ public class EnvironmentDistanceVectorsGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String shape = "/Users/laemmel/teach/simpleEnvMultiPolygon.shp";
+		String shape = "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/90grad.shp";
+		@SuppressWarnings("unchecked")
 		Iterator<Feature> fs = ShapeFileReader.readDataFile(shape).getFeatures().iterator();
+		
+		
+		Config config = ConfigUtils.createConfig();
+		
+		Module module = config.getModule("sim2d");
+		Sim2DConfigGroup s = null;
+		if (module == null) {
+			s = new Sim2DConfigGroup();
+		} else {
+			s = new Sim2DConfigGroup(module);
+		}
+		config.getModules().put("sim2d", s);
+		
+		double sensingRange = 5;
+		double res = 0.1;
 		while (fs.hasNext()) {
 			Feature ft = fs.next();
 			Geometry geo = ft.getDefaultGeometry();
-			QuadTree<EnvironmentDistances> tree = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo).loadDistanceVectors();
-			System.out.println(tree.size());
-			new EnvironmentDistancesWriter().write("/Users/laemmel/teach/simpleEnvDistances.xml.gz", tree);
+			StaticEnvironmentDistancesField fl = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo,sensingRange,res).loadDistanceVectors();
+//			System.out.println(tree.size());
+			new EnvironmentDistancesWriter().write("test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/staticEnvDistances.xml.gz", fl);
 		}
 	}
 

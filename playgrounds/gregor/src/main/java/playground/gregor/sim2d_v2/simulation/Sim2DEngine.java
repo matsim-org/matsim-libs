@@ -34,7 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
@@ -46,10 +46,11 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
 	private final Scenario2DImpl scenario;
-	private final Random random;
 	private final Sim2D sim;
 
 	private final Map<Id, Floor> linkIdFloorMapping = new HashMap<Id, Floor>();
+	private Sim2DConfigGroup sim2ConfigGroup;
+	private double sim2DStepSize;
 
 	/**
 	 * @param sim
@@ -57,10 +58,10 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	 */
 	public Sim2DEngine(Sim2D sim, Random random) {
 		this.scenario = (Scenario2DImpl) sim.getScenario();
-		this.random = random;
+		this.sim2ConfigGroup = (Sim2DConfigGroup)this.scenario.getConfig().getModule("sim2d");
 		this.sim = sim;
-		double sim2DStepSize = Sim2DConfig.TIME_STEP_SIZE;
-		double factor = this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize() / sim2DStepSize;
+		this.sim2DStepSize = this.sim2ConfigGroup.getTimeStepSize();
+		double factor = this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize() / this.sim2DStepSize;
 		if (factor != Math.round(factor)) {
 			throw new RuntimeException("QSim time step size has to be a multiple of sim2d time step size");
 		}
@@ -80,7 +81,7 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 				floor.move(sim2DTime);
 			}
 
-			sim2DTime += Sim2DConfig.TIME_STEP_SIZE;
+			sim2DTime += this.sim2DStepSize;
 //			System.out.println("++++++++++++++++++");
 		}
 	}

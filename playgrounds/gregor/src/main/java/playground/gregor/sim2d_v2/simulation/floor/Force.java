@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel
@@ -77,9 +75,9 @@ public class Force {
 	}
 	
 	
-	public void update() {
-		this.vx += fx*Sim2DConfig.TIME_STEP_SIZE/Agent2D.AGENT_WEIGHT;
-		this.vy += fy*Sim2DConfig.TIME_STEP_SIZE/Agent2D.AGENT_WEIGHT;
+	public void update(double deltaT, double weight) {
+		this.vx += fx*deltaT/weight;
+		this.vy += fy*deltaT/weight;
 		this.fx = 0;
 		this.fy = 0;
 	}

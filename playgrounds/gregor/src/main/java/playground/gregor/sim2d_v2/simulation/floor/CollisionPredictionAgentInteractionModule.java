@@ -10,7 +10,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -28,10 +27,13 @@ DynamicForceModule {
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	//Helbing constants 
+	//Zanlungo et al constant 
 	public static final double Bi=0.34;
 	public static final double Ai=250;
 
+	//Laemmel constant
+	private static final double neighborhoodSensingRange = 5;
+	
 	public CollisionPredictionAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 	}
@@ -41,10 +43,10 @@ DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		double minX = agent.getPosition().x - Sim2DConfig.PNeighborhoddRange;
-		double maxX = agent.getPosition().x + Sim2DConfig.PNeighborhoddRange;
-		double minY = agent.getPosition().y - Sim2DConfig.PNeighborhoddRange;
-		double maxY = agent.getPosition().y + Sim2DConfig.PNeighborhoddRange;
+		double minX = agent.getPosition().x - neighborhoodSensingRange;
+		double maxX = agent.getPosition().x + neighborhoodSensingRange;
+		double minY = agent.getPosition().y - neighborhoodSensingRange;
+		double maxY = agent.getPosition().y + neighborhoodSensingRange;
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
 		@SuppressWarnings("unchecked")
 		List<Agent2D> l = this.coordsQuad.query(e);

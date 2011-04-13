@@ -5,7 +5,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
-import playground.gregor.sim2d_v2.controller.Sim2DConfig;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -13,7 +12,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 	
 	private Scenario2DImpl sc;
-	private StaticForceField sff;
+	private StaticEnvironmentDistancesField sff;
 	
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
@@ -34,11 +33,8 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	public void run(Agent2D agent) {
 		double fx = 0;
 		double fy = 0;
-		ForceLocation fl = this.sff.getForceLocationWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION + 0.01);
-		if (fl == null) {
-			return;
-		}
-		EnvironmentDistances ed = fl.getEnvironmentDistances();
+
+		EnvironmentDistances ed = this.sff.getEnvironmentDistances(agent.getPosition());
 		
 		double t_i = getTi(ed,agent);
 		if (t_i == Double.POSITIVE_INFINITY) {

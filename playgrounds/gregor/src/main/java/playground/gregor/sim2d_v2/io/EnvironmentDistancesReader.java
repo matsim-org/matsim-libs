@@ -19,18 +19,14 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.io;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
-import playground.gregor.sim2d_v2.simulation.floor.ForceLocation;
+import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -40,14 +36,14 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class EnvironmentDistancesReader extends MatsimXmlParser {
 
-	private QuadTree<ForceLocation> tree = null;
 	private EnvironmentDistances currentEnvDist;
+	private StaticEnvironmentDistancesField distField = null;
 
-	public QuadTree<ForceLocation> getEnvDistQuadTree() {
-		if (this.tree == null) {
+	public StaticEnvironmentDistancesField getEnvDistField() {
+		if (this.distField == null) {
 			throw new RuntimeException("Environment file needs to parsed before this method is allowed to be called!");
 		}
-		return this.tree;
+		return this.distField;
 	}
 
 	/*
@@ -85,8 +81,7 @@ public class EnvironmentDistancesReader extends MatsimXmlParser {
 		String x = atts.getValue("x");
 		String y = atts.getValue("y");
 		this.currentEnvDist = new EnvironmentDistances(new Coordinate(Double.parseDouble(x), Double.parseDouble(y)));
-		ForceLocation fl = new ForceLocation(this.currentEnvDist);
-		this.tree.put(this.currentEnvDist.getLocation().x, this.currentEnvDist.getLocation().y, fl);
+		this.distField.getEnvironmentDistancesQuadTree().put(this.currentEnvDist.getLocation().x, this.currentEnvDist.getLocation().y, this.currentEnvDist);
 
 	}
 
@@ -98,7 +93,12 @@ public class EnvironmentDistancesReader extends MatsimXmlParser {
 		String my = atts.getValue("maxY");
 		String mix = atts.getValue("minX");
 		String miy = atts.getValue("minY");
-		this.tree = new QuadTree<ForceLocation>(Double.parseDouble(mix), Double.parseDouble(miy), Double.parseDouble(mx), Double.parseDouble(my));
+		QuadTree<EnvironmentDistances> tree = new QuadTree<EnvironmentDistances>(Double.parseDouble(mix), Double.parseDouble(miy), Double.parseDouble(mx), Double.parseDouble(my));
+		String maxSensingRange = atts.getValue("maxSensingRange");
+		String res = atts.getValue("resolution"); 
+		
+		
+		this.distField = new StaticEnvironmentDistancesField(tree,Double.parseDouble(maxSensingRange),Double.parseDouble(res));
 	}
 
 	/*
@@ -111,24 +111,6 @@ public class EnvironmentDistancesReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public static void main(String[] args) {
-		try {
-			EnvironmentDistancesReader x = new EnvironmentDistancesReader();
-			x.setValidating(false);
-			x.parse("/home/laemmel/devel/dfg/data/envDistances.xml.gz");
-			System.out.println(x.getEnvDistQuadTree().size());
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

@@ -99,6 +99,10 @@ public class Agent2D extends PersonDriverAgentImpl {
 	public double getVy() {
 		return this.vy;
 	}
+
+	public double getWeight() {
+		return AGENT_WEIGHT;
+	}
 	
 	// /**
 	// * @return
