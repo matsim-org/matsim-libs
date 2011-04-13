@@ -64,9 +64,9 @@ public class LoadDistributionInterval  extends TimeInterval
 	}
 	
 	
-	public void makeXYSeries(){
+	private void makeXYSeries(String seriesName){
 		
-		xy  = new XYSeries("LoadDistributionInterval at Hub: todo...");
+		xy  = new XYSeries(seriesName);
 		
 		for(int i=(int)Math.ceil(super.getStartTime()); i<=(int)Math.floor(super.getEndTime()); i++){
 			xy.add(i, p.value(i));
@@ -75,7 +75,8 @@ public class LoadDistributionInterval  extends TimeInterval
 	
 	
 	
-	public XYSeries getXYSeries(){
+	public XYSeries getXYSeries(String seriesName){
+		makeXYSeries(seriesName);
 		return xy;
 	}
 	

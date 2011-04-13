@@ -65,8 +65,8 @@ public class Main {
 		
 		final double bufferBatteryCharge=0.0;
 		
-		final double batterySizeEV= 17*3600*1000; 
-		final double batterySizePHEV= 17*3600*1000; 
+		final double batterySizeEV= 24*3600*1000; 
+		final double batterySizePHEV= 24*3600*1000; 
 		final double batteryMinEV= 0.1; 
 		final double batteryMinPHEV= 0.1; 
 		final double batteryMaxEV= 0.9; 
@@ -336,7 +336,7 @@ public class Main {
 				bullShitFunc,//p
 				true//boolean
 		);
-		l1.makeXYSeries();
+		
 		bullShitSchedule.addTimeInterval(l1);
 		
 		
@@ -346,7 +346,7 @@ public class Main {
 				bullShitFunc2,//p
 				false//boolean
 		);
-		l2.makeXYSeries();
+		
 		bullShitSchedule.addTimeInterval(l2);
 		
 		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
@@ -431,14 +431,21 @@ public class Main {
 	public static LinkedListValueHashMap<Id, Schedule> makeBullshitAgentVehicleSource(Controler controler){
 		LinkedListValueHashMap<Id, Schedule> agentSource= new LinkedListValueHashMap<Id, Schedule>();
 		
-		Schedule bullShit= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
+		Schedule bullShitPlus= new Schedule();
+		Schedule bullShitMinus= new Schedule();
+		PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500});
+		PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500});
 		
-		bullShit.addTimeInterval(new LoadDistributionInterval(50000.0, 62490.0, p, true));
-		
+		bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
+		bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
 		//Id
 		for(Id id : controler.getPopulation().getPersons().keySet()){
-			agentSource.put(id, bullShit);	
+			if(Math.random()<0.5){
+				
+			}else{
+				agentSource.put(id, bullShitMinus);	
+			}
+			
 		}
 		
 		return agentSource;
@@ -494,9 +501,9 @@ public class Main {
 		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			
-			ContractTypeAgent contract= new ContractTypeAgent(false , // up
+			ContractTypeAgent contract= new ContractTypeAgent(true, // up
 					true,// down
-					false);//reschedule
+					true);//reschedule
 			list.put(id, contract);
 		}
 		

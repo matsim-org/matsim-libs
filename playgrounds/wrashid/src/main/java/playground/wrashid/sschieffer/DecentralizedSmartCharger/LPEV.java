@@ -132,7 +132,7 @@ public class LPEV {
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
-		
+		schedule.printSchedule();
 		
 		setUpLP(schedule, id, batterySize, batteryMin, batteryMax, startingSOC);
 		int status = solver.solve();
@@ -243,9 +243,6 @@ public class LPEV {
 		
 		
 		
-//		System.out.println("LP summary for agent"+ id.toString());
-//		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
-//		System.out.println("Starting SOC: "+ startingSOC);
 //		
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;

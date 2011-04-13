@@ -20,6 +20,8 @@
 
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
+
 public abstract class TimeInterval implements Comparable{
 	double start;
 	double end;
@@ -137,6 +139,12 @@ public abstract class TimeInterval implements Comparable{
 	
 	public boolean isCharging(){
 		if(this.getClass().equals(new ChargingInterval(0,0).getClass())){
+			return true;
+		}else{return false;}
+	}
+	
+	public boolean isLoadDistributionInterval(){
+		if(this.getClass().equals(new LoadDistributionInterval(0,0, new PolynomialFunction(new double[]{0}), false).getClass())){
 			return true;
 		}else{return false;}
 	}

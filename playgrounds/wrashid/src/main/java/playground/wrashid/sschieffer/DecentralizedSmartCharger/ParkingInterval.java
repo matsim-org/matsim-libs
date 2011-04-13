@@ -120,9 +120,26 @@ public class ParkingInterval extends TimeInterval {
 		joulesInTimeInterval=d; 
 	}
 	
+	/**
+	 * only for print purposes
+	 * @return
+	 */
+	private int getSizeOfChargingSchedule(){
+		if(chargingSchedule!=null){
+			return chargingSchedule.getNumberOfEntries();
+		}else{
+			return 0;
+		}
+	}
+	
 	
 	@Override
 	public void printInterval(){
-		System.out.println("Parking Interval \t start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  ChargingTime:  " + requiredChargingDuration+ "\t  Optimal:  " + optimal+ "\t  Joules per Interval:  " + joulesInTimeInterval);
+		System.out.println("Parking Interval \t start: "+ this.getStartTime()
+				+ "\t  end: "+ this.getEndTime()
+				+ "\t  ChargingTime:  " + requiredChargingDuration
+				+ "\t  Optimal:  " + optimal
+				+ "\t  Joules per Interval:  " + joulesInTimeInterval
+				+ "\t  ChargingSchedule:  " + getSizeOfChargingSchedule());
 	}
 }

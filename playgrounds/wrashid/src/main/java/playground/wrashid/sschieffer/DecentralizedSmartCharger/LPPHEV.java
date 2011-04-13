@@ -117,6 +117,7 @@ public class LPPHEV {
 	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
 		
 		System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
+		schedule.printSchedule();
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;

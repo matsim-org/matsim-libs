@@ -78,6 +78,16 @@ public class Schedule {
 	
 	
 	
+	public int getNumberOfEntries(){
+		return timesInSchedule.size();
+	}
+
+
+	public double getStartingSOC(){
+		return startingSOC;
+	}
+
+
 	public double getTotalConsumption(){
 		
 		double total=0;
@@ -138,21 +148,14 @@ public class Schedule {
 	}
 	
 	public void printSchedule(){
+		System.out.println("*************************");
+		System.out.println("Starting SOC: "+ getStartingSOC());
 		for(TimeInterval t: timesInSchedule){
 			t.printInterval();
 		}
+		System.out.println("*************************");
 		
-		
 	}
-	
-	public int getNumberOfEntries(){
-		return timesInSchedule.size();
-	}
-	
-	public double getStartingSOC(){
-		return startingSOC;
-	}
-	
 	
 	public void mergeSchedules(Schedule schedule2){
 		for(int i=0; i< schedule2.getNumberOfEntries(); i++){
@@ -168,13 +171,23 @@ public class Schedule {
 	}
 	
 	
+	
+	/**
+	 * only meant for schedules with loaddistributionIntervals,
+	 * 
+	 * passed String is title String of diagram
+	 * @param name
+	 * @throws IOException
+	 */
+	
 	public void visualizeLoadDistribution(String name) throws IOException{
 		XYSeriesCollection loadDistributionIntervals = new XYSeriesCollection();
 				
-		for(TimeInterval t: timesInSchedule){
-			if(t.getClass().equals(new LoadDistributionInterval(0,0,null,false).getClass())){
+		for(int i=0; i<getNumberOfEntries();i++){
+			TimeInterval t= timesInSchedule.get(i);
+			if(t.isLoadDistributionInterval()){
 				LoadDistributionInterval t2=(LoadDistributionInterval) t;
-				loadDistributionIntervals.addSeries(t2.getXYSeries());
+				loadDistributionIntervals.addSeries(t2.getXYSeries(""));
 			}
 		}
 		
@@ -195,17 +208,14 @@ public class Schedule {
 	            )
 	        );
 	   
-        
 	    
         chart.setBackgroundPaint(Color.white);
         plot.setBackgroundPaint(Color.white);
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray); 
-        
-        //ChartFrame frame1=new ChartFrame("XYLine Chart",chart);
-        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "hubSchedule.png") , chart, 800, 600);
-        /*frame1.setVisible(true);
-        frame1.setSize(300,300);*/
+      
+        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ name+"_visualization.png") , chart, 800, 600);
+       
 	}
 	
 	
@@ -289,7 +299,7 @@ public class Schedule {
 	public int positionOfIthDrivingTime(int ithTime){
 		int sol=0;
 		int count=0;
-		this.printSchedule();
+		//this.printSchedule();
 		
 		for(int i=0; i<timesInSchedule.size(); i++){
 			

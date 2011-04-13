@@ -63,7 +63,7 @@ public class HubLoadDistributionReader {
 	LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
 	LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution;
 	LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-	LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
+	LinkedListValueHashMap<Integer, TimeDataCollector> connectivityHubDistribution;
 	
 	LinkedListValueHashMap<Integer, Schedule> locationSourceMapping;
 	LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping;
@@ -125,8 +125,22 @@ public class HubLoadDistributionReader {
 		
 		this.locationSourceMapping=locationSourceMapping;
 		this.agentVehicleSourceMapping=agentVehicleSourceMapping;
+		
+		initializeConnectivityHubDistribution();
+		
 	}
 	
+	
+	
+	
+	public void initializeConnectivityHubDistribution(){
+		connectivityHubDistribution= new LinkedListValueHashMap<Integer, TimeDataCollector> ();
+		
+		for(Integer i: deterministicHubLoadDistribution.getKeySet()){
+			connectivityHubDistribution.put(i, new TimeDataCollector(DecentralizedSmartCharger.MINUTESPERDAY));
+		}
+		
+	}
 	
 	
 	
@@ -285,16 +299,22 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	
+	/**
+	 * VISUALIZATION PURPOSE
+	 * updates the double[] loadAfterDeterministicChargingDecision with charging activities of agents; 
+	 * only done for first second in minute, to get an overall idea of load distribution for visualization purposes over the day
+	 * 
+	 * @param linkId
+	 * @param minInDay
+	 * @param wattReduction
+	 */
 	public void updateLoadAfterDeterministicChargingDecision(Id linkId, int minInDay, double wattReduction){
 		
 		
 		int hubId= getHubForLinkId(linkId);
 		
-		/*double [][]check1= loadAfterDeterministicChargingDecision.getValue(hubId);
-		double [][]check2= originalDeterministicChargingDistribution.getValue(hubId);
-		System.out.println("BEFORE new: "+ check1[minInDay][0]+", "+check1[minInDay][1]);
-		System.out.println("BEFORE old: "+ check2[minInDay][0]+", "+check2[minInDay][1]);*/
-		
+	
 		double [][]loadAfter=loadAfterDeterministicChargingDecision.getValue(hubId);
 		
 		loadAfter[minInDay][0]=minInDay*DecentralizedSmartCharger.SECONDSPERMIN;
@@ -302,13 +322,84 @@ public class HubLoadDistributionReader {
 		                    
 		loadAfterDeterministicChargingDecision.put(hubId, loadAfter);
 		
-		/*check1= loadAfterDeterministicChargingDecision.getValue(hubId);
-		check2= originalDeterministicChargingDistribution.getValue(hubId);
-		System.out.println("AFTER new: "+ check1[minInDay][0]+", "+check1[minInDay][1]);
-		System.out.println("AFTER old: "+ check2[minInDay][0]+", "+check2[minInDay][1]);
-		System.out.println();*/
 		
 	}
+	
+	
+	
+	/**
+	 * provide minute in which agent is parking, and hub at which he is parking
+	 * and the corresponding data value in connectivityHubDistribution will be increased by 1
+	 * @param minute
+	 * @param hub
+	 */
+	public void recordParkingAgentAtHubInMinute(
+			int minute,
+			int hub
+			){
+		
+		double second= minute*DecentralizedSmartCharger.SECONDSPERMIN;
+		double before= connectivityHubDistribution.getValue(hub).getYAtEntry(minute);
+		connectivityHubDistribution.getValue(hub).addDataPoint(minute, second, before+1);
+	}
+	
+	
+	
+	
+	public double getExpectedNumberOfParkingAgentsAtHubAtTime(int hub, double time){
+		int min= (int)Math.ceil(time/DecentralizedSmartCharger.SECONDSPERMIN);
+		return connectivityHubDistribution.getValue(hub).getFunction().value(time);
+	}
+	
+	
+	
+	
+	
+	public void calculateConnectivityDistributionsAtHubsInHubLoadReader() throws OptimizationException, IOException{
+		
+		XYSeriesCollection connectivity= new XYSeriesCollection();
+		
+		for(Integer i: connectivityHubDistribution.getKeySet()){
+			connectivityHubDistribution.getValue(i).fitFunction();
+			XYSeries xx= connectivityHubDistribution.getValue(i).getXYSeries("Parking Vehicles at Hub"+ i);
+			connectivity.addSeries(xx);
+		}
+		
+		JFreeChart chart = ChartFactory.createXYLineChart("Number of parking agents at hubs over the day", 
+				"time [s]", 
+				"number of agents", 
+				connectivity, 
+				PlotOrientation.VERTICAL, 
+				true, true, false);
+		
+		chart.setBackgroundPaint(Color.white);
+		
+		final XYPlot plot = chart.getXYPlot();
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.gray); 
+        plot.setRangeGridlinePaint(Color.gray);
+		
+        
+        for(Integer i: connectivityHubDistribution.getKeySet()){
+        	plot.getRenderer().setSeriesPaint(i, Color.black);//after
+        	plot.getRenderer().setSeriesStroke(
+                    i, 
+                  
+                    new BasicStroke(
+                        1.0f,  //float width
+                        BasicStroke.CAP_ROUND, //int cap
+                        BasicStroke.JOIN_ROUND, //int join
+                        1.0f, //float miterlimit
+                        new float[] {i*2.0f, i*0.5f}, //float[] dash
+                        0.0f //float dash_phase
+                    )
+                );
+        }
+        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "connectivityOfAgentsOverDay.png") , chart, 1000, 1000);
+       
+		
+	}
+	
 	
 	
 	
