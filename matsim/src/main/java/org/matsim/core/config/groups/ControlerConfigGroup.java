@@ -127,7 +127,7 @@ public class ControlerConfigGroup extends Module {
 			this.setRunId(value.trim());
 		} else if (LINKTOLINK_ROUTING_ENABLED.equalsIgnoreCase(key)){
 			if (value != null) {
-				this.linkToLinkRoutingEnabled = Boolean.getBoolean(value.trim());
+				this.linkToLinkRoutingEnabled = Boolean.parseBoolean(value.trim());
 			}
 		} else if (EVENTS_FILE_FORMAT.equals(key)) {
 			String[] parts = StringUtils.explode(value, ',');

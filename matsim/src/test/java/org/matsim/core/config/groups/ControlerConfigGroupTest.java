@@ -127,4 +127,27 @@ public class ControlerConfigGroupTest {
 		Assert.assertEquals(2, cg.getWritePlansInterval());
 	}
 
+	/**
+	 * Ensure that the enableLinkToLinkRouting value is correctly stored and 
+	 * returned with the getters and setters.
+	 */
+	@Test
+	public void testLink2LinkRouting(){
+		ControlerConfigGroup cg = new ControlerConfigGroup();
+		//initial value
+		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
+		//modify by string
+		cg.addParam("enableLinkToLinkRouting", "true");
+		Assert.assertTrue(cg.isLinkToLinkRoutingEnabled());
+		cg.addParam("enableLinkToLinkRouting", "false");
+		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
+		//modify by boolean
+		cg.setLinkToLinkRoutingEnabled(true);
+		Assert.assertTrue(cg.isLinkToLinkRoutingEnabled());
+		Assert.assertEquals("true", cg.getValue("enableLinkToLinkRouting"));
+		cg.setLinkToLinkRoutingEnabled(false);
+		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
+		Assert.assertEquals("false", cg.getValue("enableLinkToLinkRouting"));
+	}
+	
 }
