@@ -33,8 +33,10 @@ public class Camera {
 	public void setBoundaries(double xMin, double yMin, double xMax, double yMax) {
 		upLeftCorner = new Point2D(xMin, yMax);
 		size = new Vector2D(upLeftCorner, new Point2D(xMax, yMin));
-		Window.width=(int) (size.getX()/-size.getY()>(double)Window.MAX_WIDTH/(double)Window.MAX_HEIGHT?Window.MAX_WIDTH:Window.MAX_HEIGHT*size.getX()/-size.getY());
-		Window.height=(int) (-size.getY()/size.getX()>(double)Window.MAX_HEIGHT/(double)Window.MAX_WIDTH?Window.MAX_HEIGHT:Window.MAX_WIDTH*-size.getY()/size.getX());
+		double smallXSize = Window.MAX_HEIGHT*size.getX()/-size.getY();
+		double smallYSize = Window.MAX_WIDTH*-size.getY()/size.getX();
+		Window.width=(int) (size.getX()/-size.getY()>(double)Window.MAX_WIDTH/(double)Window.MAX_HEIGHT?Window.MAX_WIDTH:smallXSize<Window.MIN_WIDTH?Window.MIN_WIDTH:smallXSize);
+		Window.height=(int) (-size.getY()/size.getX()>(double)Window.MAX_HEIGHT/(double)Window.MAX_WIDTH?Window.MAX_HEIGHT:smallYSize<Window.MIN_HEIGHT?Window.MIN_HEIGHT:smallYSize);
 	}
 	public int getIntX(double x) {
 		return (int) ((x-upLeftCorner.getX())*(Window.width-2*Window.FRAMESIZE)/size.getX())+Window.FRAMESIZE;

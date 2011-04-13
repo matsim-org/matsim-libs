@@ -32,11 +32,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
+import java.util.Collection;
 
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.PathEditor.gui.Window.Option;
@@ -57,6 +59,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Color linesColor = Color.GRAY;
 	private Color linesColor2 = Color.ORANGE;
 	private Color selectedColor = Color.RED;
+	private Color nodeSelectedColor = Color.MAGENTA;
 	private Color networkColor = Color.LIGHT_GRAY;
 	private int pointsSize = 1;
 	private Stroke pointsStroke = new BasicStroke(1);
@@ -90,7 +93,10 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	private void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		for(Coord point:window.getPoints()) {
+		Collection<Coord> points = window.getPoints();
+		if(points.size()==0)
+			points = window.getStopPoints();
+		for(Coord point:points) {
 			if(point.getX()<xMin)
 				xMin = point.getX();
 			if(point.getX()>xMax)
@@ -164,6 +170,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 				g2.drawLine(camera.getIntX(stop.getX()), camera.getIntY(stop.getY())-2*pointsSize, camera.getIntX(stop.getX()), camera.getIntY(stop.getY())+2*pointsSize);
 			}
 		}
+		Node node = window.getSelectedNode();
+		if(node!=null) {
+			g2.setColor(nodeSelectedColor);
+			Shape circle = new Ellipse2D.Double(camera.getIntX(node.getCoord().getX())-pointsSize*4,camera.getIntY(node.getCoord().getY())-pointsSize*4,pointsSize*8,pointsSize*8);
+			g2.fill(circle);
+		}
 	}
 	private void paintLink(Link link, Graphics2D g2) {
 		g2.drawLine(camera.getIntX(link.getFromNode().getCoord().getX()),
@@ -195,11 +207,15 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 				if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
 					window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
-					window.unselectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+					window.unselectLink();
 				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
 					window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
-					window.unselectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+					window.unselectStop();
+				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1)
+					window.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3)
+					window.unselectNode();
 				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
 					camera.zoomIn(e.getX(), e.getY());
 				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)

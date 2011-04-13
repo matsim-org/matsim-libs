@@ -123,7 +123,7 @@ public class RoutesPathsGenerator {
 			window.setVisible(true);
 			while(links.size()==0)
 				try {
-					Thread.sleep(10);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -155,9 +155,15 @@ public class RoutesPathsGenerator {
 			writer = new PrintWriter(new FileWriter(PREFILES[2],true));
 			writer.println(tripEntry.getKey());
 			String linksT = "";
-			for(Link link:links)
+			String[] linksA = new String[links.size()];
+			int i=0;
+			for(Link link:links) {
 				linksT+=link.getId()+";";
+				linksA[i]=link.getId().toString();
+				i++;
+			}
 			writer.println(linksT);
+			finishedTrips.put(tripEntry.getKey(), linksA);
 			writer.close();
 		}
 		else {
@@ -194,12 +200,11 @@ public class RoutesPathsGenerator {
 			for(Entry<String,Route> routeE:routes.entrySet()) {
 				Trip trip = routeE.getValue().getTrips().get(fTripE.getKey());
 				if(trip!=null)
-					for(StopTime stopTime:trip.getStopTimes().values()) {
+					for(StopTime stopTime:trip.getStopTimes().values())
 						if(stopTime.getStopId().equals(selectedStopId)) {
 							isOk=false;
 							baseId = routeE.getValue().getShortName()+(fTripE.getKey().contains("_1")?"_1":"_2");
 						}
-					}
 			}
 			if(isOk) {
 				writer.println(fTripE.getKey());
@@ -208,9 +213,8 @@ public class RoutesPathsGenerator {
 					linksT+=link+";";
 				writer.println(linksT);
 			}
-			else {
+			else
 				bases.remove(baseId);
-			}
 		}
 		writer.close();
 		writer = new PrintWriter(PREFILES[1]);

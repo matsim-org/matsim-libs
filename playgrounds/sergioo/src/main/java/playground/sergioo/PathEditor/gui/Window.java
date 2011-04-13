@@ -46,6 +46,7 @@ import javax.swing.border.TitledBorder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -62,8 +63,9 @@ public class Window extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	//Enumerations
 	public enum Option {
-		SELECT_LINK("<html>S<br/>E<br/>L<br/>E<br/>C<br/>T<br/> <br/>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_STOP("<html>S<br/>E<br/>L<br/>E<br/>C<br/>T<br/> <br/>S<br/>T<br/>O<br/>P</html>"),
+		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
+		SELECT_STOP("<html>S<br/>T<br/>O<br/>P</html>"),
+		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		public String caption;
 		private Option(String caption) {
@@ -71,7 +73,7 @@ public class Window extends JFrame implements ActionListener {
 		}
 	}
 	public enum Tool {
-		ADD("Add first",0,0,2,1,"addFirst"),
+		ADD_FIRST("Add first",0,0,2,1,"addFirst"),
 		ADD_NEXT("Add next",0,1,2,1,"addNext"),
 		ROUTE("Route",2,0,2,1,"route"),
 		REMOVE("Remove",2,1,2,1,"remove"),
@@ -83,9 +85,10 @@ public class Window extends JFrame implements ActionListener {
 		DECREASE_NUM_CANDIDATES("-Candidates",10,1,2,1,"decCandidates"),
 		ADD_LINK_STOP("Add link to stop",12,0,2,1,"addLinkStop"),
 		REMOVE_LINK_STOP("Remove link to stop",12,1,2,1,"removeLinkStop"),
-		CALCULATE("Calculate!",14,0,4,2,"calculate"),
-		IS_OK("Is ok?",18,0,4,2,"isOk"),
-		SAVE("Save",22,0,4,2,"save");
+		ADD_LINK("Add Link network",14,0,2,2,"addLinkNetwork"),
+		CALCULATE("Calculate!",16,0,4,2,"calculate"),
+		IS_OK("Is ok?",20,0,4,2,"isOk"),
+		SAVE("Save",24,0,4,2,"save");
 		String caption;
 		int gx;int gy;
 		int sx;int sy;
@@ -123,11 +126,18 @@ public class Window extends JFrame implements ActionListener {
 			this.text = text;
 		}
 	}
+	public enum Wait {
+		ADD_FIRST,
+		ADD_NEXT,
+		ADD_LINK;
+	}
 	//Constants
 	private static int GAPX = 50;
 	private static int GAPY = 120;
 	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
 	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
+	public static int MIN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width/2;
+	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/2;
 	public static int FRAMESIZE = 50;
 	
 	//Attributes
@@ -139,13 +149,13 @@ public class Window extends JFrame implements ActionListener {
 	private Option option;
 	private int selectedLinkIndex = -1;
 	private String selectedStopId = "";
+	private Node selectedNode = null;
 	public List<Link> links;
 	private RoutesPathsGenerator routesPathsGenerator;
 	private JButton saveButton;
 	private JLabel[] labels;
 	private JCheckBox[] checks;
-	private boolean first;
-	
+	private Wait wait;
 	//Methods
 	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
 		this(title,network,trip,stops,null,links,routesPathsGenerator);
@@ -154,8 +164,6 @@ public class Window extends JFrame implements ActionListener {
 		setTitle(title);
 		this.routesPathsGenerator = routesPathsGenerator;
 		this.links = linksE;
-		this.setLocation(0,0);
-		this.setLayout(new BorderLayout());
 		if(linksS==null)
 			routePath = new RoutePath(network, trip, stops);
 		else {
@@ -164,6 +172,8 @@ public class Window extends JFrame implements ActionListener {
 				links.add(network.getLinks().get(new IdImpl(link)));
 			routePath = new RoutePath(network, trip, stops, links);
 		}
+		this.setLocation(0,0);
+		this.setLayout(new BorderLayout());
 		option = Option.SELECT_LINK;
 		panel = new PanelPathEditor(this);
 		this.setSize(width+GAPX, height+GAPY);
@@ -248,6 +258,14 @@ public class Window extends JFrame implements ActionListener {
 		}
 		infoPanel.add(labelsPanel, BorderLayout.CENTER);
 		this.add(infoPanel, BorderLayout.SOUTH);
+		if(linksS!=null) {
+			int first = routePath.isFirstLinkWithStop();
+			if(first!=-1)
+				routePath.removeLinksTo(first);
+		}
+		else
+			JOptionPane.showMessageDialog(this, "Review this");
+		isOk();
 	}
 	public Option getOption() {
 		return option;
@@ -262,7 +280,7 @@ public class Window extends JFrame implements ActionListener {
 		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
 		labels[Label.LINK.ordinal()].setText(refreshLink());
 	}
-	public void unselectLink(double x, double y) {
+	public void unselectLink() {
 		selectedLinkIndex = -1;
 		labels[Label.LINK.ordinal()].setText("");
 	}
@@ -270,26 +288,41 @@ public class Window extends JFrame implements ActionListener {
 		selectedStopId = routePath.getIdNearestStop(x, y);
 		labels[Label.STOP.ordinal()].setText(refreshStop());
 	}
-	public void unselectStop(double x, double y) {
+	public void unselectStop() {
 		selectedStopId = "";
 		labels[Label.STOP.ordinal()].setText("");
 	}
+	public void selectNode(double x, double y) {
+		selectedNode = routePath.getNearestNode(x, y);
+	}
+	public void unselectNode() {
+		selectedNode = null;
+	}
 	public void addFirst() {
 		panel.waitSecondCoord();
-		first = true;
+		wait = Wait.ADD_FIRST;
 	}
 	public void addNext() {
 		panel.waitSecondCoord();
-		first = false;
+		wait = Wait.ADD_NEXT;
+	}
+	public void addLinkNetwork() {
+		panel.waitSecondCoord();
+		wait = Wait.ADD_LINK;
 	}
 	public void add(Coord second) {
-		if(first) {
+		switch(wait) {
+		case ADD_FIRST:
 			routePath.addLinkFirst(second);
 			selectedLinkIndex = 0;
-		}
-		else if(selectedLinkIndex!=-1) {
+			break;
+		case ADD_NEXT:
 			routePath.addLinkNext(selectedLinkIndex, second);
 			selectedLinkIndex++;
+			break;
+		case ADD_LINK:
+			routePath.addLinkNetwork(selectedNode, second);
+			break;
 		}
 	}
 	public void remove() {
@@ -449,6 +482,9 @@ public class Window extends JFrame implements ActionListener {
 	public Coord getSelectedStop() {
 		return selectedStopId==""?null:routePath.getStop(selectedStopId);
 	}
+	public Node getSelectedNode() {
+		return selectedNode;
+	}
 	public void increaseSelectedLink() {
 		selectedLinkIndex++;
 		if(selectedLinkIndex==routePath.getLinks().size())
@@ -485,6 +521,7 @@ public class Window extends JFrame implements ActionListener {
 				} catch (InvocationTargetException e1) {
 					e1.printStackTrace();
 				}
+				saveButton.setEnabled(false);
 			}
 		for(Tool tool:Tool.values())
 			if(e.getActionCommand().equals(tool.name())) {
@@ -502,7 +539,10 @@ public class Window extends JFrame implements ActionListener {
 				} catch (InvocationTargetException e1) {
 					e1.printStackTrace();
 				}
+				if(!tool.equals(Tool.IS_OK))
+					saveButton.setEnabled(false);
 				panel.repaint();
 			}
 	}
+	
 }

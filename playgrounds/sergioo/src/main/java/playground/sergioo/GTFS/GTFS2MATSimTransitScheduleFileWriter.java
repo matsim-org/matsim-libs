@@ -2,7 +2,6 @@ package playground.sergioo.GTFS;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +37,6 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.GTFS.Route.RouteTypes;
-import playground.sergioo.PathEditor.gui.Window;
 import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
 
 
@@ -455,7 +453,29 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
+		/*try {
+			calculateShapePoints();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}*/
 	}
+	/*private void calculateShapePoints() throws FileNotFoundException {
+		PrintWriter pw = new PrintWriter(new File("./data/shapesDistance"));
+		for(Route route:routes[0].values())
+			for(Entry<String,Trip> tripE:route.getTrips().entrySet()) {
+				Shape shape = tripE.getValue().getShape();
+				if(shape!=null) {
+					double avg = 0;
+					SortedMap<Integer, Coord> ps = shape.getPoints();
+					for(int i=1; i<ps.size(); i++)
+						avg+=CoordUtils.calcDistance(ps.get(i), ps.get(i+1))*(6371000*Math.PI)/180;
+					avg/=ps.size();
+					pw.println(tripE.getKey()+" "+avg);
+				}
+			}
+		pw.close();
+	}*/
+
 	/**
 	 * Methods for processing one line of each file
 	 * @param parts
@@ -553,7 +573,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							stopTime.getValue().setStopId(newStopId);
 						}
 		//Links
-		
 		for(int r=0; r<roots.length; r++) {
 			if(r==0) {
 				RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, routes[r], stops[r]);

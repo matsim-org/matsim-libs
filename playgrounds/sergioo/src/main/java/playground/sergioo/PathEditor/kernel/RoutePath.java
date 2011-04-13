@@ -45,7 +45,7 @@ public class RoutePath {
 	private double minDistance = 40*180/(6371000*Math.PI);
 	private int numCandidates = 3;
 	private boolean withAngleShape = false;
-	private boolean withShapeCost = true;
+	private boolean withShapeCost = false;
 	private boolean withInsideStops = true;
 	private boolean us = true;
 	private boolean reps = true;
@@ -88,9 +88,6 @@ public class RoutePath {
 	}
 	public boolean isWithShapeCost() {
 		return withShapeCost;
-	}
-	public void setWithShapeCost() {
-		this.withShapeCost = !withShapeCost;
 	}
 	public boolean isWithInsideStops() {
 		return withInsideStops;
@@ -165,7 +162,10 @@ public class RoutePath {
 		return links;
 	}
 	public Collection<Coord> getShapePoints() {
-		return trip.getShape().getPoints().values();
+		if(trip.getShape()!=null)
+			return trip.getShape().getPoints().values();
+		else
+			return new ArrayList<Coord>();
 	}
 	public Collection<Coord> getStopPoints() {
 		Collection<Coord> points = new ArrayList<Coord>();
@@ -214,6 +214,19 @@ public class RoutePath {
 		}
 		return nearest;
 	}
+	public Node getNearestNode(double x, double y) {
+		Coord point = new CoordImpl(x, y);
+		Node nearest = links.get(0).getFromNode();
+		double nearestDistance = CoordUtils.calcDistance(point, nearest.getCoord());
+		for(Link link:links) {
+			double distance = CoordUtils.calcDistance(new CoordImpl(x, y),link.getToNode().getCoord());
+			if(distance<nearestDistance) {
+				nearestDistance = distance;
+				nearest = link.getToNode();
+			}
+		}
+		return nearest;
+	}
 	public void addLinkFirst(Coord point) {
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
@@ -246,6 +259,9 @@ public class RoutePath {
 				}
 			links.add(index+1, (LinkImpl)bestLink);
 		}	
+	}
+	public void addLinkNetwork(Node selectedNode, Coord second) {
+		network.addLink(network.getFactory().createLink(new IdImpl(network.getLinks().size()*2), selectedNode, getNearestNode(second.getX(), second.getY())));
 	}
 	public void removeLink(int index) {
 		links.remove(index);
@@ -532,7 +548,7 @@ public class RoutePath {
 	public void removeLinkStop(String selectedStopId) {
 		stops.get(selectedStopId).setLinkId(null);
 	}
-	public void setWithCostShape() {
+	public void setWithShapeCost() {
 		TravelMinCost travelMinCost = null;
 		if(withShapeCost) {
 			travelMinCost = new TravelMinCost() {
@@ -546,13 +562,13 @@ public class RoutePath {
 			preProcessData = new PreProcessEuclidean(travelMinCost);
 			preProcessData.run(network);
 		}
-		else if(!withShapeCost) {
+		else {
 			travelMinCost = new TravelMinCost() {
 				public double getLinkGeneralizedTravelCost(Link link, double time) {
 					return getLinkMinimumTravelCost(link);
 				}
 				public double getLinkMinimumTravelCost(Link link) {
-					return link.getLength()*trip.getShape().getDistance(link);
+					return link.getLength()*Math.pow(trip.getShape().getDistance(link),1);
 				}
 			};
 			preProcessData = new PreProcessEuclidean(travelMinCost);
