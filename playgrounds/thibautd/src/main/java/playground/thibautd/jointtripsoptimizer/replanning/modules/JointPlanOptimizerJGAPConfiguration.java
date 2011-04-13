@@ -116,8 +116,15 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// this selector ensures that a certain proportion of the genes (named
 			// "Threshold") is selected using a "best first" strategy.
 			// The rest of the new generation is selected randomly, with replacement.
-			ThresholdSelector selector =
-				new ThresholdSelector(this, configGroup.getSelectionThreshold());
+			//ThresholdSelector selector =
+			//	new ThresholdSelector(this, configGroup.getSelectionThreshold());
+			//	this reimplementation allows to choose whether to use replacement
+			//	or not (TODO: import from config group)
+			JointPlanOptimizerJGAPThresholdSelector selector = 
+				new JointPlanOptimizerJGAPThresholdSelector(
+						this, 
+						configGroup.getSelectionThreshold());
+			selector.setDoubletteChromosomesAllowed(false);
 			this.addNaturalSelector(selector, false);
 
 			// Chromosome: construction
