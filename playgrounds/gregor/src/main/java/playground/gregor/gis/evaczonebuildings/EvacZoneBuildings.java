@@ -37,9 +37,9 @@ public class EvacZoneBuildings {
 	
 	public static void main(String [] args) throws IOException {
 		
-		String evacZone = "/home/laemmel/arbeit/svn/shared-svn/studies/countries/id/padang/gis/evac_zone/zone_10_20m_buffer.shp";
-		String in = "/home/laemmel/arbeit/svn/shared-svn/studies/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp";
-		String out = "/home/laemmel/arbeit/svn/shared-svn/studies/countries/id/padang/gis/buildings_v20100315/evac_zone_buildings_v20100315.shp";
+		String evacZone = "/Users/laemmel/svn/shared-svn/studies/countries/id/padang/gis/evac_zone/zone_10_20m_buffer.shp";
+		String in = "/Users/laemmel/svn/shared-svn/studies/countries/id/padang/network/evac_zone_buildings_v20100517.shp";
+		String out = "/Users/laemmel/svn/shared-svn/studies/countries/id/padang/network/evac_zone_buildings_v20100517.shp";
 	
 		FeatureSource fs1 = ShapeFileReader.readDataFile(evacZone);
 		Iterator it1 = fs1.getFeatures().iterator();
