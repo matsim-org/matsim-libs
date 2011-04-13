@@ -44,7 +44,7 @@ public class Controller2D extends Controler {
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime(9*3600 + 5* 30);
-		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 
 	@Override
@@ -60,12 +60,12 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			 this.vis = new PedVisPeekABot(1);
-			 Link l = this.network.getLinks().get(new IdImpl(0));
-			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-			 this.vis.drawNetwork(network);
-			 this.events.addHandler(this.vis);
+//			 this.vis = new PedVisPeekABot(1);
+//			 Link l = this.network.getLinks().get(new IdImpl(0));
+//			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+//			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+//			 this.vis.drawNetwork(network);
+//			 this.events.addHandler(this.vis);
 		}
 
 	}
