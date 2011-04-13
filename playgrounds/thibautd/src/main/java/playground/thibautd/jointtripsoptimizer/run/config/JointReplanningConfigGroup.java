@@ -66,6 +66,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String DO_MONITOR = "fitnessToMonitor";
 	private static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
 	private static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
+	private static final String DOUBLETTES = "geneticSelectionWithReplacement";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -88,6 +89,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double minImprovement = 1d;
 	private PlanomatConfigGroup.TripStructureAnalysisLayerOption
 		tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
+	private boolean allowDoublettes = false;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -158,6 +160,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(STRUCTURE_LAYER)) {
 			this.setTripStructureAnalysisLayer(value);
 		}
+		else if (param_name.equals(DOUBLETTES)) {
+			this.setAllowDoublettes(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -224,6 +229,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(STRUCTURE_LAYER)) {
 			return this.getTripStructureAnalysisLayer().toString();
 		}
+		else if (param_name.equals(DOUBLETTES)) {
+			return String.valueOf(this.getAllowDoublettes());
+		}
 		return null;
 	}
 
@@ -248,6 +256,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, MONITORING_PERIOD);
 		this.addParameterToMap(map, DO_MONITOR);
 		this.addParameterToMap(map, STRUCTURE_LAYER);
+		this.addParameterToMap(map, DOUBLETTES);
 		return map;
 	}
 
@@ -510,6 +519,14 @@ public class JointReplanningConfigGroup extends Module {
 	public PlanomatConfigGroup.TripStructureAnalysisLayerOption 
 		getTripStructureAnalysisLayer() {
 			return this.tripStructureAnalysisLayer;
+	}
+
+	public boolean getAllowDoublettes() {
+		return this.allowDoublettes;
+	}
+
+	public void setAllowDoublettes(String value) {
+		this.allowDoublettes = Boolean.parseBoolean(value);
 	}
 }
 
