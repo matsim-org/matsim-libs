@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.Module;
 
 /**
@@ -64,6 +65,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String MONITORING_PERIOD = "fitnessMonitoringPeriod";
 	private static final String DO_MONITOR = "fitnessToMonitor";
 	private static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
+	private static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -84,6 +86,8 @@ public class JointReplanningConfigGroup extends Module {
 	private int monitoringPeriod = 5;
 	private boolean doMonitor = true;
 	private double minImprovement = 1d;
+	private PlanomatConfigGroup.TripStructureAnalysisLayerOption
+		tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -151,7 +155,13 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MIN_IMPROVEMENT)) {
 			this.setMinImprovement(value);
 		}
-
+		else if (param_name.equals(STRUCTURE_LAYER)) {
+			this.setTripStructureAnalysisLayer(value);
+		}
+		else {
+			log.warn("Unrecognized JointReplanning parameter: "+
+					param_name+", of value: "+value+".");
+		}
 	}
 
 	@Override
@@ -211,6 +221,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MIN_IMPROVEMENT)) {
 			return String.valueOf(this.getMinImprovement());
 		}
+		else if (param_name.equals(STRUCTURE_LAYER)) {
+			return this.getTripStructureAnalysisLayer().toString();
+		}
 		return null;
 	}
 
@@ -234,7 +247,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, ITER_MIN_NUM);
 		this.addParameterToMap(map, MONITORING_PERIOD);
 		this.addParameterToMap(map, DO_MONITOR);
-		this.addParameterToMap(map, MIN_IMPROVEMENT);
+		this.addParameterToMap(map, STRUCTURE_LAYER);
 		return map;
 	}
 
@@ -477,6 +490,26 @@ public class JointReplanningConfigGroup extends Module {
 
 	public double getMinImprovement() {
 		return this.minImprovement;
+	}
+
+	public void setTripStructureAnalysisLayer(String value) {
+		if (value.equals("facility")) {
+			this.tripStructureAnalysisLayer =
+				PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
+		}
+		else if (value.equals("link")) {
+			this.tripStructureAnalysisLayer =
+				PlanomatConfigGroup.TripStructureAnalysisLayerOption.link;
+		}
+		else {
+			throw new IllegalArgumentException("the tripStructureAnalysisLayer option"+
+					" must be facility or link.");
+		}
+	}
+
+	public PlanomatConfigGroup.TripStructureAnalysisLayerOption 
+		getTripStructureAnalysisLayer() {
+			return this.tripStructureAnalysisLayer;
 	}
 }
 

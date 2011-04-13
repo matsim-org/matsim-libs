@@ -68,6 +68,7 @@ public class JointPlanOptimizerDecoderFactory {
 		if (configGroup.getModeToOptimize()) {
 			output.addDecoder(new ModeDecoder(
 						this.plan,
+						this.configGroup,
 						this.numJointEpisodes,
 						this.numEpisodes));
 		}

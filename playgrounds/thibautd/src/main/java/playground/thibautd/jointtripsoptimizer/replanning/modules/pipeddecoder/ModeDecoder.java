@@ -40,6 +40,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPModeGene;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * For decoding the mode.
@@ -84,6 +85,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	 */
 	public ModeDecoder(
 			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
 			final int nToggleGenes,
 			final int nDurGenes) {
 		//this.firstModeGene = nToggleGenes + nDurGenes;
@@ -92,8 +94,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		int lastIndividualIndex = currentIndex;
 		List<Integer> individualIndices;
 
-		//TODO: import from config group
-		this.analyseSubtours.setTripStructureAnalysisLayer(org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
+		this.analyseSubtours.setTripStructureAnalysisLayer(
+				configGroup.getTripStructureAnalysisLayer());
 
 		for (Map.Entry<Id, Plan> individualPlan : 
 				plan.getIndividualPlans().entrySet()) {
