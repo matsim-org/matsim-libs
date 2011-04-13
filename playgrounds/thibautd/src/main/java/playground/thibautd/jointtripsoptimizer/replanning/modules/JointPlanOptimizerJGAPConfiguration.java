@@ -124,7 +124,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				new JointPlanOptimizerJGAPThresholdSelector(
 						this, 
 						configGroup.getSelectionThreshold());
-			selector.setDoubletteChromosomesAllowed(false);
+			selector.setDoubletteChromosomesAllowed(configGroup.getAllowDoublettes());
 			this.addNaturalSelector(selector, false);
 
 			// Chromosome: construction
