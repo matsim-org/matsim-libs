@@ -28,11 +28,17 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.JointPlansReplanning;
 import playground.thibautd.jointtripsoptimizer.replanning.JointStrategyManager;
+import playground.thibautd.jointtripsoptimizer.router.CarPassengerLegRouter;
 import playground.thibautd.jointtripsoptimizer.scoring.JointPlansScoring;
 
 /**
@@ -62,7 +68,7 @@ public class JointControler extends Controler {
 	 * ScenarioWithCliques in the controler.
 	 * The config has to be set in the scenario before.
 	 */
-	public JointControler(ScenarioWithCliques scenario) {
+	public JointControler(final ScenarioWithCliques scenario) {
 		super((ScenarioImpl) scenario);
 	}
 
@@ -119,10 +125,39 @@ public class JointControler extends Controler {
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
+	
+	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		 return createRoutingAlgorithm(
+				 this.createTravelCostCalculator(),
+				 this.getTravelTimeCalculator());
+	}
+	/**
+	 * Creates a routing algorithm, which takes explicitly car passenger mode
+	 * into account.
+	 *
+	 * @param travelCosts
+	 *            the travel costs to be used for the routing
+	 * @param travelTimes
+	 *            the travel times to be used for the routing
+	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
+	 *         of plans with the specified travelCosts and travelTimes. Only to
+	 *         be used by a single thread, use multiple instances for multiple
+	 *         threads!
+	 */
+	@Override
+	public PlanAlgorithm createRoutingAlgorithm(
+			final PersonalizableTravelCost travelCosts,
+			final PersonalizableTravelTime travelTimes) {
+		log.debug("routing algorithm created");
+		PlansCalcRoute router = (PlansCalcRoute) 
+			super.createRoutingAlgorithm(travelCosts, travelTimes);
 
-	//@Override
-	//public PlansScoring getPlansScoring() {
-	//	return this.plansScoring;
-	//}
+		router.addLegHandler(
+				JointActingTypes.PASSENGER,
+				new CarPassengerLegRouter());
+
+		return router;
+	}
 
 }
