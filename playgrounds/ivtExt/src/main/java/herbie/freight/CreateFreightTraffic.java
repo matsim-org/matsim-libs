@@ -88,8 +88,7 @@ public class CreateFreightTraffic {
 			log.info("Please specify a config file path!"); 
 			return;
 		}
-		CreateFreightTraffic creator = new CreateFreightTraffic();
-		
+		CreateFreightTraffic creator = new CreateFreightTraffic();				
 		creator.init(args[0]);
 		creator.create();
 		creator.write();
@@ -118,16 +117,16 @@ public class CreateFreightTraffic {
 		Utils util = new Utils();
 		this.facilityTree = util.createActivitiesTree("all", this.scenario);
     }
-		
+			
 	public void create() {
 		this.createZones();
 		// -----------------------------------------------------
 		double[][] odMatrix = this.sumMatrices(this.readODMatrix(lkwFile), this.readODMatrix(liFile));
 		this.createPersonsFromODMatrices(odMatrix);
 		// -----------------------------------------------------
-//		List<ODRelation> relations = this.getHeavyRelations(odMatrix);
-//		CSShapeFileWriter gisWriter = new CSShapeFileWriter();
-//		gisWriter.writeODRelations(this.outpath, relations);
+		List<ODRelation> relations = this.getHeavyRelations(odMatrix);
+		CSShapeFileWriter gisWriter = new CSShapeFileWriter();
+		gisWriter.writeODRelations(this.outpath, relations);
 		// -----------------------------------------------------
 		log.info("Creation finished ...");
 	}
