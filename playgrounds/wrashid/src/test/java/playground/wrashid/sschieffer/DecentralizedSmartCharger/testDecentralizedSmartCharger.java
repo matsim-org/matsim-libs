@@ -276,6 +276,10 @@ public class testDecentralizedSmartCharger extends TestCase{
 					
 					assertEquals(agentsWithPHEV.size(), 100);
 					
+					//*****************************************
+					//*****************************************
+					//TEST CalculateChargingCost For Agent Schedule
+					
 					
 					
 					//*****************************************
@@ -361,7 +365,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 				bullShitFunc,//p
 				true//boolean
 		);
-		l1.makeXYSeries();
+		
 		bullShitSchedule.addTimeInterval(l1);
 		
 		
@@ -371,7 +375,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 				bullShitFunc2,//p
 				false//boolean
 		);
-		l2.makeXYSeries();
+	
 		bullShitSchedule.addTimeInterval(l2);
 		
 		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	

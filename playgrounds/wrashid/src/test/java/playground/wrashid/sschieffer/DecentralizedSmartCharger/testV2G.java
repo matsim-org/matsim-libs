@@ -149,11 +149,6 @@ public class testV2G extends TestCase{
 	}
 	
 	
-	public void testCalculateChargingCostForAgentSchedule(){
-		//calculateChargingCostForAgentSchedule
-		
-		//TODO
-	}
 	
 	
 	
