@@ -63,9 +63,6 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    vehTestMap.put(event3.getVehicleId(), event3);
 	    vehTestMap.put(event4.getVehicleId(), event4);
 	    
-//	    System.out.println("EINS: "+test.getStopId2RouteId2DelayAtStopMap().toString());
-//	    System.out.println("ZWEI: "+test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).firstEntry().toString());
-	    
 	    // to be completed
 	        
 //	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getFacilityId()).getRealizedDepartures().get(0));

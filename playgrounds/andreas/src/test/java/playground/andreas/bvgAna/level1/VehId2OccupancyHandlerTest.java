@@ -2,6 +2,7 @@ package playground.andreas.bvgAna.level1;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class VehId2OccupancyHandlerTest {
@@ -12,8 +13,8 @@ public class VehId2OccupancyHandlerTest {
 		VehId2OccupancyHandler test = new VehId2OccupancyHandler();
 		
 //		to be implemented
-		
-		
+				
+		Assert.assertNotNull(test);
 		
 	}
 
