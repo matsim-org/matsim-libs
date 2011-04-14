@@ -33,7 +33,8 @@ public class LegHistoBox {
 			}
 		}
 		try {
-			this.runsEnsemble.writeLegHistogramFile();
+			this.runsEnsemble.writeLegHistogramFile("arrivals");
+			this.runsEnsemble.writeLegHistogramFile("departures");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

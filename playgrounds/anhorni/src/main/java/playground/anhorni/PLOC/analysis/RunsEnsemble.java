@@ -88,10 +88,10 @@ public class RunsEnsemble {
 		}
 	}
 		
-	public void writeLegHistogramFile() throws IOException {
+	public void writeLegHistogramFile(String ad) throws IOException {
 		DecimalFormat formatter = new DecimalFormat("0.00");
 			new File(outpath).mkdirs();			
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outpath +  "/legHistogram.txt")); 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outpath + "/" + ad + "_legHistogram.txt")); 
 			bufferedWriter.write("Run.Day \\ Hour\t");
 			
 			for (int hour = 0; hour < 24; hour++) {
@@ -103,13 +103,18 @@ public class RunsEnsemble {
 				for (Run run : this.randomRuns) {
 					bufferedWriter.write("R" + run.getId() + "D" + day + "\t");
 					for (int hour = 0; hour < 24; hour++) {
-						bufferedWriter.write(formatter.format(run.getArrivals()[day][hour]) + "\t");
+						if (ad.equals("arrivals")) {
+							bufferedWriter.write(formatter.format(run.getArrivals()[day][hour]) + "\t");
+						}
+						else {
+							bufferedWriter.write(formatter.format(run.getDepartures()[day][hour]) + "\t");
+						}
 					}
 					bufferedWriter.newLine();
 				}
 			}
 			bufferedWriter.flush();
 			bufferedWriter.close();
-			log.info("legHistogram file written");
+			log.info(ad + " leg histogram file written");
 		}
 }
