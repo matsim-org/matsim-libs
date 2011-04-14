@@ -38,7 +38,7 @@ import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 
 public class ReplanningFlagInitializer implements SimulationInitializedListener {
 
-	private static final Logger log = Logger.getLogger(WithinDayController.class);
+	private static final Logger log = Logger.getLogger(ReplanningFlagInitializer.class);
 	
 	protected ReplanningManager replanningManager;
 	protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;

@@ -20,22 +20,17 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.List;
-
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-
+/**
+ * A class for running {@link WithinDayInitialReplanner} in parallel using threads.
+ *
+ * @author Christoph Dobler
+ */
 public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplanner> {
 		
-	public ParallelInitialReplanner(int numOfThreads, Controler controler) {
-		super(numOfThreads, controler);
-		this.init("ParallelInitialReplanner");
-	}
-	
-	public ParallelInitialReplanner(int numOfThreads, List<SimulationListener> list) {
-		super(numOfThreads, list);
+	public ParallelInitialReplanner(int numOfThreads) {
+		super(numOfThreads);
 		this.init("ParallelInitialReplanner");
 	}
 		

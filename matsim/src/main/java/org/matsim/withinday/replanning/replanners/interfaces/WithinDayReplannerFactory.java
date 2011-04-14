@@ -34,6 +34,11 @@ public abstract class WithinDayReplannerFactory {
 	private AbstractMultithreadedModule abstractMultithreadedModule;
 	private double replanningProbability = 1.0;
 	
+	/*
+	 * I don't think we need the agentCounter here anymore. Counter updates should
+	 * be triggered by calling QSim.rescheduleActivityEnd(...). There, the count
+	 * is in- or decreased, if necessary.	
+	 */
 	public WithinDayReplannerFactory(AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		this.agentCounter = agentCounter;
 		this.abstractMultithreadedModule = abstractMultithreadedModule;

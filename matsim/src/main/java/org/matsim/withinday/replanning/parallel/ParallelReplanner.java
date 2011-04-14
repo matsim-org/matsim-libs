@@ -27,16 +27,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
-
 
 /*
  * Abstract class that contains the basic elements that are needed
@@ -45,6 +42,9 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
  * Features like the creation of parallel running threads and the
  * split up of the replanning actions have to be implemented in
  * the subclasses.
+ * 
+ * Please ensure that each ParallelReplanner is registered as 
+ * a SimulationListener to the Controller!
  */
 public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> implements SimulationInitializedListener {
 
@@ -58,14 +58,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 
-	public ParallelReplanner(int numOfThreads, Controler controler) {
+	public ParallelReplanner(int numOfThreads) {
 		this.setNumberOfThreads(numOfThreads);
-		controler.getQueueSimulationListener().add(this);
-	}
-
-	public ParallelReplanner(int numOfThreads, List<SimulationListener> list) {
-		this.setNumberOfThreads(numOfThreads);
-		list.add(this);
 	}
 
 	public final void init(String replannerName) {

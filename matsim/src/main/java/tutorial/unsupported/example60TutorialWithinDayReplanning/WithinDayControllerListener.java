@@ -125,6 +125,11 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		controller.setMobsimFactory(new WithinDayQSimFactory());
 		
 		/*
+		 * Add this as a ControlerListener
+		 */
+		controller.addControlerListener(this);
+		
+		/*
 		 * Create and register a FixedOrderQueueSimulationListener
 		 */
 		fosl = new FixedOrderSimulationListener();
@@ -202,9 +207,14 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 */
 		log.info("Initialize Parallel Replanning Modules");
 		int numReplanningThreads = event.getControler().getConfig().global().getNumberOfThreads();
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, event.getControler().getQueueSimulationListener());
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, event.getControler().getQueueSimulationListener());
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, event.getControler().getQueueSimulationListener());
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		
+		// register them as SimulationListeners
+		event.getControler().getQueueSimulationListener().add(this.parallelInitialReplanner);
+		event.getControler().getQueueSimulationListener().add(this.parallelActEndReplanner);
+		event.getControler().getQueueSimulationListener().add(this.parallelLeaveLinkReplanner);
 		
 		/*
 		 * We create and set the Replanning Modules for each iteration.

@@ -20,12 +20,7 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.List;
-
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-
 
 /**
  * A class for running {@link WithinDayDuringLegReplanner} in parallel using threads.
@@ -34,13 +29,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  */
 public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplanner> {
 
-	public ParallelDuringLegReplanner(int numOfThreads, Controler controler) {
-		super(numOfThreads, controler);
-		this.init("ParallelDuringLegReplanner");
-	}
-	
-	public ParallelDuringLegReplanner(int numOfThreads, List<SimulationListener> list) {
-		super(numOfThreads, list);
+	public ParallelDuringLegReplanner(int numOfThreads) {
+		super(numOfThreads);
 		this.init("ParallelDuringLegReplanner");
 	}
 	
