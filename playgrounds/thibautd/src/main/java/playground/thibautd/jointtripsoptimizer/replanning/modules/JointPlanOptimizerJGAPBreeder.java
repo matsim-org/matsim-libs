@@ -43,6 +43,14 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Evolves the population. This is done with the following properties:
+	 * -allows negative fitnesses
+	 * -does NOT reinitialize fitnesses of chromosomes. Genetic operators
+	 *  have the responsability to deliver new borned with "no fitness"
+	 *  fitness values (This is automatic if the new borned are generated
+	 *  with JointPlanOptimizerJGAPChromosome.clone() method).
+	 */
 	@Override
 	public Population evolve(Population a_pop, Configuration a_conf) {
 	    Population pop = a_pop;
@@ -94,7 +102,12 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    int currentPopSize = pop.size();
 	    for (int i = originalPopSize; i < currentPopSize; i++) {
 	      IChromosome chrom = pop.getChromosome(i);
-	      chrom.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
+		  //do NOT reset fitness value, as:
+		  // - the JointPlanOptimizerChromosome.clone() method does it
+		  // - "parents" fitness does not change, and thus does not have to be
+		  //    evaluated again.
+		  //-------------------------------------------------------------------
+	      //chrom.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 	      // Mark chromosome as new-born.
 	      // ----------------------------
 	      chrom.resetAge();
@@ -122,12 +135,12 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 
 	    pop = applyNaturalSelectors(a_conf, pop, false);
 
-	    BulkFitnessFunction bulkFunction = a_conf.getBulkFitnessFunction();
-	    if (bulkFunction != null) {
-	      /**@todo utilize jobs: bulk fitness function is not so important for a
-	       * prototype! */
-	      bulkFunction.evaluate(pop);
-	    }
+	    //BulkFitnessFunction bulkFunction = a_conf.getBulkFitnessFunction();
+	    //if (bulkFunction != null) {
+	    //  /**@todo utilize jobs: bulk fitness function is not so important for a
+	    //   * prototype! */
+	    //  bulkFunction.evaluate(pop);
+	    //}
 	    // Fill up population randomly if size dropped below specified percentage
 	    // of original size.
 	    // ----------------------------------------------------------------------

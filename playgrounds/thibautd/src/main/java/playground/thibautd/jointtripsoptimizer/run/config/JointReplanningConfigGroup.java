@@ -67,6 +67,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
 	private static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
 	private static final String DOUBLETTES = "geneticSelectionWithReplacement";
+	private static final String DYNAMIC_CO_RATES = "allowAdaptiveCrossOverRates";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -90,6 +91,7 @@ public class JointReplanningConfigGroup extends Module {
 	private PlanomatConfigGroup.TripStructureAnalysisLayerOption
 		tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
 	private boolean allowDoublettes = false;
+	private boolean dynamicCoRate = true;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -163,6 +165,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DOUBLETTES)) {
 			this.setAllowDoublettes(value);
 		}
+		else if (param_name.equals(DYNAMIC_CO_RATES)) {
+			this.setIsDynamicCO(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -232,6 +237,10 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DOUBLETTES)) {
 			return String.valueOf(this.getAllowDoublettes());
 		}
+		else if (param_name.equals(DYNAMIC_CO_RATES)) {
+			return String.valueOf(this.getIsDynamicCO());
+		}
+
 		return null;
 	}
 
@@ -257,6 +266,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, DO_MONITOR);
 		this.addParameterToMap(map, STRUCTURE_LAYER);
 		this.addParameterToMap(map, DOUBLETTES);
+		this.addParameterToMap(map, DYNAMIC_CO_RATES);
 		return map;
 	}
 
@@ -527,6 +537,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public void setAllowDoublettes(String value) {
 		this.allowDoublettes = Boolean.parseBoolean(value);
+	}
+
+	public boolean getIsDynamicCO() {
+		return this.dynamicCoRate;
+	}
+
+	public void setIsDynamicCO(String value) {
+		this.dynamicCoRate = Boolean.parseBoolean(value);
 	}
 }
 

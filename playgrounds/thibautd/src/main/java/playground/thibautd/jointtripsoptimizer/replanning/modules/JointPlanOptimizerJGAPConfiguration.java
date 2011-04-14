@@ -176,13 +176,25 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 							configGroup.getMaxIterations(),
 							outputPath));
 			}
-			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
-						this,
-						configGroup,
-						this.numToggleGenes,
-						this.numEpisodes,
-						this.numModeGenes,
-						this.nDurationGenes) );
+			if (configGroup.getIsDynamicCO()) {
+				this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
+							this,
+							configGroup,
+							new CrossOverRateCalculator(configGroup),
+							this.numToggleGenes,
+							this.numEpisodes,
+							this.numModeGenes,
+							this.nDurationGenes) );
+			}
+			else {
+				this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
+							this,
+							configGroup,
+							this.numToggleGenes,
+							this.numEpisodes,
+							this.numModeGenes,
+							this.nDurationGenes) );
+			}
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,

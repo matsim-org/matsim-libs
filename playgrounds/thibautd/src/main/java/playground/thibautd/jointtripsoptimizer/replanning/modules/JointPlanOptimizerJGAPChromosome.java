@@ -78,6 +78,10 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		}
 	}
 
+	/**
+	 * Returns a deep clone of the chromosome, but with its fitness set to the
+	 * "no fitness" value.
+	 */
 	@Override
 	public synchronized Object clone() {
 		// Before doing anything, make sure that a Configuration object
@@ -126,8 +130,10 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 				else {
 					copy = new JointPlanOptimizerJGAPChromosome(getConfiguration());
 				}
-				copy.setFitnessValue(m_fitnessValue);
-				//copy.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
+				// do NOT clone the fitness, as this function is mainly used to
+				// create new chromosomes to be modified, and thus re-evaluated.
+				//copy.setFitnessValue(m_fitnessValue);
+				copy.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 			}
 			// Clone constraint checker.
 			// -------------------------

@@ -61,19 +61,25 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	private final int N_DOUBLE;
 	private final int N_MODE;
 
+	private final RateCalculator rateCalculator;
+	private final boolean dynamicRates;
+
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 
 	private final double DAY_DURATION;
 
 	private final RandomGenerator randomGenerator;
 
+	/**
+	 * Constructor for use with static rates
+	 */
 	public JointPlanOptimizerJGAPCrossOver(
-			JointPlanOptimizerJGAPConfiguration config,
-			JointReplanningConfigGroup configGroup,
-			int numBooleanGenes,
-			int numDoubleGenes,
-			int numModeGenes,
-			List<Integer> nDurationGenes
+			final JointPlanOptimizerJGAPConfiguration config,
+			final JointReplanningConfigGroup configGroup,
+			final int numBooleanGenes,
+			final int numDoubleGenes,
+			final int numModeGenes,
+			final List<Integer> nDurationGenes
 			) {
 		this.WHOLE_CO_RATE = configGroup.getWholeCrossOverProbability();
 		this.SIMPLE_CO_RATE = configGroup.getSimpleCrossOverProbability();
@@ -85,6 +91,34 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		this.nDurationGenes.clear();
 		this.nDurationGenes.addAll(nDurationGenes);
 		this.randomGenerator = config.getRandomGenerator();
+		this.rateCalculator = null;
+		this.dynamicRates = false;
+	}
+
+	/**
+	 * Constructor for use with dynamic rates.
+	 */
+	public JointPlanOptimizerJGAPCrossOver(
+			final JointPlanOptimizerJGAPConfiguration config,
+			final JointReplanningConfigGroup configGroup,
+			final RateCalculator rateCalculator,
+			final int numBooleanGenes,
+			final int numDoubleGenes,
+			final int numModeGenes,
+			final List<Integer> nDurationGenes
+			) {
+		this.WHOLE_CO_RATE = Double.NaN;
+		this.SIMPLE_CO_RATE = Double.NaN;
+		this.SINGLE_CO_RATE = Double.NaN;
+		this.N_BOOL = numBooleanGenes;
+		this.N_DOUBLE = numDoubleGenes;
+		this.N_MODE = numModeGenes;
+		this.DAY_DURATION = config.getDayDuration();
+		this.nDurationGenes.clear();
+		this.nDurationGenes.addAll(nDurationGenes);
+		this.randomGenerator = config.getRandomGenerator();
+		this.rateCalculator = rateCalculator;
+		this.dynamicRates = true;
 	}
 
 	@Override
@@ -93,37 +127,79 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			final List a_candidateChromosome
 			) {
 		int populationSize = a_population.size();
-		int numOfWholeCo = (int) Math.ceil(this.WHOLE_CO_RATE * populationSize);
-		int numOfSimpleCo = (int) Math.ceil(this.SIMPLE_CO_RATE * populationSize);
-		int numOfSingleCo = (int) Math.ceil(this.SINGLE_CO_RATE * populationSize);
+		int numOfWholeCo;
+		int numOfSimpleCo;
+		int numOfSingleCo;
+
+		if (dynamicRates) {
+			numOfWholeCo = (int) Math.ceil(this.WHOLE_CO_RATE * populationSize);
+			numOfSimpleCo = (int) Math.ceil(this.SIMPLE_CO_RATE * populationSize);
+			numOfSingleCo = (int) Math.ceil(this.SINGLE_CO_RATE * populationSize);
+		}
+		else {
+			double[] rates = this.rateCalculator.getRates();
+			numOfWholeCo = (int) Math.ceil(rates[0] * populationSize);
+			numOfSimpleCo = (int) Math.ceil(rates[1] * populationSize);
+			numOfSingleCo = (int) Math.ceil(rates[2] * populationSize);
+		}
+
 		int numOfCo = numOfWholeCo + numOfSimpleCo + numOfSingleCo;
 		int index1;
+		IChromosome parent1;
 		IChromosome mate1;
 		int index2;
+		IChromosome parent2;
 		IChromosome mate2;
 
 		for (int i=0; i < numOfCo; i++) {
 			// draw random parents
 			index1 = this.randomGenerator.nextInt(populationSize);
 			index2 = this.randomGenerator.nextInt(populationSize);
-			mate1 = (IChromosome) a_population.getChromosome(index1).clone();
-			mate2 = (IChromosome) a_population.getChromosome(index2).clone();
+			parent1 = (IChromosome) a_population.getChromosome(index1);
+			parent2 = (IChromosome) a_population.getChromosome(index2);
+			mate1 = (IChromosome) parent1.clone();
+			mate2 = (IChromosome) parent2.clone();
 
 			doBooleanCrossOver(mate1, mate2);
 			doModeCrossOver(mate1, mate2);
 			if (i < numOfWholeCo) {
 				doDoubleWholeCrossOver(mate1, mate2);
+				if (dynamicRates) {
+					notifyCO(0, parent1, parent2, mate1, mate2);
+				}
 			}
 			else if (i < numOfWholeCo + numOfSimpleCo) {
 				doDoubleSimpleCrossOver(mate1, mate2);
+				if (dynamicRates) {
+					notifyCO(1, parent1, parent2, mate1, mate2);
+				}
 			}
 			else {
 				doDoubleSingleCrossOver(mate1, mate2);
+				if (dynamicRates) {
+					notifyCO(2, parent1, parent2, mate1, mate2);
+				}
 			}
 
 			a_candidateChromosome.add(mate1);
 			a_candidateChromosome.add(mate2);
 		}
+
+		if (dynamicRates) {
+			this.rateCalculator.iterationIsOver();
+		}
+	}
+
+	private void notifyCO(
+			final int index,
+			final IChromosome parent1,
+			final IChromosome parent2,
+			final IChromosome mate1,
+			final IChromosome mate2) {
+		this.rateCalculator.addResult(
+				index,
+				parent1.getFitnessValue() + parent2.getFitnessValue(),
+				mate1.getFitnessValue() + mate2.getFitnessValue());
 	}
 
 	/**
