@@ -26,10 +26,10 @@ public class LegHistoBox {
 		this.runsEnsemble = new RunsEnsemble(0, pathStub);
 		for (int i = 0; i < numberOfRuns; i++) {
 			Run randomRun = new Run(i, 9);
+			runsEnsemble.addRandomRun(randomRun);
 			for (int day = 0; day < 5; day++) {
 				String p = pathStub +  "/run" + i + "/day" + day +"/matsim/ITERS/it.100/" + "R" + i + "D" + day + "." + 100 + ".legHistogram.txt";
 				this.readLegHistogramFile(p, day, randomRun);
-				runsEnsemble.addRandomRun(randomRun);
 			}
 		}
 		try {
