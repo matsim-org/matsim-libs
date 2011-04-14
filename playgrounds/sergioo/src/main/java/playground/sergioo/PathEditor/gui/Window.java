@@ -174,7 +174,7 @@ public class Window extends JFrame implements ActionListener {
 		}
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		option = Option.SELECT_LINK;
+		option = Option.ZOOM;
 		panel = new PanelPathEditor(this);
 		this.setSize(width+GAPX, height+GAPY);
 		this.add(panel, BorderLayout.CENTER);
@@ -263,9 +263,9 @@ public class Window extends JFrame implements ActionListener {
 			if(first!=-1)
 				routePath.removeLinksTo(first);
 		}
-		else
-			JOptionPane.showMessageDialog(this, "Review this");
 		isOk();
+		if(linksS!=null && saveButton.isEnabled())
+			save();
 	}
 	public Option getOption() {
 		return option;
@@ -321,7 +321,12 @@ public class Window extends JFrame implements ActionListener {
 			selectedLinkIndex++;
 			break;
 		case ADD_LINK:
-			routePath.addLinkNetwork(selectedNode, second);
+			Node firstNode = selectedNode;
+			selectedNode = routePath.getNearestNode(second.getX(), second.getY());
+			panel.repaint();
+			int res = JOptionPane.showConfirmDialog(this, "Are you sure do you want to add a new link?");
+			if(res == JOptionPane.YES_OPTION)
+				routePath.addLinkNetwork(firstNode, selectedNode);
 			break;
 		}
 	}

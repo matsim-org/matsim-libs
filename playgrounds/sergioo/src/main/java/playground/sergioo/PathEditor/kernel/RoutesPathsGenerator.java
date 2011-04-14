@@ -94,9 +94,12 @@ public class RoutesPathsGenerator {
 		reader.close();
 	}
 	public void run() throws IOException {
-		for(Route route:routes.values())
-			for(Entry<String,Trip> tripEntry:route.getTrips().entrySet())
-				calculateBusLinksSequence(tripEntry, route);
+		System.out.println(routes.size());
+		for(Entry<String,Route> route:routes.entrySet()) {
+			for(Entry<String,Trip> tripEntry:route.getValue().getTrips().entrySet())
+				calculateBusLinksSequence(tripEntry, route.getValue());
+			System.out.println(route.getKey());
+		}
 	}
 	/**
 	 * 
@@ -177,7 +180,6 @@ public class RoutesPathsGenerator {
 			link.setAllowedModes(modes);
 		}
 		tripEntry.getValue().setRoute(links);
-		System.out.println("Finished "+tripEntry.getKey());
 	}
 	/**
 	 * 

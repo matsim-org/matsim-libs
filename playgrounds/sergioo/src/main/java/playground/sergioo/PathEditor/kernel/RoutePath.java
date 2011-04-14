@@ -1,5 +1,9 @@
 package playground.sergioo.PathEditor.kernel;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -35,7 +40,7 @@ public class RoutePath {
 	
 	//Constants
 	private static final double MIN_DISTANCE_DELTA = 20*180/(6371000*Math.PI);
-	
+	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
 	//Attributes
 	private Map<String, Stop> stops;
 	public List<Link> links;
@@ -260,8 +265,18 @@ public class RoutePath {
 			links.add(index+1, (LinkImpl)bestLink);
 		}	
 	}
-	public void addLinkNetwork(Node selectedNode, Coord second) {
-		network.addLink(network.getFactory().createLink(new IdImpl(network.getLinks().size()*2), selectedNode, getNearestNode(second.getX(), second.getY())));
+	public void addLinkNetwork(Node fromNode, Node toNode) {
+		Id linkId = new IdImpl(network.getLinks().size()*2);
+		network.addLink(network.getFactory().createLink(linkId, fromNode, toNode));
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(NEW_NETWORK_LINKS_FILE,true));
+			writer.println(linkId);
+			writer.println(fromNode.getId());
+			writer.println(toNode.getId());
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public void removeLink(int index) {
 		links.remove(index);

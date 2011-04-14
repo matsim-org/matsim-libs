@@ -1,6 +1,7 @@
 package playground.sergioo.GTFS;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,6 +39,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.GTFS.Route.RouteTypes;
+import playground.sergioo.PathEditor.kernel.RoutePath;
 import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
 
 
@@ -86,7 +89,24 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		super();
 		this.roots = roots;
 		this.network = network;
+		updateNetwork();
 		this.serviceIds = serviceIds;
+	}
+
+	private void updateNetwork() {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(RoutePath.NEW_NETWORK_LINKS_FILE));
+			String line = reader.readLine();
+			while(line!=null) {
+				Id id = new IdImpl(line);
+				network.addLink(network.getFactory().createLink(id, network.getNodes().get(new IdImpl(reader.readLine())), network.getNodes().get(new IdImpl(reader.readLine()))));
+				line = reader.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
