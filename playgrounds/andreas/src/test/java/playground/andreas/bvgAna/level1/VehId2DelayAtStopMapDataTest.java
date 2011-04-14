@@ -3,6 +3,7 @@ package playground.andreas.bvgAna.level1;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,6 +41,10 @@ public class VehId2DelayAtStopMapDataTest {
         VehId2DelayAtStopMapData mapData = new VehId2DelayAtStopMapData(event1);
         
         mapData.addVehicleDepartsAtFacilityEvent(event2);
+        
+//        testing
+        
+        Assert.assertNotNull(mapData);
         
         
         

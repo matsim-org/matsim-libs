@@ -48,6 +48,12 @@ public class StopId2LineId2PulkTest {
 	    test.handleEvent(event2);
 	    
 	    System.out.println(test.getStopId2LineId2PulkDataList().toString());
+	    
+//	    to be implemented
+	    
+	    System.out.println(test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
+	    
+	    
 		
 	}
 
