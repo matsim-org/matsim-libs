@@ -19,9 +19,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.anhorni.counts.SummaryWriter;
-
-
 public class CompareScenarios {	
 	public String outpath = "src/main/java/playground/anhorni/output/PLOC/zh/";
 	private ScenarioImpl baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());

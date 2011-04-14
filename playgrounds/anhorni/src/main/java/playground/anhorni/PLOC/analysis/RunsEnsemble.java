@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import playground.anhorni.PLOC.MultiplerunsControler;
 
 public class RunsEnsemble {
@@ -16,6 +17,7 @@ public class RunsEnsemble {
 	private String outpath;
 	
 	private Vector<Run> randomRuns = new Vector<Run>();
+	private final static Logger log = Logger.getLogger(RunsEnsemble.class);
 	
 	public RunsEnsemble(int id, String outpath) {
 		this.id = id;
@@ -84,6 +86,30 @@ public class RunsEnsemble {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		}
+	}
 		
-    }
+	public void writeLegHistogramFile() throws IOException {
+		DecimalFormat formatter = new DecimalFormat("0.00");
+			new File(outpath).mkdirs();			
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outpath +  "/legHistogram.txt")); 
+			bufferedWriter.write("Run.Day \\ Hour\t");
+			
+			for (int hour = 0; hour < 24; hour++) {
+				bufferedWriter.write("h" + hour + "\t");
+			}			
+			bufferedWriter.newLine();
+			
+			for (int day = 0; day < 5; day++) {
+				for (Run run : this.randomRuns) {
+					bufferedWriter.write("R" + run.getId() + "D" + day + "\t");
+					for (int hour = 0; hour < 24; hour++) {
+						bufferedWriter.write(formatter.format(run.getArrivals()[day][hour]) + "\t");
+					}
+					bufferedWriter.newLine();
+				}
+			}
+			bufferedWriter.flush();
+			bufferedWriter.close();
+			log.info("legHistogram file written");
+		}
 }
