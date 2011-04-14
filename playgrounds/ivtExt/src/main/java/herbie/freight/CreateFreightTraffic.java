@@ -22,6 +22,7 @@ package herbie.freight;
 import herbie.Utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -58,6 +59,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CreateFreightTraffic {
@@ -80,7 +82,7 @@ public class CreateFreightTraffic {
 	private double roundingLimit;
 	
 	private QuadTree<ActivityFacility> facilityTree;
-
+	private Statistics stats = new Statistics();
 	private ScenarioImpl scenario;
 	
 	public static void main(String[] args) {
@@ -92,6 +94,7 @@ public class CreateFreightTraffic {
 		creator.init(args[0]);
 		creator.create();
 		creator.write();
+		log.info("Creation finished ...");
 	}
 	
 	private void init(String file) {
@@ -117,7 +120,10 @@ public class CreateFreightTraffic {
 		Utils util = new Utils();
 		this.facilityTree = util.createActivitiesTree("all", this.scenario);
     }
-			
+	
+	/*
+	 * TODO: Get the zones (Zonierung) starting from: 900000000 (outside of KVMZH region)
+	 */
 	public void create() {
 		this.createZones();
 		// -----------------------------------------------------
@@ -128,7 +134,6 @@ public class CreateFreightTraffic {
 		CSShapeFileWriter gisWriter = new CSShapeFileWriter();
 		gisWriter.writeODRelations(this.outpath, relations);
 		// -----------------------------------------------------
-		log.info("Creation finished ...");
 	}
 	
 	private List<ODRelation> getHeavyRelations(double [][] od) {
@@ -138,12 +143,28 @@ public class CreateFreightTraffic {
 			for (int j = 0; j < numberOfZones; j++) {
 				Coord coordStart = this.zones.get(this.zoneIds[i]).getCentroidCoord();
 				Coord coordEnd = this.zones.get(this.zoneIds[j]).getCentroidCoord();
-				odRelations.add(new ODRelation(new IdImpl(cnt), coordStart, coordEnd, od[i][j]));
-				cnt++;
+				
+				if (od[i][j] > this.roundingLimit) {
+					odRelations.add(new ODRelation(new IdImpl(cnt), coordStart, coordEnd, od[i][j], this.zones.get(this.zoneIds[i]).getName(),
+							this.zones.get(this.zoneIds[j]).getName(), this.zoneIds[i], this.zoneIds[j]));
+					cnt++;
+				}
 			}
 		}
 		Collections.sort(odRelations);
-		return odRelations.subList(0, 10);
+		
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(this.outpath + "/heavyRelations.txt");
+			for (ODRelation relation : odRelations) {
+				out.write(formatter.format(relation.getWeight()) + "\tfrom: (" + relation.getOriginId().toString() + ")\t" + relation.getOriginName() + 
+						"\tto (" + relation.getDestinationId().toString() + ")\t" + relation.getDestinationName() + "\n");
+			}
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return odRelations.subList(0, 1000);
 	}
 	
 	/*
@@ -164,7 +185,8 @@ public class CreateFreightTraffic {
 				double x = Double.parseDouble(parts[7]);
 				double y = Double.parseDouble(parts[8]);
 				Id id = new IdImpl(Integer.parseInt(parts[2]));
-				Zone zone = new Zone(id, new CoordImpl(x,y));
+				String name = parts[3];
+				Zone zone = new Zone(id, new CoordImpl(x,y), name);
 				this.zones.put(id, zone);
 				cnt++;
 			}  
@@ -192,7 +214,7 @@ public class CreateFreightTraffic {
 		
 		for (int i = 0; i < numberOfZones; i++) {
 			for (int j = 0; j < numberOfZones; j++) {
-				int numberOfPersons = (int) Math.floor(odMatrix[i][j] + this.roundingLimit);
+				int numberOfPersons = (int) Math.floor(odMatrix[i][j] + (1.0 - this.roundingLimit));
 				
 				if (odMatrix[i][j] - Math.floor(odMatrix[i][j]) >= this.roundingLimit) {
 					countRoundUps++;
@@ -210,7 +232,8 @@ public class CreateFreightTraffic {
 					counter++;
 				}
 			}
-			if (counter > 1000) break;
+			// for debugging
+			//if (counter > 4000) break;
 		} 
 		log.info("Created " + counter + " freight agents");
 		log.info("Round ups: " + countRoundUps + " || " + roundUp);
@@ -226,7 +249,7 @@ public class CreateFreightTraffic {
 		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
 		Zone originZone = this.zones.get(this.zoneIds[originIndex]);
 		Zone destinationZone = this.zones.get(this.zoneIds[destinationIndex]);
-		p.addPlan(this.createSingleFreightPlan(originZone, destinationZone));		
+		p.addPlan(this.createSingleFreightPlan(originZone, destinationZone));
 		return p;
 	}
 	
@@ -281,9 +304,11 @@ public class CreateFreightTraffic {
 	/*
 	 * TODO: 
 	 * 	- Use a nicer time distribution (-> look into Mohits report)
+	 *  See the output -> departures.png
 	 */
 	private Plan createSingleFreightPlan(Zone origin, Zone destination) {
 		double departureTime = 5.0 * 3600.0 + this.randomNumberGenerator.nextDouble() * 15.0 * 3600.0;	
+		this.stats.addDeparture(departureTime);
 		
 		ActivityFacility homeFacility = this.getRandomFacilityFromZone(origin);
 		ActivityFacility freightFacility = this.getRandomFacilityFromZone(destination);
@@ -336,7 +361,8 @@ public class CreateFreightTraffic {
 	private void write() {	
 		log.info("Writing population and facilities ...");
 		new File(this.outpath).mkdirs();
-		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(this.outpath + "facilities.xml.gz");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outpath + "plans.xml.gz");
+		this.stats.writeDepartures(this.outpath);
+		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(this.outpath + "facilitiesWFreight.xml.gz");
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outpath + "freightplans.xml.gz");
 	}
 }

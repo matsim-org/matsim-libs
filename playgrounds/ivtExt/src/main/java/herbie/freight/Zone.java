@@ -23,12 +23,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public class Zone {
-	Id id;
-	Coord centroidCoord;
+	private Id id;
+	private Coord centroidCoord;
+	private String name;
 	
-	public Zone(Id id, Coord centroidCoord) {
+	public Zone(Id id, Coord centroidCoord, String name) {
 		this.id = id;
 		this.centroidCoord = centroidCoord;
+		this.name = name;
 	}
 	
 	public Id getId() {
@@ -42,5 +44,13 @@ public class Zone {
 	}
 	public void setCentroidCoord(Coord centroidCoord) {
 		this.centroidCoord = centroidCoord;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
