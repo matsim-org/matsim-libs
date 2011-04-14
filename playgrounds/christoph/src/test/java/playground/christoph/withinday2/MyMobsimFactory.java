@@ -17,10 +17,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.christoph.withinday2;
 
-import java.util.ArrayList;
-import java.util.List;
+package playground.christoph.withinday2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -28,7 +26,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -84,17 +81,15 @@ public class MyMobsimFactory implements MobsimFactory {
 		mobsim.addQueueSimulationListeners(fosl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
 
-		List<SimulationListener> simulationListenerList = new ArrayList<SimulationListener>() ;
-
 		log.info("Initialize Parallel Replanning Modules");
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, simulationListenerList );
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, simulationListenerList );
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, simulationListenerList );
-		// these are containers, but they don't do anything by themselves
-
-		for ( SimulationListener siml : simulationListenerList ) {
-			mobsim.addQueueSimulationListeners( siml ) ;
-		}
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		// these are containers, but they don't do anything by themselves	
+		
+		mobsim.addQueueSimulationListeners(parallelInitialReplanner);
+		mobsim.addQueueSimulationListeners(parallelActEndReplanner);
+		mobsim.addQueueSimulationListeners(parallelLeaveLinkReplanner);
 
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter(sc, mobsim);

@@ -224,7 +224,8 @@ public class SimpleRouterControler extends Controler {
 	 * Hands over the ArrayList to the ParallelReplannerModules
 	 */
 	protected void initParallelReplanningModules() {
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.getQueueSimulationListener().add(this.parallelInitialReplanner);
 
 		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		replanningManager.setInitialReplanningModule(initialReplanningModule);

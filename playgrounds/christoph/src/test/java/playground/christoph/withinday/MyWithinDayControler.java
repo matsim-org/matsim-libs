@@ -128,9 +128,13 @@ class MyWithinDayControler extends Controler {
 	 * Initializes the ParallelReplannerModules
 	 */
 	private void initParallelReplanningModules() {
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads, this);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads, this);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads, this);
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
+		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
+		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		
+		this.getQueueSimulationListener().add(parallelInitialReplanner);
+		this.getQueueSimulationListener().add(parallelActEndReplanner);
+		this.getQueueSimulationListener().add(parallelLeaveLinkReplanner);
 	}
 
 	/*
