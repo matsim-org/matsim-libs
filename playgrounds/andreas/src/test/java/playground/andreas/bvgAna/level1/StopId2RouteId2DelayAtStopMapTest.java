@@ -55,9 +55,9 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    StopId2RouteId2DelayAtStopMap test = new StopId2RouteId2DelayAtStopMap();
 	    
 	    test.handleEvent(event3);
-//	    test.handleEvent(event4);
+	    test.handleEvent(event4);
 	    test.handleEvent(event1);
-//	    test.handleEvent(event2);
+	    test.handleEvent(event2);
 	   	   
 	    
 	    vehTestMap.put(event3.getVehicleId(), event3);
@@ -68,8 +68,9 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    
 	    // to be completed
 	        
-	    System.out.println(vehTestMap.toString());
+//	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getFacilityId()).getRealizedDepartures().get(0));
 	    
+	    Assert.assertEquals(event1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getFacilityId()).getRealizedDepartures().get(0));
 	    
 	    
 	    
