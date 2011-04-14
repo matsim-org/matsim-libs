@@ -131,16 +131,16 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		int numOfSimpleCo;
 		int numOfSingleCo;
 
-		if (dynamicRates) {
-			numOfWholeCo = (int) Math.ceil(this.WHOLE_CO_RATE * populationSize);
-			numOfSimpleCo = (int) Math.ceil(this.SIMPLE_CO_RATE * populationSize);
-			numOfSingleCo = (int) Math.ceil(this.SINGLE_CO_RATE * populationSize);
+		if (!dynamicRates) {
+			numOfWholeCo = getNumberOfOperations(this.WHOLE_CO_RATE, populationSize);
+			numOfSimpleCo = getNumberOfOperations(this.SIMPLE_CO_RATE, populationSize);
+			numOfSingleCo = getNumberOfOperations(this.SINGLE_CO_RATE, populationSize);
 		}
 		else {
 			double[] rates = this.rateCalculator.getRates();
-			numOfWholeCo = (int) Math.ceil(rates[0] * populationSize);
-			numOfSimpleCo = (int) Math.ceil(rates[1] * populationSize);
-			numOfSingleCo = (int) Math.ceil(rates[2] * populationSize);
+			numOfWholeCo = getNumberOfOperations(rates[0], populationSize);
+			numOfSimpleCo = getNumberOfOperations(rates[1], populationSize);
+			numOfSingleCo = getNumberOfOperations(rates[2], populationSize);
 		}
 
 		int numOfCo = numOfWholeCo + numOfSimpleCo + numOfSingleCo;
@@ -188,6 +188,10 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		if (dynamicRates) {
 			this.rateCalculator.iterationIsOver();
 		}
+	}
+
+	private int getNumberOfOperations(final double rate, final double populationSize) {
+		return Math.max(1, (int) Math.ceil(rate * populationSize));
 	}
 
 	private void notifyCO(

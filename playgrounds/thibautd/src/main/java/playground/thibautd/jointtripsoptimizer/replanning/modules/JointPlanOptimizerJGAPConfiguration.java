@@ -180,7 +180,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 							this,
 							configGroup,
-							new CrossOverRateCalculator(configGroup),
+							new CrossOverRateCalculator(configGroup, outputPath),
 							this.numToggleGenes,
 							this.numEpisodes,
 							this.numModeGenes,
