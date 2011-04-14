@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.util.Set;
 import java.util.TreeSet;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -50,8 +52,11 @@ public class StopId2LineId2PulkTest {
 	    System.out.println(test.getStopId2LineId2PulkDataList().toString());
 	    
 //	    to be implemented
+
+	    Assert.assertEquals(event2, test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
 	    
 	    System.out.println(test.getStopId2LineId2PulkDataList().get(event2.getFacilityId()).get(event2.getVehicleId()));
+	    System.out.println(event2.getVehicleId());
 	    
 	    
 		
