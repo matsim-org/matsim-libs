@@ -31,6 +31,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 
 import playground.anhorni.PLOC.MultiplerunsControler;
+import playground.anhorni.PLOC.analysis.postprocessing.LegHistoBox;
 
 public class SummaryWriter {
 	private final static Logger log = Logger.getLogger(SummaryWriter.class);
@@ -64,6 +65,9 @@ public class SummaryWriter {
 		log.info("Create multiple ensemble analyses");
 		MultipleEnsemblesAnalyzer analyzer = new MultipleEnsemblesAnalyzer(path, this.runs);
 		analyzer.run();		
+		
+		LegHistoBox legHisto = new LegHistoBox();
+		legHisto.run(numberOfRuns, path + "output/PLOC/3towns/");
     }
     
     private void readRD(int numberOfRuns) {
