@@ -20,17 +20,15 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
-
 
 public class LeaveLinkIdentifier extends DuringLegIdentifier {
 
@@ -42,14 +40,24 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-		List<PersonAgent> agentsToReplanLeaveLink = linkReplanningMap.getReplanningAgents(time);
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>(); 
-
-		for (PersonAgent personAgent : agentsToReplanLeaveLink) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-			if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-				agentsToReplan.add(withinDayPersonAgent);
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+		Collection<PersonAgent> legPerformingAgents =  linkReplanningMap.getReplanningAgents(time);
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+		
+		if (handledAgents == null) return agentsToReplan;
+		
+		if (legPerformingAgents.size() > handledAgents.size()) {
+			for (WithinDayAgent agent : handledAgents) {
+				if (legPerformingAgents.contains(agent)) {
+					agentsToReplan.add(agent);
+				}
+			}
+		} else {
+			for (PersonAgent agent : legPerformingAgents) {
+				if (handledAgents.contains(agent)) {
+					agentsToReplan.add((WithinDayAgent)agent);
+				}
 			}
 		}
 

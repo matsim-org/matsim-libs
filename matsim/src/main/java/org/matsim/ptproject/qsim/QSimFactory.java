@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimFactory
+ * QSimFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.ptproject.qsim;
 
 import org.apache.log4j.Logger;
@@ -28,8 +29,8 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-
-/**The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
+/**
+ * The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
  * Can (presumably) be something much more minimalistic than QSimI.  kai, jun'10
  *
  * @author dgrether
@@ -41,27 +42,32 @@ public class QSimFactory implements MobsimFactory {
 
 	@Override
 	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		if (sc.getConfig().getQSimConfigGroup() == null) {
+		
+		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		if (sc.getConfig().getQSimConfigGroup().getNumberOfThreads() > 1) {
+		
+		// Get number of parallel Threads		
+		int numOfThreads = conf.getNumberOfThreads();
+		
+		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-		  ParallelQSimulation sim = new ParallelQSimulation(sc, em);
+			ParallelQSimulation sim = new ParallelQSimulation(sc, em);
 
-		  // Get number of parallel Threads
-		  QSimConfigGroup conf = (QSimConfigGroup) sc.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
-		  int numOfThreads = conf.getNumberOfThreads();
-		  log.info("Using parallel QSim with " + numOfThreads + " threads.");
-
-		  return sim;
+//			ParallelQSimulation sim = new ParallelQSimulation(sc, eventsManager);
+			
+			log.info("Using parallel QSim with " + numOfThreads + " threads.");
+			return sim;
+		} else {
+			QSim sim = new QSim(sc, eventsManager);
+			if (sc.getConfig().scenario().isUseTransit()) {
+				sim.getTransitEngine().setUseUmlaeufe(true);
+				sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			}
+			return sim;
 		}
 
-		QSim sim = new QSim(sc, eventsManager);
-		if (sc.getConfig().scenario().isUseTransit()) {
-			sim.getTransitEngine().setUseUmlaeufe(true);
-			sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-		}
-		return sim;
 	}
 
 }

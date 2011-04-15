@@ -20,10 +20,13 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 
 /*
  * Identify Agents that need a replanning of their scheduled plan.
@@ -31,10 +34,19 @@ import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 public abstract class AgentsToReplanIdentifier {
 	
 	private IdentifierFactory identifierFactory;
+	private Set<WithinDayAgent> handledAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 	
-	// yyyy change this to a (Hash)Set? Are there situations where duplicated entries might be meaningful? cdobler, Oct'10
-	public abstract Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId);
+	public abstract Set<WithinDayAgent> getAgentsToReplan(double time);
+
+	public final void setHandledAgent(Collection<WithinDayAgent> agents) {
+		this.handledAgents.clear();
+		this.handledAgents.addAll(agents);
+	}
 	
+	public final Set<WithinDayAgent> getHandledAgents() {
+		return Collections.unmodifiableSet(handledAgents);
+	}
+		
 	public final void setIdentifierFactory(IdentifierFactory factory) {
 		this.identifierFactory = factory;
 	}

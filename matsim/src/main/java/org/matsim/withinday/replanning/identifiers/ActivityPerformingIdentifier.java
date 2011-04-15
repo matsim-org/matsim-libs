@@ -20,18 +20,16 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-
 
 public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
@@ -43,23 +41,26 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	}
 	
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();	
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
+		if (handledAgents == null) return agentsToReplan;
 		
-		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
-		while(iter.hasNext()) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
-			
-			/*
-			 * Add the Agent to the list, if the replanning flag is set.
-			 */
-			if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-				agentsToReplan.add(withinDayPersonAgent);
+		if (activityPerformingAgents.size() > handledAgents.size()) {
+			for (WithinDayAgent agent : handledAgents) {
+				if (activityPerformingAgents.contains(agent)) {
+					agentsToReplan.add(agent);
+				}
+			}
+		} else {
+			for (PersonAgent agent : activityPerformingAgents) {
+				if (handledAgents.contains(agent)) {
+					agentsToReplan.add((WithinDayAgent)agent);
+				}
 			}
 		}
-		
 		
 		return agentsToReplan;
 	}

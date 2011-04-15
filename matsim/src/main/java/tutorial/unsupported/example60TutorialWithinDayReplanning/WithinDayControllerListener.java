@@ -39,7 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.withinday.controller.ReplanningFlagInitializer;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
@@ -54,6 +53,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -98,7 +98,7 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 	private PersonalizableTravelTime travelTime;
 	private OnlyTimeDependentTravelCostCalculator travelCost;
 	private ReplanningManager replanningManager;
-	private ReplanningFlagInitializer rfi;
+	private SelectHandledAgentsByProbability selector;
 	private FixedOrderSimulationListener fosl;
 	
 	private static final Logger log = Logger.getLogger(WithinDayControllerListener.class);
@@ -199,8 +199,8 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 */
 		replanningManager = new ReplanningManager();
 		fosl.addSimulationListener(replanningManager);
-		rfi = new ReplanningFlagInitializer(replanningManager);
-		fosl.addSimulationListener(rfi);
+		selector = new SelectHandledAgentsByProbability();
+		fosl.addSimulationListener(selector);
 		
 		/*
 		 * Create ParallelReplanners. They are registered as SimulationListeners.
@@ -248,22 +248,22 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 * the agents that should adapt their plans.
 		 */
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
 		this.initialReplanner = new InitialReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-		this.rfi.addInitialReplanner(this.initialReplanner.getId(), this.pInitialReplanning);
 		
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
+		this.selector.addIdentifier(this.duringActivityIdentifier, this.pDuringActivityReplanning);
 		this.duringActivityReplanner = new NextLegReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
-		this.rfi.addDuringActivityReplanner(this.duringActivityReplanner.getId(), this.pDuringActivityReplanning);
 		
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		this.selector.addIdentifier(this.duringLegIdentifier, this.pDuringLegReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
-		this.rfi.addDuringLegReplanner(this.duringLegReplanner.getId(), this.pDuringLegReplanning);
 	}
 
 	@Override
@@ -273,9 +273,9 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 * Remove some SimulationListeners
 		 */
 		fosl.removeSimulationListener(replanningManager);
-		fosl.removeSimulationListener(rfi);
+		fosl.removeSimulationListener(selector);
 		replanningManager = null;
-		rfi = null;
+		selector = null;
 	}
 
 }

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,22 +20,21 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-
 
 public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
@@ -47,22 +46,31 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	}
 	
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
 		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
-
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
-		while(iter.hasNext()) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
-			
-			/*
-			 * Remove the Agent from the list, if the replanning flag is not set.
-			 */
-			if (!withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-				continue;
+		if (handledAgents == null) return agentsToReplan;
+		
+		if (activityPerformingAgents.size() > handledAgents.size()) {
+			for (WithinDayAgent agent : handledAgents) {
+				if (activityPerformingAgents.contains(agent)) {
+					agentsToReplan.add(agent);
+				}
 			}
-			
+		} else {
+			for (PersonAgent agent : activityPerformingAgents) {
+				if (handledAgents.contains(agent)) {
+					agentsToReplan.add((WithinDayAgent)agent);
+				}
+			}
+		}
+		
+		Iterator<WithinDayAgent> iter = agentsToReplan.iterator();
+		while(iter.hasNext()) {
+			WithinDayAgent withinDayAgent = iter.next();	
+						
 			/*
 			 * Check whether the next Leg has to be replanned.
 			 * 
@@ -70,10 +78,11 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			 * next Activity with duration 0)
 			 */
 			// get executed plan
-			PlanImpl executedPlan = (PlanImpl)withinDayPersonAgent.getExecutedPlan();
+			PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
 			
 			// If we don't have a selected plan
 			if (executedPlan == null) {
+				iter.remove();
 				continue;
 			}
 			
@@ -84,13 +93,17 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			/*
 			 *  Get the current PlanElement and check if it is an Activity
 			 */
-			PlanElement currentPlanElement = withinDayPersonAgent.getCurrentPlanElement();
+			PlanElement currentPlanElement = withinDayAgent.getCurrentPlanElement();
 			if (currentPlanElement instanceof Activity) {
 				currentActivity = (Activity) currentPlanElement;
-			} else continue;
+			} else {
+				iter.remove();
+				continue;
+			}
 			
 			nextLeg = executedPlan.getNextLeg(currentActivity);
 			if (nextLeg == null) {
+				iter.remove();
 				continue;
 			}
 			
@@ -128,11 +141,11 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			 * If no "next" leg to replan has been found - remove Agent from list.
 			 */
 			if (removeAgent) {
+				iter.remove();
 				continue;
 			}
 			
-			// If we reach this point, the agent can be replanned.
-			agentsToReplan.add(withinDayPersonAgent);
+			// If the agent has not been removed from the Set yet, it will be replanned.
 		}
 		
 		return agentsToReplan;

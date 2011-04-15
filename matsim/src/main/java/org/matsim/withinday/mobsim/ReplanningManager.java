@@ -35,9 +35,9 @@ import org.matsim.core.utils.misc.Time;
  */
 public class ReplanningManager implements SimulationBeforeSimStepListener, SimulationInitializedListener {
 
-	protected boolean initialReplanning = false;
-	protected boolean actEndReplanning = false;
-	protected boolean leaveLinkReplanning = false;
+	protected boolean initialReplanning = true;
+	protected boolean actEndReplanning = true;
+	protected boolean leaveLinkReplanning = true;
 
 	protected InitialReplanningModule initialReplanningModule;
 	protected DuringActivityReplanningModule actEndReplanningModule;

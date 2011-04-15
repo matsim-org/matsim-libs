@@ -22,6 +22,8 @@ package org.matsim.withinday.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -39,6 +41,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
@@ -55,11 +58,9 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
  * The path to a config file is needed as argument to run the
  * simulation.
  *
- * By default "test/scenarios/berlin/config.xml" should work.
- *
  * @author Christoph Dobler
  */
-public class ExampleWithinDayController extends WithinDayController implements SimulationInitializedListener {
+public class ExampleWithinDayController extends WithinDayController implements SimulationInitializedListener, StartupListener {
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -82,26 +83,30 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	protected WithinDayDuringActivityReplanner duringActivityReplanner;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
-	protected ReplanningFlagInitializer rfi;
+	protected SelectHandledAgentsByProbability selector;
 
 	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
 	public ExampleWithinDayController(String[] args) {
 		super(args);
 
-		setScoringFunction();
+		init();
 	}
 
 	// only for Batch Runs
 	public ExampleWithinDayController(Config config) {
 		super(config);
 
-		setScoringFunction();
+		init();
 	}
 
-	private void setScoringFunction() {
+	private void init() {
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+		
+		// register this as a Controller and Simulation Listener
+		super.getFixedOrderSimulationListener().addSimulationListener(this);
+		super.addControlerListener(this);
 	}
 
 	/*
@@ -110,35 +115,39 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	 */
 	protected void initReplanners(QSim sim) {
 
-		super.createAndInitTravelTimeCollector();
 		TravelTimeCollector travelTime = super.getTravelTimeCollector();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		super.addIntialReplanner(this.initialReplanner);
-		this.rfi.addInitialReplanner(this.initialReplanner.getId(), this.pInitialReplanning);
 		
-		super.createAndInitActivityReplanningMap();
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
+		this.selector.addIdentifier(duringActivityIdentifier, pDuringActivityReplanning);
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		super.addDuringActivityReplanner(this.duringActivityReplanner);
-		this.rfi.addDuringActivityReplanner(this.duringActivityReplanner.getId(), this.pDuringActivityReplanning);
-		
-		super.createAndInitLinkReplanningMap();
+				
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		super.addDuringLegReplanner(this.duringLegReplanner);
-		this.rfi.addDuringLegReplanner(this.duringLegReplanner.getId(), this.pDuringLegReplanning);
 	}
 
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		super.createAndInitTravelTimeCollector();
+		super.createAndInitActivityReplanningMap();
+		super.createAndInitLinkReplanningMap();
+	}
+	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
@@ -148,8 +157,8 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	protected void runMobSim() {
 		super.initWithinDayModules(numReplanningThreads);
 		
-		rfi = new ReplanningFlagInitializer(super.getReplanningManager());
-		super.getFixedOrderSimulationListener().addSimulationListener(rfi);
+		selector = new SelectHandledAgentsByProbability();
+		super.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
 		super.runMobSim();
 	}

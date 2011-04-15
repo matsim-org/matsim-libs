@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplannerAdministrator.java
+ * PersonAgentComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,43 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.mobsim;
+package org.matsim.ptproject.qsim.comparators;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.core.mobsim.framework.PersonAgent;
 
 /**
- * A ReplannerAdministrator is used to define which within day replanners
- * should be used by a WithinDayPersonAgent. Replanners that should be used
- * can be added or removed by their Id. Each replanner can only be added
- * once. 
- * 
+ * Compares two {@link PersonAgent}s according to their Id.
+ *
  * @author cdobler
  */
-public class ReplannerAdministrator {
-	
-	// If I am understanding this correctly, the replanners that are added in the following are not actively used as instances,
-	// but they are used in order to identify those agents that possess those replanners.  And only those are submitted to 
-	// the replanning process. Kai
-	
-	private Set<Id> withinDayReplannerIds;
+public class PersonAgentComparator implements Comparator<PersonAgent>, Serializable, MatsimComparator {
 
-	public ReplannerAdministrator() {
-		withinDayReplannerIds = new HashSet<Id>();
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public int compare(PersonAgent agent1, PersonAgent agent2) {
+		return agent1.getId().compareTo(agent2.getId());
 	}
-	
-	public boolean addWithinDayReplanner(Id replannerId) {
-		return this.withinDayReplannerIds.add(replannerId);
-	}
-	
-	public boolean removeWithinDayReplanner(Id replannerId) {
-		return this.withinDayReplannerIds.remove(replannerId);
-	}
-	
-	public Set<Id> getWithinDayReplannerIds() {
-		return Collections.unmodifiableSet(withinDayReplannerIds);
-	}
+
 }

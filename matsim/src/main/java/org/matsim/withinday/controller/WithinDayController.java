@@ -210,6 +210,8 @@ public class WithinDayController extends Controler {
 		replanningManager.setInitialReplanningModule(initialReplanningModule);
 		replanningManager.setActEndReplanningModule(actEndReplanningModule);
 		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanningModule);
+		
+		isInitialized = true;
 	}
 	
 	@Override

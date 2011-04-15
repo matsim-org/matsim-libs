@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,25 +22,25 @@ package org.matsim.withinday.mobsim;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
-
 public abstract class WithinDayReplanningModule<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> {
 
 	protected ParallelReplanner<T> parallelReplanner;
 
-	// yyyy how to make this final? Add an additional hook to disable replanning? cdobler, Oct'10
 	public void doReplanning(double time) {
 		for (T replanner : this.parallelReplanner.getWithinDayReplanners()) {
 			Set<? extends AgentsToReplanIdentifier> identifiers = replanner.getAgentsToReplanIdentifers(); 
-				
+			Id replannerId = replanner.getId();
+			
 			for (AgentsToReplanIdentifier identifier : identifiers) {
-				for (WithinDayAgent withinDayAgent : identifier.getAgentsToReplan(time, replanner.getId())) {
-					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, replanner.getId());
+				for (WithinDayAgent withinDayAgent : identifier.getAgentsToReplan(time)) {
+					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, replannerId);
 					this.parallelReplanner.addReplanningTask(replanningTask);
 				}
 			}

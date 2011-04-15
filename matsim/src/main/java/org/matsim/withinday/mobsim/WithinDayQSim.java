@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
@@ -44,14 +45,14 @@ public class WithinDayQSim extends QSim {
 	public WithinDayQSim(final Scenario scenario, final EventsManager events, NetsimEngineFactory factory) {
 		super(scenario, events, factory);
 		
-		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
-		WithinDayAgentFactory agentFactory = new WithinDayAgentFactory(this);
+		// use ExperimentalBasicWithindayAgentFactory that creates ExperimentalBasicWithindayAgents who can reset their chachedNextLink
+		ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(this);
 		super.setAgentFactory(agentFactory);
 	}
 	
 	@Override
 	public void setAgentFactory(AgentFactory factory) {
-		if (factory instanceof WithinDayAgentFactory) {
+		if (factory instanceof ExperimentalBasicWithindayAgentFactory) {
 			super.setAgentFactory(factory);
 		}
 		else throw new RuntimeException("Please use a WithinDayAgentFactory!");

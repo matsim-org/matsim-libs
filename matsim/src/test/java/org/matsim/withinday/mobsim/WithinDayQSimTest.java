@@ -31,6 +31,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 public class WithinDayQSimTest extends MatsimTestCase {
@@ -60,6 +61,6 @@ public class WithinDayQSimTest extends MatsimTestCase {
 		}
 
 		// using a WithinDayAgentFactory should be fine
-		sim.setAgentFactory(new WithinDayAgentFactory(sim));
+		sim.setAgentFactory(new ExperimentalBasicWithindayAgentFactory(sim));
 	}
 }

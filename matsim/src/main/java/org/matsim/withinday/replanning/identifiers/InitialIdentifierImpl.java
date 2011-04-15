@@ -20,16 +20,15 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-
 
 public class InitialIdentifierImpl extends InitialIdentifier {
 
@@ -41,19 +40,27 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 	}
 		
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+		Collection<MobsimAgent> mobsimAgents = this.qsim.getAgents();
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		for (MobsimAgent mobsimAgent : this.qsim.getAgents()) {
-			if (mobsimAgent instanceof WithinDayPersonAgent) {
-				WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) mobsimAgent;
-				
-				if (withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-					agentsToReplan.add(withinDayPersonAgent);
+		if (handledAgents == null) return agentsToReplan;
+		
+		if (mobsimAgents.size() > handledAgents.size()) {
+			for (WithinDayAgent agent : handledAgents) {
+				if (mobsimAgents.contains(agent)) {
+					agentsToReplan.add(agent);
+				}
+			}
+		} else {
+			for (MobsimAgent agent : mobsimAgents) {
+				if (handledAgents.contains(agent)) {
+					agentsToReplan.add((WithinDayAgent)agent);
 				}
 			}
 		}
-		
+	
 		return agentsToReplan;
 	}
 
