@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +55,8 @@ public class RoutesPathsGenerator {
 	 */
 	private Map<String, String[]> finishedTrips;
 
+	private Set<List<Link>> allLinks;
+
 	//Methods
 	/**
 	 * @param network
@@ -65,6 +68,7 @@ public class RoutesPathsGenerator {
 		this.network = network;
 		this.routes = routes;
 		this.stops = stops;
+		allLinks = new HashSet<List<Link>>();
 		bases = new HashMap<String, String[]>();
 		finishedTrips = new HashMap<String, String[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[1]));
@@ -95,10 +99,12 @@ public class RoutesPathsGenerator {
 	}
 	public void run() throws IOException {
 		System.out.println(routes.size());
+		int i=0;
 		for(Entry<String,Route> route:routes.entrySet()) {
 			for(Entry<String,Trip> tripEntry:route.getValue().getTrips().entrySet())
 				calculateBusLinksSequence(tripEntry, route.getValue());
-			System.out.println(route.getKey());
+			i++;
+			System.out.println(i+". "+route.getKey()+" ("+route.getValue().getTrips().size()+")");
 		}
 	}
 	/**
@@ -180,6 +186,7 @@ public class RoutesPathsGenerator {
 			link.setAllowedModes(modes);
 		}
 		tripEntry.getValue().setRoute(links);
+		allLinks.add(links);
 	}
 	/**
 	 * 
@@ -228,6 +235,16 @@ public class RoutesPathsGenerator {
 			writer.println(linksT);
 		}
 		writer.close();
+	}
+	public Collection<List<Link>> getAllLinks() {
+		return allLinks;
+	}
+	public Collection<Link> getAllStopLinks() {
+		Set<Link> allStopLinks = new HashSet<Link>();
+		for(Stop stop:stops.values())
+			if(stop.isFixedLinkId())
+				allStopLinks.add(network.getLinks().get(new IdImpl(stop.getLinkId())));
+		return allStopLinks;
 	}
 	
 }

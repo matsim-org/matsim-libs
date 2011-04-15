@@ -138,7 +138,7 @@ public class Window extends JFrame implements ActionListener {
 	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
 	public static int MIN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width/2;
 	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/2;
-	public static int FRAMESIZE = 50;
+	public static int FRAMESIZE = 5;
 	
 	//Attributes
 	public static int width;
@@ -504,6 +504,12 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
 		return routePath.getNetworkLinks(xMin, yMin, xMax, yMax);
+	}
+	public Collection<List<Link>> getAllLinks() {
+		return routesPathsGenerator.getAllLinks();
+	}
+	public Collection<Link> getAllStopLinks() {
+		return routesPathsGenerator.getAllStopLinks();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

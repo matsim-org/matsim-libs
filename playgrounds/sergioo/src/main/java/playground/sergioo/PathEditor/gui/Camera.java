@@ -16,6 +16,12 @@ public class Camera {
 	public Point2D getCenter() {
 		return upLeftCorner.getTranslated(size.getScaled(0.5));
 	}
+	public Point2D getUpLeftCorner() {
+		return upLeftCorner;
+	}
+	public Vector2D getSize() {
+		return size;
+	}
 	public void zoomIn(int x, int y) {
 		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(getDoubleX(x), getDoubleY(y)));
 		Vector2D difCorners = new Vector2D(size.getX()*(1-1/ZOOM_RATE)/2,size.getY()*(1-1/ZOOM_RATE)/2);
