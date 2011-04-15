@@ -28,6 +28,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -54,7 +55,7 @@ public class LegModeDistanceDistribution {
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run30/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run25/";
 	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
 	private static String finalPlansFile = runDirectory + "output_plans.xml.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
@@ -90,11 +91,15 @@ public class LegModeDistanceDistribution {
 		Population finalMiDPop = getMiDPopulation(finalPop);
 		SortedMap<String, Map<Integer, Integer>> initialMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(initialMiDPop);
 		SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(finalMiDPop);
+		SortedMap<String, Map<Integer, Integer>> differenceMode2DistanceClassNoOfLegs = calculateDifferenceMode2DistanceClassNoOfLegs(initialMode2DistanceClassNoOfLegs, finalMode2DistanceClassNoOfLegs);
+		
 
 		logger.info("The initial LegModeDistanceDistribution is :" + initialMode2DistanceClassNoOfLegs);
 		logger.info("The final LegModeDistanceDistribution is :" + finalMode2DistanceClassNoOfLegs);
+		logger.info("The difference in the LegModeDistanceDistribution is :" + differenceMode2DistanceClassNoOfLegs);
 		writeInformation(initialMode2DistanceClassNoOfLegs, "legModeDistanceDistributionInitial");
 		writeInformation(finalMode2DistanceClassNoOfLegs, "legModeDistanceDistributionFinal");
+		writeInformation(differenceMode2DistanceClassNoOfLegs, "legModeDistanceDistributionDifference");
 	}
 
 	private void writeInformation(Map<String, Map<Integer, Integer>> mode2DistanceClassNoOfLegs, String fileName) {
@@ -105,15 +110,20 @@ public class LegModeDistanceDistribution {
 			for(String mode : this.usedModes){
 				out.write("\t" + mode);
 			}
+			out.write("\t" + "sum");
 			out.write("\n");
 			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
-				Integer middleOfDistanceClass = ((this.distanceClasses.get(i) + this.distanceClasses.get(i + 1)) / 2);
-				out.write(middleOfDistanceClass + "\t");
+//				Integer middleOfDistanceClass = ((this.distanceClasses.get(i) + this.distanceClasses.get(i + 1)) / 2);
+//				out.write(middleOfDistanceClass + "\t");
+				out.write(this.distanceClasses.get(i+1) + "\t");
+				Integer totalLegsInDistanceClass = 0;
 				for(String mode : this.usedModes){
-					String modeLegs = null;
-					modeLegs = mode2DistanceClassNoOfLegs.get(mode).get(this.distanceClasses.get(i + 1)).toString() + "\t";
-					out.write(modeLegs);
+					Integer modeLegs = null;
+					modeLegs = mode2DistanceClassNoOfLegs.get(mode).get(this.distanceClasses.get(i + 1));
+					totalLegsInDistanceClass = totalLegsInDistanceClass + modeLegs;
+					out.write(modeLegs.toString() + "\t");
 				}
+				out.write(totalLegsInDistanceClass.toString());
 				out.write("\n");
 			}
 			//Close the output stream
@@ -122,6 +132,20 @@ public class LegModeDistanceDistribution {
 		}catch (Exception e){
 			logger.error("Error: " + e.getMessage());
 		}
+	}
+
+	private SortedMap<String, Map<Integer, Integer>> calculateDifferenceMode2DistanceClassNoOfLegs(SortedMap<String, Map<Integer, Integer>> initialMode2DistanceClassNoOfLegs, SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs) {
+		SortedMap<String, Map<Integer, Integer>> modeDifference2DistanceClassNoOfLegs = new TreeMap<String, Map<Integer, Integer>>();
+		for(String mode : finalMode2DistanceClassNoOfLegs.keySet()){
+			Map<Integer, Integer> finalMap = new TreeMap<Integer, Integer>();
+			for(Entry<Integer, Integer> entry: finalMode2DistanceClassNoOfLegs.get(mode).entrySet()){
+				Integer distanceClass = entry.getKey();
+				Integer difference = entry.getValue() - initialMode2DistanceClassNoOfLegs.get(mode).get(entry.getKey());
+				finalMap.put(distanceClass, difference);
+			}
+			modeDifference2DistanceClassNoOfLegs.put(mode, finalMap);
+		}
+		return modeDifference2DistanceClassNoOfLegs;
 	}
 
 	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClassNoOfLegs(Population population) {
