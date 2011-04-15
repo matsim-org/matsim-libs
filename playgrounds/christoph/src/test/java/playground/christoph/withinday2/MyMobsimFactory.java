@@ -87,10 +87,6 @@ public class MyMobsimFactory implements MobsimFactory {
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
 		// these are containers, but they don't do anything by themselves	
 		
-		mobsim.addQueueSimulationListeners(parallelInitialReplanner);
-		mobsim.addQueueSimulationListeners(parallelActEndReplanner);
-		mobsim.addQueueSimulationListeners(parallelLeaveLinkReplanner);
-
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter(sc, mobsim);
 

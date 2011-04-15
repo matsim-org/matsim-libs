@@ -267,10 +267,6 @@ public class EvacuationControler extends MultiModalControler {
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
 		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
 		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
-		
-		this.getQueueSimulationListener().add(this.parallelInitialReplanner);
-		this.getQueueSimulationListener().add(this.parallelDuringActivityReplanner);
-		this.getQueueSimulationListener().add(this.parallelDuringLegReplanner);
 	}
 
 	@Override
