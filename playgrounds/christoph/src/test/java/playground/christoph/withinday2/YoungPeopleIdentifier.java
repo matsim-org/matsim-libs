@@ -3,7 +3,6 @@ package playground.christoph.withinday2;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
@@ -17,7 +16,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	private Netsim queueSim;
 
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
 		
 		Set<WithinDayAgent> set = new HashSet<WithinDayAgent>();
 

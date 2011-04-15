@@ -32,12 +32,12 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
-import org.matsim.withinday.mobsim.WithinDayAgentFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -68,7 +68,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		Netsim mobsim = new QSim( sc, eventsManager ) ;
 
-		AgentFactory agentFactory = new WithinDayAgentFactory( mobsim ) ;
+		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory( mobsim ) ;
 		mobsim.setAgentFactory(agentFactory) ;
 
 		ReplanningManager replanningManager = new ReplanningManager();

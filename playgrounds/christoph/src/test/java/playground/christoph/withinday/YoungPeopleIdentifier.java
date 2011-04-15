@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
@@ -19,7 +18,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	private Netsim mobsim;
 
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
 		
 		Set<WithinDayAgent> set = new HashSet<WithinDayAgent>();
 

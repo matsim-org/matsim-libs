@@ -3,7 +3,6 @@ package playground.christoph.withinday;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PersonImpl;
@@ -16,7 +15,7 @@ public class OldPeopleIdentifier extends DuringActivityIdentifier {
 	private Netsim mobsim;
 
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
 
 		Set<WithinDayAgent> set = new HashSet<WithinDayAgent>();
 
