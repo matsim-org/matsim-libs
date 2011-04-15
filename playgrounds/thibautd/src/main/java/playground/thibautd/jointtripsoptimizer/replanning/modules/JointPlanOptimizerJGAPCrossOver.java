@@ -21,6 +21,7 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -32,6 +33,7 @@ import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
@@ -54,12 +56,15 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 	private static final double EPSILON = 1e-10;
 
+	private final FitnessValueComparator fitnessComparator = new FitnessValueComparator();
+
 	private final double WHOLE_CO_RATE;
 	private final double SIMPLE_CO_RATE;
 	private final double SINGLE_CO_RATE;
 	private final int N_BOOL;
 	private final int N_DOUBLE;
 	private final int N_MODE;
+	private final int N_LS = 10;
 
 	private final RateCalculator rateCalculator;
 	private final boolean dynamicRates;
@@ -175,7 +180,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				}
 			}
 			else {
-				doDoubleSingleCrossOver(mate1, mate2);
+				//doDoubleSingleCrossOver(mate1, mate2);
+				doHillClimbingSingleCrossOver(mate1, mate2);
 				if (dynamicRates) {
 					notifyCO(2, parent1, parent2, mate1, mate2);
 				}
@@ -191,6 +197,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	}
 
 	private int getNumberOfOperations(final double rate, final double populationSize) {
+		// always perform at least one operation of each CO
 		return Math.max(1, (int) Math.ceil(rate * populationSize));
 	}
 
@@ -209,7 +216,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	/**
 	 * Performs a uniform cross-over on the boolean valued genes.
 	 */
-	private final void doBooleanCrossOver(IChromosome mate1, IChromosome mate2) {
+	private void doBooleanCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
 		boolean value1;
 		boolean value2;
 		// loop over boolean genes
@@ -228,7 +237,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	/**
 	 * Performs a uniform cross-over on the mode genes.
 	 */
-	private final void doModeCrossOver(IChromosome mate1, IChromosome mate2) {
+	private void doModeCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
 		Object value1;
 		Object value2;
 
@@ -252,7 +263,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * Performs a "GENOCOP-like" "Whole arithmetical cross-over" on the double
 	 * valued genes, with a random coefficient.
 	 */
-	private final void doDoubleWholeCrossOver(IChromosome mate1, IChromosome mate2) {
+	private void doDoubleWholeCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
 		DoubleGene gene1;
 		DoubleGene gene2;
 		double oldValue1;
@@ -274,7 +287,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * Performs a "GENOCOP-like" "Simple arithmetical cross-over" on the double
 	 * valued genes.
 	 */
-	private final void doDoubleSimpleCrossOver(IChromosome mate1, IChromosome mate2) {
+	private void doDoubleSimpleCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
 		DoubleGene gene1;
 		DoubleGene gene2;
 		double oldValue1;
@@ -308,9 +323,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * point cross-over.
 	 */
 	private double SimpleCoCrossingCoef(
-			Gene[] mate1Genes,
-			Gene[] mate2Genes,
-			int crossingPoint) {
+			final Gene[] mate1Genes,
+			final Gene[] mate2Genes,
+			final int crossingPoint) {
 		double mate1PlanDuration = 0d;
 		double crossOverSurplus = 0d;
 		double currentEpisodeDuration;
@@ -356,15 +371,17 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		minIndivCoef = Math.min(minIndivCoef,
 			calculateCoef(mate1PlanDuration, crossOverSurplus));
 
-		return Math.max(1d, minIndivCoef);
+		return Math.min(1d, minIndivCoef);
 	}
 
-	private double calculateCoef(double mate1PlanDuration, double crossOverSurplus) {
+	private double calculateCoef(
+			final double mate1PlanDuration,
+			final double crossOverSurplus) {
 		if (Math.abs(crossOverSurplus) < EPSILON) {
 			return 1d;
 		} else {
 			double upperLimit = (DAY_DURATION - mate1PlanDuration) / crossOverSurplus;
-			return Math.max(1d, upperLimit);
+			return Math.min(1d, upperLimit);
 		}
 	}
 
@@ -373,7 +390,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * valued genes.
 	 * each gene is crossed with probability 0.5
 	 */
-	private final void doDoubleSingleCrossOver(IChromosome mate1, IChromosome mate2) {
+	private final void doDoubleSingleCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
 		DoubleGene gene1;
 		DoubleGene gene2;
 		double oldValue1;
@@ -421,12 +440,11 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * and
 	 * (y_1, y_2, ..., y_(i-1), (1 - a)y_i + a*x_i, y_(i+1), ..., y_n)
 	 * respect the constraints.
-	 * (NOT HERE: here, it is the max such that the modified x respects the constraints.
 	 */
 	private double SingleCoCrossingCoef(
-			Gene[] mate1Genes,
-			Gene[] mate2Genes,
-			int crossingPoint) {
+			final Gene[] mate1Genes,
+			final Gene[] mate2Genes,
+			final int crossingPoint) {
 		double mate1PlanDuration = 0d;
 		double crossOverSurplus = 0d;
 		double currentEpisodeDuration;
@@ -434,6 +452,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		int currentNGenes=nGenesIterator.next();
 		int countGenes = 1;
 		boolean crossingPointIsPast = false;
+		double randomCoef = this.randomGenerator.nextDouble();
 	
 		for (int i=this.N_BOOL; i < this.N_BOOL + this.N_DOUBLE; i++) {
 			if (countGenes > currentNGenes) {
@@ -444,7 +463,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 					mate1PlanDuration = 0d;
 				}
 				else {
-					return Math.max(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
+					return randomCoef *
+						Math.min(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
 				}
 			} else {
 				countGenes++;
@@ -462,9 +482,91 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 		if (crossingPointIsPast) {
 			// if the crossing point was in the last plan
-			return Math.max(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
+			return randomCoef *
+					Math.min(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
 		}
 
 		throw new RuntimeException("Single cross over coefficient computation failed!");
+	}
+
+	private void doHillClimbingSingleCrossOver(
+			final IChromosome mate1,
+			final IChromosome mate2) {
+		IChromosome workingChr1 = (IChromosome) mate1.clone();
+		IChromosome workingChr2 = (IChromosome) mate2.clone();
+		IChromosome best1 = (IChromosome) workingChr1.clone();
+		IChromosome best2 = (IChromosome) workingChr2.clone();
+
+		//Generate N_LS offsprings, and remember the best 2
+		for (int i=0; i < N_LS; i++) {
+			doDoubleSingleCrossOver(workingChr1, workingChr2);
+			//doDoubleWholeCrossOver(workingChr1, workingChr2);
+			retainTheBests(best1, best2, workingChr1, workingChr2);
+		}
+
+		//finally set the two offsprings to the correct values
+		mate1.setFitnessValueDirectly(best1.getFitnessValue());
+		mate2.setFitnessValueDirectly(best2.getFitnessValue());
+		try {
+			mate1.setGenes(best1.getGenes());
+			mate2.setGenes(best2.getGenes());
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+			throw new RuntimeException("hill climbing CO failed");
+		}
+	}
+
+	private void retainTheBests(
+			final IChromosome best1,
+			final IChromosome best2,
+			final IChromosome workingChr1,
+			final IChromosome workingChr2) {
+		List<IChromosome> chromosomes = new ArrayList<IChromosome>(4);
+		chromosomes.add(best1);
+		chromosomes.add(best2);
+		chromosomes.add(workingChr1);
+		chromosomes.add(workingChr2);
+		Collections.sort(chromosomes, this.fitnessComparator);
+		//log.warn("1: "+chromosomes.get(0).getFitnessValue()+
+		//		" 2: "+chromosomes.get(1).getFitnessValue()+
+		//		" 3: "+chromosomes.get(2).getFitnessValue()+
+		//		" 4: "+chromosomes.get(3).getFitnessValue());
+
+
+		IChromosome first = (IChromosome) chromosomes.get(3).clone();
+		IChromosome second = (IChromosome) chromosomes.get(2).clone();
+
+		try {
+			best1.setFitnessValueDirectly(first.getFitnessValue());
+			best1.setGenes(first.getGenes());
+			best2.setFitnessValueDirectly(second.getFitnessValue());
+			best2.setGenes(second.getGenes());
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+			throw new RuntimeException("hill climbing CO failed");
+		}
+	}
+
+	/**
+	 * Comparator regarding only the fitness value. Best fitness value will
+	 * be on first position of resulting sorted list.
+	 * for use in the "Hill climbing" CO.
+	 */
+	private class FitnessValueComparator implements Comparator<IChromosome> {
+		public FitnessValueComparator() {}
+
+		public int compare(final IChromosome chrom1, final IChromosome chrom2) {
+			double fit1 = chrom1.getFitnessValue();
+			double fit2 = chrom2.getFitnessValue();
+			if (fit1 > fit2) {
+				return 1;
+			}
+			else if (fit1 < fit2) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		}
 	}
 }
