@@ -28,9 +28,6 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
@@ -46,7 +43,7 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
  * Please ensure that each ParallelReplanner is registered as 
  * a SimulationListener to the Controller!
  */
-public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> implements SimulationInitializedListener {
+public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends AgentsToReplanIdentifier>> { 
 
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
@@ -56,6 +53,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
 	protected CyclicBarrier timeStepStartBarrier;
+	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 
 	public ParallelReplanner(int numOfThreads) {
@@ -73,6 +71,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		}
 		
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.betweenReplannerBarrier = new CyclicBarrier(numOfThreads);
 		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
 
 		// finalize Thread Setup
@@ -80,6 +79,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 			ReplanningThread replanningThread = replanningThreads[i];
 
 			replanningThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
+			replanningThread.setBetweenReplannerBarrier(betweenReplannerBarrier);
 			replanningThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
 			replanningThread.setDaemon(true);
 
@@ -158,16 +158,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 			log.error("The number of parallel running replanning threads is bigger than the number of available CPUs/Cores!");
 		}
 	}
-
-	@Override
-	public final void notifySimulationInitialized(SimulationInitializedEvent e) {
-
-		for (ReplanningThread replanningThread : this.replanningThreads) {
-			replanningThread.setAgentCounter(((Netsim) e.getQueueSimulation()).getAgentCounter());
-		}
-	}
-	
-	
+		
 	/*
 	 * The thread class that really handles the replanning.
 	 */

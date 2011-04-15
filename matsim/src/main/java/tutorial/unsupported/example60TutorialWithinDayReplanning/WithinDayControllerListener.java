@@ -211,11 +211,6 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
 		
-		// register them as SimulationListeners
-		event.getControler().getQueueSimulationListener().add(this.parallelInitialReplanner);
-		event.getControler().getQueueSimulationListener().add(this.parallelActEndReplanner);
-		event.getControler().getQueueSimulationListener().add(this.parallelLeaveLinkReplanner);
-		
 		/*
 		 * We create and set the Replanning Modules for each iteration.
 		 * This could be varied, e.g. using the WithinDay Modules only

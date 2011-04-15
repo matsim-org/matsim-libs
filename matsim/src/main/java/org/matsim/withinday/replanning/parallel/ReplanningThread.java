@@ -20,7 +20,8 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.BrokenBarrierException;
@@ -31,11 +32,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
-
 
 /*
  * Typical Replanner Implementations should be able to use this 
@@ -48,7 +47,6 @@ public abstract class ReplanningThread extends Thread {
 	
 	protected Counter counter;
 	protected double time = 0.0;
-	protected AgentCounterI agentCounter;
 	protected boolean simulationRunning = true;
 	
 	/*
@@ -59,10 +57,19 @@ public abstract class ReplanningThread extends Thread {
 	 */
 	protected Map<Id, WithinDayReplanner<? extends AgentsToReplanIdentifier>> withinDayReplanners = new TreeMap<Id, WithinDayReplanner<? extends AgentsToReplanIdentifier>>();
 	
-	protected LinkedList<ReplanningTask> replanningTasks = new LinkedList<ReplanningTask>();
+	/*
+	 * Use one List of ReplanningTasks per WithinDayReplanner. By doing so
+	 * and by using a CyclicBarrier, it can be ensured that only instances
+	 * of the same WithinDayReplanner are run in parallel. Otherwise two
+	 * different Replanners on different Threads could try to replan the
+	 * same Agent.
+	 */
+	protected Map<Id, List<ReplanningTask>> replanningTasks = new TreeMap<Id, List<ReplanningTask>>();
+//	protected LinkedList<ReplanningTask> replanningTasks = new LinkedList<ReplanningTask>();
 	protected WithinDayReplanner<AgentsToReplanIdentifier> withinDayReplanner;
 	
 	protected CyclicBarrier timeStepStartBarrier;
+	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
 	public ReplanningThread(String counterText) {
@@ -73,10 +80,6 @@ public abstract class ReplanningThread extends Thread {
 		this.time = time;
 	}
 	
-	public final void setAgentCounter(AgentCounterI agentCounter) {
-		this.agentCounter = agentCounter;
-	}
-	
 	public final void setSimulationRunning(boolean simulationRunning) {
 		this.simulationRunning = simulationRunning;
 	}
@@ -85,59 +88,74 @@ public abstract class ReplanningThread extends Thread {
 		this.timeStepStartBarrier = barrier;
 	}
 	
+	public final void setBetweenReplannerBarrier(CyclicBarrier barrier) {
+		this.betweenReplannerBarrier = barrier;
+	}
+	
 	public final void setCyclicTimeStepEndBarrier(CyclicBarrier barrier) {
 		this.timeStepEndBarrier = barrier;
 	}
 
-	public final void addReplanningTask(ReplanningTask replanningTask) {			
-		replanningTasks.add(replanningTask);
+	public final void addReplanningTask(ReplanningTask replanningTask) {
+		List<ReplanningTask> list = this.replanningTasks.get(replanningTask.getWithinDayReplannerId());
+		list.add(replanningTask);
 	}
 	
 	public final void addWithinDayReplanner(WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner) {
 		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
+		this.replanningTasks.put(withinDayReplanner.getId(), new ArrayList<ReplanningTask>());
 	}
 	
 	/*
 	 * Typical Replanner Implementations should be able to use 
 	 * this method without any Changes.
 	 */
-	private void doReplanning() {
-		ReplanningTask replanningTask;
-		while((replanningTask = replanningTasks.poll()) != null) {
-			Id id = replanningTask.getWithinDayReplannerId();
-			WithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
-			
-			if (id == null) {
-				log.error("WithinDayReplanner Id is null!");
-				return;
-			}
-			
-			if (withinDayAgent == null) {
-				log.error("WithinDayAgent is null!");
-				return;
-			}
-			
-			WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner = this.withinDayReplanners.get(id);
+	private void doReplanning() throws InterruptedException, BrokenBarrierException {
 
-			if (withinDayReplanner != null) {
-				/*
-				 * Check whether the current Agent should be replanned based on the 
-				 * replanning probability. If not, continue with the next one.
-				 */
-				if (!withinDayReplanner.replanAgent()) continue;
+		for (List<ReplanningTask> list : this.replanningTasks.values()) {
+			
+			for (ReplanningTask replanningTask : list) {
+				Id id = replanningTask.getWithinDayReplannerId();
+				WithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
 				
-				withinDayReplanner.setTime(time);
-				boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
-				
-				if (!replanningSuccessful) {
-					log.error("Replanning was not successful!");
+				if (id == null) {
+					log.error("WithinDayReplanner Id is null!");
+					return;
 				}
-				else counter.incCounter();
-			}
-			else {
-				log.error("WithinDayReplanner is null!");
-			}
+				
+				if (withinDayAgent == null) {
+					log.error("WithinDayAgent is null!");
+					return;
+				}
 
+				WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner = this.withinDayReplanners.get(id);
+
+				if (withinDayReplanner != null) {
+					/*
+					 * Check whether the current Agent should be replanned based on the 
+					 * replanning probability. If not, continue with the next one.
+					 */
+					if (!withinDayReplanner.replanAgent()) continue;
+					
+					withinDayReplanner.setTime(time);
+					boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
+					
+					if (!replanningSuccessful) {
+						log.error("Replanning was not successful!");
+					}
+					else counter.incCounter();
+				}
+				else {
+					log.error("WithinDayReplanner is null!");
+				}
+			}
+			list.clear();
+			
+			/*
+			 * Wait here until all Threads have ended the replanning for the
+			 * current WithinDayReplanner.
+			 */
+			this.betweenReplannerBarrier.await();
 		}
 	}
 	

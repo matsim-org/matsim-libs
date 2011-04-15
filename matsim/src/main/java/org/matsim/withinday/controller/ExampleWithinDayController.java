@@ -68,8 +68,8 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	 * multiple Strategies to the Agents.
 	 */
 	private double pInitialReplanning = 0.0;
-	private double pDuringActivityReplanning = 1.0;
-	private double pDuringLegReplanning = 1.0;
+	private double pDuringActivityReplanning = 0.1;
+	private double pDuringLegReplanning = 0.1;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -141,6 +141,11 @@ public class ExampleWithinDayController extends WithinDayController implements S
 		super.addDuringLegReplanner(this.duringLegReplanner);
 	}
 
+	/*
+	 * When the Controller Startup Event is created, the EventsManager
+	 * has already been initialized. Therefore we can initialize now
+	 * all Objects, that have to be registered at the EventsManager.
+	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		super.createAndInitTravelTimeCollector();

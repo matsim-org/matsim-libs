@@ -196,11 +196,6 @@ public class WithinDayController extends Controler {
 		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
 		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
 		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
-		
-		// register them as SimulationListeners
-		this.getQueueSimulationListener().add(this.parallelInitialReplanner);
-		this.getQueueSimulationListener().add(this.parallelActEndReplanner);
-		this.getQueueSimulationListener().add(this.parallelLeaveLinkReplanner);
 
 		log.info("Initialize Replanning Modules");
 		initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
