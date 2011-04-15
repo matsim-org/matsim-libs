@@ -27,7 +27,6 @@ import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -71,10 +70,6 @@ public abstract class OTFClient implements Runnable {
 		this.url = url;
 	}
 
-	protected OTFClient() {
-
-	}
-
 	@Override
 	public void run() {
 		if (this.masterHostControl == null) {
@@ -90,26 +85,18 @@ public abstract class OTFClient implements Runnable {
 		OTFDrawer mainDrawer = createDrawer();
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
-		pane.setRightComponent(this.createDrawerPanel(this.url, mainDrawer));
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
+		pane.setRightComponent(panel);
 		pane.validate();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		mainDrawer.redraw();
 		frame.setVisible(true);
-
 		log.info("OTFVis finished init");
 	}
 
 	public void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
 		this.masterHostControl = otfHostConnectionManager;
-	}
-
-	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){
-		JPanel panel = new JPanel(new BorderLayout());
-		JLabel label = new JLabel();
-		label.setText(url);
-		panel.add(drawer.getComponent(), BorderLayout.CENTER);
-		panel.add(label, BorderLayout.NORTH);
-		return panel;
 	}
 
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {

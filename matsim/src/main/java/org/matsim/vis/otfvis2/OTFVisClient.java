@@ -35,7 +35,7 @@ public final class OTFVisClient extends OTFClient {
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
 	public OTFVisClient() {
-		super();
+		super("dummyURL");
 	}
 
 	private void prepareConnectionManager() {
