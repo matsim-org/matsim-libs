@@ -16,24 +16,16 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -42,16 +34,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.geometry.*;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class GtfsConverter {
 
 	private String filepath = "";
 	
 	private TransitScheduleFactory tf = new TransitScheduleFactoryImpl();
+	
+	private CoordinateTransformation transform = new GeotoolsTransformation("WGS84", "EPSG:3395");
 	
 	public static void main(String[] args) {
 		GtfsConverter gtfs = new GtfsConverter("../../matsim/input");
@@ -231,7 +221,7 @@ public class GtfsConverter {
 			String row = br.readLine();
 			do{
 				String[] entries = row.split(",");
-				TransitStopFacility t = this.tf.createTransitStopFacility(new IdImpl(entries[stopIdIndex]), MGC.coordinate2Coord(new Coordinate(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
+				TransitStopFacility t = this.tf.createTransitStopFacility(new IdImpl(entries[stopIdIndex]), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
 				t.setName(entries[stopNameIndex]);
 				ts.addStopFacility(t);
 				row = br.readLine();
@@ -291,13 +281,11 @@ public class GtfsConverter {
 					entries = row.split(",");
 					Id toNodeId = new IdImpl(entries[stopIdIndex]);
 					double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
-					network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);
+					Link link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);
 					// Change the linktype to pt
-					Link link = network.getLinks().get(new IdImpl(i-1));
 					Set<String> modes = new HashSet<String>();
 					modes.add(TransportMode.pt);
 					link.setAllowedModes(modes);
-					row = br.readLine();
 				}		
 			}while(row!= null);
 		} catch (FileNotFoundException e) {
