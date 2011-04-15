@@ -20,20 +20,18 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
@@ -54,27 +52,24 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
-	
-		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+		Collection<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		Iterator<PersonAgent> iter = activityPerformingAgents.iterator();
-		while(iter.hasNext()) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) iter.next();
-			
+		if (handledAgents == null) return agentsToReplan;	
+
+		for (PersonAgent personAgent : activityPerformingAgents) {
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
-			if (!withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-				continue;
-			}
+			if (!handledAgents.contains(personAgent)) continue;
 			
 			/*
 			 *  Get the current PlanElement and check if it is an Activity
 			 */
 			Activity currentActivity;
-			PlanElement currentPlanElement = withinDayPersonAgent.getCurrentPlanElement();
+			PlanElement currentPlanElement = personAgent.getCurrentPlanElement();
 			if (currentPlanElement instanceof Activity) {
 				currentActivity = (Activity) currentPlanElement;
 			} else continue;
@@ -88,7 +83,7 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 			}
 			
 			// If we reach this point, the agent can be replanned.
-			agentsToReplan.add(withinDayPersonAgent);
+			agentsToReplan.add((WithinDayAgent)personAgent);
 		}
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + activityPerformingAgents.size() + " Agents performing an Activity in a secure area.");
 		

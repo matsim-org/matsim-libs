@@ -21,12 +21,13 @@
 package playground.christoph.controler;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -44,9 +45,10 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
@@ -119,7 +121,11 @@ public class SimpleRouterControler extends Controler {
 	protected int randomCompassRouterCounter = 0;
 	protected int randomDijkstraRouterCounter = 0;
 
-	protected InitialIdentifier initialIdentifier;
+	protected InitialIdentifier randomIdentifier;
+	protected InitialIdentifier tabuIdentifier;
+	protected InitialIdentifier compassIdentifier;
+	protected InitialIdentifier randomCompassIdentifier;
+	protected InitialIdentifier dijkstraIdentifier;
 	protected WithinDayInitialReplanner randomReplanner;
 	protected WithinDayInitialReplanner tabuReplanner;
 	protected WithinDayInitialReplanner compassReplanner;
@@ -184,39 +190,42 @@ public class SimpleRouterControler extends Controler {
 
 		AbstractMultithreadedModule router;
 
-		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
-
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
 		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory());
+		this.randomIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.randomReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
 		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
+		this.tabuIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.tabuReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
 		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
+		this.compassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.compassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
 		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
+		this.randomCompassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
+		this.dijkstraIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
+		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
 		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);
 	}
 
@@ -284,7 +293,7 @@ public class SimpleRouterControler extends Controler {
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 
 		protected SimpleRouterControler simpleRouterControler;
-		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
+		protected Collection<WithinDayAgent> withinDayAgents;
 
 		protected int noReplanningCounter = 0;
 		protected int initialReplanningCounter = 0;
@@ -308,7 +317,13 @@ public class SimpleRouterControler extends Controler {
 		 * are assigned based on probabilities from config files.
 		 */
 		protected void setReplanningFlags() {
-			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
+			Set<WithinDayAgent> randomAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			Set<WithinDayAgent> tabuAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			Set<WithinDayAgent> compassAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			Set<WithinDayAgent> randomCompassAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			Set<WithinDayAgent> dijkstraAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			
+			for (WithinDayAgent withinDayAgent : this.withinDayAgents) {
 				double probability;
 				Random random = MatsimRandom.getLocalInstance();
 				probability = random.nextDouble();
@@ -333,31 +348,31 @@ public class SimpleRouterControler extends Controler {
 
 				// Random Router
 				if (pRandomRouterLow <= probability && probability < pRandomRouterHigh) {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomReplanner.getId());
+					randomAgents.add(withinDayAgent);
 					initialReplanningCounter++;
 					simpleRouterControler.randomRouterCounter++;
 				}
 				// Tabu Router
 				else if (pTabuRouterLow <= probability && probability < pTabuRouterHigh) {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.tabuReplanner.getId());
+					tabuAgents.add(withinDayAgent);
 					initialReplanningCounter++;
 					simpleRouterControler.tabuRouterCounter++;
 				}
 				// Compass Router
 				else if (pCompassRouterLow <= probability && probability < pCompassRouterHigh) {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.compassReplanner.getId());
+					compassAgents.add(withinDayAgent);
 					initialReplanningCounter++;
 					simpleRouterControler.compassRouterCounter++;
 				}
 				// Random Compass Router
 				else if (pRandomCompassRouterLow <= probability && probability < pRandomCompassRouterHigh) {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomCompassReplanner.getId());
+					randomCompassAgents.add(withinDayAgent);
 					initialReplanningCounter++;
 					simpleRouterControler.randomCompassRouterCounter++;
 				}
 				// Random Dijkstra Router
 				else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh) {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(simpleRouterControler.randomDijkstraReplanner.getId());
+					dijkstraAgents.add(withinDayAgent);
 					initialReplanningCounter++;
 					simpleRouterControler.randomDijkstraRouterCounter++;
 				}
@@ -370,7 +385,13 @@ public class SimpleRouterControler extends Controler {
 				if (initialReplanningCounter == 0) simpleRouterControler.replanningManager.doInitialReplanning(false);
 				else simpleRouterControler.replanningManager.doInitialReplanning(true);
 			}
-
+			
+			simpleRouterControler.randomIdentifier.setHandledAgent(randomAgents);
+			simpleRouterControler.tabuIdentifier.setHandledAgent(tabuAgents);
+			simpleRouterControler.compassIdentifier.setHandledAgent(compassAgents);
+			simpleRouterControler.randomCompassIdentifier.setHandledAgent(randomCompassAgents);
+			simpleRouterControler.dijkstraIdentifier.setHandledAgent(dijkstraAgents);
+			
 			log.info("Random Routing Probability: " + simpleRouterControler.pRandomRouter);
 			log.info("Tabu Routing Probability: " + simpleRouterControler.pTabuRouter);
 			log.info("Compass Routing Probability: " + simpleRouterControler.pCompassRouter);
@@ -378,7 +399,7 @@ public class SimpleRouterControler extends Controler {
 			log.info("Random Dijkstra Routing Probability: " + simpleRouterControler.pRandomDijkstraRouter);
 
 //			double numPersons = simpleRouterControler.population.getPersons().size();
-			double numPersons = withinDayPersonAgents.size();
+			double numPersons = withinDayAgents.size();
 			log.info(simpleRouterControler.randomRouterCounter + " persons use a Random Router (" + simpleRouterControler.randomRouterCounter / numPersons * 100.0 + "%)");
 			log.info(simpleRouterControler.tabuRouterCounter + " persons use a Tabu Router (" + simpleRouterControler.tabuRouterCounter / numPersons * 100.0 + "%)");
 			log.info(simpleRouterControler.compassRouterCounter + " persons use a Compass Router (" + simpleRouterControler.compassRouterCounter / numPersons * 100.0 + "%)");
@@ -390,12 +411,12 @@ public class SimpleRouterControler extends Controler {
 		}
 
 		protected void collectAgents(QSim sim) {
-			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
+			this.withinDayAgents = new ArrayList<WithinDayAgent>();
 
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
 				if (mobsimAgent instanceof PersonAgent) {
 					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					withinDayPersonAgents.put(personAgent.getId(), (WithinDayPersonAgent) personAgent);
+					withinDayAgents.add((WithinDayAgent) personAgent);
 				} else {
 					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
 				}

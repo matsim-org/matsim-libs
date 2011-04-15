@@ -34,7 +34,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
@@ -74,12 +73,6 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
-
-		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(withinDayAgent instanceof WithinDayPersonAgent)) return false;
-		else {
-			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
-		}
 
 		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
 
@@ -137,7 +130,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		withinDayPersonAgent.resetCaches();
+		withinDayAgent.resetCaches();
 		
 		return true;
 	}

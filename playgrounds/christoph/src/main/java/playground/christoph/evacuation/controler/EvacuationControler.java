@@ -20,22 +20,12 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -44,7 +34,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
@@ -53,7 +42,6 @@ import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
 import org.matsim.withinday.mobsim.DuringLegReplanningModule;
 import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -61,6 +49,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
@@ -83,16 +72,6 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToSecureFacilityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
-
-/*
- * Theimport playground.christoph.withinday.trafficmonitoring.TravelTimeCollector;
- Path to a Config File is needed as Argument to run the
- * Simulation.
- *
- * By default "../matsim/test/scenarios/berlin/config.xml" should work.
- *
- * @author Christoph Dobler
- */
 
 public class EvacuationControler extends MultiModalControler {
 
@@ -149,6 +128,7 @@ public class EvacuationControler extends MultiModalControler {
 	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
 	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
 
+	protected SelectHandledAgentsByProbability selector;
 	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
 	protected FixedOrderSimulationListener fosl;
@@ -224,6 +204,7 @@ public class EvacuationControler extends MultiModalControler {
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
 
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
+//		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 //		this.initialReplanner.setReplanner(router);
 //		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
@@ -237,12 +218,14 @@ public class EvacuationControler extends MultiModalControler {
 		fosl.addSimulationListener(activityReplanningMap);
 
 		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+		this.selector.addIdentifier(this.duringSecureActivityIdentifier, this.pDuringActivityReplanning);
 		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringSecureActivityReplanner.addAgentsToReplanIdentifier(this.duringSecureActivityIdentifier);
 		this.duringSecureActivityReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringActivityReplanner.addWithinDayReplanner(this.duringSecureActivityReplanner);
 
 		this.duringInsecureActivityIdentifier = new InsecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+		this.selector.addIdentifier(this.duringInsecureActivityIdentifier, this.pDuringActivityReplanning);
 		this.duringInsecureActivityReplanner = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
 		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
@@ -256,18 +239,21 @@ public class EvacuationControler extends MultiModalControler {
 		fosl.addSimulationListener(linkReplanningMap);
 
 		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+		this.selector.addIdentifier(this.duringSecureLegIdentifier, this.pDuringLegReplanning);
 		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
 		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringSecureLegReplanner);
 
 		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+		this.selector.addIdentifier(this.duringInsecureLegIdentifier, this.pDuringLegReplanning);
 		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
 		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
 		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringInsecureLegReplanner);
 
 		this.currentInsecureLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		this.selector.addIdentifier(this.currentInsecureLegIdentifier, this.pDuringLegReplanning);
 		this.currentInsecureLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.currentInsecureLegReplanner.addAgentsToReplanIdentifier(this.currentInsecureLegIdentifier);
 		this.currentInsecureLegReplanner.setReplanningProbability(pReplanning);
@@ -287,16 +273,6 @@ public class EvacuationControler extends MultiModalControler {
 		this.getQueueSimulationListener().add(this.parallelDuringLegReplanner);
 	}
 
-	/*
-	 * Creates the Handler and Listener Object so that they can be handed over to the Within Day
-	 * Replanning Modules (TravelCostWrapper, etc).
-	 *
-	 * The full initialization of them is done later (we don't have all necessary Objects yet).
-	 */
-	protected void createHandlersAndListeners() {
-		replanningManager = new ReplanningManager();
-	}
-
 	@Override
 	protected void setUp() {
 		/*
@@ -312,10 +288,10 @@ public class EvacuationControler extends MultiModalControler {
 		
 		super.setUp();
 
-		createHandlersAndListeners();
+		replanningManager = new ReplanningManager();
 
-		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
-		fosl.addSimulationInitializedListener(rfi);
+		selector = new SelectHandledAgentsByProbability();
+		fosl.addSimulationListener(selector);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
@@ -368,115 +344,11 @@ public class EvacuationControler extends MultiModalControler {
 		return new MultiModalMobsimFactory(super.getMobsimFactory(), travelTime);
 	}
 
-	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
-
-		protected EvacuationControler withinDayControler;
-		protected Map<Id, WithinDayPersonAgent> withinDayPersonAgents;
-
-		protected int noReplanningCounter = 0;
-		protected int initialReplanningCounter = 0;
-		protected int actEndReplanningCounter = 0;
-		protected int leaveLinkReplanningCounter = 0;
-
-		public ReplanningFlagInitializer(EvacuationControler controler) {
-			this.withinDayControler = controler;
-		}
-
-		@Override
-		public void notifySimulationInitialized(SimulationInitializedEvent e) {
-			collectAgents((QSim)e.getQueueSimulation());
-			setReplanningFlags();
-		}
-
-		protected void setReplanningFlags() {
-			noReplanningCounter = 0;
-			initialReplanningCounter = 0;
-			actEndReplanningCounter = 0;
-			leaveLinkReplanningCounter = 0;
-
-			Random random = MatsimRandom.getLocalInstance();
-
-			for (WithinDayPersonAgent withinDayPersonAgent : this.withinDayPersonAgents.values()) {
-				double probability;
-				boolean noReplanning = true;
-
-				// No Replanner
-				probability = random.nextDouble();
-				if (probability > withinDayControler.pInitialReplanning) ;
-				else {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.initialReplanner.getId());
-					noReplanning = false;
-					initialReplanningCounter++;
-				}
-
-				// During Activity Replanner
-				probability = random.nextDouble();
-				if (probability > withinDayControler.pDuringActivityReplanning) ;
-				else {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringSecureActivityReplanner.getId());
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringInsecureActivityReplanner.getId());
-					noReplanning = false;
-					actEndReplanningCounter++;
-				}
-
-				// During Leg Replanner
-				probability = random.nextDouble();
-				if (probability > withinDayControler.pDuringLegReplanning) ;
-				else {
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringSecureLegReplanner.getId());
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.duringInsecureLegReplanner.getId());
-					withinDayPersonAgent.getReplannerAdministrator().addWithinDayReplanner(withinDayControler.currentInsecureLegReplanner.getId());
-					noReplanning = false;
-					leaveLinkReplanningCounter++;
-				}
-
-				// if non of the Replanning Modules was activated
-				if (noReplanning) noReplanningCounter++;
-
-				// (de)activate replanning if they are not needed
-				if (initialReplanningCounter == 0) withinDayControler.replanningManager.doInitialReplanning(false);
-				else withinDayControler.replanningManager.doInitialReplanning(true);
-
-				if (actEndReplanningCounter == 0) withinDayControler.replanningManager.doActEndReplanning(false);
-				else withinDayControler.replanningManager.doActEndReplanning(true);
-
-				if (leaveLinkReplanningCounter == 0) withinDayControler.replanningManager.doLeaveLinkReplanning(false);
-				else withinDayControler.replanningManager.doLeaveLinkReplanning(true);
-			}
-
-			log.info("Initial Replanning Probability: " + withinDayControler.pInitialReplanning);
-			log.info("Act End Replanning Probability: " + withinDayControler.pDuringActivityReplanning);
-			log.info("Leave Link Replanning Probability: " + withinDayControler.pDuringLegReplanning);
-
-			//double numPersons = withinDayControler.population.getPersons().size();
-			double numPersons = this.withinDayPersonAgents.size();
-			log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
-			log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
-			log.info(actEndReplanningCounter + " persons replan their plans after an activity (" + actEndReplanningCounter / numPersons * 100.0 + "%)");
-			log.info(leaveLinkReplanningCounter + " persons replan their plans at each node (" + leaveLinkReplanningCounter / numPersons * 100.0 + "%)");
-		}
-
-		protected void collectAgents(QSim sim) {
-			this.withinDayPersonAgents = new TreeMap<Id, WithinDayPersonAgent>();
-
-			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
-				if (mobsimAgent instanceof PersonAgent) {
-					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					withinDayPersonAgents.put(personAgent.getId(), (WithinDayPersonAgent) personAgent);
-				} else {
-					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
-				}
-			}
-		}
-
-	}
-
 	/*
 	 * ===================================================================
 	 * main
 	 * ===================================================================
 	 */
-
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");

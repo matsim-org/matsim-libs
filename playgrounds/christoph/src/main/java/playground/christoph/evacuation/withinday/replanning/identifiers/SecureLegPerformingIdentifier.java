@@ -20,19 +20,18 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
@@ -54,25 +53,23 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<WithinDayAgent> getAgentsToReplan(double time, Id withinDayReplannerId) {
+	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+		Collection<PersonAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
+		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		List<PersonAgent> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
-		Set<WithinDayAgent> agentsToReplan = new HashSet<WithinDayAgent>();
-		
+		if (handledAgents == null) return agentsToReplan;	
+				
 		for (PersonAgent personAgent : legPerformingAgents) {
-			WithinDayPersonAgent withinDayPersonAgent = (WithinDayPersonAgent) personAgent;
-			
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
-			if (!withinDayPersonAgent.getReplannerAdministrator().getWithinDayReplannerIds().contains(withinDayReplannerId)) {
-				continue;
-			}
+			if (!handledAgents.contains(personAgent)) continue;
 			
 			/*
 			 * Remove the Agent from the list, if the current Link is in a insecure Area.
 			 */
-			Link currentLink = this.network.getLinks().get(withinDayPersonAgent.getCurrentLinkId());
+			Link currentLink = this.network.getLinks().get(personAgent.getCurrentLinkId());
 			double distanceToStartNode = CoordUtils.calcDistance(currentLink.getFromNode().getCoord(), centerCoord);
 			double distanceToEndNode = CoordUtils.calcDistance(currentLink.getToNode().getCoord(), centerCoord);
 			if (distanceToStartNode <= secureDistance || distanceToEndNode <= secureDistance) {
@@ -82,7 +79,7 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 			/*
 			 * Add the Agent to the Replanning List
 			 */
-			agentsToReplan.add(withinDayPersonAgent);
+			agentsToReplan.add((WithinDayAgent)personAgent);
 		}
 		
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing a Leg in a secure area.");

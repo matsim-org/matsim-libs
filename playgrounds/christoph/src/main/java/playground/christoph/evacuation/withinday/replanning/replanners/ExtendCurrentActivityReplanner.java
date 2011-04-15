@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.withinday.mobsim.WithinDayPersonAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 /*
@@ -52,10 +52,10 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		WithinDayPersonAgent withinDayPersonAgent = null;
-		if (!(withinDayAgent instanceof WithinDayPersonAgent)) return false;
+		ExperimentalBasicWithindayAgent withinDayPersonAgent = null;
+		if (!(withinDayAgent instanceof ExperimentalBasicWithindayAgent)) return false;
 		else {
-			withinDayPersonAgent = (WithinDayPersonAgent) withinDayAgent;
+			withinDayPersonAgent = (ExperimentalBasicWithindayAgent) withinDayAgent;
 		}
 	
 		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
