@@ -38,12 +38,12 @@ public class EnvironmentForceModule implements ForceModule {
 
 	//Helbing constant
 	private static final double Bi=0.08;
-	private static final double Ai=1130;
+	private static final double Ai=2000;
 	private static final double k = 1.2 * 100000;
 	private static final double kappa = 2.4 * 100000;
 
-	
-	private final double sensingRange; 
+
+	private final double sensingRange;
 
 	/**
 	 * @param floor
@@ -52,9 +52,9 @@ public class EnvironmentForceModule implements ForceModule {
 	public EnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.sc = scenario;
 		this.sff = this.sc.getStaticForceField();
-		
+
 		//sensing range to maximum
-		this.sensingRange = this.sff.getMaxSensingRange(); 
+		this.sensingRange = this.sff.getMaxSensingRange();
 	}
 
 	/*
@@ -78,10 +78,14 @@ public class EnvironmentForceModule implements ForceModule {
 			if (dist > this.sensingRange) {
 				continue;
 			}
+			if (dist < 0.5) {
+				int i = 0;
+				i++;
+			}
 			double dx =(agent.getPosition().x - obj.x) / dist;
 			double dy =(agent.getPosition().y - obj.y) / dist;
 
-			double bounderyDist = Agent2D.AGENT_DIAMETER/4 - dist;
+			double bounderyDist = Agent2D.AGENT_DIAMETER - dist;
 			double g = bounderyDist > 0 ? bounderyDist : 0;
 
 			double tanDvx = (- agent.getVx()) * dx;

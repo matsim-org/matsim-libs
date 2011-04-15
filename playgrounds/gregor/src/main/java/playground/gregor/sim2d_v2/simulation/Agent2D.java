@@ -52,7 +52,7 @@ public class Agent2D extends PersonDriverAgentImpl {
 		super(p, sim2d);
 
 		// TODO think about this
-		this.desiredVelocity = 1.34; //+ (MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+		this.desiredVelocity = 1 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 4;
 
 	}
 
@@ -89,9 +89,9 @@ public class Agent2D extends PersonDriverAgentImpl {
 	public void setCurrentVelocity(double vx, double vy) {
 		this.vx = vx;
 		this.vy = vy;
-		
+
 	}
-	
+
 	public double getVx() {
 		return this.vx;
 	}
@@ -103,7 +103,7 @@ public class Agent2D extends PersonDriverAgentImpl {
 	public double getWeight() {
 		return AGENT_WEIGHT;
 	}
-	
+
 	// /**
 	// * @return
 	// */

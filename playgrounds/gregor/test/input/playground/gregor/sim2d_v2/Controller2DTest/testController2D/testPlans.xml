@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+<person id="0">
+<plan score="-2.3016666666666667" selected="yes">
+<act type="h" x="386411" y="5819501"  link="18" end_time="09:00:00"/>
+<leg mode="car" dep_time="09:00:00">
+</leg>
+<act type="h" x="386428" y="5819501" link="0" />
+</plan>
+</person>
+<person id="1">
+<plan score="-2.3016666666666667" selected="yes">
+<act type="h" x="386411" y="5819502" end_time="09:00:00"/>
+<leg mode="car" dep_time="09:00:00">
+</leg>
+<act type="h" x="386428" y="5819502" link="0" />
+</plan>
+</person>
+<person id="2">
+<plan score="-2.3016666666666667" selected="yes">
+<act type="h" x="386420" y="5819494" link="31" end_time="09:00:01"/>
+<leg mode="car" dep_time="09:00:01">
+</leg>
+<act type="h" x="386420" y="5819508" link="2" />
+</plan>
+</person>
+<person id="3">
+<plan score="-2.3016666666666667" selected="yes">
+<act type="h" x="386421" y="5819494" link="31" end_time="09:00:02"/>
+<leg mode="car" dep_time="09:00:02">
+</leg>
+<act type="h" x="386421" y="5819508" link="2" />
+</plan>
+</person>
+</plans>

@@ -73,8 +73,8 @@ public class Floor {
 	private final GeometryFactory geofac = new GeometryFactory();
 
 	private final boolean ms = false;
-	private double sim2DTimeStepSize;
-	private boolean emitXYZAzimuthEvents = true;
+	private final double sim2DTimeStepSize;
+	private final boolean emitXYZAzimuthEvents = true;
 
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
 		this.scenario = scenario;
@@ -88,13 +88,13 @@ public class Floor {
 	 * 
 	 */
 	public void init() {
-//		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
-		//		
-		this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, scenario));
+		//		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
+		//
+		this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, this.scenario));
 
 		this.forceModules.add(new DrivingForceModule(this, this.scenario));
-		this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
-//		this.forceModules.add(new CollisionPredictionEnvironmentForceModule(this, this.scenario));
+		//		this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
+		this.forceModules.add(new CollisionPredictionEnvironmentForceModule(this, this.scenario));
 		this.forceModules.add(new PathForceModule(this, this.scenario));
 
 		for (ForceModule m : this.forceModules) {
@@ -155,8 +155,9 @@ public class Floor {
 			Force f = agent.getForce();
 			Coordinate oldPos = agent.getPosition();
 
-			f.update(this.sim2DTimeStepSize,agent.getWeight());
-			validateVelocity(f);
+			f.update(agent.getWeight(),this.sim2DTimeStepSize);
+			//			f.update(this.sim2DTimeStepSize,agent.getWeight());
+			validateVelocity(f,agent.getDesiredVelocity());
 
 			double vx = f.getVx();
 			double vy = f.getVy();
@@ -189,10 +190,11 @@ public class Floor {
 
 	}
 
-	private void validateVelocity(Force f) {
+	private void validateVelocity(Force f, double v0) {
 		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
-		if (v > 2) {
-			double scale = 2/v;
+		//		System.out.println("v:" + v);
+		if (v > 1.25*v0) {
+			double scale = (1.25*v0)/v;
 			f.setVx(f.getVx()*scale);
 			f.setVy(f.getVy()*scale);
 		}
@@ -290,9 +292,9 @@ public class Floor {
 			}
 		}
 
-//				for (Agent2D agent : this.agents) {
-//					validateForce(agent);
-//				}
+		//				for (Agent2D agent : this.agents) {
+		//					validateForce(agent);
+		//				}
 	}
 
 	/**

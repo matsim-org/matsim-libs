@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -44,19 +45,21 @@ public class PathForceModule implements ForceModule {
 	private HashMap<Id, LineString> linkGeos;
 
 	int redraws = 0;
+	private final double deltaT;
 
-	
+
 	// Mauron constant
-	private static final double Apath =1000./25;
-	private static final double Bpath = .5;
-	
-	
+	private static final double Apath =150.;
+	private static final double Bpath = 1;
+
+
 	/**
 	 * @param floor
 	 * @param scenario
 	 */
 	public PathForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
+		this.deltaT = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 
 	}
 
@@ -100,19 +103,23 @@ public class PathForceModule implements ForceModule {
 
 		double hypotenuse = agent.getPosition().distance(fromNode);
 
-		
+
 		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(this.linkGeos.get(agent.getCurrentLinkId()));
+		//		if (pathDist < Bpath){
+		//			return;
+		//		}
+		//
 		double scale = Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(pathDist, 2));
 
 		double deltaX = (fromNode.x - agent.getPosition().x) + drivingDir.x * scale;
 		double deltaY = (fromNode.y - agent.getPosition().y) + drivingDir.y * scale;
-		
-		double f = Math.exp(pathDist / Bpath);
-		deltaX *= f;// / pathDist;
-		deltaY *= f;// / pathDist;
 
-		deltaX = Apath * deltaX/ agent.getWeight();
-		deltaY = Apath * deltaY/ agent.getWeight();
+		double f = Math.exp(pathDist / Bpath) * this.deltaT; //deltaT is needed here to make path force independent of temporal resolution
+		deltaX *= f / pathDist;
+		deltaY *= f / pathDist;
+
+		deltaX = Apath * deltaX;
+		deltaY = Apath * deltaY;
 
 
 		agent.getForce().incrementX(deltaX);

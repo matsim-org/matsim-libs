@@ -75,9 +75,9 @@ public class Force {
 	}
 	
 	
-	public void update(double deltaT, double weight) {
-		this.vx += fx*deltaT/weight;
-		this.vy += fy*deltaT/weight;
+	public void update(double weight, double deltaT) {
+		this.vx += (deltaT*fx)/weight;
+		this.vy += (deltaT*fy)/weight;
 		this.fx = 0;
 		this.fy = 0;
 	}

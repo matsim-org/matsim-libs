@@ -52,17 +52,17 @@ public class GisDebugger {
 	private static FeatureType ftLine;
 
 	private static FeatureType ftPoint;
-	
+
 	private static List<Geometry> geos = new ArrayList<Geometry>();
-	
+
 	private static boolean init = false;
-	
+
 	private static final GeometryFactory geofac = new GeometryFactory();
-	
+
 	public static void addGeometry(Geometry geo) {
 		geos.add(geo);
 	}
-	
+
 	public static void dump(String file) {
 		if (!init) {
 			initFeatures();
@@ -89,11 +89,17 @@ public class GisDebugger {
 					fts.add(ftLine.create(new Object[] {geo,d,d++}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
-				}				
-			} else {
+				}
+			} else if (geo instanceof Point) {
+				try {
+					fts.add(ftPoint.create(new Object[] {geo,d,d++}));
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				}
+			}else {
 				throw new RuntimeException("type of Geometry is not supported" + geo);
 			}
-			
+
 		}
 		try {
 			ShapeFileWriter.writeGeometries(fts, file);
@@ -105,8 +111,8 @@ public class GisDebugger {
 
 
 
-	
-	
+
+
 	private static void initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 32632");
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(

@@ -38,6 +38,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.helper.EnvironmentDistanceVectorsGeneratorII;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
@@ -73,43 +74,6 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		loader.loadNetwork();
 		loadMps();
 		loadStaticEnvironmentDistancesField();
-		//		return;
-		//		}
-
-		//		if (Sim2DConfig.LOAD_NETWORK_FROM_XML_FILE) {
-		//			super.loadNetwork();
-		//			loadMps();
-		//			loadLsMp();
-		//		} else if (!Sim2DConfig.NETWORK_LOADERII) {
-		//			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork(), getScenario().getConfig().planCalcScore());
-		//			this.mps = loader.getFloors();
-		//			if (this.mps.size() > 1) {
-		//				throw new RuntimeException("multiple floors are not supported yet");
-		//			}
-		//			FeatureType ft = initFeatureType();
-		//			Collection<Feature> fts = new ArrayList<Feature>();
-		//			int num = 0;
-		//			for (MultiPolygon mp : this.mps.keySet()) {
-		//				try {
-		//					fts.add(ft.create(new Object[] { mp, num++ }));
-		//				} catch (IllegalAttributeException e) {
-		//					throw new RuntimeException(e);
-		//				}
-		//			}
-		//			try {
-		//				ShapeFileWriter.writeGeometries(fts, this.sim2DConfig.getFloorShapeFile());
-		//			} catch (IOException e) {
-		//				throw new RuntimeException(e);
-		//			}
-		//			new NetworkWriter(getScenario().getNetwork()).write(getScenario().getConfig().network().getInputFile());
-		//		} else {
-		//			NetworkLoader loader = new NetworkLoaderImplII(getScenario().getNetwork());
-		//			loader.loadNetwork();
-		//			new NetworkWriter(getScenario().getNetwork()).write(getScenario().getConfig().network().getInputFile());
-		//			loadMps();
-		//			loadLsMp();
-		//		}
-		//		loadStaticForceField();
 	}
 
 	private void loadLsMp() {
@@ -174,6 +138,19 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 
 	private void loadStaticEnvironmentDistancesField() {
+		if (this.sim2DConfig.getStaticEnvFieldFile() == null) {
+			generateStaticEnvironmentDistancesField();
+		} else  {
+			loadStaticEnvironmentDistancesField(this.sim2DConfig.getStaticEnvFieldFile());
+		}
+
+
+		this.scenarioData.setStaticForceField(this.sff);
+	}
+
+	private void loadStaticEnvironmentDistancesField(String staticEnvFieldFile) {
+
+
 		EnvironmentDistancesReader r = new EnvironmentDistancesReader();
 		try {
 			r.setValidating(false);
@@ -186,7 +163,15 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			e.printStackTrace();
 		}
 		this.sff = r.getEnvDistField();
-		this.scenarioData.setStaticForceField(this.sff);
+
+	}
+
+	private void generateStaticEnvironmentDistancesField() {
+		EnvironmentDistanceVectorsGeneratorII gen = new EnvironmentDistanceVectorsGeneratorII(this.scenarioData.getConfig());
+		gen.setResolution(.20);
+		gen.setIncr(2*Math.PI/8);
+		this.sff = gen.generate();
+
 	}
 
 

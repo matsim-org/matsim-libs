@@ -10,7 +10,7 @@ public class StaticEnvironmentDistancesField {
 	private double resoltution;
 	private double maxSensingRange;
 
-	public StaticEnvironmentDistancesField(QuadTree<EnvironmentDistances> quadTree, double  resolution, double maxSensingRange) {
+	public StaticEnvironmentDistancesField(QuadTree<EnvironmentDistances> quadTree,  double maxSensingRange, double  resolution) {
 		this.quadTree = quadTree;
 		this.resoltution = resolution;
 		this.maxSensingRange = maxSensingRange;

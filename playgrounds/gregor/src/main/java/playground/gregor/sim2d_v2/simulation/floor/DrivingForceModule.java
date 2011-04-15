@@ -38,7 +38,7 @@ public class DrivingForceModule implements ForceModule {
 
 	private final Floor floor;
 	private HashMap<Id, Coordinate> drivingDirections;
-	
+
 	// inertia -- needs to be revised
 	private final double tau;
 
@@ -48,7 +48,7 @@ public class DrivingForceModule implements ForceModule {
 	 */
 	public DrivingForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
-		this.tau = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
+		this.tau = .5;
 	}
 
 	/*

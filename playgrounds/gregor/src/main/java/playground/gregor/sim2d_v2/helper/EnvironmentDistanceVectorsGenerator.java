@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -183,30 +184,33 @@ public class EnvironmentDistanceVectorsGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String shape = "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/90grad.shp";
-		@SuppressWarnings("unchecked")
-		Iterator<Feature> fs = ShapeFileReader.readDataFile(shape).getFeatures().iterator();
 		
-		
-		Config config = ConfigUtils.createConfig();
-		
-		Module module = config.getModule("sim2d");
+		String cf = args[0];
+		Config c = ConfigUtils.loadConfig(cf);
+		Module module = c.getModule("sim2d");
 		Sim2DConfigGroup s = null;
 		if (module == null) {
 			s = new Sim2DConfigGroup();
 		} else {
 			s = new Sim2DConfigGroup(module);
 		}
-		config.getModules().put("sim2d", s);
+		c.getModules().put("sim2d", s);
+		
+		
+//		String shape = "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/90grad.shp";
+		@SuppressWarnings("unchecked")
+		Iterator<Feature> fs = ShapeFileReader.readDataFile(s.getFloorShapeFile()).getFeatures().iterator();
+		
+		
 		
 		double sensingRange = 5;
-		double res = 0.1;
+		double res = 0.05;
 		while (fs.hasNext()) {
 			Feature ft = fs.next();
 			Geometry geo = ft.getDefaultGeometry();
 			StaticEnvironmentDistancesField fl = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo,sensingRange,res).loadDistanceVectors();
 //			System.out.println(tree.size());
-			new EnvironmentDistancesWriter().write("test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/staticEnvDistances.xml.gz", fl);
+			new EnvironmentDistancesWriter().write(s.getStaticEnvFieldFile(), fl);
 		}
 	}
 

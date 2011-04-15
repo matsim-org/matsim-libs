@@ -17,7 +17,7 @@ public class CollisionPredictionAgentInteractionModule implements
 DynamicForceModule {
 
 
-	private Floor floor;
+	private final Floor floor;
 
 
 	private final double quadUpdateInterval = 0.1;
@@ -27,13 +27,13 @@ DynamicForceModule {
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	//Zanlungo et al constant 
-	public static final double Bi=0.34;
+	//Zanlungo et al constant
+	public static final double Bi=0.5;
 	public static final double Ai=250;
 
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
-	
+
 	public CollisionPredictionAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 	}
@@ -58,49 +58,49 @@ DynamicForceModule {
 			return;
 		}
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
-		double stopTime = v_i / t_i;
-		
-		
+		double stopDist = v_i / t_i;
+
+
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
 			}
-			
+
 			double dist = other.getPosition().distance(agent.getPosition());
-			double term1 = Ai * stopTime * Math.exp(-dist/Bi);
-			
+			double term1 = Ai * stopDist * Math.exp(-dist/Bi);
+
 			Vector v = getDistVector(agent,other,t_i);
 			double projectedDist = Math.sqrt(v.x*v.x+v.y*v.y);
-			
 
-			fx += -term1 * v.x/projectedDist;
-			fy += -term1 * v.y/projectedDist;
-			
-			
-			
+
+			fx += term1 * v.x/projectedDist;
+			fy += term1 * v.y/projectedDist;
+
+
+
 		}
-		
-		
+
+
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
-		
+
 	}
 
 	private Vector getDistVector(Agent2D agent, Agent2D other, double t_i) {
 		double projectedOtherX = other.getPosition().x + other.getVx() * t_i;
 		double projectedOtherY = other.getPosition().y + other.getVy() * t_i;
-		
+
 		double projectedX = agent.getPosition().x + agent.getVx() * t_i;
 		double projectedY = agent.getPosition().y + agent.getVy() * t_i;
-		
-		double dPrimeX_ij = projectedOtherX - projectedX;
-		double dPrimeY_ij = projectedOtherY - projectedY;
-		
+
+		double dPrimeX_ij = projectedX - projectedOtherX;
+		double dPrimeY_ij = projectedY - projectedOtherY;
+
 		Vector v = new Vector();
 		v.x = dPrimeX_ij;
 		v.y = dPrimeY_ij;
 
-		
+
 		return v;
 	}
 
@@ -128,8 +128,8 @@ DynamicForceModule {
 
 		double relV = Math.sqrt(relVx*relVx + relVy * relVy);
 
-		LineString ls = geofac.createLineString(new Coordinate[] {other.getPosition(),new Coordinate(other.getPosition().x+relVx*EventHorizonTime,other.getPosition().y+relVy*EventHorizonTime,0)});
-		DistanceOp op =  new DistanceOp(ls, geofac.createPoint(agent.getPosition()));
+		LineString ls = this.geofac.createLineString(new Coordinate[] {other.getPosition(),new Coordinate(other.getPosition().x+relVx*this.EventHorizonTime,other.getPosition().y+relVy*this.EventHorizonTime,0)});
+		DistanceOp op =  new DistanceOp(ls, this.geofac.createPoint(agent.getPosition()));
 		double ti = op.closestPoints()[0].distance(other.getPosition());
 		double tanPhi = op.distance()/ti;
 		double phi = Math.atan(tanPhi);
@@ -176,10 +176,10 @@ DynamicForceModule {
 		}
 
 	}
-	
+
 	private static final class Vector {
 		double x;
-		
+
 		double y;
 	}
 

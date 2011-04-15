@@ -30,7 +30,7 @@ import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
-import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
+//import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
 public class Controller2D extends Controler {
 
@@ -43,8 +43,8 @@ public class Controller2D extends Controler {
 		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime( 5* 60);
-//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
+		//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 
 	@Override
@@ -60,16 +60,16 @@ public class Controller2D extends Controler {
 			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-//			 this.vis = new PedVisPeekABot(1);
-//			 Link l = this.network.getLinks().get(new IdImpl(0));
-//			 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-//			 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-//			 this.vis.drawNetwork(network);
-//			 this.events.addHandler(this.vis);
+			//			this.vis = new PedVisPeekABot(1);
+			//			Link l = this.network.getLinks().get(new IdImpl(0));
+			//			this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+			//			this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+			//			this.vis.drawNetwork(this.network);
+			//			this.events.addHandler(this.vis);
 		}
 
 	}
-	
+
 
 	/**
 	 * 
@@ -98,15 +98,15 @@ public class Controller2D extends Controler {
 		// this.events.addHandler(writer);
 
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
-//
-//		if (this.getIterationNumber() == 0) {
-//		 this.vis = new PedVisPeekABot(1);
-//		 Link l = this.network.getLinks().get(new IdImpl(1));
-//		 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-//		 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-//		 this.vis.drawNetwork(network);
-//		 this.events.addHandler(this.vis);
-//		}
+		//
+		//		if (this.getIterationNumber() == 0) {
+		//		 this.vis = new PedVisPeekABot(1);
+		//		 Link l = this.network.getLinks().get(new IdImpl(1));
+		//		 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
+		//		 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
+		//		 this.vis.drawNetwork(network);
+		//		 this.events.addHandler(this.vis);
+		//		}
 		// }
 		sim.run();
 		// writer.closeFile();

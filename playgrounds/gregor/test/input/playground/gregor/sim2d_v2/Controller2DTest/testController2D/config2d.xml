@@ -55,9 +55,9 @@
 ====================================================================== -->
 
 <module name="sim2d">
-	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" />
-	<param name="floorShapeFile" value="&INPUTBASE;/90grad.shp"/>
-	<param name="lsShapeFile" value="&INPUTBASE;/90gradNetwork.shp" />
+	<!--  <param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" /> -->
+	<param name="floorShapeFile" value="&INPUTBASE;/testPolygons.shp"/>
+	<param name="lsShapeFile" value="&INPUTBASE;/testPaths.shp" />
 </module>
 
 <!-- ====================================================================== -->
@@ -75,7 +75,7 @@
 <!-- ====================================================================== -->	
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/90gradPlans.xml" />
+		<param name="inputPlansFile" value="&INPUTBASE;/testPlans.xml" />
 
 
 	</module>
