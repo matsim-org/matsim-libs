@@ -30,8 +30,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -50,15 +48,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLCapabilitiesChooser;
-import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
 import javax.swing.AbstractAction;
@@ -116,22 +112,20 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
 	private static int linkTexWidth = 0;
-	
+
 	private GL gl = null;
-	
+
 	private VisGUIMouseHandler mouseMan = null;
-	
+
 	private final OTFClientQuad clientQ;
-	
+
 	private String lastTime = "";
-	
+
 	private int lastShot = -1;
 
 	private final List<OTFGLAbstractDrawable> overlayItems = new ArrayList<OTFGLAbstractDrawable>();
 
 	private static List<OTFGLAbstractDrawable> newItems = new ArrayList<OTFGLAbstractDrawable>();
-
-	private static volatile GLContext motherContext = null;
 
 	private StatusTextDrawer statusDrawer = null;
 
@@ -255,34 +249,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		public static  Texture  agentpng = null;
 	}
 
-	private static class MyGLCanvas2 extends GLCanvas {
-
-		private static final long serialVersionUID = 1L;
-
-		public MyGLCanvas2(GLCapabilities caps) {
-			super(caps);
-		}
-
-		public MyGLCanvas2(GLCapabilities caps, GLCapabilitiesChooser object, GLContext motherContext, GraphicsDevice object2) {
-			super(caps, object,motherContext, object2);
-		}
-
-		@Override
-		public void paint(Graphics arg0) {
-			synchronized (newItems) {
-				super.paint(arg0);
-			}
-		}
-
-	}
-
-	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
-		GLCanvas canvas;
-		if (motherContext == null) {
-			canvas = new MyGLCanvas2(caps);
-		} else {
-			canvas = new MyGLCanvas2(caps, null, motherContext, null);
-		}
+	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
+		GLCanvas canvas = new GLCanvas(caps);
 		canvas.addGLEventListener(drawer);
 		return canvas;
 	}
@@ -290,7 +258,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	public OTFOGLDrawer(OTFClientQuad clientQ, OTFHostControlBar hostControlBar) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
-		this.canvas = createGLCanvas(this, caps, motherContext);
+		this.canvas = createGLCanvas(this, caps);
 		this.mouseMan = new VisGUIMouseHandler(this);
 		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
 		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
@@ -436,7 +404,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		if(motherContext == null) motherContext = drawable.getContext();
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
@@ -458,7 +425,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	}
 
 	private void showZoomDialog() {
-		this.zoomD = new JDialog(  );
+		this.zoomD = new JDialog();
 		this.zoomD.setUndecorated(true);
 		this.zoomD.setLocationRelativeTo(this.canvas.getParent());
 		Point pD = this.canvas.getLocationOnScreen();
