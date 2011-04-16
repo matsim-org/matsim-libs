@@ -41,7 +41,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.config.EvacuationConfigGroup.EvacuationScenario;
-import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 import org.xml.sax.SAXException;
 
 import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
@@ -51,6 +50,7 @@ import playground.gregor.snapshots.postprocessors.SheltersColorizer;
 import playground.gregor.snapshots.postprocessors.TimeDependentColorizer;
 import playground.gregor.snapshots.writers.LineStringTree;
 import playground.gregor.snapshots.writers.MVISnapshotWriter;
+import playground.gregor.snapshots.writers.OTFBackgroundTexturesDrawer;
 import playground.gregor.snapshots.writers.PositionInfo;
 import playground.gregor.snapshots.writers.SnapshotGenerator;
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * InundationDataReader_v2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,34 +26,51 @@ import java.nio.ByteBuffer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.fileio.OTFObjectInputStream;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class TileDrawerDataReader extends OTFDataReader {
+import playground.gregor.otf.readerwriter.InundationData;
+
+public class InundationDataReader_v2 extends OTFDataReader {
+
+	private final OTFInundationDrawer drawer;
+	private TimeDependentTrigger receiver;
+
+	public InundationDataReader_v2() {
+		this.drawer = new OTFInundationDrawer();
+	}
 
 	@Override
 	public void connect(OTFDataReceiver receiver) {
+		this.receiver = (TimeDependentTrigger) receiver;
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
+		this.receiver = new TimeDependentTrigger();
+		this.receiver.setDrawer(this.drawer);
+		graph.addItem(this.receiver);
+		this.receiver.setTime(graph.getTime());
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+
+		double startTime = in.getDouble();
+		this.drawer.setStartTime(startTime);
 		int size = in.getInt();
 
 		 byte[] byts = new byte[size];
-
 		    in.get(byts);
-
 		    ObjectInputStream istream = null;
 
 		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
+		    	istream = new OTFObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
+		        if(obj instanceof InundationData){
+		        	this.drawer.setData((InundationData) obj);
+		            System.out.println("deserialization successful");
 		        }
 		    }
 		    catch(IOException e){

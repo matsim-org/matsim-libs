@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.otf.drawer;
+package playground.gregor.snapshots.writers;
 
 import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
 import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
@@ -39,32 +39,26 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
-import playground.gregor.snapshots.writers.Tile;
-import playground.gregor.snapshots.writers.TileLoader;
-
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
 
 public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8732378231241446615L;
-	
+
 	private static final Logger log = Logger.getLogger(OTFTilesDrawer.class);
 	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
-	
-	
-	
+
+
+
 	double [] powerLookUp;
-	
+
 	Map<String,Tile> tilesMap = Collections.synchronizedMap(new HashMap<String,Tile>(769,0.75f));
 	private final TreeSet<Tile> currentView = new TreeSet<Tile>(new Comper());
-	
+
 //	int numX = 0;
 //	int numY = 0;
 	private double zoom;
@@ -74,38 +68,39 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 	private float oTy;
 	private float oTx;
 	private boolean stopped = false;
-	
-	
+
+
 	public OTFTilesDrawer() {
-		
+
 		this.loader = new TileLoader(this.tilesMap);
 		this.loader.start();
 		this.powerLookUp = new double [16];
-		double z = 0.125;
+		double z = 0.25;
 		for (int i = 0; i < 16; i++) {
 			this.powerLookUp[i] = (z *= 2);
 		}
 	}
-	
+
+	@Override
 	public void onDraw(GL gl) {
 		if (this.stopped) {
 			return;
 		}
 		updateMatrices(gl);
 		calcCurrentZoom();
-				
+
 		recalcView(gl);
 //		log.debug("on:" + this.offsetNorth + " oe:" + this.offsetEast);
-		
+
 		for (Tile t : this.currentView) {
 			drawTile(t,gl);
 		}
 
 
 	}
-	
-	
-	
+
+
+
 	private void recalcView(GL gl) {
 		if (this.viewLocked) {
 			return;
@@ -122,8 +117,8 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 //				System.out.println("x:" + x + " y:" + y + " r:" +r + " c:" + c + " s:" + s);
 //				drawPED(x,y,gl);
 //				double zoom = this.zoom;
-//				
-//				
+//
+//
 //				Tile t = getTile(x, y, this.zoom);
 //				while (t == null && zoom  <= this.initZoom ) {
 //					zoom *= 2;
@@ -134,17 +129,17 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 //					continue;
 //				}
 //				this.currentView.add(t);
-//			
+//
 //			}
-//			
+//
 //		}
 //		System.out.println("==============================");
-//		
+//
 		for (int x = this.viewport[0]; x < this.viewport[2] + Tile.LENGTH/2; x += Tile.LENGTH*0.33) {
 			for (int y = this.viewport[1]; y < this.viewport[3] +Tile.LENGTH/2 ; y += Tile.LENGTH*0.33) {
 				double zoom = this.zoom;
-				
-				
+
+
 				Tile t = getTile(x, y, this.zoom);
 				while (t == null && zoom  <= this.initZoom ) {
 					zoom *= 2;
@@ -157,7 +152,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 				this.currentView.add(t);
 			}
 		}
-		
+
 	}
 
 
@@ -169,11 +164,11 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		float [] bottom = getOGLPos(this.viewport[2], this.viewport[3]);
 		float glWidth = Math.abs(top[0]-bottom[0]);
 		double ratio = glWidth/scrWidth;
-		
+
 		int idx = -Arrays.binarySearch(this.powerLookUp, ratio);
 		double zoom = this.powerLookUp[idx-1];
-		
-		
+
+
 		if (zoom != this.zoom){
 			this.viewLocked = false;
 //			System.out.println("ratio:" + ratio + " zoom:" + zoom);
@@ -183,7 +178,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 			this.oTx = top[0];
 			this.oTy = top[1];
 		}
-		
+
 		this.zoom = zoom;
 	}
 
@@ -200,7 +195,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 			t.setTex(TextureIO.newTexture(t.getTx()));
 			t.setTx(null);
 		}
-		
+
 		if (this.stopped) {
 			return;
 		}
@@ -213,7 +208,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		final float z = 1.1f;
 		t.getTex().enable();
 		t.getTex().bind();
-		
+
 		gl.glColor4f(1,1,1,1);
 
 		gl.glBegin(GL_QUADS);
@@ -222,10 +217,10 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(t.tX, t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(t.tX, t.tY, z);
 //		log.debug("(" + (t.tX +t.sX) + "," + t.tY + ")  " + "(" + (t.tX +t.sX) + "," + (t.tY+t.sY) + ")  " + "(" + (t.tX) + "," + (t.tY+t.sY) + ")  " +  "(" + (t.tX) + "," + (t.tY) + ")  ");
-		
+
 		gl.glEnd();
 		t.getTex().disable();
-	
+
 
 	}
 
@@ -234,17 +229,17 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		double geoX = Math.abs(glPos[0]) + this.offsetEast;
 		double geoY = Math.abs(glPos[1]) + this.offsetNorth;
 		double refCoordX = ((int)(geoX / zoom / Tile.LENGTH)) * zoom * Tile.LENGTH;
-		double refCoordY = ((int)(geoY / zoom / Tile.LENGTH)) * zoom * Tile.LENGTH;		
+		double refCoordY = ((int)(geoY / zoom / Tile.LENGTH)) * zoom * Tile.LENGTH;
 		String tileId =  zoom + "_" + refCoordX + "_" + refCoordY;
 		Tile t =  this.tilesMap.get(tileId);
 		if (t != null) {
-			return t; 		
+			return t;
 		}
-		
-		
+
+
 		float signX = glPos[0] < 0 ? -1.f : 1.f;
 		float signY = glPos[1] < 0 ? -1.f : 1.f;
-		
+
 		float glX = (float) (signX * (refCoordX - this.offsetEast));
 		float glY = (float) (signY * (refCoordY - this.offsetNorth));
 		double geoWidth = zoom * Tile.LENGTH;
@@ -258,28 +253,27 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		t.y = y;
 		t.zoom = zoom;
 		t.key = zoom + MatsimRandom.getRandom().nextDouble();
-		
+		if (zoom >= this.initZoom/2) {
+			t.locked = true;
+		} else {
+			t.locked = false;
+		}
+
+
 		this.loader.addRequest(t,refCoordX,refCoordY + zoom * Tile.LENGTH,geoWidth);
-		
+
 		return null;
 	}
-	
-	
 
-
-
-	public void updateMatrices(GL gl) { //TODO give me the drawer!!
+	public void updateMatrices(GL gl) {
 		// update matrices for mouse position calculation
 		gl.glGetDoublev( GL_MODELVIEW_MATRIX, this.modelview,0);
 		gl.glGetDoublev( GL_PROJECTION_MATRIX, this.projection,0);
 		gl.glGetIntegerv( GL_VIEWPORT, this.viewport,0 );
-		
 	}
-	
+
 	private float [] getOGLPos(int x, int y)
 	{
-		
-		
 		double[] obj_pos = new double[3];
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;
@@ -303,24 +297,25 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 
 		return new float []{posX, posY};
 	}
-	
+
 	private static class Comper implements Comparator<Tile>, Serializable {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -2522220167848088766L;
 
+		@Override
 		public int compare(Tile o1, Tile o2) {
 			if (o1.key < o2.key) {
 				return 1;
 			} else if (o1.key > o2.key) {
 				return -1;
 			}
-			
+
 			return 0;
 		}
-		
+
 	}
 
 }

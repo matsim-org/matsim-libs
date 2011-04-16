@@ -34,13 +34,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.evacuation.flooding.FloodingInfo;
-import org.matsim.evacuation.otfvis.readerwriter.InundationData;
-import org.matsim.evacuation.otfvis.readerwriter.InundationData.InundationGeometry;
-import org.matsim.evacuation.otfvis.readerwriter.InundationData.Polygon;
-import org.matsim.evacuation.otfvis.readerwriter.InundationData.Quad;
 
 import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.flooding.TriangularMeshSimplifier;
+import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
+import playground.gregor.otf.readerwriter.InundationData.Polygon;
+import playground.gregor.otf.readerwriter.InundationData.Quad;
 public class InundationDataFromNetcdfReaderII {
 
 

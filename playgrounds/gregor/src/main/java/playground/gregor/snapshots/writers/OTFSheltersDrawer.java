@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.otf.drawer;
+package playground.gregor.snapshots.writers;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -36,8 +36,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 
-import playground.gregor.snapshots.writers.OTFTimeDependentDrawer;
-
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -50,16 +48,12 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serializable {
 
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4178231998542735528L;
 	private final List<Shelter> shelters = new ArrayList<Shelter>();
 	private final ValueColorizer colorizer;
 	private final double on;
 	private final double oe;
-	private TextRenderer textRenderer = null;
+	private transient TextRenderer textRenderer = null;
 	private int minTime = 3600 * 24;
 	private int oldTime = 0;
 	private int increment = 3600 * 24;
@@ -70,7 +64,7 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		double [] values = {-1.,0.,1.0,1.5,2.0};
 		Color [] colors = {new Color(0,0,0),new Color(128,128,128,128), new Color(24,255,0,255), new Color(255,255,0,255), new Color(255,0,0,255)};
 		this.colorizer = new ValueColorizer(values,colors);
-		
+
 		Iterator<Feature> it;
 		try {
 			it = features.getFeatures().iterator();
@@ -80,6 +74,10 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		while (it.hasNext()){
 			final Feature ft = it.next();
 			String id = ((Integer) ft.getAttribute("ID")).toString();
+			Integer quakeProof = (Integer) ft.getAttribute("quakeProof");
+			if (quakeProof != 1) {
+				continue;
+			}
 			ArrayList<Tuple<Integer,Double>> l = occupancy.get(id);
 			if (l == null || l.size() == 0) {
 				l = new ArrayList<Tuple<Integer,Double>>();
@@ -97,23 +95,23 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		s.occupancy = arrayList;
 		final Geometry geo = ft.getDefaultGeometry();
 		final LineString ls;
-		final int glType;
+//		final int glType;
 		if (geo instanceof Polygon) {
 			ls = ((Polygon) geo).getExteriorRing();
-			glType = GL.GL_POLYGON;
+//			glType = GL.GL_POLYGON;
 		}else if (geo instanceof MultiPolygon) {
 			ls = ((Polygon)((MultiPolygon)geo).getGeometryN(0)).getExteriorRing();
-			glType = GL.GL_POLYGON;
+//			glType = GL.GL_POLYGON;
 		} else if (geo instanceof LineString) {
 				ls = (LineString) geo;
-				glType = GL.GL_LINE_STRIP;
+//				glType = GL.GL_LINE_STRIP;
 		} else if (geo instanceof MultiLineString) {
 			ls = (LineString)((MultiLineString) geo).getGeometryN(0);
-			glType = GL.GL_LINE_STRIP;
+//			glType = GL.GL_LINE_STRIP;
 		}else if (geo instanceof Point) {
 				final GeometryFactory geofac  = new GeometryFactory();
 				ls = geofac.createLineString(new Coordinate [] {geo.getCoordinate()});
-				glType = GL.GL_POINTS;
+//				glType = GL.GL_POINTS;
 		} else {
 			throw new RuntimeException("Could not read Geometry from Feature!!");
 		}
@@ -125,11 +123,11 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 			xpoints[i] = (float) (ls.getPointN(i).getCoordinate().x - this.oe);
 			ypoints[i] = (float) (ls.getPointN(i).getCoordinate().y - this.on);
 		}
-		
-		s.glType = glType;
+
+//		s.glType = glType;
 		s.xpoints = xpoints;
 		s.ypoints = ypoints;
-		
+
 		return s;
 	}
 
@@ -138,16 +136,11 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		if (this.textRenderer == null) {
 			initTextRenderer();
 		}
-		
-		
-		int timeSlotIdx = getTimeSlotIdx(time); 
-//		int relTime = ((((time - 3*3600)/60))); //FIXME 60 should be replaced by snapshot period!!
-//		
-//		if (this.timeSlotIdx < 0) {
-//			return;
-//		}
-		
-		
+
+
+		int timeSlotIdx = getTimeSlotIdx(time);
+
+
 		for (Shelter s : this.shelters) {
 			int sTime = timeSlotIdx;
 			if (timeSlotIdx >= s.occupancy.size()) {
@@ -160,23 +153,22 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 
 				gl.glVertex3f(s.xpoints[i],s.ypoints[i],1.f);
 			}
-			
-			gl.glEnd();	
-			
+
+			gl.glEnd();
+
 			this.textRenderer.begin3DRendering();
 			float c = 1.f;
 			String text = ""+s.occupancy.get(sTime).getFirst();
-			float width = (float) this.textRenderer.getBounds(text).getWidth();
 			// Render the text
 			this.textRenderer.setColor(c, c, c, 1.f);
 			this.textRenderer.draw3D(text,s.xpoints[0],s.ypoints[0],1.f,.5f);
 			this.textRenderer.end3DRendering();
-			
+
 		}
 
 	}
 
-	
+
 	private int getTimeSlotIdx(int time) {
 		if (this.minTime > time || this.minTime == 0) {
 			this.increment = Integer.MAX_VALUE; //needs to be initialized here, otherwise it won't work with older movies - GL sept. 2009
@@ -187,9 +179,9 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 			this.increment  = Math.min(this.increment, time-this.oldTime);
 			this.oldTime = time;
 		}
-		
+
 		return (time - this.minTime) / this.increment;
-		
+
 	}
 
 
@@ -200,13 +192,10 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		this.textRenderer  = new TextRenderer(font, true, false);
 		InfoText.setRenderer(this.textRenderer);
 	}
-	
+
 	private static class Shelter implements Serializable{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 2583984535719211050L;
-		int glType;
+//		int glType;
 		List<Tuple<Integer,Double>> occupancy;
 		float [] xpoints;
 		float [] ypoints;

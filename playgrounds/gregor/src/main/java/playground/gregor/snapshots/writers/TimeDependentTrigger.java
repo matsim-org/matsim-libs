@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * TimeDependentTrigger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,54 +19,30 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.ByteBuffer;
+import javax.media.opengl.GL;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 
-public class TileDrawerDataReader extends OTFDataReader {
+
+public class TimeDependentTrigger extends OTFGLAbstractDrawableReceiver {
+
+	public OTFTimeDependentDrawer myDrawer;
+	int time;
+	
 
 	@Override
-	public void connect(OTFDataReceiver receiver) {
+	public void onDraw(GL gl) {
+		this.myDrawer.onDraw(gl,this.time);
+		
 	}
 
-	@Override
-	public void invalidate(SceneGraph graph) {
+	public void setTime(double time2) {
+		this.time = (int) time2;
+		
 	}
-
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int size = in.getInt();
-
-		 byte[] byts = new byte[size];
-
-		    in.get(byts);
-
-		    ObjectInputStream istream = null;
-
-		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-		        Object obj = istream.readObject();
-
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
-		        }
-		    }
-		    catch(IOException e){
-		        e.printStackTrace();
-		    }
-		    catch(ClassNotFoundException e){
-		        e.printStackTrace();
-		    }
-	}
-
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// no dyn data
+	
+	public void setDrawer(OTFTimeDependentDrawer drawer) {
+		this.myDrawer = drawer;
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * LabelLayer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,54 +19,11 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.ByteBuffer;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-
-public class TileDrawerDataReader extends OTFDataReader {
-
+public class LabelLayer extends SimpleSceneLayer{
 	@Override
-	public void connect(OTFDataReceiver receiver) {
+	public int getDrawOrder() {
+		return 200;
 	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-	}
-
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int size = in.getInt();
-
-		 byte[] byts = new byte[size];
-
-		    in.get(byts);
-
-		    ObjectInputStream istream = null;
-
-		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-		        Object obj = istream.readObject();
-
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
-		        }
-		    }
-		    catch(IOException e){
-		        e.printStackTrace();
-		    }
-		    catch(ClassNotFoundException e){
-		        e.printStackTrace();
-		    }
-	}
-
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// no dyn data
-	}
-
 }

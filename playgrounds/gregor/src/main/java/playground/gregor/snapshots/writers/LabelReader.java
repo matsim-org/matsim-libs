@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * LabelReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,40 +28,47 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class TileDrawerDataReader extends OTFDataReader {
+public class LabelReader extends OTFDataReader {
 
-	@Override
-	public void connect(OTFDataReceiver receiver) {
-	}
+	private OTFLabelDrawer drawer;
 
 	@Override
 	public void invalidate(SceneGraph graph) {
+		this.drawer.invalidate(graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		int size = in.getInt();
 
-		 byte[] byts = new byte[size];
+		byte[] byts = new byte[size];
 
-		    in.get(byts);
+		in.get(byts);
 
-		    ObjectInputStream istream = null;
+		ObjectInputStream istream = null;
 
-		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-		        Object obj = istream.readObject();
+		try {
+			istream = new ObjectInputStream(new ByteArrayInputStream(byts));
+			Object obj = istream.readObject();
 
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
-		        }
-		    }
-		    catch(IOException e){
-		        e.printStackTrace();
-		    }
-		    catch(ClassNotFoundException e){
-		        e.printStackTrace();
-		    }
+			if(obj instanceof String){
+				this.drawer.setLabel((String)obj);
+			}
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		catch(ClassNotFoundException e){
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public void connect(OTFDataReceiver receiver) {
+		if (receiver instanceof OTFLabelDrawer) {
+			this.drawer = (OTFLabelDrawer) receiver;
+		}
 	}
 
 	@Override

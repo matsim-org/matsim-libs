@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * SheltersWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,54 +19,38 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.data.OTFDataWriter;
 
-public class TileDrawerDataReader extends OTFDataReader {
 
-	@Override
-	public void connect(OTFDataReceiver receiver) {
+public class SheltersWriter extends OTFDataWriter<Void> {
+
+	private static final long serialVersionUID = -1023289245440233199L;
+	private final OTFSheltersDrawer data;
+
+	public SheltersWriter(OTFSheltersDrawer data) {
+		this.data = data;
 	}
 
 	@Override
-	public void invalidate(SceneGraph graph) {
+	public void writeConstData(ByteBuffer out) throws IOException {
+
+		ByteArrayOutputStream a = new ByteArrayOutputStream();
+
+		ObjectOutputStream o = new ObjectOutputStream(a);
+		o.writeObject(this.data);
+
+		out.putInt(a.toByteArray().length);
+
+		out.put(a.toByteArray());
 	}
 
 	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int size = in.getInt();
-
-		 byte[] byts = new byte[size];
-
-		    in.get(byts);
-
-		    ObjectInputStream istream = null;
-
-		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-		        Object obj = istream.readObject();
-
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
-		        }
-		    }
-		    catch(IOException e){
-		        e.printStackTrace();
-		    }
-		    catch(ClassNotFoundException e){
-		        e.printStackTrace();
-		    }
-	}
-
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+	public void writeDynData(ByteBuffer out) throws IOException {
 		// no dyn data
 	}
-
 }

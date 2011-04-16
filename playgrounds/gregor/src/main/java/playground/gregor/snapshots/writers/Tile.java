@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * Tile.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,54 +19,68 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.ByteBuffer;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureData;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+public class Tile { // implements Comparable<Tile> {
 
-public class TileDrawerDataReader extends OTFDataReader {
+	public static final int LENGTH = 256;
+	
+//	int zoomLevel;
+	private TextureData tx;
+	private Texture tex;
+	
+	public float tX;
+	public float tY;
 
-	@Override
-	public void connect(OTFDataReceiver receiver) {
+	public float sX;
+
+	public float sY;
+
+	public double zoom;
+
+//	private double time;
+	public String id;
+
+	public int x;
+
+	public int y;
+
+	public double key;
+
+	public boolean locked;
+
+//	public int compareTo(Tile o) {
+//		if (this.getTime() > o.getTime()) {
+//			return -1;
+//		} else if (this.getTime() < o.getTime()){
+//			return 1;
+//		}
+//		return 0;
+//	}
+
+	public void setTx(TextureData tx) {
+		this.tx = tx;
 	}
 
-	@Override
-	public void invalidate(SceneGraph graph) {
+	public TextureData getTx() {
+		return this.tx;
 	}
 
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int size = in.getInt();
-
-		 byte[] byts = new byte[size];
-
-		    in.get(byts);
-
-		    ObjectInputStream istream = null;
-
-		    try {
-		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-		        Object obj = istream.readObject();
-
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
-		        }
-		    }
-		    catch(IOException e){
-		        e.printStackTrace();
-		    }
-		    catch(ClassNotFoundException e){
-		        e.printStackTrace();
-		    }
+	public void setTex(Texture tex) {
+		this.tex = tex;
 	}
 
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// no dyn data
+	public Texture getTex() {
+		return this.tex;
 	}
 
+//	public void setTime(double time) {
+//		this.time = time;
+//	}
+//
+//	public double getTime() {
+//		return this.time;
+//	}
+	
 }

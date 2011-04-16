@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileDrawerDataReader.java
+ * SheltersReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,18 +28,31 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class TileDrawerDataReader extends OTFDataReader {
+
+public class SheltersReader extends OTFDataReader {
+
+	private OTFSheltersDrawer drawer;
+	private TimeDependentTrigger receiver;
 
 	@Override
 	public void connect(OTFDataReceiver receiver) {
+		this.receiver = (TimeDependentTrigger) receiver;
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
+//		this.drawer.invalidate(graph);
+		this.receiver = new TimeDependentTrigger();
+		this.receiver.setDrawer(this.drawer);
+		graph.addItem(this.receiver);
+		this.receiver.setTime(graph.getTime());
+
+//		this.receiver.invalidate(graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
+
 		int size = in.getInt();
 
 		 byte[] byts = new byte[size];
@@ -52,8 +65,9 @@ public class TileDrawerDataReader extends OTFDataReader {
 		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
 		        Object obj = istream.readObject();
 
-		        if(obj instanceof String){
-		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
+		        if(obj instanceof OTFSheltersDrawer){
+		        	this.drawer = (OTFSheltersDrawer) obj;
+		            System.out.println("deserialization successful");
 		        }
 		    }
 		    catch(IOException e){
@@ -62,11 +76,13 @@ public class TileDrawerDataReader extends OTFDataReader {
 		    catch(ClassNotFoundException e){
 		        e.printStackTrace();
 		    }
+//		this.drawer.setData(data);
 	}
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		// no dyn data
 	}
-
 }
+
+
