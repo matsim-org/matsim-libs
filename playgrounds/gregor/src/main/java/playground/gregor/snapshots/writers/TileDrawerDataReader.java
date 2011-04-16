@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleSceneLayer.java
+ * TileDrawerDataReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,66 +17,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.snapshots.writers;
 
-package org.matsim.vis.otfvis.caching;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.ByteBuffer;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.evacuation.otfvis.drawer.OTFTilesDrawer;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-
-/**
- *  * The SimpleSceneLayer is the one SceneLayer that is guaranteed to be present in the OTFVis.
- * Every element that is not mapped to a specific layer is added to this layer.
-
- * @author dstrippgen
- *
- */
-public class SimpleSceneLayer implements SceneLayer {
-	
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
+public class TileDrawerDataReader extends OTFDataReader {
 
 	@Override
-	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawable)item);
-	}
-	
-	@Override
-	public void glInit() {
-		// Nothing to do
+	public void connect(OTFDataReceiver receiver) {
 	}
 
 	@Override
-	public void draw() {
-		for(OTFDrawable item : items) item.draw();
-	}
-	
-	@Override
-	public void finish() {
+	public void invalidate(SceneGraph graph) {
 	}
 
 	@Override
-	public void init(boolean initConstData) {
+	public void readConstData(ByteBuffer in) throws IOException {
+		int size = in.getInt();
+
+		 byte[] byts = new byte[size];
+
+		    in.get(byts);
+
+		    ObjectInputStream istream = null;
+
+		    try {
+		        istream = new ObjectInputStream(new ByteArrayInputStream(byts));
+		        Object obj = istream.readObject();
+
+		        if(obj instanceof String){
+		        	OGLSimpleBackgroundLayer.addPersistentItem(new OTFTilesDrawer());
+		        }
+		    }
+		    catch(IOException e){
+		        e.printStackTrace();
+		    }
+		    catch(ClassNotFoundException e){
+		        e.printStackTrace();
+		    }
 	}
 
 	@Override
-	public int getDrawOrder() {
-		return 100;
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		// no dyn data
 	}
 
-	@Override
-	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
-		try {
-			return clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	
-	
 }

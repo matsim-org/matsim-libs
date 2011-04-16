@@ -27,11 +27,10 @@ import java.util.List;
 import javax.media.opengl.GL;
 
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.gui.OTFDrawable;
-import org.matsim.vis.otfvis.opengl.drawer.OGLProvider;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 
 
 /**
@@ -54,8 +53,6 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
 	
-	private OGLProvider myDrawer;
-	
 	private static int netDisplList = -1;
 	
 	private static float basicLineWidth_m = 30.f;
@@ -71,7 +68,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	@Override
 	public void draw() {
-		GL gl = myDrawer.getGL();
+		GL gl = OTFGLAbstractDrawable.getGl();
 		checkNetList(gl);
 		Color netColor = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor();
 		float[] components = netColor.getColorComponents(new float[4]);
@@ -80,8 +77,14 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	@Override
-	public void init(SceneGraph graph, boolean initConstData) {
-		myDrawer = (OGLProvider)graph.getDrawer();
+	public void init(boolean initConstData) {
+	}
+	
+	@Override
+	public void glInit() {
+		netDisplList = -1;
+		GL gl = OTFGLAbstractDrawable.getGl();
+		checkNetList(gl);
 	}
 
 	@Override
@@ -106,25 +109,20 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	private void checkNetList(GL gl) {
-		List<OTFDrawable> it = items;
 		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		if (getBasicLineWidth_m() != cellWidthAct_m){
 			gl.glDeleteLists(netDisplList, 1);
 			netDisplList = -2;
 		}
 		if (netDisplList < 0) {
-			setBasicLineWidth_m(cellWidthAct_m);
+			basicLineWidth_m = cellWidthAct_m;
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL.GL_COMPILE);
-			for (OTFDrawable item : it) {
+			for (OTFDrawable item : items) {
 				item.draw();
 			}
 			gl.glEndList();
 		}
-	}
-
-	public static void setBasicLineWidth_m(float basicLineWidth_m) {
-		OGLSimpleStaticNetLayer.basicLineWidth_m = basicLineWidth_m;
 	}
 
 	public static float getBasicLineWidth_m() {

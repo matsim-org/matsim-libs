@@ -204,7 +204,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				prepare(gl);
 				createActivityTextsIfNecessary(drawer);
 			}
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getCurrentSceneGraph().getLayer(AgentPointDrawer.class);
 			Point2D.Double pos = tryToFindAgentPosition(layer);
 			if (pos != null) {
 				// We know where the agent is, so we draw stuff around them.

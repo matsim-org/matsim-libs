@@ -34,9 +34,10 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer.AgentDrawer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
@@ -62,15 +63,13 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 
 	private Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 
-	private Texture texture;
+	private static Texture texture;
 
 	private static final Logger log = Logger.getLogger(AgentArrayDrawer.class);
 
-	AgentArrayDrawer() {
-	}
-
-	private void setTexture() {
-		this.texture = AgentDrawer.agentpng;
+	@Override
+	protected void onInit(GL gl) {
+		texture = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("icon18.png"));
 	}
 
 	private static void setAgentSize(GL gl) {
@@ -158,18 +157,16 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 
-		this.setTexture();
-
 		//texture = null;
 		// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
 		// tests and found on my computer (mac powerbook, with "slow" graphics settings) no difference at all between "null"
 		// and a jpg.  But it looks weird w/o some reasonable icon.  kai, jan'11
 
-		if (this.texture != null) {
-			this.texture.enable();
+		if (texture != null) {
+			texture.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
-			this.texture.bind();
+			texture.bind();
 		}
 
 		gl.glDepthMask(false);
@@ -178,8 +175,8 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 
 		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-		if (this.texture != null ) {
-			this.texture.disable();
+		if (texture != null ) {
+			texture.disable();
 		}
 
 		gl.glDisable(GL.GL_POINT_SPRITE);

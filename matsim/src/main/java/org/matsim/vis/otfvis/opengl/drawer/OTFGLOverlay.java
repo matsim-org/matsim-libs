@@ -2,35 +2,36 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import static javax.media.opengl.GL.GL_VIEWPORT;
 
-import java.io.InputStream;
-
 import javax.media.opengl.GL;
 
+import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 import com.sun.opengl.util.texture.Texture;
 
 class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
-	private final InputStream texture;
 	private final float relX;
 	private final float relY;
 	private final boolean opaque;
 	private final float size;
 	private Texture t = null;
+	private String textureFileName;
 
-	OTFGLOverlay(final InputStream texture, float relX, float relY, float size, boolean opaque) {
-		this.texture = texture;
-		this.relX =relX;
+	OTFGLOverlay(final String textureFileName, float relX, float relY, float size, boolean opaque) {
+		this.textureFileName = textureFileName;
+		this.relX = relX;
 		this.relY = relY;
 		this.size = size;
 		this.opaque = opaque;
 	}
 
 	@Override
+	public void onInit(GL gl) {
+		this.t = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(textureFileName));
+	}
+
+	@Override
 	public void onDraw(GL gl) {
-		if(this.t == null) {
-			this.t = OTFOGLDrawer.createTexture(this.texture);
-		}
 		int[] viewport = new int[4];
 		gl.glGetIntegerv( GL_VIEWPORT, viewport ,0 );
 		float height = this.size*this.t.getHeight()/viewport[3];
@@ -48,15 +49,15 @@ class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		
+
 		if ( gl != getGl() ) {
 			throw new RuntimeException("the `gl's are inconsistent; don't know what this means.  kai, jan'11") ;
 		}
 
 		//drawQuad
 		if(!this.opaque) {
-//			getGl().glEnable(GL.GL_BLEND);
-//			getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			//			getGl().glEnable(GL.GL_BLEND);
+			//			getGl().glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		}
@@ -72,7 +73,7 @@ class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 		//restore old mode
 		this.t.disable();
 		if(!this.opaque) {
-//			getGl().glDisable(GL.GL_BLEND);
+			//			getGl().glDisable(GL.GL_BLEND);
 			gl.glDisable(GL.GL_BLEND);
 		}
 		gl.glMatrixMode( GL.GL_MODELVIEW);

@@ -86,7 +86,7 @@ public class SceneGraph {
 		this.time = time;
 		connect.fillLayerMap(layers);
 		for (SceneLayer layer : layers.values()) {
-			layer.init(this, time == -1 ? true : false);
+			layer.init(time == -1 ? true : false);
 			drawingLayers.add(layer);
 		}
 
@@ -133,7 +133,15 @@ public class SceneGraph {
 	}
 
 	public void draw() {
-		for (SceneLayer layer : drawingLayers) layer.draw();
+		for (SceneLayer layer : drawingLayers) {
+			layer.draw();
+		}
+	}
+
+	public void glInit() {
+		for (SceneLayer layer : drawingLayers) {
+			layer.glInit();
+		}
 	}
 
 }

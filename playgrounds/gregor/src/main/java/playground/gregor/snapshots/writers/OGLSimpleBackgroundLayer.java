@@ -18,14 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.opengl.layer;
+package playground.gregor.snapshots.writers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
@@ -44,13 +42,9 @@ public class OGLSimpleBackgroundLayer implements SceneLayer {
 	private final static List<AbstractBackgroundDrawer> items = new ArrayList<AbstractBackgroundDrawer>();
 
 	@Override
-	public void init(final SceneGraph graph, boolean initConstData) {
-		if (graph.getDrawer() != null) {
-			final OTFClientQuad quad = graph.getDrawer().getQuad();
-
-			offsetEast = quad.offsetEast;
-			offsetNorth = quad.offsetNorth;
-		}
+	public void init(boolean initConstData) {
+		this.offsetEast = offsetEast;
+		this.offsetNorth = offsetNorth;
 	}
 
 	@Override
@@ -61,6 +55,14 @@ public class OGLSimpleBackgroundLayer implements SceneLayer {
 
 	public static void addPersistentItem(final AbstractBackgroundDrawer drawer) {
 		items.add(drawer);
+	}
+
+	
+	
+	@Override
+	public void glInit() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

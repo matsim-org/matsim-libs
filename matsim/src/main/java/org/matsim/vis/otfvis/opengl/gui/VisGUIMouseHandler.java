@@ -274,11 +274,8 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 
 	public void drawElements(GL gl){
 		if((currentRect != null) && (alpha >= 0.f)){
-			if(marker == null) marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
-
 			gl.glEnable(GL_BLEND);
 			gl.glBlendFunc(GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-
 			renderFace(gl, marker);
 			gl.glDisable(GL_BLEND);
 		} else {
@@ -360,6 +357,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 		camera = new Camera();
 		camera.setLocation(cameraStart);
 		camera.setTarget(cameraTarget);
+		marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
 	}
 
 	public void setAspectRatio(double aspectRatio) {

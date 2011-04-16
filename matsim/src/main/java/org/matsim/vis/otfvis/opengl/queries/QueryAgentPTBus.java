@@ -80,7 +80,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 		private void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
 
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getCurrentSceneGraph().getLayer(AgentPointDrawer.class);
 
 			if( this.calcOffset == true) {
 				float east = (float)drawer.getQuad().offsetEast;

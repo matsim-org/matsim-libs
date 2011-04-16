@@ -213,7 +213,7 @@ public final class QueryAgentPlan extends AbstractQuery {
 				prepare(gl);
 				createActivityTextsIfNecessary(drawer);
 			}
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getCurrentSceneGraph().getLayer(AgentPointDrawer.class);
 			Point2D.Double pos = tryToFindAgentPosition(layer);
 			if (pos == null) {
 				pos = teleportingAgentPosition;

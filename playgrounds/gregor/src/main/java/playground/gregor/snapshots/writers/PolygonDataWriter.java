@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleSceneLayer.java
+ * PolygonDataWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,66 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.snapshots.writers;
 
-package org.matsim.vis.otfvis.caching;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.geotools.data.FeatureSource;
+import org.matsim.vis.otfvis.data.OTFDataWriter;
+import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
 
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+public class PolygonDataWriter extends OTFDataWriter<Void> {
 
+	private static final long serialVersionUID = 7454644070258134874L;
+	private SimpleBackgroundFeatureDrawer data;
 
-/**
- *  * The SimpleSceneLayer is the one SceneLayer that is guaranteed to be present in the OTFVis.
- * Every element that is not mapped to a specific layer is added to this layer.
-
- * @author dstrippgen
- *
- */
-public class SimpleSceneLayer implements SceneLayer {
-	
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
-
-	@Override
-	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawable)item);
-	}
-	
-	@Override
-	public void glInit() {
-		// Nothing to do
-	}
-
-	@Override
-	public void draw() {
-		for(OTFDrawable item : items) item.draw();
-	}
-	
-	@Override
-	public void finish() {
-	}
-
-	@Override
-	public void init(boolean initConstData) {
-	}
-
-	@Override
-	public int getDrawOrder() {
-		return 100;
-	}
-
-	@Override
-	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
+	public PolygonDataWriter(FeatureSource fs, float [] color ) {
 		try {
-			return clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+			this.data = new SimpleBackgroundFeatureDrawer(fs,color);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	
-	
+	@Override
+	public void writeConstData(ByteBuffer out) throws IOException {
+
+	ByteArrayOutputStream a = new ByteArrayOutputStream();
+
+		ObjectOutputStream o = new ObjectOutputStream(a);
+		o.writeObject(this.data);
+
+		out.putInt(a.toByteArray().length);
+		out.put(a.toByteArray());
+	}
+
+	@Override
+	public void writeDynData(ByteBuffer out) throws IOException {
+		// no dyn data
+	}
+
 }

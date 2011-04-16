@@ -145,7 +145,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	private int now;
 
-	private SceneGraph actGraph = null;
+	private SceneGraph currentSceneGraph = null;
 
 	private OTFHostControlBar hostControlBar;
 
@@ -242,13 +242,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		}
 	}
 
-	/**I think that this class is used nowhere except that some static fields are used from somewhere else.
-	 * (But, as usual, it might be needed in some old mvi files.)  Kai, jan'10
-	 */
-	public static class AgentDrawer {
-		public static  Texture  agentpng = null;
-	}
-
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
 		GLCanvas canvas = new GLCanvas(caps);
 		canvas.addGLEventListener(drawer);
@@ -268,15 +261,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
-		this.canvas.setMinimumSize(new Dimension(50,50));
-		this.canvas.setPreferredSize(new Dimension(300,300));
-		this.canvas.setMaximumSize(new Dimension(1024,1024));
 		ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
-		OTFGLOverlay matsimLogo = new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false);
+		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 		this.overlayItems.add(matsimLogo);
 		this.scaleBar = new OTFScaleBarDrawer();
 		this.hostControlBar = hostControlBar;
@@ -338,7 +328,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	}
 
 	@Override
-	synchronized public void display(GLAutoDrawable drawable) {
+	public void display(GLAutoDrawable drawable) {
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl = drawable.getGL();
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
@@ -349,8 +339,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.mouseMan.setFrustrum(this.gl);
 		components = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor().getColorComponents(components);
 		this.gl.glColor4d(components[0], components[1], components[2], components[3]);
-		if (this.actGraph != null) {
-			this.actGraph.draw();
+		if (this.currentSceneGraph != null) {
+			this.currentSceneGraph.draw();
 		}
 		if (this.queryHandler != null) {
 			this.queryHandler.drawQueries(this);
@@ -410,8 +400,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this.mouseMan.init(this.gl);
-		AgentDrawer.agentpng = createTexture(MatsimResource.getAsInputStream("icon18.png"));
 		OTFGLAbstractDrawableReceiver.setGl(this.gl);
+		for (OTFGLAbstractDrawable item : this.overlayItems) {
+			item.glInit();
+		}
+		if (currentSceneGraph != null) {
+			currentSceneGraph.glInit();
+		}
 	}
 
 	@Override
@@ -574,7 +569,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		synchronized (this.blockRefresh) {
 			QuadTree.Rect rect = this.mouseMan.getBounds();
 			synchronized (newItems) {
-				this.actGraph  = this.clientQ.getSceneGraph(time, rect, this);
+				this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
 			}
 		}
 		if (this.queryHandler != null) {
@@ -622,8 +617,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		return this.mouseMan.getBounds();
 	}
 
-	public SceneGraph getActGraph() {
-		return this.actGraph;
+	public SceneGraph getCurrentSceneGraph() {
+		return this.currentSceneGraph;
 	}
 
 	static public Texture createTexture(String filename) {

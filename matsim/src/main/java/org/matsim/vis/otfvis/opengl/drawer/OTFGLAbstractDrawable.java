@@ -56,6 +56,27 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 //		isValid = true;
 	}
 	
+
+	/**
+	 * 
+	 * This is the OpenGL init command passed down. OpenGL may call init any time, for example when switching
+	 * displays, re-creating buffers etc., so layers need to be notified of this.
+	 * Particularly, the OGLSimpleStaticNetLayer needs this message to recreate its OpenGL display lists
+	 * when the OpenGL context changes.
+	 *
+	 * Swing implementations don't need this, and OpenGL implementations need to get the OpenGL context
+	 * from a static variable somewhere. Sorry. I think it is not really possible to put drawables for
+	 * two graphics frameworks with completely different protocols behind a common interface.
+	 * 
+	 */
+	public final void glInit() {
+		onInit(gl);
+	}
+	
+	protected void onInit(GL gl) {
+		// To override.
+	}
+	
 	abstract protected void onDraw( GL gl ) ;
 
 	/**<p>
@@ -70,7 +91,8 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 		// package-private seems to be sufficient--?  kai, jan'11
 		OTFGLAbstractDrawable.gl = gl;
 	}
-	protected final static GL getGl() {
+	
+	public final static GL getGl() {
 		return gl;
 	}
 

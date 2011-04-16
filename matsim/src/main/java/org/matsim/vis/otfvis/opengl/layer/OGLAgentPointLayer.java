@@ -25,7 +25,6 @@ import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
-import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
@@ -60,7 +59,12 @@ public class OGLAgentPointLayer implements SceneLayer {
 	}
 
 	@Override
-	public void init(SceneGraph graph, boolean initConstData) {
+	public void init(boolean initConstData) {
+	}
+
+	@Override
+	public void glInit() {
+		this.drawer.glInit();
 	}
 
 	@Override
@@ -94,6 +98,5 @@ public class OGLAgentPointLayer implements SceneLayer {
 	public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId) {
 		drawer.addAgent(id, startX, startY, mycolor, saveId);
 	}
-
 
 }
