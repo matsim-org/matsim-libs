@@ -121,16 +121,16 @@ public class Route2GoogleMap extends X2GoogleMap {
 		String path = this.createPath(coords, this.pathColor + transparency,
 				this.weight);
 
-		StringBuffer strBuf = new StringBuffer(URL_HEADER);
-		strBuf.append(SIZE);
-		strBuf.append(DEFAULT_SIZE);
+		StringBuffer strBuf = new StringBuffer();
 		strBuf.append(startMarkers);
 		strBuf.append(endMarkers);
 		strBuf.append(path);
-		strBuf.append(SENSOR);
-		strBuf.append(DEFAULT_SENSOR);
 
 		return strBuf.toString();
+	}
+
+	public String getGoogleMapURL() {
+		return DEFAULT_URL_PREFIX + this.getRoutePath4googleMap()+DEFAULT_URL_POSTFIX;
 	}
 
 	// -------------CREATE FEATURES IN GOOGLE MAPS--------------
@@ -147,7 +147,43 @@ public class Route2GoogleMap extends X2GoogleMap {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void route2GoogleMap(String[] args) {
+		final String netFilename = "../../matsim/examples/equil/network.xml";
+		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
+		final String outputPlansFilenameBase = "../";
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(netFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
+		Population population = scenario.getPopulation();
+		Network network = scenario.getNetwork();
+
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				List<PlanElement> pes = plan.getPlanElements();
+				int cnt = 0;
+				for (PlanElement pe : pes) {
+					if (pe instanceof Leg) {
+						Route route = ((Leg) pe).getRoute();
+						if (route != null) {
+							System.out.println(new Route2GoogleMap(
+									TransformationFactory.ATLANTIS, network,
+									route).getGoogleMapURL());
+						} else {
+							System.err.println("person Id :\t" + person.getId()
+									+ "leg index :\t" + cnt + "Route==null");
+						}
+						cnt++;
+					}
+
+				}
+			}
+		}
+	}
+
+	public static void routes2GoogleMap(String[] args) {
 		final String netFilename = "../../matsim/examples/equil/network.xml";
 		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
 		final String outputPlansFilenameBase = "../";
@@ -181,5 +217,9 @@ public class Route2GoogleMap extends X2GoogleMap {
 				}
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		route2GoogleMap(args);
 	}
 }

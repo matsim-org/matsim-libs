@@ -51,6 +51,8 @@ public abstract class X2GoogleMap {
 			DEFAULT_SIZE = "1024x768",
 			DEFAULT_SENSOR = "false";
 	protected static int DEFAULT_WEIGHT = 5, COLOR_MAX = 256;
+	public static String DEFAULT_URL_PREFIX = URL_HEADER + SIZE + DEFAULT_SIZE,
+			DEFAULT_URL_POSTFIX = SENSOR + DEFAULT_SENSOR;
 
 	public X2GoogleMap(String fromSystem) {
 		coordTransform = TransformationFactory.getCoordinateTransformation(
@@ -106,4 +108,6 @@ public abstract class X2GoogleMap {
 		}
 		return strBuf.toString();
 	}
+
+	public abstract String getGoogleMapURL();
 }
