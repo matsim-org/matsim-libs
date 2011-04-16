@@ -140,7 +140,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);	
+		this.replanningManager.addIntialReplanner(this.initialReplanner);	
 		
 		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
 		this.getEvents().addHandler(activityReplanningMap);
@@ -148,7 +148,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(this.duringActivityReplanner);
 		
 		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
 		this.getEvents().addHandler(linkReplanningMap);
@@ -156,7 +156,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
+		this.replanningManager.addDuringLegReplanner(this.duringLegReplanner);
 	}
 
 	/*

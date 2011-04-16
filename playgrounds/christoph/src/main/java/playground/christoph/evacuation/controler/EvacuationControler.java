@@ -38,9 +38,6 @@ import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
-import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -51,9 +48,6 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -62,8 +56,6 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.EvacuationDuringActivityReplanningModule;
-import playground.christoph.evacuation.mobsim.EvacuationDuringLegReplanningModule;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InsecureActivityPerformingIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InsecureLegPerformingIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.SecureActivityPerformingIdentifierFactory;
@@ -112,9 +104,6 @@ public class EvacuationControler extends MultiModalControler {
 
 	protected PersonalizableTravelTime travelTime;
 
-	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ParallelDuringActivityReplanner parallelDuringActivityReplanner;
-	protected ParallelDuringLegReplanner parallelDuringLegReplanner;
 	protected InitialIdentifier initialIdentifier;
 	protected DuringActivityIdentifier duringSecureActivityIdentifier;
 	protected DuringActivityIdentifier duringInsecureActivityIdentifier;
@@ -208,7 +197,7 @@ public class EvacuationControler extends MultiModalControler {
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
 //		this.initialReplanner.setReplanner(router);
 //		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-//		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
+//		this.replanningManager.addIntialReplanner(this.initialReplanner);
 
 		/*
 		 * Create ActivityReplanningMap here and reuse it for both duringActivityReplanners!
@@ -222,14 +211,14 @@ public class EvacuationControler extends MultiModalControler {
 		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringSecureActivityReplanner.addAgentsToReplanIdentifier(this.duringSecureActivityIdentifier);
 		this.duringSecureActivityReplanner.setReplanningProbability(pReplanning);
-		this.parallelDuringActivityReplanner.addWithinDayReplanner(this.duringSecureActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(this.duringSecureActivityReplanner);
 
 		this.duringInsecureActivityIdentifier = new InsecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.selector.addIdentifier(this.duringInsecureActivityIdentifier, this.pDuringActivityReplanning);
 		this.duringInsecureActivityReplanner = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
 		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
-		this.parallelDuringActivityReplanner.addWithinDayReplanner(this.duringInsecureActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(this.duringInsecureActivityReplanner);
 
 		/*
 		 * Create LegReplanningMap here and reuse it for all three duringLegReplanners!
@@ -243,30 +232,21 @@ public class EvacuationControler extends MultiModalControler {
 		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
 		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
-		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringSecureLegReplanner);
+		this.replanningManager.addDuringLegReplanner(this.duringSecureLegReplanner);
 
 		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
 		this.selector.addIdentifier(this.duringInsecureLegIdentifier, this.pDuringLegReplanning);
 		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
 		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
-		this.parallelDuringLegReplanner.addWithinDayReplanner(this.duringInsecureLegReplanner);
+		this.replanningManager.addDuringLegReplanner(this.duringInsecureLegReplanner);
 
 		this.currentInsecureLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.currentInsecureLegIdentifier, this.pDuringLegReplanning);
 		this.currentInsecureLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.currentInsecureLegReplanner.addAgentsToReplanIdentifier(this.currentInsecureLegIdentifier);
 		this.currentInsecureLegReplanner.setReplanningProbability(pReplanning);
-		this.parallelDuringLegReplanner.addWithinDayReplanner(this.currentInsecureLegReplanner);
-	}
-
-	/*
-	 * Initializes the ParallelReplannerModules
-	 */
-	protected void initParallelReplanningModules() {
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
+		this.replanningManager.addDuringLegReplanner(this.currentInsecureLegReplanner);
 	}
 
 	@Override
@@ -284,7 +264,7 @@ public class EvacuationControler extends MultiModalControler {
 		
 		super.setUp();
 
-		replanningManager = new ReplanningManager();
+		replanningManager = new ReplanningManager(numReplanningThreads);
 
 		selector = new SelectHandledAgentsByProbability();
 		fosl.addSimulationListener(selector);
@@ -297,20 +277,8 @@ public class EvacuationControler extends MultiModalControler {
 		fosl.addSimulationBeforeSimStepListener(replanningManager);
 
 		this.getQueueSimulationListener().add(fosl);
-
-		log.info("Initialize Parallel Replanning Modules");
-		initParallelReplanningModules();
-
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
-
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		DuringActivityReplanningModule actEndReplanning = new EvacuationDuringActivityReplanningModule(parallelDuringActivityReplanner);
-		DuringLegReplanningModule leaveLinkReplanning = new EvacuationDuringLegReplanningModule(parallelDuringLegReplanner);
-
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
-		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
 
 		log.info("Creating additional Plans");
 		clonePlans();

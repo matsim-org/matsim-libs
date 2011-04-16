@@ -47,13 +47,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
@@ -153,8 +151,7 @@ public class SimpleRouterControler extends Controler {
 	 */
 	protected boolean useKnowledge = true;
 
-	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ReplanningManager replanningManager = new ReplanningManager();
+	protected ReplanningManager replanningManager = new ReplanningManager(numReplanningThreads);
 	protected WithinDayQSim sim;
 
 	public SimpleRouterControler(String[] args) {
@@ -197,28 +194,28 @@ public class SimpleRouterControler extends Controler {
 		this.randomIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.randomReplanner);
+		this.replanningManager.addIntialReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
 		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
 		this.tabuIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.tabuReplanner);
+		this.replanningManager.addIntialReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
 		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
 		this.compassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.compassReplanner);
+		this.replanningManager.addIntialReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
 		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
 		this.randomCompassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.randomCompassReplanner);
+		this.replanningManager.addIntialReplanner(this.randomCompassReplanner);
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
@@ -226,17 +223,7 @@ public class SimpleRouterControler extends Controler {
 		this.dijkstraIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.randomDijkstraReplanner);
-	}
-
-	/*
-	 * Hands over the ArrayList to the ParallelReplannerModules
-	 */
-	protected void initParallelReplanningModules() {
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
+		this.replanningManager.addIntialReplanner(this.randomDijkstraReplanner);
 	}
 
 	@Override
@@ -260,9 +247,9 @@ public class SimpleRouterControler extends Controler {
 			setKnowledgeStorageHandler();
 		}
 
-		log.info("Initialize Parallel Replanning Modules");
-		initParallelReplanningModules();
-
+		this.replanningManager.doDuringActivityReplanning(false);
+		this.replanningManager.doDuringLegReplanning(false);
+			
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
 

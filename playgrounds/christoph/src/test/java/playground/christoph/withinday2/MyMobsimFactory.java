@@ -34,14 +34,8 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
@@ -51,12 +45,10 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  */
 public class MyMobsimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
-	private ParallelInitialReplanner parallelInitialReplanner;
-	private ParallelDuringActivityReplanner parallelActEndReplanner;
-	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
-
+	private ReplanningManager replanningManager;
+	
 	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
@@ -71,7 +63,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory( mobsim ) ;
 		mobsim.setAgentFactory(agentFactory) ;
 
-		ReplanningManager replanningManager = new ReplanningManager();
+		replanningManager = new ReplanningManager(numReplanningThreads);
 
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		// ensure that they are started in the needed order.
@@ -80,28 +72,14 @@ public class MyMobsimFactory implements MobsimFactory {
 		fosl.addSimulationBeforeSimStepListener(replanningManager);
 		mobsim.addQueueSimulationListeners(fosl);
 		// (essentially, can just imagine the replanningManager as a regular MobsimListener)
-
-		log.info("Initialize Parallel Replanning Modules");
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
-		// these are containers, but they don't do anything by themselves	
 		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter(sc, mobsim);
 
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
-		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
-
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
-		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-
 		//just activitate replanning during an activity
-		replanningManager.doActEndReplanning(true);
+		replanningManager.doDuringActivityReplanning(true);
 		replanningManager.doInitialReplanning(false);
-		replanningManager.doLeaveLinkReplanning(true);
+		replanningManager.doDuringLegReplanning(true);
 
 		return mobsim ;
 	}
@@ -129,7 +107,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(mobsim).createIdentifier());
 		// which persons to replan
 
-		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(duringActivityReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 
@@ -145,7 +123,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(mobsim).createIdentifier());
 		// persons identifier added to replanner
 
-		this.parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);
+		this.replanningManager.addDuringLegReplanner(duringLegReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 	}

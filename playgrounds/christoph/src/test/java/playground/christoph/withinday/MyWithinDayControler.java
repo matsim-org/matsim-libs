@@ -25,15 +25,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
@@ -66,10 +60,6 @@ class MyWithinDayControler extends Controler {
 	 * How many parallel Threads shall do the Replanning.
 	 */
 	protected int numReplanningThreads = 5;
-
-	protected ParallelInitialReplanner parallelInitialReplanner;
-	protected ParallelDuringActivityReplanner parallelActEndReplanner;
-	protected ParallelDuringLegReplanner parallelLeaveLinkReplanner;
 
 	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
@@ -104,7 +94,7 @@ class MyWithinDayControler extends Controler {
 		duringActivityReplanner.addAgentsToReplanIdentifier(new OldPeopleIdentifierFactory(this.sim).createIdentifier());
 		// which persons to replan
 		
-		this.parallelActEndReplanner.addWithinDayReplanner(duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(duringActivityReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
 
@@ -119,18 +109,9 @@ class MyWithinDayControler extends Controler {
 		duringLegReplanner.addAgentsToReplanIdentifier(new YoungPeopleIdentifierFactory(this.sim).createIdentifier());
 		// persons identifier added to replanner
 
-		this.parallelLeaveLinkReplanner.addWithinDayReplanner(duringLegReplanner);
+		this.replanningManager.addDuringLegReplanner(duringLegReplanner);
 		// I think this just adds the stuff to the threads mechanics (can't say why it is not enough to use the multithreaded
 		// module).  kai, oct'10
-	}
-
-	/*
-	 * Initializes the ParallelReplannerModules
-	 */
-	private void initParallelReplanningModules() {
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
 	}
 
 	/*
@@ -140,7 +121,7 @@ class MyWithinDayControler extends Controler {
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
 	private void createHandlersAndListeners() {
-		replanningManager = new ReplanningManager();
+		replanningManager = new ReplanningManager(numReplanningThreads);
 	}
 
 	@Override
@@ -162,25 +143,13 @@ class MyWithinDayControler extends Controler {
 		sim.addQueueSimulationListeners(fosl);
 		// essentially, can just imagine the replanningManager as a regular MobsimListener
 
-		log.info("Initialize Parallel Replanning Modules");
-		initParallelReplanningModules();
-		// these are containers, but they don't do anything by themselves
-
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
 
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
-		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
-
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
-		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-
 		//just activitate replanning during an activity
-		replanningManager.doActEndReplanning(true);
+		replanningManager.doDuringActivityReplanning(true);
 		replanningManager.doInitialReplanning(false);
-		replanningManager.doLeaveLinkReplanning(true);
+		replanningManager.doDuringLegReplanning(true);
 
 		sim.run();
 	}
