@@ -39,9 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
@@ -55,9 +52,6 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
@@ -83,9 +77,6 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 	/**
 	 * Define the objects that are needed for the replanning.
 	 */
-	private ParallelInitialReplanner parallelInitialReplanner;
-	private ParallelDuringActivityReplanner parallelActEndReplanner;
-	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
 	private InitialIdentifier initialIdentifier;
 	private DuringActivityIdentifier duringActivityIdentifier;
 	private DuringLegIdentifier duringLegIdentifier;
@@ -197,32 +188,11 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the correct order.
 		 */
-		replanningManager = new ReplanningManager();
+		int numReplanningThreads = event.getControler().getConfig().global().getNumberOfThreads();
+		replanningManager = new ReplanningManager(numReplanningThreads);
 		fosl.addSimulationListener(replanningManager);
 		selector = new SelectHandledAgentsByProbability();
 		fosl.addSimulationListener(selector);
-		
-		/*
-		 * Create ParallelReplanners. They are registered as SimulationListeners.
-		 */
-		log.info("Initialize Parallel Replanning Modules");
-		int numReplanningThreads = event.getControler().getConfig().global().getNumberOfThreads();
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
-		
-		/*
-		 * We create and set the Replanning Modules for each iteration.
-		 * This could be varied, e.g. using the WithinDay Modules only
-		 * in the first iteration.
-		 */
-		InitialReplanningModule initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		DuringActivityReplanningModule actEndReplanning = new DuringActivityReplanningModule(parallelActEndReplanner);
-		DuringLegReplanningModule leaveLinkReplanning = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
-
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
-		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
 	}
 
 	@Override
@@ -246,19 +216,19 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
 		this.initialReplanner = new InitialReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
+		this.replanningManager.addIntialReplanner(this.initialReplanner);
 		
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pDuringActivityReplanning);
 		this.duringActivityReplanner = new NextLegReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		this.parallelActEndReplanner.addWithinDayReplanner(this.duringActivityReplanner);
+		this.replanningManager.addDuringActivityReplanner(this.duringActivityReplanner);
 		
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pDuringLegReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(sim.getScenario(), sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		this.parallelLeaveLinkReplanner.addWithinDayReplanner(this.duringLegReplanner);
+		this.replanningManager.addDuringLegReplanner(this.duringLegReplanner);
 	}
 
 	@Override

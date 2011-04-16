@@ -124,21 +124,21 @@ public class ExampleWithinDayController extends WithinDayController implements S
 		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		super.addIntialReplanner(this.initialReplanner);
+		this.getReplanningManager().addIntialReplanner(this.initialReplanner);
 		
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringActivityIdentifier, pDuringActivityReplanning);
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		super.addDuringActivityReplanner(this.duringActivityReplanner);
+		this.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 				
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		super.addDuringLegReplanner(this.duringLegReplanner);
+		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}
 
 	/*
@@ -148,6 +148,7 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
@@ -160,7 +161,6 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	
 	@Override
 	protected void runMobSim() {
-		super.initWithinDayModules(numReplanningThreads);
 		
 		selector = new SelectHandledAgentsByProbability();
 		super.getFixedOrderSimulationListener().addSimulationListener(selector);
@@ -173,7 +173,6 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	 * main
 	 * ===================================================================
 	 */
-
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");

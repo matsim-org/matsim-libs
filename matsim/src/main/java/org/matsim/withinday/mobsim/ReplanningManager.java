@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,63 +20,65 @@
 
 package org.matsim.withinday.mobsim;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-/*
- * This Class implements a QueueSimulationBeforeSimStepListener.
+/**
+ * This Class implements a SimulationBeforeSimStepListener.
  *
  * Each time a ListenerEvent is created it is checked
  * whether a WithinDayReplanning of the Agents Plans should
  * be done and / or is necessary.
+ * 
+ * @author: cdobler
  */
 public class ReplanningManager implements SimulationBeforeSimStepListener, SimulationInitializedListener {
 
-	protected boolean initialReplanning = true;
-	protected boolean actEndReplanning = true;
-	protected boolean leaveLinkReplanning = true;
+	private static final Logger log = Logger.getLogger(ReplanningManager.class);
+	
+	private boolean initialReplanning = true;
+	private boolean duringActivityReplanning = true;
+	private boolean duringLegReplanning = true;
 
-	protected InitialReplanningModule initialReplanningModule;
-	protected DuringActivityReplanningModule actEndReplanningModule;
-	protected DuringLegReplanningModule leaveLinkReplanningModule;
-
-	public ReplanningManager() {
+	private InitialReplanningModule initialReplanningModule;
+	private DuringActivityReplanningModule duringActivityReplanningModule;
+	private DuringLegReplanningModule duringLegReplanningModule;
+	
+	private ParallelInitialReplanner parallelInitialReplanner;
+	private ParallelDuringActivityReplanner parallelDuringActivityReplanner;
+	private ParallelDuringLegReplanner parallelDuringLegReplanner;
+	
+	public ReplanningManager(int numOfThreads) {
+		initializeReplanningModules(numOfThreads);
 	}
+	
+	private void initializeReplanningModules(int numOfThreads) {
+		
+		log.info("Initialize Parallel Replanning Modules");
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numOfThreads);
+		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numOfThreads);
+		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numOfThreads);
 
-	/*
-	 * Using this Constructor is prefered. If the handed over
-	 * Replanning Modules are not null, the replanning will be
-	 * activated automatically!
-	 */
-	public ReplanningManager(InitialReplanningModule initialReplanningModule, DuringActivityReplanningModule actEndReplanningModule, DuringLegReplanningModule leaveLinkReplanningModule) {
-		if (initialReplanningModule != null) {
-			this.initialReplanningModule = initialReplanningModule;
-			initialReplanning = true;
-		}
-		else {
-			initialReplanning = false;
-		}
+		log.info("Initialize Replanning Modules");
+		initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
+		duringActivityReplanningModule = new DuringActivityReplanningModule(parallelDuringActivityReplanner);
+		duringLegReplanningModule = new DuringLegReplanningModule(parallelDuringLegReplanner);
 
-		if (actEndReplanningModule != null) {
-			this.actEndReplanningModule = actEndReplanningModule;
-			actEndReplanning = true;
-		}
-		else {
-			actEndReplanning = false;
-		}
-
-		if (leaveLinkReplanningModule != null) {
-			this.leaveLinkReplanningModule = leaveLinkReplanningModule;
-			leaveLinkReplanning = true;
-		}
-		else {
-			leaveLinkReplanning = false;
-		}
+		this.setInitialReplanningModule(initialReplanningModule);
+		this.setDuringActivityReplanningModule(duringActivityReplanningModule);
+		this.setDuringLegReplanningModule(duringLegReplanningModule);
 	}
-
+	
 	public void doInitialReplanning(boolean value) {
 		initialReplanning = value;
 	}
@@ -93,38 +95,50 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 		return this.initialReplanningModule;
 	}
 
-	public void doActEndReplanning(boolean value) {
-		actEndReplanning = value;
+	public void doDuringActivityReplanning(boolean value) {
+		duringActivityReplanning = value;
 	}
 
-	public boolean isActEndReplanning() {
-		return actEndReplanning;
+	public boolean isDuringActivityReplanning() {
+		return duringActivityReplanning;
 	}
 
-	public void setActEndReplanningModule(DuringActivityReplanningModule module) {
-		this.actEndReplanningModule = module;
+	public void setDuringActivityReplanningModule(DuringActivityReplanningModule module) {
+		this.duringActivityReplanningModule = module;
 	}
 
-	public DuringActivityReplanningModule getActEndReplanningModule() {
-		return this.actEndReplanningModule;
+	public DuringActivityReplanningModule getDuringActivityReplanningModule() {
+		return this.duringActivityReplanningModule;
 	}
 
-	public void doLeaveLinkReplanning(boolean value) {
-		leaveLinkReplanning = value;
+	public void doDuringLegReplanning(boolean value) {
+		duringLegReplanning = value;
 	}
 
-	public boolean isLeaveLinkReplanning() {
-		return leaveLinkReplanning;
+	public boolean isDuringLegReplanning() {
+		return duringLegReplanning;
 	}
 
-	public void setLeaveLinkReplanningModule(DuringLegReplanningModule module) {
-		this.leaveLinkReplanningModule = module;
+	public void setDuringLegReplanningModule(DuringLegReplanningModule module) {
+		this.duringLegReplanningModule = module;
 	}
 
-	public DuringLegReplanningModule getLeaveLinkReplanningModule() {
-		return this.leaveLinkReplanningModule;
+	public DuringLegReplanningModule getDuringLegReplanningModule() {
+		return this.duringLegReplanningModule;
 	}
 
+	public void addIntialReplanner(WithinDayInitialReplanner replanner) {
+		this.parallelInitialReplanner.addWithinDayReplanner(replanner);
+	}
+	
+	public void addDuringActivityReplanner(WithinDayDuringActivityReplanner replanner) {		
+		this.parallelDuringActivityReplanner.addWithinDayReplanner(replanner);
+	}
+	
+	public void addDuringLegReplanner(WithinDayDuringLegReplanner replanner) {		
+		this.parallelDuringLegReplanner.addWithinDayReplanner(replanner);
+	}
+	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		if (isInitialReplanning()) {
@@ -134,12 +148,12 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-		if (isActEndReplanning()) {
-			actEndReplanningModule.doReplanning(e.getSimulationTime());
+		if (isDuringActivityReplanning()) {
+			duringActivityReplanningModule.doReplanning(e.getSimulationTime());
 		}
 
-		if (isLeaveLinkReplanning()) {
-			leaveLinkReplanningModule.doReplanning(e.getSimulationTime());
+		if (isDuringLegReplanning()) {
+			duringLegReplanningModule.doReplanning(e.getSimulationTime());
 		}
 	}
 }

@@ -26,20 +26,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.withinday.mobsim.DuringActivityReplanningModule;
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.mobsim.InitialReplanningModule;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
-import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -57,14 +48,6 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 public class WithinDayController extends Controler {
 
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
-
-	private ParallelInitialReplanner parallelInitialReplanner;
-	private ParallelDuringActivityReplanner parallelActEndReplanner;
-	private ParallelDuringLegReplanner parallelLeaveLinkReplanner;
-
-	private InitialReplanningModule initialReplanningModule;
-	private DuringActivityReplanningModule actEndReplanningModule;
-	private DuringLegReplanningModule leaveLinkReplanningModule;
 	
 	private TravelTimeCollector travelTime;
 	private ActivityReplanningMap activityReplanningMap;
@@ -72,39 +55,17 @@ public class WithinDayController extends Controler {
 	
 	private ReplanningManager replanningManager;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-
-	private boolean isInitialized = false;
 	
 	public WithinDayController(String[] args) {
 		super(args);
 		
-		/*
-		 * Use MyLinkImpl. They can carry some additional Information like their
-		 * TravelTime. This is required by a TravelTimeCollector.
-		 */
-		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
+		init();
 	}
 
 	public WithinDayController(Config config) {
 		super(config);
 	
-		/*
-		 * Use MyLinkImpl. They can carry some additional Information like their
-		 * TravelTime. This is required by a TravelTimeCollector.
-		 */
-		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
-	}
-
-	public void addIntialReplanner(WithinDayInitialReplanner replanner) {
-		this.parallelInitialReplanner.addWithinDayReplanner(replanner);
-	}
-	
-	public void addDuringActivityReplanner(WithinDayDuringActivityReplanner replanner) {		
-		this.parallelActEndReplanner.addWithinDayReplanner(replanner);
-	}
-	
-	public void addDuringLegReplanner(WithinDayDuringLegReplanner replanner) {		
-		this.parallelLeaveLinkReplanner.addWithinDayReplanner(replanner);
+		init();
 	}
 	
 	/*
@@ -163,6 +124,18 @@ public class WithinDayController extends Controler {
 		return this.linkReplanningMap;
 	}
 	
+	/*
+	 * TODO: Add a Within-Day Group to the Config. Then this method
+	 * can be called on startup.
+	 */
+	public void createAndInitReplanningManager(int numOfThreads) {
+		if (this.replanningManager == null) {
+			log.info("Initialize ReplanningManager");
+			replanningManager = new ReplanningManager(numOfThreads);
+			fosl.addSimulationListener(replanningManager);			
+		}
+	}
+	
 	public ReplanningManager getReplanningManager() {
 		return this.replanningManager;
 	}
@@ -174,39 +147,16 @@ public class WithinDayController extends Controler {
 	 * ===================================================================
 	 */
 	
-	public void initWithinDayModules(int numReplanningThreads) {
+	private void init() {
+		/*
+		 * Use MyLinkImpl. They can carry some additional Information like their
+		 * TravelTime. This is required by a TravelTimeCollector.
+		 */
+		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
 		
-		// initialize it only once
-		if (isInitialized) return;
-
 		// set WithinDayQSimFactory
 		super.setMobsimFactory(new WithinDayQSimFactory());
 		super.getQueueSimulationListener().add(fosl);
-		
-		/*
-		 * Crate and initialize a ReplanningManager and a ReplaningFlagInitializer.
-		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
-		 * ensure that they are started in the correct order.
-		 */
-		log.info("Initialize ReplanningManager");
-		replanningManager = new ReplanningManager();
-		fosl.addSimulationListener(replanningManager);
-
-		log.info("Initialize Parallel Replanning Modules");
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numReplanningThreads);
-		this.parallelActEndReplanner = new ParallelDuringActivityReplanner(numReplanningThreads);
-		this.parallelLeaveLinkReplanner = new ParallelDuringLegReplanner(numReplanningThreads);
-
-		log.info("Initialize Replanning Modules");
-		initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
-		actEndReplanningModule = new DuringActivityReplanningModule(parallelActEndReplanner);
-		leaveLinkReplanningModule = new DuringLegReplanningModule(parallelLeaveLinkReplanner);
-
-		replanningManager.setInitialReplanningModule(initialReplanningModule);
-		replanningManager.setActEndReplanningModule(actEndReplanningModule);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanningModule);
-		
-		isInitialized = true;
 	}
 	
 	@Override
@@ -228,9 +178,10 @@ public class WithinDayController extends Controler {
 	@Override
 	protected void runMobSim() {
 		// ensure that all modules have been initialized
-		if (!isInitialized) {
-			log.warn("Within-day replanning modules have not been initialized! Force initialization using 1 replanning thread.");
-			initWithinDayModules(1);
+		if (replanningManager == null) {
+			log.warn("Within-day replanning modules have not been initialized! Force initialization using 1 replanning thread. " +
+					"Please call createAndInitReplanningManager(int numOfThreads).");
+			createAndInitReplanningManager(1);
 		}
 		
 		super.runMobSim();
