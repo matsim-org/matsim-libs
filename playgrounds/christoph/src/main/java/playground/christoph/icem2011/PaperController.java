@@ -20,7 +20,17 @@
 
 package playground.christoph.icem2011;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
@@ -31,7 +41,9 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -46,8 +58,6 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 /**
  * Controller for the simulation runs presented in the ICEM 2011 paper. 
  * 
- * TODO: Replan only agents on links within a given distance!
- *
  * @author cdobler
  */
 public class PaperController extends WithinDayController implements StartupListener,
@@ -58,15 +68,23 @@ public class PaperController extends WithinDayController implements StartupListe
 	 * Replanning Strategy. It is possible to assign
 	 * multiple Strategies to the Agents.
 	 */
-//	private double pInitialReplanning = 0.0;
-//	private double pDuringActivityReplanning = 0.0;
-	private double pDuringLegReplanning = 1.0;
+//	/*package*/ double pInitialReplanning = 0.0;
+//	/*package*/ double pDuringActivityReplanning = 0.0;
+	/*package*/ double pDuringLegReplanning = 1.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 4;
+	/*package*/ int numReplanningThreads = 4;
 
+	/*
+	 * File that contains a list of all links where agents
+	 * will replan their plans.
+	 */
+	/*package*/ String replanningLinksFile = "";
+	private Set<Id> replanningLinks;
+	private Charset charset = Charset.forName("UTF-8");
+	
 	/*
 	 * Define when the Replanning is en- and disabled.
 	 */
@@ -125,9 +143,15 @@ public class PaperController extends WithinDayController implements StartupListe
 //		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 //		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 //		this.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
-				
+		
+		/*
+		 * Use the FilteredDuringLegIdentifier to remove those agents that are not within
+		 * a given distance to the affected links.
+		 */
+		parseReplanningLinks(this.replanningLinksFile);
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
-		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		this.duringLegIdentifier = new FilteredDuringLegIdentifier(identifier, this.replanningLinks);
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
@@ -179,20 +203,109 @@ public class PaperController extends WithinDayController implements StartupListe
 		super.runMobSim();
 	}
 
+
+	private void parseReplanningLinks(String replanningLinksFile) {
+		replanningLinks = new HashSet<Id>();
+	    	    
+	    try {
+	    	Counter lineCounter = new Counter("Parsed replanning link ids ");
+
+	    	FileInputStream fis = null;
+	    	InputStreamReader isr = null;
+	    	BufferedReader br = null;
+
+	    	log.info("start parsing...");
+	    	fis = new FileInputStream(replanningLinksFile);
+	    	isr = new InputStreamReader(fis, charset);
+	    	br = new BufferedReader(isr);
+
+	    	// skip first Line which is only a header
+	    	br.readLine();
+	    	
+	    	String line;
+	    	while((line = br.readLine()) != null) {
+	    		
+	    		replanningLinks.add(this.scenarioData.createId(line));
+	    		lineCounter.incCounter();
+	    	}	    	
+
+	    	br.close();
+	    	isr.close();
+	    	fis.close();
+	    	
+	    	log.info("done.");
+	    	log.info("Found " + replanningLinksFile.length() + " replanning links.");
+	    } catch (IOException e) {
+	    	log.error("Error when trying to parse the replanning links file. No replanning links identified!");
+	    }
+	}
+	
+	
+	/*
+	 * Wrapper for a DuringLegIdentifier. Checks for all agents that are identified by
+	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
+	 * replanning shall be performed.
+	 */
+	private static class FilteredDuringLegIdentifier extends DuringLegIdentifier {
+
+		private DuringLegIdentifier delegate;
+		private Set<Id> replanningLinks;
+		
+		public FilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningLinks) {
+			this.delegate = identifier;
+			this.replanningLinks = replanningLinks;
+		}	
+		
+		@Override
+		public Set<WithinDayAgent> getAgentsToReplan(double time) {
+			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>();
+			for (WithinDayAgent agent : agentsFromDelegate) {
+				if (replanningLinks.contains(agent.getCurrentLinkId())) filteredAgents.add(agent);
+			}
+			return filteredAgents;
+		}
+	}
+	
 	/*
 	 * ===================================================================
 	 * main
 	 * ===================================================================
 	 */
+	private final static String NUMOFTHREADS = "-numofthreads";
+	private final static String LEGREPLANNINGSHARE = "-legreplanningshare";
+	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
-		} else {
-			final PaperController controller = new PaperController(args);
+		} else {		
+			final PaperController controller = new PaperController(new String[]{args[0]});
+			
+			// set parameter from command line
+			for (int i = 1; i < args.length; i++) {
+				if (args[i].equalsIgnoreCase(NUMOFTHREADS)) {
+					i++;
+					controller.numReplanningThreads = Integer.parseInt(args[i]);
+					log.info("number of replanning threads: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(LEGREPLANNINGSHARE)) {
+					i++;
+					double share = Double.parseDouble(args[i]);
+					if (share > 1.0) share = 1.0;
+					else if (share < 0.0) share = 0.0;
+					controller.pDuringLegReplanning = share;
+					log.info("share of leg replanning agents: " + args[i]);
+				}  else if (args[i].equalsIgnoreCase(REPLANNINGLINKSFILE)) {
+					i++;
+					controller.replanningLinksFile = args[i];
+					log.info("leg replanning links file: " + args[i]);
+				} else log.warn("Unknown Parameter: " + args[i]);
+			}
 			controller.run();
 		}
 		System.exit(0);
 	}
+	
 }
