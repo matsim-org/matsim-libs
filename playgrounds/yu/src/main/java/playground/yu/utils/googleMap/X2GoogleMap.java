@@ -24,6 +24,7 @@ package playground.yu.utils.googleMap;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -54,11 +55,13 @@ public abstract class X2GoogleMap {
 	protected static int DEFAULT_WEIGHT = 5, COLOR_MAX = 256;
 	public static String DEFAULT_URL_PREFIX = URL_HEADER + SIZE + DEFAULT_SIZE,
 			DEFAULT_URL_POSTFIX = SENSOR + DEFAULT_SENSOR;
-	protected static DecimalFormat formatter = new DecimalFormat("###.######");
+	protected static DecimalFormat formatter;
 
 	public X2GoogleMap(String fromSystem) {
 		coordTransform = TransformationFactory.getCoordinateTransformation(
 				fromSystem, TransformationFactory.WGS84);
+		Locale.setDefault(Locale.US);
+		formatter = new DecimalFormat("###.######");
 	}
 
 	/**
@@ -77,9 +80,11 @@ public abstract class X2GoogleMap {
 
 	protected String createMarker(Coord coord, String label, String color) {
 		StringBuffer strBuf = new StringBuffer(MARKERS);
-		strBuf.append(COLOR);
-		strBuf.append(color);
-		strBuf.append(SEPERATOR_IN_PARAMETER);
+		if (color != null) {
+			strBuf.append(COLOR);
+			strBuf.append(color);
+			strBuf.append(SEPERATOR_IN_PARAMETER);
+		}
 		strBuf.append(LABEL);
 		strBuf.append(label);
 		strBuf.append(SEPERATOR_IN_PARAMETER);
@@ -96,9 +101,11 @@ public abstract class X2GoogleMap {
 	 */
 	protected String createPath(List<Coord> coords, String color, int weight) {
 		StringBuffer strBuf = new StringBuffer(PATH);
-		strBuf.append(COLOR);
-		strBuf.append(color);
-		strBuf.append(SEPERATOR_IN_PARAMETER);
+		if (color != null) {
+			strBuf.append(COLOR);
+			strBuf.append(color);
+			strBuf.append(SEPERATOR_IN_PARAMETER);
+		}
 		strBuf.append(WEIGHT);
 		strBuf.append(weight);
 		strBuf.append(SEPERATOR_IN_PARAMETER);

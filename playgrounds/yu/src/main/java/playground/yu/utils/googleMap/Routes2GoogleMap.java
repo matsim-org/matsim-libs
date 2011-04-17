@@ -25,10 +25,12 @@ package playground.yu.utils.googleMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -162,12 +164,20 @@ public class Routes2GoogleMap extends X2GoogleMap {
 		// // }
 		// // return "These routes have different OD pair";
 
-		StringBuffer routePaths4GoogleMap = new StringBuffer();
+		Set<String> strings = new HashSet<String>();
+
 		for (Route route : this.routes) {
-			routePaths4GoogleMap.append(new Route2GoogleMap(fromSystem,
-					network, route).getRoutePath4googleMap());
+			Route2GoogleMap r2gm = new Route2GoogleMap(fromSystem, network,
+					route);
+			strings.add(r2gm.getStartMarkers());
+			strings.add(r2gm.getEndMarkers());
+			strings.add(r2gm.getPureRoutePath());
 		}
 
+		StringBuffer routePaths4GoogleMap = new StringBuffer();
+		for (String str : strings) {
+			routePaths4GoogleMap.append(str);
+		}
 		return routePaths4GoogleMap.toString();
 	}
 

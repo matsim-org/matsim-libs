@@ -83,16 +83,21 @@ public class Route2GoogleMap extends X2GoogleMap {
 		this.weight = weight;
 	}
 
-	public String getRoutePath4googleMap() {
+	public String getStartMarkers() {
+		return createLinkCenterMarker(
+				this.network.getLinks().get(route.getStartLinkId()), "O", null);
+	}
+
+	public String getEndMarkers() {
+		return this.createLinkCenterMarker(
+				this.network.getLinks().get(route.getEndLinkId()), "D", null);
+	}
+
+	public String getPureRoutePath() {
 		Map<Id, ? extends Link> links = this.network.getLinks();
 
-		Id startLinkId = route.getStartLinkId();
-		Link startLink = links.get(startLinkId);
-		String startMarkers = createLinkCenterMarker(startLink, "O");
-
-		Id endLinkId = route.getEndLinkId();
-		Link endLink = links.get(endLinkId);
-		String endMarkers = createLinkCenterMarker(endLink, "D");
+		Link startLink = links.get(route.getStartLinkId()), endLink = links
+				.get(route.getEndLinkId());
 
 		List<Coord> coords = new ArrayList<Coord>();
 
@@ -118,19 +123,15 @@ public class Route2GoogleMap extends X2GoogleMap {
 			transparency = GENERIC_ROUTE_TRANSPARENCY;
 		}
 
-		String path = this.createPath(coords, this.pathColor + transparency,
-				this.weight);
-
-		StringBuffer strBuf = new StringBuffer();
-		strBuf.append(startMarkers);
-		strBuf.append(endMarkers);
-		strBuf.append(path);
-
-		return strBuf.toString();
+		// return this.createPath(coords, this.pathColor + transparency,
+		// this.weight);
+		return this.createPath(coords, null, this.weight);
 	}
 
 	public String getGoogleMapURL() {
-		return DEFAULT_URL_PREFIX + this.getRoutePath4googleMap()+DEFAULT_URL_POSTFIX;
+		return DEFAULT_URL_PREFIX + this.getStartMarkers()
+				+ this.getEndMarkers() + this.getPureRoutePath()
+				+ DEFAULT_URL_POSTFIX;
 	}
 
 	// -------------CREATE FEATURES IN GOOGLE MAPS--------------
