@@ -183,42 +183,6 @@ public class Route2GoogleMap extends X2GoogleMap {
 		}
 	}
 
-	public static void routes2GoogleMap(String[] args) {
-		final String netFilename = "../../matsim/examples/equil/network.xml";
-		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
-		final String outputPlansFilenameBase = "../";
-
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(netFilename);
-		new MatsimPopulationReader(scenario).readFile(plansFilename);
-
-		Population population = scenario.getPopulation();
-		Network network = scenario.getNetwork();
-
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				List<PlanElement> pes = plan.getPlanElements();
-				int cnt = 0;
-				for (PlanElement pe : pes) {
-					if (pe instanceof Leg) {
-						Route route = ((Leg) pe).getRoute();
-						if (route != null) {
-							System.out.println(new Route2GoogleMap(
-									TransformationFactory.ATLANTIS, network,
-									route).getRoutePath4googleMap());
-						} else {
-							System.err.println("person Id :\t" + person.getId()
-									+ "leg index :\t" + cnt + "Route==null");
-						}
-						cnt++;
-					}
-
-				}
-			}
-		}
-	}
-
 	public static void main(String[] args) {
 		route2GoogleMap(args);
 	}
