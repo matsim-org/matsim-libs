@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,8 +19,6 @@
  * *********************************************************************** */
 
 package herbie.running.scoring;
-
-import herbie.running.config.HerbieConfigGroup;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -39,16 +37,18 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, Pe
 
 	public HerbieTravelTimeDistanceCostCalculator(
 			TravelTime timeCalculator,
-			PlanCalcScoreConfigGroup cnScoringGroup,
-			HerbieConfigGroup ktiConfigGroup) {
+			PlanCalcScoreConfigGroup cnScoringGroup) {
 		super();
 		this.timeCalculator = timeCalculator;
 		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-
-//		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
-		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar()
-		   * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		
+		this.marginalUtlOfDistance = 0.0; // ????????? ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar()
+		  // * cnScoringGroup.getMarginalUtilityOfMoney() ; ???????????
 		log.warn("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
+		/*
+		 * TODO: Adapt distance costs ...
+		 *  
+		 */
 	}
 
 	@Override

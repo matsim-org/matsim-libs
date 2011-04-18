@@ -39,21 +39,6 @@ public class HerbieConfigGroup extends Module {
 	 *
 	 */
 	public enum KtiConfigParameter {
-		
-		/**
-		 * constant to be added to the score of a bike leg.
-		 * represents fixed costs of walk access/egress to the bike
-		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
-		 * TODO should be replaced by actual access/egress walk legs, 
-		 * which take time in the activity plan and thus generates exact additional opportunity costs 
-		 */
-		CONST_BIKE("constBike", "0.0", ""),
-
-		/**
-		 * distance cost for mode "car"
-		 * unit: CHF/km
-		 */
-		DISTANCE_COST_CAR("distanceCostCar", "0.0", ""),
 		/**
 		 * distance cost for mode "pt", without travel card
 		 * unit: CHF/km
@@ -64,19 +49,7 @@ public class HerbieConfigGroup extends Module {
 		 * unit: CHF/km
 		 */
 		DISTANCE_COST_PT_UNKNOWN("distanceCostPtUnknownTravelCard", "0.0", ""),
-		/**
-		 * marginal utility of travel time for mode "bike"
-		 * unit: 1/h
-		 */
-		TRAVELING_BIKE("travelingBike", "0.0", ""), 
-		/**
-		 * constant to be added to the score of a car leg.
-		 * represents fixed costs of walk access/egress to the car
-		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
-		 * TODO should be replaced by actual access/egress walk legs, 
-		 * which take time in the activity plan and thus generate additional opportunity costs 
-		 */
-		CONST_CAR("constCar", "0.0", ""),
+
 		/**
 		 * speed of legs with mode "pt" for intrazonal legs. 
 		 * The VISUM travel time matrix contains no travel time data for intrazonal trips, 
@@ -145,25 +118,11 @@ public class HerbieConfigGroup extends Module {
 			}
 
 		}
-
 		if (!validParameterName) {
-			logger.warn("Unknown parameter name in module " + PlanomatConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
+			logger.warn("Unknown parameter name in module " + 
+					PlanomatConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
 		}
-
-	}
-
-	public double getConstBike() {
-		return Double.parseDouble(KtiConfigParameter.CONST_BIKE.getActualValue());
-	}
-	
-	public void setDistanceCostCar(double newValue) {
-		KtiConfigParameter.DISTANCE_COST_CAR.setActualValue(Double.toString(newValue));
-	}
-	
-	public double getDistanceCostCar() {
-		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_CAR.getActualValue());
-	}
-	
+	}	
 	public double getDistanceCostPtNoTravelCard() {
 		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_PT.getActualValue());
 	}
@@ -180,26 +139,6 @@ public class HerbieConfigGroup extends Module {
 		KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.setActualValue(Double.toString(newValue));
 	}
 	
-	public double getTravelingBike() {
-		return Double.parseDouble(KtiConfigParameter.TRAVELING_BIKE.getActualValue());
-	}
-
-	public void setTravelingBike(double newValue) {
-		KtiConfigParameter.TRAVELING_BIKE.setActualValue(Double.toString(newValue));
-	}
-
-	public double getConstCar() {
-		return Double.parseDouble(KtiConfigParameter.CONST_CAR.getActualValue());
-	}
-
-	public void setConstBike(double newValue) {
-		KtiConfigParameter.CONST_BIKE.setActualValue(Double.toString(newValue));
-	}
-
-	public void setConstCar(double newValue) {
-		KtiConfigParameter.CONST_CAR.setActualValue(Double.toString(newValue));
-	}
-
 	public double getIntrazonalPtSpeed() {
 		return Double.parseDouble(KtiConfigParameter.INTRAZONAL_PT_SPEED.getActualValue());
 	}
@@ -211,5 +150,4 @@ public class HerbieConfigGroup extends Module {
 	public boolean isInvalidateScores() {
 		return Boolean.parseBoolean(KtiConfigParameter.INVALIDATE_SCORES.getActualValue());
 	}
-	
 }

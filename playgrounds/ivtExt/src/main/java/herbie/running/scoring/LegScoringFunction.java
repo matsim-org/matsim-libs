@@ -22,16 +22,20 @@ package herbie.running.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
+
+/*
+ * 
+ * WARNING: Do not use this class without adaptation to HERBIE!!!!!!
+ * 
+ */
 
 /**
  * This class contains modifications of the standard leg scoring function for the KTI project.
@@ -51,17 +55,12 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction {
 
 	private final HerbieConfigGroup ktiConfigGroup;
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-
-	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
-
 	public LegScoringFunction(Plan plan,
 			CharyparNagelScoringParameters params,
 			Config config,
 			HerbieConfigGroup ktiConfigGroup) {
 		super(plan, params);
 		this.ktiConfigGroup = ktiConfigGroup;
-		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
 	}
 
 	@Override
@@ -70,11 +69,13 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 		if (TransportMode.car.equals(leg.getMode())) {
-			tmpScore += this.ktiConfigGroup.getConstCar();
+			tmpScore += super.params.constantCar;
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = route.getDistance();
-				tmpScore += this.params.marginalUtilityOfDistanceCar_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
+				
+				// TODO: correct following line!!!!! I do not get the point!
+				tmpScore += this.params.marginalUtilityOfDistanceCar_m * this.params.monetaryDistanceCostRateCar/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 		} else if (TransportMode.pt.equals(leg.getMode())) {
@@ -106,8 +107,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			}
 			tmpScore += this.getWalkScore(dist, travelTime);
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			tmpScore += this.ktiConfigGroup.getConstBike();
-			tmpScore += travelTime * this.ktiConfigGroup.getTravelingBike() / 3600d;
+			tmpScore += this.params.constantBike;
+			tmpScore += travelTime * super.params.marginalUtilityOfTravelingBike_s / 3600d;
 		} else {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();

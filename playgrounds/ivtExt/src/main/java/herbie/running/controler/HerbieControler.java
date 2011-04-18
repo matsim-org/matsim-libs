@@ -35,8 +35,7 @@ import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * A special controler for the Herbie-Project.
- *
+ * Controler for the Herbie project.
  */
 public class HerbieControler extends Controler {
 
@@ -62,14 +61,14 @@ public class HerbieControler extends Controler {
 
 	@Override
 	protected void setUp() {
-		HerbieScoringFunctionFactory kTIYear3ScoringFunctionFactory = new HerbieScoringFunctionFactory(
+		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());
-		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
+		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(ktiConfigGroup);
+		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory();
 		this.setTravelCostCalculatorFactory(costCalculatorFactory);
 
 		super.setUp();
