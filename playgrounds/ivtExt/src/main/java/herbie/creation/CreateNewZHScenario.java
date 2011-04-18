@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie;
+package herbie.creation;
 
 import java.util.List;
 import java.util.Random;
@@ -49,6 +49,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.core.population.ActivityImpl;
+
+import utils.BuildTrees;
 
 public class CreateNewZHScenario {
 	private String currentDir = "//pingelap/matsim/";
@@ -170,7 +172,7 @@ public class CreateNewZHScenario {
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
 						
-						Utils util = new Utils();
+						BuildTrees util = new BuildTrees();
 						if (trees.get(act.getType()) == null) trees.put(act.getType(), util.createActivitiesTree(act.getType(), this.scenario));
 						QuadTree<ActivityFacility> facQuadTree = trees.get(act.getType());
 						

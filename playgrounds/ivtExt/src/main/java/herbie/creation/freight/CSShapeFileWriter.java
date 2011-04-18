@@ -1,4 +1,4 @@
-package herbie.freight;
+package herbie.creation.freight;
 
 import java.io.IOException;
 import java.util.ArrayList;

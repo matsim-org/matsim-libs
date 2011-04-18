@@ -17,9 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie.freight;
+package herbie.creation.freight;
 
-import herbie.Utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -61,6 +60,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+
+import utils.BuildTrees;
 
 public class CreateFreightTraffic {
 	
@@ -117,7 +118,7 @@ public class CreateFreightTraffic {
 		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 		
-		Utils util = new Utils();
+		BuildTrees util = new BuildTrees();
 		this.facilityTree = util.createActivitiesTree("all", this.scenario);
     }
 	

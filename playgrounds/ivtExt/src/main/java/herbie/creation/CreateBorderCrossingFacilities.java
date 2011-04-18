@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie;
+package herbie.creation;
 
 public class CreateBorderCrossingFacilities {
 	

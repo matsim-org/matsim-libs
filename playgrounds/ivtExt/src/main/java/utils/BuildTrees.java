@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie;
+package utils;
 
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -28,9 +28,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.scenario.ScenarioImpl;
 
-public class Utils {
+public class BuildTrees {
 	
-	private final static Logger log = Logger.getLogger(Utils.class);
+	private final static Logger log = Logger.getLogger(BuildTrees.class);
 	
 	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
 		QuadTree<ActivityFacility> facQuadTree;

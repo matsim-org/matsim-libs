@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie.freight;
+package herbie.creation.freight;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
