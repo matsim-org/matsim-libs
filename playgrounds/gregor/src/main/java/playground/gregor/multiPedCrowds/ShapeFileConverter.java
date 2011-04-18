@@ -14,10 +14,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapeFileConverter {
-	
+
 	public static void main(String [] args) throws IOException {
-		String input = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/walls.shp";
-		String output = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/walls_transformt.shp";
+		String input = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries.shp";
+		String output = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_transformt.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(input);
 		Iterator it = fs.getFeatures().iterator();
 		List<Feature> fts = new ArrayList<Feature>();
@@ -25,8 +25,8 @@ public class ShapeFileConverter {
 			Feature ft = (Feature) it.next();
 			Geometry g = ft.getDefaultGeometry();
 			Coordinate[] coords = g.getCoordinates();
-			for (int i = 0; i < coords.length; i++) {
-				Coordinate c = coords[i];
+			for (Coordinate coord : coords) {
+				Coordinate c = coord;
 				Coordinate c2 = WGS86UTM33N2MathBuildingTransformation.transform(c);
 				c.x = c2.x;
 				c.y = c2.y;
@@ -34,10 +34,10 @@ public class ShapeFileConverter {
 			}
 			fts.add(ft);
 		}
-		
+
 		ShapeFileWriter.writeGeometries(fts, output);
-		
+
 	}
-	
+
 
 }
