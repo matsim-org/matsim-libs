@@ -49,6 +49,7 @@ import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -94,6 +95,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.InvertedNetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -101,7 +103,6 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -556,11 +557,6 @@ public class Controler {
 			} else {
 				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 			}
-		}
-
-		if (this.config.controler().isLinkToLinkRoutingEnabled()) {
-			this.leastCostPathCalculatorFactory = new LeastCostPathCalculatorInvertedNetProxyFactory(
-					this.leastCostPathCalculatorFactory);
 		}
 
 		/*
@@ -1131,15 +1127,21 @@ public class Controler {
 	 *         threads!
 	 */
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
+		PlansCalcRoute plansCalcRoute = null;
+		
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
-			return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
+			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
-		} else if (this.config.scenario().isUseTransit()) {
-			return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
+			log.warn("As roadpricing with area toll is enabled a leg router for area tolls is used. Other features, e.g. transit or multimodal simulation may not work" +
+					"as expected.");
+		} 	else if (this.config.scenario().isUseTransit()) {
+			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 					this.getLeastCostPathCalculatorFactory(), this.config.transit(), this.transitRouterFactory.createTransitRouter());
+			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, e.g. multimodal simulation, may not work" +
+			"as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
 
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes,
@@ -1148,12 +1150,19 @@ public class Controler {
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
 			}
-
-			return plansCalcRoute;
 		} else {
-			return new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 					.getLeastCostPathCalculatorFactory());
 		}
+		
+		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()){
+			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, network.getFactory(), 
+					this.getLeastCostPathCalculatorFactory(), travelCosts, travelTimes);
+			plansCalcRoute.addLegHandler(TransportMode.car, invertedNetLegRouter);
+			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
+		}
+		
+		return plansCalcRoute;
 	}
 
 	/*

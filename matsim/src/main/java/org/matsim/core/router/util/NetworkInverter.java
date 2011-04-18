@@ -53,7 +53,7 @@ public class NetworkInverter {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
 					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
-							this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(new IdImpl(outLink.getId().toString())),
+							this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
 							outLink.getLength(),
 							outLink.getFreespeed(),
 							outLink.getCapacity(),
@@ -70,15 +70,6 @@ public class NetworkInverter {
 		// NetworkWriter myNetworkWriter = new NetworkWriter(wrappedNetwork,
 		// "wrappedNetwork");
 		// myNetworkWriter.write();
-	}
-
-
-	public List<Node> convertInvertedLinksToNodes(List<Link> links) {
-		List<Node> ret = new ArrayList<Node>(links.size());
-		for (Link l : links){
-			ret.add(this.originalNetwork.getNodes().get(l.getId()));
-		}
-		return ret;
 	}
 
 	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
