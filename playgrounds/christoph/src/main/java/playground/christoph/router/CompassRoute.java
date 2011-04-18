@@ -42,18 +42,15 @@ public class CompassRoute extends SimpleRouter {
 	
 	private final static Logger log = Logger.getLogger(CompassRoute.class);
 	
-	public CompassRoute(Network network)
-	{
+	public CompassRoute(Network network) {
 		super(network);
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
-	{
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		return findRoute(fromNode, toNode);
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode)
-	{
+	private Path findRoute(Node fromNode, Node toNode) {
 		Node previousNode = null;
 		Node currentNode = fromNode;
 		Link currentLink;
@@ -67,8 +64,7 @@ public class CompassRoute extends SimpleRouter {
 		nodes.add(fromNode);
 		
 		boolean useKnowledge = false;
-		if (nw instanceof SubNetwork)
-		{
+		if (nw instanceof SubNetwork) {
 			SubNetwork subNetwork = (SubNetwork) nw;
 			
 			/*
@@ -81,12 +77,10 @@ public class CompassRoute extends SimpleRouter {
 			useKnowledge = true;
 		}
 		
-		while(!currentNode.equals(toNode))
-		{
+		while(!currentNode.equals(toNode)) {
 			// stop searching if to many links in the generated Route...
 
-			if (nodes.size() > maxLinks) 
-			{
+			if (nodes.size() > maxLinks) {
 				log.warn("Route has reached the maximum allowed length - break!");
 				errorCounter++;
 				break;
@@ -97,8 +91,7 @@ public class CompassRoute extends SimpleRouter {
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) linksArray = tabuSelector.getLinks(linksArray, previousNode);
 			
-			if (linksArray.length == 0)
-			{
+			if (linksArray.length == 0) {
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				errorCounter++;
 				break;
@@ -108,48 +101,38 @@ public class CompassRoute extends SimpleRouter {
 			double angle = Math.PI;	// worst possible start value
 			
 			// get the Link with the nearest direction to the destination node
-			for(int i = 0; i < linksArray.length; i++)
-			{
-				if(linksArray[i] instanceof Link)
-				{
+			for(int i = 0; i < linksArray.length; i++) {
+				
+				if(linksArray[i] instanceof Link) {
 					double newAngle = calcAngle (fromNode, toNode, linksArray[i].getToNode());
 					
 					//if the new direction is better than the existing one
-					if (newAngle <= angle)
-					{
+					if (newAngle <= angle) {
 						angle = newAngle;
 						nextLink = linksArray[i];
 					}				
-				}
-				else
-				{
+				} else {
 					log.error("Return object was not from type Link! Class " + linksArray[i] + " was returned!");
 				}	
 			}
 				
 			
 			// make the chosen link to the current link
-			if(nextLink != null)
-			{
+			if(nextLink != null) {
 				currentLink = nextLink;
 				previousNode = currentNode;
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
-			}
-			else
-			{
+			} else {
 				log.error("Number of Links " + linksArray.length);
 				log.error("Return object was not from type Link! Class " + nextLink + " was returned!");
 				break;
 			}
 
-			if (useKnowledge)
-			{
+			if (useKnowledge) {
 				nodes.add(((SubNode)currentNode).getParentNode());
 				links.add(((SubLink)currentLink).getParentLink());
-			}
-			else
-			{
+			} else {
 				nodes.add(currentNode);
 				links.add(currentLink);
 			}
@@ -157,8 +140,7 @@ public class CompassRoute extends SimpleRouter {
 
 		Path path = new Path(nodes, links, 0, 0);
 
-		if (maxLinks == path.links.size())
-		{
+		if (maxLinks == path.links.size()) {
 //			log.info("LinkCount " + route.getLinkRoute().length + " distance " + route.getDist());
 //			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
 		}
@@ -168,18 +150,15 @@ public class CompassRoute extends SimpleRouter {
 		return path;
 	}
 	
-	public static int getErrorCounter()
-	{
+	public static int getErrorCounter() {
 		return errorCounter;
 	}
 	
-	public static void setErrorCounter(int i)
-	{
+	public static void setErrorCounter(int i) {
 		errorCounter = i;
 	}
 	
-	protected double calcAngle(Node currentNode, Node toNode, Node nextLinkNode)
-	{
+	protected double calcAngle(Node currentNode, Node toNode, Node nextLinkNode) {
 		double v1x = nextLinkNode.getCoord().getX() - currentNode.getCoord().getX();
 		double v1y = nextLinkNode.getCoord().getY() - currentNode.getCoord().getY();
 
@@ -211,8 +190,7 @@ public class CompassRoute extends SimpleRouter {
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		
 		//if (phi == Double.NaN)
-		if(String.valueOf(phi).equals("NaN"))
-		{
+		if(String.valueOf(phi).equals("NaN")) {
 			log.error("v1x " + v1x);
 			log.error("v1y " + v1y);
 			log.error("v2x " + v2x);
@@ -220,16 +198,5 @@ public class CompassRoute extends SimpleRouter {
 		}
 		
 		return phi;
-	}
-	
-	@Override
-	public CompassRoute clone()
-	{
-		CompassRoute clone = new CompassRoute(this.network);
-		clone.removeLoops = this.removeLoops;
-		clone.tabuSearch = this.tabuSearch;
-		clone.maxLinks = this.maxLinks;
-		
-		return clone;
 	}
 }

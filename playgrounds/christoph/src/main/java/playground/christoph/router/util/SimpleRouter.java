@@ -36,7 +36,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
  * By implementing the PersonalizableTravelCost interface the PlansCalcRoute
  * class hands over the currently handled person by using the setPerson method. 
  */
-public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelCost, Cloneable {
+public abstract class SimpleRouter implements LeastCostPathCalculator, PersonalizableTravelCost {
 	
 	protected KnowledgeTools knowledgeTools;
 	protected Network network;

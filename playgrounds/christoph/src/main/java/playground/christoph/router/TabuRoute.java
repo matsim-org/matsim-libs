@@ -41,18 +41,15 @@ public class TabuRoute extends SimpleRouter {
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
-	public TabuRoute(Network network) 
-	{
+	public TabuRoute(Network network) {
 		super(network);
 	}
 
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
-	{
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		return findRoute(fromNode, toNode);
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode)
-	{
+	private Path findRoute(Node fromNode, Node toNode) {
 		Node currentNode = fromNode;
 		Link currentLink;
 		double routeLength = 0.0;
@@ -65,8 +62,7 @@ public class TabuRoute extends SimpleRouter {
 		nodes.add(fromNode);
 		
 		boolean useKnowledge = false;
-		if (nw instanceof SubNetwork)
-		{
+		if (nw instanceof SubNetwork) {
 			SubNetwork subNetwork = (SubNetwork) nw;
 			
 			/*
@@ -82,8 +78,7 @@ public class TabuRoute extends SimpleRouter {
 		// first loop -> there is no previous node
 		Node previousNode = null;
 		
-		while(!currentNode.equals(toNode))
-		{
+		while(!currentNode.equals(toNode)) {
 			// stop searching if to many links in the generated Route...
 			if (nodes.size() > maxLinks) 
 			{
@@ -97,8 +92,7 @@ public class TabuRoute extends SimpleRouter {
 			/*
 			 * If there are no Links available something may be wrong.
 			 */
-			if (linksArray.length == 0)
-			{
+			if (linksArray.length == 0) {
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
@@ -110,26 +104,20 @@ public class TabuRoute extends SimpleRouter {
 			int nextLink = random.nextInt(newLinks.length);
 			
 			// make the chosen link to the new current link
-			if(newLinks[nextLink] instanceof Link)
-			{
+			if(newLinks[nextLink] instanceof Link) {
 				currentLink = newLinks[nextLink];
 				previousNode = currentNode;
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
-			}
-			else
-			{
+			} else {
 				log.error("Return object was not from type Link! Class " + linksArray[nextLink] + " was returned!");
 				break;
 			}
 			
-			if (useKnowledge)
-			{
+			if (useKnowledge) {
 				nodes.add(((SubNode)currentNode).getParentNode());
 				links.add(((SubLink)currentLink).getParentLink());
-			}
-			else
-			{
+			} else {
 				nodes.add(currentNode);
 				links.add(currentLink);
 			}
@@ -142,24 +130,12 @@ public class TabuRoute extends SimpleRouter {
 		return path;
 	}
 	
-	public static int getErrorCounter()
-	{
+	public static int getErrorCounter() {
 		return errorCounter;
 	}
 	
-	public static void setErrorCounter(int i)
-	{
+	public static void setErrorCounter(int i) {
 		errorCounter = i;
-	}
-	
-	@Override
-	public TabuRoute clone()
-	{
-		TabuRoute clone = new TabuRoute(this.network);
-		clone.removeLoops = this.removeLoops;
-		clone.maxLinks = this.maxLinks;
-		
-		return clone;
 	}
 	
 }

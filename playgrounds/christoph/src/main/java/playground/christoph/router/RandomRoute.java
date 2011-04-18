@@ -41,18 +41,15 @@ public class RandomRoute extends SimpleRouter {
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
-	public RandomRoute(Network network) 
-	{
+	public RandomRoute(Network network) {
 		super(network);
 	}
 	
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
-	{
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		return findRoute(fromNode, toNode);
 	}
 	
-	private Path findRoute(Node fromNode, Node toNode)
-	{
+	private Path findRoute(Node fromNode, Node toNode) {
 		Node currentNode = fromNode;
 		Link currentLink;
 		double routeLength = 0.0;
@@ -65,8 +62,7 @@ public class RandomRoute extends SimpleRouter {
 		nodes.add(fromNode);
 		
 		boolean useKnowledge = false;
-		if (nw instanceof SubNetwork)
-		{
+		if (nw instanceof SubNetwork) {
 			SubNetwork subNetwork = (SubNetwork) nw;
 
 			/*
@@ -83,11 +79,10 @@ public class RandomRoute extends SimpleRouter {
 		 * equals checks if the Ids are identically, what they are, even if the
 		 * CurrentNode comes from a SubNetwork.
 		 */
-		while(!currentNode.equals(toNode))
-		{
+		while(!currentNode.equals(toNode)) {
+
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks) 
-			{
+			if (nodes.size() > maxLinks) {
 				log.warn("Route has reached the maximum allowed length - break!");
 				errorCounter++;
 				break;
@@ -95,8 +90,7 @@ public class RandomRoute extends SimpleRouter {
 			
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
-			if (linksArray.length == 0)
-			{
+			if (linksArray.length == 0) {
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
@@ -105,25 +99,19 @@ public class RandomRoute extends SimpleRouter {
 			int nextLink = random.nextInt(linksArray.length);
 			
 			// make the chosen link to the new current link
-			if(linksArray[nextLink] instanceof Link)
-			{
+			if(linksArray[nextLink] instanceof Link) {
 				currentLink = linksArray[nextLink];
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
-			}
-			else
-			{
+			} else {
 				log.error("Return object was not from type Link! Class " + linksArray[nextLink] + " was returned!");
 				break;
 			}
 			
-			if (useKnowledge)
-			{
+			if (useKnowledge) {
 				nodes.add(((SubNode)currentNode).getParentNode());
 				links.add(((SubLink)currentLink).getParentLink());
-			}
-			else
-			{
+			} else {
 				nodes.add(currentNode);
 				links.add(currentLink);
 			}
@@ -136,24 +124,12 @@ public class RandomRoute extends SimpleRouter {
 		return path;
 	}
 	
-	public static int getErrorCounter()
-	{
+	public static int getErrorCounter() {
 		return errorCounter;
 	}
 	
-	public static void setErrorCounter(int i)
-	{
+	public static void setErrorCounter(int i) {
 		errorCounter = i;
-	}
-	
-	@Override
-	public RandomRoute clone()
-	{
-		RandomRoute clone = new RandomRoute(this.network);
-		clone.removeLoops = this.removeLoops;
-		clone.maxLinks = this.maxLinks;
-		
-		return clone;
 	}
 
 }

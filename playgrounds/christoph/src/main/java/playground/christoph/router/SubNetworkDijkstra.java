@@ -47,18 +47,15 @@ public class SubNetworkDijkstra extends Dijkstra {
 	private Person person;
 	private KnowledgeTools knowledgeTools = new KnowledgeTools();
 	
-	public SubNetworkDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction)
-	{
+	public SubNetworkDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
 
-	public void setNetwork(Network network)
-	{
+	public void setNetwork(Network network) {
 		this.network = network;
 	}
 	
-	public void setPerson(Person person)
-	{
+	public void setPerson(Person person) {
 		this.person = person;
 	}
 	
@@ -68,8 +65,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 	 * their children in the Person's SubNetwork.
 	 */
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime)
-	{
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		Network subNetwork = this.knowledgeTools.getSubNetwork(person, network);
 		
 		Node newFromNode = subNetwork.getNodes().get(fromNode.getId());
@@ -93,8 +89,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 		 *  their Parents.
 		 */
 		List<Node> newNodes = new ArrayList<Node>();
-		for(Node node : path.nodes)
-		{
+		for(Node node : path.nodes) {
 			if (node instanceof SubNode) newNodes.add(((SubNode)node).getParentNode());
 			else newNodes.add(node);
 		}
@@ -102,8 +97,7 @@ public class SubNetworkDijkstra extends Dijkstra {
 		path.nodes.addAll(newNodes);
 		
 		List<Link> newLinks = new ArrayList<Link>();
-		for(Link link : path.links)
-		{
+		for(Link link : path.links) {
 			if (link instanceof SubLink) newLinks.add(((SubLink)link).getParentLink());
 			else newLinks.add(link);
 		}
@@ -111,6 +105,5 @@ public class SubNetworkDijkstra extends Dijkstra {
 		path.links.addAll(newLinks);
 		
 		return path;
-	}
-	
+	}	
 }
