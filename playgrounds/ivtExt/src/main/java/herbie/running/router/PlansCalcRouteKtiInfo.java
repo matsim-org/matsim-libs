@@ -54,16 +54,11 @@ public class PlansCalcRouteKtiInfo {
 	}
 
 	public void prepare(final Network network) {
-
-		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			log.error("The kti module is missing.");
-		}
-
 		// municipality layer from world file
 		ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.localWorld = new World();
 		try {
-			new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
+			new MatsimWorldReader(localScenario, localWorld).parse("null");
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -76,13 +71,13 @@ public class PlansCalcRouteKtiInfo {
 		Matrices matrices = new Matrices();
 		this.ptTravelTimes = matrices.createMatrix("pt_traveltime", null);
 		VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
-		reader.readFile(ktiConfigGroup.getPtTraveltimeMatrixFilename());
+		reader.readFile("null");
 		log.info("Reading traveltime matrix...done.");
 
 		log.info("Reading haltestellen...");
 		this.haltestellen = new SwissHaltestellen(network);
 		try {
-			haltestellen.readFile(ktiConfigGroup.getPtHaltestellenFilename());
+			haltestellen.readFile("null");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

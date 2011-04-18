@@ -33,12 +33,10 @@ public class KtiScenarioLoaderImpl extends ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(KtiScenarioLoaderImpl.class);
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
-	private KtiConfigGroup ktiConfigGroup;
 	
 	public KtiScenarioLoaderImpl(Scenario scenario, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo, KtiConfigGroup ktiConfigGroup) {
 		super(scenario);
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
-		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
 	@Override
@@ -48,9 +46,6 @@ public class KtiScenarioLoaderImpl extends ScenarioLoaderImpl {
 		log.info("loading scenario from base directory: " + currentDir);
 //		this.loadWorld();
 		this.loadNetwork();
-		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.loadPlansCalcRouteKtiInfo();
-		}
 		this.loadActivityFacilities();
 		this.loadPopulation();
 		
@@ -61,5 +56,4 @@ public class KtiScenarioLoaderImpl extends ScenarioLoaderImpl {
 	private void loadPlansCalcRouteKtiInfo() {
 		this.plansCalcRouteKtiInfo.prepare(this.getScenario().getNetwork());
 	}
-	
 }

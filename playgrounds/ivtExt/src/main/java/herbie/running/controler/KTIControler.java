@@ -8,7 +8,6 @@ import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.router.KtiLinkNetworkRouteFactory;
 import herbie.running.router.KtiPtRouteFactory;
 import herbie.running.router.KtiTravelCostCalculatorFactory;
-import herbie.running.router.PlansCalcRouteKti;
 import herbie.running.router.PlansCalcRouteKtiInfo;
 import herbie.running.scenario.KtiScenarioLoaderImpl;
 import herbie.running.scoring.KTIYear3ScoringFunctionFactory;
@@ -91,23 +90,8 @@ public class KTIControler extends Controler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-
 		PlanAlgorithm router = null;
-
-		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			router = super.createRoutingAlgorithm(travelCosts, travelTimes);
-		} else {
-
-			router = new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(),
-					super.network,
-					travelCosts,
-					travelTimes,
-					super.getLeastCostPathCalculatorFactory(),
-					this.plansCalcRouteKtiInfo);
-
-		}
-
+		router = super.createRoutingAlgorithm(travelCosts, travelTimes);
 		return router;
 	}
 

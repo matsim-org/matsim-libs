@@ -26,7 +26,9 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 
 public class KtiConfigGroup extends Module {
 
-	public static final String GROUP_NAME = "kti";
+	private static final long serialVersionUID = 1L;
+
+	public static final String GROUP_NAME = "herbie";
 
 	private final static Logger logger = Logger.getLogger(KtiConfigGroup.class);
 
@@ -46,22 +48,7 @@ public class KtiConfigGroup extends Module {
 		 * which take time in the activity plan and thus generates exact additional opportunity costs 
 		 */
 		CONST_BIKE("constBike", "0.0", ""),
-		/**
-		 * the path to the file with the travel-time matrix (VISUM-format)
-		 */
-		PT_TRAVEL_TIME_MATRIX_FILENAME("pt_traveltime_matrix_filename", "", ""),
-		/**
-		 * the path to the file containing the list of all pt-stops and their coordinates.
-		 */
-		PT_HALTESTELLEN_FILENAME("pt_haltestellen_filename", "", ""),
-		/**
-		 * the path to the world file containing a layer 'municipality'
-		 */
-		WORLD_INPUT_FILENAME("worldInputFilename", "", ""),
-		/**
-		 * boolean variable indicating whether the kti router should be used or not
-		 */
-		USE_PLANS_CALC_ROUTE_KTI("usePlansCalcRouteKti", "false", ""),
+
 		/**
 		 * distance cost for mode "car"
 		 * unit: CHF/km
@@ -167,38 +154,6 @@ public class KtiConfigGroup extends Module {
 
 	public double getConstBike() {
 		return Double.parseDouble(KtiConfigParameter.CONST_BIKE.getActualValue());
-	}
-
-	public String getPtHaltestellenFilename() {
-		return KtiConfigParameter.PT_HALTESTELLEN_FILENAME.getActualValue();
-	}
-
-	public void setPtHaltestellenFilename(String ptHaltestellenFilename) {
-		KtiConfigParameter.PT_HALTESTELLEN_FILENAME.setActualValue(ptHaltestellenFilename);
-	}
-
-	public String getPtTraveltimeMatrixFilename() {
-		return KtiConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.getActualValue();
-	}
-
-	public void setPtTraveltimeMatrixFilename(String ptTraveltimeMatrixFilename) {
-		KtiConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.setActualValue(ptTraveltimeMatrixFilename);
-	}
-
-	public String getWorldInputFilename() {
-		return KtiConfigParameter.WORLD_INPUT_FILENAME.getActualValue();
-	}
-
-	public void setWorldInputFilename(String worldInputFilename) {
-		KtiConfigParameter.WORLD_INPUT_FILENAME.setActualValue(worldInputFilename);
-	}
-
-	public boolean isUsePlansCalcRouteKti() {
-		return Boolean.parseBoolean(KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.getActualValue());
-	}
-	
-	public void setUsePlansCalcRouteKti(boolean usePlansCalcRouteKti) {
-		KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.setActualValue(Boolean.toString(usePlansCalcRouteKti));
 	}
 	
 	public void setDistanceCostCar(double newValue) {

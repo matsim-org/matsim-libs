@@ -21,7 +21,6 @@
 package herbie.running.controler.listeners;
 
 import herbie.running.config.KtiConfigGroup;
-import herbie.running.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
 import herbie.running.population.algorithms.PersonInvalidateScores;
 
 import org.matsim.api.core.v01.population.Population;
@@ -43,22 +42,7 @@ public class KtiPopulationPreparation implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 
 		Population pop = event.getControler().getPopulation();
-		Config config = event.getControler().getConfig();
-		
-		/*
-		 * make sure every pt leg has a kti pt route when the kti pt router is used
-		 */
-		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			ParallelPersonAlgorithmRunner.run(
-					pop, 
-					config.global().getNumberOfThreads(),
-					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-						public AbstractPersonAlgorithm getPersonAlgorithm() {
-							return new PersonDeleteNonKtiCompatibleRoutes();
-						}
-					});
-		}
-		
+		Config config = event.getControler().getConfig();		
 		/*
 		 * for an explanation, see the element comment of the kti config parameter
 		 */
