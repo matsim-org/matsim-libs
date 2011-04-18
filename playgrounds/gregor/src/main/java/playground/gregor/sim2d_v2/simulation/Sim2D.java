@@ -254,7 +254,7 @@ public class Sim2D implements Netsim {
 	 * @param agent
 	 */
 	private void unregisterAgentAtActivityLocation(PlanAgent agent) {
-		log.error("Not implemented!! Not sure if we need this!!");
+		//		log.error("Not implemented!! Not sure if we need this!!");
 
 	}
 
@@ -474,7 +474,7 @@ public class Sim2D implements Netsim {
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.realWorldStarttime.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.iterationNumber + "): #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim / (diffreal + Double.MIN_VALUE)));
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.getIterationNumber() + "): #Veh=" + this.agentCounter.getLiving() + " lost=" + this.agentCounter.getLost() + " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim / (diffreal + Double.MIN_VALUE)));
 
 			Gbl.printMemoryUsage();
 		}
@@ -555,6 +555,10 @@ public class Sim2D implements Netsim {
 	@Override
 	public void addQueueSimulationListeners(SimulationListener listener) {
 		throw new RuntimeException("not implemented");
+	}
+
+	public Integer getIterationNumber() {
+		return this.iterationNumber;
 	}
 
 }

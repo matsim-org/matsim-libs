@@ -27,17 +27,24 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
@@ -67,8 +74,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private static final float FLOOR_HEIGHT = 3.5f;
 	double ofX = 0;
 	double ofY = 0;
-	
-	private Map<Id,Double> az = new HashMap<Id,Double>();
+
+	private final Map<Id,Double> az = new HashMap<Id,Double>();
 
 	public PedVisPeekABot(double speedUp) {
 		this.speedUp = speedUp;
@@ -138,10 +145,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			float toX = (float)(l.getToNode().getCoord().getX()-this.ofX);
 			float toY = (float)(l.getToNode().getCoord().getY()-this.ofY);
 			this.pc.drawLink(Integer.parseInt(l.getId().toString()), 0, 0, fromX, fromY, toX, toY);
-			
+
 		}
 	}
-	
+
 	private void drawSegment(Point pointN1, Point pointN2) {
 		this.pc.initPolygonII(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
 		float x1 = (float) (pointN1.getX() - this.ofX);
@@ -156,18 +163,35 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	}
 
-	public PedVisPeekABot(String eventsFile, boolean loop, double speedUp) {
+	public PedVisPeekABot(Config c, String events, boolean loop, double speedUp) {
+		Module m = c.getModule("sim2d");
+		if (m == null) {
+			throw new RuntimeException("Module \"sim2d\" is missing in config");
+		}
+		Sim2DConfigGroup sc = new Sim2DConfigGroup(m);
+		this.floorShape = sc.getFloorShapeFile();
+		Scenario s = ScenarioUtils.loadScenario(c);
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
-		this.pc.initII();
-		this.file = eventsFile;
-		if (!loop) {
-			run();
-		} else {
-			while (true) {
-				run();
+		this.file = events;
+		setOffsets(s.getNetwork());
+		init();
+	}
+
+	private void setOffsets(Network network) {
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		for (Node n : network.getNodes().values()) {
+			if (n.getCoord().getX() < minX) {
+				minX=n.getCoord().getX();
+			}
+			if (n.getCoord().getY() < minY) {
+				minY = n.getCoord().getY();
 			}
 		}
+
+		this.setOffsets(minX, minY);
+
 	}
 
 	public void setFloorShapeFile(String floorShapeFile) {
@@ -178,8 +202,19 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	/**
 	 * 
 	 */
-	private void run() {
-		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
+	public void play(boolean loop) {
+		if (!loop) {
+			play();
+		} else {
+			while (true) {
+				play();
+			}
+		}
+
+	}
+
+	private void play(){
+		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {
@@ -187,16 +222,16 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		;
 	}
 
+	@Override
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
 		Double oldAz = this.az.get(e.getPersonId());
 		if (oldAz == null) {
 			oldAz = 0.;
 		}
-		
+
 		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) (e.getX() - this.ofX), (float) (e.getY() - this.ofY), (float) e.getZ(), (float) ((oldAz + e.getAzimuth())/2));
 
 		this.az.put(e.getPersonId(), e.getAzimuth());
@@ -225,7 +260,13 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	public static void main(String[] args) {
-		PedVisPeekABot vis = new PedVisPeekABot("/home/laemmel/devel/dfg/output/ITERS/it.0/0.xyzAzimuthEvents.xml.gz", true, 1);
+		String config = args[0];
+		Config c = ConfigUtils.loadConfig(config);
+
+
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/output/ITERS/it.0/0.events.xml.gz", true, .5);
+		vis.play(true);
+
 	}
 
 	/*
@@ -301,10 +342,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float b = event.getB();
 		float fromX = (float) (event.getFrom().x - this.ofX);
 		float fromY = (float) (event.getFrom().y - this.ofY);
-		float fromZ = (float) 0;//event.getFrom().z;
+		float fromZ = 0;//event.getFrom().z;
 		float toX = (float) (event.getTo().x - this.ofX);
 		float toY = (float) (event.getTo().y - this.ofY);
-		float toZ = (float) 0; //event.getTo().z;
+		float toZ = 0; //event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
 	}

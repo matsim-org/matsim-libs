@@ -49,8 +49,8 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	private final Sim2D sim;
 
 	private final Map<Id, Floor> linkIdFloorMapping = new HashMap<Id, Floor>();
-	private Sim2DConfigGroup sim2ConfigGroup;
-	private double sim2DStepSize;
+	private final Sim2DConfigGroup sim2ConfigGroup;
+	private final double sim2DStepSize;
 
 	/**
 	 * @param sim
@@ -82,7 +82,7 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 			}
 
 			sim2DTime += this.sim2DStepSize;
-//			System.out.println("++++++++++++++++++");
+			//			System.out.println("++++++++++++++++++");
 		}
 	}
 
@@ -104,8 +104,14 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	@Override
 	public void onPrepareSim() {
 
+		boolean emitEvents = false;
+		if (this.sim.getIterationNumber() % this.sim2ConfigGroup.getEventsInterval() == 0) {
+			emitEvents = true;
+		}
+
+
 		for (Entry<MultiPolygon, List<Link>> e : this.scenario.getFloorLinkMapping().entrySet()) {
-			Floor f = new Floor(this.scenario, e.getValue(), this.sim);
+			Floor f = new Floor(this.scenario, e.getValue(), this.sim, emitEvents);
 			this.floors.add(f);
 			for (Link l : e.getValue()) {
 				if (this.linkIdFloorMapping.get(l.getId()) != null) {

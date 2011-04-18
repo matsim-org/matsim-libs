@@ -41,15 +41,15 @@ public class Controller2DTest {
 
 	@Test
 	public void testController2D() {
-		String testEventsFile = this.utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
+		String testEventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
 		String configFile = this.utils.getInputDirectory() + "config2d.xml";
 		Controller2D c = new Controller2D(new String[] { configFile });
 		c.run();
-		String refEventsFile = this.utils.getInputDirectory() + "0.events.xml.gz";
+		String refEventsFile = this.utils.getInputDirectory() + "10.events.xml.gz";
 		log.info("comparing events files: ");
 		log.info(refEventsFile);
 		log.info(testEventsFile);
 		int i = EventsFileComparator.compare(refEventsFile, testEventsFile);
-		Assert.assertEquals("different events-files in iteration 0", 0, i);
+		Assert.assertEquals("different events-files in iteration 10", 0, i);
 	}
 }

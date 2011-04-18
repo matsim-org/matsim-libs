@@ -42,8 +42,11 @@ public class Sim2DConfigGroup extends Module {
 	public static final String LS_SHAPE_FILE = "lsShapeFile";
 	public static final String TIME_STEP_SIZE = "timeStepSize";
 
+	public static final String EVENTS_INTERVAL = "eventsInterval";
 
 
+
+	private int eventsInterval = 1;
 
 	private double timeStepSize = 1./25;
 
@@ -78,6 +81,8 @@ public class Sim2DConfigGroup extends Module {
 			setLSShapeFile(value);
 		} else if (TIME_STEP_SIZE.equals(key)) {
 			setTimeStepSize(value);
+		} else if (EVENTS_INTERVAL.equals(key)) {
+			setEventsInterval(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
@@ -95,6 +100,8 @@ public class Sim2DConfigGroup extends Module {
 			return getLSShapeFile();
 		}else if (TIME_STEP_SIZE.equals(key)) {
 			return Double.toString(getTimeStepSize());
+		}else if (EVENTS_INTERVAL.equals(key)) {
+			return Integer.toString(getEventsInterval());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -108,6 +115,7 @@ public class Sim2DConfigGroup extends Module {
 		map.put(STATIC_ENV_FIELD_FILE, getValue(STATIC_ENV_FIELD_FILE));
 		map.put(FLOOR_SHAPE_FILE, getValue(FLOOR_SHAPE_FILE));
 		map.put(TIME_STEP_SIZE,getValue(TIME_STEP_SIZE));
+		map.put(EVENTS_INTERVAL,getValue(EVENTS_INTERVAL));
 		return map;
 	}
 
@@ -155,6 +163,23 @@ public class Sim2DConfigGroup extends Module {
 		this.staticEnvFieldFile = value;
 
 	}
+
+	/**
+	 * Iteration interval for XYZAzimuth events output
+	 * @param value
+	 */
+	public void setEventsInterval(String value) {
+		this.eventsInterval = Integer.parseInt(value);
+	}
+
+	/**
+	 * 
+	 * @return events interval
+	 */
+	public int getEventsInterval() {
+		return this.eventsInterval;
+	}
+
 
 	/**
 	 * 

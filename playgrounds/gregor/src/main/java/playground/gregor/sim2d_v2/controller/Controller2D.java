@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -31,6 +29,7 @@ import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.Sim2D;
 //import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
+import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
 public class Controller2D extends Controler {
 
@@ -44,7 +43,7 @@ public class Controller2D extends Controler {
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
-		//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 	}
 
 	@Override
@@ -56,16 +55,8 @@ public class Controller2D extends Controler {
 			this.loader.loadScenario();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
-			// ((ScenarioLoader2DImpl)
-			// this.loader).setPhantomPopulationEventsFile("/home/laemmel/devel/dfg/events.xml");
 			this.scenarioLoaded = true;
 
-			//			this.vis = new PedVisPeekABot(1);
-			//			Link l = this.network.getLinks().get(new IdImpl(0));
-			//			this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-			//			this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-			//			this.vis.drawNetwork(this.network);
-			//			this.events.addHandler(this.vis);
 		}
 
 	}
@@ -89,27 +80,9 @@ public class Controller2D extends Controler {
 	@Override
 	protected void runMobSim() {
 
-		// EventsManager manager = new EventsManagerImpl();
-		// EventWriterXML writer = new
-		// EventWriterXML(getConfig().controler().getOutputDirectory() +
-		// "/ITERS/it." + getIterationNumber() + "/" + getIterationNumber() +
-		// ".xyzAzimuthEvents.xml.gz");
-
-		// this.events.addHandler(writer);
-
 		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
-		//
-		//		if (this.getIterationNumber() == 0) {
-		//		 this.vis = new PedVisPeekABot(1);
-		//		 Link l = this.network.getLinks().get(new IdImpl(1));
-		//		 this.vis.setOffsets(l.getCoord().getX(), l.getCoord().getY());
-		//		 this.vis.setFloorShapeFile(this.sim2dConfig.getFloorShapeFile());
-		//		 this.vis.drawNetwork(network);
-		//		 this.events.addHandler(this.vis);
-		//		}
-		// }
+		sim.setIterationNumber(getIterationNumber());
 		sim.run();
-		// writer.closeFile();
 		if (this.vis != null) {
 			this.vis.reset(getIterationNumber());
 		}
@@ -119,6 +92,10 @@ public class Controller2D extends Controler {
 		Controler controller = new Controller2D(args);
 		controller.run();
 
+	}
+
+	public Sim2DConfigGroup getSim2dConfig() {
+		return this.sim2dConfig;
 	}
 
 }

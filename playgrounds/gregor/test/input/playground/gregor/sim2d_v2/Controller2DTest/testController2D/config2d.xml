@@ -10,8 +10,7 @@
 <config>
 
 	<module name="travelTimeCalculator" >
-		<param name = "travelTimeCalculator" value = "TravelTimeCalculatorHashMap" />
-		<param name = "travelTimeAggregator" value = "experimental_LastMile" />
+		<param name = "travelTimeCalculator" value = "TravelTimeCalculatorMSAHashMap" />
 		<param name = "travelTimeBinSize" value = "120" />
 	</module>
 <!-- ====================================================================== -->
@@ -58,6 +57,7 @@
 	<!--  <param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" /> -->
 	<param name="floorShapeFile" value="&INPUTBASE;/testPolygons.shp"/>
 	<param name="lsShapeFile" value="&INPUTBASE;/testPaths.shp" />
+	<param name="eventsInterval" value="10" />
 </module>
 
 <!-- ====================================================================== -->
@@ -66,7 +66,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
 	
 		 

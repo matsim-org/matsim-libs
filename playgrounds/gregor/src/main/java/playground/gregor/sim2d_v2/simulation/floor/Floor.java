@@ -74,13 +74,14 @@ public class Floor {
 
 	private final boolean ms = false;
 	private final double sim2DTimeStepSize;
-	private final boolean emitXYZAzimuthEvents = true;
+	private final boolean emitXYZAzimuthEvents;
 
-	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim) {
+	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim, boolean emitEvents) {
 		this.scenario = scenario;
 		this.sim2DTimeStepSize = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 		this.links = list;
 		this.sim2D = sim;
+		this.emitXYZAzimuthEvents = emitEvents;
 
 	}
 
