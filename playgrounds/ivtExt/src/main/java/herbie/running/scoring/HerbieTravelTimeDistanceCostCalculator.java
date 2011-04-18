@@ -28,6 +28,12 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
+/*
+ * 
+ * WARNING: Do not use this class without adaptation to HERBIE!!!!!!
+ * 
+ */
+
 public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
 	private final static Logger log = Logger.getLogger(HerbieTravelTimeDistanceCostCalculator.class);
