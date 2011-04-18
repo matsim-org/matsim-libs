@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,10 +21,7 @@
 package herbie.running.scenario;
 
 import herbie.running.config.KtiConfigGroup;
-import herbie.running.router.PlansCalcRouteKtiInfo;
-
 import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -32,11 +29,9 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class KtiScenarioLoaderImpl extends ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(KtiScenarioLoaderImpl.class);
-	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
-	public KtiScenarioLoaderImpl(Scenario scenario, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo, KtiConfigGroup ktiConfigGroup) {
+	public KtiScenarioLoaderImpl(Scenario scenario, KtiConfigGroup ktiConfigGroup) {
 		super(scenario);
-		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 	}
 
 	@Override
@@ -44,16 +39,9 @@ public class KtiScenarioLoaderImpl extends ScenarioLoaderImpl {
 		String currentDir = new File("tmp").getAbsolutePath();
 		currentDir = currentDir.substring(0, currentDir.length() - 3);
 		log.info("loading scenario from base directory: " + currentDir);
-//		this.loadWorld();
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		
 		return getScenario();
-
-	}
-
-	private void loadPlansCalcRouteKtiInfo() {
-		this.plansCalcRouteKtiInfo.prepare(this.getScenario().getNetwork());
 	}
 }

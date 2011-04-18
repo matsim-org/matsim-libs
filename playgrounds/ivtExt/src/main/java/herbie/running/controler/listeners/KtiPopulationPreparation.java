@@ -56,7 +56,5 @@ public class KtiPopulationPreparation implements StartupListener {
 						}
 					});
 		}
-		
 	}
-
 }

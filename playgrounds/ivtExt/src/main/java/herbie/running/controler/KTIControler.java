@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * KTIControler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package herbie.running.controler;
 
 import herbie.running.config.KtiConfigGroup;
@@ -5,14 +25,9 @@ import herbie.running.controler.listeners.CalcLegTimesKTIListener;
 import herbie.running.controler.listeners.KtiPopulationPreparation;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
-import herbie.running.router.KtiLinkNetworkRouteFactory;
-import herbie.running.router.KtiPtRouteFactory;
 import herbie.running.router.KtiTravelCostCalculatorFactory;
-import herbie.running.router.PlansCalcRouteKtiInfo;
 import herbie.running.scenario.KtiScenarioLoaderImpl;
 import herbie.running.scoring.KTIYear3ScoringFunctionFactory;
-
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -20,11 +35,7 @@ import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * A special controler for the KTI-Project.
- *
- * @author meisterk
- * @author mrieser
- * @author wrashid
+ * A special controler for the Herbie-Project.
  *
  */
 public class KTIControler extends Controler {
@@ -35,22 +46,16 @@ public class KTIControler extends Controler {
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
 	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 
 	public KTIControler(String[] args) {
 		super(args);
-
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
-
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-
 	}
 
 	@Override
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
-			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.ktiConfigGroup);
 			loader.loadScenario();
 			this.network = this.scenarioData.getNetwork();
 			this.population = this.scenarioData.getPopulation();
@@ -60,7 +65,6 @@ public class KTIControler extends Controler {
 
 	@Override
 	protected void setUp() {
-
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config,
 				this.ktiConfigGroup,
@@ -77,9 +81,7 @@ public class KTIControler extends Controler {
 
 	@Override
 	protected void loadControlerListeners() {
-
 		super.loadControlerListeners();
-
 		// the scoring function processes facility loads
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
@@ -101,7 +103,7 @@ public class KTIControler extends Controler {
 	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: KtiControler config-file [dtd-file]");
+			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
 			final Controler controler = new KTIControler(args);
@@ -109,6 +111,4 @@ public class KTIControler extends Controler {
 		}
 		System.exit(0);
 	}
-
-
 }
