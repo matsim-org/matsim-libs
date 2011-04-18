@@ -17,16 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -35,15 +32,13 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
-import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.HistogramDataset;
-import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import org.jgap.GeneticOperator;
 import org.jgap.Population;
+
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 
 /**
  * "fake" genetic operator for displaying information about the population.
@@ -64,8 +59,8 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	private final String fileNameLine;
 	private final int populationSize;
 	private final int chromosomeLength;
-	private int width = 800;
-	private int height = 500;
+	private int width = 1024;
+	private int height = 768;
 
 
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +34,8 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPModeGene;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -127,8 +129,8 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 								(DoubleGene) geneToMute,
 								currentChromosome);
 
-						//mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
-						mutateDouble((DoubleGene) geneToMute, freeSpace);
+						mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+						//mutateDouble((DoubleGene) geneToMute, freeSpace);
 					}
 					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
 						geneToMute.setToRandomValue(this.randomGenerator);

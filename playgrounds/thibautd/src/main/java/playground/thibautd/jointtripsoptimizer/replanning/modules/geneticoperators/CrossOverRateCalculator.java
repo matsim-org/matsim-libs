@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 import java.io.File;
 import java.io.IOException;
@@ -162,8 +162,8 @@ public class CrossOverRateCalculator implements RateCalculator {
 			boolean legend = true;
 			double[][] currentData;
 			List<Double> currentMemory;
-			int width = 800;
-			int height = 500;
+			int width = 1024;
+			int height = 780;
 
 			DefaultXYDataset dataset = new DefaultXYDataset();
 

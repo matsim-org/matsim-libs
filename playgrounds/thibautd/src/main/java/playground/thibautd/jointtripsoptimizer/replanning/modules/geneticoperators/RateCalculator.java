@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 /**
  * Interface for all classes allowing dynamic rates for several operators at the

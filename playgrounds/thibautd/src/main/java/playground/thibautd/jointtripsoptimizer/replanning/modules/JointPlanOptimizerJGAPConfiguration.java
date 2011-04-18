@@ -48,6 +48,10 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.CrossOverRateCalculator;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +37,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -180,8 +181,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				}
 			}
 			else {
-				//doDoubleSingleCrossOver(mate1, mate2);
-				doHillClimbingSingleCrossOver(mate1, mate2);
+				doDoubleSingleCrossOver(mate1, mate2);
+				//doHillClimbingSingleCrossOver(mate1, mate2);
 				if (dynamicRates) {
 					notifyCO(2, parent1, parent2, mate1, mate2);
 				}
