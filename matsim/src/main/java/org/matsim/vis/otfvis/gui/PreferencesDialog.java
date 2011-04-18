@@ -39,6 +39,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -62,11 +64,11 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	
 	private OTFHostControlBar host = null;
 	
-	private JSlider agentSizeSlider = null;
-
-	private JSlider linkWidthSlider;
+	private JSpinner agentSizeSpinner = null;
 	
-	private JSlider delaySlider = null;
+	private JSpinner linkWidthSpinner;
+	
+	private JSpinner delaySpinner = null;
 
 	public PreferencesDialog(final OTFFrame frame, final OTFHostControlBar mother) {
 		super(frame);
@@ -222,15 +224,13 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			getContentPane().add(label);
 			label.setText("AgentSize:");
 			label.setBounds(10, 145, 80, 31);
-			this.agentSizeSlider = new JSlider();
-			BoundedRangeModel model = new DefaultBoundedRangeModel((int) visConfig.getAgentSize(), 0, 10, 300);
-			this.agentSizeSlider.setModel(model);
-			this.agentSizeSlider.setLabelTable(this.agentSizeSlider.createStandardLabels(100, 100));
-			this.agentSizeSlider.setPaintLabels(true);
-			this.agentSizeSlider.setBounds(90, 140, 153, 45);
-			this.agentSizeSlider.addChangeListener(this);
+			this.agentSizeSpinner = new JSpinner();
+			SpinnerNumberModel model = new SpinnerNumberModel((int) visConfig.getAgentSize(), 0.1, Double.MAX_VALUE, 10);
+			this.agentSizeSpinner.setModel(model);
+			this.agentSizeSpinner.setBounds(90, 145, 153, 31);
+			this.agentSizeSpinner.addChangeListener(this);
 			getContentPane().add(label);
-			getContentPane().add(this.agentSizeSlider);
+			getContentPane().add(this.agentSizeSpinner);
 		}
 
 		 //Link Width
@@ -239,16 +239,13 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 getContentPane().add(label);
 		 label.setText("LinkWidth:");
 		 label.setBounds(10, 195, 80, 31);
-		 this.linkWidthSlider = new JSlider();
-		 BoundedRangeModel model2 = new DefaultBoundedRangeModel((int) visConfig.getLinkWidth(),0,0,100);
-		 this.linkWidthSlider.setModel(model2);
-		 this.linkWidthSlider.setLabelTable(this.linkWidthSlider.
-		 createStandardLabels(20, 0));
-		 this.linkWidthSlider.setPaintLabels(true);
-		 this.linkWidthSlider.setBounds(90, 190, 153, 45);
-		 this.linkWidthSlider.addChangeListener(this);
+		 this.linkWidthSpinner = new JSpinner();
+		 SpinnerNumberModel model2 = new SpinnerNumberModel((int) visConfig.getLinkWidth(), 0.1, Double.MAX_VALUE, 10);
+		 this.linkWidthSpinner.setModel(model2);
+		 this.linkWidthSpinner.setBounds(90, 195, 153, 31);
+		 this.linkWidthSpinner.addChangeListener(this);
 		 getContentPane().add(label);
-		 getContentPane().add(this.linkWidthSlider);
+		 getContentPane().add(this.linkWidthSpinner);
 		 }
 
 		 //Delay ms
@@ -257,33 +254,30 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 getContentPane().add(label);
 		 label.setText("AnimSpeed:");
 		 label.setBounds(10, 245, 110, 31);
-		 this.delaySlider = new JSlider();
-		 BoundedRangeModel model2 = new DefaultBoundedRangeModel(visConfig.getDelay_ms(),10,0,500);
-		 this.delaySlider.setModel(model2);
-		 this.delaySlider.setLabelTable(this.delaySlider.
-		 createStandardLabels(500, 00));
-		 this.delaySlider.setPaintLabels(true);
-		 this.delaySlider.setBounds(120, 240, 123, 45);
-		 this.delaySlider.addChangeListener(this);
+		 this.delaySpinner = new JSpinner();
+		 SpinnerNumberModel model2 = new SpinnerNumberModel((int) visConfig.getDelay_ms(), 0, Double.MAX_VALUE, 10);
+		 this.delaySpinner.setModel(model2);
+		 this.delaySpinner.setBounds(90, 245, 153, 31);
+		 this.delaySpinner.addChangeListener(this);
 		 getContentPane().add(label);
-		 getContentPane().add(this.delaySlider);
+		 getContentPane().add(this.delaySpinner);
 		 }
 
 	}
 
 	@Override
 	public void stateChanged(final ChangeEvent e) {
-		if (e.getSource() == this.agentSizeSlider) {
-			this.visConfig.setAgentSize(this.agentSizeSlider.getValue());
+		if (e.getSource() == this.agentSizeSpinner) {
+			this.visConfig.setAgentSize(((Double)(this.agentSizeSpinner.getValue())).floatValue());
 			if (this.host != null)
 				this.host.getOTFHostControl().invalidateDrawers();
-		 } else if (e.getSource() == this.linkWidthSlider) {
-			 this.visConfig.setLinkWidth(this.linkWidthSlider.getValue());
+		 } else if (e.getSource() == this.linkWidthSpinner) {
+			 this.visConfig.setLinkWidth(((Double)(this.linkWidthSpinner.getValue())).floatValue());
 			 if (this.host != null){
 				host.redrawDrawers();
 			 }
-		 } else if (e.getSource() == this.delaySlider) {
-			 this.visConfig.setDelay_ms(this.delaySlider.getValue());
+		 } else if (e.getSource() == this.delaySpinner) {
+			 this.visConfig.setDelay_ms(((Double)(this.delaySpinner.getValue())).intValue());
 			 if (this.host != null){
 				host.redrawDrawers();
 			 }
