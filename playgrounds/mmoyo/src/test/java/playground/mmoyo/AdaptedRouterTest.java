@@ -16,7 +16,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 	/**validates that the given transitConfigValues are read from the instance class*/
 	public void testEquil() {
 	
-		String inputDir = this.getInputDirectory();
+		String inputDir = this.getClassInputDirectory();
 		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/AdaptedRouterTest/";
 		
 		System.out.println(" Input Dir " + this.getInputDirectory());

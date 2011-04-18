@@ -60,7 +60,9 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 
 
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+		controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		//scenario data  test

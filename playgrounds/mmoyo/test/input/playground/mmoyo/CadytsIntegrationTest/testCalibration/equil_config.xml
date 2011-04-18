@@ -3,7 +3,7 @@
   [
    <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
    <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK		"../matsim/examples/equil/network.xml">
+   <!ENTITY NETWORK		"test/scenarios/equil/network.xml">
   ]
 >
   <!-- 

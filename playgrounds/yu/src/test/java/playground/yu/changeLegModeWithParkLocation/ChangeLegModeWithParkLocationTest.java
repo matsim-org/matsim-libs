@@ -42,6 +42,7 @@ import playground.yu.test.ChangeLegModeWithParkLocation;
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
 			IterationEndsListener {
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
@@ -99,6 +100,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	private static class LegChainModesListener2 implements
 			IterationEndsListener {
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
@@ -156,6 +158,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	private static class LegChainModesListener3 implements
 			IterationEndsListener {
+		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			int itr = event.getIteration();
@@ -213,11 +216,13 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes1() {
 		// the agent in the initial plan has only "walk" legs.
-		Config config = loadConfig("yu/"+getInputDirectory() + "config1.xml");
+		Config config = loadConfig(getInputDirectory() + "config1.xml");
+		config.controler().setWritePlansInterval(0);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
+		ctl.setDumpDataAtEnd(false);
 
 		// !!!NO longer necessary, man can set constanceWalk in
 		// "planCalcScore"-Config Group
@@ -234,10 +239,12 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	public void testLegChainModes2() {
 		// the agent in the initial plan has only "car" legs.
 		Config config = loadConfig(getInputDirectory() + "config2.xml");
+		config.controler().setWritePlansInterval(0);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
+		ctl.setDumpDataAtEnd(false);
 		// !!!NO longer necessary, man can set constanceWalk in
 		// "planCalcScore"-Config Group
 
@@ -253,10 +260,12 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
 		Config config = loadConfig(getInputDirectory() + "config3.xml");
+		config.controler().setWritePlansInterval(0);
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
 		ctl.setWriteEventsInterval(0);
+		ctl.setDumpDataAtEnd(false);
 
 		// !!!NO longer necessary, man can set constanceWalk in
 		// "planCalcScore"-Config Group
