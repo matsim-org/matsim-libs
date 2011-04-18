@@ -53,9 +53,6 @@ public final class Pipeline {
 		taskManagers.add(new TravelTimeCalculatorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		taskManagers.add(new TravelCostCalculatorTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		taskManagers.add(new RouterTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
-		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			taskManagers.add(new RouterInvertedNetTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
-		}
 		taskManagers.add(new VehicleWatcherFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		taskManagers.add(new ScoringTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
 		taskManagers.add(new PersonReplanningTaskManagerFactory().createTaskManagerImpl(new TaskConfiguration(config, null)));
