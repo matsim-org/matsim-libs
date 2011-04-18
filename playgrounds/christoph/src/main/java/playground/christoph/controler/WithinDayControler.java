@@ -22,7 +22,6 @@ package playground.christoph.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
@@ -33,6 +32,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
@@ -70,7 +70,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
  * 
  * @author Christoph Dobler
  */
-public class WithinDayControler extends Controler {
+public class WithinDayControler extends WithinDayController {
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -96,9 +96,7 @@ public class WithinDayControler extends Controler {
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
 	protected SelectHandledAgentsByProbability selector;
-	protected ReplanningManager replanningManager;
 	protected WithinDayQSim sim;
-	protected FixedOrderSimulationListener fosl;
 	
 	static final Logger log = Logger.getLogger(WithinDayControler.class);
 
@@ -133,13 +131,10 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void initReplanningRouter() {
 
-		travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
-		fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);	// for TravelTimeCollector
-		this.events.addHandler((TravelTimeCollector)travelTime);	// for TravelTimeCollector
+		super.createAndInitReplanningManager(numReplanningThreads);
 
-//		travelTime = new FreeSpeedTravelTime();
+		super.createAndInitTravelTimeCollector();
+		travelTime = super.getTravelTimeCollector();
 
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 
@@ -151,66 +146,35 @@ public class WithinDayControler extends Controler {
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-		this.replanningManager.addIntialReplanner(this.initialReplanner);
+		super.getReplanningManager().addIntialReplanner(this.initialReplanner);
 
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
-		this.getEvents().addHandler(activityReplanningMap);
-		fosl.addSimulationListener(activityReplanningMap);
+		super.createAndInitActivityReplanningMap();
+		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pActEndReplanning);
 		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
-		this.replanningManager.addDuringActivityReplanner(this.duringActivityReplanner);
+		super.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
-		this.getEvents().addHandler(linkReplanningMap);
-		fosl.addSimulationListener(linkReplanningMap);
+		super.createAndInitLinkReplanningMap();
+		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pLeaveLinkReplanning);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
-		this.replanningManager.addDuringLegReplanner(this.duringLegReplanner);
-	}
-
-	@Override
-	protected void setUp() {
-		/*
-		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
-		 * Then this piece of code could be placed in the controller.
-		 */
-		if (this.events instanceof ParallelEventsManagerImpl) {
-			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
-			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
-			this.fosl.addSimulationAfterSimStepListener(manager);
-			this.events = manager;
-		}
-		
-		super.setUp();
+		super.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}
 	
 	@Override
 	protected void runMobSim() {
-		
-		this.replanningManager = new ReplanningManager(numReplanningThreads);
 
-		sim = new WithinDayQSimFactory().createMobsim(this.scenarioData, this.events);
-
-		selector = new SelectHandledAgentsByProbability();
-		fosl.addSimulationListener(selector);
-		
-		/*
-		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
-		 * ensure that they are started in the needed order.
-		 */
-		fosl.addSimulationInitializedListener(replanningManager);
-		fosl.addSimulationBeforeSimStepListener(replanningManager);
-
-		sim.addQueueSimulationListeners(fosl);
-	
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
-
-		sim.run();
+		
+		selector = new SelectHandledAgentsByProbability();
+		super.getFixedOrderSimulationListener().addSimulationListener(selector);
+		
+		super.runMobSim();
 	}
 
 	/*

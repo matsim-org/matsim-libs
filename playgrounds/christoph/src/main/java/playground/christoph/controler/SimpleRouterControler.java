@@ -30,12 +30,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -47,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
@@ -78,7 +76,7 @@ import playground.christoph.router.util.SimpleRouterFactory;
 
 //mysimulations/kt-zurich/configIterative.xml
 
-public class SimpleRouterControler extends Controler {
+public class SimpleRouterControler extends WithinDayController implements SimulationInitializedListener {
 
 	private static final Logger log = Logger.getLogger(SimpleRouterControler.class);
 
@@ -130,11 +128,10 @@ public class SimpleRouterControler extends Controler {
 	protected WithinDayInitialReplanner randomCompassReplanner;
 	protected WithinDayInitialReplanner randomDijkstraReplanner;
 
-	protected FixedOrderSimulationListener fosl;
+//	protected FixedOrderSimulationListener fosl;
 		
 	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTimeCalculator();
 	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
-//	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -150,9 +147,6 @@ public class SimpleRouterControler extends Controler {
 	 * the entire Network.
 	 */
 	protected boolean useKnowledge = true;
-
-	protected ReplanningManager replanningManager = new ReplanningManager(numReplanningThreads);
-	protected WithinDayQSim sim;
 
 	public SimpleRouterControler(String[] args) {
 		super(args);
@@ -183,77 +177,75 @@ public class SimpleRouterControler extends Controler {
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	protected void initReplanningRouter() {
-
+	protected void initReplanningRouter(QSim sim) {
+		
 		AbstractMultithreadedModule router;
 
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
 		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory());
-		this.randomIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.randomIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
-		this.replanningManager.addIntialReplanner(this.randomReplanner);
+		super.getReplanningManager().addIntialReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
 		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
-		this.tabuIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.tabuIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
-		this.replanningManager.addIntialReplanner(this.tabuReplanner);
+		super.getReplanningManager().addIntialReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
 		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
-		this.compassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.compassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
-		this.replanningManager.addIntialReplanner(this.compassReplanner);
+		super.getReplanningManager().addIntialReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
 		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
-		this.randomCompassIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.randomCompassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
-		this.replanningManager.addIntialReplanner(this.randomCompassReplanner);
+		super.getReplanningManager().addIntialReplanner(this.randomCompassReplanner);
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
-		this.dijkstraIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
+		this.dijkstraIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
-		this.replanningManager.addIntialReplanner(this.randomDijkstraReplanner);
+		super.getReplanningManager().addIntialReplanner(this.randomDijkstraReplanner);	
 	}
 
 	@Override
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		log.info("Initialize Replanning Routers");
+		initReplanningRouter((QSim)e.getQueueSimulation());
+	}
+	
+	@Override
 	protected void runMobSim() {
-		sim = new WithinDayQSim(this.scenarioData, this.events);
-//		sim.addQueueSimulationListeners(replanningManager);
-		sim.addQueueSimulationListeners(fosl);
+		
+		super.createAndInitReplanningManager(numReplanningThreads);
+		super.getReplanningManager().doDuringActivityReplanning(false);
+		super.getReplanningManager().doDuringLegReplanning(false);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
 		 */
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
-		fosl.addSimulationInitializedListener(rfi);
-		fosl.addSimulationInitializedListener(replanningManager);
-		fosl.addSimulationBeforeSimStepListener(replanningManager);
-
+		super.getFixedOrderSimulationListener().addSimulationInitializedListener(rfi);
 
 		if (useKnowledge) {
 			log.info("Set Knowledge Storage Type");
 			setKnowledgeStorageHandler();
 		}
 
-		this.replanningManager.doDuringActivityReplanning(false);
-		this.replanningManager.doDuringLegReplanning(false);
-			
-		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
-
-		sim.run();
+		super.runMobSim();
 	}
 
 	/*
@@ -368,8 +360,8 @@ public class SimpleRouterControler extends Controler {
 				}
 
 				// (de)activate replanning if they are not needed
-				if (initialReplanningCounter == 0) simpleRouterControler.replanningManager.doInitialReplanning(false);
-				else simpleRouterControler.replanningManager.doInitialReplanning(true);
+				if (initialReplanningCounter == 0) simpleRouterControler.getReplanningManager().doInitialReplanning(false);
+				else simpleRouterControler.getReplanningManager().doInitialReplanning(true);
 			}
 			
 			simpleRouterControler.randomIdentifier.setHandledAgent(randomAgents);
@@ -384,7 +376,6 @@ public class SimpleRouterControler extends Controler {
 			log.info("Random Compass Routing Probability: " + simpleRouterControler.pRandomCompassRouter);
 			log.info("Random Dijkstra Routing Probability: " + simpleRouterControler.pRandomDijkstraRouter);
 
-//			double numPersons = simpleRouterControler.population.getPersons().size();
 			double numPersons = withinDayAgents.size();
 			log.info(simpleRouterControler.randomRouterCounter + " persons use a Random Router (" + simpleRouterControler.randomRouterCounter / numPersons * 100.0 + "%)");
 			log.info(simpleRouterControler.tabuRouterCounter + " persons use a Tabu Router (" + simpleRouterControler.tabuRouterCounter / numPersons * 100.0 + "%)");
@@ -416,7 +407,6 @@ public class SimpleRouterControler extends Controler {
 	 * main
 	 * ===================================================================
 	 */
-
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
