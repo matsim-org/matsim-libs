@@ -125,5 +125,4 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 			e.printStackTrace();
 		}
 	}
-
 }

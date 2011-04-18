@@ -20,7 +20,7 @@
 
 package herbie.running.controler.listeners;
 
-import herbie.running.config.KtiConfigGroup;
+import herbie.running.config.HerbieConfigGroup;
 import herbie.running.population.algorithms.PersonInvalidateScores;
 
 import org.matsim.api.core.v01.population.Population;
@@ -32,9 +32,9 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 
 public class KtiPopulationPreparation implements StartupListener {
 
-	private final KtiConfigGroup ktiConfigGroup;
+	private final HerbieConfigGroup ktiConfigGroup;
 	
-	public KtiPopulationPreparation(KtiConfigGroup ktiConfigGroup) {
+	public KtiPopulationPreparation(HerbieConfigGroup ktiConfigGroup) {
 		super();
 		this.ktiConfigGroup = ktiConfigGroup;
 	}

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
-import org.apache.log4j.Logger;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPersonAlgorithm {
@@ -37,18 +36,13 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	protected static final NumberFormat percentFormat;
 
 	static {
-
 		classFormat = NumberFormat.getInstance();
 		classFormat.setMaximumFractionDigits(1);
 		percentFormat = NumberFormat.getPercentInstance();
 		percentFormat.setMaximumFractionDigits(2);
-
 	}
 
 	private static final double DUMMY_NEGATIVE_BOUND = -1000.0;
-
-	private final static Logger log = Logger.getLogger(AbstractClassifiedFrequencyAnalysis.class);
-
 	protected Map<String, Frequency> frequencies = new HashMap<String, Frequency>();
 	protected Map<String, ResizableDoubleArray> rawData = new HashMap<String, ResizableDoubleArray>();
 
@@ -69,11 +63,9 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @return
 	 */
 	public long getNumberOfLegs(String mode, double oneBound, double theOtherBound) {
-
 		return
 		this.frequencies.get(mode).getCumFreq((oneBound > theOtherBound) ? oneBound : theOtherBound) -
 		this.frequencies.get(mode).getCumFreq((oneBound < theOtherBound) ? oneBound : theOtherBound);
-
 	}
 
 	/**
@@ -82,15 +74,11 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @return the overall frequency of legs of a mode
 	 */
 	public long getNumberOfLegs(String mode) {
-
 		long numberOfLegs = 0;
-
 		if (this.frequencies.containsKey(mode)) {
 			numberOfLegs = this.frequencies.get(mode).getSumFreq();
 		}
-
 		return numberOfLegs;
-
 	}
 
 	/**
@@ -99,30 +87,22 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @return the number of legs in a distance class.
 	 */
 	public long getNumberOfLegs(double oneBound, double theOtherBound) {
-
 		long numberOfLegs = 0;
-
 		for (String mode : this.frequencies.keySet()) {
 			numberOfLegs += this.getNumberOfLegs(mode, oneBound, theOtherBound);
 		}
-
 		return numberOfLegs;
-
 	}
 
 	/**
 	 * @return the overall number of legs.
 	 */
 	public long getNumberOfLegs() {
-
 		long numberOfLegs = 0;
-
 		for (String mode : this.frequencies.keySet()) {
 			numberOfLegs += this.getNumberOfLegs(mode);
 		}
-
 		return numberOfLegs;
-
 	}
 
 	public AbstractClassifiedFrequencyAnalysis() {
@@ -139,9 +119,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @param classes the classification of distances
 	 */
 	public void printClasses(CrosstabFormat crosstabFormat, boolean isCumulative, double[] classes, PrintStream out) {
-
 		long numberOfLegs;
-
 		out.println();
 		/*
 		 * header - start
@@ -160,9 +138,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		 * table - start
 		 */
 		for (int i=0; i < classes.length; i++) {
-
 			long sumClass = 0;
-
 			out.print(Integer.toString(i) + "\t");
 			out.print(classFormat.format(classes[i]));
 			for (String mode : this.frequencies.keySet()) {
@@ -219,7 +195,6 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 				break;
 			}
 		}
-
 		out.print("\t");
 		numberOfLegs = this.getNumberOfLegs();
 
@@ -234,9 +209,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		/*
 		 * sum - end
 		 */
-
 		out.println();
-
 	}
 
 	public void printDeciles(boolean isCumulative, PrintStream out) {
@@ -249,15 +222,10 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @param numberOfQuantiles number of quantiles desired
 	 */
 	public void printQuantiles(boolean isCumulative, int numberOfQuantiles, PrintStream out) {
-
 		out.println();
-
-//		long millis;
-
 		/*
 		 * header - start
 		 */
-//		millis = System.currentTimeMillis();
 		out.print("#p");
 		for (String mode : this.frequencies.keySet()) {
 			out.print("\t" + mode);
@@ -266,8 +234,6 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		/*
 		 * header - end
 		 */
-//		millis = System.currentTimeMillis() - millis;
-//		log.info("Writing header took: " + Long.toString(millis));
 
 		/*
 		 * table - start
@@ -280,20 +246,14 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		for (int ii = 0; ii < numberOfQuantiles; ii++) {
 			out.print(percentFormat.format(quantiles[ii]));
 			for (String mode : this.frequencies.keySet()) {
-//				millis = System.currentTimeMillis();
 				out.print("\t");
 				out.print(classFormat.format(StatUtils.percentile(this.rawData.get(mode).getElements(), quantiles[ii] * 100.0)));
-//				millis = System.currentTimeMillis() - millis;
-//				log.info("Writing and calculatin percentiles took: " + Long.toString(millis));
 			}
 			out.println();
 		}
 		/*
 		 * table - end
 		 */
-
 		out.println();
-
 	}
-
 }

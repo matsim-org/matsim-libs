@@ -18,26 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie.running.router;
+package herbie.running.scoring;
 
-import herbie.running.config.KtiConfigGroup;
+import herbie.running.config.HerbieConfigGroup;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 
-public class KtiTravelCostCalculatorFactory implements
+public class HerbieTravelCostCalculatorFactory implements
 		TravelCostCalculatorFactory {
 
-	private KtiConfigGroup ktiConfigGroup = null;
+	private HerbieConfigGroup ktiConfigGroup = null;
 	
-	public KtiTravelCostCalculatorFactory(KtiConfigGroup ktiConfigGroup) {
+	public HerbieTravelCostCalculatorFactory(HerbieConfigGroup ktiConfigGroup) {
 		super();
 		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new KtiTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, ktiConfigGroup);
+		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, ktiConfigGroup);
 	}
 }

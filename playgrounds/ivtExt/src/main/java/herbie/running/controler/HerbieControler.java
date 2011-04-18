@@ -20,14 +20,14 @@
 
 package herbie.running.controler;
 
-import herbie.running.config.KtiConfigGroup;
+import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesKTIListener;
 import herbie.running.controler.listeners.KtiPopulationPreparation;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
-import herbie.running.router.KtiTravelCostCalculatorFactory;
-import herbie.running.scenario.KtiScenarioLoaderImpl;
-import herbie.running.scoring.KTIYear3ScoringFunctionFactory;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -38,41 +38,38 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * A special controler for the Herbie-Project.
  *
  */
-public class KTIControler extends Controler {
+public class HerbieControler extends Controler {
 
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
-	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+	private final HerbieConfigGroup ktiConfigGroup = new HerbieConfigGroup();
 
-	public KTIControler(String[] args) {
+	public HerbieControler(String[] args) {
 		super(args);
-		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 	}
 
 	@Override
 	protected void loadData() {
-		if (!this.scenarioLoaded) {
-			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.ktiConfigGroup);
-			loader.loadScenario();
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
-			this.scenarioLoaded = true;
-		}
+		super.loadData();
+		this.network = this.scenarioData.getNetwork();
+		this.population = this.scenarioData.getPopulation();
+		this.scenarioLoaded = true;
 	}
 
 	@Override
 	protected void setUp() {
-		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+		HerbieScoringFunctionFactory kTIYear3ScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
-		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(ktiConfigGroup);
 		this.setTravelCostCalculatorFactory(costCalculatorFactory);
 
 		super.setUp();
@@ -106,7 +103,7 @@ public class KTIControler extends Controler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new KTIControler(args);
+			final Controler controler = new HerbieControler(args);
 			controler.run();
 		}
 		System.exit(0);

@@ -18,9 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package herbie.running.router;
+package herbie.running.scoring;
 
-import herbie.running.config.KtiConfigGroup;
+import herbie.running.config.HerbieConfigGroup;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -30,17 +30,17 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 
-public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
+public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
-	private final static Logger log = Logger.getLogger(KtiTravelTimeDistanceCostCalculator.class);
+	private final static Logger log = Logger.getLogger(HerbieTravelTimeDistanceCostCalculator.class);
 	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
 
-	public KtiTravelTimeDistanceCostCalculator(
+	public HerbieTravelTimeDistanceCostCalculator(
 			TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup,
-			KtiConfigGroup ktiConfigGroup) {
+			HerbieConfigGroup ktiConfigGroup) {
 		super();
 		this.timeCalculator = timeCalculator;
 		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
@@ -74,10 +74,5 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelMinCost, Perso
 
 	@Override
 	public void setPerson(Person person) {
-		// TODO Auto-generated method stub
-
 	}
-
-
-
 }

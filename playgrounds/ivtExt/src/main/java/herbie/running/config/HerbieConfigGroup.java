@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 
-public class KtiConfigGroup extends Module {
+public class HerbieConfigGroup extends Module {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "herbie";
 
-	private final static Logger logger = Logger.getLogger(KtiConfigGroup.class);
+	private final static Logger logger = Logger.getLogger(HerbieConfigGroup.class);
 
 	/**
 	 * TODO extract interface/abstract class from his config group and PlanomatConfigGroup
@@ -121,7 +121,7 @@ public class KtiConfigGroup extends Module {
 		
 	}
 	
-	public KtiConfigGroup() {
+	public HerbieConfigGroup() {
 		super(GROUP_NAME);
 		for (KtiConfigParameter param : KtiConfigParameter.values()) {
 			param.setActualValue(param.getDefaultValue());

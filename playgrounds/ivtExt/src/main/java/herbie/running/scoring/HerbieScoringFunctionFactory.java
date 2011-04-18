@@ -20,7 +20,7 @@
 
 package herbie.running.scoring;
 
-import herbie.running.config.KtiConfigGroup;
+import herbie.running.config.HerbieConfigGroup;
 
 import java.util.TreeMap;
 
@@ -33,16 +33,16 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 
-public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
+public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
 
 	private final Config config;
-	private final KtiConfigGroup ktiConfigGroup;
+	private final HerbieConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 	
-	public KTIYear3ScoringFunctionFactory(
+	public HerbieScoringFunctionFactory(
 			final Config config, 
-			final KtiConfigGroup ktiConfigGroup,
+			final HerbieConfigGroup ktiConfigGroup,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities) {
 		super(config.planCalcScore());
