@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 public class Aggregator {
+	private final static Logger log = Logger.getLogger(Aggregator.class);
+	
 	private TreeMap<Integer, List<Double>> volumes = new TreeMap<Integer, List<Double>>();
 		
 	private double [] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
@@ -71,33 +75,52 @@ public class Aggregator {
 	
 	private void avg() {	
 		for (int hour = 0; hour < 24; hour++) {
-			Iterator<Double> vol_it;
-			vol_it = volumes.get(hour).iterator();
-			while (vol_it.hasNext()) {
-				double vol = vol_it.next();		
-				avg[hour] += vol;
+			int n = 0;
+			for (double vol : volumes.get(hour)) {
+				if (vol > -1.0) { // filter undefined values
+					avg[hour] += vol;
+					n++;
+				}
 			}
-		}
-		for (int i = 0; i < 24; i++) {
-			avg[i] /= volumes.get(i).size();
+			avg[hour] /= n;
 		}	
 	}
 	
 	private void standarddev() {
 		for (int hour = 0; hour < 24; hour++) {
-			Iterator<Double> vol_it;
-			vol_it = volumes.get(hour).iterator();
-			while (vol_it.hasNext()) {
-				double vol = vol_it.next();		
-				if (vol > -1.0) {
-					standarddev[hour] += Math.pow(vol - avg[hour] , 2.0);
+			double variance = 0.0;
+			int n = 0;
+			for (double vol : volumes.get(hour)) {
+				if (vol > -1.0) { // filter undefined values
+					variance += Math.pow(vol - avg[hour] , 2.0);
+					n++;
 				}
 			}
-		}
-		for (int i = 0; i < 24; i++) {
-			standarddev[i] = Math.sqrt(standarddev[i] / volumes.get(i).size());
+			if (n == 0) {
+				log.error("Something went wrong ..."); 
+				return;
+			}
+			variance /= n;
+			standarddev[hour] = Math.sqrt(variance);
 		}	
 	}
+
+// old version: 
+//	private void standarddev() {
+//		for (int hour = 0; hour < 24; hour++) {
+//			Iterator<Double> vol_it;
+//			vol_it = volumes.get(hour).iterator();
+//			while (vol_it.hasNext()) {
+//				double vol = vol_it.next();		
+//				if (vol > -1.0) {
+//					standarddev[hour] += Math.pow(vol - avg[hour] , 2.0);
+//				}
+//			}
+//		}
+//		for (int i = 0; i < 24; i++) {
+//			standarddev[i] = Math.sqrt(standarddev[i] / volumes.get(i).size());
+//		}	
+//	}
 		
 	private void median() {
 		for (int i = 0; i < 24; i++) {

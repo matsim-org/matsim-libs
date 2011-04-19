@@ -22,7 +22,7 @@ public class CountsCreation {
 	private final static String dayFilter = "DIDO";
 	private final static boolean removeOutliers = false;
 	private final boolean removeSummerHolidays = false;
-	private final boolean removeXmasDays = false;
+	private final boolean removeXmasDays = true;
 	private boolean removeZeroVolumes = true;
 	
 	public static void main(final String[] args) {
