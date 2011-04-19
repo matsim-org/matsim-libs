@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
 public class LinkReplanningMapTest extends MatsimTestCase {
 
@@ -50,6 +51,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 
 		Controler controler = new Controler(config);
+		controler.setMobsimFactory(new WithinDayQSimFactory());
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
 		controler.run();
