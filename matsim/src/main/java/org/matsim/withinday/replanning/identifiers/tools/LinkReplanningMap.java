@@ -20,11 +20,11 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -42,12 +42,13 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
@@ -83,7 +84,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
-	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
+	private Map<Id, WithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
 	private Map<Id, Tuple<Id, Double>> replanningMap;	// PersonId, Tuple<LinkId, ReplanningTime>
 	
@@ -104,13 +105,13 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 		// Update Reference to QNetwork
 		this.netsimNetwork = sim.getNetsimNetwork();
 
-		personAgentMapping = new HashMap<Id, PersonAgent>();
+		personAgentMapping = new HashMap<Id, WithinDayAgent>();
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				if (mobsimAgent instanceof PersonAgent) {
-					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					personAgentMapping.put(personAgent.getId(), personAgent);
+				if (mobsimAgent instanceof WithinDayAgent) {
+					WithinDayAgent withinDayAgent = (WithinDayAgent) mobsimAgent;
+					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
 				}
 			}
 		}
@@ -167,10 +168,9 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	/*
 	 * returns a List of Agents who might need a replanning
 	 */
-	public synchronized List<PersonAgent> getReplanningAgents(double time) {
-		// using the ArrayList is just a Workaround...
-		ArrayList<PersonAgent> agentsToReplanLeaveLink = new ArrayList<PersonAgent>();
-
+	public synchronized Set<WithinDayAgent> getReplanningAgents(double time) {
+		Set<WithinDayAgent> agentsToReplanLeaveLink = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+		
 		Iterator<Entry<Id, Tuple<Id, Double>>> entries = replanningMap.entrySet().iterator();
 		while (entries.hasNext()) {
 			Entry<Id, Tuple<Id, Double>> entry = entries.next();
@@ -180,13 +180,13 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 			double replanningTime = entry.getValue().getSecond();
 
 			if (time >= replanningTime) {
-				PersonAgent personAgent = this.personAgentMapping.get(personId);
+				WithinDayAgent withinDayAgent = this.personAgentMapping.get(personId);
 
 				// Repeated Replanning per Link possible?
 				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));
 				else entries.remove();
 
-				agentsToReplanLeaveLink.add(personAgent);
+				agentsToReplanLeaveLink.add(withinDayAgent);
 			}
 		}
 
@@ -198,12 +198,12 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	/*
 	 * Returns a List of all Agents, that are currently performing a Leg.
 	 */
-	public synchronized List<PersonAgent> getLegPerformingAgents() {
-		ArrayList<PersonAgent> legPerformingAgents = new ArrayList<PersonAgent>();
+	public synchronized Set<WithinDayAgent> getLegPerformingAgents() {
+		Set<WithinDayAgent> legPerformingAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 
 		for (Entry<Id, Tuple<Id, Double>> entry : replanningMap.entrySet()) {
 			Id personId = entry.getKey();
-			PersonAgent agent = this.personAgentMapping.get(personId);
+			WithinDayAgent agent = this.personAgentMapping.get(personId);
 			legPerformingAgents.add(agent);
 		}
 

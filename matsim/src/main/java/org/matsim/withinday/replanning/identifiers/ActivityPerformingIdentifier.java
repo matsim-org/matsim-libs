@@ -21,11 +21,9 @@
 package org.matsim.withinday.replanning.identifiers;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -42,11 +40,11 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
 	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();	
+		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();	
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		if (handledAgents == null) return agentsToReplan;
+		if (this.handleAllAgents()) return activityPerformingAgents;
 		
 		if (activityPerformingAgents.size() > handledAgents.size()) {
 			for (WithinDayAgent agent : handledAgents) {
@@ -55,9 +53,9 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 				}
 			}
 		} else {
-			for (PersonAgent agent : activityPerformingAgents) {
+			for (WithinDayAgent agent : activityPerformingAgents) {
 				if (handledAgents.contains(agent)) {
-					agentsToReplan.add((WithinDayAgent)agent);
+					agentsToReplan.add(agent);
 				}
 			}
 		}

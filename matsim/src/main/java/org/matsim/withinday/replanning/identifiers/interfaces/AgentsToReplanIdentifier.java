@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 
@@ -33,6 +34,9 @@ import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
  */
 public abstract class AgentsToReplanIdentifier {
 	
+	private static final Logger log = Logger.getLogger(AgentsToReplanIdentifier.class);
+	
+	private boolean handleAllAgents = true;
 	private IdentifierFactory identifierFactory;
 	private Set<WithinDayAgent> handledAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 	
@@ -41,12 +45,25 @@ public abstract class AgentsToReplanIdentifier {
 	public final void setHandledAgent(Collection<WithinDayAgent> agents) {
 		this.handledAgents.clear();
 		this.handledAgents.addAll(agents);
+
+		if (handleAllAgents) {
+			log.info("Agents to be handled have been set.Therefore, disable \"handle all Agents\"!");
+			this.handleAllAgents = false;
+		}
+	}
+	
+	public final void handleAllAgents(boolean value) {
+		this.handleAllAgents = value;
+	}
+	
+	public final boolean handleAllAgents() {
+		return this.handleAllAgents;
 	}
 	
 	public final Set<WithinDayAgent> getHandledAgents() {
 		return Collections.unmodifiableSet(handledAgents);
 	}
-		
+	
 	public final void setIdentifierFactory(IdentifierFactory factory) {
 		this.identifierFactory = factory;
 	}

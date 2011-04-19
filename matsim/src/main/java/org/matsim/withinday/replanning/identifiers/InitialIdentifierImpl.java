@@ -45,7 +45,12 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		if (handledAgents == null) return agentsToReplan;
+		if (this.handleAllAgents()) {
+			for (MobsimAgent agent : mobsimAgents) {
+				agentsToReplan.add((WithinDayAgent)agent);
+			}
+			return agentsToReplan;
+		}
 		
 		if (mobsimAgents.size() > handledAgents.size()) {
 			for (WithinDayAgent agent : handledAgents) {

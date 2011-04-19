@@ -22,14 +22,12 @@ package org.matsim.withinday.replanning.identifiers;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
@@ -47,25 +45,28 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		List<PersonAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
+		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		if (handledAgents == null) return agentsToReplan;
-		
-		if (activityPerformingAgents.size() > handledAgents.size()) {
-			for (WithinDayAgent agent : handledAgents) {
-				if (activityPerformingAgents.contains(agent)) {
-					agentsToReplan.add(agent);
-				}
-			}
+		if (this.handleAllAgents()) {
+			agentsToReplan.addAll(activityPerformingAgents);
 		} else {
-			for (PersonAgent agent : activityPerformingAgents) {
-				if (handledAgents.contains(agent)) {
-					agentsToReplan.add((WithinDayAgent)agent);
+			if (activityPerformingAgents.size() > handledAgents.size()) {
+				for (WithinDayAgent agent : handledAgents) {
+					if (activityPerformingAgents.contains(agent)) {
+						agentsToReplan.add(agent);
+					}
 				}
-			}
+			} else {
+				for (WithinDayAgent agent : activityPerformingAgents) {
+					if (handledAgents.contains(agent)) {
+						agentsToReplan.add(agent);
+					}
+				}
+			}			
 		}
+		
 		
 		Iterator<WithinDayAgent> iter = agentsToReplan.iterator();
 		while(iter.hasNext()) {

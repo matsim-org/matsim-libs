@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -41,11 +40,11 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 	
 	@Override
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Collection<PersonAgent> legPerformingAgents =  linkReplanningMap.getReplanningAgents(time);
+		Set<WithinDayAgent> legPerformingAgents =  linkReplanningMap.getReplanningAgents(time);
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		if (handledAgents == null) return agentsToReplan;
+		if (this.handleAllAgents()) return legPerformingAgents;
 		
 		if (legPerformingAgents.size() > handledAgents.size()) {
 			for (WithinDayAgent agent : handledAgents) {
@@ -54,7 +53,7 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 				}
 			}
 		} else {
-			for (PersonAgent agent : legPerformingAgents) {
+			for (WithinDayAgent agent : legPerformingAgents) {
 				if (handledAgents.contains(agent)) {
 					agentsToReplan.add((WithinDayAgent)agent);
 				}

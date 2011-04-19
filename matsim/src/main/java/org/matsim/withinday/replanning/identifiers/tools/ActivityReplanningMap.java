@@ -20,10 +20,8 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -44,6 +42,8 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /*
@@ -73,7 +73,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
-	private Map<Id, PersonAgent> personAgentMapping;	// PersonId, PersonDriverAgent
+	private Map<Id, WithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 	
 	public ActivityReplanningMap() {
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
@@ -81,7 +81,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	}
 	
 	private void init() {
-		this.personAgentMapping = new TreeMap<Id, PersonAgent>();
+		this.personAgentMapping = new TreeMap<Id, WithinDayAgent>();
 		this.replanningSet = new TreeSet<Id>();
 		this.startingAgents = new TreeSet<Id>();
 	}
@@ -99,13 +99,13 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		
 		Netsim sim = (Netsim) e.getQueueSimulation();
 
-		personAgentMapping = new HashMap<Id, PersonAgent>();
+		personAgentMapping = new HashMap<Id, WithinDayAgent>();
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
 				if (mobsimAgent instanceof PersonAgent) {
-					PersonAgent personAgent = (PersonAgent) mobsimAgent;
-					personAgentMapping.put(personAgent.getId(), personAgent);
+					WithinDayAgent withinDayAgent = (WithinDayAgent) mobsimAgent;
+					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
 					
 					// mark the agent as currently performing an Activity
 					replanningSet.add(((PersonAgent) mobsimAgent).getId());
@@ -177,8 +177,8 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	/*
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
-	public synchronized List<PersonAgent> getActivityPerformingAgents() {
-		ArrayList<PersonAgent> activityPerformingAgents = new ArrayList<PersonAgent>();
+	public synchronized Set<WithinDayAgent> getActivityPerformingAgents() {
+		Set<WithinDayAgent> activityPerformingAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 
 		for (Id id : replanningSet) activityPerformingAgents.add(personAgentMapping.get(id));
 
@@ -189,20 +189,20 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * TODO: find a better name
 	 * Returns a List of all agents that are going to end their activity right now
 	 */
-	public synchronized List<PersonAgent> getReplanningDriverAgents(double time) {
-		ArrayList<PersonAgent> personAgentsToReplanActivityEnd = new ArrayList<PersonAgent>();
-
+	public synchronized Set<WithinDayAgent> getReplanningDriverAgents(double time) {
+		Set<WithinDayAgent> personAgentsToReplanActivityEnd = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+				
 		Iterator<Id> ids = replanningSet.iterator();
 		while(ids.hasNext()) {
 			Id id = ids.next();
 
-			PersonAgent personAgent = personAgentMapping.get(id);
+			WithinDayAgent withinDayAgent = personAgentMapping.get(id);
 
-			double replanningTime = personAgent.getActivityEndTime();
+			double replanningTime = withinDayAgent.getActivityEndTime();
 
 			if (time >= replanningTime) {
 				ids.remove();
-				personAgentsToReplanActivityEnd.add(personAgent);
+				personAgentsToReplanActivityEnd.add(withinDayAgent);
 			}
 //			else break;
 		}
