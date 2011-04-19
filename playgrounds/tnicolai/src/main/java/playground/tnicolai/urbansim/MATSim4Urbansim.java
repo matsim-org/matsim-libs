@@ -100,10 +100,6 @@ public class MATSim4Urbansim {
 			return;
 		}
 
-//		// init scenario and config object
-//		scenario = InitMATSimScenario.getScenario();
-//		config = InitMATSimScenario.getConfig();
-
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();

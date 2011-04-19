@@ -103,12 +103,38 @@ public class InitMATSimScenario {
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY, tempDirectory);
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY, opusHomeDirectory);
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR, year + "");
+		// tnicolai: implement/make configurable the following flags (matsim4urbansim config/JAXB)
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA, 1 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_TIMES, 1 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_TIMES, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_TIMES, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_COSTS, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_COSTS, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_COSTS, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_DISTANCE, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_DISTANCE, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_DISTANCE, 0 + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.CUSTOM_PARAMETER, "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MEASUREMENT_LOGFILE, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.MEASUREMENT_LOGFILE);
+		
+		
 		log.info("... done!");
 		log.info("MATSim4UrbanSim Parameter -> SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE) + 
 											 " Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) + 
 											 " TempDir: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + 
 											 " OPUS_HOME: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY) + 
-											 " TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.IS_TEST_RUN));
+											 " TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.IS_TEST_RUN) +
+											 " Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA) +
+											 " Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_TIMES) +
+											 " Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_TIMES) +
+											 " Beta power(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_TIMES) +
+											 " Beta Travel Costs: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_COSTS) +
+											 " Beta ln(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_COSTS) +
+											 " Beta power(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_COSTS) +
+											 " Beta Travel Distance: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_DISTANCE) +
+											 " Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_DISTANCE) +
+											 " Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_DISTANCE) +
+											 " Custom Parameter: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.CUSTOM_PARAMETER) );
 		
 		// set opus (sub-)directories
 		setOpusHomeDirectory(opusHomeDirectory);

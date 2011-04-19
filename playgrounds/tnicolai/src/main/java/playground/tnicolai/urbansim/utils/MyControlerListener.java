@@ -21,12 +21,19 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.toronto.ttimematrix.SpanningTree;
@@ -45,6 +52,7 @@ public class MyControlerListener implements ShutdownListener {
 	private Map<Id,WorkplaceObject> numberOfWorkplacesPerZone;
 	private String travelDataPath;
 	private String zonesPath;
+	private double beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts, betaPowerTravelCosts, betaTravelDistance, betaLnTravelDistance, betaPowerTravelDistance;
 
 	/**
 	 * constructor
@@ -66,8 +74,11 @@ public class MyControlerListener implements ShutdownListener {
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
-		// get the calling controller:
+		// get the controller and scenario
 		Controler controler = event.getControler() ;
+		Scenario sc = controler.getScenario();
+		
+		initCostfunctionParameter(sc);
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
@@ -76,7 +87,6 @@ public class MyControlerListener implements ShutdownListener {
 		double depatureTime = 8.*3600 ;
 		st.setDepartureTime(depatureTime);
 		
-		Scenario sc = controler.getScenario() ;
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
 		
@@ -111,7 +121,7 @@ public class MyControlerListener implements ShutdownListener {
 					percentDone++ ; System.out.print('=') ;
 				}
 				cnt++;
-				
+
 				// running through network from given origin (from) zone
 				Coord coord = fromZone.getCoord();
 				assert( coord != null );
@@ -125,7 +135,7 @@ public class MyControlerListener implements ShutdownListener {
 
 				// beta per hr should be -12 (by default configuration
 				double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr() ;
-				double beta 			= beta_per_hr/3600.; // get utility per second
+				double beta 	   = beta_per_hr/3600.; // get utility per second
 				
 				double minTravelTime 	= Double.MAX_VALUE;
 
@@ -133,13 +143,13 @@ public class MyControlerListener implements ShutdownListener {
 					
 					Coord toCoord = toZone.getCoord();
 					Node toNode = network.getNearestNode( toCoord );
+					assert( toNode != null );
+					
 					double arrivalTime = st.getTree().get(toNode.getId()).getTime();
 					// travel times in sec
 					double ttime = arrivalTime - depatureTime;
-					
 					// convert travel times in minutes for urbansim
 					ttime = ttime / 60.;
-					
 					// we guess that any value less than 1.2 leads to errors on the urbansim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(ttime < 1.2)
@@ -151,9 +161,14 @@ public class MyControlerListener implements ShutdownListener {
 					if(e != null)
 						trips = e.getValue();
 					
-					// tnicolai test to caculate travel costs
-					//LinkImpl toLink = network.getNearestLink( toCoord );
-					//double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
+					// tnicolai test to calculate travel costs
+					// LinkImpl toLink = network.getNearestLink( toCoord );
+					// double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
+					
+					// tnicolai: add "single_vehicle_to_work_travel_distance.lf4" to header
+					double distance = getZone2ZoneDistance(fromZone, toZone, network, controler);
+					double meterInMilesFaktor = 0.000621371; // use this to convert distance in meter to distance in miles.
+//					System.out.println("Distance from zone" + fromZone.getId() + " to zone " + toZone.getId() + " in meter : " + distance + " in miles: " + distance*meterInMilesFaktor);
 					
 					travelDataWriter.write ( fromZone.getId().toString()	//origin zone id
 							+ "," + toZone.getId().toString()				//destination zone id
@@ -174,10 +189,10 @@ public class MyControlerListener implements ShutdownListener {
 					// get minimum travel time for in zone accessibility (see below)
 					minTravelTime = Math.min(ttime, minTravelTime);
 					
-					// this sum corresponts to the sum term of the log sum computation
+					// this sum corresponds to the sum term of the log sum computation
 					if(numberOfWorkplacesPerZone.get(toZone.getId()) != null){ // skipping zones no workplaces
 						long weight = numberOfWorkplacesPerZone.get(toZone.getId()).counter;
-						double costFunction = Math.exp( beta * ttime ); // tnicolai: implement cost function as: Math.exp ( apha * traveltime + beta * traveltime**2 + gamma * ln(traveltime) + delta * distance + epsilon * distance**2 + phi * ln(distance) ) 
+						double costFunction = Math.exp( beta * ttime ); // tnicolai: implement cost function as: Math.exp ( alpha * traveltime + beta * traveltime**2 + gamma * ln(traveltime) + delta * distance + epsilon * distance**2 + phi * ln(distance) ) 
 						accessibility += weight * costFunction;
 					}
 					// yyyy should only be work facilities!!!! kai & thomas, dec'10
@@ -215,6 +230,45 @@ public class MyControlerListener implements ShutdownListener {
 		log.info("... done with notifyShutdown.") ;
 	}
 	
+	
+	/**
+	 * 
+	 * @param fromZone
+	 * @param toZone
+	 * @param network
+	 * @param controler
+	 * @return distance between 2 zones in meter
+	 */
+	private double getZone2ZoneDistance(ActivityFacility fromZone, ActivityFacility toZone, NetworkImpl network, Controler controler){
+		
+		double distance = 0.0; // tnicolai: should we take another default value???
+		
+		PersonImpl dummyPerson = new PersonImpl( fromZone.getId() );
+		PlanImpl plan = dummyPerson.createAndAddPlan(true);
+		CommonMATSimUtilities.makeHomePlan(plan, fromZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+fromZone.getId()).createFacility(fromZone.getId(), fromZone.getCoord()));
+		CommonMATSimUtilities.completePlanToHwh(plan, toZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+toZone.getId()).createFacility(toZone.getId(), toZone.getCoord()));
+		
+		PersonPrepareForSim pps = new PersonPrepareForSim( controler.createRoutingAlgorithm() , network);
+		pps.run(dummyPerson);
+		
+		if( plan.getPlanElements().size() >= 2 ){
+			
+			// get first leg. this contains the route from "fromZone" to "toZone"
+			PlanElement pe = plan.getPlanElements().get(1);
+			if (pe instanceof LegImpl) {
+				LegImpl l = (LegImpl) pe;
+				
+				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) l.getRoute();
+
+				if(route.getLinkIds().size()  > 0){
+					NetworkRoute nr = RouteUtils.createNetworkRoute(route.getLinkIds(), network);
+					distance = RouteUtils.calcDistance(nr, network);
+				}
+			}
+		}
+		return distance;
+	}
+	
 	/**
 	 * goes through all person ant their plans and stores their trips into a matrix
 	 * 
@@ -240,7 +294,7 @@ public class MyControlerListener implements ShutdownListener {
 				if ( pe instanceof Activity ) {
 					Activity act = (Activity) pe;
 					Id id = act.getFacilityId();
-					if( id == null) // that person plan doesn't contain activity, continue with next person
+					if( id == null) // that person plan doesn't contain any activity, continue with next person
 						continue;
 					
 					Map<Id, ActivityFacility> allFacilities = facilities.getFacilities();
@@ -291,6 +345,32 @@ public class MyControlerListener implements ShutdownListener {
 //		}
 		
 		log.info("DONE with computing zone2zone trip numbers ...") ;
+	}
+	
+	/**
+	 * initialize betas for logsum cost function 
+	 * 
+	 * @param scenario
+	 */
+	private void initCostfunctionParameter(Scenario scenario){
+		
+		try{
+			beta = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA) );
+			betaTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_TIMES) );
+			betaLnTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_TIMES) );
+			betaPowerTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_TIMES) );
+			betaTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_COSTS) );
+			betaLnTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_COSTS) );
+			betaPowerTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_COSTS) );
+			betaTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_DISTANCE) );
+			betaLnTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_DISTANCE) );
+			betaPowerTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_DISTANCE) );
+		}
+		catch(NumberFormatException e){
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
 	}
 
 }

@@ -29,7 +29,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -159,7 +158,7 @@ public class CommonMATSimUtilities {
 		
 		// complete the first activity (home) by setting end time. 
 		ActivityImpl act = (ActivityImpl)plan.getFirstActivity();
-		act.setEndTime( 7.*3600. ) ;
+		act.setEndTime( 7.*3600. ) ; // tnicolai: make configurable: see actType1.setOpeningTime(7*3600)
 		// gather coordinate and facility id needed for last activity
 		Coord homeCoord = act.getCoord();
 		Id homeId = act.getFacilityId();
@@ -170,7 +169,7 @@ public class CommonMATSimUtilities {
 		// set second activity (work)
 		act = plan.createAndAddActivity( Constants.ACT_WORK, workCoord );
 		act.setFacilityId( jobLocation.getId() );
-		act.setMaximumDuration( 8.*3600. ) ;
+		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
 		
 		// set Leg
 		plan.createAndAddLeg(TransportMode.car) ;

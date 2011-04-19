@@ -110,9 +110,6 @@ public class Constants {
 	public static final int TEST_RUN_SUCCESSFUL = 0;
 	public static final int TEST_RUN_FAILD = -1;
 	
-	/** measurements */
-	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
-	
 	/** xsd on matsim.org */
 	public static final String MATSim_4_UrbanSim_XSD = "http://www.matsim.org/files/dtd/MATSim4UrbanSimConfigSchema.xsd";
 	public static final String XSD_FILE_NAME = "MATSim4UrbanSimConfigSchema.xsd";
@@ -148,6 +145,21 @@ public class Constants {
 	public static final String TEMP_DIRECTORY = "tempDirectory";
 	public static final String OPUS_HOME_DIRECTORY = "opusHomeDirectory";
 	public static final String YEAR = "year";
+	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
+	public static final String COMPUTE_LOGSUM = "compute_logsum";
+	public static final String RETURN_RAW_SUM = "return_raw_sum";
+	public static final String BETA = "beta";
+	public static final String BETA_TRAVEL_TIMES = "beta_travel_times";
+	public static final String BETA_LN_TRAVEL_TIMES = "beta_ln_travel_times";
+	public static final String BETA_POWER_TRAVEL_TIMES = "beta_power_travel_times";
+	public static final String BETA_TRAVEL_COSTS = "beta_travel_costs";
+	public static final String BETA_LN_TRAVEL_COSTS = "beta_ln_travel_costs";
+	public static final String BETA_POWER_TRAVEL_COSTS = "beta_power_travel_costs";
+	public static final String BETA_TRAVEL_DISTANCE = "beta_travel_distance";
+	public static final String BETA_LN_TRAVEL_DISTANCE = "beta_ln_travel_distance";
+	public static final String BETA_POWER_TRAVEL_DISTANCE = "beta_power_travel_distance";
+	public static final String CUSTOM_PARAMETER = "custom_parameter";
+	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
 	
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";
