@@ -51,9 +51,9 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	private static final String DO_DUR = "dropOffDuration";
 	private static final String MUTATION_PROB = "mutationProbability";
-	private static final String WHOLE_CO_PROB = "WholeArithmeticalCrossOverProbability";
-	private static final String SIMPLE_CO_PROB = "SimpleArithmeticalCrossOverProbability";
-	private static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverProbability";
+	private static final String WHOLE_CO_PROB = "WholeArithmeticalCrossOverRate";
+	private static final String SIMPLE_CO_PROB = "SimpleArithmeticalCrossOverRate";
+	private static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverRate";
 	private static final String ITER_NUM = "maxNumberOfGAIterations";
 	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
 	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
@@ -68,15 +68,17 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
 	private static final String DOUBLETTES = "geneticSelectionWithReplacement";
 	private static final String DYNAMIC_CO_RATES = "allowAdaptiveCrossOverRates";
+	private static final String SPX_RATE = "SPXCrossOverRate";
+	private static final String SPX_SONS = "SPXOffspringRate";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
 	private int populationSize = 10;
 	private double dropOffDuration = 0;
 	private double mutationProb = 0.1;
-	private double wholeCrossOverProb = 0.5;
-	private double simpleCrossOverProb = 0.5;
-	private double singleCrossOverProb = 0.5;
+	private double wholeCrossOverProb = 0.1;
+	private double simpleCrossOverProb = 0.1;
+	private double singleCrossOverProb = 0.1;
 	private int numberOfIterations = 100;
 	private double betaNonUniformity = 1;
 	private boolean optimizeToggle = false;
@@ -92,6 +94,8 @@ public class JointReplanningConfigGroup extends Module {
 		tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
 	private boolean allowDoublettes = false;
 	private boolean dynamicCoRate = true;
+	private double spxRate = 0.6d;
+	private int spxOffspringRate = 4;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -168,6 +172,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DYNAMIC_CO_RATES)) {
 			this.setIsDynamicCO(value);
 		}
+		else if (param_name.equals(SPX_RATE)) {
+			this.setSPXProbability(value);
+		}
+		else if (param_name.equals(SPX_SONS)) {
+			this.setSPXOffspringRate(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -240,6 +250,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DYNAMIC_CO_RATES)) {
 			return String.valueOf(this.getIsDynamicCO());
 		}
+		else if (param_name.equals(SPX_RATE)) {
+			return String.valueOf(this.getSPXProbability());
+		}
+		else if (param_name.equals(SPX_SONS)) {
+			return String.valueOf(this.getSPXOffspringRate());
+		}
 
 		return null;
 	}
@@ -267,6 +283,8 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, STRUCTURE_LAYER);
 		this.addParameterToMap(map, DOUBLETTES);
 		this.addParameterToMap(map, DYNAMIC_CO_RATES);
+		this.addParameterToMap(map, SPX_RATE);
+		this.addParameterToMap(map, SPX_SONS);
 		return map;
 	}
 
@@ -545,6 +563,29 @@ public class JointReplanningConfigGroup extends Module {
 
 	public void setIsDynamicCO(String value) {
 		this.dynamicCoRate = Boolean.parseBoolean(value);
+	}
+
+	public double getSPXProbability() {
+		return this.spxRate;
+	}
+
+	public void setSPXProbability(String coProb) {
+		this.spxRate = Double.valueOf(coProb);
+
+		if ((this.spxRate < 0)||(this.spxRate > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public void setSPXOffspringRate(String value) {
+		this.spxOffspringRate = Integer.valueOf(value);
+		if (this.spxOffspringRate < 0) {
+			throw new IllegalArgumentException("offspring rate must be positive");
+		}
+	}
+
+	public int getSPXOffspringRate() {
+		return this.spxOffspringRate;
 	}
 }
 

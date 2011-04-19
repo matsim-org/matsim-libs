@@ -51,6 +51,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.CrossOverRateCalculator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPSpx;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -100,10 +101,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		this.optimizeToggle = configGroup.getOptimizeToggle();
 
-		//if (this.optimizeToggle) {
-		//	throw new UnsupportedOperationException("toggle optimization possibly"
-		//			+" broken: temporarily unsupported.");
-		//}
 		// get info on the plan structure
 		this.countEpisodes(plan);
 
@@ -199,6 +196,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 							this.numModeGenes,
 							this.nDurationGenes) );
 			}
+			this.addGeneticOperator( new JointPlanOptimizerJGAPSpx(
+						this,
+						configGroup,
+						this.numToggleGenes,
+						this.numEpisodes,
+						this.nDurationGenes) );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
