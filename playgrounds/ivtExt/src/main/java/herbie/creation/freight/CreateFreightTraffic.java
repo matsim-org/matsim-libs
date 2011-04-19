@@ -78,7 +78,7 @@ public class CreateFreightTraffic {
 	private String outpath;
 	private double radius;
 	private TreeMap<Id, Zone> zones = new TreeMap<Id, Zone>();
-	private final int numberOfZones = 1341;
+	private final int numberOfZones = 1434;
 	private Id [] zoneIds = new Id[numberOfZones];
 	private double roundingLimit;
 	
@@ -177,21 +177,21 @@ public class CreateFreightTraffic {
 	 *  But: Check the coordinates! There was a strange error for the ArcGIS export of centroids!
 	 */
 	private void createZones() {
+		log.info("creating zones ...");
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.zonesfilePath));
 			String line = bufferedReader.readLine(); //skip header
-			int cnt = 0;
-			while ((line = bufferedReader.readLine()) != null) {
-				String parts[] = line.split("\t");				
-				double x = Double.parseDouble(parts[7]);
-				double y = Double.parseDouble(parts[8]);
-				Id id = new IdImpl(Integer.parseInt(parts[2]));
-				String name = parts[3];
+			for (int i = 0; i < this.numberOfZones; i++) {
+				line = bufferedReader.readLine();
+				String parts[] = line.split("\t");
+				Id id = new IdImpl(Integer.parseInt(parts[0].trim()));
+				double x = Double.parseDouble(parts[1]);
+				double y = Double.parseDouble(parts[2]);
+				String name = "external";
+				if (parts.length >= 4) name = parts[3];
 				Zone zone = new Zone(id, new CoordImpl(x,y), name);
 				this.zones.put(id, zone);
-				cnt++;
-			}  
-			log.info("reading " + cnt + " zones");
+			}
 		} // end try
 		catch (IOException e) {
 			e.printStackTrace();
@@ -278,17 +278,18 @@ public class CreateFreightTraffic {
 		
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(odFile));
-			String line = bufferedReader.readLine(); //skip header
+			String line = bufferedReader.readLine(); //skip number of entries (1434)
+			line = bufferedReader.readLine(); //skip header
 			
 			// fill the zones id index
-			String header[] = line.split("\t");
+			String header[] = line.split(",");
 			for (int i = 0; i < numberOfZones; i++) {
-				this.zoneIds[i] = new IdImpl(header[i + 1]);
+				this.zoneIds[i] = new IdImpl(header[i + 1].trim());
 			}			
 			double cnt = 0.0;
 			for (int i = 0; i < numberOfZones; i++) {
 				line = bufferedReader.readLine();
-				String parts[] = line.split("\t");
+				String parts[] = line.split(",");
 				for (int j = 0; j < numberOfZones; j++) {
 					od[i][j] = Double.parseDouble(parts[j + 1]);
 					cnt += od[i][j];
