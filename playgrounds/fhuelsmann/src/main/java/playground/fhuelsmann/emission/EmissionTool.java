@@ -67,7 +67,10 @@ public class EmissionTool {
 	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
-
+	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
+	
+	
+	
 	//	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	//	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	//	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
@@ -102,6 +105,8 @@ public class EmissionTool {
 		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
 		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+		HbefaHot hbefaHot = new HbefaHot();
+		hbefaHot.makeHbefaHot(hbefaHotFile);
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();

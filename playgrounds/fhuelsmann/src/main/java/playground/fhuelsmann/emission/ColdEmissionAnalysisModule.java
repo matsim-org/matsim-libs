@@ -34,37 +34,34 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 
 		int nightTime = 12;
 		int initDis =1;
-
+	
 		for(Entry<String,Map<Integer,Map<Integer,HbefaColdObject>>> component : hbefaColdTable.getHbefaColdTable().entrySet()){
-
+			
 			double coldEfOtherAct = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(dis).get(time).getColdEF();	
-
-
-			double coldEfNight=0.0;
-
-			if(!personId.toString().contains("gv_") && !personId.toString().contains("pv_"))
-				coldEfNight = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(initDis).get(nightTime).getColdEF();
-
+			
 			if(this.coldEmissionsPerson.get(personId) == null){
-
+			
 				Map<String,Double> tempMap = new TreeMap<String,Double>();
-				tempMap.put(component.getKey(), coldEfOtherAct+coldEfNight);
-				this.coldEmissionsPerson.put(personId, tempMap);
-
-			}else{
-
-				if (this.coldEmissionsPerson.get(personId).containsKey(component.getKey())) {
-
+				this.coldEmissionsPerson.put(personId,tempMap);}
+		
+			if (!this.coldEmissionsPerson.get(personId).containsKey(component.getKey())) {
+			
+					double coldEfNight=0.0;		
+					if(!personId.toString().contains("gv_")){ 
+					coldEfNight = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(initDis).get(nightTime).getColdEF();}
+					
+				this.coldEmissionsPerson.get(personId).put(component.getKey(), coldEfNight + coldEfOtherAct );
+			
+			}else if(this.coldEmissionsPerson.get(personId).containsKey(component.getKey())){
+					
 					double oldValue = this.coldEmissionsPerson.get(personId).get(component.getKey());
-					this.coldEmissionsPerson.get(personId).put(component.getKey(), oldValue+coldEfOtherAct);
-
-					//						String id = personId.toString();
-					//						if(id.contains("569253.3#11147"))	
-					//						System.out.println("component" + component.getKey()+"coldEfOtherAct " +coldEfOtherAct + " coldEfNight " + coldEfNight);
-
-				} else this.coldEmissionsPerson.get(personId).put(component.getKey(), coldEfOtherAct);
-			}
-		}
+					this.coldEmissionsPerson.get(personId).put(component.getKey(),oldValue+coldEfOtherAct );
+					
+					System.out.print("\n in the else : "+ personId + " component "+component.getKey()+ " Value "+ 
+							this.coldEmissionsPerson.get(personId).get(component.getKey()) +" oldValue " + oldValue 
+							+" coldEfOtherAct " + coldEfOtherAct + " new Value : " + this.coldEmissionsPerson.get(personId).get(component.getKey()) );
+				}			 			 
+		 }
 	}
 
 	public Map<Id, Map<String, Double>> getColdEmissionsPerPerson() {
