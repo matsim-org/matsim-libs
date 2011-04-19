@@ -21,15 +21,11 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PersonAgent;
@@ -56,7 +52,7 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 	}
 	
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Collection<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		

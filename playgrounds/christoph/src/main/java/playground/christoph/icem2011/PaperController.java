@@ -44,6 +44,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -62,6 +63,8 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
  */
 public class PaperController extends WithinDayController implements StartupListener,
 		SimulationInitializedListener, SimulationBeforeSimStepListener {
+
+	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -101,7 +104,6 @@ public class PaperController extends WithinDayController implements StartupListe
 
 	protected SelectHandledAgentsByProbability selector;
 
-	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
 	public PaperController(String[] args) {
 		super(args);
@@ -120,7 +122,7 @@ public class PaperController extends WithinDayController implements StartupListe
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
+	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners(QSim sim) {
 
@@ -130,7 +132,7 @@ public class PaperController extends WithinDayController implements StartupListe
 //		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		LeastCostPathCalculatorFactory factory = new DijkstraFactory(); 
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
-
+		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
 //		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
@@ -184,12 +186,17 @@ public class PaperController extends WithinDayController implements StartupListe
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		boolean currentState = this.enabled;
 		int time = (int) e.getSimulationTime();
-		if (time >= this.tWithinDayEnabled && time <= this.tWithinDayDisabled) this.getReplanningManager().doDuringLegReplanning(true);
-		else this.getReplanningManager().doDuringLegReplanning(false);
+		if (time >= this.tWithinDayEnabled && time <= this.tWithinDayDisabled) {
+			this.enabled = true;
+			this.getReplanningManager().doDuringLegReplanning(true);
+		} else {
+			this.enabled = false;
+			this.getReplanningManager().doDuringLegReplanning(false);
+		}
 		
 		// if state has changed
 		if (enabled != currentState) {
-			if (currentState) log.info("Within-Day Replanning has been enabled at t = " + e.getSimulationTime());
+			if (enabled) log.info("Within-Day Replanning has been enabled at t = " + e.getSimulationTime());
 			else log.info("Within-Day Replanning has been disabled at t = " + e.getSimulationTime());
 		}
 	}
@@ -259,7 +266,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		@Override
 		public Set<WithinDayAgent> getAgentsToReplan(double time) {
 			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
-			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>();
+			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 			for (WithinDayAgent agent : agentsFromDelegate) {
 				if (replanningLinks.contains(agent.getCurrentLinkId())) filteredAgents.add(agent);
 			}

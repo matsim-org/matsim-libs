@@ -53,7 +53,7 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 	}
 	
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Collection<PersonAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		

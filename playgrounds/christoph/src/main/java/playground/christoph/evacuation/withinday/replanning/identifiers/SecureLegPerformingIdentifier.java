@@ -54,7 +54,7 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 	}
 	
 	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Collection<PersonAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
+		Set<WithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
