@@ -101,18 +101,18 @@ public class CreateNewZHScenario {
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
     	matsimConfigReader.readFile(configFile);   	
 		
-		this.outputFolder = config.getParam("demandcreation", "outputFolder");
+		this.outputFolder = config.findParam("demandcreation", "outputFolder");
 		
 		// old scenario parts -----
-		this.networkfilePath = config.getParam("demandcreation", "networkfilePath");
-		this.facilitiesfilePath = config.getParam("demandcreation", "facilitiesfilePath");
-		this.plansV2filePath = config.getParam("demandcreation", "plansV2filePath");
+		this.networkfilePath = config.findParam("demandcreation", "networkfilePath");
+		this.facilitiesfilePath = config.findParam("demandcreation", "facilitiesfilePath");
+		this.plansV2filePath = config.findParam("demandcreation", "plansV2filePath");
 		
 		// new demand -------------
-		this.crossBorderPlansFilePath = config.getParam("demandcreation", "crossBorderPlansFilePath");
-		this.freightPlansFilePath = config.getParam("demandcreation", "freightPlansFilePath");
+		this.crossBorderPlansFilePath = config.findParam("demandcreation", "crossBorderPlansFilePath");
+		this.freightPlansFilePath = config.findParam("demandcreation", "freightPlansFilePath");
 		
-		this.sampleFraction = Double.parseDouble(config.getParam("demandcreation", "sampleRatePercent"));
+		this.sampleFraction = Double.parseDouble(config.findParam("demandcreation", "sampleRatePercent"));
     }
 	
 	// ====================================================================================
