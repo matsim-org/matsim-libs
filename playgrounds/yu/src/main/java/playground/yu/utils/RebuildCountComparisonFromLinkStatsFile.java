@@ -176,6 +176,54 @@ public class RebuildCountComparisonFromLinkStatsFile {
 			distanceFilter = distance;
 			distanceFilterNode = network.getNodes().get(new IdImpl(nodeId));
 		}
+
+		/**
+		 * Creates the List with the counts vs sim values stored in the
+		 * countAttribute Attribute of this class.
+		 */
+		public double getScaleFactor4_0bias(int startHour, int endHour) {
+			double simValSquareSum = 0, countSimProductSum = 0;
+
+			if (startHour < 1 || startHour > endHour || endHour > 24) {
+				throw new RuntimeException(
+						"Illegal start- and endHour for count comparison! [1-24]");
+			}
+
+			double countValue;
+
+			for (Count count : counts.getCounts().values()) {
+				if (!isInRange(count.getLocId())) {
+					continue;
+				}
+				double[] volumes = linkStats
+						.getAvgLinkVolumes(count.getLocId());
+				if (volumes.length == 0) {
+					log.warn("No volumes for link: "
+							+ count.getLocId().toString());
+					volumes = new double[24];
+				}
+				for (int hour = startHour; hour <= endHour; hour++) {
+					// real volumes:
+					Volume volume = count.getVolume(hour);
+					if (volume != null) {
+						countValue = volume.getValue();
+						double simValue = volumes[hour - 1];
+						simValue *= countsScaleFactor;
+
+						simValSquareSum += simValue * simValue;
+						countSimProductSum += countValue * simValue;
+
+					} else {
+						countValue = 0.0;
+					}
+				}
+			}
+			if (simValSquareSum <= 0) {
+				throw new RuntimeException(
+						"sigma(sim^2)==0, no agents were simulated?");
+			}
+			return countsScaleFactor * countSimProductSum / simValSquareSum;
+		}
 	}
 
 	private final String linkStatsFilename;
@@ -214,6 +262,36 @@ public class RebuildCountComparisonFromLinkStatsFile {
 		for (double scaleFactor = minScaleFactor; scaleFactor <= maxScaleFactor; scaleFactor += scaleFactorInterval) {
 			runCountsComparisonAlgorithmAndOutput(scaleFactor);
 		}
+	}
+
+	public void run2() {
+		config = scenario.getConfig();
+
+		counts = new Counts();
+		CountsConfigGroup countsCG = config.counts();
+		new MatsimCountsReader(counts).readFile(countsCG.getCountsFileName());
+
+		double scaleFactor = countsCG.getCountsScaleFactor();
+		log.info("compare with counts, scaleFactor =\t" + scaleFactor);
+
+		Network network = scenario.getNetwork();
+
+		CalcLinkStats calcLinkStats = new CalcLinkStats(network, scaleFactor
+				/ countsCG.getCountsScaleFactor());
+		calcLinkStats.readFile(linkStatsFilename);
+
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(
+				calcLinkStats, counts, network, scaleFactor);
+
+		if (countsCG.getDistanceFilter() != null
+				&& countsCG.getDistanceFilterCenterNode() != null) {
+			cca.setDistanceFilter(countsCG.getDistanceFilter(),
+					countsCG.getDistanceFilterCenterNode());
+		}
+		cca.setCountsScaleFactor(scaleFactor);
+
+		System.out.println("best scaleFactor could be "
+				+ cca.getScaleFactor4_0bias(1, 24) + "!");
 	}
 
 	private void runCountsComparisonAlgorithmAndOutput(double scaleFactor) {
@@ -284,11 +362,38 @@ public class RebuildCountComparisonFromLinkStatsFile {
 	 *            countScaleFactor, args[4] incremental interval of
 	 *            countScaleFactor
 	 */
-	public static void main(String[] args) {
+	public static void run1(String[] args) {
 		RebuildCountComparisonFromLinkStatsFile rccfls = new RebuildCountComparisonFromLinkStatsFile(
 				args[0], args[1], Double.parseDouble(args[2]),
 				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
 		rccfls.run();
 
+	}
+
+	/**
+	 * @param args
+	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
+	 *            minimum value of countScaleFactor, args[3] maximum vaule of
+	 *            countScaleFactor, args[4] incremental interval of
+	 *            countScaleFactor
+	 */
+	public static void run2(String[] args) {
+		RebuildCountComparisonFromLinkStatsFile rccfls = new RebuildCountComparisonFromLinkStatsFile(
+				args[0], args[1], Double.parseDouble(args[2]),
+				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+		rccfls.run2();
+
+	}
+
+	/**
+	 * @param args
+	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
+	 *            minimum value of countScaleFactor, args[3] maximum vaule of
+	 *            countScaleFactor, args[4] incremental interval of
+	 *            countScaleFactor
+	 */
+	public static void main(String[] args) {
+		// run1(args);
+		run2(args);
 	}
 }
