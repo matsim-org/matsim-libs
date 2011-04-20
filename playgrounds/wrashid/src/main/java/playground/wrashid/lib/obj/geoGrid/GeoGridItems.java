@@ -6,14 +6,14 @@ import org.matsim.api.core.v01.Coord;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public class GeoGridList<T> {
+public class GeoGridItems<T> {
 
-	private LinkedListValueHashMap<String, T> gridValues;
+	private LinkedListValueHashMap<String, T> gridItems;
 	private int sideLengthInMeters;
 	
-	public GeoGridList(int sideLengthInMeters){
+	public GeoGridItems(int sideLengthInMeters){
 		this.sideLengthInMeters=sideLengthInMeters;
-		gridValues=new LinkedListValueHashMap<String, T>();
+		gridItems=new LinkedListValueHashMap<String, T>();
 	}
 	
 	public LinkedList<T> getElementsWithinDistance(Coord coord, int numberOfGridUnits){
@@ -24,7 +24,7 @@ public class GeoGridList<T> {
 		
 		for (int i=0;i<numberOfGridUnits*2+1;i++){
 			for (int j=0;j<numberOfGridUnits*2+1;j++){
-				LinkedList<T> tmpList=gridValues.get(getGridKeyFromComponents(xGridCompLeftBottomCorner+i,yGridCompLeftBottomCorner+j));
+				LinkedList<T> tmpList=gridItems.get(getGridKeyFromComponents(xGridCompLeftBottomCorner+i,yGridCompLeftBottomCorner+j));
 				resultList.addAll(tmpList);
 			}
 		}
@@ -33,7 +33,7 @@ public class GeoGridList<T> {
 	}
 	
 	public void addElement(T element,Coord coord){
-		gridValues.put(getGridKeyFromCoordinate(coord), element);
+		gridItems.put(getGridKeyFromCoordinate(coord), element);
 	}
 	
 	private String getGridKeyFromComponents(int xGridComp, int yGridComp) {
