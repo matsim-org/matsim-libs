@@ -92,6 +92,8 @@ public class CreateNewZHScenario {
 	private void init(String configFile) {
 		log.info("Initializing ...");
 		this.readConfig(configFile);
+		
+		log.info("Reading network, facilities and plans ...");
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
@@ -99,6 +101,7 @@ public class CreateNewZHScenario {
 	}
 	
 	private void readConfig(String configFile) {
+		log.info("Reading the config ...");
 		Config config = new Config();
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
     	matsimConfigReader.readFile(configFile);   	
@@ -106,15 +109,15 @@ public class CreateNewZHScenario {
 		this.outputFolder = config.findParam("demandcreation", "outputFolder");
 		
 		// old scenario parts -----
-		this.networkfilePath = config.findParam("demandcreation", "networkfilePath");
-		this.facilitiesfilePath = config.findParam("demandcreation", "facilitiesfilePath");
-		this.plansV2filePath = config.findParam("demandcreation", "plansV2filePath");
+		this.networkfilePath = config.findParam("demandcreation", "networkFile");
+		this.facilitiesfilePath = config.findParam("demandcreation", "facilitiesFile");
+		this.plansV2filePath = config.findParam("demandcreation", "plansV2File");
 		
 		// new demand -------------
-		this.crossBorderPlansFilePath = config.findParam("demandcreation", "crossBorderPlansFilePath");
-		this.freightPlansFilePath = config.findParam("demandcreation", "freightPlansFilePath");
+		this.crossBorderPlansFilePath = config.findParam("demandcreation", "crossBorderPlansFile");
+		this.freightPlansFilePath = config.findParam("demandcreation", "freightPlansFile");
 		
-		this.sampleRatePercent = Double.parseDouble(config.findParam("demandcreation", "sampleRatePercent"));
+		this.sampleRatePercent = Double.parseDouble(config.findParam("demandcreation", "samplingRatePercent"));
     }
 	
 	// ====================================================================================
