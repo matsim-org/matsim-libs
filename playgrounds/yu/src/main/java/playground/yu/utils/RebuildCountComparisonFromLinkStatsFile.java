@@ -291,7 +291,8 @@ public class RebuildCountComparisonFromLinkStatsFile {
 		cca.setCountsScaleFactor(scaleFactor);
 
 		System.out.println("best scaleFactor could be "
-				+ cca.getScaleFactor4_0bias(1, 24) + "!");
+				+ cca.getScaleFactor4_0bias(1, 24) + "!");// TODO parameterize
+															// 7-20
 	}
 
 	private void runCountsComparisonAlgorithmAndOutput(double scaleFactor) {
