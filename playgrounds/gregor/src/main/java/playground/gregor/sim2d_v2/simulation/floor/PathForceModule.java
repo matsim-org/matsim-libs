@@ -49,7 +49,7 @@ public class PathForceModule implements ForceModule {
 
 
 	// Mauron constant
-	private static final double Apath =150.;
+	private static final double Apath =1.13*Agent2D.AGENT_WEIGHT;
 	private static final double Bpath = 1;
 
 

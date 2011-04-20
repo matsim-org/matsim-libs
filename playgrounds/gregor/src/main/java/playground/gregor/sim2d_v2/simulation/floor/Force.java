@@ -27,7 +27,7 @@ package playground.gregor.sim2d_v2.simulation.floor;
 public class Force {
 	private double fx = 0;
 	private double fy = 0;
-	
+
 	private double vx = 0;
 	private double vy = 0;
 
@@ -57,27 +57,31 @@ public class Force {
 	}
 
 
-	
+
 	public double getVx() {
 		return this.vx;
 	}
-	
+
 	public double getVy() {
 		return this.vy;
 	}
-	
+
 	public void setVx(double vx) {
 		this.vx = vx;
 	}
-	
+
 	public void setVy(double vy) {
 		this.vy = vy;
 	}
-	
-	
+
+
 	public void update(double weight, double deltaT) {
-		this.vx += (deltaT*fx)/weight;
-		this.vy += (deltaT*fy)/weight;
+		this.vx += (deltaT*this.fx)/weight;
+		this.vy += (deltaT*this.fy)/weight;
+		if (Double.isNaN(this.vx)){
+			int i =0;
+			i++;
+		}
 		this.fx = 0;
 		this.fy = 0;
 	}

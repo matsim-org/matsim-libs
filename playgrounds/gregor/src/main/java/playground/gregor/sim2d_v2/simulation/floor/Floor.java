@@ -34,6 +34,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -75,6 +76,7 @@ public class Floor {
 	private final boolean ms = false;
 	private final double sim2DTimeStepSize;
 	private final boolean emitXYZAzimuthEvents;
+	private Envelope envelope;
 
 	public Floor(Scenario2DImpl scenario, List<Link> list, Sim2D sim, boolean emitEvents) {
 		this.scenario = scenario;
@@ -89,6 +91,8 @@ public class Floor {
 	 * 
 	 */
 	public void init() {
+		calculateEnvelope();
+
 		//		this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
 		//
 		this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, this.scenario));
@@ -110,6 +114,20 @@ public class Floor {
 
 		createFinishLines();
 
+
+	}
+
+	private void calculateEnvelope() {
+		this.envelope = new Envelope();
+		for (Link link : this.links) {
+			this.envelope.expandToInclude(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			this.envelope.expandToInclude(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+		}
+
+	}
+
+	public Envelope getEnvelope() {
+		return this.envelope;
 	}
 
 	private void createFinishLines() {
@@ -162,6 +180,11 @@ public class Floor {
 
 			double vx = f.getVx();
 			double vy = f.getVy();
+
+			if (Double.isNaN(vx)){
+				int i = 0 ;
+				i++;
+			}
 
 
 			Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* this.sim2DTimeStepSize, oldPos.y + f.getVy()* this.sim2DTimeStepSize, 0);

@@ -1,7 +1,8 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -22,20 +23,27 @@ DynamicForceModule {
 
 	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
-	private Quadtree coordsQuad;
 
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
 
 	//Zanlungo et al constant
-	public static final double Bi=0.5;
-	public static final double Ai=250;
+	public static final double Bi=.71;
+	public static final double Ai=1.13*Agent2D.AGENT_WEIGHT;
+	public static final double lambda=.75;
+
+
+	private double maxForce = 0;
+
+
+	private  Quadtree agentsQuad;
 
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
 
 	public CollisionPredictionAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
+
 	}
 
 	@Override
@@ -43,14 +51,14 @@ DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
+
 		double minX = agent.getPosition().x - neighborhoodSensingRange;
 		double maxX = agent.getPosition().x + neighborhoodSensingRange;
 		double minY = agent.getPosition().y - neighborhoodSensingRange;
 		double maxY = agent.getPosition().y + neighborhoodSensingRange;
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
 		@SuppressWarnings("unchecked")
-		List<Agent2D> l = this.coordsQuad.query(e);
-
+		Collection<Agent2D> l = this.agentsQuad.query(e);
 		double t_i = getTi(l,agent);
 
 
@@ -58,32 +66,84 @@ DynamicForceModule {
 			return;
 		}
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
-		double stopDist = v_i / t_i;
+		double decel = v_i / t_i;
 
+
+		List<Double> dists = new ArrayList<Double>();
+		List<Double> proj = new ArrayList<Double>();
+		List<Double> fs = new ArrayList<Double>();
 
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
 			}
 
+
 			double dist = other.getPosition().distance(agent.getPosition());
-			double term1 = Ai * stopDist * Math.exp(-dist/Bi);
+			if (dist > neighborhoodSensingRange) {
+				continue;
+			}
+			dists.add(dist);
+			double term1 = Ai * decel * Math.exp(-dist/Bi);
 
 			Vector v = getDistVector(agent,other,t_i);
 			double projectedDist = Math.sqrt(v.x*v.x+v.y*v.y);
 
+			//DEBUG
+			proj.add(projectedDist);
 
-			fx += term1 * v.x/projectedDist;
-			fy += term1 * v.y/projectedDist;
+			double phi = getPhi(agent,other);
+			double anostropyWeight = (lambda + (1-lambda)*(1+Math.cos(phi))/2);
 
+
+			fx += anostropyWeight * term1 * v.x/projectedDist;
+			fy += anostropyWeight * term1 * v.y/projectedDist;
+
+			//DEBUG
+			if (Double.isNaN(fx)){
+				int i =0;
+				i++;
+			}
+
+
+			//DEBUG
+			fs.add(Math.sqrt(fx*fx + fy*fy));
 
 
 		}
 
+		double force = Math.sqrt(fx*fx + fy*fy);
+		if (force > this.maxForce){
+			this.maxForce = force;
+			System.out.println("========================" +
+					"\nforce:" + force);
+			for (int i = 0; i < proj.size(); i++) {
+				System.out.println("num:"  + i+ " t_i:" + t_i + " decel g:" + ((int)(10*decel/9.81 + 0.5))/10. + " dist:" + dists.get(i) + " projectedDist:" + proj.get(i) + " force:" + fs.get(i));
+			}
+		}
 
 		agent.getForce().incrementX(fx);
 		agent.getForce().incrementY(fy);
 
+	}
+
+	private double getPhi(Agent2D agent, Agent2D other) {
+		double phi = 0;
+		double dist = agent.getPosition().distance(other.getPosition()) ;
+		LineString ls = this.geofac.createLineString(new Coordinate[]{agent.getPosition(),new Coordinate(agent.getPosition().x+agent.getVx()*1000,agent.getPosition().y+agent.getVy()*1000)});
+		DistanceOp op =  new DistanceOp(ls, this.geofac.createPoint(other.getPosition()));
+		if (op.distance() >= dist) {
+			ls = this.geofac.createLineString(new Coordinate[]{agent.getPosition(),new Coordinate(agent.getPosition().x-agent.getVx()*1000,agent.getPosition().y-agent.getVy()*1000)});
+			op =  new DistanceOp(ls, this.geofac.createPoint(other.getPosition()));
+			double sinPhi = op.distance()/dist;
+			phi = Math.PI - Math.asin(sinPhi);
+		} else {
+			double sinPhi = op.distance()/dist;
+			phi = Math.asin(sinPhi);
+		}
+
+
+		return phi;
 	}
 
 	private Vector getDistVector(Agent2D agent, Agent2D other, double t_i) {
@@ -104,7 +164,7 @@ DynamicForceModule {
 		return v;
 	}
 
-	private double getTi(List<Agent2D> l, Agent2D agent) {
+	private double getTi(Collection<Agent2D> l, Agent2D agent) {
 
 		double t_i = Double.POSITIVE_INFINITY;
 
@@ -131,13 +191,12 @@ DynamicForceModule {
 		LineString ls = this.geofac.createLineString(new Coordinate[] {other.getPosition(),new Coordinate(other.getPosition().x+relVx*this.EventHorizonTime,other.getPosition().y+relVy*this.EventHorizonTime,0)});
 		DistanceOp op =  new DistanceOp(ls, this.geofac.createPoint(agent.getPosition()));
 		double ti = op.closestPoints()[0].distance(other.getPosition());
-		double tanPhi = op.distance()/ti;
-		double phi = Math.atan(tanPhi);
-		if (phi > Math.PI) {
-			phi = Math.PI*2 - phi;
-		}
 
-		if (phi > Math.PI/4){
+
+		double tanTheta = op.distance()/ti;
+		double theta = Math.atan(tanTheta);
+
+		if (theta > Math.PI/4){
 			return Double.POSITIVE_INFINITY;
 		}
 		ti /= relV;
@@ -169,10 +228,10 @@ DynamicForceModule {
 	}
 
 	protected void updateAgentQuadtree() {
-		this.coordsQuad = new Quadtree();
+		this.agentsQuad = new Quadtree();
 		for (Agent2D agent : this.floor.getAgents()) {
 			Envelope e = new Envelope(agent.getPosition());
-			this.coordsQuad.insert(e, agent);
+			this.agentsQuad.insert(e, agent);
 		}
 
 	}

@@ -52,7 +52,7 @@ public class Agent2D extends PersonDriverAgentImpl {
 		super(p, sim2d);
 
 		// TODO think about this
-		this.desiredVelocity = 1 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 4;
+		this.desiredVelocity = 0.8 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 8;
 
 	}
 
