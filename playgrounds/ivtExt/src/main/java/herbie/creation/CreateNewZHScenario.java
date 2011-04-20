@@ -65,14 +65,15 @@ public class CreateNewZHScenario {
 	//freight zh
 	private String freightPlansFilePath;
 	
-	private double sampleFraction = 100.0;
+	private double sampleRatePercent = 100.0;
 	
 	// ====================================================================================
 	public static void main(final String[] args) {
 		if (args.length != 1) {
 			log.error("Please specify a config file!");
 			return;
-		}				
+		}
+		log.info("Creation started ...");
 		CreateNewZHScenario creator = new CreateNewZHScenario();
 		creator.run(args[0]);
 		log.info("Creation finished -----------------------------------------");
@@ -89,6 +90,7 @@ public class CreateNewZHScenario {
 	// ====================================================================================
 	// read in network, facilities and plans into scenario
 	private void init(String configFile) {
+		log.info("Initializing ...");
 		this.readConfig(configFile);
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
@@ -112,7 +114,7 @@ public class CreateNewZHScenario {
 		this.crossBorderPlansFilePath = config.findParam("demandcreation", "crossBorderPlansFilePath");
 		this.freightPlansFilePath = config.findParam("demandcreation", "freightPlansFilePath");
 		
-		this.sampleFraction = Double.parseDouble(config.findParam("demandcreation", "sampleRatePercent"));
+		this.sampleRatePercent = Double.parseDouble(config.findParam("demandcreation", "sampleRatePercent"));
     }
 	
 	// ====================================================================================
@@ -129,6 +131,7 @@ public class CreateNewZHScenario {
 		this.map2Network((PopulationImpl) sTmp.getPopulation());
 		
 		if (type.equals("cross-border")) {
+			log.info("Adding cross-border traffic ...");
 			this.mapActivities2Facilities((PopulationImpl) sTmp.getPopulation());
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
@@ -138,12 +141,13 @@ public class CreateNewZHScenario {
 		
 		// facilities are already mapped
 		if (type.equals("freight")) {
+			log.info("Adding freight traffic ...");
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
 				sTmp.getPopulation().getPersons().remove(personId);
 			}
 		}
-		this.samplePlans(sTmp.getPopulation(), this.sampleFraction);
+		this.samplePlans(sTmp.getPopulation(), this.sampleRatePercent);
 		log.info("Remaining " + type + " agents" + sTmp.getPopulation().getPersons().size());
 		
 		for (Person p : sTmp.getPopulation().getPersons().values()){
@@ -155,6 +159,7 @@ public class CreateNewZHScenario {
 	//TODO: Is this really necessary?
 	// What happens if we have small differences in facilities->links mapping during simulation?
 	private void mapActivities2Facilities(PopulationImpl population) {
+		log.info("Mapping facilities ...");
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		
 		for (Person p : population.getPersons().values()){
@@ -186,6 +191,7 @@ public class CreateNewZHScenario {
 	
 	// at the moment only necessary for cross-border and freight traffic -> stratified sampling
 	private void samplePlans(Population population, double percent) {
+		log.info("Sampling plans ...");
 		int newPopulationSize = (int)(population.getPersons().size() * percent);
 		
 		while (population.getPersons().size() > newPopulationSize) {
@@ -197,6 +203,7 @@ public class CreateNewZHScenario {
 	
 	// at the moment only necessary for cross-border traffic
 	private List<Id> dilutedZH(Population population) {
+		log.info("Cutting scenario ...");
 		double aoiRadius = 30000.0;
 		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
 		
