@@ -52,7 +52,6 @@ import org.matsim.core.population.ActivityImpl;
 import utils.BuildTrees;
 
 public class CreateNewZHScenario {
-	private String currentDir = "//pingelap/matsim/";
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder;
@@ -70,27 +69,18 @@ public class CreateNewZHScenario {
 	
 	// ====================================================================================
 	public static void main(final String[] args) {
-		if (args.length < 2) {
-			log.error("Please specify a running location! Either 'l' (locally) or 'r' (remotely) and please specify a sample rate in percent");
+		if (args.length != 1) {
+			log.error("Please specify a config file!");
 			return;
 		}				
 		CreateNewZHScenario creator = new CreateNewZHScenario();
-		creator.init();
-		creator.run(args[0], Double.parseDouble(args[1]));
+		creator.run(args[0]);
 		log.info("Creation finished -----------------------------------------");
 	}
 	
 	// ====================================================================================
-	private void run(String runningLocation, double sampleFraction) {
-		if (runningLocation.equals("l")) {
-			this.currentDir = "//pingelap/matsim/";
-		}
-		else {
-			this.currentDir = "/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/projekt/matsim/";
-		}
-		this.sampleFraction = sampleFraction;
-		this.init();
-		
+	private void run(String configFile) {
+		this.init(configFile);
 		this.addSpecialPlans2Population(this.crossBorderPlansFilePath, "cross-border");
 		this.addSpecialPlans2Population(this.freightPlansFilePath, "freight");
 		this.write();
@@ -98,29 +88,31 @@ public class CreateNewZHScenario {
 	
 	// ====================================================================================
 	// read in network, facilities and plans into scenario
-	private void init() {
-		this.readPathsFile(currentDir, "herbie/configs/paths-config.xml");
+	private void init(String configFile) {
+		this.readConfig(configFile);
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansV2filePath);
 	}
 	
-	private void readPathsFile(String currentDir, String pathsfile) {
+	private void readConfig(String configFile) {
 		Config config = new Config();
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(currentDir + pathsfile);   	
+    	matsimConfigReader.readFile(configFile);   	
 		
-		this.outputFolder = currentDir + config.getParam("pathsettings", "outputFolder");
+		this.outputFolder = config.getParam("demandcreation", "outputFolder");
 		
 		// old scenario parts -----
-		this.networkfilePath = currentDir + config.getParam("pathsettings", "networkfilePath");
-		this.facilitiesfilePath = currentDir + config.getParam("pathsettings", "facilitiesfilePath");
-		this.plansV2filePath = currentDir + config.getParam("pathsettings", "plansV2filePath");
+		this.networkfilePath = config.getParam("demandcreation", "networkfilePath");
+		this.facilitiesfilePath = config.getParam("demandcreation", "facilitiesfilePath");
+		this.plansV2filePath = config.getParam("demandcreation", "plansV2filePath");
 		
 		// new demand -------------
-		this.crossBorderPlansFilePath = currentDir + config.getParam("pathsettings", "crossBorderPlansFilePath");
-		this.freightPlansFilePath = currentDir + config.getParam("pathsettings", "freightPlansFilePath");
+		this.crossBorderPlansFilePath = config.getParam("demandcreation", "crossBorderPlansFilePath");
+		this.freightPlansFilePath = config.getParam("demandcreation", "freightPlansFilePath");
+		
+		this.sampleFraction = Double.parseDouble(config.getParam("demandcreation", "sampleRatePercent"));
     }
 	
 	// ====================================================================================
@@ -220,8 +212,7 @@ public class CreateNewZHScenario {
 		}
 		return persons2remove;
 	}
-	
-	
+		
 	private void write() {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
 	}
