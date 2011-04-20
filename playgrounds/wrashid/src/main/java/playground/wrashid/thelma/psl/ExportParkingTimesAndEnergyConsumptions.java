@@ -70,7 +70,7 @@ public class ExportParkingTimesAndEnergyConsumptions {
 			LinkedList<Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs().get(personId);
 			
 			for (int i=0;i<parkingIntervals.size();i++){
-				System.out.println(personId + "\t" + parkingIntervals.get(i).getArrivalTime() + "\t" + parkingIntervals.get(i).getDepartureTime() + "\t" + parkingIntervals.get(i).getLinkId() + "\t" + parkingIntervals.get(i).getActTypeOfFirstActDuringParking() + "\t"  + energyConsumptionOfLegs.get(i));
+				System.out.println(personId + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getArrivalTime()) + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getDepartureTime()) + "\t" + parkingIntervals.get(i).getLinkId() + "\t" + parkingIntervals.get(i).getActTypeOfFirstActDuringParking() + "\t"  + energyConsumptionOfLegs.get(i));
 			}
 		}
 	}
