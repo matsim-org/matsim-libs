@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,6 +39,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -45,6 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -82,7 +85,9 @@ public class CreateNewZHScenario {
 	// ====================================================================================
 	private void run(String configFile) {
 		this.init(configFile);
+		log.info("Adding cross-border traffic ...");
 		this.addSpecialPlans2Population(this.crossBorderPlansFilePath, "cross-border");
+		log.info("Adding freight traffic ...");
 		this.addSpecialPlans2Population(this.freightPlansFilePath, "freight");
 		this.write();
 	}
@@ -134,7 +139,7 @@ public class CreateNewZHScenario {
 		this.map2Network((PopulationImpl) sTmp.getPopulation());
 		
 		if (type.equals("cross-border")) {
-			log.info("Adding cross-border traffic ...");
+			this.convertFromV1toV2(sTmp);
 			this.mapActivities2Facilities((PopulationImpl) sTmp.getPopulation());
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
@@ -144,7 +149,6 @@ public class CreateNewZHScenario {
 		
 		// facilities are already mapped
 		if (type.equals("freight")) {
-			log.info("Adding freight traffic ...");
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
 				sTmp.getPopulation().getPersons().remove(personId);
@@ -221,6 +225,26 @@ public class CreateNewZHScenario {
 			}
 		}
 		return persons2remove;
+	}
+	
+	private void convertFromV1toV2(Scenario inScenario) {		
+		for (Person p : inScenario.getPopulation().getPersons().values()){
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						ActivityImpl act = (ActivityImpl)pe;
+						String v2Type = ActTypeConverter.convert2FullType(act.getType());
+						double duration = 12.0;
+						if (!act.getType().equals("tta")) {
+							duration = Double.parseDouble(act.getType().substring(1));
+						}
+						act.setType(v2Type);
+						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
+					}
+				}
+			}
+		}
+		
 	}
 		
 	private void write() {
