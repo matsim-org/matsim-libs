@@ -89,11 +89,19 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		String eventsFile = "F:/temp/bvg.run128.25pct.100.events.xml.gz";
-		String plansFile = "F:/bvgAna/output/ITERS/it.0/bvgAna.0.plans.xml.gz";
-		String netFile = "F:/bvgAna/input/network.xml";
-		String transitScheduleFile = "F:/bvgAna/input/transitSchedule.xml";
-		String vehDefinitionFile = "F:/bvgAna/input/vehicles.xml";
+//		String eventsFile = "f:\\ils4\\data\\bvg\\runs\\bvg.run128.25pct\\it.100\\bvg.run128.25pct.100.events.xml.gz";
+//		String plansFile = "f:\\ils4\\data\\bvg\\runs\\bvg.run128.25pct\\it.100\\bvg.run128.25pct.100.plans.selected.xml.gz";
+//		String netFile = "E:\\temp\\network.final.xml.gz";
+//		String transitScheduleFile = "E:\\temp\\transitSchedule.xml.gz";
+//		String vehDefinitionFile = "E:\\temp\\transitVehicles.final.xml.gz";		
+//		String outFile = "E:\\temp\\out.txt";
+		
+		String eventsFile = "./bvg.run128.25pct.100.events.xml.gz";
+		String plansFile = "./bvg.run128.25pct.100.plans.selected.xml.gz";
+		String netFile = "./network.final.xml.gz";
+		String transitScheduleFile = "./transitSchedule.xml.gz";
+		String vehDefinitionFile = "./transitVehicles.final.xml.gz";
+		String outFile = "./out.txt";
 
 		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
@@ -141,44 +149,44 @@ public class TestMain {
 		stopIds.add(new IdImpl("804070.2"));
 
 		StopId2PersonEnterLeaveVehicleHandler stophandler = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
-		eventsManager.addHandler(stophandler);
+//		eventsManager.addHandler(stophandler);
 		PersonEnterLeaveVehicle2ActivityHandler enterLeaveHandler = new PersonEnterLeaveVehicle2ActivityHandler(agentIds);
-		eventsManager.addHandler(enterLeaveHandler);
+//		eventsManager.addHandler(enterLeaveHandler);
 		AgentId2EnterLeaveVehicleEventHandler aid2elhandler = new AgentId2EnterLeaveVehicleEventHandler(agentIds);
-		eventsManager.addHandler(aid2elhandler);
+//		eventsManager.addHandler(aid2elhandler);
 
 		VehId2OccupancyHandler veh2occu = new VehId2OccupancyHandler();
-		eventsManager.addHandler(veh2occu);
+//		eventsManager.addHandler(veh2occu);
 
 		VehId2LoadMap veh2load = new VehId2LoadMap(sc.getVehicles());
-		eventsManager.addHandler(veh2load);
+//		eventsManager.addHandler(veh2load);
 
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
-		eventsManager.addHandler(remainSeated);
+//		eventsManager.addHandler(remainSeated);
 
 		AgentId2PtTripTravelTimeMap a2ptleg = new AgentId2PtTripTravelTimeMap(agentIds);
-		eventsManager.addHandler(a2ptleg);
+//		eventsManager.addHandler(a2ptleg);
 
 		VehId2DelayAtStopMap v2delay = new VehId2DelayAtStopMap();
-		eventsManager.addHandler(v2delay);
+//		eventsManager.addHandler(v2delay);
 
 		StopId2DelayOfLine24hMap s224h = new StopId2DelayOfLine24hMap();
-		eventsManager.addHandler(s224h);
+//		eventsManager.addHandler(s224h);
 
 		VehId2PersonEnterLeaveVehicleMap v2ELM = new VehId2PersonEnterLeaveVehicleMap();
-		eventsManager.addHandler(v2ELM);
+//		eventsManager.addHandler(v2ELM);
 
 		VehId2AgentIds v2agid = new VehId2AgentIds();
-		eventsManager.addHandler(v2agid);
+//		eventsManager.addHandler(v2agid);
 
 		StopId2LineId2Pulk s2pulk = new StopId2LineId2Pulk();
-		eventsManager.addHandler(s2pulk);
+//		eventsManager.addHandler(s2pulk);
 
 		StopId2MissedVehMap s2mv = new StopId2MissedVehMap(plans);
 		eventsManager.addHandler(s2mv);
 		
 		VehDelayAtStopHistogram dH = new VehDelayAtStopHistogram(24 * 60);
-		eventsManager.addHandler(dH);
+//		eventsManager.addHandler(dH);
 
 		try {
 			reader.parse(eventsFile);
@@ -193,47 +201,48 @@ public class TestMain {
 			e.printStackTrace();
 		}
 
-		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
-
-		Map<Id, List<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
-
-		TreeMap<Id, Id> map3 = new TransitScheduleDataProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
-
-		Map<Id, List<PersonEntersVehicleEvent>> map4 = stophandler.getStopId2PersonEnterEventMap();
-		Map<Id, List<PersonLeavesVehicleEvent>> map5 = stophandler.getStopId2PersonLeaveEventMap();
-
-		Map<PersonEntersVehicleEvent, ActivityEndEvent> map6 = enterLeaveHandler.getPersonEntersVehicleEvent2ActivityEndEvent();
-		Map<PersonLeavesVehicleEvent, ActivityStartEvent> map7 = enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
-		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map8 = aid2elhandler.getAgentId2EnterEventMap();
-		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map9 = aid2elhandler.getAgentId2LeaveEventMap();
-
-		String name = new TransitScheduleDataProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
-
-		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
-
-		int occu = veh2occu.getVehicleLoad(new IdImpl("veh_8"), 46127.0);
-		double load = veh2load.getVehLoadByTime(new IdImpl("veh_8"), 46127.0);
-
-		Map<Id, List<StopId2RemainSeatedDataMapData>> remSeat = remainSeated.getStopId2RemainSeatedDataMap();
-		int rS = remSeat.get(new IdImpl("812013.1")).get(68).getNumberOfAgentsRemainedSeated();
-		double fS = remSeat.get(new IdImpl("812013.1")).get(68).getFractionRemainedSeated();
-
-		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
-
-		TreeMap<Id, StopId2DelayOfLine24hMapData> s22 = s224h.getStopId2DelayOfLine24hMap();
-
-		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> v2em = v2ELM.getVehId2PersonEnterEventMap();
-		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> v2lm = v2ELM.getVehId2PersonLeaveEventMap();
-
-		@SuppressWarnings("unused")
-		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(new IdImpl("veh_8"), 46127.0);
-
-		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
+//		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
+//
+//		Map<Id, List<Tuple<Id, Integer>>> testMap2 = comp.getNumberOfMissedVehiclesMap();
+//
+//		TreeMap<Id, Id> map3 = new TransitScheduleDataProvider(sc.getTransitSchedule()).getRouteId2lineIdMap();
+//
+//		Map<Id, List<PersonEntersVehicleEvent>> map4 = stophandler.getStopId2PersonEnterEventMap();
+//		Map<Id, List<PersonLeavesVehicleEvent>> map5 = stophandler.getStopId2PersonLeaveEventMap();
+//
+//		Map<PersonEntersVehicleEvent, ActivityEndEvent> map6 = enterLeaveHandler.getPersonEntersVehicleEvent2ActivityEndEvent();
+//		Map<PersonLeavesVehicleEvent, ActivityStartEvent> map7 = enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
+//		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> map8 = aid2elhandler.getAgentId2EnterEventMap();
+//		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> map9 = aid2elhandler.getAgentId2LeaveEventMap();
+//
+//		String name = new TransitScheduleDataProvider(sc.getTransitSchedule()).getStopName(stopIds.first());
+//
+//		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
+//
+//		int occu = veh2occu.getVehicleLoad(new IdImpl("veh_8"), 46127.0);
+//		double load = veh2load.getVehLoadByTime(new IdImpl("veh_8"), 46127.0);
+//
+//		Map<Id, List<StopId2RemainSeatedDataMapData>> remSeat = remainSeated.getStopId2RemainSeatedDataMap();
+//		int rS = remSeat.get(new IdImpl("812013.1")).get(68).getNumberOfAgentsRemainedSeated();
+//		double fS = remSeat.get(new IdImpl("812013.1")).get(68).getFractionRemainedSeated();
+//
+//		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
+//
+//		TreeMap<Id, StopId2DelayOfLine24hMapData> s22 = s224h.getStopId2DelayOfLine24hMap();
+//
+//		TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> v2em = v2ELM.getVehId2PersonEnterEventMap();
+//		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> v2lm = v2ELM.getVehId2PersonLeaveEventMap();
+//
+//		@SuppressWarnings("unused")
+//		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(new IdImpl("veh_8"), 46127.0);
+//
+//		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
 
 		TreeMap<Id, StopId2MissedVehMapData> s2mvR = s2mv.getStopId2StopId2MissedVehMapDataMap();
+		s2mv.writeResultsToFile(outFile);
 		
-		dH.dumpToConsole();
-		dH.write("F:/temp/delayHistogram.txt");
+//		dH.dumpToConsole();
+//		dH.write("F:/temp/delayHistogram.txt");
 
 		System.out.println("Waiting");
 
