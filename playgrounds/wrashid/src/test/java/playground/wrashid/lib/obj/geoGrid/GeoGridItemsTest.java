@@ -4,10 +4,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import junit.framework.TestCase;
 
-public class GeoGridListTest extends TestCase {
+public class GeoGridItemsTest extends TestCase {
 
 	public void testBasic(){
-		GeoGridList geoGridList=new GeoGridList<Integer>(10);
+		GeoGridItems geoGridList=new GeoGridItems<Integer>(10);
 		geoGridList.addElement(1.0, new CoordImpl(10.0, 10.0));
 		
 		assertEquals(0, geoGridList.getElementsWithinDistance(new CoordImpl(0,0), 0).size());
@@ -16,7 +16,7 @@ public class GeoGridListTest extends TestCase {
 	}
 	
 	public void testBasic2(){
-		GeoGridList geoGridList=new GeoGridList<Integer>(10);
+		GeoGridItems geoGridList=new GeoGridItems<Integer>(10);
 		geoGridList.addElement(1.0, new CoordImpl(9.0, 9.0));
 		geoGridList.addElement(1.0, new CoordImpl(18.0, 18.0));
 		geoGridList.addElement(1.0, new CoordImpl(27.0, 27.0));
