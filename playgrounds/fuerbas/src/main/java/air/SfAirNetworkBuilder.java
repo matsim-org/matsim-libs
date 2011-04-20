@@ -58,6 +58,7 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String airportCode = lineEntries[0];
 			double xValue = Double.parseDouble(lineEntries[1]);
+//				if (xValue<=-10.) System.out.println(oneLine);
 			double yValue = Double.parseDouble(lineEntries[2]);		
 			Coord coord = new CoordImpl(xValue, yValue);
 			Coord airportCoord = coordtransform.transform(coord);
@@ -73,8 +74,12 @@ public class SfAirNetworkBuilder {
 			String[] lineEntries = oneLine.split("\t");
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
-			double flightTime = Double.parseDouble(lineEntries[2])-600.;		//flight time in seconds, assumption: 600secs for taxi/take-off/landing
-			double groundSpeed = length/flightTime;						
+			double flightTime = Double.parseDouble(lineEntries[2]);		
+			if (flightTime>=3600.) flightTime-=600.;//flight time in seconds, assumption: 600secs for taxi/take-off/landing
+			else if (flightTime>=1800 && flightTime<3600.) flightTime-=300.;
+			else flightTime-=120.;
+			double groundSpeed = length/flightTime;	
+				if (groundSpeed<=50.) System.out.println(oneLine+"\t"+groundSpeed);
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
 			

@@ -20,9 +20,9 @@ public class SfFlightDelayAnalysis {
 	private Map<String, Double> scheduledArrival;
 	private Map<Integer, Integer> delay;	
 	
-	private static String actualTimes = "/home/soeren/workspace/arrivalstats.txt";
+	private static String actualTimes = "/home/soeren/bachelorarbeit/0.statistic.csv";
 	private static String scheduledTimes= "/home/soeren/workspace/oagEuroFlights.txt";
-	private static String delayOutput = "/home/soeren/workspace/delayOutput.csv";
+	private static String delayOutput = "/home/soeren/bachelorarbeit/delayOutput.csv";
 	
 	public SfFlightDelayAnalysis() {
 		this.actualArrival = new HashMap<String, Double>(); 

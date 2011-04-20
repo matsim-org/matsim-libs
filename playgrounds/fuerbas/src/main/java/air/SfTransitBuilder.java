@@ -46,6 +46,9 @@ public class SfTransitBuilder {
 		SfTransitBuilder builder = new SfTransitBuilder();
 		builder.createSchedule("/home/soeren/workspace/oagEuroFlights.txt");
 		
+//			German domestic flights only
+//		builder.createSchedule("/home/soeren/workspace/oagGermanFlights.txt");
+		
 	}
 		
 	public void createSchedule(String inputOagData) throws IOException {
@@ -53,6 +56,8 @@ public class SfTransitBuilder {
 		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
+//		Germany only
+//		config.network().setInputFile("/home/soeren/workspace/germanAirNetwork.xml");
 		ScenarioUtils.loadScenario(scen);		
 		Network network = scen.getNetwork();
 		scen.getConfig().scenario().setUseTransit(true);
@@ -152,9 +157,14 @@ public class SfTransitBuilder {
 		
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
 		scheduleWriter.write("/home/soeren/workspace/euroFlightSchedule.xml");
+//		Germany only		
+//		scheduleWriter.write("/home/soeren/workspace/germanFlightSchedule.xml");
+
 		
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
 		vehicleWriter.writeFile("/home/soeren/workspace/euroFlightVehicles.xml");
+//		Germany only
+//		vehicleWriter.writeFile("/home/soeren/workspace/GermanFlightVehicles.xml");
 			
 	}
 

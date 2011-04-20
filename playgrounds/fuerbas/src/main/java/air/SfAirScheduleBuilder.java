@@ -46,6 +46,8 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	
 	
+
+	
 	@SuppressWarnings("unchecked")
 	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs) throws IOException, SAXException, ParserConfigurationException {
 			
@@ -97,16 +99,20 @@ public class SfAirScheduleBuilder {
 			
 			
 				if (origin && destination) {
-					
+													
 				
 				if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
 					
 						String hours = lineEntries[13].substring(0, 3);
-						String minutes = lineEntries[13].substring(3);				
+						String minutes = lineEntries[13].substring(3);
 						double durationMinutes = Double.parseDouble(minutes)*60;	//convert flight dur minutes into seconds
 						double durationHours = Double.parseDouble(hours)*3600;
 						double duration = durationHours+durationMinutes;
 						double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10].substring(0, 2))*3600;
+						double utcOffset = getOffsetUTC(originCountry)*3600;
+						departureInSec=departureInSec-utcOffset;
+						double stops = Double.parseDouble(lineEntries[15]);
+						String fullRouting = lineEntries[40];
 						
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
@@ -131,13 +137,20 @@ public class SfAirScheduleBuilder {
 							//LÖSCHEN ENDE
 						
 						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator) && seatsAvail>0 && !originAirport.equalsIgnoreCase(destinationAirport) &&
-												this.airportsInOsm.containsKey(originAirport) && this.airportsInOsm.containsKey(destinationAirport)) {
+												this.airportsInOsm.containsKey(originAirport) && this.airportsInOsm.containsKey(destinationAirport)
+													&& !originAirport.equalsIgnoreCase("HAD") && !destinationAirport.equalsIgnoreCase("HAD")
+													&& !originAirport.equalsIgnoreCase("BAX") && !destinationAirport.equalsIgnoreCase("BAX")
+													&& !originAirport.equalsIgnoreCase("CER") && !destinationAirport.equalsIgnoreCase("CER")
+													&& !aircraftType.equalsIgnoreCase("BUS")
+													&& (stops<1) && (fullRouting.length()<=6)) {
 							
 							if (!this.routes.containsKey(route)) {
 								this.routes.put(route, duration);
 							}
 							
 							this.cityPairDistance.put(route, flightDistance);
+							
+							if ((flightDistance*1000/duration)<=40.) System.out.println("too low speed :"+flightDesignator);
 							
 							bwOag.write(
 									route+"\t"+											//TransitRoute
@@ -206,6 +219,70 @@ public class SfAirScheduleBuilder {
 		
 	}
 	
+	
+	private double getOffsetUTC(String originCountry) {
+		
+		if (originCountry.equalsIgnoreCase("AD")) return 2;
+		else if (originCountry.equalsIgnoreCase("AL")) return 2;
+		else if (originCountry.equalsIgnoreCase("AM")) return 5;
+		else if (originCountry.equalsIgnoreCase("AT")) return 2;
+		else if (originCountry.equalsIgnoreCase("AX")) return 3;
+		else if (originCountry.equalsIgnoreCase("AZ")) return 5;
+		else if (originCountry.equalsIgnoreCase("BA")) return 2;
+		else if (originCountry.equalsIgnoreCase("BE")) return 2;
+		else if (originCountry.equalsIgnoreCase("BG")) return 3;
+		else if (originCountry.equalsIgnoreCase("BY")) return 3;
+		else if (originCountry.equalsIgnoreCase("CH")) return 2;
+		else if (originCountry.equalsIgnoreCase("CY")) return 3;
+		else if (originCountry.equalsIgnoreCase("CZ")) return 2;
+		else if (originCountry.equalsIgnoreCase("DE")) return 2;
+		else if (originCountry.equalsIgnoreCase("DK")) return 2;
+		else if (originCountry.equalsIgnoreCase("EE")) return 3;
+		else if (originCountry.equalsIgnoreCase("ES")) return 2;
+		else if (originCountry.equalsIgnoreCase("FI")) return 3;
+		else if (originCountry.equalsIgnoreCase("FO")) return 1;
+		else if (originCountry.equalsIgnoreCase("FR")) return 2;
+		else if (originCountry.equalsIgnoreCase("GB")) return 1;
+		else if (originCountry.equalsIgnoreCase("GI")) return 2;
+		else if (originCountry.equalsIgnoreCase("GE")) return 4;
+		else if (originCountry.equalsIgnoreCase("GG")) return 1;
+		else if (originCountry.equalsIgnoreCase("GR")) return 3;
+		else if (originCountry.equalsIgnoreCase("HR")) return 2;
+		else if (originCountry.equalsIgnoreCase("HU")) return 2;
+		else if (originCountry.equalsIgnoreCase("IE")) return 1;
+		else if (originCountry.equalsIgnoreCase("IM")) return 1;
+		else if (originCountry.equalsIgnoreCase("IS")) return 0;
+		else if (originCountry.equalsIgnoreCase("IT")) return 2;
+		else if (originCountry.equalsIgnoreCase("JE")) return 1;
+		else if (originCountry.equalsIgnoreCase("KZ")) return 6;
+		else if (originCountry.equalsIgnoreCase("LI")) return 2;
+		else if (originCountry.equalsIgnoreCase("LT")) return 3;
+		else if (originCountry.equalsIgnoreCase("LU")) return 2;
+		else if (originCountry.equalsIgnoreCase("LV")) return 3;
+		else if (originCountry.equalsIgnoreCase("MC")) return 2;
+		else if (originCountry.equalsIgnoreCase("MD")) return 3;
+		else if (originCountry.equalsIgnoreCase("ME")) return 2;
+		else if (originCountry.equalsIgnoreCase("MK")) return 2;
+		else if (originCountry.equalsIgnoreCase("MT")) return 2;
+		else if (originCountry.equalsIgnoreCase("NL")) return 2;
+		else if (originCountry.equalsIgnoreCase("NO")) return 2;
+		else if (originCountry.equalsIgnoreCase("PL")) return 2;
+//			Azores are UTC, while mainland and Madeira are UTC+1
+		else if (originCountry.equalsIgnoreCase("PT")) return 1;
+		else if (originCountry.equalsIgnoreCase("RO")) return 3;
+		else if (originCountry.equalsIgnoreCase("RS")) return 0;
+//			Russia with Moscow time zone offset UTC+4
+		else if (originCountry.equalsIgnoreCase("RU")) return 4;
+		else if (originCountry.equalsIgnoreCase("SE")) return 2;
+		else if (originCountry.equalsIgnoreCase("SI")) return 2;
+		else if (originCountry.equalsIgnoreCase("SJ")) return 2;
+		else if (originCountry.equalsIgnoreCase("SK")) return 2;
+		else if (originCountry.equalsIgnoreCase("SM")) return 2;
+		else if (originCountry.equalsIgnoreCase("TR")) return 3;
+		else if (originCountry.equalsIgnoreCase("UA")) return 3;
+		else if (originCountry.equalsIgnoreCase("VA")) return 2;
+		else return 0;
+	}	
 	
 	
 
