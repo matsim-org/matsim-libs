@@ -199,7 +199,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 	private int getNumberOfOperations(final double rate, final double populationSize) {
 		// always perform at least one operation of each CO
-		return Math.max(1, (int) Math.ceil(rate * populationSize));
+		//return Math.max(1, (int) Math.ceil(rate * populationSize));
+		return (int) Math.ceil(rate * populationSize);
 	}
 
 	private void notifyCO(
@@ -311,8 +312,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			oldValue1 = gene1.doubleValue();
 			oldValue2 = gene2.doubleValue();
 			
-			gene1.setAllele((1 - crossingCoef1)*oldValue1 + crossingCoef1*oldValue2);
-			gene2.setAllele(crossingCoef2*oldValue1 + (1 - crossingCoef2)*oldValue2);
+			gene1.setAllele((1d - crossingCoef1)*oldValue1 + crossingCoef1*oldValue2);
+			gene2.setAllele(crossingCoef2*oldValue1 + (1d - crossingCoef2)*oldValue2);
 		}
 	}
 
@@ -329,16 +330,19 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			final int crossingPoint) {
 		double mate1PlanDuration = 0d;
 		double crossOverSurplus = 0d;
-		double currentEpisodeDuration;
+		double currentSurplus;
+		double currentEpisodeDuration1;
+		double currentEpisodeDuration2;
 		double minIndivCoef = 0;
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes=nGenesIterator.next();
-		int countGenes = 1;
+		int countGenes = 0;
+		double minPosDurationCoef = Double.POSITIVE_INFINITY;
 
 		// move count gene through the uncrossed part of the plan and
 		// initialize the first plan duration.
 		for (int i=this.N_BOOL; i < this.N_BOOL + crossingPoint; i++) {
-			if (countGenes > currentNGenes) {
+			if (countGenes == currentNGenes) {
 				countGenes = 1;
 				currentNGenes = nGenesIterator.next();
 				mate1PlanDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
@@ -349,40 +353,51 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		}
 	
 		for (int i=this.N_BOOL + crossingPoint; i < this.N_BOOL + this.N_DOUBLE; i++) {
-			if (countGenes > currentNGenes) {
+			if (countGenes == currentNGenes) {
 				// end of the individual plan reached.
 				countGenes = 1;
 				currentNGenes = nGenesIterator.next();
 				minIndivCoef = Math.min(minIndivCoef,
-						calculateCoef(mate1PlanDuration, crossOverSurplus));
+						calculatePlanDurCoef(mate1PlanDuration, crossOverSurplus));
 				crossOverSurplus = 0d;
 				mate1PlanDuration = 0d;
 			} else {
 				countGenes++;
 			}
 
-			currentEpisodeDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
-			mate1PlanDuration += currentEpisodeDuration;
+			currentEpisodeDuration1 = ((DoubleGene) mate1Genes[i]).doubleValue();
+			currentEpisodeDuration2 = ((DoubleGene) mate2Genes[i]).doubleValue();
+			mate1PlanDuration += currentEpisodeDuration1;
 
-			crossOverSurplus += ((DoubleGene) mate2Genes[i]).doubleValue() -
-				currentEpisodeDuration;
+			currentSurplus = currentEpisodeDuration2 - currentEpisodeDuration1;
+
+			if (currentSurplus < 0) {
+				minPosDurationCoef = Math.min(
+						minPosDurationCoef,
+						-currentEpisodeDuration1 / currentSurplus);
+			}
+
+			crossOverSurplus += currentSurplus;
 		}
 
 		// take the last individual plan into account
 		minIndivCoef = Math.min(minIndivCoef,
-			calculateCoef(mate1PlanDuration, crossOverSurplus));
+			calculatePlanDurCoef(mate1PlanDuration, crossOverSurplus));
+
+		//take both plan duration and positive duration into account
+		minIndivCoef = Math.min(minIndivCoef, minPosDurationCoef);
 
 		return Math.min(1d, minIndivCoef);
 	}
 
-	private double calculateCoef(
+	private double calculatePlanDurCoef(
 			final double mate1PlanDuration,
 			final double crossOverSurplus) {
 		if (Math.abs(crossOverSurplus) < EPSILON) {
 			return 1d;
 		} else {
 			double upperLimit = (DAY_DURATION - mate1PlanDuration) / crossOverSurplus;
-			return Math.min(1d, upperLimit);
+			return Math.max(0d, Math.min(1d, upperLimit));
 		}
 	}
 
@@ -451,24 +466,29 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		double currentEpisodeDuration;
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes=nGenesIterator.next();
-		int countGenes = 1;
+		int countGenes = 0;
 		boolean crossingPointIsPast = false;
 		double randomCoef = this.randomGenerator.nextDouble();
+		double posDurCoef = 1d;
+		double coef;
 	
 		for (int i=this.N_BOOL; i < this.N_BOOL + this.N_DOUBLE; i++) {
-			if (countGenes > currentNGenes) {
+			if (countGenes == currentNGenes) {
 				if (!crossingPointIsPast) {
 					// end of an individual plan reached.
-					countGenes = 1;
+					countGenes = 0;
 					currentNGenes = nGenesIterator.next();
 					mate1PlanDuration = 0d;
 				}
 				else {
-					return randomCoef *
-						Math.min(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
+					coef = Math.min(posDurCoef,
+							calculatePlanDurCoef(
+								mate1PlanDuration,
+								crossOverSurplus));
+					coef = Math.min(1d, coef);
+					coef = Math.max(0d, coef);
+					return randomCoef * coef;
 				}
-			} else {
-				countGenes++;
 			}
 
 			currentEpisodeDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
@@ -477,14 +497,23 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			if (i==crossingPoint) {
 				crossOverSurplus = ((DoubleGene) mate2Genes[i]).doubleValue() -
 					currentEpisodeDuration;
+				if (crossOverSurplus < 0) {
+					posDurCoef = -currentEpisodeDuration / crossOverSurplus;
+				}
 				crossingPointIsPast = true;
 			}
+			countGenes++;
 		}
 
 		if (crossingPointIsPast) {
 			// if the crossing point was in the last plan
-			return randomCoef *
-					Math.min(1d, calculateCoef(mate1PlanDuration, crossOverSurplus));
+			coef = Math.min(posDurCoef,
+				calculatePlanDurCoef(
+					mate1PlanDuration,
+					crossOverSurplus));
+			coef = Math.min(1d, coef);
+			coef = Math.max(0d, coef);
+			return randomCoef * coef;
 		}
 
 		throw new RuntimeException("Single cross over coefficient computation failed!");

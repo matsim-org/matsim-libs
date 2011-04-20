@@ -289,6 +289,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		return this.numModeGenes;
 	}
 
+	public List<Integer> getNDurationGenesPerIndiv() {
+		return this.nDurationGenes;
+	}
+
 	/**
 	 * to avoid multiplying the places where the day duration is defined.
 	 * Not very elegant, should be moved somewhere else, for example in the config

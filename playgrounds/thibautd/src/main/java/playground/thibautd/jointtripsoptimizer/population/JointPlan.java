@@ -94,7 +94,7 @@ public class JointPlan implements Plan {
 
 		//TODO: check for consistency (referenced IDs, etc)
 		for (Id id: plans.keySet()) {
-			currentPlan = new PlanImpl();
+			currentPlan = new PlanImpl(this.clique.getMembers().get(id));
 
 			for (PlanElement pe : plans.get(id).getPlanElements()) {
 

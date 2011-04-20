@@ -29,9 +29,11 @@ import org.apache.log4j.Logger;
 import org.jgap.IChromosome;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -169,6 +171,9 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		int[] subtourIndexation = this.analyseSubtours.getSubtourIndexation();
 		int legIndex = 0;
 		String[] subtourModes;
+		// TODO: move at a higher level (ie at the construction)
+		boolean hasCar = 
+			!"never".equals(((PersonImpl) individualPlan.getPerson()).getCarAvail());
 
 		Plan output = new PlanImpl(individualPlan.getPerson());
 		List<PlanElement> planElements = individualPlan.getPlanElements();
@@ -184,7 +189,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		subtourModes = getModeChoice(
 				modeGenes,
 				subtourLabels,
-				fatherTable);
+				fatherTable,
+				hasCar);
 
 		// iterate over the plan elements, setting the mode according to the genes.
 		for (PlanElement pe : planElements) {
@@ -215,7 +221,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	private String[] getModeChoice(
 			final List<JointPlanOptimizerJGAPModeGene> modeGenes,
 			final String[] subtourLabels,
-			final int[] fatherTable) {
+			final int[] fatherTable,
+			final boolean hasCar) {
 		int nSubtours = this.analyseSubtours.getNumSubtours();
 		String[] output = new String[nSubtours];
 		List<String> currentGeneValue;
@@ -235,7 +242,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 				if (isFeasibleMode(
 							mode,
 							subtourLabels[i],
-							fatherMode)) {
+							fatherMode,
+							hasCar)) {
 					output[i] = mode;
 					break;
 				}
@@ -252,7 +260,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	private boolean isFeasibleMode(
 			final String mode,
 			final String subtourLabel,
-			final String fatherMode) {
+			final String fatherMode,
+			final boolean hasCar) {
 		if (!isChainBased(mode)) {
 			if ((subtourLabel.equals(FREE_LABEL)) ||
 					(subtourLabel.equals(PASSENGER_LABEL))){
@@ -262,20 +271,22 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 			return false;
 		}
 
-		return isFeasibleChainMode(mode, subtourLabel, fatherMode);
+		return isFeasibleChainMode(mode, subtourLabel, fatherMode, hasCar);
 	}
 
 	private boolean isFeasibleChainMode(
 			final String mode,
 			final String subtourLabel,
-			final String fatherMode) {
+			final String fatherMode,
+			final boolean hasCar) {
 		if (subtourLabel.equals(DRIVER_LABEL)) {
 			return (mode.equals(TransportMode.car));
 		}
 		boolean notAPassengerSubtour = (!subtourLabel.equals(PASSENGER_LABEL));
 		boolean vehicleAvailable = fatherMode.equals(ROOT_MODE) ||
 			mode.equals(fatherMode);
-		return notAPassengerSubtour && vehicleAvailable;
+		boolean isCarAndNoDriver = mode.equals(TransportMode.car) && (!hasCar);
+		return notAPassengerSubtour && vehicleAvailable && (!isCarAndNoDriver);
 	}
 
 	private boolean isChainBased(final String mode) {

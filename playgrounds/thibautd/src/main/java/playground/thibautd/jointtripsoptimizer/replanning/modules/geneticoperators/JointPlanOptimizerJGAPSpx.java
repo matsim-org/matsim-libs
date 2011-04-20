@@ -20,6 +20,8 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 
 	public static final long serialVersionUID = 1L;
 
-	private static final double EPSILON = 0.0000001d;
+	private static final double EPSILON = 1E-6;
 
 	private final double expansionRate;
 	private final int numberOfParents;
@@ -55,8 +57,10 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	private final double coRate;
 	private final List<Integer> nDurationGenesPerIndiv;
 	private final double dayDuration = 24*3600;
+	private final int numberOfHillClimbingSteps = 1;
 
 	private final RandomGenerator generator;
+	private final Comparator<IChromosome> comparator = new FitnessValueComparator();
 
 	public JointPlanOptimizerJGAPSpx(
 			final JointPlanOptimizerJGAPConfiguration config,
@@ -78,44 +82,64 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	}
 
 	@Override
-	public void operate(Population a_population, List a_candidateChromosome) {
+	public void operate(
+			final Population a_population,
+			final List a_candidateChromosome) {
 		int populationSize = a_population.size();
 
-		IChromosome[] fathers;
+		List<IChromosome> fathers;
 		double[][] fatherValues;
 		double[] centerOfMass;
 		double[][] edges;
 		double[] variablePart;
 		double[] offspring;
+		List<IChromosome> workingList = new ArrayList<IChromosome>(
+				this.numberOfParents + this.numberOfOffsprings);
 
 		int generatedOffsprings;
 		for (int i=0;
 				i < getNumberOfOperations(this.coRate, populationSize); 
 				i += this.numberOfOffsprings) {
-			// generate the simplex
+			// get "initial" fathers randomly from the population
 			fathers = getFathers(a_population);
-			fatherValues = getFatherValues(fathers);
-			centerOfMass = getCenterOfMass(fatherValues);
-			edges = getSimplexEdges(centerOfMass, fatherValues);
 
-			// sample from the simplex
 			generatedOffsprings = 0;
-			while (generatedOffsprings < this.numberOfOffsprings) {
-				variablePart = getVariablePart(edges);
-				offspring = getOffspring(edges, variablePart);
-				
-				if (isAcceptable(offspring)) {
-					retainValue(offspring, fathers, a_candidateChromosome);
-					generatedOffsprings++;
+			for (int j=0; j < numberOfHillClimbingSteps; j++) {
+				// generate the simplex
+				fatherValues = getFatherValues(fathers);
+				centerOfMass = getCenterOfMass(fatherValues);
+				edges = getSimplexEdges(centerOfMass, fatherValues);
+
+				// sample from the simplex
+				while (generatedOffsprings < this.numberOfOffsprings) {
+					variablePart = getVariablePart(edges);
+					offspring = getOffspring(edges, variablePart);
+					
+					if (isAcceptable(offspring)) {
+						retainValue(offspring, fathers, workingList);
+						generatedOffsprings++;
+					}
+					else {
+						// should be moved to a test case: there is no point in checking
+						// something that mustn't occur during the runs.
+						throw new RuntimeException("unacceptable moves cannot be "+
+								"generated!");
+					}
 				}
-				else {
-					// should be moved to a test case: there is no point in checking
-					// something that mustn't occur during the runs.
-					throw new RuntimeException("unacceptable moves cannot be "+
-							"generated!");
+
+				//prepare next step
+				if (j < numberOfHillClimbingSteps - 1) {
+					generatedOffsprings = 0;
+					workingList.addAll(fathers);
+					Collections.sort(workingList, this.comparator);
+					fathers.clear();
+					fathers.addAll(workingList.subList(0,this.numberOfParents));
+					workingList.clear();
 				}
 			}
 		}
+
+		a_candidateChromosome.addAll(workingList);
 	}
 
 	/**
@@ -123,13 +147,13 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	 * The chromosomes are drawn without replacement, to ensure that the fathers
 	 * are different.
 	 */
-	private IChromosome[] getFathers(final Population a_population) {
+	private List<IChromosome> getFathers(final Population a_population) {
 		if (a_population.size() < this.numberOfParents) {
 			throw new IllegalArgumentException("the population size must be "+
 					"greater to the number of double genes to work with SPX");
 		}
 
-		IChromosome[] output = new IChromosome[this.numberOfParents];
+		List<IChromosome> output = new ArrayList<IChromosome>(this.numberOfParents);
 		int popSize = a_population.size();
 		List<Integer> alreadyChoosen = new ArrayList<Integer>(this.numberOfParents);
 		int randomIndex;
@@ -138,7 +162,7 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 			randomIndex = this.generator.nextInt(popSize);
 
 			if (!alreadyChoosen.contains(randomIndex)) {
-				output[i] = a_population.getChromosome(randomIndex);
+				output.add(a_population.getChromosome(randomIndex));
 
 				alreadyChoosen.add(randomIndex);
 				i++;
@@ -154,12 +178,12 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	 * @return a bi dimensionnal array X: X_ij is the value of the jth double gene
 	 * of father i.
 	 */
-	private double[][] getFatherValues(final IChromosome[] fathers) {
+	private double[][] getFatherValues(final List<IChromosome> fathers) {
 		Gene[] currentGenes;
-		double[][] output = new double[fathers.length][this.numberOfDoubleGenes];
+		double[][] output = new double[fathers.size()][this.numberOfDoubleGenes];
 
-		for (int i=0; i < fathers.length; i++) {
-			currentGenes = fathers[i].getGenes();
+		for (int i=0; i < fathers.size(); i++) {
+			currentGenes = fathers.get(i).getGenes();
 			for (int j=0; j < this.numberOfDoubleGenes; j++) {
 				output[i][j] = 
 					((DoubleGene) currentGenes[this.numberOfBooleanGenes + j])
@@ -184,7 +208,7 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	}
 
 	/**
-	 * get the "edges" of the simplex (named Y in tsutsui and goldberg 2002)
+	 * get the edges of the simplex (named Y in tsutsui and goldberg 2002)
 	 */
 	private double[][] getSimplexEdges(
 			final double[] centerOfMass,
@@ -219,11 +243,13 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 		for (int i=0; i < this.numberOfDoubleGenes; i++) {
 			currentValue = parent[i] - centerOfMass[i];
 
-			if (currentValue < EPSILON) {
+			if (currentValue < -EPSILON) {
 				currentValue = -centerOfMass[i] / currentValue;
 				upperBound = Math.min(upperBound, currentValue);
 			}
 		}
+
+		if (upperBound < 1d) log.error("expansion < 1 for act duration");
 
 		// plan duration
 		upperBound = Math.min(
@@ -248,6 +274,10 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 			if (count == nGenes) {
 				// compute upper bound
 				denom = currentDuration - centerOfMassDur;
+				if ((dayDuration - currentDuration) < -EPSILON) {
+					log.error("1 -> invalid father duration "+(dayDuration - currentDuration));
+				}
+
 				if (denom > EPSILON) {
 					output = Math.min(
 							output,
@@ -267,12 +297,16 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 
 		// treat the last plan
 		denom = currentDuration - centerOfMassDur;
+		if ((dayDuration - currentDuration) < -EPSILON) {
+			log.error("2 -> invalid father duration "+(dayDuration - currentDuration));
+		}
 		if (denom > EPSILON) {
 			output = Math.min(
 					output,
 					(dayDuration - centerOfMassDur) / denom);
 		}
 
+		if (output < 1d) log.error("expansion < 1 for plan duration");
 		return output;
 	}
 
@@ -345,11 +379,11 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	 */
 	private void retainValue(
 			final double[] offspring,
-			final IChromosome[] fathers,
+			final List<IChromosome> fathers,
 			final List a_candidateChromosome) {
 		//get a random father to include the generated value in
 		IChromosome newChrom = (IChromosome)
-			fathers[this.generator.nextInt(this.numberOfParents)].clone();
+			fathers.get(this.generator.nextInt(this.numberOfParents)).clone();
 		Gene[] genes = newChrom.getGenes();
 
 		// set the double values to the "crossed" ones
@@ -418,6 +452,28 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 		}
 
 		return output;
+	}
+
+	/**
+	 * comparator aimed at classing chromosomes in ascending order: if f(C1) > f(C2),
+	 * compare(C1, C2) = -1.
+	 */
+	private class FitnessValueComparator implements Comparator<IChromosome> {
+		public FitnessValueComparator() {}
+
+		public int compare(final IChromosome chrom1, final IChromosome chrom2) {
+			double fit1 = chrom1.getFitnessValue();
+			double fit2 = chrom2.getFitnessValue();
+			if (fit1 > fit2) {
+				return -1;
+			}
+			else if (fit1 < fit2) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
 	}
 }
 

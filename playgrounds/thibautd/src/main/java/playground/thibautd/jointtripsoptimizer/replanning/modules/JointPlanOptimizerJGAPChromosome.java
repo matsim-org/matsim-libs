@@ -47,6 +47,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	private final int nDoubleGenes;
 	private final int nModeGenes;
 	private final double dayDuration;
+	private final List<Integer> nDurationGenes;
 
 	public JointPlanOptimizerJGAPChromosome(Configuration a_configuration, Gene[] genes) throws InvalidConfigurationException {
 		super(a_configuration, genes);
@@ -57,6 +58,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
 			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
 			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
+			this.nDurationGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNDurationGenesPerIndiv();
 		} catch (ClassCastException e) {
 			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
 					"must be initialized with JointPlanOptimizerJGAPConfiguration");
@@ -72,6 +74,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
 			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
 			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
+			this.nDurationGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNDurationGenesPerIndiv();
 		} catch (ClassCastException e) {
 			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
 					"must be initialized with JointPlanOptimizerJGAPConfiguration");
@@ -153,7 +156,6 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		return copy;
 	}
 
-
 	@Override
 	public boolean isHandlerFor(Object a_obj, Class a_class) {
 		return (a_class == JointPlanOptimizerJGAPChromosome.class);
@@ -214,6 +216,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		Double[] randomDurations = new Double[this.nDoubleGenes + 1];
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		double scalingFactor = 0d;
+		int countDoubleGenes = 0;
 
 		// create a random chromosome, taking into account the structure of a
 		// JointPlan chromosome and the time constraints
@@ -221,19 +224,23 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 			newGenes[j] = new BooleanGene(this.getConfiguration(),
 					generator.nextBoolean());
 		}
+		
+		for (int planLength : this.nDurationGenes) {
+			scalingFactor = 0d;
+			for (int j=0; j <= planLength; j++) {
+				randomDurations[j] = generator.nextDouble();
+				scalingFactor += randomDurations[j];
+			}
 
-		for (int j=0; j <= this.nDoubleGenes; j++) {
-			randomDurations[j] = generator.nextDouble();
-			scalingFactor += randomDurations[j];
-		}
+			scalingFactor = this.dayDuration / scalingFactor;
 
-		scalingFactor = this.dayDuration / scalingFactor;
+			for (int j=0; j < planLength; j++) {
+				newDoubleGene =  new DoubleGene(this.getConfiguration(), 0d, this.dayDuration);
+				newDoubleGene.setAllele(scalingFactor * randomDurations[j]);
 
-		for (int j=0; j < this.nDoubleGenes; j++) {
-			newDoubleGene =  new DoubleGene(this.getConfiguration(), 0d, this.dayDuration);
-			newDoubleGene.setAllele(scalingFactor * randomDurations[j]);
-
-			newGenes[this.nBooleanGenes + j] = newDoubleGene;
+				newGenes[this.nBooleanGenes + countDoubleGenes] = newDoubleGene;
+				countDoubleGenes++;
+			}
 		}
 
 		if (this.nModeGenes > 0) {
