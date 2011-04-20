@@ -86,6 +86,10 @@ public class PendlerMatrixReader {
 	}
 
 	private void readMatrix(final String filename) {
+		
+		Logger.getLogger(this.getClass()).warn("this method may read double entries in the Pendlermatrix (such as Nuernberg) twice. " +
+				"If this may be a problem, you need to check.  kai, apr'11" ) ;
+		
 		System.out.println("======================" + "\n"
 						   + "Start reading " + filename + "\n"
 						   + "======================" + "\n");
