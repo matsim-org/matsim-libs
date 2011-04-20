@@ -63,7 +63,7 @@ public class CountsAnalyser {
 	public static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
 	private Scenario scenario;
 	private NetworkImpl network;
-	private String outputPath = "../../matsim/output/";
+	private String outputPath;
 	private String outputFormat;
 	private Double distanceFilter;
 	private String distanceFilterCenterNode;
@@ -77,7 +77,7 @@ public class CountsAnalyser {
 		this.linkstatsfile = linkstatsfile;
 
 		try {
-			this.readConfig("../../matsim/input/config.xml");
+			this.readConfig("src/main/java/playground/anhorni/input/counts/config.xml");
 			this.writeCountsComparisonList(this.outputPath, this.outputFormat);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -88,6 +88,9 @@ public class CountsAnalyser {
 	private void readConfig(final String configFile) throws Exception {
 		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = this.scenario.getConfig();
+		
+		this.outputPath = config.controler().getOutputDirectory();
+		
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
