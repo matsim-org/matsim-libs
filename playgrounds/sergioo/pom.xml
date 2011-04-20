@@ -1,11 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>playground</groupId>
+	<artifactId>sergioo</artifactId>
+	<name>sergioo</name>
+	<version>0.2.0-SNAPSHOT</version>
 	<repositories>
 		<repository>
 			<snapshots>
@@ -21,10 +24,6 @@
 			<layout>default</layout>
 		</repository>
 	</repositories>
-	<groupId>playground</groupId>
-	<artifactId>sergioo</artifactId>
-	<name>sergioo</name>
-	<version>0.4.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

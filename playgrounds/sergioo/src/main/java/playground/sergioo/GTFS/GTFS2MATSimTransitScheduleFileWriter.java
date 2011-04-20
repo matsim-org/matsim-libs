@@ -95,13 +95,22 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 
 	private void updateNetwork() {
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(RoutePath.NEW_NETWORK_LINKS_FILE));
+			BufferedReader reader = new BufferedReader(new FileReader(RoutePath.NEW_NETWORK_NODES_FILE));
 			String line = reader.readLine();
+			while(line!=null) {
+				Id id = new IdImpl(line);
+				network.addNode(network.getFactory().createNode(id, new CoordImpl(Double.parseDouble(reader.readLine()), Double.parseDouble(reader.readLine()))));
+				line = reader.readLine();
+			}
+			reader.close();
+			reader = new BufferedReader(new FileReader(RoutePath.NEW_NETWORK_LINKS_FILE));
+			line = reader.readLine();
 			while(line!=null) {
 				Id id = new IdImpl(line);
 				network.addLink(network.getFactory().createLink(id, network.getNodes().get(new IdImpl(reader.readLine())), network.getNodes().get(new IdImpl(reader.readLine()))));
 				line = reader.readLine();
 			}
+			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

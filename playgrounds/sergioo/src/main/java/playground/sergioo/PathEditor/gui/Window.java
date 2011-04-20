@@ -137,8 +137,8 @@ public class Window extends JFrame implements ActionListener {
 	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
 	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
 	public static int MIN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width/2;
-	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/2;
-	public static int FRAMESIZE = 5;
+	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/3;
+	public static int FRAMESIZE = 20;
 	
 	//Attributes
 	public static int width;
@@ -262,10 +262,10 @@ public class Window extends JFrame implements ActionListener {
 			int first = routePath.isFirstLinkWithStop();
 			if(first!=-1)
 				routePath.removeLinksTo(first);
-		}
-		isOk();
-		if(linksS!=null && saveButton.isEnabled())
 			save();
+		}
+		else
+			isOk();
 	}
 	public Option getOption() {
 		return option;
@@ -297,6 +297,12 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void unselectNode() {
 		selectedNode = null;
+	}
+	public void createNode(double x, double y) {
+		int res = JOptionPane.showConfirmDialog(this, "Are you sure to create that node?");
+		if(res == JOptionPane.YES_OPTION) {
+			selectedNode = routePath.createNode(x,y);
+		}
 	}
 	public void addFirst() {
 		panel.waitSecondCoord();

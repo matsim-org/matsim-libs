@@ -98,7 +98,7 @@ public class RoutesPathsGenerator {
 		reader.close();
 	}
 	public void run() throws IOException {
-		System.out.println(routes.size());
+		System.out.println("Total number of routes: "+routes.size());
 		int i=0;
 		for(Entry<String,Route> route:routes.entrySet()) {
 			for(Entry<String,Trip> tripEntry:route.getValue().getTrips().entrySet())

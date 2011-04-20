@@ -239,15 +239,14 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
-		if(e.getClickCount()==2) {
+		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
-		}
 		else {
 			if(wait) {
 				window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
 				wait=false;
 			}
-			else {
+			else
 				if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
 					window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
@@ -256,6 +255,8 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 					window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
 					window.unselectStop();
+				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1 && e.getClickCount()==2)
+					window.createNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1)
 					window.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3)
@@ -264,7 +265,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 					camera.zoomIn(e.getX(), e.getY());
 				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
 					camera.zoomOut(e.getX(), e.getY());
-			}
 		}
 		repaint();
 	}

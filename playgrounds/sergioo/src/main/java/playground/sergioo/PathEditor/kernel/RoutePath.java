@@ -40,6 +40,7 @@ public class RoutePath {
 	
 	//Constants
 	private static final double MIN_DISTANCE_DELTA = 20*180/(6371000*Math.PI);
+	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes.txt");
 	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
 	//Attributes
 	private Map<String, Stop> stops;
@@ -278,6 +279,20 @@ public class RoutePath {
 			e.printStackTrace();
 		}
 	}
+	public Node createNode(double x, double y) {
+		Node node = network.getFactory().createNode(new IdImpl("n"+network.getNodes().size()), new CoordImpl(x, y));
+		network.addNode(node);
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(NEW_NETWORK_NODES_FILE,true));
+			writer.println(node.getId());
+			writer.println(node.getCoord().getX());
+			writer.println(node.getCoord().getY());
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return node;
+	}
 	public void removeLink(int index) {
 		links.remove(index);
 	}
@@ -509,7 +524,7 @@ public class RoutePath {
 				int pos=getLinkPosition(link.getId().toString());
 				if(pos==-1)
 					return stopTime.getStopId();
-				if(pos==links.size()-1)
+				if(pos==links.size()-1||pos==0)
 					return "";
 				Link link2 = links.get(pos+1);
 				fromPoint = new Point2D(link2.getFromNode().getCoord().getX(), link2.getFromNode().getCoord().getY());
