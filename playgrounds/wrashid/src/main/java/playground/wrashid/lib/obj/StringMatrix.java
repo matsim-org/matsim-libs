@@ -7,6 +7,10 @@ public class StringMatrix {
 
 	ArrayList<LinkedList<String>> matrix=new ArrayList<LinkedList<String>>();
 	
+	public int getColumnIndex(String columnName){
+		return matrix.get(0).indexOf(columnName);
+	}
+	
 	public int getNumberOfRows(){
 		return matrix.size();
 	}
