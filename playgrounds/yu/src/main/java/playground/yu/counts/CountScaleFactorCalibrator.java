@@ -227,8 +227,7 @@ public class CountScaleFactorCalibrator {
 	}
 
 	private final String linkStatsFilename;
-
-	private final double minScaleFactor, maxScaleFactor, scaleFactorInterval;
+	private final double[] scaleFactors;
 
 	private final Logger log = Logger
 			.getLogger(CountScaleFactorCalibrator.class);
@@ -241,14 +240,11 @@ public class CountScaleFactorCalibrator {
 	 * @param config
 	 */
 	public CountScaleFactorCalibrator(String configFilename,
-			String linkStatsFilename, double minScaleFactor,
-			double maxScaleFactor, double scaleFactorInterval) {
+			String linkStatsFilename, double[] scaleFactors) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
 				.loadConfig(configFilename));
 		this.linkStatsFilename = linkStatsFilename;
-		this.minScaleFactor = minScaleFactor;
-		this.maxScaleFactor = maxScaleFactor;
-		this.scaleFactorInterval = scaleFactorInterval;
+		this.scaleFactors = scaleFactors;
 	}
 
 	public void run() {
@@ -259,7 +255,7 @@ public class CountScaleFactorCalibrator {
 				.getCountsFileName());
 
 		// SET COUNTS_SCALE_FACTOR
-		for (double scaleFactor = minScaleFactor; scaleFactor <= maxScaleFactor; scaleFactor += scaleFactorInterval) {
+		for (double scaleFactor : scaleFactors) {
 			runCountsComparisonAlgorithmAndOutput(scaleFactor);
 		}
 	}
@@ -327,15 +323,16 @@ public class CountScaleFactorCalibrator {
 
 	/**
 	 * @param args
-	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
-	 *            minimum value of countScaleFactor, args[3] maximum vaule of
-	 *            countScaleFactor, args[4] incremental interval of
-	 *            countScaleFactor
+	 *            - args[0] configFilename; args[1] linkstatsFilename,
+	 *            args[2...] possible values for countScaleFactor
 	 */
 	public static void run(String[] args) {
+		double[] countScaleFactors = new double[args.length - 2];
+		for (int i = 2; i < args.length; i++) {
+			countScaleFactors[i - 2] = Double.parseDouble(args[i]);
+		}
 		CountScaleFactorCalibrator rccfls = new CountScaleFactorCalibrator(
-				args[0], args[1], Double.parseDouble(args[2]),
-				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+				args[0], args[1], countScaleFactors);
 		rccfls.run();
 
 	}
