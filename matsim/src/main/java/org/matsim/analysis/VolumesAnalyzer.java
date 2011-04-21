@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -36,6 +37,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  */
 public class VolumesAnalyzer implements LinkLeaveEventHandler {
 
+	private final static Logger log = Logger.getLogger(VolumesAnalyzer.class);
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
@@ -73,6 +75,46 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler {
 	 */
 	public int[] getVolumesForLink(final Id linkId) {
 		return this.links.get(linkId);
+	}
+	
+	/*
+	 * This procedure is only working if (hour % timeBinSize == 0)
+	 * 
+	 * Example: 15 minutes bins
+	 *  ___________________
+	 * |  0 | 1  | 2  | 3  |
+	 * |____|____|____|____|
+	 * 0   900 1800  2700 3600
+		___________________
+	 * | 	  hour 0	   |
+	 * |___________________|
+	 * 0   				  3600
+	 * 
+	 * hour 0 = bins 0,1,2,3
+	 * hour 1 = bins 4,5,6,7
+	 * ...
+	 * 
+	 * getTimeSlotIndex = (int)time / this.timeBinSize => jumps at 3600.0!
+	 * Thus, starting time = (hour = 0) * 3600.0
+	 */
+	public double[] getVolumesPerHourForLink(final Id linkId) {
+		if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
+		
+		double [] volumes = new double[24];
+		for (int hour = 0; hour < 24; hour++) {
+			volumes[hour] = 0.0;
+		}
+		if (this.getVolumesForLink(linkId) == null) return volumes;
+
+		int slotsPerHour = (int)(3600.0 / this.timeBinSize);
+		for (int hour = 0; hour < 24; hour++) {
+			double time = hour * 3600.0;
+			for (int i = 0; i < slotsPerHour; i++) {
+				volumes[hour] += this.getVolumesForLink(linkId)[this.getTimeSlotIndex(time)];
+				time += this.timeBinSize;
+			}
+		}
+		return volumes;
 	}
 
 	/**

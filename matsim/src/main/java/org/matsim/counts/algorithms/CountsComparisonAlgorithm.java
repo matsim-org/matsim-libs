@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +49,9 @@ public class CountsComparisonAlgorithm {
 	/**
 	 * The LinkAttributes of the simulation
 	 */
-	private final CalcLinkStats linkStats;
+	private CalcLinkStats linkStats;
+	
+	private VolumesAnalyzer volumes;
 	/**
 	 * The counts object
 	 */
@@ -75,6 +78,14 @@ public class CountsComparisonAlgorithm {
 		this.network = network;
 		this.countsScaleFactor = countsScaleFactor;
 	}
+	
+	public CountsComparisonAlgorithm(VolumesAnalyzer volumes, final Counts counts, final Network network, final double countsScaleFactor) {
+		this.volumes = volumes;
+		this.counts = counts;
+		this.countSimComp = new ArrayList<CountSimComparison>();
+		this.network = network;
+		this.countsScaleFactor = countsScaleFactor;
+	}
 
 	/**
 	 * Creates the List with the counts vs sim values stored in the
@@ -87,7 +98,13 @@ public class CountsComparisonAlgorithm {
 			if (!isInRange(count.getLocId())) {
 				continue;
 			}
-			double[] volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
+			double[] volumes = new double[24];
+			if (this.linkStats != null) {
+				volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
+			}
+			else {
+				volumes = this.volumes.getVolumesPerHourForLink(count.getLocId());
+			}
 			if (volumes.length == 0) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
@@ -106,7 +123,7 @@ public class CountsComparisonAlgorithm {
 			}
 		}
 	}
-
+	
 	/**
 	 *
 	 * @param linkid
