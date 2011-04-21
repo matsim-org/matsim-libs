@@ -26,8 +26,8 @@ public class ReadMigrosKML {
 	
 	public void read() {
 		
-		//TODO: Namen pr�fen in KML
-		String [] kreise = {"Z�rich","Altstetten", "Albisrieden", "Friesenberg", "Leimbach", "Wollishofen", "Witikon", "Hirzenbach", "H�ngg", 
+		//TODO: Namen pruefen in KML
+		String [] kreise = {"Zürich","Altstetten", "Albisrieden", "Friesenberg", "Leimbach", "Wollishofen", "Witikon", "Hirzenbach", "Höngg", 
 				"Affoltern", "Seebach", "Oerlikon", "Saatlen", "Schwamendingen"};
 		
 		String outfile = "../../matsim/output/Migros.txt";	
