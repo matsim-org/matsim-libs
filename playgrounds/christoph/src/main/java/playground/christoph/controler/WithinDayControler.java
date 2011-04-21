@@ -36,7 +36,6 @@ import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -114,13 +113,6 @@ public class WithinDayControler extends WithinDayController {
 	}
 
 	private void setConstructorParameters() {
-		/*
-		 * Use MyLinkImpl. They can carry some additional Information like their
-		 * TravelTime or VehicleCount.
-		 * This is needed to be able to use a LinkVehiclesCounter.
-		 */
-		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
-
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 	}

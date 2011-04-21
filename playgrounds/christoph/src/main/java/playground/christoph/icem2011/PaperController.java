@@ -91,8 +91,11 @@ public class PaperController extends WithinDayController implements StartupListe
 	/*
 	 * Define when the Replanning is en- and disabled.
 	 */
-	protected int tWithinDayEnabled = 7*3600 + 45*60;	// 07:45
-	protected int tWithinDayDisabled = 11*3600 + 45*60;	// 11:45
+//	protected int tWithinDayEnabled = 7*3600 + 45*60;	// 07:45
+//	protected int tWithinDayDisabled = 11*3600 + 45*60;	// 11:45
+	protected int tWithinDayEnabled = 7*3600 + 30*60;	// 07:30
+//	protected int tWithinDayDisabled = 10*3600 + 00*60;	// 10:00
+	protected int tWithinDayDisabled = 100*3600;	// 100:00
 	protected boolean enabled = false;
 	
 //	protected InitialIdentifier initialIdentifier;
@@ -282,6 +285,8 @@ public class PaperController extends WithinDayController implements StartupListe
 	private final static String NUMOFTHREADS = "-numofthreads";
 	private final static String LEGREPLANNINGSHARE = "-legreplanningshare";
 	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
+	private final static String STARTREPLANNING = "-startreplanning";
+	private final static String ENDREPLANNING = "-endreplanning";
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -308,6 +313,14 @@ public class PaperController extends WithinDayController implements StartupListe
 					i++;
 					controller.replanningLinksFile = args[i];
 					log.info("leg replanning links file: " + args[i]);
+				}  else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
+					i++;
+					controller.tWithinDayEnabled = Integer.parseInt(args[i]);
+					log.info("start within-day replanning: " + args[i]);
+				}  else if (args[i].equalsIgnoreCase(ENDREPLANNING)) {
+					i++;
+					controller.tWithinDayDisabled = Integer.parseInt(args[i]);
+					log.info("end within-day replanning: " + args[i]);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
 			controller.run();
