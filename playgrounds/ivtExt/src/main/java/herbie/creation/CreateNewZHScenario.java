@@ -19,6 +19,7 @@
 
 package herbie.creation;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
@@ -76,18 +77,18 @@ public class CreateNewZHScenario {
 			log.error("Please specify a config file!");
 			return;
 		}
-		log.info("Creation started ...");
+		log.info("\tCreation started ............................................");
 		CreateNewZHScenario creator = new CreateNewZHScenario();
 		creator.run(args[0]);
-		log.info("Creation finished -----------------------------------------");
+		log.info("\tCreation finished -----------------------------------------");
 	}
 	
 	// ====================================================================================
 	private void run(String configFile) {
 		this.init(configFile);
-		log.info("Adding cross-border traffic ...");
+		log.info("\tAdding cross-border traffic ............................");
 		this.addSpecialPlans2Population(this.crossBorderPlansFilePath, "cross-border");
-		log.info("Adding freight traffic ...");
+		log.info("\tAdding freight traffic .................................");
 		this.addSpecialPlans2Population(this.freightPlansFilePath, "freight");
 		this.write();
 	}
@@ -95,10 +96,10 @@ public class CreateNewZHScenario {
 	// ====================================================================================
 	// read in network, facilities and plans into scenario
 	private void init(String configFile) {
-		log.info("Initializing ...");
+		log.info("\tInitializing ................................................");
 		this.readConfig(configFile);
 		
-		log.info("Reading network, facilities and plans ...");
+		log.info("\tReading network, facilities and plans .............................");
 		new MatsimNetworkReader(scenario).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
@@ -106,7 +107,7 @@ public class CreateNewZHScenario {
 	}
 	
 	private void readConfig(String configFile) {
-		log.info("Reading the config ...");
+		log.info("\tReading the config .........................");
 		Config config = new Config();
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
     	matsimConfigReader.readFile(configFile);   	
@@ -139,34 +140,38 @@ public class CreateNewZHScenario {
 		this.map2Network((PopulationImpl) sTmp.getPopulation());
 		
 		if (type.equals("cross-border")) {
+			log.info(sTmp.getPopulation().getPersons().size() + " cross-border agents ##########################################");
 			this.convertFromV1toV2(sTmp);
 			this.mapActivities2Facilities((PopulationImpl) sTmp.getPopulation());
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
 				sTmp.getPopulation().getPersons().remove(personId);
 			}
+			log.info("\tRemaining " + type + " agents " + sTmp.getPopulation().getPersons().size() + " ###############################");
 		}
 		
 		// facilities are already mapped
 		if (type.equals("freight")) {
+			log.info(sTmp.getPopulation().getPersons().size() + " freight agents #######################################");
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
 				sTmp.getPopulation().getPersons().remove(personId);
 			}
+			log.info("\tRemaining " + type + " agents " + sTmp.getPopulation().getPersons().size());
 		}
 		this.samplePlans(sTmp.getPopulation(), this.sampleRatePercent);
-		log.info("Remaining " + type + " agents" + sTmp.getPopulation().getPersons().size());
+		log.info("\tRemaining " + type + " agents " + sTmp.getPopulation().getPersons().size() + " ####################################");
 		
 		for (Person p : sTmp.getPopulation().getPersons().values()){
 			this.scenario.getPopulation().addPerson(p);
 		}
-		log.info("Number of agents in new scenario: " + this.scenario.getPopulation().getPersons().size());
+		log.info("\tNumber of agents in new scenario: " + this.scenario.getPopulation().getPersons().size() + " #################################");
 	} 
 	
-	//TODO: Is this really necessary?
+	//TODO: Is this really necessary? Or is this still done automatically?
 	// What happens if we have small differences in facilities->links mapping during simulation?
 	private void mapActivities2Facilities(PopulationImpl population) {
-		log.info("Mapping facilities ...");
+		log.info("\tMapping facilities .........................");
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		
 		for (Person p : population.getPersons().values()){
@@ -176,7 +181,15 @@ public class CreateNewZHScenario {
 						ActivityImpl act = (ActivityImpl)pe;
 						
 						BuildTrees util = new BuildTrees();
-						if (trees.get(act.getType()) == null) trees.put(act.getType(), util.createActivitiesTree(act.getType(), this.scenario));
+						if (trees.get(act.getType()) == null) {
+							if (act.getType().equals("work")) {
+								String [] workTypes = {"work_sector2", "work_sector3"};
+								trees.put("work", util.createActivitiesTree(workTypes, "work", this.scenario));
+							}
+							else {
+								trees.put(act.getType(), util.createActivitiesTree(act.getType(), this.scenario));
+							}
+						}
 						QuadTree<ActivityFacility> facQuadTree = trees.get(act.getType());
 						
 						// get closest facility.
@@ -198,19 +211,27 @@ public class CreateNewZHScenario {
 	
 	// at the moment only necessary for cross-border and freight traffic -> stratified sampling
 	private void samplePlans(Population population, double percent) {
-		log.info("Sampling plans ...");
-		int newPopulationSize = (int)(population.getPersons().size() * percent);
+		int newPopulationSize = (int)(population.getPersons().size() * percent / 100.0);
+		log.info("\tSampling plans " + percent + " percent: new population size: " + newPopulationSize + "...............................");
 		
+		int counter = 0;
+		int nextMsg = 1;
 		while (population.getPersons().size() > newPopulationSize) {
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+			}
 			Random random = new Random();
 			int index = random.nextInt(population.getPersons().size());
-			population.getPersons().remove(new IdImpl(index));
+			Id id = (Id) population.getPersons().keySet().toArray()[index];
+			population.getPersons().remove(id);
 		}
 	}
 	
 	// at the moment only necessary for cross-border traffic
 	private List<Id> dilutedZH(Population population) {
-		log.info("Cutting scenario ...");
+		log.info("\tCutting scenario ...................................");
 		double aoiRadius = 30000.0;
 		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
 		
@@ -239,15 +260,16 @@ public class CreateNewZHScenario {
 							duration = Double.parseDouble(act.getType().substring(1));
 						}
 						act.setType(v2Type);
+						((PersonImpl)p).createDesires(v2Type);
 						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
 					}
 				}
 			}
 		}
-		
 	}
 		
 	private void write() {
+		new File(this.outputFolder).mkdirs();
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
 	}
 }

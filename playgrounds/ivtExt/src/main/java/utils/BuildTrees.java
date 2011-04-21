@@ -20,6 +20,8 @@
 package utils;
 
 import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,6 +46,15 @@ public class BuildTrees {
 				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
 		}
 		return facQuadTree;
+	}
+	
+	public QuadTree<ActivityFacility> createActivitiesTree(String [] activityTypes, String mainType, Scenario scenario) {
+		Map<Id,ActivityFacility> facilities_of_type = new TreeMap<Id, ActivityFacility>();
+			
+		for (String activityType : activityTypes) {
+			facilities_of_type.putAll(((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));
+		}
+		return this.builFacQuadTree(mainType, facilities_of_type);
 	}
 	
 	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id,ActivityFacility> facilities_of_type) {
