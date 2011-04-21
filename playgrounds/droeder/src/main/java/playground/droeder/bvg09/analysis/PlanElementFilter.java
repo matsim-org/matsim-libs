@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips;
+package playground.droeder.bvg09.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class PlanElementFilter extends AbstractPersonFilter{
 	@Override
 	public boolean judge(Person person) {
 
-		if(this.containsPT(person) && this.moreThanOneElement(person)){
+		if(this.moreThanOneElement(person)){
 			this.elements.put(person.getId(), (ArrayList<PlanElement>) person.getSelectedPlan().getPlanElements());
 			return true;
 		}else{
@@ -62,15 +62,15 @@ public class PlanElementFilter extends AbstractPersonFilter{
 		}
 	}
 
-	private boolean containsPT(Person person) {
-		boolean pt = false;
-		for(PlanElement pe: person.getSelectedPlan().getPlanElements()){
-			if(pe instanceof Leg && (((Leg) pe).getMode().equals(TransportMode.pt) || ((Leg) pe).getMode().equals(TransportMode.transit_walk)) ){
-				pt = true;
-			}
-		}
-		return pt;
-	}
+//	private boolean containsPT(Person person) {
+//		boolean pt = false;
+//		for(PlanElement pe: person.getSelectedPlan().getPlanElements()){
+//			if(pe instanceof Leg && (((Leg) pe).getMode().equals(TransportMode.pt) || ((Leg) pe).getMode().equals(TransportMode.transit_walk)) ){
+//				pt = true;
+//			}
+//		}
+//		return pt;
+//	}
 	
 	private boolean moreThanOneElement(Person person){
 		if(person.getSelectedPlan().getPlanElements().size() > 1){

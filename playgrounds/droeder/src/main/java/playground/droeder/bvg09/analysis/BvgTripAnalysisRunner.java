@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
@@ -47,9 +48,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.AnalysisTripSet;
 import playground.droeder.Analysis.Trips.AnalysisTripGenerator;
-import playground.droeder.Analysis.Trips.PlanElementFilter;
+import playground.droeder.Analysis.Trips.AnalysisTripSet;
 import playground.droeder.Analysis.Trips.TripEventsHandler;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -63,7 +63,7 @@ public class BvgTripAnalysisRunner {
 	private Geometry zone;
 	private Map<Id, ArrayList<PersonEvent>> events;
 	private Map<Id, ArrayList<PlanElement>> planElements;
-	private AnalysisTripSet tripSet;
+	private Map<String, AnalysisTripSet> tripSet;
 	
 	
 	
@@ -71,7 +71,8 @@ public class BvgTripAnalysisRunner {
 		final String PATH = DaPaths.VSP + "BVG09_Auswertung/"; 
 		final String IN = PATH + "input/";
 		final String PLANS = PATH + "testPopulation1.xml.gz";
-		final String EVENTS = PATH + "testEvents.xml.gz";
+//		final String EVENTS = IN + "bvg.run128.25pct.100.events.xml.gz";
+		final String EVENTS = PATH + "testEvents.xml";
 		final String NETWORK = IN + "network.final.xml.gz";
 		
 		Set<Feature> features = null;
@@ -84,7 +85,7 @@ public class BvgTripAnalysisRunner {
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
 		BvgTripAnalysisRunner ana = new BvgTripAnalysisRunner(g);
-		ana.run(PLANS, NETWORK, EVENTS, null);
+		ana.run(PLANS, NETWORK, EVENTS, null, false);
 	}
 	
 	
@@ -92,10 +93,16 @@ public class BvgTripAnalysisRunner {
 		this.zone = g;
 	}
 	
-	public void run(String plans, String network, String events, String out){
+	public void run(String plans, String network, String events, String out, boolean storeTrips){
 		this.readPlans(plans, network);
 		this.readEvents(events);
-		this.tripSet = AnalysisTripGenerator.calculateTripSet(this.events, this.planElements, this.zone);
+		this.tripSet = AnalysisTripGenerator.calculateTripSet(this.events, this.planElements, this.zone, storeTrips);
+		for(Entry<String, AnalysisTripSet> e: this.tripSet.entrySet()){
+			System.out.println(e.getKey());
+			System.out.print(e.getValue().toString());
+			System.out.println();
+			System.out.println();
+		}
 	}
 
 	private void readPlans(String plans, String network){
@@ -143,8 +150,14 @@ public class BvgTripAnalysisRunner {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
 		
-		try {
-			new EventsReaderXMLv1(manager).parse(new GZIPInputStream(new FileInputStream(eventsFile)));
+		InputStream in = null;
+		try{
+			if(eventsFile.endsWith("xml.gz")){
+				in = new GZIPInputStream(new FileInputStream(eventsFile));
+			}else{
+				in = new FileInputStream(eventsFile);
+			}
+			new EventsReaderXMLv1(manager).parse(in);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

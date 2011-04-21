@@ -47,7 +47,6 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 										ActivityEndEventHandler, ActivityStartEventHandler{
 
 	private Map<Id, ArrayList<PersonEvent>> events;
-	private EventWriterXML writer = new EventWriterXML( DaPaths.VSP + "BVG09_Auswertung/testEvents.xml.gz");
 	
 	/**
 	 * @param keySet
@@ -72,7 +71,6 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(ActivityStartEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-			writer.handleEvent(event);
 		}
 	}
 
@@ -80,7 +78,6 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(ActivityEndEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-			writer.handleEvent(event);
 		}
 	}
 
@@ -88,7 +85,6 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(AgentArrivalEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-			writer.handleEvent(event);
 		}	
 	}
 
@@ -96,12 +92,10 @@ public class TripEventsHandler implements AgentDepartureEventHandler, AgentArriv
 	public void handleEvent(AgentDepartureEvent event) {
 		if(this.events.containsKey(event.getPersonId())){
 			this.events.get(event.getPersonId()).add(event);
-			writer.handleEvent(event);
 		}	
 	}
 
 	public Map<Id, ArrayList<PersonEvent>> getEvents(){
-		writer.closeFile();
 		return this.events;
 	}
 }

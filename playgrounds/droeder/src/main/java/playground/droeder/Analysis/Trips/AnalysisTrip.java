@@ -20,13 +20,17 @@
 package playground.droeder.Analysis.Trips;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ListIterator;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
@@ -39,11 +43,30 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  */
 public class AnalysisTrip {
-	private String type;
+	private String mode = null;
 	private Coordinate start;
 	private Coordinate end;
 	private ArrayList<PersonEvent> events;
 	private ArrayList<PlanElement> elements;
+	
+	//all modes
+	private Double tripTTime = 0.0;
+	
+	// pt only
+	private int accesWalkCnt = 0;
+	private int accesWaitCnt = 0;
+	private int egressWalkCnt = 0;
+	private int switchWalkCnt= 0;
+	private int switchWaitCnt = 0;
+	private int lineCnt = 0;
+	
+	private double accesWalkTTime = 0.0;
+	private double accesWaitTime = 0.0;
+	private double egressWalkTTime = 0.0;
+	private double switchWalkTTime = 0.0;
+	private double switchWaitTime = 0.0;
+	private double lineTTime = 0.0;
+	
 	
 	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
 		this.events = events;
@@ -52,21 +75,67 @@ public class AnalysisTrip {
 				((Activity) elements.get(0)).getCoord().getY());
 		this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
 				((Activity) elements.get(elements.size() - 1)).getCoord().getY());
+		this.mode = this.findMode(elements);
+		this.analyze();
 	}
 	
-	public Map<String, Double> analyze(){
-		Map<String, Double> temp  = new HashMap<String, Double>();
-		
-		
-		return temp;
+	public String getMode(){
+		return this.mode;
 	}
 	
-	protected static Map<String, Double> getEmptyValueMap(){
-		Map<String, Double> temp = new HashMap<String, Double>();
-		
-		//TODO add constants with 0
-		return temp;
+	private String findMode(ArrayList<PlanElement> elements) {
+		String mode = null;
+		for(PlanElement p : elements){
+			if(p instanceof Leg){
+				if(((Leg) p).getMode().equals(TransportMode.transit_walk)){
+					mode = TransportMode.transit_walk;
+				}else{
+					return ((Leg) p).getMode();
+				}
+			}
+		}
+		return mode;
 	}
+
+	private void analyze(){
+		analyzeForAll();
+		if(this.mode.equals(TransportMode.pt)){
+			analyzePT();
+		}
+	}
+	
+	/**
+	 * @return
+	 */
+	private void analyzeForAll() {
+		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
+	}
+
+	/**
+	 * @return
+	 */
+	private void analyzePT() {
+		ListIterator<PersonEvent> it = this.events.listIterator();
+		PersonEvent pe;
+		
+		while(it.hasNext()){
+			pe = it.next();
+		
+			if(pe instanceof ActivityEndEvent){
+			}else if(pe instanceof AgentDepartureEvent){
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineCnt++;
+					lineTTime -= pe.getTime();
+				}
+			}else if(pe instanceof AgentArrivalEvent){
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineTTime += pe.getTime();
+				}
+			}else if(pe instanceof ActivityStartEvent){
+			}
+		}
+	}
+
 
 	/**
 	 * @return
@@ -102,5 +171,96 @@ public class AnalysisTrip {
 		}
 		
 		return buffer.toString();
+	}
+
+	/**
+	 * @return the tripTTime
+	 */
+	public Double getTripTTime() {
+		return tripTTime;
+	}
+
+	/**
+	 * @return the accesWalkCnt
+	 */
+	public int getAccesWalkCnt() {
+		return accesWalkCnt;
+	}
+
+	/**
+	 * @return the accesWaitCnt
+	 */
+	public int getAccesWaitCnt() {
+		return accesWaitCnt;
+	}
+
+	/**
+	 * @return the egressWalkCnt
+	 */
+	public int getEgressWalkCnt() {
+		return egressWalkCnt;
+	}
+
+	/**
+	 * @return the switchWalkCnt
+	 */
+	public int getSwitchWalkCnt() {
+		return switchWalkCnt;
+	}
+
+	/**
+	 * @return the switchWaitCnt
+	 */
+	public int getSwitchWaitCnt() {
+		return switchWaitCnt;
+	}
+
+	/**
+	 * @return the lineCnt
+	 */
+	public int getLineCnt() {
+		return lineCnt;
+	}
+
+	/**
+	 * @return the accesWalkTTime
+	 */
+	public double getAccesWalkTTime() {
+		return accesWalkTTime;
+	}
+
+	/**
+	 * @return the accesWaitTime
+	 */
+	public double getAccesWaitTime() {
+		return accesWaitTime;
+	}
+
+	/**
+	 * @return the egressWalkTTime
+	 */
+	public double getEgressWalkTTime() {
+		return egressWalkTTime;
+	}
+
+	/**
+	 * @return the switchWalkTTime
+	 */
+	public double getSwitchWalkTTime() {
+		return switchWalkTTime;
+	}
+
+	/**
+	 * @return the switchWaitTime
+	 */
+	public double getSwitchWaitTime() {
+		return switchWaitTime;
+	}
+
+	/**
+	 * @return the lineTTime
+	 */
+	public double getLineTTime() {
+		return lineTTime;
 	}
 }
