@@ -20,7 +20,7 @@
 /**
  *
  */
-package playground.yu.utils;
+package playground.yu.counts;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,9 +54,9 @@ import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
  * enables {@code Counts} comparison and writing .kmz file to work for each
  * iteration, and tests the counts comparison effects with different
  * countsScaleFactor
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class CountScaleFactorCalibrator {
 	protected class CountsComparisonAlgorithm {
@@ -130,7 +130,7 @@ public class CountScaleFactorCalibrator {
 		}
 
 		/**
-		 * 
+		 *
 		 * @return the result list
 		 */
 		public List<CountSimComparison> getComparison() {
@@ -138,7 +138,7 @@ public class CountScaleFactorCalibrator {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param linkid
 		 * @return <code>true</true> if the Link with the given Id is not farther away than the
 		 * distance specified by the distance filter from the center node of the filter.
@@ -168,7 +168,7 @@ public class CountScaleFactorCalibrator {
 		/**
 		 * Set a distance filter, dropping everything out which is not in the
 		 * distance given in meters around the given Node Id.
-		 * 
+		 *
 		 * @param distance
 		 * @param nodeId
 		 */
@@ -264,37 +264,6 @@ public class CountScaleFactorCalibrator {
 		}
 	}
 
-	public void run2() {
-		config = scenario.getConfig();
-
-		counts = new Counts();
-		CountsConfigGroup countsCG = config.counts();
-		new MatsimCountsReader(counts).readFile(countsCG.getCountsFileName());
-
-		double scaleFactor = countsCG.getCountsScaleFactor();
-		log.info("compare with counts, scaleFactor =\t" + scaleFactor);
-
-		Network network = scenario.getNetwork();
-
-		CalcLinkStats calcLinkStats = new CalcLinkStats(network, scaleFactor
-				/ countsCG.getCountsScaleFactor());
-		calcLinkStats.readFile(linkStatsFilename);
-
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(
-				calcLinkStats, counts, network, scaleFactor);
-
-		if (countsCG.getDistanceFilter() != null
-				&& countsCG.getDistanceFilterCenterNode() != null) {
-			cca.setDistanceFilter(countsCG.getDistanceFilter(),
-					countsCG.getDistanceFilterCenterNode());
-		}
-		cca.setCountsScaleFactor(scaleFactor);
-
-		System.out.println("best scaleFactor could be "
-				+ cca.getScaleFactor4_0bias(1, 24) + "!");// TODO parameterize
-															// 7-20
-	}
-
 	private void runCountsComparisonAlgorithmAndOutput(double scaleFactor) {
 		CountsConfigGroup countsConfigGroup = config.counts();
 
@@ -363,7 +332,7 @@ public class CountScaleFactorCalibrator {
 	 *            countScaleFactor, args[4] incremental interval of
 	 *            countScaleFactor
 	 */
-	public static void run1(String[] args) {
+	public static void run(String[] args) {
 		CountScaleFactorCalibrator rccfls = new CountScaleFactorCalibrator(
 				args[0], args[1], Double.parseDouble(args[2]),
 				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
@@ -373,28 +342,10 @@ public class CountScaleFactorCalibrator {
 
 	/**
 	 * @param args
-	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
-	 *            minimum value of countScaleFactor, args[3] maximum vaule of
-	 *            countScaleFactor, args[4] incremental interval of
-	 *            countScaleFactor
-	 */
-	public static void run2(String[] args) {
-		CountScaleFactorCalibrator rccfls = new CountScaleFactorCalibrator(
-				args[0], args[1], Double.parseDouble(args[2]),
-				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
-		rccfls.run2();
-
-	}
-
-	/**
-	 * @param args
-	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
-	 *            minimum value of countScaleFactor, args[3] maximum vaule of
-	 *            countScaleFactor, args[4] incremental interval of
-	 *            countScaleFactor
+	 *            - args[0] configFilename; args[1] linkstatsFilename,
+	 *            args[2...] possible values for countScaleFactor
 	 */
 	public static void main(String[] args) {
-		// run1(args);
-		run2(args);
+		run(args);
 	}
 }

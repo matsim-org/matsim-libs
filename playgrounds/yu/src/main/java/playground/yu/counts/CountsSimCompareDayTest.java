@@ -1,7 +1,7 @@
 /**
  *
  */
-package playground.yu.analysis;
+package playground.yu.counts;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

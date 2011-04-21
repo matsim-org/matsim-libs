@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils.io;
+package playground.yu.counts;
 
 import java.util.List;
 
@@ -36,6 +36,8 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * rebuilds data of CountsSimRealPerHour (scatter plots) from LinkStatsfile

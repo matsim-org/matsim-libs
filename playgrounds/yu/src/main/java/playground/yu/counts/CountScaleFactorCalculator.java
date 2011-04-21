@@ -20,7 +20,7 @@
 /**
  *
  */
-package playground.yu.utils;
+package playground.yu.counts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
@@ -49,9 +48,9 @@ import org.matsim.counts.Volume;
  * enables {@code Counts} comparison and writing .kmz file to work for each
  * iteration, and tests the counts comparison effects with different
  * countsScaleFactor
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class CountScaleFactorCalculator {
 	protected class CountsComparisonAlgorithm {
@@ -89,43 +88,43 @@ public class CountScaleFactorCalculator {
 			this.countsScaleFactor = countsScaleFactor;
 		}
 
-		/**
-		 * Creates the List with the counts vs sim values stored in the
-		 * countAttribute Attribute of this class.
-		 */
-		private void compare() {
-			double countValue;
+		// /**
+		// * Creates the List with the counts vs sim values stored in the
+		// * countAttribute Attribute of this class.
+		// */
+		// private void compare() {
+		// double countValue;
+		//
+		// for (Count count : counts.getCounts().values()) {
+		// if (!isInRange(count.getLocId())) {
+		// continue;
+		// }
+		// double[] volumes = linkStats
+		// .getAvgLinkVolumes(count.getLocId());
+		// if (volumes.length == 0) {
+		// log.warn("No volumes for link: "
+		// + count.getLocId().toString());
+		// volumes = new double[24];
+		// // continue;
+		// }
+		// for (int hour = 1; hour <= 24; hour++) {
+		// // real volumes:
+		// Volume volume = count.getVolume(hour);
+		// if (volume != null) {
+		// countValue = volume.getValue();
+		// double simValue = volumes[hour - 1];
+		// simValue *= countsScaleFactor;
+		// countSimComp.add(new CountSimComparisonImpl(count
+		// .getLocId(), hour, countValue, simValue));
+		// } else {
+		// countValue = 0.0;
+		// }
+		// }
+		// }
+		// }
 
-			for (Count count : counts.getCounts().values()) {
-				if (!isInRange(count.getLocId())) {
-					continue;
-				}
-				double[] volumes = linkStats
-						.getAvgLinkVolumes(count.getLocId());
-				if (volumes.length == 0) {
-					log.warn("No volumes for link: "
-							+ count.getLocId().toString());
-					volumes = new double[24];
-					// continue;
-				}
-				for (int hour = 1; hour <= 24; hour++) {
-					// real volumes:
-					Volume volume = count.getVolume(hour);
-					if (volume != null) {
-						countValue = volume.getValue();
-						double simValue = volumes[hour - 1];
-						simValue *= countsScaleFactor;
-						countSimComp.add(new CountSimComparisonImpl(count
-								.getLocId(), hour, countValue, simValue));
-					} else {
-						countValue = 0.0;
-					}
-				}
-			}
-		}
-
 		/**
-		 * 
+		 *
 		 * @return the result list
 		 */
 		public List<CountSimComparison> getComparison() {
@@ -133,7 +132,7 @@ public class CountScaleFactorCalculator {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param linkid
 		 * @return <code>true</true> if the Link with the given Id is not farther away than the
 		 * distance specified by the distance filter from the center node of the filter.
@@ -152,9 +151,9 @@ public class CountScaleFactorCalculator {
 			return dist < distanceFilter.doubleValue();
 		}
 
-		public void run() {
-			compare();
-		}
+		// public void run() {
+		// compare();
+		// }
 
 		public void setCountsScaleFactor(final double countsScaleFactor) {
 			this.countsScaleFactor = countsScaleFactor;
@@ -163,7 +162,7 @@ public class CountScaleFactorCalculator {
 		/**
 		 * Set a distance filter, dropping everything out which is not in the
 		 * distance given in meters around the given Node Id.
-		 * 
+		 *
 		 * @param distance
 		 * @param nodeId
 		 */
@@ -177,7 +176,10 @@ public class CountScaleFactorCalculator {
 		 * countAttribute Attribute of this class.
 		 */
 		public void getBestScaleFactors(int startHour, int endHour) {
-			double simValSquareSum = 0, countSimProductSum = 0;
+			double simValSquareSum = 0d, countSimProductSum = 0d;// 4 MSB
+			double simValSum = 0d, countValSum = 0d;// 4 MB
+			double simCntQuotientSum = 0d, simCntQuotientSquareSum = 0d;// 4
+																		// MSRE
 
 			if (startHour < 1 || startHour > endHour || endHour > 24) {
 				throw new RuntimeException(
@@ -205,28 +207,50 @@ public class CountScaleFactorCalculator {
 						double simValue = volumes[hour - 1];
 						simValue *= countsScaleFactor;
 
+						// 4 MSB
 						simValSquareSum += simValue * simValue;
 						countSimProductSum += countValue * simValue;
 
+						// 4 MB
+						simValSum += simValue;
+						countValSum += countValue;
+
+						// 4 MSRE
+						double simCntQuotient = countValue > 0d ? simValue
+								/ countValue : 11d;
+						simCntQuotientSum += simCntQuotient;
+						// see also CountSimComparisonImpl.java
+						simCntQuotientSquareSum += simCntQuotient
+								* simCntQuotient;
 					} else {
 						countValue = 0.0;
 					}
 				}
 			}
+
 			if (simValSquareSum <= 0) {
 				throw new RuntimeException(
 						"sigma(sim^2)==0, no agents were simulated?");
 			}
+
 			System.out
-					.println("best scaleFactor for minimal MSE (mean squred bias) could be "
+					.println("best scaleFactor for minimal MSB (mean squred bias) (  sigma[(sim-cnt)^2]  ) could be\t"
 							+ countsScaleFactor
 							* countSimProductSum
-							/ simValSquareSum + "!");
-			// TODO best ... for minimal MSRE (mean squred relative errors,
-			// because of
-			// absolute value)
-			// TODO best ... for minimal SE (total squred bias, because of
-			// absolute value)
+							/ simValSquareSum + "\t!");
+
+			System.out
+					.println("best scaleFactor for minimal MSRE (mean squred relative errors) ( sigma[(sim/cnt-1)^2] ) could be\t"
+							+ countsScaleFactor
+							* simCntQuotientSum
+							/ simCntQuotientSquareSum + "\t!");
+
+			System.out
+					.println("best scaleFactor for minimal MB (mean bias) (  [sigma(sim-cnt)]^2  ) could be\t"
+							+ countsScaleFactor
+							* countValSum
+							/ simValSum
+							+ "\t!");
 		}
 	}
 
@@ -255,7 +279,7 @@ public class CountScaleFactorCalculator {
 		this.endHour = endHour;
 	}
 
-	public void run2() {
+	public void run() {
 		config = scenario.getConfig();
 
 		counts = new Counts();
@@ -289,11 +313,11 @@ public class CountScaleFactorCalculator {
 	 *            - args[0] configFilename; args[1] linkstatsFilename, args[2]
 	 *            and args[3] time range of calculating countScaleFactor
 	 */
-	public static void run2(String[] args) {
+	public static void run(String[] args) {
 		CountScaleFactorCalculator rccfls = new CountScaleFactorCalculator(
 				args[0], args[1], Integer.parseInt(args[2]),
 				Integer.parseInt(args[3]));
-		rccfls.run2();
+		rccfls.run();
 	}
 
 	/**
@@ -303,6 +327,6 @@ public class CountScaleFactorCalculator {
 	 */
 	public static void main(String[] args) {
 		// run1(args);
-		run2(args);
+		run(args);
 	}
 }
