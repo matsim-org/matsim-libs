@@ -68,13 +68,13 @@ public class ExampleWithinDayController extends WithinDayController implements S
 	 * multiple Strategies to the Agents.
 	 */
 	private double pInitialReplanning = 0.0;
-	private double pDuringActivityReplanning = 0.1;
-	private double pDuringLegReplanning = 0.1;
+	private double pDuringActivityReplanning = 0.0;
+	private double pDuringLegReplanning = 1.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 8;
 
 	protected InitialIdentifier initialIdentifier;
 	protected DuringActivityIdentifier duringActivityIdentifier;

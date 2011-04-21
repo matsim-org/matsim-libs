@@ -28,7 +28,6 @@ import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManager
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
@@ -147,13 +146,7 @@ public class WithinDayController extends Controler {
 	 * ===================================================================
 	 */
 	
-	private void init() {
-		/*
-		 * Use MyLinkImpl. They can carry some additional Information like their
-		 * TravelTime. This is required by a TravelTimeCollector.
-		 */
-		this.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
-		
+	private void init() {		
 		// set WithinDayQSimFactory
 		super.setMobsimFactory(new WithinDayQSimFactory());
 		super.getQueueSimulationListener().add(fosl);

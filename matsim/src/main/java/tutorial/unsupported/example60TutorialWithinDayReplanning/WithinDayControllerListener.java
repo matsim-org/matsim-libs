@@ -41,7 +41,6 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-import org.matsim.withinday.network.WithinDayLinkFactoryImpl;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -99,12 +98,6 @@ public class WithinDayControllerListener implements StartupListener, BeforeMobsi
 	}
 
 	public void setControllerParameters(Controler controller) {
-		/*
-		 * Use WithinDayLinkImpls. They can carry some additional information
-		 * like their current TravelTime.
-		 */
-		controller.getNetwork().getFactory().setLinkFactory(new WithinDayLinkFactoryImpl());
-
 		/*
 		 * Use a Scoring Function, that only scores the travel times!
 		 */

@@ -75,7 +75,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler,
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
 	// Repeated replanning if a person gets stuck in a Link
-	private boolean repeatedReplanning = true;
+	private boolean repeatedReplanning = false;
 	private double replanningInterval = 300.0;
 
 	private NetsimNetwork netsimNetwork;
