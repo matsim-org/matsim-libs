@@ -28,14 +28,17 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsGraphWriter;
@@ -48,27 +51,48 @@ public class CountsCreatorFromEvents {
 	private Counts counts;
 	private EventsManager events;
 	private Network network;
+	private String networkFile;
 	private String outpath;
 	private final static Logger log = Logger.getLogger(CountsCreatorFromEvents.class);
 	
+	public static final String COUNTS = "counts";
+	public static final String DISTANCEFILTER = "distanceFilter";
+	public static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
+	
+	private Double distanceFilter = null;
+	private String distanceFilterCenterNode = null;
+	private double countsScaleFactor = 1.0;
+	private String inputCountsFile = null;
+	private String outputFormat = null;
+	private String coordinateSystem = null;
+	
+	/*
+	 * arg0: config file
+	 * arg1: events file
+	 * arg2: outpath
+	 */
 	public static void main(final String[] args) {
-
 		Gbl.startMeasurement();
 		CountsCreatorFromEvents creator = new CountsCreatorFromEvents();
-		creator.run(args[0], args[1], args[2], args[3]);
+		creator.run(args[0], args[1], args[2]);
 				
 		Gbl.printElapsedTime();
 		log.info("Counts post creation finished #########################################################################");
 	}
 	
-	public void run(String countsFile, String eventsFile, String networkFile, String outpath) {
+	public void run(String configFile, String eventsFile, String outpath) {
 		this.counts = new Counts();
-		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
-		counts_parser.readFile(countsFile);
 		
-		log.info("reading the network ...");
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		log.info("reading config: " + configFile);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+		this.readConfig(scenario);
+				
+		log.info("reading counts: " + this.inputCountsFile);	
+		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
+		counts_parser.readFile(this.inputCountsFile);
+		
+		log.info("reading the network: " + this.networkFile);
+		new MatsimNetworkReader(scenario).readFile(this.networkFile);
 		this.network = scenario.getNetwork();
 		
 		this.events = EventsUtils.createEventsManager();
@@ -82,18 +106,60 @@ public class CountsCreatorFromEvents {
 		this.createCounts(analyzer);
 	}
 	
-	private void createCounts(VolumesAnalyzer analyzer) {		
-		CountsComparisonAlgorithm comparator = new CountsComparisonAlgorithm(analyzer, this.counts, this.network, 1.0);
-		comparator.run();
-		comparator.getComparison();
-		CountsGraphWriter cgw = new CountsGraphWriter(this.outpath, comparator.getComparison(), 0, true, true);
-		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-		cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-		cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-		cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-		cgw.createGraphs();
+	private void readConfig(final Scenario scenario) {
+		Config config = scenario.getConfig();
 		
-		CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(comparator.getComparison(),Locale.ENGLISH);
-		ctw.writeFile(this.outpath + "/counts.txt");
+		this.coordinateSystem = config.global().getCoordinateSystem();
+		log.info("Coordinate system: " + this.coordinateSystem);
+		
+		this.networkFile = config.network().getInputFile();
+		log.info("Network: " + this.networkFile);
+		
+		this.inputCountsFile = config.counts().getCountsFileName();
+		log.info("Counts file: " + this.inputCountsFile);
+		
+		this.outputFormat = config.counts().getOutputFormat();
+		log.info("Output formats: " + this.outputFormat);
+		
+		this.distanceFilterCenterNode = config.counts().getDistanceFilterCenterNode();
+		log.info("Distance filter center node: " + this.distanceFilterCenterNode);
+		
+		this.distanceFilter = config.counts().getDistanceFilter();
+		log.info("Distance filter: " + this.distanceFilter);
+		
+		this.countsScaleFactor = config.counts().getCountsScaleFactor();
+		log.info("Counts scale factor: " + this.countsScaleFactor);
+	}
+	
+	private void createCounts(VolumesAnalyzer analyzer) {		
+		CountsComparisonAlgorithm comparator = new CountsComparisonAlgorithm(analyzer, this.counts, this.network, this.countsScaleFactor);
+		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null)) {
+			comparator.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
+		}
+		comparator.run();
+						
+		if (this.outputFormat.contains("html") || this.outputFormat.contains("all")) {
+				boolean htmlset = true;
+				boolean pdfset = true;
+				CountsGraphWriter cgw = new CountsGraphWriter(this.outpath, comparator.getComparison(), 0, htmlset, pdfset);
+				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
+				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+				cgw.createGraphs();
+		}
+		if (this.outputFormat.contains("kml")|| this.outputFormat.contains("all")) {
+			String filename = this.outpath + "countscompare.kmz";
+			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
+					comparator.getComparison(), this.network, 
+					TransformationFactory.getCoordinateTransformation(this.coordinateSystem, TransformationFactory.WGS84 ));
+			kmlWriter.setIterationNumber(0);
+			kmlWriter.writeFile(filename);
+		}
+		if (this.outputFormat.contains("txt")||	this.outputFormat.contains("all")) {
+			String filename = this.outpath +  "countscompare.txt";
+			CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(comparator.getComparison(),Locale.ENGLISH);
+			ctw.writeFile(filename);
+		}
 	}
 }
