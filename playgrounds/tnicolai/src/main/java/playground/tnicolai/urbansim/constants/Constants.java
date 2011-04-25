@@ -161,6 +161,14 @@ public class Constants {
 	public static final String CUSTOM_PARAMETER = "custom_parameter";
 	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
 	
+	/** ERSA output file header items */
+	public static final String ERSA_ZONE_ID = "zone_id";
+	public static final String ERSA_X_COORDNIATE = "x_coordinate";
+	public static final String ERSA_Y_COORDINATE = "y_coordinate";
+	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
+	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
+	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";
 	public static final String FALSE = " false";

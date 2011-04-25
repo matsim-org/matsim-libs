@@ -122,12 +122,6 @@ public class JAXBUnmaschal {
 				matsimConfig = (MatsimConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
-			
-//			// creatin MASim config object that contains the values from the xml config file.
-//			if(matsimConfig != null){
-//				log.info("Creating new MATSim config object to store the values from the xml configuration.");
-//				MATSimConfigObject.initMATSimConfigObject(matsimConfig, true);
-//			}
 		}
 		catch(JAXBException je){
 			je.printStackTrace();

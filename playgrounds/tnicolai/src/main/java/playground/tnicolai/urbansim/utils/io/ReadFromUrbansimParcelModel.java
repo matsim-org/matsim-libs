@@ -38,7 +38,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import playground.kai.urbansim.ids.ZoneId;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
-import playground.tnicolai.urbansim.utils.WorkplaceObject;
+import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
+import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 
 /**
  * @author nagel
@@ -193,11 +194,11 @@ public class ReadFromUrbansimParcelModel {
 	 *
 	 * @param oldPop
 	 * @param newPop
-	 * @param facilities
+	 * @param parcels
 	 * @param network
 	 * @param samplingRate
 	 */
-	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl facilities, final NetworkImpl network, final double samplingRate) {
+	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
 
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation() ;
 		long NUrbansimPersons=0 ;
@@ -238,7 +239,7 @@ public class ReadFromUrbansimParcelModel {
 
 				// get home location id
 				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
-				ActivityFacility homeLocation = facilities.getFacilities().get( homeParcelId ) ;
+				ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId ) ;
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
@@ -259,7 +260,7 @@ public class ReadFromUrbansimParcelModel {
 				else {
 					newPerson.setEmployed(Boolean.TRUE);
 					Id workParcelId = new IdImpl( parts[ indexParcelID_WORK ] ) ;
-					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
+					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						// show warning message only once
 						if ( jobLocationIdNullCnt < 1 ) {
@@ -361,10 +362,10 @@ public class ReadFromUrbansimParcelModel {
 	 * 
 	 * @return HashMap
 	 */
-	public Map<Id,WorkplaceObject> readJobs(){
+	public Map<Id,WorkplaceObject> readZoneBasedWorkplaces(){
 		
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read jobs table from " + filename ) ;
+		log.info( "Starting to read jobs table from " + filename );
 
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = new HashMap<Id,WorkplaceObject>();
 		
@@ -401,14 +402,91 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info( "Finished reading jobs table from " + filename );
 		return numberOfWorkplacesPerZone;
+	}
+	
+	/**
+	 * Reads in the job table from urbansim and returns a HashMap with all jobs containing the following attributes:
+	 * - job ID
+	 * - parcel ID
+	 * - zone ID
+	 * - workplace coordinate
+	 * 
+	 * @param parcels
+	 * @return HashMap
+	 */
+	public Map<Id, JobsObject> readDisaggregatedJobs(final ActivityFacilitiesImpl parcels){
+		
+		Id jobID, parcelID, zoneID;
+		Coord coord;
+		
+		Map<Id, JobsObject> jobObjectMap = new HashMap<Id, JobsObject>();
+		int jobCounter = 0; // counting number of jobs ...
+		int skipCounter = 0;// counting number of skipped jobs ...
+		
+		if(parcels != null){
+			
+			String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+			log.info( "Starting to read jobs table from " + filename );
+			
+			Map<Id, ActivityFacility> parcelsMap = parcels.getFacilities();
+			
+			try{
+				BufferedReader reader = IOUtils.getBufferedReader( filename );
+				
+				// reading header
+				String line = reader.readLine();
+				// get columns for job, parcel and zone id
+				Map<String,Integer> idxFromKey = CommonMATSimUtilities.createIdxFromKey( line, Constants.TAB );
+				final int indexJobID = idxFromKey.get( Constants.JOB_ID );
+				final int indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
+				final int indexZoneID =idxFromKey.get( Constants.ZONE_ID_WORK );
+				
+				while ( (line=reader.readLine()) != null ) {
+					
+					// tnicolai: for debugging, remove later !!!
+					if(MatsimRandom.getRandom().nextDouble() > 0.01)
+						continue;
+					
+					String[] parts = line.split( Constants.TAB );
+					
+					jobID = new IdImpl( parts[indexJobID] );
+					assert( jobID != null);
+					
+					if( Integer.parseInt( parts[indexParcelID] ) >= 0 ){
+					
+						parcelID = new IdImpl( parts[indexParcelID] );
+						assert( parcelID != null );
+						zoneID = new IdImpl( parts[indexZoneID] );
+						assert( zoneID != null );
+						coord = parcelsMap.get( parcelID ).getCoord();
+						assert( coord != null );
+						
+						jobObjectMap.put(jobID, new JobsObject(jobID, parcelID, zoneID, coord));
+						jobCounter++;
+					}
+					else skipCounter++;
+				}
+				
+				reader.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		log.info( "Finished reading jobs table ..." );
+		log.info(jobCounter + " jobs were were found and " + skipCounter + " jobs were skipped (because they don't provide any parcel id)!");
+		return jobObjectMap;		
 	}
 
 	/**
 	 * determine if a person already exists
 	 * @param oldPop
 	 * @param personId
-	 * @return true if a person already exists in an old poulation
+	 * @return true if a person already exists in an old population
 	 */
 	private boolean personExistsInOldPopulation(Population oldPop, Id personId){
 

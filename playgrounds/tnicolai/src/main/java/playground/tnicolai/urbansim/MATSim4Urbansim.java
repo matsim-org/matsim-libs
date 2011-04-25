@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
@@ -45,7 +46,7 @@ import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.JAXBUnmaschal;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
-import playground.tnicolai.urbansim.utils.WorkplaceObject;
+import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -108,11 +109,11 @@ public class MATSim4Urbansim {
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ) );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
-		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
+		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
+		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		
-		readUrbansimParcelModel(readFromUrbansim, facilities, zones);
-		Population newPopulation = readUrbansimPersons(readFromUrbansim, facilities, network);
+		readUrbansimParcelModel(readFromUrbansim, parcels, zones);
+		Population newPopulation = readUrbansimPersons(readFromUrbansim, parcels, network);
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 
 		log.info("### DONE with demand generation from urbansim ###") ;
@@ -121,32 +122,33 @@ public class MATSim4Urbansim {
 		scenario.setPopulation(newPopulation);
 		// scenario.setFacilities(facilities); // tnicolai: suggest to implement method
 
-		runControler(zones, numberOfWorkplacesPerZone, facilities);
+		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
 	}
 	
 	/**
 	 * read urbansim parcel table and build facilities and zones in MATSim
 	 * 
 	 * @param readFromUrbansim
-	 * @param facilities
+	 * @param parcels
 	 * @param zones
 	 */
-	protected void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, ActivityFacilitiesImpl zones){
+	protected void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
 
-		readFromUrbansim.readFacilities(facilities, zones);
+		readFromUrbansim.readFacilities(parcels, zones);
 		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
-//		new FacilitiesWriter(facilities).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz" );
+		new FacilitiesWriter(parcels).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "parcels.xml.gz" );
+		new FacilitiesWriter(zones).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "zones.xml.gz" );
 	}
 	
 	/**
 	 * read person table from urbansim and build MATSim population
 	 * 
 	 * @param readFromUrbansim
-	 * @param facilities
+	 * @param parcels
 	 * @param network
 	 * @return
 	 */
-	protected Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
+	protected Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, NetworkImpl network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
@@ -164,7 +166,7 @@ public class MATSim4Urbansim {
 
 		Population newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
-		readFromUrbansim.readPersons( oldPopulation, newPopulation, facilities, network, Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE)) ) ;
+		readFromUrbansim.readPersons( oldPopulation, newPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE)) ) ;
 		oldPopulation=null;
 		System.gc();
 		
@@ -181,22 +183,24 @@ public class MATSim4Urbansim {
 	 */
 	protected Map<Id,WorkplaceObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
 
-		return readFromUrbansim.readJobs();
+		return readFromUrbansim.readZoneBasedWorkplaces();
 	}
 	
 	/**
 	 * run simulation
 	 * @param zones
 	 */
-	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities ){
+	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl parcels, 
+			ReadFromUrbansimParcelModel readFromUrbansim){
+		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone, facilities, scenario ) );
+		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
 		
-		// tnicolai todo: count number of cars per h on a link
+		// tnicolai todo?: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
 		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
 		// see also http://matsim.org/docs/controler
@@ -258,14 +262,6 @@ public class MATSim4Urbansim {
 			
 			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
 			System.exit(Constants.UNMARSCHALLING_FAILED);
-//			if(MATSimConfigObject.isTestRun()){
-//				log.error("TestRun failed !!!");
-//				System.exit(Constants.TEST_RUN_FAILD);
-//			}
-//			else{
-//				log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-//				System.exit(Constants.UNMARSCHALLING_FAILED);
-//			}
 		}
 		return matsimConfig;
 	}
@@ -273,7 +269,6 @@ public class MATSim4Urbansim {
 	/**
 	 * Entry point
 	 * @param args urbansim command prompt
-	 * @return 0 if simulation successful, >0 else
 	 */
 	public static void main(String args[]){
 		MATSim4Urbansim m4u = new MATSim4Urbansim(args);

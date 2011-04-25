@@ -36,6 +36,7 @@ import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.toronto.ttimematrix.SpanningTree;
 
 /**
@@ -75,7 +76,7 @@ public class MyControlerListener implements ShutdownListener {
 		log.info("Entering notifyShutdown ..." ) ;
 
 		// get the controller and scenario
-		Controler controler = event.getControler() ;
+		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
 		initCostfunctionParameter(sc);
@@ -91,23 +92,14 @@ public class MyControlerListener implements ShutdownListener {
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
 		
 		try {
-			BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
-			BufferedWriter zonesWriter = IOUtils.getBufferedWriter( zonesPath );
-
+			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter();
+			BufferedWriter zonesWriter = initWorkplaceAccessibilityWriter();
+			
 			computeZoneToZoneTrips(sc, originDestinationMatrix);
 
-			log.info("Computing and writing travel_data" ) ;
+			log.info("Computing and writing travel_data" );
 			// log.warn("Can't feed floats to urbansim; am thus feeding ints for the ttime.") ;
 			// solved 3dec08 by travis
-
-			// Travel Data Header
-			travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips.lf4" ) ; 
-			Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
-			travelDataWriter.newLine();
-			
-			// Zone Header (workplace accessibility)
-			zonesWriter.write( "zone_id:i4,workplace_accessibility:f4") ;
-			zonesWriter.newLine();
 			
 			// Progress bar
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
@@ -229,9 +221,46 @@ public class MyControlerListener implements ShutdownListener {
 
 		log.info("... done with notifyShutdown.") ;
 	}
+
+	/**
+	 * Returns a BufferedWriter writing accessibility measures for each zone
+	 * 
+	 * @return BufferedWriter
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private BufferedWriter initWorkplaceAccessibilityWriter()
+			throws FileNotFoundException, IOException {
+		BufferedWriter zonesWriter = IOUtils.getBufferedWriter( zonesPath );
+		
+		// Zone Header (workplace accessibility)
+		zonesWriter.write( "zone_id:i4,workplace_accessibility:f4") ;
+		zonesWriter.newLine();
+		return zonesWriter;
+	}
+
+	/**
+	 * Returns a BufferedWriter writing a zone-to-zone impedance matrix for UrbanSim
+	 * 
+	 * @return BufferedWriter
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private BufferedWriter initZone2ZoneImpedaceWriter()
+			throws FileNotFoundException, IOException {
+		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
+		
+
+		// Travel Data Header
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips.lf4" ) ; 
+		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
+		travelDataWriter.newLine();
+		return travelDataWriter;
+	}
 	
 	
 	/**
+	 * Calculates the travel distance (in meters) between an origin and destination zone on the traffic network.
 	 * 
 	 * @param fromZone
 	 * @param toZone

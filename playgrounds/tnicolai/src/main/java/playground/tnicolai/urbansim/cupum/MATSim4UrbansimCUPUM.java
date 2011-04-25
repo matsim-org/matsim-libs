@@ -36,7 +36,7 @@ import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.WorkplaceObject;
+import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -94,7 +94,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
 
-		runControler(zones, numberOfWorkplacesPerZone, facilities);
+		runControler(zones, numberOfWorkplacesPerZone, facilities, readFromUrbansim);
 	}
 	
 	/**

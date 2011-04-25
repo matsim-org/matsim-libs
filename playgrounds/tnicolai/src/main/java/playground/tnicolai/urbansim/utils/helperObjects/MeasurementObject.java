@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.utils;
+package playground.tnicolai.urbansim.utils.helperObjects;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -59,6 +59,7 @@ public class MeasurementObject {
 	/**
 	 * prevent usage of default constructor from external classes
 	 */
+	@Deprecated
 	private MeasurementObject(){
 		DURATION_READ_FACILITIES_URBANSIM_OUTPUT 	= -1;
 		DURATION_READ_PERSONS_URBANSIM_OUTPUT		= -1;

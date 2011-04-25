@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.InitMATSimScenario;
-import playground.tnicolai.urbansim.utils.MeasurementObject;
+import playground.tnicolai.urbansim.utils.helperObjects.MeasurementObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 import playground.toronto.ttimematrix.SpanningTree;
 
