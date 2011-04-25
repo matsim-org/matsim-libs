@@ -149,7 +149,7 @@ public class CountsCreatorFromEvents {
 				cgw.createGraphs();
 		}
 		if (this.outputFormat.contains("kml")|| this.outputFormat.contains("all")) {
-			String filename = this.outpath + "countscompare.kmz";
+			String filename = this.outpath + "/countscompare.kmz";
 			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 					comparator.getComparison(), this.network, 
 					TransformationFactory.getCoordinateTransformation(this.coordinateSystem, TransformationFactory.WGS84 ));
@@ -157,7 +157,7 @@ public class CountsCreatorFromEvents {
 			kmlWriter.writeFile(filename);
 		}
 		if (this.outputFormat.contains("txt")||	this.outputFormat.contains("all")) {
-			String filename = this.outpath +  "countscompare.txt";
+			String filename = this.outpath +  "/countscompare.txt";
 			CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(comparator.getComparison(),Locale.ENGLISH);
 			ctw.writeFile(filename);
 		}
