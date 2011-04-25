@@ -38,6 +38,7 @@ public class SimulatedLinkVolumesAndCounts {
 	private void readVolumes() {
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
 			String p = this.path + "/" + i + "/countspost/countscompare.txt";
+			//String p = this.path + "/" + i + "/zh10PctEps.100.countscompare.txt";
 			this.readCountsCompare(p);
 		}
 	}
