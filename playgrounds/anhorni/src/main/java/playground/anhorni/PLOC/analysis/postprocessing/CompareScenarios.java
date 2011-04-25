@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -20,11 +18,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CompareScenarios {	
-	public String outpath = "src/main/java/playground/anhorni/output/PLOC/zh/";
+	public String outpath;
 	private ScenarioImpl baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private List<String> paths = new Vector<String>();
+	private int numberOfAnalyses;
+	private String path;
 	private String networkFilePath;
 	private String facilitiesFilePath;
+	private String plansFileName;
 	
 	private final static Logger log = Logger.getLogger(CompareScenarios.class);
 
@@ -34,27 +34,25 @@ public class CompareScenarios {
 		log.info("Comparisons finished ...");
 	}
 	
-	private void readPathsList(String pathsFile) {
+	private void readConfig(String configFile) {
 		try {
-	          BufferedReader bufferedReader = new BufferedReader(new FileReader(pathsFile));
+	          BufferedReader bufferedReader = new BufferedReader(new FileReader(configFile));
  
 	          this.networkFilePath = bufferedReader.readLine();
 	          this.facilitiesFilePath = bufferedReader.readLine();
-	          
-	          String line;
-	          while ((line = bufferedReader.readLine()) != null) {
-	        	  this.paths.add(line);
-	          }
-	          
+	          this.numberOfAnalyses = Integer.parseInt(bufferedReader.readLine());
+	          this.path = bufferedReader.readLine();
+	          this.plansFileName = bufferedReader.readLine();
+	          this.outpath = bufferedReader.readLine();
 	        } // end try
         catch (IOException e) {
         	e.printStackTrace();
         }	
 	}
 	
-	private void init(String pathsFile) {
+	private void init(String configFile) {
+		this.readConfig(configFile);
 		new File(outpath).mkdirs();
-		this.readPathsList(pathsFile);
 		new MatsimNetworkReader(baseScenario).readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(baseScenario).readFile(facilitiesFilePath);
 	}
@@ -63,27 +61,32 @@ public class CompareScenarios {
 		this.init(pathsFile);
 		
 		CompareScores scoreComparator = new CompareScores(this.outpath);
+		scoreComparator.openScoresFile(this.outpath + "/bestScores.txt");
 		
-		scoreComparator.openScoresFile(this.outpath + "bestScores.txt");
-		
-		for (String path : this.paths) {
-			log.info("reading: " + path);
-			this.readPopulation(path);
+		for (int i = 0; i < this.numberOfAnalyses; i++) {
+			String p = this.path + "/" + i + "/" + this.plansFileName;
+			log.info("reading: " + p);
+			this.readPopulation(p);
 			scoreComparator.handleScenario(this.baseScenario);
 		}
 		scoreComparator.closeScoresFile();
 		scoreComparator.printScores();
-		scoreComparator.compareBestScores(this.outpath + "bestScores.txt", 
-				this.outpath + "bestScoresStandardDeviationsinPercent.txt");
+		
+		scoreComparator.compareBestScores(this.outpath + "/bestScores.txt", 
+				this.outpath + "/bestScoresStandardDeviationsinPercent.txt");
 		
 		CompareDestinations destinationComparator = new CompareDestinations();
-		for (String path : this.paths) {
-			log.info("reading: " + path);
-			this.readPopulation(path);
+		for (int i = 0; i < this.numberOfAnalyses; i++) {
+			String p = this.path + "/" + i + "/" + this.plansFileName;
+			log.info("reading: " + p);
+			this.readPopulation(p);
 			destinationComparator.handleScenario(this.baseScenario);
 		}
-		DecimalFormat formatter = new DecimalFormat("0.0");
+		DecimalFormat formatter = new DecimalFormat("0.0000000");
 		log.info("Distances from center point: " + formatter.format(destinationComparator.evaluateScenarios()) + "[m]");
+		
+		SimulatedLinkVolumesAndCounts volumesAnalyzer = new SimulatedLinkVolumesAndCounts(numberOfAnalyses, this.path, this.outpath);
+		volumesAnalyzer.run();		
 	}
 	
 	private void readPopulation(String populationFilePath) {

@@ -43,9 +43,10 @@ public class CompareScores {
 	}
 	
 	private void append2ScoresFile(List<Double> scoresPerAgent, List<Id> agentIds) {
+		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
 		for (int i = 0; i < scoresPerAgent.size(); i++) {
 			try {
-				bufferedWriterBestScores.write(scoresPerAgent.get(i) + "\t" + agentIds.get(i).toString() + "\t");
+				bufferedWriterBestScores.write(agentIds.get(i).toString() + "\t" + formatter.format(scoresPerAgent.get(i)) +  "\t");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -58,11 +59,14 @@ public class CompareScores {
 	}
 		
 	private void printAverageScore() {
-		DecimalFormat formatter = new DecimalFormat("0.000");
+		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outpath + "averageScores.txt")); 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outpath + "/averageBestScores.txt")); 
+			bufferedWriter.write("sim_run" + "\t" + "average_best_score" + "\n"); 
+			int cnt = 0;
 			for (Double score : averageScores) {
-				bufferedWriter.write(formatter.format(score) + "\n");
+				bufferedWriter.write(cnt + "\t" + formatter.format(score) + "\n");
+				cnt++;
 			}
 			bufferedWriter.newLine();
 			
@@ -80,7 +84,8 @@ public class CompareScores {
 	
 	public void openScoresFile(String bestScoresFile) {
 		try {
-			this.bufferedWriterBestScores = new BufferedWriter(new FileWriter(bestScoresFile)); 
+			this.bufferedWriterBestScores = new BufferedWriter(new FileWriter(bestScoresFile));
+			this.bufferedWriterBestScores.write("Agent_id" + "\t" + "score" + "\n");
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
@@ -99,6 +104,7 @@ public class CompareScores {
 	private void printBestScoresStatistics(TreeMap<Id, AgentsScores> agentsScores, String outfile) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outfile)); 
+			bufferedWriter.write("Agent_Id" + "\t" + "relativeStandardDeviation [%]" + "\n");
 			for (AgentsScores scores : agentsScores.values()) {
 				double relativeStandardDeviationinPercent = 100.0 * scores.getStandardDeviationScore() / Math.abs(scores.getAverageScore());
 				bufferedWriter.write(scores.getAgentId() + "\t" + relativeStandardDeviationinPercent + "\n");
@@ -118,12 +124,12 @@ public class CompareScores {
 		TreeMap<Id, AgentsScores> agentsScores = new TreeMap<Id, AgentsScores>();	
 		try {
 	          BufferedReader bufferedReader = new BufferedReader(new FileReader(bestScoresFile));
-	          String line;	          
+	          String line = bufferedReader.readLine(); // skip header	          
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t");
 	        	  for (int i = 0; i < parts.length; i+=2) {
-	        		  Id agentId = new IdImpl(parts[i + 1]);
-	        		  double score = Double.parseDouble(parts[i]);
+	        		  Id agentId = new IdImpl(parts[i]);
+	        		  double score = Double.parseDouble(parts[i + 1]);
 	        		  if (agentsScores.get(agentId) == null) agentsScores.put(agentId, new AgentsScores(agentId));
 	        		  agentsScores.get(agentId).addScore(score);
 	        	  }

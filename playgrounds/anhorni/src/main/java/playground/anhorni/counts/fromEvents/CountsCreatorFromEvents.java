@@ -48,16 +48,13 @@ import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 public class CountsCreatorFromEvents {
+	private final static Logger log = Logger.getLogger(CountsCreatorFromEvents.class);
+	
 	private Counts counts;
 	private EventsManager events;
 	private Network network;
 	private String networkFile;
 	private String outpath;
-	private final static Logger log = Logger.getLogger(CountsCreatorFromEvents.class);
-	
-	public static final String COUNTS = "counts";
-	public static final String DISTANCEFILTER = "distanceFilter";
-	public static final String DISTANCEFITLERCENTERNODE = "distanceFilterCenterNode";
 	
 	private Double distanceFilter = null;
 	private String distanceFilterCenterNode = null;
