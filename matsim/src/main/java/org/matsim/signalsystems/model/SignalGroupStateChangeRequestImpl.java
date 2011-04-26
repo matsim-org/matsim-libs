@@ -31,6 +31,8 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 	private double timeSec;
 	private Id signalGroupId;
 	
+	private String hashCode = null;
+	
 	public SignalGroupStateChangeRequestImpl(Id groupId, SignalGroupState newState, double timeSeconds){
 		this.signalGroupId = groupId;
 		this.newState = newState;
@@ -64,6 +66,18 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 			return idCompare;
 		}
 		return doubleCompare;
+	}
+	
+	@Override
+	public int hashCode(){
+		if (this.hashCode == null){
+			StringBuilder hCode = new StringBuilder();
+			hCode.append(newState.toString());
+			hCode.append(Double.toString(timeSec));
+			hCode.append(signalGroupId.toString());
+			this.hashCode = hCode.toString();
+		}
+		return this.hashCode.hashCode();
 	}
 	
 	@Override
