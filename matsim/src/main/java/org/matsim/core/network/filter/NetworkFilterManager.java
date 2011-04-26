@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -60,6 +61,43 @@ public class NetworkFilterManager {
 		this.nodeFilters.add(f);
 	}
 
+	private Node addNode(Network net, Node n){
+		Node newNode = net.getFactory().createNode(n.getId(), n.getCoord());
+		net.addNode(newNode);
+		return newNode;
+	}
+	
+	private void addLink(Network net, Link l){
+		Id fromId = l.getFromNode().getId();
+		Id toId = l.getToNode().getId();
+		Node from = null;
+		Node to = null;
+		Node nn;
+		//check if from node already exists
+		if (! net.getNodes().containsKey(fromId)) {
+			nn = this.network.getNodes().get(fromId);
+			from = this.addNode(net, nn);
+		}
+		else {
+			from = net.getNodes().get(fromId);
+		}
+		//check if to node already exists
+		if (! net.getNodes().containsKey(toId)){
+			nn = this.network.getNodes().get(toId);
+			to = this.addNode(net, nn);
+		}
+		else {
+			to = net.getNodes().get(toId);
+		}
+		Link ll = net.getFactory().createLink(l.getId(), from, to);
+		ll.setAllowedModes(l.getAllowedModes());
+		ll.setCapacity(l.getCapacity());
+		ll.setFreespeed(l.getFreespeed());
+		ll.setLength(l.getLength());
+		ll.setNumberOfLanes(l.getNumberOfLanes());
+		net.addLink(ll);
+	}
+	
 	/**
 	 * Call this method to filter the network.
 	 * @return
@@ -79,7 +117,7 @@ public class NetworkFilterManager {
 					}
 				}
 				if (add) {
-					net.addNode(n);
+					this.addNode(net, n);
 					nodeCount++;
 				}
 			}
@@ -94,19 +132,12 @@ public class NetworkFilterManager {
 					}
 				}
 				if (add) {
-					Node from = l.getFromNode();
-					Node to = l.getToNode();
-					if (!net.getNodes().containsKey(from.getId())) {
-						net.getNodes().put(from.getId(), from);
-					}
-					if (!net.getNodes().containsKey(to.getId())){
-						net.getNodes().put(to.getId(), to);
-					}
-					net.addLink(l);
+					this.addLink(net, l);
 					linkCount++;
 				}
 			}
 		}
+		net.connect();
 		log.info("filtered " + nodeCount + " of " + network.getNodes().size() + " nodes...");
 		log.info("filtered " + linkCount + " of " + network.getLinks().size() + " links.");
 		return net;
