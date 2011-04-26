@@ -133,7 +133,7 @@ public class BvgTripAnalysisRunner {
 			e1.printStackTrace();
 		}
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		PlanElementFilter filter = new PlanElementFilter();
+		BVGPlanElementFilter filter = new BVGPlanElementFilter();
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(filter);
 		
 		InputStream in = null;

@@ -34,10 +34,10 @@ import org.matsim.population.filters.AbstractPersonFilter;
  * @author droeder
  *
  */
-public class PlanElementFilter extends AbstractPersonFilter{
+public class BVGPlanElementFilter extends AbstractPersonFilter{
 	private Map<Id, ArrayList<PlanElement>> elements;
 	
-	public PlanElementFilter(){
+	public BVGPlanElementFilter(){
 		this.elements = new HashMap<Id, ArrayList<PlanElement>>();
 	}
 	
