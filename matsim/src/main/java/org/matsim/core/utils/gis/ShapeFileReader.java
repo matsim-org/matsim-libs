@@ -36,6 +36,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -58,6 +59,8 @@ public class ShapeFileReader implements MatsimSomeReader {
 	private FeatureType schema = null;
 	
 	private Set<Feature> featureSet = null;
+
+	private CoordinateReferenceSystem crs;
 	
 	/**
 	 * Provides access to a shape file and returns a <code>FeatureSource</code> containing all features.
@@ -108,6 +111,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 		this.dataStore = this.featureSource.getDataStore();
 		this.featureCollection = this.featureSource.getFeatures();
 		this.schema = this.featureSource.getSchema();
+		this.crs = this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem();
 	}
 
 
@@ -136,7 +140,9 @@ public class ShapeFileReader implements MatsimSomeReader {
 		return featureSet;
 	}
 
-	
+	public CoordinateReferenceSystem getCoordinateSystem(){
+		return this.crs;
+	}
 	
 
 }
