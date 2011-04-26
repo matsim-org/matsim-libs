@@ -8,21 +8,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-
-import playground.mzilske.pipeline.PopulationWriterTask;
-import playground.mzilske.pipeline.RoutePersonTask;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -35,7 +27,6 @@ public class PendlerMatrixReader {
 
 	private static final Logger log = Logger.getLogger(PendlerMatrixReader.class);
 
-	//	private static final String PV_EINPENDLERMATRIX = "../../shared-svn/studies/countries/de/pendler_nach_gemeinden/CD_Pendler_Gemeindeebene_30_06_2009/einpendler-muenchen.csv";
 	private static final String PV_EINPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/EinpendlerMUC_843_062004.csv";
 
 	private static final String PV_AUSPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/AuspendlerMUC_843_062004.csv";
@@ -43,12 +34,6 @@ public class PendlerMatrixReader {
 	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
 
 	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
-
-	//	private static final String FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/naechster_versuch.xml";
-	//
-	//	private static final String NETWORK_FILENAME = "/Users/michaelzilske/osm/motorway_germany.xml";
-	//
-	//	private static final String FILTER_FILENAME = "/Users/michaelzilske/workspace/prognose_2025/demand/filter.shp";
 
 	private TripFlowSink flowSink;
 
@@ -165,18 +150,6 @@ public class PendlerMatrixReader {
 		}
 	}
 
-	private static boolean isCoordInShape(Coord linkCoord, Set<Feature> features, GeometryFactory factory) {
-		boolean found = false;
-		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
-		for (Feature ft : features) {
-			if (ft.getDefaultGeometry().contains(geo)) {
-				found = true;
-				break;
-			}
-		}
-		return found;
-	}
-
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
 		Zone source = zones.get(quelle);
 		Zone sink = zones.get(ziel);
@@ -202,14 +175,6 @@ public class PendlerMatrixReader {
 			flowSink.process(zones.get(quelle), zones.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
 		}
 	}
-
-	//	private int getCarQuantity(Zone source, Zone sink, int carWorkTripsPerDay) {
-	//		double outWeight = ((double) source.workingPopulation * sink.workplaces) /  ((double) source.workplaces * sink.workingPopulation);
-	//		double inWeight = ((double) source.workplaces * sink.workingPopulation) /  ((double) source.workingPopulation * sink.workplaces);
-	//		double outShare = outWeight / (inWeight + outWeight);
-	//		int amount = (int) (outShare * carWorkTripsPerDay * 0.5);
-	//		return amount;
-	//	}
 
 	private int scale(int quantityOut) {
 		int scaled = (int) (quantityOut * 0.1 );
