@@ -37,6 +37,13 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
+/**
+ * initializes energyConsumptionPlugin and 
+ * vehicles for all agents according to desired percentages of EV/PHEV/normal car
+ * 
+ * @author Stella
+ *
+ */
 public class EnergyConsumptionInit implements StartupListener {
 	
 	

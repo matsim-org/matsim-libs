@@ -21,6 +21,18 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 
 
+/**
+ * extends TimeInterval
+ * extra parameters are the total consumption during the interval for driving.
+ * 
+ * the variables extraConsumption [J] and timeEngine [s] are adjusted during the optimization
+ * if the energy is taken from a source other than the electric battery.
+ * 
+ * 
+ *  		
+ * @author Stella
+ *
+ */
 public class DrivingInterval extends TimeInterval {
 	
 	double consumption;
@@ -32,7 +44,7 @@ public class DrivingInterval extends TimeInterval {
 	
 	
 	/**
-	 * 
+	 * Driving Interval with start, end and consumption in Joules
 	 * @param start - startTime
 	 * @param end - End Time
 	 * @param consumption - Consumption in Joule

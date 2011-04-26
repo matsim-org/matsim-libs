@@ -12,6 +12,14 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
+
+/**
+ * this class handles regulation up and down. For every agent, it calculates, if rescheduling or keeping its current schedule is more profitable.
+ * If rescheduling has a higher utility for the agent, he reschedules the rest of his day and decreases the stochastic hub load 
+ * 
+ * @author Stella
+ *
+ */
 public class V2G {
 	
 	DecentralizedSmartCharger mySmartCharger;

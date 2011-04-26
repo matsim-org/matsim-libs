@@ -4,6 +4,12 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.jfree.data.xy.XYSeries;
 
+/**
+ * is a convenience class that collects point data, fits the point data and 
+ * thus allows an easy way to visualize the data in a graph afterwards
+ * @author Stella
+ *
+ */
 public class TimeDataCollector {
 
 	

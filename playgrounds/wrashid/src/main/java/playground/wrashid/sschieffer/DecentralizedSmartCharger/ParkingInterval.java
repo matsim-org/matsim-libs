@@ -22,6 +22,18 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.matsim.api.core.v01.Id;
 
+
+/**
+ * extends TimeInterval 
+ * additional parameters are the required Charging Duration (and the related charging Schedule)
+ * its location (linkId),
+ * the available joules to charge according to the deterministic hub load profile during this interval.
+ * if the interval is in a system optimal time slot meaning there is available energy to charge
+ * (deterministic hub load >0 && joulesInTimeInterval>0), then the boolean parameter optimal is set to true. 
+ * 
+ * @author Stella
+ *
+ */
 public class ParkingInterval extends TimeInterval {
 	
 	private double requiredChargingDuration=-1;

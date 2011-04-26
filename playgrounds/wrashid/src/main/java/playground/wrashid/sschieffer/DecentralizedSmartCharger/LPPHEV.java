@@ -38,6 +38,19 @@ import org.matsim.api.core.v01.Id;
 import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
 
+
+/**
+ * this class conducts the linear programming for PHEVs which results in the required charging times and starting SOC or each agent
+ * 
+ * from the agent's schedule and given battery constraints, the objective function and constraints are set up
+ * - the problem is solved
+ * - and the agent's schedules are updated with the results
+ * 
+ * This class can handle first time scheduling and rescheduling problems 
+ * 
+ * @author Stella
+ *
+ */
 public class LPPHEV {
 	
 	private Schedule schedule;
@@ -54,9 +67,6 @@ public class LPPHEV {
 	public LPPHEV(){
 		
 	}
-	
-	
-	
 	
 	
 	/**
@@ -89,13 +99,13 @@ public class LPPHEV {
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"objective.txt");
+			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"objective.txt");
 			solver.printObjective();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent"+ personId.toString()+"tableau.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"tableau.txt");
 			solver.printTableau();*/
 		} catch (Exception e) {	    
 		}
@@ -121,7 +131,19 @@ public class LPPHEV {
 	
 	
 	
-	
+	/**
+	 * rescheduling problem, by providing a starting SOC, the first entry of the solution vector is fixed. Otherwise the same optimization is performed
+	 * @param schedule
+	 * @param id
+	 * @param batterySize
+	 * @param batteryMin
+	 * @param batteryMax
+	 * @param vehicleType
+	 * @param startingSOC
+	 * @return
+	 * @throws LpSolveException
+	 * @throws IOException
+	 */
 	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
 		
 		System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
@@ -137,13 +159,13 @@ public class LPPHEV {
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
 			solver.printObjective();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
 			solver.printTableau();
 		} catch (Exception e) {	    
 		}
@@ -871,7 +893,7 @@ public class LPPHEV {
  	            )
  	        );
      	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "SOC_of_"+type+"afterLPPHEV_Agent"+personId.toString()+".png") , chart, 800, 600);
+     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPPHEV_Agent"+personId.toString()+".png") , chart, 800, 600);
 	  	
 	}
 		

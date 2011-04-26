@@ -22,9 +22,19 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import lpsolve.LpSolveException;
 
-
+/**
+ * this class is called if the agent has a conventional vehicle
+ * 
+ * An actual LP is not required, since the agent can only use the combustion engine.
+ * So his required charging times are set to 0.
+ * 
+ * @author Stella
+ *
+ */
 public class LPCombustion {
 
+	
+	private double energyFromCombustionEngine;
 	private Schedule schedule;
 	LPCombustion(){
 		
@@ -41,11 +51,15 @@ public class LPCombustion {
 			}
 		
 		}
-		
+		energyFromCombustionEngine= getDrivingConsumption();
 		return schedule;
 	}
 	
 	
+	
+	public double getEnergyFromCombustionEngine(){
+		return energyFromCombustionEngine;
+	}
 	
 	public double getDrivingConsumption(){
 		double consumption=0;

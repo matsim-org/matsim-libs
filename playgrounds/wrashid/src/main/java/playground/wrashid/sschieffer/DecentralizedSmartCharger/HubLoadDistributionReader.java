@@ -49,8 +49,16 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 
 
+/**
+ * keeps track of all deterministic and stochastic loads and prices for EVs and PHEVs
+ *  over the day.
+ * 
+ * @author Stella
+ *
+ */
 public class HubLoadDistributionReader {
 	
+	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 	
 	UnivariateRealSolverFactory factory = UnivariateRealSolverFactory.newInstance();
 	UnivariateRealSolver solverBisection = factory.newBisectionSolver();
@@ -87,11 +95,8 @@ public class HubLoadDistributionReader {
 	 */
 	public HubLoadDistributionReader(Controler controler, 
 			HubLinkMapping hubLinkMapping,
-			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,
-			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
-			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping,
+			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,			
 			double gasPrice) throws IOException, OptimizationException, InterruptedException{
 		
 		this.controler=controler;
@@ -101,7 +106,6 @@ public class HubLoadDistributionReader {
 		this.deterministicHubLoadDistribution=deterministicHubLoadDistribution; // continuous functions
 		
 		this.gasPriceInCostPerSecond=gasPrice;
-		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions
 		
 		this.pricingHubDistribution=pricingHubDistribution; // continuous functions with same intervals as deterministic HubLoadDistribution!!!
 		
@@ -118,19 +122,24 @@ public class HubLoadDistributionReader {
 			controler.wait();
 		}
 		
-		
-		
 		initializeLoadAfterDeterministicChargingDecision();
-		
-		
-		this.locationSourceMapping=locationSourceMapping;
-		this.agentVehicleSourceMapping=agentVehicleSourceMapping;
 		
 		initializeConnectivityHubDistribution();
 		
 	}
 	
 	
+	
+	
+	public void setStochasticSources(
+			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
+			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping){
+		
+		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions		
+		this.locationSourceMapping=locationSourceMapping;
+		this.agentVehicleSourceMapping=agentVehicleSourceMapping;
+	}
 	
 	
 	public void initializeConnectivityHubDistribution(){
@@ -379,23 +388,26 @@ public class HubLoadDistributionReader {
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray);
 		
-        
-        for(Integer i: connectivityHubDistribution.getKeySet()){
+        int i=0;
+        for(Integer j:  connectivityHubDistribution.getKeySet()){
+        	//System.out.println(i);
         	plot.getRenderer().setSeriesPaint(i, Color.black);//after
         	plot.getRenderer().setSeriesStroke(
                     i, 
                   
                     new BasicStroke(
-                        1.0f,  //float width
+                        3.0f,  //float width
                         BasicStroke.CAP_ROUND, //int cap
                         BasicStroke.JOIN_ROUND, //int join
                         1.0f, //float miterlimit
-                        new float[] {i*4.0f, i*1f}, //float[] dash
+                        new float[] {(1+i)*2.0f, i*3f}, //float[] dash
                         0.0f //float dash_phase
                     )
                 );
+        	i++;
         }
-        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "connectivityOfAgentsOverDay.png") , chart, 1000, 1000);
+        String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
+        ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
 		
 	}
@@ -418,16 +430,17 @@ public class HubLoadDistributionReader {
 		
 		for(Integer i : pricingHubDistribution.getKeySet()){
 			
-			Schedule s= pricingHubDistribution.getValue(i);
+			Schedule pricingS= pricingHubDistribution.getValue(i);
+			pricingS.printSchedule();
 			
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.getValue(i);
-			
+			deterministicSchedule.printSchedule();
 			Schedule sPHEV= new Schedule();
-			for(int j=0; j<s.getNumberOfEntries(); j++){
+			for(int j=0; j<pricingS.getNumberOfEntries(); j++){
 				
 				LoadDistributionInterval currentDeterministicLoadInterval= (LoadDistributionInterval)deterministicSchedule.timesInSchedule.get(j);
 				
-				LoadDistributionInterval currentPricingLoadInterval= (LoadDistributionInterval)s.timesInSchedule.get(j);
+				LoadDistributionInterval currentPricingLoadInterval= (LoadDistributionInterval)pricingS.timesInSchedule.get(j);
 				
 				PolynomialFunction func= currentPricingLoadInterval.getPolynomialFunction();
 				
@@ -510,6 +523,7 @@ public class HubLoadDistributionReader {
 //			sPHEV.printSchedule();
 					
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
+			//sPHEV.printSchedule();
 		}
 		
 		return hubLoadDistributionPHEVAdjusted;
@@ -707,7 +721,7 @@ public class HubLoadDistributionReader {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		
@@ -809,7 +823,7 @@ public class HubLoadDistributionReader {
     	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "hubDeterministic_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\hubDeterministic_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		}

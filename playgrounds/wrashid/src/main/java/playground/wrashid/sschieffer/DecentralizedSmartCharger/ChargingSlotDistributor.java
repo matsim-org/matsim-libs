@@ -27,6 +27,17 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
 
 
+/**
+ * assigns charging slots to the required charging times (calculated in the LP) using 
+ * a random number generator and the distribution of free charging slots over the day.
+ * 
+ * Charging Slots are of a certain given maximum length and are stored as a schedule 
+ * within the parking interval
+ * 
+ * 
+ * @author Stella
+ *
+ */
 public class ChargingSlotDistributor {
 	/*
 	 * will assign exact charging times from an agents schedule and required charging times

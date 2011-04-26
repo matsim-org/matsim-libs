@@ -22,9 +22,18 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
+/**
+ * abstract class TimeInterval stores start and end second of time interval
+ * 
+ * @author Stella
+ *
+ */
 public abstract class TimeInterval implements Comparable{
 	double start;
 	double end;
+	
+	
+	
 	
 	TimeInterval(double start, double end){
 		this.start=start;
@@ -43,9 +52,9 @@ public abstract class TimeInterval implements Comparable{
 	
 	public boolean overlap(TimeInterval other){
 		boolean check=false;
-		if( timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(other.getStartTime()) 
+		if( timeIsGreaterThanStartAndSmallerThanEnd(other.getStartTime()) 
 				||
-				timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(other.getEndTime()) ) {
+				timeIsGreaterThanStartAndSmallerThanEnd(other.getEndTime()) ) {
 			check=true;
 		}
 		return check;
@@ -77,16 +86,16 @@ public abstract class TimeInterval implements Comparable{
 	
 	public LoadDistributionInterval ifOverlapWithLoadDistributionIntervalReturnOverlap(LoadDistributionInterval l){
 		
-		if(timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+		if(timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
 				&&
-				timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+				timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
 			//if start and end in
 			return l;
 			
 		}else{
-			if(timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+			if(timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
 					&&
-					!timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+					!timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
 				//if start in and end not in
 				return new LoadDistributionInterval(l.getStartTime(), 
 						getEndTime(), 
@@ -94,9 +103,9 @@ public abstract class TimeInterval implements Comparable{
 						l.isOptimal());
 				
 			}else{
-				if(!timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getStartTime())
+				if(!timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
 						&&
-						timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(l.getEndTime()	)){
+						timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
 					//if start not in and end in
 					return new LoadDistributionInterval(getStartTime(), 
 							l.getEndTime(), 
@@ -104,8 +113,17 @@ public abstract class TimeInterval implements Comparable{
 							l.isOptimal());
 					
 				}else{
-					//nothing in
-					return null;
+					if (start>l.getStartTime() && end< l.getEndTime()){
+						return new LoadDistributionInterval(getStartTime(), 
+								getEndTime(), 
+								l.getPolynomialFunction(), 
+								l.isOptimal());
+						
+					}else{
+						//nothing in
+						return null;
+					}
+					
 				}
 				
 			}
@@ -114,8 +132,15 @@ public abstract class TimeInterval implements Comparable{
 	}
 	
 	
-	public boolean timeIsEqualOrGreaterThanStartOrEqualOrSmallerThanEnd(double time){
-		if(time>=getStartTime() || time<=getEndTime()){
+	public boolean timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(double time){
+		if(time>=getStartTime() && time<=getEndTime()){
+			return true;
+		}else{return false;}
+	}
+	
+	
+	public boolean timeIsGreaterThanStartAndSmallerThanEnd(double time){
+		if(time>getStartTime() && time<getEndTime()){
 			return true;
 		}else{return false;}
 	}

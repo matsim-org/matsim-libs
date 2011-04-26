@@ -262,11 +262,9 @@ public class DecentralizedSmartCharger {
 
 	public void initializeHubLoadDistributionReader(
 			HubLinkMapping hubLinkMapping, 
-			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,
-			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
-			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping) throws OptimizationException, IOException, InterruptedException{
+			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			) throws OptimizationException, IOException, InterruptedException{
 		
 		// check if pricing and deterministic have same time intervals
 		
@@ -277,15 +275,22 @@ public class DecentralizedSmartCharger {
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
-				deterministicHubLoadDistribution,
-				stochasticHubLoadDistribution,
-				pricingHubDistribution,
-				locationSourceMapping,
-				agentVehicleSourceMapping,
+				deterministicHubLoadDistribution,				
+				pricingHubDistribution,				
 				gasPriceInCostPerSecond);
 	}
 
-
+	
+	public void setStochasticSources(
+			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
+			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping){
+		
+		myHubLoadReader.setStochasticSources(stochasticHubLoadDistribution,
+				locationSourceMapping, 
+				agentVehicleSourceMapping);
+	}
+	
 
 	/**
 	 * get agent schedules, find required charging times, assign charging times
@@ -307,6 +312,7 @@ public class DecentralizedSmartCharger {
 		calculateChargingCostsAllAgents();
 		
 		writeSummary();
+		System.out.println("Decentralized Smart Charger DONE");
 	}
 
 
@@ -356,7 +362,7 @@ public class DecentralizedSmartCharger {
 			if(hasAgentCombustionVehicle(id)){
 								
 				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
-				double consumption = lpcombustion.getDrivingConsumption();
+				double consumption = lpcombustion.getEnergyFromCombustionEngine();
 				
 				double emissionContribution= joulesToEmissionInKg(consumption);
 				// get entire driving Joules and transform to emissions
@@ -376,10 +382,9 @@ public class DecentralizedSmartCharger {
 				double batteryMax; 
 				
 				if(hasAgentPHEV(id)){
-					
-					//PlugInHybridElectricVehicle thisPHEV= (PlugInHybridElectricVehicle)vehicles.getValue(id);										
-					batterySize=batterySizePHEV;//thisPHEV.getBatterySizeInJoule();
-					batteryMin=batteryMinPHEV; //dummy
+															
+					batterySize=batterySizePHEV;
+					batteryMin=batteryMinPHEV; 
 					batteryMax=batteryMaxPHEV; 
 					agentsWithPHEV.add(id);
 					type="PHEVVehicle";
@@ -1022,7 +1027,9 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	
+	/**
+	 * clears agentParkingAndDrivingSchedules, agentChargingSchedules, emissions and lists of EV/PHEV/conventional car owners
+	 */
 	public void clearResults(){
 		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
 		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
@@ -1213,7 +1220,7 @@ public class DecentralizedSmartCharger {
         }
         
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath+ "agent "+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
+        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agent "+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
 	
@@ -1283,7 +1290,7 @@ public class DecentralizedSmartCharger {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "loadAfterFirstOptimizationAtHubTEST_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\loadAfterFirstOptimizationAtHubTEST_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		
@@ -1358,7 +1365,7 @@ public class DecentralizedSmartCharger {
     	                0.0f //float dash_phase
     	            )
     	        );
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "loadAfterFirstOptimizationAtHub_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\loadAfterFirstOptimizationAtHub_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
         
@@ -1430,7 +1437,7 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "_allChargingTimes.png"), chart, 2000, 2000);	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, 2000);	
 	
 	}
 	
@@ -1525,7 +1532,7 @@ public class DecentralizedSmartCharger {
      	
     	
   
-    	ChartUtilities.saveChartAsPNG(new File(outputPath+ "validation_chargingdistribution.png") , chart, 800, 600);
+    	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\validation_chargingdistribution.png") , chart, 800, 600);
 	  	
 	
 	}
@@ -1602,9 +1609,8 @@ public class DecentralizedSmartCharger {
 		    String pic= outputPath +"connectivityOfAgentsOverDay.png";
 		    
 		    out.write("");
-		    out.write("<a href='"+pic+"' > 	Picture </a>");
 		    out.write("<img src='"+pic+"' alt='connectivity' width='80%'");
-		    //<img src="pulpit.jpg" alt="Pulpit rock" width="304" height="228" /> 
+		   
 		  //*************************************
 		    out.write("</body>");
 		    out.write("</html>");   

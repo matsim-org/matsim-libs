@@ -34,6 +34,7 @@ import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 /**
  * reads and sorts schedules of agents
  * calls Linear Programming
+ * 
  * @author Stella
  *
  */
@@ -67,18 +68,16 @@ public class AgentTimeIntervalReader {
 		schedule=readParkingTimes(id, schedule);	
 		
 		
-		schedule=addDrivingTimes(id, schedule);			
-		System.out.println("with driving times");
-		//schedule.printSchedule();
+		schedule=addDrivingTimes(id, schedule);		
 		
 		
 		System.out.println("controlling optimal vs nonOptimal charging times");
 		schedule = checkTimesWithHubSubAndOptimalTimes(schedule, id);
-		//schedule.printSchedule();
+		
 		
 		System.out.println("calculating Joules per Interval");
 		schedule = getJoulesForEachParkingInterval(id, schedule);
-		//schedule.printSchedule();
+		
 		
 		return schedule;
 	}
@@ -168,58 +167,22 @@ public class AgentTimeIntervalReader {
 			loadDistributionSchedule= DecentralizedSmartCharger.myHubLoadReader.getLoadDistributionScheduleForHubId(id, idLink);
 		
 			
-			double startParking= t.getStartTime();
-			double endParking= t.getEndTime();
-			
-			int intervalStart=loadDistributionSchedule.timeIsInWhichInterval(startParking);
-			int intervalEnd=loadDistributionSchedule.timeIsInWhichInterval(endParking);
-			
-			LoadDistributionInterval lstart= (LoadDistributionInterval)loadDistributionSchedule.timesInSchedule.get(intervalStart);
-			LoadDistributionInterval lend= (LoadDistributionInterval)loadDistributionSchedule.timesInSchedule.get(intervalEnd);
-			
-			// if start and end are in same loadDistributionInterval
-			if(intervalStart==intervalEnd){
+			for(int i=0; i<loadDistributionSchedule.getNumberOfEntries(); i++){
 				
-				thisParkingInterval.setParkingOptimalBoolean(lstart.isOptimal());
-				newSchedule.addTimeInterval(t);
-				return newSchedule;
+				LoadDistributionInterval lHub= ((LoadDistributionInterval)loadDistributionSchedule.timesInSchedule.get(i));
+				LoadDistributionInterval overlap= 
+					t.ifOverlapWithLoadDistributionIntervalReturnOverlap(lHub);
 				
-			}else{
-				// if start and end are NOT in same loadDistributionInterval
-				
-				ParkingInterval p1= 
-					new ParkingInterval(startParking, 
-							loadDistributionSchedule.timesInSchedule.get(intervalStart).getEndTime(),
-							idLink
-							);
-				p1.setParkingOptimalBoolean(lstart.isOptimal());
-				newSchedule.addTimeInterval(p1);
-				
-				
-				for(int j=intervalStart+1; j<intervalEnd; j++){
-					LoadDistributionInterval lInBetween= (LoadDistributionInterval)loadDistributionSchedule.timesInSchedule.get(j);
+				if(null!=overlap){
+					ParkingInterval p= new ParkingInterval(overlap.getStartTime(),
+							overlap.getEndTime(), 
+							((ParkingInterval)t).getLocation());
+					p.setParkingOptimalBoolean(lHub.isOptimal());
+					newSchedule.addTimeInterval(p);
 					
-					ParkingInterval p3= 
-						new ParkingInterval(
-								lInBetween.getStartTime(),//start
-								lInBetween.getEndTime(),// end
-								idLink
-								);
-					p3.setParkingOptimalBoolean(lInBetween.isOptimal());
-					newSchedule.addTimeInterval(p3);
 				}
-				
-									
-				ParkingInterval p2= 
-					new ParkingInterval(loadDistributionSchedule.timesInSchedule.get(intervalEnd).getStartTime(),
-							endParking, 
-							idLink
-							);
-				p2.setParkingOptimalBoolean(lend.isOptimal());
-				newSchedule.addTimeInterval(p2);
-				return newSchedule;
-				
 			}
+			return newSchedule;
 			
 		}
 	}
@@ -229,10 +192,15 @@ public class AgentTimeIntervalReader {
 	public Schedule checkTimesWithHubSubAndOptimalTimes( Schedule schedule, Id id){
 		Schedule newSchedule= new Schedule();	
 		
+		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			
 			TimeInterval t= schedule.timesInSchedule.get(i);
+			//System.out.println("current interval");
+			//t.printInterval();
 			Schedule checkedTimeIntervalSchedule= checkIntervalForSubAndOptimalIntervals(t, id);
+			//System.out.println("current intervalafter check");
+			//checkedTimeIntervalSchedule.printSchedule();
 			
 			for(int j=0; j<checkedTimeIntervalSchedule.getNumberOfEntries();j++){
 				newSchedule.addTimeInterval(checkedTimeIntervalSchedule.timesInSchedule.get(j));

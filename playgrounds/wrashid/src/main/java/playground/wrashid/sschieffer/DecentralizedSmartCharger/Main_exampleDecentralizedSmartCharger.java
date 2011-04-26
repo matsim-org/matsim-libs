@@ -1,7 +1,8 @@
 
+
 /* *********************************************************************** *
  * project: org.matsim.*
- * Main.java
+ * Main_exampleDecentralizedSmartCharger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -38,61 +39,147 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import java.util.*;
 
-
-public class Main {
+/**
+ * This package guides charging decisions for electric vehicles (EV & PHEV) and 
+ * provides an optimized charging schedule for all agents as well as the associated charging costs. 
+ * It also calculates the total emissions produced by the vehicles.
+ * 
+ * To set up using these functions
+ * - first create a DecentralizedSmartCharger object within your simulation
+ * - set its input parameters
+ * 
+ * 
+ * To use the function
+ * - run() it after the iteration(s) as demonstrated in the code below
+ * 
+ * 
+ */
+public class Main_exampleDecentralizedSmartCharger {
 	
-	
-	
+		
 	public static void main(String[] args) throws IOException {
 		
-		
-		final ParkingTimesPlugin parkingTimesPlugin;		
-		
-		/*
-		 * //0,142500 €/kWh - 1 hour at 1kW
-		// 0,4275 1 hour at 3.5kW
-		//  per second =  0,4275/(3600)
-		 */
-		final double optimalPrice=0.4275/(3600); // cost/second - CAREFUL would have to implement different multipliers for high speed or regular connection
-		final double suboptimalPrice=optimalPrice*3; // cost/second    
-		final double gasPricePerLiter= 0.25;
-		final double compensationPerKWHRegulationUp=optimalPrice*1.1;
-		final double compensationPerKWHRegulationDown=optimalPrice*0.9;
-		
-		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-		
-		
-		final double bufferBatteryCharge=0.0;
-		
-		final double batterySizeEV= 24*3600*1000; 
-		final double batterySizePHEV= 24*3600*1000; 
-		final double batteryMinEV= 0.1; 
-		final double batteryMinPHEV= 0.1; 
-		final double batteryMaxEV= 0.9; 
-		final double batteryMaxPHEV= 0.9; 
-		
-		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
-		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
-		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
-		
-		
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
-		
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-				
-		final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
+		final double optimalPrice=0.4275/(3600); // //0,142500 €/kWh - 1 hour at 1kW cost/second - CAREFUL would have to implement different multipliers for high speed or regular connection
+		final double suboptimalPrice=optimalPrice*3; // cost/second  
 		
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
 		
+		/**
+		 * INPUT PARAMETERS
+		 */
 		
-		final double MINCHARGINGLENGTH=5*60;//5 minutes
+		/*
+		 * Simulation variables: 
+		 * - Controler of the simulation in which the charging optimization is embedded
+		 * - ParkingTimesPlugin
+		 * 
+		 */
+		final Controler controler;
+		final ParkingTimesPlugin parkingTimesPlugin;					
 		
-		final Controler controler=new Controler(configPath);
+		/*
+		 * Constants
+		 * - Gas Price [currency]
+		 * - Joules per liter in gas [J]
+		 * - emissions of Co2 per liter gas [kg]
+		 
+		 */
+		final double gasPricePerLiter= 0.25; 
+		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
+		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		
+		/*
+		 * LP optimization parameters
+		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
+		 * than what he needs before starting the next trip ); 
+		 * 
+		 */
+		final double bufferBatteryCharge=0.0;
+		
+		/*
+		 * Charging Distribution
+		 * - minimum charging length [s]
+		 * - time resolution of optimization
+		 */
+		final double minChargingLength=5*60;//5 minutes
+		
+		/*
+		 * Battery characteristics:
+		 * - full capacity [J]
+		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
+		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
+		 * (0.1=10%)
+		 * - maximum level of state of charge, avoid going above = batteryMax
+		 * (0.9=90%)
+		 */
+		final double batterySizeEV= 24*3600*1000; 
+		final double batterySizePHEV= 24*3600*1000; 
+		final double batteryMinEV= 0.1; 
+		final double batteryMinPHEV= 0.1; 
+		final double batteryMaxEV= 0.9; 
+		final double batteryMaxPHEV= 0.9; 		
+		
+		
+		/*
+		 * Network  - Electric Grid Information
+		 * 
+		 * - distribution of free load [W] available for charging over the day (deterministicHubLoadDistribution)
+		 * this is given in form of a LinkedListValueHashMap, where Integer corresponds to a hub and 
+		 * the Schedule includes LoadDistributionIntervals which represent the free load 
+		 * (LoadDistributionIntervals indicate a time interval: start second, end second and also have a PolynomialFunction)
+		 * 
+		 * - pricing (pricingHubDistribution)
+		 * is also given as LinkedListValueHashMap, where Integer corresponds to a hub and
+		 * the Schedule includes LoadDistributionIntervals which represent the price per second over the day
+		 * 
+		 * determinisitcHubLoadDistribution and pricingHubDistribution should have the same timeIntervals
+		 * i.e. loadInterval from 0-1000 seconds corresponding to price in Interval 0-1000 seconds
+		 */
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+		
+		
+		// HubLinkMapping links linkIds (Id) to Hubs (Integer)
+		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
+		
+		
+		/*
+		 * Output path to store results locally
+		 * please provide a folder Output with the following sub-folders
+		 * <ul>
+		 * 		<li>DecentralizedCharger
+		 * 			<ul>
+		 * 				<li>agentPlans
+		 * 				<li>LP	
+		 * 					<ul><li>EV <li> PHEV</ul>
+		 * 			</ul>
+		 * 		<li>Hub
+		 * 		<li>V2G
+		 * 			<ul>
+		 * 				<li>agentPlans
+		 * 				<li>LP
+		 * 					<ul><li>EV <li> PHEV</ul>
+		 *  		</ul>
+		 * </ul>
+		 * 
+		 * 
+		 */
+		
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
+		
+		
+		/**
+		 * END INPUT PARAMETERS
+		 */		
+
+		
+		
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		controler=new Controler(configPath);
+		
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
@@ -103,7 +190,6 @@ public class Main {
 		
 		final EnergyConsumptionInit e= new EnergyConsumptionInit(
 				phev, ev, combustion);
-				
 		
 		controler.addControlerListener(e);
 				
@@ -114,83 +200,25 @@ public class Main {
 		controler.addControlerListener(new IterationEndsListener() {
 			
 			
-			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				
 				try {
 					
-					
-					/*
-					 * TODO
-					 * MAPPING AND READING HUBS
-					 * Redo reading and mapping hubs dependent on scenario
-					 * 
-					 * CHARGING SPEED HUBS
-					 * //TODO in scenario charging speed must be mapped to facilities
-					// this was not the case in the first scenario and thus not yet possible
-					// current default is 3500 W;
-					//getChargingSpeed()
-					 */
-					
-					
-					
-					/*
-					 * TODO
-					 * PRICE
-					 * Discussions on Price not clear...
-					 * Price is also dependent on scenario
-					 * @Rashid - you have to be clear on how you would like this to be implemented
-					 * 
-					 * I can compute internally easily...
-					 * but we have to define price functions similar to 
-					 * LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution
-					 * I JUST ASSUMED SOME FUNCTIONS NOW BASED ON DUAL TARIFF SCHEME
-					 */
-					
-					/*
-					 * TODO
-					 * VEHICLE CLASS
-					 * NO CONSUMPTION VALUES FOR COMBUSTION CARS
-					 * --> emissions
-					 * 
-					 */
-					
-					/*
-					 * TODO
-					 * VEHICLE
-					 * BATTERY SIZE AD MIN AND MAX CHARGE NOT WORKING... always 0 values
-					 * 
-					 */
-					
-					
-					//*****************************************
-					//How to initialize and run
-					//*****************************************
-					
-					
-					
-					//*****************************************
-					//for V2G
-					//*****************************************
-				
-					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= makeBullshitSourceHub();
-					//hub/LoadDIstributionSchedule
-					
-					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= makeBullshitAgentVehicleSource(controler);
-					//agent/LoadDIstributionSchedule
-					LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= getAgentContracts(controler);
-					
-					
-					
-					//*****************************************
-					//for Decentralized Smart Charging
-					//*****************************************
+					// map linkIds to hubs once the scenario is read in from the config file
 					mapHubs(controler,hubLinkMapping);
 					
+					
+					/*
+					 * for Decentralized Smart Charging
+					 * 
+					 * initialize parameters
+					 */
+				
+					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), 
-							parkingTimesPlugin,
+							event.getControler(), //controler
+							parkingTimesPlugin, //ParkingTimesPlugIn
 							e.getEnergyConsumptionPlugin(),
 							outputPath, 
 							gasJoulesPerLiter,
@@ -198,8 +226,6 @@ public class Main {
 							gasPricePerLiter
 							);
 					
-					
-					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
 					
 					myDecentralizedSmartCharger.setBatteryConstants(
 							batterySizeEV, 
@@ -212,54 +238,63 @@ public class Main {
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
+					myDecentralizedSmartCharger.initializeChargingSlotDistributor(minChargingLength);
 					
 					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
 							e.getVehicles());
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 							hubLinkMapping, 
-							deterministicHubLoadDistribution,
-							stochasticHubLoadDistribution,
-							pricingHubDistribution,
-							locationSourceMapping,
-							agentVehicleSourceMapping);
-					// pricing and deterministicHubLoadDistribution  have to have same time intervals
-				
+							deterministicHubLoadDistribution,							
+							pricingHubDistribution
+							);
 					
-					myDecentralizedSmartCharger.run();
+					//RUN
+					myDecentralizedSmartCharger.run();					
 					
 					
+					/*
+					 * Examples how to use
+					 */
 					
-					
-					//*****************************************
-					//Examples how to use
-					//*****************************************
-					LinkedListValueHashMap<Id, Double> agentCharginCosts= 
-						myDecentralizedSmartCharger.getChargingCostsForAgents();
-					
-					LinkedListValueHashMap<Id, Schedule> agentSchedule= 
+					//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
+					LinkedListValueHashMap<Id, Schedule> agentSchedules= 
 						myDecentralizedSmartCharger.getAllAgentChargingSchedules();
 					
+					
+					//CHARGING COSTS
+					LinkedListValueHashMap<Id, Double> agentChargingCosts= 
+						myDecentralizedSmartCharger.getChargingCostsForAgents();
+					
+					
+					//CHARGING SCHEDULES FOR EVERY AGENT
+					for (Id id: controler.getPopulation().getPersons().keySet()){
+						Schedule agentSchedule= myDecentralizedSmartCharger.getAgentChargingSchedule(id);//.printSchedule();
+					}
+					
+					//LIST OF AGENTS WITH EV WHERE LP FAILED, i.e. where battery swap would be necessary
 					LinkedList<Id> agentsWithEVFailure = 
 						myDecentralizedSmartCharger.getIdsOfEVAgentsWithFailedOptimization();
 					
+					
+					// GET ALL IDs OF AGENTS WITH EV, PHEV or Combustion engine car
 					LinkedList<Id> agentsWithEV = myDecentralizedSmartCharger.getAllAgentsWithEV();
-					
-					if(agentsWithEV.isEmpty()==false){
-						Id id= agentsWithEV.get(0);
-						myDecentralizedSmartCharger.getAgentChargingSchedule(id).printSchedule();
-					}
-					
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
+					LinkedList<Id> agentsWithConventionalCar = myDecentralizedSmartCharger.getAllAgentsWithCombustionVehicle();
 					
+					
+					// DETAILED DATA PER AGENT
 					if(agentsWithEV.isEmpty()==false){
 						
+						// DRIVING CONSUMPTION [Joules]
 						Id id= agentsWithEV.get(0);
 						myDecentralizedSmartCharger.getAgentChargingSchedule(id).printSchedule();
 						System.out.println("Total consumption from battery [joules]" 
 								+ myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromBattery(id));
 						
+						
+						// TOTAL DRIVING CONSUMPTION NOT FROM ELECTRIC ENGINE[Joules]
+						// either from combustion engine or through potential battery swap for EVs
 						System.out.println("Total consumption from engine [joules]" +
 								myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromOtherSources(id));
 						
@@ -267,28 +302,19 @@ public class Main {
 								myDecentralizedSmartCharger.joulesToEmissionInKg(
 										myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromOtherSources(id)));
 								
-						System.out.println("Total consumption [joules]" +
-								myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgent(id));
-						
-						System.out.println("Total emissions [kg]" +
-								myDecentralizedSmartCharger.getTotalEmissions());
-						
-						
 					}
 					
+					//TOTAL EMISSIONS
+					System.out.println("Total emissions [kg]" +
+							myDecentralizedSmartCharger.getTotalEmissions());
 					
-					
-					//*****************************************
-					//V2G
-					//*****************************************
-					myDecentralizedSmartCharger.initializeAndRunV2G(
-							compensationPerKWHRegulationUp, 
-							compensationPerKWHRegulationDown);
 					
 					//*****************************************
 					//END
 					//*****************************************
 					myDecentralizedSmartCharger.clearResults();
+					
+				
 					
 				} catch (Exception e1) {
 					
@@ -349,7 +375,7 @@ public class Main {
 		
 		bullShitSchedule.addTimeInterval(l2);
 		
-		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
+		//bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
 		return bullShitSchedule;
 	}
 	
@@ -459,8 +485,8 @@ public class Main {
 		
 		LinkedListValueHashMap<Integer, Schedule> pricing= readHubs();
 		
-		PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
-		PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
+		
+		
 		
 		for(Integer i: pricing.getKeySet()){
 			for(int j=0; j<pricing.getValue(i).getNumberOfEntries(); j++){
@@ -468,6 +494,7 @@ public class Main {
 					LoadDistributionInterval l = (LoadDistributionInterval) pricing.getValue(i).timesInSchedule.get(j);
 					
 					if(l.isOptimal()){
+						PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
 						pricing.getValue(i).timesInSchedule.set(j, 
 								new LoadDistributionInterval(
 								l.getStartTime(),
@@ -477,6 +504,7 @@ public class Main {
 						
 						
 					}else{
+						PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
 						pricing.getValue(i).timesInSchedule.set(j, 
 								new LoadDistributionInterval(
 										l.getStartTime(),

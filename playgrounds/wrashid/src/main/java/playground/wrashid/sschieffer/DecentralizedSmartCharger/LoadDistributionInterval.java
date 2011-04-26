@@ -23,11 +23,20 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.jfree.data.xy.XYSeries;
 
 
+/**
+ * extends TimeInterval. its additional parameters are a PolynomialFunction to indicate 
+ * i.e. the available free load, or the charging prices for the time interval,
+ * 
+ * the boolean optimal can indicate whether the time interval has optimal values during the time interval. This is only used for the deterministic hub load in HubLoadDistributionReader.
+ * If this variable is not needed, feel free to put a dummy value.
+ * 
+ * @author Stella
+ *
+ */
 public class LoadDistributionInterval  extends TimeInterval
 {
 	
-	private boolean optimal;
-	
+	private boolean optimal;	
 	private PolynomialFunction p;
 	private XYSeries xy;
 	
@@ -48,15 +57,7 @@ public class LoadDistributionInterval  extends TimeInterval
 	}
 	
 	
-	public boolean overlap(LoadDistributionInterval other){
-		boolean check=false;
-		if( (other.getStartTime()>=getStartTime() && other.getStartTime()<getEndTime()) 
-				||
-				(other.getEndTime()>getStartTime() && other.getEndTime()<=getEndTime())){
-			check=true;
-		}
-		return check;
-	}
+	
 	
 	public LoadDistributionInterval clone(){
 		LoadDistributionInterval clone= new LoadDistributionInterval(start, end, p, optimal);

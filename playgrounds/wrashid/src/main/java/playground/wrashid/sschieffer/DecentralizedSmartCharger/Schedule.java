@@ -39,7 +39,11 @@ import org.matsim.api.core.v01.Id;
 
 
 /**
- * saves activities (driving, parking) of agent in one Object
+ * A schedule is a LinkedList of timeIntervals.
+ * It helps to store related time intervals or activties in one object
+ * i.e. to keep the daily plans of an agent and to sort his activities.
+ * or to store all charging intervals during one parking interval
+ * 
  * @author Stella
  *
  */
@@ -214,7 +218,7 @@ public class Schedule {
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray); 
       
-        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ name+"_visualization.png") , chart, 800, 600);
+        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+"_visualization.png") , chart, 800, 600);
        
 	}
 	

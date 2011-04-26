@@ -19,7 +19,13 @@
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
-
+/**
+ * extends TimeInterval
+ * TimeSlot designated for Charging
+ * 
+ * @author Stella
+ *
+ */
 public class ChargingInterval extends TimeInterval {
 // might be unnecessary
 	
