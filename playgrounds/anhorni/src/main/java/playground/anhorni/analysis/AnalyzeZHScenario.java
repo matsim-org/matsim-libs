@@ -54,10 +54,17 @@ public class AnalyzeZHScenario {
 	private void analyzefacilities(Set<Id> set, String region) {
 		log.info("Number of " + region + " facilities: " + set.size());
 		int numberOfActivityOptions = 0;
+		int numberOfShopFacilities = 0;
+		int numberOfLeisureFacilities = 0;
 		for (Id facilityId: set) {
 			ActivityFacility facility = this.scenario.getActivityFacilities().getFacilities().get(facilityId);
 			numberOfActivityOptions += facility.getActivityOptions().entrySet().size();
+			
+			if (facility.getActivityOptions().containsKey("s")) numberOfShopFacilities++;
+			if (facility.getActivityOptions().containsKey("l")) numberOfLeisureFacilities++;
 		}
+		log.info("Number of " + region + " shopping facilities: " + numberOfShopFacilities);
+		log.info("Number of " + region + " leisure facilities: " + numberOfLeisureFacilities);		
 		log.info("Number of " + region + " activity options: " + numberOfActivityOptions);
 	}
 }
