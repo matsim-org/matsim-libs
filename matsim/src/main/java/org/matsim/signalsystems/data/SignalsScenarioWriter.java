@@ -46,15 +46,15 @@ public class SignalsScenarioWriter {
 	public static final String FILENAME_AMBER_TIMES = "output_amber_times_v1.0.xml.gz";
 	private static final String FILENAME_INTERGREEN_TIMES = "output_intergreen_times_v1.0.xml.gz";
 
-	private String pathToSignalSystemsOutputFilename;
+	private String pathToSignalSystemsOutputFilename = null;
 
-	private String pathToSignalGroupsOutputFilename;
+	private String pathToSignalGroupsOutputFilename = null;
 
-	private String pathToSignalControlOutputFilename;
+	private String pathToSignalControlOutputFilename = null;
 
-	private String pathToAmberTimesOutputFilename;
+	private String pathToAmberTimesOutputFilename = null;
 
-	private String pathToIntergreenTimesOutputFilename;
+	private String pathToIntergreenTimesOutputFilename = null;
 
 	public SignalsScenarioWriter(){
 	}
@@ -95,23 +95,43 @@ public class SignalsScenarioWriter {
 	}
 	
 	public void writeSignalSystemsData(SignalSystemsData signalSystemsData){
-		SignalSystemsWriter20 writer = new SignalSystemsWriter20(signalSystemsData);
-		writer.write(this.pathToSignalSystemsOutputFilename);
+		if (this.pathToSignalSystemsOutputFilename != null) {
+			SignalSystemsWriter20 writer = new SignalSystemsWriter20(signalSystemsData);
+			writer.write(this.pathToSignalSystemsOutputFilename);
+		}
+		else {
+			log.warn("No path to signal systems output file set!");
+		}
 	}
 	
 	public void writeSignalGroupsData(SignalGroupsData signalGroupsData){
-		SignalGroupsWriter20 writer = new SignalGroupsWriter20(signalGroupsData);
-		writer.write(this.pathToSignalGroupsOutputFilename);
+		if (this.pathToSignalGroupsOutputFilename != null){
+			SignalGroupsWriter20 writer = new SignalGroupsWriter20(signalGroupsData);
+			writer.write(this.pathToSignalGroupsOutputFilename);
+		}
+		else {
+			log.warn("No path to signal groups output file set!");
+		}
 	}
 	
 	public void writeSignalControlData(SignalControlData controlData){
-		SignalControlWriter20 writer = new SignalControlWriter20(controlData);
-		writer.write(this.pathToSignalControlOutputFilename);
+		if (this.pathToSignalControlOutputFilename != null) {
+			SignalControlWriter20 writer = new SignalControlWriter20(controlData);
+			writer.write(this.pathToSignalControlOutputFilename);
+		}
+		else {
+			log.warn("No path to signal control output file set!");
+		}
 	}
 	
 	public void writeAmberTimesData(AmberTimesData amberTimesData){
-		AmberTimesWriter10 writer = new AmberTimesWriter10(amberTimesData);
-		writer.write(this.pathToAmberTimesOutputFilename);
+		if (this.pathToAmberTimesOutputFilename != null) {
+			AmberTimesWriter10 writer = new AmberTimesWriter10(amberTimesData);
+			writer.write(this.pathToAmberTimesOutputFilename);
+		}
+		else {
+			log.warn("No path to amber times output file set!");
+		}
 	}
 	
 //	public void writeIntergreenTimesData(IntergreenTimesData intergreenTimesData){
