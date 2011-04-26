@@ -7,16 +7,37 @@ import org.matsim.api.core.v01.Id;
 
 import junit.framework.TestCase;
 
-public class testSchedule extends TestCase{
+/**
+ * the test class checks if all Schedule methods to sort or edit Schedules are functional
+ * @author Stella
+ *
+ */
+public class ScheduleTest extends TestCase{
 
 	
 	private Schedule s;
-	
-	public testSchedule(){		
-		
+	/**
+	 * testGetTotalTimeOfIntervalsInSchedule,
+		 * testSorting,
+		 * testGetTotalConsumption,
+		 * testGetOverlaps,
+		 * testAddLoadDistributionIntervalToSchedule
+	 */
+	public ScheduleTest(){		
+		/*
+		 * testGetTotalTimeOfIntervalsInSchedule
+		 * testSorting
+		 * testGetTotalConsumption
+		 * testGetOverlaps
+		 * testAddLoadDistributionIntervalToSchedule
+		 * 
+		 */
 	}
 	
 	
+	/*
+	 * 
+	 */
 	public void testGetTotalTimeOfIntervalsInSchedule(){
 		s= setDummySchedule();
 		s.sort();
@@ -137,24 +158,6 @@ public class testSchedule extends TestCase{
 		assertEquals(func.getCoefficients()[0], 10.0);
 		
 	}
-	
-	
-	public void testScheduleMethods() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		testGetTotalTimeOfIntervalsInSchedule();
-		
-		testSort();
-		
-		testTotalConsumption();
-		
-		testMergeOverLapTimeIsInWhichInterval();
-		
-		testInsertChargingSchedule();
-		
-		testAddLoadDistributionIntervalToExistingLoadDistributionSchedule();
-		
-	}
-	
 	
 	
 	

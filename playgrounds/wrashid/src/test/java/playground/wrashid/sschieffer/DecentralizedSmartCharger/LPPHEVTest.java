@@ -3,19 +3,22 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
-public class testLPPHEV extends TestCase{
+public class LPPHEVTest extends TestCase{
 	
 	
 	private Schedule s;
 	LPPHEV lp= new LPPHEV();
 	
-	public testLPPHEV() {		
+	public LPPHEVTest() {		
 		
 	}
 		
 	
 	
-	
+	/*
+	 * calcEnergyUsageFromCombustionEngine
+	 * check energy use from engine/battery for one case
+	 */
 	public void testRunLPPHEV() throws LpSolveException{
 		
 		double [] solution = setUpTestLPPHEV();

@@ -11,11 +11,24 @@ import org.matsim.api.core.v01.Id;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
-public class testV2G extends TestCase{
+/**
+ * checks if V2G methods ...
+ * 
+ * @author Stella
+ *
+ */
+public class V2GTest extends TestCase{
 	
 	public  V2G someV2G= new V2G(null);
 	
-	public testV2G(){
+	public V2GTest(){
+		/*
+		 * - tests the schedule cutting procedures of the V2G class
+		 * - test the charging schedule cutting procedures
+		 * - tests the calculation of SOC at a certain time
+		 * 
+		 * .. TODO
+		 */
 		
 	}
 	
@@ -25,6 +38,9 @@ public class testV2G extends TestCase{
 	}
 	
 	
+	/*
+	 * tests the schedule cutting procedures of the V2G class
+	 */
 	public void testV2GCutSchedule() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule someSchedule= setDummySchedule();
@@ -52,7 +68,10 @@ public class testV2G extends TestCase{
 	}
 	
 	
-	
+	/*
+	 * test the charging schedule cutting procedures,
+	 * charging schedules do not have to be continuous
+	 */
 	public void testV2GCutChargingSchedule(){
 		
 		
@@ -127,6 +146,9 @@ public class testV2G extends TestCase{
 //	}
 	
 	
+	/*
+	 * tests the calculation of SOC at a certain time
+	 */
 	public void testGetSOCAtTime(DecentralizedSmartCharger mySmartCharger, Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		V2G localV2G= new V2G(mySmartCharger);
 		

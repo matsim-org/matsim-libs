@@ -24,17 +24,38 @@ import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public class testHubLoadDistributionReader extends TestCase{
+
+/**
+ * checks if the calculation of the PHEV pricing schedule is works
+ * @author Stella
+ *
+ */
+public class HubLoadDistributionReaderTest extends TestCase{
 	
-	final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
+	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final Controler controler=new Controler(configPath);
 	
-	public testHubLoadDistributionReader(){
+	
+	/**
+	 * check calculation of PHEV pricing schedule for constant, linear or parabolic pricing function
+	 */
+	public HubLoadDistributionReaderTest(){
 		
 	}
 
-
+	
+	/**
+	 * check calculation of PHEV pricing schedule for constant, linear or parabolic pricing function
+	 * 
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws LpSolveException
+	 * @throws OptimizationException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public void testHubLoadReader() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
 		LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
@@ -47,21 +68,10 @@ public class testHubLoadDistributionReader extends TestCase{
 		
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
 				hubLinkMapping,//HubLinkMapping hubLinkMapping
-				deterministicHubLoadDistribution,
-				stochasticHubLoadDistribution,
-				pricingHubDistribution,
-				null,
-				null,
+				deterministicHubLoadDistribution,				
+				pricingHubDistribution,				
 				1.0) ;
 	
-		/*public HubLoadDistributionReader(Controler controler, 
-				HubLinkMapping hubLinkMapping,
-				LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,
-				LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-				LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,
-				LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
-				LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping,
-				double gasPrice) throws IOException, OptimizationException, InterruptedException{*/
 		
 		System.out.println("GasPrice: 1");
 		System.out.println();
@@ -252,8 +262,6 @@ public class testHubLoadDistributionReader extends TestCase{
 	
 		
 	}
-	
-	
 	
 	
 	

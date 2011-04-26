@@ -23,12 +23,12 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
-public class testDecentralizedSmartCharger extends TestCase{
+public class DecentralizedSmartChargerTest extends TestCase{
 
 	/**
 	 * @param args
 	 */
-	final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
+	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final Controler controler=new Controler(configPath);
 	
@@ -40,7 +40,6 @@ public class testDecentralizedSmartCharger extends TestCase{
 	
 	public static void testMain(String[] args) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException {
 				
-		
 	}
 	
 	
@@ -59,8 +58,6 @@ public class testDecentralizedSmartCharger extends TestCase{
 	public void testDecentralizedCharger() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		
-		testSchedule t = new testSchedule();
-		t.testScheduleMethods();
 		
 		//*****************************************
 		
@@ -80,16 +77,12 @@ public class testDecentralizedSmartCharger extends TestCase{
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		
-		final String outputPath="C:\\Users\\stellas\\Output\\V1G\\";
-		
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
 		
 		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
 		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-		
-		
 		
 		final double bufferBatteryCharge=0.0;
 		
@@ -101,8 +94,6 @@ public class testDecentralizedSmartCharger extends TestCase{
 		final double batteryMaxPHEV= 0.9; 
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
-		
-		
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
@@ -161,11 +152,9 @@ public class testDecentralizedSmartCharger extends TestCase{
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 							hubLinkMapping, 
-							deterministicHubLoadDistribution,
-							stochasticHubLoadDistribution,
-							pricingHubDistribution,
-							locationSourceMapping,
-							agentVehicleSourceMapping);
+							deterministicHubLoadDistribution,							
+							pricingHubDistribution
+							);
 					
 					//*****************************************
 					//*****************************************
@@ -289,26 +278,10 @@ public class testDecentralizedSmartCharger extends TestCase{
 					
 					
 					
-					testLPPHEV testLP = new testLPPHEV();
+					LPPHEVTest testLP = new LPPHEVTest();
 					testLP.testRunLPPHEV();
 					
-					
-					
-					
-					
-					//*****************************************
-					//*****************************************
-					//******TEST V2G
-					//*****************************************
-					
-					testV2G myTestV2G = new testV2G();
-					
-					myTestV2G.testAllV2G();
-					myTestV2G.testGetSOCAtTime(myDecentralizedSmartCharger, agentOne);
-					
-					//*****************************************
-					//*****************************************
-					
+									
 					
 					myDecentralizedSmartCharger.clearResults();
 					
@@ -378,7 +351,7 @@ public class testDecentralizedSmartCharger extends TestCase{
 	
 		bullShitSchedule.addTimeInterval(l2);
 		
-		bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
+		
 		return bullShitSchedule;
 	}
 	
