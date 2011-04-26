@@ -36,7 +36,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
  */
 public class CircularAgentInteractionModule implements DynamicForceModule {
 
-	protected final Floor floor;
+	protected final PhysicalFloor floor;
 	protected final Scenario2DImpl scenario;
 
 	private final double quadUpdateInterval = 0.1;
@@ -56,7 +56,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	 * @param floor
 	 * @param sceanrio
 	 */
-	public CircularAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
+	public CircularAgentInteractionModule(PhysicalFloor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 		this.scenario = scenario;
 	}

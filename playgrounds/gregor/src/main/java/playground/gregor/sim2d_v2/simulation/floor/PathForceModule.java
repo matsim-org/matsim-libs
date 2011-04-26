@@ -39,7 +39,7 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
  */
 public class PathForceModule implements ForceModule {
 
-	private final Floor floor;
+	private final PhysicalFloor floor;
 	private HashMap<Id, Coordinate> drivingDirections;
 	private HashMap<Id, Coordinate> fromCoords;
 	private HashMap<Id, LineString> linkGeos;
@@ -57,7 +57,7 @@ public class PathForceModule implements ForceModule {
 	 * @param floor
 	 * @param scenario
 	 */
-	public PathForceModule(Floor floor, Scenario2DImpl scenario) {
+	public PathForceModule(PhysicalFloor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 		this.deltaT = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 

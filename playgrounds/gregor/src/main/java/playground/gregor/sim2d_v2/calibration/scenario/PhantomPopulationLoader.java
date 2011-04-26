@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.scenario;
+package playground.gregor.sim2d_v2.calibration.scenario;
 
 import java.io.IOException;
 import java.util.Queue;

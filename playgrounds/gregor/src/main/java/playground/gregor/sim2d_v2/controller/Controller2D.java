@@ -33,9 +33,9 @@ import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
 public class Controller2D extends Controler {
 
-	private Scenario2DImpl scenario2DData;
+	protected Scenario2DImpl scenario2DData;
 	private PedVisPeekABot vis;
-	private Sim2DConfigGroup sim2dConfig;
+	protected Sim2DConfigGroup sim2dConfig;
 	private ScenarioLoader2DImpl loader;
 
 	public Controller2D(String[] args) {

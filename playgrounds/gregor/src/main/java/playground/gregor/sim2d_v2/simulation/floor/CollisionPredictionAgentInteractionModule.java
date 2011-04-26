@@ -18,7 +18,7 @@ public class CollisionPredictionAgentInteractionModule implements
 DynamicForceModule {
 
 
-	private final Floor floor;
+	private final PhysicalFloor floor;
 
 
 	private final double quadUpdateInterval = 0.1;
@@ -36,12 +36,12 @@ DynamicForceModule {
 	private double maxForce = 0;
 
 
-	private  Quadtree agentsQuad;
+	protected  Quadtree agentsQuad;
 
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
 
-	public CollisionPredictionAgentInteractionModule(Floor floor, Scenario2DImpl scenario) {
+	public CollisionPredictionAgentInteractionModule(PhysicalFloor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 
 	}

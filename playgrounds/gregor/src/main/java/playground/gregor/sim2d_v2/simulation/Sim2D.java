@@ -55,7 +55,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 
 /**
  * implementation of a 2d pedestrian transport simulation some day 2d
@@ -320,7 +320,7 @@ public class Sim2D implements Netsim {
 			PersonDriverAgentImpl agent = this.agentFactory.createPersonAgent(p);
 			this.agents.add(agent);
 			agent.initialize();
-			Floor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
+			PhysicalFloor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
 			floor.addAgent((Agent2D) agent);
 		}
 
@@ -443,7 +443,7 @@ public class Sim2D implements Netsim {
 			} else {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
-				Floor f = this.sim2DEngine.getFloor(linkId);
+				PhysicalFloor f = this.sim2DEngine.getFloor(linkId);
 				f.addAgent((Agent2D) agent);
 
 			}

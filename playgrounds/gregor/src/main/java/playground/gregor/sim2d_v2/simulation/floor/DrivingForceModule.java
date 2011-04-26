@@ -36,7 +36,7 @@ import playground.gregor.sim2d_v2.simulation.Agent2D;
  */
 public class DrivingForceModule implements ForceModule {
 
-	private final Floor floor;
+	private final PhysicalFloor floor;
 	private HashMap<Id, Coordinate> drivingDirections;
 
 	// inertia -- needs to be revised
@@ -46,7 +46,7 @@ public class DrivingForceModule implements ForceModule {
 	 * @param floor
 	 * @param scenario
 	 */
-	public DrivingForceModule(Floor floor, Scenario2DImpl scenario) {
+	public DrivingForceModule(PhysicalFloor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
 		this.tau = 1/1.52;
 	}

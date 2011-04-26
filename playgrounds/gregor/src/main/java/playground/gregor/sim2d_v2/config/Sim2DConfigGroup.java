@@ -44,7 +44,15 @@ public class Sim2DConfigGroup extends Module {
 
 	public static final String EVENTS_INTERVAL = "eventsInterval";
 
+	public static final String ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE = "enableCircularAgentInteractionModule";
+	public static final String ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE = "enableCollisionPredictionAgentInteractionModule";
+	public static final String ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE = "enableCollisionPredictionPhantomAgentInteractionModule";
+	public static final String ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE = "enbableCollisionPredictionEnvironmentForceModule";
+	public static final String ENABLE_DRIVING_FORCE_MODULE = "enableDrivingForceModule";
+	public static final String ENABLE_ENVIRONMENT_FORCE_MODULE = "enableEnvironmentForceModule";
+	public static final String ENABLE_PATH_FORCE_MODULE = "enablePathForthModule";
 
+	public static final String PHANTOM_POPULATION_EVENTS_FILE = "phantomPopulationEventsFile";
 
 	private int eventsInterval = 1;
 
@@ -55,6 +63,26 @@ public class Sim2DConfigGroup extends Module {
 	private String floorShapeFile;
 
 	private String lsShapeFile;
+
+	private String phantomPopulationEventsFile;
+
+	private boolean enableCircularAgentInteractionModule = false;
+	private boolean enableCollisionPredictionAgentInteractionModule = true;
+
+
+	private boolean enableCollisionPredictionPhantomAgentInteractionModule = false;
+
+
+	private boolean enableCollisionPredictionEnvironmentForceModule = true;
+	private boolean enableDrivingForceModule = true;
+
+
+	private boolean enableEnvironmentForceModule = false;
+
+
+	private boolean enablePathForceModule = true;
+
+
 
 	public Sim2DConfigGroup(Module sim2d) {
 		super(GROUP_NAME);
@@ -83,12 +111,91 @@ public class Sim2DConfigGroup extends Module {
 			setTimeStepSize(value);
 		} else if (EVENTS_INTERVAL.equals(key)) {
 			setEventsInterval(value);
-		}else {
+		} else if (PHANTOM_POPULATION_EVENTS_FILE.equals(key)){
+			setPhantomPopulationEventsFile(value);
+		} else if (ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE.equals(key)){
+			setEnableCircularAgentInterActionModule(value);
+		} else if (ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE.equals(key)){
+			setEnableCollisionPredictionAgentInteractionModule(value);
+		} else if (ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE.equals(key)){
+			setEnableCollisionPredictionEnvironmentForceModule(value);
+		} else if (ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE.equals(key)) {
+			setEnableCollisionPredictionPhantomAgentIneractionModule(value);
+		} else if (ENABLE_DRIVING_FORCE_MODULE.equals(key)) {
+			setEnableDrivingForceModule(value);
+		} else if (ENABLE_ENVIRONMENT_FORCE_MODULE.equals(key)){
+			setEnableEnvironmentForceModule(value);
+		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)){
+			setEnablePathForceModule(value);
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
 
 
+	public void setPhantomPopulationEventsFile(String value) {
+		this.phantomPopulationEventsFile = value;
+	}
+
+	public boolean isEnableCollisionPredictionAgentInteractionModule() {
+		return this.enableCollisionPredictionAgentInteractionModule;
+	}
+	public boolean isEnableCollisionPredictionPhantomAgentInteractionModule() {
+		return this.enableCollisionPredictionPhantomAgentInteractionModule;
+	}
+	public boolean isEnableDrivingForceModule() {
+		return this.enableDrivingForceModule;
+	}
+
+	public boolean isEnableCollisionPredictionEnvironmentForceModule() {
+		return this.enableCollisionPredictionEnvironmentForceModule;
+	}
+	public boolean isEnableEnvironmentForceModule() {
+		return this.enableEnvironmentForceModule;
+	}
+	public boolean isEnablePathForceModule() {
+		return this.enablePathForceModule;
+	}
+	public boolean isEnableCircularAgentInteractionModule() {
+		return this.enableCircularAgentInteractionModule;
+	}
+
+	public void setEnablePathForceModule(String value) {
+		this.enablePathForceModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableEnvironmentForceModule(String value) {
+		this.enableEnvironmentForceModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableDrivingForceModule(String value) {
+		this.enableDrivingForceModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableCollisionPredictionPhantomAgentIneractionModule(
+			String value) {
+		this.enableCollisionPredictionPhantomAgentInteractionModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableCollisionPredictionEnvironmentForceModule(String value) {
+		this.enableCollisionPredictionEnvironmentForceModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableCollisionPredictionAgentInteractionModule(String value) {
+		this.enableCollisionPredictionAgentInteractionModule = Boolean.parseBoolean(value);
+
+	}
+
+	public void setEnableCircularAgentInterActionModule(String value) {
+		this.enableCircularAgentInteractionModule = Boolean.parseBoolean(value);
+
+	}
 
 	@Override
 	public String getValue(final String key) {
@@ -102,11 +209,31 @@ public class Sim2DConfigGroup extends Module {
 			return Double.toString(getTimeStepSize());
 		}else if (EVENTS_INTERVAL.equals(key)) {
 			return Integer.toString(getEventsInterval());
+		}else if (PHANTOM_POPULATION_EVENTS_FILE.equals(key)){
+			return getPhantomPopulationEventsFile();
+		} else if (ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE.equals(key)){
+			return Boolean.toString(isEnableCircularAgentInteractionModule());
+		}else if (ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE.equals(key)){
+			return Boolean.toString(isEnableCollisionPredictionAgentInteractionModule());
+		} else if (ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE.equals(key)){
+			return Boolean.toString(isEnableCollisionPredictionEnvironmentForceModule());
+		}else if (ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE.equals(key)){
+			return Boolean.toString(isEnableCollisionPredictionPhantomAgentInteractionModule());
+		}else if (ENABLE_DRIVING_FORCE_MODULE.equals(key)) {
+			return Boolean.toString(isEnableDrivingForceModule());
+		} else if (ENABLE_ENVIRONMENT_FORCE_MODULE.equals(key)) {
+			return Boolean.toString(isEnableEnvironmentForceModule());
+		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)) {
+			return Boolean.toString(isEnablePathForceModule());
 		}
 		throw new IllegalArgumentException(key);
 	}
 
 
+
+	public String getPhantomPopulationEventsFile() {
+		return this.phantomPopulationEventsFile;
+	}
 
 	@Override
 	public final TreeMap<String, String> getParams() {
@@ -116,6 +243,14 @@ public class Sim2DConfigGroup extends Module {
 		map.put(FLOOR_SHAPE_FILE, getValue(FLOOR_SHAPE_FILE));
 		map.put(TIME_STEP_SIZE,getValue(TIME_STEP_SIZE));
 		map.put(EVENTS_INTERVAL,getValue(EVENTS_INTERVAL));
+		map.put(ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE,getValue(ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE));
+		map.put(ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE,getValue(ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE));
+		map.put(ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE));
+		map.put(ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE, getValue(ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE));
+		map.put(ENABLE_DRIVING_FORCE_MODULE, getValue(ENABLE_DRIVING_FORCE_MODULE));
+		map.put(ENABLE_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_ENVIRONMENT_FORCE_MODULE));
+		map.put(ENABLE_PATH_FORCE_MODULE, getValue(ENABLE_PATH_FORCE_MODULE));
+		map.put(PHANTOM_POPULATION_EVENTS_FILE, getValue(PHANTOM_POPULATION_EVENTS_FILE));
 		return map;
 	}
 
