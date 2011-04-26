@@ -5,8 +5,6 @@ package playground.demandde.pendlermatrix;
 
 import org.matsim.api.core.v01.Coord;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 public class Zone {
 
 	public final int id;
