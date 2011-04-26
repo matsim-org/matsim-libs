@@ -61,7 +61,7 @@ public class CompareScenarios {
 		this.init(pathsFile);
 		
 		CompareScores scoreComparator = new CompareScores(this.outpath);
-		scoreComparator.openScoresFile(this.outpath + "/bestScores.txt");
+		scoreComparator.openScoresFile(this.outpath + "/scores.txt");
 		
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
 			String p = this.path + "/" + i + "/" + this.plansFileName;
@@ -72,8 +72,8 @@ public class CompareScenarios {
 		scoreComparator.closeScoresFile();
 		scoreComparator.printScores();
 		
-		scoreComparator.compareBestScores(this.outpath + "/bestScores.txt", 
-				this.outpath + "/bestScoresStandardDeviationsinPercent.txt");
+		scoreComparator.compareScores(this.outpath + "/scores.txt", 
+				this.outpath + "/scoresStandardDeviationsInPercent.txt");
 		
 		CompareDestinations destinationComparator = new CompareDestinations();
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
@@ -98,11 +98,16 @@ public class CompareScenarios {
 	
 	public static Plan getBestPlan(Person person) {
 		double highestScore = Double.MIN_VALUE;
-		Plan bestPlan = person.getSelectedPlan();
+		int bestPlanIndex = 0;
 		
+		int cnt = 0;
 		for (Plan plan : person.getPlans()) {
-			if (plan.getScore() > highestScore) bestPlan = plan;
+			if (plan.getScore() > highestScore) {
+				highestScore = plan.getScore();
+				bestPlanIndex = cnt;
+			}
+			cnt++;
 		}
-		return bestPlan;
+		return person.getPlans().get(bestPlanIndex);
  	}
 }

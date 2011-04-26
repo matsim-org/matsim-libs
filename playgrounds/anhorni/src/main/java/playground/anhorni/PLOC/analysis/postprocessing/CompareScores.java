@@ -18,8 +18,9 @@ import org.matsim.core.basic.v01.IdImpl;
 
 public class CompareScores {
 	 
-	private List<Double> averageScores = new Vector<Double>();
-	private BufferedWriter bufferedWriterBestScores;
+	private List<Double> averageBestScores = new Vector<Double>();
+	private List<Double> averageExecutedScores = new Vector<Double>();
+	private BufferedWriter bufferedWriterScores;
 	private String outpath;
 		
 	public CompareScores(String outpath) {
@@ -27,32 +28,39 @@ public class CompareScores {
 	}
 	
 	public void handleScenario(Scenario scenario) {		
-		double totalScore = 0.0;
+		double totalBestScore = 0.0;
+		double totalExecutedScore = 0.0;
 		int numberOfEvaluatedPlans = 0;
-		List<Double> scoresPerAgent = new Vector<Double>();
+		List<Double> bestScoresPerAgent = new Vector<Double>();
+		List<Double> executedScoresPerAgent = new Vector<Double>();
 		List<Id> agentIds = new Vector<Id>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan bestPlan = CompareScenarios.getBestPlan(person);
-			totalScore += bestPlan.getScore();
+			totalBestScore += bestPlan.getScore();
+			totalExecutedScore += person.getSelectedPlan().getScore();
 			numberOfEvaluatedPlans++;
-			scoresPerAgent.add(bestPlan.getScore());
+			bestScoresPerAgent.add(bestPlan.getScore());
+			executedScoresPerAgent.add(person.getSelectedPlan().getScore());
 			agentIds.add(person.getId());
 		}
-		this.averageScores.add(totalScore / numberOfEvaluatedPlans);
-		this.append2ScoresFile(scoresPerAgent, agentIds);
+		this.averageBestScores.add(totalBestScore / numberOfEvaluatedPlans);
+		this.averageExecutedScores.add(totalExecutedScore / numberOfEvaluatedPlans);
+		this.append2ScoresFile(bestScoresPerAgent, executedScoresPerAgent, agentIds);
 	}
 	
-	private void append2ScoresFile(List<Double> scoresPerAgent, List<Id> agentIds) {
+	private void append2ScoresFile(List<Double> bestScoresPerAgent, List<Double> executedScoresPerAgent, List<Id> agentIds) {
 		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
-		for (int i = 0; i < scoresPerAgent.size(); i++) {
+		for (int i = 0; i < bestScoresPerAgent.size(); i++) {
 			try {
-				bufferedWriterBestScores.write(agentIds.get(i).toString() + "\t" + formatter.format(scoresPerAgent.get(i)) +  "\t");
+				this.bufferedWriterScores.write(agentIds.get(i).toString() + "\t" 
+						+ formatter.format(bestScoresPerAgent.get(i)) +  "\t" 
+						+ formatter.format(executedScoresPerAgent.get(i)) + "\t");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		try {
-			bufferedWriterBestScores.newLine();
+			bufferedWriterScores.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -61,11 +69,14 @@ public class CompareScores {
 	private void printAverageScore() {
 		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outpath + "/averageBestScores.txt")); 
-			bufferedWriter.write("sim_run" + "\t" + "average_best_score" + "\n"); 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outpath + "/averageScores.txt")); 
+			bufferedWriter.write("sim_run" + "\t" + "average_best_score" + "\t" + "average_executed_score" + "\n"); 
 			int cnt = 0;
-			for (Double score : averageScores) {
-				bufferedWriter.write(cnt + "\t" + formatter.format(score) + "\n");
+			for (Double score : this.averageBestScores) {
+				bufferedWriter.write(cnt + "\t" + 
+						formatter.format(score) + "\t" + 
+						formatter.format(this.averageExecutedScores.get(cnt)) + 
+						"\n");
 				cnt++;
 			}
 			bufferedWriter.newLine();
@@ -84,8 +95,8 @@ public class CompareScores {
 	
 	public void openScoresFile(String bestScoresFile) {
 		try {
-			this.bufferedWriterBestScores = new BufferedWriter(new FileWriter(bestScoresFile));
-			this.bufferedWriterBestScores.write("Agent_id" + "\t" + "score" + "\n");
+			this.bufferedWriterScores = new BufferedWriter(new FileWriter(bestScoresFile));
+			this.bufferedWriterScores.write("Agent_id" + "\t" + "bestScore" + "\t" + "executedScore" + "\n");
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
@@ -94,20 +105,34 @@ public class CompareScores {
 	
 	public void closeScoresFile() {
 		try {
-			this.bufferedWriterBestScores.close(); 
+			this.bufferedWriterScores.close(); 
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void printBestScoresStatistics(TreeMap<Id, AgentsScores> agentsScores, String outfile) {
+	private void printScoresStatistics(TreeMap<Id, AgentsScores> agentsBestScores, TreeMap<Id, AgentsScores> agentsExecutedScores, String outfile) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outfile)); 
-			bufferedWriter.write("Agent_Id" + "\t" + "relativeStandardDeviation [%]" + "\n");
-			for (AgentsScores scores : agentsScores.values()) {
-				double relativeStandardDeviationinPercent = 100.0 * scores.getStandardDeviationScore() / Math.abs(scores.getAverageScore());
-				bufferedWriter.write(scores.getAgentId() + "\t" + relativeStandardDeviationinPercent + "\n");
+			bufferedWriter.write("Agent_Id" + "\t" + 
+					"bestScore" + "\t" +
+					"executedScore"
+					+ "\n");
+			
+			for (AgentsScores bestScores : agentsBestScores.values()) {
+				double bestScoreRelativeStandardDeviationinPercent = 
+					100.0 * bestScores.getStandardDeviationScore() / Math.abs(bestScores.getAverageScore());
+				
+				double executedScoreRelativeStandardDeviationinPercent = 
+					100.0 * agentsExecutedScores.get(bestScores.getAgentId()).getStandardDeviationScore() / 
+					Math.abs(agentsExecutedScores.get(bestScores.getAgentId()).getAverageScore());
+				
+				bufferedWriter.write(bestScores.getAgentId() + "\t" + 
+						bestScoreRelativeStandardDeviationinPercent + "\t" +  
+						executedScoreRelativeStandardDeviationinPercent +
+						"\n");
+				
 			}
 			bufferedWriter.newLine();
 			
@@ -117,27 +142,30 @@ public class CompareScores {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
-	public void compareBestScores(String bestScoresFile, String outfile) {
-		TreeMap<Id, AgentsScores> agentsScores = new TreeMap<Id, AgentsScores>();	
+	public void compareScores(String scoresFile, String outfile) {
+		TreeMap<Id, AgentsScores> agentsBestScores = new TreeMap<Id, AgentsScores>();
+		TreeMap<Id, AgentsScores> agentsExecutedScores = new TreeMap<Id, AgentsScores>();
 		try {
-	          BufferedReader bufferedReader = new BufferedReader(new FileReader(bestScoresFile));
+	          BufferedReader bufferedReader = new BufferedReader(new FileReader(scoresFile));
 	          String line = bufferedReader.readLine(); // skip header	          
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t");
-	        	  for (int i = 0; i < parts.length; i+=2) {
+	        	  for (int i = 0; i < parts.length; i+=3) {
 	        		  Id agentId = new IdImpl(parts[i]);
-	        		  double score = Double.parseDouble(parts[i + 1]);
-	        		  if (agentsScores.get(agentId) == null) agentsScores.put(agentId, new AgentsScores(agentId));
-	        		  agentsScores.get(agentId).addScore(score);
+	        		  double bestScore = Double.parseDouble(parts[i + 1]);
+	        		  double executedScore = Double.parseDouble(parts[i + 2]);
+	        		  if (agentsBestScores.get(agentId) == null) agentsBestScores.put(agentId, new AgentsScores(agentId));
+	        		  if (agentsExecutedScores.get(agentId) == null) agentsExecutedScores.put(agentId, new AgentsScores(agentId));
+	        		  agentsBestScores.get(agentId).addScore(bestScore);
+	        		  agentsExecutedScores.get(agentId).addScore(executedScore);
 	        	  }
 	          }
 	  } // end try
       catch (IOException e) {
     	  e.printStackTrace();
       }
-      this.printBestScoresStatistics(agentsScores, outfile);
+      this.printScoresStatistics(agentsBestScores, agentsExecutedScores, outfile);
 	}
 }
