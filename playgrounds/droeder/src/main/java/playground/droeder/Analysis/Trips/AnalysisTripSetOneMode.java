@@ -32,9 +32,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class AnalysisTripSet {
+public class AnalysisTripSetOneMode {
 	
-	private static final Logger log = Logger.getLogger(AnalysisTripSet.class);
+	private static final Logger log = Logger.getLogger(AnalysisTripSetOneMode.class);
 	
 	private List<AnalysisTrip> trips;
 	private boolean storeTrips;
@@ -89,12 +89,12 @@ public class AnalysisTripSet {
 	private double[] fLine1 = new double[3];
 	private double[] fLine2 = new double[3];
 	private double[] fLine3 = new double[3];
-	private double[] flineGt3 = new double[3];
+	private double[] flineGT3 = new double[3];
 
 	/**
 	 * @param zones
 	 */
-	public AnalysisTripSet(String mode, Geometry zone, boolean storeTrips) {
+	public AnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
 		this.zone = zone;
 		this.storeTrips = storeTrips;
 		if(storeTrips){
@@ -111,55 +111,57 @@ public class AnalysisTripSet {
 			tripCnt[i] = 0.0;
 			avTripTTime[i] = 0.0;
 			
-			accesWalkCnt[i] = 0.0;
-			accesWaitCnt[i] = 0.0;
-			egressWalkCnt[i] = 0.0;
-			switchWalkCnt[i] = 0.0;
-			switchWaitCnt[i] = 0.0;
-			lineCnt[i] = 0.0;
-			
-			accesWalkTTime[i] = 0.0;
-			accesWaitTime[i] = 0.0;
-			egressWalkTTime[i] = 0.0;
-			switchWalkTTime[i] = 0.0;
-			switchWaitTime[i] = 0.0;
-			lineTTime[i] = 0.0;
-			
-			avAccesWalkTTime[i] = 0.0;
-			avAccesWaitTime[i] = 0.0;
-			avEgressWalkTTime[i] = 0.0;
-			avSwitchWalkTTime[i] = 0.0;
-			avSwitchWaitTime[i] = 0.0;
-			avLineTTime[i] = 0.0;
-			
-			switch0cnt[i] = 0.0;
-			switch1cnt[i] = 0.0;
-			switch2cnt[i] = 0.0;
-			switchGT2cnt[i] = 0.0;
-			
-			line1cnt[i] = 0.0;
-			line2cnt[i] = 0.0;
-			line3cnt[i] = 0.0;
-			lineGt3cnt[i] = 0.0;
-			
-			fSwitch0[i] = 0.0;
-			fSwitch1[i] = 0.0;
-			fSwitch2[i] = 0.0;
-			fSwitchGT2[i] = 0.0;
-			
-			fLine1[i] = 0.0;
-			fLine2[i] = 0.0;
-			fLine3[i] = 0.0;
-			flineGt3[i] = 0.0;
+			if(this.mode.equals(TransportMode.pt)){
+				accesWalkCnt[i] = 0.0;
+				accesWaitCnt[i] = 0.0;
+				egressWalkCnt[i] = 0.0;
+				switchWalkCnt[i] = 0.0;
+				switchWaitCnt[i] = 0.0;
+				lineCnt[i] = 0.0;
+				
+				accesWalkTTime[i] = 0.0;
+				accesWaitTime[i] = 0.0;
+				egressWalkTTime[i] = 0.0;
+				switchWalkTTime[i] = 0.0;
+				switchWaitTime[i] = 0.0;
+				lineTTime[i] = 0.0;
+				
+				avAccesWalkTTime[i] = 0.0;
+				avAccesWaitTime[i] = 0.0;
+				avEgressWalkTTime[i] = 0.0;
+				avSwitchWalkTTime[i] = 0.0;
+				avSwitchWaitTime[i] = 0.0;
+				avLineTTime[i] = 0.0;
+				
+				switch0cnt[i] = 0.0;
+				switch1cnt[i] = 0.0;
+				switch2cnt[i] = 0.0;
+				switchGT2cnt[i] = 0.0;
+				
+				line1cnt[i] = 0.0;
+				line2cnt[i] = 0.0;
+				line3cnt[i] = 0.0;
+				lineGt3cnt[i] = 0.0;
+				
+				fSwitch0[i] = 0.0;
+				fSwitch1[i] = 0.0;
+				fSwitch2[i] = 0.0;
+				fSwitchGT2[i] = 0.0;
+				
+				fLine1[i] = 0.0;
+				fLine2[i] = 0.0;
+				fLine3[i] = 0.0;
+				flineGT3[i] = 0.0;
+			}
 		}
 	}
 
 
-	public AnalysisTripSet(String mode, Geometry zone){
+	public AnalysisTripSetOneMode(String mode, Geometry zone){
 		this(mode, zone, false);
 	}
 	
-	public AnalysisTripSet(String mode){
+	public AnalysisTripSetOneMode(String mode){
 		this(mode, null, false);
 	}
 
@@ -230,7 +232,7 @@ public class AnalysisTripSet {
 		fLine1[zone] = line1cnt[zone] / temp;
 		fLine2[zone] = line2cnt[zone] / temp;
 		fLine3[zone] = line3cnt[zone] / temp;
-		flineGt3[zone] = lineGt3cnt[zone] / temp;
+		flineGT3[zone] = lineGt3cnt[zone] / temp;
 		
 		temp = switch0cnt[zone] + switch1cnt[zone] + switch2cnt[zone] + switchGT2cnt[zone];
 		fSwitch0[zone] = switch0cnt[zone] / temp;
@@ -273,117 +275,123 @@ public class AnalysisTripSet {
 		return this.trips;
 	}
 	
-	public String toString(){
+	public String toString(boolean header){
 		StringBuffer buffer = new StringBuffer();
 		
-		buffer.append("zone\t");
-		buffer.append("sumTTime\t");
-		buffer.append("tripCnt\t");
-		buffer.append("avTripTTime\t");
 		
-		if(this.mode.equals(TransportMode.pt)){
-			buffer.append("accesWalkCnt\t");
-			buffer.append("accesWaitCnt\t");
-			buffer.append("egressWalkCnt\t");
-			buffer.append("switchWalkCnt\t");
-			buffer.append("switchWaitCnt\t");
-			buffer.append("lineCnt\t");
+		if(header){
+			buffer.append("mode;");
+			buffer.append("zone;");
+			buffer.append("sumTTime;");
+			buffer.append("tripCnt;");
+			buffer.append("avTripTTime;");
+			buffer.append("accesWalkCnt;");
+			buffer.append("accesWaitCnt;");
+			buffer.append("egressWalkCnt;");
+			buffer.append("switchWalkCnt;");
+			buffer.append("switchWaitCnt;");
+			buffer.append("lineCnt;");
 			
-			buffer.append("accesWalkTTime\t");
-			buffer.append("accesWaitTime\t");
-			buffer.append("egressWalkTTime\t");
-			buffer.append("switchWalkTTime\t");
-			buffer.append("switchWaitTime\t");
-			buffer.append("lineTTime\t");
+			buffer.append("accesWalkTTime;");
+			buffer.append("accesWaitTime;");
+			buffer.append("egressWalkTTime;");
+			buffer.append("switchWalkTTime;");
+			buffer.append("switchWaitTime;");
+			buffer.append("lineTTime;");
 			
-			buffer.append("avAccesWalkTTime\t");
-			buffer.append("avAccesWaitTime\t");
-			buffer.append("avEgressWalkTTime\t");
-			buffer.append("avSwitchWalkTTime\t");
-			buffer.append("avSwitchWaitTime\t");
-			buffer.append("avLineTTime\t");
+			buffer.append("avAccesWalkTTime;");
+			buffer.append("avAccesWaitTime;");
+			buffer.append("avEgressWalkTTime;");
+			buffer.append("avSwitchWalkTTime;");
+			buffer.append("avSwitchWaitTime;");
+			buffer.append("avLineTTime;");
 			
-			buffer.append("switch0cnt\t");
-			buffer.append("switch1cnt\t");
-			buffer.append("switch2cnt\t");
-			buffer.append("switchGT2cnt\t");
+			buffer.append("switch0cnt;");
+			buffer.append("switch1cnt;");
+			buffer.append("switch2cnt;");
+			buffer.append("switchGT2cnt;");
 			
-			buffer.append("line1cnt\t");
-			buffer.append("line2cnt\t");
-			buffer.append("line3cnt\t");
-			buffer.append("lineGt3cnt\t");
+			buffer.append("line1cnt;");
+			buffer.append("line2cnt;");
+			buffer.append("line3cnt;");
+			buffer.append("lineGt3cnt;");
 			
-			buffer.append("fSwitch0\t");
-			buffer.append("fSwitch1\t");
-			buffer.append("fSwitch2\t");
-			buffer.append("fSwitchGT2\t");
+			buffer.append("fSwitch0;");
+			buffer.append("fSwitch1;");
+			buffer.append("fSwitch2;");
+			buffer.append("fSwitchGT2;");
 			
-			buffer.append("fLine1\t");
-			buffer.append("fLine2\t");
-			buffer.append("fLine3\t");
-			buffer.append("flineGt3\t");
+			buffer.append("fLine1;");
+			buffer.append("fLine2;");
+			buffer.append("fLine3;");
+			buffer.append("flineGt3;");
 		}
 		buffer.append("\n");
 		
 		for(int i = 0; i < 3; i++){
+			buffer.append(this.mode + ";");
+			
 			switch(i){
-				case 0: buffer.append("in\t"); break;
-				case 1: buffer.append("out\t"); break;
-				case 2: buffer.append("cross\t"); break;
+				case 0: buffer.append("in;"); break;
+				case 1: buffer.append("out;"); break;
+				case 2: buffer.append("cross;"); break;
 			}
-			buffer.append(sumTTime[i] + "\t");
-			buffer.append(tripCnt[i] + "\t");
-			buffer.append(avTripTTime[i] + "\t");
+			buffer.append(sumTTime[i] + ";");
+			buffer.append(tripCnt[i] + ";");
+			buffer.append(avTripTTime[i] + ";");
 			
 			if(this.mode.equals(TransportMode.pt)){
 				
-				buffer.append(accesWalkCnt[i] + "\t");
-				buffer.append(accesWaitCnt[i] + "\t");
-				buffer.append(egressWalkCnt[i] + "\t");
-				buffer.append(switchWalkCnt[i] + "\t");
-				buffer.append(switchWaitCnt[i] + "\t");
-				buffer.append(lineCnt[i] + "\t");
+				buffer.append(accesWalkCnt[i] + ";");
+				buffer.append(accesWaitCnt[i] + ";");
+				buffer.append(egressWalkCnt[i] + ";");
+				buffer.append(switchWalkCnt[i] + ";");
+				buffer.append(switchWaitCnt[i] + ";");
+				buffer.append(lineCnt[i] + ";");
 				
-				buffer.append(accesWalkTTime[i] + "\t");
-				buffer.append(accesWaitTime[i] + "\t");
-				buffer.append(egressWalkTTime[i] + "\t");
-				buffer.append(switchWalkTTime[i] + "\t");
-				buffer.append(switchWaitTime[i] + "\t");
-				buffer.append(lineTTime[i] + "\t");
+				buffer.append(accesWalkTTime[i] + ";");
+				buffer.append(accesWaitTime[i] + ";");
+				buffer.append(egressWalkTTime[i] + ";");
+				buffer.append(switchWalkTTime[i] + ";");
+				buffer.append(switchWaitTime[i] + ";");
+				buffer.append(lineTTime[i] + ";");
 				
-				buffer.append(avAccesWalkTTime[i] + "\t");
-				buffer.append(avAccesWaitTime[i] + "\t");
-				buffer.append(avEgressWalkTTime[i] + "\t");
-				buffer.append(avSwitchWalkTTime[i] + "\t");
-				buffer.append(avSwitchWaitTime[i] + "\t");
-				buffer.append(avLineTTime[i] + "\t");
+				buffer.append(avAccesWalkTTime[i] + ";");
+				buffer.append(avAccesWaitTime[i] + ";");
+				buffer.append(avEgressWalkTTime[i] + ";");
+				buffer.append(avSwitchWalkTTime[i] + ";");
+				buffer.append(avSwitchWaitTime[i] + ";");
+				buffer.append(avLineTTime[i] + ";");
 				
-				buffer.append(switch0cnt[i] + "\t");
-				buffer.append(switch1cnt[i] + "\t");
-				buffer.append(switch2cnt[i] + "\t");
-				buffer.append(switchGT2cnt[i] + "\t");
+				buffer.append(switch0cnt[i] + ";");
+				buffer.append(switch1cnt[i] + ";");
+				buffer.append(switch2cnt[i] + ";");
+				buffer.append(switchGT2cnt[i] + ";");
 				
-				buffer.append(line1cnt[i] + "\t");
-				buffer.append(line2cnt[i] + "\t");
-				buffer.append(line3cnt[i] + "\t");
-				buffer.append(lineGt3cnt[i] + "\t");
+				buffer.append(line1cnt[i] + ";");
+				buffer.append(line2cnt[i] + ";");
+				buffer.append(line3cnt[i] + ";");
+				buffer.append(lineGt3cnt[i] + ";");
 				
-				buffer.append(fSwitch0[i] + "\t");
-				buffer.append(fSwitch1[i] + "\t");
-				buffer.append(fSwitch2[i] + "\t");
-				buffer.append(fSwitchGT2[i] + "\t");
+				buffer.append(fSwitch0[i] + ";");
+				buffer.append(fSwitch1[i] + ";");
+				buffer.append(fSwitch2[i] + ";");
+				buffer.append(fSwitchGT2[i] + ";");
 				
-				buffer.append(fLine1[i] + "\t");
-				buffer.append(fLine2[i] + "\t");
-				buffer.append(fLine3[i] + "\t");
-				buffer.append(flineGt3[i] + "\t");
+				buffer.append(fLine1[i] + ";");
+				buffer.append(fLine2[i] + ";");
+				buffer.append(fLine3[i] + ";");
+				buffer.append(flineGT3[i] + ";");
 			}
 			buffer.append("\n");
 		}
-		
-		
 		return buffer.toString();
 	}
+	
+	@Override
+	public String toString(){
+		return this.toString(true);
+	}	
 }
 
 

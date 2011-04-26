@@ -47,7 +47,6 @@ public class AnalysisTrip {
 	private Coordinate start;
 	private Coordinate end;
 	private ArrayList<PersonEvent> events;
-	private ArrayList<PlanElement> elements;
 	
 	//all modes
 	private Double tripTTime = 0.0;
@@ -70,7 +69,6 @@ public class AnalysisTrip {
 	
 	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
 		this.events = events;
-		this.elements = elements;
 		this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
 				((Activity) elements.get(0)).getCoord().getY());
 		this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
@@ -98,42 +96,92 @@ public class AnalysisTrip {
 	}
 
 	private void analyze(){
-		analyzeForAll();
+		this.analyzeValuesForAllModes();
 		if(this.mode.equals(TransportMode.pt)){
-			analyzePT();
+			this.analyzeValuesForPT();
 		}
 	}
 	
 	/**
 	 * @return
 	 */
-	private void analyzeForAll() {
+	private void analyzeValuesForAllModes() {
 		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
 	}
 
 	/**
 	 * @return
 	 */
-	private void analyzePT() {
+	private void analyzeValuesForPT() {
 		ListIterator<PersonEvent> it = this.events.listIterator();
 		PersonEvent pe;
+		double switchWait = 0;
 		
 		while(it.hasNext()){
 			pe = it.next();
 		
 			if(pe instanceof ActivityEndEvent){
-			}else if(pe instanceof AgentDepartureEvent){
+				if(it.previousIndex() == 4){
+					accesWaitTime += pe.getTime();
+					if(accesWaitTime > 0) accesWaitCnt++;
+				}
+				
+				else if((it.previousIndex() > 4) && (it.previousIndex() < events.size() - 3)){
+					switchWait += pe.getTime();
+					if(switchWait > 0) switchWaitCnt++;
+					switchWaitTime += switchWait;
+					switchWait = 0;
+				}
+			}
+			
+			else if(pe instanceof AgentDepartureEvent){
 				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
 					lineCnt++;
 					lineTTime -= pe.getTime();
 				}
-			}else if(pe instanceof AgentArrivalEvent){
+				
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 1){
+						accesWalkTTime -= pe.getTime();
+						accesWalkCnt++;
+					}else if(it.previousIndex() == events.size() - 3){
+						egressWalkTTime -= pe.getTime();
+						egressWalkCnt++;
+					}else{
+						switchWalkTTime -= pe.getTime();
+						switchWalkCnt++;
+					}
+				}
+			}
+			
+			else if(pe instanceof AgentArrivalEvent){
 				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
 					lineTTime += pe.getTime();
 				}
-			}else if(pe instanceof ActivityStartEvent){
+				
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 2){
+						accesWalkTTime += pe.getTime();
+					}else if(it.previousIndex() == events.size() - 2){
+						egressWalkTTime += pe.getTime();
+					}else{
+						switchWalkTTime += pe.getTime();
+					}
+				}
+				
+			}
+			
+			else if(pe instanceof ActivityStartEvent){
+				if(it.previousIndex() == 3){
+					accesWaitTime -= pe.getTime();
+				}
+				
+				else if((it.previousIndex() > 3) && (it.previousIndex() < events.size() - 4)){
+					switchWait -= pe.getTime();
+				}
 			}
 		}
+		
 	}
 
 
@@ -151,27 +199,27 @@ public class AnalysisTrip {
 		return new GeometryFactory().createPoint(this.end);
 	}
 	
-	@Override
-	public String toString(){
-		StringBuffer buffer = new StringBuffer();
-		for(PlanElement pe: this.elements){
-			if(pe instanceof Leg){
-				buffer.append(((Leg) pe).getMode() + "\t");
-			}else if (pe instanceof Activity){
-				buffer.append(((Activity) pe).getType() + "\t");
-			}
-		}
-		buffer.append("\n");
-		for(PersonEvent pe : this.events){
-			if(pe instanceof ActivityEvent){
-				buffer.append(((ActivityEvent) pe).getActType() + "\t");
-			}else if(pe instanceof AgentEvent){
-				buffer.append(((AgentEvent) pe).getLegMode()+ "\t");
-			}
-		}
-		
-		return buffer.toString();
-	}
+//	@Override
+//	public String toString(){
+//		StringBuffer buffer = new StringBuffer();
+//		for(PlanElement pe: this.elements){
+//			if(pe instanceof Leg){
+//				buffer.append(((Leg) pe).getMode() + "\t");
+//			}else if (pe instanceof Activity){
+//				buffer.append(((Activity) pe).getType() + "\t");
+//			}
+//		}
+//		buffer.append("\n");
+//		for(PersonEvent pe : this.events){
+//			if(pe instanceof ActivityEvent){
+//				buffer.append(((ActivityEvent) pe).getActType() + "\t");
+//			}else if(pe instanceof AgentEvent){
+//				buffer.append(((AgentEvent) pe).getLegMode()+ "\t");
+//			}
+//		}
+//		
+//		return buffer.toString();
+//	}
 
 	/**
 	 * @return the tripTTime

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.bvg09.analysis;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,12 +45,14 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
 import playground.droeder.Analysis.Trips.AnalysisTripGenerator;
-import playground.droeder.Analysis.Trips.AnalysisTripSet;
+import playground.droeder.Analysis.Trips.AnalysisTripSetAllMode;
+import playground.droeder.Analysis.Trips.AnalysisTripSetOneMode;
 import playground.droeder.Analysis.Trips.TripEventsHandler;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -63,21 +66,27 @@ public class BvgTripAnalysisRunner {
 	private Geometry zone;
 	private Map<Id, ArrayList<PersonEvent>> events;
 	private Map<Id, ArrayList<PlanElement>> planElements;
-	private Map<String, AnalysisTripSet> tripSet;
+	private AnalysisTripSetAllMode tripSet;
 	
 	
 	
 	public static void main(String[] args){
-		final String PATH = DaPaths.VSP + "BVG09_Auswertung/"; 
-		final String IN = PATH + "input/";
-		final String PLANS = PATH + "testPopulation1.xml.gz";
-//		final String EVENTS = IN + "bvg.run128.25pct.100.events.xml.gz";
-		final String EVENTS = PATH + "testEvents.xml";
-		final String NETWORK = IN + "network.final.xml.gz";
+		final String OUT = DaPaths.VSP + "BVG09_Auswertung/"; 
+		final String IN = OUT + "input/";
+		
+		final String NETWORKFILE = IN + "network.final.xml.gz";
+		final String SHAPEFILE = OUT + "/BerlinSHP/Berlin.shp"; 
+		final String OUTPUTFILE = OUT + "outTest.csv";
+		
+//		final String EVENTSFILE = IN + "bvg.run128.25pct.100.events.xml.gz";
+//		final String PLANSFILE = IN + "bvg.run128.25pct.100.plans.selected.xml.gz";
+		
+		final String EVENTSFILE = OUT + "testEvents.xml";
+		final String PLANSFILE = OUT + "testPopulation1.xml.gz";
 		
 		Set<Feature> features = null;
 		try {
-			features = new ShapeFileReader().readFileAndInitialize(DaPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
+			features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,7 +94,7 @@ public class BvgTripAnalysisRunner {
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
 		BvgTripAnalysisRunner ana = new BvgTripAnalysisRunner(g);
-		ana.run(PLANS, NETWORK, EVENTS, null, false);
+		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTPUTFILE, false);
 	}
 	
 	
@@ -97,11 +106,18 @@ public class BvgTripAnalysisRunner {
 		this.readPlans(plans, network);
 		this.readEvents(events);
 		this.tripSet = AnalysisTripGenerator.calculateTripSet(this.events, this.planElements, this.zone, storeTrips);
-		for(Entry<String, AnalysisTripSet> e: this.tripSet.entrySet()){
-			System.out.println(e.getKey());
-			System.out.print(e.getValue().toString());
-			System.out.println();
-			System.out.println();
+		this.write2csv(out);
+	}
+	
+	private void write2csv(String out){
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(out);
+			writer.write(this.tripSet.toString());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -44,25 +44,22 @@ public class AnalysisTripGenerator {
 	private static final Logger log = Logger
 			.getLogger(AnalysisTripGenerator.class);
 	
-	public static Map<String, AnalysisTripSet> calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
+	public static AnalysisTripSetAllMode calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
 			Map<Id, ArrayList<PlanElement>> planElements, Geometry zone, boolean storeTrips){
 		
-		Map<String, AnalysisTripSet> mode2tripSet = new HashMap<String, AnalysisTripSet>();
+		AnalysisTripSetAllMode tripSet = new AnalysisTripSetAllMode(storeTrips, zone);
 
 		int nextMsg = 1;
+		int errorCnt = 0;
 		Set<Id> ids = planElements.keySet();
 		ArrayList<PersonEvent> splittedEvents;
 		ArrayList<PlanElement> splittedElements;
 
 		ListIterator<PlanElement> elementsIterator;
 		ListIterator<PersonEvent> eventIterator;
-		AnalysisTrip trip;
 
 		PlanElement p;
-		int msgCnt = 0;
-		
-		String mode;
-		AnalysisTripSet tripSet;
+		int handledCnt = 0;
 		
 		for(Id id : ids){
 			
@@ -87,15 +84,7 @@ public class AnalysisTripGenerator {
 							splittedEvents.add(eventIterator.next());
 						}else{
 							splittedElements.add(p);
-							trip = new AnalysisTrip(splittedEvents, splittedElements);
-							mode = trip.getMode();
-							if(mode2tripSet.containsKey(mode)){
-								mode2tripSet.get(mode).addTrip(trip);
-							}else{
-								tripSet = new AnalysisTripSet(mode, zone, storeTrips);
-								tripSet.addTrip(trip);
-								mode2tripSet.put(mode, tripSet);
-							}
+							tripSet.addTrip(new AnalysisTrip(splittedEvents, splittedElements));
 							
 							splittedElements = new ArrayList<PlanElement>();
 							splittedEvents = new ArrayList<PersonEvent>();
@@ -113,14 +102,22 @@ public class AnalysisTripGenerator {
 					}
 				}
 				
-				msgCnt++;
-				if(msgCnt % nextMsg == 0){
-					log.info("processed " + nextMsg + " of " + ids.size() + " plans");
-					nextMsg *= 2;
-				}
+				handledCnt++;
+			}else{
+				errorCnt++;
+			}
+			if((handledCnt + errorCnt)  % nextMsg == 0){
+				log.info("processed " + nextMsg + " of " + ids.size() + " plans");
+				nextMsg *= 2;
 			}
 		}
+		if(errorCnt > 0){
+			log.error("was not able to store " + errorCnt + " of " + ids.size() + 
+					" plans, because number of events and planElements did not correspond... should be   events.size() == ((planElements.size() * 2) - 2)");
+		}
+		log.info(handledCnt + " of " + ids.size() + " plans are correct and stored in the TripSet...");
+		log.info("finished...");
 		
-		return mode2tripSet;
+		return tripSet;
 	}
 }
