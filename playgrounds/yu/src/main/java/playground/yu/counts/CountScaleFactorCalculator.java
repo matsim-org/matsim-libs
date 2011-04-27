@@ -233,24 +233,28 @@ public class CountScaleFactorCalculator {
 						"sigma(sim^2)==0, no agents were simulated?");
 			}
 
+			double a = countsScaleFactor * countSimProductSum / simValSquareSum, b = countsScaleFactor
+					* simCntQuotientSum / simCntQuotientSquareSum, c = countsScaleFactor
+					* countValSum / simValSum;
 			System.out
 					.println("best scaleFactor for minimal MSB (mean squred bias) (  sigma[(sim-cnt)^2]  ) could be\t"
-							+ countsScaleFactor
-							* countSimProductSum
-							/ simValSquareSum + "\t!");
+							+ a + "\t!");
 
 			System.out
 					.println("best scaleFactor for minimal MSRE (mean squred relative errors) ( sigma[(sim/cnt-1)^2] ) could be\t"
-							+ countsScaleFactor
-							* simCntQuotientSum
-							/ simCntQuotientSquareSum + "\t!");
+							+ b + "\t!");
 
 			System.out
 					.println("best scaleFactor for minimal MB (mean bias) (  [sigma(sim-cnt)]^2  ) could be\t"
-							+ countsScaleFactor
-							* countValSum
-							/ simValSum
-							+ "\t!");
+							+ c + "\t!");
+
+			System.out.println("simSum =\t" + simValSum + "\tcntSum=\t"
+					+ countValSum);
+			for (double csf = 4d; csf < 7d; csf += 0.05) {
+				System.out.println("countScaleFactor =\t" + csf
+						+ "\tdifference=\t"
+						+ (simValSum * csf / countsScaleFactor - countValSum));
+			}
 		}
 	}
 
