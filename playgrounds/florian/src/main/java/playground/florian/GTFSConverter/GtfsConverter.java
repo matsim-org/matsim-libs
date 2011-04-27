@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,10 +18,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -69,13 +74,15 @@ public class GtfsConverter {
 		// Get the TripIds, which are available for the serviceIds 
 		List<Id> usedTripIds = this.getUsedTripIds(usedServiceIds);
 		System.out.println("Reading of TripIds succesfull: " + usedTripIds);
-		// Build and safe a Network --- IT PROBABLY NEEDS A TRANSFORMATION
+		// Build and safe a Network --- you only need this, if you don't have a network
 		NetworkImpl net = this.createNetworkOfStopsAndTrips(ts);
 		new NetworkWriter(net).write("./network.xml");
-		// Assign the links of the Network to the stops --- NOT WORKING YET
-//		this.assignLinksToStops(ts, net);
+		// Assign the links of the Network to the stops
+		this.assignLinksToStops(ts, net);
+		// Get the TripRoutes
+		Map<Id,NetworkRoute> tripRoute = createNetworkRoutes(ts);
 		// Convert the schedules for the trips
-		this.convertSchedules(ts, routeNames, routeToTripAssignments, usedTripIds, net);
+		this.convertSchedules(ts, routeNames, routeToTripAssignments, usedTripIds, tripRoute);
 
 		
 		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
@@ -186,7 +193,7 @@ public class GtfsConverter {
 		return serviceIds;
 	}
 	
-	private void convertSchedules(TransitSchedule ts, Map<Id, String> routeNames, Map<Id, Id> routeToTripAssignments, List<Id> tripIds, NetworkImpl net){
+	private void convertSchedules(TransitSchedule ts, Map<Id, String> routeNames, Map<Id, Id> routeToTripAssignments, List<Id> tripIds, Map<Id, NetworkRoute> tripRoute){
 		String stopTimesFilename = filepath + "/stop_times.txt";
 		Map<String,TransitLine> transitLines = new HashMap<String, TransitLine>();
 		try {
@@ -240,6 +247,53 @@ public class GtfsConverter {
 		}
 	}
 	
+	private Map<Id,NetworkRoute> createNetworkRoutes(TransitSchedule ts){
+		// this only works, if you used the created network
+		String stopTimesFilename = filepath + "/stop_times.txt";
+		Map<Id,NetworkRoute> tripRoutes = new HashMap<Id,NetworkRoute>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
+			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			int tripIdIndex = header.indexOf("trip_id");
+			int stopIdIndex = header.indexOf("stop_id");
+			String row = br.readLine();
+			String[] entries = row.split(",");
+			String currentTrip = entries[tripIdIndex];
+			LinkedList<Id> route = new LinkedList<Id>();
+			do {
+				entries = row.split(",");
+				if(currentTrip.equals(entries[tripIdIndex])){
+					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
+				}else{
+					// This is not nice, but it works - it should be changed in near future
+					route.add(route.size()-1, new IdImpl(route.getLast().toString().substring(3)));
+					
+					NetworkRoute netRoute = (NetworkRoute) (new LinkNetworkRouteFactory()).createRoute(route.getFirst(), route.getLast());
+					netRoute.setLinkIds(route.getFirst(), route, route.getLast());
+					tripRoutes.put(new IdImpl(currentTrip), netRoute);
+					currentTrip = entries[tripIdIndex];
+					route = new LinkedList<Id>();
+					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
+				}
+				row = br.readLine();
+			}while(row!= null);
+			// This is not nice, but it works - it should be changed in near future
+			route.add(route.size()-1, new IdImpl(route.getLast().toString().substring(3)));
+			
+			NetworkRoute netRoute = (NetworkRoute) (new LinkNetworkRouteFactory()).createRoute(route.getFirst(), route.getLast());
+			netRoute.setLinkIds(route.getFirst(), route, route.getLast());
+			tripRoutes.put(new IdImpl(currentTrip), netRoute);
+		} catch (FileNotFoundException e) {
+			System.out.println(stopTimesFilename + " not found!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//LinkNetworkRoute net = (new LinkNetworkRouteFactory()).createRoute(startLinkId, endLinkId);
+		return tripRoutes;
+		
+		
+	}
+	
 	private void createTransitLines(TransitSchedule ts, Map<Id, String> routeNames) {
 		for(Id id: routeNames.keySet()){
 			TransitLine tl = tf.createTransitLine(id);
@@ -254,15 +308,17 @@ public class GtfsConverter {
 		double freespeed = freespeedKmPerHour / 3.6;
 		int numLanes = 1;
 		long i = 0;
+		// To prevent the creation of similiar links in different directions there need to be a Map which assigns the ToNodes to all FromNodes
+		Map<Id,List<Id>> fromNodes = new HashMap<Id,List<Id>>();
 		// Create a new Network
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = sc.getNetwork();
-		// Add all stops as nodes
+		// Add all stops as nodes but move them a little
 		Map<Id, TransitStopFacility> stops = ts.getFacilities();
 		for(Id id: stops.keySet()){
 			TransitStopFacility stop = stops.get(id);
 			NodeImpl n = new NodeImpl(id);
-			n.setCoord(stop.getCoord());
+			n.setCoord(new CoordImpl(stop.getCoord().getX()-1,stop.getCoord().getY()-1));
 			network.addNode(n);
 		}
 		// Get the Links from the trips in stop_times.txt
@@ -271,21 +327,57 @@ public class GtfsConverter {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
 			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
 			do {
+				boolean addLink = false;
 				String[] entries = row.split(",");
 				Id fromNodeId = new IdImpl(entries[stopIdIndex]); // This works only as long as the nodes have the same ID as the stops;
+				String usedTripId = entries[tripIdIndex];
 				row = br.readLine();
 				if(row!=null){
 					entries = row.split(",");
 					Id toNodeId = new IdImpl(entries[stopIdIndex]);
-					double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
-					Link link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);
-					// Change the linktype to pt
-					Set<String> modes = new HashSet<String>();
-					modes.add(TransportMode.pt);
-					link.setAllowedModes(modes);
+					if(fromNodes.containsKey(fromNodeId)){
+						if(!(fromNodes.get(fromNodeId)).contains(toNodeId)){
+							addLink = true;
+						}
+					}else{
+						addLink = true;
+						fromNodes.put(fromNodeId, new ArrayList<Id>());
+					}
+					if(!(fromNodes.containsKey(toNodeId))){
+						fromNodes.put(toNodeId, new ArrayList<Id>());
+					}
+					
+					// If the toNode belongs to a different trip, there should not be a link!
+					if(!usedTripId.equals(entries[tripIdIndex])){
+						addLink = false;
+						// in this case there need to be a dummylink next to the begining of the nexttrip
+						Id dummyId = new IdImpl("dN " + toNodeId);
+						if(!(network.getNodes().containsKey(dummyId))){
+							NodeImpl n = new NodeImpl(dummyId);
+							n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX() + 0.1,nodes.get(toNodeId).getCoord().getY()+0.1));
+							network.addNode(n);
+							double length = CoordUtils.calcDistance(n.getCoord(), nodes.get(toNodeId).getCoord());
+							Link link = network.createAndAddLink(new IdImpl("dL " + toNodeId), n, nodes.get(toNodeId), length, freespeed, capacity, numLanes);
+							// Change the linktype to pt
+							Set<String> modes = new HashSet<String>();
+							modes.add(TransportMode.pt);
+							link.setAllowedModes(modes);
+						}
+					}
+					if(addLink){
+						double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
+						Link link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);
+						// Change the linktype to pt
+						Set<String> modes = new HashSet<String>();
+						modes.add(TransportMode.pt);
+						link.setAllowedModes(modes);
+						fromNodes.get(fromNodeId).add(toNodeId);
+						fromNodes.get(toNodeId).add(fromNodeId);
+					}					
 				}		
 			}while(row!= null);
 		} catch (FileNotFoundException e) {
