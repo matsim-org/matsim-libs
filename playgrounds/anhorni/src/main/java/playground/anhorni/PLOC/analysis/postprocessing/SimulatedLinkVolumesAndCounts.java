@@ -82,7 +82,7 @@ public class SimulatedLinkVolumesAndCounts {
 				links.add(link);
 				String line = "n.a.\t" + ensemble.getId();
 				for (int hour = 0; hour < 24; hour++) {
-					double stdDevPct = 100.0 * ensemble.getStandardDev_population(hour) / ensemble.getAverageVolume(hour);
+					double stdDevPct = 100.0 * ensemble.getStandardDev_s(hour) / ensemble.getAverageVolume(hour);
 					line += "\t" + stdDevPct;
 					link.setStdDev(hour, stdDevPct);
 					link.setAvgVolume(hour, ensemble.getAverageVolume(hour));

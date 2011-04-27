@@ -26,13 +26,13 @@ public class AgentsScores {
 		return sum / this.scores.size();
 	}
 	
-	public double getStandardDeviationScore() {
+	public double getStandardDeviationScore_S() {
 		double sumQuadraticDeviations = 0.0;
 		double averageScore = this.getAverageScore();
 		for (double score : this.scores) {
 			sumQuadraticDeviations += Math.pow(score - averageScore, 2.0);
 		}
-		return Math.sqrt(sumQuadraticDeviations / this.scores.size());
+		return Math.sqrt(sumQuadraticDeviations / (this.scores.size() -1));
 	}
 
 	public Id getAgentId() {

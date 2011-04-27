@@ -34,7 +34,7 @@ public class EnsemblePerLink {
 		return this.simVolumes.get(hour).size() > 0;
 	}
 	
-	public double getStandardDev_population(int hour) {
+	public double getStandardDev_s(int hour) {
 		if (this.simVolumes.get(hour).size() == 0) {
 			log.warn("Link without volumes!");
 			return 0.0;
@@ -43,7 +43,7 @@ public class EnsemblePerLink {
 		double variance = 0.0;
 		double n = this.simVolumes.get(hour).size();
 		for (int i = 0; i < n; i++) {
-			variance += Math.pow(this.simVolumes.get(hour).get(i) - mean, 2.0) / n;
+			variance += Math.pow(this.simVolumes.get(hour).get(i) - mean, 2.0) / (n - 1);
 		}
 		return Math.sqrt(variance);
 	}

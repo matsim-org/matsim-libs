@@ -122,10 +122,10 @@ public class CompareScores {
 			
 			for (AgentsScores bestScores : agentsBestScores.values()) {
 				double bestScoreRelativeStandardDeviationinPercent = 
-					100.0 * bestScores.getStandardDeviationScore() / Math.abs(bestScores.getAverageScore());
+					100.0 * bestScores.getStandardDeviationScore_S() / Math.abs(bestScores.getAverageScore());
 				
 				double executedScoreRelativeStandardDeviationinPercent = 
-					100.0 * agentsExecutedScores.get(bestScores.getAgentId()).getStandardDeviationScore() / 
+					100.0 * agentsExecutedScores.get(bestScores.getAgentId()).getStandardDeviationScore_S() / 
 					Math.abs(agentsExecutedScores.get(bestScores.getAgentId()).getAverageScore());
 				
 				bufferedWriter.write(bestScores.getAgentId() + "\t" + 
