@@ -38,7 +38,7 @@ public class DestinationChoiceScoring {
 	private ActivityFacilities facilities;
 	private Config config;
 	
-	private final String LCEXP = "locationchoiceExperimental";
+	private static String LCEXP = "locationchoiceExperimental";
 	
 	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , Config config) {
 		this.rnd = rnd;

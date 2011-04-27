@@ -73,11 +73,11 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 		
 		// Setting distance = true (plan.score=-999) for travel time estimation only
 		// score is reset to 0.0 after estimation.
-		if (!(this.plan.getScore() == null)) {
-			if (this.plan.getScore() < -998) {
+		//if (!(this.plan.getScore() == null)) {
+			//if (this.plan.getScore() < -998) {
 			//	distance = true;
-			}
-		}
+			//}
+		//}
 		// ----------------------------------------------------------
 		
 		super.finish();

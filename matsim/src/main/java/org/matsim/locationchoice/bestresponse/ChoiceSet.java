@@ -28,7 +28,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 public class ChoiceSet {
 		
 	// *************************************
-	private final double exponent = 3.0;
+	private static double exponent = 3.0;
 	private int numberOfAlternatives = 30;
 	private int approximationLevel = 0;	
 	// *************************************
