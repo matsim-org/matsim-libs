@@ -41,7 +41,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsGraphWriter;
+import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
@@ -136,14 +136,12 @@ public class CountsCreatorFromEvents {
 		comparator.run();
 						
 		if (this.outputFormat.contains("html") || this.outputFormat.contains("all")) {
-				boolean htmlset = true;
-				boolean pdfset = true;
-				CountsGraphWriter cgw = new CountsGraphWriter(this.outpath, comparator.getComparison(), 0, htmlset, pdfset);
-				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-				cgw.createGraphs();
+				CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(this.outpath, comparator.getComparison(), 0);
+				cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+				cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
+				cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+				cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+				cgw.createHtmlAndGraphs();
 		}
 		if (this.outputFormat.contains("kml")|| this.outputFormat.contains("all")) {
 			String filename = this.outpath + "/countscompare.kmz";

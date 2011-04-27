@@ -32,7 +32,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsGraphWriter;
+import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
@@ -72,15 +72,12 @@ public class CountControlerListener implements StartupListener,
 
 			if (this.config.counts().getOutputFormat().contains("html") ||
 					this.config.counts().getOutputFormat().contains("all")) {
-				// html and pdf output
-				boolean htmlset = true;
-				boolean pdfset = true;
-				CountsGraphWriter cgw = new CountsGraphWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration(), htmlset, pdfset);
-				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-				cgw.createGraphs();
+				CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
+				cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+				cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
+				cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+				cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+				cgw.createHtmlAndGraphs();
 			}
 			if (this.config.counts().getOutputFormat().contains("kml")||
 					this.config.counts().getOutputFormat().contains("all")) {

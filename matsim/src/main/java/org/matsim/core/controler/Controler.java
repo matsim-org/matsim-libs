@@ -784,7 +784,6 @@ public class Controler {
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
 
-		this.addCoreControlerListener(new LinkStatsControlerListener());
 		this.addCoreControlerListener(new EventsHandling(this.events)); // must be last being added (=first being executed)
 	}
 
@@ -827,6 +826,8 @@ public class Controler {
 			this.counts = ccl.getCounts();
 		}
 
+		this.addControlerListener(new LinkStatsControlerListener());
+		
 		if (this.config.scenario().isUseTransit()) {
 			addControlerListener(new TransitControlerListener());
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {

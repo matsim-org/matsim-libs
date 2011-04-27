@@ -20,8 +20,6 @@
 
 package org.matsim.counts.algorithms.graphs.helper;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,7 +33,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -44,19 +41,7 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.DefaultFontMapper;
-import com.lowagie.text.pdf.FontMapper;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
-
-
 public class OutputDelegate {
-
-	private final static Logger log = Logger.getLogger(OutputDelegate.class);
 
 	private final List<Section> sections_;
 	private final List<CountsGraph> cg_list_;
@@ -80,44 +65,27 @@ public class OutputDelegate {
 		return this.cg_list_;
 	}
 
-	public void outPutAll(final boolean htmlset, final boolean pdfset){
-		if (htmlset) {
-			new File(this.iterPath_+"/png").mkdir();
-		}
-		if (pdfset) {
-			new File(this.iterPath_+"/pdf").mkdir();
-		}
+	public void outputHtml(){
+		new File(this.iterPath_+"/png").mkdir();
 
 		Iterator<CountsGraph> cg_it = this.cg_list_.iterator();
 		while (cg_it.hasNext()) {
 			CountsGraph cg=cg_it.next();
 
-			if (htmlset) {
-				writeHtml(cg, this.iterPath_, false);
-			}
-			if (pdfset){
-				try {
-					saveChartAsPDF(cg, this.iterPath_+"/pdf/", (int)PageSize.A4.rotate().getWidth(), (int)PageSize.A4.rotate().getHeight(), new DefaultFontMapper());
-				}
-				catch (IOException e) {
-			        System.out.println(e.toString());
-			    }//catch
-			}
+			writeHtml(cg, this.iterPath_, false);
 		}
-		if (htmlset) {
-			writeHtml(null, this.iterPath_, true);
-			try {
-				new File(this.iterPath_+"/div").mkdir();
-				copyResourceToFile("style1.css", this.iterPath_ + "/div/style1.css");
-				copyResourceToFile("logo.png", this.iterPath_ + "/div/logo.png");
-				copyResourceToFile("overlib.js", this.iterPath_ + "/div/overlib.js");
-				copyResourceToFile("title.png", this.iterPath_ + "/div/title.png");
-			}
-			catch (IOException e) {
-				System.out.println(e.toString());
-				e.printStackTrace();
-			}//catch
-		}//if
+		writeHtml(null, this.iterPath_, true);
+		try {
+			new File(this.iterPath_+"/div").mkdir();
+			copyResourceToFile("style1.css", this.iterPath_ + "/div/style1.css");
+			copyResourceToFile("logo.png", this.iterPath_ + "/div/logo.png");
+			copyResourceToFile("overlib.js", this.iterPath_ + "/div/overlib.js");
+			copyResourceToFile("title.png", this.iterPath_ + "/div/title.png");
+		}
+		catch (IOException e) {
+			System.out.println(e.toString());
+			e.printStackTrace();
+		}//catch
 	}
 
 	private void copyResourceToFile(final String resourceFilename, final String destinationFilename) throws IOException {
@@ -148,8 +116,8 @@ public class OutputDelegate {
 
 	private void writeHtml(final CountsGraph cg, final String iter_path, boolean indexFile){
 		/* we want landscape, thus exchange width / height */
-		int width=(int)PageSize.A4.getHeight();
-		int height=(int)PageSize.A4.getWidth();
+		int width=800;
+		int height=600;
 
 		JFreeChart chart=null;
 		String fileName="";
@@ -267,49 +235,5 @@ public class OutputDelegate {
 			}
 		}//finally
 	}//writeHtml
-
-
-	private void saveChartAsPDF(final CountsGraph cg,final String iter_path, final int width,	final int height,	final FontMapper mapper) throws IOException {
-		JFreeChart chart=cg.getChart();
-		String fileName=cg.getFilename();
-		final File file = new File(iter_path+"/"+fileName+".pdf");
-		OutputStream out = null;
-		try {
-			out = new BufferedOutputStream(new FileOutputStream(file));
-			writeChartAsPDF(chart, out, width, height, mapper);
-		}
-		finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) { log.warn("Could not close output-stream.", e); }
-			}
-		}
-	}//saveChartAsPDF
-
-
-	//Writes a chart to an output stream in PDF format
-	private void writeChartAsPDF(final JFreeChart chart, final OutputStream out,final int width,	final int height,	final FontMapper mapper) {
-		Rectangle pagesize = new Rectangle(width, height);
-		Document document = new Document(pagesize);
-		try {
-			PdfWriter writer = PdfWriter.getInstance(document, out);
-			document.addAuthor("MATSim");
-			document.addSubject("Counts");
-			document.setPageSize(PageSize.A4.rotate());
-			document.open();
-			PdfContentByte cb = writer.getDirectContent();
-			PdfTemplate tp = cb.createTemplate(width, height);
-			Graphics2D g2 = tp.createGraphics(width, height, mapper);
-			Rectangle2D r2D = new Rectangle2D.Double(0, 0, width, height);
-			chart.draw(g2, r2D);
-			g2.dispose();
-			cb.addTemplate(tp, 0, 0);
-			document.close();
-		}//try
-		catch (Exception e) {
-			System.err.println(e.getMessage());
-		}//catch
-	}//writeChartAsPDF
 
 }

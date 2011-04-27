@@ -30,19 +30,17 @@ import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 
-public class CountsGraphWriter {
+public class CountsHtmlAndGraphsWriter {
 
 	private String iter_path_;
 	private List<CountSimComparison> ccl_;
 	private int iteration_;
-	private final boolean pdfset_;
-	private final boolean htmlset_;
 	private OutputDelegate outputDelegate_;
 	private List<CountsGraphsCreator> graphsCreators;
 
-	private static final Logger log = Logger.getLogger(CountsGraphWriter.class);
+	private static final Logger log = Logger.getLogger(CountsHtmlAndGraphsWriter.class);
 
-	public CountsGraphWriter(final String iter_path, final List<CountSimComparison> ccl, final int iteration, final boolean htmlset,final boolean pdfset) {
+	public CountsHtmlAndGraphsWriter(final String iter_path, final List<CountSimComparison> ccl, final int iteration) {
 		this.iter_path_=iter_path+"/graphs/";
 		this.ccl_=ccl;
 		this.iteration_=iteration;
@@ -50,11 +48,7 @@ public class CountsGraphWriter {
 		// delegate pattern without callback
 		this.outputDelegate_=new OutputDelegate(this.iter_path_);
 
-		this.htmlset_=htmlset;
-		this.pdfset_=pdfset;
-		if (htmlset || pdfset) {
-			new File(this.iter_path_).mkdir();
-		}
+		new File(this.iter_path_).mkdir();
 		this.graphsCreators=new Vector<CountsGraphsCreator>();
 	}
 
@@ -62,11 +56,11 @@ public class CountsGraphWriter {
 		return this.outputDelegate_;
 	}
 
-	public void setGraphsCreator(final CountsGraphsCreator graphsCreator) {
+	public void addGraphsCreator(final CountsGraphsCreator graphsCreator) {
 		this.graphsCreators.add(graphsCreator);
 	}
 
-	public void createGraphs() {
+	public void createHtmlAndGraphs() {
 		log.info("Creating graphs");
 
 		Iterator<CountsGraphsCreator> cgc_it = this.graphsCreators.iterator();
@@ -83,6 +77,6 @@ public class CountsGraphWriter {
 			}
 		}
 
-		this.outputDelegate_.outPutAll(this.htmlset_, this.pdfset_);
+		this.outputDelegate_.outputHtml();
 	}
 }

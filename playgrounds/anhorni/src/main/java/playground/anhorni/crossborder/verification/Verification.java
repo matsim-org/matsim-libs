@@ -12,8 +12,6 @@ import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
-import com.lowagie.text.PageSize;
-
 public class Verification {
 	
 	//0:E; 1:P; 2:N; 3:S
@@ -59,8 +57,8 @@ public class Verification {
 	
 	private void writeTGZMGraph() {
 				
-		int width=(int)PageSize.A4.getHeight();
-		int height=(int)PageSize.A4.getWidth();
+		int width=800;
+		int height=600;
 		
 		for (int i=0; i<4; i++) {
 			TGZMCompare tgzm=new TGZMCompare(this.xTripsPerHour[i], this.aggregatedVolumePerHourTGZM[i]);

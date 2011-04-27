@@ -21,7 +21,7 @@
 package org.matsim.counts;
 
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsGraphWriter;
+import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestCase;
  * Tests if some graphs are created.
  * As types of graphs can be plugged in or removed no testing for the existence of particular graphs is done.
  */
-public class CountsGraphWriterTest extends MatsimTestCase {
+public class CountsHtmlAndGraphsWriterTest extends MatsimTestCase {
 
 	public void testGraphCreation() {
 		CountsFixture fixture = new CountsFixture();
@@ -41,12 +41,12 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.run();
 
-		CountsGraphWriter cgw = new CountsGraphWriter(this.getOutputDirectory(), cca.getComparison(),1, true, true);
-		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
-		cgw.setGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
-		cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
-		cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-		cgw.createGraphs();
+		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(this.getOutputDirectory(), cca.getComparison(),1);
+		cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
+		cgw.addGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
+		cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
+		cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+		cgw.createHtmlAndGraphs();
 
 		assertTrue(cgw.getOutput().getGraphs().size()>0);
 	}

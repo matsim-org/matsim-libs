@@ -21,14 +21,14 @@ package org.matsim.core.controler.corelisteners;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
 /**
  * @author mrieser
  */
-public class LinkStatsControlerListener implements AfterMobsimListener, IterationEndsListener {
+public class LinkStatsControlerListener implements AfterMobsimListener, IterationStartsListener {
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -45,8 +45,9 @@ public class LinkStatsControlerListener implements AfterMobsimListener, Iteratio
 	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		if ((event.getIteration() % 10 == 0) && (event.getIteration() > event.getControler().getFirstIteration())) {
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (event.getIteration() % 10 == 1) {
+			// resetting at the beginning of an iteration, to allow others to use the data until the very end of the previous iteration
 			event.getControler().getLinkStats().reset();
 		}
 	}

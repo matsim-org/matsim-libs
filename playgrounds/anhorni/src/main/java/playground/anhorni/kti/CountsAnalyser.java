@@ -38,7 +38,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsGraphWriter;
+import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
@@ -174,12 +174,12 @@ public class CountsAnalyser {
 			tableWriter.writeFile(path + "errortable.txt");
 		}
 		if (format.compareToIgnoreCase("html") == 0 || (format.compareToIgnoreCase("all") == 0)) {
-			CountsGraphWriter writer = new CountsGraphWriter(path, countsComparisonList, 0 , true , true);
-			writer.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-			writer.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-			writer.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-			writer.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-			writer.createGraphs();
+			CountsHtmlAndGraphsWriter writer = new CountsHtmlAndGraphsWriter(path, countsComparisonList, 0);
+			writer.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+			writer.addGraphsCreator(new CountsErrorGraphCreator("errors"));
+			writer.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+			writer.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+			writer.createHtmlAndGraphs();
 		}
 	}
 
