@@ -43,8 +43,10 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF.data.HubLinkMapping;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 
@@ -82,9 +84,7 @@ public class HubLoadDistributionReader {
 	//double [time - seconds in day] = available free load in W on grid in Hub
 	
 	Controler controler;
-	
-	
-	private double gasPriceInCostPerSecond;
+	VehicleTypeCollector myVehicleTypeCollector;
 	
 	/**
 	 * Reads in load data for all hubs and stores PolynomialFunctions 
@@ -96,8 +96,8 @@ public class HubLoadDistributionReader {
 	public HubLoadDistributionReader(Controler controler, 
 			HubLinkMapping hubLinkMapping,
 			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,			
-			double gasPrice) throws IOException, OptimizationException, InterruptedException{
+			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,		
+			VehicleTypeCollector myVehicleTypeCollector) throws IOException, OptimizationException, InterruptedException{
 		
 		this.controler=controler;
 		
@@ -105,14 +105,13 @@ public class HubLoadDistributionReader {
 		
 		this.deterministicHubLoadDistribution=deterministicHubLoadDistribution; // continuous functions
 		
-		this.gasPriceInCostPerSecond=gasPrice;
 		
 		this.pricingHubDistribution=pricingHubDistribution; // continuous functions with same intervals as deterministic HubLoadDistribution!!!
 		
+		this.myVehicleTypeCollector= myVehicleTypeCollector;
+		checkForPlugInHybrid();// if PHEV then deterministicLoad function changes for this one
 		
-		deterministicHubLoadDistributionPHEVAdjusted=getPHEVDeterministicHubLoad();
 		
-		visualizePricingAndGas();
 		visualizeLoadDistributionGeneralAndPHEV();
 		
 		
@@ -128,6 +127,28 @@ public class HubLoadDistributionReader {
 		
 	}
 	
+	
+	
+	public void checkForPlugInHybrid() throws IOException{
+		
+		PlugInHybridElectricVehicle p= new PlugInHybridElectricVehicle(new IdImpl(1));
+		
+		if (myVehicleTypeCollector.containsVehicleTypeForThisVehicle(p)){
+			
+			double gasPriceInCostPerSecond; // cost/second = cost/liter * liter/joules * joules/second			
+			Battery phevBattery= myVehicleTypeCollector.getBattery(p);
+			GasType phevGasType= myVehicleTypeCollector.getGasType(p);
+			double engineWatt =  myVehicleTypeCollector.getWattOfEngine(p);
+			gasPriceInCostPerSecond=phevGasType.getPricePerLiter() * 1/(phevGasType.getJoulesPerLiter()) * engineWatt;
+						
+			deterministicHubLoadDistributionPHEVAdjusted=getPHEVDeterministicHubLoad(gasPriceInCostPerSecond);
+			visualizePricingAndGas(gasPriceInCostPerSecond);
+			
+		}else{
+			deterministicHubLoadDistributionPHEVAdjusted=deterministicHubLoadDistribution;
+		}
+		
+	}
 	
 	
 	
@@ -422,9 +443,7 @@ public class HubLoadDistributionReader {
 	 * those time intervals will be turned into suboptimal parking slots
 	 * @return
 	 */
-	private LinkedListValueHashMap<Integer, Schedule> getPHEVDeterministicHubLoad(){
-		
-		
+	private LinkedListValueHashMap<Integer, Schedule> getPHEVDeterministicHubLoad(double gasPriceInCostPerSecond){
 		
 		LinkedListValueHashMap<Integer, Schedule> hubLoadDistributionPHEVAdjusted= new LinkedListValueHashMap<Integer, Schedule> ();
 		
@@ -451,10 +470,10 @@ public class HubLoadDistributionReader {
 				
 				ArrayList<ChargingInterval> badIntervals= new ArrayList<ChargingInterval> ();
 				
-				checkRoot(currentDeterministicLoadInterval, f,  badIntervals);
-//				System.out.println("badIntervals:");
-//				printArrayList(badIntervals);
-				
+				checkRoot(currentDeterministicLoadInterval, 
+						f, 
+						gasPriceInCostPerSecond,
+						badIntervals);
 				
 				if(badIntervals.size()==0){
 					sPHEV.addTimeInterval(currentDeterministicLoadInterval);
@@ -520,10 +539,8 @@ public class HubLoadDistributionReader {
 			}
 			
 			sPHEV.sort();
-//			sPHEV.printSchedule();
-					
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
-			//sPHEV.printSchedule();
+			
 		}
 		
 		return hubLoadDistributionPHEVAdjusted;
@@ -542,7 +559,10 @@ public class HubLoadDistributionReader {
 	 * @param objective
 	 * @param badIntervals
 	 */
-	private void checkRoot(LoadDistributionInterval l, PolynomialFunction objective, ArrayList<ChargingInterval> badIntervals){
+	private void checkRoot(LoadDistributionInterval l, 
+			PolynomialFunction objective, 
+			double gasPriceInCostPerSecond,
+			ArrayList<ChargingInterval> badIntervals){
 		
 		
 		//*********************************
@@ -660,7 +680,7 @@ public class HubLoadDistributionReader {
 	}
 
 	
-	private void visualizePricingAndGas() throws IOException{
+	private void visualizePricingAndGas(double gasPriceInCostPerSecond) throws IOException{
 		for( Integer i : pricingHubDistribution.getKeySet()){
 			
 			XYSeriesCollection prices= new XYSeriesCollection();
@@ -670,8 +690,8 @@ public class HubLoadDistributionReader {
 			XYSeries hubPricing= new XYSeries("hub"+i.toString()+"pricing");
 			XYSeries gasPriceXY= new XYSeries("gasprice");
 			
-			gasPriceXY.add(0, this.gasPriceInCostPerSecond);
-			gasPriceXY.add(DecentralizedSmartCharger.SECONDSPERDAY,this.gasPriceInCostPerSecond);
+			gasPriceXY.add(0, gasPriceInCostPerSecond);
+			gasPriceXY.add(DecentralizedSmartCharger.SECONDSPERDAY,gasPriceInCostPerSecond);
 			
 			for(int j=0; j<pricingHubDistribution.getValue(i).getNumberOfEntries(); j++){
 				

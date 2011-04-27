@@ -5,8 +5,18 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.jfree.data.xy.XYSeries;
 
 /**
- * is a convenience class that collects point data, fits the point data and 
+ * is a convenience class that 
+ * <ul>
+ * <li>collects point data,
+ * <li>fits the point data and 
  * thus allows an easy way to visualize the data in a graph afterwards
+ * 
+ * </ul> 
+ * only xy data is possible; to add data points, specify the entry row and state the x and y coordinate
+ * e.g. row=minute 1;
+ * x=second 60;
+ * y=load of 1000W
+ * 
  * @author Stella
  *
  */

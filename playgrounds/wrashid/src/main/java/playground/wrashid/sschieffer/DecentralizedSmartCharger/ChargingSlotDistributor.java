@@ -94,15 +94,15 @@ public class ChargingSlotDistributor {
 					
 				}else{
 					
-					Schedule chargingScheduleForParkingInterval=assignChargingScheduleForParkingInterval(func, 
+					chargingScheduleAgent=assignChargingScheduleForParkingInterval(func, 
 							p.getJoulesInInterval(), 
 							p.getStartTime(), 
 							p.getEndTime(), 
 							chargingTime);
 					
-					p.setChargingSchedule(chargingScheduleForParkingInterval);
+					p.setChargingSchedule(chargingScheduleAgent);
 					
-					chargingScheduleAgent.mergeSchedules(chargingScheduleForParkingInterval);
+					
 				}
 				
 			}

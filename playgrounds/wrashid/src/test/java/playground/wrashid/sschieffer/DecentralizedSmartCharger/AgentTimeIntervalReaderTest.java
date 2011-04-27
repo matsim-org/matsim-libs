@@ -11,6 +11,7 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -18,6 +19,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
@@ -79,17 +82,57 @@ public class AgentTimeIntervalReaderTest extends TestCase{
 		final double ev=0.0;
 		final double combustion=0.0;
 		
-		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
 		
 		final double bufferBatteryCharge=0.0;
 		
-		final double batterySizeEV= 17*3600*1000; 
-		final double batterySizePHEV= 17*3600*1000; 
-		final double batteryMinEV= 0.1; 
-		final double batteryMinPHEV= 0.1; 
-		final double batteryMaxEV= 0.9; 
-		final double batteryMaxPHEV= 0.9; 
+		double gasPricePerLiter= 0.25; 
+		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
+		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		GasType normalGas=new GasType("normal gas", 
+				gasJoulesPerLiter, 
+				gasPricePerLiter, 
+				emissionPerLiter);
+		
+		
+		/*
+		 * Battery characteristics:
+		 * - full capacity [J]
+		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
+		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
+		 * (0.1=10%)
+		 * - maximum level of state of charge, avoid going above = batteryMax
+		 * (0.9=90%)
+		 * 
+		 * Create desired Battery Types
+		 */
+		double batterySizeEV= 24*3600*1000; 
+		double batterySizePHEV= 24*3600*1000; 
+		double batteryMinEV= 0.1; 
+		double batteryMinPHEV= 0.1; 
+		double batteryMaxEV= 0.9; 
+		double batteryMaxPHEV= 0.9; 		
+		
+		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
+		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+		
+		
+		VehicleType EVTypeStandard= new VehicleType("standard EV", 
+				EVBattery, 
+				null, 
+				new ElectricVehicle(null, new IdImpl(1)),
+				80000);// Nissan leaf 80kW Engine
+		
+		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
+				PHEVBattery, 
+				normalGas, 
+				new PlugInHybridElectricVehicle(new IdImpl(1)),
+				80000);
+		
+		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
+		myVehicleTypes.addVehicleType(EVTypeStandard);
+		myVehicleTypes.addVehicleType(PHEVTypeStandard);
+		
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
 		
@@ -126,19 +169,10 @@ public class AgentTimeIntervalReaderTest extends TestCase{
 							event.getControler(), 
 							parkingTimesPlugin,
 							e.getEnergyConsumptionPlugin(),
-							outputPath, 
-							gasJoulesPerLiter,
-							emissionPerLiterEngine,
-							gasPrice
+							outputPath,
+							myVehicleTypes
 							);
 					
-					myDecentralizedSmartCharger.setBatteryConstants(
-							batterySizeEV, 
-							batterySizePHEV,
-							batteryMinEV,
-							batteryMinPHEV,
-							batteryMaxEV,
-							batteryMaxPHEV);
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					

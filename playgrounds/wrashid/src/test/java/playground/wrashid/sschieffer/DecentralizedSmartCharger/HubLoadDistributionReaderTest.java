@@ -14,6 +14,7 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -21,6 +22,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
@@ -36,12 +39,59 @@ public class HubLoadDistributionReaderTest extends TestCase{
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final Controler controler=new Controler(configPath);
 	
+	final VehicleTypeCollector myVehicleTypes;
 	
 	/**
 	 * check calculation of PHEV pricing schedule for constant, linear or parabolic pricing function
 	 */
 	public HubLoadDistributionReaderTest(){
+		double gasPricePerLiter= 0.25; 
+		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
+		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
 		
+		GasType normalGas=new GasType("normal gas", 
+				gasJoulesPerLiter, 
+				gasPricePerLiter, 
+				emissionPerLiter);
+		
+		
+		/*
+		 * Battery characteristics:
+		 * - full capacity [J]
+		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
+		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
+		 * (0.1=10%)
+		 * - maximum level of state of charge, avoid going above = batteryMax
+		 * (0.9=90%)
+		 * 
+		 * Create desired Battery Types
+		 */
+		double batterySizeEV= 24*3600*1000; 
+		double batterySizePHEV= 24*3600*1000; 
+		double batteryMinEV= 0.1; 
+		double batteryMinPHEV= 0.1; 
+		double batteryMaxEV= 0.9; 
+		double batteryMaxPHEV= 0.9; 		
+		
+		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
+		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+		
+		
+		VehicleType EVTypeStandard= new VehicleType("standard EV", 
+				EVBattery, 
+				null, 
+				new ElectricVehicle(null, new IdImpl(1)),
+				80000);// Nissan leaf 80kW Engine
+		
+		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
+				PHEVBattery, 
+				normalGas, 
+				new PlugInHybridElectricVehicle(new IdImpl(1)),
+				80000);
+		
+		myVehicleTypes= new VehicleTypeCollector();
+		myVehicleTypes.addVehicleType(EVTypeStandard);
+		myVehicleTypes.addVehicleType(PHEVTypeStandard);
 	}
 
 	
@@ -69,8 +119,8 @@ public class HubLoadDistributionReaderTest extends TestCase{
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
 				hubLinkMapping,//HubLinkMapping hubLinkMapping
 				deterministicHubLoadDistribution,				
-				pricingHubDistribution,				
-				1.0) ;
+				pricingHubDistribution,
+				myVehicleTypes) ;
 	
 		
 		System.out.println("GasPrice: 1");
@@ -262,6 +312,7 @@ public class HubLoadDistributionReaderTest extends TestCase{
 	
 		
 	}
+	
 	
 	
 	

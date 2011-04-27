@@ -30,11 +30,14 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import java.util.*;
@@ -78,19 +81,66 @@ public class Main_exampleDecentralizedSmartCharger {
 		 */
 		final Controler controler;
 		final ParkingTimesPlugin parkingTimesPlugin;					
-		
 		/*
-		 * Constants
+		 * GAS TYPES
+		 * 
+		 * 
 		 * - Gas Price [currency]
 		 * - Joules per liter in gas [J]
 		 * - emissions of Co2 per liter gas [kg]
 		 
 		 */
-		final double gasPricePerLiter= 0.25; 
-		final double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		final double emissionPerLiterEngine = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		double gasPricePerLiter= 0.25; 
+		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
+		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		GasType normalGas=new GasType("normal gas", 
+				gasJoulesPerLiter, 
+				gasPricePerLiter, 
+				emissionPerLiter);
 		
 		
+		/*
+		 * Battery characteristics:
+		 * - full capacity [J]
+		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
+		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
+		 * (0.1=10%)
+		 * - maximum level of state of charge, avoid going above = batteryMax
+		 * (0.9=90%)
+		 * 
+		 * Create desired Battery Types
+		 */
+		double batterySizeEV= 24*3600*1000; 
+		double batterySizePHEV= 24*3600*1000; 
+		double batteryMinEV= 0.1; 
+		double batteryMinPHEV= 0.1; 
+		double batteryMaxEV= 0.9; 
+		double batteryMaxPHEV= 0.9; 		
+		
+		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
+		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+		
+		
+		VehicleType EVTypeStandard= new VehicleType("standard EV", 
+				EVBattery, 
+				null, 
+				new ElectricVehicle(null, new IdImpl(1)),
+				80000);// Nissan leaf 80kW Engine
+		
+		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
+				PHEVBattery, 
+				normalGas, 
+				new PlugInHybridElectricVehicle(new IdImpl(1)),
+				80000);
+		
+		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
+		myVehicleTypes.addVehicleType(EVTypeStandard);
+		myVehicleTypes.addVehicleType(PHEVTypeStandard);
+		
+		
+		
+
 		/*
 		 * LP optimization parameters
 		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
@@ -106,22 +156,6 @@ public class Main_exampleDecentralizedSmartCharger {
 		 */
 		final double minChargingLength=5*60;//5 minutes
 		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 */
-		final double batterySizeEV= 24*3600*1000; 
-		final double batterySizePHEV= 24*3600*1000; 
-		final double batteryMinEV= 0.1; 
-		final double batteryMinPHEV= 0.1; 
-		final double batteryMaxEV= 0.9; 
-		final double batteryMaxPHEV= 0.9; 		
-		
 		
 		/*
 		 * Network  - Electric Grid Information
@@ -134,9 +168,6 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * - pricing (pricingHubDistribution)
 		 * is also given as LinkedListValueHashMap, where Integer corresponds to a hub and
 		 * the Schedule includes LoadDistributionIntervals which represent the price per second over the day
-		 * 
-		 * determinisitcHubLoadDistribution and pricingHubDistribution should have the same timeIntervals
-		 * i.e. loadInterval from 0-1000 seconds corresponding to price in Interval 0-1000 seconds
 		 */
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
@@ -146,36 +177,8 @@ public class Main_exampleDecentralizedSmartCharger {
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
 		
-		/*
-		 * Output path to store results locally
-		 * please provide a folder Output with the following sub-folders
-		 * <ul>
-		 * 		<li>DecentralizedCharger
-		 * 			<ul>
-		 * 				<li>agentPlans
-		 * 				<li>LP	
-		 * 					<ul><li>EV <li> PHEV</ul>
-		 * 			</ul>
-		 * 		<li>Hub
-		 * 		<li>V2G
-		 * 			<ul>
-		 * 				<li>agentPlans
-		 * 				<li>LP
-		 * 					<ul><li>EV <li> PHEV</ul>
-		 *  		</ul>
-		 * </ul>
-		 * 
-		 * 
-		 */
-		
+				
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
-		
-		
-		/**
-		 * END INPUT PARAMETERS
-		 */		
-
-		
 		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		controler=new Controler(configPath);
@@ -209,32 +212,20 @@ public class Main_exampleDecentralizedSmartCharger {
 					mapHubs(controler,hubLinkMapping);
 					
 					
-					/*
+					/******************************************
 					 * for Decentralized Smart Charging
-					 * 
-					 * initialize parameters
+					 * *****************************************
 					 */
-				
 					
+					//initialize parameters
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 							event.getControler(), //controler
 							parkingTimesPlugin, //ParkingTimesPlugIn
 							e.getEnergyConsumptionPlugin(),
 							outputPath, 
-							gasJoulesPerLiter,
-							emissionPerLiterEngine,
-							gasPricePerLiter
+							myVehicleTypes
 							);
 					
-					
-					myDecentralizedSmartCharger.setBatteryConstants(
-							batterySizeEV, 
-							batterySizePHEV,
-							batteryMinEV,
-							batteryMinPHEV,
-							batteryMaxEV,
-							batteryMaxPHEV);
-						
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
@@ -250,7 +241,7 @@ public class Main_exampleDecentralizedSmartCharger {
 							);
 					
 					//RUN
-					myDecentralizedSmartCharger.run();					
+					myDecentralizedSmartCharger.run();
 					
 					
 					/*
@@ -297,11 +288,7 @@ public class Main_exampleDecentralizedSmartCharger {
 						// either from combustion engine or through potential battery swap for EVs
 						System.out.println("Total consumption from engine [joules]" +
 								myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromOtherSources(id));
-						
-						System.out.println("Total emissions from this agent [joules]" + 
-								myDecentralizedSmartCharger.joulesToEmissionInKg(
-										myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromOtherSources(id)));
-								
+							
 					}
 					
 					//TOTAL EMISSIONS
@@ -525,19 +512,5 @@ public class Main_exampleDecentralizedSmartCharger {
 	
 	
 	
-	
-	
-	public static LinkedListValueHashMap<Id, ContractTypeAgent>  getAgentContracts(Controler controler){
-		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-			
-			ContractTypeAgent contract= new ContractTypeAgent(true, // up
-					true,// down
-					true);//reschedule
-			list.put(id, contract);
-		}
-		
-		return list;
-	}
 
 }

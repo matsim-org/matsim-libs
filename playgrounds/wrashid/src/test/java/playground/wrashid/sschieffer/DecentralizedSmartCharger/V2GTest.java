@@ -22,20 +22,10 @@ public class V2GTest extends TestCase{
 	public  V2G someV2G= new V2G(null);
 	
 	public V2GTest(){
-		/*
-		 * - tests the schedule cutting procedures of the V2G class
-		 * - test the charging schedule cutting procedures
-		 * - tests the calculation of SOC at a certain time
-		 * 
-		 * .. TODO
-		 */
+		
 		
 	}
 	
-	public void testAllV2G() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		testV2GCutSchedule();
-		testV2GCutChargingSchedule();
-	}
 	
 	
 	/*
@@ -52,7 +42,6 @@ public class V2GTest extends TestCase{
 		
 		assertEquals(4, someSchedule.getNumberOfEntries());
 		assertEquals(40.0, someSchedule.timesInSchedule.get(3).getEndTime());
-		
 		
 		someSchedule= setDummySchedule();
 		System.out.println("schedule before");
@@ -200,7 +189,27 @@ public class V2GTest extends TestCase{
 	}
 	
 	
-
+	
+	public void testReduceAgentVehicleLoadByGivenLoadInterval(){
+		
+	}
+	
+	
+	public void testReduceHubLoadByGivenLoadInterval(){
+		
+	}
+	
+	
+	
+	
+	public void testFindAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(){
+		
+	}
+	
+	
+	public void testReassignJoulesToSchedule(){
+		
+	}
 	
 	public Schedule makeSimpleChargingSchedule(){
 		Schedule someChargingSchedule= new Schedule();

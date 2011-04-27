@@ -19,17 +19,30 @@ public class ContractTypeAgent {
 	
 	private boolean regulationDown;
 	
+	private double compensationRegulationUpPerKWH, compensationRegulationDownPerKWH;
+	
 	//private boolean reschedule;
 	
 	public ContractTypeAgent(boolean up, 
 			boolean down,
-			boolean reschedule){
+			double compensationRegulationUpPerKWH,
+			double compensationRegulationDownPerKWH){
 		regulationUp=up;
 		regulationDown=down;
-		//this.reschedule=reschedule;
+		
+		this.compensationRegulationDownPerKWH=compensationRegulationDownPerKWH;
+		this.compensationRegulationUpPerKWH=compensationRegulationUpPerKWH;
 	}
 	
 	
+	
+	public double compensationUp(){
+		return compensationRegulationUpPerKWH;
+	}
+	
+	public double compensationDown(){
+		return compensationRegulationDownPerKWH;
+	}
 	
 	public boolean isUp(){
 		return regulationUp;

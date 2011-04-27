@@ -17,6 +17,11 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * this class handles regulation up and down. For every agent, it calculates, if rescheduling or keeping its current schedule is more profitable.
  * If rescheduling has a higher utility for the agent, he reschedules the rest of his day and decreases the stochastic hub load 
  * 
+ * <ul>
+ * <li> reschedule according to V2G loads if possible
+ * <li> save revenues from V2G fro everz agent in LinkedList agentV2GRevenue
+ * </ul>
+ * 
  * @author Stella
  *
  */
@@ -24,6 +29,8 @@ public class V2G {
 	
 	DecentralizedSmartCharger mySmartCharger;
 	private LinkedListValueHashMap<Id, Double> agentElectricSourcesFailureinJoules = new LinkedListValueHashMap<Id, Double>(); 
+	private LinkedListValueHashMap<Id, Double> agentV2GRevenue = new LinkedListValueHashMap<Id, Double>(); 
+	
 	public Schedule answerScheduleAfterElectricSourceInterval;
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
@@ -32,6 +39,16 @@ public class V2G {
 		
 	}
 	
+	
+	
+	public  LinkedListValueHashMap<Id, Double> getAgentV2GRevenues(){
+		return agentV2GRevenue;
+	}
+	
+	public void addRevenueToAgentFromV2G(double revenue, Id agentId){
+		agentV2GRevenue.put(agentId, 
+				agentV2GRevenue.getValue(agentId)+revenue);
+	}
 	
 	public void regulationDownVehicleLoad(Id agentId, 
 			LoadDistributionInterval electricSourceInterval, 
@@ -85,6 +102,8 @@ public class V2G {
 			
 			
 			if(costKeeping>costReschedule){
+				
+				
 				//reschedule
 				reschedule(agentId, 
 						answerScheduleAfterElectricSourceInterval,
@@ -179,6 +198,7 @@ public class V2G {
 			
 			
 			if(costKeeping>costReschedule){
+				
 				//reschedule
 				reschedule(agentId, 
 						answerScheduleAfterElectricSourceInterval,
@@ -294,6 +314,7 @@ public class V2G {
 					
 					
 					if(costKeeping>costReschedule){
+						
 						//reschedule
 						reschedule(agentId, 
 								answerScheduleAfterElectricSourceInterval,
@@ -432,6 +453,7 @@ public class V2G {
 						
 						
 						if(costKeeping>costReschedule){
+							
 							//reschedule
 							reschedule(agentId, 
 									answerScheduleAfterElectricSourceInterval,
@@ -505,14 +527,15 @@ public class V2G {
 	
 	
 	/**
-	 * reassembles updated agentParkingandDriving Schedule from original Schedule,
+	 * <ul>
+	 * <li>updates revenue of agent in addRevenueToAgentFromV2G
+	 * <li>reassembles updated agentParkingandDriving Schedule from original Schedule,
 	 * the rescheduled part during the electric stochastic load
 	 * and the newly scheduled part after the electric stochastic load;
-	 * saves the reassembled schedule back into AgentParkingAndDrivingSchedules
+	 * <li>saves the reassembled schedule back into AgentParkingAndDrivingSchedules
+	 * <li> updates total charging costs in ChargingCostsForAgents
+	 * </ul>
 	 * 
-	 * AND
-	 * 
-	 * updates charging costs in ChargingCostsForAgents
 	 * 
 	 * @param agentId
 	 * @param answerScheduleAfterElectricSourceInterval
@@ -533,27 +556,18 @@ public class V2G {
 			double costReschedule) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
 		
 		
-//		System.out.println();
-//		answerScheduleAfterElectricSourceInterval.printSchedule();
+		addRevenueToAgentFromV2G(costKeeping-costReschedule, agentId);
 //		
 		mySmartCharger.getAllAgentChargingSchedules().put(agentId, 
 				mySmartCharger.myChargingSlotDistributor.distribute(agentId, answerScheduleAfterElectricSourceInterval));
 		
 		
-		
-//		System.out.println();
-//		answerScheduleAfterElectricSourceInterval.printSchedule();
-		//merge with old schedule
+	
 		Schedule rescheduledFirstHalf= cutScheduleAtTime(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
-//		System.out.println();
-//		rescheduledFirstHalf.printSchedule();
-		
+
 		Schedule rescheduledPart= cutScheduleAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
 		rescheduledPart=cutScheduleAtTimeSecondHalf(rescheduledPart, electricSourceInterval.getStartTime());
-		
-//		System.out.println();
-//		rescheduledPart.printSchedule();
-		
+	
 		rescheduledFirstHalf.mergeSchedules(rescheduledPart);
 		rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
 		
