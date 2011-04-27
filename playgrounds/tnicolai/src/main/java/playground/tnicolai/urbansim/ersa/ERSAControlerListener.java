@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,9 +62,11 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
+import playground.johannes.socialnetworks.gis.SpatialGrid;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
+import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
 import playground.toronto.ttimematrix.SpanningTree;
 
 import com.vividsolutions.jts.geom.Point;
@@ -80,15 +81,25 @@ public class ERSAControlerListener implements ShutdownListener{
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
 	private Map<Id, JobsObject> jobObjectMap;
-	private ZoneLayer<Integer> startZones;
+	private ZoneLayer<ZoneObject> startZones;
+	
+	private SpatialGrid<Double> travelTimeAccessibilityGrid;
+	private SpatialGrid<Double> travelCostAccessibilityGrid;
+	private SpatialGrid<Double> travelDistanceAccessibilityGrid;
 	
 	/**
 	 * constructor
 	 * @param jobObjectMap
 	 */
-	public ERSAControlerListener(ZoneLayer<Integer> startZones, Map<Id, JobsObject> jobObjectMap){
+	public ERSAControlerListener(ZoneLayer<ZoneObject> startZones, Map<Id, JobsObject> jobObjectMap, 
+			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
+			SpatialGrid<Double> travelDistanceAccessibilityGrid){
+		
 		this.jobObjectMap 	= jobObjectMap;
-		this.startZones		= startZones;		
+		this.startZones		= startZones;	
+		this.travelTimeAccessibilityGrid = travelTimeAccessibilityGrid;
+		this.travelCostAccessibilityGrid = travelCostAccessibilityGrid;
+		this.travelDistanceAccessibilityGrid = travelDistanceAccessibilityGrid;
 	}
 	
 	/**
@@ -109,10 +120,10 @@ public class ERSAControlerListener implements ShutdownListener{
 		st.setDepartureTime(depatureTime);
 		
 		try{
-			BufferedWriter accessibilityIndicatorWriter = initAccessibilityWriter( sc );
+			BufferedWriter accessibilityIndicatorWriter = initCSVWriter( sc );
 			
 			log.info("Computing and writing accessibility measures ..." );
-			Iterator<Zone<Integer>> startZoneIterator = startZones.getZones().iterator();
+			Iterator<Zone<ZoneObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processed ...");
 	
 			// init progress bar
@@ -124,12 +135,12 @@ public class ERSAControlerListener implements ShutdownListener{
 			while( startZoneIterator.hasNext() ){
 
 				// progress bar
-				if ( (int) (100.*cnt/startZones.getZones().size()) > percentDone ) {
-					percentDone++ ; System.out.print('|') ;
+				while ( (int) (100.*cnt/startZones.getZones().size()) > percentDone ) {
+					percentDone++; System.out.print('|');
 				}
 				cnt++;
 				
-				Zone<Integer> startZone = startZoneIterator.next();
+				Zone<ZoneObject> startZone = startZoneIterator.next();
 				// get coordinate from origin (start point)
 				Coord coordFromZone = getStartingPointCoordinate(startZone, st, network);
 				
@@ -163,19 +174,20 @@ public class ERSAControlerListener implements ShutdownListener{
 					// sum travel distances
 					accessibilityTravelDistance += Math.exp( beta * travelDistance ); // tnicolai: find another beta for travel distance
 				}
-
-				// dumping results into output file
-				accessibilityIndicatorWriter.write( startZone.getAttribute().intValue() + "," +
-													coordFromZone.getX() + "," +
-													coordFromZone.getY() + "," +
-													Math.log( accessibilityTravelTimes ) + "," +
-													Math.log( accessibilityTravelCosts ) + "," +
-													Math.log( accessibilityTravelDistance) + ",");
-				accessibilityIndicatorWriter.newLine();
+				
+				startZone.getAttribute().setTravelTimeAccessibility( Math.log( accessibilityTravelTimes ) );
+				startZone.getAttribute().setTravelCostAccessibility( Math.log( accessibilityTravelCosts ) );
+				startZone.getAttribute().setTravelDistanceAccessibility( Math.log( accessibilityTravelDistance) );
+				
+				// sets the accessibility values for each spatial grid (travel times, travel costs and travel distance)
+				setAccessiblityValue2SpatialGrid(startZone);
+				
+				// dumping results into csv file
+				dumpCSVData(accessibilityIndicatorWriter, startZone, coordFromZone);
 			}
 			
 			// finish and close writing
-			closeWriter(accessibilityIndicatorWriter);
+			closeCSVFile(accessibilityIndicatorWriter);
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -185,12 +197,43 @@ public class ERSAControlerListener implements ShutdownListener{
 	}
 
 	/**
+	 * Sets the accessibility values for each spatial grid (travel times, travel costs and travel distance)
+	 * 
+	 * @param startZone
+	 */
+	private void setAccessiblityValue2SpatialGrid(Zone<ZoneObject> startZone) {
+		
+		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+	}
+
+	/**
+	 * @param accessibilityIndicatorWriter
+	 * @param startZone
+	 * @param coordFromZone
+	 * @throws IOException
+	 */
+	private void dumpCSVData(BufferedWriter accessibilityIndicatorWriter,
+			Zone<ZoneObject> startZone, Coord coordFromZone) throws IOException {
+		
+		// dumping results into output file
+		accessibilityIndicatorWriter.write( startZone.getAttribute().getZoneID() + "," +
+											coordFromZone.getX() + "," +
+											coordFromZone.getY() + "," +
+											startZone.getAttribute().getTravelTimeAccessibility() + "," +
+											startZone.getAttribute().getTravelCostAccessibility() + "," +
+											startZone.getAttribute().getTravelDistanceAccessibility() + ",");
+		accessibilityIndicatorWriter.newLine();
+	}
+
+	/**
 	 * finish and close accessibility writer
 	 * 
 	 * @param accessibilityIndicatorWriter
 	 * @throws IOException
 	 */
-	private void closeWriter(BufferedWriter accessibilityIndicatorWriter) throws IOException {
+	private void closeCSVFile(BufferedWriter accessibilityIndicatorWriter) throws IOException {
 		//		accessibilityIndicatorWriter.newLine();
 		//		accessibilityIndicatorWriter.write("used parameters");
 		//		accessibilityIndicatorWriter.newLine();
@@ -205,7 +248,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private BufferedWriter initAccessibilityWriter(Scenario sc)
+	private BufferedWriter initCSVWriter(Scenario sc)
 			throws FileNotFoundException, IOException {
 		String filename = Constants.OPUS_HOME + sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "accessibility_indicators_ersa.csv";
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
@@ -227,7 +270,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param network <code>NetworkImpl</code>
 	 * @return coordinate of a given zone
 	 */
-	private Coord getStartingPointCoordinate(Zone<Integer> startZone, SpanningTree st, NetworkImpl network) {
+	private Coord getStartingPointCoordinate(Zone<ZoneObject> startZone, SpanningTree st, NetworkImpl network) {
 			
 		Point point = startZone.getGeometry().getCentroid();
 		Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
@@ -326,5 +369,23 @@ public class ERSAControlerListener implements ShutdownListener{
 		return distance;
 	}
 	
+	
+	// getter methods
+	
+	public ZoneLayer<ZoneObject> getStartZones(){
+		return startZones;
+	}
+	public Map<Id, JobsObject> getJobObjectMap(){
+		return jobObjectMap;
+	}
+	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
+		return travelTimeAccessibilityGrid;
+	}
+	public SpatialGrid<Double> getTravelCostAccessibilityGrid(){
+		return travelCostAccessibilityGrid;
+	}
+	public SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
+		return travelDistanceAccessibilityGrid;
+	}
 }
 

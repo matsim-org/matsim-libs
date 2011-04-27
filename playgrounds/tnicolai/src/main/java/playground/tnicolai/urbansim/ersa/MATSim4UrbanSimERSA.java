@@ -23,12 +23,15 @@
  */
 package playground.tnicolai.urbansim.ersa;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.sna.gis.Zone;
 import org.matsim.contrib.sna.gis.ZoneLayer;
@@ -43,10 +46,16 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
+import playground.johannes.socialnetworks.gis.SpatialGrid;
+import playground.johannes.socialnetworks.gis.SpatialGridTableWriter;
+import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 import playground.tnicolai.urbansim.MATSim4Urbansim;
+import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
@@ -58,8 +67,58 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	// Logger
 	private static final Logger logger = Logger.getLogger(MATSim4UrbanSimERSA.class);
 	
+	private int gridSize = -1;
+	private String shapeFile = null;
+	
 	public MATSim4UrbanSimERSA(String args[]){
 		super(args);
+		// set the resolution, this is used for setting 
+		// the starting points for accessibility measures
+		checkAndSetGridSize(args);
+		checkAndSetShapeFile(args);
+	}
+
+	/**
+	 * Set the grid size for the starting points
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetGridSize(String[] args) {
+		try{
+			if(args.length >= 2){
+				gridSize = Integer.parseInt( args[1].trim() );
+				logger.info("The grid size was set to " + gridSize);
+			}
+			else{
+				gridSize = 10000;
+				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSize + " (default setting)!");
+			}
+		} catch (NumberFormatException nfe){
+			nfe.printStackTrace();
+			logger.error( "Please set a correct grid size. " + args[1] + " is not a valid value (integer).");
+		}
+	}
+	
+	/**
+	 * Set the shape file path in order to determine 
+	 * the starting points for accessibility computation
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetShapeFile(String[] args) {
+
+		if( args.length >= 3 ){
+			shapeFile = args[2].trim();
+			logger.info("The shape file path was set to " + shapeFile);
+		}
+		else{
+			shapeFile = "/Users/thomas/Development/opus_home/data/psrc_parcel/shapefiles/boundary.shp";
+			logger.warn("No path for the shape file was given. The path is set to " + shapeFile + " (default setting)!");
+		}
+		
+		if(!pathExsits(shapeFile))
+			throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
+		
 	}
 	
 	/**
@@ -75,16 +134,74 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
+		ERSAControlerListener myListener = null;
 		
 		try {
-			initAndAddControlerListener(parcels, readFromUrbansim, controler);
+			myListener = initAndAddControlerListener(parcels, readFromUrbansim, controler);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		runControler(controler);
 		
-		System.out.println("Finished!!!");
+		logger.info("Finished computations ...");
+		
+		writeKMZFiles(myListener);
+		
+		writeSpatialGridTables(myListener);
+	}
+
+	/**
+	 * @param myListener
+	 */
+	private void writeSpatialGridTables(ERSAControlerListener myListener) {
+		logger.info("Writing spatial grid tables ...");
+		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
+		try {
+			sgTableWriter.write(myListener.getTravelTimeAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(myListener.getTravelCostAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(myListener.getTravelDistanceAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		logger.info("Done with writing spatial grid tables ...");
+	}
+
+	/**
+	 * @param myListener
+	 */
+	private void writeKMZFiles(ERSAControlerListener myListener) {
+		logger.info("Writing Google Erath files ...");
+		
+		ZoneLayer<ZoneObject> startZones = myListener.getStartZones();
+		
+		FeatureKMLWriter writer = new FeatureKMLWriter();
+		Set<Geometry> geometries = new HashSet<Geometry>();
+		
+		TObjectDoubleHashMap<Geometry> travelTimeValues = new TObjectDoubleHashMap<Geometry>();
+		TObjectDoubleHashMap<Geometry> travelCostValues = new TObjectDoubleHashMap<Geometry>();
+		TObjectDoubleHashMap<Geometry> travelDistanceValues = new TObjectDoubleHashMap<Geometry>();
+		
+		for(Zone<ZoneObject> zone : startZones.getZones()) {
+			geometries.add(zone.getGeometry());
+			travelTimeValues.put(zone.getGeometry(), zone.getAttribute().getTravelTimeAccessibility());
+			travelCostValues.put(zone.getGeometry(), zone.getAttribute().getTravelCostAccessibility());
+			travelDistanceValues.put(zone.getGeometry(), zone.getAttribute().getTravelDistanceAccessibility());
+		}
+		
+		// writing travel time accessibility kmz file
+		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		
+		// writing travel cost accessibility kmz file
+		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		
+		// writing travel distance accessibility kmz file
+		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+	
+		logger.info("Done with writing Google Erath files ...");
 	}
 
 	/**
@@ -109,17 +226,41 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @param controler
 	 * @throws IOException 
 	 */
-	private void initAndAddControlerListener(ActivityFacilitiesImpl parcels,
+	private ERSAControlerListener initAndAddControlerListener(ActivityFacilitiesImpl parcels,
 			ReadFromUrbansimParcelModel readFromUrbansim, Controler controler) throws IOException {
 		
-		// set starting points to measure accessibility
-		ZoneLayer<Integer> startZones = getStratZones();
+		Geometry boundary = getBoundary(shapeFile);
+		
+		// set starting points to measure accessibility (KMZ and CSV output)
+		ZoneLayer<ZoneObject> startZones = getStratZones(boundary);
+		
+		SpatialGrid<Double> travelTimeAccessibilityGrid = createSpatialGrid(boundary);
+		SpatialGrid<Double> travelCostAccessibilityGrid = createSpatialGrid(boundary);
+		SpatialGrid<Double> travelDistanceAccessibilityGrid = createSpatialGrid(boundary);
 		
 		// gather all workplaces
 		Map<Id, JobsObject> jobObjectMap = getJobMap(parcels, readFromUrbansim);
 		
+		ERSAControlerListener myListener = new ERSAControlerListener(startZones, jobObjectMap, 
+				travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid);
+		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new ERSAControlerListener(startZones,jobObjectMap) );
+		controler.addControlerListener( myListener );
+		
+		return myListener;
+	}
+
+	/**
+	 * @param boundary
+	 */
+	private SpatialGrid<Double> createSpatialGrid(Geometry boundary) {
+		Envelope env = boundary.getEnvelopeInternal();
+		double xMin = env.getMinX();
+		double xMax = env.getMaxX();
+		double yMin = env.getMinY();
+		double yMax = env.getMaxY();
+		
+		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSize);
 	}
 
 	/**
@@ -132,6 +273,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		long startTime;
 		long endTime;
 		long time;
+		
 		startTime = System.currentTimeMillis();
 		Map<Id, JobsObject> jobObjectMap = readFromUrbansim.readDisaggregatedJobs(parcels);
 		endTime = System.currentTimeMillis();
@@ -144,41 +286,43 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @return
 	 * @throws IOException
 	 */
-	private ZoneLayer<Integer> getStratZones() throws IOException {
+	private ZoneLayer<ZoneObject> getStratZones(Geometry boundary) throws IOException {
 		long startTime;
 		long endTime;
 		long time;
-		int resolution = 50000;
-		String psrcSHPFile = "/Users/thomas/Development/opus_home/data/psrc_parcel/shapefiles/boundary.shp";
+		
 		startTime = System.currentTimeMillis();
-		ZoneLayer<Integer> startZones = setMeasurePoints(resolution, psrcSHPFile);
+		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSize, boundary);
 		endTime = System.currentTimeMillis();
 		time = (endTime - startTime) / 1000;
-		logger.info("Creating start points took " + time + "seconds with a resolution of " + resolution + ".");
+		
+		logger.info("Creating start points took " + time + "seconds with a grid size of " + gridSize + ".");
 		return startZones;
 	}
 
 	/**
-	 * Sets measurement points (for accessibility measurements) in the study area
+	 * @param psrcSHPFile
+	 * @return
 	 * @throws IOException
 	 */
-	private ZoneLayer<Integer> setMeasurePoints(int resolution, String psrcSHPFile) throws IOException{
-		
+	private Geometry getBoundary(String psrcSHPFile) throws IOException {
 		// get boundaries of study area
-		Geometry boundary = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
-//		boundary.setSRID(21781); // tnicolai: this is the srid for switzerland, set right srid instead ..
+		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
+		logger.info("Extracting boundary of the shape file");
+		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
+		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
 		
-		return createGridLayerByResolution(resolution, boundary);
+		return boundary;
 	}
 	
 	/**
 	 * 
 	 * @param <T>
-	 * @param resolution
+	 * @param gridSize
 	 * @param boundary
 	 * @return
 	 */
-	private static ZoneLayer<Integer> createGridLayerByResolution(double resolution, Geometry boundary) {
+	private static ZoneLayer<ZoneObject> createGridLayerByGridSize(double gridSize, Geometry boundary) {
 		
 		logger.info("Setting statring points for accessibility measure ...");
 
@@ -186,11 +330,9 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		int setPoints = 0;
 		
 		GeometryFactory factory = new GeometryFactory();
-		Set<Zone<Integer>> zones = new HashSet<Zone<Integer>>();
+		Set<Zone<ZoneObject>> zones = new HashSet<Zone<ZoneObject>>();
 		Envelope env = boundary.getEnvelopeInternal();
-		
-//		System.out.println("X_MIN: " + env.getMinX() + " , X_MAX: " + env.getMaxX() + " , Y_MIN: " + env.getMinY() + " , Y_MAX: " + env.getMaxY());
-		
+				
 		// Progress bar
 		System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 		long cnt = 0; 
@@ -198,32 +340,31 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		long total = (long) (env.getMaxX() - env.getMinX());
 		
 		// goes step by step from the min x and y coordinate to max x and y coordinate
-		for(double x = env.getMinX(); x < env.getMaxX(); x += resolution) {
+		for(double x = env.getMinX(); x < env.getMaxX(); x += gridSize) {
 			
 			// progress bar
-			int progres = (int) (100.*cnt/(total/resolution));
-			while ( progres >= percentDone ) {
-				percentDone++ ; 
-				System.out.print('|') ;
+			while ( (int) (100.*cnt/(total/gridSize)) >= percentDone ){
+				percentDone++;  System.out.print('|');
 			}
 			cnt++;
 			
-			for(double y = env.getMinY(); y < env.getMaxY(); y += resolution) {
+			for(double y = env.getMinY(); y < env.getMaxY(); y += gridSize) {
 				Point point = factory.createPoint(new Coordinate(x, y));
 				if(boundary.contains(point)) {
 					
 					Coordinate[] coords = new Coordinate[5];
 					coords[0] = point.getCoordinate();
-					coords[1] = new Coordinate(x, y + resolution);
-					coords[2] = new Coordinate(x + resolution, y + resolution);
-					coords[3] = new Coordinate(x + resolution, y);
+					coords[1] = new Coordinate(x, y + gridSize);
+					coords[2] = new Coordinate(x + gridSize, y + gridSize);
+					coords[3] = new Coordinate(x + gridSize, y);
 					coords[4] = point.getCoordinate();
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-//					polygon.setSRID(21781); // tnicolai: this is the srid for switzerland, set right srid instead ..
-					Zone<Integer> zone = new Zone<Integer>(polygon);
-					zone.setAttribute( new Integer(setPoints) );
+					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
+					
+					Zone<ZoneObject> zone = new Zone<ZoneObject>(polygon);
+					zone.setAttribute( new ZoneObject( setPoints ) );
 					zones.add(zone);
 					
 					setPoints++;
@@ -236,14 +377,14 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		logger.info(setPoints + " starting points were set and " + skippedPoints + " points have been skipped (because they lay outside the shape file boundary).");
 		logger.info("Finished setting starting points!");
 		
-		ZoneLayer<Integer> layer = new ZoneLayer<Integer>(zones);
+		ZoneLayer<ZoneObject> layer = new ZoneLayer<ZoneObject>(zones);
 		return layer;
 	}
 	
 	/**
 	 * 
 	 * @param <T>
-	 * @param resolution
+	 * @param gridSize
 	 * @param boundary
 	 * @return
 	 */

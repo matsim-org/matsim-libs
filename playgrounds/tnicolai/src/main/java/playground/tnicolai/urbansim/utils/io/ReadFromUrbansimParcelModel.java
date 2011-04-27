@@ -171,7 +171,7 @@ public class ReadFromUrbansimParcelModel {
 			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
 			zones.createFacility(zone_ID, coord);
 		}
-		log.info( "Finished constructing urbansim zones" ) ;
+		log.info( "Done with constructing urbansim zones" ) ;
 	}
 	
 	/**
@@ -402,7 +402,7 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info( "Finished reading jobs table from " + filename );
+		log.info( "Done with reading jobs." );
 		return numberOfWorkplacesPerZone;
 	}
 	
@@ -443,10 +443,12 @@ public class ReadFromUrbansimParcelModel {
 				final int indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
 				final int indexZoneID =idxFromKey.get( Constants.ZONE_ID_WORK );
 				
+				log.warn("Remove job size limiter !!!");
+				
 				while ( (line=reader.readLine()) != null ) {
 					
 					// tnicolai: for debugging, remove later !!!
-					if(MatsimRandom.getRandom().nextDouble() > 0.01)
+					if(MatsimRandom.getRandom().nextDouble() > 0.001)
 						continue;
 					
 					String[] parts = line.split( Constants.TAB );
@@ -477,7 +479,7 @@ public class ReadFromUrbansimParcelModel {
 			}
 		}
 		
-		log.info( "Finished reading jobs table ..." );
+		log.info( "Done with reading jobs." );
 		log.info(jobCounter + " jobs were were found and " + skipCounter + " jobs were skipped (because they don't provide any parcel id)!");
 		return jobObjectMap;		
 	}

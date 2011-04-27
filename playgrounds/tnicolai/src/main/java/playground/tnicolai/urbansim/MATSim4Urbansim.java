@@ -226,7 +226,7 @@ public class MATSim4Urbansim {
 	 * @param arg path
 	 * @return true if the given file exists
 	 */
-	private boolean pathExsits(String matsimConfigFile){
+	protected boolean pathExsits(String matsimConfigFile){
 
 		if( (new File(matsimConfigFile)).exists() )
 			return true;

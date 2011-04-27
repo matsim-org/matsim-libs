@@ -86,6 +86,8 @@ public class Constants {
 	public static final String FILE_TYPE_ESRI = ".esri";
 	public static final String FILE_TYPE_GZ = ".gz";
 	public static final String FILE_TYPE_XML = ".xml";
+	public static final String FILE_TYPE_KMZ = ".kmz";
+	public static final String FILE_TYPE_TXT = ".txt";
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
@@ -168,6 +170,9 @@ public class Constants {
 	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
 	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
 	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	
+	/** Spatial IDs */
+	public static final int SRID_WASHINGTON_NORTH = 32048;
 	
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";
