@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 
 import org.matsim.core.config.Module;
 
+import playground.gregor.sim2d_v2.simulation.Agent2D;
+
 /**
  * @author laemmel
  * 
@@ -54,6 +56,8 @@ public class Sim2DConfigGroup extends Module {
 
 	public static final String PHANTOM_POPULATION_EVENTS_FILE = "phantomPopulationEventsFile";
 
+	public static final String CALIBRATION_MODE = "calibrationMode";
+
 	private int eventsInterval = 1;
 
 	private double timeStepSize = 1./25;
@@ -82,7 +86,13 @@ public class Sim2DConfigGroup extends Module {
 
 	private boolean enablePathForceModule = true;
 
+	private boolean calibrationMode = false;
 
+
+	//Zanlungo et al constant
+	private double Bi=.71;
+	private double Ai=1.13*Agent2D.AGENT_WEIGHT;
+	private double lambda=.75;
 
 	public Sim2DConfigGroup(Module sim2d) {
 		super(GROUP_NAME);
@@ -97,6 +107,32 @@ public class Sim2DConfigGroup extends Module {
 	 */
 	public Sim2DConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+
+	public void setBi(double Bi) {
+		this.Bi = Bi;
+	}
+
+	public double getBi() {
+		return this.Bi;
+	}
+
+
+	public void setAi(double Ai) {
+		this.Ai = Ai;
+	}
+
+	public double getAi() {
+		return this.Ai;
+	}
+
+	public void setLambda(double lambda) {
+		this.lambda = lambda;
+	}
+
+	public double getLambda() {
+		return this.lambda;
 	}
 
 	@Override
@@ -127,6 +163,8 @@ public class Sim2DConfigGroup extends Module {
 			setEnableEnvironmentForceModule(value);
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)){
 			setEnablePathForceModule(value);
+		} else if (CALIBRATION_MODE.equals(key)) {
+			setCalibrationMode(value);
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -197,6 +235,15 @@ public class Sim2DConfigGroup extends Module {
 
 	}
 
+
+	public void setCalibrationMode(String value) {
+		this.calibrationMode = Boolean.parseBoolean(value);
+	}
+
+	public boolean isCalibrationMode() {
+		return this.calibrationMode;
+	}
+
 	@Override
 	public String getValue(final String key) {
 		if (STATIC_ENV_FIELD_FILE.equals(key)) {
@@ -225,6 +272,8 @@ public class Sim2DConfigGroup extends Module {
 			return Boolean.toString(isEnableEnvironmentForceModule());
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnablePathForceModule());
+		} else if (CALIBRATION_MODE.equals(key)){
+			return Boolean.toString(isCalibrationMode());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -251,6 +300,7 @@ public class Sim2DConfigGroup extends Module {
 		map.put(ENABLE_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_ENVIRONMENT_FORCE_MODULE));
 		map.put(ENABLE_PATH_FORCE_MODULE, getValue(ENABLE_PATH_FORCE_MODULE));
 		map.put(PHANTOM_POPULATION_EVENTS_FILE, getValue(PHANTOM_POPULATION_EVENTS_FILE));
+		map.put(CALIBRATION_MODE, getValue(CALIBRATION_MODE));
 		return map;
 	}
 

@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -16,6 +17,8 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
+	private final double Bi;
+	private final double Ai;
 
 	/**
 	 * @param floor
@@ -24,6 +27,9 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	public CollisionPredictionEnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
 		this.sc = scenario;
 		this.sff = this.sc.getStaticForceField();
+		Sim2DConfigGroup conf = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
+		this.Bi = conf.getBi();
+		this.Ai = conf.getAi();
 	}
 
 	@Override
@@ -42,7 +48,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 		for (Coordinate c : ed.getObjects()) {
 			double dist = c.distance(agent.getPosition());
-			double term1 = CollisionPredictionAgentInteractionModule.Ai * stopDist * Math.exp(-dist/CollisionPredictionAgentInteractionModule.Bi);
+			double term1 = this.Ai * stopDist * Math.exp(-dist/this.Bi);
 			Vector vecDPrime_ij_t_i = getDistVector(agent,c,t_i);
 			double dPrime_ij_t_i = Math.sqrt(vecDPrime_ij_t_i.x*vecDPrime_ij_t_i.x+vecDPrime_ij_t_i.y*vecDPrime_ij_t_i.y);
 

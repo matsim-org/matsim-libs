@@ -48,7 +48,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	private static final double Ai=2000;
 	private static final double k = 1.2 * 100000;
 	private static final double kappa = 2.4 * 100000;
-	
+
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
 
@@ -88,7 +88,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 		Envelope e = new Envelope(minX, maxX, minY, maxY);
 		@SuppressWarnings("unchecked")
 		List<Agent2D> l = this.coordsQuad.query(e);
-		
+
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
@@ -103,13 +103,13 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 
 			double bounderyDist = Agent2D.AGENT_DIAMETER - dist;
 			double g = bounderyDist > 0 ? bounderyDist : 0;
-			
+
 			double tanDvx = (other.getVx() - agent.getVx()) * -dx;
 			double tanDvy = (other.getVy() - agent.getVy()) * dy;
-			
+
 			double tanX = tanDvx * -dx;
 			double tanY = tanDvy * dy;
-			
+
 			double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
 			double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
 

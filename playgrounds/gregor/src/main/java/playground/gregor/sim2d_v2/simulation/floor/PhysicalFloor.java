@@ -64,9 +64,9 @@ public class PhysicalFloor implements Floor {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	private final List<ForceModule> forceModules = new ArrayList<ForceModule>();
-	private final List<DynamicForceModule> dynamicForceModules = new ArrayList<DynamicForceModule>();
+	protected final List<DynamicForceModule> dynamicForceModules = new ArrayList<DynamicForceModule>();
 
-	private final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
+	protected final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
 	private final Scenario2DImpl scenario;
 	private final List<Link> links;
 	private final Sim2D sim2D;
@@ -74,7 +74,6 @@ public class PhysicalFloor implements Floor {
 
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	private final boolean ms = false;
 	private final double sim2DTimeStepSize;
 	private final boolean emitXYZAzimuthEvents;
 	private Envelope envelope;
@@ -187,54 +186,53 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * 
 	 */
-	private void moveAgents(double time) {
+	protected void moveAgents(double time) {
 		Iterator<Agent2D> it = this.agents.iterator();
 
 		for (; it.hasNext();) {
 			Agent2D agent = it.next();
-			Force f = agent.getForce();
-			Coordinate oldPos = agent.getPosition();
-
-			f.update(agent.getWeight(),this.sim2DTimeStepSize);
-			//			f.update(this.sim2DTimeStepSize,agent.getWeight());
-			validateVelocity(f,agent.getDesiredVelocity());
-
-			double vx = f.getVx();
-			double vy = f.getVy();
-
-			if (Double.isNaN(vx)){
-				int i = 0 ;
-				i++;
-			}
-
-
-			Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* this.sim2DTimeStepSize, oldPos.y + f.getVy()* this.sim2DTimeStepSize, 0);
-
-			agent.setCurrentVelocity(vx,vy);
-
-			//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
-
-			boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
-			if (endOfLeg) {
+			if (moveAgentAndCheckForEndOfLeg(agent, time)){
 				it.remove();
-				continue;
 			}
-
-			double azimuth = getAzimuth(oldPos, newPos);
-			agent.moveToPostion(newPos);
-
-			if (this.emitXYZAzimuthEvents ) {
-				XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), agent.getPosition(), azimuth, time);
-				getSim2D().getEventsManager().processEvent(e);
-			}
-			//			if (Sim2DConfig.DEBUG) {
-			//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx , agent.getPosition().y + vy , 0), 0.0f, 1.f, 1.f, 9);
-			//				getSim2D().getEventsManager().processEvent(arrow);
-			//			}
 		}
 
 	}
 
+	protected boolean moveAgentAndCheckForEndOfLeg(Agent2D agent, double time) {
+		Force f = agent.getForce();
+		Coordinate oldPos = agent.getPosition();
+
+		f.update(agent.getWeight(),this.sim2DTimeStepSize);
+		//			f.update(this.sim2DTimeStepSize,agent.getWeight());
+		validateVelocity(f,agent.getDesiredVelocity());
+
+		double vx = f.getVx();
+		double vy = f.getVy();
+
+
+		Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* this.sim2DTimeStepSize, oldPos.y + f.getVy()* this.sim2DTimeStepSize, 0);
+
+		agent.setCurrentVelocity(vx,vy);
+
+		//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
+
+		boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
+		if (endOfLeg) {
+			return true;
+		}
+
+		double azimuth = getAzimuth(oldPos, newPos);
+		agent.moveToPostion(newPos);
+
+		if (this.emitXYZAzimuthEvents ) {
+			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), (Coordinate) agent.getPosition().clone(), azimuth, time);
+			getSim2D().getEventsManager().processEvent(e);
+		}
+		//			if (Sim2DConfig.DEBUG) {
+		//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx , agent.getPosition().y + vy , 0), 0.0f, 1.f, 1.f, 9);
+		//				getSim2D().getEventsManager().processEvent(arrow);
+		return false;
+	}
 	private void validateVelocity(Force f, double v0) {
 		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
 		//		System.out.println("v:" + v);
@@ -251,7 +249,7 @@ public class PhysicalFloor implements Floor {
 	 * @param oldPos
 	 * 
 	 */
-	private boolean checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
+	protected boolean checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
 		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
 		if (trajectory.crosses(finishLine)) {
@@ -303,87 +301,40 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * 
 	 */
-	private void updateForces(double time) {
+	protected void updateForces(double time) {
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.update(time);
 		}
 
-		if (this.ms) {
-			multitThreadedForceUpdate();
-		} else {
-			for (Agent2D agent : this.agents) {
+		for (Agent2D agent : this.agents) {
+			updateForces(agent,time);
 
-				for (ForceModule m : this.dynamicForceModules) {
-					m.run(agent);
-
-					//					if (Sim2DConfig.DEBUG) {
-					//						Force f = agent.getForce();
-					//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
-					//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
-					//							System.out.println("dv" + dv);
-					//						}
-					//					}
-				}
-				for (ForceModule m : this.forceModules) {
-					m.run(agent);
-					//					if (Sim2DConfig.DEBUG) {
-					//						Force f = agent.getForce();
-					//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
-					//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
-					//							System.out.println("dv" + dv);
-					//						}
-					//					}
-				}
-			}
 		}
-
-		//				for (Agent2D agent : this.agents) {
-		//					validateForce(agent);
-		//				}
 	}
 
-	/**
-	 * 
-	 */
-	private void multitThreadedForceUpdate() {
+	protected void updateForces(Agent2D agent, double time) {
+		for (ForceModule m : this.dynamicForceModules) {
+			m.run(agent);
 
-		List<Agent2D> l1 = new ArrayList<Agent2D>();
-		List<Agent2D> l2 = new ArrayList<Agent2D>();
-		Iterator<Agent2D> it = this.agents.iterator();
-		for (int i = 0; i < this.agents.size(); i++) {
-			if (i < this.agents.size() / 2) {
-				l1.add(it.next());
-			} else {
-				l2.add(it.next());
-			}
+			//					if (Sim2DConfig.DEBUG) {
+			//						Force f = agent.getForce();
+			//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
+			//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
+			//							System.out.println("dv" + dv);
+			//						}
+			//					}
 		}
-
-		MultiThreadedForceUpdater u1 = new MultiThreadedForceUpdater(l1, this.forceModules, this.dynamicForceModules);
-		MultiThreadedForceUpdater u2 = new MultiThreadedForceUpdater(l2, this.forceModules, this.dynamicForceModules);
-
-		Thread t1 = new Thread(u1);
-		Thread t2 = new Thread(u2);
-
-		t1.start();
-		t2.start();
-
-		try {
-			t1.join();
-			t2.join();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+		for (ForceModule m : this.forceModules) {
+			m.run(agent);
+			//					if (Sim2DConfig.DEBUG) {
+			//						Force f = agent.getForce();
+			//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
+			//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
+			//							System.out.println("dv" + dv);
+			//						}
+			//					}
 		}
-
 	}
-
-	//	private void validateForce(Agent2D agent) {
-	//		Force force = agent.getForce();
-	//		double norm = Math.sqrt(Math.pow(force.getXComponent(), 2) + Math.pow(force.getYComponent(), 2));
-	//		if (norm > agent.getDesiredVelocity() ) {
-	//			force.setXComponent(force.getXComponent() * ((agent.getDesiredVelocity() ) / norm));
-	//			force.setYComponent(force.getYComponent() * ((agent.getDesiredVelocity() ) / norm));
-	//		}
-	//	}
 
 	/**
 	 * 
@@ -440,34 +391,4 @@ public class PhysicalFloor implements Floor {
 		return this.sim2D;
 	}
 
-	private static class MultiThreadedForceUpdater implements Runnable {
-
-		private final List<Agent2D> agents;
-		private final List<ForceModule> fm;
-		private final List<DynamicForceModule> dfm;
-
-		public MultiThreadedForceUpdater(List<Agent2D> agents, List<ForceModule> fm, List<DynamicForceModule> dfm) {
-			this.agents = agents;
-			this.fm = fm;
-			this.dfm = dfm;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run() {
-			for (Agent2D agent : this.agents) {
-				for (ForceModule m : this.dfm) {
-					m.run(agent);
-				}
-				for (ForceModule m : this.fm) {
-					m.run(agent);
-				}
-			}
-		}
-
-	}
 }

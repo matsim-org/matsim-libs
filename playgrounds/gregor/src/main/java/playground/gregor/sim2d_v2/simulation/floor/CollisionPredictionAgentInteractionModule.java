@@ -1,8 +1,6 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -11,6 +9,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
 
@@ -28,12 +27,11 @@ DynamicForceModule {
 	private final GeometryFactory geofac = new GeometryFactory();
 
 	//Zanlungo et al constant
-	public static final double Bi=.71;
-	public static final double Ai=1.13*Agent2D.AGENT_WEIGHT;
-	public static final double lambda=.75;
+	public double Bi=.71;
+	public double Ai=1.13*Agent2D.AGENT_WEIGHT;
+	public double lambda=.75;
 
 
-	private double maxForce = 0;
 
 
 	protected  Quadtree agentsQuad;
@@ -43,6 +41,10 @@ DynamicForceModule {
 
 	public CollisionPredictionAgentInteractionModule(PhysicalFloor floor, Scenario2DImpl scenario) {
 		this.floor = floor;
+		Sim2DConfigGroup conf = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
+		this.Bi = conf.getBi();
+		this.Ai = conf.getAi();
+		this.lambda = conf.getLambda();
 
 	}
 
@@ -69,9 +71,6 @@ DynamicForceModule {
 		double decel = v_i / t_i;
 
 
-		List<Double> dists = new ArrayList<Double>();
-		List<Double> proj = new ArrayList<Double>();
-		List<Double> fs = new ArrayList<Double>();
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -83,43 +82,21 @@ DynamicForceModule {
 			if (dist > neighborhoodSensingRange) {
 				continue;
 			}
-			dists.add(dist);
-			double term1 = Ai * decel * Math.exp(-dist/Bi);
+			double term1 = this.Ai * decel * Math.exp(-dist/this.Bi);
 
 			Vector v = getDistVector(agent,other,t_i);
 			double projectedDist = Math.sqrt(v.x*v.x+v.y*v.y);
 
-			//DEBUG
-			proj.add(projectedDist);
 
 			double phi = getPhi(agent,other);
-			double anostropyWeight = (lambda + (1-lambda)*(1+Math.cos(phi))/2);
+			double anostropyWeight = (this.lambda + (1-this.lambda)*(1+Math.cos(phi))/2);
 
 
 			fx += anostropyWeight * term1 * v.x/projectedDist;
 			fy += anostropyWeight * term1 * v.y/projectedDist;
 
-			//DEBUG
-			if (Double.isNaN(fx)){
-				int i =0;
-				i++;
-			}
 
 
-			//DEBUG
-			fs.add(Math.sqrt(fx*fx + fy*fy));
-
-
-		}
-
-		double force = Math.sqrt(fx*fx + fy*fy);
-		if (force > this.maxForce){
-			this.maxForce = force;
-			System.out.println("========================" +
-					"\nforce:" + force);
-			for (int i = 0; i < proj.size(); i++) {
-				System.out.println("num:"  + i+ " t_i:" + t_i + " decel g:" + ((int)(10*decel/9.81 + 0.5))/10. + " dist:" + dists.get(i) + " projectedDist:" + proj.get(i) + " force:" + fs.get(i));
-			}
 		}
 
 		agent.getForce().incrementX(fx);

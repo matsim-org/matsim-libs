@@ -20,17 +20,18 @@
 package playground.gregor.sim2d_v2.calibration.scenario;
 
 import java.io.IOException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.xml.sax.SAXException;
 
@@ -42,10 +43,11 @@ import playground.gregor.sim2d_v2.events.XYZEventsHandler;
  * @author laemmel
  * 
  */
-public class PhantomPopulationLoader implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class PhantomPopulationLoader implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	private final String file;
-	private Queue<Event> phantomPopulation;
+	//	private List<Event> phantomPopulation;
+	private final PhantomEvents pe = new PhantomEvents();
 
 	/**
 	 * @param file
@@ -57,9 +59,8 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	/**
 	 * @return
 	 */
-	public Queue<Event> getPhantomPopulation() {
-		this.phantomPopulation = new ConcurrentLinkedQueue<Event>();
-		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
+	public PhantomEvents getPhantomPopulation() {
+		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {
@@ -71,7 +72,7 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return this.phantomPopulation;
+		return this.pe;
 	}
 
 	/*
@@ -83,7 +84,7 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	 */
 	@Override
 	public void handleEvent(XYZAzimuthEvent event) {
-		this.phantomPopulation.add(event);
+		this.pe.addEvent(event);
 	}
 
 	/*
@@ -106,7 +107,7 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.phantomPopulation.add(event);
+		this.pe.addEvent(event);
 	}
 
 	/*
@@ -118,7 +119,19 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.phantomPopulation.add(event);
+		this.pe.addEvent(event);
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		this.pe.addEvent(event);
+
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		this.pe.addEvent(event);
+
 	}
 
 }
