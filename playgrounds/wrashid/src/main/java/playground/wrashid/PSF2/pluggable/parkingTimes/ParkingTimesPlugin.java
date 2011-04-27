@@ -191,6 +191,7 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 			
 			if (actTypesFilter == null || actTypesFilter.contains(event.getActType())) {
 				parkingIntervalsOfCurrentAgent.getLast().setActTypeOfFirstActDuringParking(event.getActType());
+				parkingIntervalsOfCurrentAgent.getLast().setFacilityId(event.getFacilityId());
 			} else {
 				parkingIntervalsOfCurrentAgent.removeLast();
 			}
