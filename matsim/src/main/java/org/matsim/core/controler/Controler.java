@@ -66,6 +66,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
+import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
@@ -567,6 +568,7 @@ public class Controler {
 		 */
 		this.linkStats = new CalcLinkStats(this.network);
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
+		this.events.addHandler(this.volumes);
 		this.legTimes = new CalcLegTimes(this.population);
 		this.events.addHandler(this.legTimes);
 
@@ -761,8 +763,10 @@ public class Controler {
 		 * dependencies between different listeners exist or listeners may read
 		 * and write to common variables, the order is important. Example: The
 		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-		 * turn is used by the PlansScoring-Listener. Note that the execution
-		 * order is contrary to the order the listeners are added to the list.
+		 * turn is used by the PlansScoring-Listener.
+		 * 
+		 * IMPORTANT:
+		 * The execution order is reverse to the order the listeners are added to the list.
 		 */
 
 		this.addCoreControlerListener(new CoreControlerListener());
@@ -780,7 +784,8 @@ public class Controler {
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
 
-		this.addCoreControlerListener(new EventsHandling(this.events));
+		this.addCoreControlerListener(new LinkStatsControlerListener());
+		this.addCoreControlerListener(new EventsHandling(this.events)); // must be last being added (=first being executed)
 	}
 
 	/**

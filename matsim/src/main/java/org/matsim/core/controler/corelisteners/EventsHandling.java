@@ -76,11 +76,6 @@ public class EventsHandling implements BeforeMobsimListener,
 			}
 		}
 
-		if (event.getIteration() % 10 == 6) {
-			controler.getVolumes().reset(event.getIteration());
-			eventsManager.addHandler(controler.getVolumes());
-		}
-
 		// init for event processing of new iteration
 		eventsManager.initProcessing();
 	}
@@ -101,25 +96,6 @@ public class EventsHandling implements BeforeMobsimListener,
 		 * been handled.
 		 */
 		eventsManager.finishProcessing();
-
-		/*
-		 * moved to notifyIterationEnds(...)
-		 * cdobler, Nov'10
-		 */
-//		for (EventWriter writer : this.eventWriters) {
-//			writer.closeFile();
-//			event.getControler().getEvents().removeHandler(writer);
-//		}
-//		this.eventWriters.clear();
-
-		if (((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) || (iteration % 10 >= 6)) {
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-		}
-
-		if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
-			eventsManager.removeHandler(controler.getVolumes());
-			controler.getLinkStats().writeFile(event.getControler().getControlerIO().getIterationFilename(iteration, Controler.FILENAME_LINKSTATS));
-		}
 
 		if (controler.getLegTimes() != null) {
 			controler.getLegTimes().writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));

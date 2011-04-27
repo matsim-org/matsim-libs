@@ -96,12 +96,6 @@ public class CountControlerListener implements StartupListener,
 				CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(cca.getComparison(),Locale.ENGLISH);
 				ctw.writeFile(filename);
 			}
-			//controler.getLinkStats().reset(); // This is, presumably, a good place where CalcLinkStats.reset() could be called.  
-			// But would need to be tested.  kai, jan'11
-			
-			//controler.getVolumes().reset(event.getIteration());
-			// if using the VolumesAnalyzer this is likewise a good place to reset it. 
-			// TODO: Check how it is filled. The same (strange) way as linkstats? ah, apr'11
 			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
