@@ -78,6 +78,13 @@ public class VspExperimentalConfigGroup extends Module {
 	private static final String OFFSET_WALK = "offsetWalk";
 	// private double offsetWalk = 0d;
 
+	// ---
+	
+	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING = 
+		"usingOpportunityCostOfTimeForPtRouting" ;
+	private boolean isUsingOpportunityCostOfTimeInPtRouting = false ;
+
+
 
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
@@ -103,6 +110,12 @@ public class VspExperimentalConfigGroup extends Module {
 				"set offset for mode \"walk\" in leg scoring function");
 		
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
+		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING, 
+				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
+				"utilities of time.\n" +
+				"Default is false although some of us (bk, kn) think this should always be true.\n" +
+				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
+				"obey this." ) ;
 		return map;
 	}
 
@@ -130,6 +143,8 @@ public class VspExperimentalConfigGroup extends Module {
 			setInputMZ05File(value);
 		} else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key)) {
 			setModesForSubTourModeChoice(value);
+		} else if ( USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING.equals(key) ) {
+			this.setUsingOpportunityCostOfTimeInPtRouting(Boolean.parseBoolean(value)) ;
 		} else if (CHAIN_BASED_MODES.equalsIgnoreCase(key)) {
 			setChainBasedModes(value);
 		} else if (OFFSET_WALK.equalsIgnoreCase(key)) {
@@ -157,6 +172,8 @@ public class VspExperimentalConfigGroup extends Module {
 
 //		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
 		
+		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING, 
+				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
 		map.put(COLORING, getColoring() ) ;
 		return map;
 	}
@@ -222,6 +239,14 @@ public class VspExperimentalConfigGroup extends Module {
 
 	public void setRemovingUnneccessaryPlanAttributes(boolean removingUnneccessaryPlanAttributes) {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
+	}
+
+	public boolean isUsingOpportunityCostOfTimeInPtRouting() {
+		return isUsingOpportunityCostOfTimeInPtRouting;
+	}
+
+	public void setUsingOpportunityCostOfTimeInPtRouting(boolean tmp) {
+		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
 	}
 
 }

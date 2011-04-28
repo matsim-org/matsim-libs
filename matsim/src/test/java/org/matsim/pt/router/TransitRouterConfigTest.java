@@ -24,18 +24,20 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
 /**
  * @author mrieser
  */
 public class TransitRouterConfigTest {
-
+	
 	@Test
 	public void testConstructor() {
 		PlanCalcScoreConfigGroup planScoring = new PlanCalcScoreConfigGroup();
 		PlansCalcRouteConfigGroup planRouting = new PlansCalcRouteConfigGroup();
 		TransitRouterConfigGroup transitRouting = new TransitRouterConfigGroup();
+		VspExperimentalConfigGroup vspConfig = new VspExperimentalConfigGroup() ;
 		
 		planScoring.setTravelingPt_utils_hr(-9.0);
 		planScoring.setTravelingWalk_utils_hr(-11.0);
@@ -52,7 +54,9 @@ public class TransitRouterConfigTest {
 		transitRouting.setExtensionRadius(123.4);
 		transitRouting.setMaxBeelineWalkConnectionDistance(23.4);
 		
-		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting);
+		// test without marginal utl of time:
+		{
+		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
 		
 		Assert.assertEquals(-9.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
 		Assert.assertEquals(-11.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
@@ -64,6 +68,23 @@ public class TransitRouterConfigTest {
 		Assert.assertEquals(987.6, config.searchRadius, 1e-8);
 		Assert.assertEquals(123.4, config.extensionRadius, 1e-8);
 		Assert.assertEquals(23.4, config.beelineWalkConnectionDistance, 1e-8);
+		}
 		
+		// test with marginal utl of time:
+		{
+		vspConfig.setUsingOpportunityCostOfTimeInPtRouting(true) ;
+		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
+		
+		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
+		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
+		
+		Assert.assertEquals(128.0, config.additionalTransferTime, 1e-8);
+		Assert.assertEquals(987.6, config.searchRadius, 1e-8);
+		Assert.assertEquals(123.4, config.extensionRadius, 1e-8);
+		Assert.assertEquals(23.4, config.beelineWalkConnectionDistance, 1e-8);
+		}
 	}
 }

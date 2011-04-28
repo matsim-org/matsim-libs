@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
 /**
@@ -90,21 +91,37 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double utilityOfLineSwitch_utl;
 
-	// =============================================================================================================================
-	// only setters and getters below this line
+	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, 
+			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
+	{
 
-	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, final TransitRouterConfigGroup trConfig) {
-		Logger.getLogger(this.getClass()).warn("transit router is not adding the opportunity cost of time; be careful if you need that.  kai, apr'11") ;
+		if ( !vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
+			Logger.getLogger(this.getClass()).warn("transit router is not adding the opportunity cost of time; be careful if you need that.  kai, apr'11") ;
+		}
 
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor();
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0;
+		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
+			this.marginalUtilityOfTravelTimeWalk_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ; 
+		}
 		
 		// pt:
-		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0;
+		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 ;
+		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
+			this.marginalUtilityOfTravelTimeTransit_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
+			
+		}
+
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
+
 		this.marginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0;
+		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
+			this.marginalUtiltityOfWaiting_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
+		}
+
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
+
 		// router:
 		this.searchRadius = trConfig.getSearchRadius();
 		this.extensionRadius = trConfig.getExtensionRadius();

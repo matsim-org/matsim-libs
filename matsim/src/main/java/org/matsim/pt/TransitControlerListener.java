@@ -70,7 +70,8 @@ public class TransitControlerListener implements StartupListener {
 		if (event.getControler().getTransitRouterFactory() == null) {
 			
 			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore()
-					, scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter());
+					, scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+					scenario.getConfig().vspExperimental());
 			
 			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
 					((ScenarioImpl)scenario).getTransitSchedule(), transitRouterConfig ));

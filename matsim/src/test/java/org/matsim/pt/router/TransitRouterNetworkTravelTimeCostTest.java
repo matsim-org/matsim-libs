@@ -34,7 +34,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter());
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
@@ -54,7 +55,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter());
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
@@ -77,7 +79,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter());
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
@@ -102,7 +105,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter());
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
@@ -130,7 +134,8 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter());
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeCost tc = new TransitRouterNetworkTravelTimeCost(conf);
 		TransitRouterImpl router = new TransitRouterImpl(f.schedule, conf);
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
