@@ -37,9 +37,6 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
-
-		double arrivalTime = getData(toNode).getTime();
-
 		// now construct the path
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
@@ -57,7 +54,7 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 		}
 		// arrival time was not ok in earlier versions!
 		DijkstraNodeData toNodeData = getData(toNode);
-		arrivalTime = toNodeData.getTime();
+		double arrivalTime = toNodeData.getTime();
 		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 
 		return path;

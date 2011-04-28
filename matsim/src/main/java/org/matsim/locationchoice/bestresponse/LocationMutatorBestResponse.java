@@ -40,7 +40,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -52,6 +51,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.ActTypeConverter;
+import org.matsim.locationchoice.utils.PlanUtils;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
@@ -83,37 +83,10 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		
 		// copy the best plan into replanned plan
 		// making a deep copy
-		this.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
+		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
 		super.resetRoutes(plan);
 	}
-	
-	private void copyPlanFields(PlanImpl planTarget, PlanImpl planTemplate) {
-		planTarget.setScore(planTemplate.getScore());
-		
-		int actLegIndex = 0;
-		for (PlanElement pe : planTarget.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl actTemplate = ((ActivityImpl)planTemplate.getPlanElements().get(actLegIndex));
-				((ActivityImpl) pe).setEndTime(actTemplate.getEndTime());
-				((ActivityImpl) pe).setCoord(actTemplate.getCoord());
-				((ActivityImpl) pe).setFacilityId(actTemplate.getFacilityId());
-				((ActivityImpl) pe).setLinkId(actTemplate.getLinkId());
-				((ActivityImpl) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((ActivityImpl) pe).setStartTime(actTemplate.getStartTime());
-				((ActivityImpl) pe).setType(actTemplate.getType());
-				
-			} else if (pe instanceof LegImpl) {
-				LegImpl legTemplate = ((LegImpl)planTemplate.getPlanElements().get(actLegIndex));
-				((LegImpl) pe).setArrivalTime(legTemplate.getArrivalTime());
-				((LegImpl) pe).setDepartureTime(legTemplate.getArrivalTime());
-				((LegImpl) pe).setMode(legTemplate.getMode());
-				((LegImpl) pe).setRoute(legTemplate.getRoute());
-				((LegImpl) pe).setTravelTime(legTemplate.getTravelTime());
-			}
-			actLegIndex++;
-		}
-	}
-		
+			
 	private void initFlexibleTypes(LocationChoiceConfigGroup config) {
 		String types = config.getFlexibleTypes();
 		if (!(types.equals("null") || types.equals(""))) {
@@ -223,7 +196,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		scoringFunction.reset();
 		
 		if (adapt) {
-			this.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);
+			PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);
 		}		
 		return score;
 	}
