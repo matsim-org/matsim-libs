@@ -187,7 +187,8 @@ public class DataPrepare {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
+				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+				this.scenario.getConfig().vspExperimental());
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
@@ -201,7 +202,8 @@ public class DataPrepare {
 	protected void visualizeRouterNetwork() {
 		
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
+				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+				this.scenario.getConfig().vspExperimental());
 		
 		TransitRouterImpl router = new TransitRouterImpl(this.scenario.getTransitSchedule(), transitRouterConfig );
 		Network routerNet = router.getTransitRouterNetwork();

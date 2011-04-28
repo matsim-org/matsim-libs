@@ -49,7 +49,8 @@ public class OverDemandPlan_router {
 		this.config = this.scenario.getConfig();
 		
 		myTransitRouterConfig = new MyTransitRouterConfig(this.scenario.getConfig().planCalcScore(),
-				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter());
+				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+				this.scenario.getConfig().vspExperimental());
 	}
 	
 	/**

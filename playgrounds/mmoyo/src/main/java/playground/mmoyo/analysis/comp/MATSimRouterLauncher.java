@@ -44,7 +44,8 @@ public class MATSimRouterLauncher {
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		
 		TransitRouterConfig tRConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(), 
-				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter());
+				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+				scenario.getConfig().vspExperimental());
 
 		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, 

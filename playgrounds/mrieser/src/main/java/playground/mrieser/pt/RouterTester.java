@@ -88,7 +88,8 @@ public class RouterTester {
 		}
 		log.info("build transit router...");
 		TransitRouterConfig tRConfig = new TransitRouterConfig(s.getConfig().planCalcScore(), 
-				s.getConfig().plansCalcRoute(), s.getConfig().transitRouter());
+				s.getConfig().plansCalcRoute(), s.getConfig().transitRouter(),
+				s.getConfig().vspExperimental());
 
 		TransitRouterImpl router = new TransitRouterImpl(ts, tRConfig);
 

@@ -21,6 +21,7 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
 
@@ -35,8 +36,9 @@ public class MyTransitRouterConfig extends TransitRouterConfig {
 //	public double marginalUtilityOfTravelDistanceTransit = -0.0;    // yyyy presumably, in Eu/m ?????????  so far, not used.  kai, apr'10
 //	public double costLineSwitch = 60.0 * -this.marginalUtilityOfTravelTimeTransit;	//* -this.marginalUtilityOfTravelTimeTransit; // == 1min travel time in vehicle  // in Eu.  kai, apr'10
 
-	public MyTransitRouterConfig(PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig, TransitRouterConfigGroup trConfig) {
-		super(pcsConfig, pcrConfig, trConfig);
+	public MyTransitRouterConfig(PlanCalcScoreConfigGroup pcsConfig, PlansCalcRouteConfigGroup pcrConfig, 
+			TransitRouterConfigGroup trConfig, VspExperimentalConfigGroup vspConfig ) {
+		super(pcsConfig, pcrConfig, trConfig, vspConfig);
 	}
 	
 	//additional config variables

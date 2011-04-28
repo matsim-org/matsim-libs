@@ -25,7 +25,8 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		ScenarioImpl scenarioImpl = new DataLoader().loadScenarioWithTrSchedule(inputDir + "5x5config.xml");
 
 		MyTransitRouterConfig myConfig = new MyTransitRouterConfig(scenarioImpl.getConfig().planCalcScore(),
-				scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getConfig().transitRouter());
+				scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getConfig().transitRouter(),
+				scenarioImpl.getConfig().vspExperimental());
 
 		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
 		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());

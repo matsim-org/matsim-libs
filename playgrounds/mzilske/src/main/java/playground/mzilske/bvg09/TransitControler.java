@@ -162,7 +162,8 @@ public class TransitControler extends Controler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter());
+		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter(),
+				this.config.vspExperimental());
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.transitConfig,
 				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), trConfig) );
