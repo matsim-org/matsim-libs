@@ -25,14 +25,17 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * Translates emme networks into matsim networks.
@@ -44,7 +47,7 @@ import org.matsim.core.utils.io.IOUtils;
  * - link "length" (column # 3) is in arbitrary units, connected to rest of system only through freespeed value
  * - Column # 8-10 are user-defined BUT contain freespeed, capacity, ... in arbitrary order and units
  *   (connected to rest of system through user-defined volume-delay functions)
- * <p/>vadocva
+ * <p/>
  * Keyword(s): emme/2
  * 
  * @author nagel
@@ -58,15 +61,16 @@ public class NetworkEmme2Matsim {
 
 	private static final int NW_NAME = PSRC ;
 
-	public static void readNetwork( NetworkImpl network ) {
-		network.setCapacityPeriod(3600.) ;
-		network.setEffectiveLaneWidth(3.75) ;
+	public static void readNetwork( Scenario sc ) {
+		Network network = sc.getNetwork() ;
+		((NetworkImpl) network).setCapacityPeriod(3600.) ;
+		((NetworkImpl) network).setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
 
 		// read emme3 network
 		try {
 //			BufferedReader reader = IOUtils.getBufferedReader("/home/nagel/tmp/tab/net1.out" ) ;
-			BufferedReader reader = IOUtils.getBufferedReader("/Users/nagel/eclipse/shared-svn/studies/north-america/us/psrc/network/emme-export/net1.out" ) ;
+			BufferedReader reader = IOUtils.getBufferedReader("/Users/nagel/eclipse/shared-svn/studies/countries/us/psrc/network/emme-export/net1.out" ) ;
 
 			boolean weAreReadingNodes = true ;
 			long linkCnt = 0 ;
@@ -86,14 +90,12 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						Node node = network.createAndAddNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
-						if ( NW_NAME==PSRC ) {
-							((NodeImpl) node).setOrigId(parts[7]);
-						}
-//						checkMax( xxStr, yyStr ) ;
+						Node node = network.getFactory().createNode( sc.createId(idStr), 
+								sc.createCoord(Double.parseDouble(xxStr),Double.parseDouble(yyStr)) ) ;
+						network.addNode( node ) ;
 					} else {
-						Node fromNode = network.getNodes().get(new IdImpl(parts[1])) ;
-						Node toNode = network.getNodes().get(new IdImpl(parts[2]));
+						Node fromNode = network.getNodes().get(sc.createId(parts[1]) ) ;
+						Node toNode = network.getNodes().get(sc.createId(parts[2]));
 						if ( fromNode==null || toNode==null ) {
 //							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
 							continue ;
@@ -129,9 +131,15 @@ public class NetworkEmme2Matsim {
 							System.exit(-1);
 						}
 
-						Id id = new IdImpl( linkCnt ) ; linkCnt++ ;
+						Id id = sc.createId( Long.toString(linkCnt) ) ; linkCnt++ ;
 
-						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes );
+						Link link = network.getFactory().createLink(id, fromNode, toNode ) ;
+						link.setLength(length) ;
+						link.setFreespeed(freespeed) ;
+						link.setCapacity(capacity) ;
+						link.setNumberOfLanes(permlanes) ;
+						
+						network.addLink(link); 
 					}
 				} else {
 					// something else; do nothing
@@ -150,10 +158,16 @@ public class NetworkEmme2Matsim {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetworkImpl network = NetworkImpl.createNetwork() ;
+		Config config = ConfigUtils.createConfig() ;
+		// (no api-only way to get a scenario without config)
+		
+		Scenario sc = ScenarioUtils.createScenario(config) ;
+		// (no api-only way to get a network, Id, Coord without scenario)
+		
+		Network network = sc.getNetwork();
 
 		log.info("reading network ...");
-		readNetwork(network) ;
+		readNetwork(sc) ;
 		log.info("... finished reading network.\n");
 
 		log.info("cleaning network ...");
