@@ -416,7 +416,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param parcels
 	 * @return HashMap
 	 */
-	public Map<Id, JobsObject> readDisaggregatedJobs(final ActivityFacilitiesImpl parcels){
+	public Map<Id, JobsObject> readDisaggregatedJobs(final ActivityFacilitiesImpl parcels, double jobSample){
 		
 		Id jobID, parcelID, zoneID;
 		Coord coord;
@@ -443,12 +443,10 @@ public class ReadFromUrbansimParcelModel {
 				final int indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
 				final int indexZoneID =idxFromKey.get( Constants.ZONE_ID_WORK );
 				
-				log.warn("Remove job size limiter !!!");
-				
 				while ( (line=reader.readLine()) != null ) {
 					
 					// tnicolai: for debugging, remove later !!!
-					if(MatsimRandom.getRandom().nextDouble() > 0.01)
+					if(MatsimRandom.getRandom().nextDouble() > jobSample)
 						continue;
 					
 					String[] parts = line.split( Constants.TAB );

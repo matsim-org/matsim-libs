@@ -71,7 +71,7 @@ public class MATSim4Urbansim {
 	public MATSim4Urbansim(String args[]){
 		
 		// Stores location of MATSim configuration file
-		String matsimConfiFile = args!= null ? args[0].trim():null;
+		String matsimConfiFile = (args!= null && args.length>0) ? args[0].trim():null;
 		// checks if args parameter contains a valid path
 		isValidPath(matsimConfiFile);
 		// loading and initializing MATSim config

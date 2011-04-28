@@ -67,38 +67,19 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	// Logger
 	private static final Logger logger = Logger.getLogger(MATSim4UrbanSimERSA.class);
 	
-	private int gridSize = -1;
 	private String shapeFile = null;
+	private int gridSize = -1;
+	private double jobSample = 1.;
 	
 	public MATSim4UrbanSimERSA(String args[]){
 		super(args);
 		// set the resolution, this is used for setting 
 		// the starting points for accessibility measures
-		checkAndSetGridSize(args);
 		checkAndSetShapeFile(args);
+		checkAndSetGridSize(args);
+		checkAnsSetJobSample(args);
 	}
 
-	/**
-	 * Set the grid size for the starting points
-	 * 
-	 * @param args
-	 */
-	private void checkAndSetGridSize(String[] args) {
-		try{
-			if(args.length >= 2){
-				gridSize = Integer.parseInt( args[1].trim() );
-				logger.info("The grid size was set to " + gridSize);
-			}
-			else{
-				gridSize = 10000;
-				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSize + " (default setting)!");
-			}
-		} catch (NumberFormatException nfe){
-			nfe.printStackTrace();
-			logger.error( "Please set a correct grid size. " + args[1] + " is not a valid value (integer).");
-		}
-	}
-	
 	/**
 	 * Set the shape file path in order to determine 
 	 * the starting points for accessibility computation
@@ -107,8 +88,8 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 */
 	private void checkAndSetShapeFile(String[] args) {
 
-		if( args.length >= 3 ){
-			shapeFile = args[2].trim();
+		if( args.length >= 2 ){
+			shapeFile = args[1].trim();
 			logger.info("The shape file path was set to " + shapeFile);
 		}
 		else{
@@ -118,7 +99,46 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		if(!pathExsits(shapeFile))
 			throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
-		
+	}
+	
+	/**
+	 * Set the grid size for the starting points
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetGridSize(String[] args) {
+		try{
+			if(args.length >= 3){
+				gridSize = Integer.parseInt( args[2].trim() );
+				logger.info("The grid size was set to " + gridSize);
+			} else{
+				gridSize = 10000;
+				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSize + " (default setting)!");
+			}
+		} catch (NumberFormatException nfe){
+			nfe.printStackTrace();
+			logger.error( "Please set a correct grid size. " + args[2] + " is not a valid value (integer).");
+		}
+	}
+	
+	/**
+	 * Set the jobSample for the starting points
+	 * 
+	 * @param args
+	 */
+	private void checkAnsSetJobSample(String[] args) {
+		try{
+			if(args.length >= 4){
+				jobSample = Double.parseDouble( args[3].trim() );
+				logger.info("The jobSample was set to " + String.valueOf(jobSample) );
+			} else{
+				jobSample = 1.;
+				logger.warn("No parameter for the job sample was given. The job sample is set to " + String.valueOf(jobSample) + " (default setting)!");
+			}
+		} catch(NumberFormatException nfe){
+			nfe.printStackTrace();
+			logger.error( "Please set a correct job sample . " + args[3] + " is not a valid value (double).");
+		}
 	}
 	
 	/**
@@ -275,7 +295,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		long time;
 		
 		startTime = System.currentTimeMillis();
-		Map<Id, JobsObject> jobObjectMap = readFromUrbansim.readDisaggregatedJobs(parcels);
+		Map<Id, JobsObject> jobObjectMap = readFromUrbansim.readDisaggregatedJobs(parcels, jobSample);
 		endTime = System.currentTimeMillis();
 		time = (endTime - startTime) / 1000;
 		logger.info("Creating job map took " + time + "seconds.");
