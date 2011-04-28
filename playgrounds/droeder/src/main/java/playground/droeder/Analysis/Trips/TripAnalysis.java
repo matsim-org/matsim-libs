@@ -26,13 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -44,12 +41,9 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
-
-import playground.droeder.DaPaths;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -80,6 +74,7 @@ public class TripAnalysis {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(out);
 			writer.write(this.tripSet.toString());
+			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

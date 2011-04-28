@@ -34,10 +34,6 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.events.algorithms.EventWriterXML;
-
-import playground.droeder.DaPaths;
 
 /**
  * @author droeder
