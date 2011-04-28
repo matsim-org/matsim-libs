@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin.dataprepare;
 
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.apache.log4j.Logger;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -35,8 +34,10 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
  */
 public class NetworkMatsim2Shape {
 	
+	private static Logger log = Logger.getLogger(NetworkMatsim2Shape.class);
+	
 	private static String filePath = "../../detailedEval/Net/";
-	private static String networkName = "network-86-85-87-84_simplified---withLanes";
+	private static String networkName = "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes";
 //	private static String networkName = "../policies/network-86-85-87-84_simplified---withLanes_zone30";
 	private static String inFileType = ".xml";
 //	private static String inFileType = ".xml.gz";
@@ -48,13 +49,12 @@ public class NetworkMatsim2Shape {
 	public static void main(String[] args) {
 		String netFile = filePath + networkName + inFileType;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		log.info("loading network from " + netFile);
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
+		log.info("done.");
 
-//		NetworkCleaner nc = new NetworkCleaner();
-//		nc.run(net);
-//		NetworkWriter writer = new NetworkWriter(net);
-//		writer.write(netFile);
 		new Links2ESRIShape(net, filePath + networkName + outFileType, "DHDN_GK4").write();
 	}
 

@@ -53,6 +53,24 @@ public class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
+	public static void main(String[] args) {
+	
+			Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+			nodeTypesToMerge.add(new Integer(4));
+			nodeTypesToMerge.add(new Integer(5));
+	
+			Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			final Network network = scenario.getNetwork();
+			new MatsimNetworkReader(scenario).readFile("../../detailedEval/Net/network-86-85-87-84_withLanes.xml");
+	
+			NetworkSimplifier nsimply = new NetworkSimplifier();
+			nsimply.setNodesToMerge(nodeTypesToMerge);
+			nsimply.setMergeLinkStats(true);
+			nsimply.run(network);
+	
+			new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
+		}
+
 	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
@@ -159,6 +177,26 @@ public class NetworkSimplifier {
 	}
 
 	/**
+		 * Compare link attributes. Return whether they are the same or not.
+		 */
+		private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+	
+			boolean bothLinksHaveSameLinkStats = true;
+	
+	//		if(!linkA.getAllowedModes().equals(linkB.getAllowedModes())){ bothLinksHaveSameLinkStats = false; }
+	
+			if(linkA.getFreespeed() != linkB.getFreespeed()){ bothLinksHaveSameLinkStats = false; }
+	
+			if(linkA.getCapacity() != linkB.getCapacity()){ bothLinksHaveSameLinkStats = false; }
+	
+	//		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
+			
+	//		if(linkA.getType() != linkB.getType()){ bothLinksHaveSameLinkStats = false; }
+	
+			return bothLinksHaveSameLinkStats;
+		}
+
+	/**
 	 * Specify the types of node which should be merged.
 	 *
 	 * @param nodeTypesToMerge A Set of integer indicating the node types as specified by {@link NetworkCalcTopoType}
@@ -176,48 +214,5 @@ public class NetworkSimplifier {
 	 */
 	public void setMergeLinkStats(boolean mergeLinkStats){
 		this.mergeLinkStats = mergeLinkStats;
-	}
-
-	// helper
-
-	/**
-	 * Compare link attributes. Return whether they are the same or not.
-	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
-
-		boolean bothLinksHaveSameLinkStats = true;
-
-//		if(!linkA.getAllowedModes().equals(linkB.getAllowedModes())){ bothLinksHaveSameLinkStats = false; }
-
-		if(linkA.getFreespeed() != linkB.getFreespeed()){ bothLinksHaveSameLinkStats = false; }
-
-		if(linkA.getCapacity() != linkB.getCapacity()){ bothLinksHaveSameLinkStats = false; }
-
-//		if(linkA.getNumberOfLanes() != linkB.getNumberOfLanes()){ bothLinksHaveSameLinkStats = false; }
-		
-//		if(linkA.getType() != linkB.getType()){ bothLinksHaveSameLinkStats = false; }
-
-		return bothLinksHaveSameLinkStats;
-	}
-
-	public static void main(String[] args) {
-
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
-
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("../../detailedEval/Net/network-86-85-87-84_withLanes.xml");
-//		new MatsimNetworkReader(scenario).readFile("../../detailedEval/policies/network-86-85-87-84_withLanes_zone30.xml.gz");
-
-		NetworkSimplifier nsimply = new NetworkSimplifier();
-		nsimply.setNodesToMerge(nodeTypesToMerge);
-//		nsimply.setMergeLinkStats(true);
-		nsimply.run(network);
-
-		new NetworkWriter(network).write("../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml");
-//		new NetworkWriter(network).write("../../detailedEval/policies/network-86-85-87-84_simplified---withLanes_zone30.xml.gz");
-
 	}
 }
