@@ -36,8 +36,8 @@ public class MyGantryComparator {
 	private File compareFile;
 	private File linkIdFile;
 	
-	private Map<Id, Integer> baseMap;
-	private Map<Id, Integer> compareMap;
+	private Map<Id, Double> baseMap;
+	private Map<Id, Double> compareMap;
 	private List<Id> linkList;
 
 	/**
@@ -102,7 +102,7 @@ public class MyGantryComparator {
 						bw.write(",");
 						bw.write(String.valueOf(compareMap.get(id)));
 						bw.write(",");
-						double d = ((double) compareMap.get(id) - (double) baseMap.get(id)) / (double) baseMap.get(id);
+						double d = (compareMap.get(id) - baseMap.get(id)) / baseMap.get(id);
 						bw.write(String.format("%3.4f", d));
 						bw.newLine();
 					}
@@ -147,7 +147,7 @@ public class MyGantryComparator {
 					Value vId = new NumberValue(Integer.parseInt(i.toString()));
 					Value vBase = new NumberValue(baseMap.get(i));
 					Value vComp = new NumberValue(compareMap.get(i));
-					double d = ((double) compareMap.get(i) - (double) baseMap.get(i)) / (double) baseMap.get(i);
+					double d = (compareMap.get(i) - baseMap.get(i)) / baseMap.get(i);
 					Value vChange= new NumberValue(d);
 					log.info(Integer.parseInt(i.toString()) + ";" + baseMap.get(i) + ";" + compareMap.get(i) + ";" + d);
 					map.put("linkId", vId);
@@ -201,8 +201,8 @@ public class MyGantryComparator {
 	}
 	
 	
-	private Map<Id, Integer> readLinkStatsOptionOne(File file){
-		Map<Id, Integer> map = new HashMap<Id, Integer>();
+	private Map<Id, Double> readLinkStatsOptionOne(File file){
+		Map<Id, Double> map = new HashMap<Id, Double>();
 		
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
@@ -213,7 +213,7 @@ public class MyGantryComparator {
 					String[] entry = line.split("\t");
 					Id id = new IdImpl(entry[0]);
 					if(linkList.contains(id)){
-						map.put(id, Integer.parseInt(entry[80]));						
+						map.put(id, Double.parseDouble(entry[80]));						
 					}
 				}
 			}finally{
@@ -268,12 +268,12 @@ public class MyGantryComparator {
 	}
 	
 	
-	public Map<Id, Integer> getBaseMap() {
+	public Map<Id, Double> getBaseMap() {
 		return baseMap;
 	}
 
 
-	public Map<Id, Integer> getCompareMap() {
+	public Map<Id, Double> getCompareMap() {
 		return compareMap;
 	}
 

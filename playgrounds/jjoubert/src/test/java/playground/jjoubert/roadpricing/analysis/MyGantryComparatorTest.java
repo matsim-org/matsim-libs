@@ -80,14 +80,14 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		assertEquals("Wrong number of links in compared map.", 9, mgc.getCompareMap().size());
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in base file. */
-		assertEquals("Wrong number of vehicles for link 2 in base file.", Integer.valueOf(11), Integer.valueOf(mgc.getBaseMap().get(new IdImpl(2))));
-		assertEquals("Wrong number of vehicles for link 6 in base file.", Integer.valueOf(9), Integer.valueOf(mgc.getBaseMap().get(new IdImpl(6))));
-		assertEquals("Wrong number of vehicles for link 10 in base file.", Integer.valueOf(23), Integer.valueOf(mgc.getBaseMap().get(new IdImpl(10))));
+		assertEquals("Wrong number of vehicles for link 2 in base file.", 13.6, mgc.getBaseMap().get(new IdImpl(2)).doubleValue(), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 6 in base file.", 10.2, mgc.getBaseMap().get(new IdImpl(6)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in base file.", 11.0, mgc.getBaseMap().get(new IdImpl(10)), 1.e-8);
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in comparison file. */
-		assertEquals("Wrong number of vehicles for link 2 in compare file.", Integer.valueOf(11), Integer.valueOf(mgc.getCompareMap().get(new IdImpl(2))));
-		assertEquals("Wrong number of vehicles for link 6 in compare file.", Integer.valueOf(9), Integer.valueOf(mgc.getCompareMap().get(new IdImpl(6))));
-		assertEquals("Wrong number of vehicles for link 10 in compare file.", Integer.valueOf(26), Integer.valueOf(mgc.getCompareMap().get(new IdImpl(10))));
+		assertEquals("Wrong number of vehicles for link 2 in compare file.", 11.0, mgc.getCompareMap().get(new IdImpl(2)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 6 in compare file.", 11.0, mgc.getCompareMap().get(new IdImpl(6)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in compare file.", 15.4, mgc.getCompareMap().get(new IdImpl(10)), 1.e-8);
 
 	}
 	
@@ -126,23 +126,23 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		}
 		
 		assertTrue("Could not find link 2.", map.containsKey(new IdImpl(2)));
-		assertEquals("Wrong values for link 2.", true, map.get(new IdImpl(2)).equalsIgnoreCase("2,11,11,0.0000"));
+		assertEquals("Wrong values for link 2.", "2,13.6,11.0,-0.1912", map.get(new IdImpl(2)));
 		assertTrue("Could not find link 3.", map.containsKey(new IdImpl(3)));
-		assertEquals("Wrong values for link 3.", true, map.get(new IdImpl(3)).equalsIgnoreCase("3,9,10,0.1111"));
+		assertEquals("Wrong values for link 3.", "3,9.6,12.6,0.3125", map.get(new IdImpl(3)));
 		assertTrue("Could not find link 4.", map.containsKey(new IdImpl(4)));
-		assertEquals("Wrong values for link 4.", true, map.get(new IdImpl(4)).equalsIgnoreCase("4,9,11,0.2222"));
+		assertEquals("Wrong values for link 4.", "4,8.8,12.0,0.3636", map.get(new IdImpl(4)));
 		assertTrue("Could not find link 5.", map.containsKey(new IdImpl(5)));
-		assertEquals("Wrong values for link 5.", true, map.get(new IdImpl(5)).equalsIgnoreCase("5,9,9,0.0000"));
+		assertEquals("Wrong values for link 5.", "5,12.6,11.4,-0.0952", map.get(new IdImpl(5)));
 		assertTrue("Could not find link 6.", map.containsKey(new IdImpl(6)));
-		assertEquals("Wrong values for link 6.", true, map.get(new IdImpl(6)).equalsIgnoreCase("6,9,9,0.0000"));
+		assertEquals("Wrong values for link 6.", "6,10.2,11.0,0.0784", map.get(new IdImpl(6)));
 		assertTrue("Could not find link 7.", map.containsKey(new IdImpl(7)));
-		assertEquals("Wrong values for link 7.", true, map.get(new IdImpl(7)).equalsIgnoreCase("7,7,10,0.4286"));
+		assertEquals("Wrong values for link 7.", "7,10.2,11.2,0.0980", map.get(new IdImpl(7)));
 		assertTrue("Could not find link 8.", map.containsKey(new IdImpl(8)));
-		assertEquals("Wrong values for link 8.", true, map.get(new IdImpl(8)).equalsIgnoreCase("8,9,10,0.1111"));
+		assertEquals("Wrong values for link 8.", "8,10.4,14.0,0.3462", map.get(new IdImpl(8)));
 		assertTrue("Could not find link 9.", map.containsKey(new IdImpl(9)));
-		assertEquals("Wrong values for link 9.", true, map.get(new IdImpl(9)).equalsIgnoreCase("9,9,10,0.1111"));
+		assertEquals("Wrong values for link 9.", "9,13.6,11.4,-0.1618", map.get(new IdImpl(9)));
 		assertTrue("Could not find link 10.", map.containsKey(new IdImpl(10)));
-		assertEquals("Wrong values for link 10.", true, map.get(new IdImpl(10)).equalsIgnoreCase("10,23,26,0.1304"));
+		assertEquals("Wrong values for link 10.", "10,11.0,15.4,0.4000", map.get(new IdImpl(10)));
 	}
 	
 	
@@ -172,49 +172,49 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 					int id = r.getNumberValue("linkId").intValue();
 					switch (id) {
 					case 2:
-						assertEquals("Wrong base count for link " + id, 11, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong base count for link " + id, 14, r.getNumberValue("baseCount").intValue());
 						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.0, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong change value for link " + id, -0.1912, r.getNumberValue("change").doubleValue());
 						break;
 					case 3:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 10, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.1111, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 13, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.3125, r.getNumberValue("change").doubleValue());
 						break;
 					case 4:
 						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.2222, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong compare count for link " + id, 12, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.3636, r.getNumberValue("change").doubleValue());
 						break;
 					case 5:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 9, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.0, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 13, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, -0.0952, r.getNumberValue("change").doubleValue());
 						break;
 					case 6:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 9, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.0, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.0784, r.getNumberValue("change").doubleValue());
 						break;
 					case 7:
-						assertEquals("Wrong base count for link " + id, 7, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 10, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.4286, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.0980, r.getNumberValue("change").doubleValue());
 						break;
 					case 8:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 10, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.1111, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 14, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.3462, r.getNumberValue("change").doubleValue());
 						break;
 					case 9:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 10, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.1111, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 14, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, -0.1618, r.getNumberValue("change").doubleValue());
 						break;
 					case 10:
-						assertEquals("Wrong base count for link " + id, 23, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 26, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.1304, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 11, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 15, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.4000, r.getNumberValue("change").doubleValue());
 						break;						
 					default:
 						break;
