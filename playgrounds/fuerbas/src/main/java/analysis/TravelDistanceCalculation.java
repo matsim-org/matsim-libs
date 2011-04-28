@@ -19,6 +19,8 @@
 
 package analysis;
 
+import java.io.IOException;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -32,9 +34,9 @@ public class TravelDistanceCalculation {
 	
 	public static void main(String[] args) {
 		//path to events file
-//		String inputFile = "/home01/sfuerbas/workspace/893.2200.events.txt.gz";
+		String inputFile = "/home/soeren/workspace2/matsim-0.3.0/output/azores_small/ITERS/it.10/10.events.xml.gz";
 		
-		String inputFile = args[0];
+//		String inputFile = args[0];
 		
 		//create an event object
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
@@ -50,8 +52,12 @@ public class TravelDistanceCalculation {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
 		
-		handler.returnDistances();
-
+		try {
+			handler.returnDistances();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
