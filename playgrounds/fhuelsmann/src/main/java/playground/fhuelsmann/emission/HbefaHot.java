@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
+import playground.fhuelsmann.emission.objects.HotValue;
 
 public class HbefaHot {
 	
@@ -11,7 +12,7 @@ public class HbefaHot {
 		public void makeHbefaHot(String filename){
 		
 			// HbefaHot<String,String> 
-			Map<String,String> HbefaHot = new HashMap<String,String>() ;
+			Map<String,HotValue> HbefaHot = new HashMap<String,HotValue>() ;
 			
 			// read all rows
 			File file = new File(filename);
@@ -19,34 +20,32 @@ public class HbefaHot {
 			
 		try{
 				reader = new BufferedReader(new FileReader(file));
-				String hbefa = null;
+				String text = null;
 				reader.readLine();
-				while ((hbefa = reader.readLine()) != null) {
+				while ((text = reader.readLine()) != null) {
 					
-					// used a split method as the Java options don't consider the case of several semicolons ";;"
-					String[] row = split(hbefa,";");
+					// split is implemented in this class, see explanation.  
+					String[] row = split(text,";");
+					String key="";
+					String[] value = new String[27];
 					
-					// Set up Key and Value
-					String hbefaHotKey = "";
-					String hbefaHotValue ="";
-				
-					// 
-						for(int i=0;i<14;i++)
-							hbefaHotKey += row[i];
+					//create the key, the key is an array , hotKey	
+						for(int i=0;i<13;i++)
+							if (!(i==8 || i==9))
+							key +=row[i]+";";
 						
-						for(int i=14;i<27;i++)
-							hbefaHotValue += row[i];
+					//create the value, the value is an array , hotValue	
+
+						for(int i=0;i<27;i++)
+						value[i] = row[i];
 						
-	//					System.out.println("++++++++++++++++++++++++++" + hbefaHotKey +" "+ hbefaHotValue);
+					
+					// erstllen von HbefaHot
 						
-						// write HbefaHot
-						HbefaHot.put(hbefaHotKey, hbefaHotValue);
+						HbefaHot.put(key, new HotValue(value));
+						System.out.println(key);
 						
-						// new key and Value 
-						hbefaHotKey="";
-						hbefaHotValue="";
 						
-				
 				}
 			}catch(Exception e ){
 				System.err.println(e);
