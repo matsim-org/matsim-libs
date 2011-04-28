@@ -133,12 +133,6 @@ public class ERSAControlerListener implements ShutdownListener{
 			
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startZoneIterator.hasNext() ){
-
-				// progress bar
-				while ( (int) (100.*cnt/startZones.getZones().size()) > percentDone ) {
-					percentDone++; System.out.print('|');
-				}
-				cnt++;
 				
 				Zone<ZoneObject> startZone = startZoneIterator.next();
 				// get coordinate from origin (start point)
@@ -175,17 +169,24 @@ public class ERSAControlerListener implements ShutdownListener{
 					accessibilityTravelDistance += Math.exp( beta * travelDistance ); // tnicolai: find another beta for travel distance
 				}
 				
-				startZone.getAttribute().setTravelTimeAccessibility( Math.log( accessibilityTravelTimes ) );
-				startZone.getAttribute().setTravelCostAccessibility( Math.log( accessibilityTravelCosts ) );
-				startZone.getAttribute().setTravelDistanceAccessibility( Math.log( accessibilityTravelDistance) );
+				setAccessibilityValue2StartZone(startZone,
+						accessibilityTravelTimes, accessibilityTravelCosts,
+						accessibilityTravelDistance);
 				
 				// sets the accessibility values for each spatial grid (travel times, travel costs and travel distance)
 				setAccessiblityValue2SpatialGrid(startZone);
 				
 				// dumping results into csv file
 				dumpCSVData(accessibilityIndicatorWriter, startZone, coordFromZone);
+				
+				cnt++;
+				// progress bar
+				while ( (int) (100.*cnt/startZones.getZones().size()) > percentDone ) {
+					percentDone++; System.out.print('|');
+				}
+				
 			}
-			
+			System.out.println("");
 			// finish and close writing
 			closeCSVFile(accessibilityIndicatorWriter);
 		
@@ -197,6 +198,25 @@ public class ERSAControlerListener implements ShutdownListener{
 	}
 
 	/**
+	 * @param startZone
+	 * @param accessibilityTravelTimes
+	 * @param accessibilityTravelCosts
+	 * @param accessibilityTravelDistance
+	 */
+	private void setAccessibilityValue2StartZone(Zone<ZoneObject> startZone,
+			double accessibilityTravelTimes, double accessibilityTravelCosts,
+			double accessibilityTravelDistance) {
+		
+		double tt = Math.log( accessibilityTravelTimes );
+		double tc = Math.log( accessibilityTravelCosts );
+		double td =  Math.log( accessibilityTravelDistance);
+		
+		startZone.getAttribute().setTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
+		startZone.getAttribute().setTravelCostAccessibility( tc < 0.0 ? 0.0 : tc );
+		startZone.getAttribute().setTravelDistanceAccessibility(td < 0.0 ? 0.0 : td );
+	}
+
+	/**
 	 * Sets the accessibility values for each spatial grid (travel times, travel costs and travel distance)
 	 * 
 	 * @param startZone
@@ -204,8 +224,8 @@ public class ERSAControlerListener implements ShutdownListener{
 	private void setAccessiblityValue2SpatialGrid(Zone<ZoneObject> startZone) {
 		
 		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
-		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
-		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getTravelCostAccessibility() , startZone.getGeometry().getCentroid());
+		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getTravelDistanceAccessibility() , startZone.getGeometry().getCentroid());
 	}
 
 	/**

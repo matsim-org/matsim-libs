@@ -448,7 +448,7 @@ public class ReadFromUrbansimParcelModel {
 				while ( (line=reader.readLine()) != null ) {
 					
 					// tnicolai: for debugging, remove later !!!
-					if(MatsimRandom.getRandom().nextDouble() > 0.001)
+					if(MatsimRandom.getRandom().nextDouble() > 0.01)
 						continue;
 					
 					String[] parts = line.split( Constants.TAB );

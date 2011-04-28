@@ -38,6 +38,18 @@ import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
+import playground.johannes.socialnetworks.gis.SpatialGrid;
+import playground.johannes.socialnetworks.gis.SpatialGridTableWriter;
+import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.tnicolai.urbansim.MATSim4Urbansim;
+import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.gis.MyColorizer;
+import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
+import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
+import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
+import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,18 +57,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.johannes.socialnetworks.gis.SpatialGrid;
-import playground.johannes.socialnetworks.gis.SpatialGridTableWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
-import playground.tnicolai.urbansim.MATSim4Urbansim;
-import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
-import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
-import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
-import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
 /**
  * @author thomas
@@ -190,15 +190,15 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		}
 		
 		// writing travel time accessibility kmz file
-		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.setColorizable(new MyColorizer(travelTimeValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
 		
 		// writing travel cost accessibility kmz file
-		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.setColorizable(new MyColorizer(travelCostValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
 		
 		// writing travel distance accessibility kmz file
-		writer.setColorizable(new NumericAttributeColorizer(travelTimeValues));
+		writer.setColorizable(new MyColorizer(travelDistanceValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
 	
 		logger.info("Done with writing Google Erath files ...");
@@ -308,9 +308,10 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	private Geometry getBoundary(String psrcSHPFile) throws IOException {
 		// get boundaries of study area
 		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
-		logger.info("Extracting boundary of the shape file");
+		logger.info("Extracting boundary of the shape file ...");
 		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
 		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
+		logger.info("Done extracting boundary ...");
 		
 		return boundary;
 	}
@@ -341,13 +342,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		// goes step by step from the min x and y coordinate to max x and y coordinate
 		for(double x = env.getMinX(); x < env.getMaxX(); x += gridSize) {
-			
-			// progress bar
-			while ( (int) (100.*cnt/(total/gridSize)) >= percentDone ){
-				percentDone++;  System.out.print('|');
-			}
-			cnt++;
-			
+						
 			for(double y = env.getMinY(); y < env.getMaxY(); y += gridSize) {
 				Point point = factory.createPoint(new Coordinate(x, y));
 				if(boundary.contains(point)) {
@@ -371,11 +366,17 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 				}
 				else skippedPoints++;
 			}
+			
+			// progress bar
+			cnt++;
+			while ( (int) (100.*cnt/(total/gridSize)) >= percentDone ){
+				percentDone++;  System.out.print('|');
+			}
 		}
 		
 		System.out.println("|\r\n");
 		logger.info(setPoints + " starting points were set and " + skippedPoints + " points have been skipped (because they lay outside the shape file boundary).");
-		logger.info("Finished setting starting points!");
+		logger.info("Done with setting starting points!");
 		
 		ZoneLayer<ZoneObject> layer = new ZoneLayer<ZoneObject>(zones);
 		return layer;
@@ -422,7 +423,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 //		}
 		
 		logger.info(setPoints + " were set and " + skippedPoints + " have been skipped.");
-		logger.info("Finished setting starting points!");
+		logger.info("Done with setting starting points!");
 		
 		ZoneLayer<Integer> layer = new ZoneLayer<Integer>(zones);
 		return layer;
@@ -434,11 +435,22 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		long startTime;
+		long endTime;
+		long time;
+		
+		startTime = System.currentTimeMillis();
+		
 		MATSim4UrbanSimERSA m4uERSA = new MATSim4UrbanSimERSA(args);
 		m4uERSA.runMATSim();
 //		if(m4uERSA.computationMeasures != null)
 //			MeasurementObject.wirteLogfile();
 //		else throw new RuntimeException("The object measuring comuting times is not initialized...");
+		endTime = System.currentTimeMillis();
+		time = (endTime - startTime) / 60000;
+		
+		logger.info("Computation took " + time + "minutes. Computation done!");
 	}
 
 }
