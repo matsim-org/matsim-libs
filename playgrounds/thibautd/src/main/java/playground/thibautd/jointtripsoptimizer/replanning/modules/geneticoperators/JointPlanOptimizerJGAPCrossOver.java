@@ -166,8 +166,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			mate1 = (IChromosome) parent1.clone();
 			mate2 = (IChromosome) parent2.clone();
 
-			doBooleanCrossOver(mate1, mate2);
-			doModeCrossOver(mate1, mate2);
+			//doBooleanCrossOver(mate1, mate2);
+			//doModeCrossOver(mate1, mate2);
 			if (i < numOfWholeCo) {
 				doDoubleWholeCrossOver(mate1, mate2);
 				if (dynamicRates) {

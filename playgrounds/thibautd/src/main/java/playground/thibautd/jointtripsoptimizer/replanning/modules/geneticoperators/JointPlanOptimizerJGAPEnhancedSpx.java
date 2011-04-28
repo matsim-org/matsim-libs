@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointPlanOptimizerJGAPSpx.java
+ * JointPlanOptimizerJGAPEnhancedSpx.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -40,10 +40,11 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
- * Multi-parent "Simplex cross-over".
+ * Multi-parent "Simplex cross-over", with boolean CO.
+ * modified JointPlanOptimizerJGAPSpx: refactoring to do.
  * @author thibautd
  */
-public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
+public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPSpx.class);
 
@@ -64,7 +65,10 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	private final RandomGenerator generator;
 	private final Comparator<IChromosome> comparator = new FitnessValueComparator();
 
-	public JointPlanOptimizerJGAPSpx(
+	private double actualExpansionRate;
+	private final double[] currentCoordinates;
+
+	public JointPlanOptimizerJGAPEnhancedSpx(
 			final JointPlanOptimizerJGAPConfiguration config,
 			final JointReplanningConfigGroup configGroup,
 			final int numBooleanGenes,
@@ -79,6 +83,8 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 		this.numberOfDoubleGenes = numDoubleGenes;
 		this.numberOfBooleanGenes = numBooleanGenes;
 		this.nDurationGenesPerIndiv = nDurationGenesPerIndiv;
+
+		this.currentCoordinates = new double[this.numberOfParents];
 
 		this.generator = config.getRandomGenerator();
 	}
@@ -218,17 +224,38 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 		double[][] output = new double[this.numberOfParents][this.numberOfDoubleGenes];
 		double[] vectorInConstruction;
 
+		this.actualExpansionRate = getActualExpansionRate(
+				centerOfMass,
+				fatherValues);
+
 		for (int i=0; i < this.numberOfParents; i++) {
-			vectorInConstruction = substractVector(fatherValues[i], centerOfMass);
+			vectorInConstruction = substractVector(
+					fatherValues[i],
+					centerOfMass);
 			vectorInConstruction = scalarVectorProduct(
-					getConstrainedExpansionRate(
-						centerOfMass,
-						fatherValues[i]),
+					this.actualExpansionRate,
 					vectorInConstruction);
 			output[i] = addVector(centerOfMass, vectorInConstruction);
 		}
 
 		return output;
+	}
+
+	private double getActualExpansionRate(
+			final double[] centerOfMass,
+			final double[][] fatherValues) {
+		double output = Double.POSITIVE_INFINITY;
+
+		for (int i=0; i < this.numberOfParents; i++) {
+			output = Math.min(
+					getConstrainedExpansionRate(
+						centerOfMass,
+						fatherValues[i]),
+					output);
+		}
+
+		return output;
+
 	}
 
 	/**
@@ -318,7 +345,7 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 	private double[] getVariablePart(
 			final double[][] simplexEdges) {
 		double[] output = new double[this.numberOfDoubleGenes];
-		double randomCoef;
+		double[] randomCoefs = new double[this.numberOfParents];
 		double[] vectorInConstruction;
 
 		//initialize the output to the null vector
@@ -326,11 +353,13 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 			output[i] = 0d;
 		}
 
+		randomCoefs[0] = 0d;
+
 		//construct the output such that it corresponds to a random point in the
 		//simplex
 		for (int i=1; i < this.numberOfParents; i++) {
-			randomCoef = this.generator.nextDouble();
-			randomCoef = Math.pow(randomCoef, 1d / i);
+			randomCoefs[i] = this.generator.nextDouble();
+			randomCoefs[i] = Math.pow(randomCoefs[i], 1d / i);
 
 			vectorInConstruction = substractVector(
 					simplexEdges[i-1],
@@ -339,10 +368,25 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 					vectorInConstruction,
 					output);
 
-			output = scalarVectorProduct(randomCoef, vectorInConstruction);
+			output = scalarVectorProduct(randomCoefs[i], vectorInConstruction);
 		}
 
+		retainCoordinates(randomCoefs);
+
 		return output;
+	}
+
+	private void retainCoordinates(double[] randomCoefs) {
+		double accumulation = this.actualExpansionRate;
+		double toAdd = (1d / this.numberOfParents) * (1 - this.actualExpansionRate);
+
+		for (int i = this.numberOfParents - 1; i > 0; i--) {
+			accumulation *= randomCoefs[i];
+			this.currentCoordinates[i] = 
+				accumulation * (1 - randomCoefs[i-1]) + toAdd;
+		}
+
+		this.currentCoordinates[0] = accumulation * randomCoefs[0] + toAdd;
 	}
 
 	private double[] getOffspring(
@@ -388,12 +432,9 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 			fathers.get(this.generator.nextInt(this.numberOfParents)).clone();
 		Gene[] genes = newChrom.getGenes();
 
-		//"uniform" CO: does not improve anything
-		//for (int i=0; i < this.numberOfBooleanGenes; i++) {
-		//	genes[i].setAllele(((BooleanGene)
-		//			fathers.get(this.generator.nextInt(this.numberOfParents)).
-		//			getGene(i)).booleanValue());
-		//}
+		for (int i=0; i < this.numberOfBooleanGenes; i++) {
+			genes[i].setAllele(getBooleanAllele(i, fathers));
+		}
 
 		// set the double values to the "crossed" ones
 		for (int i=0; i < this.numberOfDoubleGenes; i++) {
@@ -410,6 +451,22 @@ public class JointPlanOptimizerJGAPSpx implements GeneticOperator {
 
 		//add to candidates
 		a_candidateChromosome.add(newChrom);
+	}
+
+	private boolean getBooleanAllele(
+			final int geneIndex,
+			final List<IChromosome> fathers) {
+		double prob = 0d;
+		IChromosome father;
+
+		for (int i = 0; i < this.numberOfParents; i++) {
+			father = fathers.get(i);
+			if (((BooleanGene) father.getGene(geneIndex)).booleanValue()) {
+				prob += this.currentCoordinates[i];
+			}
+		}
+
+		return this.generator.nextDouble() < prob;
 	}
 
 	/*

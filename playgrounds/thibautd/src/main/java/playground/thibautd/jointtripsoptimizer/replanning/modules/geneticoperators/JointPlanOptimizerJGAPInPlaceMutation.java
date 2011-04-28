@@ -41,15 +41,18 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
- * Class mutating random members from the previous generation.
- * The type of mutation differs depending on the gene:
- * -"toggle" gene: the value is changed with probability 1.
- * -duration gene: GENOCOP (Michalewicz and Janikow, 1996) like "non-uniform
- *  mutation" (preserves the inequality constraints).
+ * Mutates toggle genes "in place".
+ * The genes of the <u>candidate</u> chromosomes are mutated according to some 
+ * probability, and the resulting offspring reimplaces the original chromosome
+ * if it is fittest.
+ *
+ * Using this mutation operator can be seen as the usage of a local optimizer
+ * for toggle gene, thus making useless the modification of those genes in genetic
+ * operators.
  *
  * @author thibautd
  */
-public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
+public class JointPlanOptimizerJGAPInPlaceMutation implements GeneticOperator {
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPMutation.class);
 
@@ -69,7 +72,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	private final RandomGenerator randomGenerator;
 	private final Configuration jgapConfig;
 
-	public JointPlanOptimizerJGAPMutation(
+	public JointPlanOptimizerJGAPInPlaceMutation(
 			final JointPlanOptimizerJGAPConfiguration config,
 			final JointReplanningConfigGroup configGroup,
 			final int chromosomeSize,
@@ -102,14 +105,14 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 			final Population a_population,
 			final List a_candidateChromosome
 			) {
-		int populationSize = a_population.size();
+		int populationSize = a_candidateChromosome.size();
 		Gene geneToMute;
 		double freeSpace;
 		IChromosome currentChromosome;
 		IChromosome copyOfChromosome = null;
 
 		for (int j=0; j < populationSize; j++) {
-			currentChromosome = a_population.getChromosome(j);
+			currentChromosome = (IChromosome) a_candidateChromosome.get(j);
 			Collections.shuffle(this.geneIndices, (Random) this.randomGenerator);
 
 			//for each gene in the chromosome:
@@ -118,29 +121,42 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 					//perform mutation
 
 					// if not already done for this chromosome, make a copy of
-					// the current chromosome and add it to the candidates.
+					// the current chromosome
 					if (copyOfChromosome == null) {
 						copyOfChromosome = (IChromosome) currentChromosome.clone();
-						a_candidateChromosome.add(copyOfChromosome);
 					}
 					geneToMute = copyOfChromosome.getGene(i);
 
 					if (geneToMute instanceof BooleanGene) {
 						mutateBoolean((BooleanGene) geneToMute);
 					}
-					else if (geneToMute instanceof DoubleGene) {
+					//else if (geneToMute instanceof DoubleGene) {
 
-						freeSpace = getFreeSpace(
-								i,
-								copyOfChromosome);
+					//	freeSpace = getFreeSpace(
+					//			i,
+					//			copyOfChromosome);
 
-						mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
-						//mutateDouble((DoubleGene) geneToMute, freeSpace);
-					}
-					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
-						geneToMute.setToRandomValue(this.randomGenerator);
+					//	//mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+					//	mutateDouble((DoubleGene) geneToMute, freeSpace);
+					//}
+					//else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
+					//	geneToMute.setToRandomValue(this.randomGenerator);
+					//}
+					if (copyOfChromosome.getFitnessValue() > 
+							currentChromosome.getFitnessValue()) {
+						a_candidateChromosome.remove(currentChromosome);
+						a_candidateChromosome.add(copyOfChromosome);
+						currentChromosome = copyOfChromosome;
 					}
 				}
+			}
+
+			//replace mutated chromosome if new one better
+			if ( (!(copyOfChromosome==null)) && 
+					(copyOfChromosome.getFitnessValue() > 
+					 currentChromosome.getFitnessValue()) ) {
+				a_candidateChromosome.remove(currentChromosome);
+				a_candidateChromosome.add(copyOfChromosome);
 			}
 			copyOfChromosome = null;
 		}
@@ -155,36 +171,6 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes = nGenesIterator.next();
 		boolean inGoodPlan = false;
-
-		//for (Gene gene : chromosome.getGenes()) {
-		//	if ( !(gene instanceof DoubleGene) ) {
-		//		totalCount++;
-		//		continue;
-		//	}
-
-		//	if (geneCount == currentNGenes) {
-		//		// end of an individual plan reached
-		//		if (inGoodPlan) {
-		//			// we were in the plan of the mutated chromosome:
-		//			// we are done.
-		//			break;
-		//		}
-		//		// else, we begin a new initial plan
-		//		freeSpace = DAY_DURATION;
-		//		geneCount = 0;
-		//		currentNGenes = nGenesIterator.next();
-		//	}
-
-		//	if ((totalCount != indexToMute)) {
-		//		freeSpace -= ((DoubleGene) gene).doubleValue();
-		//	}
-		//	else {
-		//		inGoodPlan = true;
-		//	}
-
-		//	geneCount++;
-		//	totalCount++;
-		//}
 
 		Gene[] genes = chromosome.getGenes();
 		Gene gene;
@@ -230,14 +216,12 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 			final Double freeSpace) {
 		// GENOCOP (Michalewicz, Janikow, 1996) like "non uniform" mutation.
 		double value = gene.doubleValue();
-		double lowerBound = 0;
-		double upperBound = freeSpace;
 		int iter = this.jgapConfig.getGenerationNr();
 
 		if (this.randomGenerator.nextInt(2) == 0) {
-			value += delta(iter, upperBound - value);
+			value += delta(iter, gene.getUpperBound() - value);
 		} else {
-			value -= delta(iter, value - lowerBound);
+			value -= delta(iter, value - gene.getLowerBound());
 		}
 
 		gene.setAllele(value);

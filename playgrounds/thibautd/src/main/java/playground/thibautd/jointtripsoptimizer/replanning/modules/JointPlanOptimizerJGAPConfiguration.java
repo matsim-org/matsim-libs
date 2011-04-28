@@ -33,6 +33,8 @@ import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.ThresholdSelector;
+import org.jgap.impl.TournamentSelector;
+import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
@@ -50,9 +52,15 @@ import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.CrossOverRateCalculator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPEnhancedSpx;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPInPlaceMutation;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPSpx;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.DefaultChromosomeDistanceComparator;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.RestrictedTournamentSelector;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuBestFitnessSelector;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuRestrictedTournamentSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -121,12 +129,21 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//	new ThresholdSelector(this, configGroup.getSelectionThreshold());
 			//	this reimplementation allows to choose whether to use replacement
 			//	or not (TODO: import from config group)
-			JointPlanOptimizerJGAPThresholdSelector selector = 
-				new JointPlanOptimizerJGAPThresholdSelector(
-						this, 
-						configGroup.getSelectionThreshold());
-			selector.setDoubletteChromosomesAllowed(configGroup.getAllowDoublettes());
+			//JointPlanOptimizerJGAPThresholdSelector selector = 
+			//	new JointPlanOptimizerJGAPThresholdSelector(
+			//			this, 
+			//			configGroup.getSelectionThreshold());
+			//selector.setDoubletteChromosomesAllowed(configGroup.getAllowDoublettes());
+			//TournamentSelector selector = new TournamentSelector(this, 2, 0.6d);
+			RestrictedTournamentSelector selector = 
+				new TabuRestrictedTournamentSelector(
+						this,
+						new DefaultChromosomeDistanceComparator(00d)); 
+			//TabuBestFitnessSelector selector =
+			//	new TabuBestFitnessSelector(this, configGroup);
 			this.addNaturalSelector(selector, false);
+
+			this.setPreservFittestIndividual(true);
 
 			// Chromosome: construction
 			Gene[] sampleGenes =
@@ -196,7 +213,13 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 							this.numModeGenes,
 							this.nDurationGenes) );
 			}
-			this.addGeneticOperator( new JointPlanOptimizerJGAPSpx(
+			//this.addGeneticOperator( new JointPlanOptimizerJGAPSpx(
+			//			this,
+			//			configGroup,
+			//			this.numToggleGenes,
+			//			this.numEpisodes,
+			//			this.nDurationGenes) );
+			this.addGeneticOperator( new JointPlanOptimizerJGAPEnhancedSpx(
 						this,
 						configGroup,
 						this.numToggleGenes,
@@ -207,6 +230,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						configGroup,
 						this.numToggleGenes + this.numEpisodes,
 						this.nDurationGenes));
+			//this.addGeneticOperator( new JointPlanOptimizerJGAPInPlaceMutation(
+			//			this,
+			//			configGroup,
+			//			this.numToggleGenes + this.numEpisodes,
+			//			this.nDurationGenes));
 
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e.getMessage());

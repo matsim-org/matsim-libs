@@ -37,7 +37,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 public class run {
 	/**
 	 * run the simulation.
-	 * @args the config file to use.
+	 * @param args the config file to use.
 	 */
 	public static void main(String[] args) {
 		String configFile = args[0];
