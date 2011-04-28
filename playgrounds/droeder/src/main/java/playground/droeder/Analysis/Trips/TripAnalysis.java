@@ -74,7 +74,6 @@ public class TripAnalysis {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(out);
 			writer.write(this.tripSet.toString());
-			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

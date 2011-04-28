@@ -36,18 +36,18 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class BvgTripAnalysisRunner {
 	public static void main(String[] args){
-		final String OUT = DaPaths.VSP + "BVG09_Auswertung/"; 
-		final String IN = OUT + "input/";
+		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
+		final String INDIR = OUTDIR + "input/";
 		
-		final String NETWORKFILE = IN + "network.final.xml.gz";
-		final String SHAPEFILE = OUT + "/BerlinSHP/Berlin.shp"; 
-		final String OUTPUTFILE = OUT + "outTest.csv";
+		final String NETWORKFILE = INDIR + "network.final.xml.gz";
+		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
+		final String OUTPUTFILE = OUTDIR + "BerlinTrips.csv";
 		
 //		final String EVENTSFILE = IN + "bvg.run128.25pct.100.events.xml.gz";
 //		final String PLANSFILE = IN + "bvg.run128.25pct.100.plans.selected.xml.gz";
 		
-		final String EVENTSFILE = OUT + "testEvents.xml";
-		final String PLANSFILE = OUT + "testPopulation1.xml.gz";
+		final String EVENTSFILE = OUTDIR + "testEvents.xml";
+		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
 		
 		Set<Feature> features = null;
 		try {
