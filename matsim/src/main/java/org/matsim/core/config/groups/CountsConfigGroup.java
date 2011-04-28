@@ -27,6 +27,7 @@ import org.matsim.core.config.Module;
 
 /**
  * @author dgrether
+ * @author mrieser
  */
 public class CountsConfigGroup extends Module {
 
@@ -39,14 +40,13 @@ public class CountsConfigGroup extends Module {
 	private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
 	private static final String COUNTSINPUTFILENAME = "inputCountsFile";
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
+	private static final String WRITECOUNTSINTERVAL = "writeCountsInterval";
+	private static final String AVERAGECOUNTSOVERITERATIONS = "averageCountsOverIterations";
 
 	private String outputFormat;
 
 	/**
-	 * the distance filter in m
-	 * <p/>
-	 * yyyy I don't think this is in `m'; it is rather implied by the coordinate system (which happens to be in m in 
-	 * Switzerland).  kai, oct'10
+	 * the distance filter in [length unit defined by coordinates] 
 	 */
 	private Double distanceFilter;
 
@@ -63,6 +63,9 @@ public class CountsConfigGroup extends Module {
 	 * the scaling for the counts
 	 */
 	private double countsScaleFactor = 1.0;
+	
+	private int writeCountsInterval = 10;
+	private int averageCountsOverIterations = 5;
 
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
@@ -83,6 +86,10 @@ public class CountsConfigGroup extends Module {
 			return getCountsFileName();
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			return Double.toString(getCountsScaleFactor());
+		} else if (WRITECOUNTSINTERVAL.equals(key)) {
+			return Integer.toString(getWriteCountsInterval());
+		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
+			return Integer.toString(getAverageCountsOverIterations());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -104,6 +111,10 @@ public class CountsConfigGroup extends Module {
 			setCountsFileName(value.replace('\\', '/'));
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
+		} else if (WRITECOUNTSINTERVAL.equals(key)) {
+			this.setWriteCountsInterval(Integer.parseInt(value));
+		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
+			this.setAverageCountsOverIterations(Integer.parseInt(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -117,6 +128,8 @@ public class CountsConfigGroup extends Module {
 		this.addParameterToMap(map, DISTANCEFILTERCENTERNODE);
 		this.addParameterToMap(map, COUNTSINPUTFILENAME);
 		this.addParameterToMap(map, COUNTSSCALEFACTOR);
+		this.addParameterToMap(map, WRITECOUNTSINTERVAL);
+		this.addParameterToMap(map, AVERAGECOUNTSOVERITERATIONS);
 		return map;
 	}
 	
@@ -138,6 +151,9 @@ public class CountsConfigGroup extends Module {
 		comments.put(DISTANCEFILTERCENTERNODE, COUNTS_DISTANCEFILTERCENTERNODE_COMMENT ) ;
 		comments.put(COUNTSINPUTFILENAME, COUNTSINPUTFILENAME_COMMENT ) ;
 		comments.put(COUNTSSCALEFACTOR, COUNTSSCALEFACTOR_COMMENT ) ;
+		comments.put(WRITECOUNTSINTERVAL, "Specifies how often the counts comparison should be calculated and written.");
+		comments.put(AVERAGECOUNTSOVERITERATIONS, "Specifies over how many iterations the link volumes should be averaged that are used for the " +
+				"counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for " + WRITECOUNTSINTERVAL);
 		return comments;
 	}
 
@@ -185,5 +201,21 @@ public class CountsConfigGroup extends Module {
 
 	public void setCountsScaleFactor(final double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
+	}
+	
+	public int getWriteCountsInterval() {
+		return writeCountsInterval;
+	}
+	
+	public void setWriteCountsInterval(int writeCountsInterval) {
+		this.writeCountsInterval = writeCountsInterval;
+	}
+	
+	public int getAverageCountsOverIterations() {
+		return averageCountsOverIterations;
+	}
+	
+	public void setAverageCountsOverIterations(int averageCountsOverIterations) {
+		this.averageCountsOverIterations = averageCountsOverIterations;
 	}
 }

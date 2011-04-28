@@ -45,10 +45,10 @@ public class CalcLinkStats {
 	private final static Logger log = Logger.getLogger(CalcLinkStats.class);
 
 	private static class LinkData {
-		public final int[][] volumes;
+		public final double[][] volumes;
 		public final double[][] ttimes;
 
-		public LinkData(final int[][] linksVolumes, final double[][] linksTTimes) {
+		public LinkData(final double[][] linksVolumes, final double[][] linksTTimes) {
 			this.volumes = linksVolumes.clone();
 			this.ttimes = linksTTimes.clone();
 		}
@@ -73,6 +73,12 @@ public class CalcLinkStats {
 		reset();
 	}
 
+	/**
+	 * @param network
+	 * @param vol_scale_factor scaling factor when reading in values from a file
+	 * 
+	 * @see #readFile(String)
+	 */
 	public CalcLinkStats(final Network network, double vol_scale_factor) {
 		this(network);
 		this.volScaleFactor = vol_scale_factor;
@@ -80,10 +86,10 @@ public class CalcLinkStats {
 
 	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes) {
 		this.count++;
-		// TODO verify analyzer and ttimes have hourly timeBin-Settings
+		// TODO verify ttimes has hourly timeBin-Settings
 		for (Id linkId : this.linkData.keySet()) {
 			Link link = this.network.getLinks().get(linkId);
-			int[] volumes = analyzer.getVolumesForLink(linkId);
+			double[] volumes = analyzer.getVolumesPerHourForLink(linkId);
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
 			if (volumes == null) {
@@ -141,7 +147,7 @@ public class CalcLinkStats {
 
 		// initialize our data-table
 		for (Link link : this.network.getLinks().values()) {
-			LinkData data = new LinkData(new int[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
+			LinkData data = new LinkData(new double[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
 			this.linkData.put(link.getId(), data);
 		}
 
@@ -150,7 +156,7 @@ public class CalcLinkStats {
 	public void writeFile(final String filename) {
 		BufferedWriter out = null;
 		try {
-			out = IOUtils.getBufferedWriter(filename, true);
+			out = IOUtils.getBufferedWriter(filename);
 
 			// write header
 			out.write("LINK\tORIG_ID\tFROM\tTO\tLENGTH\tFREESPEED\tCAPACITY");
@@ -186,18 +192,18 @@ public class CalcLinkStats {
 				// HRS0-1, HRS1-2, ... HRS23-24
 //				int[] sum = {0, 0, 0};
 				for (int i = 0; i < this.nofHours; i++) {
-					out.write("\t" + Integer.toString(data.volumes[MIN][i]));
+					out.write("\t" + Double.toString(data.volumes[MIN][i]));
 //					sum[MIN] = sum[MIN] + data.volumes[MIN][i];
-					out.write("\t" + Integer.toString(data.volumes[SUM][i] / this.count));
+					out.write("\t" + Double.toString((data.volumes[SUM][i]) / this.count));
 //					sum[SUM] = sum[SUM] + data.volumes[SUM][i];
-					out.write("\t" + Integer.toString(data.volumes[MAX][i]));
+					out.write("\t" + Double.toString(data.volumes[MAX][i]));
 //					sum[MAX] = sum[MAX] + data.volumes[MAX][i];
 				}
 
 				// HRS0-nofHours
-				out.write("\t" + Integer.toString(data.volumes[MIN][this.nofHours]));
-				out.write("\t" + Integer.toString(data.volumes[SUM][this.nofHours] / this.count));
-				out.write("\t" + Integer.toString(data.volumes[MAX][this.nofHours]));
+				out.write("\t" + Double.toString(data.volumes[MIN][this.nofHours]));
+				out.write("\t" + Double.toString((data.volumes[SUM][this.nofHours]) / this.count));
+				out.write("\t" + Double.toString(data.volumes[MAX][this.nofHours]));
 
 				// TRAVELTIME0-1, TRAVELTIME1-2, ... TRAVELTIME23-24
 				for (int i = 0; i < this.nofHours; i++) {
@@ -268,11 +274,11 @@ public class CalcLinkStats {
 					} else {
 						int baseTTimes;
 						for (int i = 0; i < this.nofHours; i++) {
-							data.volumes[MIN][i] = Integer.parseInt(parts[7 + i*3]);
+							data.volumes[MIN][i] = Double.parseDouble(parts[7 + i*3]);
 							data.volumes[MIN][i] *= this.volScaleFactor;
-							data.volumes[SUM][i] = Integer.parseInt(parts[8 + i*3]);
+							data.volumes[SUM][i] = Double.parseDouble(parts[8 + i*3]);
 							data.volumes[SUM][i] *= this.volScaleFactor;
-							data.volumes[MAX][i] = Integer.parseInt(parts[9 + i*3]);
+							data.volumes[MAX][i] = Double.parseDouble(parts[9 + i*3]);
 							data.volumes[MAX][i] *= this.volScaleFactor;
 							baseTTimes = 7 + (this.nofHours+1)*3;
 							data.ttimes[MIN][i] = Double.parseDouble(parts[baseTTimes + i*3]);
@@ -283,11 +289,11 @@ public class CalcLinkStats {
 							}
 							data.ttimes[MAX][i] = Double.parseDouble(parts[baseTTimes + i*3 + 2]);
 						}
-						data.volumes[MIN][this.nofHours] = Integer.parseInt(parts[7 + this.nofHours*3]);
+						data.volumes[MIN][this.nofHours] = Double.parseDouble(parts[7 + this.nofHours*3]);
 						data.volumes[MIN][this.nofHours] *= this.volScaleFactor;
-						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
+						data.volumes[SUM][this.nofHours] = Double.parseDouble(parts[8 + this.nofHours*3]);
 						data.volumes[SUM][this.nofHours] *= this.volScaleFactor;
-						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[9 + this.nofHours*3]);
+						data.volumes[MAX][this.nofHours] = Double.parseDouble(parts[9 + this.nofHours*3]);
 						data.volumes[MAX][this.nofHours] *= this.volScaleFactor;
 					}
 				}
@@ -299,11 +305,11 @@ public class CalcLinkStats {
 					} else {
 						int baseTTimes;
 						for (int i = 0; i < this.nofHours; i++) {
-							data.volumes[MIN][i] = Integer.parseInt(parts[6 + i*3]);
+							data.volumes[MIN][i] = Double.parseDouble(parts[6 + i*3]);
 							data.volumes[MIN][i] *= this.volScaleFactor;
 							data.volumes[SUM][i] = Integer.parseInt(parts[7 + i*3]);
 							data.volumes[SUM][i] *= this.volScaleFactor;
-							data.volumes[MAX][i] = Integer.parseInt(parts[8 + i*3]);
+							data.volumes[MAX][i] = Double.parseDouble(parts[8 + i*3]);
 							data.volumes[MAX][i] *= this.volScaleFactor;
 							baseTTimes = 6 + (this.nofHours+1)*3;
 							data.ttimes[MIN][i] = Double.parseDouble(parts[baseTTimes + i*3]);
@@ -314,11 +320,11 @@ public class CalcLinkStats {
 							}
 							data.ttimes[MAX][i] = Double.parseDouble(parts[baseTTimes + i*3 + 2]);
 						}
-						data.volumes[MIN][this.nofHours] = Integer.parseInt(parts[6 + this.nofHours*3]);
+						data.volumes[MIN][this.nofHours] = Double.parseDouble(parts[6 + this.nofHours*3]);
 						data.volumes[MIN][this.nofHours] *= this.volScaleFactor;
-						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[7 + this.nofHours*3]);
+						data.volumes[SUM][this.nofHours] = Double.parseDouble(parts[7 + this.nofHours*3]);
 						data.volumes[SUM][this.nofHours] *= this.volScaleFactor;
-						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
+						data.volumes[MAX][this.nofHours] = Double.parseDouble(parts[8 + this.nofHours*3]);
 						data.volumes[MAX][this.nofHours] *= this.volScaleFactor;
 					}
 				}
@@ -355,7 +361,7 @@ public class CalcLinkStats {
 		}
 		double[] volumes = new double[this.nofHours];
 		for (int i = 0; i < this.nofHours; i++) {
-			volumes[i] = ((double)data.volumes[SUM][i]) / ((double)this.count);
+			volumes[i] = (data.volumes[SUM][i]) / (this.count);
 		}
 		return volumes;
 	}

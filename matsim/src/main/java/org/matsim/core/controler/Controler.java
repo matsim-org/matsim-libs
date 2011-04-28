@@ -156,7 +156,7 @@ public class Controler {
 	public static final String DIRECTORY_ITERS = "ITERS";
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt";
+	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
 	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats.txt";
 	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
@@ -821,12 +821,14 @@ public class Controler {
 
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
-			CountControlerListener ccl = new CountControlerListener(this.config);
+			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 			this.counts = ccl.getCounts();
 		}
 
-		this.addControlerListener(new LinkStatsControlerListener());
+		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
+			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
+		}
 		
 		if (this.config.scenario().isUseTransit()) {
 			addControlerListener(new TransitControlerListener());
@@ -1217,6 +1219,11 @@ public class Controler {
 		return this.counts;
 	}
 
+	/**
+	 * @deprecated Do not use this, as it may not contain values in every iteration
+	 * @return
+	 */
+	@Deprecated
 	public final CalcLinkStats getLinkStats() {
 		return this.linkStats;
 	}

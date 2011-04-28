@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
+import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -92,6 +93,7 @@ public class Config {
 	private StrategyConfigGroup strategy = null;
 	private TransitConfigGroup transit = null;
 	private TransitRouterConfigGroup transitRouter = null;
+	private LinkStatsConfigGroup linkStats = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 
 	// config groups that are elsewhere:
@@ -183,6 +185,9 @@ public class Config {
 
 		this.transit = new TransitConfigGroup();
 		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
+		
+		this.linkStats = new LinkStatsConfigGroup();
+		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, this.linkStats);
 
 		this.transitRouter = new TransitRouterConfigGroup();
 		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, this.transitRouter);
@@ -462,6 +467,10 @@ public class Config {
 
 	public TransitRouterConfigGroup transitRouter() {
 		return this.transitRouter;
+	}
+	
+	public LinkStatsConfigGroup linkStats() {
+		return this.linkStats;
 	}
 
 	// typed adders:

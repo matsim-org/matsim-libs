@@ -56,6 +56,10 @@ public class CountSimComparisonLinkFilter {
 		this.countSimComparisons = countSimComparisons;
 		this.countSimComparisonLinkMap=new Hashtable<Id, List<CountSimComparison>>();
 		
+		if (this.countSimComparisons.size() < 1) {
+			return;
+		}
+
 		List<CountSimComparison> countSimComparisonsPerLink=new Vector<CountSimComparison>();
 		Id prevId=this.countSimComparisons.get(0).getId();
 		

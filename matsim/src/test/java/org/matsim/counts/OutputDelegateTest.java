@@ -44,8 +44,6 @@ public class OutputDelegateTest extends MatsimTestCase {
 			sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
 	
 			new File(getOutputDirectory() + "graphs").mkdir();
-			new File(getOutputDirectory() + "graphs/pdf").mkdir();
-			new File(getOutputDirectory() + "graphs/png").mkdir();
 			OutputDelegate outputDelegate=new OutputDelegate(getOutputDirectory() + "graphs/");
 			outputDelegate.addSection(new Section("testOutPutAll"));
 			assertNotNull("No graph was created", sg.createChart(0));

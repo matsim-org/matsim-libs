@@ -173,7 +173,7 @@ public class ControlerMFeil extends Controler {
 		
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
-			CountControlerListener ccl = new CountControlerListener(this.config);
+			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 			this.counts = ccl.getCounts();
 		}

@@ -22,6 +22,7 @@ package org.matsim.counts.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
@@ -49,13 +50,15 @@ public class CountsComparisonAlgorithm {
 	/**
 	 * The LinkAttributes of the simulation
 	 */
-	private CalcLinkStats linkStats;
+	private final CalcLinkStats linkStats;
 	
-	private VolumesAnalyzer volumes;
+	private final VolumesAnalyzer volumes;
+	
+	private final Map<Id, double[]> volumesPerLinkPerHour;
 	/**
 	 * The counts object
 	 */
-	private Counts counts;
+	private final Counts counts;
 	/**
 	 * The result list
 	 */
@@ -77,6 +80,8 @@ public class CountsComparisonAlgorithm {
 		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
 		this.countsScaleFactor = countsScaleFactor;
+		this.volumes = null;
+		this.volumesPerLinkPerHour = null;
 	}
 	
 	public CountsComparisonAlgorithm(VolumesAnalyzer volumes, final Counts counts, final Network network, final double countsScaleFactor) {
@@ -85,6 +90,18 @@ public class CountsComparisonAlgorithm {
 		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
 		this.countsScaleFactor = countsScaleFactor;
+		this.linkStats = null;
+		this.volumesPerLinkPerHour = null;
+	}
+
+	public CountsComparisonAlgorithm(final Map<Id, double[]> volumesPerLinkPerHour, final Counts counts, final Network network, final double countsScaleFactor) {
+		this.volumesPerLinkPerHour = volumesPerLinkPerHour;
+		this.counts = counts;
+		this.countSimComp = new ArrayList<CountSimComparison>();
+		this.network = network;
+		this.countsScaleFactor = countsScaleFactor;
+		this.linkStats = null;
+		this.volumes = null;
 	}
 
 	/**
@@ -101,9 +118,10 @@ public class CountsComparisonAlgorithm {
 			double[] volumes = new double[24];
 			if (this.linkStats != null) {
 				volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
-			}
-			else {
+			} else if (this.volumes != null) {
 				volumes = this.volumes.getVolumesPerHourForLink(count.getLocId());
+			} else {
+				volumes = this.volumesPerLinkPerHour.get(count.getLocId());
 			}
 			if (volumes.length == 0) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
