@@ -20,9 +20,9 @@ public class SfFlightDelayAnalysis {
 	private Map<String, Double> scheduledArrival;
 	private Map<Integer, Integer> delay;	
 	
-	private static String actualTimes = "/home/soeren/bachelorarbeit/0.statistic.csv";
+	private static String actualTimes = "/home/soeren/runs-svn/run1240/ITERS/it.0/0.statistic.csv";
 	private static String scheduledTimes= "/home/soeren/workspace/oagEuroFlights.txt";
-	private static String delayOutput = "/home/soeren/bachelorarbeit/delayOutput.csv";
+	private static String delayOutput = "/home/soeren/Desktop/delayOutput.csv";
 	
 	public SfFlightDelayAnalysis() {
 		this.actualArrival = new HashMap<String, Double>(); 
@@ -46,6 +46,7 @@ public class SfFlightDelayAnalysis {
 		BufferedReader brActual = new BufferedReader(new FileReader(new File(actualTimes)));
 		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
 		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(delayOutput)));
+		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("/home/soeren/Desktop/delayByFlight.csv")));
 		
 		this.delay.put(0, 0);
 		this.delay.put(1, 0);
@@ -95,6 +96,9 @@ public class SfFlightDelayAnalysis {
 			Double arrival = Double.parseDouble(entries[3])+Double.parseDouble(entries[4]);
 			this.scheduledArrival.put(flightNumber, arrival/60);
 			Double flightDelay = this.actualArrival.get(flightNumber)-this.scheduledArrival.get(flightNumber);
+			if (flightDelay >=60.) System.out.println(flightNumber+"..."+flightDelay+"STA"+this.scheduledArrival.get(flightNumber)+"ATA"+this.actualArrival.get(flightNumber));
+			bwDelaySingleFlights.write(this.actualArrival.get(flightNumber)+"\t"+flightDelay);
+			bwDelaySingleFlights.newLine();
 			
 				if (flightDelay == 0.) {
 					Integer soFar = this.delay.get(0);
@@ -237,6 +241,7 @@ public class SfFlightDelayAnalysis {
 		}
 		
 		brScheduled.close();
+		bwDelaySingleFlights.close();
 		
 		bwDelay.write("Delay in minutes \t Number of Delays");
 		bwDelay.newLine();

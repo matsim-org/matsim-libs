@@ -111,6 +111,7 @@ public class SfAirScheduleBuilder {
 						double departureInSec = Double.parseDouble(lineEntries[10].substring(2))*60+Double.parseDouble(lineEntries[10].substring(0, 2))*3600;
 						double utcOffset = getOffsetUTC(originCountry)*3600;
 						departureInSec=departureInSec-utcOffset;
+							if (departureInSec<0) departureInSec+=86400.0;	//shifting flights with departure on previous day in UTC time +24 hours
 						double stops = Double.parseDouble(lineEntries[15]);
 						String fullRouting = lineEntries[40];
 						
