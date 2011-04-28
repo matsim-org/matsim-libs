@@ -84,7 +84,8 @@ public class Validator implements XYZEventsHandler{
 			if (Math.abs(xyza1.getTime() - xyza2.getTime()) > this.delta) {
 				throw new RuntimeException("validator out of sync!\nThis should not happen!");
 			}
-			double diff = xyza1.getCoordinate().distance(xyza2.getCoordinate());
+			//			double diff = xyza1.getCoordinate().distance(xyza2.getCoordinate());
+			double diff = Math.pow(xyza1.getX()-xyza2.getX(), 2) + Math.pow(xyza1.getY()-xyza2.getY(), 2);
 			this.allDiff  += diff;
 			//			System.err.println("dist:" + diff);
 		}

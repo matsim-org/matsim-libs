@@ -2,6 +2,7 @@ package playground.gregor.sim2d_v2.calibration_v2;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -28,23 +29,19 @@ public class CalibrationController2D  {
 
 
 	private PedVisPeekABot vis;
-	private final PhantomEvents phantomEvents;
-	private final Validator validator;
 	private final List<Double> allDiffs = new ArrayList<Double>();
 	private final  List<Double>  allAi = new ArrayList<Double>();
 
-	private final Id cali = new IdImpl("1");
 	private final Config config;
 	private Sim2DConfigGroup sim2dConfig;
-	private final EventsManager events;
 	private final Scenario scenario;
 	private final Scenario2DImpl scenario2DData;
+	private final PhantomEvents phantomEvents;
 
 	public CalibrationController2D(String[] args) {
 		String configFile = args[0];
 		this.config = ConfigUtils.loadConfig(configFile);
 		initSim2DConfigGroup();
-		this.events = EventsUtils.createEventsManager();
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		this.scenario2DData = new Scenario2DImpl(this.config);
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario2DData);
@@ -56,10 +53,8 @@ public class CalibrationController2D  {
 		this.sim2dConfig.setEnableEnvironmentForceModule("false");
 		this.sim2dConfig.setEnablePathForceModule("true");
 		this.sim2dConfig.setPhantomPopulationEventsFile("/Users/laemmel/devel/dfg/phantomEvents.xml.gz");
-		this.sim2dConfig.setAi(40);
+		this.sim2dConfig.setAi(50);
 		this.phantomEvents = new PhantomPopulationLoader(this.sim2dConfig.getPhantomPopulationEventsFile()).getPhantomPopulation();
-		this.validator = new Validator(this.events);
-		this.events.addHandler(this.validator);
 	}
 
 	/**
@@ -79,10 +74,53 @@ public class CalibrationController2D  {
 
 
 	public void run() {
-		for (int it = 0; it < 100; it++){
-			runMobSim();
-			System.out.println("ITERATION " + it + " finished");
+
+		List<Id> ids = new ArrayList<Id>();
+		for (int i = 0; i < 480; i++) {
+			ids.add(new IdImpl(i));
 		}
+
+		int numOfThreads = 4;
+
+		for (int it = 0; it < 20; it++){
+
+			List<Validator> vs = new ArrayList<Validator>();
+			List<Thread> ts = new ArrayList<Thread>();
+
+			int size = 40/ numOfThreads;
+			for (int i = 0; i < numOfThreads; i++) {
+				Collections.shuffle(ids);
+				List<Id> sub = ids.subList(0, size-1);
+				Validator v1 = new Validator(null);
+				Worker w1 = new Worker(this.scenario2DData,this.phantomEvents,v1,sub);
+				Thread t1 = new Thread(w1);
+				vs.add(v1);
+				ts.add(t1);
+				t1.start();
+			}
+
+			double diff = 0;
+
+			for (int i = 0; i < numOfThreads; i++) {
+				Thread t1 = ts.get(i);
+				try {
+					t1.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				Validator v1 = vs.get(i);
+				diff += v1.getAndResetAllDiff();
+			}
+
+			this.allDiffs.add(diff);
+			this.allAi .add(this.sim2dConfig.getAi());
+			System.out.println("ITERATION " + it + " finished");
+			this.sim2dConfig.setAi(this.sim2dConfig.getAi()+5);
+		}
+
+
+
+
 		System.err.println("=================================================");
 		for (int i = 0; i <this.allAi.size(); i++) {
 			System.err.println("diff:" + this.allDiffs.get(i) + "  Ai:" + this.allAi.get(i));
@@ -90,18 +128,31 @@ public class CalibrationController2D  {
 		System.err.println("=================================================");
 	}
 
+	private static class Worker implements Runnable {
 
-	protected void runMobSim() {
+		private final Scenario2DImpl scenario2DData;
+		private final PhantomEvents phantomEvents;
+		private final Validator validator;
+		private final List<Id> ids;
 
-		CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario2DData, this.phantomEvents, this.events, this.validator);
 
-		cse.doOneIteration(this.cali);
+		public Worker( Scenario2DImpl scenario2DData, PhantomEvents phantomEvents, Validator validator, List<Id> ids) {
+			this.scenario2DData = scenario2DData;
+			this.phantomEvents = phantomEvents;
+			this.validator = validator;
+			this.ids = ids;
+		}
 
-		this.allDiffs.add(this.validator.getAndResetAllDiff());
-		this.allAi .add(this.sim2dConfig.getAi());
+		@Override
+		public void run() {
+			CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario2DData, this.phantomEvents, this.validator);
+			cse.doOneIteration(this.ids);
 
-		this.sim2dConfig.setAi(this.sim2dConfig.getAi()+1);
+		}
+
 	}
+
+
 
 	public static void main(String [] args) {
 		CalibrationController2D controller = new CalibrationController2D(args);

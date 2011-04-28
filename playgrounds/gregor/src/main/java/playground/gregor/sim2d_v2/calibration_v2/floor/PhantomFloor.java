@@ -37,7 +37,7 @@ public class PhantomFloor extends PhysicalFloor {
 	private final Validator validator;
 
 	private double lastValidated = 0;
-	private final double validationIntervall = 2;
+	private final double validationIntervall = 8;
 
 	private final boolean silent = true;
 	private boolean finished = false;
