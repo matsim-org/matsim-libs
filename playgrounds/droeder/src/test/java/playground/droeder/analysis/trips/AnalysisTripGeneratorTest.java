@@ -108,7 +108,7 @@ public class AnalysisTripGeneratorTest {
 		
 		link2 = sc.createId("l2");
 		link3 = sc.createId("l3");
-		fac2 = sc.createId("fac2");
+		fac2 = sc.createId("f2");
 		fac3 = sc.createId("f3");
 		type1 = "home";
 		type2 = "pt interaction";
