@@ -22,7 +22,7 @@ public abstract class CreatePendlerDemand {
 		PopulationWriterTask populationWriter = new PopulationWriterTask(OUTPUT_POPULATION_FILENAME, osmNetwork.getNetwork());
 		PopulationGenerator populationBuilder = new PopulationGenerator();		
 		TravelTimeToWorkCalculator routerFilter = new TravelTimeToWorkCalculator(osmNetwork.getNetwork());
-		PendlerMatrixReader pvMatrixReader = new PendlerMatrixReader();
+		PendlerMatrixReader pvMatrixReader = new PendlerMatrixReader(LANDKREISE);
 		pvMatrixReader.setFlowSink(routerFilter);
 		routerFilter.setSink(populationBuilder);
 		populationBuilder.setSink(personVerschmiererTask);

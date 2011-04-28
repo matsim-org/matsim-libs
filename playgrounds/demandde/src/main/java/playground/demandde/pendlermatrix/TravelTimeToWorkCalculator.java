@@ -29,8 +29,10 @@ public class TravelTimeToWorkCalculator implements TripFlowSink {
 		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.coord);
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0);
 		double travelTimeToWork = calculateFreespeedTravelTimeToNode(this.network, path, zielNode);
-		System.out.println("from zone " + quelle.id + " to zone " + ziel.id + ", it takes " + travelTimeToWork + " seconds to travel.");
-		sink.process(quelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset - travelTimeToWork );
+//		if(quelle.id == 9375 && ziel.id == 9162){
+			System.out.println("from zone " + quelle.id + " to zone " + ziel.id + ", it takes " + travelTimeToWork + " seconds to travel.");
+			sink.process(quelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset - travelTimeToWork );
+//		}
 	}
 
 	void setSink(TripFlowSink sink) {
