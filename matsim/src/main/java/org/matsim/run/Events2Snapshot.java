@@ -21,7 +21,6 @@
 package org.matsim.run;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
@@ -190,7 +189,7 @@ public class Events2Snapshot {
 
 	private void prepare() {
 		// create events
-		this.events = (EventsManager) EventsUtils.createEventsManager();
+		this.events = EventsUtils.createEventsManager();
 
 		// create SnapshotGenerator
 		this.visualizer = new SnapshotGenerator(this.network, this.config.getQSimConfigGroup().getSnapshotPeriod(), 

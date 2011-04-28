@@ -20,7 +20,6 @@
 
 package org.matsim.run;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;

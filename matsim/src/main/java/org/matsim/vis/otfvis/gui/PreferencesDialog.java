@@ -28,9 +28,7 @@ import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
 import javax.swing.ComboBoxModel;
-import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,7 +36,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -255,7 +252,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		 label.setText("AnimSpeed:");
 		 label.setBounds(10, 245, 110, 31);
 		 this.delaySpinner = new JSpinner();
-		 SpinnerNumberModel model2 = new SpinnerNumberModel((int) visConfig.getDelay_ms(), 0, Double.MAX_VALUE, 10);
+		 SpinnerNumberModel model2 = new SpinnerNumberModel(visConfig.getDelay_ms(), 0, Double.MAX_VALUE, 10);
 		 this.delaySpinner.setModel(model2);
 		 this.delaySpinner.setBounds(90, 245, 153, 31);
 		 this.delaySpinner.addChangeListener(this);
