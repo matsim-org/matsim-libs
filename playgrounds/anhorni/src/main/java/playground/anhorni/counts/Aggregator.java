@@ -25,7 +25,7 @@ public class Aggregator {
 		this.volumes = volumes;	
 		if (removeOutliers) this.removeOutliers();
 		this.avg();
-		this.standarddev();
+		this.standarddev_s();
 		this.median();	
 	}
 	
@@ -85,7 +85,7 @@ public class Aggregator {
 		}	
 	}
 	
-	private void standarddev() {
+	private void standarddev_s() {
 		for (int hour = 0; hour < 24; hour++) {
 			double variance = 0.0;
 			int n = 0;
@@ -96,10 +96,10 @@ public class Aggregator {
 				}
 			}
 			if (n == 0) {
-				log.error("Something went wrong ..."); 
+				log.error("Something went wrong (n == 0) for hour :" + hour); 
 				return;
 			}
-			variance /= n;
+			variance /= ( n -1 );
 			standarddev[hour] = Math.sqrt(variance);
 		}	
 	}
