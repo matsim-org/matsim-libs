@@ -239,9 +239,12 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		config.plans().setInputFile(getClassInputDirectory() + "plans100.xml.gz");
 		config.controler().setOutputDirectory(getOutputDirectory() + "Output1/");
 		
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		
 		Controler c = new Controler(config);
 		c.setCreateGraphs(false);
-		c.setOverwriteFiles(true);
+		c.setDumpDataAtEnd(false);
 		c.run();
 		
 		config.plans().setInputFile(getClassInputDirectory() + "plans110.xml.gz");
@@ -249,7 +252,7 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		
 		c = new Controler(config);
 		c.setCreateGraphs(false);
-		c.setOverwriteFiles(true);
+		c.setDumpDataAtEnd(false);
 		c.run();		
 	}
 
