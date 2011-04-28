@@ -69,6 +69,8 @@ public class AnalysisTrip {
 	
 	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
 		this.events = events;
+		
+		//if no zones in TripSet are defined, coords not necessary
 		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
 			this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
 					((Activity) elements.get(0)).getCoord().getY());
@@ -83,6 +85,7 @@ public class AnalysisTrip {
 		return this.mode;
 	}
 	
+	// not essential but good to prevent mixing up different modes
 	private String findMode(ArrayList<PlanElement> elements) {
 		String mode = null;
 		for(PlanElement p : elements){
@@ -104,16 +107,12 @@ public class AnalysisTrip {
 		}
 	}
 	
-	/**
-	 * @return
-	 */
 	private void analyzeValuesForAllModes() {
+		// from first departure to last arrival
 		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
 	}
 
-	/**
-	 * @return
-	 */
+	
 	private void analyzeValuesForPT() {
 		ListIterator<PersonEvent> it = this.events.listIterator();
 		PersonEvent pe;
@@ -128,6 +127,7 @@ public class AnalysisTrip {
 					if(accesWaitTime > 0) accesWaitCnt++;
 				}
 				
+				// only pt interactions between 2 pt legs are registered for waitTime
 				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 7)){
 					switchWait += pe.getTime();
 					if(switchWait > 0) switchWaitCnt++;
@@ -137,11 +137,13 @@ public class AnalysisTrip {
 			}
 			
 			else if(pe instanceof AgentDepartureEvent){
+				// every pt leg is a new line
 				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
 					lineCnt++;
 					lineTTime -= pe.getTime();
 				}
 				
+				// deside if transit_walk is used for access, egress or switch
 				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
 					if(it.previousIndex() == 1){
 						accesWalkTTime -= pe.getTime();
@@ -157,10 +159,12 @@ public class AnalysisTrip {
 			}
 			
 			else if(pe instanceof AgentArrivalEvent){
+				
 				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
 					lineTTime += pe.getTime();
 				}
-				
+
+				// see at departure
 				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
 					if(it.previousIndex() == 2){
 						accesWalkTTime += pe.getTime();
@@ -178,6 +182,7 @@ public class AnalysisTrip {
 					accesWaitTime -= pe.getTime();
 				}
 				
+				// see at endEvent
 				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 8)){
 					switchWait -= pe.getTime();
 				}
@@ -201,28 +206,6 @@ public class AnalysisTrip {
 		return new GeometryFactory().createPoint(this.end);
 	}
 	
-//	@Override
-//	public String toString(){
-//		StringBuffer buffer = new StringBuffer();
-//		for(PlanElement pe: this.elements){
-//			if(pe instanceof Leg){
-//				buffer.append(((Leg) pe).getMode() + "\t");
-//			}else if (pe instanceof Activity){
-//				buffer.append(((Activity) pe).getType() + "\t");
-//			}
-//		}
-//		buffer.append("\n");
-//		for(PersonEvent pe : this.events){
-//			if(pe instanceof ActivityEvent){
-//				buffer.append(((ActivityEvent) pe).getActType() + "\t");
-//			}else if(pe instanceof AgentEvent){
-//				buffer.append(((AgentEvent) pe).getLegMode()+ "\t");
-//			}
-//		}
-//		
-//		return buffer.toString();
-//	}
-
 	/**
 	 * @return the tripTTime
 	 */

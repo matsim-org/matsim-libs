@@ -103,13 +103,7 @@ public class AnalysisTripSetOneMode {
 	}
 	
 	private void init() {
-		int j;
-		if(this.zone == null){
-			j = 1;
-		}else{ 
-			j = 3;
-		}
-		for(int i = 0; i < j; i++){
+		for(int i = 0; i < 3; i++){
 			sumTTime[i] = 0.0;
 			tripCnt[i] = 0.0;
 			avTripTTime[i] = 0.0;
@@ -171,6 +165,7 @@ public class AnalysisTripSetOneMode {
 		if(trip.getMode().equals(this.mode)){
 			this.addTripValues(trip);
 		}else{ 
+			//can only happen if AnalysisTripSetAllMode is not used
 			log.error("wrong tripMode for TripSet");
 		}
 		
@@ -266,6 +261,9 @@ public class AnalysisTripSetOneMode {
 	}
 	
 	public List<AnalysisTrip> getTrips(){
+		if(!storeTrips){
+			log.error("Trips not stored. Check constructor!");
+		}
 		return this.trips;
 	}
 	

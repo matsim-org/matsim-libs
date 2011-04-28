@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09.analysis;
+package playground.droeder.Analysis.Trips;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +34,10 @@ import org.matsim.population.filters.AbstractPersonFilter;
  * @author droeder
  *
  */
-public class BVGPlanElementFilter extends AbstractPersonFilter{
+public class PlanElementFilter extends AbstractPersonFilter{
 	private Map<Id, ArrayList<PlanElement>> elements;
 	
-	public BVGPlanElementFilter(){
+	public PlanElementFilter(){
 		this.elements = new HashMap<Id, ArrayList<PlanElement>>();
 	}
 	

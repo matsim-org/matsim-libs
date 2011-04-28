@@ -63,6 +63,7 @@ public class AnalysisTripGenerator {
 		
 		for(Id id : ids){
 			
+			// if number of PlanElements and Events of one Agent doesn't fit, don't process
 			if( ((planElements.get(id).size() * 2) - 2) ==  events.get(id).size()){
 				elementsIterator = planElements.get(id).listIterator();
 				eventIterator = events.get(id).listIterator();
@@ -78,11 +79,15 @@ public class AnalysisTripGenerator {
 							splittedElements.add(p);
 							splittedEvents.add(eventIterator.next());
 							splittedEvents.add(eventIterator.next());
-						}else if(((Activity) p).getType().equals("pt interaction")){
+						}
+						//pt trips consist almost of act-leg-act-leg-act-leg-act or more
+						else if(((Activity) p).getType().equals("pt interaction")){
 							splittedElements.add(p);
 							splittedEvents.add(eventIterator.next());
 							splittedEvents.add(eventIterator.next());
-						}else{
+						}
+						// other modes consists only act-leg-act
+						else{
 							splittedElements.add(p);
 							tripSet.addTrip(new AnalysisTrip(splittedEvents, splittedElements));
 							
