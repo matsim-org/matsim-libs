@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StayHome.java
+ * DummyPlansScoring4PC.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,39 +19,41 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
-package playground.yu.utils;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 /**
- * judges if a {@code Plan} is a "stay home" {@code Plan}
- *
+ * a changed copy of {@code PlansScoring} for the parameter calibration,
+ * especially in order to put new parameters to CharyparNagelScoringConfigGroup
+ * 
  * @author yu
- *
+ * 
  */
-public class StayHomePlan {
-	public static boolean isAStayHomePlan(Plan plan) {
-		List<PlanElement> pes = plan.getPlanElements();
-		int size = pes.size();
+public abstract class PlansScoring4PC implements StartupListener,
+		ScoringListener, IterationStartsListener {
 
-		if (size > 3) {
-			return false;
-		}
+	protected Events2Score4PC planScorer;
 
-		PlanElement firstPe = pes.get(0), lastPe = pes.get(size - 1);
-		if (!(firstPe instanceof Activity) || !(lastPe instanceof Activity)) {
-			return false;
-		}
+	public abstract void notifyStartup(final StartupEvent event);
 
-		String firstType = ((Activity) firstPe).getType(), lastType = ((Activity) lastPe)
-				.getType();
-		return (firstType.startsWith("h") || firstType.startsWith("H"))
-				&& (lastType.startsWith("h") || lastType.startsWith("H"));
+	public Events2Score4PC getPlanScorer() {
+		return planScorer;
 	}
+
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		planScorer.reset(event.getIteration());
+	}
+
+	public void notifyScoring(final ScoringEvent event) {
+		planScorer.finish();
+	}
+
 }

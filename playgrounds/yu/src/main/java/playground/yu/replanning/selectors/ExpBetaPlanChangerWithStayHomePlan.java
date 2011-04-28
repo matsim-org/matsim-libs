@@ -68,7 +68,7 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 
 		for (Plan plan : person.getPlans()) {
 
-			if (!StayHomePlan.stayHome(plan)) {
+			if (!StayHomePlan.isAStayHomePlan(plan)) {
 				expBetaScoreSum += Math.exp(betaBrain * plan.getScore());
 			} else {// stay home
 				stayHomePlan = plan;
