@@ -300,10 +300,19 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		b = MatsimRandom.getRandom().nextFloat();
 		if (Integer.parseInt(e.getPersonId().toString()) < 240) {
 			r = 1.f;
-		} else if (Integer.parseInt(e.getPersonId().toString()) == 0) {
-			b = 1.f;
 		} else {
 			g = 1.f;
+		}
+
+		if (Integer.parseInt(e.getPersonId().toString()) == 1) {
+			b = 1.f;
+			r=0;
+			g=0;
+		}
+		if (Integer.parseInt(e.getPersonId().toString()) == 500) {
+			b = 1.f;
+			r=0.5f;
+			g=0.5f;
 		}
 
 		this.pc.setBotColorII(Integer.parseInt(e.getPersonId().toString()), r, g, b);

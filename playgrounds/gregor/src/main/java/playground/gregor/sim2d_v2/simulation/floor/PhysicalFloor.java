@@ -20,17 +20,22 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -38,13 +43,11 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-import playground.gregor.sim2d_v2.calibration.simulation.floor.CollisionPredictionPhantomAgentInteractionModule;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.Agent2D;
-import playground.gregor.sim2d_v2.simulation.Sim2D;
 
 /**
  * @author laemmel
@@ -68,8 +71,7 @@ public class PhysicalFloor implements Floor {
 
 	protected final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
 	private final Scenario2DImpl scenario;
-	private final List<Link> links;
-	private final Sim2D sim2D;
+	private final Collection<Link> links;
 	private HashMap<Id, LineString> finishLines;
 
 	private final GeometryFactory geofac = new GeometryFactory();
@@ -78,13 +80,15 @@ public class PhysicalFloor implements Floor {
 	private final boolean emitXYZAzimuthEvents;
 	private Envelope envelope;
 	private final Sim2DConfigGroup sim2DConfig;
+	private final Map<PersonDriverAgent,Agent2D> readyToDepart = new HashMap<PersonDriverAgent, Agent2D>();
+	private final EventsManager em;
 
-	public PhysicalFloor(Scenario2DImpl scenario, List<Link> list, Sim2D sim, boolean emitEvents) {
+	public PhysicalFloor(Scenario2DImpl scenario, Collection<Link> list, EventsManager em, boolean emitEvents) {
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
 		this.sim2DTimeStepSize = this.sim2DConfig.getTimeStepSize();
 		this.links = list;
-		this.sim2D = sim;
+		this.em = em;
 		this.emitXYZAzimuthEvents = emitEvents;
 
 	}
@@ -102,10 +106,6 @@ public class PhysicalFloor implements Floor {
 
 		if (this.sim2DConfig.isEnableCollisionPredictionAgentInteractionModule()){
 			this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, this.scenario));
-		}
-
-		if (this.sim2DConfig.isEnableCollisionPredictionPhantomAgentInteractionModule()){
-			this.dynamicForceModules.add(new CollisionPredictionPhantomAgentInteractionModule(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableDrivingForceModule()) {
@@ -225,8 +225,8 @@ public class PhysicalFloor implements Floor {
 		agent.moveToPostion(newPos);
 
 		if (this.emitXYZAzimuthEvents ) {
-			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getPerson().getId(), (Coordinate) agent.getPosition().clone(), azimuth, time);
-			getSim2D().getEventsManager().processEvent(e);
+			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), azimuth, time);
+			this.em.processEvent(e);
 		}
 		//			if (Sim2DConfig.DEBUG) {
 		//				ArrowEvent arrow = new ArrowEvent(agent.getPerson().getId(), agent.getPosition(), new Coordinate(agent.getPosition().x + vx , agent.getPosition().y + vy , 0), 0.0f, 1.f, 1.f, 9);
@@ -253,8 +253,12 @@ public class PhysicalFloor implements Floor {
 		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
 		if (trajectory.crosses(finishLine)) {
+			if (agent.getId().equals(new IdImpl("1"))){
+				int stop = 0;
+				stop++;
+			}
 			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId());
-			this.sim2D.getEventsManager().processEvent(e);
+			this.em.processEvent(e);
 
 			Id id = agent.chooseNextLinkId();
 
@@ -266,7 +270,7 @@ public class PhysicalFloor implements Floor {
 			} else {
 				agent.notifyMoveOverNode();
 				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId());
-				this.sim2D.getEventsManager().processEvent(e2);
+				this.em.processEvent(e2);
 			}
 		}
 
@@ -345,10 +349,12 @@ public class PhysicalFloor implements Floor {
 	}
 
 	/**
-	 * @param agent
+	 * @param pda
 	 */
-	public void addAgent(Agent2D agent) {
-		Activity act = (Activity) agent.getCurrentPlanElement();
+	public void addAgent(PersonDriverAgent pda) {
+		Agent2D agent = new Agent2D(pda);
+		this.readyToDepart.put(pda,agent);
+		Activity act = (Activity) pda.getCurrentPlanElement();
 		if (act.getCoord() != null) {
 			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
 		} else {
@@ -368,7 +374,8 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * @param agent
 	 */
-	public void agentDepart(Agent2D agent) {
+	public void agentDepart(PersonDriverAgent pda) {
+		Agent2D agent = this.readyToDepart.remove(pda);
 		this.agents.add(agent);
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.forceUpdate();
@@ -379,16 +386,12 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * @return
 	 */
-	public List<Link> getLinks() {
+	public Collection<Link> getLinks() {
 		return this.links;
 	}
 
-
-	/**
-	 * @return the sim2D
-	 */
-	public Sim2D getSim2D() {
-		return this.sim2D;
+	protected EventsManager getEventsManager() {
+		return this.em;
 	}
 
 }

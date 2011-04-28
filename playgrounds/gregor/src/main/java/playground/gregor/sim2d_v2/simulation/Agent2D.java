@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 import playground.gregor.sim2d_v2.simulation.floor.Force;
 
@@ -32,14 +31,14 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class Agent2D extends PersonDriverAgentImpl {
+public class Agent2D  {
 
 	private Coordinate currentPosition;
 	private final Force force = new Force();
 	private final double desiredVelocity;
-	private Coordinate currentVelocity;
 	private double vx;
 	private double vy;
+	private final PersonDriverAgent pda;
 
 	public static final double AGENT_WEIGHT = 80;// * 1000;
 	public static final double AGENT_DIAMETER = 0.7;
@@ -48,9 +47,8 @@ public class Agent2D extends PersonDriverAgentImpl {
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(Person p, Netsim sim2d) {
-		super(p, sim2d);
-
+	public Agent2D(PersonDriverAgent pda) {
+		this.pda = pda;
 		// TODO think about this
 		this.desiredVelocity = 0.8 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 8;
 
@@ -102,6 +100,26 @@ public class Agent2D extends PersonDriverAgentImpl {
 
 	public double getWeight() {
 		return AGENT_WEIGHT;
+	}
+
+	public void notifyMoveOverNode() {
+		this.pda.notifyMoveOverNode();
+	}
+
+	public Id getId() {
+		return this.pda.getId();
+	}
+
+	public Id getCurrentLinkId() {
+		return this.pda.getCurrentLinkId();
+	}
+
+	public void endLegAndAssumeControl(double time) {
+		this.pda.endLegAndAssumeControl(time);
+	}
+
+	public Id chooseNextLinkId() {
+		return this.pda.chooseNextLinkId();
 	}
 
 	// /**

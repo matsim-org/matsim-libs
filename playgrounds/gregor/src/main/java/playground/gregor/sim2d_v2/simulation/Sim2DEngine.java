@@ -23,22 +23,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-import playground.gregor.sim2d_v2.calibration.Validator;
-import playground.gregor.sim2d_v2.calibration.scenario.PhantomEvents;
-import playground.gregor.sim2d_v2.calibration.simulation.floor.PhantomFloor;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
@@ -58,8 +53,6 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	private final Sim2DConfigGroup sim2ConfigGroup;
 	private final double sim2DStepSize;
 	private Id calibrationAgentId;
-	private PhantomEvents phantomEvents;
-	private Validator validator;
 
 	/**
 	 * @param sim
@@ -120,12 +113,7 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 
 
 		for (Entry<MultiPolygon, List<Link>> e : this.scenario.getFloorLinkMapping().entrySet()) {
-			PhysicalFloor f = null;
-			if (this.sim2ConfigGroup.isCalibrationMode()) {
-				f = new PhantomFloor(this.phantomEvents,this.calibrationAgentId, this.sim,e.getValue(),this.scenario, this.validator);
-			} else {
-				f = new PhysicalFloor(this.scenario, e.getValue(), this.sim, emitEvents);
-			}
+			PhysicalFloor f = new PhysicalFloor(this.scenario, e.getValue(), this.sim.getEventsManager(), emitEvents);
 			this.floors.add(f);
 			for (Link l : e.getValue()) {
 				if (this.linkIdFloorMapping.get(l.getId()) != null) {
@@ -153,18 +141,6 @@ public class Sim2DEngine implements MobsimEngine, Steppable {
 	 */
 	public PhysicalFloor getFloor(Id currentLinkId) {
 		return this.linkIdFloorMapping.get(currentLinkId);
-	}
-
-	public void setPhantomPopulationEvents(PhantomEvents phantomEvents) {
-		this.phantomEvents = phantomEvents;
-	}
-	public void setCalibrationAgentId(Id id)  {
-		this.calibrationAgentId = id;
-	}
-
-	public void setValidator(Validator validator) {
-		this.validator = validator;
-
 	}
 
 

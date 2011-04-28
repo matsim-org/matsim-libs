@@ -48,15 +48,12 @@ public class Sim2DConfigGroup extends Module {
 
 	public static final String ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE = "enableCircularAgentInteractionModule";
 	public static final String ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE = "enableCollisionPredictionAgentInteractionModule";
-	public static final String ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE = "enableCollisionPredictionPhantomAgentInteractionModule";
 	public static final String ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE = "enbableCollisionPredictionEnvironmentForceModule";
 	public static final String ENABLE_DRIVING_FORCE_MODULE = "enableDrivingForceModule";
 	public static final String ENABLE_ENVIRONMENT_FORCE_MODULE = "enableEnvironmentForceModule";
 	public static final String ENABLE_PATH_FORCE_MODULE = "enablePathForthModule";
 
 	public static final String PHANTOM_POPULATION_EVENTS_FILE = "phantomPopulationEventsFile";
-
-	public static final String CALIBRATION_MODE = "calibrationMode";
 
 	private int eventsInterval = 1;
 
@@ -74,8 +71,6 @@ public class Sim2DConfigGroup extends Module {
 	private boolean enableCollisionPredictionAgentInteractionModule = true;
 
 
-	private boolean enableCollisionPredictionPhantomAgentInteractionModule = false;
-
 
 	private boolean enableCollisionPredictionEnvironmentForceModule = true;
 	private boolean enableDrivingForceModule = true;
@@ -85,8 +80,6 @@ public class Sim2DConfigGroup extends Module {
 
 
 	private boolean enablePathForceModule = true;
-
-	private boolean calibrationMode = false;
 
 
 	//Zanlungo et al constant
@@ -155,16 +148,12 @@ public class Sim2DConfigGroup extends Module {
 			setEnableCollisionPredictionAgentInteractionModule(value);
 		} else if (ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE.equals(key)){
 			setEnableCollisionPredictionEnvironmentForceModule(value);
-		} else if (ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE.equals(key)) {
-			setEnableCollisionPredictionPhantomAgentIneractionModule(value);
-		} else if (ENABLE_DRIVING_FORCE_MODULE.equals(key)) {
+		}else if (ENABLE_DRIVING_FORCE_MODULE.equals(key)) {
 			setEnableDrivingForceModule(value);
 		} else if (ENABLE_ENVIRONMENT_FORCE_MODULE.equals(key)){
 			setEnableEnvironmentForceModule(value);
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)){
 			setEnablePathForceModule(value);
-		} else if (CALIBRATION_MODE.equals(key)) {
-			setCalibrationMode(value);
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -178,9 +167,6 @@ public class Sim2DConfigGroup extends Module {
 
 	public boolean isEnableCollisionPredictionAgentInteractionModule() {
 		return this.enableCollisionPredictionAgentInteractionModule;
-	}
-	public boolean isEnableCollisionPredictionPhantomAgentInteractionModule() {
-		return this.enableCollisionPredictionPhantomAgentInteractionModule;
 	}
 	public boolean isEnableDrivingForceModule() {
 		return this.enableDrivingForceModule;
@@ -214,11 +200,6 @@ public class Sim2DConfigGroup extends Module {
 
 	}
 
-	public void setEnableCollisionPredictionPhantomAgentIneractionModule(
-			String value) {
-		this.enableCollisionPredictionPhantomAgentInteractionModule = Boolean.parseBoolean(value);
-
-	}
 
 	public void setEnableCollisionPredictionEnvironmentForceModule(String value) {
 		this.enableCollisionPredictionEnvironmentForceModule = Boolean.parseBoolean(value);
@@ -233,15 +214,6 @@ public class Sim2DConfigGroup extends Module {
 	public void setEnableCircularAgentInterActionModule(String value) {
 		this.enableCircularAgentInteractionModule = Boolean.parseBoolean(value);
 
-	}
-
-
-	public void setCalibrationMode(String value) {
-		this.calibrationMode = Boolean.parseBoolean(value);
-	}
-
-	public boolean isCalibrationMode() {
-		return this.calibrationMode;
 	}
 
 	@Override
@@ -264,16 +236,12 @@ public class Sim2DConfigGroup extends Module {
 			return Boolean.toString(isEnableCollisionPredictionAgentInteractionModule());
 		} else if (ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE.equals(key)){
 			return Boolean.toString(isEnableCollisionPredictionEnvironmentForceModule());
-		}else if (ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE.equals(key)){
-			return Boolean.toString(isEnableCollisionPredictionPhantomAgentInteractionModule());
 		}else if (ENABLE_DRIVING_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnableDrivingForceModule());
 		} else if (ENABLE_ENVIRONMENT_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnableEnvironmentForceModule());
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnablePathForceModule());
-		} else if (CALIBRATION_MODE.equals(key)){
-			return Boolean.toString(isCalibrationMode());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -295,12 +263,10 @@ public class Sim2DConfigGroup extends Module {
 		map.put(ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE,getValue(ENABLE_CIRCULAR_AGENT_INTERACTION_MODULE));
 		map.put(ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE,getValue(ENABLE_COLLISION_PREDICTION_AGENT_INTERACTION_MODULE));
 		map.put(ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_COLLISION_PREDICTION_ENVIRONMENT_FORCE_MODULE));
-		map.put(ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE, getValue(ENABLE_COLLISION_PREDICTION_PHANTOM_AGENT_INTERACTION_MODULE));
 		map.put(ENABLE_DRIVING_FORCE_MODULE, getValue(ENABLE_DRIVING_FORCE_MODULE));
 		map.put(ENABLE_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_ENVIRONMENT_FORCE_MODULE));
 		map.put(ENABLE_PATH_FORCE_MODULE, getValue(ENABLE_PATH_FORCE_MODULE));
 		map.put(PHANTOM_POPULATION_EVENTS_FILE, getValue(PHANTOM_POPULATION_EVENTS_FILE));
-		map.put(CALIBRATION_MODE, getValue(CALIBRATION_MODE));
 		return map;
 	}
 

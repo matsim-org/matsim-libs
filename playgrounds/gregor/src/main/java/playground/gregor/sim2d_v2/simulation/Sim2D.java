@@ -39,11 +39,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
@@ -80,8 +82,6 @@ public class Sim2D implements Netsim {
 
 	private Sim2DEngine sim2DEngine;
 
-	private Agent2DFactory agentFactory;
-
 	private final Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 
 	private double stopTime;
@@ -96,6 +96,8 @@ public class Sim2D implements Netsim {
 	private Integer iterationNumber = null;
 
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
+
+	private DefaultAgentFactory agentFactory;
 
 	public Sim2D(EventsManager events, Scenario2DImpl scenario2DData) {
 		this(events, scenario2DData, new DefaultSim2DEngineFactory());
@@ -123,7 +125,7 @@ public class Sim2D implements Netsim {
 
 		// create Sim2DEngine
 		this.sim2DEngine = factory.createSim2DEngine(this, MatsimRandom.getRandom());
-		this.agentFactory = new Agent2DFactory(this);
+		this.agentFactory = new DefaultAgentFactory(this);
 
 		// TODO may be we have to create a departure handler somewhere here? --
 		// yes we do!
@@ -317,11 +319,11 @@ public class Sim2D implements Netsim {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			PersonDriverAgentImpl agent = this.agentFactory.createPersonAgent(p);
+			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			this.agents.add(agent);
 			agent.initialize();
 			PhysicalFloor floor = this.sim2DEngine.getFloor(agent.getCurrentLinkId());
-			floor.addAgent((Agent2D) agent);
+			floor.addAgent(agent);
 		}
 
 	}
@@ -444,7 +446,7 @@ public class Sim2D implements Netsim {
 				Activity act = (Activity) pe;
 				Id linkId = act.getLinkId();
 				PhysicalFloor f = this.sim2DEngine.getFloor(linkId);
-				f.addAgent((Agent2D) agent);
+				f.addAgent((PersonDriverAgentImpl) agent);
 
 			}
 		}
