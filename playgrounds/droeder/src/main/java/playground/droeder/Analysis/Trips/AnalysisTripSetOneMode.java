@@ -42,7 +42,6 @@ public class AnalysisTripSetOneMode {
 	private Geometry zone;
 	private String mode;
 	
-	
 	//[0]inside, [1]outside, [2]crossing
 	//all modes
 	private double[] sumTTime = new double[3];
@@ -67,6 +66,8 @@ public class AnalysisTripSetOneMode {
 	private double[] avAccesWalkTTime = new double[3];
 	private double[] avAccesWaitTime = new double[3];
 	private double[] avEgressWalkTTime = new double[3];
+	
+
 	private double[] avSwitchWalkTTime = new double[3];
 	private double[] avSwitchWaitTime = new double[3];
 	private double[] avLineTTime = new double[3];
@@ -91,9 +92,6 @@ public class AnalysisTripSetOneMode {
 	private double[] fLine3 = new double[3];
 	private double[] flineGT3 = new double[3];
 
-	/**
-	 * @param zones
-	 */
 	public AnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
 		this.zone = zone;
 		this.storeTrips = storeTrips;
@@ -104,9 +102,14 @@ public class AnalysisTripSetOneMode {
 		this.init();
 	}
 	
-	
 	private void init() {
-		for(int i = 0; i < 3; i++){
+		int j;
+		if(this.zone == null){
+			j = 1;
+		}else{ 
+			j = 3;
+		}
+		for(int i = 0; i < j; i++){
 			sumTTime[i] = 0.0;
 			tripCnt[i] = 0.0;
 			avTripTTime[i] = 0.0;
@@ -156,7 +159,6 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-
 	public AnalysisTripSetOneMode(String mode, Geometry zone){
 		this(mode, zone, false);
 	}
@@ -165,14 +167,9 @@ public class AnalysisTripSetOneMode {
 		this(mode, null, false);
 	}
 
-	/**
-	 * @param trip
-	 */
 	public void addTrip(AnalysisTrip trip) {
-		Integer zone = this.getTripLocation(trip);
-		
 		if(trip.getMode().equals(this.mode)){
-			this.addTripValues(trip, zone);
+			this.addTripValues(trip);
 		}else{ 
 			log.error("wrong tripMode for TripSet");
 		}
@@ -182,9 +179,9 @@ public class AnalysisTripSetOneMode {
 		}
 		
 	}
-	
 
-	private void addTripValues(AnalysisTrip trip, Integer zone) {
+	private void addTripValues(AnalysisTrip trip) {
+		Integer zone = this.getTripLocation(trip);
 		this.addAllModeValues(trip, zone);
 		if(trip.getMode().equals(TransportMode.pt)){
 			this.addPtValues(trip, zone);
@@ -241,7 +238,6 @@ public class AnalysisTripSetOneMode {
 		fSwitchGT2[zone] = switchGT2cnt[zone] / temp;
 	}
 
-
 	public void addTrips(List<AnalysisTrip> trips){
 		int nextMsg = 1;
 		int counter = 0;
@@ -254,7 +250,6 @@ public class AnalysisTripSetOneMode {
 			}
 		}
 	}
-	
 	
 	private Integer getTripLocation(AnalysisTrip trip){
 		if(this.zone == null){
@@ -270,14 +265,12 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 	
-	
 	public List<AnalysisTrip> getTrips(){
 		return this.trips;
 	}
 	
 	public String toString(boolean header){
 		StringBuffer buffer = new StringBuffer();
-		
 		
 		if(header){
 			buffer.append("mode;");
@@ -332,16 +325,15 @@ public class AnalysisTripSetOneMode {
 			buffer.append(this.mode + ";");
 			
 			switch(i){
-				case 0: buffer.append("in;"); break;
-				case 1: buffer.append("out;"); break;
-				case 2: buffer.append("cross;"); break;
+				case 0: buffer.append("inside;"); break;
+				case 1: buffer.append("outside;"); break;
+				case 2: buffer.append("crossing;"); break;
 			}
 			buffer.append(sumTTime[i] + ";");
 			buffer.append(tripCnt[i] + ";");
 			buffer.append(avTripTTime[i] + ";");
 			
 			if(this.mode.equals(TransportMode.pt)){
-				
 				buffer.append(accesWalkCnt[i] + ";");
 				buffer.append(accesWaitCnt[i] + ";");
 				buffer.append(egressWalkCnt[i] + ";");
@@ -392,6 +384,256 @@ public class AnalysisTripSetOneMode {
 	public String toString(){
 		return this.toString(true);
 	}	
+	
+	public double[] getSumTTime(){
+		return this.sumTTime;
+	}
+	
+	public double[] getTripCnt(){
+		return this.tripCnt;
+	}
+	
+	public double[] getAvTripTTime(){
+		return this.avTripTTime;
+	}
+	
+	/**
+	 * @return the accesWalkCnt
+	 */
+	public double[] getAccesWalkCnt() {
+		return accesWalkCnt;
+	}
+
+	/**
+	 * @return the accesWaitCnt
+	 */
+	public double[] getAccesWaitCnt() {
+		return accesWaitCnt;
+	}
+
+	/**
+	 * @return the egressWalkCnt
+	 */
+	public double[] getEgressWalkCnt() {
+		return egressWalkCnt;
+	}
+
+	/**
+	 * @return the switchWalkCnt
+	 */
+	public double[] getSwitchWalkCnt() {
+		return switchWalkCnt;
+	}
+
+	/**
+	 * @return the switchWaitCnt
+	 */
+	public double[] getSwitchWaitCnt() {
+		return switchWaitCnt;
+	}
+
+	/**
+	 * @return the lineCnt
+	 */
+	public double[] getLineCnt() {
+		return lineCnt;
+	}
+
+	/**
+	 * @return the accesWalkTTime
+	 */
+	public double[] getAccesWalkTTime() {
+		return accesWalkTTime;
+	}
+
+	/**
+	 * @return the accesWaitTime
+	 */
+	public double[] getAccesWaitTime() {
+		return accesWaitTime;
+	}
+
+	/**
+	 * @return the egressWalkTTime
+	 */
+	public double[] getEgressWalkTTime() {
+		return egressWalkTTime;
+	}
+
+	/**
+	 * @return the switchWalkTTime
+	 */
+	public double[] getSwitchWalkTTime() {
+		return switchWalkTTime;
+	}
+
+	/**
+	 * @return the switchWaitTime
+	 */
+	public double[] getSwitchWaitTime() {
+		return switchWaitTime;
+	}
+
+	/**
+	 * @return the lineTTime
+	 */
+	public double[] getLineTTime() {
+		return lineTTime;
+	}
+
+	/**
+	 * @return the avAccesWalkTTime
+	 */
+	public double[] getAvAccesWalkTTime() {
+		return avAccesWalkTTime;
+	}
+
+	/**
+	 * @return the avAccesWaitTime
+	 */
+	public double[] getAvAccesWaitTime() {
+		return avAccesWaitTime;
+	}
+
+	/**
+	 * @return the avEgressWalkTTime
+	 */
+	public double[] getAvEgressWalkTTime() {
+		return avEgressWalkTTime;
+	}
+
+	/**
+	 * @return the avSwitchWalkTTime
+	 */
+	public double[] getAvSwitchWalkTTime() {
+		return avSwitchWalkTTime;
+	}
+
+	/**
+	 * @return the avSwitchWaitTime
+	 */
+	public double[] getAvSwitchWaitTime() {
+		return avSwitchWaitTime;
+	}
+
+	/**
+	 * @return the avLineTTime
+	 */
+	public double[] getAvLineTTime() {
+		return avLineTTime;
+	}
+
+	/**
+	 * @return the switch0cnt
+	 */
+	public double[] getSwitch0cnt() {
+		return switch0cnt;
+	}
+
+	/**
+	 * @return the switch1cnt
+	 */
+	public double[] getSwitch1cnt() {
+		return switch1cnt;
+	}
+
+	/**
+	 * @return the switch2cnt
+	 */
+	public double[] getSwitch2cnt() {
+		return switch2cnt;
+	}
+
+	/**
+	 * @return the switchGT2cnt
+	 */
+	public double[] getSwitchGT2cnt() {
+		return switchGT2cnt;
+	}
+
+	/**
+	 * @return the line1cnt
+	 */
+	public double[] getLine1cnt() {
+		return line1cnt;
+	}
+
+	/**
+	 * @return the line2cnt
+	 */
+	public double[] getLine2cnt() {
+		return line2cnt;
+	}
+
+	/**
+	 * @return the line3cnt
+	 */
+	public double[] getLine3cnt() {
+		return line3cnt;
+	}
+
+	/**
+	 * @return the lineGt3cnt
+	 */
+	public double[] getLineGt3cnt() {
+		return lineGt3cnt;
+	}
+
+	/**
+	 * @return the fSwitch0
+	 */
+	public double[] getfSwitch0() {
+		return fSwitch0;
+	}
+
+	/**
+	 * @return the fSwitch1
+	 */
+	public double[] getfSwitch1() {
+		return fSwitch1;
+	}
+
+	/**
+	 * @return the fSwitch2
+	 */
+	public double[] getfSwitch2() {
+		return fSwitch2;
+	}
+
+	/**
+	 * @return the fSwitchGT2
+	 */
+	public double[] getfSwitchGT2() {
+		return fSwitchGT2;
+	}
+
+	/**
+	 * @return the fLine1
+	 */
+	public double[] getfLine1() {
+		return fLine1;
+	}
+
+	/**
+	 * @return the fLine2
+	 */
+	public double[] getfLine2() {
+		return fLine2;
+	}
+
+	/**
+	 * @return the fLine3
+	 */
+	public double[] getfLine3() {
+		return fLine3;
+	}
+
+	/**
+	 * @return the flineGT3
+	 */
+	public double[] getFlineGT3() {
+		return flineGT3;
+	}
 }
 
 

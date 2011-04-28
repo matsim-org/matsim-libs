@@ -69,10 +69,12 @@ public class AnalysisTrip {
 	
 	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
 		this.events = events;
-		this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
-				((Activity) elements.get(0)).getCoord().getY());
-		this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
-				((Activity) elements.get(elements.size() - 1)).getCoord().getY());
+		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
+			this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
+					((Activity) elements.get(0)).getCoord().getY());
+			this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
+					((Activity) elements.get(elements.size() - 1)).getCoord().getY());
+		}
 		this.mode = this.findMode(elements);
 		this.analyze();
 	}
@@ -126,7 +128,7 @@ public class AnalysisTrip {
 					if(accesWaitTime > 0) accesWaitCnt++;
 				}
 				
-				else if((it.previousIndex() > 4) && (it.previousIndex() < events.size() - 3)){
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 7)){
 					switchWait += pe.getTime();
 					if(switchWait > 0) switchWaitCnt++;
 					switchWaitTime += switchWait;
@@ -176,7 +178,7 @@ public class AnalysisTrip {
 					accesWaitTime -= pe.getTime();
 				}
 				
-				else if((it.previousIndex() > 3) && (it.previousIndex() < events.size() - 4)){
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 8)){
 					switchWait -= pe.getTime();
 				}
 			}
