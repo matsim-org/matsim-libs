@@ -46,6 +46,7 @@ import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.JAXBUnmaschal;
 import playground.tnicolai.urbansim.utils.MyControlerListener;
+import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 
@@ -60,6 +61,8 @@ public class MATSim4Urbansim {
 
 	// MATSim scenario
 	protected ScenarioImpl scenario = null;
+	// Benchmarking computation times and hard disc space ... 
+	protected Benchmark benchmark = null;
 	
 	/**
 	 * constructor
@@ -83,6 +86,8 @@ public class MATSim4Urbansim {
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}			
+		// init Benchmark as default
+		benchmark = new Benchmark();
 		// init loader
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
@@ -107,7 +112,7 @@ public class MATSim4Urbansim {
 		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ) );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ), benchmark );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");

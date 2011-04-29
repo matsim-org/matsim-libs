@@ -45,6 +45,7 @@ import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.gis.MyColorizer;
+import playground.tnicolai.urbansim.utils.ProgressBar;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
@@ -73,6 +74,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	
 	public MATSim4UrbanSimERSA(String args[]){
 		super(args);
+		
 		// set the resolution, this is used for setting 
 		// the starting points for accessibility measures
 		checkAndSetShapeFile(args);
@@ -162,13 +164,18 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 			e.printStackTrace();
 		}
 		
-		runControler(controler);
+		int cID = benchmark.addMeasure("Running Contoler");
+		controler.run();
+		benchmark.stoppMeasurement(cID);
 		
 		logger.info("Finished computations ...");
+		logger.info("Running contoler took " + benchmark.getDurationInSeconds(cID) + " seconds.");
 		
 		writeKMZFiles(myListener);
-		
 		writeSpatialGridTables(myListener);
+		
+		// dumping benchmark results
+		benchmark.dumpResults(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "matsim4ersa_benchmark.txt");
 	}
 
 	/**
@@ -178,9 +185,21 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		logger.info("Writing spatial grid tables ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
+			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGrid-Table" , Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
 			sgTableWriter.write(myListener.getTravelTimeAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			benchmark.stoppMeasurement(ttID);
+			logger.info("Writing TravelTime SpatialGrid-Table took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
+			
+			int tcID = benchmark.addMeasure("Writing TravelCostSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
 			sgTableWriter.write(myListener.getTravelCostAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			benchmark.stoppMeasurement(tcID);
+			logger.info("Writing TravelCost SpatialGrid-Table took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
+			
+			int tdID = benchmark.addMeasure("Writing TravelDistanceSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
 			sgTableWriter.write(myListener.getTravelDistanceAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			benchmark.stoppMeasurement(tdID);
+			logger.info("Writing TravelDistance SpatialGrid-Table took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -210,34 +229,27 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		}
 		
 		// writing travel time accessibility kmz file
+		int ttID = benchmark.addMeasure("Writing TravelTime KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelTimeValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		benchmark.stoppMeasurement(ttID);
+		logger.info("Writing TravelTime KMZ-file took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
 		
 		// writing travel cost accessibility kmz file
+		int tcID = benchmark.addMeasure("Writing TravelCost KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelCostValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		benchmark.stoppMeasurement(tcID);
+		logger.info("Writing TravelCost KMZ-file took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
 		
 		// writing travel distance accessibility kmz file
+		int tdID = benchmark.addMeasure("Writing TravelDistance KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelDistanceValues));
 		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
-	
-		logger.info("Done with writing Google Erath files ...");
-	}
-
-	/**
-	 * @param controler
-	 */
-	private void runControler(Controler controler) {
-		long startTime;
-		long endTime;
-		long time;
+		benchmark.stoppMeasurement(tdID);
+		logger.info("Writing TravelDistance KMZ-file took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
 		
-		startTime = System.currentTimeMillis();
-		// run the iterations, including the post-processing:
-		controler.run();
-		endTime = System.currentTimeMillis();
-		time = (endTime - startTime) / 1000;
-		logger.info("Running MATSim controler took " + time +" seconds.");
+		logger.info("Done with writing Google Erath files ...");
 	}
 
 	/**
@@ -252,17 +264,23 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		Geometry boundary = getBoundary(shapeFile);
 		
 		// set starting points to measure accessibility (KMZ and CSV output)
+		int szID = benchmark.addMeasure("Creating Grid (startingZomes)");
 		ZoneLayer<ZoneObject> startZones = getStratZones(boundary);
+		benchmark.stoppMeasurement(szID);
+		logger.info("Creating Grid took " + benchmark.getDurationInSeconds(szID) + "seconds.");
 		
 		SpatialGrid<Double> travelTimeAccessibilityGrid = createSpatialGrid(boundary);
 		SpatialGrid<Double> travelCostAccessibilityGrid = createSpatialGrid(boundary);
 		SpatialGrid<Double> travelDistanceAccessibilityGrid = createSpatialGrid(boundary);
 		
 		// gather all workplaces
+		int jmID = benchmark.addMeasure("Creating Destinations (jobObjectMap)");
 		Map<Id, JobsObject> jobObjectMap = getJobMap(parcels, readFromUrbansim);
+		benchmark.stoppMeasurement(jmID);
+		logger.info("Creating job destinations (jobObjectMap) took " + benchmark.getDurationInSeconds(jmID) + "seconds.");
 		
 		ERSAControlerListener myListener = new ERSAControlerListener(startZones, jobObjectMap, 
-				travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid);
+				travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid, benchmark);
 		
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( myListener );
@@ -290,15 +308,8 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 */
 	private Map<Id, JobsObject> getJobMap(ActivityFacilitiesImpl parcels,
 			ReadFromUrbansimParcelModel readFromUrbansim) {
-		long startTime;
-		long endTime;
-		long time;
-		
-		startTime = System.currentTimeMillis();
+
 		Map<Id, JobsObject> jobObjectMap = readFromUrbansim.readDisaggregatedJobs(parcels, jobSample);
-		endTime = System.currentTimeMillis();
-		time = (endTime - startTime) / 1000;
-		logger.info("Creating job map took " + time + "seconds.");
 		return jobObjectMap;
 	}
 
@@ -307,16 +318,9 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @throws IOException
 	 */
 	private ZoneLayer<ZoneObject> getStratZones(Geometry boundary) throws IOException {
-		long startTime;
-		long endTime;
-		long time;
 		
-		startTime = System.currentTimeMillis();
 		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSize, boundary);
-		endTime = System.currentTimeMillis();
-		time = (endTime - startTime) / 1000;
 		
-		logger.info("Creating start points took " + time + "seconds with a grid size of " + gridSize + ".");
 		return startZones;
 	}
 
@@ -353,15 +357,13 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		GeometryFactory factory = new GeometryFactory();
 		Set<Zone<ZoneObject>> zones = new HashSet<Zone<ZoneObject>>();
 		Envelope env = boundary.getEnvelopeInternal();
-				
-		// Progress bar
-		System.out.println("|--------------------------------------------------------------------------------------------------|") ;
-		long cnt = 0; 
-		long percentDone = 0;
-		long total = (long) (env.getMaxX() - env.getMinX());
+		
+		ProgressBar bar = new ProgressBar( (env.getMaxX()-env.getMinX())/gridSize );
 		
 		// goes step by step from the min x and y coordinate to max x and y coordinate
 		for(double x = env.getMinX(); x < env.getMaxX(); x += gridSize) {
+			
+			bar.update();
 						
 			for(double y = env.getMinY(); y < env.getMaxY(); y += gridSize) {
 				Point point = factory.createPoint(new Coordinate(x, y));
@@ -376,7 +378,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
+					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: this should be the correct id for the Washington area
 					
 					Zone<ZoneObject> zone = new Zone<ZoneObject>(polygon);
 					zone.setAttribute( new ZoneObject( setPoints ) );
@@ -386,16 +388,9 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 				}
 				else skippedPoints++;
 			}
-			
-			// progress bar
-			cnt++;
-			while ( (int) (100.*cnt/(total/gridSize)) >= percentDone ){
-				percentDone++;  System.out.print('|');
-			}
 		}
-		
-		System.out.println("|\r\n");
-		logger.info(setPoints + " starting points were set and " + skippedPoints + " points have been skipped (because they lay outside the shape file boundary).");
+
+		logger.info(setPoints + " starting points were set and " + skippedPoints + " points have been skipped (points were skipped when they lay outside the shape file boundary).");
 		logger.info("Done with setting starting points!");
 		
 		ZoneLayer<ZoneObject> layer = new ZoneLayer<ZoneObject>(zones);
@@ -464,9 +459,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		MATSim4UrbanSimERSA m4uERSA = new MATSim4UrbanSimERSA(args);
 		m4uERSA.runMATSim();
-//		if(m4uERSA.computationMeasures != null)
-//			MeasurementObject.wirteLogfile();
-//		else throw new RuntimeException("The object measuring comuting times is not initialized...");
+		
 		endTime = System.currentTimeMillis();
 		time = (endTime - startTime) / 60000;
 		

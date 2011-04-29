@@ -185,7 +185,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 	private ActivityFacilitiesImpl testRunPracels(int year){
 		log.info("Running ReadFromUrbansimParcelModel with argument year = " + year);
 		// get the data from test urbansim parcels
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year, null );
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");
@@ -210,7 +210,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		int oldPopSize = 0;
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year, null );
 
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("dummy locations");

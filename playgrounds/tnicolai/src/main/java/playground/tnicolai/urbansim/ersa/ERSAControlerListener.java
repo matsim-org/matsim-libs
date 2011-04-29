@@ -65,6 +65,8 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import playground.johannes.socialnetworks.gis.SpatialGrid;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
+import playground.tnicolai.urbansim.utils.ProgressBar;
+import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
 import playground.toronto.ttimematrix.SpanningTree;
@@ -87,19 +89,24 @@ public class ERSAControlerListener implements ShutdownListener{
 	private SpatialGrid<Double> travelCostAccessibilityGrid;
 	private SpatialGrid<Double> travelDistanceAccessibilityGrid;
 	
+	private Benchmark benchmark;
+	
+	private int csvID = -1;
+	
 	/**
 	 * constructor
 	 * @param jobObjectMap
 	 */
 	public ERSAControlerListener(ZoneLayer<ZoneObject> startZones, Map<Id, JobsObject> jobObjectMap, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
-			SpatialGrid<Double> travelDistanceAccessibilityGrid){
+			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
 		this.jobObjectMap 	= jobObjectMap;
 		this.startZones		= startZones;	
 		this.travelTimeAccessibilityGrid = travelTimeAccessibilityGrid;
 		this.travelCostAccessibilityGrid = travelCostAccessibilityGrid;
 		this.travelDistanceAccessibilityGrid = travelDistanceAccessibilityGrid;
+		this.benchmark = benchmark;
 	}
 	
 	/**
@@ -126,13 +133,12 @@ public class ERSAControlerListener implements ShutdownListener{
 			Iterator<Zone<ZoneObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processed ...");
 	
-			// init progress bar
-			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
-			long cnt = 0; 
-			long percentDone = 0;
+			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
 			
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startZoneIterator.hasNext() ){
+				
+				bar.update();
 				
 				Zone<ZoneObject> startZone = startZoneIterator.next();
 				// get coordinate from origin (start point)
@@ -178,13 +184,6 @@ public class ERSAControlerListener implements ShutdownListener{
 				
 				// dumping results into csv file
 				dumpCSVData(accessibilityIndicatorWriter, startZone, coordFromZone);
-				
-				cnt++;
-				// progress bar
-				while ( (int) (100.*cnt/startZones.getZones().size()) > percentDone ) {
-					percentDone++; System.out.print('|');
-				}
-				
 			}
 			System.out.println("");
 			// finish and close writing
@@ -258,8 +257,11 @@ public class ERSAControlerListener implements ShutdownListener{
 		//		accessibilityIndicatorWriter.write("used parameters");
 		//		accessibilityIndicatorWriter.newLine();
 		//		accessibilityIndicatorWriter.write("beta," + beta);
-				accessibilityIndicatorWriter.flush();
-				accessibilityIndicatorWriter.close();
+		accessibilityIndicatorWriter.flush();
+		accessibilityIndicatorWriter.close();
+		
+		benchmark.stoppMeasurement(csvID);
+		log.info("Done with writing CSV-File. This took " + benchmark.getDurationInSeconds(csvID) + " seconds.");
 	}
 
 	/**
@@ -271,6 +273,8 @@ public class ERSAControlerListener implements ShutdownListener{
 	private BufferedWriter initCSVWriter(Scenario sc)
 			throws FileNotFoundException, IOException {
 		String filename = Constants.OPUS_HOME + sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "accessibility_indicators_ersa.csv";
+		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
+		
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
 		// create header
 		accessibilityIndicatorWriter.write( Constants.ERSA_ZONE_ID + "," +

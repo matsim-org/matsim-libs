@@ -38,6 +38,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import playground.kai.urbansim.ids.ZoneId;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
+import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 
@@ -51,13 +52,18 @@ public class ReadFromUrbansimParcelModel {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModel.class);
 	// year of current urbansim run
 	private final int year;
+	private Benchmark benchmark = null;
 	
 	/**
 	 * constructor
 	 * @param year of current run
 	 */
-	public ReadFromUrbansimParcelModel ( final int year ) {
+	public ReadFromUrbansimParcelModel ( final int year, Benchmark benchmark ) {
 		this.year = year;
+		
+		this.benchmark = benchmark;
+		if(benchmark == null)
+			this.benchmark = new Benchmark();
 	}
 
 	/**
@@ -70,6 +76,8 @@ public class ReadFromUrbansimParcelModel {
 	public void readFacilities(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		int rfID = benchmark.addMeasure("Reading Facilities Table", filename, true);
+		
 		log.info( "Starting to read urbansim parcels table from " + filename );
 
 		// temporary data structure in order to get coordinates for zones:
@@ -142,7 +150,8 @@ public class ReadFromUrbansimParcelModel {
 			e.printStackTrace();
 			System.exit( Constants.EXCEPTION_OCCURED );
 		}
-		log.info( "DONE with reading urbansim parcels" ) ;
+		benchmark.stoppMeasurement(rfID);
+		log.info( "Done with reading urbansim parcels. This took " + benchmark.getDurationInSeconds(rfID) + " seconds." ) ;
 
 		// create urbansim zones from the intermediate pseudo zones
 		constructZones ( zones, pseudoZones) ;
@@ -207,7 +216,9 @@ public class ReadFromUrbansimParcelModel {
 		boolean flag = false;
 
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
-		log.info( "Starting to read persons table from " + filename ) ;
+		int rpID = benchmark.addMeasure("Reading Persons Table", filename, true);
+		
+		log.info( "Starting to read persons table from " + filename );
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -334,7 +345,9 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
+		benchmark.stoppMeasurement(rpID);
+		
 		int oldPopSize = oldPop==null ? 0 : oldPop.getPersons().size();
 
 		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPopSize + " newPopSize: " + newPop.getPersons().size()
@@ -353,7 +366,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPopSize + " newPopSize: " + newPop.getPersons().size()
 				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 
-		log.info( "Done with reading persons." ) ;
+		log.info( "Done with reading persons. This took " + benchmark.getDurationInSeconds(rpID) +" seconds.") ;
 	}
 	
 	/**
@@ -365,6 +378,8 @@ public class ReadFromUrbansimParcelModel {
 	public Map<Id,WorkplaceObject> readZoneBasedWorkplaces(){
 		
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		int wpID = benchmark.addMeasure("Reading Job Table", filename, true);
+		
 		log.info( "Starting to read jobs table from " + filename );
 
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = new HashMap<Id,WorkplaceObject>();
@@ -402,7 +417,8 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info( "Done with reading jobs." );
+		benchmark.stoppMeasurement(wpID);
+		log.info( "Done with reading jobs. This took " + benchmark.getDurationInSeconds(wpID) + " seconds." );
 		return numberOfWorkplacesPerZone;
 	}
 	
@@ -425,9 +441,11 @@ public class ReadFromUrbansimParcelModel {
 		int jobCounter = 0; // counting number of jobs ...
 		int skipCounter = 0;// counting number of skipped jobs ...
 		
+		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		int jmID = benchmark.addMeasure("Reading Job Table", filename, true);
+		
 		if(parcels != null){
 			
-			String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 			log.info( "Starting to read jobs table from " + filename );
 			
 			Map<Id, ActivityFacility> parcelsMap = parcels.getFacilities();
@@ -470,6 +488,7 @@ public class ReadFromUrbansimParcelModel {
 				}
 				
 				reader.close();
+				benchmark.stoppMeasurement(jmID);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -477,7 +496,7 @@ public class ReadFromUrbansimParcelModel {
 			}
 		}
 		
-		log.info( "Done with reading jobs." );
+		log.info( "Done with reading jobs. This took " + benchmark.getDurationInSeconds(jmID) + "seconds." );
 		log.info(jobCounter + " jobs were were found and " + skipCounter + " jobs were skipped (because they don't provide any parcel id)!");
 		return jobObjectMap;		
 	}
@@ -501,7 +520,10 @@ public class ReadFromUrbansimParcelModel {
 	 * @return number of persons determined by person id
 	 */
 	public int countPersons(){
+		
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		int cpID = benchmark.addMeasure("Reading Persons Table", filename, true);
+		
 		log.info( "Starting to read persons from " + filename ) ;
 		// counter
 		int persons = 0;
@@ -526,6 +548,9 @@ public class ReadFromUrbansimParcelModel {
 					nfe.printStackTrace();
 				}
 			}
+			benchmark.stoppMeasurement(cpID);
+			log.info("Done with reading persons table. This took " + benchmark.getDurationInSeconds(cpID) + " seconds.");
+			
 			return persons;
 		}
 		catch (Exception e) {

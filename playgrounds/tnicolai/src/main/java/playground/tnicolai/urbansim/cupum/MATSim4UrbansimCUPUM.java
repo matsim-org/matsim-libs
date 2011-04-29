@@ -80,7 +80,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 			modifyLinks(network, testParam);
 		
 		// get the data from urbansim (parcels and persons)
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ) );
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) ), benchmark );
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones");

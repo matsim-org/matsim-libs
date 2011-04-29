@@ -108,7 +108,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		Population outputPopulation = null;
 		
 		// get population size from MATSim input file
-		ReadFromUrbansimParcelModel readFromUrbanSim = new ReadFromUrbansimParcelModel(2001);
+		ReadFromUrbansimParcelModel readFromUrbanSim = new ReadFromUrbansimParcelModel(2001, null);
 		inputPopulation = readFromUrbanSim.countPersons();
 		
 		// population size from MATSim output file
