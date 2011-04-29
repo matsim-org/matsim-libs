@@ -34,6 +34,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -44,7 +45,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
-	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final PlansCalcRoute routingAlgorithm;
 	private final Network network;
 	private final String outputPath;
@@ -54,7 +55,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	public JointPlanOptimizer(
 			JointReplanningConfigGroup configGroup,
 			ScoringFunctionFactory scoringFunctionFactory,
-			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			PlansCalcRoute routingAlgorithm,
 			Network network,
 			String iterationOutputPath
@@ -109,7 +110,9 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 		}
 
 		//get fittest chromosome, and modify the given plan accordingly
-		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(gaPopulation.getFittestChromosome());
+		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(
+				//gaPopulation.getFittestChromosome());
+				((JointPlanOptimizerJGAPBreeder) jgapConfig.getBreeder()).getAllTimesBest());
 		plan.resetFromPlan(evolvedPlan);
 		plan.resetScores();
 	}

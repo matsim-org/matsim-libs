@@ -48,6 +48,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -90,7 +91,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	private final Map<JointLeg, JointLeg> driverLegs =
 		new HashMap<JointLeg, JointLeg>();
 
-	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private	final PlansCalcRoute routingAlgorithm;
 	private	final Network network;
 
@@ -101,7 +102,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	public DurationDecoder(
 			final JointPlan plan,
 			final JointReplanningConfigGroup configGroup,
-			final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			final PlansCalcRoute routingAlgorithm,
 			final Network network,
 			final int numJointEpisodes,
@@ -215,6 +216,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	private void resetInternalState() {
 		this.readyJointLegs.clear();
 		this.driverLegs.clear();
+		this.legTTEstimators.clear();
 	}
 
 	private final void planNextActivity(

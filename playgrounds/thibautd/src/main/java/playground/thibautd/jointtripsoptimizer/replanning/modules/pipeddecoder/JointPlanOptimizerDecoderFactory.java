@@ -24,6 +24,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -34,7 +35,7 @@ public class JointPlanOptimizerDecoderFactory {
 
 	private final JointPlan plan;
 	private final JointReplanningConfigGroup configGroup;
-	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final PlansCalcRoute routingAlgorithm;
 	private final Network network;
 	private final int numJointEpisodes;
@@ -43,7 +44,7 @@ public class JointPlanOptimizerDecoderFactory {
 	public JointPlanOptimizerDecoderFactory(
 			final JointPlan plan,
 			final JointReplanningConfigGroup configGroup,
-			final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			final PlansCalcRoute routingAlgorithm,
 			final Network network,
 			final int numJointEpisodes,

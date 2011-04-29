@@ -50,6 +50,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.CrossOverRateCalculator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPEnhancedSpx;
@@ -98,7 +99,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			JointPlan plan,
 			JointReplanningConfigGroup configGroup,
 			ScoringFunctionFactory scoringFunctionFactory,
-			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
 			PlansCalcRoute routingAlgorithm,
 			Network network,
 			String outputPath,
@@ -143,7 +144,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//	new TabuBestFitnessSelector(this, configGroup);
 			this.addNaturalSelector(selector, false);
 
-			this.setPreservFittestIndividual(true);
+			this.setPreservFittestIndividual(false);
 
 			// Chromosome: construction
 			Gene[] sampleGenes =
@@ -188,6 +189,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setChromosomePool(new ChromosomePool());
 
 			// genetic operators definitions
+			// TODO: use SPX if more individuals than double genes,
+			// use GENOCOP COs otherwise, loging a warning.
 			if (configGroup.getPlotFitness()) {
 				this.addGeneticOperator( new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
@@ -228,12 +231,12 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
-						this.numToggleGenes + this.numEpisodes,
+						this.numToggleGenes + this.numEpisodes + this.numModeGenes,
 						this.nDurationGenes));
 			//this.addGeneticOperator( new JointPlanOptimizerJGAPInPlaceMutation(
 			//			this,
 			//			configGroup,
-			//			this.numToggleGenes + this.numEpisodes,
+			//			this.numToggleGenes + this.numEpisodes + this.numModeGenes,
 			//			this.nDurationGenes));
 
 		} catch (InvalidConfigurationException e) {

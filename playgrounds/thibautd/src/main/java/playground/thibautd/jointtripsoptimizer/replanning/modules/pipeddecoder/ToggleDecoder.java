@@ -391,7 +391,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	/**
 	 * Plans an activity, and the following leg if a shared ride is to reimplace.
 	 * The legs reimplacing shared rides are pt legs. Other modes are possible
-	 * only if the mode is optimized.
+	 * only if the mode is optimized: this part is left to the ModeDecoder.
+	 *
 	 * @return the number of plan elements to ignore
 	 */
 	private int planActivity(

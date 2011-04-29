@@ -34,6 +34,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -48,7 +49,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final PersonalizableTravelCost travelCost;
 	private final PersonalizableTravelTime travelTime;
-	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 
 	public JointPlanOptimizerModule(
 			Controler controler,
@@ -73,7 +74,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		controler.getEvents().addHandler(tDepDelayCalc);
 
-		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(
+		this.legTravelTimeEstimatorFactory = new JointPlanOptimizerLegTravelTimeEstimatorFactory(
 				this.travelTime,
 				tDepDelayCalc);
 	}

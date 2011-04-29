@@ -134,8 +134,8 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 								i,
 								copyOfChromosome);
 
-						mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
-						//mutateDouble((DoubleGene) geneToMute, freeSpace);
+						//mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+						mutateDouble((DoubleGene) geneToMute, freeSpace);
 					}
 					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
 						geneToMute.setToRandomValue(this.randomGenerator);

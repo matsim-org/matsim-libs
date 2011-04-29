@@ -26,7 +26,9 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerPopulationFactory;
 
 /**
  * Quick implementation of a RTS with tabu capabilities on toggle genes.
@@ -36,7 +38,7 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 	//cannot use delegation:  add protected
 	private static final long serialVersionUID = 1L;
 
-	private int nextIterToMonitor = 1;
+	private int nextIterToMonitor = 3;
 	private final int monitoringPeriod = 10;
 	private final double minImprovement = 3d;
 	private final int numBool;
@@ -47,6 +49,7 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 
 	private final RandomGenerator generator;
 	private final boolean[][] tabuSequences;
+	private final JointPlanOptimizerPopulationFactory populationFactory;
 
 	public TabuRestrictedTournamentSelector(
 			final JointPlanOptimizerJGAPConfiguration jgapConfig,
@@ -59,6 +62,7 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 		this.tabuSequences = new boolean[this.maxNumberOfTabuElems][this.numBool];
 
 		this.generator = jgapConfig.getRandomGenerator();
+		this.populationFactory = new JointPlanOptimizerPopulationFactory(jgapConfig);
 	}
 
 	@Override
@@ -84,13 +88,25 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 			IChromosome fittest = population.determineFittestChromosome();
 			double fitness = fittest.getFitnessValue();
 
+			//TODO: check that the fittest is not the same as the last one.
 			if ((fitness - this.lastBestFitness < this.minImprovement) &&
 					(this.indexInTabuList < this.maxNumberOfTabuElems)) {
+				boolean[] newTabuSequence = new boolean[this.numBool];
 				for (int i=0; i < this.numBool; i++) {
-					this.tabuSequences[this.indexInTabuList][i] =
+					newTabuSequence[i] =
 						((BooleanGene) fittest.getGene(i)).booleanValue();
 				}
-				this.indexInTabuList++;
+
+				// add the new sequence only if it is not already tabu
+				if (!isTabu(newTabuSequence)) {
+					this.tabuSequences[this.indexInTabuList] = newTabuSequence;
+					this.indexInTabuList++;
+
+					// reinitialize population
+					population.clear();
+					population.addChromosomes(populationFactory.createRandomInitialPopulation());
+					fitness = Double.NEGATIVE_INFINITY;
+				}
 			}
 
 			this.nextIterToMonitor += this.monitoringPeriod;
@@ -110,22 +126,25 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 			toCorrect[i] = ((BooleanGene) chromosome.getGene(i)).booleanValue();
 		}
 
-		// randomly mutate until the chromosome isn't tabu
-		while (isTabu(toCorrect)) {
-			index = this.generator.nextInt(this.numBool);
-			toCorrect[index] = !toCorrect[index];
-		}
+		if (isTabu(toCorrect)) {
+			// randomly mutate until the chromosome isn't tabu
+			//while (isTabu(toCorrect)) {
+			//	index = this.generator.nextInt(this.numBool);
+			//	toCorrect[index] = !toCorrect[index];
+			//}
 
-		// update chromosome values
-		for (int i=0; i < this.numBool; i++) {
-			chromosome.getGene(i).setAllele(toCorrect[i]);
+			//// update chromosome values
+			//for (int i=0; i < this.numBool; i++) {
+			//	chromosome.getGene(i).setAllele(toCorrect[i]);
+			//}
+			chromosome.setFitnessValueDirectly(chromosome.getFitnessValue() - 150d);
 		}
 	}
 
 	/**
 	 * @return true if a matching tabu element is found.
 	 */
-	private boolean isTabu(boolean[] toggleValues) {
+	private boolean isTabu(final boolean[] toggleValues) {
 		boolean[] currentTabuValues;
 		boolean areEqual;
 
