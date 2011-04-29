@@ -19,42 +19,19 @@
 
 package playground.dgrether.signalsystems.sylvia;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
-import org.matsim.core.utils.io.IOUtils;
 
-public class DgTimeCalcEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentArrivalEventHandler, AgentDepartureEventHandler, LaneEnterEventHandler {
+public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(DgTimeCalcEventHandler.class);
 
-	private Map<Id, Double> arrivaltimesSPN2FB;
-	private Map<Id, Double> arrivaltimesCB2FB;
-
-	private Map<Id, Double> arrivaltimesFB2SPN;
-	private Map<Id, Double> arrivaltimesFB2CB;
-	private Map<Id, Double> personId2TravelTimeMap;
 	private Set<Id> carsPassed;
 	private Set<Id> wannabeadaptiveLanes;
 
@@ -66,68 +43,7 @@ public class DgTimeCalcEventHandler implements LinkEnterEventHandler, LinkLeaveE
 
 	@Override
 	public void reset(int iteration) {
-		this.personId2TravelTimeMap = new TreeMap<Id, Double>();
 		this.carsPassed = new HashSet<Id>();
-		this.arrivaltimesFB2CB = new TreeMap<Id, Double>();
-		this.arrivaltimesFB2SPN = new TreeMap<Id, Double>();
-		this.arrivaltimesCB2FB = new TreeMap<Id, Double>();
-		this.arrivaltimesSPN2FB = new TreeMap<Id, Double>();
-		this.arrivaltimesFB2CB.put(new IdImpl(0), 0.0);
-		this.arrivaltimesSPN2FB.put(new IdImpl(0), 0.0);
-		this.arrivaltimesCB2FB.put(new IdImpl(0), 0.0);
-		this.arrivaltimesFB2SPN.put(new IdImpl(0), 0.0);
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
-	}
-
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
-	
-		if (event.getPersonId().toString().endsWith("SPN_SDF")) {
-			Double tr = this.arrivaltimesSPN2FB.get(event.getPersonId());
-			if (tr == null) {
-				this.arrivaltimesSPN2FB.put(event.getPersonId(), event.getTime());
-			}
-			else {
-				this.arrivaltimesFB2SPN.put(event.getPersonId(), event.getTime());
-			}
-		}
-		if (event.getPersonId().toString().endsWith("CB_SDF")) {
-			Double tr = this.arrivaltimesCB2FB.get(event.getPersonId());
-			if (tr == null) {
-				this.arrivaltimesCB2FB.put(event.getPersonId(), event.getTime());
-			}
-			else {
-				this.arrivaltimesFB2CB.put(event.getPersonId(), event.getTime());
-			}
-		}
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		if (agentTt == null) {
-			this.personId2TravelTimeMap.put(event.getPersonId(), 0 - event.getTime());
-		}
-		else {
-			this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
-		}
-	}
-
-	public Map<Id, Double> getTtmap() {
-		return personId2TravelTimeMap;
 	}
 
 	private void fillWannaBes() {
@@ -162,95 +78,5 @@ public class DgTimeCalcEventHandler implements LinkEnterEventHandler, LinkLeaveE
 		return carsPassed;
 	}
 
-	public void exportArrivalTime(int iteration, String outdir) {
-		String filename = outdir + iteration + ".arrival_times_FB_CB.csv";
-		this.exportMaptoCVS(this.arrivaltimesFB2CB, filename);
-		filename = outdir + iteration + ".arrival_times_FB_SPN.csv";
-		this.exportMaptoCVS(this.arrivaltimesFB2SPN, filename);
-		filename = outdir + iteration + ".arrival_times_CB_FB.csv";
-		this.exportMaptoCVS(this.arrivaltimesCB2FB, filename);
-		filename = outdir + iteration + ".arrival_times_SPN_FB.csv";
-		this.exportMaptoCVS(this.arrivaltimesSPN2FB, filename);
-		
-		filename = outdir + iteration + ".latest_arrivals.csv";
-		this.exportLatestArrivals(filename);
-	}
 
-	private void exportLatestArrivals(String filename) {
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			writer.append("CB2FB;" + "SPN2FB;" + "FB2CB;" + "FB2SPN;");
-			writer.newLine();
-			
-			writer.append(Collections.max(this.arrivaltimesCB2FB.values()) + ";"
-					+ Collections.max(this.arrivaltimesSPN2FB.values()) + ";"
-					+ Collections.max(this.arrivaltimesFB2CB.values()) + ";"
-					+ Collections.max(this.arrivaltimesFB2SPN.values()) + ";");
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void exportMaptoCVS(Map<Id, Double> atmap, String filename) {
-		try {
-			FileWriter writer = new FileWriter(filename);
-
-			for (Entry<Id, Double> e : atmap.entrySet()) {
-				writer.append(e.getKey().toString() + ";" + e.getValue() + ";" + "\n");
-			}
-			writer.flush();
-			writer.close();
-			log.info("Wrote " + filename);
-		} catch (IOException e1) {
-			log.error("cannot write to file: " + filename);
-			e1.printStackTrace();
-		}
-
-	}
-
-	public double getLatestArrivalCBSDF() {
-		return Collections.max(this.arrivaltimesCB2FB.values()).doubleValue();
-
-	}
-
-	public double getLatestArrivalSPNSDF() {
-		return Collections.max(this.arrivaltimesSPN2FB.values()).doubleValue();
-
-	}
-
-	public double getLatestArrivalSDFCB() {
-		return Collections.max(this.arrivaltimesFB2CB.values()).doubleValue();
-
-	}
-
-	public double getLatestArrivalSDFSPN() {
-		return Collections.max(this.arrivaltimesFB2SPN.values()).doubleValue();
-
-	}
-
-	public int getAverageTravelTime() {
-
-		Double att = 0.0;
-		for (Entry<Id, Double> entry : personId2TravelTimeMap.entrySet()) {
-			att += entry.getValue();
-		}
-		att = att / personId2TravelTimeMap.size();
-		return att.intValue();
-	}
-
-	public int getAverageAdaptiveTravelTime() {
-		if (this.getPassedAgents() == 0)
-			return 0;
-		Double att = 0.0;
-		for (Entry<Id, Double> entry : personId2TravelTimeMap.entrySet()) {
-			if (this.getPassedCars().contains(entry.getKey())) {
-				att += entry.getValue();
-			}
-		}
-		att = att / this.getPassedAgents();
-		return att.intValue();
-	}
 }

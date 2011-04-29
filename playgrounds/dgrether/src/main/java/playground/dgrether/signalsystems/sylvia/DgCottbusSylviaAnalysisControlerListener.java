@@ -41,7 +41,12 @@ import org.matsim.signalsystems.model.SignalGroupState;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 
-
+/**
+ * 
+ * @author dgrether
+ * @deprecated
+ */
+@Deprecated
 public class DgCottbusSylviaAnalysisControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private static final Logger log = Logger.getLogger(DgCottbusSylviaAnalysisControlerListener.class);
@@ -69,23 +74,13 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 
 	}
 
-	
-	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent e) {
 		if (e.getIteration() == 0 || e.getIteration() % 10 == 0){
 			log.info("Analysis of run id: " + e.getControler().getConfig().controler().getRunId());
 			log.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
 					+ this.timeCalcHandler.getPassedAgents());
-			log.info("Average TravelTime for Agents that passed an adaptive signal at least once: "+this.timeCalcHandler.getAverageAdaptiveTravelTime());
-			log.info("Average TT of all Agents " + this.timeCalcHandler.getAverageTravelTime()); 
-			log.info("Latest arrival time at stadium for Agents coming from Cottbus: "+this.timeCalcHandler.getLatestArrivalCBSDF());
-			log.info("Latest arrival time at stadium for Agents coming from SPN: "+this.timeCalcHandler.getLatestArrivalSPNSDF());
-			log.info("Latest home time for agents going from stadium to Cottbus: "+this.timeCalcHandler.getLatestArrivalSDFCB());
-			log.info("Latest home time for agents going from stadium to SPN: "+this.timeCalcHandler.getLatestArrivalSDFSPN());
 			
-			this.timeCalcHandler.exportArrivalTime(e.getIteration(), e.getControler().getControlerIO().getIterationPath(e.getIteration()));
-
 			if (collectGreenSplitInformation){
 				this.writeSignalStats(e);
 			}
@@ -97,11 +92,6 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	}
 
 	
-	public double getAverageTravelTime(){
-		return this.timeCalcHandler.getAverageTravelTime();
-	}
-
-
 	private void initGreenSplitHandler(){
 		this.signalGreenSplitHandler = new DgSignalGreenSplitHandler();
 		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));

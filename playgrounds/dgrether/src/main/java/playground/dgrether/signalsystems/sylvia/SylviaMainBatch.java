@@ -32,8 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -43,8 +41,9 @@ import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListe
 
 /**
  * @author dgrether
- *
+ * @deprecated use CottbusFootballBatch instead
  */
+@Deprecated
 public class SylviaMainBatch {
 
 	
@@ -66,7 +65,7 @@ public class SylviaMainBatch {
 		String sylviaSignals = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/sylvia/signal_control_sylvia.xml";
 		String footballPlansBaseFilename = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
 		//read the config
-		Config baseConfig = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
+		Config baseConfig = ConfigUtils.createConfig();
 		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 
@@ -87,7 +86,6 @@ public class SylviaMainBatch {
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
-			fixedtimeScale2AverageTTMap.put(scale, analysis.getAverageTravelTime());
 			
 			//sylvia control
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
@@ -101,7 +99,6 @@ public class SylviaMainBatch {
 			controler.addControlerListener(analysis);
 			controler.setOverwriteFiles(true);
 			controler.run();
-			sylviaScale2AverageTTMap.put(scale, analysis.getAverageTravelTime());
 		}
 		
 		writeAverageTT(fixedtimeScale2AverageTTMap, outputDirBase + "fixed-time_avg_tt.txt");
