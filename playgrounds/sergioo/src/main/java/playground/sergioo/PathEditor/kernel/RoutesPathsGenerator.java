@@ -32,6 +32,8 @@ public class RoutesPathsGenerator {
 	 * Pre-processed information files
 	 */
 	private final static File[] PREFILES = {new File("./data/paths/fixedStops.txt"),new File("./data/paths/bases.txt"),new File("./data/paths/finishedTrips.txt")};
+	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes.txt");
+	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
 	
 	//Attributes
 	/**

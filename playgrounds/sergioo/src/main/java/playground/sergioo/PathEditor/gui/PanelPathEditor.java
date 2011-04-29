@@ -22,6 +22,7 @@ package playground.sergioo.PathEditor.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -34,6 +35,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 
@@ -76,7 +78,9 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private double yMax;
 	private double xMin;
 	private double yMin;
+	private boolean shapeNums = false;
 	private boolean paintAll = false;
+	
 	//Methods
 	public PanelPathEditor(Window window) {
 		this.window = window;
@@ -90,7 +94,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	private void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		Collection<Coord> points = window.getPoints();
+		Collection<Coord> points = window.getPoints().values();
 		if(points.size()==0)
 			points = window.getStopPoints();
 		for(Coord point:points) {
@@ -154,9 +158,14 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private void paintPoints(Graphics2D g2) {
 		g2.setColor(pointsColor);
 		g2.setStroke(pointsStroke);
-		for(Coord point:window.getPoints()) {
+		for(Entry<Integer,Coord> ePoint:window.getPoints().entrySet()) {
+			Coord point = ePoint.getValue();
 			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())+pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())-pointsSize);
 			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())-pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())+pointsSize);
+			if(shapeNums) {
+				g2.setFont(new Font("Arial", Font.PLAIN, 5));
+				g2.drawString(ePoint.getKey().toString(), camera.getIntX(point.getX()), camera.getIntY(point.getY())-5);
+			}
 		}
 		if(withStops) {
 			g2.setColor(pointsColor2);
@@ -297,7 +306,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		
+		window.setCoords(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -307,6 +316,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			break;
 		case '-':
 			window.decreaseSelectedLink();
+			break;
+		case '>':
+			window.increaseSelectedStop();
+			break;
+		case '<':
+			window.decreaseSelectedStop();
 			break;
 		case 's':
 			withStops = !withStops;
@@ -325,6 +340,9 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			break;
 		case 'i':
 			window.changeInStops();
+			break;
+		case 'e':
+			shapeNums = !shapeNums;
 			break;
 		case 'a':
 			paintAll = !paintAll;

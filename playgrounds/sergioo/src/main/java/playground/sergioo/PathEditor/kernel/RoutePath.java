@@ -1,6 +1,5 @@
 package playground.sergioo.PathEditor.kernel;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,8 +41,6 @@ public class RoutePath {
 	
 	//Constants
 	private static final double MIN_DISTANCE_DELTA = 20*180/(6371000*Math.PI);
-	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes.txt");
-	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
 	//Attributes
 	private Map<String, Stop> stops;
 	public List<Link> links;
@@ -167,17 +166,26 @@ public class RoutePath {
 		}
 		return links;
 	}
-	public Collection<Coord> getShapePoints() {
+	public SortedMap<Integer,Coord> getShapePoints() {
 		if(trip.getShape()!=null)
-			return trip.getShape().getPoints().values();
+			return trip.getShape().getPoints();
 		else
-			return new ArrayList<Coord>();
+			return new TreeMap<Integer,Coord>();
 	}
 	public Collection<Coord> getStopPoints() {
 		Collection<Coord> points = new ArrayList<Coord>();
 		for(StopTime stopTime:trip.getStopTimes().values())
 			points.add(stops.get(stopTime.getStopId()).getPoint());
 		return points;
+	}
+	public String getStopId(int pos) {
+		int i = 0;
+		for(StopTime stopTime:trip.getStopTimes().values()) {
+			if(i==pos)
+				return stopTime.getStopId();
+			i++;
+		}
+		return "";
 	}
 	public Link getLink(int index) {
 		return links.get(index);
@@ -192,6 +200,18 @@ public class RoutePath {
 				return i;
 			i++;
 		}
+		return -1;
+	}
+	public int getLinkIndexStop(String selectedStopId) {
+		for(int i=0; i<links.size(); i++)
+			if(links.get(i).getId().toString().equals(stops.get(selectedStopId).getLinkId()))
+				return i;
+		return -1;
+	}
+	private int getLinkPosition(String link) {
+		for(int i=0; i<links.size(); i++)
+			if(link.equals(links.get(i).getId().toString()))
+				return i;
 		return -1;
 	}
 	public int getIndexNearestLink(double x, double y) {
@@ -270,7 +290,7 @@ public class RoutePath {
 		Id linkId = new IdImpl(network.getLinks().size()*2);
 		network.addLink(network.getFactory().createLink(linkId, fromNode, toNode));
 		try {
-			PrintWriter writer = new PrintWriter(new FileWriter(NEW_NETWORK_LINKS_FILE,true));
+			PrintWriter writer = new PrintWriter(new FileWriter(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE,true));
 			writer.println(linkId);
 			writer.println(fromNode.getId());
 			writer.println(toNode.getId());
@@ -283,7 +303,7 @@ public class RoutePath {
 		Node node = network.getFactory().createNode(new IdImpl("n"+network.getNodes().size()), new CoordImpl(x, y));
 		network.addNode(node);
 		try {
-			PrintWriter writer = new PrintWriter(new FileWriter(NEW_NETWORK_NODES_FILE,true));
+			PrintWriter writer = new PrintWriter(new FileWriter(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE,true));
 			writer.println(node.getId());
 			writer.println(node.getCoord().getX());
 			writer.println(node.getCoord().getY());
@@ -544,12 +564,6 @@ public class RoutePath {
 				return stopTime.getStopId();
 		}
 		return "";
-	}
-	private int getLinkPosition(String link) {
-		for(int i=0; i<links.size(); i++)
-			if(link.equals(links.get(i).getId().toString()))
-				return i;
-		return -1;
 	}
 	public void increaseMinDistance() {
 		minDistance += MIN_DISTANCE_DELTA;

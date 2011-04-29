@@ -77,10 +77,10 @@ public class Point2D {
 	public Point2D getTranslated(Vector2D v) {
 		return new Point2D(x+v.getX(), y+v.getY());
 	}
-	public double getDistance() {
+	public double getDistanceCenter() {
 		return Math.hypot(x, y);
 	}
-	public double getDistanceSqr() {
+	public double getDistanceCenterSqr() {
 		return Math.pow(x,2)+Math.pow(y,2);
 	}
 	public double getDistance(Point2D p2) {

@@ -30,10 +30,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -154,9 +156,66 @@ public class Window extends JFrame implements ActionListener {
 	private RoutesPathsGenerator routesPathsGenerator;
 	private JButton saveButton;
 	private JLabel[] labels;
+	private JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	private JCheckBox[] checks;
 	private Wait wait;
 	//Methods
+	public Window(String title, Network network, Trip trip, Map<String,Stop> stops) {
+		setTitle(title);
+		routePath = new RoutePath(network, trip, stops, trip.getLinks());
+		this.setLocation(0,0);
+		this.setLayout(new BorderLayout());
+		option = Option.ZOOM;
+		panel = new PanelPathEditor(this);
+		this.setSize(width+GAPX, height+GAPY);
+		this.add(panel, BorderLayout.CENTER);
+		JPanel buttonsPanel = new JPanel();
+		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
+		for(Option option:Option.values()) {
+			JButton optionButton = new JButton(option.caption);
+			optionButton.setActionCommand(option.name());
+			optionButton.addActionListener(this);
+			buttonsPanel.add(optionButton);
+		}
+		this.add(buttonsPanel, BorderLayout.EAST);
+		JPanel infoPanel = new JPanel();
+		infoPanel.setLayout(new BorderLayout());
+		saveButton = new JButton("Exit");
+		saveButton.addActionListener(this);
+		saveButton.setActionCommand("Exit");
+		infoPanel.add(saveButton, BorderLayout.WEST);
+		JPanel labelsPanel = new JPanel();
+		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labelsPanel.setBorder(new TitledBorder("Information"));
+		labels = new JLabel[Label.values().length];
+		int l=0;
+		for(Label label:Label.values()) {
+			try {
+				Method m = RoutePath.class.getMethod("get"+label.text, new Class[] {});
+				labels[l]=new JLabel(m.invoke(routePath, new Object[]{}).toString());
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			labelsPanel.add(labels[l]);
+			l++;
+		}
+		infoPanel.add(labelsPanel, BorderLayout.CENTER);JPanel coordsPanel = new JPanel();
+		coordsPanel.setLayout(new GridLayout(1,2));
+		coordsPanel.setBorder(new TitledBorder("Coordinates"));
+		coordsPanel.add(lblCoords[0]);
+		coordsPanel.add(lblCoords[1]);
+		infoPanel.add(coordsPanel, BorderLayout.EAST);
+		this.add(infoPanel, BorderLayout.SOUTH);
+		isOk();
+	}
 	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
 		this(title,network,trip,stops,null,links,routesPathsGenerator);
 	}
@@ -166,7 +225,7 @@ public class Window extends JFrame implements ActionListener {
 		this.links = linksE;
 		if(linksS==null)
 			routePath = new RoutePath(network, trip, stops);
-		else {
+		else{
 			List<Link> links = new ArrayList<Link>();
 			for(String link:linksS)
 				links.add(network.getLinks().get(new IdImpl(link)));
@@ -257,6 +316,12 @@ public class Window extends JFrame implements ActionListener {
 			l++;
 		}
 		infoPanel.add(labelsPanel, BorderLayout.CENTER);
+		JPanel coordsPanel = new JPanel();
+		coordsPanel.setLayout(new GridLayout(1,2));
+		coordsPanel.setBorder(new TitledBorder("Coordinates"));
+		coordsPanel.add(lblCoords[0]);
+		coordsPanel.add(lblCoords[1]);
+		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
 		if(linksS!=null) {
 			int first = routePath.isFirstLinkWithStop();
@@ -266,6 +331,7 @@ public class Window extends JFrame implements ActionListener {
 		}
 		else
 			isOk();
+		
 	}
 	public Option getOption() {
 		return option;
@@ -287,6 +353,8 @@ public class Window extends JFrame implements ActionListener {
 	public void selectStop(double x, double y) {
 		selectedStopId = routePath.getIdNearestStop(x, y);
 		labels[Label.STOP.ordinal()].setText(refreshStop());
+		selectedLinkIndex = routePath.getLinkIndexStop(selectedStopId);
+		labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
 	}
 	public void unselectStop() {
 		selectedStopId = "";
@@ -469,13 +537,18 @@ public class Window extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(this, "No, the path is not joined");
 			coord = routePath.getLink(selectedLinkIndex).getCoord();
 		}
+		labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
+		labels[Label.STOP.ordinal()].setText(selectedStopId.equals("")?"":refreshStop());
 		saveButton.setEnabled(false);
 		panel.centerCamera(coord.getX(), coord.getY());
 	}
 	public void save() {
-		links.addAll(routePath.getLinks());
+		if(links.size() == 0)
+			links.addAll(routePath.getLinks());
+		else
+			links.add(links.get(0));
 	}
-	public Collection<Coord> getPoints() {
+	public SortedMap<Integer,Coord> getPoints() {
 		return routePath.getShapePoints();
 	}
 	public Collection<Coord> getStopPoints() {
@@ -508,6 +581,22 @@ public class Window extends JFrame implements ActionListener {
 			selectedLinkIndex=-1;
 		labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
 	}
+	public void increaseSelectedStop() {
+		selectedStopId = routePath.getStopId(routePath.getIndexStop(selectedStopId)+1);
+		if(!selectedStopId.equals("")) {
+			labels[Label.STOP.ordinal()].setText(refreshStop());
+			selectedLinkIndex = routePath.getLinkIndexStop(selectedStopId);
+			labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
+		}
+	}
+	public void decreaseSelectedStop() {
+		selectedStopId = routePath.getStopId(routePath.getIndexStop(selectedStopId)-1);
+		if(!selectedStopId.equals("")) {
+			labels[Label.STOP.ordinal()].setText(refreshStop());
+			selectedLinkIndex = routePath.getLinkIndexStop(selectedStopId);
+			labels[Label.LINK.ordinal()].setText(selectedLinkIndex==-1?"":refreshLink());
+		}
+	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
 		return routePath.getNetworkLinks(xMin, yMin, xMax, yMax);
 	}
@@ -516,6 +605,13 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public Collection<Link> getAllStopLinks() {
 		return routesPathsGenerator.getAllStopLinks();
+	}
+	public void setCoords(double x, double y) {
+		NumberFormat nF = NumberFormat.getInstance();
+		nF.setMaximumFractionDigits(4);
+		nF.setMinimumFractionDigits(4);
+		lblCoords[0].setText(nF.format(x)+" ");
+		lblCoords[1].setText(" "+nF.format(y));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -560,6 +656,8 @@ public class Window extends JFrame implements ActionListener {
 					saveButton.setEnabled(false);
 				panel.repaint();
 			}
+		if(e.getActionCommand().equals("Exit"))
+			setVisible(false);
 	}
 	
 }

@@ -22,6 +22,7 @@ package visUtils;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -43,16 +44,24 @@ public class PanelPointLines extends JPanel implements Observer {
 	private Point2D upLeftCorner;
 	private Vector2D size;
 	private Color backgroundColor = Color.WHITE;
-	private Color pointsColor = Color.RED;
+	private Color pointsColor = Color.BLACK;
 	private Color linesColor = Color.GRAY;
-	private int pointsSize = 1;
-	private Stroke pointsStroke = new BasicStroke(1);
+	private int pointsSize = 5;
+	private Stroke pointsStroke = new BasicStroke(3);
 	private Stroke linesStroke = new BasicStroke(1);
 	private PointLines pointsLines;
+	private String title;
 	//Methods
 	public PanelPointLines(PointLines pointsLines) {
 		this.setBackground(backgroundColor);
 		this.pointsLines = pointsLines;
+		calculateBoundaries();
+		((Observable) pointsLines).addObserver(this);
+	}
+	public PanelPointLines(PointLines pointsLines, String title) {
+		this.setBackground(backgroundColor);
+		this.pointsLines = pointsLines;
+		this.title = title;
 		calculateBoundaries();
 		((Observable) pointsLines).addObserver(this);
 	}
@@ -62,6 +71,11 @@ public class PanelPointLines extends JPanel implements Observer {
 		Graphics2D g2=(Graphics2D)g;
 		paintLines(g2);
 		paintPoints(g2);
+		if(title!=null) {
+			g2.setFont(new Font("Arial",Font.ITALIC,20));
+			g2.setColor(new Color(0,0,0));
+			g2.drawString(title, 400, 50);
+		}
 	}
 	private void paintPoints(Graphics2D g2) {
 		g2.setColor(pointsColor);
@@ -74,8 +88,13 @@ public class PanelPointLines extends JPanel implements Observer {
 	private void paintLines(Graphics2D g2) {
 		g2.setColor(linesColor);
 		g2.setStroke(linesStroke);
-		for(Line2D line:pointsLines.getLines())
+		for(Line2D line:pointsLines.getLines()) {
+			if(line.getThickness()!=-1) {
+				g2.setColor(new Color(1,1-(float)line.getThickness()/10,0));
+				g2.setStroke(new BasicStroke((float)line.getThickness()));
+			}
 			g2.drawLine(getIntX(line.getPI().getX()), getIntY(line.getPI().getY()), getIntX(line.getPF().getX()), getIntY(line.getPF().getY()));
+		}
 		/*for(Line2D line:((SimpleMapMatcher)pointsLines).getLines2())
 			g2.drawLine(getIntX(line.getPI().getX()), getIntY(line.getPI().getY()), getIntX(line.getPF().getX()), getIntY(line.getPF().getY()));*/
 	}
@@ -88,6 +107,26 @@ public class PanelPointLines extends JPanel implements Observer {
 	private void calculateBoundaries() {
 		double xMin=Double.POSITIVE_INFINITY, yMin=Double.POSITIVE_INFINITY, xMax=Double.NEGATIVE_INFINITY, yMax=Double.NEGATIVE_INFINITY;
 		for(Point2D point:pointsLines.getPoints()) {
+			if(point.getX()<xMin)
+				xMin = point.getX();
+			if(point.getX()>xMax)
+				xMax = point.getX();
+			if(point.getY()<yMin)
+				yMin = point.getY();
+			if(point.getY()>yMax)
+				yMax = point.getY();
+		}
+		for(Line2D line:pointsLines.getLines()) {
+			Point2D point = line.getPI();
+			if(point.getX()<xMin)
+				xMin = point.getX();
+			if(point.getX()>xMax)
+				xMax = point.getX();
+			if(point.getY()<yMin)
+				yMin = point.getY();
+			if(point.getY()>yMax)
+				yMax = point.getY();
+			point = line.getPF();
 			if(point.getX()<xMin)
 				xMin = point.getX();
 			if(point.getX()>xMax)

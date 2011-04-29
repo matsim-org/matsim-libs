@@ -31,16 +31,26 @@ public class Window extends JFrame {
 	//Constants
 	public static int MAX_WIDTH = 1920;
 	public static int MAX_HEIGHT = 1080;
-	public static int FRAMESIZE = 50;
+	public static int FRAMESIZE = 100;
 	//Attributes
 	public static int width;
 	public static int height;
 	private PanelPointLines panel;
 	//Methods
 	public Window(PointLines pointLines) {
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		panel=new PanelPointLines(pointLines);
+		this.setSize(width, height);
+		this.add(panel, BorderLayout.CENTER);
+	}
+	public Window(PointLines pointLines, String title) {
+		setTitle(title);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLocation(0,0);
+		this.setLayout(new BorderLayout());
+		panel=new PanelPointLines(pointLines,title);
 		this.setSize(width, height);
 		this.add(panel, BorderLayout.CENTER);
 	}

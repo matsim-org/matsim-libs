@@ -36,6 +36,7 @@ public class Line2D {
 	//Attributes
 	private Point2D pI;
 	private Point2D pF;
+	private double thickness = -1;
 	
 	//Methods
 	public Line2D() {
@@ -68,6 +69,12 @@ public class Line2D {
 	public void setPF(Point2D pf) {
 		pF = pf;
 	}
+	public double getThickness() {
+		return thickness;
+	}
+	public void setThickness(double thickness) {
+		this.thickness = thickness;
+	}
 	public double getLength() {
 		return pI.getDistance(pF);
 	}
@@ -83,6 +90,9 @@ public class Line2D {
 	public double getFunction(double x) {
 		return this.getSlope()*x+this.getYIntersect();
 	}
+	public double getParameter(Point2D p) {
+		return (p.getX()-pI.getX())/(pF.getX()-pI.getX());
+	}
 	public boolean isFromLine(Point2D p) {
 		if(Math.abs(p.getY()-(p.getX()*this.getSlope()+this.getYIntersect()))<2*Double.MIN_VALUE)
 			return true;
@@ -90,12 +100,19 @@ public class Line2D {
 			return false;
 	}
 	public boolean isInside(Point2D p) {
-		if(this.isFromLine(p)&&p.getDistance(pI)<this.getLength()&&p.getDistance(pF)<this.getLength())
+		if(this.isFromLine(p)&&isInside2(p))
 			return true;
 		else
 			return false;
 	}
 	public boolean isInside2(Point2D p) {
+		double parameter = getParameter(p);
+		if(0<=parameter && parameter<=1)
+			return true;
+		else
+			return false;
+	}
+	public boolean isInside3(Point2D p) {
 		if(p.getDistance(pI)<this.getLength() && p.getDistance(pF)<this.getLength())
 			return true;
 		else
@@ -106,11 +123,11 @@ public class Line2D {
 	}
 	public PointPosition getPointPosition(Point2D p) {
 		Point2D nearest = getNearestPoint(p);
-		double length = this.getLength();
-		if(nearest.getDistance(pI)<length && nearest.getDistance(pF)<length)
-			return PointPosition.INSIDE;
-		else if(nearest.getDistance(pI)<nearest.getDistance(pF))
+		double parameter = getParameter(nearest);
+		if(parameter<0)
 			return PointPosition.BEFORE;
+		else if(parameter<=1)
+			return PointPosition.INSIDE;
 		else
 			return PointPosition.AFTER;
 	}
