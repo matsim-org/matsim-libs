@@ -83,6 +83,53 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 	}
 
 	/**
+	 * Tests that the combination of {@link ReRoute} and {@link TimeAllocationMutator} always generates 
+	 * the same results with the same number of threads.
+	 */
+	public void testReRouteTimeAllocationMutator() {
+		int lastIteration = 5;
+		Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(lastIteration);
+		config.global().setNumberOfThreads(4); // just use any number > 1
+		
+		// setup run1
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		StrategyManager strategyManager = new StrategyManager();
+		strategyManager.addStrategy(strategy, 1.0);
+		
+		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
+		TestControler controler = new TestControler(config, strategyManager);
+		strategy.addStrategyModule(new ReRoute(controler)); // finish strategy configuration
+		strategy.addStrategyModule(new TimeAllocationMutator(config));
+		controler.run();
+
+		// setup run2
+		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+		StrategyManager strategyManager2 = new StrategyManager();
+		strategyManager2.addStrategy(strategy2, 1.0);
+		
+		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
+		TestControler controler2 = new TestControler(config, strategyManager2);
+		strategy2.addStrategyModule(new ReRoute(controler2)); // finish strategy configuration
+		strategy2.addStrategyModule(new TimeAllocationMutator(config));
+		controler2.run();
+
+		for (int i = 0; i <= lastIteration; i++) {
+			
+			long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
+			long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
+			
+			assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
+		}
+		
+		for (int i = 0; i < 2; i++) {
+			long pcksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
+			long pcksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
+			assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
+		}
+	}
+	
+	/**
 	 * Tests that the generic {@link ReRoute} generates always the same results
 	 * with the same number of threads using only one agent.
 	 */
@@ -153,6 +200,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategy.addStrategyModule(new ReRoute(controler));
 		controler.run();
 
+		// setup run2
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.addStrategy(strategy2, 1.0);
@@ -190,6 +238,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 			this.strategyManager = manager;
 			this.setCreateGraphs(false);
 			this.setWriteEventsInterval(1);
+			this.setDumpDataAtEnd(false);
 		}
 
 		@Override
