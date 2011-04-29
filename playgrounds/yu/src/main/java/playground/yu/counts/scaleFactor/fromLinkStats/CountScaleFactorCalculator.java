@@ -20,7 +20,7 @@
 /**
  *
  */
-package playground.yu.counts;
+package playground.yu.counts.scaleFactor.fromLinkStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
 
 /**
- * enables {@code Counts} comparison and writing .kmz file to work for each
- * iteration, and tests the counts comparison effects with different
- * countsScaleFactor
+ * calculates countsScaleFactor meeting different criteria (e.g. min MRE).
  *
  * @author yu
  *

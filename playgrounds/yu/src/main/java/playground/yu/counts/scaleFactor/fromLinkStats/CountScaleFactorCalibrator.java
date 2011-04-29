@@ -20,7 +20,7 @@
 /**
  *
  */
-package playground.yu.counts;
+package playground.yu.counts.scaleFactor.fromLinkStats;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 /**
  * enables {@code Counts} comparison and writing .kmz file to work for each
  * iteration, and tests the counts comparison effects with different
- * countsScaleFactor
+ * "countsScaleFactor"s
  *
  * @author yu
  *

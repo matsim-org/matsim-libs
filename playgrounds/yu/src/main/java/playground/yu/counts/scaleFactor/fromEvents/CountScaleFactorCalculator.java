@@ -20,61 +20,49 @@
 /**
  *
  */
-package playground.yu.counts;
+package playground.yu.counts.scaleFactor.fromEvents;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 
 /**
- * enables {@code Counts} comparison and writing .kmz file to work for each
- * iteration, and tests the counts comparison effects with different
- * countsScaleFactor
+ * calculates countsScaleFactor meeting different criteria (e.g. min MRE).
  *
  * @author yu
  *
  */
-public class CountScaleFactorLab {
+public class CountScaleFactorCalculator {
 	protected class CountsComparisonAlgorithm {
-		/**
-		 * The LinkAttributes of the simulation
-		 */
-		private final CalcLinkStats linkStats;
-		/**
-		 * The counts object
-		 */
+		/** The VolumesAnalyszer of the simulation */
+		private final VolumesAnalyzer volumes;
+		/** The counts object */
 		private final Counts counts;
-		/**
-		 * The result list
-		 */
+		/** The result list */
 		private final List<CountSimComparison> countSimComp;
 
 		private Node distanceFilterNode = null;
-
 		private Double distanceFilter = null;
 
 		private final Network network;
@@ -84,49 +72,14 @@ public class CountScaleFactorLab {
 		private final Logger log = Logger
 				.getLogger(CountsComparisonAlgorithm.class);
 
-		public CountsComparisonAlgorithm(final CalcLinkStats linkStats,
+		public CountsComparisonAlgorithm(final VolumesAnalyzer volumes,
 				final Counts counts, final Network network,
 				final double countsScaleFactor) {
-			this.linkStats = linkStats;
+			this.volumes = volumes;
 			this.counts = counts;
 			countSimComp = new ArrayList<CountSimComparison>();
 			this.network = network;
 			this.countsScaleFactor = countsScaleFactor;
-		}
-
-		/**
-		 * Creates the List with the counts vs sim values stored in the
-		 * countAttribute Attribute of this class.
-		 */
-		private void compare() {
-			double countValue;
-
-			for (Count count : counts.getCounts().values()) {
-				if (!isInRange(count.getLocId())) {
-					continue;
-				}
-				double[] volumes = linkStats
-						.getAvgLinkVolumes(count.getLocId());
-				if (volumes.length == 0) {
-					log.warn("No volumes for link: "
-							+ count.getLocId().toString());
-					volumes = new double[24];
-					// continue;
-				}
-				for (int hour = 1; hour <= 24; hour++) {
-					// real volumes:
-					Volume volume = count.getVolume(hour);
-					if (volume != null) {
-						countValue = volume.getValue();
-						double simValue = volumes[hour - 1];
-						simValue *= countsScaleFactor;
-						countSimComp.add(new CountSimComparisonImpl(count
-								.getLocId(), hour, countValue, simValue));
-					} else {
-						countValue = 0.0;
-					}
-				}
-			}
 		}
 
 		/**
@@ -157,9 +110,9 @@ public class CountScaleFactorLab {
 			return dist < distanceFilter.doubleValue();
 		}
 
-		public void run() {
-			compare();
-		}
+		// public void run() {
+		// compare();
+		// }
 
 		public void setCountsScaleFactor(final double countsScaleFactor) {
 			this.countsScaleFactor = countsScaleFactor;
@@ -177,12 +130,11 @@ public class CountScaleFactorLab {
 			distanceFilterNode = network.getNodes().get(new IdImpl(nodeId));
 		}
 
-		/**
-		 * Creates the List with the counts vs sim values stored in the
-		 * countAttribute Attribute of this class.
-		 */
-		public double getScaleFactor4_0bias(int startHour, int endHour) {
-			double simValSquareSum = 0, countSimProductSum = 0;
+		public void getBestScaleFactors(int startHour, int endHour) {
+			double simValSquareSum = 0d, countSimProductSum = 0d;// 4 MSB
+			double simValSum = 0d, countValSum = 0d;// 4 MB
+			double simCntQuotientSum = 0d, simCntQuotientSquareSum = 0d;// 4
+																		// MSRE
 
 			if (startHour < 1 || startHour > endHour || endHour > 24) {
 				throw new RuntimeException(
@@ -195,8 +147,8 @@ public class CountScaleFactorLab {
 				if (!isInRange(count.getLocId())) {
 					continue;
 				}
-				double[] volumes = linkStats
-						.getAvgLinkVolumes(count.getLocId());
+				double[] volumes = this.volumes.getVolumesPerHourForLink(count
+						.getLocId());
 				if (volumes.length == 0) {
 					log.warn("No volumes for link: "
 							+ count.getLocId().toString());
@@ -210,139 +162,133 @@ public class CountScaleFactorLab {
 						double simValue = volumes[hour - 1];
 						simValue *= countsScaleFactor;
 
+						// 4 MSB
 						simValSquareSum += simValue * simValue;
 						countSimProductSum += countValue * simValue;
 
+						// 4 MB
+						simValSum += simValue;
+						countValSum += countValue;
+
+						// 4 MSRE
+						double simCntQuotient = countValue > 0d ? simValue
+								/ countValue : 11d;
+						simCntQuotientSum += simCntQuotient;
+						// see also CountSimComparisonImpl.java
+						simCntQuotientSquareSum += simCntQuotient
+								* simCntQuotient;
 					} else {
 						countValue = 0.0;
 					}
 				}
 			}
+
 			if (simValSquareSum <= 0) {
 				throw new RuntimeException(
 						"sigma(sim^2)==0, no agents were simulated?");
 			}
-			return countsScaleFactor * countSimProductSum / simValSquareSum;
+
+			double a = countsScaleFactor * countSimProductSum / simValSquareSum, b = countsScaleFactor
+					* simCntQuotientSum / simCntQuotientSquareSum, c = countsScaleFactor
+					* countValSum / simValSum;
+			System.out
+					.println("best scaleFactor for minimal MSB (mean squred bias) (  sigma[(sim-cnt)^2]  ) could be\t"
+							+ a + "\t!");
+
+			System.out
+					.println("best scaleFactor for minimal MSRE (mean squred relative errors) ( sigma[(sim/cnt-1)^2] ) could be\t"
+							+ b + "\t!");
+
+			System.out
+					.println("best scaleFactor for minimal MB (mean bias) (  [sigma(sim-cnt)]^2  ) could be\t"
+							+ c + "\t!");
+
+			System.out.println("simSum =\t" + simValSum + "\tcntSum=\t"
+					+ countValSum);
+			for (double csf = countsScaleFactor / 2d; csf < countsScaleFactor * 2d; csf += 0.05) {
+				System.out.println("countScaleFactor =\t" + csf
+						+ "\tdifference=\t"
+						+ (simValSum * csf / countsScaleFactor - countValSum));
+			}
 		}
 	}
 
-	private final String linkStatsFilename;
-	private final double[] scaleFactors;
+	private final String eventsFilename;
 
 	private final Logger log = Logger
-			.getLogger(CountScaleFactorLab.class);
+			.getLogger(CountScaleFactorCalculator.class);
 
 	private final Scenario scenario;
 	private Config config;
 	private Counts counts;
 
+	private final int startHour, endHour;
+
 	/**
+	 * @param endHour
+	 * @param startHour
 	 * @param config
 	 */
-	public CountScaleFactorLab(String configFilename,
-			String linkStatsFilename, double[] scaleFactors) {
+	public CountScaleFactorCalculator(String configFilename,
+			String eventsFilename, int startHour, int endHour) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
 				.loadConfig(configFilename));
-		this.linkStatsFilename = linkStatsFilename;
-		this.scaleFactors = scaleFactors;
+		this.eventsFilename = eventsFilename;
+		this.startHour = startHour;
+		this.endHour = endHour;
 	}
 
 	public void run() {
 		config = scenario.getConfig();
 
 		counts = new Counts();
-		new MatsimCountsReader(counts).readFile(config.counts()
-				.getCountsFileName());
+		CountsConfigGroup countsCG = config.counts();
+		new MatsimCountsReader(counts).readFile(countsCG.getCountsFileName());
 
-		// SET COUNTS_SCALE_FACTOR
-		for (double scaleFactor : scaleFactors) {
-			runCountsComparisonAlgorithmAndOutput(scaleFactor);
-		}
-	}
-
-	private void runCountsComparisonAlgorithmAndOutput(double scaleFactor) {
-		CountsConfigGroup countsConfigGroup = config.counts();
-
+		double scaleFactor = countsCG.getCountsScaleFactor();
 		log.info("compare with counts, scaleFactor =\t" + scaleFactor);
 
 		Network network = scenario.getNetwork();
 
-		CalcLinkStats calcLinkStats = new CalcLinkStats(network, scaleFactor
-				/ countsConfigGroup.getCountsScaleFactor());
-		calcLinkStats.readFile(linkStatsFilename);
+		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,
+				network);
 
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(
-				calcLinkStats, counts, network, scaleFactor);
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(volumes);
+		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		if (countsConfigGroup.getDistanceFilter() != null
-				&& countsConfigGroup.getDistanceFilterCenterNode() != null) {
-			cca.setDistanceFilter(countsConfigGroup.getDistanceFilter(),
-					countsConfigGroup.getDistanceFilterCenterNode());
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(volumes,
+				counts, network, scaleFactor);
+
+		if (countsCG.getDistanceFilter() != null
+				&& countsCG.getDistanceFilterCenterNode() != null) {
+			cca.setDistanceFilter(countsCG.getDistanceFilter(),
+					countsCG.getDistanceFilterCenterNode());
 		}
 		cca.setCountsScaleFactor(scaleFactor);
 
-		cca.run();
-
-		String outputFormat = countsConfigGroup.getOutputFormat();
-		if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-			ControlerConfigGroup ctlCG = config.controler();
-
-			int iteration = ctlCG.getFirstIteration();
-			ControlerIO ctlIO = new ControlerIO(ctlCG.getOutputDirectory(),
-					new IdImpl(ctlCG.getRunId()));
-
-			// String filename = ctlIO.getIterationFilename(iteration, "sf"
-			// + scaleFactor + "_countscompare" + ".kmz");
-
-			String path = ctlIO.getIterationPath(iteration) + "/sf"
-					+ scaleFactor + "/";
-			File itDir = new File(path);
-			if (!itDir.mkdirs()) {
-				if (itDir.exists()) {
-					log.info("Iteration directory " + path + " exists already.");
-				} else {
-					log.info("Could not create iteration directory " + path
-							+ ".");
-				}
-			}
-			String filename = path + "/countscompare.kmz";
-
-			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-					cca.getComparison(), network,
-					TransformationFactory.getCoordinateTransformation(config
-							.global().getCoordinateSystem(),
-							TransformationFactory.WGS84));
-			kmlWriter.setIterationNumber(iteration);
-			kmlWriter.writeFile(filename);// biasErrorGraphData.txt will
-			// be
-			// written here
-		}
-
-		log.info("compare with counts, scaleFactor =\t" + scaleFactor);
+		cca.getBestScaleFactors(startHour, endHour);
 	}
 
 	/**
 	 * @param args
-	 *            - args[0] configFilename; args[1] linkstatsFilename,
-	 *            args[2...] possible values for countScaleFactor
+	 *            - args[0] configFilename; args[1] eventsFilename, args[2]
+	 *            and args[3] time range of calculating countScaleFactor
 	 */
 	public static void run(String[] args) {
-		double[] countScaleFactors = new double[args.length - 2];
-		for (int i = 2; i < args.length; i++) {
-			countScaleFactors[i - 2] = Double.parseDouble(args[i]);
-		}
-		CountScaleFactorLab rccfls = new CountScaleFactorLab(
-				args[0], args[1], countScaleFactors);
+		CountScaleFactorCalculator rccfls = new CountScaleFactorCalculator(
+				args[0], args[1], Integer.parseInt(args[2]),
+				Integer.parseInt(args[3]));
 		rccfls.run();
-
 	}
 
 	/**
 	 * @param args
-	 *            - args[0] configFilename; args[1] linkstatsFilename,
-	 *            args[2...] possible values for countScaleFactor
+	 *            - args[0] configFilename; args[1] eventsFilename, args[2] and
+	 *            args[3] time range of calculating countScaleFactor
 	 */
 	public static void main(String[] args) {
+		// run1(args);
 		run(args);
 	}
 }
