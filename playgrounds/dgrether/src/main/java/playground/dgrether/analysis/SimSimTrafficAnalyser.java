@@ -21,6 +21,8 @@ package playground.dgrether.analysis;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +89,8 @@ public class SimSimTrafficAnalyser {
 	}
 	
 	
-	private Map<Id, CountSimComparison> createCountSimComparison(Network network, CalcLinkStats linkstats1, CalcLinkStats linkstats2){
-		Map<Id, CountSimComparison> countSimComp = new HashMap<Id, CountSimComparison>(network.getLinks().size());
+	private Map<Id, List<CountSimComparison>> createCountSimComparison(Network network, CalcLinkStats linkstats1, CalcLinkStats linkstats2){
+		Map<Id, List<CountSimComparison>> countSimComp = new HashMap<Id, List<CountSimComparison>>(network.getLinks().size());
 
 		for (Link l : network.getLinks().values()) {
 			double[] volumes = linkstats1.getAvgLinkVolumes(l.getId());
@@ -98,11 +100,20 @@ public class SimSimTrafficAnalyser {
 				log.warn("No volumes for link: " + l.getId().toString());
 				continue;
 			}
+			ArrayList<CountSimComparison> cscList = new ArrayList<CountSimComparison>();
+			countSimComp.put(l.getId(), cscList);
 			for (int hour = 1; hour <= 24; hour++) {
 				double sim1Value=volumes[hour-1];
 				double sim2Value=volumes2[hour-1];
-				countSimComp.put(l.getId(), new CountSimComparisonImpl(l.getId(), hour, sim1Value, sim2Value));
+				countSimComp.get(l.getId()).add(new CountSimComparisonImpl(l.getId(), hour, sim1Value, sim2Value));
 			}
+			//sort the list
+			Collections.sort(cscList, new Comparator<CountSimComparison>() {
+				@Override
+				public int compare(CountSimComparison c1, CountSimComparison c2) {
+					return new Integer(c1.getHour()).compareTo(c2.getHour());
+				}
+			});
 		}
 		return countSimComp;
 	}
@@ -135,13 +146,14 @@ public class SimSimTrafficAnalyser {
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
 		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
-		//TODO continue here CountSimComparison is per hour
-		Map<Id, CountSimComparison> countSimCompMap = this.createCountSimComparison(filteredNetwork, linkstats1, linkstats2);
+		Map<Id, List<CountSimComparison>> countSimCompMap = this.createCountSimComparison(filteredNetwork, linkstats1, linkstats2);
 		
 		this.writeShape(filteredNetwork, networkSrs, outfile, countSimCompMap);
 
 		List<CountSimComparison> countSimComp = new ArrayList<CountSimComparison>();
-		countSimComp.addAll(countSimCompMap.values());
+		for (List<CountSimComparison> list : countSimCompMap.values()){
+			countSimComp.addAll(list);
+		}
 		
 //		this.writeKML(filteredNetwork, countSimComp, outfile, srs);
 
@@ -150,7 +162,7 @@ public class SimSimTrafficAnalyser {
 
 	}
 
-	private void writeShape(Network net, CoordinateReferenceSystem netCrs, String outfile, Map<Id, CountSimComparison> countSimCompMap){
+	private void writeShape(Network net, CoordinateReferenceSystem netCrs, String outfile, Map<Id, List<CountSimComparison>> countSimCompMap){
 		FeatureType featureType = createFeatureType(netCrs);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<Feature> features = new ArrayList<Feature>();
@@ -164,11 +176,11 @@ public class SimSimTrafficAnalyser {
 		}
 	}
 
-	private Feature createFeature(Link link, GeometryFactory geofac, FeatureType featureType, CountSimComparison countSimComparison) {
+	private Feature createFeature(Link link, GeometryFactory geofac, FeatureType featureType, List<CountSimComparison> countSimComparisonList) {
 		LineString ls = geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
-
-		Object [] attribs = new Object[10];
+		
+		Object [] attribs = new Object[35];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -179,7 +191,17 @@ public class SimSimTrafficAnalyser {
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = link.getNumberOfLanes();
 		attribs[9] = ((LinkImpl) link).getType();
-		attribs[10] = countSimComparison.calculateRelativeError();
+		int i = 10;
+		double sumRelativeError = 0.0;
+		double relativeError = 0.0;
+		for (CountSimComparison csc : countSimComparisonList){
+			if (csc.getHour() != i - 9) throw new IllegalStateException("List not sorted correclty");
+			relativeError = csc.calculateRelativeError();
+			attribs[i] = relativeError;
+			sumRelativeError += relativeError;
+			i++;
+		}
+		attribs[34] = sumRelativeError / 24.0;
 		try {
 			return featureType.create(attribs);
 		} catch (IllegalAttributeException e) {
@@ -190,7 +212,7 @@ public class SimSimTrafficAnalyser {
 	
 	private FeatureType createFeatureType(CoordinateReferenceSystem crs) {
 		FeatureType featureType = null;
-		AttributeType [] attribs = new AttributeType[10];
+		AttributeType [] attribs = new AttributeType[35];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -201,7 +223,10 @@ public class SimSimTrafficAnalyser {
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
 		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
-//		attribs[10] = AttributeTypeFactory.newAttributeType();
+		for (int i = 0; i < 24; i++){
+			attribs[10 + i] = AttributeTypeFactory.newAttributeType("re h " + (i + 1), Double.class);
+		}
+		attribs[34] = AttributeTypeFactory.newAttributeType("re 24h", Double.class);
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
 		} catch (FactoryRegistryException e) {
@@ -260,15 +285,15 @@ public class SimSimTrafficAnalyser {
 //			outfile = DgPaths.RUNBASE + "run710/traffic709vs710.500";
 //			srs = TransformationFactory.CH1903_LV03;
 
-//			net = "/media/data/work/repos/runs-svn/run1216/1216.output_network.xml.gz";
-//			linkstats1 = "/media/data/work/repos/runs-svn/run1216/ITERS/it.500/1216.500.linkstats.txt.gz";
-//			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-//			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
+			net = "/media/data/work/repos/runs-svn/run1216/1216.output_network.xml.gz";
+			linkstats1 = "/media/data/work/repos/runs-svn/run1216/ITERS/it.500/1216.500.linkstats.txt.gz";
+			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
+			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
 
-			net = "/media/data/work/repos/runs-svn/run1217/1217.output_network.xml.gz";
-			linkstats1 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-			linkstats2 = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1218.500.linkstats.txt.gz";
-			outfile = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1217.500vs1218.500";
+//			net = "/media/data/work/repos/runs-svn/run1217/1217.output_network.xml.gz";
+//			linkstats1 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
+//			linkstats2 = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1218.500.linkstats.txt.gz";
+//			outfile = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1217.500vs1218.500";
 			
 			srs = TransformationFactory.WGS84_UTM33N;
 			
