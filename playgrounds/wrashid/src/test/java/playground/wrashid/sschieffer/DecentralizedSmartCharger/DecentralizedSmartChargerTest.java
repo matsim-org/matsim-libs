@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
+import lpsolve.LpSolveException;
+
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
@@ -14,24 +16,18 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import junit.framework.TestCase;
-import lpsolve.LpSolveException;
 
-public class DecentralizedSmartChargerTest extends TestCase{
+public class DecentralizedSmartChargerTest extends MatsimTestCase {
 
-	/**
-	 * @param args
-	 */
-	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final Controler controler=new Controler(configPath);
 	
@@ -60,6 +56,7 @@ public class DecentralizedSmartChargerTest extends TestCase{
 	 */
 	public void testDecentralizedCharger() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
+		final String outputPath = super.getOutputDirectory();
 		
 		
 		//*****************************************
