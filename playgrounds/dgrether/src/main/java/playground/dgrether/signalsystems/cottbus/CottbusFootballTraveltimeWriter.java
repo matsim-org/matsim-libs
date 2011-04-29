@@ -52,11 +52,12 @@ public class CottbusFootballTraveltimeWriter {
 			writer.append(CottbusFootballStrings.FB2SPN);
 			writer.append(CottbusFootballStrings.SEPARATOR);
 			writer.newLine();
-			
-			writer.append(Collections.max(traveltimeHandler.getArrivalTimesCB2FB().values()) + CottbusFootballStrings.SEPARATOR
-					+ Collections.max(traveltimeHandler.getArrivalTimesSPN2FB().values()) + CottbusFootballStrings.SEPARATOR
-					+ Collections.max(traveltimeHandler.getArrivalTimesFB2CB().values()) + CottbusFootballStrings.SEPARATOR
-					+ Collections.max(traveltimeHandler.getArrivalTimesFB2SPN().values()) + CottbusFootballStrings.SEPARATOR);
+			if (! traveltimeHandler.getArrivalTimesCB2FB().isEmpty() && ! traveltimeHandler.getArrivalTimesSPN2FB().isEmpty()){
+				writer.append(Collections.max(traveltimeHandler.getArrivalTimesCB2FB().values()) + CottbusFootballStrings.SEPARATOR
+						+ Collections.max(traveltimeHandler.getArrivalTimesSPN2FB().values()) + CottbusFootballStrings.SEPARATOR
+						+ Collections.max(traveltimeHandler.getArrivalTimesFB2CB().values()) + CottbusFootballStrings.SEPARATOR
+						+ Collections.max(traveltimeHandler.getArrivalTimesFB2SPN().values()) + CottbusFootballStrings.SEPARATOR);
+			}
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
