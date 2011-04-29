@@ -38,7 +38,9 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 	//cannot use delegation:  add protected
 	private static final long serialVersionUID = 1L;
 
-	private int nextIterToMonitor = 3;
+	//TODO: do not monitor first iters post-tabu
+	private int numberOfUnmonitoredIterations = 3;
+	private int nextIterToMonitor = numberOfUnmonitoredIterations;
 	private final int monitoringPeriod = 10;
 	private final double minImprovement = 3d;
 	private final int numBool;
@@ -87,6 +89,7 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 		if (super.getConfiguration().getGenerationNr() == nextIterToMonitor) {
 			IChromosome fittest = population.determineFittestChromosome();
 			double fitness = fittest.getFitnessValue();
+			int step = this.monitoringPeriod;
 
 			//TODO: check that the fittest is not the same as the last one.
 			if ((fitness - this.lastBestFitness < this.minImprovement) &&
@@ -106,10 +109,11 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 					population.clear();
 					population.addChromosomes(populationFactory.createRandomInitialPopulation());
 					fitness = Double.NEGATIVE_INFINITY;
+					step = this.numberOfUnmonitoredIterations;
 				}
 			}
 
-			this.nextIterToMonitor += this.monitoringPeriod;
+			this.nextIterToMonitor += step;
 			this.lastBestFitness = fitness;
 		}
 	}
@@ -128,16 +132,17 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 
 		if (isTabu(toCorrect)) {
 			// randomly mutate until the chromosome isn't tabu
-			//while (isTabu(toCorrect)) {
-			//	index = this.generator.nextInt(this.numBool);
-			//	toCorrect[index] = !toCorrect[index];
-			//}
+			while (isTabu(toCorrect)) {
+				index = this.generator.nextInt(this.numBool);
+				toCorrect[index] = !toCorrect[index];
+			}
 
-			//// update chromosome values
-			//for (int i=0; i < this.numBool; i++) {
-			//	chromosome.getGene(i).setAllele(toCorrect[i]);
-			//}
-			chromosome.setFitnessValueDirectly(chromosome.getFitnessValue() - 150d);
+			// update chromosome values
+			for (int i=0; i < this.numBool; i++) {
+				chromosome.getGene(i).setAllele(toCorrect[i]);
+			}
+			//chromosome.setFitnessValueDirectly(chromosome.getFitnessValue() - 150d);
+			chromosome.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 		}
 	}
 
