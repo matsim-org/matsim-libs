@@ -50,7 +50,7 @@ import org.matsim.counts.Volume;
  * @author yu
  *
  */
-public class CountScaleFactorCalculator {
+public class CountsScaleFactorCalculator {
 	protected class CountsComparisonAlgorithm {
 		/**
 		 * The LinkAttributes of the simulation
@@ -259,7 +259,7 @@ public class CountScaleFactorCalculator {
 	private final String linkStatsFilename;
 
 	private final Logger log = Logger
-			.getLogger(CountScaleFactorCalculator.class);
+			.getLogger(CountsScaleFactorCalculator.class);
 
 	private final Scenario scenario;
 	private Config config;
@@ -272,7 +272,7 @@ public class CountScaleFactorCalculator {
 	 * @param startHour
 	 * @param config
 	 */
-	public CountScaleFactorCalculator(String configFilename,
+	public CountsScaleFactorCalculator(String configFilename,
 			String linkStatsFilename, int startHour, int endHour) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
 				.loadConfig(configFilename));
@@ -316,7 +316,7 @@ public class CountScaleFactorCalculator {
 	 *            and args[3] time range of calculating countScaleFactor
 	 */
 	public static void run(String[] args) {
-		CountScaleFactorCalculator rccfls = new CountScaleFactorCalculator(
+		CountsScaleFactorCalculator rccfls = new CountsScaleFactorCalculator(
 				args[0], args[1], Integer.parseInt(args[2]),
 				Integer.parseInt(args[3]));
 		rccfls.run();

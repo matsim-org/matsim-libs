@@ -58,7 +58,7 @@ import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
  * @author yu
  *
  */
-public class CountScaleFactorCalibrator {
+public class CountsScaleFactorCalibrator {
 	protected class CountsComparisonAlgorithm {
 		/**
 		 * The LinkAttributes of the simulation
@@ -232,7 +232,7 @@ public class CountScaleFactorCalibrator {
 	private final double minScaleFactor, maxScaleFactor, scaleFactorInterval;
 
 	private final Logger log = Logger
-			.getLogger(CountScaleFactorCalibrator.class);
+			.getLogger(CountsScaleFactorCalibrator.class);
 
 	private final Scenario scenario;
 	private Config config;
@@ -241,7 +241,7 @@ public class CountScaleFactorCalibrator {
 	/**
 	 * @param config
 	 */
-	public CountScaleFactorCalibrator(String configFilename,
+	public CountsScaleFactorCalibrator(String configFilename,
 			String linkStatsFilename, double minScaleFactor,
 			double maxScaleFactor, double scaleFactorInterval) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
@@ -334,7 +334,7 @@ public class CountScaleFactorCalibrator {
 	 *            countScaleFactor
 	 */
 	public static void run(String[] args) {
-		CountScaleFactorCalibrator rccfls = new CountScaleFactorCalibrator(
+		CountsScaleFactorCalibrator rccfls = new CountsScaleFactorCalibrator(
 				args[0], args[1], Double.parseDouble(args[2]),
 				Double.parseDouble(args[3]), Double.parseDouble(args[4]));
 		rccfls.run();

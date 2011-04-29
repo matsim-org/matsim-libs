@@ -20,24 +20,27 @@
 /**
  *
  */
-package playground.yu.counts.scaleFactor.fromLinkStats;
+package playground.yu.counts.scaleFactor.fromEvents;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -52,17 +55,17 @@ import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 
 /**
  * playground for rebuilding google earth files in MATSim simulations from
- * {@code LinkStats} given arbitrary countsScaleFactors
+ * Events given arbitrary countsScaleFactors
  *
  * @author yu
  *
  */
-public class CountScaleFactorLab {
+public class CountsScaleFactorLab {
 	protected class CountsComparisonAlgorithm {
 		/**
-		 * The LinkAttributes of the simulation
+		 * The VolumesAnalyzer of the simulation
 		 */
-		private final CalcLinkStats linkStats;
+		private final VolumesAnalyzer volumes;
 		/**
 		 * The counts object
 		 */
@@ -83,10 +86,10 @@ public class CountScaleFactorLab {
 		private final Logger log = Logger
 				.getLogger(CountsComparisonAlgorithm.class);
 
-		public CountsComparisonAlgorithm(final CalcLinkStats linkStats,
+		public CountsComparisonAlgorithm(final VolumesAnalyzer volumes,
 				final Counts counts, final Network network,
 				final double countsScaleFactor) {
-			this.linkStats = linkStats;
+			this.volumes = volumes;
 			this.counts = counts;
 			countSimComp = new ArrayList<CountSimComparison>();
 			this.network = network;
@@ -104,8 +107,8 @@ public class CountScaleFactorLab {
 				if (!isInRange(count.getLocId())) {
 					continue;
 				}
-				double[] volumes = linkStats
-						.getAvgLinkVolumes(count.getLocId());
+				double[] volumes = this.volumes.getVolumesPerHourForLink(count
+						.getLocId());
 				if (volumes.length == 0) {
 					log.warn("No volumes for link: "
 							+ count.getLocId().toString());
@@ -194,8 +197,8 @@ public class CountScaleFactorLab {
 				if (!isInRange(count.getLocId())) {
 					continue;
 				}
-				double[] volumes = linkStats
-						.getAvgLinkVolumes(count.getLocId());
+				double[] volumes = this.volumes.getVolumesPerHourForLink(count
+						.getLocId());
 				if (volumes.length == 0) {
 					log.warn("No volumes for link: "
 							+ count.getLocId().toString());
@@ -225,11 +228,10 @@ public class CountScaleFactorLab {
 		}
 	}
 
-	private final String linkStatsFilename;
+	private final String eventsFilename;
 	private final double[] scaleFactors;
 
-	private final Logger log = Logger
-			.getLogger(CountScaleFactorLab.class);
+	private final Logger log = Logger.getLogger(CountsScaleFactorLab.class);
 
 	private final Scenario scenario;
 	private Config config;
@@ -238,11 +240,11 @@ public class CountScaleFactorLab {
 	/**
 	 * @param config
 	 */
-	public CountScaleFactorLab(String configFilename,
-			String linkStatsFilename, double[] scaleFactors) {
+	public CountsScaleFactorLab(String configFilename, String eventsFilename,
+			double[] scaleFactors) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
 				.loadConfig(configFilename));
-		this.linkStatsFilename = linkStatsFilename;
+		this.eventsFilename = eventsFilename;
 		this.scaleFactors = scaleFactors;
 	}
 
@@ -266,12 +268,15 @@ public class CountScaleFactorLab {
 
 		Network network = scenario.getNetwork();
 
-		CalcLinkStats calcLinkStats = new CalcLinkStats(network, scaleFactor
-				/ countsConfigGroup.getCountsScaleFactor());
-		calcLinkStats.readFile(linkStatsFilename);
+		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,
+				network);
 
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(
-				calcLinkStats, counts, network, scaleFactor);
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(volumes);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(volumes,
+				counts, network, scaleFactor);
 
 		if (countsConfigGroup.getDistanceFilter() != null
 				&& countsConfigGroup.getDistanceFilterCenterNode() != null) {
@@ -330,8 +335,8 @@ public class CountScaleFactorLab {
 		for (int i = 2; i < args.length; i++) {
 			countScaleFactors[i - 2] = Double.parseDouble(args[i]);
 		}
-		CountScaleFactorLab rccfls = new CountScaleFactorLab(
-				args[0], args[1], countScaleFactors);
+		CountsScaleFactorLab rccfls = new CountsScaleFactorLab(args[0], args[1],
+				countScaleFactors);
 		rccfls.run();
 
 	}
