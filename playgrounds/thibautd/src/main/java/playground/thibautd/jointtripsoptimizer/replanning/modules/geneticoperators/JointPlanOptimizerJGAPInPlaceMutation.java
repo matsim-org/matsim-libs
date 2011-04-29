@@ -36,6 +36,7 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPModeGene;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
@@ -125,6 +126,8 @@ public class JointPlanOptimizerJGAPInPlaceMutation implements GeneticOperator {
 					if (copyOfChromosome == null) {
 						copyOfChromosome = (IChromosome) currentChromosome.clone();
 					}
+					copyOfChromosome.setFitnessValueDirectly(
+							JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 					geneToMute = copyOfChromosome.getGene(i);
 
 					if (geneToMute instanceof BooleanGene) {
@@ -147,6 +150,7 @@ public class JointPlanOptimizerJGAPInPlaceMutation implements GeneticOperator {
 						a_candidateChromosome.remove(currentChromosome);
 						a_candidateChromosome.add(copyOfChromosome);
 						currentChromosome = copyOfChromosome;
+						copyOfChromosome = null;
 					}
 				}
 			}
