@@ -21,8 +21,6 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunction;
-
 
 /**
  * Returns a Scoring Function that only respects the travel time.

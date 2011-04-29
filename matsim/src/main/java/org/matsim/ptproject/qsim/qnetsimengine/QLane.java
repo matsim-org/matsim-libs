@@ -694,9 +694,6 @@ public final class QLane extends VisLane implements SignalizeableItem {
 
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-			double time = QLane.this.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
-
-
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
 			//the offset of this lane
 			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();

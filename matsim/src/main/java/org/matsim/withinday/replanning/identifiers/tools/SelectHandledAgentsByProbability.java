@@ -72,8 +72,7 @@ public class SelectHandledAgentsByProbability implements SimulationInitializedLi
 
 			for (WithinDayAgent withinDayAgent : this.withinDayAgents) {
 				probability = random.nextDouble();
-				if (probability > tuple.getSecond());
-				else {
+				if (probability <= tuple.getSecond()) {
 					agentsToHandle.add(withinDayAgent);
 					
 					if (tuple.getFirst() instanceof InitialIdentifier) initialIdentificationCounter++;

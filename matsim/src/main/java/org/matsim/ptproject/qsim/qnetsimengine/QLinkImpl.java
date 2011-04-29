@@ -496,7 +496,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		return this.buffer.isEmpty();
 	}
 
-	private double lastEntry = 0. ;
 	@Override
 	final boolean hasSpace() {
 		double now = this.qsimEngine.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -852,8 +851,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-			double time = QLinkImpl.this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay() ;
-
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,

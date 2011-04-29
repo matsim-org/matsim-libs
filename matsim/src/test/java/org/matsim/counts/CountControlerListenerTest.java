@@ -302,8 +302,11 @@ public class CountControlerListenerTest {
 	
 	private double getVolume(final String filename) throws IOException {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		String line = reader.readLine(); // header
-		line = reader.readLine(); // link 100
+		reader.readLine(); // header
+		String line = reader.readLine(); // link 100
+		if (line == null) {
+			return Double.NaN; // should never happen...
+		}
 		String[] parts = line.split("\t");// [0] = linkId, [1] = matsim volume, [2] = real volume
 		return Double.parseDouble(parts[1]);
 	}

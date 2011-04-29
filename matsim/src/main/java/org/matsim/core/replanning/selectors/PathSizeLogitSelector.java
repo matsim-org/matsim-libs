@@ -60,7 +60,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	@Override
-	public final Plan selectPlan(final Person person) {
+	public Plan selectPlan(final Person person) {
 
 		// First check if there are any unscored plans
 		Plan selectedPlan = ((PersonImpl) person).getRandomUnscoredPlan();
@@ -90,7 +90,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	public final void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
+	public void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
 

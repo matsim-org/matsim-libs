@@ -92,39 +92,22 @@ public class CalcLinkStats {
 			double[] volumes = analyzer.getVolumesPerHourForLink(linkId);
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
-			if (volumes == null) {
-				// nobody traveled along this link
-				// use default data: volumes[i] = 0
-				// the following for-loop is the same as in the else-clause below, but optimized for the case volumes[i] = 0
-				for (int i = 0; i < this.nofHours; i++) {
-					double ttime = ttimes.getLinkTravelTime(link, i*3600);
-					if (this.count == 1) {
-						data.ttimes[MIN][i] = ttime;
-						data.ttimes[MAX][i] = ttime;
-					} else {
-						data.volumes[MIN][i] = 0;
-						if (ttime < data.ttimes[MIN][i]) data.ttimes[MIN][i] = ttime;
-						if (ttime > data.ttimes[MAX][i]) data.ttimes[MAX][i] = ttime;
-					}
+			for (int i = 0; i < this.nofHours; i++) {
+				double ttime = ttimes.getLinkTravelTime(link, i*3600);
+				sum += volumes[i];
+				if (this.count == 1) {
+					data.volumes[MIN][i] = volumes[i];
+					data.volumes[MAX][i] = volumes[i];
+					data.ttimes[MIN][i] = ttime;
+					data.ttimes[MAX][i] = ttime;
+				} else {
+					if (volumes[i] < data.volumes[MIN][i]) data.volumes[MIN][i] = volumes[i];
+					if (volumes[i] > data.volumes[MAX][i]) data.volumes[MAX][i] = volumes[i];
+					if (ttime < data.ttimes[MIN][i]) data.ttimes[MIN][i] = ttime;
+					if (ttime > data.ttimes[MAX][i]) data.ttimes[MAX][i] = ttime;
 				}
-			} else {
-				for (int i = 0; i < this.nofHours; i++) {
-					double ttime = ttimes.getLinkTravelTime(link, i*3600);
-					sum += volumes[i];
-					if (this.count == 1) {
-						data.volumes[MIN][i] = volumes[i];
-						data.volumes[MAX][i] = volumes[i];
-						data.ttimes[MIN][i] = ttime;
-						data.ttimes[MAX][i] = ttime;
-					} else {
-						if (volumes[i] < data.volumes[MIN][i]) data.volumes[MIN][i] = volumes[i];
-						if (volumes[i] > data.volumes[MAX][i]) data.volumes[MAX][i] = volumes[i];
-						if (ttime < data.ttimes[MIN][i]) data.ttimes[MIN][i] = ttime;
-						if (ttime > data.ttimes[MAX][i]) data.ttimes[MAX][i] = ttime;
-					}
-					data.volumes[SUM][i] += volumes[i];
-					data.ttimes[SUM][i] += volumes[i] * ttime;
-				}
+				data.volumes[SUM][i] += volumes[i];
+				data.ttimes[SUM][i] += volumes[i] * ttime;
 			}
 			// dataVolumes[.][nofHours] are daily (0-24) values
 			if (this.count == 1) {

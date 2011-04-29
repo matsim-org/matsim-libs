@@ -50,14 +50,16 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		this.plansCalcGroup = plansCalcGroup;
 		this.ptScaleFactor = plansCalcGroup.getPtSpeedFactor();
 		
-		if (transportMode.equals(TransportMode.bike)) speed = plansCalcGroup.getBikeSpeed();
-		else if (transportMode.equals(TransportMode.walk)) speed = plansCalcGroup.getWalkSpeed();
-		else if (transportMode.equals(TransportMode.pt)) ;	// nothing to do here
-		else if (transportMode.equals(TransportMode.ride)) ; // nothing to do here
-		else throw new RuntimeException("Not supported TransportMode: " + transportMode);
+		if (transportMode.equals(TransportMode.bike)) {
+			speed = plansCalcGroup.getBikeSpeed();
+		} else if (transportMode.equals(TransportMode.walk)) { 
+			speed = plansCalcGroup.getWalkSpeed();
+		}	else if ((!transportMode.equals(TransportMode.pt)) && (!transportMode.equals(TransportMode.ride))) {
+			throw new RuntimeException("Not supported TransportMode: " + transportMode);
+		}
 
 		/*
-		 * By default: us FreeSpeedTravelTimes.
+		 * By default: use FreeSpeedTravelTimes.
 		 */
 		travelTime = new FreeSpeedTravelTime();
 	}

@@ -53,11 +53,8 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		this.planSelector = planSelector;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#addStrategyModule(org.matsim.api.core.v01.replanning.PlanStrategyModule)
-	 */
 	@Override
-	public final void addStrategyModule(final PlanStrategyModule module) {
+	public void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
@@ -65,24 +62,16 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#getNumberOfStrategyModules()
-	 */
 	@Override
-	public final int getNumberOfStrategyModules() {
+	public int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
 		}
 		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
 	
-	private static int wrnCnt = 0 ;
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#run(org.matsim.api.core.v01.population.Person)
-	 */
 	@Override
-	public final void run(final Person person) {
+	public void run(final Person person) {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
@@ -111,21 +100,15 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#init()
-	 */
 	@Override
-	public final void init() {
+	public void init() {
 		if (this.firstModule != null) {
 			this.firstModule.prepareReplanning();
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#finish()
-	 */
 	@Override
-	public final void finish() {
+	public void finish() {
 		// yyyy I don't think this needs to be public once StrategyManager.run is final.  kai, sep'10
 		if (this.firstModule != null) {
 			// finish the first module
@@ -144,9 +127,6 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		this.counter = 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuffer name = new StringBuffer(20);
@@ -162,11 +142,8 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		return name.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.replanning.PlanStrategy#getPlanSelector()
-	 */
 	@Override
-	public final PlanSelector getPlanSelector() {
+	public PlanSelector getPlanSelector() {
 		return planSelector;
 	}
 	
