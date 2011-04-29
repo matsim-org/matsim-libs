@@ -19,9 +19,9 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
 
 import java.util.ArrayList;
 
@@ -36,21 +36,21 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.withLegModeASC.LegScoringFunction4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.LegScoringFunction4PC;
 
 /**
  * @author yu
- * 
+ *
  */
 // in order to get attributes, e.g. actDur, legDurCar, legDurPt, stuck?
 public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 	protected CharyparNagelScoringParameters params;
 
 	protected ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
-	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
-	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
-	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
-	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
+	private final ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
+	private final ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
+	private final ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
+	private final ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 	private double perfAttr/* [h] */, travTimeAttrCar/* [h] */,
 			travTimeAttrPt/* [h] */, stuckAttr = 0d/* [utils] */,
 			travTimeAttrWalk/* [h] */, distanceCar/* [m] */, distancePt/* [m] */,
@@ -105,42 +105,49 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 		return distanceWalk;
 	}
 
+	@Override
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
 	}
 
+	@Override
 	public void agentStuck(double time) {
 		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);
 		}
 	}
 
+	@Override
 	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
 	}
 
+	@Override
 	public void endActivity(double time) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.endActivity(time);
 		}
 	}
 
+	@Override
 	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}
 	}
 
+	@Override
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
 		}
 	}
 
+	@Override
 	public void finish() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.finish();
@@ -150,6 +157,7 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 	/**
 	 * Add the score of all functions.
 	 */
+	@Override
 	public double getScore() {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
@@ -190,6 +198,7 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 		return score;
 	}
 
+	@Override
 	public void reset() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();
@@ -199,7 +208,7 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 	/**
 	 * add the scoring function the list of functions, it implemented the
 	 * interfaces.
-	 * 
+	 *
 	 * @param scoringFunction
 	 */
 	public void addScoringFunction(BasicScoring scoringFunction) {

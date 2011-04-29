@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;

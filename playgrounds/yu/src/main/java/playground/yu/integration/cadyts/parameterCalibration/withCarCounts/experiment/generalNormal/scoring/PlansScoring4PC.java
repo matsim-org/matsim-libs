@@ -19,12 +19,12 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
@@ -33,24 +33,27 @@ import org.matsim.core.controler.listener.StartupListener;
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
  * especially in order to put new parameters to CharyparNagelScoringConfigGroup
- *
+ * 
  * @author yu
- *
+ * 
  */
-public class PlansScoring4PC_mnl extends PlansScoring4PC implements
-		StartupListener, ScoringListener, IterationStartsListener {
-	private final static Logger log = Logger.getLogger(PlansScoring4PC_mnl.class);
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-		Controler ctl = event.getControler();
+public abstract class PlansScoring4PC implements StartupListener,
+		ScoringListener, IterationStartsListener {
 
-		planScorer = new Events2Score4PC_mnl(ctl.getConfig(), ctl
-				.getScoringFunctionFactory(), ctl.getPopulation());
+	protected Events2Score4PC planScorer;
 
-		log.debug(
-				"PlansScoring4PC_mnl loaded ScoringFunctionFactory");
+	public abstract void notifyStartup(final StartupEvent event);
 
-		ctl.getEvents().addHandler(planScorer);
+	public Events2Score4PC getPlanScorer() {
+		return planScorer;
+	}
+
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		planScorer.reset(event.getIteration());
+	}
+
+	public void notifyScoring(final ScoringEvent event) {
+		planScorer.finish();
 	}
 
 }

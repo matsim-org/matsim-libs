@@ -37,15 +37,15 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.BseParamCalibrationControlerListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
  * "constantPt", "constantWalk", "monetaryDistanceCostRateCar",
  * "monetaryDistanceCostRatePt", "marginalUtlOfDistanceWalk"can be calibrated.
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PCCtl2 extends BseParamCalibrationControler2 {
 

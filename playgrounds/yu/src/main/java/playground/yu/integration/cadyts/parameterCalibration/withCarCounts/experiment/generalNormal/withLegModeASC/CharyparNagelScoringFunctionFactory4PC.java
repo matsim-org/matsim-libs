@@ -1,4 +1,4 @@
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.withLegModeASC;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -29,7 +29,7 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.ScoringFunctionAccumulator4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.ScoringFunctionAccumulator4PC;
 
 public class CharyparNagelScoringFunctionFactory4PC extends
 		CharyparNagelScoringFunctionFactory {
@@ -43,6 +43,7 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 		super(config);
 	}
 
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		CharyparNagelScoringParameters params = getParams();
 		ScoringFunctionAccumulator4PC scoringFunctionAccumulator = new ScoringFunctionAccumulator4PC(

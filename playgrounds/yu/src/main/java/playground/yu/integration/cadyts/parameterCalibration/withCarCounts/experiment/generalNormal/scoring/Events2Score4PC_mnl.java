@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
 
 import java.util.List;
 import java.util.Map;
@@ -35,14 +35,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.PCCtlListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4PC_mnl extends Events2Score4PC implements
 		MultinomialLogitChoice {
@@ -71,7 +71,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 */
 	@Override

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring.Events2Score4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
@@ -52,9 +52,10 @@ import cadyts.utilities.math.Vector;
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
 	private final static Logger log = Logger.getLogger(PCStrMn.class);
-	private double delta, brainExpBeta;
+	private double delta;
+	private final double brainExpBeta;
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
-	private int paramDimension;
+	private final int paramDimension;
 	private Plan oldSelected = null;
 	private BasicStatistics travelingCarStats = null, performingStats = null;
 

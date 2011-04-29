@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalFrejingerScoring;
 
@@ -27,13 +27,13 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.BseParamCalibrationControlerListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 
 /**
  * imitates and expands {@code CharyparNagelScoringParameters}
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class ScoringParameters implements MatsimParameters {
 	private final CharyparNagelScoringParameters params;

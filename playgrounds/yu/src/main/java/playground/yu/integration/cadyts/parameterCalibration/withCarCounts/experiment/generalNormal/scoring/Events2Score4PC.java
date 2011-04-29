@@ -19,9 +19,9 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,12 +44,12 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.normal.paramCorrection.BseParamCalibrationControlerListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class Events2Score4PC extends EventsToScore implements
 		CadytsChoice {
@@ -58,7 +58,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	private static final String PARAM_SCALE_FACTOR_INDEX = "paramScaleFactor_";
 
-	private Config config;
+	private final Config config;
 	/** Map<personId,Map<Plan,attr>> */
 	protected Map<Id/* agent */, Map<Plan, Double>> legDursCar = new HashMap<Id, Map<Plan, Double>>(),
 			legDursPt = new HashMap<Id, Map<Plan, Double>>(),
@@ -124,10 +124,12 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.parseDouble(paramScaleFactorIStr));
 	}
 
+	@Override
 	public PlanCalcScoreConfigGroup getScoring() {
 		return scoring;
 	}
 
+	@Override
 	public Double getAgentScore(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
 		if (data == null) {
@@ -152,6 +154,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		return data;
 	}
 
+	@Override
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(agentId);
 		if (data == null) {
@@ -168,15 +171,18 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param performStats
 	 * @param travelingCarStats
 	 */
+	@Override
 	public abstract void setPersonAttrs(Person person);
 
+	@Override
 	public abstract void setPersonScore(Person person);
 
+	@Override
 	public void reset(List<Tuple<Id, Plan>> toRemoves) {
 		for (Tuple<Id, Plan> agentIdPlanPair : toRemoves) {
 			Id agentId = agentIdPlanPair.getFirst();
@@ -217,6 +223,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		}
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		agentScorers.clear();
 		agentPlanElementIndex.clear();
@@ -342,6 +349,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		}
 	}
 
+	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
 				.getPersonId());
@@ -363,6 +371,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		return 1 + index.intValue();
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
 				.getPersonId());
