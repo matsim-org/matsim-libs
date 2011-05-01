@@ -23,6 +23,7 @@
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,12 +39,13 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.utils.StayHomePlan;
+import playground.yu.utils.container.CollectionMax;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4PC_mnl extends Events2Score4PC implements
 		MultinomialLogitChoice {
@@ -52,6 +54,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			.getLogger(Events2Score4PC_mnl.class);
 
 	protected MultinomialLogit mnl;
+	private final static String NORMAL_SCORE = "normalScore",
+			STAY_HOME_PLAN_SCORE = "stayHomePlanScore";
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
@@ -73,12 +77,11 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent. - Caution!!! this
 	 * method should be called after calling of setPersonScore(Person)
-	 * 
+	 *
 	 * @param person
 	 */
 	@Override
-	public void setPersonAttrs(Person person) {// TODO more attribute: dummy?
-												// new parameter 1, attr. x/0
+	public void setPersonAttrs(Person person) {
 		Id agentId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
 				.get(agentId), legDurMapWalk = legDursWalk.get(agentId), perfAttrMap = actAttrs
@@ -217,6 +220,20 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				attrNameIndex = attrNameList.indexOf("constantWalk");
 				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
+
+				// dummy4stayHomePlan
+				attrNameIndex = attrNameList.indexOf("dummy4stayHomePlan");
+
+				double dummyAttr = 0d;
+				if (StayHomePlan.isAStayHomePlan(plan)) {
+					Map<String, Object> customAttrs = plan
+							.getCustomAttributes();
+					dummyAttr = (Double) customAttrs.get(STAY_HOME_PLAN_SCORE)
+							- (Double) customAttrs.get(NORMAL_SCORE);
+				}
+
+				mnl.setAttribute(choiceIdx, attrNameIndex, dummyAttr
+						/ paramScaleFactorList.get(attrNameIndex));
 			}
 		}
 	}
@@ -253,7 +270,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		}
 
 		Plan stayHomePlan = null;
-		double expBetaScoreSum = 0d;
+		List<Double> notStayHomeScores = new ArrayList<Double>();
 
 		for (Plan plan : legDurMapCar.keySet()) {
 
@@ -314,7 +331,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 																			 * dummy
 																			 * parameter
 																			 * located
-																			 * 
+																			 *
 																			 * @
 																			 * the
 																			 * end
@@ -389,17 +406,41 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			plan.setScore(util);
 
 			if (!StayHomePlan.isAStayHomePlan(plan)) {
-				expBetaScoreSum += Math.exp(betaBrain * plan.getScore());
+				Double score = plan.getScore();
+				if (score == null) {
+					throw new RuntimeException("Plan :\t" + plan
+							+ "\thas NOT score, which should NOT happen!!!");
+				}
+				notStayHomeScores.add(score);
+
 			} else {
 				stayHomePlan = plan;
-				// TODO save old stayHomePlan score?
+
 			}
 		}// end for
 		if (stayHomePlan != null) {
-			stayHomePlan.setScore(Math.log(expBetaScoreSum * (1d - f) / f)
-					/ betaBrain);
+			stayHomePlan.getCustomAttributes().put(NORMAL_SCORE,
+					stayHomePlan.getScore())/* save normal score */;
+
+			double score = calcStayHomeScoreWithProbs(notStayHomeScores);
+			stayHomePlan.setScore(score)/*
+										 * set recalculated score for
+										 * stayHomePlan
+										 */;
+			stayHomePlan.getCustomAttributes().put(STAY_HOME_PLAN_SCORE,
+					Double.valueOf(score))/* save recalculated score */;
 		}
-		// TODO removePlan? stayHomePlan should not be deleted
+	}
+
+	private double calcStayHomeScoreWithProbs(List<Double> notStayHomeScores) {
+		double scoreMax = CollectionMax.getDoubleMax(notStayHomeScores);
+		double expBetaScoreDiffSum = 0d;
+		for (Double scoreJ : notStayHomeScores) {
+			expBetaScoreDiffSum += Math.exp(betaBrain * (scoreJ - scoreMax));
+		}
+		return Math.log((1d - f) / f * expBetaScoreDiffSum
+				/ Math.exp(-betaBrain * scoreMax))
+				/ betaBrain;
 	}
 
 	private MultinomialLogit createMultinomialLogit(Config config) {

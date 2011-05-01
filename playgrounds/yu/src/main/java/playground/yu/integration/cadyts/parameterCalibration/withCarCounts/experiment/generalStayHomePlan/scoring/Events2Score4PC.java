@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring;
 
@@ -49,7 +49,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlVa
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class Events2Score4PC extends EventsToScore implements
 		CadytsChoice {
@@ -109,8 +109,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		initialAttrNameScaleFactor("constantCar");
 		initialAttrNameScaleFactor("constantPt");
 		initialAttrNameScaleFactor("constantWalk");
-		
-		//dummy
+
+		// dummy
 		initialAttrNameScaleFactor("dummy4stayHomePlan");
 		// #####################################
 		scoring = config.planCalcScore();
@@ -120,7 +120,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		betaBrain = scoring.getBrainExpBeta();
 		f = Double.parseDouble(this.config.findParam(
 				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"stayHomeProb"));
+				"notStayHomeProb"));
 	}
 
 	private void initialAttrNameScaleFactor(String attributeName) {
@@ -179,7 +179,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param performStats
 	 * @param travelingCarStats
