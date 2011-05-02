@@ -218,7 +218,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	}
 
 	
-	private void initFreespeedEventsArrays() {
+	private synchronized void initFreespeedEventsArrays() {
 
 		this.aFreespeedTimes = new double [this.aFreespeedEvents];
 		this.aFreespeedValues = new double [this.aFreespeedEvents];
@@ -248,7 +248,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 	}
 
-	private void initFlowCapacityEventsArrays() {
+	private synchronized void initFlowCapacityEventsArrays() {
 
 		this.aFlowCapacityTimes = new double [this.aFlowCapacityEvents];
 		this.aFlowCapacityValues = new double [this.aFlowCapacityEvents];
@@ -279,7 +279,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 	}
 
-	private void initLanesEventsArrays() {
+	private synchronized void initLanesEventsArrays() {
 
 		this.aLanesTimes = new double [this.aLanesEvents];
 		this.aLanesValues = new double [this.aLanesEvents];
