@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package playground.yu.utils.io.txt2chart;
+package playground.yu.utils.charts.txt2chart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ModalSplitLogExtractor {
 	private final List<Double> carFracs = new ArrayList<Double>();
@@ -148,8 +148,7 @@ public class ModalSplitLogExtractor {
 				bikeFracs[i] = bikeFrac;
 			}
 			Double undefinedFrac = i < msle.undefinedFracs.size() ? msle.undefinedFracs
-					.get(i)
-					: null;
+					.get(i) : null;
 			if (undefinedFrac != null) {
 				undefinedFracs[i] = undefinedFrac;
 			}
@@ -175,8 +174,7 @@ public class ModalSplitLogExtractor {
 		chart.saveAsPng(chartFilename, 800, 600);
 
 		SimpleWriter sw = new SimpleWriter(outputFilename);
-		sw
-				.writeln("iteration\tcar [%]\tpt [%]\twalk [%]\tbike [%]\tundefined [%]");
+		sw.writeln("iteration\tcar [%]\tpt [%]\twalk [%]\tbike [%]\tundefined [%]");
 		System.out.println("n=" + maxIter);
 		for (int i = 0; i < maxIter; i++) {
 			sw.writeln(i + "\t" + carFracs[i] + "\t" + ptFracs[i] + "\t"
@@ -191,9 +189,9 @@ public class ModalSplitLogExtractor {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String filenameBase = "../runs-svn/run699/699.";
-		String logFilename = filenameBase + "logfile2.short.log";
-		// String logFilename = filenameBase + "logfile.log";
+		String filenameBase = "../../runs-svn/run1109/1109.";
+		// String logFilename = filenameBase + "logfile2.short.log";
+		String logFilename = filenameBase + "logfile.log";
 		// String filenameBase = "D:/tmp/";
 		// String logFilename = filenameBase + "prepare3.log";
 		// String logFilename = "../runs-svn/run669/logfile.txt";

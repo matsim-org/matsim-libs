@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils.io.txt2chart;
+package playground.yu.utils.charts.txt2chart;
 
 import org.matsim.core.utils.charts.XYLineChart;
 
