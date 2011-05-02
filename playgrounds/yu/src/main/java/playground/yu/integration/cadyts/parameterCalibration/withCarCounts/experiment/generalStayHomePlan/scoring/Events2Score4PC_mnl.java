@@ -228,8 +228,21 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				if (StayHomePlan.isAStayHomePlan(plan)) {
 					Map<String, Object> customAttrs = plan
 							.getCustomAttributes();
-					dummyAttr = (Double) customAttrs.get(STAY_HOME_PLAN_SCORE)
-							- (Double) customAttrs.get(NORMAL_SCORE);
+
+					Double stayHomePlanScore = (Double) customAttrs
+							.get(STAY_HOME_PLAN_SCORE);
+					Double normalScore = (Double) customAttrs.get(NORMAL_SCORE);
+					if (stayHomePlanScore == null || normalScore == null) {
+						throw new RuntimeException(
+								"Person :\t"
+										+ person.getId()
+										+ "\thas a \"stay home\" Plan, but the customAttributes of this Plan are NULL!!!");
+					}
+					dummyAttr = stayHomePlanScore - normalScore;
+
+					// dummyAttr = (Double)
+					// customAttrs.get(STAY_HOME_PLAN_SCORE)
+					// - (Double) customAttrs.get(NORMAL_SCORE);
 				}
 
 				mnl.setAttribute(choiceIdx, attrNameIndex, dummyAttr
@@ -412,12 +425,11 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 							+ "\thas NOT score, which should NOT happen!!!");
 				}
 				notStayHomeScores.add(score);
-
 			} else {
 				stayHomePlan = plan;
-
 			}
 		}// end for
+
 		if (stayHomePlan != null) {
 			stayHomePlan.getCustomAttributes().put(NORMAL_SCORE,
 					stayHomePlan.getScore())/* save normal score */;

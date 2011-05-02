@@ -3,6 +3,7 @@
  */
 package playground.yu.utils.charts.txt2chart;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +78,10 @@ public class ModalSplitLogExtractor {
 
 	private static void readLog(final String logFilename,
 			final ModalSplitLogExtractor msle) {
+		if (!new File(logFilename).exists()) {
+			throw new RuntimeException(logFilename + "\tdoes NOT exist!!!");
+		}
+
 		SimpleReader sr = new SimpleReader(logFilename);
 		String line = sr.readLine();
 		int count = -1;

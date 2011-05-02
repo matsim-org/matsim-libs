@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -31,19 +31,18 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * complements the {@code Population}, that each has less than maxPlansPerAgents
  * {@code Plan}s, so that every person has maxPlansPerAgents {@code Plan}s
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class PopComplementer extends NewPopulation {
-	private int maxPlansPerAgent;
+	private final int maxPlansPerAgent;
 
 	/**
 	 * @param network
@@ -59,11 +58,11 @@ public class PopComplementer extends NewPopulation {
 	@Override
 	public void run(Person person) {
 		int size = person.getPlans().size();
-		while (size < this.maxPlansPerAgent) {
+		while (size < maxPlansPerAgent) {
 			person.addPlan(new RandomPlanSelector().selectPlan(person));
 			size = person.getPlans().size();
 		}
-		this.pw.writePerson(person);
+		pw.writePerson(person);
 	}
 
 	/**
@@ -71,10 +70,10 @@ public class PopComplementer extends NewPopulation {
 	 */
 	public static void main(String[] args) {
 		String netFilename = "../../matsim/examples/equil/network.xml";
-		String oldPopFilename = "../../matsim/output/equil/output_plans.xml.gz";
-		String newPopFilename = "../../matsim/output/equil/output_4plans.xml.gz";
+		String oldPopFilename = "test/input/10.plans.xml.gz";
+		String newPopFilename = "test/input/10.plansFull.xml.gz";
 
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl net = (NetworkImpl) s.getNetwork();
 		new MatsimNetworkReader(s).readFile(netFilename);

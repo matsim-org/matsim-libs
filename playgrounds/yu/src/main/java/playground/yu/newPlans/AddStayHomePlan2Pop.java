@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -44,13 +44,13 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author yu
- * 
+ *
  */
-public class AddHomePlan2Pop extends NewPopulation {
-	private PopulationFactory populationFactory;
+public class AddStayHomePlan2Pop extends NewPopulation {
+	private final PopulationFactory populationFactory;
 	private static String WALK = TransportMode.walk;
 
-	public AddHomePlan2Pop(Network network, Population population,
+	public AddStayHomePlan2Pop(Network network, Population population,
 			String outputPopulationFilename) {
 		super(network, population, outputPopulationFilename);
 		populationFactory = population.getFactory();
@@ -78,8 +78,8 @@ public class AddHomePlan2Pop extends NewPopulation {
 		// + referenceActivity.toString());
 		// }
 
-		return populationFactory.createActivityFromCoord(referenceActivity
-				.getType(), homeCoord);
+		return populationFactory.createActivityFromCoord(
+				referenceActivity.getType(), homeCoord);
 
 	}
 
@@ -131,9 +131,9 @@ public class AddHomePlan2Pop extends NewPopulation {
 			inputPopFilename = args[1];
 			outputPopFilename = args[2];
 		} else {
-			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			inputPopFilename = "../matsimTests/ParamCalibration/general2/fixChoiceSetPop1000.xml.gz";
-			outputPopFilename = "../matsimTests/ParamCalibration/general2/fixChoiceSetPop1000stayHome.xml.gz";
+			netFilename = "../../matsim/examples/equil/network.xml";
+			inputPopFilename = "test/input/10.plansFull.xml.gz";
+			outputPopFilename = "test/input/10.plansWithStayHomePlan.xml.gz";
 		}
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
@@ -145,7 +145,7 @@ public class AddHomePlan2Pop extends NewPopulation {
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inputPopFilename);
 
-		AddHomePlan2Pop nsp = new AddHomePlan2Pop(network, population,
+		AddStayHomePlan2Pop nsp = new AddStayHomePlan2Pop(network, population,
 				outputPopFilename);
 		nsp.run(population);
 		nsp.writeEndPlans();
