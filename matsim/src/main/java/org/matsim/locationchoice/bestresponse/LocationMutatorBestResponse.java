@@ -130,27 +130,16 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 					this.createChoiceSetCircle(center, maxRadius, ActTypeConverter.convert2FullType(((ActivityImpl)actToMove).getType()), cs);
 										
 					// **************************************************
-					if (travelTimeApproximationLevel > 0) {
-						// maybe repeat this a couple of times
-						TravelTime travelTime = super.getControler().getTravelTimeCalculator();
-						TravelCost travelCost = super.getControler().getTravelCostCalculatorFactory().
+					// maybe repeat this a couple of times
+					TravelTime travelTime = super.getControler().getTravelTimeCalculator();
+					TravelCost travelCost = super.getControler().getTravelCostCalculatorFactory().
 							createTravelCostCalculator((PersonalizableTravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
 						
-						this.setLocation((ActivityImpl)actToMove, 
-								cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
-										actPre.getCoord(), actPost.getCoord(), this.facilities, this.random,
-										scoringFunction, plan, travelTime, travelCost));						
-						this.evaluatePlan(plan, bestPlan, cs, true, scoringFunction);
-					}
-					else {
-						cs.shuffle(this.random);
-						int cnt = 0;
-						while (cs.hasUnvisited() && cnt < cs.getNumberOfDestinations() * 0.5) {
-							this.setLocation((ActivityImpl)actToMove, cs.visitNext());
-							this.evaluatePlan(plan, bestPlan, cs, false, scoringFunction);
-							cnt++;
-						}
-					}
+					this.setLocation((ActivityImpl)actToMove, 
+							cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
+									actPre.getCoord(), actPost.getCoord(), this.facilities, this.random,
+									scoringFunction, plan, travelTime, travelCost));						
+					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
 					// **************************************************
 				}
 			}
@@ -172,8 +161,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private void evaluatePlan(Plan plan, Plan bestPlan, ChoiceSet cs, boolean adapt, ScoringFunctionAccumulator scoringFunction) {		
-		double score = this.computeScore(plan, cs, adapt, scoringFunction);	
+	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlan, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
+		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
 		if (score > bestPlan.getScore() + 0.0000000000001) {
 			plan.setScore(score);
 			((PlanImpl)bestPlan).getPlanElements().clear();
@@ -181,7 +170,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		}
 	}
 	
-	private double computeScore(Plan plan, ChoiceSet cs, boolean adapt, ScoringFunctionAccumulator scoringFunction) {
+	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {
 		PlanImpl planTmp = new PlanImpl(plan.getPerson());
 		planTmp.copyPlan(plan);			
 		scoringFunction.reset();
@@ -193,10 +182,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		scoringFunction.finish();
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();
-		
-		if (adapt) {
-			PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);
-		}		
+		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);		
 		return score;
 	}
 	
