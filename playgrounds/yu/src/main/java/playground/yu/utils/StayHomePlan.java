@@ -65,9 +65,7 @@ public class StayHomePlan {
 
 		String firstType = ((Activity) firstPe).getType(), lastType = ((Activity) lastPe)
 				.getType();
-		if ((firstType.startsWith("h") || firstType.startsWith("H"))
-				&& (lastType.startsWith("h") || lastType.startsWith("H"))
-				&& firstType.equals(lastType)) {
+		if (firstType.equals(lastType)) {
 			PlanElement pe = pes.get(1);
 			if (!(pe instanceof Leg)) {
 				return false;
