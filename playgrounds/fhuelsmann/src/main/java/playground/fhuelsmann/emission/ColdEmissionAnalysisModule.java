@@ -57,9 +57,9 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 					double oldValue = this.coldEmissionsPerson.get(personId).get(component.getKey());
 					this.coldEmissionsPerson.get(personId).put(component.getKey(),oldValue+coldEfOtherAct );
 					
-					System.out.print("\n in the else : "+ personId + " component "+component.getKey()+ " Value "+ 
-							this.coldEmissionsPerson.get(personId).get(component.getKey()) +" oldValue " + oldValue 
-							+" coldEfOtherAct " + coldEfOtherAct + " new Value : " + this.coldEmissionsPerson.get(personId).get(component.getKey()) );
+	//				System.out.print("\n in the else : "+ personId + " component "+component.getKey()+ " Value "+ 
+	//						this.coldEmissionsPerson.get(personId).get(component.getKey()) +" oldValue " + oldValue 
+	//						+" coldEfOtherAct " + coldEfOtherAct + " new Value : " + this.coldEmissionsPerson.get(personId).get(component.getKey()) );
 				}			 			 
 		 }
 	}

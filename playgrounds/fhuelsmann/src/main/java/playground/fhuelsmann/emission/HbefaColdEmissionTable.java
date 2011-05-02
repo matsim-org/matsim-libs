@@ -111,7 +111,7 @@ public class HbefaColdEmissionTable {
 		for(Entry<String,Map<Integer,Map<Integer,HbefaColdObject>>> component : this.HbefaColdEmissionTable.entrySet()){	
 			for(Entry<Integer,Map<Integer,HbefaColdObject>> distance : this.HbefaColdEmissionTable.get(component.getKey()).entrySet()){	
 				for(Entry<Integer,HbefaColdObject> parkingTime : this.HbefaColdEmissionTable.get(component.getKey()).get(distance.getKey()).entrySet()){
-					System.out.println(component.getKey() + ";" + distance.getKey() + ";" + parkingTime.getKey() +";" + parkingTime.getValue().getColdEF() );
+	//				System.out.println(component.getKey() + ";" + distance.getKey() + ";" + parkingTime.getKey() +";" + parkingTime.getValue().getColdEF() );
 				}
 			}
 		}

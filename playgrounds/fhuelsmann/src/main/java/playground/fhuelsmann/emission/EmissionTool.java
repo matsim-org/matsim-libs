@@ -22,9 +22,12 @@ package playground.fhuelsmann.emission;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -46,6 +49,16 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehiclesImpl;
+import org.matsim.vehicles.VehicleReaderV1;
+
+
 
 import playground.fhuelsmann.emission.objects.VisumObject;
 
@@ -68,6 +81,8 @@ public class EmissionTool {
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
+	private static String vehicleFile="../../detailedEval/pop/befragte-personen/vehicles.xml";
+	private static String householdsFile="../../detailedEval/pop/befragte-personen/households.xml";
 	
 	
 	
@@ -127,14 +142,27 @@ public class EmissionTool {
 		//create the reader and read the file
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
+		
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+		vehicleReader.readFile(vehicleFile);
+		
+		Households households = new HouseholdsImpl();
+		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
+		reader.readFile(householdsFile);
+		
+	
 
 // =======================================================================================================		
 
 		// warm emissions
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
 		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
-
-		// coldstart emissions
+		
+		//vehicles
+		Map<Id, Id> personId2VehicleId = getVehicleIdFromHouseholds(households);
+		Map<Id, Id> vehicleId2VehicleType = getVehicleTypeFromVehicleId(vehicles);
+// coldstart emissions
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
 
 		// sum up emissions
@@ -219,6 +247,37 @@ public class EmissionTool {
 		
 		return personId2totalEmissions;
 	}*/
+	
+	private SortedMap<Id, Id> getVehicleTypeFromVehicleId (Vehicles vehicle) {
+		SortedMap<Id,Id> vehicleId2VehicleType = new TreeMap<Id, Id>();
+		
+		//iterating over every vehicle veh in order to get vehicleIds and vehcile type 
+		for (Vehicle veh : vehicle.getVehicles().values()){
+			Id vehicleId = veh.getId();
+			Id vehicleType = veh.getType().getId();
+			vehicleId2VehicleType.put(vehicleId, vehicleType);	
+//			System.out.print("\n ++++++++++++++++++++++++++++++++++++"+vehicleId +"  "+ vehicleType);
+		}
+		
+		return vehicleId2VehicleType;
+	}
+	
+	private SortedMap<Id, Id> getVehicleIdFromHouseholds(Households households) {
+		SortedMap<Id,Id> personId2VehicleId = new TreeMap<Id, Id>();
+		
+		//iterating over every household hh in order to get personIds and personal income 
+	
+		for (Household hh : households.getHouseholds().values()) {
+			Id personId = hh.getMemberIds().get(0);
+			if (hh.getVehicleIds() != null && !hh.getVehicleIds().isEmpty()){
+				Id vehicleId = hh.getVehicleIds().get(0);
+				personId2VehicleId.put(personId, vehicleId);
+				System.out.print("\n ****************************"+personId +"  "+ vehicleId);}
+		
+		}
+		return personId2VehicleId;
+	}
+
 
 	private void loadScenario() {
 		Config config = scenario.getConfig();

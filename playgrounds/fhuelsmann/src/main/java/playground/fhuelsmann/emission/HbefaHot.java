@@ -43,7 +43,7 @@ public class HbefaHot {
 					// erstllen von HbefaHot
 						
 						HbefaHot.put(key, new HotValue(value));
-						System.out.println(key);
+					//	System.out.println(key);
 						
 						
 				}
