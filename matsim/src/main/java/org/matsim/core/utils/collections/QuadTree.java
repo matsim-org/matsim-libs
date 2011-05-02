@@ -228,15 +228,15 @@ public class QuadTree<T> implements Serializable {
 		return this.top.getBounds().maxY;
 	}
 
-  /**
-   * Returns a collection view of the values contained in this map.  The
-   * collection's iterator will return the values in the order that their
-   * corresponding keys appear in the tree.  The collection is backed by
-   * this <tt>QuadMap</tt> instance, so changes to this map are reflected in
-   * the collection.
-   *
-   * @return a collection view of the values contained in this map.
-   */
+	/**
+	 * Returns a collection view of the values contained in this map.  The
+	 * collection's iterator will return the values in the order that their
+	 * corresponding keys appear in the tree.  The collection is backed by
+	 * this <tt>QuadMap</tt> instance, so changes to this map are reflected in
+	 * the collection.
+	 *
+	 * @return a collection view of the values contained in this map.
+	 */
 	public Collection<T> values() {
 		if (this.values == null) {
 			this.values = new AbstractCollection<T>() {
@@ -268,7 +268,7 @@ public class QuadTree<T> implements Serializable {
 								return null;
 							}
 							if (QuadTree.this.modCount != this.expectedModCount) {
-                throw new ConcurrentModificationException();
+								throw new ConcurrentModificationException();
 							}
 							T current = this.next;
 							loadNext();
@@ -439,55 +439,61 @@ public class QuadTree<T> implements Serializable {
 					other.minY < this.maxY);
 		}
 
-		   /**
-	     * Computes the intersection of this <code>Rect</code> with the
-	     * specified <code>Rect</code>. Returns a new <code>Rect</code>
-	     * that represents the intersection of the two rectangles.
-	     * If the two rectangles do not intersect, the result will be
-	     * null.
-	     *
-	     * @param     r   the specified <code>Rectangle</code>
-	     * @return    the largest <code>Rectangle</code> contained in both the
-	     *            specified <code>Rectangle</code> and in
-	     *		  this <code>Rectangle</code>; or if the rectangles
-	     *            do not intersect, an empty rectangle.
-	     */
-	    public Rect intersection(final Rect r) {
-		double tx1 = this.minX;
-		double ty1 = this.minY;
-		double tx2 = this.maxX;
-		double ty2 = this.maxY;
-		if (this.minX < r.minX) tx1 = r.minX;
-		if (this.minY < r.minY) ty1 = r.minY;
-		if (tx2 > r.maxX) tx2 = r.maxX;
-		if (ty2 > r.maxY) ty2 = r.maxY;
-		// did they intersect at all?
-		if(tx2-tx1 <=0.f || ty2-ty1 <= 0.f) return null;
+		/**
+		 * Computes the intersection of this <code>Rect</code> with the
+		 * specified <code>Rect</code>. Returns a new <code>Rect</code>
+		 * that represents the intersection of the two rectangles.
+		 * If the two rectangles do not intersect, the result will be
+		 * null.
+		 *
+		 * @param     r   the specified <code>Rectangle</code>
+		 * @return    the largest <code>Rectangle</code> contained in both the
+		 *            specified <code>Rectangle</code> and in
+		 *		  this <code>Rectangle</code>; or if the rectangles
+		 *            do not intersect, an empty rectangle.
+		 */
+		public Rect intersection(final Rect r) {
+			double tx1 = this.minX;
+			double ty1 = this.minY;
+			double tx2 = this.maxX;
+			double ty2 = this.maxY;
+			if (this.minX < r.minX) tx1 = r.minX;
+			if (this.minY < r.minY) ty1 = r.minY;
+			if (tx2 > r.maxX) tx2 = r.maxX;
+			if (ty2 > r.maxY) ty2 = r.maxY;
+			// did they intersect at all?
+			if(tx2-tx1 <=0.f || ty2-ty1 <= 0.f) return null;
 
-		return new Rect(tx1, ty1, tx2, ty2);
-	    }
+			return new Rect(tx1, ty1, tx2, ty2);
+		}
 
-	    /**
-	     * Adds a <code>Rect</code> to this <code>Rect</code>.
-	     * The resulting <code>Rect</code> is the union of the two
-	     * rectangles (i.e. the minimum rectangle that contains the two original rectangles)
-	     * @param  r the specified <code>Rect</code>
-	     */
-	    public Rect union(final Rect r) {
+		/**
+		 * Adds a <code>Rect</code> to this <code>Rect</code>.
+		 * The resulting <code>Rect</code> is the union of the two
+		 * rectangles (i.e. the minimum rectangle that contains the two original rectangles)
+		 * @param  r the specified <code>Rect</code>
+		 */
+		public Rect union(final Rect r) {
 			return new Rect( Math.min(this.minX, r.minX),
 					Math.min(this.minY, r.minY),
 					Math.max(this.maxX, r.maxX),
 					Math.max(this.maxY, r.maxY));
-		    }
+		}
 
-	    /**
-	     * Increases the size of the rectangle by scaleX and scaleY.
-	     */
-	    public Rect scale(double scaleX, double scaleY) {
-	    	scaleY *= this.centerY - this.minY;
-	    	scaleX *= this.centerX - this.minX;
+		/**
+		 * Increases the size of the rectangle by scaleX and scaleY.
+		 */
+		public Rect scale(double scaleX, double scaleY) {
+			scaleY *= this.centerY - this.minY;
+			scaleX *= this.centerX - this.minX;
 			return new Rect(this.minX - scaleX, this.minY-scaleY, this.maxX + scaleX, this.maxY + scaleY);
-		    }
+		}
+		
+		@Override
+		public String toString() {
+			return "topLeft: ("+minX+","+minY+") bottomRight: ("+maxX+","+maxY+")";
+		}
+		
 	}
 
 	protected static class Leaf<T> implements Serializable {

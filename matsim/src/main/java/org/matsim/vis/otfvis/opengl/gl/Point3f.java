@@ -51,4 +51,9 @@ public class Point3f {
     public float getZ() {
         return z;
     }
+    
+    public String toString() {
+    	return "("+x+","+y+","+z+")";
+    }
+    
 }

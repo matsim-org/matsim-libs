@@ -66,6 +66,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -148,6 +150,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	private SceneGraph currentSceneGraph = null;
 
 	private OTFHostControlBar hostControlBar;
+
+	private Collection<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
 	public static class StatusTextDrawer {
 
@@ -577,6 +581,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		}
 		hostControlBar.updateScaleLabel();
 		this.canvas.repaint();
+		fireChangeListeners();
+	}
+
+	private void fireChangeListeners() {
+		for (ChangeListener changeListener : changeListeners) {
+			changeListener.stateChanged(new ChangeEvent(this));
+		}
 	}
 
 	/**
@@ -669,4 +680,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		return this.mouseMan.getOGLPos(x, y);
 	}
 
+	public void addChangeListener(ChangeListener changeListener) {
+		this.changeListeners.add(changeListener);
+	}
+	
 }

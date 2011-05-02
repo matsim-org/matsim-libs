@@ -98,10 +98,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 		this.clickHandler = clickHandler;
 	}
 
-	private void invalidateHandler() {
-		clickHandler.redraw();
-	}
-
 	void scrollCamera(Point3f start, Point3f end, String prop) {
 		KeyValues<Point3f> values = KeyValues.create(new EvaluatorPoint3f(),
 				start, end);
@@ -133,7 +129,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 		cameraTarget = targetEnd;
 		camera.setTarget(cameraTarget);
 		camera.setLocation(cameraStart);
-		invalidateHandler();
+		clickHandler.redraw();
 	}
 
 	@Override
@@ -313,7 +309,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 
 	public void scaleNetwork(float scale) {
 		this.scale = scale;
-		float test = bounds.height*0.7f;
+		float test = bounds.height;
 		float zPos = (test*scale);
 		if (zPos < minZoom) zPos =minZoom;
 		if (zPos > maxZoom) zPos =maxZoom;
