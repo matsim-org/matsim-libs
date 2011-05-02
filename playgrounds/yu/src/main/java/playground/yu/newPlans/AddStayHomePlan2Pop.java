@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -115,6 +116,8 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 		Activity lastHomeAct = createHomeActivity(firstAct);
 		lastHomeAct.setStartTime(21700d);
 		homePlan.addActivity(lastHomeAct);
+
+		((PlanImpl) homePlan).setType(PlanImpl.DeprecatedConstants.WALK);
 
 		person.addPlan(homePlan);
 	}
