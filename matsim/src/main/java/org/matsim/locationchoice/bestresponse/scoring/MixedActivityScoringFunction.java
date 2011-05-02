@@ -20,7 +20,6 @@
 
 package org.matsim.locationchoice.bestresponse.scoring;
 
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -41,7 +40,6 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	private final ActivityFacilities facilities;
 	
 	// for destination scoring: -----------
-	private Random random;
 	private DestinationChoiceScoring destinationChoiceScoring;	
 	private Config config;
 	// ------------------------------------
@@ -49,15 +47,13 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	private final String LCEXP = "locationchoiceExperimental";
 
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
-			final ActivityFacilities facilities, Random random, 
-			final TreeMap<Id, FacilityPenalty> facilityPenalties,
+			final ActivityFacilities facilities, final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			Config config) {
 		//super(plan, params, facilityPenalties, facilities);
 		super(plan, params, facilities);
-		this.random = random;
 		this.facilities = facilities;
 		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(this.random, this.facilities, this.config);
+		this.destinationChoiceScoring = new DestinationChoiceScoring(this.facilities, this.config);
 	}
 	
 	@Override

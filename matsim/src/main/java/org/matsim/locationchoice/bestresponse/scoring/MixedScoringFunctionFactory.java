@@ -22,7 +22,6 @@ package org.matsim.locationchoice.bestresponse.scoring;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -41,8 +40,8 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		MixedActivityScoringFunction scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), this.controler.getFacilities(), 
-				MatsimRandom.getLocalInstance(), this.controler.getFacilityPenalties(), this.controler.getConfig());
+		MixedActivityScoringFunction scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), 
+				this.controler.getFacilities(), this.controler.getFacilityPenalties(), this.controler.getConfig());
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, super.getParams()));

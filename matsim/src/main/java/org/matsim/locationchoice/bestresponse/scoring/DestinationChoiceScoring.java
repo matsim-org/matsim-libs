@@ -32,16 +32,15 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class DestinationChoiceScoring {
-
-	private Random rnd;
+public class DestinationChoiceScoring { 
+	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
+	private Random rnd = new Random();
 	private ActivityFacilities facilities;
 	private Config config;
 	
 	private static String LCEXP = "locationchoiceExperimental";
 	
-	public DestinationChoiceScoring(Random rnd, ActivityFacilities facilities , Config config) {
-		this.rnd = rnd;
+	public DestinationChoiceScoring(ActivityFacilities facilities , Config config) {
 		this.facilities = facilities;
 		this.config = config;
 	}

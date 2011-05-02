@@ -23,7 +23,6 @@ package org.matsim.locationchoice.bestresponse;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -61,8 +60,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 			
 	public LocationMutatorBestResponse(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		super(network, controler, kn, quad_trees, facilities_of_type, random);
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
+		super(network, controler, kn, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
 		
@@ -137,8 +136,10 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 						
 					this.setLocation((ActivityImpl)actToMove, 
 							cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
-									actPre.getCoord(), actPost.getCoord(), this.facilities, this.random,
-									scoringFunction, plan, travelTime, travelCost));						
+									actPre.getCoord(), actPost.getCoord(), this.facilities, 
+									scoringFunction, plan, travelTime, travelCost,
+									this.controler.getIterationNumber()));	
+					
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
 					// **************************************************
 				}

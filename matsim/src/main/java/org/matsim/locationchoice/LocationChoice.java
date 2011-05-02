@@ -144,9 +144,10 @@ public class LocationChoice extends AbstractMultithreadedModule {
 				this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
 						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			}
+			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 			else if (algorithm.equals("bestResponse")) {
 				this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+						this.quadTreesOfType, this.facilitiesOfType));
 			}
 			else if (algorithm.equals("localSearchRecursive")) {
 				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
