@@ -81,7 +81,7 @@ public class PopComplementer extends NewPopulation {
 		Population pop = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(oldPopFilename);
 
-		PopComplementer pp = new PopComplementer(net, pop, newPopFilename, 4);
+		PopComplementer pp = new PopComplementer(net, pop, newPopFilename, 2);
 		pp.run(pop);
 		pp.writeEndPlans();
 	}
