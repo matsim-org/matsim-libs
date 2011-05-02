@@ -39,7 +39,7 @@ public class TabuBestFitnessSelector extends NaturalSelectorExt {
 	private final static long serialVersionUID = 1L;
 
 	private final List<IChromosome> candidateChromosomes;
-	private final TabuMonitor tabuMonitor;
+	private final TabuComparator tabuMonitor;
 
 	public TabuBestFitnessSelector(
 			final Configuration jgapConfig,
@@ -47,7 +47,7 @@ public class TabuBestFitnessSelector extends NaturalSelectorExt {
 			) throws InvalidConfigurationException {
 		super();
 		candidateChromosomes = new ArrayList<IChromosome>();
-		tabuMonitor = new TabuMonitor(jgapConfig, configGroup);
+		tabuMonitor = new TabuComparator(jgapConfig, configGroup);
 	}
 
 	@Override

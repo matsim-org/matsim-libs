@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
@@ -60,7 +61,9 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperato
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.RestrictedTournamentSelector;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuAndEvolutionMonitor;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuBestFitnessSelector;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuMonitor;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuRestrictedTournamentSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -91,7 +94,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * the joint plan.
 	 */
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
-	private JointPlanOptimizerFitnessFunction fitnessFunction;
+	private final JointPlanOptimizerFitnessFunction fitnessFunction;
+	private final TabuAndEvolutionMonitor monitor;
 
 	private final boolean optimizeToggle;
 
@@ -112,6 +116,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		// get info on the plan structure
 		this.countEpisodes(plan);
+
+		this.monitor = new TabuAndEvolutionMonitor(this, configGroup);
 
 		try {
 			// default JGAP objects initializations
@@ -139,7 +145,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			RestrictedTournamentSelector selector = 
 				new TabuRestrictedTournamentSelector(
 						this,
-						new DefaultChromosomeDistanceComparator(00d)); 
+						new DefaultChromosomeDistanceComparator(00d),
+						this.monitor); 
 			//TabuBestFitnessSelector selector =
 			//	new TabuBestFitnessSelector(this, configGroup);
 			this.addNaturalSelector(selector, false);
@@ -331,6 +338,14 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	public double getDayDuration() {
 		return DAY_DUR;
+	}
+
+	public TabuMonitor getTabuMonitor() {
+		return this.monitor;
+	}
+
+	public IEvolutionMonitor getEvolutionMonitor() {
+		return this.monitor;
 	}
 }
 
