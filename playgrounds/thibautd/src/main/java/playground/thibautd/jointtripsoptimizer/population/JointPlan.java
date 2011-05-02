@@ -75,9 +75,7 @@ public class JointPlan implements Plan {
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replanning for example).
 	 */
-	//TODO: improve:
-	// - less hard-coded modes
-	// - improve reimplacement leg creation
+	//TODO: separate in several helpers (too messy)
 	public JointPlan(
 			Clique clique,
 			Map<Id, ? extends Plan> plans,
@@ -86,6 +84,11 @@ public class JointPlan implements Plan {
 		Plan currentPlan;
 		this.clique = clique;
 
+		// in the plan file, pu activities are numbered. If two pick ups have
+		// the same number in the same joint plan, the following legs are
+		// considered joint.
+		// This structure "accumulates" the legs to join during the construction,
+		// in order to be able to link all related genes.
 		Map<String, List<JointLeg>> toLink = new HashMap<String, List<JointLeg>>();
 		String actType;
 		String currentJointEpisodeId = null;
@@ -97,29 +100,34 @@ public class JointPlan implements Plan {
 			currentPlan = new PlanImpl(this.clique.getMembers().get(id));
 
 			for (PlanElement pe : plans.get(id).getPlanElements()) {
-
 				if (pe instanceof Activity) {
 					currentActivity = new JointActivity((Activity) pe, 
 							this.clique.getMembers().get(id));
 					actType = currentActivity.getType();
+
 					if (actType.matches(JointActingTypes.PICK_UP_REGEXP)) {
+						// the next leg will be to associate with this id
 						currentJointEpisodeId =
 							actType.split(JointActingTypes.PICK_UP_SPLIT_EXPR)[1];
 						currentActivity.setType(JointActingTypes.PICK_UP);
 					}
-					currentPlan.addActivity(currentActivity);
 
-				} else {
+					currentPlan.addActivity(currentActivity);
+				}
+				else {
 					currentLeg = new JointLeg((Leg) pe,
 							(Person) this.clique.getMembers().get(id));
+
 					if (currentJointEpisodeId != null) {
 						// this leg is a shared leg, remember this.
 						if (!toLink.containsKey(currentJointEpisodeId)) {
 							toLink.put(currentJointEpisodeId, new ArrayList<JointLeg>());
 						}
+
 						toLink.get(currentJointEpisodeId).add(currentLeg);
 						currentJointEpisodeId = null;
 					}
+
 					currentPlan.addLeg(currentLeg);
 				}
 			}
@@ -151,6 +159,12 @@ public class JointPlan implements Plan {
 		}
 
 		this.constructLegsMap();
+
+		//TODO: if plan contains joint legs, synchronize it
+		this.synchronize();
+	}
+
+	private void synchronize() {
 	}
 
 	public JointPlan(JointPlan plan) {

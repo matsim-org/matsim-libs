@@ -214,7 +214,6 @@ public class Clique implements Person {
 	 * extraction, joint trips insertion heuristics, choice model...)
 	 */
 	public void buildJointPlanFromIndividualPlans() {
-		//TODO: create JointTrips
 		if (this.plans.isEmpty()) {
 			Map<Id, PlanImpl> individualPlans = new HashMap<Id, PlanImpl>();
 			JointPlan newJointPlan;

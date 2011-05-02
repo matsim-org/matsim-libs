@@ -64,7 +64,8 @@ public class run {
 		try {
 			new CliquesXmlReader(scenario).parse();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException("Problem while importing clique information:"
+					+" "+e.getMessage());
 		}
 
 		controler = new JointControler(scenario);
