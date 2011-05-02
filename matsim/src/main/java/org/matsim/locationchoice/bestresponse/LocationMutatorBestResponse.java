@@ -65,16 +65,15 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		super(network, controler, kn, quad_trees, facilities_of_type, random);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
+		
+		this.initFlexibleTypes(controler.getConfig().locationchoice());
 	}
 	
 	@Override
 	public void handlePlan(final Plan plan){
-		
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 1000000000) return;
 				
-		this.initFlexibleTypes(this.controler.getConfig().locationchoice());
-		
 		Plan bestPlan = new PlanImpl(plan.getPerson());	
 		// make sure there is a valid plan in bestPlan
 		((PlanImpl)bestPlan).copyPlan(plan);
