@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package playground.yu.utils;
 
@@ -11,11 +11,11 @@ import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
- * quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David
+ *quote from org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI of David
  * Strippgen
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class MyOTFEvents2Mvi {
 	private static void printUsage() {
@@ -28,7 +28,7 @@ public class MyOTFEvents2Mvi {
 		System.out.println("usage: MyOTFEvents2Mvi args");
 		System.out.println(" args[0]: netFilename incl. path (.xml)(required)");
 		System.out
-				.println(" arg[1]: eventsFilename incl. path (without xml[.gz])(required), the .mvi file path = args[1] + mvi");
+				.println(" arg[1]: eventsFilename incl. path (without txt[.gz])(required), the .mvi file path = args[1] + mvi");
 
 		System.out
 				.println(" arg[2]: time-interval[s](optional, default value = 300 [s])");
@@ -49,10 +49,9 @@ public class MyOTFEvents2Mvi {
 			System.exit(0);
 		}
 		// -----------WRITES A SHORT EVENTSFILE-----------------
-		String eventsFilename = args[1] + "xml";
-		if (!new File(eventsFilename).exists()) {
+		String eventsFilename = args[1] + "txt";
+		if (!new File(eventsFilename).exists())
 			eventsFilename += ".gz";
-		}
 
 		SimpleReader sr = new SimpleReader(eventsFilename);
 		String eventsOutputFilename = eventsFilename.replaceAll("events",
@@ -82,7 +81,7 @@ public class MyOTFEvents2Mvi {
 		// ----------------------------------------------------
 		OTFVis.main(new String[] { "-convert", eventsOutputFilename,
 				args[0]/* networkFilename */, args[1] + "mvi"/* mviFilename */,
-				args.length < 3 ? "300" : args[2] /* snapshotPeriod */});
+				(args.length < 3) ? "300" : args[2] /* snapshotPeriod */});
 
 		System.out.println("done.");
 	}
