@@ -23,12 +23,13 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Queue;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -51,11 +52,18 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	private List<QNode> nodesList = null;
 	private List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 
-	/** This is the collection of nodes that have to be activated in the current time step.
+	/** 
+	 * This is the collection of nodes that have to be activated in the current time step.
 	 * This needs to be thread-safe since it is not guaranteed that each incoming link is handled
-	 * by the same thread as a node itself. */
-	private final Queue<QNode> nodesToActivate = new ConcurrentLinkedQueue<QNode>();
-
+	 * by the same thread as a node itself.
+	 * A node could be activated multiple times concurrently from different incoming links within 
+	 * a time step. To avoid this,
+	 * a) 	the activateNode() method in the QNode class could be synchronized or 
+	 * b) 	a map could be used instead of a list. By doing so, no multiple entries are possible.
+	 * 		However, still multiple "put" operations will be performed for the same node.
+	 */
+	private final Map<Id, QNode> nodesToActivate = new ConcurrentHashMap<Id, QNode>();
+	
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 	private final QSim qsim;
@@ -127,12 +135,10 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				 */
 				if (useNodeArray) {
 					for (QNode node : nodesArray) {
-//						synchronized(node) {
-							Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-							if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-								node.moveNode(time, random);
-							}
-//						}
+						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
+						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
+							node.moveNode(time, random);
+						}
 					}
 				} else {
 					ListIterator<QNode> simNodes = this.nodesList.listIterator();
@@ -164,20 +170,11 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				while (simLinks.hasNext()) {
 					link = simLinks.next();
 
-					/*
-					 * Synchronize on the QueueLink is only some kind of Workaround.
-					 * It is only needed, if the QueueSimulation teleports Vehicles
-					 * between different Threads. It would be probably faster, if the
-					 * QueueSimulation would contain a synchronized method to do the
-					 * teleportation instead of synchronize on EVERY QueueLink.
-					 */
-//					synchronized(link) {
-						isActive = link.moveLink(time);
+					isActive = link.moveLink(time);
 
-						if (!isActive && !simulateAllLinks) {
-							simLinks.remove();
-						}
-//					}
+					if (!isActive && !simulateAllLinks) {
+						simLinks.remove();
+					}
 				}
 
 				/*
@@ -214,13 +211,13 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	@Override
 	protected void activateNode(QNode node) {
 		if (!useNodeArray && !simulateAllNodes) {
-			this.nodesToActivate.add(node);
+			this.nodesToActivate.put(node.getNode().getId(), node);
 		}
 	}
 
 	/*package*/ void activateNodes() {
 		if (!useNodeArray && !simulateAllNodes) {
-			this.nodesList.addAll(this.nodesToActivate);
+			this.nodesList.addAll(this.nodesToActivate.values());
 			this.nodesToActivate.clear();
 		}
 	}
@@ -258,8 +255,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
 	@Override
 	public DepartureHandler getDepartureHandler() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
 
 }
