@@ -165,6 +165,7 @@ public class JointPlan implements Plan {
 	}
 
 	private void synchronize() {
+		//
 	}
 
 	public JointPlan(JointPlan plan) {
