@@ -1,6 +1,5 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -16,7 +15,6 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private Config config;
-	private long seed;
 		
 	public ComputeMaxEpsilons(int numOfThreads, ScenarioImpl scenario, String type, Config config, long seed) {
 		super(numOfThreads);
@@ -24,12 +22,11 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 		this.type = type;
 		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(type);
 		this.config = config; 
-		this.seed = seed;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(new Random(this.seed), this.scenario.getActivityFacilities(), config);
+		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.scenario.getActivityFacilities(), config);
 		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer);
 	}
 }

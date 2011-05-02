@@ -44,7 +44,6 @@ public class UtilitySampler {
 	private final static Logger log = Logger.getLogger(UtilitySampler.class);
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private Config config;
-	private Random rnd;
 	
 	private final String LCEXP = "locationchoiceExperimental";
 		
@@ -61,7 +60,6 @@ public class UtilitySampler {
 				"src/main/java/playground/anhorni/input/LEGO/config.xml").getScenario();
 		this.config = scenario.getConfig();
 		
-		this.rnd = new Random(4711);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile("src/main/java/playground/anhorni/input/LEGO/plans.xml");
 		new MatsimNetworkReader(this.scenario).readFile("src/main/java/playground/anhorni/input/LEGO/network.xml");
@@ -69,8 +67,7 @@ public class UtilitySampler {
 	}
 
 	private void run() {	
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.rnd, 
-				this.scenario.getActivityFacilities(), config);
+		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.scenario.getActivityFacilities(), config);
 		
 		int counter = 0;
 		int nextMsg = 1;
