@@ -60,6 +60,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 
 
 
+import playground.fhuelsmann.emission.objects.Row;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class EmissionTool {
@@ -122,6 +123,14 @@ public class EmissionTool {
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
 		HbefaHot hbefaHot = new HbefaHot();
 		hbefaHot.makeHbefaHot(hbefaHotFile);
+		
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+		vehicleReader.readFile(vehicleFile);
+		
+		Households households = new HouseholdsImpl();
+		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
+		reader.readFile(householdsFile);
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
@@ -134,7 +143,7 @@ public class EmissionTool {
 //		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(households, vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
 		eventsManager.addHandler(warmEmissionHandler);
@@ -143,13 +152,7 @@ public class EmissionTool {
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
 		
-		Vehicles vehicles = new VehiclesImpl();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-		vehicleReader.readFile(vehicleFile);
-		
-		Households households = new HouseholdsImpl();
-		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile(householdsFile);
+	
 		
 	
 
@@ -248,8 +251,8 @@ public class EmissionTool {
 		return personId2totalEmissions;
 	}*/
 	
-	private SortedMap<Id, Id> getVehicleTypeFromVehicleId (Vehicles vehicle) {
-		SortedMap<Id,Id> vehicleId2VehicleType = new TreeMap<Id, Id>();
+	private Map<Id, Id> getVehicleTypeFromVehicleId (Vehicles vehicle) {
+		Map<Id,Id> vehicleId2VehicleType = new TreeMap<Id, Id>();
 		
 		//iterating over every vehicle veh in order to get vehicleIds and vehcile type 
 		for (Vehicle veh : vehicle.getVehicles().values()){
@@ -262,8 +265,8 @@ public class EmissionTool {
 		return vehicleId2VehicleType;
 	}
 	
-	private SortedMap<Id, Id> getVehicleIdFromHouseholds(Households households) {
-		SortedMap<Id,Id> personId2VehicleId = new TreeMap<Id, Id>();
+	private Map<Id, Id> getVehicleIdFromHouseholds(Households households) {
+		Map<Id,Id> personId2VehicleId = new TreeMap<Id, Id>();
 		
 		//iterating over every household hh in order to get personIds and personal income 
 	
@@ -278,6 +281,21 @@ public class EmissionTool {
 		return personId2VehicleId;
 	}
 
+/*	private Map<Id, Row> PersonId2VehicleType(Map<Id, Id> personId2VehicleId, Map<Id, Id> vehicleId2VehicleType) {
+		
+		Map<Id, Row> result = new TreeMap<Id, Row>();
+		for(Id id : personId2VehicleId.keySet()){						
+			
+			//Row can be extended to all the needed information
+			Row row = new Row();
+			row.setPersonId(id);
+			row.setVehicleId(vehicleId.get(id));
+			row.setVehicleType(vehicleType.get(id));
+
+			result.put(id, row);
+		}
+		return result;
+	}*/
 
 	private void loadScenario() {
 		Config config = scenario.getConfig();
