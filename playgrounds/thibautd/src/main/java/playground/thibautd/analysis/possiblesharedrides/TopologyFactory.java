@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsTopology.java
+ * TopologyFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,72 +19,40 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.possiblesharedrides;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
 /**
- * Defines a topology on events.
- * Neigborhood is defined by a LinkTopology and a time window.
- *
  * @author thibautd
  */
-public class EventsTopology {
-
-	private final List<? extends PersonEvent> events;
+public class TopologyFactory {
 	private final LinkTopology linkTopology;
-	private final Comparator<Event> timeComparator = new TimeComparator();
 	private final double timeWindowRadius;
-	
-	public EventsTopology(
-			final List<? extends PersonEvent> events,
-			final double timeWindowRadius,
-			final LinkTopology linkTopology) {
-		// not safe, clone events!
-		this.events = events;
-		Collections.sort(events, this.timeComparator); 
-		this.linkTopology = linkTopology;
+
+	public TopologyFactory(
+			final Network network,
+			final double acceptableDistance,
+			final double timeWindowRadius) {
+		this.linkTopology = new LinkTopology(network, acceptableDistance);
 		this.timeWindowRadius = timeWindowRadius;
 	}
 
 	/**
-	 * get neighbors based on the link topology and the default time
-	 * window
+	 * @return the internal LinkTOpology instance (not a proper factory method:
+	 * two consecutive call will return the same instance)
 	 */
-	public List<PersonEvent> getNeighbors(final Event event) {
-		return null;
+	public LinkTopology getLinkTopology() {
+		return this.linkTopology;
 	}
 
-	/**
-	 * @return all events in the specified time window at the given link
-	 */
-	public List<PersonEvent> getEventsInTimeWindow(
-			final Id linkId,
-			final double timeWindowCenter,
-			final double timeWindowRadius) {
-		return null;
-	}
-
-	private class TimeComparator implements Comparator<Event> {
-		public TimeComparator() {}
-
-		@Override
-		public int compare(Event event1, Event event2) {
-			double time1 = event1.getTime();
-			double time2 = event2.getTime();
-
-			if (time1 < time2) {
-				return -1;
-			}
-			if (time1 > time2) {
-				return 1;
-			}
-			return 0;
-		}
+	public EventsTopology createEventTopology(final List<? extends PersonEvent> events) {
+		return new EventsTopology(
+				events,
+				this.timeWindowRadius,
+				this.linkTopology); 
 	}
 }
 
