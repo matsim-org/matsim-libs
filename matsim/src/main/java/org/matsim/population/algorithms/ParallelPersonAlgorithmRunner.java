@@ -20,12 +20,14 @@
 
 package org.matsim.population.algorithms;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -35,6 +37,8 @@ import org.matsim.core.utils.misc.Counter;
  */
 public abstract class ParallelPersonAlgorithmRunner {
 
+	private final static Logger log = Logger.getLogger(ParallelPersonAlgorithmRunner.class);
+	
 	public interface PersonAlgorithmProvider {
 		public AbstractPersonAlgorithm getPersonAlgorithm();
 	}
@@ -72,6 +76,9 @@ public abstract class ParallelPersonAlgorithmRunner {
 		Thread[] threads = new Thread[numOfThreads];
 		String name = null;
 		Counter counter = null;
+		
+		final AtomicBoolean hadException = new AtomicBoolean(false);
+		final ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
@@ -82,6 +89,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 			}
 			PersonAlgoThread algothread = new PersonAlgoThread(algo, counter);
 			Thread thread = new Thread(algothread, name + "." + i);
+			thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 			threads[i] = thread;
 			algoThreads[i] = algothread;
 		}
@@ -105,7 +113,10 @@ public abstract class ParallelPersonAlgorithmRunner {
 			}
 			counter.printCounter();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
+		}
+		if (hadException.get()) {
+			throw new RuntimeException("Exception while processing persons. Cannot guarantee that all persons have been fully processed.");
 		}
 	}
 
@@ -137,4 +148,24 @@ public abstract class ParallelPersonAlgorithmRunner {
 			}
 		}
 	}
+	
+	/**
+	 * @author mrieser
+	 */
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+
+		public ExceptionHandler(final AtomicBoolean hadException) {
+			this.hadException = hadException;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
+			this.hadException.set(true);
+		}
+
+	}
+
 }

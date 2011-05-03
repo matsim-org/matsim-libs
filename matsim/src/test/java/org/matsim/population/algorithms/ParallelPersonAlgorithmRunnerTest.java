@@ -22,8 +22,9 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-
+import org.jfree.util.Log;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -38,23 +39,24 @@ import org.matsim.core.utils.misc.ConfigUtils;
  *
  * @author mrieser
  */
-public class ParallelPersonAlgorithmRunnerTest extends TestCase {
+public class ParallelPersonAlgorithmRunnerTest {
 
 	/**
 	 * Tests that the specified number of threads is allocated.
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testNumberOfThreads() {
 		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
-		assertEquals(2, tester.counter);
+		Assert.assertEquals(2, tester.counter);
 
 		PersonAlgoProviderTester tester2 = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 4, tester2);
-		assertEquals(4, tester2.counter);
+		Assert.assertEquals(4, tester2.counter);
 	}
 
 	/**
@@ -62,6 +64,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testNofPersons() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
@@ -72,7 +75,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
 
-		assertEquals(100, tester.personIds.size());
+		Assert.assertEquals(100, tester.personIds.size());
 
 		// test that all 100 different persons got handled, and not 1 person 100 times
 		int sum = 0;
@@ -82,7 +85,28 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 			sumRef += i;
 			sum += Integer.parseInt(population.getPersons().get(tester.personIds.get(i)).getId().toString());
 		}
-		assertEquals(sumRef, sum);
+		Assert.assertEquals(sumRef, sum);
+	}
+	
+	@Test
+	public void testCrashingAlgorithm() {
+		try {
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			Population population = scenario.getPopulation();
+			for (int i = 0; i < 10; i++) {
+				PersonImpl person = new PersonImpl(new IdImpl(i));
+				population.addPerson(person);
+			}
+			ParallelPersonAlgorithmRunner.run(population, 2, new AbstractPersonAlgorithm() {
+				@Override
+				public void run(Person person) {
+					person.getPlans().get(0).setScore(null); // this will result in an IndexOutOfBoundsException
+				}
+			});
+			Assert.fail("Expected Exception, got none.");
+		} catch (RuntimeException e) {
+			Log.info("Catched expected exception.", e);
+		}
 	}
 
 	/**
@@ -97,6 +121,7 @@ public class ParallelPersonAlgorithmRunnerTest extends TestCase {
 		protected PersonAlgoProviderTester(final AbstractPersonAlgorithm algo) {
 			this.algo = algo;
 		}
+		@Override
 		public AbstractPersonAlgorithm getPersonAlgorithm() {
 			this.counter++;
 			return this.algo;
