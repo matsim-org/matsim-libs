@@ -145,7 +145,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			RestrictedTournamentSelector selector = 
 				new TabuRestrictedTournamentSelector(
 						this,
-						new DefaultChromosomeDistanceComparator(00d),
+						new DefaultChromosomeDistanceComparator(
+							configGroup.getDiscreteDistanceScale()),
 						this.monitor); 
 			//TabuBestFitnessSelector selector =
 			//	new TabuBestFitnessSelector(this, configGroup);

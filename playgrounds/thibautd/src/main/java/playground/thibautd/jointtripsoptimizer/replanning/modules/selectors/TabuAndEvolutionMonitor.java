@@ -99,6 +99,8 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 			if (fitness - this.lastBestFitness < this.minImprovement) {
 				if (fitness < this.allTimeBestFitness) {
 					// new toggle schematas are worst than tabu ones: quit.
+					log.debug("stop GA. current best: "+fitness+
+							", all time best: "+this.allTimeBestFitness);
 					this.quitNow = true;
 					return;
 				}
@@ -107,6 +109,7 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 				}
 
 				if (this.indexInTabuList < this.maxNumberOfTabuElems) {
+					log.debug("new tabu element: "+fitness);
 					boolean[] newTabuSequence = new boolean[this.numBool];
 					for (int i=0; i < this.numBool; i++) {
 						newTabuSequence[i] =
@@ -132,6 +135,7 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 				}
 				else {
 					//not enough improvement and tabu list full: we quit
+					log.debug("tabu list full. last best: "+fitness);
 					this.quitNow = true;
 				}
 			}

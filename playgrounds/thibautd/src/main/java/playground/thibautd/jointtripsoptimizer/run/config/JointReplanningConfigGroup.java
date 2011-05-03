@@ -70,6 +70,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String DYNAMIC_CO_RATES = "allowAdaptiveCrossOverRates";
 	private static final String SPX_RATE = "SPXCrossOverRate";
 	private static final String SPX_SONS = "SPXOffspringRate";
+	private static final String DISCRETE_DIST_SCALE = "DiscreteDistanceScale";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -96,6 +97,7 @@ public class JointReplanningConfigGroup extends Module {
 	private boolean dynamicCoRate = true;
 	private double spxRate = 0.6d;
 	private int spxOffspringRate = 4;
+	private double discreteDistScale = 100d;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -178,6 +180,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(SPX_SONS)) {
 			this.setSPXOffspringRate(value);
 		}
+		else if (param_name.equals(DISCRETE_DIST_SCALE)) {
+			this.setDiscreteDistanceScale(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -256,6 +261,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(SPX_SONS)) {
 			return String.valueOf(this.getSPXOffspringRate());
 		}
+		else if (param_name.equals(DISCRETE_DIST_SCALE)) {
+			return String.valueOf(this.getDiscreteDistanceScale());
+		}
 
 		return null;
 	}
@@ -285,6 +293,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, DYNAMIC_CO_RATES);
 		this.addParameterToMap(map, SPX_RATE);
 		this.addParameterToMap(map, SPX_SONS);
+		this.addParameterToMap(map, DISCRETE_DIST_SCALE);
 		return map;
 	}
 
@@ -586,6 +595,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public int getSPXOffspringRate() {
 		return this.spxOffspringRate;
+	}
+
+	public void setDiscreteDistanceScale(String value) {
+		this.discreteDistScale = Double.valueOf(value);
+	}
+
+	public double getDiscreteDistanceScale() {
+		return this.discreteDistScale;
 	}
 }
 
