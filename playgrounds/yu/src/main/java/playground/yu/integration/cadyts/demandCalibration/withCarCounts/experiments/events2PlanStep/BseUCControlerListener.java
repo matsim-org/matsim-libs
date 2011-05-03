@@ -68,7 +68,7 @@ public class BseUCControlerListener implements StartupListener,
 	private double distanceFilter;
 	private int arStartTime, arEndTime;
 	private boolean writeQGISFile = false;
-	private EventsToPlanSteps events2PlanStep = null;
+	private EventsToPlanSteps events2PlanSteps = null;
 
 	private static List<Link> links = new ArrayList<Link>();
 	private static Set<Id> linkIds = new HashSet<Id>();
@@ -83,14 +83,16 @@ public class BseUCControlerListener implements StartupListener,
 		return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) < distanceFilter;
 	}
 
+	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler ctl = event.getControler();
 		final Network network = ctl.getNetwork();
 		Config config = ctl.getConfig();
 
 		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = network.getNodes().get(
-				new IdImpl(config.findParam("counts",
+		distanceFilterCenterNodeCoord = network
+				.getNodes()
+				.get(new IdImpl(config.findParam("counts",
 						"distanceFilterCenterNode"))).getCoord();
 		distanceFilter = Double.parseDouble(config.findParam("counts",
 				"distanceFilter"));
@@ -279,25 +281,27 @@ public class BseUCControlerListener implements StartupListener,
 		}
 
 		// prepare events2planStep
-		events2PlanStep = new EventsToPlanSteps(network, ctl.getPopulation());
+		events2PlanSteps = new EventsToPlanSteps(network, ctl.getPopulation());
 
 		// set up a/r-strategy
-		((BseUCStrategyManager) ctl.getStrategyManager()).init(calibrator, ctl
-				.getTravelTimeCalculator(), events2PlanStep);
+		((BseUCStrategyManager) ctl.getStrategyManager()).init(calibrator,
+				ctl.getTravelTimeCalculator(), events2PlanSteps);
 
 		// events addhandler e2p
-		events.addHandler(events2PlanStep);
+		events.addHandler(events2PlanSteps);
 		// prepare resultsContainer
 		resultsContainer = new SimResultsContainerImpl();
 
 	}
 
+	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		events2PlanStep.reset(event.getIteration());
+		events2PlanSteps.reset(event.getIteration());
 	}
 
+	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		events2PlanStep.clearUpAfterMobsim();
+		events2PlanSteps.clearUpAfterMobsim();
 		calibrator.afterNetworkLoading(resultsContainer);
 		int iter = event.getIteration();
 		if (iter % 10 == 0) {
@@ -306,8 +310,8 @@ public class BseUCControlerListener implements StartupListener,
 			try {
 				DynamicData<Link> linkCostOffsets = calibrator
 						.getLinkCostOffsets();
-				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(io
-						.getIterationFilename(iter, "linkCostOffsets.xml"),
+				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(
+						io.getIterationFilename(iter, "linkCostOffsets.xml"),
 						linkCostOffsets);
 				if (writeQGISFile) {
 					for (int i = arStartTime; i <= arEndTime; i++) {
@@ -315,8 +319,8 @@ public class BseUCControlerListener implements StartupListener,
 								ctl.getNetwork(), ctl.getConfig().global()
 										.getCoordinateSystem(), i, i);
 						lco2QGSI.createLinkCostOffsets(links, linkCostOffsets);
-						lco2QGSI.output(linkIds, io.getIterationFilename(iter,
-								""));
+						lco2QGSI.output(linkIds,
+								io.getIterationFilename(iter, ""));
 					}
 				}
 			} catch (IOException e) {
@@ -325,6 +329,7 @@ public class BseUCControlerListener implements StartupListener,
 		}
 	}
 
+	@Override
 	public void setWriteQGISFile(final boolean writeQGISFile) {
 		this.writeQGISFile = writeQGISFile;
 	}
@@ -335,6 +340,7 @@ public class BseUCControlerListener implements StartupListener,
 		/***/
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public double getSimValue(final Link link, final int startTime_s,
 				final int endTime_s, final TYPE type) {
 			int hour = startTime_s / 3600;

@@ -44,7 +44,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 		BseStrategyManager {
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
 	private PlanToPlanStep planConverter = null;
-	private EventsToPlanSteps events2PlanStep = null;
+	private EventsToPlanSteps events2PlanSteps = null;
 	// private int maxDraws = 100;
 	private final PlanSelector worstPlanSelector = new WorstPlanForRemovalSelector();
 	private int correctCnt = 0, correctMileStone = 0;
@@ -71,7 +71,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	public void init(final Calibrator<Link> calibrator,
 			final TravelTime travelTimes, EventsToPlanSteps events2PlanStep) {
 		this.init(calibrator, travelTimes, beta);
-		this.events2PlanStep = events2PlanStep;
+		this.events2PlanSteps = events2PlanStep;
 	}
 
 	// /**
@@ -103,7 +103,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 		// remove oldCorrection of the removed plan
 		oldCorrections.remove(plan);
 		// ***************************************
-		events2PlanStep.removePlanSteps((PlanImpl) plan);
+		events2PlanSteps.removePlanSteps((PlanImpl) plan);
 		// ***************************************
 	}
 
@@ -182,7 +182,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 		for (Person person : population.getPersons().values()) {
 			// convert the newly selected plan
 			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
-			cadyts.demand.Plan<Link> planSteps = events2PlanStep
+			cadyts.demand.Plan<Link> planSteps = events2PlanSteps
 					.getPlanSteps(plan);
 			if (planSteps == null) {
 				planConverter.convert(plan);
@@ -208,7 +208,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	 */
 	public void correctPlansUtilities(final PersonImpl person) {
 		for (Plan plan : person.getPlans()) {
-			cadyts.demand.Plan<Link> planSteps = events2PlanStep
+			cadyts.demand.Plan<Link> planSteps = events2PlanSteps
 					.getPlanSteps((PlanImpl) plan);
 			if (planSteps == null) {
 				planConverter.convert((PlanImpl) plan);
