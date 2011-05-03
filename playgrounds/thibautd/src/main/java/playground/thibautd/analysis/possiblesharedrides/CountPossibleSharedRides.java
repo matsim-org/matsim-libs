@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
 /**
@@ -118,35 +119,35 @@ public class CountPossibleSharedRides {
 		Id arrivalId = route.getEndLinkId();
 
 		// correct leg info based on events
-		Event departure = getDepartureEvent(personId, departureTime, departureId);
-		Event arrival = getArrivalEvent(personId, arrivalTime, arrivalId);
+		LinkEvent departure = getDepartureEvent(personId, departureTime, departureId);
+		LinkEvent arrival = getArrivalEvent(personId, arrivalTime, arrivalId);
 
 		numberOfJoinableTrips = countPossibleSharedRides(departure, arrival);
 
 		return new TripData(departure.getTime(), distance, numberOfJoinableTrips);
 	}
 
-	private Event getDepartureEvent(
+	private LinkEvent getDepartureEvent(
 			final Id person,
 			final double expectedTime,
 			final Id link) {
 		return this.getEvent(person, expectedTime, link, this.departuresTopology);
 	}
 
-	private Event getArrivalEvent(
+	private LinkEvent getArrivalEvent(
 			final Id person,
 			final double expectedTime,
 			final Id link) {
 		return this.getEvent(person, expectedTime, link, this.arrivalsTopology);
 	}
 
-	private Event getEvent(
+	private LinkEvent getEvent(
 			final Id person,
 			final double expectedTime,
 			final Id link,
 			final EventsTopology searchEvents) {
 		double timeWindow = this.eventInitialSearchWindow;
-		List<PersonEvent> currentEventList;
+		List<LinkEvent> currentEventList;
 
 		// increment the tw size until an event corresponding to the agent is
 		// found.
@@ -155,7 +156,7 @@ public class CountPossibleSharedRides {
 					link,
 					expectedTime,
 					timeWindow);
-			for (PersonEvent currentEvent : currentEventList) {
+			for (LinkEvent currentEvent : currentEventList) {
 				if (currentEvent.getPersonId().equals(person)) {
 					return currentEvent;
 				}
@@ -165,11 +166,11 @@ public class CountPossibleSharedRides {
 	}
 
 	private int countPossibleSharedRides(
-			final Event departure,
-			final Event arrival) {
-		List<PersonEvent> departureNeighbors =
+			final LinkEvent departure,
+			final LinkEvent arrival) {
+		List<LinkEvent> departureNeighbors =
 			this.leaveLinksTopology.getNeighbors(departure);
-		List<PersonEvent> arrivalNeighbors =
+		List<LinkEvent> arrivalNeighbors =
 			this.enterLinksTopology.getNeighbors(arrival);
 		int count = 0;
 		
@@ -190,7 +191,7 @@ public class CountPossibleSharedRides {
 	 */
 	private boolean passesHere(
 			final Id person,
-			final List<PersonEvent> events) {
+			final List<? extends PersonEvent> events) {
 		for (PersonEvent event : events) {
 			if (event.getPersonId().equals(person)) {
 				//remove event from list?

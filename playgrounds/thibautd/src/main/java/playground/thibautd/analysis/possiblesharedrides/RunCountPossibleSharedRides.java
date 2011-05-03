@@ -65,10 +65,11 @@ public class RunCountPossibleSharedRides {
 		
 		(new MatsimEventsReader(eventsManager)).readFile(eventFile);
 
-		CountPossibleSharedRides countInstance = new CountPossibleSharedRides(
+		CountPossibleSharedRides countRides = new CountPossibleSharedRides(
 				network, eventsAccumulator, population, acceptableDistance, timeWindow);
 
 		// TODO: process
+		countRides.run();
 	}
 }
 

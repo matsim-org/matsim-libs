@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TopologyFactory.java
+ * AgentEventWrapper.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,41 +19,63 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.possiblesharedrides;
 
-import java.util.List;
+import java.util.Map;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.LinkEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 
 /**
+ * wrapper to allow manipulating AgentEvent as LinkEvent.
+ * AgentEvent is "compatible with LinkEvent as it implements the
+ * getLinkId() method, but it does not implements it, leading to
+ * the need of all kind of ugly tests.
  * @author thibautd
  */
-public class TopologyFactory {
-	private final LinkTopology linkTopology;
-	private final double timeWindowRadius;
+public class AgentEventWrapper implements AgentEvent, LinkEvent {
+	private AgentEvent delegate;
 
-	public TopologyFactory(
-			final Network network,
-			final double acceptableDistance,
-			final double timeWindowRadius) {
-		this.linkTopology = new LinkTopology(network, acceptableDistance);
-		this.timeWindowRadius = timeWindowRadius;
+	public AgentEventWrapper(final AgentEvent ev) {
+		this.delegate = ev;
 	}
 
 	/**
-	 * @return the internal LinkTOpology instance (not a proper factory method:
-	 * two consecutive call will return the same instance)
+	 * @return
+	 * @see org.matsim.core.api.experimental.events.PersonEvent#getPersonId()
 	 */
-	public LinkTopology getLinkTopology() {
-		return this.linkTopology;
+	public Id getPersonId() {
+		return delegate.getPersonId();
 	}
 
-	public EventsTopology createEventTopology(final List<? extends LinkEvent> events) {
-		return new EventsTopology(
-				events,
-				this.timeWindowRadius,
-				this.linkTopology); 
+	/**
+	 * @return
+	 * @see org.matsim.core.api.experimental.events.AgentEvent#getLinkId()
+	 */
+	public Id getLinkId() {
+		return delegate.getLinkId();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.core.api.experimental.events.AgentEvent#getLegMode()
+	 */
+	public String getLegMode() {
+		return delegate.getLegMode();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.core.api.experimental.events.Event#getTime()
+	 */
+	public double getTime() {
+		return delegate.getTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.core.api.experimental.events.Event#getAttributes()
+	 */
+	public Map<String, String> getAttributes() {
+		return delegate.getAttributes();
 	}
 }
-

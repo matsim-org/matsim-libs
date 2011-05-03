@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
@@ -40,10 +41,14 @@ public class EventsAccumulator implements
 		AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 	
-	private final List<AgentArrivalEvent> arrivals =
-		new ArrayList<AgentArrivalEvent>(1000);
-	private final List<AgentDepartureEvent> departures =
-		new ArrayList<AgentDepartureEvent>(1000);
+	//private final List<AgentArrivalEvent> arrivals =
+	//	new ArrayList<AgentArrivalEvent>(1000);
+	//private final List<AgentDepartureEvent> departures =
+	//	new ArrayList<AgentDepartureEvent>(1000);
+	private final List<AgentEventWrapper> arrivals =
+		new ArrayList<AgentEventWrapper>(1000);
+	private final List<AgentEventWrapper> departures =
+		new ArrayList<AgentEventWrapper>(1000);
 	private final List<LinkEnterEvent> enterLinks =
 		new ArrayList<LinkEnterEvent>(1000);
 	private final List<LinkLeaveEvent> leaveLinks =
@@ -64,12 +69,12 @@ public class EventsAccumulator implements
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.arrivals.add(event);
+		this.arrivals.add(new AgentEventWrapper(event));
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.departures.add(event);
+		this.departures.add(new AgentEventWrapper(event));
 	}
 
 	@Override
@@ -88,11 +93,11 @@ public class EventsAccumulator implements
 	 * =========================================================================
 	 */
 
-	public List<AgentArrivalEvent> getArrivalEvents() {
+	public List<AgentEventWrapper> getArrivalEvents() {
 		return this.arrivals;
 	}
 
-	public List<AgentDepartureEvent> getDepartureEvents()  {
+	public List<AgentEventWrapper> getDepartureEvents()  {
 		return this.departures;
 	}
 
