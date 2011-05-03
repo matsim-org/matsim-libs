@@ -14,7 +14,7 @@ public class RandomFromVarDistr {
 	
 	public void generateLongs(int n) {
 		rnd = new Random(this.seed);
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 1000000; i++) {
 			rnd.nextLong();
 		}
 		for (int i = 0; i < n; i++) {
