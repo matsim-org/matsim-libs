@@ -95,7 +95,9 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			 * utilityCorrections--
 			 * *******************************************************
 			 */
+
 			chooser.setPersonScore(person);
+
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
 			// ***before removePlans and plan choice, correct utility***

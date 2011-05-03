@@ -20,12 +20,16 @@
 
 package playground.yu.replanning.selectors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.yu.utils.StayHomePlan;
+import playground.yu.utils.container.CollectionMax;
 
 /**
  * should only be used for {@code Scenario} with {@code Population}, among which
@@ -60,27 +64,38 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 	}
 
 	private void scoreStayHomePlan(Person person) {
-		// calculate stay Home Plan score, in order to realize the choice
-		// probability "1-f", Score_stayHome = 1/betaBrain *
-		// ln[(1-f)/f*sigma[exp(betaBrain*Score_other)]]
+		/*
+		 * calculate stay Home Plan score, in order to realize the choice
+		 * probability "1-f", U_stayHome = 1/betaBrain * ln[(1-f)/f *
+		 * sigma[exp(betaBrain * (U_other-U_max)]] + U_max
+		 */
 		Plan stayHomePlan = null;
-		double expBetaScoreSum = 0d;
+		double expBetaScoreDiffSum = 0d;
+		List<Double> unStayHomeScores = new ArrayList<Double>();
 
 		for (Plan plan : person.getPlans()) {
 
 			if (!StayHomePlan.isAStayHomePlan(plan)) {
-				expBetaScoreSum += Math.exp(betaBrain * plan.getScore());
+				// expBetaScoreSum += Math.exp(betaBrain * plan.getScore());
+				unStayHomeScores.add(plan.getScore());
 			} else {// stay home
 				stayHomePlan = plan;
 			}
 		}
+
 		if (stayHomePlan == null) {
 			System.err.println("There are NOT \"stay home\" Plan of Person\t"
 					+ person.getId() + "\t!!!");
 			return;
 		}
-		stayHomePlan.setScore(Math.log(expBetaScoreSum * (1d - f) / f)
-				/ betaBrain);// TODO too large exp(beta*score) ...
+
+		double Vmax = CollectionMax.getDoubleMax(unStayHomeScores);
+		for (Double Vj : unStayHomeScores) {
+			expBetaScoreDiffSum += Math.exp(betaBrain * (Vj - Vmax));
+		}
+
+		stayHomePlan.setScore(Math.log((1d - f) / f * expBetaScoreDiffSum)
+				/ betaBrain + Vmax);
 	}
 
 	@Override

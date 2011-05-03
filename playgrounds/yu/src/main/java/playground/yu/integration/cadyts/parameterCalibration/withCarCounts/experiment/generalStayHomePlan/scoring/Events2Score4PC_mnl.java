@@ -434,13 +434,15 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			stayHomePlan.getCustomAttributes().put(NORMAL_SCORE,
 					stayHomePlan.getScore())/* save normal score */;
 
-			double score = calcStayHomeScoreWithProbs(notStayHomeScores);
-			stayHomePlan.setScore(score)/*
-										 * set recalculated score for
-										 * stayHomePlan
-										 */;
-			stayHomePlan.getCustomAttributes().put(STAY_HOME_PLAN_SCORE,
-					Double.valueOf(score))/* save recalculated score */;
+			if (iteration + 1 - firstIteration > maxPlansPerAgent) {
+				double score = calcStayHomeScoreWithProbs(notStayHomeScores);
+				stayHomePlan.setScore(score)/*
+											 * set recalculated score for
+											 * stayHomePlan
+											 */;
+				stayHomePlan.getCustomAttributes().put(STAY_HOME_PLAN_SCORE,
+						Double.valueOf(score))/* save recalculated score */;
+			}
 		}
 	}
 
@@ -450,9 +452,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		for (Double scoreJ : notStayHomeScores) {
 			expBetaScoreDiffSum += Math.exp(betaBrain * (scoreJ - scoreMax));
 		}
-		return Math.log((1d - f) / f * expBetaScoreDiffSum
-				/ Math.exp(-betaBrain * scoreMax))
-				/ betaBrain;
+		return Math.log((1d - f) / f * expBetaScoreDiffSum) / betaBrain
+				+ scoreMax;
 	}
 
 	private MultinomialLogit createMultinomialLogit(Config config) {
