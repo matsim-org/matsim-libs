@@ -86,7 +86,7 @@ public class ChoiceSet {
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
-		Random random = new Random(iteration * 102830259);
+		Random random = new Random(iteration * 102830259L);
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
