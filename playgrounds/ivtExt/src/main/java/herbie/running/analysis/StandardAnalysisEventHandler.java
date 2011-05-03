@@ -1,16 +1,12 @@
 package herbie.running.analysis;
 
-import java.io.PrintStream;
 import java.util.TreeMap;
-
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -21,14 +17,12 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-
 import utils.Bins;
 
 public class StandardAnalysisEventHandler extends AbstractClassifiedFrequencyAnalysis  
-implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, 
-AgentDepartureEventHandler, IterationEndsListener{
+	implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, 
+	AgentDepartureEventHandler, IterationEndsListener{
 
-	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	
 	// #### was macht genau dieser Constructor? ###
@@ -38,8 +32,6 @@ AgentDepartureEventHandler, IterationEndsListener{
 //	}
 	public StandardAnalysisEventHandler() {
 	}
-	
-	
 	
 	@Override
 	public void reset(int iteration) {
@@ -55,10 +47,12 @@ AgentDepartureEventHandler, IterationEndsListener{
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		
 	}
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
+		
 		
 		// trip durations
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
@@ -68,7 +62,8 @@ AgentDepartureEventHandler, IterationEndsListener{
 //		Person agent = this.population.getPersons().get(event.getPersonId());
 //		if (depTime != null && agent != null) {
 		if (depTime != null) {
-
+			
+			
 			double travelTime = event.getTime() - depTime;
 			String mode = event.getLegMode();
 
@@ -96,10 +91,10 @@ AgentDepartureEventHandler, IterationEndsListener{
 	}
 	/**
 	 * 
-	 * @param intervallLength in min
+	 * @param intervalLength in min
 	 * @return
 	 */
-	public TreeMap<String, Bins> getTravelTimeDistributionByMode(int intervallLength){
+	public TreeMap<String, Bins> getTravelTimeDistributionByMode(double intervalLength){
 		
 		TreeMap<String, Bins> allTravelTimeDistributions = new TreeMap<String, Bins>();
 		
@@ -108,7 +103,7 @@ AgentDepartureEventHandler, IterationEndsListener{
 			double[]weights = new double [this.rawData.get(mode).getElements().length];
 			for (int i = 0; i < weights.length; i++) weights[i] = 1.0;
 			
-			Bins travelTimeDistributionByMode = new Bins(intervallLength*60.0, 24.0*3600.0, "Travel Time Distribution "+mode);
+			Bins travelTimeDistributionByMode = new Bins(intervalLength*60.0, 24.0*3600.0, "Travel Time Distribution "+mode);
 			travelTimeDistributionByMode.addValues(this.rawData.get(mode).getElements(), weights);
 			
 			allTravelTimeDistributions.put(mode, travelTimeDistributionByMode);
@@ -141,15 +136,11 @@ AgentDepartureEventHandler, IterationEndsListener{
 	
 	@Override
 	public void run(Person person) {
-		// TODO Auto-generated method stub
-		
 	}
-
-
+	
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
 		
 	}
 }
