@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.possiblesharedrides;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.LinkEvent;
 
 /**
  * Defines a topology on events.
@@ -35,13 +36,13 @@ import org.matsim.core.api.experimental.events.PersonEvent;
  */
 public class EventsTopology {
 
-	private final List<? extends PersonEvent> events;
+	private final List<? extends LinkEvent> events;
 	private final LinkTopology linkTopology;
 	private final Comparator<Event> timeComparator = new TimeComparator();
 	private final double timeWindowRadius;
 	
 	public EventsTopology(
-			final List<? extends PersonEvent> events,
+			final List<? extends LinkEvent> events,
 			final double timeWindowRadius,
 			final LinkTopology linkTopology) {
 		// not safe, clone events!
@@ -51,22 +52,116 @@ public class EventsTopology {
 		this.timeWindowRadius = timeWindowRadius;
 	}
 
+	/*
+	 * =========================================================================
+	 * public methods
+	 * =========================================================================
+	 */
 	/**
 	 * get neighbors based on the link topology and the default time
 	 * window
 	 */
-	public List<PersonEvent> getNeighbors(final Event event) {
-		return null;
+	public List<LinkEvent> getNeighbors(final LinkEvent event) {
+		List<? extends LinkEvent> temporalNeighbors = getTemporalNeighbors(event);
+		List<Id> spatialNeighborhood = 
+			this.linkTopology.getNeighbors(event.getLinkId());
+		List<LinkEvent> output = new ArrayList<LinkEvent>();
+
+		for (LinkEvent currentEvent : temporalNeighbors) {
+			if (spatialNeighborhood.contains(currentEvent.getLinkId())) {
+				output.add(currentEvent);
+			}
+		}
+
+		return output;
 	}
 
 	/**
 	 * @return all events in the specified time window at the given link
 	 */
-	public List<PersonEvent> getEventsInTimeWindow(
+	public List<LinkEvent> getEventsInTimeWindow(
 			final Id linkId,
 			final double timeWindowCenter,
 			final double timeWindowRadius) {
-		return null;
+		List<? extends LinkEvent> neighbors = getTemporalNeighbors(timeWindowCenter, timeWindowRadius);
+		List<LinkEvent> output = new ArrayList<LinkEvent>();
+
+		//remove all events of other links.
+		for (LinkEvent event : neighbors) {
+			if (event.getLinkId().equals(linkId)) {
+				output.add(event);
+			}
+		}
+
+		return output;
+	}
+
+	/*
+	 * =========================================================================
+	 * helpers
+	 * =========================================================================
+	 */
+	private List<? extends LinkEvent> getTemporalNeighbors(final LinkEvent event) {
+		return getTemporalNeighbors(event.getTime(), this.timeWindowRadius);
+	}
+
+	/**
+	 * returns all the events in the specified time widow by performing
+	 * binary search in the (sorted) event list.
+	 */
+	private List<? extends LinkEvent>  getTemporalNeighbors(
+			final double timeWindowCenter,
+			final double timeWindowRadius) {
+		int lowIndex = 0;
+		int upperIndex = this.events.size();
+		int upperIndexUpperBound = upperIndex;
+		int lowerIndexUpperBound = lowIndex;
+		int midIndex;
+		double searchedLowValue = timeWindowCenter - timeWindowRadius;
+		double searchedUpperValue = timeWindowCenter + timeWindowRadius;
+		double currentValue;
+
+		//search lower index by binary search in the full list
+		while (lowIndex < upperIndex + 1) {
+			midIndex = (upperIndex + lowIndex) / 2;
+			currentValue = this.events.get(midIndex).getTime();
+
+			if (currentValue < searchedLowValue) {
+				lowIndex = midIndex;
+			}
+			else if (currentValue > searchedLowValue) {
+				upperIndex = midIndex;
+				// use this exploration to restrict following one
+				if (currentValue > searchedUpperValue) {
+					upperIndexUpperBound = midIndex;
+				}
+				else {
+					// can decrease, but becomes messy if to many checks
+					lowerIndexUpperBound = Math.max(midIndex, lowerIndexUpperBound);
+				}
+			}
+			else {
+				lowIndex = upperIndex = midIndex;
+			}
+		}
+
+		//search the upper index in the remaining list.
+		while (lowerIndexUpperBound < upperIndexUpperBound + 1) {
+			midIndex = (upperIndexUpperBound + lowerIndexUpperBound) / 2;
+			currentValue = this.events.get(midIndex).getTime();
+
+			if (currentValue < searchedUpperValue) {
+				lowerIndexUpperBound = midIndex;
+			}
+			else if (currentValue > searchedUpperValue) {
+				upperIndexUpperBound = midIndex;
+			}
+			else {
+				lowerIndexUpperBound = upperIndexUpperBound = midIndex;
+			}
+		}
+
+		return this.events.subList(lowIndex, upperIndexUpperBound);
 	}
 
 	private class TimeComparator implements Comparator<Event> {
