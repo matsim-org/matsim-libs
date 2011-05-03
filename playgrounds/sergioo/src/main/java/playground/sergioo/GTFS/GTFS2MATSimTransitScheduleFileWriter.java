@@ -653,6 +653,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		for(Route route:routes[0].values())
 			for(Trip trip:route.getTrips().values())
 				for(StopTime stopTime:trip.getStopTimes().values());
+					
 	}
 
 	/**
