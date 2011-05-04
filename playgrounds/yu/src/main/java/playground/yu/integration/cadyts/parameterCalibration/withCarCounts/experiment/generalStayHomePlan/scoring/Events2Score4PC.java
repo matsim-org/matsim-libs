@@ -264,7 +264,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 			Plan plan = entry.getValue().getFirst();
 			ScoringFunction sf = entry.getValue().getSecond();
+
 			sf.finish();
+
 			double score = sf.getScore();
 			// **********************codes from {@code EventsToScore}
 			/* this line of code must stay under the line of "sf.getScore" */

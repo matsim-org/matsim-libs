@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring;
 
@@ -33,27 +33,35 @@ import org.matsim.core.controler.listener.StartupListener;
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
  * especially in order to put new parameters to CharyparNagelScoringConfigGroup
- * 
+ *
  * @author yu
- * 
+ *
  */
 public abstract class PlansScoring4PC implements StartupListener,
 		ScoringListener, IterationStartsListener {
 
 	protected Events2Score4PC planScorer;
 
+	@Override
 	public abstract void notifyStartup(final StartupEvent event);
 
 	public Events2Score4PC getPlanScorer() {
 		return planScorer;
 	}
 
+	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		planScorer.reset(event.getIteration());
 	}
 
+	@Override
 	public void notifyScoring(final ScoringEvent event) {
 		planScorer.finish();
+		// TODO during the first iteration, calculate ASC 4 stay home Plan, ASC
+		// should be saved as custom-attr.
+		if (event.getIteration() == event.getControler().getFirstIteration()) {
+
+		}
 	}
 
 }
