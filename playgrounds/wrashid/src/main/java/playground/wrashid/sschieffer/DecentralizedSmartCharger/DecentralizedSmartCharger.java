@@ -562,15 +562,10 @@ public class DecentralizedSmartCharger {
 	public void initializeAndRunV2G(
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
-		startV2G=System.currentTimeMillis();
-
-		
 		myV2G= new V2G(this);
 		
-		//visualize stochastic load before/after vehicles/ after stochastic
-		//TODO
-		//TODO
-		
+		startV2G=System.currentTimeMillis();
+			
 		System.out.println("START CHECKING VEHICLE SOURCES");
 		//check on vehicle sources
 		checkVehicleSources();
@@ -584,6 +579,7 @@ public class DecentralizedSmartCharger {
 		timeCheckOtherSources=System.currentTimeMillis();
 		
 		System.out.println("DONE V2G");
+		writeSummary();
 	}
 	
 	
@@ -1233,7 +1229,7 @@ public class DecentralizedSmartCharger {
         }
         
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agent "+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
+        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agentPlans"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
 	
@@ -1475,7 +1471,7 @@ public class DecentralizedSmartCharger {
 				"total count of agents", 
 				distributionTotal, 
 				PlotOrientation.VERTICAL, 
-				false, true, false);
+				true, true, false);
 		
 		
 		chart.setBackgroundPaint(Color.white);
@@ -1539,7 +1535,9 @@ public class DecentralizedSmartCharger {
      	
     	
   
-    	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\validation_chargingdistribution.png") , chart, 800, 600);
+    	ChartUtilities.saveChartAsPNG(new File(
+    			outputPath+ "Hub\\validation_chargingdistribution.png") , 
+    			chart, 800, 600);
 	  	
 	
 	}
@@ -1607,7 +1605,7 @@ public class DecentralizedSmartCharger {
 		    		+"</br>");
 		    out.write("Time [ms] slot distribution:"+ (distributeTime-LPTime)
 		    		+"</br>");
-		    out.write("Time [ms] slot distribution:"+ (wrapUpTime-distributeTime)
+		    out.write("Time [ms] wrapping up:"+ (wrapUpTime-distributeTime)
 		    		+"</br>");
 		    
 		  //*************************************
@@ -1622,8 +1620,8 @@ public class DecentralizedSmartCharger {
 		    
 		  //*************************************
 		  //*************************************
-			
-		    String pic= outputPath +"connectivityOfAgentsOverDay.png";
+		    //Hub\\validation_chargingdistribution.png"
+		    String pic= outputPath +"Hub/validation_chargingdistribution.png";
 		    
 		    out.write("");
 		    out.write("<img src='"+pic+"' alt='connectivity' width='80%'");

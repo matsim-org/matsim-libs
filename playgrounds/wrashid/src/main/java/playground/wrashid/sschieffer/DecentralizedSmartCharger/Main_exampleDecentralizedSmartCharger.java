@@ -44,16 +44,16 @@ import java.util.*;
 
 /**
  * This package guides charging decisions for electric vehicles (EV & PHEV) and 
- * provides an optimized charging schedule for all agents as well as the associated charging costs. 
+ * provides an optimized charging schedule for all agents and the associated charging costs. 
  * It also calculates the total emissions produced by the vehicles.
  * 
  * To set up using these functions
  * - first create a DecentralizedSmartCharger object within your simulation
- * - set its input parameters
+ * - set its input parameters as shown in the example below
  * 
  * 
  * To use the function
- * - run() it after the iteration(s) as demonstrated in the code below
+ * - run() it after the iteration(s) 
  * 
  * 
  */
@@ -62,11 +62,12 @@ public class Main_exampleDecentralizedSmartCharger {
 		
 	public static void main(String[] args) throws IOException {
 		
-		double energyPricePerkWh=0.25;
-		double standardConnectionElectricityJPerSecond= 3500; 
-		final double optimalPrice=energyPricePerkWh*1/1000*1/3600*standardConnectionElectricityJPerSecond;//0.25 CHF per kWh		
-		final double suboptimalPrice=optimalPrice*3; // cost/second  
 		
+		
+		/**
+		 * Define the percentage of PHEVs, EVs, and combustion engine vehicles
+		 * this serves as input to EnergyConsumptionInit to create a list of vehicles
+		 */
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
@@ -82,65 +83,17 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * 
 		 */
 		final Controler controler;
-		final ParkingTimesPlugin parkingTimesPlugin;					
-		/*
-		 * GAS TYPES
-		 * 
-		 * 
-		 * - Gas Price [currency]
-		 * - Joules per liter in gas [J]
-		 * - emissions of Co2 per liter gas [kg]
-		 
-		 */
-		double gasPricePerLiter= 0.25; 
-		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		final ParkingTimesPlugin parkingTimesPlugin;	
 		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
+		
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		
+		controler=new Controler(configPath);
 		
 		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		
+		SetUpVehicleCollector sv= new SetUpVehicleCollector();
+		final VehicleTypeCollector myVehicleTypes = sv.setUp();
 		
 
 		/*
@@ -171,27 +124,27 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * is also given as LinkedListValueHashMap, where Integer corresponds to a hub and
 		 * the Schedule includes LoadDistributionIntervals which represent the price per second over the day
 		 */
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+		
+		DetermisticLoadAndPricingCollector dlpc= new DetermisticLoadAndPricingCollector();
+		
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
+			= dlpc.getDeterminisitcHubLoad();
+		
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			= dlpc.getDeterminisitcPriceDistribution();
 		
 		
-		// HubLinkMapping links linkIds (Id) to Hubs (Integer)
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
-		
-				
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
-		
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-		controler=new Controler(configPath);
-		
-		
+		/*
+		 * ****************************
+		 * SETUP SIMULATION
+		 * ****************************
+		 */
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
 		parkingTimesPlugin = new ParkingTimesPlugin(controler);
 		
 		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
-		
 		
 		final EnergyConsumptionInit e= new EnergyConsumptionInit(
 				phev, ev, combustion);
@@ -210,8 +163,14 @@ public class Main_exampleDecentralizedSmartCharger {
 				
 				try {
 					
-					// map linkIds to hubs once the scenario is read in from the config file
-					mapHubs(controler,hubLinkMapping);
+					/*
+					 * HubLinkMapping links linkIds (Id) to Hubs (Integer)
+					 * this hubMapping needs to be done individually for every scenario, please write your own class/function here
+					 * 
+					 * 
+					 */
+					StellasHubMapping setHubLinkMapping= new StellasHubMapping(controler);
+					final HubLinkMapping hubLinkMapping=setHubLinkMapping.mapHubs();
 					
 					
 					/******************************************
@@ -221,35 +180,42 @@ public class Main_exampleDecentralizedSmartCharger {
 					
 					//initialize parameters
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), //controler
+							event.getControler(), //Controler
 							parkingTimesPlugin, //ParkingTimesPlugIn
-							e.getEnergyConsumptionPlugin(),
-							outputPath, 
-							myVehicleTypes
+							e.getEnergyConsumptionPlugin(), // EnergyConsumptionPlugIn
+							outputPath, // where to save the data
+							myVehicleTypes // the defined vehicle types(gas, battery)
 							);
 					
-					
+					//set battery reserve
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
+					// set standard charging slot length
 					myDecentralizedSmartCharger.initializeChargingSlotDistributor(minChargingLength);
 					
+					// set LinkedList of vehicles <agentId, vehicle>
 					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
 							e.getVehicles());
 					
+					// initialize HubLoadReader
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 							hubLinkMapping, 
 							deterministicHubLoadDistribution,							
 							pricingHubDistribution
 							);
 					
-					//RUN
+					
+					/***********************
+					 * RUN
+					 * **********************
+					 */
 					myDecentralizedSmartCharger.run();
 					
 					
-					/*
+					/***********************
 					 * Examples how to use
+					 * **********************
 					 */
-					
 					//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
 					LinkedListValueHashMap<Id, Schedule> agentSchedules= 
 						myDecentralizedSmartCharger.getAllAgentChargingSchedules();
@@ -298,9 +264,12 @@ public class Main_exampleDecentralizedSmartCharger {
 							myDecentralizedSmartCharger.getTotalEmissions());
 					
 					
-					//*****************************************
-					//END
-					//*****************************************
+					
+					/***********************
+					 * END
+					 * 
+					 * **********************
+					 */
 					myDecentralizedSmartCharger.clearResults();
 					
 				
@@ -318,95 +287,6 @@ public class Main_exampleDecentralizedSmartCharger {
 		controler.run();		
 				
 	}
-	
-	
-	/**
-	 * deterministic distribution of free load over one day
-	 * @return
-	 * @throws IOException
-	 */
-	public static LinkedListValueHashMap<Integer, Schedule> readHubs() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
-		hubLoadDistribution1.put(1, makeBullshitSchedule());
-		hubLoadDistribution1.put(2, makeBullshitSchedule());
-		hubLoadDistribution1.put(3, makeBullshitSchedule());
-		hubLoadDistribution1.put(4, makeBullshitSchedule());
-		return hubLoadDistribution1;
-		
-	}
-	
-	
-	public static Schedule makeBullshitSchedule() throws IOException{
-		
-		Schedule bullShitSchedule= new Schedule();
-		
-		double[] bullshitCoeffs = new double[]{100*3500, 500*3500/(62490.0), 0};// 
-		double[] bullshitCoeffs2 = new double[]{914742, -100*3500/(DecentralizedSmartCharger.SECONDSPERDAY-62490.0), 0};
-		//62490*(100*3500)/(24*3600-62490))
-		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
-		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
-		LoadDistributionInterval l1= new LoadDistributionInterval(
-				0.0,
-				62490.0,
-				bullShitFunc,//p
-				true//boolean
-		);
-		
-		bullShitSchedule.addTimeInterval(l1);
-		
-		
-		LoadDistributionInterval l2= new LoadDistributionInterval(					
-				62490.0,
-				DecentralizedSmartCharger.SECONDSPERDAY,
-				bullShitFunc2,//p
-				false//boolean
-		);
-		
-		bullShitSchedule.addTimeInterval(l2);
-		
-		//bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
-		return bullShitSchedule;
-	}
-	
-
-	
-	/**
-	 * fill hubLinkMapping 
-	 * assign hubIds to the different Links--> hubLinkMapping.addMapping(link, hub)
-	 * according to scenario relevant hublocations
-	 * 
-	 * @param deterministicHubLoadDistribution
-	 * @param hubLinkMapping
-	 * @param controler
-	 */
-	public static void mapHubs(Controler controler, HubLinkMapping hubLinkMapping){
-		
-		
-		double maxX=5000;
-		double minX=-20000;
-		double diff= maxX-minX;
-		
-		for (Link link:controler.getNetwork().getLinks().values()){
-			// x values of equil from -20000 up to 5000
-			if (link.getCoord().getX()<(minX+diff)/4){
-				
-				hubLinkMapping.addMapping(link.getId().toString(), 1);
-			}else{
-				if (link.getCoord().getX()<(minX+diff)*2/4){
-					hubLinkMapping.addMapping(link.getId().toString(), 2);
-				}else{
-					if (link.getCoord().getX()<(minX+diff)*3/4){
-						hubLinkMapping.addMapping(link.getId().toString(), 3);
-					}else{
-						hubLinkMapping.addMapping(link.getId().toString(), 4);
-					}
-				}
-			}
-			
-		}
-	}
-	
-	
 	
 	
 	public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
@@ -466,49 +346,6 @@ public class Main_exampleDecentralizedSmartCharger {
 		}
 		
 		return agentSource;
-		
-	}
-	
-	
-	public static LinkedListValueHashMap<Integer, Schedule> readPricingHubDistribution(double optimal, double suboptimal) throws IOException{
-		
-		LinkedListValueHashMap<Integer, Schedule> pricing= readHubs();
-		
-		
-		
-		
-		for(Integer i: pricing.getKeySet()){
-			for(int j=0; j<pricing.getValue(i).getNumberOfEntries(); j++){
-				
-					LoadDistributionInterval l = (LoadDistributionInterval) pricing.getValue(i).timesInSchedule.get(j);
-					
-					if(l.isOptimal()){
-						PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
-						pricing.getValue(i).timesInSchedule.set(j, 
-								new LoadDistributionInterval(
-								l.getStartTime(),
-								l.getEndTime(), 
-								pOpt, 
-								true));
-						
-						
-					}else{
-						PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
-						pricing.getValue(i).timesInSchedule.set(j, 
-								new LoadDistributionInterval(
-										l.getStartTime(),
-										l.getEndTime(), 
-										pSubopt, 
-										false));
-												
-					}
-				
-			}
-			//pricing.getValue(i).printSchedule();
-		}
-		return pricing;
-	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
 		
 	}
 	

@@ -42,8 +42,17 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import java.util.*;
 
 
-/*
- * Output path to store results locally
+/**
+ * highlights how to use V2G functions of this package:
+ * 
+ * V2G can only follow after the Decentralized Smart Charger has been run
+ * since its based on the charging schedules planned by the Decentralized Smart Charger
+ * 
+ * For all stochastic loads the V2G procedure will then check if rescheduling is possible 
+ * and if the utility of the agent can be increased by rescheduling.
+ * 
+ * 
+ *PLease provide the following folders in the output path to store results locally
  * please provide a folder Output with the following sub-folders
  * <ul>
  * 		<li>DecentralizedCharger
@@ -60,18 +69,6 @@ import java.util.*;
  * 					<ul><li>EV <li> PHEV</ul>
  *  		</ul>
  * </ul>
- * 
- * 
- */
-/**
- * highlights how to use V2G functions of this package:
- * 
- * V2G can only follow after the Decentralized Smart Charger has been run
- * since its based on the charging schedules planned by the Decentralized Smart Charger
- * 
- * For all stochastic loads the V2G procedure will then check if rescheduling is possible 
- * and if the utility of the agent can be increased by rescheduling.
- * 
  * @author Stella
  *
  */
@@ -302,6 +299,9 @@ public class Main_exampleV2G {
 							0);
 					
 					
+					LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(1);
+						
+					
 					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= makeBullshitSourceHub();
 										
 					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= makeBullshitAgentVehicleSource(controler);
@@ -314,6 +314,11 @@ public class Main_exampleV2G {
 								);
 					
 					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
+					
+					myDecentralizedSmartCharger.setStochasticSources(
+							stochasticHubLoadDistribution,
+							locationSourceMapping,
+							agentVehicleSourceMapping);
 					
 					myDecentralizedSmartCharger.initializeAndRunV2G();
 					
@@ -360,6 +365,8 @@ public class Main_exampleV2G {
 		return hubLoadDistribution1;
 		
 	}
+	
+	
 	
 	
 	public static Schedule makeBullshitSchedule() throws IOException{

@@ -57,7 +57,6 @@ public class EnergyConsumptionInit implements StartupListener {
 	
 	public EnergyConsumptionInit(			
 			double phev, double ev, double combustion){
-		
 				
 		this.phev=phev;
 		this.ev=ev;
@@ -84,6 +83,7 @@ public class EnergyConsumptionInit implements StartupListener {
 		
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			if (Math.random()<phev){
+				
 				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
 			} else if (Math.random()<phev+ev){
 				
