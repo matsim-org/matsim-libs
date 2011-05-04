@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts;
 
@@ -30,22 +30,23 @@ import cadyts.calibrators.Calibrator;
 
 /**
  * @author yu
- * 
+ *
  */
 public interface BseStrategyManager {
+	public static String UTILITY_CORRECTION = "utilityCorrection";
 
 	/*
 	 * corrects the scores of all the plans except the one selected in the
 	 * choice set of a Person
-	 * 
+	 *
 	 * @param person
-	 * 
+	 *
 	 * public void correctPlansUtilities(final PersonImpl person);
 	 */
 
 	/**
 	 * initialization of BseStrategyManager
-	 * 
+	 *
 	 * @param calibrator
 	 * @param travelTimes
 	 */

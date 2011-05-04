@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import cadyts.utilities.math.MultinomialLogit;
@@ -68,9 +69,9 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	}
 
 	/**
-	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
-	 * This method should be called after removedPlans, i.e. there should be
-	 * only choiceSetSize plans in the memory of an agent.
+	 * set Attr. plans of a person. This method should be called after
+	 * removedPlans, i.e. there should be only choiceSetSize plans in the memory
+	 * of an agent.
 	 *
 	 * @param person
 	 */
@@ -158,9 +159,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			if (plans.size() <= maxPlansPerAgent)/* with mnl */{
 				// choice set index & size check
 				if (choiceIdx < 0 || choiceIdx >= mnl.getChoiceSetSize()) {
-					log
-							.warn("IndexOutofBound, choiceIdx<0 or >=choiceSetSize!\nperson "
-									+ agentId + " the " + choiceIdx + ". Plan");
+					log.warn("IndexOutofBound, choiceIdx<0 or >=choiceSetSize!\nperson "
+							+ agentId + " the " + choiceIdx + ". Plan");
 					throw new RuntimeException();
 				}
 
@@ -215,6 +215,15 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				attrNameIndex = attrNameList.indexOf("constantWalk");
 				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
+
+				/*
+				 * ASC (utilityCorrection, ASC for "stay home" Plan in the
+				 * future...)
+				 */
+				mnl.setASC(
+						choiceIdx,
+						(Double) plan.getCustomAttributes().get(
+								BseStrategyManager.UTILITY_CORRECTION));
 			}
 		}
 	}
@@ -373,9 +382,10 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		double traveling = scoring.getTraveling_utils_hr();
-		double betaStuck = Math.min(Math.min(scoring.getLateArrival_utils_hr(),
-				scoring.getEarlyDeparture_utils_hr()), Math.min(traveling,
-				scoring.getWaiting_utils_hr()));
+		double betaStuck = Math.min(
+				Math.min(scoring.getLateArrival_utils_hr(),
+						scoring.getEarlyDeparture_utils_hr()),
+				Math.min(traveling, scoring.getWaiting_utils_hr()));
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
@@ -388,8 +398,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		}
 		// travelTime
 		int attrNameIndex = attrNameList.indexOf("traveling");
-		mnl.setCoefficient(attrNameIndex, traveling
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex,
+				traveling * paramScaleFactorList.get(attrNameIndex));
 
 		attrNameIndex = attrNameList.indexOf("travelingPt");
 		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr()
@@ -405,26 +415,29 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				* paramScaleFactorList.get(attrNameIndex));
 		//
 		attrNameIndex = attrNameList.indexOf("stuck");
-		mnl.setCoefficient(attrNameIndex, betaStuck
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex,
+				betaStuck * paramScaleFactorList.get(attrNameIndex));
 
 		// distances
 		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRateCar");
-		mnl.setCoefficient(attrNameIndex, scoring
-				.getMonetaryDistanceCostRateCar()
-				* scoring.getMarginalUtilityOfMoney()
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(
+				attrNameIndex,
+				scoring.getMonetaryDistanceCostRateCar()
+						* scoring.getMarginalUtilityOfMoney()
+						* paramScaleFactorList.get(attrNameIndex));
 
 		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
-		mnl.setCoefficient(attrNameIndex, scoring
-				.getMonetaryDistanceCostRatePt()
-				* scoring.getMarginalUtilityOfMoney()
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(
+				attrNameIndex,
+				scoring.getMonetaryDistanceCostRatePt()
+						* scoring.getMarginalUtilityOfMoney()
+						* paramScaleFactorList.get(attrNameIndex));
 
 		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
-		mnl.setCoefficient(attrNameIndex, scoring
-				.getMarginalUtlOfDistanceWalk()
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(
+				attrNameIndex,
+				scoring.getMarginalUtlOfDistanceWalk()
+						* paramScaleFactorList.get(attrNameIndex));
 
 		// constants
 		attrNameIndex = attrNameList.indexOf("constantCar");
