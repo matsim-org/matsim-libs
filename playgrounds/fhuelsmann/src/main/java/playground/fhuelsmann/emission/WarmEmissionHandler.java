@@ -33,8 +33,6 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.households.Household;
-import org.matsim.households.Households;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType;
@@ -45,13 +43,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 	private Network network = null;
 	private Vehicles vehicles = null;
-	private Households households = null;
 	private HbefaObject[][] hbefaTable = null;
 	private HbefaObject[][] hbefaHdvTable =null;
 	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
 
-	public WarmEmissionHandler(Households households, Vehicles vehicles,final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
-		this.households = households;
+	public WarmEmissionHandler(Vehicles vehicles,final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
 		this.vehicles = vehicles;
 		this.network = network;
 		this.hbefaTable = hbefaTable;
@@ -59,9 +55,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 	}
 
-	Map<Id, Id> personId2VehicleId = getVehicleIdFromHouseholds(households);
-	Map<Id, Id> vehicleId2VehicleType = getVehicleTypeFromVehicleId(vehicles);
-	
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
@@ -122,11 +115,14 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			System.err.println("Error: roadtype missing");
 		}
 		
-//		Household persId = this.households.getHouseholds().get(personId);
-//			Id vehId = persId.getVehicleIds());
-//		Vehicle veh = this.vehicles.getVehicles().get(vehId);
-//		VehicleType vehType = veh.getType();
+		Id vehId = personId;
 		
+		Vehicle veh = this.vehicles.getVehicles().get(vehId);
+		if (veh != null){
+		VehicleType vehType = veh.getType();
+		String hubSizeAge = vehType.getDescription();
+		System.out.print("\n +++++++++++++++++++++++++++++++++++++++++"+hubSizeAge);
+		}
 	
 
 		if (this.linkenter.containsKey(event.getPersonId())) {						
@@ -157,33 +153,4 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		//		}
 	}
 	
-	private Map<Id, Id> getVehicleTypeFromVehicleId (Vehicles vehicle) {
-		Map<Id,Id> vehicleId2VehicleType = new TreeMap<Id, Id>();
-		
-		//iterating over every vehicle veh in order to get vehicleIds and vehcile type 
-		for (Vehicle veh : vehicle.getVehicles().values()){
-			Id vehicleId = veh.getId();
-			Id vehicleType = veh.getType().getId();
-			vehicleId2VehicleType.put(vehicleId, vehicleType);	
-//			System.out.print("\n ++++++++++++++++++++++++++++++++++++"+vehicleId +"  "+ vehicleType);
-		}
-		
-		return vehicleId2VehicleType;
-	}
-	
-	private Map<Id, Id> getVehicleIdFromHouseholds(Households households) {
-		Map<Id,Id> personId2VehicleId = new TreeMap<Id, Id>();
-		
-		//iterating over every household hh in order to get personIds and personal income 
-	
-		for (Household hh : households.getHouseholds().values()) {
-			Id personId = hh.getMemberIds().get(0);
-			if (hh.getVehicleIds() != null && !hh.getVehicleIds().isEmpty()){
-				Id vehicleId = hh.getVehicleIds().get(0);
-				personId2VehicleId.put(personId, vehicleId);
-				System.out.print("\n ****************************"+personId +"  "+ vehicleId);}
-		
-		}
-		return personId2VehicleId;
-	}
 }

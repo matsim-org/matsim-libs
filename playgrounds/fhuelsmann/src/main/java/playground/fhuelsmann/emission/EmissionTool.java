@@ -67,7 +67,7 @@ public class EmissionTool {
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
 	private static String vehicleFile="../../detailedEval/pop/befragte-personen/vehicles.xml";
-	private static String householdsFile="../../detailedEval/pop/befragte-personen/households.xml";
+//	private static String householdsFile="../../detailedEval/pop/befragte-personen/households.xml";
 	
 	
 	
@@ -112,9 +112,7 @@ public class EmissionTool {
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
 		
-		Households households = new HouseholdsImpl();
-		HouseholdsReaderV10 reader = new HouseholdsReaderV10(households);
-		reader.readFile(householdsFile);
+	
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
@@ -127,7 +125,7 @@ public class EmissionTool {
 //		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(households, vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
 		eventsManager.addHandler(warmEmissionHandler);
@@ -146,10 +144,8 @@ public class EmissionTool {
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
 		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
 		
-		//vehicles
-		Map<Id, Id> personId2VehicleId = getVehicleIdFromHouseholds(households);
-		Map<Id, Id> vehicleId2VehicleType = getVehicleTypeFromVehicleId(vehicles);
-// coldstart emissions
+	
+		// coldstart emissions
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
 
 		// sum up emissions
@@ -235,51 +231,7 @@ public class EmissionTool {
 		return personId2totalEmissions;
 	}*/
 	
-	private Map<Id, Id> getVehicleTypeFromVehicleId (Vehicles vehicle) {
-		Map<Id,Id> vehicleId2VehicleType = new TreeMap<Id, Id>();
-		
-		//iterating over every vehicle veh in order to get vehicleIds and vehcile type 
-		for (Vehicle veh : vehicle.getVehicles().values()){
-			Id vehicleId = veh.getId();
-			Id vehicleType = veh.getType().getId();
-			vehicleId2VehicleType.put(vehicleId, vehicleType);	
-//			System.out.print("\n ++++++++++++++++++++++++++++++++++++"+vehicleId +"  "+ vehicleType);
-		}
-		
-		return vehicleId2VehicleType;
-	}
-	
-	private Map<Id, Id> getVehicleIdFromHouseholds(Households households) {
-		Map<Id,Id> personId2VehicleId = new TreeMap<Id, Id>();
-		
-		//iterating over every household hh in order to get personIds and personal income 
-	
-		for (Household hh : households.getHouseholds().values()) {
-			Id personId = hh.getMemberIds().get(0);
-			if (hh.getVehicleIds() != null && !hh.getVehicleIds().isEmpty()){
-				Id vehicleId = hh.getVehicleIds().get(0);
-				personId2VehicleId.put(personId, vehicleId);
-				System.out.print("\n ****************************"+personId +"  "+ vehicleId);}
-		
-		}
-		return personId2VehicleId;
-	}
 
-/*	private Map<Id, Row> PersonId2VehicleType(Map<Id, Id> personId2VehicleId, Map<Id, Id> vehicleId2VehicleType) {
-		
-		Map<Id, Row> result = new TreeMap<Id, Row>();
-		for(Id id : personId2VehicleId.keySet()){						
-			
-			//Row can be extended to all the needed information
-			Row row = new Row();
-			row.setPersonId(id);
-			row.setVehicleId(vehicleId.get(id));
-			row.setVehicleType(vehicleType.get(id));
-
-			result.put(id, row);
-		}
-		return result;
-	}*/
 
 	private void loadScenario() {
 		Config config = scenario.getConfig();
