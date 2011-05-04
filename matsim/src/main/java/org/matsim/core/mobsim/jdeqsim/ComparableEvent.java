@@ -1,4 +1,4 @@
-package org.matsim.core.events.parallelEventsHandler;
+package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
