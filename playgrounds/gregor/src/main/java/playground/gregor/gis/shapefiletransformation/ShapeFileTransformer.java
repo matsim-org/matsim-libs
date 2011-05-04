@@ -36,7 +36,7 @@ public class ShapeFileTransformer {
 	List<TP> transformationPoint = new ArrayList<TP>();
 	private final String inFile;
 	private final String outFile;
-	
+
 	public ShapeFileTransformer(String inFile, String outFile) {
 		this.transformationPoint.add(new TP(650983.216200,9899892.899700,650976.859978,9899897.975674));
 		this.transformationPoint.add(new TP(651863.890200,9906193.308800,651857.327300,9906198.661757));
@@ -53,52 +53,51 @@ public class ShapeFileTransformer {
 		this.transformationPoint.add(new TP(648930.972900,9907887.844300,648923.603237,9907893.645140));
 		this.inFile = inFile;
 		this.outFile = outFile;
-		
-		
+
+
 	}
-	
+
 	private void run() throws IOException {
 		FeatureSource fts = ShapeFileReader.readDataFile(this.inFile);
 		Iterator it = fts.getFeatures().iterator();
-		List<Feature> outFts = new ArrayList<Feature>(); 
+		List<Feature> outFts = new ArrayList<Feature>();
 		while (it.hasNext()) {
 			Feature ft = (Feature) it.next();
 			Geometry geo = ft.getDefaultGeometry();
 			Coordinate [] coords = geo.getCoordinates();
-			for (int i = 0; i < coords.length; i++) {
-				Coordinate c = coords[i];
+			for (Coordinate c : coords) {
 				transformCoord(c);
-				
+
 			}
 			outFts.add(ft);
 		}
-		
+
 		ShapeFileWriter.writeGeometries(outFts, this.outFile);
-		
+
 	}
-	
-	
+
+
 	private void transformCoord(Coordinate c) {
-		
+
 		double d_x = 0;
 		double d_y = 0;
 		double distSum = 0;
-		
+
 		for (TP tp : this.transformationPoint) {
 			double infl = 1/tp.getDist(c);
 			d_x += tp.d_x * infl;
 			d_y += tp.d_y * infl;
 			distSum += infl;
-			
-			
+
+
 		}
 		d_x /= distSum;
 		d_y /= distSum;
-		
+
 		c.x = c.x + d_x;
 		c.y = c.y + d_y;
-		
-		
+
+
 	}
 
 	public static void main(String [] args) {
@@ -110,24 +109,23 @@ public class ShapeFileTransformer {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	private static class TP {
 		private final double d_x;
 		private final double d_y;
 		private final Coordinate c;
-		
-		
+
+
 		public TP(double x_o, double y_o, double x_n, double y_n){
 			this.d_x = x_n - x_o;
 			this.d_y = y_n - y_o;
 			this.c = new Coordinate(x_o,y_o);
 		}
-		
+
 		public double getDist(Coordinate c) {
 			return this.c.distance(c);
 		}
 	}
 }
- 
- 
+
