@@ -39,7 +39,7 @@ public class JbOsmReader {
 						TransformationFactory.WGS84_UTM33N), false);
 		osmReader.setKeepPaths(false);
 		osmReader.setScaleMaxSpeed(true);
-		String input = "/Users/JB/Documents/Work/brandenburg.osm";
+		String input = "shared-svn/studies/dgrether/cottbus/Cottbus-BA/brandenburg_tagged.osm.gz";
 		String output = "/Users/JB/Desktop/BA-Arbeit/sim/brandenburggg";
 
 //		 set osmReader useHighwayDefaults false
