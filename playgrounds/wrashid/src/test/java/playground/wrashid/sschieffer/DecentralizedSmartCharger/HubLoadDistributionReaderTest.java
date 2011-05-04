@@ -29,12 +29,12 @@ public class HubLoadDistributionReaderTest extends MatsimTestCase{
 	final Controler controler=new Controler(configPath);
 	
 	final VehicleTypeCollector myVehicleTypes;
-	
+	private double gasPricePerLiter= 0.25; 
 	/**
 	 * check calculation of PHEV pricing schedule for constant, linear or parabolic pricing function
 	 */
 	public HubLoadDistributionReaderTest(){
-		double gasPricePerLiter= 0.25; 
+		 
 		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
 		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
 		
@@ -98,9 +98,7 @@ public class HubLoadDistributionReaderTest extends MatsimTestCase{
 	public void testHubLoadReader() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
 		LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
-		LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
-		LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsTest();//readPricingHubDistribution(optimalPrice, suboptimalPrice);
-		LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
+		LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(gasPricePerLiter/2,gasPricePerLiter*2);//readPricingHubDistribution(optimalPrice, suboptimalPrice);
 		
 		HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
