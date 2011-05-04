@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,13 +41,11 @@ import org.matsim.core.utils.collections.QuadTree;
  * @author thibautd
  */
 public class LinkTopology {
+	private static final Logger log =
+		Logger.getLogger(LinkTopology.class);
 
-	private final QuadTree<Id> quadTree =
-		new QuadTree<Id>(
-				Double.NEGATIVE_INFINITY,
-				Double.NEGATIVE_INFINITY,
-				Double.POSITIVE_INFINITY,
-				Double.POSITIVE_INFINITY);
+
+	private final QuadTree<Id> quadTree;
 	private double acceptableDistance;
 	private final Map<Id, ? extends Link> network;
 	private final Map<Id, List<Id>> neighborhoods = new HashMap<Id, List<Id>>();
@@ -55,9 +55,37 @@ public class LinkTopology {
 			final double acceptableDistance) {
 		this.acceptableDistance = acceptableDistance;
 		this.network = network.getLinks();
+		double maxX = Double.NEGATIVE_INFINITY;
+		double minX = Double.POSITIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
 
 		Coord fromNode, toNode;
+		
+		//construct quadTree
+		log.info("   constructing link topology QuadTree...");
+		for (Map.Entry<Id, ? extends Link> link :
+				network.getLinks().entrySet()) {
+			fromNode = link.getValue().getFromNode().getCoord();
+			toNode = link.getValue().getToNode().getCoord();
 
+			maxX = Math.max(fromNode.getX(), maxX);
+			minX = Math.min(fromNode.getX(), minX);
+			maxX = Math.max(toNode.getX(), maxX);
+			minX = Math.min(toNode.getX(), minX);
+
+			maxY = Math.max(fromNode.getY(), maxY);
+			minY = Math.min(fromNode.getY(), minY);
+			maxY = Math.max(toNode.getY(), maxY);
+			minY = Math.min(toNode.getY(), minY);
+		}
+
+		this.quadTree = new QuadTree<Id>(minX, minY, maxX, maxY);
+		log.info("   constructing link topology QT... DONE");
+		log.info("   minX: "+minX+", minY: "+minY+", maxX: "+maxX+", maxY: "+maxY);
+
+		//fill the quadTree
+		log.info("   filling QuadTree...");
 		for (Map.Entry<Id, ? extends Link> link :
 				network.getLinks().entrySet()) {
 			fromNode = link.getValue().getFromNode().getCoord();
@@ -67,6 +95,7 @@ public class LinkTopology {
 			this.quadTree.put(fromNode.getX(), fromNode.getY(), link.getKey());
 			this.quadTree.put(toNode.getX(), toNode.getY(), link.getKey());
 		}
+		log.info("   filling QuadTree... DONE");
 	}
 
 	public List<Id> getNeighbors(final Id linkId) {

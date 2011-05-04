@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEvent;
@@ -35,6 +37,9 @@ import org.matsim.core.api.experimental.events.LinkEvent;
  * @author thibautd
  */
 public class EventsTopology {
+	private static final Logger log =
+		Logger.getLogger(EventsTopology.class);
+
 
 	private final List<? extends LinkEvent> events;
 	private final LinkTopology linkTopology;
@@ -45,11 +50,13 @@ public class EventsTopology {
 			final List<? extends LinkEvent> events,
 			final double timeWindowRadius,
 			final LinkTopology linkTopology) {
+		log.info("constructing event topology...");
 		// not safe, clone events!
 		this.events = events;
 		Collections.sort(events, this.timeComparator); 
 		this.linkTopology = linkTopology;
 		this.timeWindowRadius = timeWindowRadius;
+		log.info("constructing event topology... DONE");
 	}
 
 	/*
@@ -86,7 +93,7 @@ public class EventsTopology {
 		List<? extends LinkEvent> neighbors = getTemporalNeighbors(timeWindowCenter, timeWindowRadius);
 		List<LinkEvent> output = new ArrayList<LinkEvent>();
 
-		//remove all events of other links.
+		// only return events for the good link
 		for (LinkEvent event : neighbors) {
 			if (event.getLinkId().equals(linkId)) {
 				output.add(event);
@@ -122,7 +129,7 @@ public class EventsTopology {
 		double currentValue;
 
 		//search lower index by binary search in the full list
-		while (lowIndex < upperIndex + 1) {
+		while (lowIndex < upperIndex - 1) {
 			midIndex = (upperIndex + lowIndex) / 2;
 			currentValue = this.events.get(midIndex).getTime();
 
@@ -136,7 +143,6 @@ public class EventsTopology {
 					upperIndexUpperBound = midIndex;
 				}
 				else {
-					// can decrease, but becomes messy if to many checks
 					lowerIndexUpperBound = Math.max(midIndex, lowerIndexUpperBound);
 				}
 			}
@@ -146,7 +152,7 @@ public class EventsTopology {
 		}
 
 		//search the upper index in the remaining list.
-		while (lowerIndexUpperBound < upperIndexUpperBound + 1) {
+		while (lowerIndexUpperBound < upperIndexUpperBound - 1) {
 			midIndex = (upperIndexUpperBound + lowerIndexUpperBound) / 2;
 			currentValue = this.events.get(midIndex).getTime();
 
