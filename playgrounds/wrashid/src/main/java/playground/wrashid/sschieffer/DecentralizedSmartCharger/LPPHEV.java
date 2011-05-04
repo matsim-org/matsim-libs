@@ -78,7 +78,14 @@ public class LPPHEV {
 	 * @throws LpSolveException
 	 * @throws IOException 
 	 */
-	public Schedule solveLP(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType) throws LpSolveException, IOException{
+	public Schedule solveLP(Schedule schedule, 
+			Id id,
+			double batterySize, 
+			double batteryMin, 
+			double batteryMax, 
+			String vehicleType) throws LpSolveException, IOException{
+		
+		
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
@@ -102,20 +109,13 @@ public class LPPHEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"objective.txt");
-			solver.printObjective();
-			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"tableau.txt");
-			solver.printTableau();*/
+		
 		} catch (Exception e) {	    
 		}
 		
 		
 		schedule= update();
-		/*System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();*/
-		
-		//printLPSolution();
+	
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
 		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
@@ -896,6 +896,12 @@ public class LPPHEV {
      	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPPHEV_Agent"+personId.toString()+".png") , chart, 800, 600);
 	  	
 	}
+	
+	
+	public LpSolve getSolver(){
+		return solver;
+	}
+	
 		
 		
 		

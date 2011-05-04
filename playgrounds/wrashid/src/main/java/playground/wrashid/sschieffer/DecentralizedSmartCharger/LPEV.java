@@ -86,6 +86,8 @@ public class LPEV {
 			double batteryMax, 
 			String vehicleType) throws LpSolveException, IOException{
 		
+		
+		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
@@ -251,7 +253,9 @@ public class LPEV {
 	
 	
 	
-	
+	public LpSolve getSolver(){
+		return solver;
+	}
 	
 	
 	private void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{

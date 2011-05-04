@@ -81,7 +81,9 @@ public class Main_exampleV2G {
 	
 	public static void main(String[] args) throws IOException {
 		
-		final double optimalPrice=0.4275/(3600); // //0,142500 €/kWh - 1 hour at 1kW cost/second - CAREFUL would have to implement different multipliers for high speed or regular connection
+		double energyPricePerkWh=0.25;
+		double standardConnectionElectricityJPerSecond= 3500; 
+		final double optimalPrice=energyPricePerkWh*1/1000*1/3600*standardConnectionElectricityJPerSecond;//0.25 CHF per kWh		
 		final double suboptimalPrice=optimalPrice*3; // cost/second  
 		
 		final double phev=1.0;

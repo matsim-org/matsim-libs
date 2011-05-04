@@ -36,8 +36,9 @@ import org.matsim.api.core.v01.Id;
  * 
  * 
  * @author Stella
- *
+ * 
  */
+
 public class ChargingSlotDistributor {
 	/*
 	 * will assign exact charging times from an agents schedule and required charging times
@@ -64,7 +65,7 @@ public class ChargingSlotDistributor {
 	 * @throws OptimizationException
 	 */
 	public Schedule distribute(Id agentId, Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
-		Schedule chargingScheduleAgent = new Schedule();
+		Schedule chargingScheduleAllIntervalsAgent = new Schedule();
 		
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
 			
@@ -86,29 +87,30 @@ public class ChargingSlotDistributor {
 					//(System.out.println("assign charging time "+ startRand + " to "+  startRand+chargingTime);
 					
 					ChargingInterval c= new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime);
-					chargingScheduleAgent.addTimeInterval(c);
+					chargingScheduleAllIntervalsAgent.addTimeInterval(c);
 					
 					Schedule chargingScheduleForParkingInterval= new Schedule();
 					chargingScheduleForParkingInterval.addTimeInterval(c);
 					p.setChargingSchedule(chargingScheduleForParkingInterval);
 					
 				}else{
-					
-					chargingScheduleAgent=assignChargingScheduleForParkingInterval(func, 
+					Schedule chargingScheduleForParkingInterval= 
+						assignChargingScheduleForParkingInterval(func, 
 							p.getJoulesInInterval(), 
 							p.getStartTime(), 
 							p.getEndTime(), 
 							chargingTime);
 					
-					p.setChargingSchedule(chargingScheduleAgent);
+					p.setChargingSchedule(chargingScheduleForParkingInterval);
 					
+					chargingScheduleAllIntervalsAgent.mergeSchedules(chargingScheduleForParkingInterval);
 					
 				}
 				
 			}
 		}
 	
-		return chargingScheduleAgent;
+		return chargingScheduleAllIntervalsAgent;
 	}
 	
 	

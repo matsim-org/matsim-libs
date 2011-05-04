@@ -86,6 +86,10 @@ import playground.wrashid.sschieffer.Main;
  */
 public class DecentralizedSmartCharger {
 	
+	
+	private double startTime, agentReadTime, LPTime, distributeTime, wrapUpTime;
+	private double startV2G, timeCheckVehicles,timeCheckOtherSources;
+	
 	public DifferentiableMultivariateVectorialOptimizer optimizer;
 	public VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,-10000);//
 	//(double relativeThreshold, double absoluteThreshold)
@@ -97,6 +101,7 @@ public class DecentralizedSmartCharger {
 	public GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		
 	public static PolynomialFitter polyFit;
+	
 	
 	
 	final public static double SECONDSPERMIN=60;
@@ -254,15 +259,24 @@ public class DecentralizedSmartCharger {
 	 * @throws IOException
 	 */
 	public void run() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+		
+		startTime = System.currentTimeMillis();
+		
 		readAgentSchedules();
+		
+		agentReadTime = System.currentTimeMillis();
 		findRequiredChargingTimes();
+		
+		LPTime = System.currentTimeMillis();
 		assignChargingTimes();
 		
+		distributeTime = System.currentTimeMillis();
 		findChargingDistribution();
 		
+		wrapUpTime = System.currentTimeMillis();
 		calculateChargingCostsAllAgents();
 		
-		//writeSummary();
+		writeSummary();
 		System.out.println("Decentralized Smart Charger DONE");
 	}
 
@@ -350,7 +364,11 @@ public class DecentralizedSmartCharger {
 					// if successful --> save
 					
 					agentParkingAndDrivingSchedules.put(id, s);
-					EMISSIONCOUNTER= joulesToEmissionInKg(id,joulesFromEngine); // still 0
+					if(hasAgentPHEV(id)){
+						// only if agent has PHEV change joules to emissions
+						EMISSIONCOUNTER= joulesToEmissionInKg(id,joulesFromEngine); // still 0
+												
+					}
 					
 					
 				}else{					
@@ -544,18 +562,27 @@ public class DecentralizedSmartCharger {
 	public void initializeAndRunV2G(
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
+		startV2G=System.currentTimeMillis();
+
+		
 		myV2G= new V2G(this);
+		
 		//visualize stochastic load before/after vehicles/ after stochastic
 		//TODO
 		//TODO
+		
 		System.out.println("START CHECKING VEHICLE SOURCES");
 		//check on vehicle sources
 		checkVehicleSources();
+		timeCheckVehicles	=System.currentTimeMillis();	
 		
 		//calculate connectivity distributions at hubs
 		myHubLoadReader.calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader();
+		
 		System.out.println("START CHECKING STOCHASTIC HUB LOADS");
 		checkHubStochasticLoads();
+		timeCheckOtherSources=System.currentTimeMillis();
+		
 		System.out.println("DONE V2G");
 	}
 	
@@ -570,6 +597,12 @@ public class DecentralizedSmartCharger {
 			for(Integer h : myHubLoadReader.stochasticHubLoadDistribution.getKeySet()){
 				
 				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.getValue(h);
+				
+				//VISUALIZE SCHEDULE BEFORE
+				String strHubLoad="HubStochasticLoad_BeforeV2G_"+h.toString();
+				
+				hubStochasticSchedule.visualizeLoadDistribution(strHubLoad);
+				
 				
 				for(int j=0; j<hubStochasticSchedule.getNumberOfEntries(); j++){
 					
@@ -731,6 +764,14 @@ public class DecentralizedSmartCharger {
 					
 				}
 				
+				// visualize effect of V2G.. what is it afterwards?
+				hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.getValue(h);
+				
+				//VISUALIZE SCHEDULE BEFORE
+				strHubLoad="HubStochasticLoad_AfterV2G_"+h.toString();
+				
+				hubStochasticSchedule.visualizeLoadDistribution(strHubLoad);
+				
 			}
 		}
 		
@@ -740,15 +781,17 @@ public class DecentralizedSmartCharger {
 	private void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
-			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){
+			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){				
 				
-				
-				// if it has
-				// Visualize / TODO
 				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
 				if(hasAgentCombustionVehicle(id)==false){
 					
 					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					//VISUALIZE SCHEDULE BEFORE
+					String strAgentVehicleLoad="AgentVehicleLoad_BeforeV2G_"+id.toString();
+					
+					electricSource.visualizeLoadDistribution(strAgentVehicleLoad);
+					
 					
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
@@ -863,6 +906,13 @@ public class DecentralizedSmartCharger {
 						}	
 						
 					}
+					// check V2G effect
+					electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					//VISUALIZE SCHEDULE BEFORE
+					strAgentVehicleLoad="AgentVehicleLoad_AfterV2G_"+id.toString();
+					
+					electricSource.visualizeLoadDistribution(strAgentVehicleLoad);
+					
 					
 				}
 								
@@ -1534,7 +1584,7 @@ public class DecentralizedSmartCharger {
 		
 	}
 	
-/*	private void writeSummary(){
+	private void writeSummary(){
 		try{
 		    // Create file 
 			String title=(outputPath + "summary.html");
@@ -1550,29 +1600,23 @@ public class DecentralizedSmartCharger {
 		  //*************************************
 		    out.write("<p>"); //add where read in ferom.. what file..?
 		  //*************************************
-		    out.write("</br>");
-		    out.write("GAS </br>");
-		   
-		    out.write("Joules Per liter: "+ gasJoulesPerLiter +"</br>");
-		    out.write("Price Per liter: "+ gasPricePerLiter +"</br>");
-		    out.write("Emission Per liter: "+ emissionPerLiterEngine +"</br>");
+		    out.write("Time Decentralized Smart Charger </br>");
+		    out.write("Time [ms] reading agent schedules:"+ (agentReadTime-startTime)
+		    		+"</br>");
+		    out.write("Time [ms] LP:"+ (LPTime-agentReadTime)
+		    		+"</br>");
+		    out.write("Time [ms] slot distribution:"+ (distributeTime-LPTime)
+		    		+"</br>");
+		    out.write("Time [ms] slot distribution:"+ (wrapUpTime-distributeTime)
+		    		+"</br>");
 		    
 		  //*************************************
-		    out.write("</br>");
-		    out.write("CARS</br>");
-		    out.write("\t PHEV \t EV</br>");
-		    out.write("batterySize: \t"+ batterySizeEV +"\t batterySizePHEV </br>");
-		    out.write("batteryMIN: \t"+ batteryMinEV +"\t batteryMinPHEV </br>");
-		    out.write("batteryMAX: \t"+ batteryMaxEV +"\t batteryMaxPHEV </br>");
-		
-		  //*************************************
-		    out.write("</br>");
-		    out.write("COMPENSATION V2G</br>");
-		    out.write("compensationPerKWHRegulationUp: "+ compensationPerKWHRegulationUp +"</br>");
-		    out.write("compensationPerKWHRegulationDown: "+ compensationPerKWHRegulationDown +"</br>");
+		    out.write("Time V2G </br>");
+		    out.write("Time [ms] checking vehicle sources:"+ 
+		    		(timeCheckVehicles-startV2G)+"</br>");
 		    
-		  //*************************************
-		    out.write("Minimum charging length: "+ MINCHARGINGLENGTH +"</br>");
+		    out.write("Time [ms] checking other sources:"+ 
+		    		(timeCheckOtherSources-timeCheckVehicles)+"</br>");
 		    
 		    out.write("</p>");
 		    
@@ -1592,7 +1636,7 @@ public class DecentralizedSmartCharger {
 		    //Close the output stream
 		    out.close();
 		    }catch (Exception e){}//Catch exception if any
-	}*/
+	}
 	
 	
 }

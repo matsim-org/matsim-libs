@@ -214,6 +214,14 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	public Schedule getDeterministicHubLoadDistribution(int hubId){
+		return deterministicHubLoadDistribution.getValue(hubId);
+	}
+	
+	public Schedule getDeterministicHubLoadDistributionPHEVAdjusted(int hubId){
+		return deterministicHubLoadDistributionPHEVAdjusted.getValue(hubId);
+	}
+	
 	
 	/**
 	 * gets the loadDistribution Function for a specific time interval and location idLink
@@ -450,6 +458,8 @@ public class HubLoadDistributionReader {
 		for(Integer i : pricingHubDistribution.getKeySet()){
 			
 			Schedule pricingS= pricingHubDistribution.getValue(i);
+			
+			//price per kWh
 			pricingS.printSchedule();
 			
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.getValue(i);
@@ -475,12 +485,13 @@ public class HubLoadDistributionReader {
 						gasPriceInCostPerSecond,
 						badIntervals);
 				
+				PolynomialFunction pBad= new PolynomialFunction(new double[]{-1000000});
+				
 				if(badIntervals.size()==0){
 					sPHEV.addTimeInterval(currentDeterministicLoadInterval);
 					
 				}else{
 					
-					PolynomialFunction pBad= new PolynomialFunction(new double[]{-1000000});
 					
 					// IF BAD INTERVALS DONT START AT BEGINNING OF INTERVAL
 					if(currentDeterministicLoadInterval.getStartTime()<badIntervals.get(0).getStartTime()){
@@ -505,7 +516,8 @@ public class HubLoadDistributionReader {
 						sPHEV.addTimeInterval(lReplaceSubOptimal);
 						
 						
-						//****************If distance between bad Intervals
+						//****************good interval between to  consecutive bad intervals
+						// add good interval
 						
 						if(u<badIntervals.size()-1){// if second to last or before
 							
@@ -522,14 +534,27 @@ public class HubLoadDistributionReader {
 					}
 					
 					// IF BAD INTERVALS DONT STOP AT END OF INTERVAL
+					double currentEnd= currentDeterministicLoadInterval.getEndTime();
+					double badIntervalEnd= badIntervals.get(badIntervals.size()-1 ).getEndTime();
 					
-					if(currentDeterministicLoadInterval.getEndTime()>badIntervals.get(badIntervals.size()-1 ).getEndTime()){
+					if(currentEnd>badIntervalEnd){
 						
-						LoadDistributionInterval lReplaceSubOptimal= new LoadDistributionInterval(
-								badIntervals.get(badIntervals.size()-1 ).getEndTime(), 
-								currentDeterministicLoadInterval.getEndTime(), 
-								currentDeterministicLoadInterval.getPolynomialFunction(), 
-								currentDeterministicLoadInterval.isOptimal());
+						// if objective f >0 in last intervcal, then PHEV is bad interval
+						LoadDistributionInterval lReplaceSubOptimal;
+						if(f.value( (currentEnd+badIntervalEnd)/2)>0){
+							lReplaceSubOptimal= new LoadDistributionInterval(
+									badIntervals.get(badIntervals.size()-1 ).getEndTime(), 
+									currentDeterministicLoadInterval.getEndTime(), 
+									pBad,
+									currentDeterministicLoadInterval.isOptimal());
+						}else{
+							lReplaceSubOptimal= new LoadDistributionInterval(
+									badIntervals.get(badIntervals.size()-1 ).getEndTime(), 
+									currentDeterministicLoadInterval.getEndTime(), 
+									currentDeterministicLoadInterval.getPolynomialFunction(), 
+									currentDeterministicLoadInterval.isOptimal());
+						}
+						
 						sPHEV.addTimeInterval(lReplaceSubOptimal);
 					}
 					
@@ -561,7 +586,7 @@ public class HubLoadDistributionReader {
 	 */
 	private void checkRoot(LoadDistributionInterval l, 
 			PolynomialFunction objective, 
-			double gasPriceInCostPerSecond,
+			double gasPriceInCostPerSecond, // function - gasprice
 			ArrayList<ChargingInterval> badIntervals){
 		
 		
@@ -607,18 +632,27 @@ public class HubLoadDistributionReader {
 			}else{
 				//anything else
 				ArrayList<Double> roots = new ArrayList<Double>(0);
-				//loop and craziness
-				for(double i=l.getStartTime(); i<=l.getEndTime(); i++){
-					if(Math.abs(objective.value(i))<=gasPriceInCostPerSecond/10){
-						// TOTHINK ABOUT
-						// SENSIBLE gasPrice/10 as error
+				
+				//
+				for(double i=l.getStartTime(); i<=l.getEndTime();  ){
+					
+					if(Math.abs(objective.value(i))<0.0001){
 						
 						try {
 							double c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime(), i);
 							System.out.println("c: "+c);
 							System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime()+ " guess "+ i);
 							if(c<=l.getEndTime() && c>=l.getStartTime()){
-								roots.add(c);
+								// if roots are found multiple times
+								// check first, if 'same (error 1 minute)' root has been founded before already
+								if (roots.size()>1){
+									if(Math.abs(roots.get(roots.size()-1))-c>60.0 ){
+										roots.add(c);
+									}
+								}
+								if(roots.size()==0){
+									roots.add(c);
+								}
 								
 							}
 						} catch (ConvergenceException e) {
@@ -630,7 +664,7 @@ public class HubLoadDistributionReader {
 						}
 						
 					}
-					
+					i+=60;
 				}
 				
 				double start= l.getStartTime();

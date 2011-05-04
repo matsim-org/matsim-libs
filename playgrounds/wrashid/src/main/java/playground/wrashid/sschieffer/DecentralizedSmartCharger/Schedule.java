@@ -218,7 +218,7 @@ public class Schedule {
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray); 
       
-        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+"_visualization.png") , chart, 800, 600);
+        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+".png") , chart, 800, 600);
        
 	}
 	

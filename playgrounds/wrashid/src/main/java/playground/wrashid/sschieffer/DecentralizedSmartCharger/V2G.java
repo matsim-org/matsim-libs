@@ -28,7 +28,6 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class V2G {
 	
 	DecentralizedSmartCharger mySmartCharger;
-	private LinkedListValueHashMap<Id, Double> agentElectricSourcesFailureinJoules = new LinkedListValueHashMap<Id, Double>(); 
 	private LinkedListValueHashMap<Id, Double> agentV2GRevenue = new LinkedListValueHashMap<Id, Double>(); 
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
@@ -713,7 +712,7 @@ public class V2G {
 					System.out.println("hubSchedule after adding superfluous loads:");
 					hubSchedule.printSchedule();
 					
-				}else{
+				}/*else{
 					//IF NOT PARKING - ENERGY LOST
 					//save as impossible request for Joules
 					
@@ -722,7 +721,7 @@ public class V2G {
 							overlapAgentAndElectricSource.getEndTime(),
 							agentId);
 					
-				}
+				}*/
 			}
 			
 		}
@@ -731,7 +730,7 @@ public class V2G {
 	
 	
 	
-	public void setLoadAsLost(PolynomialFunction func, 
+	/*public void setLoadAsLost(PolynomialFunction func, 
 			double start,
 			double end,
 			Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
@@ -742,7 +741,7 @@ public class V2G {
 		
 		agentElectricSourcesFailureinJoules.put(agentId, Math.abs(lost));
 		
-	}
+	}*/
 	
 	
 	public double calcCostForRescheduling(
