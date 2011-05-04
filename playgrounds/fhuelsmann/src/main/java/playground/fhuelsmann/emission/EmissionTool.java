@@ -1,4 +1,3 @@
-package playground.fhuelsmann.emission;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhMain.java
@@ -19,33 +18,21 @@ package playground.fhuelsmann.emission;
  *                                                                         *
  * *********************************************************************** */
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.Set;
+package playground.fhuelsmann.emission;
 
-import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Coord;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -53,14 +40,11 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehiclesImpl;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesImpl;
 
-
-
-import playground.fhuelsmann.emission.objects.Row;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class EmissionTool {
@@ -99,7 +83,7 @@ public class EmissionTool {
 
 	public EmissionTool(){
 		Config config = ConfigUtils.createConfig();
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.scenario = ScenarioUtils.createScenario(config);
 	}
 
 	public static void main (String[] args) throws Exception{
