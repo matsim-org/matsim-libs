@@ -651,14 +651,15 @@ public class Controler {
 	 * @param message the message that is written just before the config dump
 	 */
 	private void checkConfigConsistencyAndWriteToLog(final String message) {
-		log.info("Checking consistency of config...");
-		this.config.checkConsistency();
 		log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		StringWriter writer = new StringWriter();
 		new ConfigWriter(this.config).writeStream(new PrintWriter(writer), newline);
 		log.info(newline + newline + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
+		log.info("Checking consistency of config...");
+		this.config.checkConsistency();
+		log.info("Checking consistency of config done.");
 	}
 
 	private final void setUpOutputDir() {
