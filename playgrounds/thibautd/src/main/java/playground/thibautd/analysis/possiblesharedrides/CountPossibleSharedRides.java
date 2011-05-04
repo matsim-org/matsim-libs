@@ -56,6 +56,9 @@ public class CountPossibleSharedRides {
 	private final double eventInitialSearchWindow = 10*60d;
 	private final double eventSeachWindowIncr = 5*60d;
 
+	private final double acceptableDistance;
+	private final double timeWindowRadius;
+
 	private final EventsTopology arrivalsTopology;
 	private final EventsTopology departuresTopology;
 	private final EventsTopology enterLinksTopology;
@@ -89,6 +92,9 @@ public class CountPossibleSharedRides {
 		for (Person pers : population.getPersons().values()) {
 			this.plans.put(pers.getId(), pers.getSelectedPlan());
 		}
+
+		this.acceptableDistance = acceptableDistance;
+		this.timeWindowRadius = timeWindowRadius;
 	}
 
 	/*
@@ -127,7 +133,9 @@ public class CountPossibleSharedRides {
 	public ChartUtil getAvergePerTimeBinChart(final int nTimeBins) {
 		this.prepareForAnalysis();
 
-		String title = "Average number of possible joint trips per departure time";
+		String title = "Number of possible joint trips per departure time\n"+
+				"acceptable distance: "+this.acceptableDistance+"m,\n"+
+				"acceptable time: "+(this.timeWindowRadius/60d)+" min.";
 		String xLabel = "Time of day (h)";
 		String yLabel = "Number of trips";
 		XYLineChart output = new XYLineChart(title, xLabel, yLabel);
@@ -135,22 +143,30 @@ public class CountPossibleSharedRides {
 		// binCount[i][0]: number of trip data taken into account
 		// binCount[i][1]: sum of the trip counts for this bin
 		int[][] binCounts = new int[nTimeBins][2];
-		double[] timeAxis = computeDataPerTimeBin(binCounts, nTimeBins);
-		double[] valueAxis = new double[nTimeBins];
+		double[] valueAxisAverage = new double[nTimeBins];
+		double[] valueAxisMin = new double[nTimeBins];
+		double[] valueAxisMax = new double[nTimeBins];
+		double[] timeAxis = computeDataPerTimeBin(
+				binCounts, valueAxisMin, valueAxisMax, nTimeBins);
 
 		for (int i=0; i < nTimeBins; i++) {
-			valueAxis[i] = (binCounts[i][0] > 0 ? 
+			valueAxisAverage[i] = (binCounts[i][0] > 0 ? 
 					((double) binCounts[i][1]) / ((double) binCounts[i][0]) :
 					0d);
 		}
 
-		output.addSeries("", timeAxis, valueAxis);
+		output.addSeries("Min", timeAxis, valueAxisMin);
+		output.addSeries("Average", timeAxis, valueAxisAverage);
+		output.addSeries("Max", timeAxis, valueAxisMax);
+		output.addMatsimLogo();
 
 		return output;
 	}
 
 	private double[] computeDataPerTimeBin(
 			final int[][] binCount,
+			final double[] valueAxisMin,
+			final double[] valueAxisMax,
 			final int nTimeBins) {
 		double[] timeValues = new double[nTimeBins];
 		double[] timeBinsUpperBounds = new double[nTimeBins];
@@ -170,14 +186,29 @@ public class CountPossibleSharedRides {
 		// fill binCount, taking into account the ordering of results
 		binCount[0][0] = 0;
 		binCount[0][1] = 0;
+		valueAxisMin[0] = Double.POSITIVE_INFINITY;
+		valueAxisMax[0] = 0d;
+
 		for (TripData data : this.results) {
 			while (data.timeOfDay > timeBinsUpperBounds[currentBin]) {
 				currentBin++;
 				binCount[currentBin][0] = 0;
 				binCount[currentBin][1] = 0;
+				valueAxisMin[currentBin] = Double.POSITIVE_INFINITY;
+				valueAxisMax[currentBin] = 0d;
+
+				if (valueAxisMin[currentBin - 1] == Double.POSITIVE_INFINITY) {
+					// there was no trip
+					valueAxisMin[currentBin - 1] = 0d;
+				}
 			}
 			binCount[currentBin][0]++;
 			binCount[currentBin][1] += data.numberOfJoinableTrips;
+
+			valueAxisMin[currentBin] = 
+				Math.min(valueAxisMin[currentBin], data.numberOfJoinableTrips);
+			valueAxisMax[currentBin] = 
+				Math.max(valueAxisMax[currentBin], data.numberOfJoinableTrips);
 		}
 
 		return timeValues;
