@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusFootballStrings
+ * DgKoehlerStrehlerScenario2Commodities
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus;
-
+package playground.dgrether.koehlerstrehlersignal;
 
 /**
+ * Needed:
+ * <ul>
+ *   <li>A not too big network</li>
+ *   <li>A MATSim population</li>
+ * </ul>
+ * Does the following:
+ * <ul>
+ *   <li></li>
+ *   <li></li>
+ * </ul>
  * @author dgrether
  *
  */
-public interface CottbusFootballStrings {
+public class DgKoehlerStrehlerScenario2Commodities {
 
-	public static final String FB2CB = "FB_2_CB";
 	
-	public static final String CB2FB = "CB_2_FB";
-
-	public static final String FB2SPN = "FB_2_SPN";
 	
-	public static final String SPN2FB = "SPN_2_FB";
-
-	public static final String SEPARATOR = "\t";
-
 }

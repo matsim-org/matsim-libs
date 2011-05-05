@@ -38,6 +38,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
+import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 

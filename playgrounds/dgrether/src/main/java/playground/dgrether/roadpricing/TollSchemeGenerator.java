@@ -55,9 +55,10 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.analysis.gis.ShapeFileNetworkWriter;
 import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
+import playground.dgrether.utils.DgNet2Shape;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -214,7 +215,8 @@ public class TollSchemeGenerator {
 	}
 
 	private void writeShapeFile(NetworkImpl network, Coord [] coords) {
-		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut + "Network.shp");
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
+		new DgNet2Shape().write(network, usedGisOut + "Network.shp", crs);
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");
 	}
 

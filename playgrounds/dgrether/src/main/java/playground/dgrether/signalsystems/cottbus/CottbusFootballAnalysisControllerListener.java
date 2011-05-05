@@ -29,6 +29,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
+
 
 /**
  * @author dgrether

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusOriginalRunner
+ * DgCottbusNet2Shape
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus;
+package playground.dgrether.signalsystems.cottbus.scripts;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-
-import playground.dgrether.DgPaths;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 
 /**
  * @author dgrether
  *
  */
-public class CottbusOriginalRunner implements AgentStuckEventHandler, StartupListener{
+public class DgCottbusNet2Shape {
 
-	private static final Logger log = Logger.getLogger(CottbusOriginalRunner.class);
-	private static final String config = DgPaths.STUDIESDG + "cottbus/originaldaten/config_dg.xml";
-	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler c = new Controler(config);
-		c.setOverwriteFiles(true);
-		c.addControlerListener(new CottbusOriginalRunner());
-		c.run();
-	}
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		NetworkImpl net = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFile);
 
-	@Override
-	public void handleEvent(AgentStuckEvent event) {
-		log.error("stuck event for agent: " + event.getPersonId() + " on link " + event.getLinkId());
-		
-	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyStartup(StartupEvent e) {
-		e.getControler().getEvents().addHandler(this);
+		NetworkCleaner nc = new NetworkCleaner();
+		nc.run(net);
+		NetworkWriter writer = new NetworkWriter(net);
+		writer.write(netFile);
+		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shp/network.shp", "WGS84").write();
 	}
 
 }

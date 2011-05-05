@@ -33,6 +33,8 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
+
 /**
  * @author dgrether
  * 

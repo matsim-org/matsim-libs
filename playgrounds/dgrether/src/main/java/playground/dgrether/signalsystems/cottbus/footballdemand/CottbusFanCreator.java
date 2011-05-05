@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus;
+package playground.dgrether.signalsystems.cottbus.footballdemand;
 
 import org.matsim.api.core.v01.Scenario;
 

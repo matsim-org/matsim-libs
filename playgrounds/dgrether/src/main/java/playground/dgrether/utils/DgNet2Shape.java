@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgCottbusNet2Shape
+ * DgNet2Shape
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus;
+package playground.dgrether.utils;
 
-import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgCottbusNet2Shape {
+public class DgNet2Shape {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl net = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFile);
-
-		NetworkCleaner nc = new NetworkCleaner();
-		nc.run(net);
-		NetworkWriter writer = new NetworkWriter(net);
-		writer.write(netFile);
-		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shp/network.shp", "WGS84").write();
+	public DgNet2Shape(){}
+	
+	public void write(Network network, String filename, final CoordinateReferenceSystem crs){
+		//write shape file
+		final WidthCalculator wc = new WidthCalculator() {
+			@Override
+			public double getWidth(Link link) {
+				return 1.0;
+			}
+		};
+		
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder() {
+			@Override
+			public FeatureGenerator createFeatureGenerator() {
+				FeatureGenerator fg = 
+					new LineStringBasedFeatureGenerator(wc, crs);
+				return fg;
+			}
+		};
+		Links2ESRIShape linksToEsri = new Links2ESRIShape(network, filename, builder);
+		linksToEsri.write();
 	}
-
+	
+	
 }

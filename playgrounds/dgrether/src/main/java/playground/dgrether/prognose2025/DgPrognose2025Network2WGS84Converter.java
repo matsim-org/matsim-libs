@@ -21,23 +21,18 @@ package playground.dgrether.prognose2025;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
-import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.DgNet2Shape;
 import playground.dgrether.visualization.KmlNetworkVisualizer;
 import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
@@ -54,7 +49,7 @@ public class DgPrognose2025Network2WGS84Converter {
 
 		String netOut = netbase + "_wgs84.xml.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
 		reader.readFile(net);
 
@@ -71,23 +66,8 @@ public class DgPrognose2025Network2WGS84Converter {
 		kmlwriter.write(netbase + ".kmz", new GeotoolsTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
 		
 		//write shape file
-		final WidthCalculator wc = new WidthCalculator() {
-			@Override
-			public double getWidth(Link link) {
-				return 1.0;
-			}
-		};
-		
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder() {
-			@Override
-			public FeatureGenerator createFeatureGenerator() {
-				FeatureGenerator fg = new LineStringBasedFeatureGenerator(wc, MGC.getCRS(TransformationFactory.WGS84));
-				return fg;
-			}
-		};
-		Links2ESRIShape linksToEsri = new Links2ESRIShape(sc.getNetwork(), netbase + "_wgs84.shp", builder);
-		linksToEsri.write();
-
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
+		new DgNet2Shape().write(sc.getNetwork(), netbase + "_wgs84.shp", crs);
 		
 		
 	}

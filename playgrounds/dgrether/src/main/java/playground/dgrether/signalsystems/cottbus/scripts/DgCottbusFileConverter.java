@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus;
+package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 
