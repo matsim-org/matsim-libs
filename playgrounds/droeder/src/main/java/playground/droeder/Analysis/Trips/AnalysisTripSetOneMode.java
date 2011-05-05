@@ -42,55 +42,37 @@ public class AnalysisTripSetOneMode {
 	private Geometry zone;
 	private String mode;
 	
-	//[0]inside, [1]outside, [2]crossing
+	//[0]inside, [1]outside, [2]inOut, [3] outIn
 	//all modes
-	private double[] sumTTime = new double[3];
-	private double[] tripCnt = new double[3];
-	private double[] avTripTTime = new double[3];
+	private double[] sumTTime = new double[4];
+	private double[] tripCnt = new double[4];
 
 	//pt only
-	private double[] accesWalkCnt = new double[3];
-	private double[] accesWaitCnt = new double[3];
-	private double[] egressWalkCnt = new double[3];
-	private double[] switchWalkCnt = new double[3];
-	private double[] switchWaitCnt = new double[3];
-	private double[] lineCnt = new double[3];
+	private double[] accesWalkCnt = new double[4];
+	private double[] accesWaitCnt = new double[4];
+	private double[] egressWalkCnt = new double[4];
+	private double[] switchWalkCnt = new double[4];
+	private double[] switchWaitCnt = new double[4];
+	private double[] lineCnt = new double[4];
 	
-	private double[] accesWalkTTime = new double[3];
-	private double[] accesWaitTime = new double[3];
-	private double[] egressWalkTTime = new double[3];
-	private double[] switchWalkTTime = new double[3];
-	private double[] switchWaitTime = new double[3];
-	private double[] lineTTime = new double[3];
+	private double[] accesWalkTTime = new double[4];
+	private double[] accesWaitTime = new double[4];
+	private double[] egressWalkTTime = new double[4];
+	private double[] switchWalkTTime = new double[4];
+	private double[] switchWaitTime = new double[4];
+	private double[] lineTTime = new double[4];
 	
-	private double[] avAccesWalkTTime = new double[3];
-	private double[] avAccesWaitTime = new double[3];
-	private double[] avEgressWalkTTime = new double[3];
-	
-
-	private double[] avSwitchWalkTTime = new double[3];
-	private double[] avSwitchWaitTime = new double[3];
-	private double[] avLineTTime = new double[3];
-	
-	private double[] switch0cnt = new double[3];
-	private double[] switch1cnt = new double[3];
-	private double[] switch2cnt = new double[3];
-	private double[] switchGT2cnt = new double[3];
-	
-	private double[] line1cnt = new double[3];
-	private double[] line2cnt = new double[3];
-	private double[] line3cnt = new double[3];
-	private double[] lineGt3cnt = new double[3];
-	
-	private double[] fSwitch0 = new double[3];
-	private double[] fSwitch1 = new double[3];
-	private double[] fSwitch2 = new double[3];
-	private double[] fSwitchGT2 = new double[3];
-	
-	private double[] fLine1 = new double[3];
-	private double[] fLine2 = new double[3];
-	private double[] fLine3 = new double[3];
-	private double[] flineGT3 = new double[3];
+	private double[] line1cnt = new double[4];
+	private double[] line2cnt = new double[4];
+	private double[] line3cnt = new double[4];
+	private double[] line4cnt = new double[4];
+	private double[] line5cnt = new double[4];
+	private double[] line6cnt = new double[4];
+	private double[] line7cnt = new double[4];
+	private double[] line8cnt = new double[4];
+	private double[] line9cnt = new double[4];
+	private double[] line10cnt = new double[4];
+	private double[] lineGt10cnt = new double[4];
 
 	public AnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
 		this.zone = zone;
@@ -103,10 +85,9 @@ public class AnalysisTripSetOneMode {
 	}
 	
 	private void init() {
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < 4; i++){
 			sumTTime[i] = 0.0;
 			tripCnt[i] = 0.0;
-			avTripTTime[i] = 0.0;
 			
 			if(this.mode.equals(TransportMode.pt)){
 				accesWalkCnt[i] = 0.0;
@@ -123,32 +104,18 @@ public class AnalysisTripSetOneMode {
 				switchWaitTime[i] = 0.0;
 				lineTTime[i] = 0.0;
 				
-				avAccesWalkTTime[i] = 0.0;
-				avAccesWaitTime[i] = 0.0;
-				avEgressWalkTTime[i] = 0.0;
-				avSwitchWalkTTime[i] = 0.0;
-				avSwitchWaitTime[i] = 0.0;
-				avLineTTime[i] = 0.0;
-				
-				switch0cnt[i] = 0.0;
-				switch1cnt[i] = 0.0;
-				switch2cnt[i] = 0.0;
-				switchGT2cnt[i] = 0.0;
-				
 				line1cnt[i] = 0.0;
 				line2cnt[i] = 0.0;
 				line3cnt[i] = 0.0;
-				lineGt3cnt[i] = 0.0;
+				line4cnt[i] = 0.0;
+				line5cnt[i] = 0.0;
+				line6cnt[i] = 0.0;
+				line7cnt[i] = 0.0;
+				line8cnt[i] = 0.0;
+				line9cnt[i] = 0.0;
+				line10cnt[i] = 0.0;
+				lineGt10cnt[i] = 0.0;
 				
-				fSwitch0[i] = 0.0;
-				fSwitch1[i] = 0.0;
-				fSwitch2[i] = 0.0;
-				fSwitchGT2[i] = 0.0;
-				
-				fLine1[i] = 0.0;
-				fLine2[i] = 0.0;
-				fLine3[i] = 0.0;
-				flineGT3[i] = 0.0;
 			}
 		}
 	}
@@ -186,51 +153,40 @@ public class AnalysisTripSetOneMode {
 	private void addAllModeValues(AnalysisTrip trip, Integer zone) {
 		tripCnt[zone]++;
 		sumTTime[zone] += trip.getTripTTime();
-		avTripTTime[zone] = sumTTime[zone] / tripCnt[zone];
 	}
 
 	private void addPtValues(AnalysisTrip trip, Integer zone) {
 		accesWalkCnt[zone] += trip.getAccesWalkCnt(); 
 		accesWalkTTime[zone] += trip.getAccesWalkTTime();
-		avAccesWalkTTime[zone] = accesWalkTTime[zone] / accesWalkCnt[zone];
 		
 		accesWaitCnt[zone] += trip.getAccesWaitCnt();
 		accesWaitTime[zone] += trip.getAccesWaitTime();
-		avAccesWaitTime[zone] = accesWaitTime[zone] / accesWaitCnt[zone];
 		
 		egressWalkCnt[zone] += trip.getEgressWalkCnt();
 		egressWalkTTime[zone] += trip.getEgressWalkTTime();
-		avEgressWalkTTime[zone] = egressWalkTTime[zone] / egressWalkCnt[zone];
 		
 		switchWalkCnt[zone] += trip.getSwitchWalkCnt();
 		switchWalkTTime[zone] += trip.getSwitchWalkTTime();
-		avSwitchWalkTTime[zone] = switchWalkTTime[zone] / switchWalkCnt[zone];
 		
 		switchWaitCnt[zone] += trip.getSwitchWaitCnt();
 		switchWaitTime[zone] += trip.getSwitchWaitTime();
-		avSwitchWaitTime[zone] = switchWaitTime[zone] / switchWaitCnt[zone]; 
 		
 		lineCnt[zone] += trip.getLineCnt();
 		lineTTime[zone] += trip.getLineTTime();
-		avLineTTime[zone] = lineTTime[zone] / lineCnt[zone];
 		
 		switch(trip.getLineCnt()){
-			case 1: line1cnt[zone]++; switch0cnt[zone]++; break;
-			case 2: line2cnt[zone]++; switch1cnt[zone]++; break;
-			case 3: line3cnt[zone]++; switch2cnt[zone]++; break;
-			default: lineGt3cnt[zone]++; switchGT2cnt[zone]++; break;
+			case 1: line1cnt[zone]++; break;
+			case 2: line2cnt[zone]++; break;
+			case 3: line3cnt[zone]++; break;
+			case 4: line4cnt[zone]++; break;
+			case 5: line5cnt[zone]++; break;
+			case 6: line6cnt[zone]++; break;
+			case 7: line7cnt[zone]++; break;
+			case 8: line8cnt[zone]++; break;
+			case 9: line9cnt[zone]++; break;
+			case 10: line10cnt[zone]++; break;
+			default: lineGt10cnt[zone]++; break;
 		}
-		double temp = line1cnt[zone] + line2cnt[zone] + line3cnt[zone] + lineGt3cnt[zone];
-		fLine1[zone] = line1cnt[zone] / temp;
-		fLine2[zone] = line2cnt[zone] / temp;
-		fLine3[zone] = line3cnt[zone] / temp;
-		flineGT3[zone] = lineGt3cnt[zone] / temp;
-		
-		temp = switch0cnt[zone] + switch1cnt[zone] + switch2cnt[zone] + switchGT2cnt[zone];
-		fSwitch0[zone] = switch0cnt[zone] / temp;
-		fSwitch1[zone] = switch1cnt[zone] / temp;
-		fSwitch2[zone] = switch2cnt[zone] / temp;
-		fSwitchGT2[zone] = switchGT2cnt[zone] / temp;
 	}
 
 	public void addTrips(List<AnalysisTrip> trips){
@@ -251,10 +207,10 @@ public class AnalysisTripSetOneMode {
 			return 0;
 		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
 			return 0;
-		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
-			return 2;
 		}else if(this.zone.contains(trip.getStart()) && !this.zone.contains(trip.getEnd())){
 			return 2;
+		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
+			return 3;
 		}else {
 			return 1;
 		}
@@ -267,121 +223,54 @@ public class AnalysisTripSetOneMode {
 		return this.trips;
 	}
 	
-	public String toString(boolean header){
-		StringBuffer buffer = new StringBuffer();
-		
-		if(header){
-			buffer.append("mode;");
-			buffer.append("zone;");
-			buffer.append("sumTTime;");
-			buffer.append("tripCnt;");
-			buffer.append("avTripTTime;");
-			buffer.append("accesWalkCnt;");
-			buffer.append("accesWaitCnt;");
-			buffer.append("egressWalkCnt;");
-			buffer.append("switchWalkCnt;");
-			buffer.append("switchWaitCnt;");
-			buffer.append("lineCnt;");
-			
-			buffer.append("accesWalkTTime;");
-			buffer.append("accesWaitTime;");
-			buffer.append("egressWalkTTime;");
-			buffer.append("switchWalkTTime;");
-			buffer.append("switchWaitTime;");
-			buffer.append("lineTTime;");
-			
-			buffer.append("avAccesWalkTTime;");
-			buffer.append("avAccesWaitTime;");
-			buffer.append("avEgressWalkTTime;");
-			buffer.append("avSwitchWalkTTime;");
-			buffer.append("avSwitchWaitTime;");
-			buffer.append("avLineTTime;");
-			
-			buffer.append("switch0cnt;");
-			buffer.append("switch1cnt;");
-			buffer.append("switch2cnt;");
-			buffer.append("switchGT2cnt;");
-			
-			buffer.append("line1cnt;");
-			buffer.append("line2cnt;");
-			buffer.append("line3cnt;");
-			buffer.append("lineGt3cnt;");
-			
-			buffer.append("fSwitch0;");
-			buffer.append("fSwitch1;");
-			buffer.append("fSwitch2;");
-			buffer.append("fSwitchGT2;");
-			
-			buffer.append("fLine1;");
-			buffer.append("fLine2;");
-			buffer.append("fLine3;");
-			buffer.append("flineGt3;");
-		}
-		buffer.append("\n");
-		
-		for(int i = 0; i < 3; i++){
-			buffer.append(this.mode + ";");
-			
-			switch(i){
-				case 0: buffer.append("inside;"); break;
-				case 1: buffer.append("outside;"); break;
-				case 2: buffer.append("crossing;"); break;
-			}
-			buffer.append(sumTTime[i] + ";");
-			buffer.append(tripCnt[i] + ";");
-			buffer.append(avTripTTime[i] + ";");
-			
-			if(this.mode.equals(TransportMode.pt)){
-				buffer.append(accesWalkCnt[i] + ";");
-				buffer.append(accesWaitCnt[i] + ";");
-				buffer.append(egressWalkCnt[i] + ";");
-				buffer.append(switchWalkCnt[i] + ";");
-				buffer.append(switchWaitCnt[i] + ";");
-				buffer.append(lineCnt[i] + ";");
-				
-				buffer.append(accesWalkTTime[i] + ";");
-				buffer.append(accesWaitTime[i] + ";");
-				buffer.append(egressWalkTTime[i] + ";");
-				buffer.append(switchWalkTTime[i] + ";");
-				buffer.append(switchWaitTime[i] + ";");
-				buffer.append(lineTTime[i] + ";");
-				
-				buffer.append(avAccesWalkTTime[i] + ";");
-				buffer.append(avAccesWaitTime[i] + ";");
-				buffer.append(avEgressWalkTTime[i] + ";");
-				buffer.append(avSwitchWalkTTime[i] + ";");
-				buffer.append(avSwitchWaitTime[i] + ";");
-				buffer.append(avLineTTime[i] + ";");
-				
-				buffer.append(switch0cnt[i] + ";");
-				buffer.append(switch1cnt[i] + ";");
-				buffer.append(switch2cnt[i] + ";");
-				buffer.append(switchGT2cnt[i] + ";");
-				
-				buffer.append(line1cnt[i] + ";");
-				buffer.append(line2cnt[i] + ";");
-				buffer.append(line3cnt[i] + ";");
-				buffer.append(lineGt3cnt[i] + ";");
-				
-				buffer.append(fSwitch0[i] + ";");
-				buffer.append(fSwitch1[i] + ";");
-				buffer.append(fSwitch2[i] + ";");
-				buffer.append(fSwitchGT2[i] + ";");
-				
-				buffer.append(fLine1[i] + ";");
-				buffer.append(fLine2[i] + ";");
-				buffer.append(fLine3[i] + ";");
-				buffer.append(flineGT3[i] + ";");
-			}
-			buffer.append("\n");
-		}
-		return buffer.toString();
-	}
-	
 	@Override
 	public String toString(){
-		return this.toString(true);
-	}	
+		StringBuffer b = new StringBuffer();
+		
+			//print header
+			b.append(";inside Zone;outside Zone;entering Zone;leaving Zone; \n");
+			
+			//values for all modes	
+			b.append("sumTTime;"); println(this.sumTTime, b);
+			b.append("tripCnt;"); println(this.tripCnt, b);
+			
+			//values for pt
+			if(this.mode.equals(TransportMode.pt)){
+				b.append("accesWalkCnt;"); println(this.accesWalkCnt, b);
+				b.append("accesWaitCnt;"); println(this.accesWaitCnt, b);
+				b.append("egressWalkCnt;"); println(this.egressWalkCnt, b);
+				b.append("switchWalkCnt;"); println(this.switchWalkCnt, b);
+				b.append("switchWaitCnt;"); println(this.switchWaitCnt, b);
+				b.append("lineCnt;"); println(this.lineCnt, b);
+				
+				b.append("accesWalkTTime;"); println(this.accesWalkTTime, b);
+				b.append("accesWaitTime;"); println(this.accesWaitTime, b);
+				b.append("egressWalkTTime;"); println(this.egressWalkTTime, b);
+				b.append("switchWalkTTime;"); println(this.switchWalkTTime, b);
+				b.append("switchWaitTime;"); println(this.switchWaitTime, b);
+				b.append("lineTTime;"); println(this.lineTTime, b);
+				
+				b.append("line1cnt;"); println(this.line1cnt, b);
+				b.append("line2cnt;"); println(this.line2cnt, b);
+				b.append("line3cnt;");println(this.line3cnt, b);
+				b.append("line4cnt;");println(this.line4cnt, b);
+				b.append("line5cnt;");println(this.line5cnt, b);
+				b.append("line6cnt;");println(this.line6cnt, b);
+				b.append("line7cnt;");println(this.line7cnt, b);
+				b.append("line8cnt;");println(this.line8cnt, b);
+				b.append("line9cnt;");println(this.line9cnt, b);
+				b.append("line10cnt;");println(this.line10cnt, b);
+				b.append("lineGt10cnt;");println(this.lineGt10cnt, b);
+			}
+		return b.toString();
+	}
+	
+	private void println(double[] d, StringBuffer b){
+		for(int i = 0; i< d.length; i++){
+			b.append(String.valueOf(d[i]) + ";");
+		}
+		b.append("\n");
+	}
 	
 	public double[] getSumTTime(){
 		return this.sumTTime;
@@ -391,9 +280,6 @@ public class AnalysisTripSetOneMode {
 		return this.tripCnt;
 	}
 	
-	public double[] getAvTripTTime(){
-		return this.avTripTTime;
-	}
 	
 	/**
 	 * @return the accesWalkCnt
@@ -479,75 +365,6 @@ public class AnalysisTripSetOneMode {
 		return lineTTime;
 	}
 
-	/**
-	 * @return the avAccesWalkTTime
-	 */
-	public double[] getAvAccesWalkTTime() {
-		return avAccesWalkTTime;
-	}
-
-	/**
-	 * @return the avAccesWaitTime
-	 */
-	public double[] getAvAccesWaitTime() {
-		return avAccesWaitTime;
-	}
-
-	/**
-	 * @return the avEgressWalkTTime
-	 */
-	public double[] getAvEgressWalkTTime() {
-		return avEgressWalkTTime;
-	}
-
-	/**
-	 * @return the avSwitchWalkTTime
-	 */
-	public double[] getAvSwitchWalkTTime() {
-		return avSwitchWalkTTime;
-	}
-
-	/**
-	 * @return the avSwitchWaitTime
-	 */
-	public double[] getAvSwitchWaitTime() {
-		return avSwitchWaitTime;
-	}
-
-	/**
-	 * @return the avLineTTime
-	 */
-	public double[] getAvLineTTime() {
-		return avLineTTime;
-	}
-
-	/**
-	 * @return the switch0cnt
-	 */
-	public double[] getSwitch0cnt() {
-		return switch0cnt;
-	}
-
-	/**
-	 * @return the switch1cnt
-	 */
-	public double[] getSwitch1cnt() {
-		return switch1cnt;
-	}
-
-	/**
-	 * @return the switch2cnt
-	 */
-	public double[] getSwitch2cnt() {
-		return switch2cnt;
-	}
-
-	/**
-	 * @return the switchGT2cnt
-	 */
-	public double[] getSwitchGT2cnt() {
-		return switchGT2cnt;
-	}
 
 	/**
 	 * @return the line1cnt
@@ -574,64 +391,9 @@ public class AnalysisTripSetOneMode {
 	 * @return the lineGt3cnt
 	 */
 	public double[] getLineGt3cnt() {
-		return lineGt3cnt;
+		return lineGt10cnt;
 	}
 
-	/**
-	 * @return the fSwitch0
-	 */
-	public double[] getfSwitch0() {
-		return fSwitch0;
-	}
-
-	/**
-	 * @return the fSwitch1
-	 */
-	public double[] getfSwitch1() {
-		return fSwitch1;
-	}
-
-	/**
-	 * @return the fSwitch2
-	 */
-	public double[] getfSwitch2() {
-		return fSwitch2;
-	}
-
-	/**
-	 * @return the fSwitchGT2
-	 */
-	public double[] getfSwitchGT2() {
-		return fSwitchGT2;
-	}
-
-	/**
-	 * @return the fLine1
-	 */
-	public double[] getfLine1() {
-		return fLine1;
-	}
-
-	/**
-	 * @return the fLine2
-	 */
-	public double[] getfLine2() {
-		return fLine2;
-	}
-
-	/**
-	 * @return the fLine3
-	 */
-	public double[] getfLine3() {
-		return fLine3;
-	}
-
-	/**
-	 * @return the flineGT3
-	 */
-	public double[] getFlineGT3() {
-		return flineGT3;
-	}
 }
 
 

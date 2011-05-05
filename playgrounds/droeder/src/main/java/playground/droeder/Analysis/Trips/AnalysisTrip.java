@@ -98,7 +98,7 @@ public class AnalysisTrip {
 		return mode;
 	}
 
-	private void analyze(){
+	public void analyze(){
 		this.analyzeValuesForAllModes();
 		if(this.mode.equals(TransportMode.pt)){
 			this.analyzeValuesForPT();

@@ -17,80 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips;
+package playground.droeder.bvg09.analysis.preProcess;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ListIterator;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.filters.AbstractPersonFilter;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.jts.geom.Geometry;
-
+import playground.droeder.DaPaths;
 
 /**
  * @author droeder
  *
  */
-public class TripAnalysis {
-	private Geometry zone;
-	private Map<Id, ArrayList<PersonEvent>> events;
-	private Map<Id, ArrayList<PlanElement>> planElements;
-	private AnalysisTripSetAllMode tripSet;
+public class PlansConsistencyChecker {
 	
 	
-	public TripAnalysis (Geometry g){
-		this.zone = g;
-	}
-	
-	public void run(String plans, String network, String events, String outDir, boolean storeTrips){
-		this.readPlans(plans, network);
-		this.readEvents(events);
-		this.tripSet = AnalysisTripGenerator.calculateTripSet(this.events, this.planElements, this.zone, storeTrips);
-		this.write2csv(outDir);
-	}
-	
-	private void write2csv(String out){
-		try {
-			BufferedWriter writer;
-			for(Entry<String, AnalysisTripSetOneMode> e : this.tripSet.getTripSets().entrySet()){
-				writer = IOUtils.getBufferedWriter(out + e.getKey() + "_trip_analysis.csv");
-				writer.write(e.getValue().toString());
-				writer.flush();
-				writer.close();
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void readPlans(String plans, String network){
+	public static void main(String[] args){
+		final String PATH = DaPaths.VSP + "BVG09_Auswertung/input/"; 
+		final String PLANS = PATH + "bvg.run128.25pct.100.plans.selected.xml.gz";
+		final String NETWORK = PATH + "network.final.xml.gz";
+		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		try {
-			new NetworkReaderMatsimV1(sc).parse(network);
+			new NetworkReaderMatsimV1(sc).parse(NETWORK);
 		} catch (SAXException e1) {
 			e1.printStackTrace();
 		} catch (ParserConfigurationException e1) {
@@ -99,15 +67,15 @@ public class TripAnalysis {
 			e1.printStackTrace();
 		}
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		PlanElementFilter filter = new PlanElementFilter();
+		PlanElementConsistencyFilter filter = new PlanElementConsistencyFilter();
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(filter);
 		
 		InputStream in = null;
 		try{
-			if(plans.endsWith("xml.gz")){
-				in = new GZIPInputStream(new FileInputStream(plans));
+			if(PLANS.endsWith("xml.gz")){
+				in = new GZIPInputStream(new FileInputStream(PLANS));
 			}else{
-				in = new FileInputStream(plans);
+				in = new FileInputStream(PLANS);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -124,30 +92,50 @@ public class TripAnalysis {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.planElements = filter.getElements();
 	}
-	
-	private void readEvents(String eventsFile){
-		TripEventsHandler handler = new TripEventsHandler(this.planElements.keySet());
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(handler);
-		
-		InputStream in = null;
-		try{
-			if(eventsFile.endsWith("xml.gz")){
-				in = new GZIPInputStream(new FileInputStream(eventsFile));
-			}else{
-				in = new FileInputStream(eventsFile);
-			}
-			new EventsReaderXMLv1(manager).parse(in);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.events = handler.getEvents();
-	}
+
 }
 
+class PlanElementConsistencyFilter extends AbstractPersonFilter{
+	private static final Logger log = Logger
+			.getLogger(PlanElementConsistencyFilter.class);
+
+	@Override
+	public void run(Person p){
+		if(this.judge(p)){
+			this.count();
+		}
+	}
+	
+	@Override
+	public boolean judge(Person person) {
+		ListIterator<PlanElement> it = person.getSelectedPlan().getPlanElements().listIterator();
+		PlanElement pe;
+		
+		while(it.hasNext()){
+			pe = it.next();
+			
+			if(it.previousIndex()%2 == 0){
+				if(pe instanceof Leg){
+					log.error("Agent: " + person.getId() + ", planElement " + it.previousIndex() + " should be an ativity!");
+					return false;
+				}
+//				else{
+//					System.out.print(((Activity) pe).getType().toString()+ " ");
+//				}
+			}else{
+				if(pe instanceof Activity){
+					log.error("Agent: " + person.getId() + ", planElement " + it.previousIndex() + " should be a leg!");
+					return false;
+				}
+//				else{
+//					System.out.print(((Leg) pe).getMode().toString() + " ");
+//				}
+			}
+		}
+//		System.out.println();
+		return true;
+	}
+	
+	
+}

@@ -52,18 +52,16 @@ public class AnalysisTripSetAllMode {
 		}
 	}
 	
-	@Override
-	public String toString(){
-		StringBuffer buffer = new StringBuffer();
-		boolean header = true;
-		
-		for(Entry<String, AnalysisTripSetOneMode> e : this.mode2TripSet.entrySet()){
-			buffer.append(e.getValue().toString(header));
-			header = false;
-		}
-		
-		return buffer.toString();
-	}
+//	@Override
+//	public String toString(){
+//		StringBuffer buffer = new StringBuffer();
+//		
+//		for(Entry<String, AnalysisTripSetOneMode> e : this.mode2TripSet.entrySet()){
+//			buffer.append(e.getValue().toString());
+//		}
+//		
+//		return buffer.toString();
+//	}
 	
 	public Map<String, AnalysisTripSetOneMode> getTripSets(){
 		return this.mode2TripSet;

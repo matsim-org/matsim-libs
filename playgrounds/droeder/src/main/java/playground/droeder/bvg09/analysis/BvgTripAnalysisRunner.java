@@ -41,7 +41,6 @@ public class BvgTripAnalysisRunner {
 		
 		final String NETWORKFILE = INDIR + "network.final.xml.gz";
 		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
-		final String OUTPUTFILE = OUTDIR + "BerlinTrips.csv";
 		
 //		final String EVENTSFILE = IN + "bvg.run128.25pct.100.events.xml.gz";
 //		final String PLANSFILE = IN + "bvg.run128.25pct.100.plans.selected.xml.gz";
@@ -59,6 +58,6 @@ public class BvgTripAnalysisRunner {
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
 		TripAnalysis ana = new TripAnalysis(g);
-		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTPUTFILE, false);
+		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTDIR, false);
 	}
 }

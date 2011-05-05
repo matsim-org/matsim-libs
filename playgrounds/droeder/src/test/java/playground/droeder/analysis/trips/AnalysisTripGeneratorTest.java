@@ -178,7 +178,6 @@ public class AnalysisTripGeneratorTest {
 		AnalysisTripSetOneMode set = this.sets.get(TransportMode.car);
 		
 		assertEquals("wrong TTime", 18.0, set.getSumTTime()[0], 0.0);
-		assertEquals("wrong avTTime", 9.0, set.getAvTripTTime()[0], 0.0);
 		assertEquals("wrong TripCnt", 2.0, set.getTripCnt()[0], 0.0);
 		
 	}
@@ -188,52 +187,26 @@ public class AnalysisTripGeneratorTest {
 		AnalysisTripSetOneMode set = this.sets.get(TransportMode.pt);
 		
 		assertEquals("wrong TTime", 58.0, set.getSumTTime()[0], 0.0);
-		assertEquals("wrong avTTime", 29.0, set.getAvTripTTime()[0], 0.0);
 		assertEquals("wrong TripCnt", 2.0, set.getTripCnt()[0], 0.0);
 		
 		assertEquals("wrong AccesWaitCount", 2.0, set.getAccesWaitCnt()[0], 0.0);
 		assertEquals("wrong AccesWaitTime", 4.0, set.getAccesWaitTime()[0], 0.0);
-		assertEquals("wrong avAccesWaitTime", 2.0, set.getAvAccesWaitTime()[0], 0.0);
 		
 		assertEquals("wrong AccesWalkCount", 2.0, set.getAccesWalkCnt()[0], 0.0);
 		assertEquals("wrong AccesWalkTime", 18.0, set.getAccesWalkTTime()[0], 0.0);
-		assertEquals("wrong avAccesWalkTime", 9.0, set.getAvAccesWalkTTime()[0], 0.0);
 		
 		assertEquals("wrong eggresWalkCount", 2.0, set.getEgressWalkCnt()[0], 0.0);
 		assertEquals("wrong eggresWalkTTime", 14.0, set.getEgressWalkTTime()[0], 0.0);
-		assertEquals("wrong avEggresWalkTTime", 7.0, set.getAvEgressWalkTTime()[0], 0.0);
 		
 		assertEquals("wrong switchWalkCount", 0.0, set.getSwitchWalkCnt()[0], 0.0);
 		assertEquals("wrong switchWalkTTime", 0.0, set.getSwitchWalkTTime()[0], 0.0);
-		assertEquals("wrong avSwitchWalkTTime", Double.NaN, set.getAvSwitchWalkTTime()[0], 0.0);
 		
 		assertEquals("wrong switchWaitCount", 0.0, set.getSwitchWaitCnt()[0], 0.0);
 		assertEquals("wrong switchWaitTime", 0.0, set.getSwitchWaitTime()[0], 0.0);
-		assertEquals("wrong avSwitchWaitTime", Double.NaN, set.getAvSwitchWaitTime()[0], 0.0);
 		
 		assertEquals("wrong lineCount", 2.0, set.getLineCnt()[0], 0.0);
 		assertEquals("wrong lineTTime", 12.0, set.getLineTTime()[0], 0.0);
-		assertEquals("wrong avLineTTime", 6.0, set.getAvLineTTime()[0], 0.0);
 		
-		assertEquals("wrong switch0Cnt", 2, set.getSwitch0cnt()[0], 0.0);
-		assertEquals("wrong switch1Cnt", 0, set.getSwitch1cnt()[0], 0.0);
-		assertEquals("wrong switch2Cnt", 0, set.getSwitch2cnt()[0], 0.0);
-		assertEquals("wrong switchGt2Cnt", 0, set.getSwitchGT2cnt()[0], 0.0);
-		
-		assertEquals("wrong fSwitch0", 1, set.getfSwitch0()[0], 0.0);
-		assertEquals("wrong fSwitch1", 0, set.getfSwitch1()[0], 0.0);
-		assertEquals("wrong fSwitch2", 0, set.getfSwitch2()[0], 0.0);
-		assertEquals("wrong fSwitchGt2", 0, set.getfSwitchGT2()[0], 0.0);
-		
-		assertEquals("wrong line1Cnt", 2, set.getSwitch0cnt()[0], 0.0);
-		assertEquals("wrong line2Cnt", 0, set.getSwitch1cnt()[0], 0.0);
-		assertEquals("wrong line3Cnt", 0, set.getSwitch2cnt()[0], 0.0);
-		assertEquals("wrong lineGt3Cnt", 0, set.getSwitchGT2cnt()[0], 0.0);
-		
-		assertEquals("wrong fLine1", 1, set.getfSwitch0()[0], 0.0);
-		assertEquals("wrong fLine2", 0, set.getfSwitch1()[0], 0.0);
-		assertEquals("wrong fLine3", 0, set.getfSwitch2()[0], 0.0);
-		assertEquals("wrong fLineGt3", 0, set.getfSwitchGT2()[0], 0.0);
 	}
 	
 	@After
