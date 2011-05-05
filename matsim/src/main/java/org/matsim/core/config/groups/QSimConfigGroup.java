@@ -61,6 +61,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
 	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
 	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
+	public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
@@ -76,6 +77,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private String trafficDynamics = TRAFF_DYN_QUEUE ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
+	private int writeSnapshotsInterval = 1;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -111,6 +113,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setSimStarttimeInterpretation(value) ;
 		} else if (VEHICLE_BEHAVIOR.equals(key)) {
 			setVehicleBehavior(value);
+		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)) {
+			setWriteSnapshotsInterval(Integer.parseInt(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -139,6 +143,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
+		map.put(WRITE_SNAPSHOTS_INTERVAL, String.valueOf(getWriteSnapshotsInterval()));
 		return map;
 	}
 
@@ -163,6 +168,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
 				+ ONLY_USE_STARTTIME + "'" ) ;
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
+		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
+				"to a file. `0' disables snapshots writing completely");
 		return map ;
 	}
 	/* direct access */
@@ -310,6 +317,16 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
+	}
+
+	
+	public int getWriteSnapshotsInterval() {
+		return writeSnapshotsInterval;
+	}
+
+	
+	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
+		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
 }

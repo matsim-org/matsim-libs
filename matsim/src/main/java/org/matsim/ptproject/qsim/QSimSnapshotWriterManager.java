@@ -51,8 +51,13 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
   
   void createSnapshotwriter(NetsimNetwork network, Scenario scenario, int snapshotPeriod, 
       Integer iterationNumber, ControlerIO controlerIO) {
+  	//don't write any snapshots if a iteration number is set and the snapshot interval condition isn't fulfilled.
+  	int writeSnapshotsInterval = scenario.getConfig().getQSimConfigGroup().getWriteSnapshotsInterval();
+  	if (iterationNumber != null &&  (writeSnapshotsInterval <= 0 || iterationNumber % writeSnapshotsInterval != 0)){
+  		return;
+  	}
     // A snapshot period of 0 or less indicates that there should be NO snapshot written
-    if (snapshotPeriod > 0 ) {
+    if (snapshotPeriod > 0) {
       String snapshotFormat =  scenario.getConfig().getQSimConfigGroup().getSnapshotFormat();
       Integer itNumber = iterationNumber;
       if (controlerIO == null) {
