@@ -32,6 +32,7 @@ import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
@@ -462,12 +463,9 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 					offspring[i]);
 		}
 
-		//"uniform" CO: does not improve anything
-		//for (int i=this.numberOfBooleanGenes + this.numberOfDoubleGenes; i < genes.length; i++) {
-		//	genes[i].setAllele(new ArrayList<String>(((JointPlanOptimizerJGAPModeGene)
-		//			fathers.get(this.generator.nextInt(this.numberOfParents)).
-		//			getGene(i)).getListValue()));
-		//}
+		for (int i=this.numberOfBooleanGenes + this.numberOfDoubleGenes; i < genes.length; i++) {
+			genes[i] = getModeGene(i, fathers);
+		}
 
 		//add to candidates
 		a_candidateChromosome.add(newChrom);
@@ -491,6 +489,48 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 		//System.out.println(sum);
 
 		return this.generator.nextDouble() < prob;
+	}
+
+	/**
+	 * Draws a parental mode value according to the position in the simplex,
+	 * in a "Roulette Wheel" fashion.
+	 */
+	private Gene getModeGene(
+			final int geneIndex,
+			final List<IChromosome> fathers) {
+		int index = 0;
+		double choice = this.generator.nextDouble();
+		double accumulation = this.currentCoordinates[0];
+
+		for (int i=0; i < this.numberOfParents; i++) {
+			if (choice < accumulation) {
+				index = i;
+				break;
+			}
+			try {
+				accumulation += this.currentCoordinates[i];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				// can occur if choice near to one and sum of coordinates
+				// slightly under one due to rounding error
+				if (choice - accumulation < EPSILON) {
+					log.debug("Mode gene choice had to be forced. Rounding error"+
+							"can may this happen, but too many of this message "+
+							"may indicate some bug.");
+					index = i;
+				}
+				else {
+					throw new RuntimeException("Mode gene could not be set properly.");
+				}
+			}
+		}
+
+		try {
+			return new JointPlanOptimizerJGAPModeGene(
+					(JointPlanOptimizerJGAPModeGene)
+					fathers.get(index).getGene(geneIndex));
+		} catch (InvalidConfigurationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*

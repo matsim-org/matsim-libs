@@ -177,9 +177,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 					", mode genes: "+this.numModeGenes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
-			// population size
-			log.debug("population size set to "+configGroup.getPopulationSize());
-			this.setPopulationSize(configGroup.getPopulationSize());
+			// population size: the SPX cross-over requires at least one chromosome
+			// per double dimension.
+			int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes);
+			log.debug("population size set to "+popSize);
+			this.setPopulationSize(popSize);
 
 			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
 						plan,

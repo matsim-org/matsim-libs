@@ -46,11 +46,17 @@ public class JointPlanOptimizerJGAPModeGene extends BaseGene {
 	private final List<String> geneValue;
 
 	public JointPlanOptimizerJGAPModeGene(
-			Configuration a_configuration,
-			List<String> possibleModes)
+			final Configuration a_configuration,
+			final List<String> possibleModes)
 			throws InvalidConfigurationException {
 		super(a_configuration);
 		this.geneValue = new ArrayList<String>(possibleModes);
+	}
+
+	public JointPlanOptimizerJGAPModeGene(
+			final JointPlanOptimizerJGAPModeGene toCopy)
+			throws InvalidConfigurationException {
+		this(toCopy.getConfiguration(), toCopy.geneValue);
 	}
 
 	/**
