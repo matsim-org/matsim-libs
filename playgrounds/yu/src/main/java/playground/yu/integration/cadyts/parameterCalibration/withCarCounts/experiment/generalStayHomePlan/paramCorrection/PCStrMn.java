@@ -89,6 +89,10 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		travelingCarStats = new BasicStatistics();
 		performingStats = new BasicStatistics();
 		for (Person person : population.getPersons().values()) {
+			// now there could be #maxPlansPerAgent+?# Plans in choice set
+			// *********************UTILITY CORRECTION********************
+			// ***before removePlans and plan choice, correct utility***
+			correctPersonPlansScores(person);// to generate UC for the next line
 			/* ***********************************************************
 			 * scoringCfg has been done, but they should be newly defined
 			 * because of new calibrated parameters and -- WITHOUT
@@ -97,12 +101,6 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			 */
 
 			chooser.setPersonScore(person);
-
-			// now there could be #maxPlansPerAgent+?# Plans in choice set
-			// *********************UTILITY CORRECTION********************
-			// ***before removePlans and plan choice, correct utility***
-			correctPersonPlansScores(person);
-			/* ******************************************************** */
 		}
 	}
 
