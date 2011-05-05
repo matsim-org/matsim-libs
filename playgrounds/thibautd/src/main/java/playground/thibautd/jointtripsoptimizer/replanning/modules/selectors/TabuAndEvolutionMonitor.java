@@ -73,7 +73,9 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 		this.jgapConfig = jgapConfig;
 
 		this.numBool = jgapConfig.getNumJointEpisodes();
-		this.maxNumberOfTabuElems = (int) Math.pow(2, this.numBool) - 1;
+		this.maxNumberOfTabuElems = Math.min(
+				(int) Math.pow(2, this.numBool) - 1,
+				configGroup.getTabuListMaxLength());
 		this.tabuSequences = new boolean[this.maxNumberOfTabuElems][this.numBool];
 
 		this.populationFactory = new JointPlanOptimizerPopulationFactory(jgapConfig);

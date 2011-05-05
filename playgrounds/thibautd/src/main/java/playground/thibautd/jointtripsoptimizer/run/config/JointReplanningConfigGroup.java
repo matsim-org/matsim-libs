@@ -71,6 +71,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String SPX_RATE = "SPXCrossOverRate";
 	private static final String SPX_SONS = "SPXOffspringRate";
 	private static final String DISCRETE_DIST_SCALE = "discreteDistanceScale";
+	private static final String MAX_TABU_LENGTH = "tabuListMaxLength";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -98,6 +99,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double spxRate = 0.6d;
 	private int spxOffspringRate = 4;
 	private double discreteDistScale = 100d;
+	private int maxTabuLength = Integer.MAX_VALUE;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -183,6 +185,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DISCRETE_DIST_SCALE)) {
 			this.setDiscreteDistanceScale(value);
 		}
+		else if (param_name.equals(MAX_TABU_LENGTH)) {
+			this.setTabuListMaxLength(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -264,6 +269,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(DISCRETE_DIST_SCALE)) {
 			return String.valueOf(this.getDiscreteDistanceScale());
 		}
+		else if (param_name.equals(MAX_TABU_LENGTH)) {
+			return String.valueOf(this.getTabuListMaxLength());
+		}
 
 		return null;
 	}
@@ -294,6 +302,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, SPX_RATE);
 		this.addParameterToMap(map, SPX_SONS);
 		this.addParameterToMap(map, DISCRETE_DIST_SCALE);
+		this.addParameterToMap(map, MAX_TABU_LENGTH);
 		return map;
 	}
 
@@ -603,6 +612,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public double getDiscreteDistanceScale() {
 		return this.discreteDistScale;
+	}
+
+	public void setTabuListMaxLength(String value) {
+		this.maxTabuLength = Math.max(0, Integer.valueOf(value));
+	}
+
+	public int getTabuListMaxLength() {
+		return this.maxTabuLength;
 	}
 }
 
