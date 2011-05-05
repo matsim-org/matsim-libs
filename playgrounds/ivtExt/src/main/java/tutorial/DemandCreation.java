@@ -241,12 +241,15 @@ public class DemandCreation {
 				else {
 					facility = this.getRandomLocation(activity, previousActivity);
 				}
+				
 				if (counter == 0) {
 					time = this.randomizeTimes(7.0 * 3600.0);
+					activity.setType("h7");
 				}
 				else {
 					double activityDuration = ((PersonImpl)person).getDesires().getActivityDuration(activity.getType());
 					time += this.randomizeTimes(time + activityDuration);
+					activity.setType(activity.getType().substring(0, 1) + (int)activityDuration);
 				}
 				activity.setFacilityId(facility.getId());
 				activity.setLinkId(facility.getLinkId());
