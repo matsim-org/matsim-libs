@@ -109,12 +109,14 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 				}
 
 				if (this.indexInTabuList < this.maxNumberOfTabuElems) {
-					log.debug("new tabu element: "+fitness);
+					log.debug("new tabu element, fitness: "+fitness);
 					boolean[] newTabuSequence = new boolean[this.numBool];
 					for (int i=0; i < this.numBool; i++) {
 						newTabuSequence[i] =
 							((BooleanGene) fittest.getGene(i)).booleanValue();
 					}
+
+					log.debug("new tabu sequence: "+print(newTabuSequence));
 
 					// add the new sequence only if it is not already tabu (possible
 					// only with a "penalty" strategy, where tabu chromosomes are kept)
@@ -143,6 +145,16 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 			this.nextIterToMonitor += step;
 			this.lastBestFitness = fitness;
 		}
+	}
+
+	// for debbuging:
+	private String print(boolean[] seq) {
+		String out = "";
+
+		for (boolean b : seq) {
+			out += "|"+b;
+		}
+		return out + "|";
 	}
 
 	/**

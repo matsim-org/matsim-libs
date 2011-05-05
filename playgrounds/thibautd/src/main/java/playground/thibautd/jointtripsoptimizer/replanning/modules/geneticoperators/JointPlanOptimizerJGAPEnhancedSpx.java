@@ -241,6 +241,9 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 		return output;
 	}
 
+	/**
+	 * Returns the expansion rate to use.
+	 */
 	private double getActualExpansionRate(
 			final double[] centerOfMass,
 			final double[][] fatherValues) {
@@ -278,7 +281,9 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 			}
 		}
 
-		if (upperBound < 1d) log.error("expansion < 1 for act duration");
+		if (upperBound < 1d) {
+			log.error("expansion < 1 for act duration: "+upperBound);
+		}
 
 		// plan duration
 		upperBound = Math.min(
@@ -335,7 +340,16 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 					(dayDuration - centerOfMassDur) / denom);
 		}
 
-		if (output < 1d) log.error("expansion < 1 for plan duration");
+		if (output < 1d) {
+			if (output < 1d - EPSILON) {
+				// significant error
+				log.error("expansion < 1 for plan duration: "+output);
+			}
+			else {
+				// rounding error: don't worry
+				output = 1d;
+			}
+		}
 		return output;
 	}
 
@@ -353,13 +367,13 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 			output[i] = 0d;
 		}
 
-		randomCoefs[0] = 0d;
+		//randomCoefs[0] = 0d;
 
 		//construct the output such that it corresponds to a random point in the
 		//simplex
 		for (int i=1; i < this.numberOfParents; i++) {
-			randomCoefs[i] = this.generator.nextDouble();
-			randomCoefs[i] = Math.pow(randomCoefs[i], 1d / i);
+			randomCoefs[i-1] = this.generator.nextDouble();
+			randomCoefs[i-1] = Math.pow(randomCoefs[i-1], 1d / i);
 
 			vectorInConstruction = substractVector(
 					simplexEdges[i-1],
@@ -371,11 +385,16 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 			output = scalarVectorProduct(randomCoefs[i], vectorInConstruction);
 		}
 
+		randomCoefs[this.numberOfParents - 1] = 1d;
+
 		retainCoordinates(randomCoefs);
 
 		return output;
 	}
 
+	/**
+	 * remember barycentric coordinates, to use with discrete values afterwards.
+	 */
 	private void retainCoordinates(double[] randomCoefs) {
 		double accumulation = this.actualExpansionRate;
 		double toAdd = (1d / this.numberOfParents) * (1 - this.actualExpansionRate);
@@ -383,7 +402,7 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 		for (int i = this.numberOfParents - 1; i > 0; i--) {
 			accumulation *= randomCoefs[i];
 			this.currentCoordinates[i] = 
-				accumulation * (1 - randomCoefs[i-1]) + toAdd;
+				(accumulation * (1 - randomCoefs[i-1])) + toAdd;
 		}
 
 		this.currentCoordinates[0] = accumulation * randomCoefs[0] + toAdd;
@@ -412,7 +431,8 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 			}
 			currentDuration += offspring[i];
 			count++;
-			if (currentDuration > dayDuration) {
+			if (currentDuration > dayDuration + EPSILON) {
+				log.error("plan duration excedent: "+(currentDuration - dayDuration));
 				return false;
 			}
 		}
@@ -459,12 +479,16 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 		double prob = 0d;
 		IChromosome father;
 
+		//double sum = 0d;
 		for (int i = 0; i < this.numberOfParents; i++) {
 			father = fathers.get(i);
 			if (((BooleanGene) father.getGene(geneIndex)).booleanValue()) {
 				prob += this.currentCoordinates[i];
 			}
+			//sum +=  this.currentCoordinates[i];
 		}
+
+		//System.out.println(sum);
 
 		return this.generator.nextDouble() < prob;
 	}

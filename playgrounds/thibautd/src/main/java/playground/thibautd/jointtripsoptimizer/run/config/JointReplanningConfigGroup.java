@@ -70,7 +70,7 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String DYNAMIC_CO_RATES = "allowAdaptiveCrossOverRates";
 	private static final String SPX_RATE = "SPXCrossOverRate";
 	private static final String SPX_SONS = "SPXOffspringRate";
-	private static final String DISCRETE_DIST_SCALE = "DiscreteDistanceScale";
+	private static final String DISCRETE_DIST_SCALE = "discreteDistanceScale";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
