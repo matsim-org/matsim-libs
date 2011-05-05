@@ -122,7 +122,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		VehicleType vehType = veh.getType();
 		String hubSizeAge = vehType.getDescription();
 		System.out.print("\n +++++++++++++++++++++++++++++++++++++++++"+hubSizeAge);
-		}
+		
 	
 
 		if (this.linkenter.containsKey(event.getPersonId())) {						
@@ -137,8 +137,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 				this.agentarrival.remove(personId);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, hubSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, hubSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
 			}
 			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
 			else {
@@ -146,11 +146,12 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, hubSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, hubSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);
 			}
 		}
 		//		}
+	}
 	}
 	
 }

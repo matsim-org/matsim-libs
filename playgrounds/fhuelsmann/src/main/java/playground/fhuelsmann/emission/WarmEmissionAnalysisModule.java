@@ -66,7 +66,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 
 	@Override
 	public void calculateEmissionsPerLink(double travelTime, Id linkId, Id personId, double averageSpeed, 
-			int roadType, double freeVelocity, double distance, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable) {
+			int roadType, String hubSizeAge, double freeVelocity, double distance, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable) {
 
 		//linkage between Hbefa road types and Visum road types
 		int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
@@ -109,7 +109,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 	}
 
 	@Override
-	public void calculateEmissionsPerPerson(double travelTime, Id personId, double averageSpeed, int roadType, double freeVelocity, double distance, HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable) {
+	public void calculateEmissionsPerPerson(double travelTime, Id personId, double averageSpeed, int roadType, String hubSizeAge, double freeVelocity, double distance, HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable) {
 
 		//linkage between Hbefa road types and Visum road types
 		int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
@@ -150,6 +150,28 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			
 		}
 	}
+/*	public void createRoadTypesTafficSituation(String filename) {
+		try{
+			FileInputStream fstream = new FileInputStream(filename);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			//Read File Line By Line
+			br.readLine();
+			while ((strLine = br.readLine()) != null){
+
+				//for all lines (whole text) we split the line to an array 
+				String[] array = strLine.split(",");
+				VisumObject obj = new VisumObject(Integer.parseInt(array[0]), array[2]);
+				this.roadTypes[obj.getVISUM_RT_NR()] = obj;
+			}
+			in.close();
+		}
+		catch (Exception e){
+			System.err.println("Error: " + e.getMessage());
+		}
+	}*/
 
 	public void createRoadTypes(String filename){
 		try{
