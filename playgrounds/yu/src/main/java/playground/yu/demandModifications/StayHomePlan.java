@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.utils;
+package playground.yu.demandModifications;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;

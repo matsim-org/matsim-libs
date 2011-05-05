@@ -276,6 +276,9 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
 				.getUtilityCorrection(planSteps) / brainExpBeta;
+		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
+		plan.getCustomAttributes().put(UTILITY_CORRECTION, scoreCorrection);
+		// ##################################################
 		Double oldScore = plan.getScore();
 		if (oldScore == null) {
 			oldScore = 0d;// dummy setting, the score of plans will be

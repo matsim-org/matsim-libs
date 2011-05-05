@@ -23,7 +23,6 @@
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,10 +35,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.yu.demandModifications.StayHomePlan;
+import playground.yu.demandModifications.StayHomePlanASC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
-import playground.yu.utils.StayHomePlan;
-import playground.yu.utils.container.CollectionMax;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
@@ -54,8 +54,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			.getLogger(Events2Score4PC_mnl.class);
 
 	protected MultinomialLogit mnl;
-	private final static String NORMAL_SCORE = "normalScore",
-			STAY_HOME_PLAN_SCORE = "stayHomePlanScore";
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
@@ -221,32 +219,19 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
 
-				// dummy4stayHomePlan
-				attrNameIndex = attrNameList.indexOf("dummy4stayHomePlan");
-
-				double dummyAttr = 0d;
-				if (StayHomePlan.isAStayHomePlan(plan)) {
-					Map<String, Object> customAttrs = plan
-							.getCustomAttributes();
-
-					Double stayHomePlanScore = (Double) customAttrs
-							.get(STAY_HOME_PLAN_SCORE);
-					Double normalScore = (Double) customAttrs.get(NORMAL_SCORE);
-					if (stayHomePlanScore == null || normalScore == null) {
-						throw new RuntimeException(
-								"Person :\t"
-										+ person.getId()
-										+ "\thas a \"stay home\" Plan, but the customAttributes of this Plan are NULL!!!");
-					}
-					dummyAttr = stayHomePlanScore - normalScore;
-
-					// dummyAttr = (Double)
-					// customAttrs.get(STAY_HOME_PLAN_SCORE)
-					// - (Double) customAttrs.get(NORMAL_SCORE);
-				}
-
-				mnl.setAttribute(choiceIdx, attrNameIndex, dummyAttr
-						/ paramScaleFactorList.get(attrNameIndex));
+				// ##########################################################
+				/*
+				 * ASC (utilityCorrection, ASC for "stay home" Plan, ...)
+				 */
+				// #############################################
+				Map<String, Object> customAttrs = plan.getCustomAttributes();
+				mnl.setASC(
+						choiceIdx,
+						(Double) customAttrs
+								.get(BseStrategyManager.UTILITY_CORRECTION)
+								+ (!StayHomePlan.isAStayHomePlan(plan) ? 0d
+										: (Double) customAttrs
+												.get(StayHomePlanASC.STAY_HOME_ASC)));
 			}
 		}
 	}
@@ -281,9 +266,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			throw new NullPointerException("BSE:\t\twasn't person\t" + agentId
 					+ "\tsimulated?????");
 		}
-
-		Plan stayHomePlan = null;
-		List<Double> notStayHomeScores = new ArrayList<Double>();
 
 		for (Plan plan : legDurMapCar.keySet()) {
 
@@ -337,21 +319,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 			// calculate utility of the plan
 			Vector attrVector = new Vector(attrNameList.size());
-			attrVector.set(attrNameList.indexOf("dummy4stayHomePlan"), 0d);/*
-																			 * attr
-																			 * .
-																			 * 4
-																			 * dummy
-																			 * parameter
-																			 * located
-																			 *
-																			 * @
-																			 * the
-																			 * end
-																			 * of
-																			 * this
-																			 * vector
-																			 */
 
 			for (String attrName : attrNameList) {
 				int attrNameIndex;
@@ -412,48 +379,18 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				}
 			}
 
+			Map<String, Object> customAttrs = plan.getCustomAttributes();
 			double util = mnl.getCoeff()/*
 										 * s. the attributes order in
 										 * Events2Score4PC2.attrNameList
-										 */.innerProd(attrVector);
+										 */.innerProd(attrVector)
+					+ (Double) customAttrs
+							.get(BseStrategyManager.UTILITY_CORRECTION)
+					+ (!StayHomePlan.isAStayHomePlan(plan) ? 0d
+							: (Double) customAttrs
+									.get(StayHomePlanASC.STAY_HOME_ASC));
 			plan.setScore(util);
-
-			if (!StayHomePlan.isAStayHomePlan(plan)) {
-				Double score = plan.getScore();
-				if (score == null) {
-					throw new RuntimeException("Plan :\t" + plan
-							+ "\thas NOT score, which should NOT happen!!!");
-				}
-				notStayHomeScores.add(score);
-			} else {
-				stayHomePlan = plan;
-			}
 		}// end for
-
-		if (stayHomePlan != null) {
-			stayHomePlan.getCustomAttributes().put(NORMAL_SCORE,
-					stayHomePlan.getScore())/* save normal score */;
-
-			if (iteration + 1 - firstIteration > maxPlansPerAgent) {
-				double score = calcStayHomeScoreWithProbs(notStayHomeScores);
-				stayHomePlan.setScore(score)/*
-											 * set recalculated score for
-											 * stayHomePlan
-											 */;
-				stayHomePlan.getCustomAttributes().put(STAY_HOME_PLAN_SCORE,
-						Double.valueOf(score))/* save recalculated score */;
-			}
-		}
-	}
-
-	private double calcStayHomeScoreWithProbs(List<Double> notStayHomeScores) {
-		double scoreMax = CollectionMax.getDoubleMax(notStayHomeScores);
-		double expBetaScoreDiffSum = 0d;
-		for (Double scoreJ : notStayHomeScores) {
-			expBetaScoreDiffSum += Math.exp(betaBrain * (scoreJ - scoreMax));
-		}
-		return Math.log((1d - f) / f * expBetaScoreDiffSum) / betaBrain
-				+ scoreMax;
 	}
 
 	private MultinomialLogit createMultinomialLogit(Config config) {
@@ -534,10 +471,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk()
 				* paramScaleFactorList.get(attrNameIndex));
 
-		mnl.setCoefficient(attrNameList.indexOf("dummy4stayHomePlan"), 1d/*
-																		 * default
-																		 * value
-																		 */);
 		return mnl;
 	}
 }

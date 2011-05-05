@@ -216,10 +216,13 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
 						/ paramScaleFactorList.get(attrNameIndex));
 
+				// ##########################################################
 				/*
 				 * ASC (utilityCorrection, ASC for "stay home" Plan in the
 				 * future...)
 				 */
+				// #############################################
+
 				mnl.setASC(
 						choiceIdx,
 						(Double) plan.getCustomAttributes().get(
@@ -370,7 +373,9 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			double util = mnl
 					.getCoeff()
 					/* s. the attributes order in Events2Score4PC2.attrNameList */.innerProd(
-							attrVector);
+							attrVector)
+					+ (Double) plan.getCustomAttributes().get(
+							BseStrategyManager.UTILITY_CORRECTION);
 			plan.setScore(util);
 		}
 	}

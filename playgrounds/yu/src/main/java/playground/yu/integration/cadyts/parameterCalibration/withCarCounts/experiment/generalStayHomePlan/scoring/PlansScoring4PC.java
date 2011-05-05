@@ -57,11 +57,6 @@ public abstract class PlansScoring4PC implements StartupListener,
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
 		planScorer.finish();
-		// TODO during the first iteration, calculate ASC 4 stay home Plan, ASC
-		// should be saved as custom-attr.
-		if (event.getIteration() == event.getControler().getFirstIteration()) {
-
-		}
 	}
 
 }

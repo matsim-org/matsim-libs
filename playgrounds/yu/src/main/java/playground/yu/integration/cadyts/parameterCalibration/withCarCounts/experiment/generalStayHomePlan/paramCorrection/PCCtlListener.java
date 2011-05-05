@@ -44,6 +44,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
+import playground.yu.demandModifications.StayHomePlanASC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
@@ -534,6 +535,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		// this.chooser.finish();-->called in notifyScoring()
 		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
 
+		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
+
 		if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
 			// ***************************************************
 			calibrator.afterNetworkLoading(resultsContainer);
@@ -548,7 +551,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
 			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
 					.getParameters();
-			PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 			// VERY IMPORTANT #########################################
 
@@ -609,6 +611,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (cycleIdx == cycle) {
 				cycleIdx = 0;
 			}
+		} else if (iter == firstIter) {
+			// ##########################################
+			// during the first iteration, calculate ASC 4 stay home Plan,
+			// ASC should be saved as custom-attr.
+			// #############################################
+			double f = Double
+					.parseDouble(config
+							.findParam(
+									BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+									"notStayHomeProb"));
+			new StayHomePlanASC(f, scoringCfg.getBrainExpBeta()).run(ctl
+					.getPopulation());
 		}
 
 		// output - chart etc.

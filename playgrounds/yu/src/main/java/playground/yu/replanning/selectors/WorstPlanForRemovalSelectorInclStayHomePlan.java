@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-import playground.yu.utils.StayHomePlan;
+import playground.yu.demandModifications.StayHomePlan;
 
 /**
  * a changed version of {@code WorstPlanForRemovalSelector}, which should never

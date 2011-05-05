@@ -116,8 +116,6 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		initialAttrNameScaleFactor("constantPt");
 		initialAttrNameScaleFactor("constantWalk");
 
-		// dummy
-		initialAttrNameScaleFactor("dummy4stayHomePlan");
 		// #####################################
 		scoring = config.planCalcScore();
 		pop = population;
