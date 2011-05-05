@@ -55,12 +55,14 @@ public class DgConfigCleaner {
 					line.contains("outputVersion") ||
 					line.contains("evacuationTime") ||
 					line.contains("snapshotfile") ||
-					line.contains("offsetWalk")
+					line.contains("offsetWalk") ||
+					line.contains("outputTimeFormat")
 				) {
 				line = reader.readLine();
 				continue;
 			}
 			writer.write(line);
+			writer.newLine();
 			line = reader.readLine();
 		}
 		reader.close();

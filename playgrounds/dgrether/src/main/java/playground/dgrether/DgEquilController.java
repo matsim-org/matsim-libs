@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -44,7 +43,11 @@ public class DgEquilController {
 		
 	  final boolean useQSim = true;
 	  
+	  
 		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
+		
+//		new DgConfigCleaner().cleanAndWriteConfig(configfile, configfile + ".xml");
+		
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
@@ -52,14 +55,14 @@ public class DgEquilController {
 		
 		
 //		final int iteration = 0;
-		final int iteration = 0;
+		final int iteration = 10;
 		
 		Controler controler = new Controler(config);
 		if (useQSim){
-		  controler.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		  controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
 		  controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(1.0);
 		  controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		  controler.getConfig().getQSimConfigGroup().setWriteSnapshotsInterval(0);
 		}
 		else {
 		  controler.getConfig().simulation().setSnapshotPeriod(1.0);
