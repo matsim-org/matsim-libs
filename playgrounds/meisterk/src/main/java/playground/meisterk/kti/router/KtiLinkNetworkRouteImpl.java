@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -48,7 +49,7 @@ public class KtiLinkNetworkRouteImpl extends LinkNetworkRouteImpl {
 	@Override
 	public double getDistance() {
 
-		double distance = RouteUtils.calcDistance(this, this.network);
+		double distance = RouteUtils.calcDistance((NetworkRoute)this, this.network);
 
 		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
 			switch (this.simLegInterpretation) {

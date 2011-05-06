@@ -36,6 +36,8 @@ public class OsmPrepare {
 	}
 
 	public static void main(String[] args) {
+		String filename = "/media/data/work/repos/shared-svn/studies/dgrether/osmBerlinSzenario/testdata/map2_sorted.osm";
+		String targetFilename = "/media/data/work/repos/shared-svn/studies/dgrether/osmBerlinSzenario/testdata/map2_filtered.osm";
 		new OsmPrepare("e:/_out/osm/berlinbrandenburg.osm", "e:/_out/osm/berlinbrandenburg_filtered_small.osm", new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary"}, new String[]{"tram", "train", "bus"}).prepareOsm();		
 	}
 	
