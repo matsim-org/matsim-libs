@@ -375,7 +375,11 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 					/* s. the attributes order in Events2Score4PC2.attrNameList */.innerProd(
 							attrVector)
 					+ (Double) plan.getCustomAttributes().get(
-							BseStrategyManager.UTILITY_CORRECTION);
+							BseStrategyManager.UTILITY_CORRECTION)/*
+																 * utilityCorrection
+																 * is also an
+																 * important ASC
+																 */;
 			plan.setScore(util);
 		}
 	}

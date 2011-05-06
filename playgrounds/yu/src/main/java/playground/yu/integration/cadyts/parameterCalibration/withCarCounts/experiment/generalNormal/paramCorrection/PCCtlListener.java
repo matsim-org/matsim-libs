@@ -80,8 +80,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 
 		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = network.getNodes().get(
-				new IdImpl(config.counts().getDistanceFilterCenterNode()))
+		distanceFilterCenterNodeCoord = network.getNodes()
+				.get(new IdImpl(config.counts().getDistanceFilterCenterNode()))
 				.getCoord();
 		distanceFilter = config.counts().getDistanceFilter();
 
@@ -131,9 +131,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 
 		// INITIALIZING "Calibrator"
-		calibrator = new MATSimChoiceParameterCalibrator<Link>(ctlIO
-				.getOutputFilename("calibration.log"), MatsimRandom
-				.getLocalInstance(), regressionInertia, paramDim);
+		calibrator = new MATSimChoiceParameterCalibrator<Link>(
+				ctlIO.getOutputFilename("calibration.log"),
+				MatsimRandom.getLocalInstance(), regressionInertia, paramDim);
 
 		// SETTING staticsFile
 		calibrator.setStatisticsFile(ctlIO
@@ -151,14 +151,17 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
 
-				initialParams.set(i, Double.parseDouble(ScoringConfigGetValue
-						.getValue(paramNames[i]))
-						* paramScaleFactor);
+				initialParams.set(
+						i,
+						Double.parseDouble(ScoringConfigGetValue
+								.getValue(paramNames[i])) * paramScaleFactor);
 
 			} else/* bse */{
-				initialParams.set(i, Double.parseDouble(config.findParam(
-						BSE_CONFIG_MODULE_NAME, paramNames[i]))
-						* paramScaleFactor);
+				initialParams.set(
+						i,
+						Double.parseDouble(config.findParam(
+								BSE_CONFIG_MODULE_NAME, paramNames[i]))
+								* paramScaleFactor);
 			}
 		}
 
@@ -183,8 +186,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						.setInitialParameterVariances(initialParamVars);
 			}
 		} else {
-			Logger
-					.getLogger("BSE:\tNo setting of setInitialParameterVariances, so it is accepted as FALSE");
+			Logger.getLogger("BSE:\tNo setting of setInitialParameterVariances, so it is accepted as FALSE");
 		}
 	}
 
@@ -368,8 +370,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
 		((PCStrMn) ctl.getStrategyManager()).init(
-				(ChoiceParameterCalibrator<Link>) calibrator, ctl
-						.getTravelTimeCalculator(),
+				(ChoiceParameterCalibrator<Link>) calibrator,
+				ctl.getTravelTimeCalculator(),
 				(MultinomialLogitChoice) chooser, delta);
 	}
 
@@ -386,8 +388,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer.writeln(sb);
 		}
 		{
-			writerCV = new SimpleWriter(ctlIO
-					.getOutputFilename("parameterCovariance.log"));
+			writerCV = new SimpleWriter(
+					ctlIO.getOutputFilename("parameterCovariance.log"));
 			StringBuffer sb = new StringBuffer("iter\tmatrix/Covariance ["
 					+ paramNames[0]);
 			for (int i = 1; i < paramNames.length; i++) {
@@ -514,8 +516,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				chartFilename += paramNames[i] + ".";
 			}
 
-			chart.saveAsPng(ctlIO.getIterationFilename(iter, chartFilename
-					+ "png"), 1024, 768);
+			chart.saveAsPng(
+					ctlIO.getIterationFilename(iter, chartFilename + "png"),
+					1024, 768);
 
 			// travPerf.saveAsPng(ctlIO.getIterationFilename(iter,
 			// "travTravPt.png"), 1024, 768);
@@ -571,12 +574,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 						double value = params.get(i);
 						if (scoringCfg.getParams().containsKey(paramNames[i])) {
-							scoringCfg.addParam(paramNames[i], Double
-									.toString(value / paramScaleFactor));
+							scoringCfg.addParam(paramNames[i],
+									Double.toString(value / paramScaleFactor));
 						} else/* bse */{
 							config.setParam(BSE_CONFIG_MODULE_NAME,
-									paramNames[i], Double.toString(value
-											/ paramScaleFactor));
+									paramNames[i],
+									Double.toString(value / paramScaleFactor));
 						}
 
 						mnl.setParameter(paramNameIndex, value);
@@ -595,7 +598,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
 
 				CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
-						config.planCalcScore());
+						config.planCalcScore(), ctl.getNetwork());
 				ctl.setScoringFunctionFactory(sfFactory);
 				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
 

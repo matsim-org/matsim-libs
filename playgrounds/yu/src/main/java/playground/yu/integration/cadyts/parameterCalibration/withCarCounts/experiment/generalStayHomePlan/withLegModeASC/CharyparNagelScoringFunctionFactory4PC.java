@@ -20,6 +20,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.expe
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -37,10 +38,12 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 	// "constantPt",
 	// CONSTANT_WALK = "constantWalk";
 	// static double constantCar, constantPt, constantWalk;
+	private final Network network;
 
 	public CharyparNagelScoringFunctionFactory4PC(
-			final PlanCalcScoreConfigGroup config) {
+			final PlanCalcScoreConfigGroup config, final Network network) {
 		super(config);
+		this.network = network;
 	}
 
 	@Override
@@ -51,7 +54,8 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 		scoringFunctionAccumulator
 				.addScoringFunction(new ActivityScoringFunction(plan, params));
 		scoringFunctionAccumulator
-				.addScoringFunction(new LegScoringFunction4PC(plan, params));
+				.addScoringFunction(new LegScoringFunction4PC(plan, params,
+						network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
 				params));
 		scoringFunctionAccumulator

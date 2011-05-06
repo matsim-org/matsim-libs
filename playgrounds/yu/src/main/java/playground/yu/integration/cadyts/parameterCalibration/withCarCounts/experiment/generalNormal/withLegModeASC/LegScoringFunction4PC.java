@@ -22,12 +22,15 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.expe
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.utils.misc.RouteUtils;
 
 public class LegScoringFunction4PC extends LegScoringFunction {
 	private final static Logger log = Logger
@@ -41,10 +44,12 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			distanceAttrWalk/* [m] */;
 
 	private int carLegNo = 0, ptLegNo = 0, walkLegNo = 0;
+	private final Network network;
 
 	public LegScoringFunction4PC(Plan plan,
-			CharyparNagelScoringParameters params) {
+			CharyparNagelScoringParameters params, Network network) {
 		super(plan, params);
+		this.network = network;
 	}
 
 	public double getTravTimeAttrPt() {
@@ -83,6 +88,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 		return distanceAttrWalk;
 	}
 
+	@Override
 	public void reset() {
 		super.reset();
 		travTimeAttrCar = 0d;
@@ -114,8 +120,9 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (params.monetaryDistanceCostRateCar != 0.0) {
-				RouteWRefs route = (RouteWRefs) leg.getRoute();
-				dist = route.getDistance();
+				Route route = leg.getRoute();
+				// dist = route.getDistance();
+				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
 				if (distanceWrnCnt < 1) {
 					/*
 					 * TODO the route-distance does not contain the length of
@@ -128,11 +135,9 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 					 * sure that the distance in the leg is the actual distance
 					 * driven by the agent.
 					 */
-					log
-							.warn("leg distance for scoring computed from plan, not from execution (=events)."
-									+ "This is not how it is meant to be, and it will fail for within-day replanning.");
-					log
-							.warn("Also means that first and last link are not included.");
+					log.warn("leg distance for scoring computed from plan, not from execution (=events)."
+							+ "This is not how it is meant to be, and it will fail for within-day replanning.");
+					log.warn("Also means that first and last link are not included.");
 					log.warn(Gbl.ONLYONCE);
 					distanceWrnCnt++;
 				}

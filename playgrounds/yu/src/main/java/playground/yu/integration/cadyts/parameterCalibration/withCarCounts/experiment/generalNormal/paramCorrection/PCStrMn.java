@@ -91,7 +91,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
 			// ***before removePlans and plan choice, correct utility***
-			correctPersonPlansScores(person);
+			generateScoreCorrections(person);
 
 			/* ***********************************************************
 			 * scoringCfg has been done, but they should be newly defined
@@ -441,13 +441,13 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				+ "\t" + statistics[3]/* perfAttrVar */);
 	}
 
-	private void correctPersonPlansScores(Person person) {
+	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			correctPlanScore(plan);
+			generateScoreCorrection(plan);
 		}
 	}
 
-	private void correctPlanScore(Plan plan) {
+	private void generateScoreCorrection(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
@@ -455,12 +455,13 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
 		plan.getCustomAttributes().put(UTILITY_CORRECTION, scoreCorrection);
 		// ##################################################
-		Double oldScore = plan.getScore();
-		if (oldScore == null) {
-			oldScore = 0d;// dummy setting, the score of plans will be
-							// calculated between firstIter+1 and firstIter+
-		}
-		plan.setScore(oldScore + scoreCorrection);// this line is NOT necessary
-													// any more
+		// Double oldScore = plan.getScore();
+		// if (oldScore == null) {
+		// oldScore = 0d;// dummy setting, the score of plans will be
+		// // calculated between firstIter+1 and firstIter+
+		// }
+		// plan.setScore(oldScore + scoreCorrection);// this line is NOT
+		// necessary
+		// // any more
 	}
 }

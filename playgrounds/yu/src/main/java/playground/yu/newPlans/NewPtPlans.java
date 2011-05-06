@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,12 +47,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.yu.analysis.PlanModeJudger;
 
 /**
- * writes new Plansfile, in which every person will has 2 plans, one with type
- * "car" and the other with type "pt", whose leg mode will be "pt" and who will
- * have only a blank <Route></Rout>
- * 
+ * writes new populationfile, in which every person will has 2 plans, one with
+ * type "car" and the other with type "pt", whose leg mode will be "pt" and who
+ * will have only a blank {@code Route}
+ *
  * @author ychen
- * 
+ *
  */
 public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	private Person person;
@@ -63,33 +65,36 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
-			this.person = person;
-			for (Plan pl : person.getPlans()) {
-				run(pl);
-			}
-			for (PlanImpl copyPlan : copyPlans) {
-				person.addPlan(copyPlan);
-			}
-			copyPlans.clear();
+		// if (Integer.parseInt(person.getId().toString()) < 1000000000) {
+		this.person = person;
+		for (Plan pl : person.getPlans()) {
+			run(pl);
 		}
-		this.pw.writePerson(person);
+		for (PlanImpl copyPlan : copyPlans) {
+			person.addPlan(copyPlan);
+		}
+		copyPlans.clear();
+		// }
+		pw.writePerson(person);
 	}
 
+	@Override
 	public void run(Plan plan) {
-		if (PlanModeJudger.useCar(plan))
+		if (PlanModeJudger.useCar(plan)) {
 			((PlanImpl) plan).setType(DeprecatedConstants.CAR);
+		}
 		PlanImpl ptPlan = new PlanImpl(person);
 		ptPlan.setType(DeprecatedConstants.PT);
 		// Plan walkPlan = new PlanImpl(person);
-		List<PlanElement> actsLegs = plan.getPlanElements();
-		for (int i = 0; i < actsLegs.size(); i++) {
-			Object o = actsLegs.get(i);
-			if (i % 2 == 0) {
-				ptPlan.addActivity((ActivityImpl) o);
+		List<PlanElement> planElements = plan.getPlanElements();
+		for (PlanElement planElement : planElements) {
+
+			if (planElement instanceof Activity) {
+				ptPlan.addActivity((ActivityImpl) planElement);
 				// walkPlan.addActivity((Activity) o);
-			} else {
-				LegImpl leg = (LegImpl) o;
+			} else if (planElement instanceof Leg) {
+				LegImpl leg = (LegImpl) planElement;
+
 				LegImpl ptLeg = new LegImpl(leg);
 				ptLeg.setMode(TransportMode.pt);
 				ptLeg.setRoute(null);
@@ -103,6 +108,7 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 				// walkLeg.setMode(TransportMode.walk);
 				// walkLeg.setRoute(null);
 				// walkPlan.addLeg(walkLeg);
+
 				if (!leg.getMode().equals(TransportMode.car)) {
 					leg.setRoute(null);
 					leg.setMode(TransportMode.car);
@@ -118,9 +124,10 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 
 		final String netFilename = "../../matsim/examples/equil/network.xml";
 		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
-		final String outputFilename = "../../MATSim_integration_demandCalibration/tests/plans100withPt.xml";
+		final String outputFilename = "test/input/plans100withPt.xml";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 

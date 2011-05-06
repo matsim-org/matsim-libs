@@ -552,7 +552,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
 
 				CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
-						config.planCalcScore());
+						config.planCalcScore(), ctl.getNetwork());
 				ctl.setScoringFunctionFactory(sfFactory);
 				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
 

@@ -92,7 +92,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
 			// ***before removePlans and plan choice, correct utility***
-			correctPersonPlansScores(person);// to generate UC for the next line
+			generateScoreCorrections(person);// to generate UC for the next line
 			/* ***********************************************************
 			 * scoringCfg has been done, but they should be newly defined
 			 * because of new calibrated parameters and -- WITHOUT
@@ -263,13 +263,13 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				+ "\t" + statistics[3]/* perfAttrVar */);
 	}
 
-	private void correctPersonPlansScores(Person person) {
+	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			correctPlanScore(plan);
+			generateScoreCorrection(plan);
 		}
 	}
 
-	private void correctPlanScore(Plan plan) {
+	private void generateScoreCorrection(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
 		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
