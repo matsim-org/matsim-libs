@@ -1,6 +1,5 @@
 package playground.anhorni.locationchoice.analysis.facilities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,12 +60,8 @@ public class FacilitiesWriter {
 				numberOfShops[5]++;
 			}
 		}
-		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries(features, "output/zhFacilities.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!features.isEmpty()) {
+			ShapeFileWriter.writeGeometries(features, "output/zhFacilities.shp");
 		}
 		return numberOfShops;
 	}

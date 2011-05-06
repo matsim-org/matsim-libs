@@ -74,11 +74,7 @@ public class DataPrepare {
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		final Set<Feature> featuresInShape;
-		try {
-			featuresInShape = new ShapeFileReader().readFileAndInitialize(DetailedAreaShape);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		featuresInShape = new ShapeFileReader().readFileAndInitialize(DetailedAreaShape);
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
 

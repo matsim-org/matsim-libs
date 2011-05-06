@@ -19,7 +19,6 @@
 
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -143,7 +142,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 	}
 
 	@Override
-	protected void writeRoutes() throws IOException {
+	protected void writeRoutes() {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		Set<List<Id>> totalKeys = new HashSet<List<Id>>();
 		totalKeys.addAll(routeCounters.keySet());
@@ -207,8 +206,6 @@ public class RouteCompare2QGIS extends Route2QGIS {
 			r2q.write();
 		} catch (FactoryException e1) {
 			e1.printStackTrace();
-		} catch (IOException e) {
-			log.error(e);
 		}
 	}
 

@@ -59,11 +59,7 @@ public class RunMunich {
 
 	private static Set<Feature> readShape(String shapeFile) {
 		final Set<Feature> featuresInZone30;
-		try {
-			featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		return featuresInZone30;
 	}
 }

@@ -20,7 +20,6 @@
 
 package playground.anhorni.locationchoice.analysis.facilities.facilityLoad;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
@@ -65,15 +64,11 @@ public class FacilityLoadsWriter {
 					featuresDecreased.add(feature);
 				}
 		}
-		try {
-			if (featuresIncreased.size() > 0) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresIncreased, shopFileIncreased);
-			}
-			if (featuresDecreased.size() > 0) { 
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresDecreased, shopFileDecreased);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (featuresIncreased.size() > 0) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresIncreased, shopFileIncreased);
+		}
+		if (featuresDecreased.size() > 0) { 
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresDecreased, shopFileDecreased);
 		}
 	}
 		

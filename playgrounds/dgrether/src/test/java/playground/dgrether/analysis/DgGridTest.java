@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,12 +82,7 @@ public class DgGridTest extends MatsimTestCase {
 		  //add to collection
 		}
 		
-		//write shape file
-		try {
-			ShapeFileWriter.writeGeometries(features, this.getOutputDirectory()+ "testGrid.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, this.getOutputDirectory()+ "testGrid.shp");
 		
 		
 	}

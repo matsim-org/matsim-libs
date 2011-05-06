@@ -52,11 +52,7 @@ public class GVPlanReader {
 		Scenario osmNetwork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
 		Set<Feature> featuresInShape;
-		try {
-			featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
 		
 		PopulationReaderTask populationReaderTask = new PopulationReaderTask(GV_PLANS, gvNetwork.getNetwork());
 		

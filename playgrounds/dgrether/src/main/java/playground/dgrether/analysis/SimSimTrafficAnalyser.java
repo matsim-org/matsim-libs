@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.dgrether.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -169,11 +168,7 @@ public class SimSimTrafficAnalyser {
 		for (Link link : net.getLinks().values()) {
 			features.add(this.createFeature(link, geofac, featureType, countSimCompMap.get(link.getId())));
 		}
-		try {
-			ShapeFileWriter.writeGeometries(features, outfile + ".shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, outfile + ".shp");
 	}
 
 	private Feature createFeature(Link link, GeometryFactory geofac, FeatureType featureType, List<CountSimComparison> countSimComparisonList) {

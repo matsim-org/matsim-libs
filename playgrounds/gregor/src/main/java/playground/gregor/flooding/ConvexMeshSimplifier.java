@@ -26,10 +26,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
@@ -552,11 +552,7 @@ public class ConvexMeshSimplifier {
 				}
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts,file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts,file);
 
 	}
 
@@ -676,11 +672,7 @@ public class ConvexMeshSimplifier {
 		public Dump(List<List<FloodingInfo>> geometries) {
 			initFeatures();
 			createFts(geometries);
-			try {
-				ShapeFileWriter.writeGeometries(this.fts, file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			ShapeFileWriter.writeGeometries(this.fts, file);
 		}
 
 		private void createFts(List<List<FloodingInfo>> geometries) {

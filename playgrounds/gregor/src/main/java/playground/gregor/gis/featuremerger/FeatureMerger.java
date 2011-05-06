@@ -105,11 +105,7 @@ public class FeatureMerger {
 			
 			
 		}
-		try {
-			ShapeFileWriter.writeGeometries(outColl, out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(outColl, out);
 	}
 
 	private static Map<Integer,Feature> getOldFeatureMap(String inOld) {

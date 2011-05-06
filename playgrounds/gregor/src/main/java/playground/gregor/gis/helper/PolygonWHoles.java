@@ -45,11 +45,7 @@ public class PolygonWHoles {
 		String in = "/home/laemmel/arbeit/diss/qgis/run789_lostAgents.shp";
 		String out = "/home/laemmel/arbeit/diss/qgis/run789_lostAgents_inv.shp";
 		FeatureSource fs = null;
-		try {
-			fs = ShapeFileReader.readDataFile(in);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fs = ShapeFileReader.readDataFile(in);
 		
 		Feature ft  = null;
 		try {
@@ -74,11 +70,7 @@ public class PolygonWHoles {
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, out);
 		
 	}
 }

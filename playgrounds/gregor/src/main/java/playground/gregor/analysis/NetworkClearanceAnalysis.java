@@ -20,7 +20,6 @@
 
 package playground.gregor.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,11 +128,7 @@ public class NetworkClearanceAnalysis {
 
 
 	private void writeFeatures() {
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 
 	}
 

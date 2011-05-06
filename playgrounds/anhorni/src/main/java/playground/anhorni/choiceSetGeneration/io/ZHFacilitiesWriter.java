@@ -1,6 +1,5 @@
 package playground.anhorni.choiceSetGeneration.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,13 +39,9 @@ public class ZHFacilitiesWriter {
 			features.add(this.createFeature(coord, facility.getId()));
 			featuresExact.add(this.createFeature(facility.getExactPosition(), facility.getId()));
 		}
-		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/zhFacilitiesPositionMapped2Net.shp");
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresExact, outdir +"/shapefiles/zhFacilitiesExactPosition.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!features.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/zhFacilitiesPositionMapped2Net.shp");
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresExact, outdir +"/shapefiles/zhFacilitiesExactPosition.shp");
 		}
 	}
 

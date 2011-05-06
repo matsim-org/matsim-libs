@@ -1,6 +1,5 @@
 package tryouts.multiagentsimulation.hw5;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,12 +74,7 @@ public class PotsdamAnalysis implements Runnable {
 			features.add(getFeature(entry.getValue()));
 		}
 		
-		try {
-			ShapeFileWriter.writeGeometries(features, "./tnicolai/configs/brandenburg/qgis/delta-network");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, "./tnicolai/configs/brandenburg/qgis/delta-network");
 		
 	}
 	

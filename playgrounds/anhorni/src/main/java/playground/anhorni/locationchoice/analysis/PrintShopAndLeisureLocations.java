@@ -20,7 +20,6 @@
 
 package playground.anhorni.locationchoice.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,12 +85,8 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 				}
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(featuresShop, shopFile);
-			ShapeFileWriter.writeGeometries(featuresLeisure, leisureFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(featuresShop, shopFile);
+		ShapeFileWriter.writeGeometries(featuresLeisure, leisureFile);
 	}
 
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {

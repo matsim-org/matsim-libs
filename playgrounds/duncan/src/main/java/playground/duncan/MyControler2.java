@@ -135,11 +135,7 @@ public class MyControler2 {
 		// create population
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
 
-		try {
-			createPlansFromShp( ShapeFileReader.readDataFile(shpFile), scenarioData.getPopulation() );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		createPlansFromShp( ShapeFileReader.readDataFile(shpFile), scenarioData.getPopulation() );
 
 		// write the population for debugging purposes
 		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork()).write("pop.xml.gz") ;

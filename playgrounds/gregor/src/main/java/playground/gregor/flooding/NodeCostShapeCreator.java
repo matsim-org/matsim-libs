@@ -20,7 +20,6 @@
 
 package playground.gregor.flooding;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -73,14 +72,10 @@ public class NodeCostShapeCreator {
 	}
 
 	private void writeFeatures() {
-		try {
-			ShapeFileWriter
-					.writeGeometries(this.features, "../../tmp/linkCost.shp");
-			ShapeFileWriter.writeGeometries(this.pointFeatures,
-					"../../tmp/linkCostDirection.shp");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		ShapeFileWriter
+				.writeGeometries(this.features, "../../tmp/linkCost.shp");
+		ShapeFileWriter.writeGeometries(this.pointFeatures,
+				"../../tmp/linkCostDirection.shp");
 
 	}
 

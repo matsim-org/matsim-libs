@@ -320,11 +320,7 @@ public class PrimaryLocationDrawing {
 
 		HashMap<String,Feature> ret = new HashMap<String, Feature>();
 		FeatureSource fts = null;
-		try {
-			fts = ShapeFileReader.readDataFile(districts);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fts = ShapeFileReader.readDataFile(districts);
 
 		try {
 			for (Object ft : fts.getFeatures()) {

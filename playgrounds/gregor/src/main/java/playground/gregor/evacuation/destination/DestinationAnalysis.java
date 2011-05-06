@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.evacuation.destination;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,12 +112,7 @@ public class DestinationAnalysis implements AgentDepartureEventHandler, AgentArr
 			}
 		}
 
-		try {
-			ShapeFileWriter.writeGeometries(fts, output);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, output);
 	}
 	
 	private FeatureType initFeatureType() {

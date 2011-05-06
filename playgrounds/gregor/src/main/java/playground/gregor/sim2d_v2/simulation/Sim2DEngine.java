@@ -43,7 +43,7 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  * @author laemmel
  * 
  */
-public class Sim2DEngine implements MobsimEngine, Steppable {
+public class Sim2DEngine implements MobsimEngine {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
 	private final Scenario2DImpl scenario;

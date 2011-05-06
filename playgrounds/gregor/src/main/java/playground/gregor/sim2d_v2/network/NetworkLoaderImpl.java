@@ -460,11 +460,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 
 
 	private void init() {
-		try {
-			this.fs = ShapeFileReader.readDataFile(this.shapefile);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.fs = ShapeFileReader.readDataFile(this.shapefile);
 		try {
 			this.env = this.fs.getBounds();
 		} catch (IOException e) {
@@ -496,11 +492,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 				e.printStackTrace();
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, string);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, string);
 	}
 
 
@@ -521,11 +513,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 				e.printStackTrace();
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, string);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, string);
 	}
 
 	private void dumpPoints(Collection<Coordinate> coords, String string) {
@@ -540,11 +528,7 @@ public class NetworkLoaderImpl implements NetworkLoader {
 			}
 
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, string);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, string);
 	}
 	private void initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);

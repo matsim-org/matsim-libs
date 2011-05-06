@@ -1,7 +1,6 @@
 package playground.gregor.evacuation.evactimecompare;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,12 +99,7 @@ public class EvacTimeCompare implements AgentDepartureEventHandler, AgentArrival
 			}
 		}
 		
-		try {
-			ShapeFileWriter.writeGeometries(fts, shape);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, shape);
 		
 		
 	}

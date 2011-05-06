@@ -78,7 +78,7 @@ public class GtfsConverter {
 	private CoordinateTransformation transform = new GeotoolsTransformation("WGS84", "EPSG:3395");
 	
 	public static void main(String[] args) {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input");
+		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed");
 		gtfs.convert(1);
 		System.out.println("Conversion successfull");
 		gtfs.createConfig();

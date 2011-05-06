@@ -106,11 +106,7 @@ public class ShapeFileMerger {
 			e.printStackTrace();
 		}
 
-		try {
-			ShapeFileWriter.writeGeometries(ft, output);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(ft, output);
 
 	}
 

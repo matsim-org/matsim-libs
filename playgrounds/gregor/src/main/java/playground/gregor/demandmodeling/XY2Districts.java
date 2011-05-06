@@ -51,11 +51,7 @@ public class XY2Districts {
 	}
 	private void run() {
 		FeatureSource fsDistricts;
-		try {
-			fsDistricts =  ShapeFileReader.readDataFile(this.districts);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fsDistricts =  ShapeFileReader.readDataFile(this.districts);
 
 		try {
 			this.envelope = fsDistricts.getBounds();
@@ -66,11 +62,7 @@ public class XY2Districts {
 		this.districtsFeatures = getFeature(fsDistricts);
 		
 		FeatureSource fsActivities;
-		try {
-			fsActivities = ShapeFileReader.readDataFile(this.activity);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fsActivities = ShapeFileReader.readDataFile(this.activity);
 		
 		ArrayList<Feature> actFts = getFeature(fsActivities);
 		this.actFts = generateQuadTree(actFts);

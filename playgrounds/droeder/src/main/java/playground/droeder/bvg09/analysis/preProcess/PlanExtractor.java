@@ -53,12 +53,7 @@ public class PlanExtractor {
 	 */
 	public static void main(String[] args) {
 		Set<Feature> features = null;
-		try {
-			features = new ShapeFileReader().readFileAndInitialize(DaPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		features = new ShapeFileReader().readFileAndInitialize(DaPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		

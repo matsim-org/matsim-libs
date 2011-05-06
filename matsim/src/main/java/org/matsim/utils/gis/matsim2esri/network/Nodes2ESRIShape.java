@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.utils.gis.matsim2esri.network;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -74,11 +73,7 @@ public class Nodes2ESRIShape {
 		for (Node node : this.network.getNodes().values()) {
 			features.add(getFeature(node));
 		}
-		try {
-			ShapeFileWriter.writeGeometries(features, this.filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, this.filename);
 
 	}
 

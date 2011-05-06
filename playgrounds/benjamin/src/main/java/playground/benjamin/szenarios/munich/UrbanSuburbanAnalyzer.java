@@ -231,11 +231,7 @@ public class UrbanSuburbanAnalyzer {
 
 		private Set<Feature> readShape(String shapeFile) {
 			final Set<Feature> featuresInShape;
-			try {
-				featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
 			return featuresInShape;
 		}
 

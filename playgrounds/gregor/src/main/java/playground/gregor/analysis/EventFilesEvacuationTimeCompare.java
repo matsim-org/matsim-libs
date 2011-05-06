@@ -136,11 +136,7 @@ public class EventFilesEvacuationTimeCompare {
 	}
 	
 	private void writeFeatures() {
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 		
 	}
 

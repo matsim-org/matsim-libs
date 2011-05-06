@@ -1,9 +1,5 @@
 package playground.mzilske.teach;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -12,39 +8,36 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 
 public class PotsdamNet {
-	
+
 	public static void main(String[] args) {
-		String osm = "./inputs/brandenburg.osm";
-		
+		String osm = "../../matsim/input/network.osm";
+
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 		Network net = sc.getNetwork();
+
+		// CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395"); 
+
+		// sCoordinateTransformation ct = new WGS84ToOSMMercator.Project();
 		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S); 
+		// CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25833"); 
 		
-			
+		// CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:45833"); 
 		
-		TeachOsmNetworkReader onr = new TeachOsmNetworkReader(net,ct); //constructs a new openstreetmap reader
-		onr.setHierarchyLayer(52.774, 12.398, 52.051, 13.774, 3);
-		onr.setHierarchyLayer(52.5152, 12.8838, 52.3402, 13.1709, 6);
-	
-		try {
-			onr.parse(osm); //starts the conversion from osm to matsim
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]"); 
+
+		OsmNetworkReader onr = new OsmNetworkReader(net,ct); //constructs a new openstreetmap reader
+
+		onr.parse(osm); //starts the conversion from osm to matsim
+
 		//at this point we already have a matsim network...
 		new NetworkCleaner().run(net); //but may be there are isolated not connected links. The network cleaner removes those links
-		
-		new NetworkWriter(net).write("./inputs/network.xml");//here we write the network to a xml file
+
+		new NetworkWriter(net).write("input/network.xml");//here we write the network to a xml file
 
 	}
 

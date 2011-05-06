@@ -19,7 +19,6 @@
 
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +158,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		return featureTypeRoute;
 	}
 
-	protected void writeRoutes() throws IOException {
+	protected void writeRoutes() {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (List<Id> routeLinkIds : routeCounters.keySet()) {
 			Feature ft = getRouteFeature(routeLinkIds);
@@ -171,7 +170,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	}
 
 	@Override
-	public void write() throws IOException {
+	public void write() {
 		if (writeRoutes) {
 			writeRoutes();
 		}
@@ -209,8 +208,6 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 			r2q.write();
 		} catch (FactoryException e1) {
 			e1.printStackTrace();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
 		}
 	}
 

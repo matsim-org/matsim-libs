@@ -97,12 +97,8 @@ public class SHPWriter {
 			}
 			features.add(this.createFeature(coord, shops));
 		}
-		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries(features, "output/hectares.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!features.isEmpty()) {
+			ShapeFileWriter.writeGeometries(features, "output/hectares.shp");
 		}
 	}
 

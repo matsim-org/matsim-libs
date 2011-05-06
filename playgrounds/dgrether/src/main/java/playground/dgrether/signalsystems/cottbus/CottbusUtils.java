@@ -38,16 +38,12 @@ public class CottbusUtils {
 	public static Tuple<CoordinateReferenceSystem, Feature> loadCottbusFeature(String shapeFile) {
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		Set<Feature> features;
-		try {
-			features = shapeReader.readFileAndInitialize(shapeFile);
-			CoordinateReferenceSystem crs = shapeReader.getCoordinateSystem();
-			for (Feature feature : features) {
-				if (feature.getAttribute("NAME").equals("Cottbus")){
-					return new Tuple<CoordinateReferenceSystem, Feature>(crs, feature);
-				}
+		features = shapeReader.readFileAndInitialize(shapeFile);
+		CoordinateReferenceSystem crs = shapeReader.getCoordinateSystem();
+		for (Feature feature : features) {
+			if (feature.getAttribute("NAME").equals("Cottbus")){
+				return new Tuple<CoordinateReferenceSystem, Feature>(crs, feature);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

@@ -20,8 +20,6 @@
 
 package playground.jjoubert.TemporaryCode;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -49,11 +47,7 @@ public class WriteEmmePlans_eThekwini {
 				"/Users/johanwjoubert/MATSim/workspace/MATSimData/eThekwini/2005/Emme");
 		sp.setWriteActs(true);
 		sp.setWriteLegs(false);
-		try {
-			sp.write();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sp.write();
 	}
 
 }

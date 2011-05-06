@@ -73,11 +73,7 @@ public class PlanToShapefile {
 				outputDir);
 		sp.setWriteActs(true);
 		sp.setWriteLegs(false);
-		try {
-			sp.write();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sp.write();
 	}
 
 }

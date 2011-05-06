@@ -126,11 +126,7 @@ public class TravelTimeLinkCompare {
 			}
 		}
 		
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 	}
 	
 	private void initFeatures() {

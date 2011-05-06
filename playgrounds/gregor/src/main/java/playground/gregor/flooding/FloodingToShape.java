@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.flooding;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -118,11 +117,7 @@ public class FloodingToShape {
 			}
 		}
 		
-		try {
-			ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/diss/qgis/flooding.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/diss/qgis/flooding.shp");
 	}
 
 	private static FeatureType createFeatureType() {

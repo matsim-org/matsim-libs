@@ -118,6 +118,13 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/tagtransform.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap</groupId>
+			<artifactId>jmapviewer</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jmapview.jar</systemPath>
+		</dependency>
 		
 	</dependencies>
 	<modules>

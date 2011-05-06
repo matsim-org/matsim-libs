@@ -200,11 +200,7 @@ public class MyDemandGenerator {
 		log.info("Writing plans as shapefile to " + outputFolder);
 		sh.setWriteActs(true);
 		sh.setWriteLegs(false);
-		try {
-			sh.write();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sh.write();
 	}
 	
 	

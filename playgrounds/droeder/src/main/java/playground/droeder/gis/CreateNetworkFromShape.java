@@ -76,11 +76,7 @@ public class CreateNetworkFromShape {
 	}
 	
 	public void run(String netOutFile){
-		try {
-			this.features = this.myReader.readFileAndInitialize(this.shapeFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.features = this.myReader.readFileAndInitialize(this.shapeFile);
 		
 		this.createNetwork();
 		this.writeNetwork(netOutFile);

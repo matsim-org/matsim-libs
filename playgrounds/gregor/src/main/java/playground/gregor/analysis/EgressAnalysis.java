@@ -130,12 +130,7 @@ public class EgressAnalysis {
 	}
 
 	private void writePolygons() {
-		try {
-			ShapeFileWriter.writeGeometries(this.features, "./padang/egress.shp");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, "./padang/egress.shp");
 	}
 
 

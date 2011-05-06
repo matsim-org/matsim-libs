@@ -115,13 +115,17 @@ public class SelectedPlans2ESRIShape {
 		this.legBlurFactor  = legBlurFactor;
 	}
 
-	public void write() throws IOException {
-		drawOutputSample();
-		if (this.writeActs) {
-			writeActs();
-		}
-		if (this.writeLegs) {
-			writeLegs();
+	public void write() {
+		try {
+			drawOutputSample();
+			if (this.writeActs) {
+				writeActs();
+			} 
+			if (this.writeLegs) {
+				writeLegs();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -259,8 +263,8 @@ public class SelectedPlans2ESRIShape {
 		// FIXME hard-coded file names; does this class really need a main-method?
 		final String populationFilename = "./examples/equil/plans100.xml";
 		final String networkFilename = "./examples/equil/network.xml";
-//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-//		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
+		//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		//		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 
 		final String outputDir = "./plans/";
 
@@ -276,11 +280,7 @@ public class SelectedPlans2ESRIShape {
 		sp.setWriteActs(true);
 		sp.setWriteLegs(true);
 
-		try {
-			sp.write();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+		sp.write();
 	}
 
 }

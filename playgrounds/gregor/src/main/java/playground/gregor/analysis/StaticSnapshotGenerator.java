@@ -20,7 +20,6 @@
 
 package playground.gregor.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -151,11 +150,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 		} catch (IllegalAttributeException e) {
 			throw new RuntimeException(e);
 		}
-		try {
-			ShapeFileWriter.writeGeometries(ft, fileName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		ShapeFileWriter.writeGeometries(ft, fileName);
 	}
 
 

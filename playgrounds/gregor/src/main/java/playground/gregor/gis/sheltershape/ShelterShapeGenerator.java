@@ -103,11 +103,7 @@ public class ShelterShapeGenerator {
 		log.info("done.");
 		
 		log.info("writing features");
-		try {
-			ShapeFileWriter.writeGeometries(this.quadTree.values(), this.out);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		ShapeFileWriter.writeGeometries(this.quadTree.values(), this.out);
 		log.info("done.");
 
 

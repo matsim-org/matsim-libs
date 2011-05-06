@@ -172,11 +172,7 @@ public class CongestionAnalyzer {
 			}
 		}
 		System.out.println("maxRho: " + maxRho);
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 	}
 
 	

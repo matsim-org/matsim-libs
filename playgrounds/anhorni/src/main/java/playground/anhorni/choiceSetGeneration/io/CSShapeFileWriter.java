@@ -1,6 +1,5 @@
 package playground.anhorni.choiceSetGeneration.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -66,25 +65,17 @@ public class CSShapeFileWriter extends CSWriter {
 				features.add(feature);
 				singleFeatures.add(feature);
 			}
-			try {
-				if (!singleFeatures.isEmpty()) {
-					ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singlechoicesets/" + 
-						name + choiceSet.getId()+ "_choiceSet.shp");
-				}
-				else {
-					log.error("Empty choice set: " + choiceSet.getId());
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (!singleFeatures.isEmpty()) {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singlechoicesets/" + 
+					name + choiceSet.getId()+ "_choiceSet.shp");
+			}
+			else {
+				log.error("Empty choice set: " + choiceSet.getId());
 			}
 			
 		}
-		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_choiceSets.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!features.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_choiceSets.shp");
 		}
 	}
 	
@@ -122,30 +113,22 @@ public class CSShapeFileWriter extends CSWriter {
 			featuresAfter.add(featureAfter);
 			singleFeatures.add(featureAfter);
 			
-			try {
-				if (!singleFeatures.isEmpty()) {
-					ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singletrips/" + name + 
-						choiceSet.getId()+"_Trip.shp");
-				}
-				else {
-					log.error("Empty trip : " + choiceSet.getId());
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (!singleFeatures.isEmpty()) {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singletrips/" + name + 
+					choiceSet.getId()+"_Trip.shp");
+			}
+			else {
+				log.error("Empty trip : " + choiceSet.getId());
 			}		
 		}			
-		try {
-			if (!featuresBefore.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripPriorLocations.shp");
-			}
-			if (!featuresShop.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
-			}
-			if (!featuresAfter.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripPosteriorLocations.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!featuresBefore.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripPriorLocations.shp");
+		}
+		if (!featuresShop.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
+		}
+		if (!featuresAfter.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripPosteriorLocations.shp");
 		}
 	}
 	

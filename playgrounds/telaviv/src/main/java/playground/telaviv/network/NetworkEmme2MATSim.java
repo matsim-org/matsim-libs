@@ -336,9 +336,6 @@ public class NetworkEmme2MATSim {
 		}
 		catch (IllegalAttributeException e) {
 			e.printStackTrace();
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	

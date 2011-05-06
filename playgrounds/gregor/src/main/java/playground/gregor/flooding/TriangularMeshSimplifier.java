@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.flooding;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,11 +27,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -1096,11 +1095,7 @@ public class TriangularMeshSimplifier {
 				}
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts,file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts,file);
 
 	}
 	private void initFeatures() {

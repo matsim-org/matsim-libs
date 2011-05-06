@@ -96,11 +96,7 @@ public class CVSToShapeFile {
 			e.printStackTrace();
 		}
 
-		try {
-			ShapeFileWriter.writeGeometries(this.map.values(), this.output);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.map.values(), this.output);
 
 	}
 

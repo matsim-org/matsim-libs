@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.otf.readerwriter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -123,11 +122,7 @@ public class BasicInundationGeometryLoader {
 		log.info("done. " + this.fgis.size() + " geometries.");
 
 		if (this.DEBUG) {
-			try {
-				ShapeFileWriter.writeGeometries(this.fts, this.outShape);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			ShapeFileWriter.writeGeometries(this.fts, this.outShape);
 		}
 		
 		this.initialized = true;

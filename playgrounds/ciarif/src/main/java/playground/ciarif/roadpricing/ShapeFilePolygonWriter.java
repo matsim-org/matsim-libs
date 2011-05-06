@@ -1,6 +1,5 @@
 package playground.ciarif.roadpricing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,11 +40,7 @@ public class ShapeFilePolygonWriter {
 		Collection<Feature> features = getFeature(getLinearRing(coords));
 
 
-		try {
-			ShapeFileWriter.writeGeometries(features, outfile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, outfile);
 	}
 
 	public LinearRing getLinearRing(Coord[] coords) {

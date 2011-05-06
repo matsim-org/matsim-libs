@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.evacuation.lostagents;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -103,11 +102,7 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 				e.printStackTrace();
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, this.out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, this.out);
 		System.out.println("total depart:" + depart + "  total lost:" + lost);
 	}
 

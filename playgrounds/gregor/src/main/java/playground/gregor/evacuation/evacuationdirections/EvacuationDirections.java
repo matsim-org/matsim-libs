@@ -112,11 +112,7 @@ public class EvacuationDirections implements LinkEnterEventHandler{
 //			e1.printStackTrace();
 //		}
 
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 	}
 
 	private void buildStreetMap() throws IOException {

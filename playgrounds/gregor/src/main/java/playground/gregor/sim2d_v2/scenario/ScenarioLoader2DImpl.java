@@ -78,11 +78,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	private void loadLsMp() {
 		FeatureSource fs = null;
-		try {
-			fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
 
 		@SuppressWarnings("rawtypes")
 		Iterator it = null;
@@ -107,11 +103,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 	private void loadMps() {
 		FeatureSource fs = null;
-		try {
-			fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
 
 		@SuppressWarnings("rawtypes")
 		Iterator it = null;

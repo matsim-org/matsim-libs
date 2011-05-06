@@ -1,6 +1,5 @@
 package playground.mzilske.teach;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +16,12 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -51,19 +48,16 @@ public class PotsdamAnalysis implements Runnable {
 
 	@Override
 	public void run() {
-		String populationFileName = "output/brandenburg/output_plans.xml";
-		String eventsFile1 = "output/brandenburg/ITERS/it.20/20.events.txt.gz";
-		String eventsFile2 = "output/brandenburg-broken-bridge/ITERS/it.50/50.events.txt.gz";
+		String eventsFile1 = "output/ITERS/it.10/10.events.xml.gz";
+		String eventsFile2 = "outputBridgeClosed/ITERS/it.20/20.events.xml.gz";
 		EventsManager before = (EventsManager) EventsUtils.createEventsManager();
 		EventsManager after = (EventsManager) EventsUtils.createEventsManager();
 		
 		
-		String network = "inputs/brandenburg/network.xml";
+		String network = "output/output_network.xml.gz";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(network);
-		new MatsimPopulationReader(scenario).readFile(populationFileName);
 		
-		Population population = scenario.getPopulation();
 		
 		for (Entry<Id, Link> entry : scenario.getNetwork().getLinks().entrySet()) {
 			linkDeltas.put(entry.getKey(), new AnalysisLink());
@@ -82,12 +76,7 @@ public class PotsdamAnalysis implements Runnable {
 			features.add(getFeature(entry.getValue()));
 		}
 		
-		try {
-			ShapeFileWriter.writeGeometries(features, "output/brandenburg/delta-network");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, "output/delta-network");
 		
 	}
 	

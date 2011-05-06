@@ -173,11 +173,7 @@ public class GeoReferencer {
 			fts.add(ft);
 			line = this.sfReader.readLine();
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts,this.output);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts,this.output);
 		System.out.println("missing" + missing);
 	}
 	

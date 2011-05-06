@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.bvg09.analysis;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
@@ -49,11 +48,7 @@ public class BvgTripAnalysisRunnerV1 {
 		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
 		
 		Set<Feature> features = null;
-		try {
-			features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		

@@ -53,11 +53,7 @@ public class EnvironmentDistanceVectorsGeneratorII {
 	public StaticEnvironmentDistancesField generate() {
 		Set<Feature> features = null;
 		ShapeFileReader reader = new ShapeFileReader();
-		try {
-			features = reader.readFileAndInitialize(this.config.getFloorShapeFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		features = reader.readFileAndInitialize(this.config.getFloorShapeFile());
 		this.envelope = reader.getBounds();
 		this.distancesQuadTree = new QuadTree<EnvironmentDistances>(this.envelope.getMinX(), this.envelope.getMinY() , this.envelope.getMaxX(), this.envelope.getMaxY());
 		initMultiPolygon(features);

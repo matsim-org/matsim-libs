@@ -90,11 +90,7 @@ public class Buildings2DistrictsMapping {
 	public void run() {
 		
 		FeatureSource fsDistricts;
-		try {
-			fsDistricts =  ShapeFileReader.readDataFile(this.districts);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fsDistricts =  ShapeFileReader.readDataFile(this.districts);
 
 		try {
 			this.envelope = fsDistricts.getBounds();
@@ -106,23 +102,14 @@ public class Buildings2DistrictsMapping {
 		
 		
 		FeatureSource fsBuildings;
-		try {
-			fsBuildings = ShapeFileReader.readDataFile(this.buildings);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		fsBuildings = ShapeFileReader.readDataFile(this.buildings);
 		
 		ArrayList<Feature> buildingsPolygons = getFeature(fsBuildings);
 		this.buildingsFeatures = generateQuadTree(buildingsPolygons);
 		
 		mapPolygons();
 		
-		try {
-			ShapeFileWriter.writeGeometries(this.features, "./output/buildings_district_mapping.shp");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, "./output/buildings_district_mapping.shp");
 	}
 	
 	private void mapPolygons() {

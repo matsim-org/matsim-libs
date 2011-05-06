@@ -143,11 +143,7 @@ public class DistanceAnalysis {
 
 
 	private void writePolygons() {
-		try {
-			ShapeFileWriter.writeGeometries(this.features, "./padang/evac_classification.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, "./padang/evac_classification.shp");
 	}
 
 

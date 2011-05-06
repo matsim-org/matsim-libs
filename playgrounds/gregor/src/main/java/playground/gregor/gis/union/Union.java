@@ -41,14 +41,11 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class Union {
@@ -129,11 +126,7 @@ int iters = 0;
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		try {
-			ShapeFileWriter.writeGeometries(this.features, "/home/laemmel/devel/sim2d/data/duisburg/duisburg.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, "/home/laemmel/devel/sim2d/data/duisburg/duisburg.shp");
 		
 		
 	}	

@@ -19,7 +19,6 @@
 
 package playground.droeder.gis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -150,12 +149,8 @@ public class DaShapeWriter {
 	}
 	
 	private static void write(Collection<Feature> features, String fileName){
-		try {
-			ShapeFileWriter.writeGeometries(features, fileName); 
-			log.info(fileName + " written!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		ShapeFileWriter.writeGeometries(features, fileName); 
+		log.info(fileName + " written!"); 
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {

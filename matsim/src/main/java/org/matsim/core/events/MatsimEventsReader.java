@@ -104,11 +104,11 @@ public class MatsimEventsReader implements MatsimSomeReader {
 			try {
 				parse(filename);
 			} catch (SAXException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 

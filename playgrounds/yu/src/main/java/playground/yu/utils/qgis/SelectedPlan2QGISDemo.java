@@ -19,8 +19,6 @@
 
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.population.Population;
@@ -80,10 +78,6 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		sp.setWriteActs(true);
 		sp.setWriteLegs(true);
 
-		try {
-			sp.write();
-		} catch (IOException e) {
-			log.error(e);
-		}
+		sp.write();
 	}
 }

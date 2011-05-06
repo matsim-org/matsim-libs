@@ -119,17 +119,12 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		
 
 		
-		try {
-//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
-//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.SAFE_FILE),safeColor));
-			this.quad.addAdditionalElement(new TileDrawerDataWriter());
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
-			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));
-//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.BUILDINGS_FILE),buildingsColor));
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.REGION_FILE),regionColor));
+		//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.SAFE_FILE),safeColor));
+					this.quad.addAdditionalElement(new TileDrawerDataWriter());
+					this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.LINKS_FILE),linksColor));
+					this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.NODES_FILE),nodesColor));
+		//			this.quad.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile(this.BUILDINGS_FILE),buildingsColor));
 		
 		for (OTFBackgroundTexturesDrawer sbg : this.sbgs){
 			this.quad.addAdditionalElement(new TextureDataWriter(sbg));
@@ -171,15 +166,11 @@ public class MVISnapshotWriter extends OTFFileWriter{
 //		connect.connectWriterToReader(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.connectWriterToReader(TextureDataWriter.class,TextutreDataReader.class);
 		if (this.occMap != null) {
-			try {
-				FeatureSource fs = ShapeFileReader.readDataFile(this.BUILDINGS_FILE);
-				OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast);
-				this.quad.addAdditionalElement(new SheltersWriter(sd));
-				connect.connectWriterToReader(SheltersWriter.class,SheltersReader.class);
-				connect.connectReaderToReceiver(SheltersReader.class,TimeDependentTrigger.class);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			FeatureSource fs = ShapeFileReader.readDataFile(this.BUILDINGS_FILE);
+			OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast);
+			this.quad.addAdditionalElement(new SheltersWriter(sd));
+			connect.connectWriterToReader(SheltersWriter.class,SheltersReader.class);
+			connect.connectReaderToReceiver(SheltersReader.class,TimeDependentTrigger.class);
 		}
 		
 		if (this.insertWave) {

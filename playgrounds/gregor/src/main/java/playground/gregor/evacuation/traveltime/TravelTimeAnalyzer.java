@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.evacuation.traveltime;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -120,11 +119,7 @@ public class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArri
 				e.printStackTrace();
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, this.out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, this.out);
 		System.out.println(g10 + "," + g20 + "," + g30 + "," + g40 + "," + g40P);
 
 	}

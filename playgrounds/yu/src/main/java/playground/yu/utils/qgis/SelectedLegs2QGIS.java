@@ -99,11 +99,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		sp.setWriteActs(false);
 		sp.setWriteLegs(true);
 
-		try {
-			sp.write();
-		} catch (IOException e) {
-			log.error(e);
-		}
+		sp.write();
 	}
 
 }

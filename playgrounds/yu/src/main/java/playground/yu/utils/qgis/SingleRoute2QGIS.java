@@ -19,7 +19,6 @@
 
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +140,7 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		return featureTypeRoute;
 	}
 
-	protected void writeRoutes() throws IOException {
+	protected void writeRoutes() {
 
 		for (Entry<String, List<LegRoute>> personDailyRoutes : dailyRoutes
 				.entrySet()) {
@@ -161,7 +160,7 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 	}
 
 	@Override
-	public void write() throws IOException {
+	public void write() {
 		if (writeRoutes) {
 			writeRoutes();
 		}
@@ -203,17 +202,13 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		drs.write();
 
 		CoordinateReferenceSystem crs;
-		try {
-			crs = MGC.getCRS(gk4);
-			SingleRoute2QGIS r2q = new SingleRoute2QGIS(population, crs,
-					outputDir, network, drs.getDailyRouteList());
-			r2q.setOutputSample(sample);
-			r2q.setWriteActs(false);
-			r2q.setWriteRoutes(true);
-			r2q.write();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+		crs = MGC.getCRS(gk4);
+		SingleRoute2QGIS r2q = new SingleRoute2QGIS(population, crs,
+				outputDir, network, drs.getDailyRouteList());
+		r2q.setOutputSample(sample);
+		r2q.setWriteActs(false);
+		r2q.setWriteRoutes(true);
+		r2q.write();
 	}
 
 	protected void setWriteRoutes(final boolean writeRoutes) {

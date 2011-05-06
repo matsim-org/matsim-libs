@@ -1,9 +1,9 @@
 package playground.anhorni.PLOC.analysis.postprocessing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -31,12 +30,8 @@ public class LinkVolumesShapeFileWriter {
 			features.add(feature);
 		}
 		
-		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outpath  + "/volumes_" + hour + ".shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!features.isEmpty()) {
+			ShapeFileWriter.writeGeometries((Collection<Feature>)features, outpath  + "/volumes_" + hour + ".shp");
 		}
 	}
 		

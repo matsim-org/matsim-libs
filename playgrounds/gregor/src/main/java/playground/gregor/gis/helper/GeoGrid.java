@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.gis.helper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -125,41 +124,8 @@ public class GeoGrid {
 			
 			
 		}
-//		
-//		for (double x = minX; x <= maxX; x += INCR) {
-//			int id = 1;
-//			if (x/1000 % 5 == 0) {
-//				id = 5;
-//			}
-//			Coordinate c1 = new Coordinate(x,minY);
-//			Coordinate c2 = new Coordinate(x,maxY);
-//			LineString ls = geofac.createLineString(new Coordinate[]{c1,c2});
-//			try {
-//				fts.add(ft.create(new Object[]{ls,id,(int)c2.x,(int)c2.y}));
-//			} catch (IllegalAttributeException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		for (double y = minY; y <= maxY; y += INCR) {
-//			int id = 1;
-//			if (y/1000 % 5 == 0) {
-//				id = 5;
-//			}
-//			Coordinate c1 = new Coordinate(minX,y);
-//			Coordinate c2 = new Coordinate(maxX,y);
-//			LineString ls = geofac.createLineString(new Coordinate[]{c1,c2});
-//			try {
-//				fts.add(ft.create(new Object[]{ls,id,(int)c2.x,(int)c2.y}));
-//			} catch (IllegalAttributeException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, "/Users/laemmel/tmp/qgis/geogridSmall1.shp");
+ShapeFileWriter.writeGeometries(fts, "/Users/laemmel/tmp/qgis/geogridSmall1.shp");
 //			ShapeFileWriter.writeGeometries(fts, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/geogrid_small.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		Collection<Feature> fts2 = new ArrayList<Feature>();
 		
@@ -182,12 +148,8 @@ public class GeoGrid {
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts2, "/Users/laemmel/tmp/qgis/boxSmall1.shp");
-//			ShapeFileWriter.writeGeometries(fts2, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/box_small.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
+		ShapeFileWriter.writeGeometries(fts2, "/Users/laemmel/tmp/qgis/boxSmall1.shp");
+//			ShapeFileWriter.writeGeometries(fts2, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/box_small.shp");		
 				
 		FeatureType ft3 = initFeatureTypePoi();
 		Collection<Feature> fts3 = new ArrayList<Feature>();
@@ -209,12 +171,8 @@ public class GeoGrid {
 				e.printStackTrace();
 			}
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts3, "/Users/laemmel/tmp/qgis/labelsSmall1.shp");
+		ShapeFileWriter.writeGeometries(fts3, "/Users/laemmel/tmp/qgis/labelsSmall1.shp");
 //			ShapeFileWriter.writeGeometries(fts3, "/home/laemmel/arbeit/svn/shared-svn/projects/LastMile/berichte/abschlussworkshop/gis/labels_small.shp");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 	}
 	

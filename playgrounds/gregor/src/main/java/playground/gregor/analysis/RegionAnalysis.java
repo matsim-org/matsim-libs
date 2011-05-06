@@ -228,11 +228,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		}
 
 
-		try {
-			ShapeFileWriter.writeGeometries(this.features, this.outfile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.features, this.outfile);
 
 	}
 

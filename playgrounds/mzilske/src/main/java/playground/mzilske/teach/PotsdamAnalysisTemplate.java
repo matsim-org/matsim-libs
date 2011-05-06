@@ -1,6 +1,5 @@
 package playground.mzilske.teach;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -38,11 +37,7 @@ public class PotsdamAnalysisTemplate implements Runnable {
 		analyse();
 		initFeatureType();
 		Collection<Feature> features = createFeatures();
-		try {
-			ShapeFileWriter.writeGeometries(features, "..."); // Hier Dateinamen einfügen
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		ShapeFileWriter.writeGeometries(features, "..."); // Hier Dateinamen einfügen 
 	}
 
 	private void analyse() {

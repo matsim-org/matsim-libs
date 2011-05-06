@@ -100,12 +100,7 @@ public class Convexer {
 	}
 
 	private void write() {
-		try {
-			ShapeFileWriter.writeGeometries(this.fetures, this.outfile);
-		} catch (final IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(this.fetures, this.outfile);
 
 
 	}

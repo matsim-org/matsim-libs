@@ -75,11 +75,7 @@ public class Links2ESRIShape {
 			features.add(this.featureGenerator.getFeature(link));
 		}
 		log.info("writing features to shape file... " + this.filename);
-		try {
-			ShapeFileWriter.writeGeometries(features, this.filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, this.filename);
 		log.info("done writing shape file.");
 	}
 

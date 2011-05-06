@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.flooding;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -108,12 +107,8 @@ public class FloodLineShape {
 //		}
 //		
 		
-		try {
-			ShapeFileWriter.writeGeometries(fts, this.output);
+		ShapeFileWriter.writeGeometries(fts, this.output);
 //			ShapeFileWriter.writeGeometries(fts2, this.output2);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void initFeatureType() {
