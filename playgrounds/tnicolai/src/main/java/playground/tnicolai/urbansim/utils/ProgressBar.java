@@ -9,8 +9,8 @@ package playground.tnicolai.urbansim.utils;
 public class ProgressBar {
 	
 	private long percent = 0;
-	private long percentDone = 0;
-	private long stepSize = 0;
+	private long stepsDone = 0;
+	private long numberOfSteps = 0;
 	private boolean isFinished = false;
 	
 	/**
@@ -18,7 +18,7 @@ public class ProgressBar {
 	 * @param stepSize <code>long</code>
 	 */
 	public ProgressBar(long stepSize){
-		this.stepSize = stepSize;
+		this.numberOfSteps = stepSize;
 		System.out.println("|--------------------------------------------------------------------------------------------------|");
 	}
 	/**
@@ -26,7 +26,7 @@ public class ProgressBar {
 	 * @param stepSize <code>double</code>
 	 */
 	public ProgressBar(double stepSize){
-		this.stepSize = Math.round( stepSize );
+		this.numberOfSteps = Math.round( stepSize );
 		System.out.println("|--------------------------------------------------------------------------------------------------|");
 	}
 	
@@ -35,14 +35,16 @@ public class ProgressBar {
 	 */
 	public void update(){
 		
-		percent++;
+		stepsDone++;
 		
-		int newState = (int) (100.*percent/stepSize);
+		int newState = (int) (100*stepsDone/numberOfSteps);
 		if(newState > 100)
 			newState = 100;
 		
-		while ( newState  > percentDone )
-			percentDone++;  System.out.print('|');
+		while ( newState  > percent ){
+			percent++;  
+			System.out.print('|');
+		}
 
 		if(newState == 100 && !isFinished){
 			System.out.println("\r\n");

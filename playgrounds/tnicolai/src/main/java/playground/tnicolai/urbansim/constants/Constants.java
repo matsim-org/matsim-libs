@@ -172,7 +172,7 @@ public class Constants {
 	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
 	
 	/** Spatial IDs */
-	public static final int SRID_WASHINGTON_NORTH = 2285;
+	public static final int SRID_WASHINGTON_NORTH = 2926;// 2285; // 2285 also worked well, but was last updated in 2001 instead of 2007
 	
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";

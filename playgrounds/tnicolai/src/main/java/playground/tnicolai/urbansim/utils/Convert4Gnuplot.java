@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.toolbox.gnuplot;
+package playground.tnicolai.urbansim.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,7 +34,6 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 import playground.tnicolai.urbansim.utils.io.filter.TabFilter;
 
 /**

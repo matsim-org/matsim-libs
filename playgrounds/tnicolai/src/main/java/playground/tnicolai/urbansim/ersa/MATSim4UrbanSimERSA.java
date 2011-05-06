@@ -26,6 +26,7 @@ package playground.tnicolai.urbansim.ersa;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,8 +36,11 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.sna.gis.Zone;
 import org.matsim.contrib.sna.gis.ZoneLayer;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.johannes.socialnetworks.gis.SpatialGrid;
 import playground.johannes.socialnetworks.gis.SpatialGridTableWriter;
@@ -71,6 +75,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	private String shapeFile = null;
 	private int gridSize = -1;
 	private double jobSample = 1.;
+	private double capacity = -1;
 	
 	public MATSim4UrbanSimERSA(String args[]){
 		super(args);
@@ -79,7 +84,8 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		// the starting points for accessibility measures
 		checkAndSetShapeFile(args);
 		checkAndSetGridSize(args);
-		checkAnsSetJobSample(args);
+		checkAndSetJobSample(args);
+		checkAndSetCUPUMNetworkModification(args); // testing impact of an accessibility improvement (see cupum). this is just for testing ...
 	}
 
 	/**
@@ -128,7 +134,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * 
 	 * @param args
 	 */
-	private void checkAnsSetJobSample(String[] args) {
+	private void checkAndSetJobSample(String[] args) {
 		try{
 			if(args.length >= 4){
 				jobSample = Double.parseDouble( args[3].trim() );
@@ -140,6 +146,24 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		} catch(NumberFormatException nfe){
 			nfe.printStackTrace();
 			logger.error( "Please set a correct job sample . " + args[3] + " is not a valid value (double).");
+		}
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	private void checkAndSetCUPUMNetworkModification(String[] args) {
+		try{
+			if(args.length >= 5){
+				capacity = Double.parseDouble( args[4].trim() );
+				logger.info("The capacity for ferry connection between Seattle CBD and Bainbridge Island was set to " + String.valueOf(capacity) );
+			} else
+				capacity = -1.;
+		} catch(NumberFormatException nfe){
+			nfe.printStackTrace();
+			logger.error( "Please set a correct capacity for ferry connection between Seattle CBD and Bainbridge Island . " + args[4] + " is not a valid value (double).");
+			capacity = -1;
 		}
 	}
 	
@@ -160,6 +184,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		try {
 			myListener = initAndAddControlerListener(parcels, readFromUrbansim, controler);
+			modifyLinks( ((NetworkImpl)scenario.getNetwork()), capacity);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -442,6 +467,71 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		ZoneLayer<Integer> layer = new ZoneLayer<Integer>(zones);
 		return layer;
+	}
+	
+	/**
+	 * modifies the links in the travel network without changing the file
+	 * @param network
+	 */
+	private void modifyLinks(NetworkImpl network, double capacity){
+		
+		// -1 means, no capacity changes on the network/links
+		if( capacity < 0.)
+			return;
+		
+		logger.info("Modifiying network now ...");
+		
+		double newFreespeed = 70*0.44704; // 70mph -> meter/sec
+		
+		ArrayList<IdImpl> wantedIdSet = new ArrayList<IdImpl>(){
+			private static final long serialVersionUID = 1L;
+			{
+				add(new IdImpl(8325));
+				add(new IdImpl(9711));
+				add(new IdImpl(7691));
+				add(new IdImpl(9710));
+				add(new IdImpl(9709));
+				add(new IdImpl(7143));
+				add(new IdImpl(7142));
+				add(new IdImpl(7127));
+				add(new IdImpl(7126));
+				add(new IdImpl(2060));
+			}
+		};
+		
+		for(int i = 0; i < wantedIdSet.size(); i++){
+			IdImpl id = wantedIdSet.get(i);
+			LinkImpl link = (LinkImpl)network.getLinks().get(id);
+			
+			// modify free speed
+			link.setFreespeed( newFreespeed );
+			
+			// modify link capacity, if available
+			if(capacity >= 0.)
+				link.setCapacity(capacity);
+			
+			printLinkInfo(link);			
+		}
+		logger.info("Finished modifying network.");
+	}
+	
+	/**
+	 * prints key data of a link
+	 * 
+	 * @param link
+	 */
+	private void printLinkInfo(LinkImpl link){
+		
+		logger.info("#########################################");
+		logger.info("Link ID:" + link.getId());
+		logger.info("Link Capacity:" + link.getCapacity()); // capacity in vehicles/hour (standard for german autobahn = 2000)
+		logger.info("Link FlowCapacity:" + link.getFlowCapacity());
+		logger.info("Link Freespeed:" + link.getFreespeed()); // freespeed in meter/sec
+		logger.info("Link FreespeedTravelTime:" + link.getFreespeedTravelTime()); // = length/freespeed
+		logger.info("Link NumberOfLanes:" + link.getNumberOfLanes());
+		logger.info("Link AllowedModes:" + link.getAllowedModes());
+		logger.info("Link Length:" + link.getLength());
+		logger.info("Link Type:" + link.getType());
 	}
 	
 	/**
