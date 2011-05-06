@@ -34,7 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
 
-public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator, Steppable {
+public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 
 	/*package*/ Netsim qSim;
 	/*package*/ MultiModalTravelTime multiModalTravelTime;

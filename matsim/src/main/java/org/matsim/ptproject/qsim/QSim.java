@@ -68,6 +68,7 @@ import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
@@ -119,6 +120,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
+	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
+	
 	private MobsimTimerI simTimer;
 
 	private Collection<PlanAgent> transitAgents;
@@ -317,6 +320,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		if (this.multiModalEngine != null) {
 			this.multiModalEngine.onPrepareSim();
 		}
+		for (MobsimEngine mobsimEngine : mobsimEngines) {
+			mobsimEngine.onPrepareSim();
+		}
 
 		createAgents();
 		createVehicles();
@@ -416,6 +422,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		if (this.multiModalEngine != null) {
 			this.multiModalEngine.afterSim();
 		}
+		for (MobsimEngine mobsimEngine : mobsimEngines) {
+			mobsimEngine.afterSim();
+		}
 
 		double now = this.simTimer.getTimeOfDay();
 
@@ -479,6 +488,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 			this.multiModalEngine.doSimStep(time);
 		}
 
+		for (MobsimEngine mobsimEngine : mobsimEngines) {
+			mobsimEngine.doSimStep(time);
+		}
+		
 		this.printSimLog(time);
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -786,6 +799,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	@Override
 	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
+	}
+	
+	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
+		this.mobsimEngines.add(mobsimEngine);
 	}
 
 	@Override

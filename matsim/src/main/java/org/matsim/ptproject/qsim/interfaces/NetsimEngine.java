@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.Steppable;
  * @author cdobler
  * @author dgrether
  */
-public interface NetsimEngine extends MobsimEngine, Steppable {
+public interface NetsimEngine extends MobsimEngine {
 
 //	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder();
 

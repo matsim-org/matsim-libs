@@ -273,5 +273,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		this.transitDriverFactory = abstractTransitDriverFactory;
 	}
 
+	@Override
+	public void doSimStep(double time) {
+		// Nothing to do here.
+	}
+
 
 }
