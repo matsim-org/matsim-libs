@@ -21,12 +21,16 @@
 package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -44,6 +48,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
+	private Network  network;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
@@ -51,6 +56,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		super();
 		this.router = router;
 		this.xy2links = new XY2Links(network);
+		this.network = network;
 	}
 
 	@Override
@@ -79,6 +85,18 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
+					}
+					else if (Double.isNaN(leg.getRoute().getDistance())){
+						Double dist = null;
+						if (leg.getRoute() instanceof NetworkRoute){
+							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+						}
+						else if (leg.getRoute() instanceof LinkNetworkRoute){
+							dist = RouteUtils.calcDistance((LinkNetworkRoute)leg.getRoute(), this.network);
+						}
+						if (dist != null){
+							leg.getRoute().setDistance(dist);
+						}
 					}
 				}
 			}

@@ -47,7 +47,7 @@ public class ReRoutingTest extends MatsimTestCase {
 		long checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
 		assertEquals("different event files", checksum1, checksum2);
 
-		checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "plans.xml.gz");
+		checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "1.plans.xml.gz");
 		checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
 		assertEquals("different plans files", checksum1, checksum2);
 	}
