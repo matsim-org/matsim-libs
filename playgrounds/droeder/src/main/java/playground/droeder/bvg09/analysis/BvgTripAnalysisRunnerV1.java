@@ -17,10 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips;
+package playground.droeder.bvg09.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.Set;
+
+import org.geotools.feature.Feature;
+import org.matsim.core.utils.gis.ShapeFileReader;
+
+import playground.droeder.DaPaths;
+import playground.droeder.Analysis.Trips.V1.TripAnalysisV1;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -28,30 +34,30 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class AnalysisTripSetAllMode {
-	
-	private Map<String, AnalysisTripSetOneMode> mode2TripSet = new HashMap<String, AnalysisTripSetOneMode>();
-	private boolean storeTrips;
-	private Geometry zone;
-	
-	public AnalysisTripSetAllMode(boolean storeTrips, Geometry zone){
-		this.storeTrips = storeTrips;
-		this.zone = zone;
-	}
-	
-	public void addTrip(AnalysisTrip trip){
-		String mode = trip.getMode();
+public class BvgTripAnalysisRunnerV1 {
+	public static void main(String[] args){
+		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
+		final String INDIR = OUTDIR + "input/";
 		
-		if(this.mode2TripSet.containsKey(mode)){
-			this.mode2TripSet.get(mode).addTrip(trip);
-		}else{
-			AnalysisTripSetOneMode temp = new AnalysisTripSetOneMode(mode, this.zone, this.storeTrips);
-			temp.addTrip(trip);
-			this.mode2TripSet.put(mode, temp);
+		final String NETWORKFILE = INDIR + "network.final.xml.gz";
+		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
+		
+		final String EVENTSFILE = INDIR + "bvg.run128.25pct.100.events.xml.gz";
+//		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
+		
+//		final String EVENTSFILE = OUTDIR + "testEvents.xml";
+		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
+		
+		Set<Feature> features = null;
+		try {
+			features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-	}
-	
-	public Map<String, AnalysisTripSetOneMode> getTripSets(){
-		return this.mode2TripSet;
+		
+		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
+		
+		TripAnalysisV1 ana = new TripAnalysisV1(g);
+		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTDIR, false);
 	}
 }

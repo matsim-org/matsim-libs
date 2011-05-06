@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
 
+import playground.droeder.Analysis.Trips.V1.AnalysisTripV1;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -42,7 +44,7 @@ public class AnalysisTripSetOneMode {
 	private Geometry zone;
 	private String mode;
 	
-	//[0]inside, [1]outside, [2]inOut, [3] outIn
+	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
 	//all modes
 	private double[] sumTTime = new double[4];
 	private double[] tripCnt = new double[4];
@@ -189,10 +191,10 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-	public void addTrips(List<AnalysisTrip> trips){
+	public void addTrips(List<AnalysisTripV1> trips){
 		int nextMsg = 1;
 		int counter = 0;
-		for(AnalysisTrip trip : trips){
+		for(AnalysisTripV1 trip : trips){
 			this.addTrip(trip);
 			counter++;
 			if(counter % nextMsg == 0){
@@ -202,17 +204,18 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 	
+	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
 	private Integer getTripLocation(AnalysisTrip trip){
 		if(this.zone == null){
 			return 0;
 		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
 			return 0;
 		}else if(this.zone.contains(trip.getStart()) && !this.zone.contains(trip.getEnd())){
-			return 2;
-		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
-			return 3;
-		}else {
 			return 1;
+		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
+			return 2;
+		}else {
+			return 3;
 		}
 	}
 	
@@ -227,41 +230,42 @@ public class AnalysisTripSetOneMode {
 	public String toString(){
 		StringBuffer b = new StringBuffer();
 		
-			//print header
-			b.append(";inside Zone;outside Zone;entering Zone;leaving Zone; \n");
+		//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
+		//print header
+		b.append(";inside Zone;leaving Zone;entering Zone;outside Zone; \n");
+		
+		//values for all modes	
+		b.append("sumTTime;"); println(this.sumTTime, b);
+		b.append("tripCnt;"); println(this.tripCnt, b);
+		
+		//values for pt
+		if(this.mode.equals(TransportMode.pt)){
+			b.append("accesWalkCnt;"); println(this.accesWalkCnt, b);
+			b.append("accesWaitCnt;"); println(this.accesWaitCnt, b);
+			b.append("egressWalkCnt;"); println(this.egressWalkCnt, b);
+			b.append("switchWalkCnt;"); println(this.switchWalkCnt, b);
+			b.append("switchWaitCnt;"); println(this.switchWaitCnt, b);
+			b.append("lineCnt;"); println(this.lineCnt, b);
 			
-			//values for all modes	
-			b.append("sumTTime;"); println(this.sumTTime, b);
-			b.append("tripCnt;"); println(this.tripCnt, b);
+			b.append("accesWalkTTime;"); println(this.accesWalkTTime, b);
+			b.append("accesWaitTime;"); println(this.accesWaitTime, b);
+			b.append("egressWalkTTime;"); println(this.egressWalkTTime, b);
+			b.append("switchWalkTTime;"); println(this.switchWalkTTime, b);
+			b.append("switchWaitTime;"); println(this.switchWaitTime, b);
+			b.append("lineTTime;"); println(this.lineTTime, b);
 			
-			//values for pt
-			if(this.mode.equals(TransportMode.pt)){
-				b.append("accesWalkCnt;"); println(this.accesWalkCnt, b);
-				b.append("accesWaitCnt;"); println(this.accesWaitCnt, b);
-				b.append("egressWalkCnt;"); println(this.egressWalkCnt, b);
-				b.append("switchWalkCnt;"); println(this.switchWalkCnt, b);
-				b.append("switchWaitCnt;"); println(this.switchWaitCnt, b);
-				b.append("lineCnt;"); println(this.lineCnt, b);
-				
-				b.append("accesWalkTTime;"); println(this.accesWalkTTime, b);
-				b.append("accesWaitTime;"); println(this.accesWaitTime, b);
-				b.append("egressWalkTTime;"); println(this.egressWalkTTime, b);
-				b.append("switchWalkTTime;"); println(this.switchWalkTTime, b);
-				b.append("switchWaitTime;"); println(this.switchWaitTime, b);
-				b.append("lineTTime;"); println(this.lineTTime, b);
-				
-				b.append("line1cnt;"); println(this.line1cnt, b);
-				b.append("line2cnt;"); println(this.line2cnt, b);
-				b.append("line3cnt;");println(this.line3cnt, b);
-				b.append("line4cnt;");println(this.line4cnt, b);
-				b.append("line5cnt;");println(this.line5cnt, b);
-				b.append("line6cnt;");println(this.line6cnt, b);
-				b.append("line7cnt;");println(this.line7cnt, b);
-				b.append("line8cnt;");println(this.line8cnt, b);
-				b.append("line9cnt;");println(this.line9cnt, b);
-				b.append("line10cnt;");println(this.line10cnt, b);
-				b.append("lineGt10cnt;");println(this.lineGt10cnt, b);
-			}
+			b.append("line1cnt;"); println(this.line1cnt, b);
+			b.append("line2cnt;"); println(this.line2cnt, b);
+			b.append("line3cnt;");println(this.line3cnt, b);
+			b.append("line4cnt;");println(this.line4cnt, b);
+			b.append("line5cnt;");println(this.line5cnt, b);
+			b.append("line6cnt;");println(this.line6cnt, b);
+			b.append("line7cnt;");println(this.line7cnt, b);
+			b.append("line8cnt;");println(this.line8cnt, b);
+			b.append("line9cnt;");println(this.line9cnt, b);
+			b.append("line10cnt;");println(this.line10cnt, b);
+			b.append("lineGt10cnt;");println(this.lineGt10cnt, b);
+		}
 		return b.toString();
 	}
 	

@@ -17,41 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips;
+package playground.droeder.Analysis.Trips.V2;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.PersonEvent;
+
+import playground.droeder.Analysis.Trips.AnalysisTrip;
+
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripSetAllMode {
+public class AnalysisTripV2 extends AnalysisTrip {
 	
-	private Map<String, AnalysisTripSetOneMode> mode2TripSet = new HashMap<String, AnalysisTripSetOneMode>();
-	private boolean storeTrips;
-	private Geometry zone;
+	private Integer nrOfElements = 0;
 	
-	public AnalysisTripSetAllMode(boolean storeTrips, Geometry zone){
-		this.storeTrips = storeTrips;
-		this.zone = zone;
-	}
-	
-	public void addTrip(AnalysisTrip trip){
-		String mode = trip.getMode();
+	public AnalysisTripV2(){
 		
-		if(this.mode2TripSet.containsKey(mode)){
-			this.mode2TripSet.get(mode).addTrip(trip);
-		}else{
-			AnalysisTripSetOneMode temp = new AnalysisTripSetOneMode(mode, this.zone, this.storeTrips);
-			temp.addTrip(trip);
-			this.mode2TripSet.put(mode, temp);
-		}
 	}
 	
-	public Map<String, AnalysisTripSetOneMode> getTripSets(){
-		return this.mode2TripSet;
+	public void addElements(ArrayList<PlanElement> elements){
+		this.nrOfElements = elements.size();
+		super.analyzeElements(elements);
+	}
+	
+	public void addEvents(ArrayList<PersonEvent> events){
+		super.analyzeEvents(events);
+	}
+	
+	public Integer getNrOfElements(){
+		return this.nrOfElements;
 	}
 }

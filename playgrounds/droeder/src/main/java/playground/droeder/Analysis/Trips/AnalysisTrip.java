@@ -41,33 +41,32 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  */
 public class AnalysisTrip {
-	private String mode = null;
-	private Coordinate start;
-	private Coordinate end;
-	private ArrayList<PersonEvent> events;
-	
+	protected Coordinate start;
+	protected Coordinate end;
+	protected String mode = null;
+
 	//all modes
-	private Double tripTTime = 0.0;
+	protected double tripTTime = 0.0;
 	
 	// pt only
-	private int accesWalkCnt = 0;
-	private int accesWaitCnt = 0;
-	private int egressWalkCnt = 0;
-	private int switchWalkCnt= 0;
-	private int switchWaitCnt = 0;
-	private int lineCnt = 0;
+	protected int accesWalkCnt = 0;
+	protected int accesWaitCnt = 0;
+	protected int egressWalkCnt = 0;
+	protected int switchWalkCnt= 0;
+	protected int switchWaitCnt = 0;
+	protected int lineCnt = 0;
 	
-	private double accesWalkTTime = 0.0;
-	private double accesWaitTime = 0.0;
-	private double egressWalkTTime = 0.0;
-	private double switchWalkTTime = 0.0;
-	private double switchWaitTime = 0.0;
-	private double lineTTime = 0.0;
+	protected double accesWalkTTime = 0.0;
+	protected double accesWaitTime = 0.0;
+	protected double egressWalkTTime = 0.0;
+	protected double switchWalkTTime = 0.0;
+	protected double switchWaitTime = 0.0;
+	protected double lineTTime = 0.0;
 	
+
 	
-	public AnalysisTrip(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
-		this.events = events;
-		
+	protected void analyzeElements(ArrayList<PlanElement> elements) {
+		this.findMode(elements);
 		//if no zones in TripSet are defined, coords not necessary
 		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
 			this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
@@ -75,44 +74,37 @@ public class AnalysisTrip {
 			this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
 					((Activity) elements.get(elements.size() - 1)).getCoord().getY());
 		}
-		this.mode = this.findMode(elements);
-		this.analyze();
-	}
-	
-	public String getMode(){
-		return this.mode;
 	}
 	
 	// not essential but good to prevent mixing up different modes
-	private String findMode(ArrayList<PlanElement> elements) {
-		String mode = null;
+	private void findMode(ArrayList<PlanElement> elements) {
 		for(PlanElement p : elements){
 			if(p instanceof Leg){
 				if(((Leg) p).getMode().equals(TransportMode.transit_walk)){
-					mode = TransportMode.transit_walk;
+					this.mode = TransportMode.transit_walk;
 				}else{
-					return ((Leg) p).getMode();
+					this.mode = ((Leg) p).getMode();
+					return;
 				}
 			}
 		}
-		return mode;
 	}
-
-	public void analyze(){
-		this.analyzeValuesForAllModes();
+	
+	protected void analyzeEvents(ArrayList<PersonEvent> events){
+		this.analyzeValuesForAllModes(events);
 		if(this.mode.equals(TransportMode.pt)){
-			this.analyzeValuesForPT();
+			this.analyzeValuesForPT(events);
 		}
 	}
 	
-	private void analyzeValuesForAllModes() {
+	private void analyzeValuesForAllModes(ArrayList<PersonEvent> events) {
 		// from first departure to last arrival
 		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
 	}
 
 	
-	private void analyzeValuesForPT() {
-		ListIterator<PersonEvent> it = this.events.listIterator();
+	private void analyzeValuesForPT(ArrayList<PersonEvent> events) {
+		ListIterator<PersonEvent> it = events.listIterator();
 		PersonEvent pe;
 		double switchWait = 0;
 		
@@ -188,8 +180,11 @@ public class AnalysisTrip {
 		}
 		
 	}
-
-
+	
+	public String getMode(){
+		return this.mode;
+	}
+	
 	/**
 	 * @return
 	 */
@@ -294,4 +289,6 @@ public class AnalysisTrip {
 	public double getLineTTime() {
 		return lineTTime;
 	}
+
+
 }

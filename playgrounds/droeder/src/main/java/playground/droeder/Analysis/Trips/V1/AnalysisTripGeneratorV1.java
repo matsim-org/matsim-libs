@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips;
+package playground.droeder.Analysis.Trips.V1;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -31,16 +31,18 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
+import playground.droeder.Analysis.Trips.AnalysisTripSetAllMode;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripGenerator {
+public class AnalysisTripGeneratorV1 {
 	
 	private static final Logger log = Logger
-			.getLogger(AnalysisTripGenerator.class);
+			.getLogger(AnalysisTripGeneratorV1.class);
 	
 	public static AnalysisTripSetAllMode calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
 			Map<Id, ArrayList<PlanElement>> planElements, Geometry zone, boolean storeTrips){
@@ -87,7 +89,7 @@ public class AnalysisTripGenerator {
 						// other modes consists only act-leg-act
 						else{
 							splittedElements.add(p);
-							tripSet.addTrip(new AnalysisTrip(splittedEvents, splittedElements));
+							tripSet.addTrip(new AnalysisTripV1(splittedEvents, splittedElements));
 							
 							splittedElements = new ArrayList<PlanElement>();
 							splittedEvents = new ArrayList<PersonEvent>();

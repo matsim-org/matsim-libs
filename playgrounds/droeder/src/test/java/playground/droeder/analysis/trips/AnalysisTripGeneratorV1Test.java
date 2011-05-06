@@ -41,14 +41,14 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.AnalysisTripGenerator;
 import playground.droeder.Analysis.Trips.AnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.V1.AnalysisTripGeneratorV1;
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripGeneratorTest {
+public class AnalysisTripGeneratorV1Test {
 	private Map<Id, ArrayList<PersonEvent>> personEvents;
 	private Map<Id, ArrayList<PlanElement>> planElements;
 	private Map<String, AnalysisTripSetOneMode> sets;
@@ -170,7 +170,7 @@ public class AnalysisTripGeneratorTest {
 			this.planElements.put(agentId, elements);
 		}
 		
-		this.sets = AnalysisTripGenerator.calculateTripSet(this.personEvents, this.planElements, null, false).getTripSets();
+		this.sets = AnalysisTripGeneratorV1.calculateTripSet(this.personEvents, this.planElements, null, false).getTripSets();
 	}
 
 	@Test

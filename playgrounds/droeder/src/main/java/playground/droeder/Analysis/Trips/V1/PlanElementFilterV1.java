@@ -17,47 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09.analysis;
+package playground.droeder.Analysis.Trips.V1;
 
-import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.geotools.feature.Feature;
-import org.matsim.core.utils.gis.ShapeFileReader;
-
-import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.TripAnalysis;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.population.filters.AbstractPersonFilter;
 
 /**
  * @author droeder
  *
  */
-public class BvgTripAnalysisRunner {
-	public static void main(String[] args){
-		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
-		final String INDIR = OUTDIR + "input/";
-		
-		final String NETWORKFILE = INDIR + "network.final.xml.gz";
-		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
-		
-//		final String EVENTSFILE = IN + "bvg.run128.25pct.100.events.xml.gz";
-//		final String PLANSFILE = IN + "bvg.run128.25pct.100.plans.selected.xml.gz";
-		
-		final String EVENTSFILE = OUTDIR + "testEvents.xml";
-		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
-		
-		Set<Feature> features = null;
-		try {
-			features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
-		
-		TripAnalysis ana = new TripAnalysis(g);
-		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTDIR, false);
+public class PlanElementFilterV1 extends AbstractPersonFilter{
+	private Map<Id, ArrayList<PlanElement>> elements;
+	
+	public PlanElementFilterV1(){
+		this.elements = new HashMap<Id, ArrayList<PlanElement>>();
 	}
+	
+	@Override
+	public void run(Person p){
+		if(judge(p)){
+			this.count();
+		}
+	}
+	
+	public Map<Id, ArrayList<PlanElement>> getElements(){
+		return this.elements;
+	}
+	@Override
+	public boolean judge(Person person) {
+
+		if(this.moreThanOneElement(person)){
+			this.elements.put(person.getId(), (ArrayList<PlanElement>) person.getSelectedPlan().getPlanElements());
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	private boolean moreThanOneElement(Person person){
+		if(person.getSelectedPlan().getPlanElements().size() > 1){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 }
