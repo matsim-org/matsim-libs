@@ -71,6 +71,11 @@ public class StayHomePlan {
 			return false;
 		}
 		return type.equals(PlanImpl.DeprecatedConstants.WALK);
+		/*
+		 * TODO: just a temporary solution, there could be a dummy PlanType in
+		 * PlanImpl .DeprecatedConstants , which should NOT be the existing
+		 * "undefined"
+		 */
 	}
 
 	/**

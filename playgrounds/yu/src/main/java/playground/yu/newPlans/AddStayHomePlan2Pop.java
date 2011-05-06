@@ -91,6 +91,7 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 		Route route = new GenericRouteImpl(firstActivityLinkId,
 				firstActivityLinkId);
 		route.setDistance(0d);
+		route.setTravelTime(0d);
 		leg.setRoute(route);
 		return leg;
 	}
@@ -114,7 +115,7 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 		homePlan.addLeg(createDummyLegAtHome(WALK, firstAct.getLinkId()));
 
 		Activity lastHomeAct = createHomeActivity(firstAct);
-		lastHomeAct.setStartTime(21700d);
+		lastHomeAct.setStartTime(21600d);
 		homePlan.addActivity(lastHomeAct);
 
 		((PlanImpl) homePlan).setType(PlanImpl.DeprecatedConstants.WALK);
@@ -135,8 +136,8 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 			outputPopFilename = args[2];
 		} else {
 			netFilename = "../../matsim/examples/equil/network.xml";
-			inputPopFilename = "test/input/10.plansFull.xml.gz";
-			outputPopFilename = "test/input/10.plansWithStayHomePlan.xml.gz";
+			inputPopFilename = "test/input/plans100withPt.xml";
+			outputPopFilename = "test/input/plans100WithPtAndStayHomePlan.xml.gz";
 		}
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils

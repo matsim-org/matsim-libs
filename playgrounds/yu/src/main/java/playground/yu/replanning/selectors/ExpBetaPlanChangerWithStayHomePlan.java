@@ -24,13 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.yu.demandModifications.StayHomePlan;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.container.CollectionMax;
 
 /**
@@ -59,15 +63,24 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 	static boolean betaWrnFlag = true;
 	static boolean scoreWrnFlag = true;
 
+	public ExpBetaPlanChangerWithStayHomePlan(Scenario scenario) {
+		Config config = scenario.getConfig();
+		betaBrain = config.planCalcScore().getBrainExpBeta();
+		String fStr = config.findParam(
+				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				BseStrategyManager.NOT_STAY_HOME_PROB);
+		if (fStr == null) {
+			f = 0.5;
+		} else {
+			f = Double.parseDouble(fStr);
+		}
+	}
+
 	/**
 	 * @param f
 	 *            the probability that any NOT "stay home" {@code Plan} can be
 	 *            chosen
 	 */
-	public ExpBetaPlanChangerWithStayHomePlan(double f) {
-		this(2d, f);
-	}
-
 	public ExpBetaPlanChangerWithStayHomePlan(double betaBrain, double f) {
 		this.betaBrain = betaBrain;
 		this.f = f;

@@ -45,6 +45,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
 import playground.yu.demandModifications.StayHomePlanASC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
@@ -620,7 +621,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					.parseDouble(config
 							.findParam(
 									BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-									"notStayHomeProb"));
+									BseStrategyManager.NOT_STAY_HOME_PROB));
 			new StayHomePlanASC(f, scoringCfg.getBrainExpBeta()).run(ctl
 					.getPopulation());
 		}

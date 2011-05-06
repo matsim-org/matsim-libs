@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-
 /**
  * <P>
  * calculates the special ASC of every stay home plan from a MATSim simulation
  * with a {@code Population}, in which each person has one "stay home
- * {@code Plan}".
+ * {@code Plan}". This class should only be used for parameter calibration with
+ * cadyts.
  * </P>
  * <P>
  * ASC = 1/betaBrain * ln( (1-f)/f * sigma exp(betaBrain * (Vi-Vmax)) ) + Vmax -

@@ -34,6 +34,7 @@ import cadyts.calibrators.Calibrator;
  */
 public interface BseStrategyManager {
 	public static String UTILITY_CORRECTION = "utilityCorrection";
+	public static String NOT_STAY_HOME_PROB = "notStayHomeProb";
 
 	/*
 	 * corrects the scores of all the plans except the one selected in the
