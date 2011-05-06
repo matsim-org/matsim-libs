@@ -810,11 +810,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		return this.agentCounter;
 	}
 
-	protected final void addDepartureHandler(final DepartureHandler departureHandler) {
-		// either the engines add the departure handlers themselves, then this function needs to be public
-		// (and part of the interface)
-		// or the engines do not add the departure handlers themselves, but it is done explicitly in the NetsimImpl
-		// and then it is sufficient that this is protected (if inheritance is desired, otherwise package or private).
+	public final void addDepartureHandler(final DepartureHandler departureHandler) {
 		this.departureHandlers.add(departureHandler);
 	}
 
