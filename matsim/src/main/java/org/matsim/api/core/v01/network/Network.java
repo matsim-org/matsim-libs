@@ -56,15 +56,23 @@ public interface Network extends MatsimToplevelContainer {
   /**
    * Returns the time period over which
    * the capacity of the given links has been measured.
-   * The default is set to one hour, i.e. 3600.0 sec.
-   * @return the time period in seconds, default 3600.0 sec.
+   * The default is given in the dtd.  Currently (may'11) it is 1h = 3600.0 sec.
+   * <p/>
+   * Notes:<ul>
+   * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
+   * </ul>
+   * @return the time period in seconds
    */
   public double getCapacityPeriod();
 
 
   /**
-   * Returns the lane width of the network's links.
-   * @return the lane width in meter
+   * Returns the lane width of the network's links. The default is given in the dtd; current (may'11) it is 3.75m.
+   * <p/>
+   * Notes:<ul>
+   * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
+   * </ul>
+   * @return the lane width in meters
    */
   public double getEffectiveLaneWidth();
 
