@@ -43,7 +43,7 @@ import playground.yu.utils.container.CollectionMax;
  * filling the lack of traffic. This is a changed version of
  * {@code ExpBetaPlanChanger}:
  * <P>
- * a. Plans with null scores can be preferentially chosen;
+ * a. Plans with null or NaN scores can be preferentially chosen;
  * <P>
  * b. If there are NOT plans with null scores any more, the unique "stay home"
  * {@code Plan} of this {@code Person}can be chosen with probability 1-f.
@@ -129,9 +129,13 @@ public class ExpBetaPlanChangerWithStayHomePlan implements PlanSelector {
 	 */
 	@Override
 	public Plan selectPlan(final Person person) {
-		// preferentially choose NULL-score Plan
+		// preferentially choose NULL or NaN -score Plan
 		for (Plan plan : person.getPlans()) {
-			if (plan.getScore() == null) {
+			Double score = plan.getScore();
+			if (score == null) {
+				return plan;
+			}
+			if (Double.isNaN(score)) {
 				return plan;
 			}
 		}

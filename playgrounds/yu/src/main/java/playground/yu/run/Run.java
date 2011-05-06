@@ -26,13 +26,13 @@ public class Run {
 
 	/**
 	 * @param args
-	 *            args[0] - configfile, args[1] - writeEventsInterval(int),
-	 *            args[2] - writeGraphs (boolean)
+	 *            args[0] - configfile;
+	 *            <P>
+	 *            args[1] - writeGraphs (boolean)
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler(args[0]);
-		controler.setWriteEventsInterval(Integer.parseInt(args[1]));
-		controler.setCreateGraphs(Boolean.parseBoolean(args[2]));
+		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

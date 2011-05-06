@@ -22,7 +22,6 @@ package playground.yu.replanning.selectors;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -45,7 +44,7 @@ public class PlanStrategy4ExpBetaPlanChangerWithStayHomePlan implements
 				new ExpBetaPlanChangerWithStayHomePlan(controler.getScenario()));
 
 		// the plan selector may, at the same time, collect events:
-		controler.getEvents().addHandler((EventHandler) getPlanSelector());
+		// controler.getEvents().addHandler((EventHandler) getPlanSelector());
 
 		// if you just want to select plans, you can stop here.
 
