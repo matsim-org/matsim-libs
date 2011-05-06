@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
-import org.matsim.core.mobsim.framework.Steppable;
 
 
 /**
