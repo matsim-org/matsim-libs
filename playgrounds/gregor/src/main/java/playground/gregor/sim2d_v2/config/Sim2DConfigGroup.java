@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import org.matsim.core.config.Module;
 
-import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 
 /**
  * @author laemmel

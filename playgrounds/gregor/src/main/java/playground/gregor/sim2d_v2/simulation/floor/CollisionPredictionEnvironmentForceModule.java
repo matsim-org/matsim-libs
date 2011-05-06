@@ -7,7 +7,6 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 

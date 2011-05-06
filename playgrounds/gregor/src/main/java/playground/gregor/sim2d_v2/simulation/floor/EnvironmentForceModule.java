@@ -22,7 +22,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * Environment interaction forces according to: D. Helbing, I. Farkas, T. Vicsek,

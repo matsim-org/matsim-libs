@@ -3,7 +3,7 @@ package playground.gregor.sim2d_v2.calibration_v2;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 
 public class PhantomAgent2D extends Agent2D {
 

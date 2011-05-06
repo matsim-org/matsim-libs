@@ -19,7 +19,7 @@ import playground.gregor.sim2d_v2.calibration_v2.Validator;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 

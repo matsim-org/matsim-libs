@@ -28,7 +28,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel

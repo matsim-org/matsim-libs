@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 /**
  * @author laemmel

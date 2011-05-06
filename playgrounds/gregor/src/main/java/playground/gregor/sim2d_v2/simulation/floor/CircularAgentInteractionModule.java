@@ -22,7 +22,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import java.util.List;
 
 import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
-import playground.gregor.sim2d_v2.simulation.Agent2D;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
