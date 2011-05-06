@@ -17,10 +17,10 @@
 <!ELEMENT nodes (node)*>
 
 <!ELEMENT links (link)*>
-<!ATTLIST links capperiod  CDATA #IMPLIED
+<!ATTLIST links capperiod  CDATA "01:00:00"
 				effectivecellsize CDATA "7.5"
 				effectivelanewidth CDATA "3.75"
-                capPeriod  CDATA #IMPLIED
+                capPeriod  CDATA "01:00:00"
                 capDivider CDATA #IMPLIED
                 capdivider CDATA #IMPLIED>
 
