@@ -567,7 +567,8 @@ public class DecentralizedSmartCharger {
 		startV2G=System.currentTimeMillis();
 			
 		System.out.println("START CHECKING VEHICLE SOURCES");
-		//check on vehicle sources
+		
+		
 		checkVehicleSources();
 		timeCheckVehicles	=System.currentTimeMillis();	
 		
@@ -586,7 +587,7 @@ public class DecentralizedSmartCharger {
 	
 	
 
-	private void checkHubStochasticLoads() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
+	public void checkHubStochasticLoads() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
 		
 				
 		if(myHubLoadReader.stochasticHubLoadDistribution !=null){
@@ -774,7 +775,7 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	private void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+	public void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){				
@@ -783,16 +784,15 @@ public class DecentralizedSmartCharger {
 				if(hasAgentCombustionVehicle(id)==false){
 					
 					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					
 					//VISUALIZE SCHEDULE BEFORE
 					String strAgentVehicleLoad="AgentVehicleLoad_BeforeV2G_"+id.toString();
 					
 					electricSource.visualizeLoadDistribution(strAgentVehicleLoad);
 					
-					
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
 						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
-						PolynomialFunction func= electricSourceInterval.getPolynomialFunction();
 						
 						// split up in small intervals of maximum length= mincharging length
 						int intervals= (int) Math.ceil(electricSourceInterval.getIntervalLength()/MINCHARGINGLENGTH);
@@ -812,6 +812,10 @@ public class DecentralizedSmartCharger {
 							//FINALLY HAVE INTERVAL TO LOOK AT IN THIS ITERATION
 							double start=electricSourceInterval.getStartTime()+intervalNum*MINCHARGINGLENGTH;
 							double end= start+bit;
+							
+							PolynomialFunction func= new PolynomialFunction(
+									electricSourceInterval.getPolynomialFunction().getCoefficients().clone()
+									);
 							
 							LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
 									end, 
@@ -849,17 +853,17 @@ public class DecentralizedSmartCharger {
 									
 									double compensation= Math.abs(joulesFromSource)*compensationPerJouleRegulationUp;
 									
-									
-									myV2G.regulationUpVehicleLoad(id, 
-												currentStochasticLoadInterval, 
-												agentParkingAndDrivingSchedules.getValue(id), 
+									//agentParkingAndDrivingSchedules.getValue(id).printSchedule();
+									myV2G.regulationUpVehicleLoad(id,
+												currentStochasticLoadInterval,
+												agentParkingAndDrivingSchedules.getValue(id),
 												compensation,
 												Math.abs(joulesFromSource),
 												hasAgentEV(id),
 												type,
 												lpev,
 												lpphev,
-												batterySize, 
+												batterySize,
 												batteryMin,
 												batteryMax);
 								}
@@ -882,6 +886,7 @@ public class DecentralizedSmartCharger {
 										
 									double compensation= joulesFromSource*compensationPerJouleRegulationDown;
 									
+									agentParkingAndDrivingSchedules.getValue(id).printSchedule();
 									
 									myV2G.regulationDownVehicleLoad(id, 
 											currentStochasticLoadInterval, 
@@ -896,7 +901,6 @@ public class DecentralizedSmartCharger {
 											batteryMin,
 											batteryMax);
 								}
-								// else set as lost?
 							}
 							
 						}	
@@ -908,7 +912,6 @@ public class DecentralizedSmartCharger {
 					strAgentVehicleLoad="AgentVehicleLoad_AfterV2G_"+id.toString();
 					
 					electricSource.visualizeLoadDistribution(strAgentVehicleLoad);
-					
 					
 				}
 								
@@ -1636,5 +1639,8 @@ public class DecentralizedSmartCharger {
 		    }catch (Exception e){}//Catch exception if any
 	}
 	
+	public void setV2G(V2G setV2G){
+		myV2G=setV2G;
+	}
 	
 }

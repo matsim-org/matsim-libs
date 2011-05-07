@@ -43,7 +43,7 @@ import java.util.*;
 
 
 /**
- * highlights how to use V2G functions of this package:
+ * This class highlights how to use V2G functions of this package:
  * 
  * V2G can only follow after the Decentralized Smart Charger has been run
  * since its based on the charging schedules planned by the Decentralized Smart Charger
@@ -86,6 +86,11 @@ public class Main_exampleV2G {
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
+		
+		final double xPercentNone=0.0;
+		final double xPercentDown=0.0;
+		final double xPercentDownUp=1.0;
+		
 		
 		/**
 		 * Decentralized Smart Charger
@@ -188,9 +193,13 @@ public class Main_exampleV2G {
 		 * is also given as LinkedListValueHashMap, where Integer corresponds to a hub and
 		 * the Schedule includes LoadDistributionIntervals which represent the price per second over the day
 		 */
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubs();
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
+		DetermisticLoadAndPricingCollector dlpc= new DetermisticLoadAndPricingCollector();
 		
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
+			= dlpc.getDeterminisitcHubLoad();
+		
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			= dlpc.getDeterminisitcPriceDistribution();
 		
 		// HubLinkMapping links linkIds (Id) to Hubs (Integer)
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
@@ -228,7 +237,8 @@ public class Main_exampleV2G {
 				try {
 					
 					// map linkIds to hubs once the scenario is read in from the config file
-					mapHubs(controler,hubLinkMapping);
+					StellasHubMapping setHubLinkMapping= new StellasHubMapping(controler);
+					final HubLinkMapping hubLinkMapping=setHubLinkMapping.mapHubs();
 					
 					
 					/******************************************
@@ -273,52 +283,59 @@ public class Main_exampleV2G {
 					 * and if the utility of the agent can be increased by rescheduling.
 					 */
 					
+				
 					/*
-					 * CONtract TYPES
-					 * COMPENSATION in CHF
+					 * ************************
+					 * Stochastic Sources
+					 * they need to be defined per scenario. dummy values have been entered in 
+					 * StochasticLoadCollector
 					 */
-					double compensationPerKWHRegulationUp=0.15; 
-					double compensationPerKWHRegulationDown=0.15;
 					
-					ContractTypeAgent contractRegUpRegDown= new ContractTypeAgent(
-							true, // up
-							true, //down
-							compensationPerKWHRegulationUp,
-							compensationPerKWHRegulationDown);
+					StochasticLoadCollector slc= new StochasticLoadCollector(controler);
 					
-					ContractTypeAgent contractRegDown= new ContractTypeAgent(
-							false,
-							true, 
-							0,
-							compensationPerKWHRegulationDown);
-					
-					ContractTypeAgent contractNoRegulation= new ContractTypeAgent(
-							false, // up
-							false, //down
-							0,
-							0);
-					
-					
-					LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(1);
+					LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=
+						slc.getStochasticHubLoad();
 						
+					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= 
+						slc.getStochasticHubSources();
 					
-					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= makeBullshitSourceHub();
-										
-					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= makeBullshitAgentVehicleSource(controler);
-					
-					LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= 
-						makeAgentContracts(controler, 
-								0, contractNoRegulation,
-								0, contractRegDown,
-								1 , contractRegUpRegDown
-								);
-					
-					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
-					
+					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= 
+						slc.getStochasticAgentVehicleSources();
+						
 					myDecentralizedSmartCharger.setStochasticSources(
 							stochasticHubLoadDistribution,
 							locationSourceMapping,
 							agentVehicleSourceMapping);
+					
+					
+					/*
+					 * ************************
+					 * Agent contracts
+					 */
+					double compensationPerKWHRegulationUp=0.15;
+					double compensationPerKWHRegulationDown=0.15;
+					 
+					AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
+							myDecentralizedSmartCharger,
+							 compensationPerKWHRegulationUp,
+							 compensationPerKWHRegulationDown);
+					
+					
+					LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= 
+						myAgentContractsCollector.makeAgentContracts(
+								controler,
+								xPercentNone,
+								xPercentDown,
+								xPercentDownUp);
+						
+					
+					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
+					
+					
+					/*
+					 * ************************
+					 * RUn
+					 */
 					
 					myDecentralizedSmartCharger.initializeAndRunV2G();
 					
@@ -351,223 +368,6 @@ public class Main_exampleV2G {
 	}
 	
 	
-	/**
-	 * deterministic distribution of free load over one day
-	 * @return
-	 * @throws IOException
-	 */
-	public static LinkedListValueHashMap<Integer, Schedule> readHubs() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
-		hubLoadDistribution1.put(1, makeBullshitSchedule());
-		hubLoadDistribution1.put(2, makeBullshitSchedule());
-		hubLoadDistribution1.put(3, makeBullshitSchedule());
-		hubLoadDistribution1.put(4, makeBullshitSchedule());
-		return hubLoadDistribution1;
-		
-	}
-	
-	
-	
-	
-	public static Schedule makeBullshitSchedule() throws IOException{
-		
-		Schedule bullShitSchedule= new Schedule();
-		
-		double[] bullshitCoeffs = new double[]{100*3500, 500*3500/(62490.0), 0};// 
-		double[] bullshitCoeffs2 = new double[]{914742, -100*3500/(DecentralizedSmartCharger.SECONDSPERDAY-62490.0), 0};
-		//62490*(100*3500)/(24*3600-62490))
-		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
-		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
-		LoadDistributionInterval l1= new LoadDistributionInterval(
-				0.0,
-				62490.0,
-				bullShitFunc,//p
-				true//boolean
-		);
-		
-		bullShitSchedule.addTimeInterval(l1);
-		
-		
-		LoadDistributionInterval l2= new LoadDistributionInterval(					
-				62490.0,
-				DecentralizedSmartCharger.SECONDSPERDAY,
-				bullShitFunc2,//p
-				false//boolean
-		);
-		
-		bullShitSchedule.addTimeInterval(l2);
-		
-		//bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
-		return bullShitSchedule;
-	}
-	
 
-	
-	/**
-	 * fill hubLinkMapping 
-	 * assign hubIds to the different Links--> hubLinkMapping.addMapping(link, hub)
-	 * according to scenario relevant hublocations
-	 * 
-	 * @param deterministicHubLoadDistribution
-	 * @param hubLinkMapping
-	 * @param controler
-	 */
-	public static void mapHubs(Controler controler, HubLinkMapping hubLinkMapping){
-		
-		
-		double maxX=5000;
-		double minX=-20000;
-		double diff= maxX-minX;
-		
-		for (Link link:controler.getNetwork().getLinks().values()){
-			// x values of equil from -20000 up to 5000
-			if (link.getCoord().getX()<(minX+diff)/4){
-				
-				hubLinkMapping.addMapping(link.getId().toString(), 1);
-			}else{
-				if (link.getCoord().getX()<(minX+diff)*2/4){
-					hubLinkMapping.addMapping(link.getId().toString(), 2);
-				}else{
-					if (link.getCoord().getX()<(minX+diff)*3/4){
-						hubLinkMapping.addMapping(link.getId().toString(), 3);
-					}else{
-						hubLinkMapping.addMapping(link.getId().toString(), 4);
-					}
-				}
-			}
-			
-		}
-	}
-	
-	
-	
-	
-	public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
-		
-		LinkedListValueHashMap<Integer, Schedule> stochastic= new LinkedListValueHashMap<Integer, Schedule>();
-		
-		Schedule bullShitStochastic= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
-		
-		bullShitStochastic.addTimeInterval(new LoadDistributionInterval(0, 24*3600, p, true));
-		for (int i=0; i<num; i++){
-			stochastic.put(i+1, bullShitStochastic);
-		}
-		return stochastic;
-	
-		
-	}
-	
-		
-	
-	public static LinkedListValueHashMap<Integer, Schedule> makeBullshitSourceHub(){
-		LinkedListValueHashMap<Integer, Schedule> hubSource= new LinkedListValueHashMap<Integer, Schedule>();
-		
-		Schedule bullShit= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
-		
-		bullShit.addTimeInterval(new LoadDistributionInterval(50000.0, 62490.0, p, true));
-		
-		hubSource.put(1, bullShit);		
-		
-		return hubSource;
-		
-	}
-	
-	
-	
-	public static LinkedListValueHashMap<Id, Schedule> makeBullshitAgentVehicleSource(Controler controler){
-		LinkedListValueHashMap<Id, Schedule> agentSource= new LinkedListValueHashMap<Id, Schedule>();
-		
-		
-		//Id
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-			if(Math.random()<0.5){
-				Schedule bullShitPlus= new Schedule();
-				PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500.0});
-				bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
-				
-				agentSource.put(id, bullShitPlus);	
-			}else{
-				Schedule bullShitMinus= new Schedule();
-				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});
-				bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
-				
-				agentSource.put(id, bullShitMinus);	
-			}
-			
-		}
-		
-		return agentSource;
-		
-	}
-	
-	
-	public static LinkedListValueHashMap<Integer, Schedule> readPricingHubDistribution(double optimal, double suboptimal) throws IOException{
-		
-		LinkedListValueHashMap<Integer, Schedule> pricing= readHubs();
-		
-		PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});
-		PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
-		
-		for(Integer i: pricing.getKeySet()){
-			for(int j=0; j<pricing.getValue(i).getNumberOfEntries(); j++){
-				
-					LoadDistributionInterval l = (LoadDistributionInterval) pricing.getValue(i).timesInSchedule.get(j);
-					
-					if(l.isOptimal()){
-						pricing.getValue(i).timesInSchedule.set(j, 
-								new LoadDistributionInterval(
-								l.getStartTime(),
-								l.getEndTime(), 
-								pOpt, 
-								true));
-						
-						
-					}else{
-						pricing.getValue(i).timesInSchedule.set(j, 
-								new LoadDistributionInterval(
-										l.getStartTime(),
-										l.getEndTime(), 
-										pSubopt, 
-										false));
-												
-					}
-				
-			}
-			//pricing.getValue(i).printSchedule();
-		}
-		return pricing;
-	/*	final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;*/
-		
-	}
-	
-	
-	
-	
-	
-	public static LinkedListValueHashMap<Id, ContractTypeAgent>  makeAgentContracts(
-			Controler controler,
-			double xPercentNone, ContractTypeAgent contractXNone,
-			double xPercentDown, ContractTypeAgent contractXDown,
-			double xPercentDownUp, ContractTypeAgent contractXDownUp			
-			){
-		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-			
-			double rand= Math.random();
-			if(rand<xPercentNone){
-				list.put(id, contractXNone);
-			}else{
-				if(rand<xPercentNone+xPercentDown){
-					list.put(id, contractXDown);
-				}else{
-					list.put(id, contractXDownUp);
-				}
-			}
-		}
-		return list;
-	}
 
 }

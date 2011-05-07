@@ -45,8 +45,13 @@ public class V2G {
 	}
 	
 	public void addRevenueToAgentFromV2G(double revenue, Id agentId){
-		agentV2GRevenue.put(agentId, 
-				agentV2GRevenue.getValue(agentId)+revenue);
+		if (agentV2GRevenue.containsKey(agentId)){
+			agentV2GRevenue.put(agentId, 
+					agentV2GRevenue.getValue(agentId)+revenue);
+		}else{
+			agentV2GRevenue.put(agentId,revenue);
+		}
+		
 	}
 	
 	public void regulationDownVehicleLoad(Id agentId, 
@@ -111,6 +116,7 @@ public class V2G {
 						costKeeping,
 						costReschedule);
 				
+				// joules>0 positive function which needs to be reduced
 				reduceAgentVehicleLoadsByGivenLoadInterval(
 						agentId, 
 						electricSourceInterval);
@@ -206,6 +212,8 @@ public class V2G {
 						costKeeping,
 						costReschedule);
 				
+				// regulation up = joules<0  = negative function in electricSourceInterval
+				// electricSourceInterval Function needs to be increased
 				reduceAgentVehicleLoadsByGivenLoadInterval(
 						agentId, 
 						electricSourceInterval);
@@ -322,7 +330,9 @@ public class V2G {
 								costKeeping,
 								costReschedule);
 						
-						
+						// e.g. stochastic load on net is -3500
+						// thus car discharges 3500 to balance the net
+						// thus -3500 will be reduced by (-3500)=>0
 						reduceHubLoadByGivenLoadInterval(hub, electricSourceInterval);
 						
 					}else{
@@ -585,8 +595,8 @@ public class V2G {
 	
 	
 	/**
-	 * reduces the entry of myHubLoadReader.agentVehicleSourceMapping.getValue(agentId)	 * 
-	 * with updated Schedule which is reduced by given electricSourceInterval
+	 * adds the passed electricSourceInterval to the current stochastic agent vehicle load
+	 * in myHubLoadReader.agentVehicleSourceMapping.getValue(agentId)	
 	 * 
 	 * @param agentId
 	 * @param electricSourceInterval
@@ -597,20 +607,23 @@ public class V2G {
 	public void reduceAgentVehicleLoadsByGivenLoadInterval(
 			Id agentId, 
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		// -3500-(-3500)=0
 		
 		
 		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.getValue(agentId);
 		
 		PolynomialFunction negativePolynomialFunc= 
-			electricSourceInterval.getPolynomialFunction().multiply(new PolynomialFunction(new double[]{-1}));
+			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
+		negativePolynomialFunc=negativePolynomialFunc.negate();
 		
 		LoadDistributionInterval negativeElectricSourceInterval= new LoadDistributionInterval(
 				electricSourceInterval.getStartTime(),
 				electricSourceInterval.getEndTime(),
-				negativePolynomialFunc,						 
+				negativePolynomialFunc,			
 				!electricSourceInterval.isOptimal());
 		
-		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(negativeElectricSourceInterval);
+		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
+				negativeElectricSourceInterval);
 		
 		mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.put(agentId, 
 				agentVehicleSource
@@ -619,13 +632,28 @@ public class V2G {
 	}
 
 	
-	
-	
+	/*public void reduceAgentVehicleLoadsByGivenLoadInterval(
+			Id agentId, 
+			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		
+		// 3500-(3500)=0
+		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.getValue(agentId);
+		
+		
+		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(electricSourceInterval);
+		
+		mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.put(agentId, 
+				agentVehicleSource
+				);
+		
+	}*/
 
 	/**
 	 * reduces the entry of myHubLoadReader.stochasticHubLoadDistribution.getValue(i)	 * 
 	 * with updated HubLoadSchedule which is reduced by given electricSourceInterval
 	 * 
+	 * hubLoad + (-1*electricSourceInterval)
 	 * @param i
 	 * @param electricSourceInterval
 	 * @throws MaxIterationsExceededException
@@ -640,7 +668,9 @@ public class V2G {
 		Schedule hubLoadSchedule= mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(i);
 		
 		PolynomialFunction negativePolynomialFunc= 
-			electricSourceInterval.getPolynomialFunction().multiply(new PolynomialFunction(new double[]{-1}));
+			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
+		negativePolynomialFunc=negativePolynomialFunc.negate();
+		
 		
 		LoadDistributionInterval negativeElectricSourceInterval= new LoadDistributionInterval(
 				electricSourceInterval.getStartTime(),
@@ -666,11 +696,11 @@ public class V2G {
 			cutScheduleAtTimeSecondHalf(agentParkingDrivingSchedule, electricSourceInterval.getStartTime());
 		
 		agentDuringLoad= cutScheduleAtTime(agentDuringLoad, electricSourceInterval.getEndTime());
+		
 		System.out.println("agentDuringLoad:");
 		agentDuringLoad.printSchedule();
 		System.out.println("electricSourceInterval:");
 		electricSourceInterval.printInterval();
-		
 		
 		for(int i=0; i<agentDuringLoad.getNumberOfEntries();i++){
 			TimeInterval agentInterval= agentDuringLoad.timesInSchedule.get(i);
@@ -682,8 +712,7 @@ public class V2G {
 			if(overlapAgentAndElectricSource!=null){
 				
 				if(agentInterval.isParking()){
-					//IF PARKING
-					//
+					//IF PARKING					
 					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
 							((ParkingInterval)agentInterval).getLocation());
 					
@@ -691,13 +720,12 @@ public class V2G {
 					
 					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(hubId);
 					hubSchedule.printSchedule();
-//					
+					
 					if (hubSchedule.overlapWithTimeInterval(overlapAgentAndElectricSource)){
 						//if there is overlap
 						
 						hubSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(overlapAgentAndElectricSource);
-						
-						
+												
 					}else{
 						hubSchedule.addTimeInterval(overlapAgentAndElectricSource);
 						hubSchedule.sort();

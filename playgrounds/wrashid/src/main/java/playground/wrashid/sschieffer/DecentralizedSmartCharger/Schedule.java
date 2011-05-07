@@ -422,11 +422,14 @@ public class Schedule {
 	}
 	
 	
-	public void addLoadDistributionIntervalToExistingLoadDistributionSchedule(LoadDistributionInterval loadToAdd) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void addLoadDistributionIntervalToExistingLoadDistributionSchedule(LoadDistributionInterval loadToAdd) 
+	throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		//LinkedList<Integer> toDelete = new LinkedList<Integer>();
+		printSchedule();
 		
-		if (overlapWithTimeInterval(loadToAdd)){
+		if (overlapWithTimeInterval(loadToAdd)
+			){
 			Schedule newSchedule=new Schedule();
 			
 			LoadDistributionInterval loadLeftToAdd= loadToAdd.clone();
@@ -434,7 +437,9 @@ public class Schedule {
 			for(int i=0; i<getNumberOfEntries();i++){
 				LoadDistributionInterval t=  (LoadDistributionInterval)timesInSchedule.get(i);
 				
-				if( t.overlap(loadLeftToAdd) ){
+				if( t.overlap(loadLeftToAdd) ||
+						(loadLeftToAdd.getStartTime()==t.getStartTime()
+								&& loadLeftToAdd.getEndTime()==t.getEndTime())){
 					
 					// interval Before LoadLeftToAdd
 					if(t.getStartTime()<loadLeftToAdd.getStartTime()){
@@ -462,8 +467,9 @@ public class Schedule {
 						//add overlapping new LoadINterval
 						newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getStartTime(),
 								t.getEndTime(),
-								combinedFunc , 
+								combinedFunc, 
 								newOptimal));
+						newSchedule.printSchedule();
 						
 						//update loadLeftTOAdd
 						loadLeftToAdd=new LoadDistributionInterval(t.getEndTime(), 
@@ -486,33 +492,40 @@ public class Schedule {
 								loadLeftToAdd.getEndTime(),
 								combinedFunc , 
 								newOptimal));
+						newSchedule.printSchedule();
 						
 						if(loadLeftToAdd.getEndTime()<t.getEndTime()){
 							newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getEndTime(),
 									t.getEndTime(),
 									t.getPolynomialFunction() , 
 									t.isOptimal()));
+							newSchedule.printSchedule();
 						}
 						loadLeftToAdd= new LoadDistributionInterval(0, 0, null, false);
 					}
 					
 				}else{
 					newSchedule.addTimeInterval(t);
+					newSchedule.printSchedule();
 				}
 				
 			}	
 			
 			if(loadLeftToAdd.getIntervalLength()>0){
 				newSchedule.addTimeInterval(loadLeftToAdd);
+				newSchedule.printSchedule();
 			}
 			
 			this.timesInSchedule= newSchedule.timesInSchedule;
 			sort();
+			printSchedule();
 		}else{//if no overlap between schedule and interval
 			addTimeInterval(loadToAdd.clone());
+			printSchedule();
 			sort();
 			
 		}
+		
 	}
 	
 	

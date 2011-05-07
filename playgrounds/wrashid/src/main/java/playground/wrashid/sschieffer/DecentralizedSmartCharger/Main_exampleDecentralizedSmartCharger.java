@@ -289,67 +289,6 @@ public class Main_exampleDecentralizedSmartCharger {
 	}
 	
 	
-	public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
-		
-		LinkedListValueHashMap<Integer, Schedule> stochastic= new LinkedListValueHashMap<Integer, Schedule>();
-		
-		Schedule bullShitStochastic= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
-		
-		bullShitStochastic.addTimeInterval(new LoadDistributionInterval(0, 24*3600, p, true));
-		for (int i=0; i<num; i++){
-			stochastic.put(i+1, bullShitStochastic);
-		}
-		return stochastic;
-	
-		
-	}
-	
-		
-	
-	public static LinkedListValueHashMap<Integer, Schedule> makeBullshitSourceHub(){
-		LinkedListValueHashMap<Integer, Schedule> hubSource= new LinkedListValueHashMap<Integer, Schedule>();
-		
-		Schedule bullShit= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
-		
-		bullShit.addTimeInterval(new LoadDistributionInterval(50000.0, 62490.0, p, true));
-		
-		hubSource.put(1, bullShit);		
-		
-		return hubSource;
-		
-	}
-	
-	
-	
-	public static LinkedListValueHashMap<Id, Schedule> makeBullshitAgentVehicleSource(Controler controler){
-		LinkedListValueHashMap<Id, Schedule> agentSource= new LinkedListValueHashMap<Id, Schedule>();
-		
-		
-		//Id
-		for(Id id : controler.getPopulation().getPersons().keySet()){
-			if(Math.random()<0.5){
-				Schedule bullShitPlus= new Schedule();
-				PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500.0});
-				bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
-				
-				agentSource.put(id, bullShitPlus);	
-			}else{
-				Schedule bullShitMinus= new Schedule();
-				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});
-				bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
-				
-				agentSource.put(id, bullShitMinus);	
-			}
-			
-		}
-		
-		return agentSource;
-		
-	}
-	
-	
 	
 
 }
