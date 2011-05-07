@@ -36,7 +36,7 @@ public class PopulationAndDemandCreation {
 		 * Create the scenario
 		 */
 		Config config = ConfigUtils.createConfig();
-		this.scenario = ScenarioUtils.createScenario(config);;
+		this.scenario = ScenarioUtils.createScenario(config);
 		/*
 		 * Read the network and store it in the scenario
 		 */
