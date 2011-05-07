@@ -32,13 +32,13 @@ import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
  */
 public class Sim2DDepartureHandler implements DepartureHandler {
 
-	private final Sim2D sim2D;
+	private final Sim2DEngine engine;
 
 	/**
 	 * @param sim2d
 	 */
-	public Sim2DDepartureHandler(Sim2D sim2d) {
-		this.sim2D = sim2d;
+	public Sim2DDepartureHandler(Sim2DEngine engine) {
+		this.engine = engine;
 	}
 
 	/*
@@ -51,9 +51,7 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 */
 	@Override
 	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
-		// TODO new TransportMode is needed i.e. TransportMode.walk2d or the
-		// like
-		if (agent instanceof PersonDriverAgentImpl) {
+		if (agent instanceof PersonDriverAgentImpl && leg.getMode().equals("walk2d")) {
 			handleAgent2DDeparture((PersonDriverAgentImpl)agent, linkId);
 			return true;
 		}
@@ -67,7 +65,7 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 * @param leg
 	 */
 	private void handleAgent2DDeparture(PersonDriverAgent agent, Id linkId) {
-		this.sim2D.getSim2DEngine().getFloor(linkId).agentDepart(agent);
+		this.engine.getFloor(linkId).agentDepart(agent);
 
 	}
 

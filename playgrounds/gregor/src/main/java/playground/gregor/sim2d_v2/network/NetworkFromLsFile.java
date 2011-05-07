@@ -39,9 +39,9 @@ import com.vividsolutions.jts.geom.Point;
 public class NetworkFromLsFile {
 
 	private final ScenarioImpl sc;
-	private final HashMap<Id, LineString> lsmp;
+	private final Map<Id, LineString> lsmp;
 
-	public NetworkFromLsFile(ScenarioImpl scenario, HashMap<Id, LineString> lsmp) {
+	public NetworkFromLsFile(ScenarioImpl scenario, Map<Id, LineString> lsmp) {
 		this.sc = scenario;
 		this.lsmp = lsmp;
 

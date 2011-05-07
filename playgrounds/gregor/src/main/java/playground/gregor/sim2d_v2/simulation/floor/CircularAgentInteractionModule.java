@@ -21,7 +21,8 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.List;
 
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import org.matsim.api.core.v01.Scenario;
+
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -36,7 +37,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 public class CircularAgentInteractionModule implements DynamicForceModule {
 
 	protected final PhysicalFloor floor;
-	protected final Scenario2DImpl scenario;
+	protected final Scenario scenario;
 
 	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
@@ -55,7 +56,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	 * @param floor
 	 * @param sceanrio
 	 */
-	public CircularAgentInteractionModule(PhysicalFloor floor, Scenario2DImpl scenario) {
+	public CircularAgentInteractionModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
 		this.scenario = scenario;
 	}

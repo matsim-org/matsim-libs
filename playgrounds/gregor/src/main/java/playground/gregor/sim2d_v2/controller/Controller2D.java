@@ -22,18 +22,22 @@ package playground.gregor.sim2d_v2.controller;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
-import playground.gregor.sim2d_v2.simulation.Sim2D;
+import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
 //import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
+@Deprecated // should not be derived from Controler
 public class Controller2D extends Controler {
 
-	protected Scenario2DImpl scenario2DData;
 	private PedVisPeekABot vis;
 	protected Sim2DConfigGroup sim2dConfig;
 	private ScenarioLoader2DImpl loader;
@@ -44,14 +48,15 @@ public class Controller2D extends Controler {
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
 	}
 
 	@Override
 	protected void loadData() {
+		//TODO remove this method!!
 		if (!this.scenarioLoaded) {
 			initSim2DConfigGroup();
-			this.scenario2DData = new Scenario2DImpl(this.config);
-			this.loader = new ScenarioLoader2DImpl(this.scenario2DData);
+			this.loader = new ScenarioLoader2DImpl(this.scenarioData);
 			this.loader.loadScenario();
 			this.network = this.loader.getScenario().getNetwork();
 			this.population = this.loader.getScenario().getPopulation();
@@ -61,6 +66,16 @@ public class Controller2D extends Controler {
 
 	}
 
+
+
+	@Override
+	public PlanAlgorithm createRoutingAlgorithm(
+			PersonalizableTravelCost travelCosts,
+			PersonalizableTravelTime travelTimes) {
+		PlansCalcRoute a = (PlansCalcRoute) super.createRoutingAlgorithm(travelCosts, travelTimes);
+		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
+		return a;
+	}
 
 	/**
 	 * 
@@ -77,16 +92,7 @@ public class Controller2D extends Controler {
 		this.config.getModules().put("sim2d", s);
 	}
 
-	@Override
-	protected void runMobSim() {
 
-		Sim2D sim = new Sim2D(this.events, this.scenario2DData);
-		sim.setIterationNumber(getIterationNumber());
-		sim.run();
-		if (this.vis != null) {
-			this.vis.reset(getIterationNumber());
-		}
-	}
 
 	public static void main(String[] args) {
 		Controler controller = new Controller2D(args);

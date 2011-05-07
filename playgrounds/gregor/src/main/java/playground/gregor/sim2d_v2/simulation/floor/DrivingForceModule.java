@@ -22,12 +22,11 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 /**
  * @author laemmel
@@ -45,7 +44,7 @@ public class DrivingForceModule implements ForceModule {
 	 * @param floor
 	 * @param scenario
 	 */
-	public DrivingForceModule(PhysicalFloor floor, Scenario2DImpl scenario) {
+	public DrivingForceModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
 		this.tau = 1/1.52;
 	}

@@ -3,6 +3,7 @@ package playground.gregor.sim2d_v2.calibration_v2;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -10,17 +11,16 @@ import org.matsim.core.events.EventsUtils;
 import playground.gregor.sim2d_v2.calibration_v2.floor.PhantomFloor;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 public class CalibrationSimulationEngine {
 
-	private final Scenario2DImpl sc;
+	private final Scenario sc;
 	private final EventsManager em;
 	private final PhantomEvents pe;
 	private final double timeIncr;
 	private final Validator v;
 
-	public CalibrationSimulationEngine(Scenario2DImpl  sc, PhantomEvents pe, Validator v) {
+	public CalibrationSimulationEngine(Scenario  sc, PhantomEvents pe, Validator v) {
 		this.sc = sc;
 		this.em = EventsUtils.createEventsManager();
 		this.em.addHandler(v);

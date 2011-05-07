@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -18,7 +19,6 @@ import playground.gregor.sim2d_v2.calibration_v2.PhantomAgent2D;
 import playground.gregor.sim2d_v2.calibration_v2.Validator;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
@@ -42,8 +42,8 @@ public class PhantomFloor extends PhysicalFloor {
 	private final boolean silent = true;
 	private boolean finished = false;
 
-	public PhantomFloor(PhantomEvents phantomEvents, Id calibrationAgentId, Collection<Link> list, Scenario2DImpl scenario, Validator validator, EventsManager em) {
-		super(scenario,list,em,true);
+	public PhantomFloor(PhantomEvents phantomEvents, Id calibrationAgentId, Collection<? extends Link> collection, Scenario scenario, Validator validator, EventsManager em) {
+		super(scenario,collection,em,true);
 		this.calibrationAgentId = calibrationAgentId;
 
 		this.times = phantomEvents.getTimesArray();

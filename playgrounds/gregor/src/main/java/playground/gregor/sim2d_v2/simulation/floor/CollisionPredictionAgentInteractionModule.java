@@ -2,6 +2,8 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Scenario;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -10,7 +12,6 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 public class CollisionPredictionAgentInteractionModule implements
 DynamicForceModule {
@@ -38,7 +39,7 @@ DynamicForceModule {
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
 
-	public CollisionPredictionAgentInteractionModule(PhysicalFloor floor, Scenario2DImpl scenario) {
+	public CollisionPredictionAgentInteractionModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
 		Sim2DConfigGroup conf = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
 		this.Bi = conf.getBi();

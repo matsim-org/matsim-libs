@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import org.matsim.api.core.v01.Scenario;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 /**
  * Environment interaction forces according to: D. Helbing, I. Farkas, T. Vicsek,
@@ -32,7 +33,7 @@ import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
  */
 public class EnvironmentForceModule implements ForceModule {
 
-	private final Scenario2DImpl sc;
+	private final Scenario sc;
 	private final StaticEnvironmentDistancesField sff;
 
 	//Helbing constant
@@ -48,9 +49,9 @@ public class EnvironmentForceModule implements ForceModule {
 	 * @param floor
 	 * @param scenario
 	 */
-	public EnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
+	public EnvironmentForceModule(Floor floor, Scenario scenario) {
 		this.sc = scenario;
-		this.sff = this.sc.getStaticForceField();
+		this.sff = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
 
 		//sensing range to maximum
 		this.sensingRange = this.sff.getMaxSensingRange();

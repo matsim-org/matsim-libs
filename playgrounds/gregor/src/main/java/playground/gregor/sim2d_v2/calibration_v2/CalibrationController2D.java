@@ -22,7 +22,6 @@ import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomPopulationLoader;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.controller.Controller2D;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 public class CalibrationController2D  {
@@ -35,7 +34,6 @@ public class CalibrationController2D  {
 	private final Config config;
 	private Sim2DConfigGroup sim2dConfig;
 	private final Scenario scenario;
-	private final Scenario2DImpl scenario2DData;
 	private final PhantomEvents phantomEvents;
 
 	public CalibrationController2D(String[] args) {
@@ -43,8 +41,7 @@ public class CalibrationController2D  {
 		this.config = ConfigUtils.loadConfig(configFile);
 		initSim2DConfigGroup();
 		this.scenario = ScenarioUtils.createScenario(this.config);
-		this.scenario2DData = new Scenario2DImpl(this.config);
-		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario2DData);
+		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
 		loader.loadScenario();
 		this.sim2dConfig.setEnableCircularAgentInterActionModule("false");
 		this.sim2dConfig.setEnableCollisionPredictionAgentInteractionModule("true");
@@ -92,7 +89,7 @@ public class CalibrationController2D  {
 				Collections.shuffle(ids);
 				List<Id> sub = ids.subList(0, size-1);
 				Validator v1 = new Validator(null);
-				Worker w1 = new Worker(this.scenario2DData,this.phantomEvents,v1,sub);
+				Worker w1 = new Worker(this.scenario,this.phantomEvents,v1,sub);
 				Thread t1 = new Thread(w1);
 				vs.add(v1);
 				ts.add(t1);
@@ -130,14 +127,14 @@ public class CalibrationController2D  {
 
 	private static class Worker implements Runnable {
 
-		private final Scenario2DImpl scenario2DData;
+		private final Scenario scenario;
 		private final PhantomEvents phantomEvents;
 		private final Validator validator;
 		private final List<Id> ids;
 
 
-		public Worker( Scenario2DImpl scenario2DData, PhantomEvents phantomEvents, Validator validator, List<Id> ids) {
-			this.scenario2DData = scenario2DData;
+		public Worker( Scenario scenario, PhantomEvents phantomEvents, Validator validator, List<Id> ids) {
+			this.scenario = scenario;
 			this.phantomEvents = phantomEvents;
 			this.validator = validator;
 			this.ids = ids;
@@ -145,7 +142,7 @@ public class CalibrationController2D  {
 
 		@Override
 		public void run() {
-			CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario2DData, this.phantomEvents, this.validator);
+			CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario, this.phantomEvents, this.validator);
 			cse.doOneIteration(this.ids);
 
 		}

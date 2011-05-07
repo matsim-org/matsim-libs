@@ -23,19 +23,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
+import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
@@ -46,20 +46,19 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
 public class Sim2DEngine implements MobsimEngine {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
-	private final Scenario2DImpl scenario;
-	private final Sim2D sim;
+	private final Scenario scenario;
 
 	private final Map<Id, PhysicalFloor> linkIdFloorMapping = new HashMap<Id, PhysicalFloor>();
 	private final Sim2DConfigGroup sim2ConfigGroup;
 	private final double sim2DStepSize;
-	private Id calibrationAgentId;
+	private final QSim sim;
 
 	/**
 	 * @param sim
 	 * @param random
 	 */
-	public Sim2DEngine(Sim2D sim, Random random) {
-		this.scenario = (Scenario2DImpl) sim.getScenario();
+	public Sim2DEngine(QSim sim) {
+		this.scenario = sim.getScenario();
 		this.sim2ConfigGroup = (Sim2DConfigGroup)this.scenario.getConfig().getModule("sim2d");
 		this.sim = sim;
 		this.sim2DStepSize = this.sim2ConfigGroup.getTimeStepSize();
@@ -106,13 +105,13 @@ public class Sim2DEngine implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 
-		boolean emitEvents = false;
-		if (this.sim.getIterationNumber() % this.sim2ConfigGroup.getEventsInterval() == 0) {
-			emitEvents = true;
-		}
+		boolean emitEvents = true;
+		//		if (this.sim.getIterationNumber() % this.sim2ConfigGroup.getEventsInterval() == 0) {
+		//			emitEvents = true;
+		//		}
 
-
-		for (Entry<MultiPolygon, List<Link>> e : this.scenario.getFloorLinkMapping().entrySet()) {
+		Map<MultiPolygon, List<Link>> flm = this.scenario.getScenarioElement(MyDataContainer.class).getMps();
+		for (Entry<MultiPolygon, List<Link>> e : flm.entrySet()) {
 			PhysicalFloor f = new PhysicalFloor(this.scenario, e.getValue(), this.sim.getEventsManager(), emitEvents);
 			this.floors.add(f);
 			for (Link l : e.getValue()) {
@@ -127,7 +126,7 @@ public class Sim2DEngine implements MobsimEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.ptproject.qsim.interfaces.SimEngine#getQSim()
 	 */
 	@Override

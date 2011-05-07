@@ -21,16 +21,15 @@ package playground.gregor.sim2d_v2.scenario;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -47,22 +46,25 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+@Deprecated //should be a stand-alone class and not inherited from ScenarioLoaderImpl
 public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
-	private Map<MultiPolygon, List<Link>> mps;
-
+	//
+	//
 	private StaticEnvironmentDistancesField sff;
+	//
+	//	private HashMap<Id, LineString> lsmp;
 
-	private HashMap<Id, LineString> lsmp;
-
-	private final Scenario2DImpl scenarioData;
+	private final Scenario scenarioData;
 
 
 	private final Sim2DConfigGroup sim2DConfig;
 
-	public ScenarioLoader2DImpl(Scenario2DImpl scenarioData) {
+	public ScenarioLoader2DImpl(Scenario scenarioData) {
 		super(scenarioData);
 		this.scenarioData = scenarioData;
+		MyDataContainer c = new MyDataContainer();
+		this.scenarioData.addScenarioElement(c);
 		this.sim2DConfig = (Sim2DConfigGroup) scenarioData.getConfig().getModule("sim2d");
 	}
 
@@ -70,15 +72,14 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	public void loadNetwork() {
 		//		if (Sim2DConfig.NETWORK_LOADER_LS) {
 		loadLsMp();
-		NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.lsmp);
+		NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap());
 		loader.loadNetwork();
 		loadMps();
 		loadStaticEnvironmentDistancesField();
 	}
 
 	private void loadLsMp() {
-		FeatureSource fs = null;
-		fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
+		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
 
 		@SuppressWarnings("rawtypes")
 		Iterator it = null;
@@ -88,22 +89,19 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			throw new RuntimeException(e);
 		}
 
-		this.lsmp = new HashMap<Id, LineString>();
+
 		int idd = 0;
 		while (it.hasNext()) {
 			Feature ft = (Feature) it.next();
 			Id id = new IdImpl(idd++);
-			this.lsmp.put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
+			this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap().put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
 
 		}
-
-		this.scenarioData.setLineStringMap(this.lsmp);
 
 	}
 
 	private void loadMps() {
-		FeatureSource fs = null;
-		fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
+		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
 
 		@SuppressWarnings("rawtypes")
 		Iterator it = null;
@@ -121,10 +119,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			throw new RuntimeException("MultiPolygon expected but got:" + geo);
 		}
 		List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
-		this.mps = new HashMap<MultiPolygon, List<Link>>();
-		this.mps.put((MultiPolygon) geo, links);
-		this.scenarioData.setFloorLinkMapping(this.mps);
-
+		this.scenarioData.getScenarioElement(MyDataContainer.class).getMps().put((MultiPolygon) geo, links);
 	}
 
 
@@ -137,7 +132,8 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		}
 
 
-		this.scenarioData.setStaticForceField(this.sff);
+		this.scenarioData.addScenarioElement(this.sff);
+
 	}
 
 	private void loadStaticEnvironmentDistancesField(String staticEnvFieldFile) {

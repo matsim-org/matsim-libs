@@ -64,6 +64,7 @@
 
 
 	<module name="controler">
+		<param name="mobsim" value="hybridQ2D" />
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />

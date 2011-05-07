@@ -1,17 +1,18 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
+import org.matsim.api.core.v01.Scenario;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 
-	private final Scenario2DImpl sc;
+	private final Scenario sc;
 	private final StaticEnvironmentDistancesField sff;
 
 	private final double EventHorizonTime = 10;
@@ -23,9 +24,9 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	 * @param floor
 	 * @param scenario
 	 */
-	public CollisionPredictionEnvironmentForceModule(Floor floor, Scenario2DImpl scenario) {
+	public CollisionPredictionEnvironmentForceModule(Floor floor, Scenario scenario) {
 		this.sc = scenario;
-		this.sff = this.sc.getStaticForceField();
+		this.sff = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
 		Sim2DConfigGroup conf = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
 		this.Bi = conf.getBi();
 		this.Ai = conf.getAi();

@@ -29,8 +29,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -46,7 +50,6 @@ import com.vividsolutions.jts.geom.LineString;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d_v2.scenario.Scenario2DImpl;
 
 /**
  * @author laemmel
@@ -69,8 +72,7 @@ public class PhysicalFloor implements Floor {
 	protected final List<DynamicForceModule> dynamicForceModules = new ArrayList<DynamicForceModule>();
 
 	protected final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
-	private final Scenario2DImpl scenario;
-	private final Collection<Link> links;
+	private final Scenario scenario;
 	private HashMap<Id, LineString> finishLines;
 
 	private final GeometryFactory geofac = new GeometryFactory();
@@ -79,14 +81,14 @@ public class PhysicalFloor implements Floor {
 	private final boolean emitXYZAzimuthEvents;
 	private Envelope envelope;
 	private final Sim2DConfigGroup sim2DConfig;
-	private final Map<PersonDriverAgent,Agent2D> readyToDepart = new HashMap<PersonDriverAgent, Agent2D>();
 	private final EventsManager em;
+	private final Collection<? extends Link> links;
 
-	public PhysicalFloor(Scenario2DImpl scenario, Collection<Link> list, EventsManager em, boolean emitEvents) {
+	public PhysicalFloor(Scenario scenario, Collection<? extends Link> collection, EventsManager em, boolean emitEvents) {
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
 		this.sim2DTimeStepSize = this.sim2DConfig.getTimeStepSize();
-		this.links = list;
+		this.links = collection;
 		this.em = em;
 		this.emitXYZAzimuthEvents = emitEvents;
 
@@ -348,21 +350,6 @@ public class PhysicalFloor implements Floor {
 	}
 
 	/**
-	 * @param pda
-	 */
-	public void addAgent(PersonDriverAgent pda) {
-		Agent2D agent = new Agent2D(pda);
-		this.readyToDepart.put(pda,agent);
-		Activity act = (Activity) pda.getCurrentPlanElement();
-		if (act.getCoord() != null) {
-			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
-		} else {
-			agent.setPostion(MGC.coord2Coordinate(this.scenario.getNetwork().getLinks().get(act.getLinkId()).getCoord()));
-		}
-
-	}
-
-	/**
 	 * 
 	 * @return list of agents
 	 */
@@ -374,7 +361,13 @@ public class PhysicalFloor implements Floor {
 	 * @param agent
 	 */
 	public void agentDepart(PersonDriverAgent pda) {
-		Agent2D agent = this.readyToDepart.remove(pda);
+		Agent2D agent = new Agent2D(pda);
+		Activity act = (Activity) getPreviousPlanElement(pda);
+		if (act.getCoord() != null) {
+			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
+		} else {
+			agent.setPostion(MGC.coord2Coordinate(this.scenario.getNetwork().getLinks().get(act.getLinkId()).getCoord()));
+		}
 		this.agents.add(agent);
 		for (DynamicForceModule m : this.dynamicForceModules) {
 			m.forceUpdate();
@@ -382,10 +375,24 @@ public class PhysicalFloor implements Floor {
 
 	}
 
+	@Deprecated //add method to PlanAgent
+	private PlanElement getPreviousPlanElement(PersonDriverAgent pda) {
+
+		Leg leg = (Leg) pda.getCurrentPlanElement();
+		Plan plan = pda.getExecutedPlan();
+		List<PlanElement> l = plan.getPlanElements();
+		for (int i = 1; i < l.size(); i++) {
+			if (l.get(i).equals(leg)) {
+				return l.get(i-1);
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @return
 	 */
-	public Collection<Link> getLinks() {
+	public Collection<? extends Link> getLinks() {
 		return this.links;
 	}
 
