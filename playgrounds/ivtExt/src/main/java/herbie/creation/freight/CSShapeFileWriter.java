@@ -1,6 +1,5 @@
 package herbie.creation.freight;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +31,8 @@ public class CSShapeFileWriter {
 		log.info("Writing freight OD relations");			
 		ArrayList<Feature> features =  (ArrayList<Feature>) this.generateRelations(relations);	
 		log.info("Created " + features.size() + " features");
-		try {
-			if (!features.isEmpty()) {
+		if (!features.isEmpty()) {
 				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir + "/heaviestODRelations.shp");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	
