@@ -32,7 +32,7 @@ public class PopulationCreation {
 	// [[ 0 ]] here you have to fill in the path of the census file
 	private String censusFile = "";
 	
-	private String municipalitiesFile;
+	private String municipalitiesFile = ".input/swiss_municipalities.txt";
 	private QuadTree<ActivityFacility> homeFacilitiesTree;
 	private QuadTree<ActivityFacility> workFacilitiesTree;
 	
@@ -132,6 +132,9 @@ public class PopulationCreation {
 				String parts[] = line.split("\t");
 				
 				Id id = new IdImpl(parts[0]);
+				/*
+				 * COORD: pay attention to coordinate systems!
+				 */
 				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 				this.municipalityCentroids.put(id, coord);;
 			}
