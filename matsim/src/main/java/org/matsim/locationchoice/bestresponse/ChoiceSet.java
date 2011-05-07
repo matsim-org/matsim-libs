@@ -28,10 +28,12 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 public class ChoiceSet {
 		
 	// *************************************
-	private static double exponent = 3.0;
-	private int numberOfAlternatives = 30;
-	private int approximationLevel = 0;	
+	private double exponent;
+	private int numberOfAlternatives;
+	
+	private int approximationLevel;	
 	// *************************************
+	private static String LCEXP = "locationchoiceExperimental";
 	
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
@@ -44,6 +46,9 @@ public class ChoiceSet {
 		this.router = router;
 		this.network = network;
 		this.config = config;
+		
+		this.exponent = Double.parseDouble(config.findParam(LCEXP, "csexponent"));
+		this.numberOfAlternatives = Integer.parseInt(config.findParam(LCEXP, "numberOfAlternatives"));
 	}
 	
 	public void addDestination(Id id) {
