@@ -1,9 +1,12 @@
 package playground.anhorni.dummy;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -46,12 +49,14 @@ public class ScnCreator {
 	private String facilitiesFile = "./input/zhcut/facilities.xml.gz";
 	private String networkFile = "./input/zhcut/network.xml";
 	private String plansFile = "./input/zhcut/plans.xml.gz";
-	private String municipalities = "./input/swiss_municipalities.txt";
+	private String municipalitiesFile = "C:/l/andreasrep/coding/input/tutorial/swiss_municipalities.txt";
 	
 	private String businessCensusOutFile = "C:/l/andreasrep/coding/input/tutorial/business_census.txt";
 	private String censusOutFile = "C:/l/andreasrep/coding/input/tutorial/census.txt";
 	private String pusPersonsOutFile = "C:/l/andreasrep/coding/input/tutorial/travelsurvey_persons.txt";
 	private String pusTripsOutFile = "C:/l/andreasrep/coding/input/tutorial/travelsurvey_trips.txt";
+	
+	private TreeMap<Id, Coord> municipalities = new TreeMap<Id, Coord>();
 	
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
@@ -79,6 +84,25 @@ public class ScnCreator {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.origScenario);
 		populationReader.readFile(this.plansFile);
 		log.info("Original population size " + this.origScenario.getPopulation().getPersons().size());
+		
+		this.readMunicipalities();
+	}
+	
+	private void readMunicipalities() {
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.municipalitiesFile));
+			String line = bufferedReader.readLine(); //skip header
+					
+			while ((line = bufferedReader.readLine()) != null) {
+				String parts[] = line.split("\t");
+				Id id = new IdImpl(parts[0]);
+				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+				this.municipalities.put(id, coord);;
+			}
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void smearPlans() {
@@ -133,9 +157,94 @@ public class ScnCreator {
 		return sign * deltaL + dp;
 	}
 	
-	private void writeCensus() {
-		int censusOffset = 10000;
+	private void writeCensus() {		
+		String header = "KANT\t" +
+				"ZGDE\t" +
+				"GEBAEUDE_ID\t" +
+				"HHNR\t" +
+				"PERSON_ID\t" +
+				"GEMT\t" +
+				"ALTJ\t" +
+				"GORTAUS\t" +
+				"AGDE\t" +
+				"AWBUS\t" +
+				"XH\t" +
+				"YH";
+		try {	
+			final BufferedWriter out = IOUtils.getBufferedWriter(this.censusOutFile);
+			out.write(header);
+			out.newLine();	
+			
+			int cnt = 0;
+			for (Person p : ((ScenarioImpl) this.origScenario).getPopulation().getPersons().values()) {
+				
+				// sample population
+				if (random.nextDouble() > sampleRate) continue;
+				
+				int kant = random.nextInt(26);
+				int zgde = random.nextInt(10);
+				int gebId = random.nextInt(10000);
+				int hhnr = random.nextInt(10000000);
+				Id personId = new IdImpl(cnt);
+				int gemt = random.nextInt(1000);
+				int age  = 1 + random.nextInt(100);
+				int gorthaus = random.nextInt(1000);				
+				int agde = this.findMunicipality(p.getSelectedPlan());
+				int awbus = random.nextInt(10000);
+				
+				Coord homeCoord = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				out.write(
+						kant + "\t" +
+						zgde + "\t" +
+						gebId + "\t" +
+						hhnr + "\t" +
+						personId + "\t" +
+						gemt + "\t" +
+						age + "\t" +
+						gorthaus + "\t" +
+						agde + "\t" +
+						awbus + "\t" +
+						homeCoord.getX() + "\t" + 
+						homeCoord.getY());
+				out.newLine();
+					
+					cnt++;
+			}
+			out.flush();
+			out.flush();			
+			out.flush();
+			out.close();
+		}catch (final IOException e) {
+					Gbl.errorMsg(e);
+		}
+		log.info("Census population written");
+	}
+	
+	private int findMunicipality(Plan plan) {
+		int municipality = -1;
 		
+		Coord workCoord = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				ActivityImpl act = (ActivityImpl)pe;
+				if (act.getType().startsWith("w")) {
+					workCoord = act.getCoord();
+				}
+			}
+		}
+		if (workCoord != null) {
+			double minDistance = 999999999999999999.0;
+			Id closestMunicipality = this.municipalities.firstKey();
+			for (Id id : this.municipalities.keySet()) {
+				CoordImpl coord = (CoordImpl) this.municipalities.get(id);
+				if (coord.calcDistance(workCoord) < minDistance) {
+					minDistance = coord.calcDistance(workCoord);
+					closestMunicipality = id;
+				}
+			}
+			municipality = Integer.parseInt(closestMunicipality.toString());
+		}
+		return municipality;
 	}
 	
 	private List<Id> writePUSPersons() {
