@@ -55,7 +55,6 @@ import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
-import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 
@@ -136,8 +135,7 @@ public abstract class OTFClient implements Runnable {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				jMapViewer.setZoom(jMapViewer.getZoom() - e.getWheelRotation(), e.getPoint());
-
+				
 				if (firstTime) {
 					Rect viewBounds = ((OTFOGLDrawer) mainDrawer).getViewBounds();
 					double minX = (viewBounds.minX + mainDrawer.getQuad().offsetEast);
@@ -148,18 +146,37 @@ public abstract class OTFClient implements Runnable {
 					final Coord bottomRight = new CoordImpl(maxX,maxY);
 					double xRatio = jMapViewer.getWidth() / (bottomRight.getX() - topLeft.getX());
 					double yRatio = jMapViewer.getHeight() / (bottomRight.getY() - topLeft.getY());
+					System.out.println("firsttime: "+(maxX-minX) + " " + (maxY - minY));
+					System.out.println(jMapViewer.getWidth() +" " + jMapViewer.getHeight());
 					System.out.println("Ratio (x,y): " + xRatio+","+yRatio);
 					mainDrawer.setScale((float) yRatio);
+					// mainDrawer.setScale(0.8f * (float)yRatio);
 					firstTime = false;
 				} else {
 					if (e.getWheelRotation() < 0) {
+						jMapViewer.setZoom(jMapViewer.getZoom() - e.getWheelRotation(), e.getPoint());
 						mainDrawer.setScale(mainDrawer.getScale() * 0.5f);
 					} else if (e.getWheelRotation() > 0) {
+						jMapViewer.setZoom(jMapViewer.getZoom() - e.getWheelRotation(), e.getPoint());
 						mainDrawer.setScale(mainDrawer.getScale() * 2.0f);
 					}
 				}
 				
 				compositePanel.repaint();
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						Rect viewBounds = ((OTFOGLDrawer) mainDrawer).getViewBounds();
+						double minX = (viewBounds.minX + mainDrawer.getQuad().offsetEast);
+						double minY = (viewBounds.minY + mainDrawer.getQuad().offsetNorth);
+						double maxX = (viewBounds.maxX + mainDrawer.getQuad().offsetEast);
+						double maxY = (viewBounds.maxY + mainDrawer.getQuad().offsetNorth);
+						System.out.println((maxX-minX) + " " + (maxY - minY));
+					}
+					
+				});
+				
 			}
 
 		});

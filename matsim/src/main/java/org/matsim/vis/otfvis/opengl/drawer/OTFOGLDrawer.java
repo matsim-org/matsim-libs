@@ -57,6 +57,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.GLJPanel;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -153,6 +154,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	private Collection<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
+	// Experimental mode for michaz
+	private final boolean USE_GLJPANEL = false;
+
 	public static class StatusTextDrawer {
 
 		private TextRenderer textRenderer;
@@ -247,8 +251,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	}
 
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
-		GLCanvas canvas = new GLCanvas(caps);
-		canvas.addGLEventListener(drawer);
+		Component canvas;
+		if (USE_GLJPANEL) {
+			GLJPanel glJPanel = new GLJPanel(caps);
+			glJPanel.addGLEventListener(drawer);
+			glJPanel.setOpaque(false);
+			canvas = glJPanel;
+		} else {
+			GLCanvas glCanvas = new GLCanvas(caps);
+			glCanvas.addGLEventListener(drawer);
+			canvas = glCanvas;
+		}
 		return canvas;
 	}
 
@@ -257,14 +270,16 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		GLCapabilities caps = new GLCapabilities();
 		this.canvas = createGLCanvas(this, caps);
 		this.mouseMan = new VisGUIMouseHandler(this);
-		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
+		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.mouseMan.setToNewPos(initialZoom);
 		}
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
-		this.canvas.addMouseWheelListener(this.mouseMan);
+		if (!USE_GLJPANEL) {
+			this.canvas.addMouseWheelListener(this.mouseMan);
+		}
 		ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
@@ -683,5 +698,5 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	public void addChangeListener(ChangeListener changeListener) {
 		this.changeListeners.add(changeListener);
 	}
-	
+
 }

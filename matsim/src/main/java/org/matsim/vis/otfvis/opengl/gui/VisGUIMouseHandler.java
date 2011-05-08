@@ -87,8 +87,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 	private final OTFDrawer clickHandler;
 
 	private Rectangle2D.Float bounds = null;
-	private float minZoom;
-	private float maxZoom;
 
 	private Texture marker = null;
 
@@ -300,8 +298,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 	private void scaleNetworkRelative(float scale) {
 		this.scale *= scale;
 		double zPos = (cameraStart.getZ()*(scale));
-		if (zPos < minZoom) zPos = minZoom;
-		if (zPos > maxZoom) zPos =maxZoom;
 		double effectiveScale = (zPos -cameraStart.getZ()) /cameraStart.getZ();
 		viewBounds = viewBounds.scale(effectiveScale, effectiveScale);
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),(float)zPos));
@@ -309,11 +305,9 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 
 	public void scaleNetwork(float scale) {
 		this.scale = scale;
-		float test = bounds.height;
-		float zPos = (test*scale);
-		if (zPos < minZoom) zPos =minZoom;
-		if (zPos > maxZoom) zPos =maxZoom;
+		float zPos = (bounds.height*scale);
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),zPos));
+		System.out.println("Set scale to: " +scale+" It is now: "+getScale() );
 	}
 
 	synchronized public Point3f getOGLPos(int x, int y)
@@ -360,17 +354,14 @@ public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelL
 		this.aspectRatio = aspectRatio;
 	}
 
-	public void setBounds(float minEasting, float minNorthing, float maxEasting, float maxNorthing, float minZoom) {
-		this.minZoom = minZoom;
-		this.maxZoom = 1.5f * Math.max(maxNorthing- minNorthing, (maxEasting-minEasting));
-		bounds = new Rectangle2D.Float(minEasting, minNorthing, maxEasting - minEasting, maxNorthing- minNorthing);
-
-		cameraStart = new Point3f((maxEasting-minEasting)/2, (maxNorthing-minNorthing)/2, (maxNorthing-minNorthing)*0.8f);
+	public void setBounds(float minEasting, float minNorthing, float maxEasting, float maxNorthing) {
+		bounds = new Rectangle2D.Float(minEasting, minNorthing, maxEasting - minEasting, maxNorthing-minNorthing);
+		cameraStart = new Point3f((maxEasting-minEasting)/2, (maxNorthing-minNorthing)/2, maxNorthing-minNorthing);
 		cameraTarget = new Point3f(cameraStart.getX(), cameraStart.getY(),0);
-		viewBounds =  new QuadTree.Rect(minEasting, minNorthing, maxEasting - minEasting, maxNorthing- minNorthing);
+		viewBounds =  new QuadTree.Rect(minEasting, minNorthing, maxEasting - minEasting, maxNorthing-minNorthing);
 	}
 
-	public QuadTree.Rect getBounds(){
+	public QuadTree.Rect getBounds() {
 		return viewBounds;
 	}
 

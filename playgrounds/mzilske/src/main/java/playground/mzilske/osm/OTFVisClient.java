@@ -143,7 +143,7 @@ public final class OTFVisClient extends OTFClient {
 	}
 	
 	public static void main(final String[] args) {
-		play("../../matsim/input/network.xml", false); 
+		play("input/network.xml", false); 
 	}
 	
 	private static final String chooseFile() {
