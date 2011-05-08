@@ -5,8 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -42,9 +42,9 @@ public class CreateFacilities {
 	
 	private void run() {
 		/*
-		 * Read the entreprise census for work, shop, leisure and education facilities
+		 * Read the business census for work, shop, leisure and education facilities
 		 */
-		int startIndex = this.readEntrepriseCensus();
+		int startIndex = this.readBusinessCensus();
 		
 		/*
 		 * Read the census for home facilities. Other sources such as official dwelling directories could be used as well.
@@ -54,23 +54,31 @@ public class CreateFacilities {
 		
 	}
 	
-	private int readEntrepriseCensus() {
+	private int readBusinessCensus() {
 		int cnt = 0;
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.businessCensusFile));
 			String line = bufferedReader.readLine(); //skip header
 			
-			int index_type = 0;
-			int index_xHomeCoord = 0;
-			int index_yHomeCoord = 0;
+			// id = 0
+			int index_xCoord = 1;
+			int index_yCoord = 2;
+			int index_types = 3;
+			
 			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				
-				Coord coord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
-						Double.parseDouble(parts[index_yHomeCoord]));
+				Coord coord = new CoordImpl(Double.parseDouble(parts[index_xCoord]),
+						Double.parseDouble(parts[index_yCoord]));
 				
-				this.addFacility(coord, new IdImpl(cnt), parts[index_type]);
+				ActivityFacilityImpl facility = 
+					(ActivityFacilityImpl)((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(cnt), coord);
+				
+				String types [] = parts[index_types].split(",");
+ 				for (int i = 0; i < types.length; i++) {
+ 					this.addActivityOption(facility, types[i]);
+				}
 				cnt++;
 			}
 		} // end try
@@ -95,7 +103,7 @@ public class CreateFacilities {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				
-				this.addFacility(homeCoord, new IdImpl(startIndex + cnt), "home");
+				((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(startIndex + cnt), homeCoord);
 				cnt++;
 			}
 			
@@ -105,9 +113,8 @@ public class CreateFacilities {
 		}
 	}
 	
-	private void addFacility(Coord coord, Id id, String type) {
-		ActivityFacilityImpl facility = (ActivityFacilityImpl)((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(id, coord);	
-		facility.createActivityOption(type);
+	private void addActivityOption(ActivityFacility facility, String type) {
+		((ActivityFacilityImpl) facility).createActivityOption(type);
 		
 		/*
 		 * [[ 1 ]] Specify the opening hours here. An example is given for the activity work.
@@ -124,9 +131,9 @@ public class CreateFacilities {
 		else {
 			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600);
 		}
-		actOption.addOpeningTime(opentime);
+		actOption.addOpeningTime(opentime);	
 	}
-	
+		
 	public void write() {
 		new FacilitiesWriter(((ScenarioImpl) this.scenario).getActivityFacilities()).write("./output/facilities.xml");
 	}
