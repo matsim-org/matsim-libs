@@ -25,7 +25,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import utils.BuildTrees;
 
 
-public class PopulationCreation {
+public class CreatePopulation {
 	
 	private Scenario scenario;
 	

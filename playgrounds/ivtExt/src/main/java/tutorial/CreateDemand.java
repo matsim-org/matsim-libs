@@ -35,7 +35,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import utils.BuildTrees;
 
 
-public class DemandCreation {
+public class CreateDemand {
 	private Scenario scenario;
 	
 	// We need another population, the PUS population
@@ -55,7 +55,7 @@ public class DemandCreation {
 	private QuadTree<ActivityFacility> leisureFacilitiesTree;
 	private QuadTree<ActivityFacility> educationFacilitiesTree;
 	
-	private final static Logger log = Logger.getLogger(DemandCreation.class);
+	private final static Logger log = Logger.getLogger(CreateDemand.class);
 	
 	
 	public void run(Scenario scenario, ObjectAttributes personHomeAndWorkLocations) {

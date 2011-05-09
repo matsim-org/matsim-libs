@@ -10,9 +10,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-public class PopulationAndDemandCreation {
+public class CreatePopulationAndDemand {
 	
-	private final static Logger log = Logger.getLogger(PopulationAndDemandCreation.class);
+	private final static Logger log = Logger.getLogger(CreatePopulationAndDemand.class);
 	private Scenario scenario;
 	
 	private String facilitiesFile = "./input/facilities.xml.gz";
@@ -20,15 +20,15 @@ public class PopulationAndDemandCreation {
 	
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
-		PopulationAndDemandCreation creator = new PopulationAndDemandCreation();
+		CreatePopulationAndDemand creator = new CreatePopulationAndDemand();
 		creator.run();		
 	}
 	
 	private void run() {
 		this.init();
-		PopulationCreation populationCreator = new PopulationCreation();
+		CreatePopulation populationCreator = new CreatePopulation();
 		populationCreator.run(this.scenario);
-		DemandCreation demandCreator = new DemandCreation();
+		CreateDemand demandCreator = new CreateDemand();
 		demandCreator.run(this.scenario, populationCreator.getPersonHomeAndWorkLocations());
 		this.write();
 	}
