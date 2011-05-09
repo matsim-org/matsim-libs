@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AgentTimeIntervalReaderTestOnePlan.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
@@ -15,6 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
@@ -28,11 +48,19 @@ import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
 /**
- * tests AgentTimeIntervalReader
+ * tests if
+ *  <li>parking times are read in correctly for first agent 
+ *  in readParkingTimes method
+	<li>driving times are read in correctly from addDrivingTimes method
+	<li>intervals in schedule are correctly distinguished into optimal and suboptimal time intervals according to the determistic hubload
+	in checkTimesWithHubSubAndOptimalTimes method
+ * <li> Joules for intervals are calculated correctly in getJoulesForEachParkingInterval
+ * using config_plans1.xml
+ * 
  * @author Stella
  *
  */
-public class AgentTimeIntervalReaderTestOnePlan extends TestCase{
+public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 
 	/**
 	 * @param args
@@ -80,9 +108,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends TestCase{
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
 		
-		
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
-		
 		
 		final double phev=1.0;
 		final double ev=0.0;
@@ -194,7 +220,6 @@ public class AgentTimeIntervalReaderTestOnePlan extends TestCase{
 					 * AGENTTIMEINTERVALREADER
 					 * *********************************
 					 */
-					
 					
 					for(Id id : controler.getPopulation().getPersons().keySet()){
 						agentOne=id;						

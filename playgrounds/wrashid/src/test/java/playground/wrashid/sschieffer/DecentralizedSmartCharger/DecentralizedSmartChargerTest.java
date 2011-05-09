@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DecentralizedSmartChargerTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
@@ -26,6 +46,13 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
+/**
+ * 1) CHECKS BASIC FUNCTIONALITY OF INTERVALS AND SCHEDULE
+* 2) CHECKS RESULTS OF AGENTTIMEINTERVALREADER SPECIFIC TO AGENT 1
+	 * 
+ * @author Stella
+ *
+ */
 public class DecentralizedSmartChargerTest extends MatsimTestCase {
 
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
@@ -66,7 +93,6 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 		
 		final double optimalPrice=0.1;
 		final double suboptimalPrice=optimalPrice*3;
-		
 			
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
 		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
@@ -92,18 +118,6 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 				gasPricePerLiter, 
 				emissionPerLiter);
 		
-		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
 		double batterySizeEV= 24*3600*1000; 
 		double batterySizePHEV= 24*3600*1000; 
 		double batteryMinEV= 0.1; 
@@ -156,10 +170,8 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 				try {
 					
 					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= new LinkedListValueHashMap<Integer, Schedule>();
-					//hub/LoadDIstributionSchedule
 					
 					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= new LinkedListValueHashMap<Id, Schedule>();
-					
 					
 					mapHubsTest(controler,hubLinkMapping);
 					
@@ -170,8 +182,6 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							outputPath, 
 							myVehicleTypes
 							);
-					
-				
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
@@ -288,19 +298,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 					
 					assertEquals(agentsWithPHEV.size(), 100);
 					
-					//*****************************************
-					//*****************************************
-					//TEST CalculateChargingCost For Agent Schedule
-					
-					
-					
-					//*****************************************
-					//*****************************************
-					//TEST LPPHEV
-					
-					
-					
-					
+						
 					LPPHEVTest testLP = new LPPHEVTest();
 					testLP.testRunLPPHEV();
 					

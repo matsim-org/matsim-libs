@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AgentTimeIntervalReader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
@@ -26,7 +45,12 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
- * tests AgentTimeIntervalReader
+ * tests if
+ *  <li>parking times are read in correctly for first agent 
+ *  in readParkingTimes method
+	<li>driving times are read in correctly from addDrivingTimes method
+	<li>intervals in schedule are correctly distinguished into optimal and suboptimal time intervals according to the determistic hubload
+	in checkTimesWithHubSubAndOptimalTimes method
  * @author Stella
  *
  */
@@ -35,11 +59,9 @@ public class AgentTimeIntervalReaderTest extends MatsimTestCase{
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final Controler controler=new Controler(configPath);
 	
-	
 	public Id agentOne=null;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
-	
 	
 	public static void testMain(String[] args) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException {
 				
@@ -57,18 +79,16 @@ public class AgentTimeIntervalReaderTest extends MatsimTestCase{
 	 */
 	public void testDecentralizedCharger() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
-		final String outputPath = super.getOutputDirectory(); 
+		final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 		
 		final ParkingTimesPlugin parkingTimesPlugin;
 		final EnergyConsumptionPlugin energyConsumptionPlugin;
 		
 		final double optimalPrice=0.1;
 		final double suboptimalPrice=optimalPrice*3;
-		final double gasPrice=optimalPrice*2;
 			
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
-		
 		
 		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
 		
@@ -232,14 +252,14 @@ public class AgentTimeIntervalReaderTest extends MatsimTestCase{
 							
 							/*
 							Parking and Driving Times:
-*************************
-Starting SOC: 0.0
-Parking Interval 	 start: 0.0	  end: 21609.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
-Driving Interval 	  start: 21609.0	  end: 22846.0	  consumption: 1.6388045816871705E7
-Parking Interval 	 start: 22846.0	  end: 36046.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
-Driving Interval 	  start: 36046.0	  end: 38386.0	  consumption: 4.879471387207076E7
-Parking Interval 	 start: 38386.0	  end: 86400.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
-*************************
+							*************************
+							Starting SOC: 0.0
+							Parking Interval 	 start: 0.0	  end: 21609.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
+							Driving Interval 	  start: 21609.0	  end: 22846.0	  consumption: 1.6388045816871705E7
+							Parking Interval 	 start: 22846.0	  end: 36046.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
+							Driving Interval 	  start: 36046.0	  end: 38386.0	  consumption: 4.879471387207076E7
+							Parking Interval 	 start: 38386.0	  end: 86400.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
+							*************************
 
 							 */
 							
@@ -259,8 +279,6 @@ Parking Interval 	 start: 38386.0	  end: 86400.0	  ChargingTime:  -1.0	  Optimal
 						}
 						
 					}
-					
-					
 					
 				} catch (Exception e1) {
 					
