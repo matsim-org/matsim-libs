@@ -96,8 +96,8 @@ public class CreateFacilities {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.censusFile));
 			String line = bufferedReader.readLine(); //skip header
 			
-			int index_xHomeCoord = 0;
-			int index_yHomeCoord = 0;
+			int index_xHomeCoord = 10;
+			int index_yHomeCoord = 11;
 			
 			int cnt = 0;
 			while ((line = bufferedReader.readLine()) != null) {
@@ -106,7 +106,8 @@ public class CreateFacilities {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				
-				((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(startIndex + cnt), homeCoord);
+				ActivityFacility facility = ((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(startIndex + cnt), homeCoord);
+				addActivityOption(facility, "home");
 				cnt++;
 			}
 			
@@ -125,19 +126,22 @@ public class CreateFacilities {
 		ActivityOptionImpl actOption = (ActivityOptionImpl)facility.getActivityOptions().get(type);
 		OpeningTimeImpl opentime;
 		if (type.equals("shop")) {
-			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+			opentime = new OpeningTimeImpl(DayType.wkday, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
 		}
 		else if (type.equals("leisure") || type.equals("education")) {
-			opentime =new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
 		}
-		// work
+		else if (type.equals("work")) {
+			opentime = new OpeningTimeImpl(DayType.wkday, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+		}
+		// home
 		else {
-			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600);
+			opentime = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
 		}
 		actOption.addOpeningTime(opentime);	
 	}
 		
 	public void write() {
-		new FacilitiesWriter(((ScenarioImpl) this.scenario).getActivityFacilities()).write("./output/facilities.xml");
+		new FacilitiesWriter(((ScenarioImpl) this.scenario).getActivityFacilities()).write("./output/facilities.xml.gz");
 	}
 }
