@@ -40,6 +40,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -376,7 +377,7 @@ public class PhysicalFloor implements Floor {
 	}
 
 	@Deprecated //add method to PlanAgent
-	private PlanElement getPreviousPlanElement(PersonDriverAgent pda) {
+	private PlanElement getPreviousPlanElement(PlanAgent pda) {
 
 		Leg leg = (Leg) pda.getCurrentPlanElement();
 		Plan plan = pda.getExecutedPlan();

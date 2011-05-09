@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 /**
@@ -51,8 +50,8 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 */
 	@Override
 	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
-		if (agent instanceof PersonDriverAgentImpl && leg.getMode().equals("walk2d")) {
-			handleAgent2DDeparture((PersonDriverAgentImpl)agent, linkId);
+		if (agent instanceof PersonDriverAgent && leg.getMode().equals("walk2d")) {
+			handleAgent2DDeparture((PersonDriverAgent)agent, linkId);
 			return true;
 		}
 		return false;
