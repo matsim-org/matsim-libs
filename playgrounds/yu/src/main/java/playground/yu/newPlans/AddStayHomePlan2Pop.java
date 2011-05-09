@@ -136,8 +136,8 @@ public class AddStayHomePlan2Pop extends NewPopulation {
 			outputPopFilename = args[2];
 		} else {
 			netFilename = "../../matsim/examples/equil/network.xml";
-			inputPopFilename = "test/input/plans100withPt.xml";
-			outputPopFilename = "test/input/plans100WithPtAndStayHomePlan.xml.gz";
+			inputPopFilename = "test/input/10.plansFull.xml.gz";
+			outputPopFilename = "test/input/10.plansFullWithStayHomePlan.xml.gz";
 		}
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
