@@ -22,7 +22,12 @@ package org.matsim.api.core.v01;
 
 
 /**
- * Represents a unique identifier.  This is essentially a c++ typedef, except that
+ * Represents a unique identifier.
+ * 
+ * Note that Ids should not contain any whitespace characters (spaces, tabs, newlines, ...), 
+ * as this may lead to problems when Ids are written to file and read back in. 
+ * 
+ * This is essentially a c++ typedef, except that
  * typedefs don't exist in Java.
  */
 public interface Id extends Comparable<Id> {

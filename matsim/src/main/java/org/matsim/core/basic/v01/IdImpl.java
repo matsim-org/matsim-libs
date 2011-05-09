@@ -31,6 +31,13 @@ public class IdImpl implements Id, Serializable {
 
 	private final String id;
 
+	/**
+	 * Creates a new Id using the string as identification.
+	 * Note that <code>id</code> should not contain any whitespace characters (spaces, tabs, 
+	 * newlines, ...), as this may lead to problems when Ids are written to file and read back in.
+	 * 
+	 * @param id
+	 */
 	public IdImpl(final String id) {
 		if (id == null) {
 			throw new NullPointerException("id cannot be null");
