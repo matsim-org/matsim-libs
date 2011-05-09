@@ -24,13 +24,17 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -46,8 +50,8 @@ import org.xml.sax.SAXException;
  */
 public class ScenarioPlayer {
 
-	public static void play(final ScenarioImpl scenario, final EventsManager events) {
-		scenario.getConfig().simulation().setSnapshotStyle("queue");
+	public static void play(final Scenario scenario, final EventsManager events) {
+		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 		final QSim sim = new QSim(scenario, events);
 		sim.addFeature(new OTFVisMobsimFeature(sim));
 		sim.run();
@@ -60,24 +64,23 @@ public class ScenarioPlayer {
 	 * @throws SAXException
 	 */
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/input/playground/marcel/pt/config.xml");
-		ScenarioImpl scenario = sl.getScenario();
-
-		NetworkImpl network = scenario.getNetwork();
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-
-		sl.loadScenario();
-
-		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		scenario.getConfig().getQSimConfigGroup().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
+		
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, scenario).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		new MatsimNetworkReader(scenario).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
 
-		final EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
+		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
+		new TransitScheduleReaderV1(schedule, network, scenario).parse("test/scenarios/pt-tutorial/transitschedule.xml");
+		new CreateVehiclesForSchedule(schedule, ((ScenarioImpl) scenario).getVehicles()).run();
+
+		final EventsManager events = EventsUtils.createEventsManager();
+		EventWriterXML writer = new EventWriterXML("./transitEvents.xml");
 		events.addHandler(writer);
 
 		play(scenario, events);
