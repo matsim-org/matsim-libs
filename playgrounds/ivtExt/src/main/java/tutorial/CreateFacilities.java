@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -21,6 +22,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 public class CreateFacilities {
 	
+	private final static Logger log = Logger.getLogger(CreateFacilities.class);
 	private Scenario scenario;
 	private String censusFile = "./input/census.txt";
 	private String businessCensusFile = "./input/business_census.txt";
@@ -30,6 +32,7 @@ public class CreateFacilities {
 		facilitiesCreator.init();
 		facilitiesCreator.run();
 		facilitiesCreator.write();
+		log.info("Creation finished #################################");
 	}
 	
 	private void init() {
@@ -122,10 +125,10 @@ public class CreateFacilities {
 		ActivityOptionImpl actOption = (ActivityOptionImpl)facility.getActivityOptions().get(type);
 		OpeningTimeImpl opentime;
 		if (type.equals("shop")) {
-			opentime = null;
+			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
 		}
 		else if (type.equals("leisure") || type.equals("education")) {
-			opentime = null;
+			opentime =new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
 		}
 		// work
 		else {
