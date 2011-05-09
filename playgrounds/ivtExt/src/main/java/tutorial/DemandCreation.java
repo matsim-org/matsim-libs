@@ -25,6 +25,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -222,28 +223,28 @@ public class DemandCreation {
 			if (((PersonImpl)person).isEmployed()) {
 				Collections.shuffle(this.pusWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusWorkers.get(0));
-				Plan plan = pusPerson.getSelectedPlan();
-				this.adaptPlan(person, plan, true);	
+				Plan plan = this.adaptAndCopyPlan(person, pusPerson.getSelectedPlan(), true);	
 				person.addPlan(plan);
 			}
 			else {
 				Collections.shuffle(this.pusNonWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusNonWorkers.get(0));
-				Plan plan = pusPerson.getSelectedPlan();
-				this.adaptPlan(person, plan, false);	
+				Plan plan =  this.adaptAndCopyPlan(person, pusPerson.getSelectedPlan(), false);	
 				person.addPlan(plan);
 			}
 		}
 	}
 	
-	private void adaptPlan(Person person, Plan plan, boolean worker) {		
+	private Plan adaptAndCopyPlan(Person person, Plan plan, boolean worker) {		
+		PlanImpl newPlan = new PlanImpl();
+		newPlan.copyPlan(plan);
 		/*
 		 * Go through plan and adapt locations and times
 		 */
 		int counter = 0;
 		double time = 0.0;
 		Activity previousActivity = null;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl activity = (ActivityImpl)pe;
 				ActivityFacility facility;
@@ -265,11 +266,10 @@ public class DemandCreation {
 				}
 				else {
 					Person pusPerson = plan.getPerson();
-					log.info(pusPerson.getId() + "_" + activity.getType() + "_");
 					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
 					
 					time += this.randomizeTimes(time + activityDuration);
-					activity.setType(activity.getType().substring(0, 1) + (int)activityDuration);
+					activity.setType(activity.getType().substring(0, 1) + (int)(activityDuration / 3600.0));
 				}								
 				activity.setFacilityId(facility.getId());
 				activity.setLinkId(facility.getLinkId());
@@ -284,6 +284,7 @@ public class DemandCreation {
 			}
 			counter++;
 		}
+		return newPlan;
 	}
 	
 	private ActivityFacility getRandomLocation(Activity activity, Coord coordPreviousActivity) {		
