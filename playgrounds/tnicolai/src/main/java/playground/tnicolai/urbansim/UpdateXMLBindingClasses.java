@@ -95,14 +95,16 @@ public class UpdateXMLBindingClasses {
 			
 			// restore previous security manager
 			System.setSecurityManager( securityManager );
+			
 		} catch (ExitException ee) {
 			log.warn( ee.getMessage() );
+			// restore previous security manager
+			System.setSecurityManager( securityManager );
+			log.info("Successful finished creating xml bindings ...");
 		}
 		catch(Throwable te){
 			te.printStackTrace();
 		}
-		
-		log.info("Successful finished creating xml bindings ...");
 	}
 	
 	/**

@@ -131,7 +131,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			
 			log.info("Computing and writing accessibility measures ..." );
 			Iterator<Zone<ZoneObject>> startZoneIterator = startZones.getZones().iterator();
-			log.info(startZones.getZones().size() + " measurement points are now processed ...");
+			log.info(startZones.getZones().size() + " measurement points are now processing ...");
 	
 			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
 			
