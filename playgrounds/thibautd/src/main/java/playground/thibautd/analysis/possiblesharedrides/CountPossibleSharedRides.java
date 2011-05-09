@@ -309,13 +309,18 @@ public class CountPossibleSharedRides {
 			this.leaveLinksTopology.getNeighbors(departure);
 		List<LinkEvent> arrivalNeighbors =
 			this.enterLinksTopology.getNeighbors(arrival);
+		List<Id> alreadyChecked = new ArrayList<Id>(1000);
+		Id currentId;
 		int count = 0;
 		
 		// count the number of persons having a "leaveLinkEvent" near the
 		// departure and a "enterLinkEvent" near the arrival: they are considered
 		// as potential shared ride drivers.
 		for (PersonEvent event : departureNeighbors) {
-			if ( passesHere(event.getPersonId(), arrivalNeighbors) ) {
+			currentId = event.getPersonId();
+			if (( !alreadyChecked.contains(currentId) ) &&
+				( passesHere(currentId, arrivalNeighbors) )) {
+				alreadyChecked.add(currentId);
 				count++;
 			}
 		}
