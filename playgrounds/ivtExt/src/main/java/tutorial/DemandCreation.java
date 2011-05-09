@@ -244,6 +244,7 @@ public class DemandCreation {
 		int counter = 0;
 		double time = 0.0;
 		Activity previousActivity = null;
+		String firstType = "";
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl activity = (ActivityImpl)pe;
@@ -260,21 +261,29 @@ public class DemandCreation {
 				}
 				
 				if (counter == 0) {
-					time = this.randomizeTimes(7.0 * 3600.0);
+					time = 8.0 * 3600.0 + this.randomizeTimes();
 					int suffix = (int)(time / 3600.0);
 					activity.setType("h" + suffix);
+					firstType = activity.getType();
+					activity.setEndTime(time);
+				}
+				else if (counter == newPlan.getPlanElements().size() -1) {
+					activity.setType(firstType);
 				}
 				else {
 					Person pusPerson = plan.getPerson();
 					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
 					
-					time += this.randomizeTimes(time + activityDuration);
-					activity.setType(activity.getType().substring(0, 1) + (int)(activityDuration / 3600.0));
+					time += activityDuration + this.randomizeTimes();
+					String dur = String.valueOf((int)(activityDuration / 3600.0));
+					if (dur.equals("0")) dur = "0.5";
+					activity.setType(activity.getType().substring(0, 1) + dur);
+					activity.setEndTime(time);
 				}								
 				activity.setFacilityId(facility.getId());
 				activity.setLinkId(facility.getLinkId());
 				activity.setCoord(facility.getCoord());
-				activity.setEndTime(time);
+				
 				
 				previousActivity = activity;
 			}
@@ -317,9 +326,9 @@ public class DemandCreation {
 		return facilities.get(randomIndex);
 	}	
 			
-	private double randomizeTimes(double time) {
-		final double sigma = 2.0;
-		return random.nextGaussian() * sigma + time;
+	private double randomizeTimes() {
+		final double sigma = 1.0;
+		return random.nextGaussian() * sigma * 3600.0;
 	}
 	
 	public Scenario getScenario() {
