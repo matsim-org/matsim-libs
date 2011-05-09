@@ -28,6 +28,11 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
 /**
+ * Notes:<ul>
+ * <li>It is our (kn+mz) intuition that this part of the tutorial is rather out-dated and
+ * should either be modernized or deleted.
+ * </ul>
+ * 
  * @author kn after mrieser
  */
 public class MyPlansToPlans {
