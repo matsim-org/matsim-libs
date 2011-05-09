@@ -1,5 +1,6 @@
 package tutorial;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -11,10 +12,11 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 public class PopulationAndDemandCreation {
 	
+	private final static Logger log = Logger.getLogger(PopulationAndDemandCreation.class);
 	private Scenario scenario;
 	
-	private String facilitiesFile = ".input/facilities.xml.gz";
-	private String networkFile = "./input/network.xml.gz";
+	private String facilitiesFile = "./input/facilities.xml.gz";
+	private String networkFile = "./input/network.xml";
 	
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
@@ -49,6 +51,7 @@ public class PopulationAndDemandCreation {
 	
 	private void write() {
 		PopulationWriter populationWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
-		populationWriter.write("./output/population.xml");
+		populationWriter.write("./output/plans.xml.gz");
+		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
 	}
 }

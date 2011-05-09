@@ -30,14 +30,14 @@ public class PopulationCreation {
 	private Scenario scenario;
 	
 	// [[ 0 ]] here you have to fill in the path of the census file
-	private String censusFile = "";
+	private String censusFile = "./input/census.txt";	// [[ 0 ]] censusFile = ""	
+	private String municipalitiesFile = "./input/swiss_municipalities.txt";
 	
-	private String municipalitiesFile = ".input/swiss_municipalities.txt";
 	private QuadTree<ActivityFacility> homeFacilitiesTree;
 	private QuadTree<ActivityFacility> workFacilitiesTree;
 	
 	private TreeMap<Id, Coord> municipalityCentroids = new TreeMap<Id, Coord>();
-	private Random random = new Random(); 
+	private Random random = new Random(3838494); 
 	
 	private ObjectAttributes personHomeAndWorkLocations = new ObjectAttributes();
 
@@ -79,11 +79,11 @@ public class PopulationCreation {
 			 * [[ 1 ]] here you have to set the indices accordingly. 
 			 *  Please note that in programming we always start with 0 and not with 1
 			 */
-			int index_id = 0;
-			int index_age = 0;
-			int index_workLocation = 0;
-			int index_xHomeCoord = 0;
-			int index_yHomeCoord = 0;
+			int index_personId = 4;		// = [[ 1 ]]  = 0;
+			int index_age = 6;
+			int index_workLocation = 8;
+			int index_xHomeCoord = 10;
+			int index_yHomeCoord = 11;
 			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
@@ -91,30 +91,33 @@ public class PopulationCreation {
 				/*
 				 * Create a person and add it to the population
 				 */
-				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_id]));
+				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_personId]));
 				((PersonImpl)person).setAge(Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;
-				if (parts[index_workLocation].equals("-008")) employed = false; 
+				if (parts[index_workLocation].equals("-1")) employed = false; 
 				((PersonImpl)person).setEmployed(employed);
 				population.addPerson(person);
 
 				/* 
-				 * Assign a home location and buffer it somewhere  [[ 2 ]]
+				 * Assign a home location and buffer it somewhere 
 				 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
+				 * Try to understand what is happening here [[ 2 ]]
 				 */
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				ActivityFacility homeFacility = this.homeFacilitiesTree.get(homeCoord.getX(), homeCoord.getY());
 				personHomeAndWorkLocations.putAttribute(person.getId().toString(), "home", homeFacility);
 				
-				/*
-				 * Assign a work location and buffer it somewhere. 
-				 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
-				 */
-				Id municipalityId = new IdImpl(Integer.parseInt(parts[index_workLocation]));
-				ActivityFacility workFacility = this.getWorkFacility(municipalityId);
-				personHomeAndWorkLocations.putAttribute(person.getId().toString(), "work", workFacility);
+				if (employed) {
+					/*
+					 * Assign a work location and buffer it somewhere. 
+					 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
+					 */
+					Id municipalityId = new IdImpl(Integer.parseInt(parts[index_workLocation]));
+					ActivityFacility workFacility = this.getWorkFacility(municipalityId);
+					personHomeAndWorkLocations.putAttribute(person.getId().toString(), "work", workFacility);
+				}
 			}
 			
 		} // end try

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -24,25 +25,27 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import utils.BuildTrees;
 
 
 public class DemandCreation {
-	
 	private Scenario scenario;
 	
 	// We need another population, the PUS population
 	private Scenario scenarioPUS;
 	
 	// [[ 3 ]] here you have to fill in the path of the pus files
-	private String pusTripsFile = "";
-	private String pusPersonsFile = "";
+	private String pusTripsFile = "./input/travelsurvey_trips.txt";		// [[ 3 ]] = "";
+	private String pusPersonsFile = "./input/travelsurvey_persons.txt";
 	
 	private ObjectAttributes personHomeAndWorkLocations;
-	private Random random = new Random(); 
+	private Random random = new Random(3838494); 
 	
 	private List<Id> pusWorkers = new Vector<Id>();
 	private List<Id> pusNonWorkers = new Vector<Id>();
@@ -51,9 +54,12 @@ public class DemandCreation {
 	private QuadTree<ActivityFacility> leisureFacilitiesTree;
 	private QuadTree<ActivityFacility> educationFacilitiesTree;
 	
+	private final static Logger log = Logger.getLogger(DemandCreation.class);
+	
 	
 	public void run(Scenario scenario, ObjectAttributes personHomeAndWorkLocations) {
 		this.scenario = scenario;
+		this.scenarioPUS = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.personHomeAndWorkLocations = personHomeAndWorkLocations;
 		this.init();
 		this.createPUSPersons();
@@ -92,7 +98,7 @@ public class DemandCreation {
 				/*
 				 * Create a person and add it to the population
 				 */
-				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_personId]));
+				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_personId].trim()));
 				population.addPerson(person);
 				
 				((PersonImpl)person).createDesires("desired activity durations");
@@ -127,15 +133,17 @@ public class DemandCreation {
 			String line = bufferedReader.readLine(); //skip header
 			
 			int index_personId = 0;
-			int index_xCoordOrigin = 0;
-			int index_yCoordOrigin = 0;
-			int index_xCoordDestination = 0;
-			int index_yCoordDestination = 0;
-			int index_activityDuration = 0;
-			int index_mode = 0;
-			int index_activityType = 0;			
+			int index_xCoordOrigin = 2;
+			int index_yCoordOrigin = 3;
+			int index_xCoordDestination = 4;
+			int index_yCoordDestination = 5;
+			int index_activityDuration = 6;
+			int index_mode = 7;
+			int index_activityType = 8;			
 			
 			Id previousPerson = null;
+			boolean worker = false;
+			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 
@@ -155,6 +163,17 @@ public class DemandCreation {
 						populationFactory.createActivityFromCoord("home", coordOrigin);
 					
 					plan.addActivity(activity);
+					
+					// define if previous person is a worker or not
+					if (previousPerson != null) {
+						if (worker) {
+							this.pusWorkers.add(previousPerson);
+						}
+						else {
+							this.pusNonWorkers.add(previousPerson);
+						}
+					}
+					worker = false;
 				}
 				else {
 					/*
@@ -169,28 +188,27 @@ public class DemandCreation {
 					Coord coordDestination = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordDestination]), 
 							Double.parseDouble(parts[index_yCoordDestination]));
 										
-					String activityType = parts[index_activityType];
+					String activityType = parts[index_activityType].trim();
+					if (activityType.startsWith("w")) worker = true;
 
 					Activity activity = 
 						populationFactory.createActivityFromCoord(activityType, coordDestination);
 					
-					Double duration = Double.parseDouble(parts[index_activityDuration]);					
+					Double duration = Double.parseDouble(parts[index_activityDuration]);		
 					// store the desired duration in the persons knowledge
 					((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
 					plan.addActivity(activity);
-					
-					if (activityType.equals("work")) {
-						if (!this.pusWorkers.contains(personId)) this.pusNonWorkers.add(personId);
-					}
-					else {
-						this.pusNonWorkers.add(personId);
-					}
 				}
-			}	
+				previousPerson = personId;
+			}
+			log.info("Number of workers: " + this.pusWorkers.size());
+			log.info("Number of non-workers: " + this.pusNonWorkers.size());
 		} // end try
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+		PopulationWriter populationWriter = new PopulationWriter(this.scenarioPUS.getPopulation(), this.scenario.getNetwork());
+		populationWriter.write("./output/PUSplans.xml.gz");
 	}
 	
 	/*
@@ -205,22 +223,20 @@ public class DemandCreation {
 				Collections.shuffle(this.pusWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusWorkers.get(0));
 				Plan plan = pusPerson.getSelectedPlan();
-				this.adaptPlan(plan, true);	
+				this.adaptPlan(person, plan, true);	
 				person.addPlan(plan);
 			}
 			else {
 				Collections.shuffle(this.pusNonWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusNonWorkers.get(0));
 				Plan plan = pusPerson.getSelectedPlan();
-				this.adaptPlan(plan, false);	
+				this.adaptPlan(person, plan, false);	
 				person.addPlan(plan);
 			}
 		}
 	}
 	
-	private void adaptPlan(Plan plan, boolean worker) {
-		Person person = plan.getPerson();
-		
+	private void adaptPlan(Person person, Plan plan, boolean worker) {		
 		/*
 		 * Go through plan and adapt locations and times
 		 */
@@ -232,25 +248,29 @@ public class DemandCreation {
 				ActivityImpl activity = (ActivityImpl)pe;
 				ActivityFacility facility;
 				
-				if (activity.getType().equals("home")) {
+				if (activity.getType().startsWith("h")) {
 					facility = (ActivityFacility)this.personHomeAndWorkLocations.getAttribute(person.getId().toString(), "home");
 				}
-				else if (activity.getType().equals("work")) {
+				else if (activity.getType().startsWith("w")) {
 					facility = (ActivityFacility)this.personHomeAndWorkLocations.getAttribute(person.getId().toString(), "work");
 				}
 				else {
-					facility = this.getRandomLocation(activity, previousActivity);
+					facility = this.getRandomLocation(activity, previousActivity.getCoord());
 				}
 				
 				if (counter == 0) {
 					time = this.randomizeTimes(7.0 * 3600.0);
-					activity.setType("h7");
+					int suffix = (int)(time / 3600.0);
+					activity.setType("h" + suffix);
 				}
 				else {
-					double activityDuration = ((PersonImpl)person).getDesires().getActivityDuration(activity.getType());
+					Person pusPerson = plan.getPerson();
+					log.info(pusPerson.getId() + "_" + activity.getType() + "_");
+					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					
 					time += this.randomizeTimes(time + activityDuration);
 					activity.setType(activity.getType().substring(0, 1) + (int)activityDuration);
-				}
+				}								
 				activity.setFacilityId(facility.getId());
 				activity.setLinkId(facility.getLinkId());
 				activity.setCoord(facility.getCoord());
@@ -266,20 +286,31 @@ public class DemandCreation {
 		}
 	}
 	
-	private ActivityFacility getRandomLocation(Activity activity, Activity previousActivity) {		
-		double xCoordCenter = (activity.getCoord().getX() + previousActivity.getCoord().getX()) / 2.0;
-		double yCoordCenter = (activity.getCoord().getY() + previousActivity.getCoord().getY() ) / 2.0;
-		ArrayList<ActivityFacility> facilities;
+	private ActivityFacility getRandomLocation(Activity activity, Coord coordPreviousActivity) {		
+		double xCoordCenter = coordPreviousActivity.getX();
+		double yCoordCenter = coordPreviousActivity.getY();
+		ArrayList<ActivityFacility> facilities = new ArrayList<ActivityFacility>();
 		
-		// actually we should check if a facility is in the circle. But for simplicity we do not do that as we know, that there is one
-		if (activity.getType().equals("shop")) {
-			facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.get(xCoordCenter, yCoordCenter, 8000);
+		if (activity.getType().startsWith("s")) {
+			double radius = 8000.0;
+			while (facilities.size() == 0) {
+				facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				radius *= 2.0;
+			}
 		}
-		else if (activity.getType().equals("leisure")) {
-			facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.get(xCoordCenter, yCoordCenter, 8000);
+		else if (activity.getType().startsWith("l")) {
+			double radius = 8000.0;
+			while (facilities.size() == 0) {
+				facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				radius *= 2.0;
+			}
 		}
 		else {
-			facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.get(xCoordCenter, yCoordCenter, 8000);
+			double radius = 8000.0;
+			while (facilities.size() == 0) {
+				facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				radius *= 2.0;
+			}
 		}
 		int randomIndex = (int)(random.nextFloat() * (facilities.size()));
 		return facilities.get(randomIndex);
