@@ -302,7 +302,7 @@ public class ScnCreator {
 						
 						double duration = nextAct.getMaximumDuration();
 						if (!(duration > 0.0)) {
-							duration = 24.0 * 3600.0 - previousActivity.getEndTime();
+							duration = Math.max(0.5 * 3600.0, 24.0 * 3600.0 - previousActivity.getEndTime());
 						}
 						line += duration + "\t";
 						line += leg.getMode() + "\t";
