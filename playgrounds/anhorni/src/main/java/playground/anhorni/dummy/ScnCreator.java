@@ -46,9 +46,9 @@ public class ScnCreator {
 	
 	Random random = new Random();
 	
-	private String facilitiesFile = "./input/zhcut/facilities.xml.gz";
-	private String networkFile = "./input/zhcut/network.xml";
-	private String plansFile = "./input/zhcut/plans.xml.gz";
+	private String facilitiesFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/facilities.xml.gz";
+	private String networkFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/network.xml";
+	private String plansFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/plans.xml.gz";
 	private String municipalitiesFile = "C:/l/andreasrep/coding/input/tutorial/swiss_municipalities.txt";
 	
 	private String businessCensusOutFile = "C:/l/andreasrep/coding/input/tutorial/business_census.txt";
@@ -337,14 +337,19 @@ public class ScnCreator {
 			final BufferedWriter out = IOUtils.getBufferedWriter(this.businessCensusOutFile);
 			out.write(header);
 			out.newLine();	
-				
+			
+			int counter = 0;
 			for (ActivityFacility facility : ((ScenarioImpl) this.newScenario).getActivityFacilities().getFacilities().values()) {
-				out.write(facility.getId().toString() + "\t" + facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t");
+				out.write(new IdImpl(counter) + "\t" + facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t");
 				
+				int cnt = 0;
 				for (ActivityOption actOption : facility.getActivityOptions().values()) {
-					out.write(actOption.getType() + ",");
+					if (cnt > 0) out.write(",");
+					out.write(actOption.getType());
+					cnt++;
 				}
 				out.newLine();
+				counter++;
 			}
 			out.flush();
 			out.flush();			
