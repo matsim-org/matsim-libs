@@ -44,7 +44,7 @@ public class ScnCreator {
 	
 	private static double sampleRate = 0.01;
 	
-	Random random = new Random();
+	Random random = new Random(3838494);
 	
 	private String facilitiesFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/facilities.xml.gz";
 	private String networkFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/network.xml";
