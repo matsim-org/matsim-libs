@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * V2GTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
@@ -13,7 +32,9 @@ import lpsolve.LpSolveException;
 
 /**
  * checks if V2G methods ...
- * 
+ * <li> cutScheduleAtTime
+ * <li> cutChargingSchedule
+ * <li> GetSOCAtTime
  * @author Stella
  *
  */
@@ -22,8 +43,6 @@ public class V2GTest extends TestCase{
 	public  V2G someV2G= new V2G(null);
 	
 	public V2GTest(){
-		
-		
 	}
 	
 	
@@ -98,41 +117,7 @@ public class V2GTest extends TestCase{
 		
 	}
 	
-	
-//	public void testRegulationDown(DecentralizedSmartCharger mySmartCharger, Id agentId) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
-//		V2G localV2G= new V2G(mySmartCharger);
-//		
-//		Schedule agentSchedule= mySmartCharger.getAllAgentParkingAndDrivingSchedules().getValue(agentId);
-//		System.out.println("testV2G - testRegulationDown - agentSChedule: "+agentId.toString());
-//		agentSchedule.printSchedule();
-//		/*Parking Interval 	 start: 0.0	  end: 21609.0	  ChargingTime:  0.0	  Optimal:  true	  Joules per Interval:  1.897038219281625E14
-//		Driving Interval 	  start: 21609.0	  end: 22846.0	  consumption: 1.6388045816871705E7
-//		Parking Interval 	 start: 22846.0	  end: 36046.0	  ChargingTime:  4635.074196830796	  Optimal:  true	  Joules per Interval:  6.53919159828E14
-//		Driving Interval 	  start: 36046.0	  end: 38386.0	  consumption: 4.879471387207076E7
-//		Parking Interval 	 start: 38386.0	  end: 62490.0	  ChargingTime:  13988.57142857143	  Optimal:  true	  Joules per Interval:  3.5063335651397495E15
-//		Parking Interval 	 start: 62490.0	  end: 86400.0	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -3.3411427243079994E14
-//		*/
-//		
-//		LoadDistributionInterval electricLoadInFirstParkingTime=new LoadDistributionInterval(
-//				0, 10000, 
-//				new PolynomialFunction(new double[]{1000}), true);
-//		
-//		//mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution
-//		
-//		localV2G.regulationDownVehicleLoad(agentId, 
-//				electricLoadInFirstParkingTime, 
-//				agentSchedule, 
-//				1, // money
-//				3*10000000,
-//				false, //yes or no
-//				"PHEV regulation down TestV2G",
-//				mySmartCharger.lpev,
-//				mySmartCharger.lpphev,
-//				17*3600*1000 ,
-//				0.1,
-//				0.9);
-//		
-//	}
+
 	
 	
 	/*
@@ -162,54 +147,6 @@ public class V2GTest extends TestCase{
 	
 	
 	
-	
-	public void testCalculateChargingCostForReschedule(){
-//		costReschedule= calcCostForRescheduling(answerScheduleAfterElectricSourceInterval,
-//				secondHalf, 
-//				agentId, 
-//				batterySize, batteryMin, batteryMax, 
-//				type,
-//				currentSOC,
-//				ev,
-//				compensation,
-//				lpphev,
-//				lpev
-//				);
-		
-		//TODO
-	}
-	
-	
-	public void testAttributeSuperfluousVehicleLoadsToGrid(){
-//		attributeSuperfluousVehicleLoadsToGridIfPossible(agentId, 
-//				agentParkingDrivingSchedule, 
-//				electricSourceInterval);
-		
-		//TODO
-	}
-	
-	
-	
-	public void testReduceAgentVehicleLoadByGivenLoadInterval(){
-		
-	}
-	
-	
-	public void testReduceHubLoadByGivenLoadInterval(){
-		
-	}
-	
-	
-	
-	
-	public void testFindAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(){
-		
-	}
-	
-	
-	public void testReassignJoulesToSchedule(){
-		
-	}
 	
 	public Schedule makeSimpleChargingSchedule(){
 		Schedule someChargingSchedule= new Schedule();
