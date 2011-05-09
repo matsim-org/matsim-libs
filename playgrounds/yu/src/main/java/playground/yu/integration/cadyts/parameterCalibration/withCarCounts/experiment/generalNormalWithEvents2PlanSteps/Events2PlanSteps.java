@@ -70,8 +70,6 @@ public class Events2PlanSteps implements AgentDepartureEventHandler,
 
 	private static final int MAX_TIME = 24 * 3600 - 1;
 
-	private final boolean foundPT = false;
-
 	public Events2PlanSteps(final Network net, final Population pop) {
 		this.net = net;
 		this.pop = pop;
@@ -122,18 +120,18 @@ public class Events2PlanSteps implements AgentDepartureEventHandler,
 
 	/*
 	 * public final void convert(final PlanImpl plan) {
-	 *
+	 * 
 	 * if (PlanModeJudger.usePt(plan)) { if (!foundPT) {
 	 * System.out.println("BSE: found a PT plan"); foundPT = true; }
 	 * planStepFactory.reset(); return; }
-	 *
+	 * 
 	 * double time = plan.getFirstActivity().getEndTime(); if (time > MAX_TIME)
 	 * return; for (int i = 1; i < plan.getPlanElements().size() - 1; i += 2) {
 	 * // that's the leg we're gonna handle now LegImpl leg = (LegImpl)
 	 * plan.getPlanElements().get(i); ActivityImpl fromAct = (ActivityImpl)
 	 * plan.getPreviousActivity(leg); ActivityImpl toAct = (ActivityImpl)
 	 * plan.getNextActivity(leg);
-	 *
+	 * 
 	 * // entry
 	 * planStepFactory.addEntry(network.getLinks().get(fromAct.getLinkId()),
 	 * (int) time); // turns for all links for (Id linkId : ((NetworkRoute)
@@ -240,7 +238,7 @@ public class Events2PlanSteps implements AgentDepartureEventHandler,
 
 	/**
 	 * this should be done by removeWorstPlan in StrategyManager
-	 *
+	 * 
 	 * @param plan
 	 */
 	public void removePlanSteps(PlanImpl plan) {
@@ -249,14 +247,14 @@ public class Events2PlanSteps implements AgentDepartureEventHandler,
 
 	public void clearUpAfterMobsim() {
 		System.out
-				.println("MATSim_Integration.DemandCalibration:\tsize of planStepFactories:\t"
+				.println("MATSim_Integration parameterCalibration:\tsize of planStepFactories:\t"
 						+ planStepFactories.size());
 		for (PlanImpl plan : planStepFactories.keySet()) {
 			planStepsMap.put(plan, planStepFactories.get(plan).getResult());
 		}
 		planStepFactories.clear();
 		System.out
-				.println("MATSim_Integration.DemandCalibration:\tsize of planStepsMap:\t"
+				.println("MATSim_Integration parameterCalibration:\tsize of planStepsMap:\t"
 						+ planStepsMap.size());
 		// finishedPlans.add(plan) is not more necessary in this iteration
 	}

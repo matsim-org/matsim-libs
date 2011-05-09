@@ -37,6 +37,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
@@ -84,6 +85,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager {
 		travelingCarStats = new BasicStatistics();
 		performingStats = new BasicStatistics();
 		for (Person person : population.getPersons().values()) {
+			// now there could be #maxPlansPerAgent+?# Plans in choice set
+			// *********************UTILITY CORRECTION********************
+			// ***before removePlans and plan choice, correct utility***
+			generateScoreCorrections(person);
+
 			/* ***********************************************************
 			 * scoringCfg has been done, but they should be newly defined
 			 * because of new calibrated parameters and -- WITHOUT
@@ -91,10 +97,6 @@ public class PCStrMn extends BseParamCalibrationStrategyManager {
 			 * *******************************************************
 			 */
 			chooser.setPersonScore(person);
-			// now there could be #maxPlansPerAgent+?# Plans in choice set
-			// *********************UTILITY CORRECTION********************
-			// ***before removePlans and plan choice, correct utility***
-			correctPersonPlansScores(person);
 			/* ******************************************************** */
 		}
 	}
@@ -438,22 +440,26 @@ public class PCStrMn extends BseParamCalibrationStrategyManager {
 				+ "\t" + statistics[3]/* perfAttrVar */);
 	}
 
-	private void correctPersonPlansScores(Person person) {
+	private void generateScoreCorrections(Person person) {
 		for (Plan plan : person.getPlans()) {
-			correctPlanScore(plan);
+			generateScoreCorrection(plan);
 		}
 	}
 
-	private void correctPlanScore(Plan plan) {
+	private void generateScoreCorrection(Plan plan) {
 		cadyts.demand.Plan<Link> planSteps = events2PlanSteps
 				.getPlanSteps((PlanImpl) plan);
 		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
 				.getUtilityCorrection(planSteps) / brainExpBeta;
-		Double oldScore = plan.getScore();
-		if (oldScore == null) {
-			oldScore = 0d;// dummy setting, the score of plans will be
-							// calculated between firstIter+1 and firstIter+
-		}
-		plan.setScore(oldScore + scoreCorrection);
+		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
+		plan.getCustomAttributes().put(BseStrategyManager.UTILITY_CORRECTION,
+				scoreCorrection);
+		// ##################################################
+		// Double oldScore = plan.getScore();
+		// if (oldScore == null) {
+		// oldScore = 0d;// dummy setting, the score of plans will be
+		// // calculated between firstIter+1 and firstIter+
+		// }
+		// plan.setScore(oldScore + scoreCorrection);
 	}
 }
