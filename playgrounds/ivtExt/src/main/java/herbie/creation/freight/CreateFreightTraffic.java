@@ -28,21 +28,28 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
@@ -51,8 +58,10 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,6 +69,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 
 import utils.BuildTrees;
 
@@ -85,6 +95,8 @@ public class CreateFreightTraffic {
 	private QuadTree<ActivityFacility> facilityTree;
 	private Statistics stats = new Statistics();
 	private ScenarioImpl scenario;
+	
+	private String crossBorderPlansFilePath;
 	
 	public static void main(String[] args) {
 		if (args.length == 0) {
@@ -113,6 +125,7 @@ public class CreateFreightTraffic {
 		this.outpath = config.findParam("freight", "output");
 		this.radius = Double.parseDouble(config.findParam("freight", "radius"));
 		this.roundingLimit = Double.parseDouble(config.findParam("freight", "roundingLimit"));
+		this.crossBorderPlansFilePath = config.findParam("freight", "crossBorderPlansFile");
 		
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
@@ -130,13 +143,14 @@ public class CreateFreightTraffic {
 		// -----------------------------------------------------
 		double[][] odMatrix = this.sumMatrices(this.readODMatrix(lkwFile), this.readODMatrix(liFile));
 		this.createPersonsFromODMatrices(odMatrix);
+		this.extendCrossBorderFacilitiesWithWorkActivity();
 		// -----------------------------------------------------
 		List<ODRelation> relations = this.getHeavyRelations(odMatrix);
 		CSShapeFileWriter gisWriter = new CSShapeFileWriter();
 		gisWriter.writeODRelations(this.outpath, relations);
 		// -----------------------------------------------------
 	}
-	
+
 	private List<ODRelation> getHeavyRelations(double [][] od) {
 		List<ODRelation> odRelations = new Vector<ODRelation>();
 		int cnt = 0;
@@ -358,6 +372,45 @@ public class CreateFreightTraffic {
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 5.0 * 3600.0, 20.0 * 3600.0);
 			((ActivityFacilityImpl)facility).getActivityOptions().get("freight").addOpeningTime(ot);
 		}	
+	}
+	
+	private void addWorkActivity2Facility(ActivityFacility facility) {
+		if (facility.getActivityOptions().get("work") == null) {
+			((ActivityFacilityImpl)facility).createActivityOption("work");
+			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600.0);
+			((ActivityFacilityImpl)facility).getActivityOptions().get("work").addOpeningTime(ot);
+		}	
+	}
+	
+	private void extendCrossBorderFacilitiesWithWorkActivity() {
+		log.info("Update Cross Boarder Facilites with the correct activities ...");
+		
+		ScenarioImpl sTmp = (ScenarioImpl) ScenarioUtils.createScenario(
+				ConfigUtils.createConfig());
+		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		populationReader.readFile(crossBorderPlansFilePath);
+		
+		
+		for (Person p : ((PopulationImpl) sTmp.getPopulation()).getPersons().values()){
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						ActivityImpl act = (ActivityImpl)pe;
+						String v2Type = ActTypeConverter.convert2FullType(act.getType());
+						
+						if(v2Type.equals("work")){
+							ActivityFacility af = 
+								this.scenario.getActivityFacilities().getFacilities().get(act.getFacilityId());
+							
+							this.addWorkActivity2Facility(af);
+							System.out.println("Add work activity to facility " + af.getId());
+						}						
+					}
+				}
+			}
+		}
+		log.info("Update Cross Boarder Facilites with the correct activities ... done");
 	}
 	
 	private void write() {	
