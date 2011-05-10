@@ -351,7 +351,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			NetworkRoute routeNRT = RouteUtils.createNetworkRoute(linkIdList, network);
 			distance = RouteUtils.calcDistance(routeNRT, network);
 		}
-//		else // tnicolai TODO : Why are there no links? ???
+//		else
 //			log.warn("LinkIList has no element!!! FromLink: " + fromLink.getId() + " ToLink:" + toLink.getId());
 
 		return distance;

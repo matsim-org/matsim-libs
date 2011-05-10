@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.accessability;
+package playground.tnicolai.urbansim.tests;
 
 import java.io.IOException;
 import java.util.HashSet;

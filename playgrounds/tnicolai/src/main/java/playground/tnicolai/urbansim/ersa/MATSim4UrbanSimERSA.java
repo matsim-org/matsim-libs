@@ -73,7 +73,8 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	private static final Logger logger = Logger.getLogger(MATSim4UrbanSimERSA.class);
 	
 	private String shapeFile = null;
-	private int gridSize = -1;
+	private double gridSizeInFeet  = -1;
+	private double gridSizeInMeter = -1;
 	private double jobSample = 1.;
 	private double capacity = -1;
 	
@@ -115,17 +116,21 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @param args
 	 */
 	private void checkAndSetGridSize(String[] args) {
+		
+		gridSizeInMeter = 1000.; // default value, if nothing else is given (1000m)
+		
 		try{
 			if(args.length >= 3){
-				gridSize = Integer.parseInt( args[2].trim() );
-				logger.info("The grid size was set to " + gridSize);
+				gridSizeInMeter = Double.parseDouble( args[2].trim() );
+				gridSizeInFeet = gridSizeInMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR;
+				logger.info("The grid size was set to " + gridSizeInMeter + " meter (this approximately corresponds to " + gridSizeInFeet + " feet).");
 			} else{
-				gridSize = 10000;
-				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSize + " (default setting)!");
+				gridSizeInFeet = gridSizeInMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR;
+				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSizeInMeter + " meter (default setting)! This approximately corresponds to " + gridSizeInFeet + " feet.");
 			}
 		} catch (NumberFormatException nfe){
 			nfe.printStackTrace();
-			logger.error( "Please set a correct grid size. " + args[2] + " is not a valid value (integer).");
+			logger.error( "Please set a correct grid size (in meters). " + args[2] + " is not a valid value (double).");
 		}
 	}
 	
@@ -210,18 +215,18 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		logger.info("Writing spatial grid tables ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
-			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGrid-Table" , Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelTimeAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGrid-Table" , Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
+			sgTableWriter.write(myListener.getTravelTimeAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(ttID);
 			logger.info("Writing TravelTime SpatialGrid-Table took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
 			
-			int tcID = benchmark.addMeasure("Writing TravelCostSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelCostAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			int tcID = benchmark.addMeasure("Writing TravelCostSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
+			sgTableWriter.write(myListener.getTravelCostAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(tcID);
 			logger.info("Writing TravelCost SpatialGrid-Table took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
 			
-			int tdID = benchmark.addMeasure("Writing TravelDistanceSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelDistanceAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_TXT);
+			int tdID = benchmark.addMeasure("Writing TravelDistanceSpatialGrid-Table", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
+			sgTableWriter.write(myListener.getTravelDistanceAccessibilityGrid(), Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(tdID);
 			logger.info("Writing TravelDistance SpatialGrid-Table took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
 			
@@ -254,23 +259,23 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		}
 		
 		// writing travel time accessibility kmz file
-		int ttID = benchmark.addMeasure("Writing TravelTime KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
+		int ttID = benchmark.addMeasure("Writing TravelTime KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelTimeValues));
-		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ);
 		benchmark.stoppMeasurement(ttID);
 		logger.info("Writing TravelTime KMZ-file took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
 		
 		// writing travel cost accessibility kmz file
-		int tcID = benchmark.addMeasure("Writing TravelCost KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
+		int tcID = benchmark.addMeasure("Writing TravelCost KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelCostValues));
-		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ);
 		benchmark.stoppMeasurement(tcID);
 		logger.info("Writing TravelCost KMZ-file took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
 		
 		// writing travel distance accessibility kmz file
-		int tdID = benchmark.addMeasure("Writing TravelDistance KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ, false);
+		int tdID = benchmark.addMeasure("Writing TravelDistance KMZ-file", Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ, false);
 		writer.setColorizable(new MyColorizer(travelDistanceValues));
-		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + gridSize + "x" + gridSize + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_KMZ);
 		benchmark.stoppMeasurement(tdID);
 		logger.info("Writing TravelDistance KMZ-file took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
 		
@@ -323,7 +328,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		double yMin = env.getMinY();
 		double yMax = env.getMaxY();
 		
-		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSize);
+		return new SpatialGrid<Double>(xMin, yMin, xMax, yMax, gridSizeInFeet);
 	}
 
 	/**
@@ -344,7 +349,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 */
 	private ZoneLayer<ZoneObject> getStratZones(Geometry boundary) throws IOException {
 		
-		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSize, boundary);
+		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSizeInFeet, boundary);
 		
 		return startZones;
 	}
@@ -359,7 +364,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
 		logger.info("Extracting boundary of the shape file ...");
 		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
-		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: check if this is the correct id
+		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH );
 		logger.info("Done extracting boundary ...");
 		
 		return boundary;
@@ -380,6 +385,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		int setPoints = 0;
 		
 		GeometryFactory factory = new GeometryFactory();
+		
 		Set<Zone<ZoneObject>> zones = new HashSet<Zone<ZoneObject>>();
 		Envelope env = boundary.getEnvelopeInternal();
 		
@@ -419,53 +425,6 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		logger.info("Done with setting starting points!");
 		
 		ZoneLayer<ZoneObject> layer = new ZoneLayer<ZoneObject>(zones);
-		return layer;
-	}
-	
-	/**
-	 * 
-	 * @param <T>
-	 * @param gridSize
-	 * @param boundary
-	 * @return
-	 */
-	private static <Integer> ZoneLayer<Integer> createGridLayerByFixedNumberOfStartingPoints(double numberfStartingPoints, Geometry boundary) {
-		
-		logger.info("Setting statring points for accessibility measure ...");
-		
-		int skippedPoints = 0;
-		int setPoints = 0;
-		
-//		GeometryFactory factory = new GeometryFactory();
-		Set<Zone<Integer>> zones = new HashSet<Zone<Integer>>();
-//		Envelope env = boundary.getEnvelopeInternal();
-//		for(double x = env.getMinX(); x < env.getMaxX(); x += resolution) {
-//			for(double y = env.getMinY(); y < env.getMaxY(); y += resolution) {
-//				Point point = factory.createPoint(new Coordinate(x, y));
-//				if(boundary.contains(point)) {
-//					Coordinate[] coords = new Coordinate[5];
-//					coords[0] = point.getCoordinate();
-//					coords[1] = new Coordinate(x, y + resolution);
-//					coords[2] = new Coordinate(x + resolution, y + resolution);
-//					coords[3] = new Coordinate(x + resolution, y);
-//					coords[4] = point.getCoordinate();
-//					
-//					LinearRing linearRing = factory.createLinearRing(coords);
-//					Polygon polygon = factory.createPolygon(linearRing, null);
-//					polygon.setSRID(21781);
-//					Zone<T> zone = new Zone<T>(polygon);
-//					zones.add(zone);
-//					
-//					setPoints++;
-//				}
-//				else skippedPoints++;
-//			}
-//		}
-		
-		logger.info(setPoints + " were set and " + skippedPoints + " have been skipped.");
-		logger.info("Done with setting starting points!");
-		
-		ZoneLayer<Integer> layer = new ZoneLayer<Integer>(zones);
 		return layer;
 	}
 	
