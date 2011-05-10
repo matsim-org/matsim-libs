@@ -31,6 +31,8 @@ public interface JointActingTypes {
 
 	//planFile constants
 	public static final String PICK_UP_SPLIT_EXPR = "_";
-	public static final String PICK_UP_REGEXP = "^pu"+PICK_UP_SPLIT_EXPR+".*$";
+	public static final String PICK_UP_BEGIN = "pu";
+	public static final String PICK_UP_REGEXP = 
+			PICK_UP_BEGIN + PICK_UP_SPLIT_EXPR + ".*";
 }
 
