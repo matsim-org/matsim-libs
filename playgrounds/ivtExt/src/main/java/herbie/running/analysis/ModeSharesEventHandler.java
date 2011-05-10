@@ -19,22 +19,39 @@
  * *********************************************************************** */
 package herbie.running.analysis;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
@@ -55,10 +72,15 @@ public class ModeSharesEventHandler
 
 	// use euclidean distance rather than network distance, as linkEvents
 	// are not generated for non-car modes.
+	private static final String ALL_MODES = "allAvailableModes";
 
 	private final Map<Id, AgentDepartureEvent> pendantDepartures =
 			new HashMap<Id, AgentDepartureEvent>();
 	private final Network network;
+
+	private final List<Map<String, Double>> modeShares;
+	private boolean toReset = false;
+	private double maxDistance = 0d;
 		
 	/*
 	 * =========================================================================
@@ -70,6 +92,7 @@ public class ModeSharesEventHandler
 	 */
 	public ModeSharesEventHandler(final Controler controler) {
 		this.network = controler.getNetwork();
+		this.modeShares = new ArrayList<Map<String, Double>>(controler.getLastIteration());
 	}
 	
 	/*
@@ -79,19 +102,29 @@ public class ModeSharesEventHandler
 	 */
 	@Override
 	public void reset(final int iteration) {
-		this.processEndOfIteration(iteration);
+		// only reset at the first fired event, so that the order in which
+		// reset and getResult methods are called at the end of the iteration
+		// does not matter.
+		this.toReset = true;
+	}
 
-		this.frequencies.clear();
-		this.rawData.clear();
+	private void doReset() {
+		if (this.toReset) {
+			this.toReset = false;
+			this.frequencies.clear();
+			this.rawData.clear();
 
-		if (this.pendantDepartures.size() > 0) {
-			log.warn("Some arrivals were not handled!");
-			this.pendantDepartures.clear();
+			if (this.pendantDepartures.size() > 0) {
+				log.warn("Some arrivals were not handled!");
+				this.pendantDepartures.clear();
+			}
+			this.maxDistance = 0d;
 		}
 	}
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
+		this.doReset();
 		// catch the previous value to check consistency of the process
 		AgentDepartureEvent old =
 			this.pendantDepartures.put(event.getPersonId(), event);
@@ -104,6 +137,7 @@ public class ModeSharesEventHandler
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent arrivalEvent) {
+		this.doReset();
 		AgentDepartureEvent departureEvent =
 			this.pendantDepartures.remove(arrivalEvent.getPersonId());
 		String mode = arrivalEvent.getLegMode();
@@ -148,6 +182,7 @@ public class ModeSharesEventHandler
 		// remember data
 		frequency.addValue(distance);
 		rawDataElement.addElement(distance);
+		this.maxDistance = Math.max(distance, this.maxDistance);
 	}
 
 	/*
@@ -160,34 +195,142 @@ public class ModeSharesEventHandler
 	 * data structures.
 	 */
 	private void processEndOfIteration(final int iteration) {
-		Map<String, Double> modeShares = getModeShares();
-
-		log.info("Share of traveled distances by mode:");
-		for (String mode : modeShares.keySet()) {
-			log.info(mode+": "+modeShares.get(mode));
-		}
+		//this.modeShares.add(iteration, getModeShares());
 	}
 
-	private Map<String, Double> getModeShares() {
-		Map<String, Double> modeShares = new HashMap<String, Double>();
+	private Map<String, Double> getModeDistances() {
+		Map<String, Double> modeDistances = new HashMap<String, Double>();
 		double totalDistance = 0d;
 		double currentDistance;
 
-		for (String mode : modeShares.keySet()) {
+		for (String mode : this.rawData.keySet()) {
 			currentDistance = 0d;
 			for (double d : this.rawData.get(mode).getElements()) {
 				currentDistance += d;
 			}
 			totalDistance += currentDistance;
-			modeShares.put(mode, currentDistance);
+			modeDistances.put(mode, currentDistance);
 		}
 
-		for (String mode : modeShares.keySet()) {
-			currentDistance =  modeShares.get(mode);
-			modeShares.put(mode, currentDistance / totalDistance);
+		modeDistances.put(ALL_MODES, totalDistance);
+
+		return modeDistances;
+	}
+
+	/**
+	 * Logs some statistics on mode shares.
+	 */
+	public void printInfo(final int iteration) {
+		//this.processEndOfIteration(iteration);
+		//Map<String, Double> currentModeShares = this.modeShares.get(iteration);
+		Map<String, Double> currentModeDistances = getModeDistances();
+		long nLegs = this.getNumberOfLegs();
+		double totalDist = currentModeDistances.remove(ALL_MODES);
+
+		log.info("Mode shares:");
+		log.info("Cumulated traveled distance: "+(totalDist/1000d)+"km");
+		for (Map.Entry<String, Double> mode : currentModeDistances.entrySet()) {
+			log.info("Share of "+mode.getKey()+":\t"+
+					"distance: "+(100d*mode.getValue() / totalDist)+"%"+
+					"\tnumber of legs: "+
+					(100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
+		}
+	}
+
+	/**
+	 * @return a {@link org.jfree.data.xy.XYSeries} representing the
+	 * distribution of traveled distances for the mode (histogramm),
+	 * or null if the mode is unknown (only modes that generated events
+	 * in the previous mobsim run are "known").
+	 *
+	 * @param step the width of the bins, in meters
+	 * @param mode the mode to get the data for
+	 */
+	public XYSeries getTraveledDistancesHistogram(final String mode, final double step) {
+		boolean autoSort = false;
+		boolean allowDuplicateXValues = true;
+		XYSeries output = new XYSeries(mode, autoSort, allowDuplicateXValues);
+		double[] modeRawData;
+		try {
+			modeRawData = this.rawData.get(mode).getElements();
+		} catch (NullPointerException e) {
+			return null;
+		}
+		Arrays.sort(modeRawData);
+		double currentUpperBound = step;
+		int count = 0;
+
+		for (double distValue : modeRawData) {
+			if (distValue < currentUpperBound) {
+				count++;
+			}
+			else {
+				// add the previous bin to the plot
+				output.add(currentUpperBound - step, count);
+				//output.add(currentUpperBound, count);
+
+				currentUpperBound += step;
+				while (distValue > currentUpperBound) {
+					output.add(currentUpperBound, 0d);
+					currentUpperBound += step;
+				}
+				count = 1;
+			}
+		}
+		//add the last count
+		output.add(currentUpperBound - step, count);
+		//output.add(currentUpperBound, count);
+		output.add(currentUpperBound, 0);
+
+		return output;
+	}
+
+	public HistogramDataset getHistogramDataset(final int nBins) {
+		HistogramDataset output = new HistogramDataset();
+		output.setType(HistogramType.RELATIVE_FREQUENCY);
+
+		for (String mode : this.rawData.keySet()) {
+			output.addSeries(mode, this.rawData.get(mode).getElements(), nBins);
 		}
 
-		return modeShares;
+		return output;
+	}
+
+	// would be more readable with a "real" histogramm.
+	// TODO: use matsim chartUtils
+	public JFreeChart getTraveledDistancesHistogram(final int numberOfBins) {
+		String title = "Traveled distances distribution by mode";
+		String xLabel = "Distance (m)";
+		String yLabel = "Number of trips";
+		boolean legend = true;
+		boolean tooltips = false;
+		boolean urls = false;
+		//XYSeriesCollection data = new XYSeriesCollection();
+		HistogramDataset data = getHistogramDataset(numberOfBins);
+		double step = this.maxDistance / numberOfBins;
+
+		//for (String mode : this.rawData.keySet()) {
+		//	data.addSeries(getTraveledDistancesHistogram(mode, step));
+		//}
+
+		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, data,
+				PlotOrientation.VERTICAL, legend, tooltips, urls);
+		chart.getXYPlot().setForegroundAlpha(0.5F);
+
+		return chart;
+	}
+
+	public void writeTraveledDistancesGraphic(
+			final String fileName,
+			final int numberOfBins) {
+		JFreeChart chart = getTraveledDistancesHistogram(numberOfBins);
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileName), chart, 1024, 768);
+		} catch (IOException e) {
+			log.error("got an error while trying to write graphics to file."+
+					" Error is not fatal, but output may be incomplete.");
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -196,6 +339,6 @@ public class ModeSharesEventHandler
 	 * =========================================================================
 	 */
 	@Override
-	public void run(Person person) { /*do nothing*/ }
+	public void run(final Person person) { /*do nothing*/ }
 }
 
