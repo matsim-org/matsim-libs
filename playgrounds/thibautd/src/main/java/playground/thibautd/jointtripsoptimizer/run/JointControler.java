@@ -132,6 +132,7 @@ public class JointControler extends Controler {
 				 this.createTravelCostCalculator(),
 				 this.getTravelTimeCalculator());
 	}
+
 	/**
 	 * Creates a routing algorithm, which takes explicitly car passenger mode
 	 * into account.

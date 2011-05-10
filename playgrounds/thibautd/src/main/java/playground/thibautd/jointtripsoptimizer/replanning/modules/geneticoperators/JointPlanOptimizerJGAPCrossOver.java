@@ -365,7 +365,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes=nGenesIterator.next();
 		int countGenes = 0;
-		double minPosDurationCoef = Double.POSITIVE_INFINITY;
+		//double minPosDurationCoef = Double.POSITIVE_INFINITY;
 
 		// move count gene through the uncrossed part of the plan and
 		// initialize the first plan duration.
@@ -400,11 +400,11 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			currentSurplus = currentEpisodeDuration2 - currentEpisodeDuration1;
 
 			// normally, unecessary: to remove
-			if (currentSurplus < 0) {
-				minPosDurationCoef = Math.min(
-						minPosDurationCoef,
-						-currentEpisodeDuration1 / currentSurplus);
-			}
+			//if (currentSurplus < 0) {
+			//	minPosDurationCoef = Math.min(
+			//			minPosDurationCoef,
+			//			-currentEpisodeDuration1 / currentSurplus);
+			//}
 
 			crossOverSurplus += currentSurplus;
 		}
@@ -414,7 +414,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			calculatePlanDurCoef(mate1PlanDuration, crossOverSurplus));
 
 		//take both plan duration and positive duration into account
-		minIndivCoef = Math.min(minIndivCoef, minPosDurationCoef);
+		// minIndivCoef = Math.min(minIndivCoef, minPosDurationCoef);
 
 		return Math.min(1d, minIndivCoef);
 	}
@@ -507,7 +507,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		boolean crossingPointIsPast = false;
 		//double randomCoef = this.randomGenerator.nextDouble();
 		double randomCoef = 1d;
-		double posDurCoef = 1d;
+		//double posDurCoef = 1d;
 		double coef;
 	
 		for (int i=this.N_BOOL; i < this.N_BOOL + this.N_DOUBLE; i++) {
@@ -519,8 +519,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 					mate1PlanDuration = 0d;
 				}
 				else {
-					coef = Math.min(posDurCoef,
-							calculatePlanDurCoef(
+					coef =// Math.min(posDurCoef,
+						(	calculatePlanDurCoef(
 								mate1PlanDuration,
 								crossOverSurplus));
 					coef = Math.min(1d, coef);
@@ -535,9 +535,10 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			if (i==crossingPoint) {
 				crossOverSurplus = ((DoubleGene) mate2Genes[i]).doubleValue() -
 					currentEpisodeDuration;
-				if (crossOverSurplus < 0) {
-					posDurCoef = -currentEpisodeDuration / crossOverSurplus;
-				}
+				// useless
+				//if (crossOverSurplus < 0) {
+				//	posDurCoef = -currentEpisodeDuration / crossOverSurplus;
+				//}
 				crossingPointIsPast = true;
 			}
 			countGenes++;
@@ -545,8 +546,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 		if (crossingPointIsPast) {
 			// if the crossing point was in the last plan
-			coef = Math.min(posDurCoef,
-				calculatePlanDurCoef(
+			//coef = Math.min(posDurCoef,
+			coef = (calculatePlanDurCoef(
 					mate1PlanDuration,
 					crossOverSurplus));
 			coef = Math.min(1d, coef);
