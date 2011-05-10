@@ -42,13 +42,13 @@ public class ScnCreator {
 	private Scenario origScenario;
 	private Scenario newScenario;
 	
-	private static double sampleRate = 0.01;
+	private static double sampleRate = 0.1;
 	
 	Random random = new Random(3838494);
 	
-	private String facilitiesFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/facilities.xml.gz";
+	private String facilitiesFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/1pct/facilities.xml.gz";
 	private String networkFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/network.xml";
-	private String plansFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/plans.xml.gz";
+	private String plansFile = "C:/l/andreasrep/coding/input/tutorial/zhcut/1pct/plans.xml.gz";
 	private String municipalitiesFile = "C:/l/andreasrep/coding/input/tutorial/swiss_municipalities.txt";
 	
 	private String businessCensusOutFile = "C:/l/andreasrep/coding/input/tutorial/business_census.txt";
@@ -179,7 +179,7 @@ public class ScnCreator {
 			for (Person p : ((ScenarioImpl) this.origScenario).getPopulation().getPersons().values()) {
 				
 				// sample population
-				if (random.nextDouble() > sampleRate) continue;
+				//if (random.nextDouble() > sampleRate) continue;
 				
 				int kant = random.nextInt(26);
 				int zgde = random.nextInt(10);
