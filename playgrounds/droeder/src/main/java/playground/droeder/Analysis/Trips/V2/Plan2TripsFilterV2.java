@@ -105,7 +105,7 @@ public class Plan2TripsFilterV2 extends AbstractPersonFilter {
 	 */
 	public String getUnprocessedAgents(){
 		StringBuffer b = new StringBuffer();
-		b.append("following Agents are not processed, because there plan consists only of one Element\n");
+		b.append("following Agents are not processed, because their plan consists only of one Element\n");
 		for(Id id : this.unprocessedAgents){
 			b.append(id.toString() + "\n");
 		}

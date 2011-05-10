@@ -1,0 +1,169 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Plansgenerator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.droeder.Analysis.Trips.V3;
+
+import java.util.ArrayList;
+import java.util.ListIterator;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.PersonEvent;
+
+import playground.droeder.Analysis.Trips.V2.AnalysisTripV2;
+
+/**
+ * @author droeder
+ *
+ */
+public class AnalysisTripV3 extends AnalysisTripV2 {
+	private int expNrOfEvents;
+
+	
+	public AnalysisTripV3(){
+		super();
+	}
+	
+	@Override
+	public void addElements(ArrayList<PlanElement> elements){
+		super.addElements(elements);
+		this.findExpectedNumberOfEvents(elements);
+	}
+	
+	private void findExpectedNumberOfEvents(ArrayList<PlanElement> elements){
+		for(PlanElement pe: elements){
+			if(pe instanceof Activity){
+				this.expNrOfEvents += 2;
+			}else if( pe instanceof Leg){
+				// a pt-leg is started a PersonEntersVehicle is thrown
+				if(((Leg) pe).getMode().equals(TransportMode.pt)){
+					this.expNrOfEvents +=3;
+				}else{
+					this.expNrOfEvents +=2;
+				}
+			}
+		}
+		//the first activity has no startEvent and the last no endEvent
+		this.expNrOfEvents -=2;
+	}
+	
+	public int getNumberOfExpectedEvents(){
+		return this.expNrOfEvents;
+	}
+	
+	@Override
+	public void addEvents(ArrayList<PersonEvent> events){
+		this.analyzeEvents(events);
+	}
+	
+	@Override
+	protected void analyzeEvents(ArrayList<PersonEvent> events){
+		super.analyzeValuesForAllModes(events);
+		if(super.mode.equals(TransportMode.pt)){
+			this.analyzeValuesForPT(events);
+		}
+	}
+	
+	@Override
+	protected void analyzeValuesForPT(ArrayList<PersonEvent> events){
+		
+		//TODO refactor
+		ListIterator<PersonEvent> it = events.listIterator();
+		PersonEvent pe;
+		double switchWait = 0;
+		
+		while(it.hasNext()){
+			pe = it.next();
+		
+			if(pe instanceof ActivityEndEvent){
+				if(it.previousIndex() == 4){
+					accesWaitTime += pe.getTime();
+					if(accesWaitTime > 0) accesWaitCnt++;
+				}
+				
+				// only pt interactions between 2 pt legs are registered for waitTime
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 7)){
+					switchWait += pe.getTime();
+					if(switchWait > 0) switchWaitCnt++;
+					switchWaitTime += switchWait;
+					switchWait = 0;
+				}
+			}
+			
+			else if(pe instanceof AgentDepartureEvent){
+				// every pt leg is a new line
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineCnt++;
+					lineTTime -= pe.getTime();
+				}
+				
+				// deside if transit_walk is used for access, egress or switch
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 1){
+						accesWalkTTime -= pe.getTime();
+						accesWalkCnt++;
+					}else if(it.previousIndex() == events.size() - 3){
+						egressWalkTTime -= pe.getTime();
+						egressWalkCnt++;
+					}else{
+						switchWalkTTime -= pe.getTime();
+						switchWalkCnt++;
+					}
+				}
+			}
+			
+			else if(pe instanceof AgentArrivalEvent){
+				
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineTTime += pe.getTime();
+				}
+
+				// see at departure
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 2){
+						accesWalkTTime += pe.getTime();
+					}else if(it.previousIndex() == events.size() - 2){
+						egressWalkTTime += pe.getTime();
+					}else{
+						switchWalkTTime += pe.getTime();
+					}
+				}
+				
+			}
+			
+			else if(pe instanceof ActivityStartEvent){
+				if(it.previousIndex() == 3){
+					accesWaitTime -= pe.getTime();
+				}
+				
+				// see at endEvent
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 8)){
+					switchWait -= pe.getTime();
+				}
+			}
+		}
+		
+	}
+}
