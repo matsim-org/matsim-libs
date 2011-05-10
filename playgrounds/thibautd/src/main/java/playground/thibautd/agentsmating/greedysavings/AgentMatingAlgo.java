@@ -28,16 +28,27 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 
 /**
  * 
  * @author thibautd
  */
 public class AgentMatingAlgo {
+
+	private static final String HOME_REGEXP = "home.*";
 
 	private final AgentTopology agentTopology;
 	private final Population population;
@@ -117,6 +128,7 @@ public class AgentMatingAlgo {
 	/**
 	 * @return a population were the plans define joint plans for the cliques
 	 * returned by getCliques.
+	 * This is done by modifying the initial population and returning it.
 	 *
 	 * Should be encapsulated in a PopulationWithCliques, but there is currently
 	 * no XML writer for such a data structure.
@@ -124,7 +136,195 @@ public class AgentMatingAlgo {
 	 * TODO
 	 */
 	public Population getPopulation() {
-		return null;
+		cleanPlansInPopulation();
+
+		PickUpNameFactory factory = new PickUpNameFactory();
+
+		// modify the plans of the affected agents
+		for (Tuple<Person, Person> couple : this.carPoolingAffectations) {
+			createJointLegs(
+					couple.getFirst().getSelectedPlan().getPlanElements(),
+					couple.getSecond().getSelectedPlan().getPlanElements(),
+					factory);
+		}
+
+		return this.population;
+	}
+
+	private void createJointLegs(
+			final List<PlanElement> planDriver,
+			final List<PlanElement> planPassenger,
+			final PickUpNameFactory factory) {
+		// keep a copy of the old plans
+		List<PlanElement> driverElements =
+			new ArrayList<PlanElement>(planDriver);
+		List<PlanElement> passengerElements =
+			new ArrayList<PlanElement>(planPassenger);
+
+		// reinitialize the actual plans
+		planDriver.clear();
+		planPassenger.clear();
+
+		// create the first joint trip
+		planUntilWork(planDriver, planPassenger, driverElements, passengerElements, factory);
+
+		if ( sharedReturnIsFeasible(driverElements, passengerElements) ) {
+			planSharedReturn(planDriver, planPassenger, driverElements, passengerElements, factory);
+		}
+		else {
+			for (PlanElement pe : driverElements.subList(3, driverElements.size())) {
+				planDriver.add(pe);
+			}
+			for (PlanElement pe : passengerElements.subList(3, passengerElements.size())) {
+				planPassenger.add(pe);
+			}
+		}
+	}
+
+	/**
+	 * Shared return coonsidered as feasible only if the beginning of the plan
+	 * is of H-W-H form.
+	 */
+	private boolean sharedReturnIsFeasible(
+			final List<PlanElement> driverElements,
+			final List<PlanElement> passengerElements) {
+		return ((Activity) driverElements.get(4)).getType().matches(HOME_REGEXP) &&
+			((Activity) passengerElements.get(4)).getType().matches(HOME_REGEXP);
+	}
+
+	private void planSharedReturn (
+			final List<PlanElement> planDriver,
+			final List<PlanElement> planPassenger,
+			final List<PlanElement> driverElements,
+			final List<PlanElement> passengerElements,
+			final PickUpNameFactory factory) {
+		String puName = factory.createName();
+		ActivityImpl passengerHome = (ActivityImpl) passengerElements.get(4);
+		ActivityImpl passengerWork = (ActivityImpl) passengerElements.get(2);
+
+		// /////////// DRIVER //////////////
+		// access leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		// PU
+		planDriver.add(
+				new ActivityImpl(
+					puName, 
+					passengerWork.getCoord(),
+					passengerWork.getLinkId()));
+		// shared leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		// DO
+		planDriver.add(
+				new ActivityImpl(
+					JointActingTypes.DROP_OFF, 
+					passengerHome.getCoord(),
+					passengerHome.getLinkId()));
+		// egress leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		//home 
+		planDriver.add(driverElements.get(4));
+
+		// /////////// PASSENGER //////////////
+		// access leg
+		planPassenger.add(new LegImpl(TransportMode.walk));
+		// PU
+		planPassenger.add(
+				new ActivityImpl(
+					puName, 
+					passengerWork.getCoord(),
+					passengerWork.getLinkId()));
+		// shared leg
+		planPassenger.add(new LegImpl(JointActingTypes.PASSENGER));
+		// DO
+		planPassenger.add(
+				new ActivityImpl(
+					JointActingTypes.DROP_OFF, 
+					passengerHome.getCoord(),
+					passengerHome.getLinkId()));
+		// egress leg
+		planPassenger.add(new LegImpl(TransportMode.walk));
+		// home
+		planPassenger.add(passengerElements.get(4));
+
+		// remaining of the plans
+		if (driverElements.size() > 5) {
+			for (PlanElement pe : driverElements.subList(5, driverElements.size())) {
+				planDriver.add(pe);
+			}
+		}
+		if (passengerElements.size() > 5) {
+			for (PlanElement pe : passengerElements.subList(5, passengerElements.size())) {
+				planPassenger.add(pe);
+			}
+		}
+	}
+
+	private void planUntilWork(
+			final List<PlanElement> planDriver,
+			final List<PlanElement> planPassenger,
+			final List<PlanElement> driverElements,
+			final List<PlanElement> passengerElements,
+			final PickUpNameFactory factory) {
+		String puName = factory.createName();
+		ActivityImpl passengerHome = (ActivityImpl) passengerElements.get(0);
+		ActivityImpl passengerWork = (ActivityImpl) passengerElements.get(2);
+
+		// /////////// DRIVER //////////////
+		//home
+		planDriver.add(driverElements.get(0));
+		// access leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		// PU
+		planDriver.add(
+				new ActivityImpl(
+					puName, 
+					passengerHome.getCoord(),
+					passengerHome.getLinkId()));
+		// shared leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		// DO
+		planDriver.add(
+				new ActivityImpl(
+					JointActingTypes.DROP_OFF, 
+					passengerWork.getCoord(),
+					passengerWork.getLinkId()));
+		// egress leg
+		planDriver.add(new LegImpl(TransportMode.car));
+		// work
+		planDriver.add(driverElements.get(2));
+		
+		// /////////// PASSENGER //////////////
+		// home
+		planPassenger.add(passengerElements.get(0));
+		// access leg
+		planPassenger.add(new LegImpl(TransportMode.walk));
+		// PU
+		planPassenger.add(
+				new ActivityImpl(
+					puName, 
+					passengerHome.getCoord(),
+					passengerHome.getLinkId()));
+		// shared leg
+		planPassenger.add(new LegImpl(JointActingTypes.PASSENGER));
+		// DO
+		planPassenger.add(
+				new ActivityImpl(
+					JointActingTypes.DROP_OFF, 
+					passengerWork.getCoord(),
+					passengerWork.getLinkId()));
+		// egress leg
+		planPassenger.add(new LegImpl(TransportMode.walk));
+		// work
+		planPassenger.add(passengerElements.get(2));
+	}
+
+	/**
+	 * removes all non selected plans from the agentDBs.
+	 */
+	private void cleanPlansInPopulation() {
+		for (Person person : this.population.getPersons().values()) {
+			((PersonImpl) person).removeUnselectedPlans();
+		}
 	}
 
 	/**
@@ -190,6 +390,18 @@ public class AgentMatingAlgo {
 		public Id createId() {
 			lastId++;
 			return new IdImpl(lastId);
+		}
+	}
+
+	private class PickUpNameFactory {
+		private long lastN = 0;
+
+		public String createName() {
+			lastN++;
+			return
+				JointActingTypes.PICK_UP_BEGIN +
+				JointActingTypes.PICK_UP_SPLIT_EXPR +
+				lastN;
 		}
 	}
 }
