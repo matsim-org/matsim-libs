@@ -174,16 +174,16 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				if (dynamicRates) {
 					notifyCO(0, parent1, parent2, mate1, mate2);
 				}
-				checkConstr(mate1, "whole");
-				checkConstr(mate2, "whole");
+				//checkConstr(mate1, "whole");
+				//checkConstr(mate2, "whole");
 			}
 			else if (i < numOfWholeCo + numOfSimpleCo) {
 				doDoubleSimpleCrossOver(mate1, mate2);
 				if (dynamicRates) {
 					notifyCO(1, parent1, parent2, mate1, mate2);
 				}
-				checkConstr(mate1, "simple");
-				checkConstr(mate2, "simple");
+				//checkConstr(mate1, "simple");
+				//checkConstr(mate2, "simple");
 			}
 			else {
 				doDoubleSingleCrossOver(mate1, mate2);
@@ -191,8 +191,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				if (dynamicRates) {
 					notifyCO(2, parent1, parent2, mate1, mate2);
 				}
-				checkConstr(mate1, "single");
-				checkConstr(mate2, "single");
+				//checkConstr(mate1, "single");
+				//checkConstr(mate2, "single");
 			}
 
 			a_candidateChromosome.add(mate1);
@@ -205,6 +205,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	}
 
 	//for debugging
+	//to move in a unit test
 	private void checkConstr(IChromosome chrom, String message) {
 		if (!((JointPlanOptimizerJGAPChromosome) chrom).respectsConstraints()) {
 			log.error("offspring does not respects the constraints: "+message);
