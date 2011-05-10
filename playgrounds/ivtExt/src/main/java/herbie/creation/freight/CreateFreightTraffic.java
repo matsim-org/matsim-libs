@@ -374,11 +374,11 @@ public class CreateFreightTraffic {
 		}	
 	}
 	
-	private void addWorkActivity2Facility(ActivityFacility facility) {
-		if (facility.getActivityOptions().get("work") == null) {
-			((ActivityFacilityImpl)facility).createActivityOption("work");
+	private void addActivity2FacilityWithoutOpeningHours(ActivityFacility facility, String type) {
+		if (facility.getActivityOptions().get(type) == null) {
+			((ActivityFacilityImpl)facility).createActivityOption(type);
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600.0);
-			((ActivityFacilityImpl)facility).getActivityOptions().get("work").addOpeningTime(ot);
+			((ActivityFacilityImpl)facility).getActivityOptions().get(type).addOpeningTime(ot);
 		}	
 	}
 	
@@ -399,13 +399,12 @@ public class CreateFreightTraffic {
 						ActivityImpl act = (ActivityImpl)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						
-						if(v2Type.equals("work")){
-							ActivityFacility af = 
-								this.scenario.getActivityFacilities().getFacilities().get(act.getFacilityId());
-							
-							this.addWorkActivity2Facility(af);
-							System.out.println("Add work activity to facility " + af.getId());
-						}						
+						Id facilityID = act.getFacilityId();
+						ActivityFacility af = 
+							this.scenario.getActivityFacilities().getFacilities().get(facilityID);
+						
+						this.addActivity2FacilityWithoutOpeningHours(af, v2Type);
+						System.out.println("Add work activity to facility " + facilityID+": "+v2Type);
 					}
 				}
 			}
