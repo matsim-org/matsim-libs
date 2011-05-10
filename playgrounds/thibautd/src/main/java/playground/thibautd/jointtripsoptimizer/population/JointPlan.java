@@ -60,12 +60,22 @@ public class JointPlan implements Plan {
 	/**
 	 * Creates a joint plan from individual plans.
 	 * The plans are added at the individual level.
-	 * equivalent to JointPlan(clique, plans, true).
+	 * equivalent to JointPlan(clique, plans, true, true).
 	 */
 	public JointPlan(
-			Clique clique,
-			Map<Id, ? extends Plan> plans) {
+			final Clique clique,
+			final Map<Id, ? extends Plan> plans) {
 		this(clique, plans, true);
+	}
+
+	/**
+	 * equivalent to JointPlan(clique, plans, addAtIndividualLevel, true)
+	 */
+	public JointPlan(
+			final Clique clique,
+			final Map<Id, ? extends Plan> plans,
+			final boolean addAtIndividualLevel) {
+		this(clique, plans, addAtIndividualLevel, true);
 	}
 
 	/**
@@ -74,12 +84,15 @@ public class JointPlan implements Plan {
 	 * to 'pu_i', where i is an integer which identifies the joint trip.
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replanning for example).
+	 * @param toSynchronize if true, the activity durations will be modified so
+	 * that the joint activities are simultaneous (not implemented yet)
 	 */
 	//TODO: separate in several helpers (too messy)
 	public JointPlan(
-			Clique clique,
-			Map<Id, ? extends Plan> plans,
-			boolean addAtIndividualLevel) {
+			final Clique clique,
+			final Map<Id, ? extends Plan> plans,
+			final boolean addAtIndividualLevel,
+			final boolean toSynchronize) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
 		Plan currentPlan;
 		this.clique = clique;
@@ -139,16 +152,10 @@ public class JointPlan implements Plan {
 		}
 
 		// create the links that where encoded in the activity types names
-		// TODO: improve the way reimplacement modes are determined.
 		for (List<JointLeg> legsToLink : toLink.values()) {
 			for (JointLeg leg : legsToLink) {
 				if (leg.getMode().equals(TransportMode.car)) {
 					leg.setIsDriver(true);
-				//	leg.setAssociatedIndividualLeg(
-				//			new JointLeg(leg.getMode(), leg.getPerson()));
-				//} else {
-				//	leg.setAssociatedIndividualLeg(
-				//			new JointLeg(TransportMode.pt, leg.getPerson()));
 				}
 				for (JointLeg linkedLeg : legsToLink) {
 					if (leg != linkedLeg) {
@@ -160,12 +167,16 @@ public class JointPlan implements Plan {
 
 		this.constructLegsMap();
 
-		//TODO: if plan contains joint legs, synchronize it
-		this.synchronize();
+		if (toSynchronize) {
+			this.synchronize();
+		}
 	}
 
 	private void synchronize() {
-		//
+		// TODO
+		// problem: quite complicated (Duration decoder is longer than 600 lines)
+		// and impossible to use DurationDecoder here (impossible to pass routing
+		// algorithm and everithing).
 	}
 
 	public JointPlan(JointPlan plan) {

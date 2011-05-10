@@ -70,6 +70,7 @@ public class run {
 
 		controler = new JointControler(scenario);
 		controler.setOverwriteFiles(true);
+		controler.addControlerListener(new JointReplanningControlerListener());
 		controler.run();
 	}
 }

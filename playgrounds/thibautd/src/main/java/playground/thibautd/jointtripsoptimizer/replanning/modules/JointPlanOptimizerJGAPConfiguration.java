@@ -179,7 +179,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 			// population size: the SPX cross-over requires at least one chromosome
 			// per double dimension.
-			int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes);
+			int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
 			log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 

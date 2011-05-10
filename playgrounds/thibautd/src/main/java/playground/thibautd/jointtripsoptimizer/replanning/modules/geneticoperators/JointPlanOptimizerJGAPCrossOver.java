@@ -37,6 +37,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPChromosome;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -173,12 +174,16 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				if (dynamicRates) {
 					notifyCO(0, parent1, parent2, mate1, mate2);
 				}
+				checkConstr(mate1, "whole");
+				checkConstr(mate2, "whole");
 			}
 			else if (i < numOfWholeCo + numOfSimpleCo) {
 				doDoubleSimpleCrossOver(mate1, mate2);
 				if (dynamicRates) {
 					notifyCO(1, parent1, parent2, mate1, mate2);
 				}
+				checkConstr(mate1, "simple");
+				checkConstr(mate2, "simple");
 			}
 			else {
 				doDoubleSingleCrossOver(mate1, mate2);
@@ -186,6 +191,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				if (dynamicRates) {
 					notifyCO(2, parent1, parent2, mate1, mate2);
 				}
+				checkConstr(mate1, "single");
+				checkConstr(mate2, "single");
 			}
 
 			a_candidateChromosome.add(mate1);
@@ -194,6 +201,13 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 		if (dynamicRates) {
 			this.rateCalculator.iterationIsOver();
+		}
+	}
+
+	//for debugging
+	private void checkConstr(IChromosome chrom, String message) {
+		if (!((JointPlanOptimizerJGAPChromosome) chrom).respectsConstraints()) {
+			log.error("offspring does not respects the constraints: "+message);
 		}
 	}
 
@@ -305,15 +319,29 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				mate2.getGenes(),
 				mate1.getGenes(),
 				crossingPoint);
+		//only compute "useful" values: more efficient and avoids cumulating
+		//rouding errors
+		boolean cross1 = (crossingCoef1 > EPSILON);
+		boolean cross2 = (crossingCoef2 > EPSILON);
 
-		for (int i=this.N_BOOL + crossingPoint; i < this.N_BOOL + this.N_DOUBLE; i++) {
-			gene1 = (DoubleGene) mate1.getGene(i);
-			gene2 = (DoubleGene) mate2.getGene(i);
-			oldValue1 = gene1.doubleValue();
-			oldValue2 = gene2.doubleValue();
-			
-			gene1.setAllele((1d - crossingCoef1)*oldValue1 + crossingCoef1*oldValue2);
-			gene2.setAllele(crossingCoef2*oldValue1 + (1d - crossingCoef2)*oldValue2);
+		if ( cross1 || cross2 ) {
+			for (int i=this.N_BOOL + crossingPoint; i < this.N_BOOL + this.N_DOUBLE; i++) {
+				gene1 = (DoubleGene) mate1.getGene(i);
+				gene2 = (DoubleGene) mate2.getGene(i);
+				oldValue1 = gene1.doubleValue();
+				oldValue2 = gene2.doubleValue();
+				
+				if (cross1) {
+					gene1.setAllele(
+							(1d - crossingCoef1)*oldValue1 +
+							crossingCoef1*oldValue2);
+				}
+				if (cross2) {
+					gene2.setAllele(
+							crossingCoef2*oldValue1 +
+							(1d - crossingCoef2)*oldValue2);
+				}
+			}
 		}
 	}
 
@@ -333,7 +361,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		double currentSurplus;
 		double currentEpisodeDuration1;
 		double currentEpisodeDuration2;
-		double minIndivCoef = 0;
+		double minIndivCoef = Double.POSITIVE_INFINITY;
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes=nGenesIterator.next();
 		int countGenes = 0;
@@ -371,6 +399,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 			currentSurplus = currentEpisodeDuration2 - currentEpisodeDuration1;
 
+			// normally, unecessary: to remove
 			if (currentSurplus < 0) {
 				minPosDurationCoef = Math.min(
 						minPosDurationCoef,
@@ -444,8 +473,16 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			oldValue1 = gene1.doubleValue();
 			oldValue2 = gene2.doubleValue();
 			
-			gene1.setAllele((1 - crossingCoef1)*oldValue1 + crossingCoef1*oldValue2);
-			gene2.setAllele(crossingCoef2*oldValue1 + (1 - crossingCoef2)*oldValue2);
+			if (crossingCoef1 > EPSILON) {
+				gene1.setAllele(
+						(1 - crossingCoef1)*oldValue1 +
+						crossingCoef1*oldValue2);
+			}
+			if (crossingCoef2 > EPSILON) {
+				gene2.setAllele(
+						crossingCoef2*oldValue1 +
+						(1 - crossingCoef2)*oldValue2);
+			}
 		}
 	}
 
@@ -468,7 +505,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		int currentNGenes=nGenesIterator.next();
 		int countGenes = 0;
 		boolean crossingPointIsPast = false;
-		double randomCoef = this.randomGenerator.nextDouble();
+		//double randomCoef = this.randomGenerator.nextDouble();
+		double randomCoef = 1d;
 		double posDurCoef = 1d;
 		double coef;
 	

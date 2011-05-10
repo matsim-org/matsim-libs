@@ -333,7 +333,7 @@ public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {
 		// treat the last plan
 		denom = currentDuration - centerOfMassDur;
 		if ((dayDuration - currentDuration) < -EPSILON) {
-			log.error("2 -> invalid father duration "+(dayDuration - currentDuration));
+			log.error("2 -> invalid father duration, exces: "+(currentDuration - dayDuration));
 		}
 		if (denom > EPSILON) {
 			output = Math.min(

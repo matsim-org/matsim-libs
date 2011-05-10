@@ -42,6 +42,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		Logger.getLogger(JointPlanOptimizerJGAPChromosome.class);
 
 	private static final long serialVersionUID = 1L;
+	private static final double EPSILON = 1E-7;
 
 	private final int nBooleanGenes;
 	private final int nDoubleGenes;
@@ -285,6 +286,30 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 
 			super.m_fitnessValue = a_newFitnessValue;
 		}
+	}
+
+	/**
+	 * Mainly a debugging method.
+	 */
+	public boolean respectsConstraints() {
+		int currentDoubleGene = this.nBooleanGenes;
+		int currentUpperBound;
+		double currentDuration;
+
+		for (int planLength : this.nDurationGenes) {
+			currentUpperBound = currentDoubleGene + planLength;
+			currentDuration = 0d;
+
+			for (; currentDoubleGene < currentUpperBound; currentDoubleGene++) {
+				currentDuration += ((DoubleGene) this.getGene(currentDoubleGene)).doubleValue();
+			}
+
+			if (currentDuration > this.dayDuration + EPSILON) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 
