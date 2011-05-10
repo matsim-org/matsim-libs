@@ -44,10 +44,10 @@ public class BvgTripAnalysisRunnerV2 {
 		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
 		
 		final String EVENTSFILE = INDIR + "bvg.run128.25pct.100.events.xml.gz";
-		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
+//		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
 		
 //		final String EVENTSFILE = OUTDIR + "testEvents.xml";
-//		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
+		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
 		
 		Set<Feature> features = null;
 		features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);

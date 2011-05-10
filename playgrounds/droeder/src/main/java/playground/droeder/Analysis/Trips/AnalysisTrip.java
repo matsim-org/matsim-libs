@@ -97,13 +97,13 @@ public class AnalysisTrip {
 		}
 	}
 	
-	private void analyzeValuesForAllModes(ArrayList<PersonEvent> events) {
+	protected void analyzeValuesForAllModes(ArrayList<PersonEvent> events) {
 		// from first departure to last arrival
 		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
 	}
 
 	
-	private void analyzeValuesForPT(ArrayList<PersonEvent> events) {
+	protected void analyzeValuesForPT(ArrayList<PersonEvent> events) {
 		ListIterator<PersonEvent> it = events.listIterator();
 		PersonEvent pe;
 		double switchWait = 0;

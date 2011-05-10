@@ -57,6 +57,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class TripAnalysisV2 {
 	private static final Logger log = Logger.getLogger(TripAnalysisV2.class);
 	private TripEventsHandlerV2 eventsHandler;
+	private String unProcessedAgents;
 	
 	public TripAnalysisV2 (){
 		 this.eventsHandler = new TripEventsHandlerV2();
@@ -76,8 +77,9 @@ public class TripAnalysisV2 {
 	}
 	
 	private void write2csv(String out){
+		BufferedWriter writer;
 		try {
-			BufferedWriter writer;
+			// write analysis
 			for(Entry<String, AnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
 				for(Entry<String, AnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
 					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_analysis.csv");
@@ -86,6 +88,25 @@ public class TripAnalysisV2 {
 					writer.close();
 				}
 			}
+			
+			//write unprocessed Agents
+			writer = IOUtils.getBufferedWriter(out + "unprocessedAgents.csv");
+			writer.write(this.unProcessedAgents);
+			writer.flush();
+			writer.close();
+			
+			//write uncompletedPlans
+			writer = IOUtils.getBufferedWriter(out + "uncompletedPlans.csv");
+			writer.write(this.eventsHandler.getUncompletedPlans());
+			writer.flush();
+			writer.close();
+			
+			//write stuckAgents
+			writer = IOUtils.getBufferedWriter(out + "stuckAgents.csv");
+			writer.write(this.eventsHandler.getStuckAgents());
+			writer.flush();
+			writer.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -131,7 +152,7 @@ public class TripAnalysisV2 {
 			e.printStackTrace();
 		}
 		
-		
+		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips(planFilter.getTrips());
 	}
 	
