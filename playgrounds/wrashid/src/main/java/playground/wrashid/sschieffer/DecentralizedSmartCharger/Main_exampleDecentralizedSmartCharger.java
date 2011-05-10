@@ -81,60 +81,26 @@ import java.util.*;
 public class Main_exampleDecentralizedSmartCharger {
 	
 		
-	public static void main(String[] args) throws IOException {
-		
-		
+	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {		
 		
 		/*************
-		 * VEHICLES
+		 * SIMULLATION VARIABLES
 		 * ************
-		 * Provide a list of vehicles with the agent Id and the corresponding vehicle object
-		 * LinkedListValueHashMap<Id, Vehicle>
-		 * 
-		 * You can use the EnergyConsumptionInit class of the package to do this or make your own
-		 * To use the EnergyConsumptionInit class, define the percentage of PHEVs, EVs, and combustion engine vehicles
-		 * 
+		 * The simulation needs 
+		 * <li>	% of phevs, evs and combustion engine cars in the simulation * 
+		 * <li> outputPath to store the output files such as graphs of the loadDistribution or behavior of the agents
+		 * <li> config Path
+		 * <li> buffer for battery charge
+		 * <li> minimum charging length
+		 * <li> MappingClass object which will map linkId to Hubs for scenario
 		 */
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
 		
-		
-		
-		/*************
-		 * SIMULLATION VARIABLES
-		 * ************
-		 * The simulation needs a 
-		 * <li>controler
-		 * <li>parkingTimesPlugIn in order to retrieve the population
-		 * <li>an outputPath to store the output files such as graphs of the loadDistribution or behavior of the agents
-		 * <li>config Path
-		 * 
-		 */
-		final Controler controler;
-		final ParkingTimesPlugin parkingTimesPlugin;	
-		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
-		
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";		
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-		
-		controler=new Controler(configPath);
-		
-		/**
-		 *  This class sets up the Vehicle types for the simulation
-		 * it defines gas types, battery types and vehicle types
-		 * <li>"normal gas" 
-		 * (gasPricePerLiter= 0.25; gasJoulesPerLiter = 43 MJ/kg; emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l)
-		 * <li>EV battery type (24kWH, minSOC=0.1, maxSOC=0.9, engine 80kW)
-		 * <li>PHEV battery type  (24kWH, minSOC=0.1, maxSOC=0.9, engine 80k)
-		 * 
-		 * you can modify the default values in the class
-		 */
-		SetUpVehicleCollector sv= new SetUpVehicleCollector();
-		final VehicleTypeCollector myVehicleTypes = sv.setUp();
-		
-
-		
+				
 		/**
 		 * LP Optimization parameters
 		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
@@ -144,214 +110,92 @@ public class Main_exampleDecentralizedSmartCharger {
 		
 		/**
 		 * Charging Distribution
-		 * - minimum charging length [s]
-		 * - time resolution of optimization
+		 * - minimum charging length [s] = time resolution of optimization
 		 */
-		final double minChargingLength=5*60;//5 minutes
+		final double minChargingLength=5*60;
 		
-		
-				
-		/*
-		 * ****************************
-		 * SETUP SIMULATION
-		 * ****************************
+		/**
+		 * define mapping class that shall be used to map the 
+		 * linkdId to the hubs in the DecentralizedSmartCharger
 		 */
-		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
+		StellasHubMapping myMappingClass= new StellasHubMapping();
 		
-		parkingTimesPlugin = new ParkingTimesPlugin(controler);
+		StellasResidentialDetermisticLoadPricingCollector loadPricingCollector= 
+			new StellasResidentialDetermisticLoadPricingCollector();
 		
-		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
+		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(configPath, 
+				outputPath, 
+				phev, ev, combustion,
+				bufferBatteryCharge,
+				minChargingLength,
+				myMappingClass,
+				loadPricingCollector
+				);
+		mySimulation.addControlerListenerDecentralizedCharging();		
+		mySimulation.controler.run();
 		
-		final EnergyConsumptionInit e= new EnergyConsumptionInit(
-				phev, ev, combustion);
+		/***********************
+		 * Examples how to use
+		 * The decentralized smart charger runs after the iteration
+		 * after the run, the results can be obtained as demonstrated in the example below
+		 * **********************
+		 */
 		
-		controler.addControlerListener(e);
-				
-		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
-		controler.setOverwriteFiles(true);
-		
-		controler.addControlerListener(new IterationEndsListener() {
+		for(Id id: DecentralizedChargingSimulation.controler.getPopulation().getPersons().keySet()){
+			//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
+			LinkedListValueHashMap<Id, Schedule> agentPDSchedules= 
+				mySimulation.getAllAgentParkingAndDrivingSchedules();
 			
-			/*
-			 * ****************************
-			 * at Iteration End
-			 * ****************************
-			 */	
-			@Override
-			public void notifyIterationEnds(IterationEndsEvent event) {
+			System.out.println("parking and driving schedule agent "+id.toString());
+			agentPDSchedules.getValue(id).printSchedule();
+			
+			//CHARGING COSTS
+			LinkedListValueHashMap<Id, Double> agentChargingCosts= 
+				mySimulation.getChargingCostsForAgents();
+			System.out.println("charging cost of agent "+id.toString() 
+					+ " "+agentChargingCosts.getValue(id));
+									
+			
+			//CHARGING SCHEDULES FOR EVERY AGENT
+			LinkedListValueHashMap<Id, Schedule> agentSchedules= 
+				mySimulation.getAllAgentChargingSchedules();
+			
+			System.out.println("charging Schedule agent "+id.toString());
+			agentSchedules.getValue(id).printSchedule();
+			
+			
+			//LIST OF AGENTS WITH EV WHERE LP FAILED, i.e. where battery swap would be necessary
+			LinkedList<Id> agentsWithEVFailure = 
+				mySimulation.getListOfIdsOfEVAgentsWithFailedOptimization();
+			
+			
+			// GET ALL IDs OF AGENTS WITH EV, PHEV or Combustion engine car
+			LinkedList<Id> agentsWithEV = mySimulation.getListOfAllEVAgents();
+			LinkedList<Id> agentsWithPHEV = mySimulation.getListOfAllPHEVAgents();
+			LinkedList<Id> agentsWithConventionalCar = mySimulation.getListOfAllCombustionAgents();
+			
+			
+			// DETAILED DATA PER AGENT
+			if(agentsWithEV.isEmpty()==false){
 				
-				try {
-					
-					/******************************************
-					 * SEtup for Decentralized Smart Charging
-					 * *****************************************
-					 */
-					
-					
-										
-					//initialize DecentralizedSmartCharger
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), //Controler
-							parkingTimesPlugin, //ParkingTimesPlugIn
-							e.getEnergyConsumptionPlugin(), // EnergyConsumptionPlugIn
-							outputPath, // where to save the data
-							myVehicleTypes // the defined vehicle types(gas, battery)
-							);
-					
-					//set battery reserve
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					// set standard charging slot length
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(minChargingLength);
-					
-					// set LinkedList of vehicles <agentId, vehicle>
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							e.getVehicles());
-					
-					
-					/*
-					 * HubLinkMapping links linkIds (Id) to Hubs (Integer)
-					 * this hubMapping needs to be done individually for every scenario, please write your own class/function here
-					 *  - an example is provided in StellasHubMapping and follows the following format
-					 *  which creates a HubLinkMapping hubLinkMapping=new HubLinkMapping(int numberOfHubs);
-					 *  hubLinkMapping.addMapping(linkId, hubNumber);
-					 */
-					StellasHubMapping setHubLinkMapping= new StellasHubMapping(controler);
-					final HubLinkMapping hubLinkMapping=setHubLinkMapping.mapHubs();
-					
-					/*
-					 * Network  - Electric Grid Information
-					 * 
-					 * - distribution of free load [W] available for charging over the day (deterministicHubLoadDistribution)
-					 * this is given in form of a LinkedListValueHashMap, where Integer corresponds to a hub and 
-					 * the Schedule includes LoadDistributionIntervals which represent the free load 
-					 * THe LoadDistributionIntervals indicate 
-					 * <li> a time interval: start second, end second 
-					 * <li>PolynomialFunction indicating the free Watts over the time interval
-					 * <li> an optimality boolean(true, if free load is positive=electricity for charging available and false if not)
-					 * </br>
-					 * </br>
-					 * - pricing (pricingHubDistribution)
-					 * is also given as LinkedListValueHashMap analogous to the determisticiHubLoadDIstribution
-					 *  where Integer corresponds to a hub and
-					 * the Schedule includes LoadDistributionIntervals which represent the price per second 
-					 * of charging at a 3500W connection over the day
-					 * </br>
-					 * !!!!!!!!!!!!!!!!!!!!!!
-					 * IMPORTANT 
-					 * !!!!!!!!!!!!!!!!!!!!!!
-					 * 1) the day can be split into as many time intervals as you wish, however 
-					 * positive and negative determisticLoad Intervals should be different intervals (either optimal or suboptimal intervals)
-					 * 2) Also the pricingHubDistribution and the deterministicHubLoadDistribution 
-					 * Should have the SAME time intervals (start and end)
-					 * 
-					 * 
-					 * DetermisticLoadAndPricingCollector is an example how you can define 
-					 * these determisticLoad curves for your scenario
-					 * 
-					 */
-					DetermisticLoadAndPricingCollector dlpc= new DetermisticLoadAndPricingCollector();
-					
-					final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
-						= dlpc.getDeterminisitcHubLoad();
-					
-					final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
-						= dlpc.getDeterminisitcPriceDistribution();
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							deterministicHubLoadDistribution,							
-							pricingHubDistribution							
-							);
-					
-					/***********************
-					 * RUN
-					 * **********************
-					 */
-					
-					myDecentralizedSmartCharger.run();
-					
-					
-					/***********************
-					 * Examples how to use
-					 * **********************
-					 */
-					for(Id id: controler.getPopulation().getPersons().keySet()){
-						//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
-						LinkedListValueHashMap<Id, Schedule> agentPDSchedules= 
-							myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules();
-						
-						System.out.println("parking and driving schedule agent "+id.toString());
-						agentPDSchedules.getValue(id).printSchedule();
-						
-						//CHARGING COSTS
-						LinkedListValueHashMap<Id, Double> agentChargingCosts= 
-							myDecentralizedSmartCharger.getChargingCostsForAgents();
-						System.out.println("charging cost of agent "+id.toString() 
-								+ " "+agentChargingCosts.getValue(id));
-												
-						
-						//CHARGING SCHEDULES FOR EVERY AGENT
-						LinkedListValueHashMap<Id, Schedule> agentSchedules= 
-							myDecentralizedSmartCharger.getAllAgentChargingSchedules();
-						
-						System.out.println("charging Schedule agent "+id.toString());
-						agentSchedules.getValue(id).printSchedule();
-						
-						
-						//LIST OF AGENTS WITH EV WHERE LP FAILED, i.e. where battery swap would be necessary
-						LinkedList<Id> agentsWithEVFailure = 
-							myDecentralizedSmartCharger.getIdsOfEVAgentsWithFailedOptimization();
-						
-						
-						// GET ALL IDs OF AGENTS WITH EV, PHEV or Combustion engine car
-						LinkedList<Id> agentsWithEV = myDecentralizedSmartCharger.getAllAgentsWithEV();
-						LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
-						LinkedList<Id> agentsWithConventionalCar = myDecentralizedSmartCharger.getAllAgentsWithCombustionVehicle();
-						
-						
-						// DETAILED DATA PER AGENT
-						if(agentsWithEV.isEmpty()==false){
-							
-							// DRIVING CONSUMPTION [Joules]
-							System.out.println("Total consumption from battery [joules]" 
-									+ myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromBattery(id));
-							
-							
-							// TOTAL DRIVING CONSUMPTION NOT FROM ELECTRIC ENGINE[Joules]
-							// either from combustion engine or through potential battery swap for EVs
-							System.out.println("Total consumption from engine [joules]" +
-									myDecentralizedSmartCharger.getTotalDrivingConsumptionOfAgentFromOtherSources(id));
-								
-						}
-						
-						//TOTAL EMISSIONS
-						System.out.println("Total emissions [kg]" +
-								myDecentralizedSmartCharger.getTotalEmissions());
-						
-					}
-					
-					
-					/***********************
-					 * END
-					 * **********************
-					 */
-					myDecentralizedSmartCharger.clearResults();
+				// DRIVING CONSUMPTION [Joules]
+				System.out.println("Total consumption from battery [joules]" 
+						+ mySimulation.getTotalDrivingConsumptionOfAgentFromBattery(id));
 				
-					
-				} catch (Exception e1) {
-					
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 				
+				// TOTAL DRIVING CONSUMPTION NOT FROM ELECTRIC ENGINE[Joules]
+				// either from combustion engine or through potential battery swap for EVs
+				System.out.println("Total consumption from engine [joules]" +
+						mySimulation.getTotalDrivingConsumptionOfAgentFromOtherSources(id));
+					
 			}
-		});
-		
-				
-		controler.run();		
-				
+			
+			//TOTAL EMISSIONS
+			System.out.println("Total emissions [kg]" +
+					mySimulation.getTotalEmissions());
+			
+		}
 	}
 	
 	

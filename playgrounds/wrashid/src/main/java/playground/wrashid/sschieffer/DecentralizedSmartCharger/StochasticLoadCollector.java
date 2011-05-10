@@ -60,7 +60,6 @@ public class StochasticLoadCollector {
 				
 				agentSource.put(id, bullShitMinus);	
 			}
-			
 		}
 		
 	}

@@ -151,25 +151,25 @@ public abstract class TimeInterval implements Comparable{
 	}
 	
 	public boolean isParking(){
-		if(this.getClass().equals(new ParkingInterval(0,0,null).getClass())){
+		if(this.getClass().equals(ParkingInterval.class)){
 			return true;
 		}else{return false;}
 	}
 	
 	public boolean isDriving(){
-		if(this.getClass().equals(new DrivingInterval(0,0,0).getClass())){
+		if(this.getClass().equals(DrivingInterval.class)){
 			return true;
 		}else{return false;}
 	}
 	
 	public boolean isCharging(){
-		if(this.getClass().equals(new ChargingInterval(0,0).getClass())){
+		if(this.getClass().equals(ChargingInterval.class)){
 			return true;
 		}else{return false;}
 	}
 	
 	public boolean isLoadDistributionInterval(){
-		if(this.getClass().equals(new LoadDistributionInterval(0,0, new PolynomialFunction(new double[]{0}), false).getClass())){
+		if(this.getClass().equals(LoadDistributionInterval.class)){
 			return true;
 		}else{return false;}
 	}

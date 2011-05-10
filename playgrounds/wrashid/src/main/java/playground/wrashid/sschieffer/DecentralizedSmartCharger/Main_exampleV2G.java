@@ -25,6 +25,8 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 import java.io.IOException;
 
 
+import org.apache.commons.math.ConvergenceException;
+import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
 import org.matsim.api.core.v01.Id;
@@ -74,9 +76,47 @@ import java.util.*;
  */
 public class Main_exampleV2G {
 	
+	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
+		
+		/*************
+		 * SET UP STANDARD Decentralized Smart Charging simulation 
+		 * *************/
+		
+		final double phev=1.0;
+		final double ev=0.0;
+		final double combustion=0.0;
+		
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";		
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
+			
+		final double bufferBatteryCharge=0.0;
+		
+		final double minChargingLength=5*60;
 	
-	
-	public static void main(String[] args) throws IOException {
+		StellasHubMapping myMappingClass= new StellasHubMapping();
+		
+		StellasResidentialDetermisticLoadPricingCollector loadPricingCollector= 
+			new StellasResidentialDetermisticLoadPricingCollector();
+		
+		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(configPath, 
+				outputPath, 
+				phev, ev, combustion,
+				bufferBatteryCharge,
+				minChargingLength,
+				myMappingClass,
+				loadPricingCollector
+				);
+		
+		/******************************************
+		 * SETUP V2G
+		 * *****************************************
+		 * V2G can only follow after Decentralized Smart Charger has been run
+		 * since it relies on the planned charging schedules
+		 * 
+		 * For all stochastic loads the V2G procedure will then check if rescheduling is possible 
+		 * and if the utility of the agent can be increased by rescheduling.
+		 */	
+		
 		
 		/**
 		 * SPECIFY WHAT PERCENTAGE OF THE POPULATION PROVIDES V2G
@@ -88,239 +128,60 @@ public class Main_exampleV2G {
 		final double xPercentDown=0.0;
 		final double xPercentDownUp=1.0;
 		
-		/**
-		 * see descriptions in Main_exampleDecentralizedSmartCharger for setup instructions
-		 */
-		final double phev=1.0;
-		final double ev=0.0;
-		final double combustion=0.0;
-		
-		
-		
-		final Controler controler;
-		final ParkingTimesPlugin parkingTimesPlugin;					
-		
-		SetUpVehicleCollector sv= new SetUpVehicleCollector();
-		final VehicleTypeCollector myVehicleTypes = sv.setUp();
-		
 		
 		/*
-		 * LP optimization parameters
-		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
-		 * than what he needs before starting the next trip ); 
+		 * ************************
+		 * Stochastic Sources
+		 * they need to be defined per scenario. dummy values for the demonstration
+		 * have been entered in StochasticLoadCollector
 		 * 
-		 */
-		final double bufferBatteryCharge=0.0;
+		 * StochasticLoadSources can be defined
+		 * <li> general hub Stochastic Load
+		 * <li> for vehicles (i.e. solar roof)
+		 * <li> local sources for hubs (wind turbine, etc)
+		 * 
+		 * the sources are given as Schedules of LoadDistributionIntervalsdistribution [Watt]
+		 * <li> negative values mean, that the source needs energy --> regulation up
+		 * <li> positive values mean, that the source has too much energy--> regulation down
+		 * 
+		 * 
+		 * THe LoadDistributionIntervals indicate 
+		 * <li> a time interval: start second, end second 
+		 * <li>PolynomialFunction indicating the free Watts over the time interval
+		 * <li> an optimality boolean(true, if stochastic load is positive=electricity for charging available and false if not)
+		 * </br>
+		 */			
+					
+		StochasticLoadCollector slc= new StochasticLoadCollector(mySimulation.controler);
 		
 		/*
-		 * Charging Distribution
-		 * - minimum charging length [s]
-		 * - time resolution of optimization
-		 */
-		final double minChargingLength=5*60;//5 minutes
-		
-		
-		/*
-		 * Network  - Electric Grid Information
+		 * ************************
+		 * Agent contracts
+		 * the convenience class AgentContractCollector 
+		 * helps you to create the necessary List
+		 * LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts
 		 * 
-		 * - distribution of free load [W] available for charging over the day (deterministicHubLoadDistribution)
-		 * this is given in form of a LinkedListValueHashMap, where Integer corresponds to a hub and 
-		 * the Schedule includes LoadDistributionIntervals which represent the free load 
-		 * (LoadDistributionIntervals indicate a time interval: start second, end second and also have a PolynomialFunction)
-		 * 
-		 * - pricing (pricingHubDistribution)
-		 * is also given as LinkedListValueHashMap, where Integer corresponds to a hub and
-		 * the Schedule includes LoadDistributionIntervals which represent the price per second over the day
+		 * provide the compensationPerKWHRegulationUp/Down in your currency
 		 */
-		DetermisticLoadAndPricingCollector dlpc= new DetermisticLoadAndPricingCollector();
+		double compensationPerKWHRegulationUp=0.15;
+		double compensationPerKWHRegulationDown=0.15;
 		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
-			= dlpc.getDeterminisitcHubLoad();
+		mySimulation.setUpV2G(
+				xPercentNone,
+				xPercentDown,
+				xPercentDownUp,
+				slc,
+				compensationPerKWHRegulationUp,
+				compensationPerKWHRegulationDown);
+	
+		mySimulation.controler.run();
 		
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
-			= dlpc.getDeterminisitcPriceDistribution();
+		/*********************
+		 * Example how to Use V2G
+		 *********************/
 		
-				
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\"; //"C:\\Users\\stellas\\Output\\V1G\\";
-		
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-		controler=new Controler(configPath);
-		
-		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
-		
-		parkingTimesPlugin = new ParkingTimesPlugin(controler);
-		
-		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
-		
-		
-		final EnergyConsumptionInit e= new EnergyConsumptionInit(
-				phev, ev, combustion);
-		
-		controler.addControlerListener(e);
-				
-		controler.addControlerListener(eventHandlerAtStartupAdder);
-		
-		controler.setOverwriteFiles(true);
-		
-		controler.addControlerListener(new IterationEndsListener() {
-			
-			
-			@Override
-			public void notifyIterationEnds(IterationEndsEvent event) {
-				
-				try {
-					
-					// map linkIds to hubs once the scenario is read in from the config file
-					StellasHubMapping setHubLinkMapping= new StellasHubMapping(controler);
-					final HubLinkMapping hubLinkMapping=setHubLinkMapping.mapHubs();
-					
-					
-					/******************************************
-					 * for Decentralized Smart Charging
-					 * *****************************************
-					 */
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), //controler
-							parkingTimesPlugin, //ParkingTimesPlugIn
-							e.getEnergyConsumptionPlugin(),
-							outputPath, 
-							myVehicleTypes
-							);
-					
-					
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(minChargingLength);
-					
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							e.getVehicles());
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							deterministicHubLoadDistribution,							
-							pricingHubDistribution
-							);
-					
-					//RUN DecentralizedSmartCharger
-					myDecentralizedSmartCharger.run();
-					
-					
-					/******************************************
-					 * SETUP V2G
-					 * *****************************************
-					 * V2G can only follow after Decentralized Smart Charger has been run
-					 * since it relies on the planned charging schedules
-					 * 
-					 * For all stochastic loads the V2G procedure will then check if rescheduling is possible 
-					 * and if the utility of the agent can be increased by rescheduling.
-					 * 
-					 * 
-					 */
-					
-				
-					/*
-					 * ************************
-					 * Stochastic Sources
-					 * they need to be defined per scenario. dummy values for the demonstration
-					 * have been entered in StochasticLoadCollector
-					 * 
-					 * StochasticLoadSources can be defined
-					 * <li> general hub Stochastic Load
-					 * <li> for vehicles (i.e. solar roof)
-					 * <li> local sources for hubs (wind turbine, etc)
-					 * 
-					 * the sources are given as Schedules of LoadDistributionIntervalsdistribution [Watt]
-					 * <li> negative values mean, that the source needs energy --> regulation up
-					 * <li> positive values mean, that the source has too much energy--> regulation down
-					 * 
-					 * 
-					 * THe LoadDistributionIntervals indicate 
-					 * <li> a time interval: start second, end second 
-					 * <li>PolynomialFunction indicating the free Watts over the time interval
-					 * <li> an optimality boolean(true, if stochastic load is positive=electricity for charging available and false if not)
-					 * </br>
-					 */
-					StochasticLoadCollector slc= new StochasticLoadCollector(controler);
-					
-					LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=
-						slc.getStochasticHubLoad();
-						
-					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= 
-						slc.getStochasticHubSources();
-					
-					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= 
-						slc.getStochasticAgentVehicleSources();
-						
-					// SET STOCHASTIC LOADS
-					myDecentralizedSmartCharger.setStochasticSources(
-							stochasticHubLoadDistribution,
-							locationSourceMapping,
-							agentVehicleSourceMapping);
-					
-					
-					/*
-					 * ************************
-					 * Agent contracts
-					 * the convenience class AgentContractCollector 
-					 * helps you to create the necessary List
-					 * LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts
-					 * 
-					 * provide the compensationPerKWHRegulationUp/Down in your currency
-					 */
-					double compensationPerKWHRegulationUp=0.15;
-					double compensationPerKWHRegulationDown=0.15;
-					 
-					AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
-							myDecentralizedSmartCharger,
-							 compensationPerKWHRegulationUp,
-							 compensationPerKWHRegulationDown);
-					
-					
-					LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= 
-						myAgentContractsCollector.makeAgentContracts(
-								controler,
-								xPercentNone,
-								xPercentDown,
-								xPercentDownUp);
-						
-					//set the agent contracts
-					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
-					
-					
-					/**
-					 * RUN V2G
-					 */
-					myDecentralizedSmartCharger.initializeAndRunV2G();
-					
-					/*
-					 * Example how to Use V2G
-					 */
-					LinkedListValueHashMap<Id, Double> agentRevenuesFromV2G=
-						myDecentralizedSmartCharger.getAgentV2GRevenues();
-					
-					
-					//*****************************************
-					//END
-					//*****************************************
-					myDecentralizedSmartCharger.clearResults();
-					
-				
-					
-				} catch (Exception e1) {
-					
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-		});
-		
-				
-		controler.run();		
-				
+		LinkedListValueHashMap<Id, Double> agentRevenuesFromV2G=
+			mySimulation.getAgentV2GRevenues();	
 	}
-	
-	
-
 
 }

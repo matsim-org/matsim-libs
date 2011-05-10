@@ -4,7 +4,7 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
-public class DetermisticLoadAndPricingCollector {
+public class StellasMockDetermisticLoadAndPricingCollector {
 	
 	
 	private LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution=
@@ -13,8 +13,8 @@ public class DetermisticLoadAndPricingCollector {
 	private LinkedListValueHashMap<Integer, Schedule> hubPricingDistribution=
 		new  LinkedListValueHashMap<Integer, Schedule>();
 	
-	public DetermisticLoadAndPricingCollector(){
-		
+	public StellasMockDetermisticLoadAndPricingCollector(){
+		setUpHubLoadTest();
 	}
 	
 	
@@ -27,7 +27,11 @@ public class DetermisticLoadAndPricingCollector {
 		return hubPricingDistribution;
 	}
 	
-	public void  setUpHubLoad(){
+	
+	
+	
+	
+	public void  setUpHubLoadTest(){
 		
 		double energyPricePerkWh=0.25;
 		double standardConnectionElectricityJPerSecond= 3500; 

@@ -113,8 +113,20 @@ public class LPPHEV {
 		} catch (Exception e) {	    
 		}
 		
+		boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
+		if(feasible){
+			schedule= update();
+		}else{
+			
+			System.out.println("no feasible solution ");
+			System.out.println("old schedule ");
+			schedule.printSchedule();
+			System.out.println("solution ");
+			double [] solutionNF =solver.getPtrVariables();
+			
+			return null;
+		}
 		
-		schedule= update();
 	
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
@@ -147,6 +159,7 @@ public class LPPHEV {
 	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
 		
 		System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
+		System.out.println("Schedule before LPPHEV: "); 
 		schedule.printSchedule();
 		
 		this.batteryMax=batteryMax;
@@ -171,16 +184,28 @@ public class LPPHEV {
 		}
 		
 		
-		schedule= update();
-		/*System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();*/
+		/*
+		 * public boolean isFeasible(double[] values,
+                          double threshold)
+                   throws LpSolveException
+		 */
+		boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
+		if(feasible){
+			schedule= update();
+		}else{
+			
+			System.out.println("no feasible solution ");
+			System.out.println("old schedule ");
+			schedule.printSchedule();
+			System.out.println("solution ");
+			double [] solutionNF =solver.getPtrVariables();
+			
+			return null;
+		}
 		
-		//printLPSolution();
-		
+		System.out.println("Schedule after update LPPHEV: ");
+		schedule.printSchedule();
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
-		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
-		*/
-		//visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
 		
 		solver.deleteLp();
 		
@@ -461,7 +486,14 @@ public class LPPHEV {
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){
-				((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(solution[i+1]);
+				if(solution[i+1]>=0.0){
+					((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(solution[i+1]);
+					
+				}else{
+					// in case LP has some problem and a negative number is the result
+					((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(0);
+					
+				}
 				
 			}
 		}

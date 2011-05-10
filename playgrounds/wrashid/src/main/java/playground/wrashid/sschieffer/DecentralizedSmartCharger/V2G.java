@@ -27,7 +27,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  */
 public class V2G {
 	
-	DecentralizedSmartCharger mySmartCharger;
+	private DecentralizedSmartCharger mySmartCharger;
 	private LinkedListValueHashMap<Id, Double> agentV2GRevenue = new LinkedListValueHashMap<Id, Double>(); 
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
@@ -92,17 +92,24 @@ public class V2G {
 			
 			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 			
-			double costReschedule= calcCostForRescheduling(
-					secondHalf, 
-					agentId, 
-					batterySize, batteryMin, batteryMax, 
-					type,
-					currentSOC,
-					ev,
-					compensation,
-					lpphev,
-					lpev
-					);
+			double costReschedule;
+			if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
+				costReschedule= calcCostForRescheduling(
+						secondHalf, 
+						agentId, 
+						batterySize, batteryMin, batteryMax, 
+						type,
+						currentSOC,
+						ev,
+						compensation,
+						lpphev,
+						lpev
+						);
+			}else{
+				costReschedule=100000000.0;
+			}
+				
+			
 			
 			
 			if(costKeeping>costReschedule){
@@ -188,17 +195,26 @@ public class V2G {
 			agentParkingDrivingSchedule.printSchedule();
 			
 			double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
-			double costReschedule= calcCostForRescheduling(
-					secondHalf, 
-					agentId, 
-					batterySize, batteryMin, batteryMax, 
-					type,
-					currentSOC,
-					ev,
-					compensation,
-					lpphev,
-					lpev
-					);
+			
+			double costReschedule= 0.0;
+			
+			if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
+				costReschedule= calcCostForRescheduling(
+						secondHalf, 
+						agentId, 
+						batterySize, batteryMin, batteryMax, 
+						type,
+						currentSOC,
+						ev,
+						compensation,
+						lpphev,
+						lpev
+						);
+			}else{
+				costReschedule=100000000.0;
+				System.out.println("currentSOC out of bounds - impossible");
+			}
+			
 			
 			
 			
@@ -306,17 +322,25 @@ public class V2G {
 					agentParkingDrivingSchedule.printSchedule();
 					
 					double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
-					double costReschedule= calcCostForRescheduling(
-							secondHalf, 
-							agentId, 
-							batterySize, batteryMin, batteryMax, 
-							type,
-							currentSOC,
-							ev,
-							compensation,
-							lpphev,
-							lpev
-							);
+					
+					
+					double costReschedule=0;
+					if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
+						costReschedule= calcCostForRescheduling(
+								secondHalf, 
+								agentId, 
+								batterySize, batteryMin, batteryMax, 
+								type,
+								currentSOC,
+								ev,
+								compensation,
+								lpphev,
+								lpev
+								);
+					}else{
+						costReschedule=100000000.0;
+					}
+					
 					
 					
 					
@@ -448,18 +472,26 @@ public class V2G {
 						
 						double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 						
-						double costReschedule= calcCostForRescheduling(
-								secondHalf, 
-								agentId, 
-								batterySize, batteryMin, batteryMax, 
-								type,
-								currentSOC,
-								ev,
-								compensation,
-								lpphev,
-								lpev
-								);
+						double costReschedule;
 						
+						if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
+							costReschedule= calcCostForRescheduling(
+									secondHalf, 
+									agentId, 
+									batterySize, batteryMin, batteryMax, 
+									type,
+									currentSOC,
+									ev,
+									compensation,
+									lpphev,
+									lpev
+									);
+						}else{
+							costReschedule=100000000.0;
+						}
+						
+						
+							
 						
 						if(costKeeping>costReschedule){
 							
@@ -793,9 +825,10 @@ public class V2G {
 			
 			if(answerScheduleAfterElectricSourceInterval==null){
 				System.out.println("Reschedule was not possible!");
-				costReschedule= 10000000000000000000000000000.0;
+				costReschedule= 100000000.0;
 			}else{
-				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
+				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)
+								-compensation;
 			}
 			
 			
@@ -804,14 +837,17 @@ public class V2G {
 			//PHEV
 			//***********************************
 			
-			answerScheduleAfterElectricSourceInterval= lpev.solveLPReschedule(secondHalf, agentId, batterySize, batteryMin, batteryMax, type,currentSOC);
+			answerScheduleAfterElectricSourceInterval= lpev.solveLPReschedule(secondHalf, 
+					agentId, batterySize, batteryMin, batteryMax, 
+					type,currentSOC);
 			
 			if(answerScheduleAfterElectricSourceInterval==null){
-				answerScheduleAfterElectricSourceInterval = lpphev.solveLPReschedule(secondHalf, agentId, batterySize, batteryMin, batteryMax, type, currentSOC);
+				answerScheduleAfterElectricSourceInterval = lpphev.solveLPReschedule(
+						secondHalf, agentId, batterySize, batteryMin, batteryMax, type, currentSOC);
 				//if still no answer possible
 				if(answerScheduleAfterElectricSourceInterval==null){
 					System.out.println("Reschedule was not possible!");
-					costReschedule= 10000000000000000000000000000.0;
+					costReschedule= 100000000.0;
 				}else{
 					costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
 				}

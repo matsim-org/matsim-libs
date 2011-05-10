@@ -36,8 +36,6 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.DefaultDrawingSupplier;
-import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
@@ -136,7 +134,7 @@ public class HubLoadDistributionReader {
 		if (myVehicleTypeCollector.containsVehicleTypeForThisVehicle(p)){
 			
 			double gasPriceInCostPerSecond; // cost/second = cost/liter * liter/joules * joules/second			
-			Battery phevBattery= myVehicleTypeCollector.getBattery(p);
+			
 			GasType phevGasType= myVehicleTypeCollector.getGasType(p);
 			double engineWatt =  myVehicleTypeCollector.getWattOfEngine(p);
 			gasPriceInCostPerSecond=phevGasType.getPricePerLiter() * 1/(phevGasType.getJoulesPerLiter()) * engineWatt;
@@ -292,13 +290,16 @@ public class HubLoadDistributionReader {
 	
 	public PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
 		
+		DecentralizedSmartCharger.polyFit.clearObservations();
+		
 		for (int i=0;i<data.length;i++){
 			DecentralizedSmartCharger.polyFit.addObservedPoint(1.0, data[i][0], data[i][1]);
 			
 		  }		
 		
-		 PolynomialFunction poly = DecentralizedSmartCharger.polyFit.fit();
-		
+		PolynomialFunction poly = DecentralizedSmartCharger.polyFit.fit();
+		 
+		DecentralizedSmartCharger.polyFit.clearObservations();
 		return poly;
 	}
 	
@@ -385,7 +386,6 @@ public class HubLoadDistributionReader {
 	
 	
 	public double getExpectedNumberOfParkingAgentsAtHubAtTime(int hub, double time){
-		int min= (int)Math.ceil(time/DecentralizedSmartCharger.SECONDSPERMIN);
 		return connectivityHubDistribution.getValue(hub).getFunction().value(time);
 	}
 	
@@ -398,8 +398,10 @@ public class HubLoadDistributionReader {
 		XYSeriesCollection connectivity= new XYSeriesCollection();
 		
 		for(Integer i: connectivityHubDistribution.getKeySet()){
-			connectivityHubDistribution.getValue(i).fitFunction();
-			XYSeries xx= connectivityHubDistribution.getValue(i).getXYSeries("Parking Vehicles at Hub"+ i);
+			
+			TimeDataCollector data= connectivityHubDistribution.getValue(i);
+			data.fitFunction();
+			XYSeries xx= data.getXYSeries("Parking Vehicles at Hub"+ i);
 			connectivity.addSeries(xx);
 		}
 		
@@ -459,11 +461,8 @@ public class HubLoadDistributionReader {
 			
 			Schedule pricingS= pricingHubDistribution.getValue(i);
 			
-			//price per kWh
-			pricingS.printSchedule();
-			
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.getValue(i);
-			deterministicSchedule.printSchedule();
+			
 			Schedule sPHEV= new Schedule();
 			for(int j=0; j<pricingS.getNumberOfEntries(); j++){
 				
@@ -605,8 +604,6 @@ public class HubLoadDistributionReader {
 				double c;
 				try {
 					c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime());
-					System.out.println("c: "+c);
-					System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime());
 					if(c<=l.getEndTime() && c>=l.getStartTime()){
 						
 						//contains bad interval
@@ -640,8 +637,8 @@ public class HubLoadDistributionReader {
 						
 						try {
 							double c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime(), i);
-							System.out.println("c: "+c);
-							System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime()+ " guess "+ i);
+							//System.out.println("c: "+c);
+							//System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime()+ " guess "+ i);
 							if(c<=l.getEndTime() && c>=l.getStartTime()){
 								// if roots are found multiple times
 								// check first, if 'same (error 1 minute)' root has been founded before already

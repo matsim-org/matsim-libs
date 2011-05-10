@@ -218,7 +218,9 @@ public class Schedule {
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray); 
       
-        ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+".png") , chart, 800, 600);
+        ChartUtilities.saveChartAsPNG(
+        		new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+".png") , 
+        		chart, 800, 600);
        
 	}
 	
@@ -386,6 +388,11 @@ public class Schedule {
 			int interval= intervalIsInWhichTimeInterval(t);
 			
 			//chck value of interval
+			if (interval==-1){
+				//trouble
+				System.out.println("time is not in schedule: "+ t);
+				printSchedule();
+			}
 			double start=timesInSchedule.get(interval).getStartTime();//currently in schedule
 			double end=timesInSchedule.get(interval).getEndTime();
 			

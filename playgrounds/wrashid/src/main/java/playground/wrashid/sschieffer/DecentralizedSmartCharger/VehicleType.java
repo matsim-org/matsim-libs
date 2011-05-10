@@ -4,11 +4,11 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 
 public class VehicleType {
 	
-	private String name;
-	Battery myBattery;
-	private GasType myGasType;
-	private Vehicle referenceObject;
-	private double engineWatt;
+	final private String name;
+	final Battery myBattery;
+	final private GasType myGasType;
+	final  private Vehicle referenceObject;
+	final private double engineWatt;
 	
 	public VehicleType(String name,
 			Battery myBattery,

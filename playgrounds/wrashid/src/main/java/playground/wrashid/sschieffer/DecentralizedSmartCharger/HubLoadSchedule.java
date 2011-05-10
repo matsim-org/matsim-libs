@@ -6,7 +6,7 @@ public class HubLoadSchedule {
 
 	
 	private String name;
-	private Schedule hubSchedule;
+	private Schedule hubSchedule= new Schedule();
 	
 	public HubLoadSchedule(String name){
 		this.name=name;

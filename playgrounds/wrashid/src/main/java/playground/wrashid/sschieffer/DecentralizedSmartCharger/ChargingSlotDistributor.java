@@ -81,7 +81,9 @@ public class ChargingSlotDistributor {
 				//Id agentId, Id idLink, TimeInterval t
 				
 				if(p.getIntervalLength()*0.7 <chargingTime){
-					
+					if(chargingTime>p.getIntervalLength()){
+						System.out.println("trouble");
+					}
 					double diff= p.getIntervalLength()-chargingTime;
 					double startRand= Math.random()*diff;
 					//(System.out.println("assign charging time "+ startRand + " to "+  startRand+chargingTime);
@@ -187,7 +189,6 @@ public class ChargingSlotDistributor {
 		boolean notFound=true;
 		boolean run=true;
 		
-		double err=joulesInInterval/1000; // accuracy 0.1%
 		
 		double upper=endTime;
 		double lower=startTime;
@@ -209,6 +210,8 @@ public class ChargingSlotDistributor {
 			while(run){
 				double integral;
 				if(joulesInInterval>=0){
+					double err=joulesInInterval/1000; // accuracy 0.1%
+					
 					integral=DecentralizedSmartCharger.functionIntegrator.integrate(func, startTime, trial);
 					
 					if(integral<rand*joulesInInterval){
@@ -225,6 +228,8 @@ public class ChargingSlotDistributor {
 					}
 					
 				}else{
+					
+					// negative suboptimal interval
 					PolynomialFunction funcSubOpt= turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(func, startTime, endTime);
 					
 					integral=DecentralizedSmartCharger.functionIntegrator.integrate(
@@ -234,6 +239,8 @@ public class ChargingSlotDistributor {
 					
 					double fullSubOptIntegral= DecentralizedSmartCharger.functionIntegrator.integrate(
 							funcSubOpt, startTime, endTime);
+					
+					double err=fullSubOptIntegral/1000; // accuracy 0.1%
 					
 					if(integral<rand*fullSubOptIntegral){
 						lower=trial;					

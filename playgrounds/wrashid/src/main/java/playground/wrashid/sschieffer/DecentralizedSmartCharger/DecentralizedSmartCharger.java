@@ -120,9 +120,9 @@ public class DecentralizedSmartCharger {
 	
 	private LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts;
 	
-	public double MINCHARGINGLENGTH;
+	public double minChargingLength;
 	
-	public double EMISSIONCOUNTER=0.0;
+	public double emissionCounter=0.0;
 	
 	final Controler controler;
 	
@@ -209,7 +209,7 @@ public class DecentralizedSmartCharger {
 
 
 	public void initializeChargingSlotDistributor(double minChargingLength){
-		this.MINCHARGINGLENGTH=minChargingLength; 
+		this.minChargingLength=minChargingLength; 
 		myChargingSlotDistributor=new ChargingSlotDistributor(minChargingLength);
 	}
 
@@ -330,7 +330,7 @@ public class DecentralizedSmartCharger {
 				
 				double emissionContribution= joulesToEmissionInKg(id, consumption);
 				// get entire driving Joules and transform to emissions
-				EMISSIONCOUNTER+= emissionContribution;
+				emissionCounter+= emissionContribution;
 				agentsWithCombustion.add(id);
 				type="combustionVehicle";
 				
@@ -366,11 +366,9 @@ public class DecentralizedSmartCharger {
 					agentParkingAndDrivingSchedules.put(id, s);
 					if(hasAgentPHEV(id)){
 						// only if agent has PHEV change joules to emissions
-						EMISSIONCOUNTER= joulesToEmissionInKg(id,joulesFromEngine); // still 0
+						emissionCounter= joulesToEmissionInKg(id,joulesFromEngine); // still 0
 												
 					}
-					
-					
 				}else{					
 					//if fails, try PHEV
 										
@@ -385,7 +383,7 @@ public class DecentralizedSmartCharger {
 						
 					}else{
 						
-						EMISSIONCOUNTER+= joulesToEmissionInKg(id, joulesFromEngine);
+						emissionCounter+= joulesToEmissionInKg(id, joulesFromEngine);
 					}
 					
 					
@@ -608,17 +606,17 @@ public class DecentralizedSmartCharger {
 					LoadDistributionInterval stochasticLoad= (LoadDistributionInterval)hubStochasticSchedule.timesInSchedule.get(j);
 					PolynomialFunction func= stochasticLoad.getPolynomialFunction();
 					
-					int intervals =(int) Math.ceil(stochasticLoad.getIntervalLength()/MINCHARGINGLENGTH);
+					int intervals =(int) Math.ceil(stochasticLoad.getIntervalLength()/minChargingLength);
 					
 					for(int i=0; i<intervals; i++){
 						
 						double bit=0;
 						
 						if(i<intervals-1){
-							bit=MINCHARGINGLENGTH;
+							bit=minChargingLength;
 							
 						}else{// i=intervals-1
-							bit=stochasticLoad.getIntervalLength()- (intervals-1)*MINCHARGINGLENGTH;
+							bit=stochasticLoad.getIntervalLength()- (intervals-1)*minChargingLength;
 							
 						}
 						
@@ -627,7 +625,7 @@ public class DecentralizedSmartCharger {
 						//*********************************
 						
 						//FINALLY HAVE INTERVAL TO LOOK AT IN THIS ITERATION
-						double start=stochasticLoad.getStartTime()+i*MINCHARGINGLENGTH;
+						double start=stochasticLoad.getStartTime()+i*minChargingLength;
 						double end= start+bit;
 						
 						LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
@@ -795,22 +793,22 @@ public class DecentralizedSmartCharger {
 						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
 						
 						// split up in small intervals of maximum length= mincharging length
-						int intervals= (int) Math.ceil(electricSourceInterval.getIntervalLength()/MINCHARGINGLENGTH);
+						int intervals= (int) Math.ceil(electricSourceInterval.getIntervalLength()/minChargingLength);
 						
 						for(int intervalNum=0; intervalNum<intervals; intervalNum++){
 							
 							double bit=0;
 							
 							if(intervalNum<intervals-1){
-								bit=MINCHARGINGLENGTH;
+								bit=minChargingLength;
 								
 							}else{// i=intervals-1
-								bit=electricSourceInterval.getIntervalLength()- (intervals-1)*MINCHARGINGLENGTH;
+								bit=electricSourceInterval.getIntervalLength()- (intervals-1)*minChargingLength;
 								
 							}
 							
 							//FINALLY HAVE INTERVAL TO LOOK AT IN THIS ITERATION
-							double start=electricSourceInterval.getStartTime()+intervalNum*MINCHARGINGLENGTH;
+							double start=electricSourceInterval.getStartTime()+intervalNum*minChargingLength;
 							double end= start+bit;
 							
 							PolynomialFunction func= new PolynomialFunction(
@@ -938,7 +936,7 @@ public class DecentralizedSmartCharger {
 		
 		Vehicle v= vehicles.getValue(id);
 		
-		if(v.getClass().equals(new PlugInHybridElectricVehicle(new IdImpl(1)).getClass() )){
+		if(v.getClass().equals(PlugInHybridElectricVehicle.class)){
 			return true;
 		}else{return false;}
 	}
@@ -948,7 +946,7 @@ public class DecentralizedSmartCharger {
 		
 		Vehicle v= vehicles.getValue(id);
 		
-		if(v.getClass().equals(new ElectricVehicle(null, new IdImpl(1)).getClass() )){
+		if(v.getClass().equals(ElectricVehicle.class)){
 			return true;
 		}else{return false;}
 	}
@@ -958,7 +956,7 @@ public class DecentralizedSmartCharger {
 		
 		Vehicle v= vehicles.getValue(id);
 		
-		if(v.getClass().equals(new ConventionalVehicle(null, new IdImpl(2)).getClass() )){
+		if(v.getClass().equals(ConventionalVehicle.class  )){
 			return true;
 		}else{return false;}
 	}
@@ -1029,7 +1027,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	public double getTotalEmissions(){
-		return EMISSIONCOUNTER;
+		return emissionCounter;
 	}
 	
 	
@@ -1046,7 +1044,7 @@ public class DecentralizedSmartCharger {
 		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
 		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
 		
-		EMISSIONCOUNTER=0.0;
+		emissionCounter=0.0;
 		
 		chargingFailureEV=new LinkedList<Id>();
 		agentsWithEV=new LinkedList<Id>();
@@ -1078,8 +1076,7 @@ public class DecentralizedSmartCharger {
 		int extraConsumptionCount=0;
 		
 		
-		if(vehicles.getValue(id).getClass().equals(
-				new PlugInHybridElectricVehicle(new IdImpl(1)).getClass())){
+		if(vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 			
 			
 			for(int i=0; i<dailySchedule.getNumberOfEntries();i++){
@@ -1636,11 +1633,29 @@ public class DecentralizedSmartCharger {
 		    
 		    //Close the output stream
 		    out.close();
-		    }catch (Exception e){}//Catch exception if any
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
 	}
 	
 	public void setV2G(V2G setV2G){
 		myV2G=setV2G;
+	}
+	
+	
+public static PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
+		
+		DecentralizedSmartCharger.polyFit.clearObservations();
+		
+		for (int i=0;i<data.length;i++){
+			DecentralizedSmartCharger.polyFit.addObservedPoint(1.0, data[i][0], data[i][1]);
+			
+		  }		
+		
+		PolynomialFunction poly = DecentralizedSmartCharger.polyFit.fit();
+		 
+		DecentralizedSmartCharger.polyFit.clearObservations();
+		return poly;
 	}
 	
 }

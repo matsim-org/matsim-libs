@@ -8,7 +8,9 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 /**
  * this class sets up the Vehicle types for the simulation
  * it defines gas types, battery types and vehicle types
- * 
+ * <li>"normal gas"
+ * <li>EV battery
+ * <li>PHEV battery
  * @author Stella
  *
  */
@@ -21,6 +23,10 @@ public class SetUpVehicleCollector {
 		
 	}
 	
+	/**
+	 * defines and sets up the gas types for the simulation
+	 * @return
+	 */
 	public VehicleTypeCollector setUp(){
 		
 		/*
@@ -58,6 +64,7 @@ public class SetUpVehicleCollector {
 		double batterySizeEV= 24*3600*1000; 
 		double batterySizePHEV= 24*3600*1000; 
 		double batteryMinEV= 0.1; 
+		
 		double batteryMinPHEV= 0.1; 
 		double batteryMaxEV= 0.9; 
 		double batteryMaxPHEV= 0.9; 		

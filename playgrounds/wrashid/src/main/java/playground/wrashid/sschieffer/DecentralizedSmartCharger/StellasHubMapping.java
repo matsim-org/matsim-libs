@@ -5,52 +5,68 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 
-public class StellasHubMapping {
-
-	private HubLinkMapping hubLinkMapping;
-	private Controler controler;
+public class StellasHubMapping extends MappingClass{
 	
-	public StellasHubMapping(Controler controler){
-		this.controler=controler;
-		hubLinkMapping=new HubLinkMapping(4);
+	private double minX=Integer.MAX_VALUE;
+	private double maxX=Integer.MIN_VALUE;
+	private double minY=Integer.MAX_VALUE;
+	private double  maxY=Integer.MIN_VALUE;
+	
+	final private int divHubsX=2;
+	final private int divHubsY=2;
+	
+	public StellasHubMapping(){
+	
 	}
 	
 	/**
 	 * fill hubLinkMapping 
 	 * assign hubIds to the different Links--> hubLinkMapping.addMapping(link, hub)
-	 * according to scenario relevant hublocations
+	 * 
+	 * finds minX-maxX, minY-maxY and splits the area into rectangular fields
+	 * with xDiv divisions in x direction and yDiv divisions in y direction
+	 * 
+	 * it then assigns hubs to each link accordingly
 	 * 
 	 * @param deterministicHubLoadDistribution
 	 * @param hubLinkMapping
 	 * @param controler
 	 */
-	public HubLinkMapping mapHubs(){
+	@Override
+	public HubLinkMapping mapHubs(Controler controler){
+		HubLinkMapping hubLinkMapping=new HubLinkMapping(4);
 		
-		
-		double maxX=5000;
-		double minX=-20000;
-		double diff= maxX-minX;
+		findMinMaxXYNetwork(controler);
 		
 		for (Link link:controler.getNetwork().getLinks().values()){
-			// x values of equil from -20000 up to 5000
-			if (link.getCoord().getX()<(minX+diff)/4){
-				
-				hubLinkMapping.addMapping(link.getId().toString(), 1);
-			}else{
-				if (link.getCoord().getX()<(minX+diff)*2/4){
-					hubLinkMapping.addMapping(link.getId().toString(), 2);
-				}else{
-					if (link.getCoord().getX()<(minX+diff)*3/4){
-						hubLinkMapping.addMapping(link.getId().toString(), 3);
-					}else{
-						hubLinkMapping.addMapping(link.getId().toString(), 4);
-					}
-				}
-			}
+			double xDiv= (maxX-minX)/divHubsX;
+			double yDiv= (maxY-minY)/divHubsY;
+						
+			double coordX=link.getCoord().getX();
+			double coordY=link.getCoord().getY();
 			
+			int hubNoX=(int)Math.ceil(coordX/xDiv);
+			int hubNoY=(int)Math.ceil(coordY/yDiv);
+			
+			int hubNumber= hubNoX + (hubNoY-1)*hubNoX;
+			
+			hubLinkMapping.addMapping(link.getId().toString(), hubNumber);
+						
 		}
 		return hubLinkMapping;
 	}	
 	
+	
+	
+	public void findMinMaxXYNetwork(Controler controler){
+		
+		for (Link link:controler.getNetwork().getLinks().values()){
+			minX= Math.min(minX, link.getCoord().getX()); 
+			maxX= Math.max(maxX,link.getCoord().getX());
+			
+			minY= Math.min(minY, link.getCoord().getY()); 
+			maxY= Math.max(maxY,link.getCoord().getY());
+		}
+	}
 	
 }
