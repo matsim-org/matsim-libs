@@ -232,10 +232,10 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					}
 
 					Matrix dProb_dParameters = mnl.get_dProb_dParameters(
-							attrIndices, true/* with/out ASC */);
+							attrIndices, false/* with/out ASC */);
 
 					List<? extends Matrix> d2ChoiceProb_dParam2 = mnl
-							.get_d2P_dbdb(delta, attrIndices, true);
+							.get_d2P_dbdb(delta, attrIndices, false);
 					/* UPDATE PARAMETERS (OBSERVE THE PLAN CHOOSING IN MATSIM) */
 
 					/* int selectedIdx= */((ChoiceParameterCalibrator<Link>) calibrator)
