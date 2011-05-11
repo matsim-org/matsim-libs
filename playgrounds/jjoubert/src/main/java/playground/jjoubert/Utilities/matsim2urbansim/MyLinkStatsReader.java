@@ -178,8 +178,69 @@ public class MyLinkStatsReader {
 		return ttm;
 	}
 	
+	public Map<Id, Double> readTotal(){
+		log.info("Reading total volume link statistics from " + this.file.getAbsolutePath());
+		
+		Map<Id,Double> volToCap = new TreeMap<Id, Double>();
+		Integer index = null;
+		BufferedReader input;
+		int linkCounter = 0;
+		int linkMultiplier = 1;
+		try {
+			input = IOUtils.getBufferedReader(file.getAbsolutePath());
+			try{
+				String[] header = input.readLine().split("\t");
+				/*
+				 * First find the column index in which the appropriate travel time 
+				 * occurs.
+				 */
+				boolean found = false;
+				int i = 0;
+				String s = "HRS0-24avg";
+				while(!found && i < header.length){
+					if(header[i].equalsIgnoreCase(s)){
+						index = i;
+						found = true;
+					} else{
+						i++;
+					}					
+				} 
+				if(index == null){
+					throw new RuntimeException("Could not find " + s + " in " + this.file.getAbsolutePath());
+				}
+				
+				/* 
+				 * Now process the links, adding each to a map.
+				 */
+				String theLine= null; 
+				while( (theLine = input.readLine()) != null ){
+					String line[] = theLine.split("\t");
+					if(line.length == header.length){
+						volToCap.put(new IdImpl(line[0]), Double.parseDouble(line[index]));
+					}
+					
+					// Report progress.
+					if(++linkCounter == linkMultiplier){
+						log.info("   Links processed: " + linkCounter);
+						linkMultiplier *= 2;
+					}
+				}
+			} finally{
+				input.close();
+			}
+			log.info("   Links processed: " + linkCounter + " (Done)");		
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return volToCap;
+	}
+	
+	
 	public File getFile(){
 		return this.file;
 	}
+	
 }
 

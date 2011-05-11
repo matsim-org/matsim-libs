@@ -64,21 +64,21 @@ public class CarTimeEstimator {
 	}
 
 	
-	/**
-	 * Implements the private car drive time estimator.
-	 * @param args a String-array containing:
-	 * <ol>
-	 * 	<li> the root folder;
-	 * 	<li> study area name. Currently allowed values are:
-	 * 		<ul>
-	 * 			<li> "eThekwini"
-	 * 		</ul> 
-	 * 	<li> version (year) of the study area to consider;
-	 * 	<li> the population sample size, e.g. "10" if a 10% sample was used;
-	 * 	<li> the final iteration number of the MATSim run used, e.g. "100" for the 100th iteration. 
-	 * 	<li> the specific hours (from link statistics file) to use, e.g. "6-7";
-	 * </ol>
-	 */
+//	/**
+//	 * Implements the private car drive time estimator.
+//	 * @param args a String-array containing:
+//	 * <ol>
+//	 * 	<li> the root folder;
+//	 * 	<li> study area name. Currently allowed values are:
+//	 * 		<ul>
+//	 * 			<li> "eThekwini"
+//	 * 		</ul> 
+//	 * 	<li> version (year) of the study area to consider;
+//	 * 	<li> the population sample size, e.g. "10" if a 10% sample was used;
+//	 * 	<li> the final iteration number of the MATSim run used, e.g. "100" for the 100th iteration. 
+//	 * 	<li> the specific hours (from link statistics file) to use, e.g. "6-7";
+//	 * </ol>
+//	 */
 	/**
 	 * Implements the private car drive time estimator. 
 	 * @param args The following arguments are required, and in the following 

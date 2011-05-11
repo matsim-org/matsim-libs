@@ -22,12 +22,11 @@ package playground.jjoubert.Utilities;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -66,43 +65,47 @@ public class MyXmlConverter {
 	 * @param object any given <code>Object</code>;
 	 * @param fileString the absolute path and filename where the XML file is to be 
 	 * 		  written.
+	 * @throws IOException 
 	 */
-	public void writeObjectToFile(Object object, String fileString){
+	public void writeObjectToFile(Object object, String fileString) throws IOException{
+		if(fileString == null){
+			throw new FileNotFoundException("No file specified (fileString = null)");
+		}
 		if(!silent){
 			log.info("Writing " + object.getClass().getSimpleName() + " to XML: " + fileString);
 		}
 		String xmlString = convertObjectToXmlString(object);
-		try {
-			BufferedWriter xmlOutput = new BufferedWriter(new FileWriter(new File(fileString)));
-			try{
-				xmlOutput.write(xmlString);
-			} finally{
-				xmlOutput.close();
-			}			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		BufferedWriter xmlOutput;
+		xmlOutput = IOUtils.getBufferedWriter(fileString);
+		try{
+			xmlOutput.write(xmlString);
+		} finally{
+			xmlOutput.close();
+		}			
 		if(!silent){
 			log.info("XML written.");
 		}
 	}
-	
+
 	private String convertFileToXmlString(String fileString){
 		StringBuilder string = new StringBuilder();
-		try{
-			BufferedReader br = new BufferedReader( new FileReader( new File(fileString)));
-			try{
-				String s;
-				while( (s = br.readLine() ) != null ){
-					string.append(s);
-					string.append("\n");
+			BufferedReader br;
+			try {
+				br = IOUtils.getBufferedReader(fileString);
+				try{
+					String s;
+					while( (s = br.readLine() ) != null ){
+						string.append(s);
+						string.append("\n");
+					}
+				} finally {
+					br.close();
 				}
-			} finally {
-				br.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
 		return string.toString();		
 	}
 	
