@@ -51,37 +51,45 @@ import lpsolve.LpSolveException;
  * checks if PHEV deterministic load is calculated correctly
  * for constant, linear and parabolic price functions
  * 
- * 
- * 
  * @author Stella
  *
  */
 public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 
-	/**
-	 * @param args
-	 */
-	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+	
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-	final Controler controler=new Controler(configPath);
+	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
+		
+	final double phev=1.0;
+	final double ev=0.0;
+	final double combustion=0.0;
 	
-	double gasPricePerLiter= 0.25; 
-	double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-	double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-	//--> gas Price per second for PHEV 4.6511627906976747E-4
+	private TestSimulationSetUp mySimulation;
+	private Controler controler;
 	
+	final double bufferBatteryCharge=0.0;
 	
+	final double MINCHARGINGLENGTH=5*60;
 	
-	final private static double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
-	final private static double suboptimalPrice=optimalPrice*3; // cost/second  
-	//0.24*10^-4 EUR per second
+	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
+	final static double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
+	final static double suboptimalPrice=optimalPrice*3; // cost/second  
 	
 	public static void testMain(String[] args) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException {
 	
-		
 	}
 	
+	
+	public Controler setControler() throws IOException{
+		mySimulation = new TestSimulationSetUp(
+				configPath, 
+				phev, 
+				ev, 
+				combustion);
+		
+		return mySimulation.getControler();
+	}
 	
 	/**
 	*  Schedule:part 1/part 2
@@ -99,64 +107,15 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	public void testHubLoadDistributionReaderConstant() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
 		
-		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		
-		deterministicHubLoadDistribution=readHubsTest();
-		pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
-		
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(1);//= new HubLinkMapping(0);
-		
-				
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
+		controler= setControler();
 		
 		
-		
-	/*
-	 * 	 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-	 */
-		 
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution=readHubsTest();
+		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
 		
 		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		mapHubsTest(hubLinkMapping);
+		// size 1
+		final HubLinkMapping hubLinkMapping= mapHubsTest();
 		
 		//*****************************************
 		// EV and PHEV 
@@ -168,8 +127,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				hubLinkMapping,//HubLinkMapping hubLinkMapping
 				deterministicHubLoadDistribution,				
 				pricingHubDistribution,
-				myVehicleTypes);
-			
+				mySimulation.getVehicleTypeCollector());
 		
 		//determistic load
 		
@@ -239,6 +197,10 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	 */
 	public void testHubLoadDistributionReaderLinear() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
+		controler= setControler();
+		
+		// size 1
+		final HubLinkMapping hubLinkMapping= mapHubsTest();
 		
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
@@ -246,56 +208,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		deterministicHubLoadDistribution=readHubsTest();
 		pricingHubDistribution= readHubsPricingTestLinear();
 			
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(1);//= new HubLinkMapping(0);
-				
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		
-		
-		/*
-		 *  * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
-		 
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		mapHubsTest(hubLinkMapping);
 		
 		//*****************************************
 		// EV and PHEV 
@@ -307,7 +219,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				hubLinkMapping,//HubLinkMapping hubLinkMapping
 				deterministicHubLoadDistribution,				
 				pricingHubDistribution,
-				myVehicleTypes);
+				mySimulation.getVehicleTypeCollector());
 			
 		/**
 		 * determistic load
@@ -404,6 +316,8 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	 */
 	public void testHubLoadDistributionReaderParabolic() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
+		controler= setControler();
+		final HubLinkMapping hubLinkMapping= mapHubsTest();
 		
 		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
 		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
@@ -411,54 +325,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		deterministicHubLoadDistribution=readHubsTest();
 		pricingHubDistribution= readHubsPricingTestParabolic();
 			
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(1);//= new HubLinkMapping(0);
-				
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		mapHubsTest(hubLinkMapping);
 		
 		//*****************************************
 		// EV and PHEV 
@@ -470,7 +336,9 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				hubLinkMapping,//HubLinkMapping hubLinkMapping
 				deterministicHubLoadDistribution,				
 				pricingHubDistribution,
-				myVehicleTypes);
+				mySimulation.getVehicleTypeCollector());
+		
+		
 			
 		/**
 		 * determistic load
@@ -616,13 +484,14 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	}
 	
 	
-	public void mapHubsTest(HubLinkMapping hubLinkMapping){
+	public HubLinkMapping mapHubsTest(){
 		
-		
+		HubLinkMapping hubLinkMapping = new HubLinkMapping(1);
 		for (Link link:controler.getNetwork().getLinks().values()){
 			hubLinkMapping.addMapping(link.getId().toString(), 1);
 			
 		}
+		return hubLinkMapping;
 	}
 	
 	

@@ -114,52 +114,11 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 		final double bufferBatteryCharge=0.0;
 		
 		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
+		SetUpVehicleCollector sv= new SetUpVehicleCollector();
+		final VehicleTypeCollector myVehicleTypes = sv.setUp();		
 		
 		final double MINCHARGINGLENGTH=5*60;//5 minutes
+		
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		
@@ -169,6 +128,7 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 		
 		final EnergyConsumptionInit e= new EnergyConsumptionInit(
 				phev, ev, combustion);
+		
 		
 		controler.addControlerListener(e);
 				
@@ -182,7 +142,6 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				
 				try {
-					
 					
 					mapHubsTest(controler,hubLinkMapping);
 					
@@ -215,8 +174,8 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 					 * *********************************
 					 */
 					
-					
-					LinkedListValueHashMap<Integer, Schedule> stochasticLoad = readStochasticLoad(1);
+					LinkedListValueHashMap<Integer, Schedule> stochasticLoad = 
+						readStochasticLoad(1);
 						
 					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping =
 						makeAgentVehicleSourceNegativeAndPositive(controler);
@@ -249,8 +208,9 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 					
 					myDecentralizedSmartCharger.setAgentContracts(agentContracts);
 					
-					// instead of initalize and run go through steps
 					
+					
+					// instead of initalize and run go through steps
 					System.out.println("START CHECKING VEHICLE SOURCES");
 					
 					/*

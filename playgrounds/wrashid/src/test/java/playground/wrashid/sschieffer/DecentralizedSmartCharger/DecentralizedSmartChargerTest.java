@@ -47,19 +47,29 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
- * 1) CHECKS BASIC FUNCTIONALITY OF INTERVALS AND SCHEDULE
-* 2) CHECKS RESULTS OF AGENTTIMEINTERVALREADER SPECIFIC TO AGENT 1
-	 * 
+ * 
+ * tests if the sizes of the final outputs of the optimization
+ * length of list of EVs, PHEVs, length of list of charging schedules
+ * have the correct size
+ * 
  * @author Stella
  *
  */
 public class DecentralizedSmartChargerTest extends MatsimTestCase {
 
 	String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-	final Controler controler=new Controler(configPath);
-	
-	
+	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 	public Id agentOne=null;
+	
+	Controler controler; 
+	
+	final double phev=0.5;
+	final double ev=0.4;
+	final double combustion=0.1;
+	
+	final double bufferBatteryCharge=0.0;
+	
+	final double MINCHARGINGLENGTH=5*60;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -70,10 +80,6 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 	
 	
 	/**
-	 * 1) CHECKS BASIC FUNCTIONALITY OF INTERVALS AND SCHEDULE
-	 * 2) CHECKS RESULTS OF AGENTTIMEINTERVALREADER SPECIFIC TO AGENT 1 AND THIS SETUP
-	 * 
-	 *  
 	 * @throws MaxIterationsExceededException
 	 * @throws FunctionEvaluationException
 	 * @throws IllegalArgumentException
@@ -83,84 +89,13 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 	 */
 	public void testDecentralizedCharger() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
-		final String outputPath = super.getOutputDirectory();
+		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
+				configPath, 
+				phev, 
+				ev, 
+				combustion);
 		
-		
-		//*****************************************
-		
-		final ParkingTimesPlugin parkingTimesPlugin;
-		final EnergyConsumptionPlugin energyConsumptionPlugin;
-		
-		final double optimalPrice=0.1;
-		final double suboptimalPrice=optimalPrice*3;
-			
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
-		final LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=readStochasticLoad(deterministicHubLoadDistribution.size());
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readPricingHubDistribution(optimalPrice, suboptimalPrice);
-		final LinkedListValueHashMap<Integer, Schedule> connectivityHubDistribution;
-		
-		
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
-		
-		
-		final double phev=1.0;
-		final double ev=0.0;
-		final double combustion=0.0;
-		
-		
-		final double bufferBatteryCharge=0.0;
-		double gasPricePerLiter= 0.25; 
-		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		final double MINCHARGINGLENGTH=5*60;//5 minutes
-		
-		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
-		
-		parkingTimesPlugin = new ParkingTimesPlugin(controler);
-		
-		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
-		
-		final EnergyConsumptionInit e= new EnergyConsumptionInit(
-				phev, ev, combustion);
-		
-		controler.addControlerListener(e);
-				
-		controler.addControlerListener(eventHandlerAtStartupAdder);
-		
-		controler.setOverwriteFiles(true);
+		controler= mySimulation.getControler();
 		
 		controler.addControlerListener(new IterationEndsListener() {
 			
@@ -169,18 +104,14 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 				
 				try {
 					
-					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= new LinkedListValueHashMap<Integer, Schedule>();
-					
-					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= new LinkedListValueHashMap<Id, Schedule>();
-					
-					mapHubsTest(controler,hubLinkMapping);
+HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 							event.getControler(), 
-							parkingTimesPlugin,
-							e.getEnergyConsumptionPlugin(),
-							outputPath, 
-							myVehicleTypes
+							mySimulation.getParkingTimesPlugIn(),
+							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
+							outputPath,
+							mySimulation.getVehicleTypeCollector()
 							);
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
@@ -188,123 +119,28 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
 					
 					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							e.getVehicles());
+							mySimulation.getEnergyConsumptionInit().getVehicles());
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 							hubLinkMapping, 
-							deterministicHubLoadDistribution,							
-							pricingHubDistribution
+							mySimulation.getDeterministicLoadSchedule(),							
+							mySimulation.getDetermisiticPricing()
 							);
 					
-					//*****************************************
-					//*****************************************
 					
-					myDecentralizedSmartCharger.readAgentSchedules();
+					myDecentralizedSmartCharger.run();
 					
-					for(Id id : myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().getKeySet()){
-						
-						System.out.println(id.toString());
-						if (id.toString().equals("1")){
-							agentOne=id;
-							Schedule s= myDecentralizedSmartCharger.myAgentTimeReader.readParkingAndDrivingTimes(id);
-							//Schedule s= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().getValue(id);
-							s.printSchedule();
-							
-							assertEquals(6, s.getNumberOfEntries());
-							assertEquals(62490.0, s.timesInSchedule.get(4).getEndTime());
-							ParkingInterval p= (ParkingInterval) s.timesInSchedule.get(0);
-							
-							
-						}
-						
-					}
+					assertEquals(100, myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().size());
 					
-					//*****************************************
-					//*****************************************
-					
-					myDecentralizedSmartCharger.findRequiredChargingTimes();
-					
-					// updated schedules with required charging times					
-					Schedule s= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().getValue(agentOne);
-					s.printSchedule();
-					// basics should be the same
-					assertEquals(6, s.getNumberOfEntries());
-					assertEquals(62490.0, s.timesInSchedule.get(4).getEndTime());
+					assertEquals(100.0*(phev+ev), myDecentralizedSmartCharger.getAllAgentChargingSchedules().size());
 					
 					
-					// THESE ARE FOR LP AS OF March 31st
-					ParkingInterval pFirst= (ParkingInterval) s.timesInSchedule.get(0);
-					assertEquals(1.897038219281625E14, pFirst.getJoulesInInterval());
-					assertEquals(0.0, pFirst.getRequiredChargingDuration());
-					assertEquals(true, pFirst.isInSystemOptimalChargingTime());
-					
-					ParkingInterval pLast= (ParkingInterval) s.timesInSchedule.get(s.getNumberOfEntries()-1);
-					assertEquals(0.0, pLast.getRequiredChargingDuration());
-					assertEquals(false, pLast.isInSystemOptimalChargingTime());
-					
-					ParkingInterval p5th= (ParkingInterval) s.timesInSchedule.get(4);
-					assertEquals(13988.57142857143, p5th.getRequiredChargingDuration());
-					assertEquals(true, p5th.isInSystemOptimalChargingTime());
-					
-					/*Parking Interval 	 start: 0.0	  end: 21609.0	  ChargingTime:  0.0	  Optimal:  true	  Joules per Interval:  1.897038219281625E14
-					Driving Interval 	  start: 21609.0	  end: 22846.0	  consumption: 1.6388045816871705E7
-					Parking Interval 	 start: 22846.0	  end: 36046.0	  ChargingTime:  4635.074196830796	  Optimal:  true	  Joules per Interval:  6.53919159828E14
-					Driving Interval 	  start: 36046.0	  end: 38386.0	  consumption: 4.879471387207076E7
-					Parking Interval 	 start: 38386.0	  end: 62490.0	  ChargingTime:  13988.57142857143	  Optimal:  true	  Joules per Interval:  3.5063335651397495E15
-					Parking Interval 	 start: 62490.0	  end: 86400.0	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -3.3411427243079994E14
-					*/
-					
-					
-					
-					
-					myDecentralizedSmartCharger.assignChargingTimes();
-					
-					PolynomialFunction func= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(agentOne,p5th.getLocation(),
-							p5th);
-					
-					Schedule sAssigned = myDecentralizedSmartCharger.myChargingSlotDistributor.assignChargingScheduleForParkingInterval(
-							func, 
-							p5th.getJoulesInInterval(), 
-							p5th.getStartTime(), 
-							p5th.getEndTime(), 
-							p5th.getRequiredChargingDuration() //13988.57142857143
-							);
-		
-					 
-					sAssigned.printSchedule();
-					
-					int numTimeIntervalSOLL= (int) Math.ceil(p5th.getRequiredChargingDuration()/MINCHARGINGLENGTH);
-					
-					assertEquals(numTimeIntervalSOLL, sAssigned.getNumberOfEntries());
-					
-					double totalChargingTime=0;
-					
-					for (int i=0; i<sAssigned.getNumberOfEntries();i++){
-						ChargingInterval c= (ChargingInterval)sAssigned.timesInSchedule.get(i);
-						totalChargingTime+=c.getIntervalLength();
-					}
-					
-					/*System.out.println(totalChargingTime);
-					System.out.println(p5th.getRequiredChargingDuration());
-					13988.571428571428
-					13988.57142857143*/
-					DecimalFormat tenPlaces = new DecimalFormat("0.0000000000"); 
-					assertEquals(tenPlaces.format(totalChargingTime), tenPlaces.format(p5th.getRequiredChargingDuration()));
-					
-					//*****************************************
-					//*****************************************
-					//100%
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
+					assertEquals(agentsWithPHEV.size(), phev*100.0);
 					
-					assertEquals(agentsWithPHEV.size(), 100);
-					
-						
-					LPPHEVTest testLP = new LPPHEVTest();
-					testLP.testRunLPPHEV();
-					
-									
-					
-					myDecentralizedSmartCharger.clearResults();
+					LinkedList<Id> agentsWithEV = myDecentralizedSmartCharger.getAllAgentsWithEV();
+					assertEquals(agentsWithEV.size(), ev*100.0);
+								
 					
 					
 				} catch (Exception e1) {

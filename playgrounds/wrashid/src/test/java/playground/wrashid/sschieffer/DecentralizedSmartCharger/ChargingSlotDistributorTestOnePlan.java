@@ -47,22 +47,28 @@ import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
 /**
- * checks if full required charging time calculated by linear programming is 
+ * <li>checks if full required charging time calculated by linear programming is 
  * attributed to agent's charging schedule
+ * 
  * @author Stella
  *
  */
 public class ChargingSlotDistributorTestOnePlan extends TestCase{
 
-	/**
-	 * @param args
-	 */
-	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+	
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-	final Controler controler=new Controler(configPath);
-	
-	
+	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 	public Id agentOne=null;
+	
+	Controler controler; 
+	
+	final double phev=0.0;
+	final double ev=1.0;
+	final double combustion=0.0;
+	
+	final double bufferBatteryCharge=0.0;
+	
+	final double standardChargingLength=5*60;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -84,95 +90,13 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 	public void testAgentTimeIntervalReader() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		
-		final ParkingTimesPlugin parkingTimesPlugin;
-		final EnergyConsumptionPlugin energyConsumptionPlugin;
+		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
+				configPath, 
+				phev, 
+				ev, 
+				combustion);
 		
-		double gasPricePerLiter= 0.25; 
-		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
-		//--> gas Price per second for PHEV 4.6511627906976747E-4
-		
-		
-		double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
-		double suboptimalPrice=optimalPrice*3; // cost/second  
-		//0.24*10^-4 EUR per second
-			
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution= readHubsTest();
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
-		
-		
-		final HubLinkMapping hubLinkMapping=new HubLinkMapping(deterministicHubLoadDistribution.size());//= new HubLinkMapping(0);
-		
-		
-		final double phev=0.0;
-		final double ev=1.0;
-		final double combustion=0.0;
-		
-		
-		final double bufferBatteryCharge=0.0;
-		
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		
-		/*
-		 * Battery characteristics:
-		 * - full capacity [J]
-		 * e.g. common size is 24kWh = 24kWh*3600s/h*1000W/kW = 24*3600*1000Ws= 24*3600*1000J
-		 * - minimum level of state of charge, avoid going below this SOC= batteryMin
-		 * (0.1=10%)
-		 * - maximum level of state of charge, avoid going above = batteryMax
-		 * (0.9=90%)
-		 * 
-		 * Create desired Battery Types
-		 */
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		double batteryMinPHEV= 0.1; 
-		double batteryMaxEV= 0.9; 
-		double batteryMaxPHEV= 0.9; 		
-		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
-		
-		
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
-				EVBattery, 
-				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
-		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
-				PHEVBattery, 
-				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
-		
-		final VehicleTypeCollector myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);
-		
-		
-		final double MINCHARGINGLENGTH=5*60;//5 minutes
-		
-		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
-		
-		parkingTimesPlugin = new ParkingTimesPlugin(controler);
-		
-		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
-		
-		final EnergyConsumptionInit e= new EnergyConsumptionInit(
-				phev, ev, combustion);
-		
-		controler.addControlerListener(e);
-				
-		controler.addControlerListener(eventHandlerAtStartupAdder);
-		
-		controler.setOverwriteFiles(true);
+		controler= mySimulation.getControler();
 		
 		controler.addControlerListener(new IterationEndsListener() {
 			
@@ -181,35 +105,28 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 				
 				try {
 					
-					LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= new LinkedListValueHashMap<Integer, Schedule>();
-					//hub/LoadDIstributionSchedule
-					
-					LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= new LinkedListValueHashMap<Id, Schedule>();
-					
-					mapHubsTest(controler,hubLinkMapping);
+					HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 							event.getControler(), 
-							parkingTimesPlugin,
-							e.getEnergyConsumptionPlugin(),
+							mySimulation.getParkingTimesPlugIn(),
+							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
 							outputPath,
-							myVehicleTypes
+							mySimulation.getVehicleTypeCollector()
 							);
-					
 					
 					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
 					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
+					myDecentralizedSmartCharger.initializeChargingSlotDistributor(standardChargingLength);
 					
 					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							e.getVehicles());
+							mySimulation.getEnergyConsumptionInit().getVehicles());
 					
 					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 							hubLinkMapping, 
-							deterministicHubLoadDistribution,							
-							pricingHubDistribution
+							mySimulation.getDeterministicLoadSchedule(),							
+							mySimulation.getDetermisiticPricing()
 							);
-					
 										
 					
 					for(Id id : controler.getPopulation().getPersons().keySet()){
@@ -224,6 +141,9 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 						parkingDrivingTimes.printSchedule();
 						
 						
+						/**
+						 * TOTAL CHARGING TIME CALCULATION
+						 */
 						double totalChargingTimeParkingDriving=0;
 						for(int i=0; i< parkingDrivingTimes.getNumberOfEntries();i++){
 							if (parkingDrivingTimes.timesInSchedule.get(i).isParking()){
@@ -243,8 +163,9 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 								);
 						
 						
+						
+						
 					}
-					
 					
 					
 				} catch (Exception e1) {
