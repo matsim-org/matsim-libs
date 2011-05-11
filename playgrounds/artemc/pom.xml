@@ -9,4 +9,11 @@
   <artifactId>artemc</artifactId>
   <name>artemc</name>
   <version>0.4.0-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>5.1.6</version>
+	</dependency>
+  </dependencies>
 </project>
