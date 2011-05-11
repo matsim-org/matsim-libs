@@ -20,7 +20,6 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
