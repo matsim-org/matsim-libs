@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,6 +31,7 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -47,6 +49,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -122,7 +125,7 @@ public class GtfsConverter {
 	
 	public void convert(int weekday){
 		// Create a config
-		this.config = this.createConfig();
+		this.config = this.createConfig();		
 		this.scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		// 1 = monday, 2 = tuesday,...
 		// Create Schedule
@@ -169,12 +172,12 @@ public class GtfsConverter {
 		List<Id> usedTripIds = new ArrayList<Id>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(tripsFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int serviceIdIndex = header.indexOf("service_id");
 			int tripIdIndex = header.indexOf("trip_id");
 			String row = br.readLine();
 			do {
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				if(usedServiceIds.contains(entries[serviceIdIndex])){
 					usedTripIds.add(new IdImpl(entries[tripIdIndex]));
 				}
@@ -193,12 +196,12 @@ public class GtfsConverter {
 		Map<Id,String> routeNames = new HashMap<Id,String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(routesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int routeIdIndex = header.indexOf("route_id");
 			int routeLongNameIndex = header.indexOf("route_long_name");
 			String row = br.readLine();
 			do {
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				routeNames.put(new IdImpl(entries[routeIdIndex]), entries[routeLongNameIndex]);				
 				row = br.readLine();
 			}while(row!= null);
@@ -215,12 +218,12 @@ public class GtfsConverter {
 		Map<Id,Id> routeTripAssignment = new HashMap<Id,Id>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(tripsFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int routeIdIndex = header.indexOf("route_id");
 			int tripIdIndex = header.indexOf("trip_id");
 			String row = br.readLine();
 			do {
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				routeTripAssignment.put(new IdImpl(entries[tripIdIndex]), new IdImpl(entries[routeIdIndex]));				
 				row = br.readLine();
 			}while(row!= null);
@@ -237,7 +240,7 @@ public class GtfsConverter {
 		List<String> serviceIds = new ArrayList<String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(calendarFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int serviceIdIndex = header.indexOf("service_id");
 			int[] weekdayIndexes= new int[7];
 			weekdayIndexes[0] = header.indexOf("monday");
@@ -249,7 +252,7 @@ public class GtfsConverter {
 			weekdayIndexes[6] = header.indexOf("sunday");
 			String row = br.readLine();
 			do {
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				if(entries[weekdayIndexes[weekday-1]].equals("1")){
 					serviceIds.add(entries[serviceIdIndex]);
 				}
@@ -269,14 +272,14 @@ public class GtfsConverter {
 		int departureCounter = 0;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(frequenciesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int startTimeIndex = header.indexOf("start_time");
 			int endTimeIndex = header.indexOf("end_time");
 			int stepIndex = header.indexOf("headway_secs");
 			String row = br.readLine();
 			do {
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				Id tripId = new IdImpl(entries[tripIdIndex]);
 				double startTime = Time.parseTime(entries[startTimeIndex]);
 				double endTime = Time.parseTime(entries[endTimeIndex]);
@@ -307,13 +310,13 @@ public class GtfsConverter {
 			int idCounter = 0;
 			int departureCounter = 0;
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int arrivalTimeIndex = header.indexOf("arrival_time");
 			int departureTimeIndex = header.indexOf("departure_time");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
-			String[] entries = row.split(",");
+			String[] entries = this.splitRow(row);
 			String currentTrip = entries[tripIdIndex];
 			Double departureTime = Time.parseTime(entries[arrivalTimeIndex]);
 			Departure departure = tf.createDeparture(new IdImpl(entries[tripIdIndex]), departureTime);
@@ -321,7 +324,7 @@ public class GtfsConverter {
 			departure.setVehicleId(new IdImpl(vehicleId));		
 			this.vehicleIds.add(vehicleId);
 			do {				
-				entries = row.split(",");
+				entries = this.splitRow(row);
 				Id currentTripId = new IdImpl(currentTrip);
 				Id tripId = new IdImpl(entries[tripIdIndex]);
 				Id stopId = new IdImpl(entries[stopIdIndex]);
@@ -360,15 +363,14 @@ public class GtfsConverter {
 		String filename = filepath + "/stops.txt";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int stopIdIndex = header.indexOf("stop_id");
 			int stopNameIndex = header.indexOf("stop_name");
 			int stopLatitudeIndex = header.indexOf("stop_lat");
 			int stopLongitudeIndex = header.indexOf("stop_lon");
-			int maxIndex = header.size()-1;
 			String row = br.readLine();
 			do{
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				TransitStopFacility t;
 				t = this.tf.createTransitStopFacility(new IdImpl(entries[stopIdIndex]), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
 				t.setName(entries[stopNameIndex]);
@@ -395,7 +397,7 @@ public class GtfsConverter {
 		Map<Id,NetworkRoute> tripRoutes = new HashMap<Id,NetworkRoute>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
@@ -403,7 +405,7 @@ public class GtfsConverter {
 			String currentTrip = entries[tripIdIndex];
 			LinkedList<Id> route = new LinkedList<Id>();
 			do {
-				entries = row.split(",");
+				entries = this.splitRow(row);
 				if(currentTrip.equals(entries[tripIdIndex])){
 					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
 				}else{				
@@ -433,16 +435,16 @@ public class GtfsConverter {
 		Map<Id,NetworkRoute> tripRoutes = new HashMap<Id,NetworkRoute>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
-			String[] entries = row.split(",");
+			String[] entries = this.splitRow(row);
 			String currentTrip = entries[tripIdIndex];
 			TransitStopFacility start = ts.getFacilities().get(new IdImpl(entries[stopIdIndex]));
 			TransitStopFacility end = ts.getFacilities().get(new IdImpl(entries[stopIdIndex]));
 			do {
-				entries = row.split(",");
+				entries = this.splitRow(row);
 				if(!(currentTrip.equals(entries[tripIdIndex]))){								
 					LeastCostPathCalculator routingAlgo = new Dijkstra(net, new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()), new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()));
 //					Path path = routingAlgo.calcLeastCostPath(net.getNearestNode(start.getCoord()), net.getNearestNode(end.getCoord()), 0.0);
@@ -509,18 +511,18 @@ public class GtfsConverter {
 		Map<Id, Node> nodes = network.getNodes();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
-			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
 			do {
 				boolean addLink = false;
-				String[] entries = row.split(",");
+				String[] entries = this.splitRow(row);
 				Id fromNodeId = new IdImpl(entries[stopIdIndex]); // This works only as long as the nodes have the same ID as the stops;
 				String usedTripId = entries[tripIdIndex];
 				row = br.readLine();
 				if(row!=null){
-					entries = row.split(",");
+					entries = this.splitRow(row);
 					Id toNodeId = new IdImpl(entries[stopIdIndex]);
 					if(fromNodes.containsKey(fromNodeId)){
 						if(!(fromNodes.get(fromNodeId)).contains(toNodeId)){
@@ -533,7 +535,10 @@ public class GtfsConverter {
 					if(!(fromNodes.containsKey(toNodeId))){
 						fromNodes.put(toNodeId, new ArrayList<Id>());
 					}
-					
+					// No 0-Length Links
+					if(fromNodeId.equals(toNodeId)){
+						addLink = false;
+					}
 					// If the toNode belongs to a different trip, there should not be a link!
 					if(!usedTripId.equals(entries[tripIdIndex])){
 						addLink = false;
@@ -575,16 +580,7 @@ public class GtfsConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//(new NetworkCleaner()).run(network);
-		
-//		double length = CoordUtils.calcDistance(nodes.get(new IdImpl("EMSI")).getCoord(), nodes.get(new IdImpl("STAGECOACH")).getCoord());
-//		Link link = network.createAndAddLink(new IdImpl(i++), nodes.get(new IdImpl("EMSI")), nodes.get(new IdImpl("STAGECOACH")), length, freespeed, capacity, numLanes);
-//		// Change the linktype to pt
-//		Set<String> modes = new HashSet<String>();
-//		modes.add(TransportMode.pt);
-//		link.setAllowedModes(modes);
-		
-		
+		(new NetworkCleaner()).run(network);
 		return network;
 	}
 
@@ -608,6 +604,23 @@ public class GtfsConverter {
 		}	
 		VehicleWriterV1 vw = new VehicleWriterV1(vs);
 		vw.writeFile("./transitVehicles.xml");
+	}
+	
+	private String[] splitRow(String row){
+		List<String> entries = new ArrayList<String>();
+		boolean quotes = false;
+		StringBuilder sb = new StringBuilder();
+		for(int i =0; i<row.length(); i++){
+			if(row.charAt(i) == '"'){
+				quotes = !(quotes);
+			}else if((row.charAt(i) == ',') && !(quotes)){
+				entries.add(sb.toString());	
+				sb = new StringBuilder();
+			}else{
+				sb.append(row.charAt(i));
+			}
+		}
+		return entries.toArray(new String[entries.size()]);
 	}
 
 }
