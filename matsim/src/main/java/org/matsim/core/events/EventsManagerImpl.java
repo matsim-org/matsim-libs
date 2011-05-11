@@ -53,7 +53,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
-import org.matsim.core.events.handler.AgentReplanEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -344,9 +343,6 @@ public class EventsManagerImpl implements EventsManager {
 			return true;
 		} else if (klass == AgentMoneyEvent.class) {
 			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEvent)ev);
-			return true;
-		} else if (klass == AgentReplanEventImpl.class) {
-			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEventImpl)ev);
 			return true;
 		} else if (klass == PersonEntersVehicleEvent.class) {
 			((PersonEntersVehicleEventHandler)handler).handleEvent((PersonEntersVehicleEvent)ev);
