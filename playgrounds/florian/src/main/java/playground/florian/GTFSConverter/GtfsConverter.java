@@ -73,6 +73,9 @@ import org.matsim.vehicles.VehiclesImpl;
 public class GtfsConverter {
 
 	private String filepath = "";
+	private boolean useFrequencies = false;
+	
+	
 	
 	private TransitScheduleFactory tf = new TransitScheduleFactoryImpl();
 	
@@ -117,27 +120,6 @@ public class GtfsConverter {
 		return c;
 	}
 	
-	private void createTransitVehiclesDummy(){
-		VehiclesFactory vf = new VehiclesFactoryImpl();
-		// TYPE
-		VehicleType vt = vf.createVehicleType(new IdImpl("dummyType"));
-		vt.setDescription("Dummy Vehicle Type for GTFS Converter");
-		VehicleCapacity vc = vf.createVehicleCapacity();
-		vc.setSeats(50);
-		vc.setStandingRoom(50);
-		vt.setCapacity(vc);
-		vt.setLength(5);
-		// VEHICLE
-		Vehicles vs = scenario.getVehicles();
-		vs.getVehicleTypes().put(new IdImpl("dummyType"), vt);
-		for(String s: vehicleIds){
-			Vehicle v = vf.createVehicle(new IdImpl(s), vt);
-			vs.getVehicles().put(new IdImpl(s), v);
-		}	
-		VehicleWriterV1 vw = new VehicleWriterV1(vs);
-		vw.writeFile("./transitVehicles.xml");
-	}
-	
 	public void convert(int weekday){
 		// Create a config
 		this.config = this.createConfig();
@@ -167,6 +149,10 @@ public class GtfsConverter {
 		Map<Id,NetworkRoute> tripRoute = createNetworkRoutes2(ts, net);
 		// Convert the schedules for the trips
 		this.convertSchedules(ts, routeNames, routeToTripAssignments, usedTripIds, tripRoute);
+		// If you use the optional frequencies.txt, it will be transformed here --> not working yet
+		if(this.useFrequencies){
+			this.convertFrequencies(ts, routeToTripAssignments);
+		}
 		// Create some dummy Vehicles
 		this.createTransitVehiclesDummy();
 		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
@@ -277,11 +263,49 @@ public class GtfsConverter {
 		return serviceIds;
 	}
 	
+	private void convertFrequencies(TransitSchedule ts, Map<Id, Id> routeToTripAssignments) {
+		String frequenciesFilename = filepath + "/frequencies.txt";
+		List<Id> usedTripIds = new ArrayList<Id>();
+		int departureCounter = 0;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(frequenciesFilename)));
+			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
+			int tripIdIndex = header.indexOf("trip_id");
+			int startTimeIndex = header.indexOf("start_time");
+			int endTimeIndex = header.indexOf("end_time");
+			int stepIndex = header.indexOf("headway_secs");
+			String row = br.readLine();
+			do {
+				String[] entries = row.split(",");
+				Id tripId = new IdImpl(entries[tripIdIndex]);
+				double startTime = Time.parseTime(entries[startTimeIndex]);
+				double endTime = Time.parseTime(entries[endTimeIndex]);
+				double step = Double.parseDouble(entries[stepIndex]);
+				double time = startTime + step;
+				do{
+					Departure d = tf.createDeparture(new IdImpl("f" + departureCounter), time);
+					d.setVehicleId(new IdImpl("dummyf"+departureCounter));
+					this.vehicleIds.add("dummyf"+departureCounter);
+					ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).addDeparture(d);
+					time = time + step;
+					departureCounter++;
+				}while(time < endTime);				
+				row = br.readLine();
+			}while(row!= null);
+		} catch (FileNotFoundException e) {
+			System.out.println(frequenciesFilename + " not found!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	private void convertSchedules(TransitSchedule ts, Map<Id, String> routeNames, Map<Id, Id> routeToTripAssignments, List<Id> tripIds, Map<Id, NetworkRoute> tripRoute){
 		String stopTimesFilename = filepath + "/stop_times.txt";
 		List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
 		try {
 			int idCounter = 0;
+			int departureCounter = 0;
 			BufferedReader br = new BufferedReader(new FileReader(new File(stopTimesFilename)));
 			List<String> header = new ArrayList<String>(Arrays.asList(br.readLine().split(",")));
 			int tripIdIndex = header.indexOf("trip_id");
@@ -293,7 +317,9 @@ public class GtfsConverter {
 			String currentTrip = entries[tripIdIndex];
 			Double departureTime = Time.parseTime(entries[arrivalTimeIndex]);
 			Departure departure = tf.createDeparture(new IdImpl(entries[tripIdIndex]), departureTime);
-			departure.setVehicleId(new IdImpl("dummy"+idCounter++));			
+			String vehicleId = "dummy" + idCounter++;
+			departure.setVehicleId(new IdImpl(vehicleId));		
+			this.vehicleIds.add(vehicleId);
 			do {				
 				entries = row.split(",");
 				Id currentTripId = new IdImpl(currentTrip);
@@ -312,8 +338,8 @@ public class GtfsConverter {
 						stops = new LinkedList<TransitRouteStop>();
 						currentTrip = entries[tripIdIndex];
 						departureTime = Time.parseTime(entries[arrivalTimeIndex]);
-						departure = tf.createDeparture(new IdImpl(entries[tripIdIndex]), departureTime);
-						String vehicleId = "dummy" + idCounter++;
+						departure = tf.createDeparture(new IdImpl(departureCounter++), departureTime);
+						vehicleId = "dummy" + idCounter++;
 						departure.setVehicleId(new IdImpl(vehicleId));
 						this.vehicleIds.add(vehicleId);
 						TransitStopFacility stop = ts.getFacilities().get(stopId);
@@ -338,11 +364,13 @@ public class GtfsConverter {
 			int stopIdIndex = header.indexOf("stop_id");
 			int stopNameIndex = header.indexOf("stop_name");
 			int stopLatitudeIndex = header.indexOf("stop_lat");
-			int stopLongitudeIndex = header.indexOf("stop_lon");			
+			int stopLongitudeIndex = header.indexOf("stop_lon");
+			int maxIndex = header.size()-1;
 			String row = br.readLine();
 			do{
 				String[] entries = row.split(",");
-				TransitStopFacility t = this.tf.createTransitStopFacility(new IdImpl(entries[stopIdIndex]), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
+				TransitStopFacility t;
+				t = this.tf.createTransitStopFacility(new IdImpl(entries[stopIdIndex]), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
 				t.setName(entries[stopNameIndex]);
 				ts.addStopFacility(t);
 				row = br.readLine();
@@ -417,7 +445,8 @@ public class GtfsConverter {
 				entries = row.split(",");
 				if(!(currentTrip.equals(entries[tripIdIndex]))){								
 					LeastCostPathCalculator routingAlgo = new Dijkstra(net, new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()), new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()));
-					Path path = routingAlgo.calcLeastCostPath(net.getNearestNode(start.getCoord()), net.getNearestNode(end.getCoord()), 0.0);
+//					Path path = routingAlgo.calcLeastCostPath(net.getNearestNode(start.getCoord()), net.getNearestNode(end.getCoord()), 0.0);
+					Path path = routingAlgo.calcLeastCostPath(net.getLinks().get(start.getLinkId()).getToNode(), net.getNearestNode(end.getCoord()), 0.0);
 					if (path == null) {
 						throw new RuntimeException("No route found from facility " + start.getId() + " to " + end.getId() + ".");
 					}
@@ -425,13 +454,15 @@ public class GtfsConverter {
 					route.setLinkIds(start.getLinkId(), NetworkUtils.getLinkIds(path.links), end.getLinkId());
 					tripRoutes.put(new IdImpl(currentTrip), route);
 					currentTrip = entries[tripIdIndex];
+					start = ts.getFacilities().get(new IdImpl(entries[stopIdIndex]));
 				}else{
 					end = ts.getFacilities().get(new IdImpl(entries[stopIdIndex]));
 				}
 				row = br.readLine();
 			}while(row!= null);		
 			LeastCostPathCalculator routingAlgo = new Dijkstra(net, new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()), new FreespeedTravelTimeCost(ConfigUtils.createConfig().planCalcScore()));
-			Path path = routingAlgo.calcLeastCostPath(net.getNearestNode(start.getCoord()), net.getNearestNode(end.getCoord()), 0.0);
+//			Path path = routingAlgo.calcLeastCostPath(net.getNearestNode(start.getCoord()), net.getNearestNode(end.getCoord()), 0.0);
+			Path path = routingAlgo.calcLeastCostPath(net.getLinks().get(start.getLinkId()).getToNode(), net.getNearestNode(end.getCoord()), 0.0);
 			if (path == null) {
 				throw new RuntimeException("No route found from facility " + start.getId() + " to " + end.getId() + ".");
 			}
@@ -507,12 +538,12 @@ public class GtfsConverter {
 					if(!usedTripId.equals(entries[tripIdIndex])){
 						addLink = false;
 					}
-					// for each stop should exist one dummyLink
+					// for each stop should exist one dummyLink --> does it need one?
 					Id dummyId = new IdImpl("dN_" + toNodeId);
 					if(!(network.getNodes().containsKey(dummyId))){
 						NodeImpl n = new NodeImpl(dummyId);
 						n.setCoord(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getCoord());
-//						n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX(),nodes.get(toNodeId).getCoord().getY()));
+//						n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+10,nodes.get(toNodeId).getCoord().getY()+10));
 						network.addNode(n);
 						double length = CoordUtils.calcDistance(n.getCoord(), nodes.get(toNodeId).getCoord());
 						Link link = network.createAndAddLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId), length, freespeed, capacity, numLanes);
@@ -555,6 +586,28 @@ public class GtfsConverter {
 		
 		
 		return network;
+	}
+
+
+	private void createTransitVehiclesDummy(){
+		VehiclesFactory vf = new VehiclesFactoryImpl();
+		// TYPE
+		VehicleType vt = vf.createVehicleType(new IdImpl("dummyType"));
+		vt.setDescription("Dummy Vehicle Type for GTFS Converter");
+		VehicleCapacity vc = vf.createVehicleCapacity();
+		vc.setSeats(50);
+		vc.setStandingRoom(50);
+		vt.setCapacity(vc);
+		vt.setLength(5);
+		// VEHICLE
+		Vehicles vs = scenario.getVehicles();
+		vs.getVehicleTypes().put(new IdImpl("dummyType"), vt);
+		for(String s: vehicleIds){
+			Vehicle v = vf.createVehicle(new IdImpl(s), vt);
+			vs.getVehicles().put(new IdImpl(s), v);
+		}	
+		VehicleWriterV1 vw = new VehicleWriterV1(vs);
+		vw.writeFile("./transitVehicles.xml");
 	}
 
 }
