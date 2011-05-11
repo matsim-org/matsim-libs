@@ -113,21 +113,33 @@ public class LPPHEV {
 		} catch (Exception e) {	    
 		}
 		
-		boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
+		schedule= update();
+		
+		double [] solutionNF =solver.getPtrVariables();
+		System.out.println("solution ");
+		
+		for(int i=0; i<solutionNF.length; i++){
+			System.out.println(solutionNF[i] + ",  ");
+		}
+		/*double [] solutionNF =solver.getPtrVariables();
+		boolean feasible= 			
+			solver.isFeasible(solutionNF, 0.0);
+		
+		
 		if(feasible){
-			schedule= update();
-		}else{
 			
+		}else{
 			System.out.println("no feasible solution ");
 			System.out.println("old schedule ");
 			schedule.printSchedule();
 			System.out.println("solution ");
-			double [] solutionNF =solver.getPtrVariables();
+			for(int i=0; i<solutionNF.length; i++){
+				System.out.println(solutionNF[i] + ",  ");
+			}
 			
 			return null;
-		}
+		}*/
 		
-	
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
 		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
@@ -240,12 +252,10 @@ public class LPPHEV {
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			String inequality=setInEqualityBatteryConstraint(i);
 			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
-			//solver.strAddConstraint(inequality, LpSolve.GE, batterySize*batteryMin);
-			
+						
 		}
 		
 		
-				
 		//upper & lower bounds
 		setLowerAndUpperBounds(batterySize, batteryMin, batteryMax);
 		
@@ -335,7 +345,7 @@ public class LPPHEV {
 				
 				
 			}
-			}
+		}
 		
 		
 		// now loop to add maximize SOC after consumption,
@@ -343,7 +353,6 @@ public class LPPHEV {
 		// setDrivingConsumptionSmallerSOC Inequality
 		for(int i=0; i<schedule.numberOfDrivingTimes();i++){
 			objective=objectiveToMinimizeCombustionEngineUse(objective, i);
-			
 		}
 		
 		
@@ -733,13 +742,13 @@ public class LPPHEV {
 	
 	
 	/**
-	 * modifies objetive double array such that the SOC right after every driving trip is maximized
+	 * modifies objective double array such that the SOC right after every driving trip is maximized
 	 * the battery of the PHEV is not bounded by minBattery restrictions
 	 * thus we have to ensure otherwise that energy is preferably charged from the battery
 	 * 
 	 * 
 	 * @param objective array of coefficients from other objective restrictions so far
-	 * @param a 
+	 * @param a = ath driving time starting at 0th
 	 * @return
 	 * @throws LpSolveException
 	 */
@@ -750,22 +759,18 @@ public class LPPHEV {
 		int pos=schedule.positionOfIthDrivingTime(a);
 		
 		for(int i=0; i<schedule.timesInSchedule.size(); i++){
-			if(i<pos){
+			if(i<=pos){
 				
 				if(schedule.timesInSchedule.get(i).isParking()){
 					objective[1+i]+= (-1)* ((ParkingInterval)schedule.timesInSchedule.get(i)).getChargingSpeed();
-					
 					
 				}
 				
 				if(schedule.timesInSchedule.get(i).isDriving()){
 					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption();
 					
-					
 				}
 				
-			}else{
-				//nothing
 			}
 		}
 		

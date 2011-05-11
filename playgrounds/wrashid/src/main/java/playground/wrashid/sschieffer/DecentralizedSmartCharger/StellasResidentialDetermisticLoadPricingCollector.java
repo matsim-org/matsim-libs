@@ -43,7 +43,6 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	private double peakWattOnGrid=Math.pow(10, 6);
 	private double assumptionBase=peakWattOnGrid*0.85;
 	
-	String outputPath;
 	
 	final int pricingLevels=1;
 	final private int divHubsX=2;
@@ -51,19 +50,16 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	
 	int numhubs= divHubsX*divHubsY;
 	
-	public StellasResidentialDetermisticLoadPricingCollector(
-			) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
-		
+	public StellasResidentialDetermisticLoadPricingCollector() throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 	}
 	
 	@Override
-	public void setUp(String outputPath) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{
-		this.outputPath=outputPath;
+	public void setUp() throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{
 		
 		String file= "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt";
 		readLoadFile(file, peakWattOnGrid);
-		visualize();
+		
 		
 		setUpHubLoadFromReader(numhubs);
 		setUpPricingLevels();
@@ -108,6 +104,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 		// DEFINE HUBS 
 		//**********************
 		for(Integer h: hubLoadDistribution.getKeySet()){
+			
 			Schedule s= hubLoadDistribution.getValue(h);
 			Schedule pricing = new Schedule();
 			for(int i=0; i<s.getNumberOfEntries(); i++){
@@ -120,18 +117,18 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 							new PolynomialFunction(new double[]{optimalPrice}), 
 							true));
 				}else{
-					if (lCurrent.isOptimal()){
 						pricing.addTimeInterval(new LoadDistributionInterval(
 								lCurrent.getStartTime(), 
 								lCurrent.getEndTime(), 
 								new PolynomialFunction(new double[]{suboptimalPrice}), 
 								false));
+					
 				}
 			}
 			// save to pricing
-				hubPricingDistribution.put(h, pricing);
-			
-			}
+			hubPricingDistribution.put(h, pricing);
+			/*pricing.printSchedule();
+			s.printSchedule();*/
 		}
 	}
 	
@@ -229,7 +226,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 				objective, 
 				after);
 		deterministicSchedule.addTimeInterval(l);
-		deterministicSchedule.printSchedule();
+		//deterministicSchedule.printSchedule();
 		return deterministicSchedule;
 	}
 	
@@ -239,7 +236,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	 * visualizes the fitted and original read in load data
 	 * @throws IOException
 	 */
-	private void visualize() throws IOException{
+	private void visualize(String outputPath) throws IOException{
 		XYSeriesCollection graph= new XYSeriesCollection();
 		graph.addSeries(loadFigureData);
 		graph.addSeries(fittedLoadFigureData);

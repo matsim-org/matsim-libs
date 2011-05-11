@@ -22,7 +22,6 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 /**
  * extends TimeInterval
  * TimeSlot designated for Charging
- * 
  * @author Stella
  *
  */

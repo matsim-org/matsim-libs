@@ -312,7 +312,8 @@ public class Schedule {
 			if(timesInSchedule.get(i).isDriving()){
 				if(count == ithTime){
 					sol= i;
-					count++;
+					i=timesInSchedule.size();
+					break;
 				}
 				
 				if(count<ithTime){

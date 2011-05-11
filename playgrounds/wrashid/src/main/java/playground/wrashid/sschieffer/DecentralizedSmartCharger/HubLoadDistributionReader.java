@@ -288,21 +288,6 @@ public class HubLoadDistributionReader {
 	
 
 	
-	public PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
-		
-		DecentralizedSmartCharger.polyFit.clearObservations();
-		
-		for (int i=0;i<data.length;i++){
-			DecentralizedSmartCharger.polyFit.addObservedPoint(1.0, data[i][0], data[i][1]);
-			
-		  }		
-		
-		PolynomialFunction poly = DecentralizedSmartCharger.polyFit.fit();
-		 
-		DecentralizedSmartCharger.polyFit.clearObservations();
-		return poly;
-	}
-	
 	
 	
 	
@@ -440,10 +425,7 @@ public class HubLoadDistributionReader {
         String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
-		
 	}
-	
-	
 	
 	
 	
@@ -563,6 +545,7 @@ public class HubLoadDistributionReader {
 			}
 			
 			sPHEV.sort();
+			//sPHEV.printSchedule();
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
 			
 		}

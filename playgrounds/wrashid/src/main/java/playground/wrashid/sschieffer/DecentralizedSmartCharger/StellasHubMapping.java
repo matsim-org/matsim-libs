@@ -41,14 +41,30 @@ public class StellasHubMapping extends MappingClass{
 		for (Link link:controler.getNetwork().getLinks().values()){
 			double xDiv= (maxX-minX)/divHubsX;
 			double yDiv= (maxY-minY)/divHubsY;
-						
+			
 			double coordX=link.getCoord().getX();
+			coordX=coordX-minX; // relative position
 			double coordY=link.getCoord().getY();
+			coordY=coordY-minY; // relative position
 			
 			int hubNoX=(int)Math.ceil(coordX/xDiv);
 			int hubNoY=(int)Math.ceil(coordY/yDiv);
 			
 			int hubNumber= hubNoX + (hubNoY-1)*hubNoX;
+			/*
+			 * example 	divX=2
+			 * 			divY=2
+			 * minX -------------------------->  maxX
+			 *minY				]
+			 *]		1			]		2
+			 *]					]
+			 *]--------------------------------
+			 *]					]
+			 *]		3			]		4
+			 *]					]
+			 *maxY
+			 */
+			
 			
 			hubLinkMapping.addMapping(link.getId().toString(), hubNumber);
 						
@@ -68,5 +84,8 @@ public class StellasHubMapping extends MappingClass{
 			maxY= Math.max(maxY,link.getCoord().getY());
 		}
 	}
+	
+	
+	
 	
 }

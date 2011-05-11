@@ -47,9 +47,9 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class EnergyConsumptionInit implements StartupListener {
 	
 	
-	public LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();;
-	public ParkingTimesPlugin parkingTimesPlugin;
-	public EnergyConsumptionPlugin energyConsumptionPlugin;
+	private LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();;
+	private ParkingTimesPlugin parkingTimesPlugin;
+	private EnergyConsumptionPlugin energyConsumptionPlugin;
 	
 	double phev=1.0;
 	double ev=0.0;
@@ -80,17 +80,19 @@ public class EnergyConsumptionInit implements StartupListener {
 		Controler controler = event.getControler();
 		
 		
-		
+		int totalPpl= controler.getPopulation().getPersons().size();
+		int count = 0;
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			if (Math.random()<phev){
-				
+			if (count< totalPpl*phev){
+			
 				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
-			} else if (Math.random()<phev+ev){
+			} else if (count<totalPpl*(phev+ev)){
 				
 				vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
 			} else{
 				vehicles.put(personId, new ConventionalVehicle(null, new IdImpl(2)));
 			}
+			count++;
 		}
 		
 		EnergyConsumptionModelPSL energyConsumptionModel = new EnergyConsumptionModelPSL(140);

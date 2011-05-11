@@ -55,7 +55,6 @@ public class LPEV {
 	private Schedule schedule;
 	private LpSolve solver; 
 	private int numberOfVariables;
-	private Id personId;
 	
 	private double buffer;
 	
@@ -93,7 +92,7 @@ public class LPEV {
 		this.batterySize=batterySize;
 		
 		System.out.println("LP EV for Agent: "+ id.toString()); 
-		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
+		setUpLP(schedule, batterySize, batteryMin, batteryMax);
 		int status = solver.solve();
         
         if(status!=0){
@@ -109,24 +108,20 @@ public class LPEV {
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ personId.toString()+"printLp.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"printLp.txt");
 			solver.printLp();
 			
-//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ personId.toString()+"objective.txt");
+//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"objective.txt");
 //			solver.printObjective();
 //			
-//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ personId.toString()+"tableau.txt");
+//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"tableau.txt");
 //			solver.printTableau();
 		} catch (Exception e) {	    
 		}
 		
-		
 		schedule= update();
-		/*System.out.println("updated schedule with required charging times:");
-		schedule.printSchedule();*/
-		visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
-		
-//		printLPSolution();
+	
+		visualizeSOCAgent(solver.getPtrVariables(), vehicleType, id);
 		
 		solver.deleteLp();
 		
@@ -153,7 +148,7 @@ public class LPEV {
 		this.batterySize=batterySize;
 		schedule.printSchedule();
 		
-		setUpLP(schedule, id, batterySize, batteryMin, batteryMax, startingSOC);
+		setUpLP(schedule, batterySize, batteryMin, batteryMax, startingSOC);
 		int status = solver.solve();
         
         if(status!=0){
@@ -169,13 +164,13 @@ public class LPEV {
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
 			solver.printLp();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"objective.txt");
 			solver.printObjective();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
+			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"tableau.txt");
 			solver.printTableau();
 		} catch (Exception e) {	    
 		}
@@ -211,23 +206,19 @@ public class LPEV {
 	 * @param id
 	 * @throws LpSolveException
 	 */
-	public void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
+	public void setUpLP(Schedule schedule, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
 		this.schedule=schedule;
-		personId=id;
-		
 		
 		
 //		System.out.println("LP summary for agent"+ id.toString());
 //		System.out.println("batterySize"+ batterySize+ " \t batteryMin "+ batteryMin+ " \t batteryMax (default)"+ batteryMax);
 //		
 		
-		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
 		solver = LpSolve.makeLp(0, numberOfVariables);
 		
 		setObjectiveFunction();
-		
 		
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
@@ -244,7 +235,6 @@ public class LPEV {
 			
 		}
 		
-		
 		//upper & lower bounds
 		setLowerAndUpperBounds(batterySize, batteryMin, batteryMax);
 		
@@ -258,14 +248,9 @@ public class LPEV {
 	}
 	
 	
-	private void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
+	private void setUpLP(Schedule schedule, double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
 		this.schedule=schedule;
-		personId=id;
-		
-		
-		
-//		
-		
+	
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
 		solver = LpSolve.makeLp(0, numberOfVariables);
@@ -295,10 +280,6 @@ public class LPEV {
 		
 		
 	}
-	
-	
-	
-	
 	
 	
 	
@@ -488,17 +469,14 @@ public class LPEV {
 		
 		for(int i=0; i<schedule.timesInSchedule.size(); i++){
 			if(i<pos){
-				
 				if(schedule.timesInSchedule.get(i).isParking()){
 					objectiveStr=objectiveStr.concat(Double.toString(((ParkingInterval)schedule.timesInSchedule.get(i)).getChargingSpeed()) 
 							+ " ");
-					
 				}
 				
 				if(schedule.timesInSchedule.get(i).isDriving()){
 					objectiveStr=objectiveStr.concat(Double.toString(
 							((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption()*(-1))+ " ");
-					
 				}
 				
 			}else{
@@ -510,8 +488,6 @@ public class LPEV {
 		solver.strAddConstraint(objectiveStr, 
 				LpSolve.GE, 
 				(1+buffer)*d.getConsumption());
-		
-		
 	}
 	
 	
@@ -573,7 +549,7 @@ public class LPEV {
 	
 	
 	
-public void visualizeSOCAgent(double [] solution, String type) throws LpSolveException, IOException{
+public void visualizeSOCAgent(double [] solution, String type, Id id) throws LpSolveException, IOException{
 		
 		XYSeriesCollection SOCAgent= new XYSeriesCollection();
 		
@@ -623,7 +599,7 @@ public void visualizeSOCAgent(double [] solution, String type) throws LpSolveExc
 		SOCAgent.addSeries(SOCMaxSuggested);
 		SOCAgent.addSeries(SOCMinSuggested);
 		
-		JFreeChart chart = ChartFactory.createXYLineChart("SOC for agent"+ personId.toString(), 
+		JFreeChart chart = ChartFactory.createXYLineChart("SOC for agent"+ id.toString(), 
 				"time of day [s]", 
 				"SOC[J]", 
 				SOCAgent, 
@@ -705,7 +681,7 @@ public void visualizeSOCAgent(double [] solution, String type) throws LpSolveExc
  	            )
  	        );
      	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPEV_Agent"+personId.toString()+".png") , chart, 800, 600);
+     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPEV_Agent" + id.toString()+".png") , chart, 800, 600);
 	  	
 	}
 	

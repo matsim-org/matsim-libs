@@ -11,7 +11,8 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
  * implements IterationEndsListener
- * to be called after an iteration, if the DecentralizedSmartCharging Optimization shall be run
+ * to be called after an iteration, 
+ * if the DecentralizedSmartCharging Optimization And V2G shall be run
  * 
  * @author Stella
  *
@@ -102,7 +103,7 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			 * 
 			 */
 			
-			DecentralizedChargingSimulation.loadPricingCollector.setUp(DecentralizedChargingSimulation.outputPath);
+			DecentralizedChargingSimulation.loadPricingCollector.setUp();
 			
 			final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
 				= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicHubLoad();
@@ -133,7 +134,15 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 					locationSourceMapping,
 					agentVehicleSourceMapping);			
 					
-			
+			/*
+			 * ************************
+			 * Agent contracts
+			 * the convenience class AgentContractCollector 
+			 * helps you to create the necessary List
+			 * LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts
+			 * 
+			 * provide the compensationPerKWHRegulationUp/Down in your currency
+			 */
 			 
 			AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
 					myDecentralizedSmartCharger,

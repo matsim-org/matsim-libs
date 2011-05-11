@@ -301,7 +301,7 @@ public class ChargingSlotDistributor {
 			newFunc[i][1]=(-1)/func.value(start+i);
 		}
 		
-		return DecentralizedSmartCharger.myHubLoadReader.fitCurve(newFunc);
+		return DecentralizedSmartCharger.fitCurve(newFunc);
 		
 		
 	}

@@ -8,7 +8,15 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+ 
 
+/**
+ * convenience class which hides complexity to ease the use to run decentralized smart charging simulations
+ * 
+ * it handles the in and outputs with the decentralized smart charger 
+ * @author Stella
+ *
+ */
 public class DecentralizedChargingSimulation {
 
 	public static Controler controler;
@@ -62,7 +70,7 @@ public class DecentralizedChargingSimulation {
 		this.myMappingClass=myMappingClass;
 		this.loadPricingCollector=loadPricingCollector;
 		
-		Controler controler=new Controler(configPath);
+		controler=new Controler(configPath);
 		parkingTimesPlugin= new ParkingTimesPlugin(controler);
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();

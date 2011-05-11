@@ -80,6 +80,7 @@ import playground.wrashid.sschieffer.Main;
 	 * 1) determining and sorting agents schedules
 	 * 2) LP
 	 * 3) charging slot optimization
+	 * 4) V2G 
 	 * stores results of charging algorithm in LinkedListValueHashMap
  * @author Stella
  *
@@ -172,20 +173,12 @@ public class DecentralizedSmartCharger {
 		optimizer=gaussNewtonOptimizer;
 		
 		polyFit= new PolynomialFitter(20, optimizer);
-		
 			
 		myAgentTimeReader= new AgentTimeIntervalReader(
 				parkingTimesPlugin, 
 				energyConsumptionPlugin);
-		this.myVehicleTypes=myVehicleTypes;
 		
-		try {
-			
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.myVehicleTypes=myVehicleTypes;
 		
 	}
 	
@@ -221,12 +214,20 @@ public class DecentralizedSmartCharger {
 
 
 
+	/**
+	 * initializes HubLoadDistributionReader with its basic parameters
+	 * @param hubLinkMapping
+	 * @param deterministicHubLoadDistribution
+	 * @param pricingHubDistribution
+	 * @throws OptimizationException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public void initializeHubLoadDistributionReader(
 			HubLinkMapping hubLinkMapping, 
 			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
 			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
 			) throws OptimizationException, IOException, InterruptedException{
-		
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
@@ -237,6 +238,12 @@ public class DecentralizedSmartCharger {
 	}
 
 	
+	/**
+	 * sets the stochastic loads in the hubDistributionReader
+	 * @param stochasticHubLoadDistribution
+	 * @param locationSourceMapping
+	 * @param agentVehicleSourceMapping
+	 */
 	public void setStochasticSources(
 			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
 			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
@@ -356,14 +363,14 @@ public class DecentralizedSmartCharger {
 				
 				//try EV first
 				
-				Schedule s= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),
+				Schedule scheduleAfterLP= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),
 						id, 
 						batterySize, batteryMin, batteryMax, 
 						type);
-				if (s !=null){
+				if (scheduleAfterLP !=null){
 					// if successful --> save
 					
-					agentParkingAndDrivingSchedules.put(id, s);
+					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
 					if(hasAgentPHEV(id)){
 						// only if agent has PHEV change joules to emissions
 						emissionCounter= joulesToEmissionInKg(id,joulesFromEngine); // still 0
@@ -372,20 +379,18 @@ public class DecentralizedSmartCharger {
 				}else{					
 					//if fails, try PHEV
 										
-					s= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
-					agentParkingAndDrivingSchedules.put(id, s);
+					scheduleAfterLP= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
+					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
 					
 					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
 					if(hasAgentEV(id)){
 						
 						chargingFailureEV.add(id);
 						
-						
 					}else{
 						
 						emissionCounter+= joulesToEmissionInKg(id, joulesFromEngine);
 					}
-					
 					
 				}
 				

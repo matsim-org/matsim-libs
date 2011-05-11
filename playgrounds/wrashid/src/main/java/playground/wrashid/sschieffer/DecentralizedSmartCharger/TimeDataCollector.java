@@ -52,10 +52,27 @@ public class TimeDataCollector {
 	}
 	
 	public void fitFunction() throws OptimizationException{
-		func= DecentralizedSmartCharger.myHubLoadReader.fitCurve(data);
+		try {
+			func= DecentralizedSmartCharger.fitCurve(data);
+	    } catch (Exception e) {
+	        // if singular with all entries = 0.0
+	    	if(allDataZero()){
+	    		func= new PolynomialFunction(new double[]{0.0});
+	    	}
+	    }
 		
 	}
 	
+	
+	public boolean allDataZero(){
+		boolean allZero=true;
+		for(int i=0; i< data.length; i++){
+			if (getYAtEntry(i)!=0.0){
+				allZero=false;
+			}
+		}
+		return allZero;
+	}
 	
 	public PolynomialFunction getFunction(){
 		return func;

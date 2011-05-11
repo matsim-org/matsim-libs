@@ -110,13 +110,6 @@ public class Main_exampleV2G {
 		/******************************************
 		 * SETUP V2G
 		 * *****************************************
-		 * V2G can only follow after Decentralized Smart Charger has been run
-		 * since it relies on the planned charging schedules
-		 * 
-		 * For all stochastic loads the V2G procedure will then check if rescheduling is possible 
-		 * and if the utility of the agent can be increased by rescheduling.
-		 */	
-		
 		
 		/**
 		 * SPECIFY WHAT PERCENTAGE OF THE POPULATION PROVIDES V2G
@@ -154,15 +147,6 @@ public class Main_exampleV2G {
 					
 		StochasticLoadCollector slc= new StochasticLoadCollector(mySimulation.controler);
 		
-		/*
-		 * ************************
-		 * Agent contracts
-		 * the convenience class AgentContractCollector 
-		 * helps you to create the necessary List
-		 * LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts
-		 * 
-		 * provide the compensationPerKWHRegulationUp/Down in your currency
-		 */
 		double compensationPerKWHRegulationUp=0.15;
 		double compensationPerKWHRegulationDown=0.15;
 		

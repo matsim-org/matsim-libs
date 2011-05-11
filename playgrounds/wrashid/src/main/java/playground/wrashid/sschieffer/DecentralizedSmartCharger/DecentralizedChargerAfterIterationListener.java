@@ -11,7 +11,8 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
  * implements IterationEndsListener
- * to be called after an iteration, if the DecentralizedSmartCharging Optimization shall be run
+ * to be called after an iteration, if the DecentralizedSmartCharging Optimization shall be run.
+ * 
  * 
  * @author Stella
  *
@@ -102,7 +103,7 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			 * 
 			 */
 			
-			DecentralizedChargingSimulation.loadPricingCollector.setUp(DecentralizedChargingSimulation.outputPath);
+			DecentralizedChargingSimulation.loadPricingCollector.setUp();
 			
 			final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
 				= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicHubLoad();

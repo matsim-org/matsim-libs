@@ -2,6 +2,30 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
+
+/**
+ * Convenience class to make it easier to establish your own scenarios 
+ * with specific load Schedules</br>
+ * 
+ * example of how you can implement a new loadSchedule for a hub for a day
+ * with two different Load Functions</br></br>
+ * HubLoadSchedule h1= new HubLoadSchedule("Hub 1");
+		
+		h1.addLoadInterval(
+				0.0, //start
+				62490.0, //end
+				new PolynomialFunction(new double[]{100*3500, 500*3500/(62490.0), 0}), 
+				true);
+		h1.addLoadInterval(				
+				62490.0, 
+				DecentralizedSmartCharger.SECONDSPERDAY,
+				new PolynomialFunction(new double[]{914742, -100*3500/(DecentralizedSmartCharger.SECONDSPERDAY-62490.0), 0}), 
+				false);
+		
+		hubLoadDistribution.put(1, h1.getHubLoadSchedule());
+ * @author Stella
+ *
+ */
 public class HubLoadSchedule {
 
 	
