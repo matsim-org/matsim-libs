@@ -20,17 +20,18 @@
 
 package playground.jjoubert.Utilities;
 
-import org.matsim.testcases.MatsimTestCase;
+import java.io.IOException;
 
-import playground.jjoubert.Utilities.MyXmlConverter;
+import org.matsim.testcases.MatsimTestCase;
 
 public class MyXmlConverterTest extends MatsimTestCase{
 
 	/**
 	 * This test creates a dummy XML object, and tests the XML converter with no
 	 * argument about the log messages being silent in the constructor.
+	 * @throws IOException 
 	 */
-	public void testMyXmlConverterNoMessage(){
+	public void testMyXmlConverterNoMessage() throws IOException{
 		String theFile = getOutputDirectory() + "TestFile.txt";
 		
 		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
@@ -41,7 +42,7 @@ public class MyXmlConverterTest extends MatsimTestCase{
 		Object newObject = xmlConverter.readObjectFromFile(theFile);
 		assertTrue("The read file should be of type MyTestXmlObject.", (newObject instanceof MyTestXmlObject));
 		if(newObject instanceof MyTestXmlObject){
-			newObject = (MyTestXmlObject) newObject;
+//			newObject = newObject;
 			assertTrue("Attribute 'Type' converted incorrectly.", ((MyTestXmlObject) newObject).getType().equalsIgnoreCase("Type"));
 			assertTrue("Attribute 'number' converted incorrectly.", ((MyTestXmlObject) newObject).getNumber() == 123);
 			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);
@@ -52,8 +53,9 @@ public class MyXmlConverterTest extends MatsimTestCase{
 	 * This test creates a dummy XML object, and tests the XML converter with the
 	 * argument about the log messages being silent set to <code>true</code> in the
 	 * constructor.
+	 * @throws IOException 
 	 */
-	public void testMyXmlConverterTrue(){
+	public void testMyXmlConverterTrue() throws IOException{
 		String theFile = getOutputDirectory() + "TestFile.txt";
 		
 		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
@@ -64,7 +66,7 @@ public class MyXmlConverterTest extends MatsimTestCase{
 		Object newObject = xmlConverter.readObjectFromFile(theFile);
 		assertTrue("The read file should be of type MyTestXmlObject.", (newObject instanceof MyTestXmlObject));
 		if(newObject instanceof MyTestXmlObject){
-			newObject = (MyTestXmlObject) newObject;
+//			newObject = newObject;
 			assertTrue("Attribute 'Type' converted incorrectly.", ((MyTestXmlObject) newObject).getType().equalsIgnoreCase("Type"));
 			assertTrue("Attribute 'number' converted incorrectly.", ((MyTestXmlObject) newObject).getNumber() == 123);
 			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);
@@ -75,8 +77,9 @@ public class MyXmlConverterTest extends MatsimTestCase{
 	 * This test creates a dummy XML object, and tests the XML converter with the
 	 * argument about the log messages being silent set to <code>false</code> in the
 	 * constructor.
+	 * @throws IOException 
 	 */
-	public void testMyXmlConverterFalse(){
+	public void testMyXmlConverterFalse() throws IOException{
 		String theFile = getOutputDirectory() + "TestFile.txt";
 		
 		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
@@ -87,7 +90,7 @@ public class MyXmlConverterTest extends MatsimTestCase{
 		Object newObject = xmlConverter.readObjectFromFile(theFile);
 		assertTrue("The read file should be of type MyTestXmlObject.", (newObject instanceof MyTestXmlObject));
 		if(newObject instanceof MyTestXmlObject){
-			newObject = (MyTestXmlObject) newObject;
+//			newObject = newObject;
 			assertTrue("Attribute 'Type' converted incorrectly.", ((MyTestXmlObject) newObject).getType().equalsIgnoreCase("Type"));
 			assertTrue("Attribute 'number' converted incorrectly.", ((MyTestXmlObject) newObject).getNumber() == 123);
 			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);

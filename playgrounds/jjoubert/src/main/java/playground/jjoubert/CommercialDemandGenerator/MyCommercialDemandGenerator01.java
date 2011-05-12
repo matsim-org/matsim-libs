@@ -21,6 +21,7 @@
 package playground.jjoubert.CommercialDemandGenerator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -153,9 +154,14 @@ public class MyCommercialDemandGenerator01 {
 			log.info("Matric files not found. Extracting from vehicle XML file.");
 			ArrayList<DenseDoubleMatrix3D> matrices = extractChainProperties();
 			withinMatrix = matrices.get(0);
-			xmlConverter.writeObjectToFile(matrices.get(0), withinMatrixFilename);
-			throughMatrix = matrices.get(1);
-			xmlConverter.writeObjectToFile(matrices.get(1), throughMatrixFilename);
+			
+			try {
+				xmlConverter.writeObjectToFile(matrices.get(0), withinMatrixFilename);
+				throughMatrix = matrices.get(1);
+				xmlConverter.writeObjectToFile(matrices.get(1), throughMatrixFilename);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			log.info("Matrix files created and written successfully.");
 		}
 		result.add(withinMatrix);

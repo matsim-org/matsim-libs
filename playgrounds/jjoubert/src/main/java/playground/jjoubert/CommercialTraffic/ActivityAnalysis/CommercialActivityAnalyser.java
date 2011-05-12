@@ -136,7 +136,11 @@ public class CommercialActivityAnalyser {
 		for (File file : sampleFiles) {
 			activities = cae.extractActivities(file);
 			pointCounter += activities.size();
-			mxc.writeObjectToFile(activities, tempFolder.getAbsolutePath() + "/" + file.getName());
+			try {
+				mxc.writeObjectToFile(activities, tempFolder.getAbsolutePath() + "/" + file.getName());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			
 			allActivities.addAll(activities);
 			

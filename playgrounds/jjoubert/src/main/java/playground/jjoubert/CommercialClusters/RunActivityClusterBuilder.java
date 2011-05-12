@@ -20,6 +20,7 @@
 
 package playground.jjoubert.CommercialClusters;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -117,8 +118,9 @@ public class RunActivityClusterBuilder {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		loadScenario();
 		

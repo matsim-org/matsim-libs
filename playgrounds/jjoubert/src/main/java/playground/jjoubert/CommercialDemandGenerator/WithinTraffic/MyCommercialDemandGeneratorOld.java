@@ -75,7 +75,7 @@ public class MyCommercialDemandGeneratorOld {
 	private final static Logger log = Logger.getLogger(MyCommercialDemandGeneratorOld.class);
 
 	@SuppressWarnings("unchecked")
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		log.info("*****************************************************************************************");
 		log.info("  Generating " + numberOfSamples + " 'plans.xml' files for " + PROVINCE + ", each with " + populationSize + " commercial agents.");
 		log.info("*****************************************************************************************");

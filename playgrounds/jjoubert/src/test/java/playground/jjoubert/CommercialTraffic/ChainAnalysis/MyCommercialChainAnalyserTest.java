@@ -217,7 +217,11 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 		v1.getChains().add(c1);
 		// Write chain to file.
 		MyXmlConverter mxc = new MyXmlConverter(true);
-		mxc.writeObjectToFile(v1, getOutputDirectory() + "1.xml");
+		try {
+			mxc.writeObjectToFile(v1, getOutputDirectory() + "1.xml");
+		} catch (IOException e2) {
+			throw new RuntimeException(e2);
+		}
 
 		/*
 		 * Build a 'within' vehicle.
@@ -260,7 +264,11 @@ public class MyCommercialChainAnalyserTest extends MatsimTestCase{
 		v2.getChains().add(c3);
 		
 		// Write chain to file.
-		mxc.writeObjectToFile(v2, getOutputDirectory() + "2.xml");
+		try {
+			mxc.writeObjectToFile(v2, getOutputDirectory() + "2.xml");
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		}
 		
 		/*
 		 * Create a 'vehicleStats.txt' file.

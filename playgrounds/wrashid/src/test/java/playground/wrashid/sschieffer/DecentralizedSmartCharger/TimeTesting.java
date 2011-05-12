@@ -2,7 +2,6 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -75,7 +74,8 @@ public class TimeTesting {
 					
 					
 					myDecentralizedSmartCharger.run();
-					myDecentralizedSmartCharger.writeSummary(configName);
+					throw new RuntimeException("commented out non-compiling code");
+//					myDecentralizedSmartCharger.writeSummary(configName);
 					
 					
 				} catch (Exception e1) {
