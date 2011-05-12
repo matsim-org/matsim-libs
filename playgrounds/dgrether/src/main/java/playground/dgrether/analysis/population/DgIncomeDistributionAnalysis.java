@@ -47,9 +47,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.analysis.DgGrid;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
+import playground.dgrether.utils.DgGrid;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

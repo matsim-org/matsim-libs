@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.LaneDefinitions;
 
-import playground.dgrether.consistency.ConsistencyChecker;
+import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
 
 /**

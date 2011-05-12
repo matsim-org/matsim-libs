@@ -34,6 +34,8 @@ import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.dgrether.utils.DgGrid;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;

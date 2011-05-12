@@ -41,7 +41,7 @@ import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 
-import playground.dgrether.consistency.ConsistencyChecker;
+import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
 
 /**

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.Map.Entry;
 
@@ -48,22 +47,21 @@ import playground.dgrether.koehlerstrehlersignal.data.DgNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
-
 public class DgKoehlerStrehler2010ModelWriter {
-	
+
 	private static final Logger log = Logger.getLogger(DgKoehlerStrehler2010ModelWriter.class);
-	
-	//common tags
+
+	// common tags
 	private static final String CDATA = "CDATA";
 	private static final String ID = "id";
-	private static final String  NODE = "node";
+	private static final String NODE = "node";
 	private static final String FROM = "from";
 	private static final String TO = "to";
 	private static final String NETWORK = "network";
 	private static final String EXPANDED = "expanded";
 	private static final String NAME = "name";
 	private static final String DESCRIPTION = "description";
-	//tags for the crossings element
+	// tags for the crossings element
 	private static final String CROSSINGS = "crossings";
 	private static final String CROSSING = "crossing";
 	private static final String NODES = "nodes";
@@ -75,58 +73,40 @@ public class DgKoehlerStrehler2010ModelWriter {
 	private static final String GREEN = "green";
 	private static final String OFFSET = "offset";
 	private static final String LENGTH = "length";
-	
+
 	// tags for the streets element
 	private static final String STREETS = "streets";
 	private static final String STREET = "street";
 	private static final String COST = "cost";
 	private static final String CAPACITY = "capacity";
-	//tags for the commodities element
+	// tags for the commodities element
 	private static final String COMMODITIES = "commodities";
-	private static final String COMMODITY  = "commodity";
-	private static final String  SOURCES = "sources";
+	private static final String COMMODITY = "commodity";
+	private static final String SOURCES = "sources";
 	private static final String FLOW = "flow";
-	private static final String  DRAINS = "drains";
+	private static final String DRAINS = "drains";
 
-	
-	public void write(ScenarioImpl sc, DgNetwork network, DgCommodities coms, String outFile) throws SAXException, IOException, TransformerConfigurationException{
-		Writer writer = IOUtils.getBufferedWriter(outFile);
-		TransformerHandler hd = this.createContentHandler(writer);
-		this.writeDocumentStart(hd, sc);
-		this.writeCrossings(network, hd);
-		this.writeStreets(network, sc.getNetwork(), hd);
-		this.writeCommodities(coms, hd);
-
-		
-		hd.endElement("", "", NETWORK);
-		//Example only
-//		AttributesImpl atts = new AttributesImpl();
-//		atts.clear();
-//		// USERS tag.
-//		hd.startElement("","","USERS",atts);
-//		// USER tags.
-//		String[] id = {"PWD122","MX787","A4Q45"};
-//		String[] type = {"customer","manager","employee"};
-//		String[] desc = {"Tim@Home","Jack&Moud","John D'oé"};
-//		for (int i=0;i<id.length;i++)
-//		{
-//		  atts.clear();
-//		  atts.addAttribute("","","ID","CDATA",id[i]);
-//		  atts.addAttribute("","","TYPE","CDATA",type[i]);
-//		  hd.startElement("","","USER",atts);
-//		  hd.characters(desc[i].toCharArray(),0,desc[i].length());
-//		  hd.endElement("","","USER");
-//		}
-//		hd.endElement("","","USERS");
-		hd.endDocument();
-
-		writer.flush();
-		writer.close();
-		log.info("done");
-
+	public void write(ScenarioImpl sc, DgNetwork network, DgCommodities coms, String outFile) {
+		Writer writer;
+		try {
+			writer = IOUtils.getBufferedWriter(outFile);
+			TransformerHandler hd = this.createContentHandler(writer);
+			this.writeDocumentStart(hd, sc);
+			this.writeCrossings(network, hd);
+			this.writeStreets(network, sc.getNetwork(), hd);
+			this.writeCommodities(coms, hd);
+			hd.endElement("", "", NETWORK);
+			hd.endDocument();
+			writer.flush();
+			writer.close();
+			log.info("done");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
-	
-	private void writeDocumentStart(TransformerHandler hd, ScenarioImpl sc) throws SAXException{
+
+	private void writeDocumentStart(TransformerHandler hd, ScenarioImpl sc) throws SAXException {
 		hd.startDocument();
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "", EXPANDED, CDATA, "false");
@@ -134,7 +114,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		atts.clear();
 		hd.startElement("", "", NAME, atts);
 		String name = sc.getNetwork().getName();
-		if (name == null){
+		if (name == null) {
 			name = "noname";
 		}
 		char[] nameArray = name.toCharArray();
@@ -146,27 +126,27 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", DESCRIPTION);
 	}
 
-	private void writeCrossings(DgNetwork net, TransformerHandler hd) throws SAXException{
+	private void writeCrossings(DgNetwork net, TransformerHandler hd) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", CROSSINGS, atts);
-		for (DgCrossing crossing : net.getCrossings().values()){
+		for (DgCrossing crossing : net.getCrossings().values()) {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, crossing.getId().toString());
 			hd.startElement("", "", CROSSING, atts);
-			//nodes
+			// nodes
 			atts.clear();
 			hd.startElement("", "", NODES, atts);
-			for (DgCrossingNode node : crossing.getNodes().values()){
+			for (DgCrossingNode node : crossing.getNodes().values()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, node.getId().toString());
 				hd.startElement("", "", NODE, atts);
 				hd.endElement("", "", NODE);
 			}
 			hd.endElement("", "", NODES);
-			//lights
+			// lights
 			atts.clear();
 			hd.startElement("", "", LIGHTS, atts);
-			for (DgStreet light : crossing.getLights().values()){
+			for (DgStreet light : crossing.getLights().values()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, light.getId().toString());
 				atts.addAttribute("", "", FROM, CDATA, light.getFromNode().getId().toString());
@@ -175,15 +155,15 @@ public class DgKoehlerStrehler2010ModelWriter {
 				hd.endElement("", "", LIGHT);
 			}
 			hd.endElement("", "", LIGHTS);
-			//programs
+			// programs
 			atts.clear();
 			hd.startElement("", "", PROGRAMS, atts);
-			for (DgProgram program : crossing.getPrograms().values()){
+			for (DgProgram program : crossing.getPrograms().values()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, program.getId().toString());
 				atts.addAttribute("", "", CYCLE, CDATA, Integer.toString(program.getCycle()));
 				hd.startElement("", "", PROGRAM, atts);
-				for (DgGreen g : program.getGreensByLightId().values()){
+				for (DgGreen g : program.getGreensByLightId().values()) {
 					atts.clear();
 					atts.addAttribute("", "", LIGHT, CDATA, g.getLightId().toString());
 					atts.addAttribute("", "", OFFSET, CDATA, Integer.toString(g.getOffset()));
@@ -193,27 +173,24 @@ public class DgKoehlerStrehler2010ModelWriter {
 				}
 				hd.endElement("", "", PROGRAM);
 			}
-			
+
 			hd.endElement("", "", PROGRAMS);
-			
+
 			hd.endElement("", "", CROSSING);
 		}
 		hd.endElement("", "", CROSSINGS);
-		
 	}
-	
-	
 
 	private void writeCommodities(DgCommodities coms, TransformerHandler hd) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", COMMODITIES, atts);
-		for (DgCommodity co : coms.getCommodities().values()){
+		for (DgCommodity co : coms.getCommodities().values()) {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, co.getId().toString());
 			hd.startElement("", "", COMMODITY, atts);
 			atts.clear();
 			hd.startElement("", "", SOURCES, atts);
-			for (Entry<Id, Double> e : co.getSourceNodesFlowMap().entrySet()){
+			for (Entry<Id, Double> e : co.getSourceNodesFlowMap().entrySet()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, e.getKey().toString());
 				atts.addAttribute("", "", FLOW, CDATA, Double.toString(e.getValue()));
@@ -223,7 +200,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.endElement("", "", SOURCES);
 			atts.clear();
 			hd.startElement("", "", DRAINS, atts);
-			for (Id drainNodeId : co.getDrainNodes()){
+			for (Id drainNodeId : co.getDrainNodes()) {
 				atts.clear();
 				atts.addAttribute("", "", ID, CDATA, drainNodeId.toString());
 				hd.startElement("", "", NODE, atts);
@@ -235,15 +212,17 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", COMMODITIES);
 	}
 
-	private void writeStreets(DgNetwork network, NetworkImpl matsimNet, TransformerHandler hd) throws SAXException {
+	private void writeStreets(DgNetwork network, NetworkImpl matsimNet, TransformerHandler hd)
+			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", STREETS, atts);
-		for (Link link : matsimNet.getLinks().values()){
+		for (Link link : matsimNet.getLinks().values()) {
 			atts.clear();
 			atts.addAttribute("", "", ID, CDATA, link.getId().toString());
-			long fs = Math.round( (link.getLength() / link.getFreespeed()));
+			long fs = Math.round((link.getLength() / link.getFreespeed()));
 			atts.addAttribute("", "", COST, CDATA, Long.toString(fs));
-			atts.addAttribute("", "", CAPACITY, CDATA, Double.toString(link.getCapacity()/matsimNet.getCapacityPeriod() * 3600.0));
+			atts.addAttribute("", "", CAPACITY, CDATA,
+					Double.toString(link.getCapacity() / matsimNet.getCapacityPeriod() * 3600.0));
 			DgStreet street = network.getStreets().get(link.getId());
 			atts.addAttribute("", "", FROM, CDATA, street.getFromNode().getId().toString());
 			atts.addAttribute("", "", TO, CDATA, street.getToNode().getId().toString());
@@ -253,19 +232,19 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", STREETS);
 	}
 
-	private TransformerHandler createContentHandler(Writer writer) throws TransformerConfigurationException {
+	private TransformerHandler createContentHandler(Writer writer)
+			throws TransformerConfigurationException {
 		StreamResult streamResult = new StreamResult(writer);
 		SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 		// SAX2.0 ContentHandler.
 		TransformerHandler hd = tf.newTransformerHandler();
 		Transformer serializer = hd.getTransformer();
-		serializer.setOutputProperty(OutputKeys.ENCODING,"utf-8");
-//		serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,"users.dtd");
-		serializer.setOutputProperty(OutputKeys.INDENT,"yes");
-		serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount","4");
+		serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+		// serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,"users.dtd");
+		serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+		serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 		hd.setResult(streamResult);
 		return hd;
 	}
 
-	
 }
