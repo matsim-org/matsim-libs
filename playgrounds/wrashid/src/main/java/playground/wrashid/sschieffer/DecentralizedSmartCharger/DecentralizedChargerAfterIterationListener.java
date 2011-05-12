@@ -117,15 +117,11 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					pricingHubDistribution							
 					);
 			
-			myDecentralizedSmartCharger.run();
-			
-			
+			myDecentralizedSmartCharger.run();			
 			
 			DecentralizedChargingSimulation.setDecentralizedSmartCharger(myDecentralizedSmartCharger);
 			
 		} catch (Exception e1) {
-			
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		

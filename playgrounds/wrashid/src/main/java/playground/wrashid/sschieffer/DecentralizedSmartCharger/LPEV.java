@@ -58,7 +58,6 @@ public class LPEV {
 	
 	private double buffer;
 	
-	
 	private double batterySize;
 	private double  batteryMin;
 	private double  batteryMax;
@@ -85,8 +84,6 @@ public class LPEV {
 			double batteryMax, 
 			String vehicleType) throws LpSolveException, IOException{
 		
-		
-		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
@@ -111,11 +108,6 @@ public class LPEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"printLp.txt");
 			solver.printLp();
 			
-//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"objective.txt");
-//			solver.printObjective();
-//			
-//			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"tableau.txt");
-//			solver.printTableau();
 		} catch (Exception e) {	    
 		}
 		
@@ -138,7 +130,11 @@ public class LPEV {
 	
 	
 	
-	public Schedule solveLPReschedule(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
+	public Schedule solveLPReschedule(Schedule schedule, 
+			Id id, 
+			double batterySize, double batteryMin, double batteryMax, 
+			String vehicleType, 
+			double startingSOC) throws LpSolveException, IOException{
 		
 		
 		System.out.println("LP EV Resolve for Agent: "+ id.toString()); 
@@ -166,22 +162,12 @@ public class LPEV {
 			
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
 			solver.printLp();
-			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"objective.txt");
-			solver.printObjective();
-			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"tableau.txt");
-			solver.printTableau();
+		
 		} catch (Exception e) {	    
 		}
 		
-		
 		schedule= update();
-//		System.out.println("updated schedule with required charging times:");
-//		schedule.printSchedule();
-		//visualizeSOCAgent(solver.getPtrVariables(), vehicleType);
-		
-//		printLPSolution();
+
 		
 		solver.deleteLp();
 		
@@ -225,7 +211,6 @@ public class LPEV {
 			String inequality=setInEqualityBatteryConstraint(i);
 			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
 			solver.strAddConstraint(inequality, LpSolve.GE, batterySize*batteryMin);
-			
 		}
 		
 		

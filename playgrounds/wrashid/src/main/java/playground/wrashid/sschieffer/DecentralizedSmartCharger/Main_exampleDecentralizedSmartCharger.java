@@ -112,7 +112,7 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * Charging Distribution
 		 * - minimum charging length [s] = time resolution of optimization
 		 */
-		final double minChargingLength=5*60;
+		final double minChargingLength=15*60;
 		
 		/**
 		 * define mapping class that shall be used to map the 

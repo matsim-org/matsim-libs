@@ -47,20 +47,23 @@ public class AgentContractCollector {
 	 * RETURNS LinkedListValueHashMap<Id, ContractTypeAgent> with given percentage of population with
 	 * no regulation, only regulation down or regulation up and down
 	 */
-	public static LinkedListValueHashMap<Id, ContractTypeAgent>  makeAgentContracts(
+	public LinkedListValueHashMap<Id, ContractTypeAgent>  makeAgentContracts(
 			Controler controler,
 			double xPercentNone,
 			double xPercentDown,
 			double xPercentDownUp			
 			){
+		
+		int popSize= controler.getPopulation().getPersons().size();
+		int count = 0;
+		
 		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
 		for(Id id : controler.getPopulation().getPersons().keySet()){
+			if (count< popSize*xPercentNone){
 			
-			double rand= Math.random();
-			if(rand<xPercentNone){
 				list.put(id, contractNoRegulation);
 			}else{
-				if(rand<xPercentNone+xPercentDown){
+				if(count< popSize*(xPercentNone+xPercentDown)){
 					list.put(id, contractRegDown);
 				}else{
 					list.put(id, contractRegUpRegDown);

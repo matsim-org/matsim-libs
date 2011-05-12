@@ -82,7 +82,9 @@ public class ChargingSlotDistributor {
 				
 				if(p.getIntervalLength()*0.7 <chargingTime){
 					if(chargingTime>p.getIntervalLength()){
-						System.out.println("trouble");
+						System.out.println("trouble - rounding error?");
+						chargingTime=p.getIntervalLength();
+						p.setRequiredChargingDuration(p.getIntervalLength());
 					}
 					double diff= p.getIntervalLength()-chargingTime;
 					double startRand= Math.random()*diff;

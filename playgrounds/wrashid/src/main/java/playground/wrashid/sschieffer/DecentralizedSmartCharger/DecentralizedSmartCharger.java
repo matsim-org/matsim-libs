@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import lpsolve.LpSolveException;
@@ -280,10 +281,8 @@ public class DecentralizedSmartCharger {
 		distributeTime = System.currentTimeMillis();
 		findChargingDistribution();
 		
-		wrapUpTime = System.currentTimeMillis();
 		calculateChargingCostsAllAgents();
-		
-		writeSummary();
+		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
 	}
 
@@ -486,13 +485,15 @@ public class DecentralizedSmartCharger {
 					
 					
 					// find Hub for this charging and parking Interval
-					interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
-					ParkingInterval p= (ParkingInterval) thisAgentParkAndDrive.timesInSchedule.get(interval);
+					interval= thisAgentParkAndDrive.timeIsInWhichParkingInterval(thisSecond);
+					ParkingInterval p= (ParkingInterval)thisAgentParkAndDrive.timesInSchedule.get(interval);
 					Id linkId = p.getLocation();
 					
 					double wattReduction=p.getChargingSpeed();
 					
 					myHubLoadReader.updateLoadAfterDeterministicChargingDecision(linkId, i, wattReduction);
+				
+					
 					
 				}
 				
@@ -540,7 +541,14 @@ public class DecentralizedSmartCharger {
 			if(t.isParking() && ((ParkingInterval)t).getChargingSchedule()!=null){
 				Id linkId = ((ParkingInterval)t).getLocation();
 				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
-				totalCost+= functionIntegrator.integrate(funcPrice, t.getStartTime(), t.getEndTime());
+				Schedule charging= ((ParkingInterval)t).getChargingSchedule();
+				for(int c=0; c<charging.getNumberOfEntries(); c++){
+					totalCost+= functionIntegrator.integrate(funcPrice, 
+							charging.timesInSchedule.get(c).getStartTime(),
+							charging.timesInSchedule.get(c).getEndTime()
+							);
+				}
+				
 			}
 			
 			if(hasAgentPHEV(id)){
@@ -551,8 +559,8 @@ public class DecentralizedSmartCharger {
 			if(hasAgentEV(id)){
 				if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
 					System.out.println("extra consumption EV price calculation ");
-					System.out.println("assigned 100000000000000000000000000000.0 for agent "+ id.toString());
-					totalCost += 100000000000000000000000000000.0; // ???  
+					System.out.println("assigned "+Double.MAX_VALUE+" for agent "+ id.toString());
+					totalCost += Double.MAX_VALUE;
 				}
 			}
 			
@@ -583,7 +591,7 @@ public class DecentralizedSmartCharger {
 		timeCheckOtherSources=System.currentTimeMillis();
 		
 		System.out.println("DONE V2G");
-		writeSummary();
+		
 	}
 	
 	
@@ -1037,7 +1045,8 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public  LinkedListValueHashMap<Id, Double> getAgentV2GRevenues(){
+	public  HashMap<Id, Double> getAgentV2GRevenues(){
+		
 		return myV2G.getAgentV2GRevenues();
 	}
 	
@@ -1234,7 +1243,7 @@ public class DecentralizedSmartCharger {
         }
         
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agentPlans"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
+        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
 	
@@ -1550,14 +1559,19 @@ public class DecentralizedSmartCharger {
 		
 	
 	
-	
+	/**
+	 * transforms joules to emissions according to the vehicle and gas type data stored in the vehicleCollector
+	 * @param agentId
+	 * @param joules
+	 * @return
+	 */
 	public double joulesToEmissionInKg(Id agentId, double joules){
 		Vehicle v= vehicles.getValue(agentId);
 		GasType vGT= myVehicleTypes.getGasType(v);
 		
-		double liter=1/(vGT.getJoulesPerLiter())*joules; // 1kgBenzin/43MJ= xkg/joules
+		double liter=1/(vGT.getJoulesPerLiter())*joules; 
 		
-		double emission= vGT.getEmissionsPerLiter()*liter; // 23,2kg/10l= xx/mass   1kg=1l
+		double emission= vGT.getEmissionsPerLiter()*liter; 
 				
 		return emission;
 	}
@@ -1587,10 +1601,10 @@ public class DecentralizedSmartCharger {
 		
 	}
 	
-	private void writeSummary(){
+	public void writeSummary(String configName){
 		try{
 		    // Create file 
-			String title=(outputPath + "summary.html");
+			String title=(outputPath + configName+ "_summary.html");
 		    FileWriter fstream = new FileWriter(title);
 		    BufferedWriter out = new BufferedWriter(fstream);
 		    //out.write("Penetration: "+ Main.penetrationPercent+"\n");
@@ -1604,6 +1618,10 @@ public class DecentralizedSmartCharger {
 		    out.write("<p>"); //add where read in ferom.. what file..?
 		  //*************************************
 		    out.write("Time Decentralized Smart Charger </br>");
+		    
+		    out.write("Standard charging time of [s]:"+ minChargingLength
+		    		+"</br>");
+		    
 		    out.write("Time [ms] reading agent schedules:"+ (agentReadTime-startTime)
 		    		+"</br>");
 		    out.write("Time [ms] LP:"+ (LPTime-agentReadTime)
@@ -1625,12 +1643,12 @@ public class DecentralizedSmartCharger {
 		    
 		  //*************************************
 		  //*************************************
-		    //Hub\\validation_chargingdistribution.png"
+		    /*//Hub\\validation_chargingdistribution.png"
 		    String pic= outputPath +"Hub/validation_chargingdistribution.png";
 		    
 		    out.write("");
 		    out.write("<img src='"+pic+"' alt='connectivity' width='80%'");
-		   
+		   */
 		  //*************************************
 		    out.write("</body>");
 		    out.write("</html>");   

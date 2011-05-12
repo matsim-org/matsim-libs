@@ -87,11 +87,11 @@ public class Main_exampleV2G {
 		final double combustion=0.0;
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";		
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-			
+		//String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml"; // 1 agent
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		final double bufferBatteryCharge=0.0;
 		
-		final double minChargingLength=5*60;
+		final double minChargingLength=15*60;
 	
 		StellasHubMapping myMappingClass= new StellasHubMapping();
 		
@@ -137,7 +137,6 @@ public class Main_exampleV2G {
 		 * <li> negative values mean, that the source needs energy --> regulation up
 		 * <li> positive values mean, that the source has too much energy--> regulation down
 		 * 
-		 * 
 		 * THe LoadDistributionIntervals indicate 
 		 * <li> a time interval: start second, end second 
 		 * <li>PolynomialFunction indicating the free Watts over the time interval
@@ -164,7 +163,7 @@ public class Main_exampleV2G {
 		 * Example how to Use V2G
 		 *********************/
 		
-		LinkedListValueHashMap<Id, Double> agentRevenuesFromV2G=
+		HashMap<Id, Double> agentRevenuesFromV2G=
 			mySimulation.getAgentV2GRevenues();	
 	}
 

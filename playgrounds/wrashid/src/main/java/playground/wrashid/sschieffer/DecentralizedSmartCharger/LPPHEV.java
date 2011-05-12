@@ -187,11 +187,11 @@ public class LPPHEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
+			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
 			solver.printObjective();
 			
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
-			solver.printTableau();
+			solver.printTableau();*/
 		} catch (Exception e) {	    
 		}
 		
@@ -201,7 +201,14 @@ public class LPPHEV {
                           double threshold)
                    throws LpSolveException
 		 */
-		boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
+		double [] solutionNF =solver.getPtrVariables();		
+		
+		System.out.println("solution ");
+		for(int i=0; i<solutionNF.length; i++){
+			System.out.println(solutionNF[i] + ",  ");
+		}
+		schedule= update();
+		/*boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
 		if(feasible){
 			schedule= update();
 		}else{
@@ -210,10 +217,10 @@ public class LPPHEV {
 			System.out.println("old schedule ");
 			schedule.printSchedule();
 			System.out.println("solution ");
-			double [] solutionNF =solver.getPtrVariables();
+			
 			
 			return null;
-		}
+		}*/
 		
 		System.out.println("Schedule after update LPPHEV: ");
 		schedule.printSchedule();

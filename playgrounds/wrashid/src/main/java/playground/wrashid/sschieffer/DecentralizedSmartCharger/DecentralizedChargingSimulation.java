@@ -1,5 +1,6 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
@@ -210,7 +211,7 @@ public class DecentralizedChargingSimulation {
 	}	
 	
 	
-	public LinkedListValueHashMap<Id, Double> getAgentV2GRevenues(){
+	public HashMap<Id, Double> getAgentV2GRevenues(){
 		return mySmartCharger.getAgentV2GRevenues();
 	}
 	

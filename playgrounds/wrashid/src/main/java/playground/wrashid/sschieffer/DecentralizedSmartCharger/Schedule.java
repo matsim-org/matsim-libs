@@ -251,6 +251,12 @@ public class Schedule {
 	}
 	
 	
+	/**
+	 * start <= time < end
+	 * (unless last interval where time can be equal to end)
+	 * @param time
+	 * @return
+	 */
 	public int timeIsInWhichInterval(double time){
 		int solution=-1;
 		for (int i=0; i<timesInSchedule.size(); i++){
@@ -266,6 +272,21 @@ public class Schedule {
 		return solution;
 	}
 	
+	
+	
+	public int timeIsInWhichParkingInterval(double time){
+		int solution=-1;
+		for (int i=0; i<timesInSchedule.size(); i++){
+			TimeInterval thisInteral= timesInSchedule.get(i);
+			if(thisInteral.isParking()){
+				if(thisInteral.timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(time)){
+					solution =i;
+				}
+			}
+						
+		}
+		return solution;
+	}
 	
 	public int intervalIsInWhichTimeInterval(TimeInterval t){
 		int solution =-1;

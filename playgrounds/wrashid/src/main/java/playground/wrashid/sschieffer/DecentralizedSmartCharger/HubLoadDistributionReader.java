@@ -386,6 +386,9 @@ public class HubLoadDistributionReader {
 			
 			TimeDataCollector data= connectivityHubDistribution.getValue(i);
 			data.fitFunction();
+			System.out.println("Parking Vehicles at Hub"+ i);
+			System.out.println(data.getFunction().toString());
+			
 			XYSeries xx= data.getXYSeries("Parking Vehicles at Hub"+ i);
 			connectivity.addSeries(xx);
 		}

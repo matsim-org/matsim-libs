@@ -66,7 +66,8 @@ public class DrivingInterval extends TimeInterval {
 	 * reduces current consumption by extraC
 	 * and sets extraConsumption equal extraC
 	 * 
-	 * @param extraC
+	 * @param extraC extra consumption not from electric battery
+	 * @param extraTime extra time required prior to this driving interval to charge the necessary missing consumption
 	 */
 	public void setExtraConsumption(double extraC, double extraTime){
 		consumption=consumption-extraC;
