@@ -105,7 +105,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -143,7 +143,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -180,7 +180,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -223,7 +223,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -274,7 +274,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -301,7 +301,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -332,7 +332,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -390,7 +390,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -447,7 +447,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -516,7 +516,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -559,7 +559,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -608,7 +608,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -655,7 +655,7 @@ public class QueueSimulationTest extends TestCase {
 		plan.createAndAddActivity("w", f.link3.getId());
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		/* prepare sim */
 		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
@@ -697,7 +697,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testCircleAsRoute() {
 		Fixture f = new Fixture();
-		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4, f.node1); // close the network
 		link4.setLength(1000.0);
 		link4.setFreespeed(100.0);
 		link4.setCapacity(6000);
@@ -720,7 +720,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -755,7 +755,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture();
-		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4, f.node1); // close the network
 		link4.setLength(1000.0);
 		link4.setFreespeed(100.0);
 		link4.setCapacity(6000);
@@ -778,7 +778,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -815,7 +815,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
@@ -830,7 +830,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongStartLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
@@ -845,7 +845,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongEndLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
@@ -861,7 +861,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_ImpossibleRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
@@ -876,7 +876,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_MissingRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
@@ -907,21 +907,21 @@ public class QueueSimulationTest extends TestCase {
 		f.network.addNode(node6);
 		f.network.addNode(node7);
 
-		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4.getId(), f.node1.getId()); // close the network
+		Link link4 = f.network.getFactory().createLink(new IdImpl(4), f.node4, f.node1); // close the network
 		link4.setLength(1000.0);
 		link4.setFreespeed(100.0);
 		link4.setCapacity(6000);
 		link4.setNumberOfLanes(1);
 		f.network.addLink(link4);
 
-		Link link5 = f.network.getFactory().createLink(new IdImpl(5), f.node4.getId(), f.node1.getId()); // close the network
+		Link link5 = f.network.getFactory().createLink(new IdImpl(5), f.node4, f.node1); // close the network
 		link5.setLength(100.0);
 		link5.setFreespeed(10.0);
 		link5.setCapacity(60000);
 		link5.setNumberOfLanes(9);
 		f.network.addLink(link5);
 
-		Link link6 = f.network.getFactory().createLink(new IdImpl(6), f.node4.getId(), f.node1.getId()); // close the network
+		Link link6 = f.network.getFactory().createLink(new IdImpl(6), f.node4, f.node1); // close the network
 		link6.setLength(100.0);
 		link6.setFreespeed(10.0);
 		link6.setCapacity(60000);
@@ -965,7 +965,7 @@ public class QueueSimulationTest extends TestCase {
 		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
 		network.addLink(link);
@@ -988,7 +988,7 @@ public class QueueSimulationTest extends TestCase {
 		person.addPlan(plan);
 		population.addPerson(person);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 
@@ -1028,11 +1028,11 @@ public class QueueSimulationTest extends TestCase {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link1.setCapacity(2000.0);
 		network.addLink(link1);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
 		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link2.setCapacity(2000.0);
 		network.addLink(link2);
@@ -1086,7 +1086,7 @@ public class QueueSimulationTest extends TestCase {
 		person3.addPlan(plan3);
 		population.addPerson(person3);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 
@@ -1183,17 +1183,17 @@ public class QueueSimulationTest extends TestCase {
 			this.network.addNode(this.node2);
 			this.network.addNode(this.node3);
 			this.network.addNode(this.node4);
-			this.link1 = this.network.getFactory().createLink(scenario.createId("1"), this.node1.getId(), this.node2.getId());
+			this.link1 = this.network.getFactory().createLink(scenario.createId("1"), this.node1, this.node2);
 			this.link1.setLength(100);
 			this.link1.setFreespeed(100);
 			this.link1.setCapacity(60000);
 			this.link1.setNumberOfLanes(9);
-			this.link2 = this.network.getFactory().createLink(scenario.createId("2"), this.node2.getId(), this.node3.getId());
+			this.link2 = this.network.getFactory().createLink(scenario.createId("2"), this.node2, this.node3);
 			this.link2.setLength(1000);
 			this.link2.setFreespeed(100);
 			this.link2.setCapacity(6000);
 			this.link2.setNumberOfLanes(2);
-			this.link3 = this.network.getFactory().createLink(scenario.createId("3"), this.node3.getId(), this.node4.getId());
+			this.link3 = this.network.getFactory().createLink(scenario.createId("3"), this.node3, this.node4);
 			this.link3.setLength(100);
 			this.link3.setFreespeed(100);
 			this.link3.setCapacity(60000);

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -137,7 +136,7 @@ public class NetworkMergeDoubleLinksTest {
 		/*package*/ final Id[] ids = new Id[13];
 
 		public Fixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.network = this.scenario.getNetwork();
 
 			for (int i = 0; i < this.ids.length; i++) {
@@ -153,12 +152,12 @@ public class NetworkMergeDoubleLinksTest {
 			this.network.addNode(n1);
 			this.network.addNode(n2);
 			this.network.addNode(n3);
-			Link l0 = factory.createLink(this.ids[0], this.ids[0], this.ids[1]);
-			Link l1 = factory.createLink(this.ids[1], this.ids[1], this.ids[2]);
-			Link l2 = factory.createLink(this.ids[2], this.ids[2], this.ids[3]);
-			Link l10 = factory.createLink(this.ids[10], this.ids[0], this.ids[1]);
-			Link l11 = factory.createLink(this.ids[11], this.ids[1], this.ids[2]);
-			Link l12 = factory.createLink(this.ids[12], this.ids[2], this.ids[3]);
+			Link l0 = factory.createLink(this.ids[0], n0, n1);
+			Link l1 = factory.createLink(this.ids[1], n1, n2);
+			Link l2 = factory.createLink(this.ids[2], n2, n3);
+			Link l10 = factory.createLink(this.ids[10], n0, n1);
+			Link l11 = factory.createLink(this.ids[11], n1, n2);
+			Link l12 = factory.createLink(this.ids[12], n2, n3);
 			l0.setLength(100); l0.setCapacity(200.0); l0.setNumberOfLanes(1); l0.setFreespeed(30.0/3.6);
 			l10.setLength(500); l10.setCapacity(2000.0); l10.setNumberOfLanes(2); l10.setFreespeed(70.0/3.6);
 			this.network.addLink(l0);

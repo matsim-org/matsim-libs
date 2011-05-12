@@ -23,8 +23,8 @@ package org.matsim.population;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,7 +66,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  reading in created population file...");
-		new PopulationReaderMatsimV4(scenario).readFile(super.getOutputDirectory()+"plans.xml");
+		new MatsimPopulationReader(scenario).readFile(super.getOutputDirectory()+"plans.xml");
 		log.info("  done.");
 
 		log.info("  writing population file again...");

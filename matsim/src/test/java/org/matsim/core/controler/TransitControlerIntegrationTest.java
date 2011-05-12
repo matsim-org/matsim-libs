@@ -37,9 +37,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -77,8 +77,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = nBuilder.createLink(id1, id1, id2);
-		Link link2 = nBuilder.createLink(id2, id2, id3);
+		Link link1 = nBuilder.createLink(id1, node1, node2);
+		Link link2 = nBuilder.createLink(id2, node2, node3);
 		network.addLink(link1);
 		network.addLink(link2);
 

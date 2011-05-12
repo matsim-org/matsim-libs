@@ -27,7 +27,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -62,11 +61,9 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 	private final void runModules(final NetworkImpl network) {
 		log.info("  running network modules... ");
-		new NetworkSummary().run(network);
 		new NetworkCleaner().run(network);
 		new NetworkMergeDoubleLinks().run(network);
 		new NetworkCalcTopoType().run(network);
-		new NetworkSummary().run(network);
 		log.info("  done.");
 	}
 
@@ -87,7 +84,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 
 		log.info("  reading network xml file independent of the world...");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		Scenario scenario = ScenarioUtils.createScenario(this.config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("  done.");

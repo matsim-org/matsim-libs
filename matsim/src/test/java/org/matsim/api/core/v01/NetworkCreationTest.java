@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -37,7 +36,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 
 
 	public void testCreateNetwork() {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Id id1 = sc.createId("1");
 		Id id2 = sc.createId("2");
@@ -54,7 +53,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		//add before link creation really needed? I don't think so dg 09/09
 		network.addNode(n1);
 		network.addNode(n2);
-		Link l1 = nb.createLink(id1, id1, id2);
+		Link l1 = nb.createLink(id1, n1, n2);
 		//test defaults
 		assertEquals(1.0, l1.getLength());
 		assertEquals(1.0, l1.getCapacity());

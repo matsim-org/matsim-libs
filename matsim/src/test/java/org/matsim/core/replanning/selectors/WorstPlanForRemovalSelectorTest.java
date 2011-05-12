@@ -22,7 +22,6 @@ package org.matsim.core.replanning.selectors;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
@@ -101,12 +100,12 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan6 = new org.matsim.core.population.PlanImpl(person);
 		plan6.setScore(21.0);
 
-		plan1.setType(PlanImpl.DeprecatedConstants.CAR);
-		plan2.setType(PlanImpl.DeprecatedConstants.PT);
-		plan3.setType(PlanImpl.DeprecatedConstants.CAR);
-		plan4.setType(PlanImpl.DeprecatedConstants.PT);
-		plan5.setType(PlanImpl.DeprecatedConstants.CAR);
-		plan6.setType(PlanImpl.DeprecatedConstants.PT);
+		plan1.setType("type1");
+		plan2.setType("type2");
+		plan3.setType("type1");
+		plan4.setType("type2");
+		plan5.setType("type1");
+		plan6.setType("type2");
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);

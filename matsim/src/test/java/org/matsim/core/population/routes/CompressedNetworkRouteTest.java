@@ -157,11 +157,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addNode(node5);
 		network.addNode(node6);
 
-		Link startLink = builder.createLink(id1, node1.getId(), node2.getId());
-		Link link3 = builder.createLink(id3, node2.getId(), node3.getId());
-		Link link4 = builder.createLink(id4, node3.getId(), node4.getId());
-		Link link5 = builder.createLink(id5, node4.getId(), node5.getId());
-		Link endLink = builder.createLink(id2, node5.getId(), node6.getId());
+		Link startLink = builder.createLink(id1, node1, node2);
+		Link link3 = builder.createLink(id3, node2, node3);
+		Link link4 = builder.createLink(id4, node3, node4);
+		Link link5 = builder.createLink(id5, node4, node5);
+		Link endLink = builder.createLink(id2, node5, node6);
 
 		network.addLink(startLink);
 		network.addLink(link3);
