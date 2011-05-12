@@ -74,7 +74,7 @@ public final class TransportModeNetworkFilter {
 					subNetwork.addNode(toNode2);
 				}
 
-				Link link2 = factory.createLink(link.getId(), fromId, toId);
+				Link link2 = factory.createLink(link.getId(), fromNode2, toNode2);
 				link2.setAllowedModes(intersection);
 				link2.setCapacity(link.getCapacity());
 				link2.setFreespeed(link.getFreespeed());

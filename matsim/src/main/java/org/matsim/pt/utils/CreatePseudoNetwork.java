@@ -169,7 +169,7 @@ public class CreatePseudoNetwork {
 	private Link createAndAddLink(Node fromNode, Node toNode,
 			Tuple<Node, Node> connection) {
 		Link link;
-		link = this.network.getFactory().createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode.getId(), toNode.getId());
+		link = this.network.getFactory().createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode);
 		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		link.setFreespeed(30.0 / 3.6);
 		link.setCapacity(500);

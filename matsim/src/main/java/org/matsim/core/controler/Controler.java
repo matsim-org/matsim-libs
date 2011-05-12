@@ -163,8 +163,6 @@ public class Controler {
 	public static final String FILENAME_NETWORK = "output_network.xml.gz";
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
-	public static final String FILENAME_SIGNALSYSTEMS = "output_signalsystems.xml.gz";
-	public static final String FILENAME_SIGNALSYSTEMS_CONFIG = "output_signalsystem_configuration.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 
 	private enum ControlerState {
@@ -1254,10 +1252,6 @@ public class Controler {
 
 	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
 		return this.facilityPenalties;
-	}
-
-	public void setFacilityPenalties(final TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		this.facilityPenalties = facilityPenalties;
 	}
 
 	/**

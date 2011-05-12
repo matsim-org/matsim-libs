@@ -101,9 +101,6 @@ public class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
-		public void setSelected(boolean selected) {
-			throw new UnsupportedOperationException() ;
-		}
 	}
 
 }

@@ -40,7 +40,7 @@ public class TransitConfigGroup extends Module {
 	public static final String GROUP_NAME = "transit";
 
 	/*package*/ static final String TRANSIT_SCHEDULE_FILE = "transitScheduleFile";
-	/*pacakge*/ static final String VEHICLES_FILE = "vehiclesFile";
+	/*package*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 
 	private String transitScheduleFile = null;
@@ -126,7 +126,7 @@ public class TransitConfigGroup extends Module {
 	}
 
 	public void setTransitModes(final Set<String> modes) {
-		this.transitModes = Collections.unmodifiableSet(new HashSet(modes));
+		this.transitModes = Collections.unmodifiableSet(new HashSet<String>(modes));
 	}
 
 	public Set<String> getTransitModes() {

@@ -21,7 +21,7 @@
 package org.matsim.counts;
 import java.io.BufferedWriter;
 import java.io.IOException;
-public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
+/*package*/ class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 
 	@Override
 	public void startCounts(final Counts counts, final BufferedWriter out) throws IOException {

@@ -86,12 +86,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
 
-	private static String TAG_LANES = "lanes";
-	private static String TAG_HIGHWAY = "highway";
-	private static String TAG_MAXSPEED = "maxspeed";
-	private static String TAG_JUNCTION = "junction";
-	private static String TAG_ONEWAY = "oneway";
-	private static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
+	private final static String TAG_LANES = "lanes";
+	private final static String TAG_HIGHWAY = "highway";
+	private final static String TAG_MAXSPEED = "maxspeed";
+	private final static String TAG_JUNCTION = "junction";
+	private final static String TAG_ONEWAY = "oneway";
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -101,7 +101,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
-	/*package*/ final CoordinateTransformation transform;
+	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
 

@@ -31,7 +31,7 @@ import org.matsim.core.gbl.Gbl;
  *
  * @author rashid_waraich
  */
-public class ProcessEventThread implements Runnable {
+/*package*/ class ProcessEventThread implements Runnable {
 	private ArrayList<Event> preInputBuffer = null;
 	private ConcurrentListSPSC<Event> eventQueue = null;
 	private EventsManager events;

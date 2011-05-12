@@ -213,30 +213,8 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		}
 
 		String type = atts.getValue(ATTR_PLAN_TYPE);
-		if (type == null) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.UNDEFINED);
-		}
-		else if ("car".equalsIgnoreCase(type)) {
-				this.currplan.setType(PlanImpl.DeprecatedConstants.CAR);
-		}
-		else if ("pt".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.PT);
-		}
-		else if ("ride".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.RIDE);
-		}
-		else if ("bike".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.BIKE);
-		}
-		else if ("walk".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.WALK);
-		}
-		else {
-			if (this.warnPlanTypeCount < 10 ) {
-				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
-				this.warnPlanTypeCount++;
-			}
-			this.currplan.setType(PlanImpl.DeprecatedConstants.UNDEFINED);
+		if (type != null) {
+			this.currplan.setType(type);
 		}
 	}
 

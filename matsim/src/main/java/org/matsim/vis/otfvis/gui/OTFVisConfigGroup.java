@@ -50,10 +50,6 @@ public class OTFVisConfigGroup extends Module {
 	public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
 	public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
 
-	public static final String FILE_VERSION = "fileVersion";
-	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
-
-	public static final String BIG_TIME_STEP = "bigTimeStep";
 	public static final String SHOW_TELEPORTATION = "showTeleportation";
 	public static final String LINK_WIDTH = "linkWidth";
 	

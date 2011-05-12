@@ -19,8 +19,6 @@ public class PlanomatConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "planomat";
 
-	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
-
 	/**
 	 * Enumeration of different specifications of traffic flow simulations how trips in activity plans are interpreted.
 	 *

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -33,7 +34,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -118,18 +118,16 @@ public class InitRoutes {
 	public void run(final String[] args) {
 		parseArguments(args);
 		Scenario scenario;
-		Config config1 = ConfigUtils.loadConfig(this.configfile);
-		MatsimRandom.reset(config1.global().getRandomSeed());
-		scenario = ScenarioUtils.createScenario(config1);
+		this.config = ConfigUtils.loadConfig(this.configfile);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		scenario = ScenarioUtils.createScenario(config);
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
-		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
-		this.config = sl.getScenario().getConfig();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		Network network = scenario.getNetwork();
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());

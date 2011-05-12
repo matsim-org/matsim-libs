@@ -47,7 +47,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
-	private NetworkImpl network;
+	private final NetworkImpl network;
 
 	public NetworkFactoryImpl(final NetworkImpl network) {
 		this.network = network;
@@ -134,10 +134,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	public boolean isTimeVariant() {
 		return (this.linkFactory instanceof TimeVariantLinkFactory);
-	}
-
-	public void setNetwork(final NetworkImpl networkLayer) {
-		this.network = networkLayer;
 	}
 
 }

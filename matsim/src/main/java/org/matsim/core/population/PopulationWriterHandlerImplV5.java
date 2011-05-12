@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.Time;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
+/*package*/ class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
 
 	@Override
 	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {

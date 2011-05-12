@@ -41,8 +41,8 @@ public class MultiModalQLinkExtension {
 
 	private final NetsimLink qLink;
 	private final MultiModalQNodeExtension toNode;
-	protected MultiModalSimEngine simEngine;
-	private PlansCalcRouteConfigGroup configGroup;
+	private MultiModalSimEngine simEngine;
+	private final PlansCalcRouteConfigGroup configGroup;
 //	private final MultiModalTravelTime multiModalTravelTime;
 
 	/*
@@ -50,17 +50,18 @@ public class MultiModalQLinkExtension {
 	 */
 	protected boolean isActive = false;
 
-	protected Queue<Tuple<Double, PersonAgent>> agents = new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TravelTimeComparator());
-	protected Queue<PersonAgent> waitingAfterActivityAgents = new LinkedList<PersonAgent>();
-	protected Queue<PersonAgent> waitingToLeaveAgents = new LinkedList<PersonAgent>();
+	private final Queue<Tuple<Double, PersonAgent>> agents = new PriorityQueue<Tuple<Double, PersonAgent>>(30, new TravelTimeComparator());
+	private final Queue<PersonAgent> waitingAfterActivityAgents = new LinkedList<PersonAgent>();
+	private final Queue<PersonAgent> waitingToLeaveAgents = new LinkedList<PersonAgent>();
 
 	public MultiModalQLinkExtension(NetsimLink qLink, MultiModalSimEngine simEngine, QNode toNode) {
 		this.qLink = qLink;
 		this.simEngine = simEngine;
 		this.toNode = simEngine.getMultiModalQNodeExtension(toNode);
-		this.configGroup = simEngine.getMobsim().getScenario().getConfig().plansCalcRoute();
+		PlansCalcRouteConfigGroup configGroup = simEngine.getMobsim().getScenario().getConfig().plansCalcRoute();
 
 		if (configGroup == null) configGroup = new PlansCalcRouteConfigGroup();
+		this.configGroup = configGroup;
 	}
 
 	/*package*/ void setMultiModalSimEngine(MultiModalSimEngine simEngine) {

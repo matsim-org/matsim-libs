@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
+/*package*/ class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		PopulationReader {
 
 	private final static String PLANS = "plans";

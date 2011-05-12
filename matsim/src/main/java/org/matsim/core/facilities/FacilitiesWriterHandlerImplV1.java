@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.matsim.core.utils.misc.Time;
 
-public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
+/*package*/ class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

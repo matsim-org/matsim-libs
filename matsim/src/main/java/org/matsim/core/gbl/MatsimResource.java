@@ -70,7 +70,7 @@ public abstract class MatsimResource {
 		File file = new File(RES_PATH_LOCAL + filename);
 		if (file.exists()) {
 			try {
-				return file.toURL();
+				return file.toURI().toURL();
 			} catch (MalformedURLException e) {
 				log.warn("Found resource-file, but could not return URL for it.", e);				// just continue, maybe we have more luck in the classpath
 			}

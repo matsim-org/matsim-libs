@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
-public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
+/*package*/ class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	private String newline = "\n";
 

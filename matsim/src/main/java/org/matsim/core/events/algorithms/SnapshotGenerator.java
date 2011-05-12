@@ -57,7 +57,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
-	protected final HashMap<Id, EventLink> eventLinks;
+	private final HashMap<Id, EventLink> eventLinks;
 	private final ArrayList<EventLink> linkList;
 	private final HashMap<Id, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();

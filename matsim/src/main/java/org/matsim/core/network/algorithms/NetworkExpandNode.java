@@ -245,7 +245,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
-			Link l = network.getFactory().createLink(inlink.getId(), inlink.getFromNode().getId(), n.getId());
+			Link l = network.getFactory().createLink(inlink.getId(), inlink.getFromNode(), n);
 			l.setLength(inlink.getLength());
 			l.setFreespeed(inlink.getFreespeed());
 			l.setCapacity(inlink.getCapacity());
@@ -265,7 +265,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
-			Link l = network.getFactory().createLink(outlink.getId(), n.getId(), outlink.getToNode().getId());
+			Link l = network.getFactory().createLink(outlink.getId(), n, outlink.getToNode());
 			l.setLength(outlink.getLength());
 			l.setFreespeed(outlink.getFreespeed());
 			l.setCapacity(outlink.getCapacity());
@@ -280,7 +280,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Tuple<Id,Id> turn = turns.get(i);
 			Link fromLink = network.getLinks().get(turn.getFirst());
 			Link toLink = network.getLinks().get(turn.getSecond());
-			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode().getId(), toLink.getFromNode().getId());
+			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode(), toLink.getFromNode());
 			l.setLength(CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()));
 			l.setFreespeed(fromLink.getFreespeed());
 			l.setCapacity(fromLink.getCapacity());

@@ -122,14 +122,14 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		Node medianNode = this.network.getFactory().createNode(getNewNodeId(), link.getCoord());
 		this.network.addNode(medianNode);
 
-		Link tmpLink = this.network.getFactory().createLink(link.getId(), link.getFromNode().getId(), medianNode.getId());
+		Link tmpLink = this.network.getFactory().createLink(link.getId(), link.getFromNode(), medianNode);
 		tmpLink.setLength(length);
 		tmpLink.setFreespeed(freespeed);
 		tmpLink.setCapacity(capacity);
 		tmpLink.setNumberOfLanes(permlanes);
 		this.network.addLink(tmpLink);
 
-		tmpLink = this.network.getFactory().createLink(getNewLinkId(), medianNode.getId(), link.getToNode().getId());
+		tmpLink = this.network.getFactory().createLink(getNewLinkId(), medianNode, link.getToNode());
 		tmpLink.setLength(length);
 		tmpLink.setFreespeed(freespeed);
 		tmpLink.setCapacity(capacity);

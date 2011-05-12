@@ -31,7 +31,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -114,20 +114,17 @@ public class Events2Snapshot {
 	public void run(final String[] args) {
 		parseArguments(args);
 		Scenario scenario;
-		Config config1 = ConfigUtils.loadConfig(this.configfile);
-		MatsimRandom.reset(config1.global().getRandomSeed());
-		scenario = ScenarioUtils.createScenario(config1);
-
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
-		this.config = sl.getScenario().getConfig();
+		this.config = ConfigUtils.loadConfig(this.configfile);
+		MatsimRandom.reset(this.config.global().getRandomSeed());
+		scenario = ScenarioUtils.createScenario(this.config);
 
 		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {
 			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
 			return;
 		}
 
-		this.network = sl.getScenario().getNetwork();
-		sl.loadNetwork();
+		this.network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		prepare();
 
 		if (this.eventsfile == null) {

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
+/*package*/ class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	//

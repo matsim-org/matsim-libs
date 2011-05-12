@@ -520,7 +520,7 @@ public class QuadTree<T> implements Serializable {
 		private Node<T> northeast = null;
 		private Node<T> southeast = null;
 		private Node<T> southwest = null;
-		private Rect bounds = null;
+		private final Rect bounds;
 
 		public Node(final double minX, final double minY, final double maxX, final double maxY) {
 			this.bounds = new Rect(minX, minY, maxX, maxY);
@@ -560,12 +560,6 @@ public class QuadTree<T> implements Serializable {
 				}
 			}
 			return false;
-		}
-
-		public Leaf<T> getLeaf(final double x, final double y) {
-			if (this.hasChilds) return getChild(x, y).getLeaf(x, y);
-			if (this.leaf != null && this.leaf.x == x && this.leaf.y == y) return this.leaf;
-			return null;
 		}
 
 		public void clear() {

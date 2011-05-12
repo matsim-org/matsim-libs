@@ -24,16 +24,16 @@ package org.matsim.households;
  */
 public interface HouseholdsSchemaV10Names {
 
-	public static String HOUSEHOLDS = "households";
-	public static String HOUSEHOLD = "household";
-	public static String ID = "id";
-	public static String MEMBERS = "members";
-	public static String PERSONID = "personId";
-	public static String REFID = "refId";
-	public static String INCOME = "income";
-	public static String CURRENCY = "currency";
-	public static String PERIOD = "period";
-	public static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
-	public static String VEHICLES = "vehicles";
+	public final static String HOUSEHOLDS = "households";
+	public final static String HOUSEHOLD = "household";
+	public final static String ID = "id";
+	public final static String MEMBERS = "members";
+	public final static String PERSONID = "personId";
+	public final static String REFID = "refId";
+	public final static String INCOME = "income";
+	public final static String CURRENCY = "currency";
+	public final static String PERIOD = "period";
+	public final static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
+	public final static String VEHICLES = "vehicles";
 	
 }

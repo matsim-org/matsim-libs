@@ -38,15 +38,6 @@ import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
-//	/**
-//	 * @deprecated use Leg.Mode instead
-//	 *
-//	 * But do not remove: minimally, kai is of the opinion that a plan type, with the consequence
-//	 * that the last plan of a certain type is never removed, is extremely useful and should remain
-//	 * there.  kai, dec'10
-//	 */
-//	@Deprecated
-//	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
 	
 	/**Plan(Impl).getType is still there, but now returns a String.  That String can be used in arbitrary, user-defined
 	 * ways; matsim will, however, make sure that the last plan of a given type is not removed.  The constants here are just
@@ -227,12 +218,10 @@ public class PlanImpl implements Plan {
 	 * yy Since this now has a defined useage (last plan of given "type" is never removed), this may be elevated into the
 	 * api.  Might be called "label" instead of "type", though???  kai, mar'11
 	 */
-	@Deprecated
 	public String getType() {
 		return this.type;
 	}
 
-	@Deprecated
 	public void setType(String type) {
 		this.type = type;
 	}

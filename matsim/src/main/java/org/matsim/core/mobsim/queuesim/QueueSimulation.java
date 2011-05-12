@@ -65,8 +65,8 @@ import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -646,10 +646,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	}
 
 
-	/*package*/ Integer getIterationNumber() {
-		return iterationNumber;
-	}
-
 	@Override
 	public void setIterationNumber(Integer iterationNumber) {
 		this.iterationNumber = iterationNumber;
@@ -685,11 +681,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	@Override
 	public MobsimTimerI getSimTimer() {
 		return this.simTimer ;
-	}
-
-
-	double getStuckTime() {
-		return this.getScenario().getConfig().simulation().getStuckTime() ;
 	}
 
 

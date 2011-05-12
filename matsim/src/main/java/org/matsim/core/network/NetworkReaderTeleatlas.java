@@ -342,14 +342,14 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			if (ignore) { ignoreCnt++; }
 			else {
 				if (oneway.equals(" ") || oneway.equals("N")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString()+"FT"), fNode.getId(), tNode.getId());
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+"FT"), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed/3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
 					((LinkImpl) l).setOrigId(id.toString());
 					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
-					l = network.getFactory().createLink(new IdImpl(id.toString()+"TF"), tNode.getId(), fNode.getId());
+					l = network.getFactory().createLink(new IdImpl(id.toString()+"TF"), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed/3.6);
 					l.setCapacity(cap);
@@ -358,7 +358,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("FT")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), fNode.getId(), tNode.getId());
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed/3.6);
 					l.setCapacity(cap);
@@ -367,7 +367,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					((LinkImpl) l).setType(linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("TF")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), tNode.getId(), fNode.getId());
+					Link l = network.getFactory().createLink(new IdImpl(id.toString()+oneway), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed/3.6);
 					l.setCapacity(cap);

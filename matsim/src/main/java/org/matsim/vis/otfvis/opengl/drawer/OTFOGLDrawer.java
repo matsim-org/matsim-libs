@@ -187,10 +187,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 			// Calculate text location and color
 			int x = this.drawable.getWidth() - this.statusWidth - 5;
 			int y = this.drawable.getHeight() - 30;
-			float c = 0.75f;
+			float c = 0.25f;
 
 			// Render the text
-			this.textRenderer.setColor(c, c, c, c);
+			this.textRenderer.setColor(Color.DARK_GRAY);
 			this.textRenderer.beginRendering(this.drawable.getWidth(), this.drawable.getHeight());
 			this.textRenderer.draw(this.status, x, y);
 			this.textRenderer.endRendering();

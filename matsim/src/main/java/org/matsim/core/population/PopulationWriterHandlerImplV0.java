@@ -40,11 +40,11 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
-public class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
+	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
 	private final Network network;
 
-	public PopulationWriterHandlerImplV0(final Network network) {
+	protected PopulationWriterHandlerImplV0(final Network network) {
 		this.network = network;
 	}
 

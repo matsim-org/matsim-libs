@@ -38,8 +38,4 @@ public class LastEventOfIteration extends EventImpl {
 		return null;
 	}
 
-	public String getTextRepresentation() {
-		return "";
-	}
-
 }

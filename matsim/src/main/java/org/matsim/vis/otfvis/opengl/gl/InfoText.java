@@ -75,10 +75,6 @@ public class InfoText implements Serializable {
 		this.size = size2;
 	}
 
-	public Rectangle2D getBounds() {
-		return renderer.getBounds(line);
-	}
-	
 	public void draw3D(GL gl) {
 		float size = this.size ; // kai: this is where font for labels can be made smaller
 		if ( line.contains("pt interaction") ) {
@@ -157,10 +153,6 @@ public class InfoText implements Serializable {
 		}
 	}
 
-	public float getAlpha() {
-		return color.getAlpha()/255.f;
-	}
-
 	public void setAlpha(float alpha) {
 		color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(alpha*255));
 	}
@@ -169,48 +161,20 @@ public class InfoText implements Serializable {
 		this.color = color;
 	}
 
-	public Color getColor() {
-		return color;
-	}
-
 	public void setX(float x) {
 		this.x = x;
-	}
-
-	public float getX() {
-		return x;
 	}
 
 	public void setY(float y) {
 		this.y = y;
 	}
 
-	public float getY() {
-		return y;
-	}
-
-	public void setZ(float z) {
-		this.z = z;
-	}
-
-	public float getZ() {
-		return z;
-	}
-
 	public void setSize(float size) {
 		this.size = size;
 	}
 
-	public float getSize() {
-		return size;
-	}
-
 	public void setFill(float fill) {
 		this.fill = fill;
-	}
-
-	public float getFill() {
-		return fill;
 	}
 
 	public void setDecorated(boolean decorated) {

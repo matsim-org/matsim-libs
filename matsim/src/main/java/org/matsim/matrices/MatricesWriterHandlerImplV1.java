@@ -23,7 +23,7 @@ package org.matsim.matrices;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
+/*package*/ class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

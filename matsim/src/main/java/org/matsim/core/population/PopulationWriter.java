@@ -182,10 +182,6 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		write(filename);
 	}
 
-	public PopulationWriterHandler getHandler() {
-		return this.handler;
-	}
-
 	public BufferedWriter getWriter() {
 		return this.writer;
 	}

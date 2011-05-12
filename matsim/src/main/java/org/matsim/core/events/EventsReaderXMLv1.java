@@ -31,10 +31,9 @@ import org.xml.sax.SAXException;
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
 	static public final String EVENT = "event";
-	static public final String EVENTS = "events";
 
 	private final EventsManager events;
-	private EventsFactoryImpl builder;
+	private final EventsFactoryImpl builder;
 
 	public EventsReaderXMLv1(final EventsManager events) {
 		this.events = events;
