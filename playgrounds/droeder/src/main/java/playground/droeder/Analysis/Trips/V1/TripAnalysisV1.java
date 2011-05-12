@@ -20,14 +20,12 @@
 package playground.droeder.Analysis.Trips.V1;
 
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -107,11 +105,7 @@ public class TripAnalysisV1 {
 		
 		InputStream in = null;
 		try{
-			if(plans.endsWith("xml.gz")){
-				in = new GZIPInputStream(new FileInputStream(plans));
-			}else{
-				in = new FileInputStream(plans);
-			}
+			in = IOUtils.getInputstream(plans);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -137,11 +131,7 @@ public class TripAnalysisV1 {
 		
 		InputStream in = null;
 		try{
-			if(eventsFile.endsWith("xml.gz")){
-				in = new GZIPInputStream(new FileInputStream(eventsFile));
-			}else{
-				in = new FileInputStream(eventsFile);
-			}
+			in = IOUtils.getInputstream(eventsFile);
 			new EventsReaderXMLv1(manager).parse(in);
 		} catch (SAXException e) {
 			e.printStackTrace();

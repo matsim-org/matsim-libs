@@ -38,7 +38,7 @@ public class AnalysisTripSetOneMode {
 	
 	private static final Logger log = Logger.getLogger(AnalysisTripSetOneMode.class);
 	
-	private List<AnalysisTrip> trips;
+	private List<AbstractAnalysisTrip> trips;
 	private boolean storeTrips;
 	
 	private Geometry zone;
@@ -80,7 +80,7 @@ public class AnalysisTripSetOneMode {
 		this.zone = zone;
 		this.storeTrips = storeTrips;
 		if(storeTrips){
-			this.trips = new LinkedList<AnalysisTrip>();
+			this.trips = new LinkedList<AbstractAnalysisTrip>();
 		}
 		this.mode = mode;
 		this.init();
@@ -130,7 +130,7 @@ public class AnalysisTripSetOneMode {
 		this(mode, null, false);
 	}
 
-	public void addTrip(AnalysisTrip trip) {
+	public void addTrip(AbstractAnalysisTrip trip) {
 		if(trip.getMode().equals(this.mode)){
 			this.addTripValues(trip);
 		}else{ 
@@ -144,7 +144,7 @@ public class AnalysisTripSetOneMode {
 		
 	}
 
-	private void addTripValues(AnalysisTrip trip) {
+	private void addTripValues(AbstractAnalysisTrip trip) {
 		Integer zone = this.getTripLocation(trip);
 		this.addAllModeValues(trip, zone);
 		if(trip.getMode().equals(TransportMode.pt)){
@@ -152,12 +152,12 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-	private void addAllModeValues(AnalysisTrip trip, Integer zone) {
+	private void addAllModeValues(AbstractAnalysisTrip trip, Integer zone) {
 		tripCnt[zone]++;
 		sumTTime[zone] += trip.getTripTTime();
 	}
 
-	private void addPtValues(AnalysisTrip trip, Integer zone) {
+	private void addPtValues(AbstractAnalysisTrip trip, Integer zone) {
 		accesWalkCnt[zone] += trip.getAccesWalkCnt(); 
 		accesWalkTTime[zone] += trip.getAccesWalkTTime();
 		
@@ -205,7 +205,7 @@ public class AnalysisTripSetOneMode {
 	}
 	
 	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
-	private Integer getTripLocation(AnalysisTrip trip){
+	private Integer getTripLocation(AbstractAnalysisTrip trip){
 		if(this.zone == null){
 			return 0;
 		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
@@ -219,7 +219,7 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 	
-	public List<AnalysisTrip> getTrips(){
+	public List<AbstractAnalysisTrip> getTrips(){
 		if(!storeTrips){
 			log.error("Trips not stored. Check constructor!");
 		}

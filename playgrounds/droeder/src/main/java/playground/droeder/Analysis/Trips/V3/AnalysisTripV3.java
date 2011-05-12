@@ -20,150 +20,176 @@
 package playground.droeder.Analysis.Trips.V3;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonEntersVehicleEventImpl;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 
-import playground.droeder.Analysis.Trips.V2.AnalysisTripV2;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripV3 extends AnalysisTripV2 {
-	private int expNrOfEvents;
-
+public class AnalysisTripV3 extends AbstractAnalysisTrip {
+	
+//	private static final Logger log = Logger.getLogger(AnalysisTripV3.class);
+	
+	private Integer nrOfExpEvents = null;
+	private Integer nrOfElements = 0;
 	
 	public AnalysisTripV3(){
-		super();
+		
 	}
 	
 	@Override
 	public void addElements(ArrayList<PlanElement> elements){
+		this.nrOfElements = elements.size();
+		this.nrOfExpEvents = this.findExpectedNumberOfEvents(elements);
 		super.addElements(elements);
-		this.findExpectedNumberOfEvents(elements);
 	}
 	
-	private void findExpectedNumberOfEvents(ArrayList<PlanElement> elements){
+	public Integer getNrOfElements(){
+		return this.nrOfElements;
+	}
+	
+	private int findExpectedNumberOfEvents(ArrayList<PlanElement> elements){
+		int temp = 0;
 		for(PlanElement pe: elements){
-			if(pe instanceof Activity){
-				this.expNrOfEvents += 2;
-			}else if( pe instanceof Leg){
-				// a pt-leg is started a PersonEntersVehicle is thrown
+			if( pe instanceof Leg){
+				
 				if(((Leg) pe).getMode().equals(TransportMode.pt)){
-					this.expNrOfEvents +=3;
+					temp +=4;
 				}else{
-					this.expNrOfEvents +=2;
+					temp +=2;
 				}
 			}
 		}
-		//the first activity has no startEvent and the last no endEvent
-		this.expNrOfEvents -=2;
+		return temp;
 	}
 	
 	public int getNumberOfExpectedEvents(){
-		return this.expNrOfEvents;
+		return this.nrOfExpEvents;
 	}
-	
-	@Override
-	public void addEvents(ArrayList<PersonEvent> events){
-		this.analyzeEvents(events);
-	}
-	
-	@Override
-	protected void analyzeEvents(ArrayList<PersonEvent> events){
-		super.analyzeValuesForAllModes(events);
-		if(super.mode.equals(TransportMode.pt)){
-			this.analyzeValuesForPT(events);
-		}
-	}
-	
-	@Override
-	protected void analyzeValuesForPT(ArrayList<PersonEvent> events){
-		
-		//TODO refactor
-		ListIterator<PersonEvent> it = events.listIterator();
-		PersonEvent pe;
-		double switchWait = 0;
-		
-		while(it.hasNext()){
-			pe = it.next();
-		
-			if(pe instanceof ActivityEndEvent){
-				if(it.previousIndex() == 4){
-					accesWaitTime += pe.getTime();
-					if(accesWaitTime > 0) accesWaitCnt++;
-				}
-				
-				// only pt interactions between 2 pt legs are registered for waitTime
-				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 7)){
-					switchWait += pe.getTime();
-					if(switchWait > 0) switchWaitCnt++;
-					switchWaitTime += switchWait;
-					switchWait = 0;
-				}
-			}
-			
-			else if(pe instanceof AgentDepartureEvent){
-				// every pt leg is a new line
-				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
-					lineCnt++;
-					lineTTime -= pe.getTime();
-				}
-				
-				// deside if transit_walk is used for access, egress or switch
-				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
-					if(it.previousIndex() == 1){
-						accesWalkTTime -= pe.getTime();
-						accesWalkCnt++;
-					}else if(it.previousIndex() == events.size() - 3){
-						egressWalkTTime -= pe.getTime();
-						egressWalkCnt++;
-					}else{
-						switchWalkTTime -= pe.getTime();
-						switchWalkCnt++;
-					}
-				}
-			}
-			
-			else if(pe instanceof AgentArrivalEvent){
-				
-				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
-					lineTTime += pe.getTime();
-				}
 
-				// see at departure
-				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
-					if(it.previousIndex() == 2){
-						accesWalkTTime += pe.getTime();
-					}else if(it.previousIndex() == events.size() - 2){
-						egressWalkTTime += pe.getTime();
-					}else{
-						switchWalkTTime += pe.getTime();
-					}
-				}
-				
-			}
-			
-			else if(pe instanceof ActivityStartEvent){
-				if(it.previousIndex() == 3){
-					accesWaitTime -= pe.getTime();
-				}
-				
-				// see at endEvent
-				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 8)){
-					switchWait -= pe.getTime();
-				}
+	public void addEvents(ArrayList<PersonEvent> events) {
+		super.tripTTime = events.get(events.size()-1).getTime() - events.get(0).getTime();
+		if(super.getMode().equals(TransportMode.pt)){
+			TravelTimeHandler handler = new TravelTimeHandler(this);
+			for(PersonEvent pe: events){
+				handler.processEvent(pe);
 			}
 		}
+	}
+	
+}
+
+class TravelTimeHandler{
+	private static final Logger log = Logger.getLogger(TravelTimeHandler.class);
+	
+	private AnalysisTripV3 trip;
+	private String expEvent = AgentDepartureEventImpl.class.toString();
+	private boolean warn = true;
+	
+	public TravelTimeHandler(AnalysisTripV3 trip){
+		this.trip = trip;
+	}
+
+	public void processEvent(PersonEvent e) {
+		if(warn && !e.getClass().toString().equals(this.expEvent)){
+			log.warn("got unexpected Event! Check results! Message thrown only once!");
+			this.warn = false;
+		}
 		
+		this.expEvent = this.getNextExpEvent(e);
+		
+		if(e instanceof AgentDepartureEvent){
+			this.process((AgentDepartureEvent) e);
+		}else if(e instanceof AgentArrivalEvent){
+			this.process((AgentArrivalEvent) e);
+		}else if(e instanceof PersonEntersVehicleEvent){
+			this.process((PersonEntersVehicleEvent)e);
+		}else if(e instanceof PersonLeavesVehicleEvent){
+			this.process((PersonLeavesVehicleEvent)e);
+		}
+	}
+	
+	
+	private boolean accesWalk = true;
+	private boolean accesWait = true;
+//	private boolean switchWait = false;
+	//TODO switchWait
+	private void process(AgentDepartureEvent e){
+		if(accesWalk){
+			this.trip.accesWalkTTime -= e.getTime();
+		}else if(e.getLegMode().equals(TransportMode.transit_walk)){
+			if(this.trip.egressWalkTTime > 0){
+				this.trip.switchWalkTTime += this.trip.egressWalkTTime;
+				this.trip.switchWalkCnt++;
+				this.trip.egressWalkCnt--;
+			}
+			this.trip.egressWalkTTime = -e.getTime();
+		}
+	}
+	
+	private void process(AgentArrivalEvent e){
+		if(accesWalk){
+			this.trip.accesWalkTTime += e.getTime();
+			this.trip.accesWalkCnt++;
+			this.accesWalk = false;
+		}else if(e.getLegMode().equals(TransportMode.transit_walk)){
+			this.trip.egressWalkTTime += e.getTime();
+			this.trip.egressWalkCnt++;
+		}
+		if(accesWait){
+			this.trip.accesWaitTime -= e.getTime();
+		}
+	}
+	
+	private void process(PersonEntersVehicleEvent e){
+		if(accesWait){
+			accesWait = false;
+			this.trip.accesWaitTime += e.getTime();
+			if(this.trip.getAccesWaitTime() > 0){
+				this.trip.accesWaitCnt++;
+			}
+		}
+		this.trip.lineTTime -=e.getTime();
+	}
+	
+	private void process(PersonLeavesVehicleEvent e){
+	
+		this.trip.lineTTime +=e.getTime();
+		this.trip.lineCnt++;
+		
+	}
+	
+	private String getNextExpEvent(PersonEvent e){
+		if(e instanceof AgentDepartureEvent){
+			if(((AgentDepartureEvent) e).getLegMode().equals(TransportMode.pt)){
+				return PersonEntersVehicleEventImpl.class.toString();
+			}else{
+				return AgentArrivalEventImpl.class.toString();
+			}
+		}else if(e instanceof AgentArrivalEvent){
+			return AgentDepartureEventImpl.class.toString();
+		}else if(e instanceof PersonEntersVehicleEvent){
+			return PersonLeavesVehicleEventImpl.class.toString();
+		}else if(e instanceof PersonLeavesVehicleEvent){
+			return AgentArrivalEventImpl.class.toString();
+		}else{
+			return "false";
+		}
 	}
 }
+

@@ -20,18 +20,24 @@
 package playground.droeder.Analysis.Trips.V2;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.AnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripV2 extends AnalysisTrip {
+public class AnalysisTripV2 extends AbstractAnalysisTrip {
 	
 	private Integer nrOfElements = 0;
 	
@@ -39,16 +45,108 @@ public class AnalysisTripV2 extends AnalysisTrip {
 		
 	}
 	
+	@Override
 	public void addElements(ArrayList<PlanElement> elements){
+		super.addElements(elements);
 		this.nrOfElements = elements.size();
-		super.analyzeElements(elements);
+	}
+
+	public Integer getNrOfElements(){
+		return this.nrOfElements;
 	}
 	
 	public void addEvents(ArrayList<PersonEvent> events){
-		super.analyzeEvents(events);
+		this.analyzeEvents(events);
 	}
 	
-	public Integer getNrOfElements(){
-		return this.nrOfElements;
+	private void analyzeEvents(ArrayList<PersonEvent> events){
+		this.analyzeValuesForAllModes(events);
+		if(this.mode.equals(TransportMode.pt)){
+			this.analyzeValuesForPT(events);
+		}
+	}
+	
+	private void analyzeValuesForAllModes(ArrayList<PersonEvent> events) {
+		// from first departure to last arrival
+		tripTTime = events.get(events.size() - 2).getTime() - events.get(1).getTime();
+	}
+
+	
+	private void analyzeValuesForPT(ArrayList<PersonEvent> events) {
+		ListIterator<PersonEvent> it = events.listIterator();
+		PersonEvent pe;
+		double switchWait = 0;
+		
+		while(it.hasNext()){
+			pe = it.next();
+		
+			if(pe instanceof ActivityEndEvent){
+				if(it.previousIndex() == 4){
+					accesWaitTime += pe.getTime();
+					if(accesWaitTime > 0) accesWaitCnt++;
+				}
+				
+				// only pt interactions between 2 pt legs are registered for waitTime
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 7)){
+					switchWait += pe.getTime();
+					if(switchWait > 0) switchWaitCnt++;
+					switchWaitTime += switchWait;
+					switchWait = 0;
+				}
+			}
+			
+			else if(pe instanceof AgentDepartureEvent){
+				// every pt leg is a new line
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineCnt++;
+					lineTTime -= pe.getTime();
+				}
+				
+				// deside if transit_walk is used for access, egress or switch
+				if(((AgentDepartureEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 1){
+						accesWalkTTime -= pe.getTime();
+						accesWalkCnt++;
+					}else if(it.previousIndex() == events.size() - 3){
+						egressWalkTTime -= pe.getTime();
+						egressWalkCnt++;
+					}else{
+						switchWalkTTime -= pe.getTime();
+						switchWalkCnt++;
+					}
+				}
+			}
+			
+			else if(pe instanceof AgentArrivalEvent){
+				
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.pt)){
+					lineTTime += pe.getTime();
+				}
+
+				// see at departure
+				if(((AgentArrivalEvent) pe).getLegMode().equals(TransportMode.transit_walk)){
+					if(it.previousIndex() == 2){
+						accesWalkTTime += pe.getTime();
+					}else if(it.previousIndex() == events.size() - 2){
+						egressWalkTTime += pe.getTime();
+					}else{
+						switchWalkTTime += pe.getTime();
+					}
+				}
+				
+			}
+			
+			else if(pe instanceof ActivityStartEvent){
+				if(it.previousIndex() == 3){
+					accesWaitTime -= pe.getTime();
+				}
+				
+				// see at endEvent
+				else if((it.previousIndex() > 6) && (it.previousIndex() < events.size() - 8)){
+					switchWait -= pe.getTime();
+				}
+			}
+		}
+		
 	}
 }

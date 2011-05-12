@@ -39,7 +39,7 @@ public class AnalysisTripSetAllMode {
 		this.zone = zone;
 	}
 	
-	public void addTrip(AnalysisTrip trip){
+	public void addTrip(AbstractAnalysisTrip trip){
 		String mode = trip.getMode();
 		
 		if(this.mode2TripSet.containsKey(mode)){

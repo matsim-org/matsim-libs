@@ -19,26 +19,25 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.V3;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.population.filters.AbstractPersonFilter;
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.population.PlanElement;
+
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder
  *
  */
-public class Plan2TripsFilterV3 extends AbstractPersonFilter{
-	
-	@Override
-	public void run(Person p){
-		if(judge(p)){
-			super.count();
-		}
-	}
+public class Plan2TripsFilterV3 extends AbstractPlan2TripsFilter{
 
 	@Override
-	public boolean judge(Person person) {
-		// TODO Auto-generated method stub
-		return false;
+	protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
+		AbstractAnalysisTrip trip = new AnalysisTripV3();
+		trip.addElements(elements);
+		return trip;
 	}
+	
 
 }
