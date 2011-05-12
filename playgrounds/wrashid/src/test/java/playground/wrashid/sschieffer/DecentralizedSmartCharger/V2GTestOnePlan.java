@@ -2,8 +2,9 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.LinkedList;
+
+import junit.framework.TestCase;
+import lpsolve.LpSolveException;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
@@ -21,11 +22,8 @@ import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlug
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import junit.framework.TestCase;
-import lpsolve.LpSolveException;
 
 /**
  * tests methods:
@@ -224,7 +222,7 @@ public class V2GTestOnePlan extends TestCase{
 							 compensationPerKWHRegulationDown);
 					
 					LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= 
-						AgentContractCollector.makeAgentContracts(
+						myAgentContractsCollector.makeAgentContracts(
 								controler,
 								0,
 								0,
