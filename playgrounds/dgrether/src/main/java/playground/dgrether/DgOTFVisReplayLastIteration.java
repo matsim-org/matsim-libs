@@ -29,6 +29,8 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
+import playground.dgrether.utils.DgConfigCleaner;
+
 /* *********************************************************************** *
  * project: org.matsim.*
  * DgOTFVisReplayLastIteration
