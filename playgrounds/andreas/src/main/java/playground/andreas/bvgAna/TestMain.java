@@ -20,11 +20,6 @@
 package playground.andreas.bvgAna;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -32,44 +27,32 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
-import playground.andreas.bvgAna.level0.AgentId2PersonMap;
-import playground.andreas.bvgAna.level0.TransitScheduleDataProvider;
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
-import playground.andreas.bvgAna.level1.VehDelayAtStopHistogram;
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2LineId2Pulk;
-import playground.andreas.bvgAna.level1.StopId2LineId2PulkData;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
+import playground.andreas.bvgAna.level1.VehDelayAtStopHistogram;
 import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
-import playground.andreas.bvgAna.level1.VehId2DelayAtStopMapData;
 import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
 import playground.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
 import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMap;
-import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMapData;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
-import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMapData;
 import playground.andreas.bvgAna.level2.VehId2AgentIds;
 import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
@@ -103,7 +86,7 @@ public class TestMain {
 		String vehDefinitionFile = "./transitVehicles.final.xml.gz";
 		String outFile = "./out.txt";
 
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -113,7 +96,7 @@ public class TestMain {
 
 		new MatsimNetworkReader(sc).readFile(netFile);
 		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
-		PopulationReaderMatsimV4 popReader = new PopulationReaderMatsimV4(sc);
+		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(plansFile);
 
 		try {

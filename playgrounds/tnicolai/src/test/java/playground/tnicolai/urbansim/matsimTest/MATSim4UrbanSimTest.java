@@ -28,7 +28,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -113,7 +113,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		
 		// population size from MATSim output file
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReaderMatsimV4 populationReader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(scenario);
 		populationReader.readFile( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
 //		populationReader.readFile( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY + "output_plans.xml.gz" );
 		outputPopulation = scenario.getPopulation();

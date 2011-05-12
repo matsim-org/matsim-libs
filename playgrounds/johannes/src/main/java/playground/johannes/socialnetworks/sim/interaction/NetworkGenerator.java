@@ -37,8 +37,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,7 +78,7 @@ public class NetworkGenerator {
 
 		GeometryFactory geoFactory = new GeometryFactory();
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 		netReader.parse(netFile);
@@ -86,7 +86,7 @@ public class NetworkGenerator {
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1((ScenarioImpl) scenario);
 		facReader.parse(facFile);
 
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(popFile);
 
 		logger.info("Building empty graph...");

@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -40,7 +40,7 @@ public class RemoveRoutes {
 		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 
-		new PopulationReaderMatsimV4(sc).readFile(sc.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());
 		Population pop = sc.getPopulation();
 		for (Person pers : pop.getPersons().values()) {
 			Plan plan = pers.getSelectedPlan();

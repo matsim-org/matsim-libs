@@ -39,8 +39,8 @@ import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -119,7 +119,7 @@ public class TripAnalysisV1 {
 		}
 		
 		try {
-			new PopulationReaderMatsimV4(sc).parse(in);
+			new MatsimPopulationReader(sc).parse(in);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -38,8 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.sna.math.Discretizer;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
@@ -92,10 +91,10 @@ public class ActivityLoadCurve {
 	}
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 //		netReader.parse("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 //		reader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_transitincl_10pct.xml");
 		reader.readFile("/Users/jillenberger/Work/work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		

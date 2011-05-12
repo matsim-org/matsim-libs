@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
@@ -62,7 +62,7 @@ public class Plans2GIS {
 			e1.printStackTrace();
 		}
 		try {
-			new PopulationReaderMatsimV4(sc).parse(DaPaths.VSP + "BVG09_Auswertung/testPopulation1.xml");
+			new MatsimPopulationReader(sc).parse(DaPaths.VSP + "BVG09_Auswertung/testPopulation1.xml");
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

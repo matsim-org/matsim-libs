@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.filters.AbstractPersonFilter;
@@ -84,7 +84,7 @@ public class PlansConsistencyChecker {
 		}
 		
 		try {
-			new PopulationReaderMatsimV4(sc).parse(in);
+			new MatsimPopulationReader(sc).parse(in);
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

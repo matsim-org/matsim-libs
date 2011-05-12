@@ -29,10 +29,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -86,7 +85,7 @@ public class PlanExtractor {
 		PersonLocationFilter algo = new PersonLocationFilter(g, 1000, sc.getNetwork());
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(algo);
 		try {
-			new PopulationReaderMatsimV4(sc).parse(zip);
+			new MatsimPopulationReader(sc).parse(zip);
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

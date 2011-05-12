@@ -34,7 +34,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +52,7 @@ public class EAFSehtlerNetConverter {
 		String plansOut ="/home/laemmel/devel/EAF/data/shelter_plans.xml.gz";
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(net);
-		new PopulationReaderMatsimV4(sc).readFile(plans);
+		new MatsimPopulationReader(sc).readFile(plans);
 		
 		extendNetwork(sc);
 		

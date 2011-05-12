@@ -39,8 +39,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
@@ -88,7 +87,7 @@ public class SampleFromCommercialPlans {
 			throw new IllegalArgumentException("Incorrect number of arguments.");
 		}
 		
-		Scenario sNew = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
@@ -109,8 +108,8 @@ public class SampleFromCommercialPlans {
 		List<Scenario> listSc = new ArrayList<Scenario>(10);
 		for(int i = 1; i <= 10; i++){
 			String filename = root + "plansGauteng5000_Sample" + i + ".xml";
-			Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			PopulationReaderMatsimV4 pr = new PopulationReaderMatsimV4(s);
+			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MatsimPopulationReader pr = new MatsimPopulationReader(s);
 			try {
 				pr.parse(filename);
 				listSc.add(s);
@@ -132,14 +131,14 @@ public class SampleFromCommercialPlans {
 			int rList = (int) Math.round(r.nextDouble()*9);
 			
 			List<Id> agentIds = new ArrayList<Id>();
-			Set<Id> Ids = listSc.get((int) rList).getPopulation().getPersons().keySet();
+			Set<Id> Ids = listSc.get(rList).getPopulation().getPersons().keySet();
 			for (Id id2 : Ids) {
 				agentIds.add(id2);
 			}
 			int rId = (int) Math.floor(r.nextDouble()*agentIds.size());
 			
 			Person p = pf.createPerson(new IdImpl(id));
-			Plan plan = listSc.get((int) rList).getPopulation().getPersons().get(agentIds.get(rId)).getSelectedPlan();
+			Plan plan = listSc.get(rList).getPopulation().getPersons().get(agentIds.get(rId)).getSelectedPlan();
 			xy.run(plan);
 			p.addPlan(plan);
 			sNew.getPopulation().addPerson(p);
@@ -166,8 +165,8 @@ public class SampleFromCommercialPlans {
 		
 		if(carFile != null){
 			log.info("Combining car and commercial vehicles.");
-			Scenario car = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			PopulationReaderMatsimV4 pr = new PopulationReaderMatsimV4(car);
+			Scenario car = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MatsimPopulationReader pr = new MatsimPopulationReader(car);
 			try {
 				pr.parse(carFile);
 			} catch (SAXException e) {

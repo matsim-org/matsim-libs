@@ -13,8 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -46,9 +45,9 @@ public class WriteBiogemeFile {
 	
 	private static final int D_W08 = 49; // Wegstrecke in km
 
-	private Scenario scenarioWithSurveyData = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenarioWithSurveyData = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	private Scenario scenarioWithRoutedPlans = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenarioWithRoutedPlans = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	private Households households = new HouseholdsImpl();
 
@@ -152,11 +151,11 @@ public class WriteBiogemeFile {
 	}
 
 	private void readPopulation() throws SAXException, ParserConfigurationException, IOException {
-		PopulationReaderMatsimV4 populationReader1 = new PopulationReaderMatsimV4(scenarioWithSurveyData);
+		MatsimPopulationReader populationReader1 = new MatsimPopulationReader(scenarioWithSurveyData);
 		populationReader1.readFile(SURVEY_PLANS);
 		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenarioWithRoutedPlans);
 		networkReader.parse(NET);
-		PopulationReaderMatsimV4 populationReader2 = new PopulationReaderMatsimV4(scenarioWithRoutedPlans);
+		MatsimPopulationReader populationReader2 = new MatsimPopulationReader(scenarioWithRoutedPlans);
 		populationReader2.readFile(ROUTED_PLANS);
 		HouseholdsReaderV10 householdsReader = new HouseholdsReaderV10(households);
 		householdsReader.readFile(HOUSEHOLDS_FILE);

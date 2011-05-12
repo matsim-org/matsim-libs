@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +49,7 @@ public class PlanIdShuffle {
 		ScenarioImpl sc2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc2).readFile(net);
 		new MatsimNetworkReader(sc1).readFile(net);
-		new PopulationReaderMatsimV4(sc1).readFile(in);
+		new MatsimPopulationReader(sc1).readFile(in);
 		List<Person> l = new ArrayList<Person>();
 		for (Person p : sc1.getPopulation().getPersons().values()) {
 			l.add(p);

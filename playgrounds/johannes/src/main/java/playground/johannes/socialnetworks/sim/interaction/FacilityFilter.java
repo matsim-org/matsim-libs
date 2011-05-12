@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -55,10 +55,10 @@ public class FacilityFilter {
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 		netReader.parse(netFile);
 
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1((ScenarioImpl) scenario);
+		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
 		facReader.parse(facFile);
 		
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(popFile);
 		
 		Set<Id> toRemove = new HashSet<Id>(scenario.getActivityFacilities().getFacilities().keySet());

@@ -36,7 +36,7 @@ import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -85,7 +85,7 @@ public class ActivityTimeAnalyzer {
 
 //		GeometryFactory geoFactory = new GeometryFactory();
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 		netReader.parse("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
@@ -93,7 +93,7 @@ public class ActivityTimeAnalyzer {
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1((ScenarioImpl) scenario);
 		facReader.parse("/Users/jillenberger/Work/work/socialnets/sim/facilities.xml");
 
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(popFile);
 		
 		ActivityTimeAnalyzer analyzer = new ActivityTimeAnalyzer();

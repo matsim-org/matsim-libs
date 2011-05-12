@@ -44,7 +44,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -141,7 +141,7 @@ public class MultiSourceEAF {
 	 * @return
 	 */
 	public static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
-		new PopulationReaderMatsimV4(scenario).readFile(filename);
+		new MatsimPopulationReader(scenario).readFile(filename);
 		return parsePopulation(scenario);
 	}
 
@@ -571,6 +571,7 @@ public class MultiSourceEAF {
 				if (result != null && !result.isEmpty()) {
 					if (settings.sortPathsBeforeAugmenting) {
 						Collections.sort(result, new Comparator<TimeExpandedPath>() {
+							@Override
 							public int compare(TimeExpandedPath first, TimeExpandedPath second) {
 								int v1 = first.getPathSteps().size();
 								int v2 = second.getPathSteps().size();

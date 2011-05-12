@@ -27,9 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.Attributes;
@@ -123,9 +122,9 @@ public class SocialSparseGraphMLReader
 		if (popFile == null && population == null)
 			throw new RuntimeException("Population file must not be null!");
 
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		if(population == null) {
-			PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+			MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 			reader.readFile(baseDir + "/" + popFile);
 			population = scenario.getPopulation();
 		}

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
@@ -89,10 +86,10 @@ public class LegDistanceAnalyzer {
 	}
 	
 	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 //		netReader.parse("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 //		reader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_transitincl_10pct.xml");
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/plans.xml");
 		
