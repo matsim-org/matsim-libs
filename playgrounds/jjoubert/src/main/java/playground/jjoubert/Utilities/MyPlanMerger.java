@@ -20,10 +20,7 @@
 
 package playground.jjoubert.Utilities;
 
-import java.io.IOException;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,11 +37,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
-import org.xml.sax.SAXException;
 
 public class MyPlanMerger {
 	private static final Logger log = Logger.getLogger(MyPlanMerger.class);
@@ -112,19 +107,11 @@ public class MyPlanMerger {
 	 * using {@link XY2Links#run(Plan)}.
 	 */
 	public void preparePlanMerger(){
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
-		try {
-			mpr.parse(baseFile);
-			nr.parse(networkFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		mpr.parse(baseFile);
+		nr.parse(networkFile);
 		log.info("Successfully created the base scenario with plans and network.");
 		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
 		for(Id id : sc.getPopulation().getPersons().keySet()){
@@ -145,19 +132,11 @@ public class MyPlanMerger {
 		int nextId = Integer.parseInt(addNumber);
 		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
 
-		Scenario scAdd = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scAdd = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		MatsimPopulationReader mprAdd = new MatsimPopulationReader(scAdd);
 		
-		try {
-			mprAdd.parse(addFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		mprAdd.parse(addFile);
 		Map<Id, ? extends Person> peopleToAdd = scAdd.getPopulation().getPersons();
 		for (Id idToAdd : peopleToAdd.keySet()) {
 			Person p = pf.createPerson(new IdImpl(nextId));

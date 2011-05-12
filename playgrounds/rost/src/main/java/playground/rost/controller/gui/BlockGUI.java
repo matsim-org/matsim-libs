@@ -30,7 +30,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -38,7 +37,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.rost.controller.vismodule.VisModuleContainerImpl;
 import playground.rost.controller.vismodule.implementations.BlockVisModule;
@@ -105,6 +103,7 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 		
 		btnWriteNetworkAndBlocks = new JButton("write network and block");
 		btnWriteNetworkAndBlocks.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				writeNetworkAndBlocks();
@@ -133,24 +132,11 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	
 	public static BlockGUI createBlocksAndShowGUI()
 	{
-		// TODO Auto-generated method stub
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
-		try {
-			nReader.parse(PathTracker.resolve("matExtract"));
-			return(new BlockGUI(network));
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		nReader.parse(PathTracker.resolve("matExtract"));
+		return(new BlockGUI(network));
 	}
 
 }

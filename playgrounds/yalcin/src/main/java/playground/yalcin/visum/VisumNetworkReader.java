@@ -42,13 +42,7 @@ public class VisumNetworkReader {
 
 	public void read(final String filename) throws FileNotFoundException, IOException {
 		BufferedReader reader;
-		try {
-			reader = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
-		}
+		reader = IOUtils.getBufferedReader(filename);
 
 		try {
 			String line = reader.readLine();

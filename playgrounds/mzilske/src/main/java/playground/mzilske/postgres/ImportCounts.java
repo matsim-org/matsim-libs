@@ -86,10 +86,6 @@ public class ImportCounts {
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
 		}
 
 	}

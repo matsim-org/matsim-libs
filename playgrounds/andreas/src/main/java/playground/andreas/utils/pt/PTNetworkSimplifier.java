@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,7 +54,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 import playground.andreas.utils.net.NetworkRemoveUnusedNodes;
 
@@ -382,7 +379,7 @@ public class PTNetworkSimplifier {
 	public void simplifyPTNetwork(){
 
 		log.info("Start...");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);
@@ -396,18 +393,7 @@ public class PTNetworkSimplifier {
 		osmLoader.loadScenario();
 
 		log.info("Reading " + this.scheduleInFile);
-		try {
-			new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork(), osmScenario).readFile(this.scheduleInFile);
 
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());

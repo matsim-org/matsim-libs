@@ -21,18 +21,15 @@
 package org.matsim.core.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for config-files of MATSim. This reader recognizes the format of the config-file and uses
@@ -71,21 +68,13 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
+	 * Parses the specified config file. This method calls {@link #parse(String)}.
 	 *
 	 * @param filename The name of the file to parse.
+	 * @throws UncheckedIOException e.g. if the file cannot be found
 	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	/**
@@ -94,18 +83,12 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	 *
 	 * @param filename The name of the file to parse.
 	 * @param dtdFilename The name of a (local) dtd-file to be used for validating the config file.
-	 * @throws IOException e.g. if the file cannot be found
+	 * @throws UncheckedIOException e.g. if the file cannot be found
 	 */
-	public void readFile(final String filename, final String dtdFilename) throws IOException {
+	public void readFile(final String filename, final String dtdFilename) throws UncheckedIOException {
 		log.info("trying to read config from " + filename);
 	  this.localDtd = dtdFilename;
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
+		parse(filename);
 		this.localDtd = null;
 	}
 

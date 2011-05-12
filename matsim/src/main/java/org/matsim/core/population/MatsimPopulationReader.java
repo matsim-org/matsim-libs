@@ -20,16 +20,13 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for plans-files of MATSim. This reader recognizes the format of the plans-file and uses
@@ -69,18 +66,11 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * possible exceptions on its own.
 	 *
 	 * @param filename The name of the file to parse.
+	 * @throws UncheckedIOException
 	 */
 	@Override
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	@Override

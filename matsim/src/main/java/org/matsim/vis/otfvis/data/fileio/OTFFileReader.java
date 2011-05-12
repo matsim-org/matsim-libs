@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.data.fileio;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
@@ -164,8 +163,6 @@ public final class OTFFileReader implements OTFServerRemote {
 				e.printStackTrace();
 			}
 			zipFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -186,8 +183,6 @@ public final class OTFFileReader implements OTFServerRemote {
 				}
 			}
 			zipFile.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

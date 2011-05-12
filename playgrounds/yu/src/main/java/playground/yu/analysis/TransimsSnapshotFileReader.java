@@ -21,7 +21,6 @@
 package playground.yu.analysis;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
@@ -31,15 +30,7 @@ public class TransimsSnapshotFileReader {
 
 	private BufferedReader infile = null;
 	public TransimsSnapshotFileReader(final String filename){
-		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}		
+		this.infile = IOUtils.getBufferedReader(filename);
 	}
 	
 	public String [] readLine() {

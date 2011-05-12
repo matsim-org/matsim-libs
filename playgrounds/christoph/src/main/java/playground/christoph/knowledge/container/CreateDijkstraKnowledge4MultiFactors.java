@@ -20,7 +20,6 @@
 
 package playground.christoph.knowledge.container;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -184,12 +183,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	{
 		this.config = scenario.getConfig();
 		this.config.checkConsistency();
-		try {
-			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
-		} catch (IOException e) {
-			log.error("Problem loading the configuration file from " + this.configFileName);
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		log.info("Loading Config ... done");
 	}
 
@@ -330,6 +324,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 			this.persons.add(person);
 		}
 
+		@Override
 		public void run()
 		{
 			int numRuns = 0;

@@ -20,14 +20,11 @@
 package playground.christoph.knowledge.nodeselection;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,7 +39,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 
 public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionReader{
@@ -296,23 +292,10 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 		return new IdImpl(atts.getValue(ID).intern());
 	}
 	
+	@Override
 	public void readFile(String fileName)
 	{
-		try 
-		{
-			super.parse(fileName);
-		} 
-		catch (SAXException e)
-		{
-			e.printStackTrace();
-		} 
-		catch (ParserConfigurationException e) 
-		{
-			e.printStackTrace();
-		} catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
+		super.parse(fileName);
 	}
 	
 	public void readMultiFile(String baseFileName)

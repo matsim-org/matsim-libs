@@ -104,7 +104,7 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		}
 
 		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
-			Id ssid = new IdImpl(xmlss.getRefId().toString());
+			Id ssid = new IdImpl(xmlss.getRefId());
 			AmberTimeData atdata = new AmberTimeDataImpl(ssid);
 
 			// Signalsystem Defaults

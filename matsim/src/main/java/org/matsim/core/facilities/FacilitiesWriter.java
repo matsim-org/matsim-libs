@@ -20,7 +20,6 @@
 
 package org.matsim.core.facilities;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -72,8 +71,6 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writeDoctype("facilities", this.dtd);
 			this.handler.startFacilities(this.facilities, this.writer);
 			this.handler.writeSeparator(this.writer);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

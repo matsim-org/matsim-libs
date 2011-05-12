@@ -26,8 +26,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,7 +37,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
 import playground.droeder.Analysis.Trips.AbstractTripEventsHandler;
@@ -114,37 +111,12 @@ public class TripAnalysisV3 {
 
 	private void readPlans(String plans, String network){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		try {
-			new NetworkReaderMatsimV1(sc).parse(network);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		new NetworkReaderMatsimV1(sc).parse(network);
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV3(); 
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
 		
-		InputStream in = null;
-		try{
-			in = IOUtils.getInputstream(plans);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			new MatsimPopulationReader(sc).parse(in);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimPopulationReader(sc).parse(plans);
 		
 		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips( planFilter.getTrips());
@@ -156,15 +128,7 @@ public class TripAnalysisV3 {
 		manager.addHandler(this.eventsHandler);
 		
 		InputStream in = null;
-		try{
-			in = IOUtils.getInputstream(eventsFile);
-			new EventsReaderXMLv1(manager).parse(in);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		in = IOUtils.getInputstream(eventsFile);
+		new EventsReaderXMLv1(manager).parse(in);
 	}
 }

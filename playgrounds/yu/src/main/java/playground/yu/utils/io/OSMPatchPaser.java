@@ -23,16 +23,13 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author yu
@@ -78,16 +75,8 @@ public class OSMPatchPaser extends MatsimXmlParser {
 		shell.add(meta.getValue("id"));
 	}
 
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	/**

@@ -214,13 +214,10 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	}
 	
 	private void readEvents(String eventFileName){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {reader.parse(eventFileName);} 
-		catch (SAXException e) {e.printStackTrace();}
-		catch (ParserConfigurationException e) {e.printStackTrace();} 
-		catch (IOException e) {e.printStackTrace();}
+		reader.parse(eventFileName); 
 	}
 	
 	public void run(String eventFileName){

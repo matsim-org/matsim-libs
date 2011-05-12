@@ -173,7 +173,7 @@ public class MyPatronComparator {
 	 */
 	public List<Map<Id,Integer>> processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList){
 		log.info("Processing events from " + eventsFile);
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		MyPatronLinkEntryHandler eh = new MyPatronLinkEntryHandler(linkList, breakList);
 		em.addHandler(eh);
 		MatsimEventsReader mer = new MatsimEventsReader(em);
@@ -194,15 +194,7 @@ public class MyPatronComparator {
 		List<Id> list = new ArrayList<Id>();
 		RoadPricingScheme rps = new RoadPricingScheme();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
-		try {
-			rpr.parse(linksFile);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		rpr.parse(linksFile);
 		for(Id i : rps.getLinkIdSet()){
 			list.add(i);
 		}

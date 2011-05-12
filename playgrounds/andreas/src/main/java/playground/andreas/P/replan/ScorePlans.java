@@ -19,10 +19,7 @@
 
 package playground.andreas.P.replan;
 
-import java.io.IOException;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +27,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.xml.sax.SAXException;
 
 import playground.andreas.P.replan.ScorePlansHandler.ScoreContainer;
 
@@ -40,24 +36,13 @@ public class ScorePlans {
 	
 	public static TreeMap<Id, Double> scorePlans(String eventsFile, Network net){
 		
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		
 		ScorePlansHandler scorePlansHandler = new ScorePlansHandler(net);
 		eventsManager.addHandler(scorePlansHandler);
 		
-		try {
-			reader.parse(eventsFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		reader.parse(eventsFile);
 		
 		TreeMap<Id, Double> scores = new TreeMap<Id, Double>();
 		TreeMap<Id, ScoreContainer> personId2ScoreMap = scorePlansHandler.getPersonId2ScoreMap();

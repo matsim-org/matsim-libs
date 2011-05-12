@@ -20,10 +20,6 @@
 
 package playground.mrieser.pt.demo;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -48,7 +44,6 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.xml.sax.SAXException;
 
 public class PseudoNetworkDemo {
 
@@ -77,27 +72,11 @@ public class PseudoNetworkDemo {
 		NetworkImpl network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
-			try {
-				new MatsimNetworkReader(scenario).parse(networkFile);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new MatsimNetworkReader(scenario).parse(networkFile);
 		}
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
 
 		network.getLinks().clear();
 		network.getNodes().clear();
@@ -122,7 +101,7 @@ public class PseudoNetworkDemo {
 		plan.addLeg(leg);
 		plan.addActivity(population.getFactory().createActivityFromLinkId("home", link1.getId()));
 
-		final EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		final EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 

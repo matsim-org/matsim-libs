@@ -20,17 +20,13 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for network-files of MATSim. This reader recognizes the format of the network-file and uses
@@ -72,17 +68,9 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
-		try {
-			parse(filename);
-			if (this.scenario.getNetwork() instanceof NetworkImpl) {
-				((NetworkImpl) this.scenario.getNetwork()).connect();
-			}
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		parse(filename);
+		if (this.scenario.getNetwork() instanceof NetworkImpl) {
+			((NetworkImpl) this.scenario.getNetwork()).connect();
 		}
 	}
 

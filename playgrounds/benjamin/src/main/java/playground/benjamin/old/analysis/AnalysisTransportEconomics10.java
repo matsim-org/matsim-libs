@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.old.analysis;
 
-import java.io.IOException;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -36,7 +33,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.old.charts.BkAvgTollPaidQuantilesChart;
@@ -155,7 +151,7 @@ public class AnalysisTransportEconomics10 {
 if(config.scenario().isUseRoadpricing()){
 	eventsfile = io2.getIterationFilename(config.controler().getLastIteration(), "events") + ".txt.gz";
 	
-	EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+	EventsManager events = EventsUtils.createEventsManager();
 	MoneyEventHandler tollCollectHandler = new MoneyEventHandler();
 	events.addHandler(tollCollectHandler);
 	
@@ -188,19 +184,8 @@ if(config.scenario().isUseRoadpricing()){
 	
   private static RoadPricingScheme loadTollLinksFile(String tollLinksFilePath) {
 		RoadPricingScheme scheme = new RoadPricingScheme();
-	  	RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
-		try {
-			reader.parse(tollLinksFilePath);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	  RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
+		reader.parse(tollLinksFilePath);
 		return scheme;
 	}
 

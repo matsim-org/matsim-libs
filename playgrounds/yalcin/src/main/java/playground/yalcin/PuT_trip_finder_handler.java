@@ -21,7 +21,6 @@
 package playground.yalcin;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,15 +68,10 @@ public class PuT_trip_finder_handler implements TabularFileHandler {
 	public PuT_trip_finder_handler(final double searchRadius,
 			final String filename) {
 		this.searchRadius = searchRadius;
-		try {
-			this.writer = IOUtils.getBufferedWriter(filename);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.writer = IOUtils.getBufferedWriter(filename);
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		this.line++;
 		if (this.line == 1) {

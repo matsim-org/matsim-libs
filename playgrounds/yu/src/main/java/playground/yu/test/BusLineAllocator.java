@@ -30,10 +30,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -56,9 +54,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -70,7 +68,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -215,8 +212,7 @@ public class BusLineAllocator {
 			}
 			carTo.getInLinks().remove(l2a.getId());
 
-			Link createdLink = this.carNet.getFactory().createLink(l2a.getId(),
-					carFrom.getId(), carTo.getId());
+			Link createdLink = this.carNet.getFactory().createLink(l2a.getId(), carFrom, carTo);
 			createdLink.setLength(l2a.getLength());
 			createdLink.setFreespeed(l2a.getFreespeed());
 			createdLink.setCapacity(l2a.getCapacity());
@@ -816,9 +812,6 @@ public class BusLineAllocator {
 		new NetworkWriter(this.carNet).write(newNetFilename);
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		// String multiModalNetworkFile =
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
@@ -856,15 +849,7 @@ public class BusLineAllocator {
 				.readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReader(scenario).readFile(transitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 
 		ScenarioImpl carScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl carNet = carScenario.getNetwork();

@@ -20,15 +20,11 @@
 
 package org.matsim.counts;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for counts-files of MATSim. This reader recognizes the format of the counts-file and uses
@@ -64,21 +60,12 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	}
 
 	/**
-	 * Parses the specified counts file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
+	 * Parses the specified counts file. This method is the same as {@link #parse(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		parse(filename);
 	}
 
 	@Override

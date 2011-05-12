@@ -20,7 +20,6 @@
 
 package playground.christoph.knowledge.container;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -165,12 +164,7 @@ public class TestCellKnowledge {
 	{
 		this.config = new Config();
 		this.config.addCoreModules();
-		try {
-			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
-		} catch (IOException e) {
-			log.error("Problem loading the configuration file from " + this.configFileName);
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		log.info("Loading Config ... done");
 	}
 /*

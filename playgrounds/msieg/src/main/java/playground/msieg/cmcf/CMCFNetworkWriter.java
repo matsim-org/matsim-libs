@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -15,8 +13,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 /**
  * This class is for converting a MATSIM Network into a file format,
@@ -43,18 +41,10 @@ public class CMCFNetworkWriter {
 		this.netName = "unspecified";
 	}
 
-	public void read() throws IOException {
-		try {
-			this.netReader.parse(this.netFile);
-			this.netLayer.connect();
-			this.netName = this.netLayer.getName();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			throw e;
-		}
+	public void read() throws UncheckedIOException {
+		this.netReader.parse(this.netFile);
+		this.netLayer.connect();
+		this.netName = this.netLayer.getName();
 	}
 
 
@@ -200,7 +190,7 @@ public class CMCFNetworkWriter {
 		//read input file
 		try{
 			cnw.read();
-		}catch(IOException ioe){
+		}catch(UncheckedIOException ioe){
 			ioe.printStackTrace();
 			System.exit(1);
 		}

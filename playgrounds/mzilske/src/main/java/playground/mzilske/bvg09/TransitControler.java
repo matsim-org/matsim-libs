@@ -20,11 +20,8 @@
 
 package playground.mzilske.bvg09;
 
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,7 +54,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -180,26 +176,10 @@ public class TransitControler extends Controler {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
-				try {
-					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario()).readFile(this.config.getTransitScheduleFile());
-				} catch (SAXException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				} catch (ParserConfigurationException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				} catch (IOException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
-				}
+				new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario()).readFile(this.config.getTransitScheduleFile());
 			}
 			if (this.config.getVehiclesFile() != null) {
-				try {
-					new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
-				} catch (SAXException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				} catch (ParserConfigurationException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				} catch (IOException e) {
-					throw new RuntimeException("could not read vehicles.", e);
-				}
+				new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
 			}
 			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
 					event.getControler().getScenario().getNetwork(), event

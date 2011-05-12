@@ -21,7 +21,6 @@
 package playground.gregor.evacuation.events2stats;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -52,7 +51,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 		this.numAgents = 0;
 		this.cumUt = 0;
 		this.numUtilityEvents = 0;
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		
 		new EventsReaderTXTv1(events).readFile(eventsFile);
@@ -64,20 +63,24 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 	
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		this.startTimes.put(event.getPersonId(), event.getTime());
 		
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		
 	}
 
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		this.oaTime += event.getTime() - this.startTimes.get(event.getPersonId());
 		this.numAgents++;
 	}
 	
+	@Override
 	public void handleEvent(final AgentMoneyEvent event) {
 		this.numUtilityEvents++;
 		this.cumUt += event.getAmount();
@@ -90,13 +93,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 		int stop = 200;
 			
 		BufferedWriter writer = null;
-		try {
-			 writer = IOUtils.getBufferedWriter("../../outputs/output/analysis/tt.csv", false);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		writer = IOUtils.getBufferedWriter("../../outputs/output/analysis/tt.csv", false);
 		
 		try {
 			writer.write("it,avgTT,cumMSA,avgMSA\n");

@@ -20,15 +20,13 @@
 
 package org.matsim.core.events;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -99,17 +97,10 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		 * possible exceptions on its own.
 		 *
 		 * @param filename The name of the file to parse.
+		 * @throws UncheckedIOException
 		 */
-		public void readFile(final String filename) {
-			try {
-				parse(filename);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		public void readFile(final String filename) throws UncheckedIOException {
+			parse(filename);
 		}
 
 		@Override

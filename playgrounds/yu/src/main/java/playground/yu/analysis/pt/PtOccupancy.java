@@ -3,13 +3,10 @@
  */
 package playground.yu.analysis.pt;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -29,7 +26,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.charts.TimeLineChart;
 import playground.yu.utils.io.SimpleWriter;
@@ -77,6 +73,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id vehId = event.getVehicleId();
 		double time = event.getTime();
@@ -108,9 +105,11 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 	}
 
+	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		// System.out
 		// .println(">>>>> i now am in handleEvent PersonLeavesVehicleEvent");
@@ -226,17 +225,9 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		new MatsimNetworkReader(s).readFile(netFilename);
 
 		TransitSchedule schedule = s.getTransitSchedule();
-		try {
-			new TransitScheduleReader(s).readFile(scheduleFilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(s).readFile(scheduleFilename);
 
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 
 		PtOccupancy po = new PtOccupancy(schedule);
 		em.addHandler(po);

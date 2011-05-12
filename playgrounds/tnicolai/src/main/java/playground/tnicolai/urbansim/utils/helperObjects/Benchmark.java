@@ -25,13 +25,13 @@ package playground.tnicolai.urbansim.utils.helperObjects;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.tnicolai.urbansim.constants.Constants;
 
@@ -94,10 +94,7 @@ public class Benchmark {
 		try {
 			this.output = output;
 			benchmarkWriter = IOUtils.getAppendingBufferedWriter( output );
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			benchmarkWriter = null;
-		} catch (IOException e) {
+		} catch (UncheckedIOException e) {
 			e.printStackTrace();
 			benchmarkWriter = null;
 		}

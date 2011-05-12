@@ -23,10 +23,7 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
 import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,7 +47,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.container.CollectionSum;
@@ -349,19 +345,10 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
-				.getRoadPricingScheme());
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		tollReader.parse(tollFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
 		// ,tollReader.getScheme()

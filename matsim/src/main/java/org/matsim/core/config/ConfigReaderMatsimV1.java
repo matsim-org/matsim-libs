@@ -21,19 +21,16 @@
 package org.matsim.core.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for config-files of MATSim according to <code>config_v1.dtd</code>.
@@ -104,21 +101,12 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
+	 * Parses the specified config file. This method calls {@link #parse(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	/**

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.vis.otfvis.gui;
 
 import java.awt.Color;
@@ -7,24 +26,17 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
 import javax.swing.event.MouseInputAdapter;
 
-class VizGuiHandler extends MouseInputAdapter implements MouseWheelListener {
-	/**
-	 * 
-	 */
+class VizGuiHandler extends MouseInputAdapter {
 	private final OTFSwingDrawerContainer otfSwingDrawer;
 
 	private MyNetVisScrollPane scrollPane;
 
-	/**
-	 * @param otfSwingDrawer
-	 */
 	VizGuiHandler(OTFSwingDrawerContainer otfSwingDrawer, MyNetVisScrollPane scrollPane) {
 		this.otfSwingDrawer = otfSwingDrawer;
 		this.scrollPane = scrollPane;
@@ -114,7 +126,7 @@ class DragToScrollListener extends MouseAdapter {
 
 	private MyNetVisScrollPane myNetVisScrollPane;
 
-	private Point start;
+	private Point start = null;
 	private int button = 0;
 
 	public DragToScrollListener(MyNetVisScrollPane myNetVisScrollPane) {

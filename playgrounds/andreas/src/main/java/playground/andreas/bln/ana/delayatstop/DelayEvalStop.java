@@ -1,10 +1,7 @@
 package playground.andreas.bln.ana.delayatstop;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,7 +12,6 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.xml.sax.SAXException;
 
 public class DelayEvalStop {
 	
@@ -24,7 +20,7 @@ public class DelayEvalStop {
 
 	
 	public void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		DelayHandler handler = new DelayHandler(this.treshold);
 		handler.addTermStop("781015.1"); //344 nord
 		//handler.addTermStop("792200.2"); //344 sued aussetzer
@@ -37,15 +33,7 @@ public class DelayEvalStop {
 		handler.addTermStop("812020.2"); //m44 sued
 		events.addHandler(handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 		
 		handler.printStats();
 	}

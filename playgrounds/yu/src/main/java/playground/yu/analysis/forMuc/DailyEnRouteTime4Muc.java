@@ -19,10 +19,6 @@
 
 package playground.yu.analysis.forMuc;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,7 +34,6 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyEnRouteTime;
 import playground.yu.utils.charts.PieChart;
@@ -745,17 +740,8 @@ public class DailyEnRouteTime4Muc extends DailyEnRouteTime implements
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
-				.getRoadPricingScheme());
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);

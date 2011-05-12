@@ -15,14 +15,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.rost.controller.gui.BlockGUI;
 import playground.rost.controller.gui.PopulationDistributionGUI;
@@ -34,8 +32,8 @@ import playground.rost.controller.gui.helpers.ShowPathTracker;
 import playground.rost.controller.gui.helpers.progressinformation.ShowProgressInformationGUI;
 import playground.rost.controller.marketplace.FlowMarketPlaceImpl;
 import playground.rost.eaflow.ea_flow.Flow;
-import playground.rost.eaflow.ea_flow.MultiSourceEAF;
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
+import playground.rost.eaflow.ea_flow.MultiSourceEAF;
 import playground.rost.graph.evacarea.EvacArea;
 import playground.rost.graph.nodepopulation.PopulationNodeMap;
 import playground.rost.osm2matconverter.OSM2MATConverter;
@@ -99,6 +97,7 @@ public class MainGUI extends JFrame {
 		JMenuItem showPaths = new JMenuItem("Show Paths");
 		showPaths.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				JInternalFrame newFrame = new ShowPathTracker();
@@ -120,6 +119,7 @@ public class MainGUI extends JFrame {
 		JMenuItem showAttributes = new JMenuItem("Show Highway Attributes");
 		showAttributes.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				JInternalFrame newFrame = new ShowHighwayAttributeSettings();
@@ -135,6 +135,7 @@ public class MainGUI extends JFrame {
 		JMenuItem parseData = new JMenuItem("Parse OSM-Map");
 		parseData.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				OSM2MATConverter.parseAndWrite();
@@ -152,6 +153,7 @@ public class MainGUI extends JFrame {
 		JMenuItem showBlocks = new JMenuItem("Create and Show Blocks");
 		showBlocks.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				JInternalFrame newFrame = BlockGUI.createBlocksAndShowGUI();
@@ -175,6 +177,7 @@ public class MainGUI extends JFrame {
 		JMenuItem calcEarliestArrivalFlowWithoutBowEdges = new JMenuItem("Calc Earliest Arrival Flow - without BowEdges");
 		calcEarliestArrivalFlowWithoutBowEdges.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				calcEAFlowWithoutBowEdges();
@@ -185,6 +188,7 @@ public class MainGUI extends JFrame {
 		JMenuItem calcEarliestArrivalFlowWithBowEdges = new JMenuItem("Calc Earliest Arrival Flow - with BowEdges");
 		calcEarliestArrivalFlowWithBowEdges.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				calcEAFlowWithBowEdges();
@@ -217,18 +221,7 @@ public class MainGUI extends JFrame {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
-		try {
-			nReader.parse(PathTracker.resolve("matExtract"));
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		nReader.parse(PathTracker.resolve("matExtract"));
 		
 		PopulationNodeMap populationNodeMap = null;
 		try {
@@ -265,6 +258,7 @@ public class MainGUI extends JFrame {
 		JMenuItem selectArea = new JMenuItem("Select Area");
 		selectArea.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				JInternalFrame newFrame = SelectAreaGUI.readNetworkAndShowGUI();
@@ -289,6 +283,7 @@ public class MainGUI extends JFrame {
 		JMenuItem defineDistribution = new JMenuItem("Define Distribution");
 		defineDistribution.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				JInternalFrame newFrame = PopulationDistributionGUI.parseNetworkAndBlocksAndShowGUI();
@@ -314,6 +309,7 @@ public class MainGUI extends JFrame {
 		JMenuItem flowVis = new JMenuItem("Visualize Flow");
 		flowVis.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				String id = selectFlow();
@@ -330,6 +326,7 @@ public class MainGUI extends JFrame {
 		JMenuItem pathVis = new JMenuItem("Visualize Paths");
 		pathVis.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				String id = selectFlow();
@@ -388,6 +385,7 @@ public class MainGUI extends JFrame {
 			this.msEAF.setEdgeTypeToUse(edgeType);
 		}
 		
+		@Override
 		public void run() {
 			result = msEAF.calcEAFlow(evacArea, network, populationNodeMap);
 			isFinished = true;
@@ -421,6 +419,7 @@ public class MainGUI extends JFrame {
 		JMenuItem removeFlow = new JMenuItem("remove: " + id);
 		removeFlow.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				if(e.getSource() != null)

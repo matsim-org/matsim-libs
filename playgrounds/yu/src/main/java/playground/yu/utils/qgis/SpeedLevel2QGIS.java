@@ -23,15 +23,12 @@
  */
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -49,7 +46,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 
@@ -163,16 +159,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 		RoadPricingScheme rps = new RoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
-		try {
-			tollReader
-					.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		tollReader.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
 
 		Collection<Id> links = rps.getLinkIdSet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);

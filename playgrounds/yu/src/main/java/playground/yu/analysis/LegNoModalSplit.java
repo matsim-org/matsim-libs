@@ -23,14 +23,11 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -48,7 +45,6 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
@@ -197,15 +193,7 @@ public class LegNoModalSplit extends AbstractPersonAlgorithm implements
 		RoadPricingScheme tollScheme = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 				tollScheme);
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		tollReader.parse(tollFilename);
 
 		LegNoModalSplit ms = new LegNoModalSplit(tollScheme);
 		ms.run(population);

@@ -1,9 +1,5 @@
 package playground.mmoyo.utils;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
@@ -22,7 +18,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.xml.sax.SAXException;
 
 public class DataLoader {
 
@@ -32,12 +27,7 @@ public class DataLoader {
 
 		//load transit schedule by config
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReaderV1(schedule, scenario.getNetwork(), scenario).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
-		} catch (SAXException e) {e.printStackTrace();
-		} catch (ParserConfigurationException e) {e.printStackTrace();
-		} catch (IOException e) {e.printStackTrace();
-		}
+		new TransitScheduleReaderV1(schedule, scenario.getNetwork(), scenario).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		return scenario;
@@ -65,15 +55,7 @@ public class DataLoader {
 		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
 		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network);
-		try {
-			transitScheduleReaderV1.readFile(transitScheduleFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		transitScheduleReaderV1.readFile(transitScheduleFile);
 		transitScheduleFactoryImpl = null;
 		transitScheduleReaderV1 = null;
 		return transitSchedule;

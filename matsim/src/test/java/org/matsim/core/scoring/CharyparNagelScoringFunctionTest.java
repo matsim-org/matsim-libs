@@ -114,43 +114,40 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		this.person = new PersonImpl(new IdImpl("1"));
 		this.plan = this.person.createAndAddPlan(true);
-		try {
-			this.plan.createAndAddActivity("h", link1.getId());
-			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
-			leg.setRoute(route);
-			// does not match the network distances or travel times! WHY? --- benjamin mar'11
-			route.setDistance(25000.0);
-			route.setTravelTime(0.5*3600);
-			
-			this.plan.createAndAddActivity("w", link3.getId());
-			leg = this.plan.createAndAddLeg(TransportMode.pt);
-			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
-			leg.setRoute(route);
-			// does not match the network distances or travel times! WHY? --- benjamin mar'11
-			route.setDistance(20000.0);
-			route.setTravelTime(0.25*3600);
-			
-			this.plan.createAndAddActivity("w", link5.getId());
-			leg = this.plan.createAndAddLeg(TransportMode.walk);
-			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5.getId(), link7.getId());
-			leg.setRoute(route);
-			// does not match the network distances or travel times! WHY? --- benjamin mar'11
-			route.setDistance(25000.0);
-			route.setTravelTime(0.5*3600);
 
-			this.plan.createAndAddActivity("w", link7.getId());
-			leg = this.plan.createAndAddLeg(TransportMode.bike);
-			route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link7.getId(), link9.getId());
-			leg.setRoute(route);
-			// does not match the network distances or travel times! WHY? --- benjamin mar'11
-			route.setDistance(20000.0);
-			route.setTravelTime(0.25*3600);
-			
-			this.plan.createAndAddActivity("h", link9.getId());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		this.plan.createAndAddActivity("h", link1.getId());
+		Leg leg = this.plan.createAndAddLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
+		leg.setRoute(route);
+		// does not match the network distances or travel times! WHY? --- benjamin mar'11
+		route.setDistance(25000.0);
+		route.setTravelTime(0.5*3600);
+		
+		this.plan.createAndAddActivity("w", link3.getId());
+		leg = this.plan.createAndAddLeg(TransportMode.pt);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
+		leg.setRoute(route);
+		// does not match the network distances or travel times! WHY? --- benjamin mar'11
+		route.setDistance(20000.0);
+		route.setTravelTime(0.25*3600);
+		
+		this.plan.createAndAddActivity("w", link5.getId());
+		leg = this.plan.createAndAddLeg(TransportMode.walk);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5.getId(), link7.getId());
+		leg.setRoute(route);
+		// does not match the network distances or travel times! WHY? --- benjamin mar'11
+		route.setDistance(25000.0);
+		route.setTravelTime(0.5*3600);
+
+		this.plan.createAndAddActivity("w", link7.getId());
+		leg = this.plan.createAndAddLeg(TransportMode.bike);
+		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link7.getId(), link9.getId());
+		leg.setRoute(route);
+		// does not match the network distances or travel times! WHY? --- benjamin mar'11
+		route.setDistance(20000.0);
+		route.setTravelTime(0.25*3600);
+		
+		this.plan.createAndAddActivity("h", link9.getId());
 	}
 
 	@Override

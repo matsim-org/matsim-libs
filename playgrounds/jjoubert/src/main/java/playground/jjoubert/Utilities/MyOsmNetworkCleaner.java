@@ -20,10 +20,6 @@
 
 package playground.jjoubert.Utilities;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,14 +29,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
-import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -62,17 +56,9 @@ public class MyOsmNetworkCleaner {
 		} else{
 			monc = new MyOsmNetworkCleaner();
 		}
-		Scenario runSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario runSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader mnr = new MatsimNetworkReader(runSc);
-		try {
-			mnr.parse(args[0]);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		mnr.parse(args[0]);
 		
 		// For now, use the envelope of the multipolygon.
 		MyShapefileReader msr = new MyShapefileReader(args[1]);
@@ -125,7 +111,7 @@ public class MyOsmNetworkCleaner {
 	public void cleanNetwork(Network network, MultiPolygon mp) {
 		log.info("Removing all links that falls outside the given polygon.");
 		log.info("Original network has " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkFactory nf = sc.getNetwork().getFactory();
 		GeometryFactory gf = new GeometryFactory();
 		for(Link l : network.getLinks().values()){

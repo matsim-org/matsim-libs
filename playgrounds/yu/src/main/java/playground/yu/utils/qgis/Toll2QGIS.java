@@ -3,10 +3,7 @@
  */
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.Collection;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -19,7 +16,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -91,15 +87,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 
 		RoadPricingScheme scheme = new RoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scheme);
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		tollReader.parse(tollFilename);
 
 		t2q.setN2g(new Toll2PolygonGraph(t2q.getNetwork(), t2q.crs, scheme));
 		t2q.writeShapeFile("../matsimTests/toll/ivtch-osm_toll.shp");

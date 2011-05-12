@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +58,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.run.NetworkCleaner;
-import org.xml.sax.SAXException;
 
 import playground.andreas.utils.net.NetworkRemoveUnusedNodes;
 import playground.andreas.utils.pt.TransitScheduleCleaner;
@@ -112,18 +109,7 @@ public class PTCountsNetworkSimplifier {
 		} else {
 			this.inCounts = new Counts();
 			CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(this.inCounts);
-			try {
-				countsReader.parse(inCounts);
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			countsReader.parse(inCounts);
 		}
 		
 		this.countsOutFile = countsOutFile;
@@ -149,7 +135,7 @@ public class PTCountsNetworkSimplifier {
 	public void simplifyPTNetwork(){
 
 		log.info("Start...");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);

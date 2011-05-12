@@ -21,8 +21,6 @@
 package playground.meisterk.phd.config;
 
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -44,11 +42,7 @@ public class PopulationConvergenceConfigGroupTest extends MatsimTestCase {
 		Config config = new Config();
 		PopulationConvergenceConfigGroup testee = new PopulationConvergenceConfigGroup();
 		config.addModule(PopulationConvergenceConfigGroup.GROUP_NAME, testee);
-		try {
-			new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
 
 		assertEquals( 0.567, testee.getAlphaSelected() );
 	}

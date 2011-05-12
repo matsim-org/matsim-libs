@@ -20,25 +20,16 @@
 
 package playground.jjoubert.Utilities;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
-import org.xml.sax.SAXException;
 
 public class PlanToShapefile {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String plansFilename;
 		String networkFilename;
@@ -52,19 +43,11 @@ public class PlanToShapefile {
 		} else{
 			throw new IllegalArgumentException("Need four arguments.");
 		}
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		MatsimPopulationReader pr = new MatsimPopulationReader(s);
-		try {
-			nr.parse(networkFilename);
-			pr.parse(plansFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFilename);
+		pr.parse(plansFilename);
 		
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(
 				s.getPopulation(), 

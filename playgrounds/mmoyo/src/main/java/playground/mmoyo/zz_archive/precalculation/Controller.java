@@ -1,12 +1,9 @@
 package playground.mmoyo.zz_archive.precalculation;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -20,7 +17,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.xml.sax.SAXException;
 
 /**invokes the precalculation of transit routes. Later on the best of them can be selected according to their properties*/
 public class Controller {
@@ -38,15 +34,7 @@ public class Controller {
 
 		/***************reads the transitSchedule file**********/
 		new MatsimNetworkReader(scenario).readFile(NETWORK);
-		try {
-			new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork(), scenario).readFile(TRANSITSCHEDULEFILE);
-		} catch (SAXException e){
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
+		new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork(), scenario).readFile(TRANSITSCHEDULEFILE);
 		/*******************************************************/
 
 		Map <Id, List<StaticConnection>> connectionMap= new TreeMap <Id, List<StaticConnection>>();

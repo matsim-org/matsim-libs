@@ -19,18 +19,15 @@
 
 package org.matsim.vehicles;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
@@ -50,16 +47,8 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		this.builder = this.vehicles.getFactory();
 	}
 
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	@Override

@@ -20,11 +20,8 @@
 package playground.mrieser.pt;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -50,7 +47,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-import org.xml.sax.SAXException;
 
 public class RouterTester {
 
@@ -77,15 +73,7 @@ public class RouterTester {
 
 		new MatsimNetworkReader(s).readFile(NETWORK);
 		new VehicleReaderV1(v).readFile(VEHICLES);
-		try {
-			new TransitScheduleReader(s).readFile(SCHEDULE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(s).readFile(SCHEDULE);
 		log.info("build transit router...");
 		TransitRouterConfig tRConfig = new TransitRouterConfig(s.getConfig().planCalcScore(), 
 				s.getConfig().plansCalcRoute(), s.getConfig().transitRouter(),
@@ -112,13 +100,7 @@ public class RouterTester {
 
 		public PtRouter(final TransitRouter router) {
 			this.router = router;
-			try {
-				this.out = IOUtils.getBufferedWriter("/Volumes/Data/vis/routesDijkstra1.txt");
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			this.out = IOUtils.getBufferedWriter("/Volumes/Data/vis/routesDijkstra1.txt");
 		}
 
 		@Override

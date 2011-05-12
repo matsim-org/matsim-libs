@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -67,7 +65,6 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
-import org.xml.sax.SAXException;
 
 import playground.meisterk.eaptus2010.MyControler;
 import playground.meisterk.kti.config.KtiConfigGroup;
@@ -226,18 +223,7 @@ public class MyRuns {
 
 		// switch to new network in scenario
 		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		try {
-			new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
 		scenario.setNetwork(scenario2.getNetwork());
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
@@ -380,15 +366,7 @@ public class MyRuns {
 		// - facilities
 		logger.info("Reading facilities xml file...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-		try {
-			new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
 		logger.info("Reading facilities xml file...");
 
 		// - population

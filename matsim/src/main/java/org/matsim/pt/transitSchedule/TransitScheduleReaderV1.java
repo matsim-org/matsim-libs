@@ -20,14 +20,11 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,6 +36,7 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -47,7 +45,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
@@ -85,7 +82,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		this.idf = idf;
 	}
 
-	public void readFile(final String fileName) throws SAXException, ParserConfigurationException, IOException {
+	public void readFile(final String fileName) throws UncheckedIOException {
 		this.parse(fileName);
 	}
 

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.crossborder;
 
 import java.io.BufferedWriter;
@@ -22,13 +41,8 @@ class OnlineWriter {
 	public OnlineWriter() {}
 		
 	public void initWriter() {
-		try {
-			this.out = IOUtils.getBufferedWriter(this.fileName);
-			this.fileOpened = true;
-		}
-		catch (IOException e) {
-			Gbl.errorMsg(e);
-		}
+		this.out = IOUtils.getBufferedWriter(this.fileName);
+		this.fileOpened = true;
 	}
 	public void setNetwork(NetworkImpl network){
 		this.network=network;

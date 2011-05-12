@@ -20,39 +20,22 @@
 
 package playground.jjoubert.roadpricing.demand;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 public class MyIdEvaluator {
 	private final static Logger log = Logger.getLogger(MyIdEvaluator.class);
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		log.info("Getting the agent IDs from " + args[0]);
 		
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
-		try {
-			pr.parse(args[0]);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		pr.parse(args[0]);
 		
 		Integer minId = Integer.MAX_VALUE;
 		Integer maxId = Integer.MIN_VALUE;

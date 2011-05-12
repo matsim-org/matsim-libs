@@ -20,14 +20,12 @@
 
 package playground.christoph.network;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -126,7 +124,7 @@ public class TestSubNetwork {
 	}
 
 	private void initReplanner() {
-		QSim sim = new QSim(this.scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QSim sim = new QSim(this.scenario, (EventsUtils.createEventsManager()));
 		qNetwork = sim.getNetsimNetwork();
 
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);
@@ -197,12 +195,7 @@ public class TestSubNetwork {
 		this.config = new Config();
 		this.config.addCoreModules();
 		this.config.checkConsistency();
-		try {
-			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
-		} catch (IOException e) {
-			log.error("Problem loading the configuration file from " + this.configFileName);
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		log.info("Loading Config ... done");
 	}
 }

@@ -23,13 +23,10 @@
  */
 package org.matsim.core.network;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -38,9 +35,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -112,29 +109,19 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 	 */
 	public List<NetworkChangeEvent> parseEvents(String file) {
 		events = new ArrayList<NetworkChangeEvent>();
-		try {
-			super.parse(file);
-		} catch (SAXException e) {
-			log.fatal("Error during parsing.", e);
-		} catch (ParserConfigurationException e) {
-			log.fatal("Error during parsing.", e);
-		} catch (IOException e) {
-			log.fatal("Error during parsing.", e);
-		}
+		super.parse(file);
 		return events;
 	}
 	
 
 	@Override
-	public void parse(String filename) throws SAXException,
-			ParserConfigurationException, IOException {
+	public void parse(String filename) throws UncheckedIOException {
 		events = new ArrayList<NetworkChangeEvent>();
 		super.parse(filename);
 	}
 
 	@Override
-	public void parse(URL url) throws SAXException,
-			ParserConfigurationException, IOException {
+	public void parse(URL url) throws UncheckedIOException {
 		events = new ArrayList<NetworkChangeEvent>();
 		super.parse(url);
 	}

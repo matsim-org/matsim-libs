@@ -18,19 +18,16 @@
 
 package org.matsim.households;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.households.Income.IncomePeriod;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
@@ -64,16 +61,8 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 		this.builder = households.getFactory();
 	}
 	
-	public void readFile(String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 	
 	/**

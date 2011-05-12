@@ -16,7 +16,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -34,13 +33,7 @@ public class SHPWriter {
 	private BufferedWriter statistics;
 
 	public SHPWriter() {
-
-	try {
 		statistics =  IOUtils.getBufferedWriter("output/statistics.txt");
-
-	} catch (final IOException e) {
-		Gbl.errorMsg(e);
-}
 	}
 
 

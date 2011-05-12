@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -19,7 +17,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.xml.sax.SAXException;
 
 public class DelayEvalVeh {
 	
@@ -70,22 +67,14 @@ public class DelayEvalVeh {
 	}
 
 	public void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		for (DelayHandler delayHandler : this.handler) {
 			events.addHandler(delayHandler);
 		}		
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 		
 		for (DelayHandler delayHandler : this.handler) {
 			delayHandler.writeGnuPlot(this.stopIDNameMap);
@@ -102,15 +91,7 @@ public class DelayEvalVeh {
 	private void readTransitSchedule(String transitScheduleFile){
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(this.transitSchedule, this.network);
-		try {
-			transitScheduleReaderV1.readFile(transitScheduleFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		transitScheduleReaderV1.readFile(transitScheduleFile);
 	}
 
 

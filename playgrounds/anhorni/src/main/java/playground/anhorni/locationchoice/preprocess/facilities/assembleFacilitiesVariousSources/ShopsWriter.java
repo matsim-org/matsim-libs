@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources;
 
 import java.io.BufferedWriter;
@@ -5,7 +24,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ShopsWriter {
@@ -13,13 +31,7 @@ public class ShopsWriter {
 	private BufferedWriter shops;
 	
 	public ShopsWriter() {
-
-		try {
-			shops =  IOUtils.getBufferedWriter("output/zhshops.txt");
-			
-		} catch (final IOException e) {
-			Gbl.errorMsg(e);
-		}
+		shops =  IOUtils.getBufferedWriter("output/zhshops.txt");
 	}
 		
 	public void write(List<ZHFacilityComposed> zhfacilities)  {
@@ -57,7 +69,7 @@ public class ShopsWriter {
 				
 				int whours = (int)(facility.getHrsWeek()) / 3600;
 				int wremainder = (int)facility.getHrsWeek() % 3600;
-				int wminutes = (int)wremainder / 60;
+				int wminutes = wremainder / 60;
 				shops.write((whours < 10 ? "0" : "") + whours + ":" + (wminutes < 10 ? "0" : "") + wminutes +"\t");
 				
 				shops.write(facility.getParkingLots() +"\t");
@@ -69,7 +81,7 @@ public class ShopsWriter {
 						if (facility.getOpentimes()[i][j] > 0.0) {
 							int hours = (int)(facility.getOpentimes()[i][j]) / 3600;
 							int remainder = (int)facility.getOpentimes()[i][j] % 3600;
-							int minutes = (int)remainder / 60;
+							int minutes = remainder / 60;
 							
 							shops.write((hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes +"\t");
 						}

@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +28,6 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.xml.sax.SAXException;
 
 import playground.andreas.bln.ana.events2timespacechart.ReadStopIDNamesMap;
 
@@ -170,19 +167,11 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	}
 
 	private void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 	}
 
 	@Override

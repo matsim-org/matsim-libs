@@ -20,10 +20,8 @@
 package playground.andreas.P.replan;
 
 import java.io.IOException;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
@@ -32,7 +30,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.xml.sax.SAXException;
 
 import playground.andreas.P.init.CreateInitialTimeSchedule;
 import playground.andreas.P.init.PConfigGroup;
@@ -71,12 +68,6 @@ public class ReplanTimeSchedule {
 			}			
 			new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");
 			
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

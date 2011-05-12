@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -32,13 +31,7 @@ public class TableSnapshotWriter {
 	private final Writer writer;
 	
 	public TableSnapshotWriter(String filename) {
-		try {
-			this.writer = IOUtils.getBufferedWriter(filename,true);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.writer = IOUtils.getBufferedWriter(filename,true);
 		try {
 			this.writer.append("time\tagent_id\teasting\tnorthing\tazimuth\tspeed\n");
 		} catch (IOException e) {

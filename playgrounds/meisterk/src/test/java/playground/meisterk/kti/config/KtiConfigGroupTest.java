@@ -20,8 +20,6 @@
 
 package playground.meisterk.kti.config;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -61,11 +59,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		Config config = new Config();
 		KtiConfigGroup testee = new KtiConfigGroup();
 		config.addModule(KtiConfigGroup.GROUP_NAME, testee);
-		try {
-			new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
 
 		assertEquals(999.9, testee.getConstBike());
 		assertEquals(-888.8, testee.getConstCar());

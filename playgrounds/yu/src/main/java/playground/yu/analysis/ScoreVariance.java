@@ -56,13 +56,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 
 	public ScoreVariance(final String outputFilename) {
 		this.outputFilename = outputFilename;
-		try {
-			this.writer = IOUtils.getBufferedWriter(outputFilename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.writer = IOUtils.getBufferedWriter(outputFilename);
 	}
 
 	@Override
@@ -97,6 +91,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 		System.exit(0);
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		this.scores.add(plan.getScore());
 	}

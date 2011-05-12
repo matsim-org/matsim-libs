@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -28,7 +26,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.charts.StackedBarChart;
 
@@ -82,6 +79,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		values.put(chartRow, m);
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		// TODO save information from MZ
 		if (lineCount > 0) {
@@ -172,15 +170,7 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
-		try {
-			tollReader.parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);

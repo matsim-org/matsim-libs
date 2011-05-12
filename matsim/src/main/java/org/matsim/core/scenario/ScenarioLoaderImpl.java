@@ -20,9 +20,6 @@
 package org.matsim.core.scenario;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +32,7 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LaneDefinitions;
@@ -44,7 +42,6 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -167,7 +164,7 @@ public class ScenarioLoaderImpl {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
 			log.info("loading network from " + networkFileName);
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+			NetworkImpl network = this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
@@ -175,27 +172,11 @@ public class ScenarioLoaderImpl {
 			if (this.config.scenario().isUseTransit()) {
 				network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
-			try {
-				new MatsimNetworkReader(this.scenario).parse(networkFileName);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			new MatsimNetworkReader(this.scenario).parse(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-				try {
-					parser.parse(config.network().getChangeEventsInputFile());
-				} catch (SAXException e) {
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				parser.parse(config.network().getChangeEventsInputFile());
 				network.setNetworkChangeEvents(parser.getEvents());
 			}
 		}
@@ -233,15 +214,7 @@ public class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			try {
-				new MatsimPopulationReader(this.getScenario()).parse(populationFileName);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			new MatsimPopulationReader(this.getScenario()).parse(populationFileName);
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
@@ -252,15 +225,7 @@ public class ScenarioLoaderImpl {
 		if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			String hhFileName = this.config.households().getInputFile();
 			log.info("loading households from " + hhFileName);
-			try {
-				new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
 			log.info("households loaded.");
 		}
 		else {
@@ -268,19 +233,11 @@ public class ScenarioLoaderImpl {
 		}
 	}
 
-	private void loadTransit() {
-		try {
-			new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
+	private void loadTransit() throws UncheckedIOException {
+		new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
 	}
 
-	private void loadVehicles() {
+	private void loadVehicles() throws UncheckedIOException {
 		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 

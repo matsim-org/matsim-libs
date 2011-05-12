@@ -21,8 +21,6 @@ package playground.mrieser.pt.application;
 
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -54,7 +52,6 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
-import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.converter.Visum2TransitSchedule;
 import playground.mrieser.pt.utils.MergeNetworks;
@@ -151,31 +148,15 @@ public class DataPrepare {
 		NetworkImpl transitNetwork = transitScenario.getNetwork();
 		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl streetNetwork = streetScenario.getNetwork();
-		try {
-			new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
-			new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
-			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
-			new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
+		new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
+		new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
 	}
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		try {
-			new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore());
@@ -209,7 +190,7 @@ public class DataPrepare {
 			visNet.addNode(node);
 		}
 		for (Link link : routerNet.getLinks().values()) {
-			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
+			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode(), link.getToNode());
 			l.setLength(link.getLength());
 			l.setFreespeed(link.getFreespeed());
 			l.setCapacity(link.getCapacity());
@@ -220,7 +201,7 @@ public class DataPrepare {
 		new NetworkWriter(visNet).write("visNet.xml");
 
 		log.info("start visualizer");
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(visScenario, events);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);

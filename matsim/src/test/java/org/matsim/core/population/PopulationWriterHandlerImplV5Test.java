@@ -20,11 +20,8 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -47,7 +44,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author mrieser
@@ -125,15 +121,7 @@ public class PopulationWriterHandlerImplV5Test {
 
 		@Override
 		public void readFile(String filename) {
-			try {
-				this.parse(filename);
-			} catch (SAXException e) {
-				throw new RuntimeException(e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			this.parse(filename);
 		}
 
 		@Override

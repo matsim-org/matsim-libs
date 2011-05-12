@@ -88,6 +88,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		
 		JButton readPopPoints = new JButton("read population points");
 		readPopPoints.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				readPopulationPoints(PathTracker.resolve("populationPoints"));
@@ -97,6 +98,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		
 		JButton outputPopPoints = new JButton("write population points");
 		outputPopPoints.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				writePopulationPoints(PathTracker.resolve("populationPoints"));
@@ -106,6 +108,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		JButton outputNodePopulation = new JButton("write population for nodes in original network");
 		
 		outputNodePopulation.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				outputDistributionForNodes(PathTracker.resolve("populationForNodes"));
@@ -236,18 +239,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
-		try {
-			nReader.parse(PathTracker.resolve("flatNetwork"));
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		nReader.parse(PathTracker.resolve("flatNetwork"));
 		
 		//read blocks
 		Blocks blocks = null;

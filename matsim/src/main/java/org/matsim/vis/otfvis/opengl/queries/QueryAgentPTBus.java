@@ -174,8 +174,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 		if(drivenLinks.size() == 0) return null;
 
 		// convert this to drawable info
-		float[] vertex = null;
-		vertex = new float[drivenLinks.size()*2];
+		float[] vertex = new float[drivenLinks.size()*2];
 		int pos = 0;
 		for(Id linkId : drivenLinks) {
 			Link link = this.net.getLinks().get(linkId);

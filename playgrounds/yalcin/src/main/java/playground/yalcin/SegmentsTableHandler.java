@@ -21,7 +21,6 @@
 package playground.yalcin;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -73,19 +72,14 @@ public class SegmentsTableHandler implements TabularFileHandler {
 		this.vNetwork = vNetwork;
 		this.searchRadius = searchRadius;
 		this.codes = codesTable;
-		try {
-			this.writer = IOUtils.getBufferedWriter(filename);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.writer = IOUtils.getBufferedWriter(filename);
 	}
 
 	public void setOnlyWriteCodedTrips(final boolean onlyWriteCodedTrips) {
 		this.onlyWriteCodedTrips = onlyWriteCodedTrips;
 	}
 
+	@Override
 	public void startRow(final String[] row) {
 		this.line++;
 		if (this.line == 1) {

@@ -27,8 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -41,7 +39,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.msieg.structure.HashPathFlow;
 import playground.msieg.structure.PathFlow;
@@ -89,18 +86,9 @@ public abstract class CMCFRouter {
 		//new MatsimNetworkReader(network).readFile(networkFile);
 		this.network = scenario.getNetwork();
 		MatsimNetworkReader reader = null;
-		try {
-			reader = new MatsimNetworkReader(scenario);
-			reader.parse(this.networkFile);
-			this.network.connect();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			//throw e;
-			e.printStackTrace();
-		}
+		reader = new MatsimNetworkReader(scenario);
+		reader.parse(this.networkFile);
+		this.network.connect();
 	}
 
 	private void loadPopulation(){

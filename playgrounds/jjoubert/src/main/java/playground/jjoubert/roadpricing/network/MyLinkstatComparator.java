@@ -28,19 +28,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 public class MyLinkstatComparator {
 	private final static Logger log = Logger.getLogger(MyLinkstatComparator.class);
@@ -76,7 +72,7 @@ public class MyLinkstatComparator {
 		String outputFile = null;
 		Double threshold = null;
 		Integer minimumLanes = null;
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		MyLinkstatComparator mlc = null;
 		if(args.length != 7){
@@ -93,15 +89,7 @@ public class MyLinkstatComparator {
 			
 			// Read the network file if the number of lanes are specified.
 			NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
-			try {
-				nr.parse(args[6]);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			nr.parse(args[6]);
 		}
 		
 		mlc.compare(sc.getNetwork(), minimumLanes, threshold);

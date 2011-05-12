@@ -1,10 +1,7 @@
 package playground.andreas.bln.ana.utils;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,7 +16,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.xml.sax.SAXException;
 
 public class FindMissingAgents implements EventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 	
@@ -30,19 +26,11 @@ public class FindMissingAgents implements EventHandler, AgentDepartureEventHandl
 	HashMap<String, Integer> linkIDCount = new HashMap<String, Integer>();
 
 	private void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 	}
 	
 	private void run(String eventsFile) {

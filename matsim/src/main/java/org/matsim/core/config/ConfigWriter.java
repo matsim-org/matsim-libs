@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
@@ -59,7 +60,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.flush();
 			this.writer = null;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -73,7 +74,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.flush();
 			this.writer = null;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -85,7 +86,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			close();
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -106,7 +107,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.flush();
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

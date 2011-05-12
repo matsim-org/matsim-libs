@@ -181,7 +181,7 @@ public class MatsimFileTypeGuesserTest {
 		try {
 			new MatsimFileTypeGuesser("examples/equil/dummy.xml");
 			fail("expected IOException");
-		} catch (IOException e) {
+		} catch (UncheckedIOException e) {
 			log.info("catched expected exception: " + e.getMessage());
 		}
 	}

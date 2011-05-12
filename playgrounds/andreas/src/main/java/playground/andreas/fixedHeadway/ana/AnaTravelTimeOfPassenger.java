@@ -7,13 +7,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.xml.sax.SAXException;
 
 public class AnaTravelTimeOfPassenger {
 	
@@ -45,22 +42,14 @@ public class AnaTravelTimeOfPassenger {
 		log.info("Reading " + this.eventsInFile);
 		log.info("Added " + this.eventHandlerList.size() + " handlers");
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		for (PassengerTTAnaEventHandler handler : this.eventHandlerList) {
 			events.addHandler(handler);
 		}	
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 		
 		try {
 			this.writer.append(this.eventsInFile); this.writer.newLine();

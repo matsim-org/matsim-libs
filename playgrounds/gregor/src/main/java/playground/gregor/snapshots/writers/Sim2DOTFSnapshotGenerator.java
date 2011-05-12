@@ -19,21 +19,13 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYZEventsManager;
 
 public class Sim2DOTFSnapshotGenerator {
 	public static String SHARED_SVN = "../../../../../arbeit/svn/shared-svn/studies";
@@ -125,21 +117,10 @@ public class Sim2DOTFSnapshotGenerator {
 		writer.setLabel(LABEL);
 
 		XYZAzimuthSnapshotGenerator sg = new XYZAzimuthSnapshotGenerator(writer);
-		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(sg);
 		writer.open();
-		try {
-			new XYZEventsFileReader(ev).parse("/home/laemmel/devel/sim2d/output/ITERS/it.0/0.xyzAzimuthEvents.xml.gz");
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new XYZEventsFileReader(ev).parse("/home/laemmel/devel/sim2d/output/ITERS/it.0/0.xyzAzimuthEvents.xml.gz");
 		writer.finish();
 	}
 

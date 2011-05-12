@@ -3,8 +3,6 @@ package playground.andreas.osmBB.hafasOSMMerger;
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
@@ -17,7 +15,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.xml.sax.SAXException;
 
 public class SimpleHafasOsmMerger {
 
@@ -70,15 +67,9 @@ public class SimpleHafasOsmMerger {
 
 			}
 
-
-
-
 			log.info("Added " + transitLineEntry.getKey() + " with " + numberOfRoutesProcessed + " routes");
 		}
 	}
-
-
-
 
 
 
@@ -110,18 +101,7 @@ public class SimpleHafasOsmMerger {
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(this.osmScenario);
 		osmLoader.loadScenario();
 
-		try {
-			new TransitScheduleReaderV1(this.hafasScenario.getTransitSchedule(), this.hafasScenario.getNetwork(), this.hafasScenario).readFile(hafasTransitSchedule);
-			new TransitScheduleReaderV1(this.osmScenario.getTransitSchedule(), this.osmScenario.getNetwork(), this.osmScenario).readFile(osmTransitSchedule);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new TransitScheduleReaderV1(this.hafasScenario.getTransitSchedule(), this.hafasScenario.getNetwork(), this.hafasScenario).readFile(hafasTransitSchedule);
+		new TransitScheduleReaderV1(this.osmScenario.getTransitSchedule(), this.osmScenario.getNetwork(), this.osmScenario).readFile(osmTransitSchedule);
 	}
 }

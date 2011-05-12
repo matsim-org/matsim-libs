@@ -64,6 +64,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent departures, will the information be saved in a hashmap
 	 * (agentDepTimes).
 	 */
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only
 																				// store
@@ -77,6 +78,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent arrives, will the "agent-ID", "depTime" and "arrTime" be
 	 * written in a .txt-file
 	 */
+	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
@@ -103,12 +105,8 @@ public class TimeWriter implements AgentDepartureEventHandler,
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		try {
-			out = IOUtils.getBufferedWriter(outfilename);
-			writeLine("agentId\tdepTime\tarrTime");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		out = IOUtils.getBufferedWriter(outfilename);
+		writeLine("agentId\tdepTime\tarrTime");
 		agentDepTimes = new HashMap<String, Double>();
 	}
 
@@ -134,6 +132,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		chart.saveAsPng(chartFilename, 1024, 768);
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		agentDepTimes.clear();
 	}
@@ -162,7 +161,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TimeWriter tw = new TimeWriter(outputFilename);
 		events.addHandler(tw);

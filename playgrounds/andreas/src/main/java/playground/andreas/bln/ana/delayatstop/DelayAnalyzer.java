@@ -1,9 +1,6 @@
 package playground.andreas.bln.ana.delayatstop;
 
-import java.io.IOException;
 import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -13,7 +10,6 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.xml.sax.SAXException;
 
 public class DelayAnalyzer {
 	
@@ -25,19 +21,11 @@ public class DelayAnalyzer {
 
 	
 	public void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		this.handler = new DelayHandler(this.treshold);
 		events.addHandler(this.handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 		
 //		handler.printStats();
 	}

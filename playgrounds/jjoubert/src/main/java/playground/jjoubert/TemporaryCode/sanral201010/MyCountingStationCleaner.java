@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -44,7 +41,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
-import org.xml.sax.SAXException;
 
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 
@@ -85,17 +81,9 @@ public class MyCountingStationCleaner {
 		
 		MyCountingStationCleaner ccs = new MyCountingStationCleaner();
 		
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
-		try {
-			nr.parse(networkFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFilename);
 		
 		ccs.readLinkIds(linkFilename);
 		ccs.cleanCounts(root, sc.getNetwork());
@@ -158,42 +146,34 @@ public class MyCountingStationCleaner {
 			// Create a duplicate counting station.
 			Counts csNew = new Counts();
 			
-			try {
-				cr.parse(file.getAbsolutePath());
-				csNew.setName(cs.getName());
-				csNew.setYear(cs.getYear());
-				Set<Id> all = cs.getCounts().keySet();
-				/*
-				 * Now, clean the counting stations.
-				 */
-				for (Id id : all) {
-					if(linkMap.containsKey(id)){
-						// It is a station that must remain.
-						Count c = cs.getCount(id);
-						Count cNew = csNew.createCount(linkMap.get(id), c.getCsId());
-												
-						// Get the coordinate. First remove the suffix from the Id.
-						cNew.setCoord(network.getLinks().get(linkMap.get(id)).getCoord());
+			cr.parse(file.getAbsolutePath());
+			csNew.setName(cs.getName());
+			csNew.setYear(cs.getYear());
+			Set<Id> all = cs.getCounts().keySet();
+			/*
+			 * Now, clean the counting stations.
+			 */
+			for (Id id : all) {
+				if(linkMap.containsKey(id)){
+					// It is a station that must remain.
+					Count c = cs.getCount(id);
+					Count cNew = csNew.createCount(linkMap.get(id), c.getCsId());
+											
+					// Get the coordinate. First remove the suffix from the Id.
+					cNew.setCoord(network.getLinks().get(linkMap.get(id)).getCoord());
 
-						// Transfer all the volumes.
-						for(int i = 1; i <= 24; i++ ){
-							cNew.createVolume(i, c.getVolume(i).getValue());
-						}
+					// Transfer all the volumes.
+					for(int i = 1; i <= 24; i++ ){
+						cNew.createVolume(i, c.getVolume(i).getValue());
 					}
 				}
-				/*
-				 * Write the cleaned counting stations.
-				 */
-				CountsWriter cw = new CountsWriter(csNew);
-				cw.write(file.getAbsolutePath());				
-				
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+			/*
+			 * Write the cleaned counting stations.
+			 */
+			CountsWriter cw = new CountsWriter(csNew);
+			cw.write(file.getAbsolutePath());				
+				
 		}
 		
 		log.info("Done.");

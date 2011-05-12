@@ -1,9 +1,5 @@
 package playground.jjoubert.TemporaryCode;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -17,10 +13,8 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 public class MyEquilAdapter {
 	private static final Logger log = Logger.getLogger(MyEquilAdapter.class);
@@ -105,21 +99,12 @@ public class MyEquilAdapter {
 	}
 
 	public MyEquilAdapter() {
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 	
 	public void readNetwork(String networkFilename) {
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
-		try {
-			nr.parse(networkFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFilename);
 	}
-	
 
 }

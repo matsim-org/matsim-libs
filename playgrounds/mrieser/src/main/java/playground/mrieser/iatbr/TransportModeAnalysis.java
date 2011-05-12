@@ -21,9 +21,8 @@
 package playground.mrieser.iatbr;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,7 +38,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.xml.sax.SAXException;
 
 public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 
@@ -88,30 +86,22 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		}
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws FileNotFoundException, IOException {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Logger log = Logger.getLogger(TransportModeAnalysis.class);
-		try {
-			log.info("reading network");
-			new MatsimNetworkReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_network.xml.gz");
-			log.info("analyzing plans");
-			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/coords.txt");
-			infoFile.write("X\tY\tID\tTYPE\n");
-			PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
-			pImpl.setIsStreaming(true);
-			pImpl.addAlgorithm(new TransportModeAnalysis(infoFile));
-			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
-			pImpl.printPlansCount();
-			infoFile.close();
-			log.info("done");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		log.info("reading network");
+		new MatsimNetworkReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_network.xml.gz");
+		log.info("analyzing plans");
+		BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/coords.txt");
+		infoFile.write("X\tY\tID\tTYPE\n");
+		PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
+		pImpl.setIsStreaming(true);
+		pImpl.addAlgorithm(new TransportModeAnalysis(infoFile));
+		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
+		pImpl.printPlansCount();
+		infoFile.close();
+		log.info("done");
 	}
 
 }

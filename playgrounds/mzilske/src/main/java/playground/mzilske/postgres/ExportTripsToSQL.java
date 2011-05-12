@@ -1,7 +1,5 @@
 package playground.mzilske.postgres;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
@@ -68,51 +66,45 @@ public class ExportTripsToSQL {
 		parseArguments(args);
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
-		try {
-			final PrintWriter out = new PrintWriter(IOUtils.getBufferedWriter(outputFile, false));
-			scenario = sl.getScenario();
-			this.config = scenario.getConfig();
-			final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
-			plans.setIsStreaming(true);
-			final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-			plans.addAlgorithm(new PersonAlgorithm() {
+		final PrintWriter out = new PrintWriter(IOUtils.getBufferedWriter(outputFile, false));
+		scenario = sl.getScenario();
+		this.config = scenario.getConfig();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		plans.setIsStreaming(true);
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		plans.addAlgorithm(new PersonAlgorithm() {
 
-				@Override
-				public void run(Person person) {
-					Iterator<? extends Plan> iPlan = person.getPlans().iterator();
-					if (iPlan.hasNext()) {
-						Plan plan = iPlan.next();
-						Iterator<PlanElement> i = plan.getPlanElements().iterator();
-						Activity a1;
-						Activity a2 = (Activity) i.next();
-						while (i.hasNext()) {
-							a1 = a2;
-							Leg l = (Leg) i.next();
-							a2 = (Activity) i.next();
-							String line = nLeg + ","
-									+ person.getId() + ","
-									+ plan.getPlanElements().indexOf(l) + ","
-									+ a1.getCoord().getX() + ","
-									+ a1.getCoord().getY() + ","
-									+ a2.getCoord().getX() + ","
-									+ a2.getCoord().getY() + ","
-									+ l.getMode();
-							out.println(line);
-							++nLeg;
-						}
+			@Override
+			public void run(Person person) {
+				Iterator<? extends Plan> iPlan = person.getPlans().iterator();
+				if (iPlan.hasNext()) {
+					Plan plan = iPlan.next();
+					Iterator<PlanElement> i = plan.getPlanElements().iterator();
+					Activity a1;
+					Activity a2 = (Activity) i.next();
+					while (i.hasNext()) {
+						a1 = a2;
+						Leg l = (Leg) i.next();
+						a2 = (Activity) i.next();
+						String line = nLeg + ","
+								+ person.getId() + ","
+								+ plan.getPlanElements().indexOf(l) + ","
+								+ a1.getCoord().getX() + ","
+								+ a1.getCoord().getY() + ","
+								+ a2.getCoord().getX() + ","
+								+ a2.getCoord().getY() + ","
+								+ l.getMode();
+						out.println(line);
+						++nLeg;
 					}
 				}
+			}
 
-			});
-			plansReader.readFile(this.config.plans().getInputFile());
-			plans.printPlansCount();
-			out.close();
-			System.out.println("done.");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		});
+		plansReader.readFile(this.config.plans().getInputFile());
+		plans.printPlansCount();
+		out.close();
+		System.out.println("done.");
 	}
 
 

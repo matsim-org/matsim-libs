@@ -23,10 +23,6 @@
  */
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -36,7 +32,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 /**
  * @author yu
@@ -58,6 +53,7 @@ public class PtStopTextLayer4QGIS extends TextLayer4QGIS {
 		this.writer.writeln("id\tlinkRef\tisBlocking");
 	}
 
+	@Override
 	public void run(Plan plan) {
 	}
 
@@ -75,22 +71,14 @@ public class PtStopTextLayer4QGIS extends TextLayer4QGIS {
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReader(scenario).readFile(scheduleFilename);
-			PtStopTextLayer4QGIS pst4q = new PtStopTextLayer4QGIS(txtFilename);
-			for (TransitStopFacility stop : schedule.getFacilities().values()) {
-				Coord coord = stop.getCoord();
-				pst4q.writeln(coord.getX() + "\t" + coord.getY() + "\t"
-						+ stop.getId() + "\t" + stop.getLinkId() + "\t"
-						+ stop.getIsBlockingLane());
-			}
-			pst4q.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+		new TransitScheduleReader(scenario).readFile(scheduleFilename);
+		PtStopTextLayer4QGIS pst4q = new PtStopTextLayer4QGIS(txtFilename);
+		for (TransitStopFacility stop : schedule.getFacilities().values()) {
+			Coord coord = stop.getCoord();
+			pst4q.writeln(coord.getX() + "\t" + coord.getY() + "\t"
+					+ stop.getId() + "\t" + stop.getLinkId() + "\t"
+					+ stop.getIsBlockingLane());
 		}
+		pst4q.close();
 	}
 }

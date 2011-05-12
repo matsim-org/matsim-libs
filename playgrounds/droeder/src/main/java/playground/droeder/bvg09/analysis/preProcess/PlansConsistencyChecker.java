@@ -26,8 +26,6 @@ import java.io.InputStream;
 import java.util.ListIterator;
 import java.util.zip.GZIPInputStream;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,7 +38,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.filters.AbstractPersonFilter;
-import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
 
@@ -57,15 +54,7 @@ public class PlansConsistencyChecker {
 		final String NETWORK = PATH + "network.final.xml.gz";
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		try {
-			new NetworkReaderMatsimV1(sc).parse(NETWORK);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		new NetworkReaderMatsimV1(sc).parse(NETWORK);
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		PlanElementConsistencyFilter filter = new PlanElementConsistencyFilter();
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(filter);
@@ -83,15 +72,7 @@ public class PlansConsistencyChecker {
 			e.printStackTrace();
 		}
 		
-		try {
-			new MatsimPopulationReader(sc).parse(in);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimPopulationReader(sc).parse(in);
 	}
 
 }

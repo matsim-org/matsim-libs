@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -39,7 +37,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.XY2Links;
-import org.xml.sax.SAXException;
 
 import playground.jjoubert.Utilities.roadpricing.MyDemandMatrix;
 
@@ -120,15 +117,7 @@ public class createDemandFromSaturnMatrix {
 		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction);
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
-		try {
-			nr.parse(networkFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFilename);
 		
 		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
 		xy.run(sc.getPopulation());

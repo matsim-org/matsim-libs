@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -55,22 +54,18 @@ public class LaneDefinitonsV11ToV20Converter {
 	
 	private void checkFileTypes(String laneDefs11Filename, String laneDefs20Filename){
 		MatsimFileTypeGuesser fileTypeGuesser;
-		try {
-			fileTypeGuesser = new MatsimFileTypeGuesser(laneDefs11Filename);
-			String sid11 = fileTypeGuesser.getSystemId();
+		fileTypeGuesser = new MatsimFileTypeGuesser(laneDefs11Filename);
+		String sid11 = fileTypeGuesser.getSystemId();
 
-			if (!(sid11.compareTo(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11) == 0)){
-				throw new IllegalArgumentException("File " + laneDefs11Filename + " is no laneDefinitions_v1.1.xsd format");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!(sid11.compareTo(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11) == 0)){
+			throw new IllegalArgumentException("File " + laneDefs11Filename + " is no laneDefinitions_v1.1.xsd format");
 		}
 	}
 	
 	public void convert(String laneDefs11Filename, String laneDefs20Filename, String networkFilename){
 		this.checkFileTypes(laneDefs11Filename, laneDefs20Filename);
 		
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();

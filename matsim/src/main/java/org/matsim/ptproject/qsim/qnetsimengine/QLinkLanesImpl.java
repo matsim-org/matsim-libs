@@ -579,34 +579,29 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 */
 	@Override
 	QLinkInternalI getQLink() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
 	double getInverseSimulatedFlowCapacity() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	double getStorageCapacity() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	int getBufferStorage() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	double getLength() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
 

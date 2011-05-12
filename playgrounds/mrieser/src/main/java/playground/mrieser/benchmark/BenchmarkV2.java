@@ -74,7 +74,7 @@ public class BenchmarkV2 {
 	public void convertNetwork() {
 		OsmNetworkReader osmReader = new OsmNetworkReader(this.scenario.getNetwork(), new WGS84toCH1903LV03());
 		osmReader.setKeepPaths(false);
-		osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
+			osmReader.parse("/Volumes/Data/projects/benchmarkV2/zurich.osm");
 		new NetworkCleaner().run(this.scenario.getNetwork());
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (link.getFreespeed() == 0.0) {
@@ -213,7 +213,7 @@ public class BenchmarkV2 {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-//		args=new String[]{"-r2", "-s 2", "-e=0", "-a10000", "-f1.0", "-m newsim"};
+		args=new String[]{"-r2", "-s 2", "-e=0", "-a5000", "-f1.0", "-m qsim"};
 
 		double flowFactor = 1.0;
 		int nOfThreadsReplanning = 4;

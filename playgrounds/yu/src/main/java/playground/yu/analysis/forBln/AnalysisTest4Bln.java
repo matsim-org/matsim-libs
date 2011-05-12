@@ -23,10 +23,6 @@
  */
 package playground.yu.analysis.forBln;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,7 +38,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
-import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -109,16 +104,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 		RoadPricingScheme toll = null;
 		if (withToll) {
 			sc.getConfig().scenario().setUseRoadpricing(true);
-			try {
-				new RoadPricingReaderXMLv1(sc.getRoadPricingScheme())
-						.parse(tollFilename);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new RoadPricingReaderXMLv1(sc.getRoadPricingScheme()).parse(tollFilename);
 			toll = sc.getRoadPricingScheme();
 		}
 
@@ -154,7 +140,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
@@ -230,7 +216,7 @@ public class AnalysisTest4Bln implements Analysis4Bln {
 			sr.close();
 			sw2.close();
 
-			QSim qsim = new QSim(sc, ((EventsManager) EventsUtils.createEventsManager()));
+			QSim qsim = new QSim(sc, (EventsUtils.createEventsManager()));
 
 			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
 					eventsFilename.split("events.txt.gz")[0]

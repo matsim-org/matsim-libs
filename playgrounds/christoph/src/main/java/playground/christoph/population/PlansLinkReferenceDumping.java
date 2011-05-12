@@ -1,7 +1,5 @@
 package playground.christoph.population;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -43,16 +41,7 @@ public class PlansLinkReferenceDumping {
 
 		Config config = new Config();
 		config.addCoreModules();
-		try
-		{
-			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
-		}
-		catch (IOException e)
-		{
-			System.out.println("Problem loading the configuration file from " + configFileName);
-			throw new RuntimeException(e);
-		}
-//		Gbl.setConfig(config);
+		new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		

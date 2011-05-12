@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +54,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.evacuation.base.EvacuationAreaFileReader;
 import org.matsim.evacuation.base.EvacuationAreaFileWriter;
 import org.matsim.evacuation.base.EvacuationAreaLink;
-import org.xml.sax.SAXException;
 
 public class CutNetwork {
 
@@ -162,39 +159,15 @@ public class CutNetwork {
 		net.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 		new MatsimNetworkReader(scenario).readFile(c.network().getInputFile());
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(net);
-		try {
-			parser.parse(c.network().getChangeEventsInputFile());
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		parser.parse(c.network().getChangeEventsInputFile());
 		net.setNetworkChangeEvents(parser.getEvents());
 
 		Population pop = scenario.getPopulation();
-		try {
-			new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
 
 		HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
 		String evacuationAreaLinksFile = c.getModules().get("evacuation").getValue("inputEvacuationAreaLinksFile");
-		try {
-			new EvacuationAreaFileReader(evacuationAreaLinks).readFile(evacuationAreaLinksFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new EvacuationAreaFileReader(evacuationAreaLinks).readFile(evacuationAreaLinksFile);
 
 		System.out.println(evacuationAreaLinks.size());
 		cutIt(net, parser.getEvents(), pop, evacuationAreaLinks);

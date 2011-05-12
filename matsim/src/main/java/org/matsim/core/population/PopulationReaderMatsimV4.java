@@ -20,12 +20,9 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -44,6 +41,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -52,7 +50,6 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.Desires;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
@@ -190,22 +187,13 @@ import org.xml.sax.SAXException;
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
+	 * Parses the specified plans file. This method calls {@link #parse(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	@Override
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	private void startPlans(final Attributes atts) {
@@ -300,29 +288,29 @@ import org.xml.sax.SAXException;
 
 		String type = atts.getValue(ATTR_TYPE);
 		if (type == null) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.UNDEFINED);
+			this.currplan.setType("undefined");
 		}
 		else if ("car".equalsIgnoreCase(type)) {
-				this.currplan.setType(PlanImpl.DeprecatedConstants.CAR);
+				this.currplan.setType("car");
 		}
 		else if ("pt".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.PT);
+			this.currplan.setType("pt");
 		}
 		else if ("ride".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.RIDE);
+			this.currplan.setType("ride");
 		}
 		else if ("bike".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.BIKE);
+			this.currplan.setType("bike");
 		}
 		else if ("walk".equalsIgnoreCase(type)) {
-			this.currplan.setType(PlanImpl.DeprecatedConstants.WALK);
+			this.currplan.setType("walk");
 		}
 		else {
 			if (this.warnPlanTypeCount < 10 ) {
 				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
 				this.warnPlanTypeCount++;
 			}
-			this.currplan.setType(PlanImpl.DeprecatedConstants.UNDEFINED);
+			this.currplan.setType("undefined");
 		}
 	}
 

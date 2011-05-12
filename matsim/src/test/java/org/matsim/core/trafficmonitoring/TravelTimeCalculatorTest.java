@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -57,6 +58,8 @@ import org.xml.sax.SAXException;
  */
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
+	private final static Logger log = Logger.getLogger(TravelTimeCalculatorTest.class);
+	
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile;
 		ScenarioImpl scenario;
@@ -180,7 +183,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 
-		EventsManager events2 = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events2 = EventsUtils.createEventsManager();
 
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, scenario.getConfig().travelTimeCalculator());
 		ttcalc.setTravelTimeAggregator(aggregator);
@@ -203,7 +206,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		finally {
 			try {
 				infile.close();
-			} catch (IOException ignored) {}
+			} catch (IOException e) {
+				log.error("could not close stream.", e);
+			}
 		}
 
 		// prepare comparison
@@ -296,7 +301,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse(networkFile);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
+		EventsManager events = EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);

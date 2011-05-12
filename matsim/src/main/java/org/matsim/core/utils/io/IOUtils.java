@@ -133,12 +133,11 @@ public class IOUtils {
 	 *
 	 * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
 	 * @return BufferedReader for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 *
 	 * @author mrieser
 	 */
-	public static BufferedReader getBufferedReader(final String filename) throws FileNotFoundException, IOException {
+	public static BufferedReader getBufferedReader(final String filename) throws UncheckedIOException {
 		return getBufferedReader(filename, Charset.forName("UTF8"));
 	}
 
@@ -151,45 +150,48 @@ public class IOUtils {
 	 * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
 	 * @param charset the Charset of the file to read
 	 * @return BufferedReader for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 *
 	 * @author mrieser
 	 */
-	public static BufferedReader getBufferedReader(final String filename, final Charset charset) throws FileNotFoundException, IOException {
+	public static BufferedReader getBufferedReader(final String filename, final Charset charset) throws UncheckedIOException {
 		BufferedReader infile = null;
 		if (filename == null) {
-			throw new FileNotFoundException("No filename given (filename == null)");
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
-		if (new File(filename).exists()) {
-			if (filename.endsWith(GZ)) {
-				infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename)), charset));
-			} else {
-				infile = new BufferedReader(new InputStreamReader(new FileInputStream(filename), charset));
-			}
-		} else if (new File(filename + GZ).exists()) {
-			infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + GZ)), charset));
-		} else {
-			InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-			if (stream != null) {
+		try {
+			if (new File(filename).exists()) {
 				if (filename.endsWith(GZ)) {
-					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
-					log.info("loading file from classpath: " + filename);
+					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename)), charset));
 				} else {
-					infile = new BufferedReader(new InputStreamReader(stream, charset));
-					log.info("loading file from classpath: " + filename);
+					infile = new BufferedReader(new InputStreamReader(new FileInputStream(filename), charset));
 				}
+			} else if (new File(filename + GZ).exists()) {
+				infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + GZ)), charset));
 			} else {
-				stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
 				if (stream != null) {
-					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
-					log.info("loading file from classpath: " + filename + GZ);
+					if (filename.endsWith(GZ)) {
+						infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
+						log.info("loading file from classpath: " + filename);
+					} else {
+						infile = new BufferedReader(new InputStreamReader(stream, charset));
+						log.info("loading file from classpath: " + filename);
+					}
+				} else {
+					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+					if (stream != null) {
+						infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
+						log.info("loading file from classpath: " + filename + GZ);
+					}
 				}
 			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 
 		if (infile == null) {
-			throw new FileNotFoundException(filename);
+			throw new UncheckedIOException(new FileNotFoundException(filename));
 		}
 		return infile;
 	}
@@ -205,12 +207,11 @@ public class IOUtils {
 	 * @param filename The filename where to write the data.
 	 * @param useCompression whether the file should be gzip-compressed or not.
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename, final boolean useCompression) throws FileNotFoundException, IOException {
+	public static BufferedWriter getBufferedWriter(final String filename, final boolean useCompression) throws UncheckedIOException {
 		if (filename == null) {
-			throw new FileNotFoundException("No filename given (filename == null)");
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		if (useCompression && !filename.endsWith(GZ)) {
 			return getBufferedWriter(filename + GZ);
@@ -230,10 +231,9 @@ public class IOUtils {
 	 *
 	 * @param filename The filename where to write the data.
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename) throws FileNotFoundException, IOException {
+	public static BufferedWriter getBufferedWriter(final String filename) throws UncheckedIOException {
 		return getBufferedWriter(filename, Charset.forName("UTF8"));
 	}
 
@@ -247,10 +247,9 @@ public class IOUtils {
 	 *
 	 * @param filename The filename where to write the data.
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getAppendingBufferedWriter(final String filename) throws FileNotFoundException, IOException {
+	public static BufferedWriter getAppendingBufferedWriter(final String filename) throws UncheckedIOException {
 		return getBufferedWriter(filename, Charset.forName("UTF8"), true);
 	}
 
@@ -262,10 +261,9 @@ public class IOUtils {
 	 * @param filename The filename where to write the data.
 	 * @param charset the encoding to use to write the file.
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset) throws FileNotFoundException, IOException {
+	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset) throws UncheckedIOException {
 		return getBufferedWriter(filename, charset, false);
 	}
 
@@ -279,10 +277,9 @@ public class IOUtils {
 	 * @param filename The filename where to write the data.
 	 * @param charset the encoding to use to write the file.
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getAppendingBufferedWriter(final String filename, final Charset charset) throws FileNotFoundException, IOException {
+	public static BufferedWriter getAppendingBufferedWriter(final String filename, final Charset charset) throws UncheckedIOException {
 		return getBufferedWriter(filename, charset, true);
 	}
 
@@ -295,21 +292,24 @@ public class IOUtils {
 	 * @param charset the encoding to use to write the file.
 	 * @param append <code>true</code> if the file should be opened for appending, instead of overwriting
 	 * @return BufferedWriter for the specified file.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset, final boolean append) throws FileNotFoundException, IOException {
+	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset, final boolean append) throws UncheckedIOException {
 		if (filename == null) {
-			throw new FileNotFoundException("No filename given (filename == null)");
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
-		if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-			File f = new File(filename);
-			if (append && f.exists() && (f.length() > 0)) {
-				throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
+		try {
+			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+				File f = new File(filename);
+				if (append && f.exists() && (f.length() > 0)) {
+					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
+				}
+				return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
 			}
-			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
+			return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
 	}
 
 
@@ -559,46 +559,49 @@ public class IOUtils {
    *
    * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
    * @return InputStream for the specified file.
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @throws UncheckedIOException
    *
    * @author dgrether
    */
-  public static InputStream getInputstream(final String filename) throws FileNotFoundException, IOException {
+  public static InputStream getInputstream(final String filename) throws UncheckedIOException {
     InputStream inputStream = null;
     if (filename == null) {
-      throw new FileNotFoundException("No filename given (filename == null)");
+      throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
     }
-    if (new File(filename).exists()) {
-      if (filename.endsWith(GZ)) {
-        inputStream = new GZIPInputStream(new FileInputStream(filename));
-      } else {
-        inputStream = new FileInputStream(filename);
-      }
-    } else if (new File(filename + GZ).exists()) {
-        inputStream = new GZIPInputStream(new FileInputStream(filename));
+    try {
+	    if (new File(filename).exists()) {
+	      if (filename.endsWith(GZ)) {
+	        inputStream = new GZIPInputStream(new FileInputStream(filename));
+	      } else {
+	        inputStream = new FileInputStream(filename);
+	      }
+	    } else if (new File(filename + GZ).exists()) {
+	        inputStream = new GZIPInputStream(new FileInputStream(filename));
+	    }
+	    else {
+	      InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+	      if (stream != null) {
+	        if (filename.endsWith(GZ)) {
+	          inputStream = new GZIPInputStream(new FileInputStream(filename));
+	        }
+	        else {
+	          inputStream = new FileInputStream(filename);
+	        }
+	      }
+	      else {
+	        inputStream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+	      }
+	      if (inputStream != null) {
+	        log.info("streaming file from classpath: " + filename);
+	      }
+	    }
+	    if (inputStream == null) {
+	      throw new FileNotFoundException(filename);
+	    }
+	    return inputStream;
+    } catch (IOException e) {
+    	throw new UncheckedIOException(e);
     }
-    else {
-      InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-      if (stream != null) {
-        if (filename.endsWith(GZ)) {
-          inputStream = new GZIPInputStream(new FileInputStream(filename));
-        }
-        else {
-          inputStream = new FileInputStream(filename);
-        }
-      }
-      else {
-        inputStream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
-      }
-      if (inputStream != null) {
-        log.info("streaming file from classpath: " + filename);
-      }
-    }
-    if (inputStream == null) {
-      throw new FileNotFoundException(filename);
-    }
-    return inputStream;
   }
 
 }

@@ -49,7 +49,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  */
 public class Events2Snapshot {
 
-	private Config config;
+	private Config config = null;
 	private Network network = null;
 	private EventsManager events = null;
 	private SnapshotGenerator visualizer = null;

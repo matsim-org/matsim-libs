@@ -26,8 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -47,14 +45,12 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
-import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -102,19 +98,11 @@ public class MyDemandGenerator {
 	public void generateDemand(Map<Id, MyZone> zones){
 		// TODO Complete.
 		log.info("Generating a synthetic population:");
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population p = scenario.getPopulation();
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario);
-		try {
-			nr.parse(networkFile.getAbsolutePath());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFile.getAbsolutePath());
 		NetworkImpl ni = (NetworkImpl) scenario.getNetwork(); 
 		
 		try {

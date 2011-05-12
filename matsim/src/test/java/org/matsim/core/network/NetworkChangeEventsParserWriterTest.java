@@ -20,17 +20,13 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.xml.sax.SAXException;
 
 public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 
@@ -48,15 +44,7 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1500, 1.667, 3600, 1);
 
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-		try {
-			parser.parse(input);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		parser.parse(input);
 		List<NetworkChangeEvent> events  = parser.getEvents();
 		new NetworkChangeEventsWriter().write(output, events);
 

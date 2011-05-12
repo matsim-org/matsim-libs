@@ -1,9 +1,5 @@
 package playground.andreas.bln;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -18,7 +14,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.xml.sax.SAXException;
 
 public class TransitLiveSimMain {
 
@@ -37,20 +32,8 @@ public class TransitLiveSimMain {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 
-        try {
-			new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork(), scenario).readFile(inputDir + "transitSchedule.xml");
-			new VehicleReaderV1(scenario.getVehicles()).parse(inputDir + "vehicles.xml");
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork(), scenario).readFile(inputDir + "transitSchedule.xml");
+		new VehicleReaderV1(scenario.getVehicles()).parse(inputDir + "vehicles.xml");
 
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
 				scenario.getNetwork(),
@@ -59,7 +42,7 @@ public class TransitLiveSimMain {
 				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		QSim sim = new QSim(scenario, events);
 		sim.getTransitEngine().setUseUmlaeufe(true);
 		OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);

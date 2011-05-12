@@ -8,8 +8,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,7 +31,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetworkReader;
-import org.xml.sax.SAXException;
 
 
 public class VisumHafasScheduleMerger {
@@ -84,24 +81,8 @@ public class VisumHafasScheduleMerger {
 		intermediateLoader.loadScenario();
 		ScenarioLoaderImpl hafasLoader = new ScenarioLoaderImpl(hafasScenario);
 		hafasLoader.loadScenario();
-		try {
-			new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork(), intermediateScenario).readFile(InTransitScheduleFile);
-		} catch (SAXException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (IOException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		}
-		try {
-			new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork(), hafasScenario).readFile(HafasTransitScheduleFile);
-		} catch (SAXException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (IOException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		}
+		new TransitScheduleReaderV1(intermediateScenario.getTransitSchedule(), intermediateScenario.getNetwork(), intermediateScenario).readFile(InTransitScheduleFile);
+		new TransitScheduleReaderV1(hafasScenario.getTransitSchedule(), hafasScenario.getNetwork(), hafasScenario).readFile(HafasTransitScheduleFile);
 		ScenarioLoaderImpl outLoader = new ScenarioLoaderImpl(outScenario);
 		outLoader.loadScenario();
 		readVisumNetwork();

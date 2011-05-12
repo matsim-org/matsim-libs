@@ -37,7 +37,7 @@ public final class LinkHandler extends OTFDataReader {
 
 	public static final double LINK_SCALE  = 1.00; 
 
-	protected OTFDataQuadReceiver quadReceiver = null;
+	private OTFDataQuadReceiver quadReceiver = null;
 
 	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;

@@ -20,6 +20,7 @@
 
 package playground.mrieser;
 
+import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -54,7 +55,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
@@ -68,10 +71,12 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
@@ -84,6 +89,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vis.kml.KMZWriter;
 
 public class MyRuns {
@@ -654,14 +660,14 @@ public class MyRuns {
 		System.out.println("# blocks read: " + cnt);
 	}
 
-	static int unsig(byte b) {
+	static int unsig(final byte b) {
 		if (b < 0) {
 			return b + 256;
 		}
 		return b;
 	}
 
-	static boolean isValid(byte[] bytes) {
+	static boolean isValid(final byte[] bytes) {
 		byte check = 0;
 		byte check2 = (byte) 0xAA;
 		for (int i = 0; i <= 0x2D; i++) {
@@ -820,6 +826,27 @@ public class MyRuns {
 //		Config config = new Config();
 //		config.addCoreModules();
 //		new ConfigWriter(config).writeStream(new PrintWriter(System.out));
+
+//		Scenario s = new ScenarioLoaderImpl("examples/equil/config.xml").loadScenario();
+//		new PopulationWriter(s.getPopulation(), null).writeFileV5("/Users/cello/Desktop/p5test.xml");
+
+		System.out.println(new Color(255, 34, 17).getRGB());
+		System.out.println(new Color(0xFF2211).getRGB());
+		System.out.println(0xFFFF2211);
+
+		Class k1 = LinkLeaveEvent.class;
+		Class k2 = LinkLeaveEventImpl.class;
+
+		System.out.println(k1.isAssignableFrom(k2));
+		System.out.println(k2.isAssignableFrom(k1));
+
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getConfig().scenario().setUseTransit(true);
+		new TransitScheduleReader(scenario).readFile("/Users/cello/Downloads/pt.xml");
+//		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
+//		schedule.getFacilities(); // Map mit den Stop Facilities
+
 
 
 		System.out.println("stop at " + (new Date()));

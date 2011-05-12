@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.EnvironmentDistanceVectorsGeneratorII;
@@ -140,16 +137,8 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 
 
 		EnvironmentDistancesReader r = new EnvironmentDistancesReader();
-		try {
-			r.setValidating(false);
-			r.parse(this.sim2DConfig.getStaticEnvFieldFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		r.setValidating(false);
+		r.parse(this.sim2DConfig.getStaticEnvFieldFile());
 		this.sff = r.getEnvDistField();
 
 	}

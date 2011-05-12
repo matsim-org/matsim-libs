@@ -1,9 +1,6 @@
 package playground.mmoyo.zz_archive.PTRouter;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +19,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.xml.sax.SAXException;
 
 import playground.mmoyo.Validators.RepeatedStopFinder;
 
@@ -56,15 +52,7 @@ public class Main {
 
 		/* **************reads the transitSchedule file********* */
 		new MatsimNetworkReader(scenario).readFile(netWorkFile);
-		try {
-			new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(transitScheduleFile);
-		} catch (SAXException e){
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
+		new TransitScheduleReaderV1(transitSchedule, network, scenario).readFile(transitScheduleFile);
 		/*******************************************************/
 
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter

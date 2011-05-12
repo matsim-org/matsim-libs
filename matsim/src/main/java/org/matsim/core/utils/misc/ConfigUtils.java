@@ -20,13 +20,10 @@
 package org.matsim.core.utils.misc;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.xml.sax.SAXException;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author mrieser
@@ -39,36 +36,20 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
-	public static Config loadConfig(final String filename) {
+	public static Config loadConfig(final String filename) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();
 
-		try {
-			new MatsimConfigReader(config).parse(filename);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(config).parse(filename);
 
 		return config;
 	}
 
-	public static void loadConfig(final Config config, final String filename) {
+	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
 		}
-		try {
-			new MatsimConfigReader(config).parse(filename);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(config).parse(filename);
 	}
 
 	/**

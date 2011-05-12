@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Random;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +47,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.xml.sax.SAXException;
 
 /**
  * This class is designed to create random plan files for
@@ -103,16 +100,8 @@ public class RandomPlansGenerator {
 	public void read(ScenarioImpl scenario) throws IOException {
 		this.network = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
-		try {
-			netReader.parse(this.networkFile);
-			this.network.connect();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			throw e;
-		}
+		netReader.parse(this.networkFile);
+		this.network.connect();
 	}
 
 	private void initDijkstra(){

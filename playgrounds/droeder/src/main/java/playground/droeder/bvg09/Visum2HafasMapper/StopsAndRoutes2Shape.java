@@ -1,15 +1,12 @@
 package playground.droeder.bvg09.Visum2HafasMapper;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.feature.FeatureType;
 import org.matsim.api.core.v01.Coord;
@@ -24,7 +21,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.xml.sax.SAXException;
 
 import playground.droeder.DaPaths;
 import playground.droeder.gis.DaShapeWriter;
@@ -91,18 +87,7 @@ public class StopsAndRoutes2Shape{
 	
 	private void readSchedule(String fileName, ScenarioImpl sc){
 		TransitScheduleReader reader = new TransitScheduleReader(sc);
-		try {
-			reader.readFile(fileName);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		reader.readFile(fileName);
 	}
 	
 	private void readNetwork(String fileName, ScenarioImpl sc){

@@ -22,7 +22,6 @@ package org.matsim.core.utils.misc;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -69,8 +68,6 @@ public class CRCChecksum {
 			   in = new BufferedInputStream(new FileInputStream( filename ));
 			}
 			return getCRCFromStream(in);
-		} catch (FileNotFoundException e1) {
-			throw new RuntimeException(e1);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

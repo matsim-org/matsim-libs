@@ -20,13 +20,10 @@
 
 package playground.jjoubert.TemporaryCode;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +40,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
-import org.xml.sax.SAXException;
 
 public class SampleFromCommercialPlans {
 	private static Logger log = Logger.getLogger(SampleFromCommercialPlans.class);
@@ -91,15 +87,7 @@ public class SampleFromCommercialPlans {
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
-		try {
-			nr.parse(networkFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		nr.parse(networkFile);
 		XY2Links xy = new XY2Links((NetworkImpl) sNew.getNetwork());
 
 		int id = Integer.parseInt(firstId);
@@ -110,16 +98,8 @@ public class SampleFromCommercialPlans {
 			String filename = root + "plansGauteng5000_Sample" + i + ".xml";
 			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			MatsimPopulationReader pr = new MatsimPopulationReader(s);
-			try {
-				pr.parse(filename);
-				listSc.add(s);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			pr.parse(filename);
+			listSc.add(s);
 		}
 		
 		Random r =  MatsimRandom.getRandom();
@@ -167,15 +147,7 @@ public class SampleFromCommercialPlans {
 			log.info("Combining car and commercial vehicles.");
 			Scenario car = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			MatsimPopulationReader pr = new MatsimPopulationReader(car);
-			try {
-				pr.parse(carFile);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			pr.parse(carFile);
 			
 			for(Id idCar : car.getPopulation().getPersons().keySet()){
 				Person carPerson = car.getPopulation().getPersons().get(idCar);

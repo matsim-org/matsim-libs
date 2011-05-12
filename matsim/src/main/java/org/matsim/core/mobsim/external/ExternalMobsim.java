@@ -94,9 +94,6 @@ public class ExternalMobsim implements Simulation {
 			runExe(iterationConfigFile);
 			readEvents(iterationEventsFile);
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}

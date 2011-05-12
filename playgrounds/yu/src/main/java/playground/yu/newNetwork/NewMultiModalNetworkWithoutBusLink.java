@@ -1,10 +1,7 @@
 package playground.yu.newNetwork;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -21,7 +18,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.xml.sax.SAXException;
 
 public class NewMultiModalNetworkWithoutBusLink {
 	private static Set<Link> busLinks2delete = new HashSet<Link>();
@@ -112,15 +108,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReader(scenario).readFile(transitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 
 		new NetworkWriter(excludeBusLinks(multiModalNetwork, schedule))
 				.write(newNetworkFile);

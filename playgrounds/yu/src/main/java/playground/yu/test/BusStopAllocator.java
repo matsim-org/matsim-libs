@@ -23,12 +23,9 @@
  */
 package playground.yu.test;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +41,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -153,17 +149,9 @@ public class BusStopAllocator {
 		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		try {
-			new TransitScheduleReader(scenario).readFile(transitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 
-		Scenario carScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario carScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network carNetwork = carScenario.getNetwork();
 		new MatsimNetworkReader(carScenario).readFile(carNetworkFile);
 

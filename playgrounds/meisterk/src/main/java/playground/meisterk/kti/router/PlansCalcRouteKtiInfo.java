@@ -22,8 +22,6 @@ package playground.meisterk.kti.router;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -32,7 +30,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import org.xml.sax.SAXException;
 
 import playground.balmermi.world.MatsimWorldReader;
 import playground.balmermi.world.World;
@@ -61,15 +58,7 @@ public class PlansCalcRouteKtiInfo {
 		// municipality layer from world file
 		ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.localWorld = new World();
-		try {
-			new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
 
 		log.info("Reading traveltime matrix...");
 		Matrices matrices = new Matrices();

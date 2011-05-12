@@ -23,10 +23,6 @@
  */
 package playground.yu.analysis.forZrh;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -43,7 +39,6 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -106,13 +101,8 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 
 		String facilitiesFilename = null;
 		if (args.length >= 7) {
-			try {
-				if (new MatsimFileTypeGuesser(args[6]).getGuessedFileType()
-						.equals(FileType.Facilities)) {
-					facilitiesFilename = args[6];
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (new MatsimFileTypeGuesser(args[6]).getGuessedFileType().equals(FileType.Facilities)) {
+				facilitiesFilename = args[6];
 			}
 		}
 
@@ -130,15 +120,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			s.getConfig().scenario().setUseRoadpricing(true);
 			toll = s.getRoadPricingScheme();
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
-			try {
-				tollReader.parse(tollFilename);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			tollReader.parse(tollFilename);
 		}
 
 		// EventsHandlers with parameter of "Population":
@@ -177,7 +159,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);

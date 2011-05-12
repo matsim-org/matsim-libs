@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +47,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
@@ -189,15 +186,7 @@ public class MultiSourceEAF {
 	
 	static List<NetworkChangeEvent> readChangeEvents(final NetworkImpl network, final String filename) throws IOException{
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-		try {
-			parser.parse(filename);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		parser.parse(filename);
 		return parser.getEvents();
 	}
 

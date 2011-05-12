@@ -1,11 +1,26 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.yu.utils.io;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
 
@@ -29,29 +44,14 @@ public class SimpleWriter implements Closeable, Flushable {
 		stringBuffer.append(intermission);
 	}
 
-	/**
-	 * 
-	 */
 	public SimpleWriter(final String outputFilename) {
-		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		writer = IOUtils.getBufferedWriter(outputFilename);
 	}
 
 	public SimpleWriter(String outputFilename, String contents2write) {
-		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
-			write(contents2write);
-			close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		writer = IOUtils.getBufferedWriter(outputFilename);
+		write(contents2write);
+		close();
 	}
 
 	public void write(char[] c) {
@@ -101,6 +101,7 @@ public class SimpleWriter implements Closeable, Flushable {
 		write('\n');
 	}
 
+	@Override
 	public void close() {
 		try {
 			writer.close();
@@ -109,6 +110,7 @@ public class SimpleWriter implements Closeable, Flushable {
 		}
 	}
 
+	@Override
 	public void flush() {
 		try {
 			writer.flush();

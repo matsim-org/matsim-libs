@@ -19,12 +19,9 @@
 
 package playground.mzilske.neo;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -35,10 +32,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 public class ApiNetworkReader extends MatsimXmlParser {
 
@@ -76,16 +73,8 @@ public class ApiNetworkReader extends MatsimXmlParser {
 		// currently, we do not have anything to do when a tag ends, maybe later sometimes...
 	}
 
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 	private void startNetwork(final Attributes atts) {

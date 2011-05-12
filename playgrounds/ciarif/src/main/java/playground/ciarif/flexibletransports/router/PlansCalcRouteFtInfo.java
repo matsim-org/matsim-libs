@@ -2,7 +2,7 @@ package playground.ciarif.flexibletransports.router;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -11,9 +11,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import playground.balmermi.world.World;
+
 import playground.balmermi.world.MatsimWorldReader;
-import org.xml.sax.SAXException;
+import playground.balmermi.world.World;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.meisterk.kti.router.SwissHaltestellen;
 
@@ -42,15 +42,7 @@ public class PlansCalcRouteFtInfo
 
     ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     //this.localWorld = localScenario.getWorld();
-    try {
-      new MatsimWorldReader(localScenario, this.localWorld).parse(this.ftConfigGroup.getWorldInputFilename());
-    } catch (SAXException e) {
-      e.printStackTrace();
-    } catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+     new MatsimWorldReader(localScenario, this.localWorld).parse(this.ftConfigGroup.getWorldInputFilename());
 
     log.info("Reading car stations...");
     this.carStations = new CarSharingStations(network);

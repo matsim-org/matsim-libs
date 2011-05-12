@@ -53,6 +53,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every "entering"-Event
 	 */
+	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
@@ -62,6 +63,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every "leaving"-Event
 	 */
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
@@ -79,12 +81,8 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 			}
 		}
 		this.cnt = 0;
-		try {
-			this.out = IOUtils.getBufferedWriter(outfilename);
-			writeLine("time\tvolume");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.out = IOUtils.getBufferedWriter(outfilename);
+		writeLine("time\tvolume");
 	}
 
 	private void writeLine(final String line) {
@@ -96,6 +94,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 		}
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		this.cnt = 0;
 	}

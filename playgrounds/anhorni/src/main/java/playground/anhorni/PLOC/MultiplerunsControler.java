@@ -20,14 +20,9 @@
 
 package playground.anhorni.PLOC;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.xml.sax.SAXException;
 
 import playground.anhorni.PLOC.analysis.SummaryWriter;
 
@@ -55,15 +50,7 @@ public class MultiplerunsControler {
     	this.summaryWriter = new SummaryWriter(path);
     	
     	ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personAttributes);
-		try {
 			attributesReader.parse("src/main/java/playground/anhorni/input/PLOC/3towns/personExpenditures.xml");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
            
     public void run() {

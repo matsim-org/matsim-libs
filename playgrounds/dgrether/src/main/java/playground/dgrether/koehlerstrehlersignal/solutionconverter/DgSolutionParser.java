@@ -19,18 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.solutionconverter;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -55,16 +51,8 @@ public class DgSolutionParser extends MatsimXmlParser {
 	}
 	
 	public void readFile(final String filename) {
-		try {
-			this.setValidating(false);
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.setValidating(false);
+		parse(filename);
 	}
 	
 	@Override

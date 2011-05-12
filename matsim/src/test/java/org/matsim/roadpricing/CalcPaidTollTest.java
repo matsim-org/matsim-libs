@@ -20,10 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import java.io.IOException;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +41,6 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.xml.sax.SAXException;
 
 /**
  * Tests that {@link CalcPaidToll} calculates the correct tolls
@@ -199,15 +195,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingScheme scheme = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
-		try {
-			reader.parse(tollFile);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		reader.parse(tollFile);
 		assertEquals(tollType, scheme.getType());
 
 		Fixture.createPopulation1(scenario);
@@ -216,7 +204,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	}
 
 	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll, final PlanCalcScoreConfigGroup config) {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
 		events.addHandler(paidToll);
 		EventsToScore scoring = new EventsToScore(scenario.getPopulation(), new CharyparNagelScoringFunctionFactory(config));

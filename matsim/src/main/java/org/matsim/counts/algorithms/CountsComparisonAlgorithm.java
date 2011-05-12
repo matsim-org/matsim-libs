@@ -115,7 +115,7 @@ public class CountsComparisonAlgorithm {
 			if (!isInRange(count.getLocId())) {
 				continue;
 			}
-			double[] volumes = new double[24];
+			double[] volumes;
 			if (this.linkStats != null) {
 				volumes = this.linkStats.getAvgLinkVolumes(count.getLocId());
 			} else if (this.volumes != null) {

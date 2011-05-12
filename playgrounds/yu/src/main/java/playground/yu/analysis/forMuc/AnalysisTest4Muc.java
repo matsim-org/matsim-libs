@@ -23,10 +23,6 @@
  */
 package playground.yu.analysis.forMuc;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -39,7 +35,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -110,15 +105,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		if (withToll) {
 			sc.getConfig().scenario().setUseRoadpricing(true);
 			toll = sc.getRoadPricingScheme();
-			try {
-				new RoadPricingReaderXMLv1(toll).parse(tollFilename);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new RoadPricingReaderXMLv1(toll).parse(tollFilename);
 		}
 
 		// EventsHandlers with parameter of "Population":
@@ -153,7 +140,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);

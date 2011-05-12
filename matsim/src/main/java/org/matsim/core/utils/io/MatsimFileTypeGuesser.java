@@ -59,7 +59,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 	private String xmlPublicId = null;
 	private String xmlSystemId = null;
 
-	public MatsimFileTypeGuesser(final String fileName) throws IOException {
+	public MatsimFileTypeGuesser(final String fileName) throws UncheckedIOException {
 		String name = fileName.toLowerCase(Locale.ROOT);
 		if (name.endsWith(".xml.gz") || name.endsWith(".xml")) {
 			guessFileTypeXml(fileName);
@@ -121,7 +121,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		return this.xmlSystemId;
 	}
 
-	private void guessFileTypeXml(final String fileName) throws IOException {
+	private void guessFileTypeXml(final String fileName) throws UncheckedIOException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setValidating(false);
 		factory.setNamespaceAware(true);
@@ -135,10 +135,12 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			reader.setErrorHandler(handler);
 			reader.setEntityResolver(handler);
 			reader.parse(input);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		} catch (SAXException e) {
-			throw new IOException("SAXException: " + e.getMessage());
+			throw new UncheckedIOException(e);
 		} catch (ParserConfigurationException e) {
-			throw new IOException("ParserConfigurationException: " + e.getMessage());
+			throw new UncheckedIOException(e);
 		} catch (XMLTypeDetectionException e) {
 			this.xmlPublicId = e.publicId;
 			this.xmlSystemId = e.systemId;

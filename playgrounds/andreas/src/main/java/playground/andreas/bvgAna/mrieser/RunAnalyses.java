@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -77,7 +75,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
@@ -95,7 +92,7 @@ public class RunAnalyses {
 	private final static String transitScheduleFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/transitSchedule.oevnet.xml.gz";
 	private final static String transitVehiclesFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/transitVehicles_bvg_2005.xml.gz";
 
-	private final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	public void readNetwork() {
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
@@ -107,7 +104,7 @@ public class RunAnalyses {
 	}
 
 	public void extractSelectedPlansOnly() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s).readFile(networkFilename);
 		PopulationImpl pop = (PopulationImpl) s.getPopulation();
 		pop.setIsStreaming(true);
@@ -204,22 +201,14 @@ public class RunAnalyses {
 
 	public void readTransitSchedule() {
 		this.scenario.getConfig().scenario().setUseTransit(true);
-		try {
-			new TransitScheduleReader(this.scenario).readFile(transitScheduleFilename);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
+		new TransitScheduleReader(this.scenario).readFile(transitScheduleFilename);
 	}
 
 	public void createRemainSeatedStats() {
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
 		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
 
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(remainSeated);
 		new MatsimEventsReader(em).readFile(eventsFilename);
 		Map<Id, List<StopId2RemainSeatedDataMapData>> remainSeatedMap = remainSeated.getStopId2RemainSeatedDataMap();
@@ -341,7 +330,7 @@ public class RunAnalyses {
 	public void createMissedConnectionStats(Set<Id> agentIds) {
 		AgentId2StopDifferenceMap missedConnections = new AgentId2StopDifferenceMap(this.scenario.getPopulation(), agentIds);
 
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(missedConnections);
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
@@ -426,7 +415,7 @@ public class RunAnalyses {
 
 		StopId2PersonEnterLeaveVehicleHandler enterLeave = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
 		PersonEnterLeaveVehicle2ActivityHandler enterLeave2Act = new PersonEnterLeaveVehicle2ActivityHandler(agentIds);
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(enterLeave);
 		em.addHandler(enterLeave2Act);
 		new MatsimEventsReader(em).readFile(eventsFilename);

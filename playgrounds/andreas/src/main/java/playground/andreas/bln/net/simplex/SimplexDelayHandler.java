@@ -1,11 +1,8 @@
 package playground.andreas.bln.net.simplex;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,7 +12,6 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.xml.sax.SAXException;
 
 public class SimplexDelayHandler {
 	
@@ -26,7 +22,7 @@ public class SimplexDelayHandler {
 
 	
 	public void readEvents(String filename){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		Collections.sort(this.timeSteps);
 		
 		this.handlerList = new LinkedList<DelayHandler>();
@@ -50,15 +46,7 @@ public class SimplexDelayHandler {
 		this.handlerList.add(handler);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {
-			reader.parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(filename);
 	}
 	
 	public LinkedList<DelayHandler> getHandler(){

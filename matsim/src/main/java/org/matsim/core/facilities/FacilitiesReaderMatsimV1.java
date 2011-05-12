@@ -21,18 +21,15 @@
 
 package org.matsim.core.facilities;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
@@ -117,21 +114,12 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	/**
-	 * Parses the specified facilities file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
+	 * Parses the specified facilities file. This method calls {@link #parse(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void readFile(final String filename) throws UncheckedIOException {
+		parse(filename);
 	}
 
 }

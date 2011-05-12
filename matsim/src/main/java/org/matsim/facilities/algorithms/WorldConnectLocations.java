@@ -22,7 +22,6 @@ package org.matsim.facilities.algorithms;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -109,8 +108,6 @@ public class WorldConnectLocations {
 			for (ActivityFacility f : facilities.getFacilities().values()) {
 				bw.write(f.getId().toString()+"\t"+f.getLinkId().toString()+"\n");
 			}
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
 		} catch (IOException e) {
 			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
 		} finally {

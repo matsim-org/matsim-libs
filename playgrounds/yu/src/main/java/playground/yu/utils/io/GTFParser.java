@@ -23,19 +23,15 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author yu
@@ -108,15 +104,7 @@ public class GTFParser extends MatsimXmlParser {
 	 *            -The name of the gtfs(greentimefractions)-file to parse.
 	 */
 	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		parse(filename);
 	}
 
 	/**

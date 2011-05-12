@@ -20,8 +20,6 @@
 
 package playground.christoph.controler;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -281,12 +279,7 @@ public class BatchRun {
 		config.addCoreModules();
 
 		if (confFileName != null) {
-			try {
-				new MatsimConfigReader(config).readFile(confFileName, dtdFileName);
-			} catch (IOException e) {
-				log.error("Problem loading the configuration file from " + confFileName);
-				throw new RuntimeException(e);
-			}
+			new MatsimConfigReader(config).readFile(confFileName, dtdFileName);
 		}
 
 		return config;

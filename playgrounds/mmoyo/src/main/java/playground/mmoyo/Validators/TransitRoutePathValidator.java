@@ -1,14 +1,11 @@
 package playground.mmoyo.Validators;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +24,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.xml.sax.SAXException;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -131,13 +127,10 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 	}
 
 	private void readEvents(String eventFileName){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		try {reader.parse(eventFileName);} 
-		catch (SAXException e) {e.printStackTrace();}
-		catch (ParserConfigurationException e) {e.printStackTrace();} 
-		catch (IOException e) {e.printStackTrace();}
+		reader.parse(eventFileName); 
 	}
 	
 	@Override

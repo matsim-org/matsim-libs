@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,11 +39,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.evacuation.config.EvacuationConfigGroup;
 import org.matsim.evacuation.config.EvacuationConfigGroup.EvacuationScenario;
-import org.xml.sax.SAXException;
 
 import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
-import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
 import playground.gregor.snapshots.postprocessors.SheltersColorizer;
 import playground.gregor.snapshots.postprocessors.TimeDependentColorizer;
 import playground.gregor.snapshots.writers.LineStringTree;
@@ -134,7 +130,7 @@ public class OTFSnapshotGenerator {
 
 		PositionInfo.setLANE_WIDTH(this.scenario.getNetwork().getEffectiveLaneWidth());
 
-		EventsManager ev = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager ev = EventsUtils.createEventsManager();
 		DestinationDependentColorizer d = new DestinationDependentColorizer();
 		ev.addHandler(d);
 		// EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();
@@ -223,15 +219,7 @@ public class OTFSnapshotGenerator {
 		if (this.eventsFile.endsWith("txt.gz")) {
 			new EventsReaderTXTv1(ev).readFile(this.eventsFile);
 		} else if (this.eventsFile.endsWith("xml.gz")) {
-			try {
-				new EventsReaderXMLv1(ev).parse(this.eventsFile);
-			} catch (SAXException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			new EventsReaderXMLv1(ev).parse(this.eventsFile);
 		} else {
 			throw new RuntimeException("unrecognized file format:" + this.eventsFile);
 		}

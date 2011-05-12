@@ -141,41 +141,47 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * will be searched for and read if found.
 	 *
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public void parse(final String filename) throws SAXException, ParserConfigurationException, IOException {
+	public void parse(final String filename) throws UncheckedIOException {
 		this.source = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
-	public void parse(final URL url) throws SAXException, ParserConfigurationException, IOException {
+	public void parse(final URL url) throws UncheckedIOException {
 		this.source = url.toString();
 		parse(new InputSource(url.toExternalForm()));
 	}
 
-	public void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
+	public void parse(final InputStream stream) throws UncheckedIOException {
 		this.source = "stream";
 		parse(new InputSource(stream));
 	}
 
-	protected void parse(final InputSource input) throws SAXException, ParserConfigurationException, IOException {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		factory.setValidating(this.isValidating);
-		factory.setNamespaceAware(this.isNamespaceAware);
-		if (this.isValidating) {
-			// enable optional support for XML Schemas
-			factory.setFeature("http://apache.org/xml/features/validation/schema", true);
-			SAXParser parser = factory.newSAXParser();
-			XMLReader reader = parser.getXMLReader();
-			reader.setContentHandler(this);
-			reader.setErrorHandler(getErrorHandler());
-			reader.setEntityResolver(getEntityResolver());
-			reader.parse(input);
-		} else {
-			SAXParser parser = factory.newSAXParser();
-			parser.parse(input, this);
+	protected void parse(final InputSource input) throws UncheckedIOException {
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setValidating(this.isValidating);
+			factory.setNamespaceAware(this.isNamespaceAware);
+			if (this.isValidating) {
+				// enable optional support for XML Schemas
+				factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+				SAXParser parser = factory.newSAXParser();
+				XMLReader reader = parser.getXMLReader();
+				reader.setContentHandler(this);
+				reader.setErrorHandler(getErrorHandler());
+				reader.setEntityResolver(getEntityResolver());
+				reader.parse(input);
+			} else {
+				SAXParser parser = factory.newSAXParser();
+				parser.parse(input, this);
+			}
+		} catch (SAXException e) {
+			throw new UncheckedIOException(e);
+		} catch (ParserConfigurationException e) {
+			throw new UncheckedIOException(e);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

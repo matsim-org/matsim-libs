@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -65,7 +63,6 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetworkReader;
-import org.xml.sax.SAXException;
 
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
@@ -142,15 +139,7 @@ public class NullFallFacilityRollout {
 	private void loadData() {
 		ScenarioLoaderImpl inLoader = new ScenarioLoaderImpl(inScenario);
 		inLoader.loadScenario();
-		try {
-			new TransitScheduleReaderV1(inScenario.getTransitSchedule(), inScenario.getNetwork(), inScenario).readFile(InTransitScheduleFile);
-		} catch (SAXException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		} catch (IOException e) {
-			throw new RuntimeException("could not read transit schedule.", e);
-		}
+		new TransitScheduleReaderV1(inScenario.getTransitSchedule(), inScenario.getNetwork(), inScenario).readFile(InTransitScheduleFile);
 		ScenarioLoaderImpl outLoader = new ScenarioLoaderImpl(outScenario);
 		outLoader.loadScenario();
 		readVisumNetwork();

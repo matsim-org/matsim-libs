@@ -2,7 +2,6 @@ package org.matsim.vis.otfvis.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D.Double;
@@ -90,11 +89,6 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 	public void setScale(Rectangle destrect, float factor){
 		this.networkScrollPane.scaleNetwork(destrect, factor);
 		this.delegate.hostControlBar.updateScaleLabel();
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
 	}
 
 }

@@ -20,11 +20,8 @@
 
 package playground.mrieser.pt.application;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -62,7 +59,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.xml.sax.SAXException;
 
 
 public class VisualizeTransitPlans {
@@ -84,15 +80,7 @@ public class VisualizeTransitPlans {
 		if (NETWORK_FILE != "") {
 			new MatsimNetworkReader(this.realScenario).readFile(NETWORK_FILE);
 		}
-		try {
-			new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
 		this.realScenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
 //		this.realScenario.getPopulation().printPlansCount();
@@ -212,7 +200,7 @@ public class VisualizeTransitPlans {
 	}
 
 	private void visualize() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(this.visScenario, events);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
 		otfVisQSim.addFeature(queueSimulationFeature);

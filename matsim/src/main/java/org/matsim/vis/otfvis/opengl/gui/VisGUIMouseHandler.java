@@ -33,7 +33,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -67,7 +66,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  * @author dstrippgen
  *
  */
-public class VisGUIMouseHandler extends MouseInputAdapter implements MouseWheelListener {
+public class VisGUIMouseHandler extends MouseInputAdapter {
 	private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
 	private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
 	private double[] modelview = new double[16];

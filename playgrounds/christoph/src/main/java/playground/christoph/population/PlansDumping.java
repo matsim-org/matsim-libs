@@ -1,7 +1,5 @@
 package playground.christoph.population;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -36,15 +34,7 @@ public class PlansDumping {
 
 		Config config = new Config();
 		config.addCoreModules();
-		try
-		{
-			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
-		}
-		catch (IOException e)
-		{
-			System.out.println("Problem loading the configuration file from " + configFileName);
-			throw new RuntimeException(e);
-		}
+		new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = scenario.getNetwork();

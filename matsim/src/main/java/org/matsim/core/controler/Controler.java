@@ -21,7 +21,6 @@
 package org.matsim.core.controler;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -621,12 +620,7 @@ public class Controler {
 	 */
 	private void loadConfig() {
 		if (this.configFileName != null) {
-			try {
-				new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
-			} catch (IOException e) {
-				log.error("Problem loading the configuration file from " + this.configFileName);
-				throw new RuntimeException(e);
-			}
+			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		}
 		checkConfigConsistencyAndWriteToLog( "Complete config dump after reading the config file:");
 
@@ -801,8 +795,6 @@ public class Controler {
 		try {
 			this.scoreStats = new ScoreStats(this.population, this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 			this.addControlerListener(this.scoreStats);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -812,8 +804,6 @@ public class Controler {
 			this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
 					this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 			this.addControlerListener(this.travelDistanceStats);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

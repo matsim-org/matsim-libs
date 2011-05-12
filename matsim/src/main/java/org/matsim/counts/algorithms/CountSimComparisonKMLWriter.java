@@ -22,7 +22,6 @@ package org.matsim.counts.algorithms;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -652,8 +651,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 				bwriter.newLine();
 			}
 			bwriter.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -42,7 +40,6 @@ import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
-import org.xml.sax.SAXException;
 
 /**
  * Class to clean the Gauteng network, particularly for the SANRAL project.
@@ -129,15 +126,7 @@ public class cleanGautengNetwork {
 		this.log.info("Updating lane definitions...");
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc);
-		try {
-			nwr.parse(networkToRead);
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		nwr.parse(networkToRead);
 
 		File folder = new File(this.laneDefinitionFolder);
 		if(folder.isDirectory()){
@@ -197,15 +186,7 @@ public class cleanGautengNetwork {
 		this.log.info("Reading cleaned network from " + networkToRead);
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		try {
-			new NetworkReaderMatsimV1(sc).parse(networkToRead);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new NetworkReaderMatsimV1(sc).parse(networkToRead);
 		this.log.info("Network read successfully.");
 	}
 	

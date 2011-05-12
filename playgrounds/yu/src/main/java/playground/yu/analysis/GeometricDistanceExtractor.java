@@ -3,12 +3,9 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -29,7 +26,6 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.DoubleBarChart;
@@ -321,15 +317,7 @@ public class GeometricDistanceExtractor extends AbstractPersonAlgorithm
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		RoadPricingScheme scheme = scenario.getRoadPricingScheme();
-		try {
-			new RoadPricingReaderXMLv1(scheme).parse(tollFilename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new RoadPricingReaderXMLv1(scheme).parse(tollFilename);
 
 		GeometricDistanceExtractor lde = new GeometricDistanceExtractor(scheme,
 				outputFilename);

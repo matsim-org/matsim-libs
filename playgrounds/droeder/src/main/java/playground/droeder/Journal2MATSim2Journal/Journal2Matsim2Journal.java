@@ -35,8 +35,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,14 +69,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
-import org.xml.sax.SAXException;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
@@ -206,18 +202,7 @@ public class Journal2Matsim2Journal {
 	
 	private void getNetWithoutPTonlyLinks(){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		try {
-			new NetworkReaderMatsimV1(sc).parse(this.networkFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new NetworkReaderMatsimV1(sc).parse(this.networkFile);
 		
 		Network net = sc.getNetwork();
 		
@@ -250,7 +235,7 @@ public class Journal2Matsim2Journal {
 	
 	private void generatePlans(){
 		log.info("generate plans");
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory fac = sc.getPopulation().getFactory();
 
 		Person personCar;
@@ -371,7 +356,7 @@ public class Journal2Matsim2Journal {
 	}
 
 	private void createAndWriteConfig() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config c = s.getConfig();
 		
 		c.getModule(GlobalConfigGroup.GROUP_NAME).addParam("coordinateSystem", "Atlantis");
@@ -429,19 +414,11 @@ public class Journal2Matsim2Journal {
 
 	
 	private void readEventsFile(){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		TripDurationHandler handler = new TripDurationHandler();
 		events.addHandler(handler);
 		
-		try {
-			new EventsReaderXMLv1(events).parse(this.outDir + "ITERS/it.0/0.events.xml.gz");
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new EventsReaderXMLv1(events).parse(this.outDir + "ITERS/it.0/0.events.xml.gz");
 		
 		this.person2Event = handler.getId2Event();
 	}

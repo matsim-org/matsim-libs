@@ -23,10 +23,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -42,7 +38,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
@@ -104,15 +99,7 @@ public class AnalysisTest {
 			scenario2.getConfig().scenario().setUseRoadpricing(true);
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 					scenario2.getRoadPricingScheme());
-			try {
-				tollReader.parse(tollFilename);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			tollReader.parse(tollFilename);
 			toll = scenario2.getRoadPricingScheme();
 		}
 
@@ -148,7 +135,7 @@ public class AnalysisTest {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);
@@ -223,7 +210,7 @@ public class AnalysisTest {
 			sr.close();
 			sw2.close();
 
-			QSim qsim = new QSim(scenario2, ((EventsManager) EventsUtils.createEventsManager()));
+			QSim qsim = new QSim(scenario2, (EventsUtils.createEventsManager()));
 			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."
 							+ (scenario.equals("normal") ? "" : scenario + ".")

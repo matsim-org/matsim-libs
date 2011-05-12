@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -52,7 +50,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import playground.yu.utils.container.CollectionSum;
 
@@ -291,15 +288,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 			String scheduleFilename) {
 		super(netFilename, coordRefSys);
 		this.scenario.getConfig().scenario().setUseTransit(true);
-		try {
-			new TransitScheduleReader(this.scenario).readFile(scheduleFilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleReader(this.scenario).readFile(scheduleFilename);
 		p2g = new PtRoute2PolygonGraph(crs, ((ScenarioImpl) this.scenario)
 				.getTransitSchedule());
 	}

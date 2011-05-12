@@ -19,11 +19,8 @@
 
 package playground.andreas.bvgAna;
 
-import java.io.IOException;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,7 +37,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.xml.sax.SAXException;
 
 import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
@@ -70,7 +66,6 @@ public class TestMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 //		String eventsFile = "f:\\ils4\\data\\bvg\\runs\\bvg.run128.25pct\\it.100\\bvg.run128.25pct.100.events.xml.gz";
 //		String plansFile = "f:\\ils4\\data\\bvg\\runs\\bvg.run128.25pct\\it.100\\bvg.run128.25pct.100.plans.selected.xml.gz";
@@ -99,18 +94,7 @@ public class TestMain {
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(plansFile);
 
-		try {
-			new TransitScheduleReader(sc).readFile(transitScheduleFile);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SAXException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		new TransitScheduleReader(sc).readFile(transitScheduleFile);
 
 		new VehicleReaderV1(sc.getVehicles()).readFile(vehDefinitionFile);
 
@@ -171,18 +155,7 @@ public class TestMain {
 		VehDelayAtStopHistogram dH = new VehDelayAtStopHistogram(24 * 60);
 //		eventsManager.addHandler(dH);
 
-		try {
-			reader.parse(eventsFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		reader.parse(eventsFile);
 
 //		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
 //

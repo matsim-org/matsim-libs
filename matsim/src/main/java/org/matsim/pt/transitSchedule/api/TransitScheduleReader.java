@@ -20,16 +20,12 @@
 
 package org.matsim.pt.transitSchedule.api;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.xml.sax.SAXException;
 
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
@@ -45,13 +41,13 @@ public class TransitScheduleReader implements MatsimSomeReader {
 		this.scenario = (ScenarioImpl) scenario;
 	}
 
-	public void readFile(final String filename) throws IOException, SAXException, ParserConfigurationException {
+	public void readFile(final String filename) throws UncheckedIOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
 		String systemId = guesser.getSystemId();
 		if (systemId.endsWith("transitSchedule_v1.dtd")) {
 			new TransitScheduleReaderV1(this.scenario.getTransitSchedule(), this.scenario.getNetwork(), this.scenario).readFile(filename);
 		} else {
-			throw new IOException("Unsupported file format: " + systemId);
+			throw new UncheckedIOException("Unsupported file format: " + systemId);
 		}
 
 	}

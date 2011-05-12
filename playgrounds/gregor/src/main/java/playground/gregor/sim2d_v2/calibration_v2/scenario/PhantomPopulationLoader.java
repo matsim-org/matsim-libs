@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.calibration_v2.scenario;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,7 +29,6 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
-import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
@@ -63,60 +58,26 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
-		try {
-			reader.parse(this.file);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader.parse(this.file);
 		return this.pe;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.gregor.sim2d.events.XYZEventsHandler#handleEvent(playground
-	 * .gregor.sim2d.events.XYZAzimuthEvent)
-	 */
 	@Override
 	public void handleEvent(XYZAzimuthEvent event) {
 		this.pe.addEvent(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler
-	 * #handleEvent(org.matsim.core.api.experimental.events.AgentDepartureEvent)
-	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		this.pe.addEvent(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler
-	 * #handleEvent(org.matsim.core.api.experimental.events.AgentArrivalEvent)
-	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		this.pe.addEvent(event);

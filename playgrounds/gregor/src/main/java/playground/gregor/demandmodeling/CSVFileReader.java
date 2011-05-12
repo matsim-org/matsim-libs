@@ -21,27 +21,18 @@
 package playground.gregor.demandmodeling;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.StringUtils;
 
 public class CSVFileReader {
 	
 	private BufferedReader infile = null;
 	
-	public CSVFileReader(String filename) {
-		
-		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-			
-			e.printStackTrace();
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}		
+	public CSVFileReader(String filename) throws UncheckedIOException {
+		this.infile = IOUtils.getBufferedReader(filename);
 	}
 
 

@@ -19,18 +19,14 @@
  * *********************************************************************** */
 package playground.benjamin.szenarios.munich;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
-import org.xml.sax.SAXException;
 
 import playground.droeder.ResizeLinksByCount.AbstractResizeLinksByCount;
 
@@ -57,15 +53,7 @@ public class RunResizeCounts extends AbstractResizeLinksByCount{
 
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		try {
-			countsReader.parse(countsFile);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		countsReader.parse(countsFile);
 
 		RunResizeCounts rrc = new RunResizeCounts(networkFile, counts, 1.1);
 		rrc.run(outputFile);

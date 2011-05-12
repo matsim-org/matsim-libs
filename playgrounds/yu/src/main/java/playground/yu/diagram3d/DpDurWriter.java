@@ -83,11 +83,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 				e.printStackTrace();
 			}
 		}
-		try {
-			this.out = IOUtils.getBufferedWriter(outfilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.out = IOUtils.getBufferedWriter(outfilename);
 		agentDepTimes = new HashMap<String, Integer>();
 		dpDurVol = new HashMap<String, ArrayList<Integer>>();
 	}
@@ -174,7 +170,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario().getConfig();
 		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ddw);// TODO ...
 
 		System.out.println("@reading the eventsfile (TXTv1) ...");

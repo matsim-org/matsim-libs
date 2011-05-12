@@ -21,7 +21,6 @@
 package playground.gregor.gis.referencing;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
@@ -34,15 +33,7 @@ public class TextFileReader {
 	
 	private BufferedReader infile = null;
 	public TextFileReader(final String filename, final char delimiter, final int size){
-		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}	
+		this.infile = IOUtils.getBufferedReader(filename);
 		this.delimiter = delimiter;
 		this.size = size;
 	}

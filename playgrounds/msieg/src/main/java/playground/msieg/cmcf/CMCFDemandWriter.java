@@ -24,8 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -41,7 +39,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.xml.sax.SAXException;
 
 import playground.msieg.structure.Commodities;
 import playground.msieg.structure.Commodity;
@@ -83,17 +80,9 @@ public class CMCFDemandWriter{
 	}
 
 	private void init(){
-		try {
-			new MatsimNetworkReader(this.scenario).parse(this.networkPath);
-			this.network.connect();
-			this.popReader.readFile(this.plansPath);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MatsimNetworkReader(this.scenario).parse(this.networkPath);
+		this.network.connect();
+		this.popReader.readFile(this.plansPath);
 	}
 
 	@Deprecated

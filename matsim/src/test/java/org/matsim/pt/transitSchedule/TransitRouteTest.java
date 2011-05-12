@@ -30,10 +30,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.transitSchedule.DepartureImpl;
-import org.matsim.pt.transitSchedule.TransitRouteImpl;
-import org.matsim.pt.transitSchedule.TransitRouteStopImpl;
-import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -59,7 +55,7 @@ public class TransitRouteTest extends MatsimTestCase {
 	 * @param mode
 	 * @return a new instance of a TransitRoute with the given attributes
 	 */
-	protected TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
+	protected static TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
 		return new TransitRouteImpl(id, route, stops, mode);
 	}
 
@@ -237,7 +233,7 @@ public class TransitRouteTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	protected class Fixture {
+	protected static class Fixture {
 
 		public final TransitRoute tRoute;
 		public final List<TransitRouteStop> stops;
@@ -251,7 +247,7 @@ public class TransitRouteTest extends MatsimTestCase {
 			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 			this.stops.add(stop);
 
-			this.tRoute = createTransitRoute(id, route, this.stops, "train");
+			this.tRoute = TransitRouteTest.createTransitRoute(id, route, this.stops, "train");
 		}
 	}
 }
