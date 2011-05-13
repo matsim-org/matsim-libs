@@ -56,6 +56,8 @@ public class DgSylviaController implements SignalController {
 	
 	private final static double GAP_SECONDS = 5.0;
 	
+	private static int extensionPointsDumpCount = 0;
+	
 	private SignalSystem system = null;
 	private Map<Id, SignalPlan> signalPlans = new HashMap<Id, SignalPlan>();
 	
@@ -317,7 +319,10 @@ public class DgSylviaController implements SignalController {
 		this.setFixedTimeCycleInSylviaPlan(plans);
 		this.setMaxExtensionTimeInSylviaPlan(plans);
 		this.calculateExtensionPoints(plans);
-		this.dumpExtensionPoints();
+		if (extensionPointsDumpCount < 1){
+			this.dumpExtensionPoints();
+			extensionPointsDumpCount++;
+		}
 		this.initializeSensoring();
 	}
 
