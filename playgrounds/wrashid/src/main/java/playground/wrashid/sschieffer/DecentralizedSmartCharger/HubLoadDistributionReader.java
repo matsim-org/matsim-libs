@@ -428,7 +428,7 @@ public class HubLoadDistributionReader {
                 );
         	i++;
         }
-        String s= DecentralizedChargingSimulation.outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
+        String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
 	}
