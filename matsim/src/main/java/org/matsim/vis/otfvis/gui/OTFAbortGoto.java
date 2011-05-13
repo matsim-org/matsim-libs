@@ -50,11 +50,7 @@ public class OTFAbortGoto extends Thread  {
 	@Override
 	public void run() {
 		int actTime = 0;
-		try {
-			actTime = host.getLocalTime();
-		} catch (RemoteException e1) {
-			e1.printStackTrace();
-		}
+		actTime = host.getLocalTime();
 		int from = actTime;
 		int to = toTime;
 		// this is a reset! start from 00:00:00
@@ -85,8 +81,6 @@ public class OTFAbortGoto extends Thread  {
 				if ((actTime < toTime) && terminate == true) {
 					host.requestNewTime(actTime, TimePreference.EARLIER);
 				}
-			} catch (RemoteException e) {
-				terminate = true;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -2,7 +2,6 @@ package org.matsim.vis.otfvis2;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -171,29 +170,28 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public OTFQueryRemote answerQuery(AbstractQuery query)
-	throws RemoteException {
+	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		return queryServer.answerQuery(query);
 	}
 
 	@Override
-	public void pause() throws RemoteException {
+	public void pause() {
 		synchedPlayback = true;
 	}
 
 	@Override
-	public void play() throws RemoteException {
+	public void play() {
 		synchedPlayback = false;
 		timeStepBuffer.clear();
 	}
 
 	@Override
-	public void removeQueries() throws RemoteException {
+	public void removeQueries() {
 		queryServer.removeQueries();
 	}
 
 	@Override
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		if (nextTimeStep == null) {
 			return 0;
 		} else {
@@ -202,17 +200,17 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		return new OTFVisConfigGroup();
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
 		return quadTree;
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
+	public byte[] getQuadConstStateBuffer(String id) {
 		byte[] result;
 		byteBuffer.position(0);
 		quadTree.writeConstData(byteBuffer);
@@ -224,8 +222,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
-	throws RemoteException {
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
 		byte[] result;
 		byteBuffer.position(0);
 		this.positions.clear();
@@ -241,17 +238,17 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public Collection<Double> getTimeSteps() throws RemoteException {
+	public Collection<Double> getTimeSteps() {
 		return null;
 	}
 
 	@Override
-	public boolean isLive() throws RemoteException {
+	public boolean isLive() {
 		return true;
 	}
 
 	@Override
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(int time, TimePreference searchDirection) {
 		if (!finished) {
 			if (snapshotGenerator != null) {
 				snapshotGenerator.skipUntil(time);
@@ -271,7 +268,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 
 	}
 

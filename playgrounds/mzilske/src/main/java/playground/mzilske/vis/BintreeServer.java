@@ -2,7 +2,6 @@ package playground.mzilske.vis;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,8 +22,8 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis2.LinkHandler;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 import playground.mzilske.vis.BintreeGenerator.Trajectory;
 
@@ -101,7 +100,7 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		if (nextTimeStep == null) {
 			nextTime = snapshotPeriod;
 			nextTimeStep = getTimeStep((int) nextTime);
@@ -127,12 +126,12 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
 		return quadTree;
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
+	public byte[] getQuadConstStateBuffer(String id) {
 		byte[] result;
 		byteBuffer.position(0);
 		quadTree.writeConstData(byteBuffer);
@@ -144,7 +143,7 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds) throws RemoteException {
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
 		byte[] result;
 		byteBuffer.position(0);
 		this.positions.clear();
@@ -169,7 +168,7 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(int time, TimePreference searchDirection) {
 		Double foundTime;
 		if (searchDirection == TimePreference.EARLIER || searchDirection == TimePreference.RESTART) {
 			foundTime = timeSteps.floor((double) time);
@@ -188,17 +187,17 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 		
 	}
 
 	@Override
-	public boolean isLive() throws RemoteException {
+	public boolean isLive() {
 		return false;
 	}
 
 	@Override
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		OTFVisConfigGroup otfVisConfigGroup = new OTFVisConfigGroup();
 		otfVisConfigGroup.setCachingAllowed(false);
 		return otfVisConfigGroup;

@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -53,8 +52,9 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 public abstract class OTFClient implements Runnable {
 
 	private static final Logger log = Logger.getLogger(OTFClient.class);
-
-	protected String url;
+	
+	// Keine Ahnung.
+	private static final String id = "id";
 
 	protected OTFFrame frame;
 
@@ -66,15 +66,12 @@ public abstract class OTFClient implements Runnable {
 
 	protected OTFHostConnectionManager masterHostControl;
 
-	public OTFClient(String url) {
-		this.url = url;
+	public OTFClient() {
+		
 	}
 
 	@Override
 	public void run() {
-		if (this.masterHostControl == null) {
-			setHostConnectionManager(new OTFHostConnectionManager(this.url));
-		}
 		createMainFrame();
 		log.info("created MainFrame");
 		OTFVisConfigGroup visconf = createOTFVisConfig();
@@ -89,7 +86,7 @@ public abstract class OTFClient implements Runnable {
 		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
 		pane.setRightComponent(panel);
 		pane.validate();
-		this.hostControlBar.addDrawer(this.url, mainDrawer);
+		this.hostControlBar.addDrawer(mainDrawer);
 		mainDrawer.redraw();
 		frame.setVisible(true);
 		log.info("OTFVis finished init");
@@ -99,7 +96,7 @@ public abstract class OTFClient implements Runnable {
 		this.masterHostControl = otfHostConnectionManager;
 	}
 
-	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
+	public OTFClientQuad createNewView(OTFConnectionManager connect, OTFHostConnectionManager hostControl) {
 		log.info("Getting Quad id " + id);
 		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
@@ -109,7 +106,6 @@ public abstract class OTFClient implements Runnable {
 		log.info("Reading data...");
 		clientQ.getConstData();
 		this.hostControlBar.updateTimeLabel();
-		hostControl.getQuads().put(id, clientQ);
 		log.info("Created OTFClientQuad!");
 		return clientQ;
 	}

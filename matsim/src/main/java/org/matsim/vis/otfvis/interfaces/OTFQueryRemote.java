@@ -1,10 +1,8 @@
 package org.matsim.vis.otfvis.interfaces;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
 
-public interface OTFQueryRemote extends Remote {
+public interface OTFQueryRemote {
 
-	public OTFQueryResult query() throws RemoteException;
+	public OTFQueryResult query();
 		
 }

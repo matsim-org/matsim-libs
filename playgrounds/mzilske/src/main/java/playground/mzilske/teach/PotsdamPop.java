@@ -36,15 +36,17 @@ public class PotsdamPop implements Runnable {
 
 	private static final String FILENAME = "../../brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis_with_berlin.shp";
 
-	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
-		Point p = null;
+	private static Coord drawRandomPointFromGeometry(Geometry g) {
+		Random rnd = new Random();
+		Point p;
 		double x, y;
 		do {
 			x = g.getEnvelopeInternal().getMinX() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
 			y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 			p = MGC.xy2Point(x, y);
 		} while (!g.contains(p));
-		return p;
+		Coord coord = new CoordImpl(p.getX(), p.getY());
+		return coord;
 	}
 
 	public static enum Relation {
@@ -195,14 +197,12 @@ public class PotsdamPop implements Runnable {
 	}
 
 	private Coord shoot(int id) {
-		Random r = new Random();
 		Geometry g = zoneGeometries.get(id);
 		if (g == null) {
 			throw new RuntimeException("No geometry for zone "+id);
 		}
-		Point point = getRandomPointInFeature(r, g);
-		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
-		return ct.transform(coordImpl);
+		Coord point = drawRandomPointFromGeometry(g);
+		return ct.transform(point);
 	}
 
 	private Id createId(int source_zone, int sink_zone, int i, String transportMode) {

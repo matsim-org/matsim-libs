@@ -19,7 +19,6 @@
 
 package org.matsim.vis.otfvis;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,9 +37,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.LaneDefinitions;
@@ -67,7 +68,7 @@ import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 public class OTFVisMobsimFeature implements VisMobsimFeature,
-SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
+SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
 
 	private static final Logger log = Logger.getLogger(OTFVisMobsimFeature.class);
 
@@ -179,19 +180,15 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 			config.otfVis().setScaleQuadTreeRect(true);
 		}
 
-		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+		OTFClientLive client = new OTFClientLive(this.otfServer, this.connectionManager);
 		new Thread(client).start();
 
-		try {
-			this.otfServer.pause();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		this.otfServer.pause();
 	}
 
 	@Override
 	public void notifySimulationBeforeCleanup( SimulationBeforeCleanupEvent ev ) {
-		this.otfServer.cleanup();
+		// Nothing to do.
 	}
 
 	@Override
@@ -200,10 +197,16 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 	}
 
 	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		this.otfServer.blockUpdates();
+	}
+	
+	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
 		double time = event.getSimulationTime() ;
 		this.updateTeleportedAgents(time);
 		this.visualizeTrackedAndTeleportingAgents();
+		this.otfServer.unblockUpdates();
 		this.otfServer.updateStatus(time);
 	}
 

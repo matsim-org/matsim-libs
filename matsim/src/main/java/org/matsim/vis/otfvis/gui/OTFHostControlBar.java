@@ -86,6 +86,8 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private static enum PlayOrPause {PLAY, PAUSE};
 
+	private List<OTFDrawer> drawers = new ArrayList<OTFDrawer>();
+
 	/*
 	 * The symbol which the play/pause button currently shows.
 	 * (NOT the mode we are in!)
@@ -101,7 +103,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
 		pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
-		if (!this.masterHostConnectionManager.isLiveHost()) {
+		if (!this.masterHostConnectionManager.getOTFServer().isLive()) {
 			add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
@@ -138,15 +140,13 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		log.debug("HostControlBar initialized.");
 	}
 
-	public void addDrawer(String id, OTFDrawer handler) {
-		this.masterHostConnectionManager.getDrawer().put(id, handler);
+	public void addDrawer(OTFDrawer handler) {
+		this.drawers.add(handler);
 	}
 
 	public void redrawDrawers() {
-		for(OTFHostConnectionManager slave : hostConnectionManagers) {
-			for (OTFDrawer handler : slave.getDrawer().values()) {
-				handler.redraw();
-			}
+		for (OTFDrawer drawer : drawers) {
+			drawer.redraw();
 		}
 	}
 
@@ -156,10 +156,8 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void clearCaches() {
-		for(OTFHostConnectionManager slave : hostConnectionManagers) {
-			for (OTFDrawer handler : slave.getDrawer().values()) {
-				handler.clearCache();
-			}
+		for (OTFDrawer drawer : drawers) {
+			drawer.clearCache();
 		}
 	}
 
@@ -186,12 +184,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void updateScaleLabel() {
-		float scale = 1.f;
-		for(OTFDrawer drawer: this.masterHostConnectionManager.getDrawer().values()){
-			if (drawer.getScale() != 0){
-				scale = drawer.getScale();
-			}
-		}
+		float scale = drawers.get(0).getScale();
 		scale = (float)(Math.round(scale*100))/100;
 		this.scaleField.setText(String.valueOf(scale));
 	}
@@ -242,7 +235,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private void changed_SCALE(ActionEvent event) {
 		String newScale = ((JFormattedTextField) event.getSource()).getText();
-		for(OTFDrawer drawer: this.masterHostConnectionManager.getDrawer().values()){
+		for (OTFDrawer drawer : drawers) {
 			drawer.setScale(Float.parseFloat(newScale));
 		}
 	}
@@ -281,7 +274,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	private void createCheckBoxes() {
-		if (masterHostConnectionManager.isLiveHost()) {
+		if (masterHostConnectionManager.getOTFServer().isLive()) {
 			JCheckBox synchBox = new JCheckBox(TOGGLE_SYNCH);
 			synchBox.setMnemonic(KeyEvent.VK_V);
 			synchBox.setSelected(synchronizedPlay);

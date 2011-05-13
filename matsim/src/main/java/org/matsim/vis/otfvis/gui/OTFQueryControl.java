@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.gui;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
-import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,11 +34,12 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
+import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
-import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -109,12 +109,8 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	@Override
 	synchronized public void removeQueries() {
-		if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
-			try {
-				this.hostControlBar.getOTFHostConnectionManager().liveHost.removeQueries();
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
+		if(this.hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
+			((OTFLiveServerRemote) this.hostControlBar.getOTFHostConnectionManager().getOTFServer()).removeQueries();
 		}
 		for (OTFQueryResult query : this.queryEntries.values()) {
 			query.remove();
@@ -165,13 +161,9 @@ public class OTFQueryControl implements OTFQueryHandler {
 			OTFQueryResult queryResult = queryItem.getValue();
 			if (queryResult.isAlive()) {
 				OTFQueryRemote queryRemote = queryItem.getKey();
-				try {
-					queryResult.remove();
-					OTFQueryResult newResult = queryRemote.query();
-					queryItem.setValue(newResult);
-				} catch (RemoteException e) {
-					throw new RuntimeException(e);
-				}
+				queryResult.remove();
+				OTFQueryResult newResult = queryRemote.query();
+				queryItem.setValue(newResult);
 			}
 		}
 	}
@@ -179,25 +171,17 @@ public class OTFQueryControl implements OTFQueryHandler {
 	public OTFQueryResult createQuery(AbstractQuery query) {
 		OTFQueryRemote remoteQuery = doQuery(query);
 		OTFQueryResult queryResult;
-		try {
-			queryResult = remoteQuery.query();
-			queryEntries.put(remoteQuery, queryResult);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		queryResult = remoteQuery.query();
+		queryEntries.put(remoteQuery, queryResult);
 		return queryResult;
 	}
 	
 	@Override
 	public OTFQueryRemote doQuery(final AbstractQuery query) {
-		try {
-			if(this.hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
-				return this.hostControlBar.getOTFHostConnectionManager().liveHost.answerQuery(query);
-			} else {
-				return null;
-			}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+		if(this.hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
+			return ((OTFLiveServerRemote) this.hostControlBar.getOTFHostConnectionManager().getOTFServer()).answerQuery(query);
+		} else {
+			return null;
 		}
 	}
 	

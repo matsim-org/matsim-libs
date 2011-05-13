@@ -1,6 +1,5 @@
 package playground.mzilske.neo;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -25,8 +24,7 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 		this.scenario = scenario;
 	}
 
-	public OTFQueryRemote answerQuery(AbstractQuery query)
-			throws RemoteException {
+	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		Transaction tx = scenario.beginTx();
 		try {
 			OTFQueryRemote queryRemote = delegate.answerQuery(query);
@@ -37,54 +35,51 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 		}
 	}
 
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		return delegate.getLocalTime();
 	}
 
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		return delegate.getOTFVisConfig();
 	}
 
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect)
-			throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
 		return delegate.getQuad(id, connect);
 	}
 
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
+	public byte[] getQuadConstStateBuffer(String id) {
 		return delegate.getQuadConstStateBuffer(id);
 	}
 
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
-			throws RemoteException {
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
 		return delegate.getQuadDynStateBuffer(id, bounds);
 	}
 
-	public Collection<Double> getTimeSteps() throws RemoteException {
+	public Collection<Double> getTimeSteps() {
 		return delegate.getTimeSteps();
 	}
 
-	public boolean isLive() throws RemoteException {
+	public boolean isLive() {
 		return delegate.isLive();
 	}
 
-	public void pause() throws RemoteException {
+	public void pause() {
 		delegate.pause();
 	}
 
-	public void play() throws RemoteException {
+	public void play() {
 		delegate.play();
 	}
 
-	public void removeQueries() throws RemoteException {
+	public void removeQueries() {
 		delegate.removeQueries();
 	}
 
-	public boolean requestNewTime(int time, TimePreference searchDirection)
-			throws RemoteException {
+	public boolean requestNewTime(int time, TimePreference searchDirection) {
 		return delegate.requestNewTime(time, searchDirection);
 	}
 
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 		delegate.toggleShowParking();
 	}
 

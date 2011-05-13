@@ -20,8 +20,6 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import java.rmi.RemoteException;
-
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 
 /**
@@ -34,12 +32,12 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
  */
 public interface OTFLiveServerRemote extends OTFServerRemote {
 	
-	public void pause() throws RemoteException;
+	public void pause();
 	
-	public void play() throws RemoteException;
+	public void play();
 	
-	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException;
+	public OTFQueryRemote answerQuery(AbstractQuery query);
 
-	public void removeQueries() throws RemoteException;
+	public void removeQueries();
 	
 }

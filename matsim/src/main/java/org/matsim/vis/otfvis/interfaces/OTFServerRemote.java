@@ -20,7 +20,6 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -37,31 +36,31 @@ import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
  * @author dstrippgen
  *
  */
-public interface OTFServerRemote extends Remote {
+public interface OTFServerRemote {
 
 	public enum TimePreference{EARLIER, LATER, RESTART}
 
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
+	public boolean requestNewTime(int time, TimePreference searchDirection);
 
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException;
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect);
 
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
+	public byte[] getQuadConstStateBuffer(String id);
 
-	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
+	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds);
 
-	public int getLocalTime() throws RemoteException;
+	public int getLocalTime();
 
 	/**
 	 * @return (I think) information if the server is "live" (i.e. has user control) or not.  kai, feb'11
 	 * @throws RemoteException
 	 */
-	public boolean isLive() throws RemoteException;
+	public boolean isLive();
 
-	public Collection<Double> getTimeSteps() throws RemoteException;
+	public Collection<Double> getTimeSteps();
 
-	public void toggleShowParking() throws RemoteException;
+	public void toggleShowParking();
 	
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException;
+	public OTFVisConfigGroup getOTFVisConfig();
 
 }
 

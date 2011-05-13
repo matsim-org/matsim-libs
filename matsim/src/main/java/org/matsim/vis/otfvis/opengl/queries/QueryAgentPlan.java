@@ -303,25 +303,21 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
-			if (activityTexts == null)  {
-				activityTexts = new ArrayList<InfoText>();
-				for (MyInfoText activityEntry : this.acts ) {
-					InfoText activityText = InfoTextContainer.showTextPermanent(
-							activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth,
-							-0.001f);
-					activityText.setAlpha(0.5f);
-					this.activityTexts.add(activityText);
-				}
+			activityTexts = new ArrayList<InfoText>();
+			for (MyInfoText activityEntry : this.acts ) {
+				InfoText activityText = InfoTextContainer.showTextPermanent(
+						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth,
+						-0.001f);
+				activityText.setAlpha(0.5f);
+				this.activityTexts.add(activityText);
 			}
 		}
 
 		private void createLabelTextIfNecessary(Point2D.Double pos) {
-			if (this.agentText == null) {
-				this.agentText = InfoTextContainer.showTextPermanent(
-						this.agentId, (float) pos.x, (float) pos.y,
-						-0.0003f);
-				this.agentText.setAlpha(0.7f);
-			}
+			this.agentText = InfoTextContainer.showTextPermanent(
+					this.agentId, (float) pos.x, (float) pos.y,
+					-0.0003f);
+			this.agentText.setAlpha(0.7f);
 		}
 
 		@Override

@@ -153,7 +153,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public synchronized void getConstData() throws RemoteException {
+	public synchronized void getConstData() {
 		byte[] bbyte = this.host.getQuadConstStateBuffer(this.id);
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		for (OTFDataReader reader : this.values()) {
@@ -184,109 +184,105 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	 * 	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
 	 */
 	private SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) {
-		try {
-			List<Rect> rects = new LinkedList<Rect>();
-			/*
-			 * This hack ensures that vehicles on links are drawn even if their center is not visible
-			 */
-			if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
-				rect = rect.scale(5.0, 5.0);
+		List<Rect> rects = new LinkedList<Rect>();
+		/*
+		 * This hack ensures that vehicles on links are drawn even if their center is not visible
+		 */
+		if (OTFClientControl.getInstance().getOTFVisConfig().isScaleQuadTreeRect()){
+			rect = rect.scale(5.0, 5.0);
+		}
+
+		SceneGraph cachedResult = this.cachedTimes.get(time);
+		// cachedTimes refers to snapshots that were already rendered at some earlier time (only mvi mode).
+		
+		if(cachedResult != null) {
+			Rect cachedRect = cachedResult.getRect();
+			if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
+
+			Rect intersec = rect.intersection(cachedRect);
+			if(intersec == null) {
+				// we need to get the whole rect
+				cachedResult = null;
+			} else {
+				// As we can only store ONE rect with our cached Drawing, we cannot simply
+				// add the new portion to the old rect but have to use a rect where both
+				// old and new rect fit into aka the union of both
+				rect = rect.union(cachedRect);
+				// Check the four possible rects, that need filling, possible rect follow this scheme
+				//   1133333344
+				//   11iiiiii44
+				//   11iiiiii44
+				//   1122222244
+				double r1w = cachedRect.minX - rect.minX;
+				double r2h = cachedRect.minY - rect.minY;
+				double r3h = rect.maxY -cachedRect.maxY;
+				double r4w = rect.maxX -cachedRect.maxX;
+				if (r1w > 0) rects.add(new Rect(rect.minX,rect.minY,cachedRect.minX,rect.maxY));
+				if (r4w > 0) rects.add(new Rect(cachedRect.maxX,rect.minY, rect.maxX,rect.maxY));
+				if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
+				if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
 			}
+		}
 
-			SceneGraph cachedResult = this.cachedTimes.get(time);
-			// cachedTimes refers to snapshots that were already rendered at some earlier time (only mvi mode).
+		// otherwise this Scenegraph is not useful, so we create a new one
+		//
+		// I don't understand the above comment.  "isLive" means is interactive.  if it is not interactive, there
+		// is no cached result.
+		if(this.host.isLive() == false) {
+			rect = null;
+			cachedResult = null;
+		}
+
+		SceneGraph result;
+		if ( cachedResult == null) {
+			SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
+			// (sets up the layers but does not put content)
 			
-			if(cachedResult != null) {
-				Rect cachedRect = cachedResult.getRect();
-				if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
-
-				Rect intersec = rect.intersection(cachedRect);
-				if(intersec == null) {
-					// we need to get the whole rect
-					cachedResult = null;
-				} else {
-					// As we can only store ONE rect with our cached Drawing, we cannot simply
-					// add the new portion to the old rect but have to use a rect where both
-					// old and new rect fit into aka the union of both
-					rect = rect.union(cachedRect);
-					// Check the four possible rects, that need filling, possible rect follow this scheme
-					//   1133333344
-					//   11iiiiii44
-					//   11iiiiii44
-					//   1122222244
-					double r1w = cachedRect.minX - rect.minX;
-					double r2h = cachedRect.minY - rect.minY;
-					double r3h = rect.maxY -cachedRect.maxY;
-					double r4w = rect.maxX -cachedRect.maxX;
-					if (r1w > 0) rects.add(new Rect(rect.minX,rect.minY,cachedRect.minX,rect.maxY));
-					if (r4w > 0) rects.add(new Rect(cachedRect.maxX,rect.minY, rect.maxX,rect.maxY));
-					if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
-					if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
+			QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
+			byte[] bbyte;
+			bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
+			// (seems that this contains the whole time step (in binary form))
+			
+			ByteBuffer in = ByteBuffer.wrap(bbyte);
+			// (converts the byte buffer into an object)
+			
+			this.execute(bound2, new ReadDataExecutor(in, false, result1));
+			// (this is pretty normal, but I still keep forgetting it: The leaves of the QuadTree contain objects of type
+			// OTFDataReader.  The ReadDataExecutor (defined above) uses them to read the data.
+			
+			for(OTFDataReader element : this.additionalElements) {
+				try {
+					element.readDynData(in,result1);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-
-			// otherwise this Scenegraph is not useful, so we create a new one
+			// fill with elements
 			//
-			// I don't understand the above comment.  "isLive" means is interactive.  if it is not interactive, there
-			// is no cached result.
-			if(this.host.isLive() == false) {
-				rect = null;
-				cachedResult = null;
-			}
-
-			SceneGraph result;
-			if ( cachedResult == null) {
-				SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
-				// (sets up the layers but does not put content)
-				
-				QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
+			// I don't understand the wording.  Why does "invalidate" do a "fill with elements"?
+			invalidate(rect, result1);
+			
+			result = result1;
+		} else {
+			result = cachedResult;
+			result.setRect(rect);
+			for(Rect rectPart : rects) {
+				QuadTree.Rect bound2 = this.host.isLive() ? rectPart : this.top.getBounds();
 				byte[] bbyte;
 				bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
-				// (seems that this contains the whole time step (in binary form))
-				
 				ByteBuffer in = ByteBuffer.wrap(bbyte);
-				// (converts the byte buffer into an object)
-				
-				this.execute(bound2, new ReadDataExecutor(in, false, result1));
-				// (this is pretty normal, but I still keep forgetting it: The leaves of the QuadTree contain objects of type
-				// OTFDataReader.  The ReadDataExecutor (defined above) uses them to read the data.
-				
-				for(OTFDataReader element : this.additionalElements) {
-					try {
-						element.readDynData(in,result1);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				this.execute(bound2, new ReadDataExecutor(in, false, result));
 				// fill with elements
-				//
-				// I don't understand the wording.  Why does "invalidate" do a "fill with elements"?
-				invalidate(rect, result1);
-				
-				result = result1;
-			} else {
-				result = cachedResult;
-				result.setRect(rect);
-				for(Rect rectPart : rects) {
-					QuadTree.Rect bound2 = this.host.isLive() ? rectPart : this.top.getBounds();
-					byte[] bbyte;
-					bbyte = this.host.getQuadDynStateBuffer(this.id, bound2);
-					ByteBuffer in = ByteBuffer.wrap(bbyte);
-					this.execute(bound2, new ReadDataExecutor(in, false, result));
-					// fill with elements
-					invalidate(rectPart, result);
-				}
+				invalidate(rectPart, result);
 			}
-
-			result.finish();
-
-			if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
-				this.cachedTimes.put(time, result);
-			}
-			return result;
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
 		}
+
+		result.finish();
+
+		if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
+			this.cachedTimes.put(time, result);
+		}
+		return result;
 	}
 
 	/**

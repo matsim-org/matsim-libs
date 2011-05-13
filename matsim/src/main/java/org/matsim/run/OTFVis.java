@@ -191,7 +191,7 @@ public class OTFVis {
 	}
 
 	public static final void playMVI_Swing(String file) {
-		new OTFClientSwing("file:" + file).run();
+		new OTFClientSwing(file).run();
 	}
 
 	public static final void playConfig(final String configFilename){

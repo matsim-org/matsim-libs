@@ -24,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.TreeMap;
@@ -133,7 +132,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		return (int) this.nextTime;
 	}
 
@@ -143,7 +142,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(final String id, final OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(final String id, final OTFConnectionManager connect) {
 		log.info("reading quad from file...");
 		OTFServerQuadI quad = readQuad();
 		readConnectionManager(connect);
@@ -189,8 +188,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(final String id)
-	throws RemoteException {
+	public byte[] getQuadConstStateBuffer(final String id) {
 		byte[] buffer = null;
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
@@ -207,8 +205,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
-			throws RemoteException {
+	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds) {
 		if (bounds == null) {
 			log.warn("Bounds are ignored but set! [[I don't understand what this means here.  kai, feb'11]]");
 		}
@@ -260,7 +257,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
 		double lastTime = -1;
 		double foundTime = -1;
 		for (Double timestep : this.timesteps.keySet()) {
@@ -294,12 +291,12 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
 
 	@Override
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		return otfVisConfig;
 	}
 

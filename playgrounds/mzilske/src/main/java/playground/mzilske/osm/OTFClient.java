@@ -25,7 +25,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -53,6 +52,7 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
@@ -79,6 +79,12 @@ public abstract class OTFClient implements Runnable {
 
 	protected OTFHostConnectionManager masterHostControl;
 
+	private OTFLiveServerRemote server;
+
+	public OTFClient(OTFLiveServerRemote otfServer) {
+		this.server = otfServer;
+	}
+	
 	public OTFClient(String url) {
 		this.url = url;
 	}
@@ -86,7 +92,7 @@ public abstract class OTFClient implements Runnable {
 	@Override
 	public void run() {
 		if (this.masterHostControl == null) {
-			setHostConnectionManager(new OTFHostConnectionManager(this.url));
+			setHostConnectionManager(new OTFHostConnectionManager(this.url, this.server));
 		}
 		createMainFrame();
 		log.info("created MainFrame");
@@ -101,7 +107,7 @@ public abstract class OTFClient implements Runnable {
 		final JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 		compositePanel.add(mainDrawer.getComponent());
-		final JMapViewer jMapViewer = new JMapViewer();
+		final JMapViewer jMapViewer = new MyJMapViewer(compositePanel);
 		// final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:3395", TransformationFactory.WGS84);
 
 		jMapViewer.setZoom(WGS84ToOSMMercator.SCALE);
@@ -186,7 +192,7 @@ public abstract class OTFClient implements Runnable {
 		panel.add(compositePanel, BorderLayout.CENTER);
 		pane.setRightComponent(panel);
 		pane.validate();
-		this.hostControlBar.addDrawer(this.url, mainDrawer);
+		this.hostControlBar.addDrawer(mainDrawer);
 		mainDrawer.redraw();
 		frame.setVisible(true);
 		log.info("OTFVis finished init");
@@ -196,7 +202,7 @@ public abstract class OTFClient implements Runnable {
 		this.masterHostControl = otfHostConnectionManager;
 	}
 
-	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
+	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) {
 		log.info("Getting Quad id " + id);
 		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
@@ -206,7 +212,6 @@ public abstract class OTFClient implements Runnable {
 		log.info("Reading data...");
 		clientQ.getConstData();
 		this.hostControlBar.updateTimeLabel();
-		hostControl.getQuads().put(id, clientQ);
 		log.info("Created OTFClientQuad!");
 		return clientQ;
 	}

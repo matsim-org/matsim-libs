@@ -22,10 +22,12 @@ package org.matsim.vis.otfvis;
 
 
 import java.awt.BorderLayout;
-import java.rmi.RemoteException;
 
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
@@ -52,11 +54,16 @@ public class OTFClientSwing extends OTFClient {
 
 	private OTFConnectionManager connectionManager = new OTFConnectionManager();
 
+	private final String url;
+	
 	/**
 	 * @param url path to a file including a marker "file:" or "net:" at the very beginning.
 	 */
-	public OTFClientSwing(String url) {
-		super(url);
+	public OTFClientSwing(String filename) {
+		super();
+		this.url = filename;
+		setHostConnectionManager(new OTFHostConnectionManager(this.url, new OTFFileReader(filename)));
+		Gbl.printMemoryUsage();
 
 		this.connectionManager.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connectionManager.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
@@ -65,37 +72,32 @@ public class OTFClientSwing extends OTFClient {
 		this.connectionManager.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		
+
 		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingSimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingAgentDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
-		
+
 		this.connectionManager.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
 		this.connectionManager.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
 	}
 
 	@Override
 	protected OTFDrawer createDrawer() {
-		try {
-			if(!hostControlBar.getOTFHostConnectionManager().isLiveHost()) {
-				OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
-				frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
-			} else  {
-				throw new IllegalStateException("Server in live mode!");
-			}
-			OTFSwingDrawerContainer mainDrawer = new OTFSwingDrawerContainer(createNewView("swing", connectionManager, hostControlBar.getOTFHostConnectionManager()), hostControlBar);
-			return mainDrawer;
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			throw new RuntimeException();
+		if(!hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
+			OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+			frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
+		} else  {
+			throw new IllegalStateException("Server in live mode!");
 		}
+		OTFSwingDrawerContainer mainDrawer = new OTFSwingDrawerContainer(createNewView(connectionManager, hostControlBar.getOTFHostConnectionManager()), hostControlBar);
+		return mainDrawer;
 	}
 
 	@Override
 	protected OTFVisConfigGroup createOTFVisConfig() {
-	    saver = new SettingsSaver(this.url);
-	    OTFVisConfigGroup visconf = new OTFVisConfigGroup();
-	    return visconf;
+		saver = new SettingsSaver(this.url);
+		OTFVisConfigGroup visconf = new OTFVisConfigGroup();
+		return visconf;
 	}
 
 }

@@ -3,11 +3,9 @@ package playground.mzilske.vis;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -28,8 +26,6 @@ import com.sleepycat.je.DatabaseException;
 
 
 public final class EventsCollectingServer implements OTFServerRemote {
-	
-	private static Logger logger = Logger.getLogger(EventsCollectingServer.class);
 	
 	public static class TimeStep implements Serializable {
 
@@ -134,7 +130,7 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		if (nextTimeStep == null) {
 			nextTime = timeSteps.firstKey();
 			nextTimeStep = getTimeStep(nextTime);
@@ -149,12 +145,12 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
 		return quadTree;
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
+	public byte[] getQuadConstStateBuffer(String id) {
 		byte[] result;
 		byteBuffer.position(0);
 		quadTree.writeConstData(byteBuffer);
@@ -166,7 +162,7 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds) throws RemoteException {
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
 		byte[] result;
 		byteBuffer.position(0);
 		positions.clear();
@@ -182,12 +178,12 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public Collection<Double> getTimeSteps() throws RemoteException {
+	public Collection<Double> getTimeSteps() {
 		return this.timeSteps.keySet();
 	}
 
 	@Override
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(int time, TimePreference searchDirection) {
 		Double dTime = (double) time;
 		Double foundTime;
 		if (searchDirection == TimePreference.EARLIER || searchDirection == TimePreference.RESTART) {
@@ -208,17 +204,17 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 		
 	}
 
 	@Override
-	public boolean isLive() throws RemoteException {
+	public boolean isLive() {
 		return false;
 	}
 
 	@Override
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		return new OTFVisConfigGroup();
 	}
 

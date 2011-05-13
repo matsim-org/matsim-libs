@@ -21,25 +21,14 @@
 package org.matsim.vis.otfvis;
 
 import java.nio.ByteBuffer;
-import java.rmi.AccessException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.NoSuchObjectException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -66,7 +55,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
  * @author dstrippgen
  *
  */
-public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote {
+public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	private static final long serialVersionUID = -4012748585344947013L;
 
@@ -77,8 +66,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	private volatile Status status = Status.UNCONNECTED;
-
-	private static Registry registry;
 
 	private final Object paused = new Object();
 
@@ -98,7 +85,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 
-//	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
+	//	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
 	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
 
 	private volatile double stepToTime = 0;
@@ -107,93 +94,16 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
 
-	/**
-	 * This ExecutorService is used for update requests from the visualizer.
-	 * A running simulation cannot be queried, because QLinks are not thread-safe.
-	 * So update requests are queued by this ExecutorService and handled by the simulation
-	 * thread, which passes by the updateStatus method of this class every time step.
-	 * If the simulations is not running, the request is handled immediately.
-	 */
-	private ExecutorService executorService = new AbstractExecutorService() {
-
-		@Override
-		public void execute(Runnable command) {
-			if (status == Status.PLAY || status == Status.STEP) {
-				queue.add(command);
-			} else {
-				command.run();
-			}
-		}
-
-		@Override
-		public boolean awaitTermination(long timeout, TimeUnit unit)
-		throws InterruptedException {
-			return false;
-		}
-
-		@Override
-		public boolean isShutdown() {
-			return false;
-		}
-
-		@Override
-		public boolean isTerminated() {
-			return false;
-		}
-
-		@Override
-		public void shutdown() {
-
-		}
-
-		@Override
-		public List<Runnable> shutdownNow() {
-			return null;
-		}
-
-	};
-
-	private OnTheFlyServer() throws RemoteException {
-		super(0);
-	}
+	private Semaphore accessToQNetwork = new Semaphore(1);
 
 	private void init(EventsManager events){
 		this.events = events;
 	}
 
 	public static OnTheFlyServer createInstance(String readableName, EventsManager events) {
-		registry = getRegistry();
-		try {
-			// Register with RMI to be seen from client
-			OnTheFlyServer instance = new OnTheFlyServer();
-			instance.init(events);
-			registry.bind(readableName, instance);
-			log.info("OTFServer bound in RMI registry");
-			return instance;
-		} catch (AlreadyBoundException e) {
-			throw new RuntimeException(e);
-		} catch (AccessException e) {
-			throw new RuntimeException(e);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static Registry getRegistry() {
-		Registry registry;
-		try {
-			registry = LocateRegistry.getRegistry(4019);
-			// THIS Line is important, as this checks, if registry is REALLY
-			// connected "late binding"
-			registry.list();
-		} catch (RemoteException e) {
-			try {
-				registry = LocateRegistry.createRegistry(4019);
-			} catch (RemoteException e1) {
-				throw new RuntimeException(e);
-			}
-		}
-		return registry;
+		OnTheFlyServer instance = new OnTheFlyServer();
+		instance.init(events);
+		return instance;
 	}
 
 	public void reset() {
@@ -204,18 +114,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 		if(stepToTime != 0) {
 			status = Status.STEP;
-		}else 		synchronized (stepDone) {
-			stepDone.notifyAll();
-		}
-	}
-
-	public void cleanup() {
-		try {
-			UnicastRemoteObject.unexportObject(this, true);
-			UnicastRemoteObject.unexportObject(registry, true);
-			registry = null;
-		} catch (NoSuchObjectException e) {
-			e.printStackTrace();
+		} else {
+			synchronized (stepDone) {
+				stepDone.notifyAll();
+			}
 		}
 	}
 
@@ -248,7 +150,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) throws RemoteException {
+	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
 		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
 			doStep(time);
 			return true;
@@ -284,21 +186,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public void pause()  throws RemoteException{
+	public void pause(){
 		synchronized (updateFinished) {
 			if (status == Status.PLAY) {
-				try {
-					executorService.submit(new Runnable() {
-						@Override
-						public void run() {
-							status = Status.PAUSE;
-						}
-					}).get();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				} catch (ExecutionException e) {
-					throw new RuntimeException(e);
-				}
+				status = Status.PAUSE;
 			} else {
 				status = Status.PAUSE;
 			}
@@ -306,7 +197,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public void play()  throws RemoteException{
+	public void play() {
 		synchronized(paused) {
 			status = Status.PLAY;
 			paused.notifyAll();
@@ -315,7 +206,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 
 	@Override
-	public int getLocalTime() throws RemoteException {
+	public int getLocalTime() {
 		return localTime;
 	}
 
@@ -325,7 +216,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
 		if (quads.containsKey(id)) {
 			return quads.get(id);
 		} else {
@@ -341,13 +232,14 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public void toggleShowParking() throws RemoteException {
+	public void toggleShowParking() {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
-		synchronized (buf) {
+	public byte[] getQuadConstStateBuffer(String id) {
+		try {
+			accessToQNetwork.acquire();
 			byte[] result;
 			buf.position(0);
 			quads.get(id).writeConstData(buf);
@@ -356,59 +248,51 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			buf.position(0);
 			buf.get(result);
 			return result;
-		}
-	}
-
-	@Override
-	public byte[] getQuadDynStateBuffer(final String id, final QuadTree.Rect bounds) throws RemoteException {
-		Callable<byte[]> callable = new Callable<byte[]>() {
-
-			@Override
-			public byte[] call() {
-				byte[] result;
-				OTFServerQuad2 updateQuad = quads.get(id);
-				buf.position(0);
-				updateQuad.writeDynData(bounds, buf);
-				int pos = buf.position();
-				result = new byte[pos];
-				buf.position(0);
-				buf.get(result);
-				return result;
-			}
-
-		};
-
-		try {
-			// If the simulation is currently running or stepping,
-			// this call blocks until the simulation thread passes the updateStatus method,
-			// calculating the result.
-			return executorService.submit(callable).get();
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		} finally {
+			accessToQNetwork.release();
 		}
-
 	}
 
 	@Override
-	public OTFQueryRemote answerQuery(AbstractQuery query) throws RemoteException {
+	public byte[] getQuadDynStateBuffer(final String id, final QuadTree.Rect bounds) {
+		try {
+			accessToQNetwork.acquire();
+			byte[] result;
+			OTFServerQuad2 updateQuad = quads.get(id);
+			buf.position(0);
+			updateQuad.writeDynData(bounds, buf);
+			int pos = buf.position();
+			result = new byte[pos];
+			buf.position(0);
+			buf.get(result);
+			return result;
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} finally {
+			accessToQNetwork.release();
+		}
+	}
+
+	@Override
+	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		OTFServerQuad2 quad = quads.values().iterator().next();
 		query.installQuery(otfVisQueueSimFeature, events, quad);
 		activeQueries.add(query);
-		OTFQueryRemote stub = (OTFQueryRemote) UnicastRemoteObject.exportObject(query, 0);
-		return stub;
+		return query;
 	}
 
 	@Override
-	public void removeQueries() throws RemoteException {
+	public void removeQueries() {
 		for (AbstractQuery query : activeQueries) {
 			query.uninstall();
-			UnicastRemoteObject.unexportObject(query, true);
 		}
 		activeQueries.clear();
 	}
 
 	@Override
-	public Collection<Double> getTimeSteps() throws RemoteException {
+	public Collection<Double> getTimeSteps() {
 		// There are no timesteps implemented here right now, so we return null instead
 		return null;
 	}
@@ -423,19 +307,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	@Override
-	public OTFVisConfigGroup getOTFVisConfig() throws RemoteException {
+	public OTFVisConfigGroup getOTFVisConfig() {
 		OTFVisConfigGroup otfVisConfig = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
 		if (otfVisConfig == null) {
 			otfVisConfig = new OTFVisConfigGroup();
 		}
-
-//		log.warn( " otfVisQueueSimFeature: " + this.otfVisQueueSimFeature ) ;
-//		log.warn( " visMobsim: " + this.otfVisQueueSimFeature.getVisMobsim() ) ;
-//		log.warn( " visNetwork: " + this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork() ) ;
-//		log.warn( " network: " + this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork() ) ;
-//		log.warn( " effLaneWidth: " + 
-//				this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork().getEffectiveLaneWidth() ) ;
-
 		double effLaneWidth = this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork().getEffectiveLaneWidth() ;
 		if ( Double.isNaN(effLaneWidth) ) {
 			otfVisConfig.setEffectiveLaneWidth( null ) ;
@@ -444,6 +320,18 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 
 		return otfVisConfig ;
+	}
+
+	public void blockUpdates() {
+		try {
+			accessToQNetwork.acquire();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void unblockUpdates() {
+		accessToQNetwork.release();
 	}
 
 }

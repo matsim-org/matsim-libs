@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
 
@@ -41,74 +33,17 @@ public class OTFHostConnectionManager {
 
 	private OTFServerRemote host = null;
 
-	protected OTFLiveServerRemote liveHost = null;
-
-	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
-
-	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
-
 	public OTFHostConnectionManager(String address, OTFServerRemote server) {
-		setAddressAndServer(address, server);
-	}
-
-	public OTFHostConnectionManager(String url) {
-		try {
-			this.openAddress(url);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			e.printStackTrace();
-		}
+		this.address = address;
+		this.host = server;
 	}
 
 	public OTFServerRemote getOTFServer(){
 		return this.host;
 	}
 
-	private void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
-		OTFServerRemote createdHost = new OTFHostConnectionBuilder().createRemoteServerConnection(address);
-		setAddressAndServer(address, createdHost);
-	}
-
-	private void setAddressAndServer(final String address, OTFServerRemote server) {
-		this.address = address;
-		this.host = server;
-		if (host != null) {
-			try {
-				if (host.isLive()){
-					liveHost = (OTFLiveServerRemote)host;
-				}
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	public boolean isLiveHost() {
-		return liveHost != null;
-	}
-
-	public double getTime() {
-		try {
-			return host.getLocalTime();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return -1;
-	}
-
 	public String getAddress() {
 		return address;
-	}
-
-	public Map<String, OTFClientQuad> getQuads() {
-		return quads;
-	}
-
-	public Map<String, OTFDrawer> getDrawer() {
-		return drawer;
 	}
 
 }

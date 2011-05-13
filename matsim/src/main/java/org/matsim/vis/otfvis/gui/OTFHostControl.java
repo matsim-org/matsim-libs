@@ -19,7 +19,6 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +30,6 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
@@ -125,42 +123,30 @@ public class OTFHostControl {
 	}
 
 	void fetchTimeAndStatus() {
-		try {
-			simTime.setValue(this.masterHostConnectionManager.getOTFServer().getLocalTime());
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		simTime.setValue(this.masterHostConnectionManager.getOTFServer().getLocalTime());
 	}
 
 	boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime) {
-		try {
-			if (requestNewTime(newTime, prefTime)) {
-				simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
-				for(OTFHostConnectionManager slave : hostControls) {
-					if (!slave.equals(this.masterHostConnectionManager))
-						slave.getOTFServer().requestNewTime(newTime, prefTime);
-				}
-				return true;
-			} else {
-				log.info("No such timestep found.");
-				return false;
+		if (requestNewTime(newTime, prefTime)) {
+			simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
+			for(OTFHostConnectionManager slave : hostControls) {
+				if (!slave.equals(this.masterHostConnectionManager))
+					slave.getOTFServer().requestNewTime(newTime, prefTime);
 			}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			return true;
+		} else {
+			log.info("No such timestep found.");
+			return false;
 		}
 	}
 
 	boolean requestNewTime(int newTime, OTFServerRemote.TimePreference prefTime) {
-		try {
-			boolean requestNewTime = masterHostConnectionManager.getOTFServer().requestNewTime(newTime, prefTime);
-			return requestNewTime;
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		boolean requestNewTime = masterHostConnectionManager.getOTFServer().requestNewTime(newTime, prefTime);
+		return requestNewTime;
 	}
 
 	public boolean isLive() {
-		return masterHostConnectionManager.isLiveHost();
+		return masterHostConnectionManager.getOTFServer().isLive();
 	}
 
 	public int getSimTime() {
@@ -185,7 +171,7 @@ public class OTFHostControl {
 	}
 
 	public void pause() {
-		if (masterHostConnectionManager.isLiveHost()) {
+		if (masterHostConnectionManager.getOTFServer().isLive()) {
 			pressPauseOnServer();
 		}
 		stopMovie();
@@ -193,33 +179,20 @@ public class OTFHostControl {
 
 
 	public Collection<Double> getTimeStepsdrawer() {
-		try {
-			return this.masterHostConnectionManager.getOTFServer().getTimeSteps();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return this.masterHostConnectionManager.getOTFServer().getTimeSteps();
 	}
 
 
 	private void pressPlayOnServer() {
-		try {
-			((OTFLiveServerRemote) masterHostConnectionManager.getOTFServer()).play();
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		((OTFLiveServerRemote) masterHostConnectionManager.getOTFServer()).play();
 	}
 
 	private void pressPauseOnServer() {
-		try {
-			((OTFLiveServerRemote) masterHostConnectionManager.getOTFServer()).pause();
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		((OTFLiveServerRemote) masterHostConnectionManager.getOTFServer()).pause();
 	}
 
 	void updateSyncPlay(boolean synchronizedPlay) {
-		if (!masterHostConnectionManager.isLiveHost()) {
+		if (!masterHostConnectionManager.getOTFServer().isLive()) {
 			return;
 		}
 		if (synchronizedPlay) {
@@ -245,11 +218,7 @@ public class OTFHostControl {
 	}
 
 	public void invalidateDrawers() {
-		for (OTFHostConnectionManager slave : hostControls) {
-			for (OTFDrawer handler : slave.getDrawer().values()) {
-				handler.redraw();
-			}
-		}
+		hostControlBar.redrawDrawers();
 	}
 
 	class MovieTimer extends Thread {
@@ -286,8 +255,6 @@ public class OTFHostControl {
 					if (simTime.getValue() != actTime) {
 						hostControlBar.repaint();
 					}
-				} catch (RemoteException e) {
-					throw new RuntimeException(e);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}

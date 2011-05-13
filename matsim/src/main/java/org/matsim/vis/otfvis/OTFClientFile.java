@@ -21,10 +21,12 @@
 package org.matsim.vis.otfvis;
 
 import java.awt.BorderLayout;
-import java.rmi.RemoteException;
 
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -52,49 +54,44 @@ public class OTFClientFile extends OTFClient {
 
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
-	public OTFClientFile( String filename) {
-		super("file:" + filename);
+	private final String url;
+	
+	public OTFClientFile(String filename) {
+		super();
+		this.url = filename;
+		setHostConnectionManager(new OTFHostConnectionManager(this.url, new OTFFileReader(filename)));
+		Gbl.printMemoryUsage();
 
 		this.connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connect.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-		
+
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		
+
 		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
 		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
-		
+
 		this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 	}
 
 	@Override
 	protected OTFDrawer createDrawer(){
-		try {
-			OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
-			frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
-			hostControlBar.addDrawer("timeline", timeLine);
-			OTFClientQuad clientQ2 = createNewView(null, this.connect, this.hostControlBar.getOTFHostConnectionManager());
-			OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ2, hostControlBar);
-			return mainDrawer;
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			throw new RuntimeException();
-		}
+		OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+		frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
+		hostControlBar.addDrawer(timeLine);
+		OTFClientQuad clientQ2 = createNewView(this.connect, this.hostControlBar.getOTFHostConnectionManager());
+		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ2, hostControlBar);
+		return mainDrawer;
 	}
 
 	@Override
 	protected OTFVisConfigGroup createOTFVisConfig() {
-		try {
-			saver = new SettingsSaver(this.url);
-			return this.masterHostControl.getOTFServer().getOTFVisConfig();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			throw new RuntimeException();
-		}
+		saver = new SettingsSaver(this.url);
+		return this.masterHostControl.getOTFServer().getOTFVisConfig();
 	}
 
 }

@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.rmi.RemoteException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -133,7 +132,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			panel.setBounds(250, 130, 220, 200);
 
 			JCheckBox synchBox; 
-			if(host.getOTFHostConnectionManager().isLiveHost()) {
+			if(host.getOTFHostConnectionManager().getOTFServer().isLive()) {
 				synchBox = new JCheckBox("show non-moving items");
 				synchBox.setSelected(visConfig.isShowParking());
 				synchBox.addItemListener(this);
@@ -141,7 +140,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				synchBox.setVisible(true);
 				panel.add(synchBox);
 			}
-			if((host.getOTFHostConnectionManager().isLiveHost())||((visConfig.getFileVersion()>=1) &&(visConfig.getFileMinorVersion()>=4))) {
+			if((host.getOTFHostConnectionManager().getOTFServer().isLive())||((visConfig.getFileVersion()>=1) &&(visConfig.getFileMinorVersion()>=4))) {
 				synchBox = new JCheckBox("show link Ids");
 				synchBox.setSelected(visConfig.isDrawingLinkIds());
 				synchBox.addItemListener(this);
@@ -179,7 +178,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			synchBox.setBounds(10, 140, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
-			if (host.getOTFHostConnectionManager().isLiveHost()) {
+			if (host.getOTFHostConnectionManager().getOTFServer().isLive()) {
 				synchBox = new JCheckBox("show transit facilities");
 				synchBox.setSelected(visConfig.drawTransitFacilities());
 				synchBox.addItemListener(this);
@@ -327,11 +326,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			visConfig.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
 			visConfig.setShowParking(!visConfig.isShowParking());
 			if (host != null) {
-				try {
-					host.getOTFHostConnectionManager().getOTFServer().toggleShowParking();
-				} catch (RemoteException e1) {
-					throw new RuntimeException(e1);
-				}
+				host.getOTFHostConnectionManager().getOTFServer().toggleShowParking();
 				host.clearCaches();
 				host.redrawDrawers();
 			}

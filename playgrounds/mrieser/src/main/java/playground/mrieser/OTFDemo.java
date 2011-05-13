@@ -119,7 +119,7 @@ public class OTFDemo {
 		connect.connectReaderToReceiver(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
-		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).run();
+//		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).run();
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect).start();
 
 
