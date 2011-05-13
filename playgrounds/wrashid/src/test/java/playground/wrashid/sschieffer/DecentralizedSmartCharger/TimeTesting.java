@@ -1,7 +1,9 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
+import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -32,6 +34,15 @@ public class TimeTesting {
 		
 		final double bufferBatteryCharge=0.0;
 		
+		final double compensationPerKWHRegulationUp=0.15;
+		final double compensationPerKWHRegulationDown=0.15;
+		
+		final double xPercentNone=0.0;
+		final double xPercentDown=0.0;
+		final double xPercentDownUp=1.0;
+		
+		
+		
 		
 		DecentralizedSmartCharger myDecentralizedSmartCharger;
 		
@@ -60,6 +71,28 @@ public class TimeTesting {
 					
 					myDecentralizedSmartCharger.writeSummary("DSC"+configName);
 					
+					/*
+					 * V2G
+					 */
+					mySimulation.setUpStochasticLoadDistributions();
+					
+					myDecentralizedSmartCharger.setStochasticSources(
+							mySimulation.getStochasticLoadSchedule(), 
+							null, 
+							mySimulation.getAgentStochasticLoadSources());
+					
+					mySimulation.setUpAgentSchedules(
+							myDecentralizedSmartCharger, 
+							compensationPerKWHRegulationUp, 
+							compensationPerKWHRegulationDown, 
+							xPercentNone, 
+							xPercentDown, 
+							xPercentDownUp);
+					
+					myDecentralizedSmartCharger.setAgentContracts(mySimulation.getAgentContracts());
+					
+					V2G myV2G= new V2G(myDecentralizedSmartCharger);
+					myDecentralizedSmartCharger.setV2G(myV2G);
 					myDecentralizedSmartCharger.initializeAndRunV2G();
 					
 					myDecentralizedSmartCharger.writeSummary("V2G"+configName);
