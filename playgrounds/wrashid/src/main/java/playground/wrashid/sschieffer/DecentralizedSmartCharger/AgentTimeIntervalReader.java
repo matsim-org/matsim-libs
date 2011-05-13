@@ -47,8 +47,9 @@ public class AgentTimeIntervalReader {
 	
 	AgentTimeIntervalReader(
 			ParkingTimesPlugin parkingTimesPlugin,
-			EnergyConsumptionPlugin energyConsumptionPlugin){
-		
+			EnergyConsumptionPlugin energyConsumptionPlugin
+			){
+	
 		this.parkingTimesPlugin=parkingTimesPlugin;
 		this.energyConsumptionPlugin=energyConsumptionPlugin;
 		

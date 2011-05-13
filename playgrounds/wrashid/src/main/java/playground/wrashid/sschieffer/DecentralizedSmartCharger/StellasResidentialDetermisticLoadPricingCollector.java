@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
@@ -25,11 +26,11 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class StellasResidentialDetermisticLoadPricingCollector extends DetermisticLoadPricingCollector{
 	
 	
-	private LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution=
-		new  LinkedListValueHashMap<Integer, Schedule>();
+	private HashMap<Integer, Schedule> hubLoadDistribution=
+		new  HashMap<Integer, Schedule>();
 	
-	private LinkedListValueHashMap<Integer, Schedule> hubPricingDistribution=
-		new  LinkedListValueHashMap<Integer, Schedule>();
+	private HashMap<Integer, Schedule> hubPricingDistribution=
+		new  HashMap<Integer, Schedule>();
 	
 	
 	private PolynomialFunction func;
@@ -60,19 +61,19 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 		String file= "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt";
 		readLoadFile(file, peakWattOnGrid);
 		
-		
 		setUpHubLoadFromReader(numhubs);
 		setUpPricingLevels();
+		visualize(DecentralizedSmartCharger.outputPath);
 	}
 	
 	
 	@Override
-	public LinkedListValueHashMap<Integer, Schedule> getDeterministicHubLoad(){
+	public HashMap<Integer, Schedule> getDeterministicHubLoad(){
 		return hubLoadDistribution;
 	}
 	
 	@Override
-	public LinkedListValueHashMap<Integer, Schedule> getDeterministicPriceDistribution(){
+	public HashMap<Integer, Schedule> getDeterministicPriceDistribution(){
 		return hubPricingDistribution;
 	}
 	
@@ -94,7 +95,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	 * 
 	 */
 	private void  setUpPricingLevels(){
-		
+		//pricinglevels
 		double energyPricePerkWh=0.25;
 		double standardConnectionElectricityJPerSecond= 3500; 
 		double optimalPrice=energyPricePerkWh*1/1000*1/3600*standardConnectionElectricityJPerSecond;//0.25 CHF per kWh		
@@ -103,9 +104,9 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 		//**********************
 		// DEFINE HUBS 
 		//**********************
-		for(Integer h: hubLoadDistribution.getKeySet()){
+		for(Integer h: hubLoadDistribution.keySet()){
 			
-			Schedule s= hubLoadDistribution.getValue(h);
+			Schedule s= hubLoadDistribution.get(h);
 			Schedule pricing = new Schedule();
 			for(int i=0; i<s.getNumberOfEntries(); i++){
 				
@@ -127,8 +128,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 			}
 			// save to pricing
 			hubPricingDistribution.put(h, pricing);
-			/*pricing.printSchedule();
-			s.printSchedule();*/
+			
 		}
 	}
 	

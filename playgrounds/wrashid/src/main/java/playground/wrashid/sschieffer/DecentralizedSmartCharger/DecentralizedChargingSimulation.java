@@ -1,5 +1,6 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -45,6 +46,8 @@ public class DecentralizedChargingSimulation {
 	public static double xPercentDown;
 	public static double xPercentDownUp;
 	
+	public static boolean LPoutput;
+	
 	/**
 	 * Setup for only decentralized smart charging optimization
 	 * @param configPath
@@ -63,13 +66,15 @@ public class DecentralizedChargingSimulation {
 			double bufferBatteryCharge,
 			double minChargingLength,
 			MappingClass myMappingClass,
-			DetermisticLoadPricingCollector loadPricingCollector){
+			DetermisticLoadPricingCollector loadPricingCollector,
+			boolean LPoutput){
 		
 		this.outputPath=outputPath;
 		this.bufferBatteryCharge=bufferBatteryCharge;
 		this.minChargingLength=minChargingLength;
 		this.myMappingClass=myMappingClass;
 		this.loadPricingCollector=loadPricingCollector;
+		this.LPoutput=LPoutput;
 		
 		controler=new Controler(configPath);
 		parkingTimesPlugin= new ParkingTimesPlugin(controler);
@@ -139,15 +144,35 @@ public class DecentralizedChargingSimulation {
 	 * i.e. parking interval, driving interval, parking interval
 	 * @return
 	 */
-	public LinkedListValueHashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
+	public HashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
 		return mySmartCharger.getAllAgentParkingAndDrivingSchedules();
 	}
 		
+	
+	/**
+	 * visualizes the daily plans of all agents (parking, driving and charging times) and saves the files in the format
+	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * @throws IOException
+	 */
+	public void visualizeAllAgentPlans() throws IOException{
+		 mySmartCharger.visualizeDailyPlanForAllAgents();
+	}
+	
+	
+	/**
+	 * visualizes the daily plans of one agent (parking, driving and charging times) and saves the file in the format
+	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * @throws IOException
+	 */
+	public void visualizeAgentPlans(Id id) throws IOException{
+		 mySmartCharger.visualizeDailyPlanForAgent(id);
+	}
+	
 	/**
 	 * return linkeList with charging costs for all agents for the entire day
 	 * @return
 	 */
-	public LinkedListValueHashMap<Id, Double> getChargingCostsForAgents(){
+	public HashMap<Id, Double> getChargingCostsForAgents(){
 		return mySmartCharger.getChargingCostsForAgents();
 	}
 	
@@ -155,7 +180,7 @@ public class DecentralizedChargingSimulation {
 	 * return linkedList with charging schedules for all agents over the entire day
 	 * @return
 	 */
-	public LinkedListValueHashMap<Id, Schedule> getAllAgentChargingSchedules(){
+	public HashMap<Id, Schedule> getAllAgentChargingSchedules(){
 		return mySmartCharger.getAllAgentChargingSchedules();
 	}
 	

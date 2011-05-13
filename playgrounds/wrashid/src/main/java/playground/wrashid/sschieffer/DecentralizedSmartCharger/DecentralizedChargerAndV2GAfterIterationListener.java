@@ -1,5 +1,6 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
@@ -50,8 +51,10 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 					);
 			
 			//set battery reserve
-			myDecentralizedSmartCharger.initializeLP(DecentralizedChargingSimulation.bufferBatteryCharge);
-			
+			myDecentralizedSmartCharger.initializeLP(
+					DecentralizedChargingSimulation.bufferBatteryCharge,
+					DecentralizedChargingSimulation.LPoutput
+					);
 			// set standard charging slot length
 			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.minChargingLength);
 			
@@ -105,10 +108,10 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			
 			DecentralizedChargingSimulation.loadPricingCollector.setUp();
 			
-			final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
+			final HashMap<Integer, Schedule> deterministicHubLoadDistribution
 				= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicHubLoad();
 			
-			final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			final HashMap<Integer, Schedule> pricingHubDistribution
 			= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicPriceDistribution();
 			
 			myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
@@ -119,13 +122,13 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			
 			myDecentralizedSmartCharger.run();
 			
-			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=
+			HashMap<Integer, Schedule> stochasticHubLoadDistribution=
 				DecentralizedChargingSimulation.slc.getStochasticHubLoad();
 				
-			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping= 
+			HashMap<Integer, Schedule> locationSourceMapping= 
 				DecentralizedChargingSimulation.slc.getStochasticHubSources();
 			
-			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping= 
+			HashMap<Id, Schedule> agentVehicleSourceMapping= 
 				DecentralizedChargingSimulation.slc.getStochasticAgentVehicleSources();
 				
 			// SET STOCHASTIC LOADS
@@ -150,7 +153,7 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 					DecentralizedChargingSimulation.compensationPerKWHRegulationDown);
 			
 			
-			LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts= 
+			HashMap<Id, ContractTypeAgent> agentContracts= 
 				myAgentContractsCollector.makeAgentContracts(
 						DecentralizedChargingSimulation.controler,
 						DecentralizedChargingSimulation.xPercentNone,

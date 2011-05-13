@@ -1,5 +1,7 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
@@ -47,7 +49,7 @@ public class AgentContractCollector {
 	 * RETURNS LinkedListValueHashMap<Id, ContractTypeAgent> with given percentage of population with
 	 * no regulation, only regulation down or regulation up and down
 	 */
-	public LinkedListValueHashMap<Id, ContractTypeAgent>  makeAgentContracts(
+	public HashMap<Id, ContractTypeAgent>  makeAgentContracts(
 			Controler controler,
 			double xPercentNone,
 			double xPercentDown,
@@ -57,7 +59,7 @@ public class AgentContractCollector {
 		int popSize= controler.getPopulation().getPersons().size();
 		int count = 0;
 		
-		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
+		HashMap<Id, ContractTypeAgent> list = new HashMap<Id, ContractTypeAgent>();
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			if (count< popSize*xPercentNone){
 			
@@ -79,7 +81,7 @@ public class AgentContractCollector {
 	 * RETURNS LinkedListValueHashMap<Id, ContractTypeAgent> with given percentage of population with
 	 * no regulation, only regulation down or regulation up and down
 	 */
-	public static LinkedListValueHashMap<Id, ContractTypeAgent>  makeAgentContractsEVPHEV(
+	public static HashMap<Id, ContractTypeAgent>  makeAgentContractsEVPHEV(
 			Controler controler,
 			double xPercentNoneEV,
 			double xPercentDownEV,
@@ -88,33 +90,37 @@ public class AgentContractCollector {
 			double xPercentDownPHEV,
 			double xPercentDownUpPHEV
 			){
-		LinkedListValueHashMap<Id, ContractTypeAgent> list = new LinkedListValueHashMap<Id, ContractTypeAgent>();
+		
+		int popSize= controler.getPopulation().getPersons().size();
+		int countEV = 0;
+		int countPHEV = 0;
+		HashMap<Id, ContractTypeAgent> list = new HashMap<Id, ContractTypeAgent>();
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			
 			if(dsc.hasAgentPHEV(id) ){
-				double rand= Math.random();
-				if(rand<xPercentNonePHEV){
+				if (countPHEV< popSize*xPercentNonePHEV){				
 					list.put(id, contractNoRegulation);
 				}else{
-					if(rand<xPercentNonePHEV+xPercentDownPHEV){
+					if(countPHEV< popSize*(xPercentNonePHEV+xPercentDownPHEV)){
 						list.put(id, contractRegDown);
 					}else{
 						list.put(id, contractRegUpRegDown);
 					}
 				}
-				
+				countPHEV++;
 			}
+			
 			if(dsc.hasAgentEV(id)){
-				double rand= Math.random();
-				if(rand<xPercentNoneEV){
+				if (countEV< popSize*xPercentNoneEV){
 					list.put(id, contractNoRegulation);
 				}else{
-					if(rand<xPercentNoneEV+xPercentDownEV){
+					if(countEV< popSize*(xPercentNoneEV+xPercentDownEV)){
 						list.put(id, contractRegDown);
 					}else{
 						list.put(id, contractRegUpRegDown);
 					}
 				}
+				countEV++;
 			}
 			
 		}

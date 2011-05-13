@@ -82,13 +82,15 @@ public class ChargingSlotDistributor {
 				
 				if(p.getIntervalLength()*0.7 <chargingTime){
 					if(chargingTime>p.getIntervalLength()){
-						System.out.println("trouble - rounding error?");
+						if(DecentralizedSmartCharger.debug){
+							System.out.println("rounding error - correction");
+						}
+						
 						chargingTime=p.getIntervalLength();
 						p.setRequiredChargingDuration(p.getIntervalLength());
 					}
 					double diff= p.getIntervalLength()-chargingTime;
 					double startRand= Math.random()*diff;
-					//(System.out.println("assign charging time "+ startRand + " to "+  startRand+chargingTime);
 					
 					ChargingInterval c= new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime);
 					chargingScheduleAllIntervalsAgent.addTimeInterval(c);
@@ -196,8 +198,6 @@ public class ChargingSlotDistributor {
 		double lower=startTime;
 		double trial=(upper+lower)/2;
 		
-		//System.out.println("Find Slot of "+ bit +" in Interval "+ startTime+ " to "+ endTime);
-		
 		while(notFound){
 			
 			run=true;			
@@ -268,7 +268,6 @@ public class ChargingSlotDistributor {
 			}else{
 				c1= new ChargingInterval(trial, trial+bit);
 			}
-			//System.out.println("Assigned Slot of "+ c1.getStartTime() + " to "+ c1.getEndTime());
 			
 			if(c1!=null && chargingInParkingInterval.overlapWithTimeInterval(c1)==false){
 				//no overlap--> exit loop

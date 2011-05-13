@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 import org.apache.commons.math.ConvergenceException;
@@ -58,7 +59,6 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  */
 public class HubLoadDistributionReader {
 	
-	final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 	
 	UnivariateRealSolverFactory factory = UnivariateRealSolverFactory.newInstance();
 	UnivariateRealSolver solverBisection = factory.newBisectionSolver();
@@ -67,24 +67,25 @@ public class HubLoadDistributionReader {
 		
 	private HubLinkMapping hubLinkMapping;
 	
-	LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
-	LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
-	LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution;
-	LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-	LinkedListValueHashMap<Integer, TimeDataCollector> connectivityHubDistribution;
+	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
+	HashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
+	HashMap<Integer, Schedule> stochasticHubLoadDistribution;
+	HashMap<Integer, Schedule> pricingHubDistribution;
+	HashMap<Integer, TimeDataCollector> connectivityHubDistribution;
 	
-	LinkedListValueHashMap<Integer, Schedule> locationSourceMapping;
-	LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping;
+	HashMap<Integer, Schedule> locationSourceMapping;
+	HashMap<Id, Schedule> agentVehicleSourceMapping;
 	
-	LinkedListValueHashMap<Integer, double [][]> originalDeterministicChargingDistribution;
-	LinkedListValueHashMap<Integer, double [][]> loadAfterDeterministicChargingDecision;
+	HashMap<Integer, double [][]> originalDeterministicChargingDistribution;
+	HashMap<Integer, double [][]> loadAfterDeterministicChargingDecision;
 	
 	//double [time - seconds in day] = available free load in W on grid in Hub
 	
 	Controler controler;
 	VehicleTypeCollector myVehicleTypeCollector;
 	
-	/**
+	private String outputPath;
+	/**e 
 	 * Reads in load data for all hubs and stores PolynomialFunctions 
 	 * of load valleys and peak load times
 	 * @throws IOException 
@@ -93,9 +94,10 @@ public class HubLoadDistributionReader {
 	 */
 	public HubLoadDistributionReader(Controler controler, 
 			HubLinkMapping hubLinkMapping,
-			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution,		
-			VehicleTypeCollector myVehicleTypeCollector) throws IOException, OptimizationException, InterruptedException{
+			HashMap<Integer, Schedule> deterministicHubLoadDistribution,			
+			HashMap<Integer, Schedule> pricingHubDistribution,		
+			VehicleTypeCollector myVehicleTypeCollector,
+			String outputPath) throws IOException, OptimizationException, InterruptedException{
 		
 		this.controler=controler;
 		
@@ -103,15 +105,14 @@ public class HubLoadDistributionReader {
 		
 		this.deterministicHubLoadDistribution=deterministicHubLoadDistribution; // continuous functions
 		
-		
 		this.pricingHubDistribution=pricingHubDistribution; // continuous functions with same intervals as deterministic HubLoadDistribution!!!
 		
 		this.myVehicleTypeCollector= myVehicleTypeCollector;
+		
+		this.outputPath=outputPath;
 		checkForPlugInHybrid();// if PHEV then deterministicLoad function changes for this one
 		
-		
 		visualizeLoadDistributionGeneralAndPHEV();
-		
 		
 		if (false==checkIfPricingAndDeterministicHaveSameTimeIntervals()){
 			System.out.println("WRONG INPUT: Deterministic Load Distribution " +
@@ -151,9 +152,9 @@ public class HubLoadDistributionReader {
 	
 	
 	public void setStochasticSources(
-			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
-			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping){
+			HashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			HashMap<Integer, Schedule> locationSourceMapping,
+			HashMap<Id, Schedule> agentVehicleSourceMapping){
 		
 		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions		
 		this.locationSourceMapping=locationSourceMapping;
@@ -162,9 +163,9 @@ public class HubLoadDistributionReader {
 	
 	
 	public void initializeConnectivityHubDistribution(){
-		connectivityHubDistribution= new LinkedListValueHashMap<Integer, TimeDataCollector> ();
+		connectivityHubDistribution= new HashMap<Integer, TimeDataCollector> ();
 		
-		for(Integer i: deterministicHubLoadDistribution.getKeySet()){
+		for(Integer i: deterministicHubLoadDistribution.keySet()){
 			connectivityHubDistribution.put(i, new TimeDataCollector(DecentralizedSmartCharger.MINUTESPERDAY));
 		}
 		
@@ -180,14 +181,14 @@ public class HubLoadDistributionReader {
 	private boolean checkIfPricingAndDeterministicHaveSameTimeIntervals(){
 		boolean isSame=false;
 		
-		if(pricingHubDistribution.getKeySet().size()!= 
-			deterministicHubLoadDistribution.getKeySet().size()){
+		if(pricingHubDistribution.keySet().size()!= 
+			deterministicHubLoadDistribution.keySet().size()){
 			return isSame;
 		}else{
 			
-			for(Integer i: pricingHubDistribution.getKeySet()){
-				isSame=pricingHubDistribution.getValue(i).sameTimeIntervalsInThisSchedule(
-						deterministicHubLoadDistribution.getValue(i));				
+			for(Integer i: pricingHubDistribution.keySet()){
+				isSame=pricingHubDistribution.get(i).sameTimeIntervalsInThisSchedule(
+						deterministicHubLoadDistribution.get(i));				
 				
 			}
 		}
@@ -213,11 +214,11 @@ public class HubLoadDistributionReader {
 	
 	
 	public Schedule getDeterministicHubLoadDistribution(int hubId){
-		return deterministicHubLoadDistribution.getValue(hubId);
+		return deterministicHubLoadDistribution.get(hubId);
 	}
 	
 	public Schedule getDeterministicHubLoadDistributionPHEVAdjusted(int hubId){
-		return deterministicHubLoadDistributionPHEVAdjusted.getValue(hubId);
+		return deterministicHubLoadDistributionPHEVAdjusted.get(hubId);
 	}
 	
 	
@@ -233,9 +234,9 @@ public class HubLoadDistributionReader {
 		Schedule hubLoadSchedule;
 		
 		if(DecentralizedSmartCharger.hasAgentEV(agentId)){
-			hubLoadSchedule = deterministicHubLoadDistribution.getValue(hub);
+			hubLoadSchedule = deterministicHubLoadDistribution.get(hub);
 		}else{
-			hubLoadSchedule = deterministicHubLoadDistributionPHEVAdjusted.getValue(hub);
+			hubLoadSchedule = deterministicHubLoadDistributionPHEVAdjusted.get(hub);
 		}
 		
 		
@@ -259,7 +260,7 @@ public class HubLoadDistributionReader {
 		
 		int hub= getHubForLinkId(idLink);
 		
-		Schedule hubLoadSchedule = pricingHubDistribution.getValue(hub);
+		Schedule hubLoadSchedule = pricingHubDistribution.get(hub);
 		int interval = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
 				
 		LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(interval);
@@ -278,9 +279,9 @@ public class HubLoadDistributionReader {
 	public Schedule getLoadDistributionScheduleForHubId(Id agentId, Id idLink){
 		int hub= getHubForLinkId(idLink);
 		if(DecentralizedSmartCharger.hasAgentEV(agentId)){
-			return deterministicHubLoadDistribution.getValue(hub);
+			return deterministicHubLoadDistribution.get(hub);
 		}else{
-			return deterministicHubLoadDistributionPHEVAdjusted.getValue(hub);
+			return deterministicHubLoadDistributionPHEVAdjusted.get(hub);
 		}
 		
 		
@@ -292,11 +293,11 @@ public class HubLoadDistributionReader {
 	
 	
 	private void  initializeLoadAfterDeterministicChargingDecision(){
-		loadAfterDeterministicChargingDecision= new LinkedListValueHashMap<Integer, double [][]>();
-		originalDeterministicChargingDistribution= new LinkedListValueHashMap<Integer, double [][]>();
+		loadAfterDeterministicChargingDecision= new HashMap<Integer, double [][]>();
+		originalDeterministicChargingDistribution= new HashMap<Integer, double [][]>();
 		
-		for(Integer i : deterministicHubLoadDistribution.getKeySet()){
-			Schedule s= deterministicHubLoadDistribution.getValue(i);
+		for(Integer i : deterministicHubLoadDistribution.keySet()){
+			Schedule s= deterministicHubLoadDistribution.get(i);
 			
 			double [][] loadBefore= new double [ (int)DecentralizedSmartCharger.MINUTESPERDAY ][2];
 			double [][] loadAfter= new double [ (int)DecentralizedSmartCharger.MINUTESPERDAY ][2];
@@ -339,7 +340,7 @@ public class HubLoadDistributionReader {
 		int hubId= getHubForLinkId(linkId);
 		
 	
-		double [][]loadAfter=loadAfterDeterministicChargingDecision.getValue(hubId);
+		double [][]loadAfter=loadAfterDeterministicChargingDecision.get(hubId);
 		
 		loadAfter[minInDay][0]=minInDay*DecentralizedSmartCharger.SECONDSPERMIN;
 		loadAfter[minInDay][1]=loadAfter[minInDay][1]-wattReduction;
@@ -363,15 +364,15 @@ public class HubLoadDistributionReader {
 			){
 		
 		double second= minute*DecentralizedSmartCharger.SECONDSPERMIN;
-		double before= connectivityHubDistribution.getValue(hub).getYAtEntry(minute);
-		connectivityHubDistribution.getValue(hub).addDataPoint(minute, second, before+1);
+		double before= connectivityHubDistribution.get(hub).getYAtEntry(minute);
+		connectivityHubDistribution.get(hub).addDataPoint(minute, second, before+1);
 	}
 	
 	
 	
 	
 	public double getExpectedNumberOfParkingAgentsAtHubAtTime(int hub, double time){
-		return connectivityHubDistribution.getValue(hub).getFunction().value(time);
+		return connectivityHubDistribution.get(hub).getFunction().value(time);
 	}
 	
 	
@@ -382,12 +383,14 @@ public class HubLoadDistributionReader {
 		
 		XYSeriesCollection connectivity= new XYSeriesCollection();
 		
-		for(Integer i: connectivityHubDistribution.getKeySet()){
+		for(Integer i: connectivityHubDistribution.keySet()){
 			
-			TimeDataCollector data= connectivityHubDistribution.getValue(i);
+			TimeDataCollector data= connectivityHubDistribution.get(i);
 			data.fitFunction();
-			System.out.println("Parking Vehicles at Hub"+ i);
-			System.out.println(data.getFunction().toString());
+			if(DecentralizedSmartCharger.debug){
+				System.out.println("Parking Vehicles at Hub"+ i);
+				System.out.println(data.getFunction().toString());
+			}
 			
 			XYSeries xx= data.getXYSeries("Parking Vehicles at Hub"+ i);
 			connectivity.addSeries(xx);
@@ -408,8 +411,8 @@ public class HubLoadDistributionReader {
         plot.setRangeGridlinePaint(Color.gray);
 		
         int i=0;
-        for(Integer j:  connectivityHubDistribution.getKeySet()){
-        	//System.out.println(i);
+        for(Integer j:  connectivityHubDistribution.keySet()){
+        	
         	plot.getRenderer().setSeriesPaint(i, Color.black);//after
         	plot.getRenderer().setSeriesStroke(
                     i, 
@@ -425,7 +428,7 @@ public class HubLoadDistributionReader {
                 );
         	i++;
         }
-        String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
+        String s= DecentralizedChargingSimulation.outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
 	}
@@ -438,15 +441,15 @@ public class HubLoadDistributionReader {
 	 * those time intervals will be turned into suboptimal parking slots
 	 * @return
 	 */
-	private LinkedListValueHashMap<Integer, Schedule> getPHEVDeterministicHubLoad(double gasPriceInCostPerSecond){
+	private HashMap<Integer, Schedule> getPHEVDeterministicHubLoad(double gasPriceInCostPerSecond){
 		
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistributionPHEVAdjusted= new LinkedListValueHashMap<Integer, Schedule> ();
+		HashMap<Integer, Schedule> hubLoadDistributionPHEVAdjusted= new HashMap<Integer, Schedule> ();
 		
-		for(Integer i : pricingHubDistribution.getKeySet()){
+		for(Integer i : pricingHubDistribution.keySet()){
 			
-			Schedule pricingS= pricingHubDistribution.getValue(i);
+			Schedule pricingS= pricingHubDistribution.get(i);
 			
-			Schedule deterministicSchedule=deterministicHubLoadDistribution.getValue(i);
+			Schedule deterministicSchedule=deterministicHubLoadDistribution.get(i);
 			
 			Schedule sPHEV= new Schedule();
 			for(int j=0; j<pricingS.getNumberOfEntries(); j++){
@@ -623,6 +626,7 @@ public class HubLoadDistributionReader {
 						
 						try {
 							double c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime(), i);
+							
 							//System.out.println("c: "+c);
 							//System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime()+ " guess "+ i);
 							if(c<=l.getEndTime() && c>=l.getStartTime()){
@@ -698,7 +702,7 @@ public class HubLoadDistributionReader {
 
 	
 	private void visualizePricingAndGas(double gasPriceInCostPerSecond) throws IOException{
-		for( Integer i : pricingHubDistribution.getKeySet()){
+		for( Integer i : pricingHubDistribution.keySet() ){
 			
 			XYSeriesCollection prices= new XYSeriesCollection();
 			//************************************
@@ -710,9 +714,9 @@ public class HubLoadDistributionReader {
 			gasPriceXY.add(0, gasPriceInCostPerSecond);
 			gasPriceXY.add(DecentralizedSmartCharger.SECONDSPERDAY,gasPriceInCostPerSecond);
 			
-			for(int j=0; j<pricingHubDistribution.getValue(i).getNumberOfEntries(); j++){
+			for(int j=0; j<pricingHubDistribution.get(i).getNumberOfEntries(); j++){
 				
-				LoadDistributionInterval l= (LoadDistributionInterval)pricingHubDistribution.getValue(i).timesInSchedule.get(j);
+				LoadDistributionInterval l= (LoadDistributionInterval)pricingHubDistribution.get(i).timesInSchedule.get(j);
 				
 				for(double time=l.getStartTime(); time<l.getEndTime(); time++){
 					hubPricing.add(time, l.getPolynomialFunction().value(time)); 
@@ -768,9 +772,8 @@ public class HubLoadDistributionReader {
 	
 	
 	private void visualizeLoadDistributionGeneralAndPHEV() throws IOException{
-		
 				
-		for( Integer i : deterministicHubLoadDistribution.getKeySet()){
+		for( Integer i : deterministicHubLoadDistribution.keySet()){
 			
 			XYSeriesCollection deterministicGeneral= new XYSeriesCollection();
 			
@@ -779,31 +782,25 @@ public class HubLoadDistributionReader {
 			
 			XYSeries hubDeterministic= new XYSeries("hub"+i.toString()+"Deterministic");
 						
-			for(int j=0; j<deterministicHubLoadDistribution.getValue(i).getNumberOfEntries(); j++){
+			for(int j=0; j<deterministicHubLoadDistribution.get(i).getNumberOfEntries(); j++){
 				
-				LoadDistributionInterval l= (LoadDistributionInterval)deterministicHubLoadDistribution.getValue(i).timesInSchedule.get(j);
+				LoadDistributionInterval l= (LoadDistributionInterval)deterministicHubLoadDistribution.get(i).timesInSchedule.get(j);
 				
 				for(double time=l.getStartTime(); time<l.getEndTime(); time++){
 					hubDeterministic.add(time, l.getPolynomialFunction().value(time)); 
 				}
-				
-				
 			}
-			deterministicGeneral.addSeries(hubDeterministic);
-				
-		
 			
+			deterministicGeneral.addSeries(hubDeterministic);
 			
 			XYSeries hubDeterministicPHEV= new XYSeries("hub"+i.toString()+"DeterministicPHEV");
 			//deterministicHubLoadDistributionPHEVAdjusted.getValue(i).printSchedule();
 			
-			for(int j=0; j<deterministicHubLoadDistributionPHEVAdjusted.getValue(i).getNumberOfEntries(); j++){
+			for(int j=0; j<deterministicHubLoadDistributionPHEVAdjusted.get(i).getNumberOfEntries(); j++){
 				
-				LoadDistributionInterval l= (LoadDistributionInterval)deterministicHubLoadDistributionPHEVAdjusted.getValue(i).timesInSchedule.get(j);
+				LoadDistributionInterval l= (LoadDistributionInterval)deterministicHubLoadDistributionPHEVAdjusted.get(i).timesInSchedule.get(j);
 				
 				for(double time=l.getStartTime(); time<l.getEndTime(); time++){
-					
-					//System.out.println("added"+ time + " , "+ l.getPolynomialFunction().value(time));
 					hubDeterministicPHEV.add(time, l.getPolynomialFunction().value(time)); 
 				}
 				

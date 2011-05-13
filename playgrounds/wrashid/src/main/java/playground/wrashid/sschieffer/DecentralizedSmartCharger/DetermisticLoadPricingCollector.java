@@ -1,6 +1,7 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
@@ -32,12 +33,12 @@ public abstract class DetermisticLoadPricingCollector {
 		
 	}
 	
-	public LinkedListValueHashMap<Integer, Schedule> getDeterministicHubLoad(){
+	public HashMap<Integer, Schedule> getDeterministicHubLoad(){
 		return null;
 	}
 	
 	
-	public LinkedListValueHashMap<Integer, Schedule> getDeterministicPriceDistribution(){
+	public HashMap<Integer, Schedule> getDeterministicPriceDistribution(){
 		return null;
 	}
 }

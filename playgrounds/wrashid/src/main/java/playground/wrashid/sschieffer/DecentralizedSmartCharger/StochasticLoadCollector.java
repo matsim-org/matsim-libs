@@ -1,5 +1,7 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
+
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
@@ -10,14 +12,14 @@ public class StochasticLoadCollector {
 	
 	private Controler controler;
 	
-	private LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution=
-		new  LinkedListValueHashMap<Integer, Schedule>();
+	private HashMap<Integer, Schedule> stochasticHubLoadDistribution=
+		new  HashMap<Integer, Schedule>();
 	
-	private LinkedListValueHashMap<Integer, Schedule> stochasticHubSource=
-		new  LinkedListValueHashMap<Integer, Schedule>();
+	private HashMap<Integer, Schedule> stochasticHubSource=
+		new  HashMap<Integer, Schedule>();
 	
-	private static LinkedListValueHashMap<Id, Schedule> agentSource= 
-		new LinkedListValueHashMap<Id, Schedule>();
+	private static HashMap<Id, Schedule> agentSource= 
+		new HashMap<Id, Schedule>();
 	
 	
 	
@@ -29,15 +31,15 @@ public class StochasticLoadCollector {
 	}
 	
 	
-	public LinkedListValueHashMap<Integer, Schedule> getStochasticHubLoad(){
+	public HashMap<Integer, Schedule> getStochasticHubLoad(){
 		return stochasticHubLoadDistribution;
 	}
 	
-	public LinkedListValueHashMap<Id, Schedule> getStochasticAgentVehicleSources(){
+	public HashMap<Id, Schedule> getStochasticAgentVehicleSources(){
 		return agentSource;
 	}
 	
-	public LinkedListValueHashMap<Integer, Schedule> getStochasticHubSources(){
+	public HashMap<Integer, Schedule> getStochasticHubSources(){
 		return stochasticHubSource;
 	}
 	

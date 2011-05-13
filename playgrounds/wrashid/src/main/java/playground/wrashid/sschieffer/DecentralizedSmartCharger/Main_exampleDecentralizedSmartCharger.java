@@ -129,7 +129,8 @@ public class Main_exampleDecentralizedSmartCharger {
 				bufferBatteryCharge,
 				minChargingLength,
 				myMappingClass,
-				loadPricingCollector
+				loadPricingCollector,
+				false // indicate if you want graph output for every agent to visualize the SOC over the day
 				);
 		mySimulation.addControlerListenerDecentralizedCharging();		
 		mySimulation.controler.run();
@@ -143,26 +144,32 @@ public class Main_exampleDecentralizedSmartCharger {
 		
 		
 		for(Id id: DecentralizedChargingSimulation.controler.getPopulation().getPersons().keySet()){
+			
 			//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
-			LinkedListValueHashMap<Id, Schedule> agentPDSchedules= 
+			HashMap<Id, Schedule> agentPDSchedules= 
 				mySimulation.getAllAgentParkingAndDrivingSchedules();
 			
 			System.out.println("parking and driving schedule agent "+id.toString());
-			agentPDSchedules.getValue(id).printSchedule();
+			agentPDSchedules.get(id).printSchedule();
+			
+			// VISUALIZE ALL AGENT PLANS AND SAVE THEM IN FOLDER - outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+			mySimulation.visualizeAllAgentPlans();
+			mySimulation.visualizeAgentPlans(id);
+			
 			
 			//CHARGING COSTS
-			LinkedListValueHashMap<Id, Double> agentChargingCosts= 
+			HashMap<Id, Double> agentChargingCosts= 
 				mySimulation.getChargingCostsForAgents();
 			System.out.println("charging cost of agent "+id.toString() 
-					+ " "+agentChargingCosts.getValue(id));
+					+ " "+agentChargingCosts.get(id));
 									
 			
 			//CHARGING SCHEDULES FOR EVERY AGENT
-			LinkedListValueHashMap<Id, Schedule> agentSchedules= 
+			HashMap<Id, Schedule> agentSchedules= 
 				mySimulation.getAllAgentChargingSchedules();
 			
 			System.out.println("charging Schedule agent "+id.toString());
-			agentSchedules.getValue(id).printSchedule();
+			agentSchedules.get(id).printSchedule();
 			
 			
 			//LIST OF AGENTS WITH EV WHERE LP FAILED, i.e. where battery swap would be necessary

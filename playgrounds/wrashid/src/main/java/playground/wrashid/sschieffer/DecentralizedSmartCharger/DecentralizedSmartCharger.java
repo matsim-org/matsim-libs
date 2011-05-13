@@ -103,8 +103,7 @@ public class DecentralizedSmartCharger {
 	public GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		
 	public static PolynomialFitter polyFit;
-	
-	
+	public static boolean debug=false;
 	
 	final public static double SECONDSPERMIN=60;
 	final public static double SECONDSPER15MIN=15*60;
@@ -117,10 +116,10 @@ public class DecentralizedSmartCharger {
 	public static AgentTimeIntervalReader myAgentTimeReader;
 	public static V2G myV2G;
 	
-	private LinkedListValueHashMap<Id, Schedule> agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
-	private LinkedListValueHashMap<Id, Schedule> agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
+	private HashMap<Id, Schedule> agentParkingAndDrivingSchedules = new HashMap<Id, Schedule>(); 
+	private HashMap<Id, Schedule> agentChargingSchedules = new HashMap<Id, Schedule>();
 	
-	private LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts;
+	private HashMap<Id, ContractTypeAgent> agentContracts;
 	
 	public double minChargingLength;
 	
@@ -137,7 +136,7 @@ public class DecentralizedSmartCharger {
 	public LinkedList<Id> agentsWithPHEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithCombustion=new LinkedList<Id>();
 	
-	private LinkedListValueHashMap<Id, Double> agentChargingCosts = new LinkedListValueHashMap<Id,  Double>();
+	private HashMap<Id, Double> agentChargingCosts = new HashMap<Id,  Double>();
 	
 	public static String outputPath;
 	
@@ -185,18 +184,30 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public void setAgentContracts(LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts){
+	public void setAgentContracts(HashMap<Id, ContractTypeAgent> agentContracts){
 		this.agentContracts= agentContracts;
 	}
 
 
-
-
+	/**
+	 * turns extra output on or off, that can be helpful for debugging
+	 * i.e. understanding because of which agent the simulation was shut down, etc.
+	 * @param onOff
+	 */
+	public void setDebug(boolean onOff){
+		debug=onOff;
+	}
 	
-	
-	public void initializeLP(double buffer){
-		lpev=new LPEV(buffer);
-		lpphev=new LPPHEV();
+	/**
+	 * initialize LPs for EV, PHEV and combustion vehicle
+	 * <li>the buffer is important for the EV calculation
+	 * <li> the boolean regulates if SOC graphs for all agents over the day are printed after the LPs
+	 * @param buffer
+	 * @param output
+	 */
+	public void initializeLP(double buffer, boolean output){
+		lpev=new LPEV(buffer, output);
+		lpphev=new LPPHEV(output);
 		lpcombustion= new LPCombustion();
 	}
 
@@ -226,15 +237,16 @@ public class DecentralizedSmartCharger {
 	 */
 	public void initializeHubLoadDistributionReader(
 			HubLinkMapping hubLinkMapping, 
-			LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution,			
-			LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			HashMap<Integer, Schedule> deterministicHubLoadDistribution,			
+			HashMap<Integer, Schedule> pricingHubDistribution
 			) throws OptimizationException, IOException, InterruptedException{
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
 				hubLinkMapping, 
 				deterministicHubLoadDistribution,				
 				pricingHubDistribution,
-				myVehicleTypes
+				myVehicleTypes,
+				outputPath
 				);
 	}
 
@@ -246,9 +258,9 @@ public class DecentralizedSmartCharger {
 	 * @param agentVehicleSourceMapping
 	 */
 	public void setStochasticSources(
-			LinkedListValueHashMap<Integer, Schedule> stochasticHubLoadDistribution,
-			LinkedListValueHashMap<Integer, Schedule> locationSourceMapping,
-			LinkedListValueHashMap<Id, Schedule> agentVehicleSourceMapping){
+			HashMap<Integer, Schedule> stochasticHubLoadDistribution,
+			HashMap<Integer, Schedule> locationSourceMapping,
+			HashMap<Id, Schedule> agentVehicleSourceMapping){
 		
 		myHubLoadReader.setStochasticSources(stochasticHubLoadDistribution,
 				locationSourceMapping, 
@@ -305,7 +317,10 @@ public class DecentralizedSmartCharger {
 	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		for (Id id : controler.getPopulation().getPersons().keySet()){
-			System.out.println("getAgentSchedule: "+ id.toString());
+			if(DecentralizedSmartCharger.debug){
+				System.out.println("getAgentSchedule: "+ id.toString());
+			}
+			
 			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
 			
 		}		
@@ -331,7 +346,7 @@ public class DecentralizedSmartCharger {
 			 */
 			if(hasAgentCombustionVehicle(id)){
 								
-				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.getValue(id));
+				lpcombustion.updateSchedule(agentParkingAndDrivingSchedules.get(id));
 				double consumption = lpcombustion.getEnergyFromCombustionEngine();
 				
 				double emissionContribution= joulesToEmissionInKg(id, consumption);
@@ -362,7 +377,7 @@ public class DecentralizedSmartCharger {
 				
 				//try EV first
 				
-				Schedule scheduleAfterLP= lpev.solveLP(agentParkingAndDrivingSchedules.getValue(id),
+				Schedule scheduleAfterLP= lpev.solveLP(agentParkingAndDrivingSchedules.get(id),
 						id, 
 						batterySize, batteryMin, batteryMax, 
 						type);
@@ -378,7 +393,7 @@ public class DecentralizedSmartCharger {
 				}else{					
 					//if fails, try PHEV
 										
-					scheduleAfterLP= lpphev.solveLP(agentParkingAndDrivingSchedules.getValue(id),id, batterySize, batteryMin, batteryMax, type);
+					scheduleAfterLP= lpphev.solveLP(agentParkingAndDrivingSchedules.get(id),id, batterySize, batteryMin, batteryMax, type);
 					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
 					
 					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
@@ -413,26 +428,50 @@ public class DecentralizedSmartCharger {
 		
 				
 		for (Id id : controler.getPopulation().getPersons().keySet()){
-			
 		
 			System.out.println("Assign charging times agent "+ id.toString());
 			
-			
-			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.getValue(id));
-			
+			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.get(id));
 			
 			agentChargingSchedules.put(id, chargingSchedule);
-			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.getValue(id), 
-					chargingSchedule, 
-					id);
 		}
 		
 		printGraphChargingTimesAllAgents();
 		
 	}
 
+	
+	
+	/**
+	 * visualizes the daily plans (parking driving charging)of all agents and saves the files in the format
+	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * @throws IOException
+	 */
+	public void visualizeDailyPlanForAllAgents() throws IOException{
+		for (Id id : controler.getPopulation().getPersons().keySet()){
+			
+			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.get(id), 
+					agentChargingSchedules.get(id), 
+					id);
+		}
+	}
+	
 
-
+	/**
+	 *  visualizes the daily plan for agent with given id and saves the file in the format
+	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * @param id
+	 * @throws IOException
+	 */
+	public void visualizeDailyPlanForAgent(Id id ) throws IOException{
+			
+			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.get(id), 
+					agentChargingSchedules.get(id), 
+					id);
+		
+	}
+	
+	
 	/**
 	 * COUNT of charging, driving and parking agents at first second of each minute over the day;
 	 * update of loadAfterDetermisticChargingDecicion according to charging habits of agents
@@ -446,7 +485,7 @@ public class DecentralizedSmartCharger {
 			double thisSecond= i*SECONDSPERMIN;
 			for(Id id : controler.getPopulation().getPersons().keySet()){
 				
-				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.getValue(id);
+				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.get(id);
 				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
 				
 				//PARKING
@@ -474,7 +513,7 @@ public class DecentralizedSmartCharger {
 					
 				}
 				
-				Schedule thisAgentCharging = agentChargingSchedules.getValue(id);
+				Schedule thisAgentCharging = agentChargingSchedules.get(id);
 				
 				//CHARGING
 				if(thisAgentCharging.isSecondWithinOneInterval(thisSecond)){
@@ -521,7 +560,7 @@ public class DecentralizedSmartCharger {
 		
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			
-			Schedule s= agentParkingAndDrivingSchedules.getValue(id);
+			Schedule s= agentParkingAndDrivingSchedules.get(id);
 			
 			agentChargingCosts.put(id,calculateChargingCostForAgentSchedule(id, s) );
 		}		
@@ -558,8 +597,11 @@ public class DecentralizedSmartCharger {
 			}
 			if(hasAgentEV(id)){
 				if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
-					System.out.println("extra consumption EV price calculation ");
-					System.out.println("assigned "+Double.MAX_VALUE+" for agent "+ id.toString());
+					if(DecentralizedSmartCharger.debug){
+						System.out.println("extra consumption EV price calculation ");
+						System.out.println("assigned "+Double.MAX_VALUE+" for agent "+ id.toString());
+					}
+				
 					totalCost += Double.MAX_VALUE;
 				}
 			}
@@ -574,7 +616,6 @@ public class DecentralizedSmartCharger {
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
 		myV2G= new V2G(this);
-		
 		startV2G=System.currentTimeMillis();
 			
 		System.out.println("START CHECKING VEHICLE SOURCES");
@@ -590,6 +631,7 @@ public class DecentralizedSmartCharger {
 		checkHubStochasticLoads();
 		timeCheckOtherSources=System.currentTimeMillis();
 		
+		
 		System.out.println("DONE V2G");
 		
 	}
@@ -602,9 +644,9 @@ public class DecentralizedSmartCharger {
 		
 				
 		if(myHubLoadReader.stochasticHubLoadDistribution !=null){
-			for(Integer h : myHubLoadReader.stochasticHubLoadDistribution.getKeySet()){
+			for(Integer h : myHubLoadReader.stochasticHubLoadDistribution.keySet()){
 				
-				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.getValue(h);
+				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.get(h);
 				
 				//VISUALIZE SCHEDULE BEFORE
 				String strHubLoad="HubStochasticLoad_BeforeV2G_"+h.toString();
@@ -669,7 +711,7 @@ public class DecentralizedSmartCharger {
 							for(Id agentId : controler.getPopulation().getPersons().keySet()){
 								
 								double compensationPerJouleRegulationUp= 
-									agentContracts.getValue(agentId).compensationUp()*1/(1000*3600); 
+									agentContracts.get(agentId).compensationUp()*1/(1000*3600); 
 									
 								double compensation= contributionInJoulesPerAgent*compensationPerJouleRegulationUp;
 								
@@ -695,7 +737,7 @@ public class DecentralizedSmartCharger {
 									
 									myV2G.regulationUpHubLoad(agentId, 
 											currentStochasticLoadInterval, 
-											agentParkingAndDrivingSchedules.getValue(agentId), 
+											agentParkingAndDrivingSchedules.get(agentId), 
 											compensation,
 											joulesFromSource,
 											hasAgentEV(agentId),
@@ -721,7 +763,7 @@ public class DecentralizedSmartCharger {
 							for(Id agentId : controler.getPopulation().getPersons().keySet()){
 								
 								double compensationPerJouleRegulationDown= 
-									agentContracts.getValue(agentId).compensationDown()*1/(1000*3600);
+									agentContracts.get(agentId).compensationDown()*1/(1000*3600);
 									
 								double compensation= contributionInJoulesPerAgent*compensationPerJouleRegulationDown;
 								
@@ -745,7 +787,7 @@ public class DecentralizedSmartCharger {
 									
 									myV2G.regulationDownHubLoad(agentId, 
 											currentStochasticLoadInterval, 
-											agentParkingAndDrivingSchedules.getValue(agentId), 
+											agentParkingAndDrivingSchedules.get(agentId), 
 											compensation,
 											joulesFromSource,
 											hasAgentEV(agentId),
@@ -773,7 +815,7 @@ public class DecentralizedSmartCharger {
 				}
 				
 				// visualize effect of V2G.. what is it afterwards?
-				hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.getValue(h);
+				hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.get(h);
 				
 				//VISUALIZE SCHEDULE BEFORE
 				strHubLoad="HubStochasticLoad_AfterV2G_"+h.toString();
@@ -789,12 +831,12 @@ public class DecentralizedSmartCharger {
 	public void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
-			for(Id id : myHubLoadReader.agentVehicleSourceMapping.getKeySet()){				
+			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
 				
 				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
 				if(hasAgentCombustionVehicle(id)==false){
 					
-					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
 					
 					//VISUALIZE SCHEDULE BEFORE
 					String strAgentVehicleLoad="AgentVehicleLoad_BeforeV2G_"+id.toString();
@@ -860,14 +902,14 @@ public class DecentralizedSmartCharger {
 								if(isAgentRegulationUp(id)){
 									
 									double compensationPerJouleRegulationUp= 
-										agentContracts.getValue(id).compensationUp()*1/(1000*3600); 
+										agentContracts.get(id).compensationUp()*1/(1000*3600); 
 									
 									double compensation= Math.abs(joulesFromSource)*compensationPerJouleRegulationUp;
 									
 									//agentParkingAndDrivingSchedules.getValue(id).printSchedule();
 									myV2G.regulationUpVehicleLoad(id,
 												currentStochasticLoadInterval,
-												agentParkingAndDrivingSchedules.getValue(id),
+												agentParkingAndDrivingSchedules.get(id),
 												compensation,
 												Math.abs(joulesFromSource),
 												hasAgentEV(id),
@@ -893,15 +935,15 @@ public class DecentralizedSmartCharger {
 								if(isAgentRegulationDown(id)){
 									
 									double compensationPerJouleRegulationDown= 
-										agentContracts.getValue(id).compensationDown()*1/(1000*3600); 
+										agentContracts.get(id).compensationDown()*1/(1000*3600); 
 										
 									double compensation= joulesFromSource*compensationPerJouleRegulationDown;
 									
-									agentParkingAndDrivingSchedules.getValue(id).printSchedule();
+									agentParkingAndDrivingSchedules.get(id).printSchedule();
 									
 									myV2G.regulationDownVehicleLoad(id, 
 											currentStochasticLoadInterval, 
-											agentParkingAndDrivingSchedules.getValue(id), 
+											agentParkingAndDrivingSchedules.get(id), 
 											compensation,
 											Math.abs(joulesFromSource),
 											hasAgentEV(id),
@@ -918,7 +960,7 @@ public class DecentralizedSmartCharger {
 						
 					}
 					// check V2G effect
-					electricSource= myHubLoadReader.agentVehicleSourceMapping.getValue(id);
+					electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
 					//VISUALIZE SCHEDULE BEFORE
 					strAgentVehicleLoad="AgentVehicleLoad_AfterV2G_"+id.toString();
 					
@@ -934,13 +976,13 @@ public class DecentralizedSmartCharger {
 
 
 	public boolean isAgentRegulationUp(Id id){
-		return agentContracts.getValue(id).isUp();
+		return agentContracts.get(id).isUp();
 	}
 	
 	
 	
 	public boolean isAgentRegulationDown(Id id){
-		return agentContracts.getValue(id).isDown();
+		return agentContracts.get(id).isDown();
 	}
 	
 	
@@ -976,20 +1018,20 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	public LinkedListValueHashMap<Id, Double> getChargingCostsForAgents(){
+	public HashMap<Id, Double> getChargingCostsForAgents(){
 		return agentChargingCosts;
 	}
 	
 	
-	public LinkedListValueHashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
+	public HashMap<Id, Schedule> getAllAgentParkingAndDrivingSchedules(){
 		return agentParkingAndDrivingSchedules;
 	}
 	
 	
 	/**
-	 * returns LinkedListValueHashMap<Id, Schedule> agentChargingSchedules
+	 * returns HashMap<Id, Schedule> agentChargingSchedules
 	 */
-	public LinkedListValueHashMap<Id, Schedule> getAllAgentChargingSchedules(){
+	public HashMap<Id, Schedule> getAllAgentChargingSchedules(){
 		return agentChargingSchedules;
 	}
 	
@@ -1008,7 +1050,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	public Schedule getAgentChargingSchedule(Id id){
-		return agentChargingSchedules.getValue(id);
+		return agentChargingSchedules.get(id);
 	}
 	
 	
@@ -1020,22 +1062,22 @@ public class DecentralizedSmartCharger {
 	
 	public double getTotalDrivingConsumptionOfAgent(Id id){
 		
-		return agentChargingSchedules.getValue(id).getTotalConsumption()
-		+agentChargingSchedules.getValue(id).getTotalConsumptionFromEngine();
+		return agentChargingSchedules.get(id).getTotalConsumption()
+		+agentChargingSchedules.get(id).getTotalConsumptionFromEngine();
 	}
 	
 	
 	
 	public double getTotalDrivingConsumptionOfAgentFromBattery(Id id){
 		
-		return agentChargingSchedules.getValue(id).getTotalConsumption();
+		return agentChargingSchedules.get(id).getTotalConsumption();
 	}
 	
 	
 	
 	public double getTotalDrivingConsumptionOfAgentFromOtherSources(Id id){
 		
-		return agentChargingSchedules.getValue(id).getTotalConsumptionFromEngine();
+		return agentChargingSchedules.get(id).getTotalConsumptionFromEngine();
 	}
 	
 	
@@ -1055,8 +1097,8 @@ public class DecentralizedSmartCharger {
 	 * clears agentParkingAndDrivingSchedules, agentChargingSchedules, emissions and lists of EV/PHEV/conventional car owners
 	 */
 	public void clearResults(){
-		agentParkingAndDrivingSchedules = new LinkedListValueHashMap<Id, Schedule>(); 
-		agentChargingSchedules = new LinkedListValueHashMap<Id, Schedule>();
+		agentParkingAndDrivingSchedules = new HashMap<Id, Schedule>(); 
+		agentChargingSchedules = new HashMap<Id, Schedule>();
 		
 		emissionCounter=0.0;
 		
@@ -1071,7 +1113,9 @@ public class DecentralizedSmartCharger {
 
 	/**
 	 * plots daily schedule and charging times of agent 
-	 * 
+	 * and save it in: 
+	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+		  
 	 * @param dailySchedule
 	 * @param chargingSchedule
 	 * @param id
@@ -1082,7 +1126,6 @@ public class DecentralizedSmartCharger {
 		// 1 charging, 2 suboptimal, 3 optimal, 4 driving
 		
 		XYSeriesCollection agentOverview= new XYSeriesCollection();
-		
 		
 		//************************************
 		//GET EXTRA CONSUMPTION TIMES - MAKE RED LATER
@@ -1255,12 +1298,11 @@ public class DecentralizedSmartCharger {
 	
 	private void visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger() throws IOException{
 		
-		
 		//************************************
 		//READ IN VALUES FOR EVERY HUB
 		// and make chart before-after
 		//************************************
-		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.getKeySet()){
+		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.keySet()){
 			
 			XYSeriesCollection load= new XYSeriesCollection();
 			//************************************
@@ -1268,8 +1310,7 @@ public class DecentralizedSmartCharger {
 			
 			XYSeries hubXBefore= new XYSeries("hub"+i.toString()+"before");
 			
-			
-			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.getValue(i);
+			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.get(i);
 			for(int j=0; j<dBefore.length; j++){
 				
 				hubXBefore.add(dBefore[j][0], dBefore[j][1]); // time, Watt
@@ -1318,7 +1359,7 @@ public class DecentralizedSmartCharger {
 		}
 		
 		
-		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.getKeySet()){
+		for( Integer i : myHubLoadReader.loadAfterDeterministicChargingDecision.keySet()){
 			
 			XYSeriesCollection load= new XYSeriesCollection();
 			//************************************
@@ -1326,18 +1367,19 @@ public class DecentralizedSmartCharger {
 			XYSeries hubXAfter= new XYSeries("hub"+i.toString()+"after");
 			XYSeries hubXBefore= new XYSeries("hub"+i.toString()+"before");
 			
-			double [][] dAfter = myHubLoadReader.loadAfterDeterministicChargingDecision.getValue(i);
-			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.getValue(i);
+			double [][] dAfter = myHubLoadReader.loadAfterDeterministicChargingDecision.get(i);
+			double [][] dBefore = myHubLoadReader.originalDeterministicChargingDistribution.get(i);
 			
 			if(dAfter.equals(dBefore)){
-				System.out.println("SAME");
+				if(DecentralizedSmartCharger.debug){
+					System.out.println("SAME");
+				}
+				
 			}
 			
 			for(int j=0; j<dAfter.length; j++){
 				hubXAfter.add(dAfter[j][0], dAfter[j][1]); // time, Watt
 				hubXBefore.add(dBefore[j][0], dBefore[j][1]); // time, Watt
-				//System.out.println("after "+ dAfter[j][0] +", "+ dAfter[j][1]);
-				//System.out.println("before "+ dBefore[j][0] +", "+ dBefore[j][1]);
 				
 			}
 			load.addSeries(hubXAfter);
@@ -1406,7 +1448,7 @@ public class DecentralizedSmartCharger {
 		
 		for(Id id : controler.getPopulation().getPersons().keySet()){
 			
-			Schedule s1= agentChargingSchedules.getValue(id);
+			Schedule s1= agentChargingSchedules.get(id);
 			
 			for(int i=0; i<s1.getNumberOfEntries(); i++){
 				
@@ -1539,7 +1581,7 @@ public class DecentralizedSmartCharger {
       	            new BasicStroke(
       	                2.0f,  //float width
       	                BasicStroke.CAP_ROUND, //int cap
-      	                BasicStroke.JOIN_ROUND, //int join
+      	                BasicStroke.JOIN_ROUND, //int jointe
       	                1.0f, //float miterlimit
       	                new float[] {1.0f, 1.0f}, //float[] dash
       	                0.0f //float dash_phase
@@ -1680,5 +1722,21 @@ public static PolynomialFunction fitCurve(double [][] data) throws OptimizationE
 		DecentralizedSmartCharger.polyFit.clearObservations();
 		return poly;
 	}
+
+	public static void linkedListIdPrinter(HashMap<Id, Schedule> list, String info){
+		System.out.println("Print LinkedList "+ info);
+		for(Id id: list.keySet()){
+			list.get(id).printSchedule();
+		}
+		
+	}
+	
+	public  static void linkedListIntegerPrinter(HashMap<Integer, Schedule> list, String info){
+		System.out.println("Print LinkedList "+ info);
+		for(Integer id: list.keySet()){
+			list.get(id).printSchedule();
+		}
+	
+}
 	
 }

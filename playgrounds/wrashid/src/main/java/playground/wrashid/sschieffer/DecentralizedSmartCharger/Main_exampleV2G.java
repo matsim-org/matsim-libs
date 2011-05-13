@@ -104,7 +104,9 @@ public class Main_exampleV2G {
 				bufferBatteryCharge,
 				minChargingLength,
 				myMappingClass,
-				loadPricingCollector
+				loadPricingCollector,
+				false // indicate if you want graph output for every agent to visualize the SOC over the day
+				
 				);
 		
 		/******************************************

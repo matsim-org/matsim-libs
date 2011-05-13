@@ -576,7 +576,7 @@ public class V2G {
 		// change agents charging costs
 		mySmartCharger.getChargingCostsForAgents().put(
 				agentId, 
-				(mySmartCharger.getChargingCostsForAgents().getValue(agentId)-costKeeping+costReschedule)
+				(mySmartCharger.getChargingCostsForAgents().get(agentId)-costKeeping+costReschedule)
 				);
 	}
 	
@@ -599,7 +599,7 @@ public class V2G {
 		// -3500-(-3500)=0
 		
 		
-		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.getValue(agentId);
+		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentId);
 		
 		PolynomialFunction negativePolynomialFunc= 
 			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
@@ -654,7 +654,7 @@ public class V2G {
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		
-		Schedule hubLoadSchedule= mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(i);
+		Schedule hubLoadSchedule= mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(i);
 		
 		PolynomialFunction negativePolynomialFunc= 
 			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
@@ -706,7 +706,7 @@ public class V2G {
 							((ParkingInterval)agentInterval).getLocation());
 					
 					
-					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.getValue(hubId);
+					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(hubId);
 					/*System.out.println("hubSchedule before:");
 					hubSchedule.printSchedule();*/
 					

@@ -1,6 +1,8 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -50,7 +52,10 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					);
 			
 			//set battery reserve
-			myDecentralizedSmartCharger.initializeLP(DecentralizedChargingSimulation.bufferBatteryCharge);
+			myDecentralizedSmartCharger.initializeLP(
+					DecentralizedChargingSimulation.bufferBatteryCharge,
+					DecentralizedChargingSimulation.LPoutput
+					);
 			
 			// set standard charging slot length
 			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.minChargingLength);
@@ -105,10 +110,10 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			
 			DecentralizedChargingSimulation.loadPricingCollector.setUp();
 			
-			final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution
+			final HashMap<Integer, Schedule> deterministicHubLoadDistribution
 				= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicHubLoad();
 			
-			final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution
+			final HashMap<Integer, Schedule> pricingHubDistribution
 			= DecentralizedChargingSimulation.loadPricingCollector.getDeterministicPriceDistribution();
 			
 			myDecentralizedSmartCharger.initializeHubLoadDistributionReader(

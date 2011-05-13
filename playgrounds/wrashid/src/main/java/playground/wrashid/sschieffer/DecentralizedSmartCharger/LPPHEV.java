@@ -64,8 +64,10 @@ public class LPPHEV {
 	private double  batteryMax;
 	
 	
-	public LPPHEV(){
-		
+	private boolean output;
+	
+	public LPPHEV(boolean output){		
+		this.output=output;
 	}
 	
 	
@@ -90,16 +92,22 @@ public class LPPHEV {
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
 		this.batterySize=batterySize;
-		System.out.println("LP PHEV for Agent: "+ id.toString()); 
+		
+		if(DecentralizedSmartCharger.debug){
+			System.out.println("LP PHEV for Agent: "+ id.toString()); 
+		}
+		
 		
 		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
 		int status = solver.solve();
 		
         if(status!=0){
         	String text = solver.getStatustext(status);
-        	System.out.println("Status text: "+ text); 
-        	// status=0--> OPTIMAL
-        	// 2 --> INFEASIBLE
+        	if(DecentralizedSmartCharger.debug){
+        		System.out.println("Status text: "+ text);
+    		}
+        	 
+        	// status=0--> OPTIMAL  2 --> INFEASIBLE
         	return null; 
         }
 		
@@ -108,43 +116,24 @@ public class LPPHEV {
 			
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
 			solver.printLp();
-			
-		
-		} catch (Exception e) {	    
+			} catch (Exception e) {	    
 		}
 		
 		schedule= update();
-		
-		double [] solutionNF =solver.getPtrVariables();
-		System.out.println("solution ");
-		
-		for(int i=0; i<solutionNF.length; i++){
-			System.out.println(solutionNF[i] + ",  ");
-		}
-		/*double [] solutionNF =solver.getPtrVariables();
-		boolean feasible= 			
-			solver.isFeasible(solutionNF, 0.0);
-		
-		
-		if(feasible){
+		if(DecentralizedSmartCharger.debug){
+			double [] solutionNF =solver.getPtrVariables();
 			
-		}else{
-			System.out.println("no feasible solution ");
-			System.out.println("old schedule ");
-			schedule.printSchedule();
 			System.out.println("solution ");
 			for(int i=0; i<solutionNF.length; i++){
 				System.out.println(solutionNF[i] + ",  ");
 			}
-			
-			return null;
-		}*/
-		
-		
+		}
+				
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
-		/*System.out.println("Energy from combustion Engine of PHEV: "+ energyFromCombustionEngine);
-		*/
-		visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
+		
+		if(output){
+			visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
+    	}
 		
 		solver.deleteLp();
 		
@@ -170,9 +159,12 @@ public class LPPHEV {
 	 */
 	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
 		
-		System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
-		System.out.println("Schedule before LPPHEV: "); 
-		schedule.printSchedule();
+		if(DecentralizedSmartCharger.debug){
+			System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
+			System.out.println("Schedule before LPPHEV: "); 
+			schedule.printSchedule();
+		}
+		
 		
 		this.batteryMax=batteryMax;
 		this.batteryMin=batteryMin;
@@ -187,43 +179,26 @@ public class LPPHEV {
 			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
 			solver.printLp();
 			
-			/*solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"objective.txt");
-			solver.printObjective();
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"tableau.txt");
-			solver.printTableau();*/
 		} catch (Exception e) {	    
 		}
 		
 		
-		/*
-		 * public boolean isFeasible(double[] values,
-                          double threshold)
-                   throws LpSolveException
-		 */
-		double [] solutionNF =solver.getPtrVariables();		
-		
-		System.out.println("solution ");
-		for(int i=0; i<solutionNF.length; i++){
-			System.out.println(solutionNF[i] + ",  ");
-		}
-		schedule= update();
-		/*boolean feasible= solver.isFeasible(solver.getPtrVariables(), 0.0);
-		if(feasible){
-			schedule= update();
-		}else{
+		if(DecentralizedSmartCharger.debug){
+			double [] solutionNF =solver.getPtrVariables();		
 			
-			System.out.println("no feasible solution ");
-			System.out.println("old schedule ");
-			schedule.printSchedule();
 			System.out.println("solution ");
-			
-			
-			return null;
-		}*/
+			for(int i=0; i<solutionNF.length; i++){
+				System.out.println(solutionNF[i] + ",  ");
+			}
+		}
 		
-		System.out.println("Schedule after update LPPHEV: ");
-		schedule.printSchedule();
+		schedule= update();
+		if(DecentralizedSmartCharger.debug){
+			System.out.println("Schedule after update LPPHEV: ");
+			schedule.printSchedule();
+		}
+		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
 		
 		solver.deleteLp();
@@ -245,8 +220,6 @@ public class LPPHEV {
 		this.schedule=schedule;
 		personId=id;
 		
-		
-		//System.out.println("LP summary for agent"+ id.toString());
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -277,8 +250,6 @@ public class LPPHEV {
 		this.schedule=schedule;
 		personId=id;
 		
-		
-		//System.out.println("LP summary for agent"+ id.toString());
 		
 		numberOfVariables= schedule.getNumberOfEntries()+1;
 		
@@ -526,8 +497,6 @@ public class LPPHEV {
 	 */
 	public void	printLPSolution() throws LpSolveException{
 		double[] solution = solver.getPtrVariables();
-		/*System.out.println("Charging times from LP:");
-		System.out.println("Starting SOC: "+ solution[0]);*/
 		
 		double optimalChargingParking=0;
 		double suboptimalChargingParking=0;
@@ -547,9 +516,6 @@ public class LPPHEV {
 			}
 		}
 		
-		/*System.out.println("Total Charging in Optimal Time: " + optimalChargingParking);
-		System.out.println("Total Charging in Suboptimal Time: " + suboptimalChargingParking);
-		*/
 		
 	}
 	
