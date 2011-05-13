@@ -137,7 +137,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 
 		@Override
 		public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-			System.out.println(travelTime.getLinkTravelTime(link, e.getSimulationTime()));
+//			System.out.println(travelTime.getLinkTravelTime(link, e.getSimulationTime()));
 			if (e.getSimulationTime() == t1) {
 				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1));
 			} else if (e.getSimulationTime() == t2) {
@@ -155,7 +155,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6));
 			} else if (e.getSimulationTime() == t7) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				assertEquals(747.5952380952381, travelTime.getLinkTravelTime(link, t7));
+				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7));
 			} else if (e.getSimulationTime() == t8) {
 				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8));
 			}
@@ -180,7 +180,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6));
 			} else if (e.getSimulationTime() == t7) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				assertEquals(747.5952380952381, travelTime.getLinkTravelTime(link, t7));
+				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7));
 			} else if (e.getSimulationTime() == t8) {
 				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8));
 			}
