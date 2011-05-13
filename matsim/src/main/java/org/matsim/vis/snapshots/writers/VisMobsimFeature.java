@@ -3,6 +3,8 @@
  */
 package org.matsim.vis.snapshots.writers;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -21,4 +23,10 @@ SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeC
 AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler
 {
 	VisMobsim getVisMobsim() ;
+
+	Person findPersonAgent(Id agentId);
+
+	void addTrackedAgent(Id agentId);
+
+	void removeTrackedAgent(Id agentId);
 }

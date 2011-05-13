@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -48,6 +47,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -186,7 +186,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";

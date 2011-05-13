@@ -50,7 +50,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawer;
@@ -67,6 +66,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -134,7 +134,7 @@ public final class QueryAgentPlan extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		throw new UnsupportedOperationException();
 	}
 

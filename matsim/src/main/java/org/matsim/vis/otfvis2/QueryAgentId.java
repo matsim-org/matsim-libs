@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -35,6 +34,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 /**
  * QueryAgentId is an internal query.
@@ -69,7 +69,7 @@ public final class QueryAgentId extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 
 	}
 

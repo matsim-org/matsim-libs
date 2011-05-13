@@ -48,7 +48,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -60,6 +59,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 import com.sun.opengl.util.BufferUtil;
@@ -87,7 +87,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private transient VisNetwork net;
 
-	private OTFVisMobsimFeature otfVisMobsimFeature;
+	private VisMobsimFeature otfVisMobsimFeature;
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -127,7 +127,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	}
 
 	@Override
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.otfVisMobsimFeature = queueSimulation;
 		this.net = queueSimulation.getVisMobsim().getVisNetwork();
 		result = new Result();

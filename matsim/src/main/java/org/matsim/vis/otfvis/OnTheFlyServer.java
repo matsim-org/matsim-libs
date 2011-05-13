@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
@@ -43,6 +42,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
@@ -90,9 +90,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	private volatile double stepToTime = 0;
 
-	private OTFVisMobsimFeature otfVisQueueSimFeature;
-
-	private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
+	private VisMobsimFeature otfVisQueueSimFeature;
 
 	private Semaphore accessToQNetwork = new Semaphore(1);
 
@@ -122,12 +120,6 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	}
 
 	public void updateStatus(double time) {
-		Runnable runnable = queue.poll();
-		while (runnable != null) {
-			runnable.run();
-			runnable = queue.poll();
-		}
-
 		localTime = (int) time;
 		if (status == Status.STEP) {
 			// Time and Iteration reached?
@@ -301,7 +293,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 		this.additionalElements.add(element);
 	}
 
-	public void setSimulation(OTFVisMobsimFeature otfVisQueueSimFeature) {
+	public void setSimulation(VisMobsimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
 		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 	}

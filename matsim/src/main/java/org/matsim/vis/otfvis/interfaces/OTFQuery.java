@@ -23,8 +23,8 @@ package org.matsim.vis.otfvis.interfaces;
 import java.io.Serializable;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 /**
  * An interface for the live version of the OTFVis.
@@ -75,7 +75,7 @@ public interface OTFQuery extends Serializable {
 	 * will actually only transport NEW objects.
 	 *
 	 */
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad);
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad);
 
 	public void uninstall();
 

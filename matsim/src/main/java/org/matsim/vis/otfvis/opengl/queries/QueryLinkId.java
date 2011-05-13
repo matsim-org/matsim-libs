@@ -32,7 +32,6 @@ import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -40,6 +39,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 /**
  * QueryLinkId find the most likely link (or links) to a given coordinate (or rectangle).
@@ -147,7 +147,7 @@ public class QueryLinkId extends AbstractQuery {
 	}
 	
 	@Override
-	public void installQuery(OTFVisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
 		this.result = new Result();
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
