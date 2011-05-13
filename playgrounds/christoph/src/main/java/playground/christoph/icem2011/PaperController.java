@@ -25,18 +25,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -55,6 +58,7 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+
 
 /**
  * Controller for the simulation runs presented in the ICEM 2011 paper. 
@@ -78,7 +82,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	/*package*/ int numReplanningThreads = 4;
+	/*package*/ int numReplanningThreads = 8;
 
 	/*
 	 * File that contains a list of all links where agents
@@ -91,12 +95,12 @@ public class PaperController extends WithinDayController implements StartupListe
 	/*
 	 * Define when the Replanning is en- and disabled.
 	 */
-//	protected int tWithinDayEnabled = 7*3600 + 45*60;	// 07:45
-//	protected int tWithinDayDisabled = 11*3600 + 45*60;	// 11:45
-	protected int tWithinDayEnabled = 7*3600 + 30*60;	// 07:30
-//	protected int tWithinDayDisabled = 10*3600 + 00*60;	// 10:00
-	protected int tWithinDayDisabled = 100*3600;	// 100:00
+	protected int tWithinDayEnabled = 8*3600 + 00*00;	// 08:00
+	protected int tWithinDayDisabled = 16*3600 + 00*60;	// 16:00
 	protected boolean enabled = false;
+	
+	/*package*/ String cityZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_City.shp";
+	/*package*/ String cantonZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_Canton.shp";
 	
 //	protected InitialIdentifier initialIdentifier;
 //	protected DuringActivityIdentifier duringActivityIdentifier;
@@ -178,11 +182,26 @@ public class PaperController extends WithinDayController implements StartupListe
 		this.getReplanningManager().doInitialReplanning(false);
 		this.getReplanningManager().doDuringActivityReplanning(false);
 		this.getReplanningManager().doDuringLegReplanning(false);
+		
+		
+		// Module to analyze expected travel time on a single link
+		Collection<Link> changedLinks = new HashSet<Link>();
+		for (NetworkChangeEvent networkChangeEvent : super.getNetwork().getNetworkChangeEvents()) {
+			changedLinks.addAll(networkChangeEvent.getLinks());
+		}
+		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, super.getTravelTimeCollector(), super.getTravelTimeCalculator());
+		super.addControlerListener(logLinkTravelTime);
+		super.getFixedOrderSimulationListener().addSimulationListener(logLinkTravelTime);
 	}
 	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
+		
+		// Module to analyze the travel times
+		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile);
+		super.addControlerListener(analyzeTravelTimes);
+		super.getEvents().addHandler(analyzeTravelTimes);
 	}
 	
 	@Override
@@ -287,6 +306,8 @@ public class PaperController extends WithinDayController implements StartupListe
 	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
 	private final static String STARTREPLANNING = "-startreplanning";
 	private final static String ENDREPLANNING = "-endreplanning";
+	private final static String ZURICHCITYSHP = "-cityshp";
+	private final static String ZURICHCANTONSHP = "-cantonshp";
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -309,18 +330,26 @@ public class PaperController extends WithinDayController implements StartupListe
 					else if (share < 0.0) share = 0.0;
 					controller.pDuringLegReplanning = share;
 					log.info("share of leg replanning agents: " + args[i]);
-				}  else if (args[i].equalsIgnoreCase(REPLANNINGLINKSFILE)) {
+				} else if (args[i].equalsIgnoreCase(REPLANNINGLINKSFILE)) {
 					i++;
 					controller.replanningLinksFile = args[i];
 					log.info("leg replanning links file: " + args[i]);
-				}  else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
+				} else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
 					i++;
 					controller.tWithinDayEnabled = Integer.parseInt(args[i]);
 					log.info("start within-day replanning: " + args[i]);
-				}  else if (args[i].equalsIgnoreCase(ENDREPLANNING)) {
+				} else if (args[i].equalsIgnoreCase(ENDREPLANNING)) {
 					i++;
 					controller.tWithinDayDisabled = Integer.parseInt(args[i]);
 					log.info("end within-day replanning: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(ZURICHCITYSHP)) {
+					i++;
+					controller.cityZurichSHPFile = args[i];
+					log.info("city of zurich shp file: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(ZURICHCANTONSHP)) {
+					i++;
+					controller.cantonZurichSHPFile = args[i];
+					log.info("canton of zurich shp file: " + args[i]);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
 			controller.run();
