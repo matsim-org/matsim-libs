@@ -74,7 +74,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 	
 	final double bufferBatteryCharge=0.0;
 	
-	final double MINCHARGINGLENGTH=5*60;
+	final double standardChargingSlotLength=5*60;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -111,30 +111,11 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 				
 				try {
 					
-					HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
 					
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), 
-							mySimulation.getParkingTimesPlugIn(),
-							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
+					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
-							mySimulation.getVehicleTypeCollector()
-							);
-					
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
-					
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							mySimulation.getEnergyConsumptionInit().getVehicles());
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							mySimulation.getDeterministicLoadSchedule(),							
-							mySimulation.getDetermisiticPricing()
-							);
-					
-					
+							bufferBatteryCharge,
+							standardChargingSlotLength);
 					
 					/***********************************
 					 * AGENTTIMEINTERVALREADER
@@ -224,13 +205,6 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 		});
 		controler.run();
 	}
-	
-	
-	
-		
-	
-	
-	
 	
 	
 	

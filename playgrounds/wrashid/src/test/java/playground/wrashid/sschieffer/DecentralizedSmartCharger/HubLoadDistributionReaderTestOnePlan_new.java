@@ -21,28 +21,15 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.LinkedList;
+import java.util.HashMap;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-
 import playground.wrashid.PSF.data.HubLinkMapping;
-import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.EventHandlerAtStartupAdder;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
@@ -110,13 +97,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		controler= setControler();
 		
 		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution=readHubsTest();
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
-		
-		
-		// size 1
-		final HubLinkMapping hubLinkMapping= mapHubsTest();
-		
 		//*****************************************
 		// EV and PHEV 
 		//determistic 10/-10
@@ -124,10 +104,11 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		//*****************************************
 		
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
-				hubLinkMapping,//HubLinkMapping hubLinkMapping
-				deterministicHubLoadDistribution,				
-				pricingHubDistribution,
-				mySimulation.getVehicleTypeCollector());
+				mapHubsTest(),//HubLinkMapping hubLinkMapping
+				readHubsTest(),				
+				readHubsPricingTest(optimalPrice, suboptimalPrice),
+				mySimulation.getVehicleTypeCollector(),
+				outputPath);
 		
 		//determistic load
 		
@@ -199,16 +180,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		
 		controler= setControler();
 		
-		// size 1
-		final HubLinkMapping hubLinkMapping= mapHubsTest();
-		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		
-		deterministicHubLoadDistribution=readHubsTest();
-		pricingHubDistribution= readHubsPricingTestLinear();
-			
-		
+				
 		//*****************************************
 		// EV and PHEV 
 		//determistic 10/-10
@@ -216,10 +188,11 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		//*****************************************
 		
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
-				hubLinkMapping,//HubLinkMapping hubLinkMapping
-				deterministicHubLoadDistribution,				
-				pricingHubDistribution,
-				mySimulation.getVehicleTypeCollector());
+				mapHubsTest(),//HubLinkMapping hubLinkMapping
+				readHubsTest(),				
+				readHubsPricingTestLinear(),
+				mySimulation.getVehicleTypeCollector(),
+				outputPath);
 			
 		/**
 		 * determistic load
@@ -317,14 +290,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	public void testHubLoadDistributionReaderParabolic() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
 		controler= setControler();
-		final HubLinkMapping hubLinkMapping= mapHubsTest();
 		
-		final LinkedListValueHashMap<Integer, Schedule> deterministicHubLoadDistribution;
-		final LinkedListValueHashMap<Integer, Schedule> pricingHubDistribution;
-		
-		deterministicHubLoadDistribution=readHubsTest();
-		pricingHubDistribution= readHubsPricingTestParabolic();
-			
 		
 		//*****************************************
 		// EV and PHEV 
@@ -333,10 +299,11 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		//*****************************************
 		
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
-				hubLinkMapping,//HubLinkMapping hubLinkMapping
-				deterministicHubLoadDistribution,				
-				pricingHubDistribution,
-				mySimulation.getVehicleTypeCollector());
+				mapHubsTest(),//HubLinkMapping hubLinkMapping
+				readHubsTest(),				
+				readHubsPricingTestParabolic(),
+				mySimulation.getVehicleTypeCollector(),
+				outputPath);
 		
 		
 			
@@ -420,8 +387,8 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	}
 
 
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsTest() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
+	public static HashMap<Integer, Schedule> readHubsTest() throws IOException{
+		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitScheduleTest());
 		
 		return hubLoadDistribution1;
@@ -429,23 +396,23 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	}
 	
 	
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsPricingTest(double optimal, double suboptimal) throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
+	public static HashMap<Integer, Schedule> readHubsPricingTest(double optimal, double suboptimal) throws IOException{
+		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitPricingScheduleTest(optimal, suboptimal));
 	return hubLoadDistribution1;
 		
 	}
 	
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsPricingTestLinear() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
+	public static HashMap<Integer, Schedule> readHubsPricingTestLinear() throws IOException{
+		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitScheduleTestLinear());
 	return hubLoadDistribution1;
 		
 	}
 	
 	
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsPricingTestParabolic() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
+	public static HashMap<Integer, Schedule> readHubsPricingTestParabolic() throws IOException{
+		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitScheduleTestParabolic());
 	return hubLoadDistribution1;
 		

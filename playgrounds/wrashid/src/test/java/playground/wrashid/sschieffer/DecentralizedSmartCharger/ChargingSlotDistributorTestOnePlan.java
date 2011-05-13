@@ -68,7 +68,7 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 	
 	final double bufferBatteryCharge=0.0;
 	
-	final double standardChargingLength=5*60;
+	final double standardChargingSlotLength=15*60;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -105,29 +105,10 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 				
 				try {
 					
-					HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
-					
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), 
-							mySimulation.getParkingTimesPlugIn(),
-							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
+					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
-							mySimulation.getVehicleTypeCollector()
-							);
-					
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(standardChargingLength);
-					
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							mySimulation.getEnergyConsumptionInit().getVehicles());
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							mySimulation.getDeterministicLoadSchedule(),							
-							mySimulation.getDetermisiticPricing()
-							);
-										
+							bufferBatteryCharge,
+							standardChargingSlotLength);
 					
 					for(Id id : controler.getPopulation().getPersons().keySet()){
 						
@@ -136,7 +117,7 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 						
 						myDecentralizedSmartCharger.run();						
 						Schedule parkingDrivingTimes= new Schedule();
-						parkingDrivingTimes= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().getValue(id);
+						parkingDrivingTimes= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(id);
 						System.out.println("parking & driving times");
 						parkingDrivingTimes.printSchedule();
 						
@@ -179,156 +160,8 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 		});
 		controler.run();
 		
-		
-		//*****************************************
-		//*****************************************
-		
-		
-		
-		
 	}
 	
-	
-	
-		
-	
-	
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsTest() throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
-		hubLoadDistribution1.put(1, makeBullshitScheduleTest());
-		hubLoadDistribution1.put(2, makeBullshitScheduleTest());
-		hubLoadDistribution1.put(3, makeBullshitScheduleTest());
-		hubLoadDistribution1.put(4, makeBullshitScheduleTest());
-		return hubLoadDistribution1;
-		
-	}
-	
-	
-	public static LinkedListValueHashMap<Integer, Schedule> readHubsPricingTest(double optimal, double suboptimal) throws IOException{
-		LinkedListValueHashMap<Integer, Schedule> hubLoadDistribution1= new  LinkedListValueHashMap<Integer, Schedule>();
-		hubLoadDistribution1.put(1, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		hubLoadDistribution1.put(2, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		hubLoadDistribution1.put(3, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		hubLoadDistribution1.put(4, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		return hubLoadDistribution1;
-		
-	}
-	
-	
-	
-	
-	public static Schedule makeBullshitScheduleTest() throws IOException{
-		
-		Schedule bullShitSchedule= new Schedule();
-		
-		double[] bullshitCoeffs = new double[]{10};// 
-		double[] bullshitCoeffs2 = new double[]{-10};
-		
-		PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
-		PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
-		LoadDistributionInterval l1= new LoadDistributionInterval(
-				0.0,
-				62490.0,
-				bullShitFunc,//p
-				true//boolean
-		);
-		
-		bullShitSchedule.addTimeInterval(l1);
-		
-		
-		LoadDistributionInterval l2= new LoadDistributionInterval(					
-				62490.0,
-				DecentralizedSmartCharger.SECONDSPERDAY,
-				bullShitFunc2,//p
-				false//boolean
-		);
-	
-		bullShitSchedule.addTimeInterval(l2);
-		//bullShitSchedule.printSchedule();
-		
-		return bullShitSchedule;
-	}
-	
-	
-	public void mapHubsTest(Controler controler, HubLinkMapping hubLinkMapping){
-		
-	
-		double maxX=5000;
-		double minX=-20000;
-		double diff= maxX-minX;
-		
-		for (Link link:controler.getNetwork().getLinks().values()){
-			// x values of equil from -20000 up to 5000
-			if (link.getCoord().getX()<(minX+diff)/4){
-				
-				hubLinkMapping.addMapping(link.getId().toString(), 1);
-			}else{
-				if (link.getCoord().getX()<(minX+diff)*2/4){
-					hubLinkMapping.addMapping(link.getId().toString(), 2);
-				}else{
-					if (link.getCoord().getX()<(minX+diff)*3/4){
-						hubLinkMapping.addMapping(link.getId().toString(), 3);
-					}else{
-						hubLinkMapping.addMapping(link.getId().toString(), 4);
-					}
-				}
-			}
-			
-		}
-	}
-	
-	
-	
-public static LinkedListValueHashMap<Integer, Schedule> readStochasticLoad(int num){
-		
-		LinkedListValueHashMap<Integer, Schedule> stochastic= new LinkedListValueHashMap<Integer, Schedule>();
-		
-		Schedule bullShitStochastic= new Schedule();
-		PolynomialFunction p = new PolynomialFunction(new double[] {3500});
-		
-		bullShitStochastic.addTimeInterval(new LoadDistributionInterval(0, 24*3600, p, true));
-		for (int i=0; i<num; i++){
-			stochastic.put(i+1, bullShitStochastic);
-		}
-		return stochastic;
-	
-		
-	}
-	
-		
-	
-
-public static Schedule makeBullshitPricingScheduleTest(double optimal, double suboptimal) throws IOException{
-	
-	Schedule bullShitSchedule= new Schedule();
-	
-	PolynomialFunction pOpt = new PolynomialFunction(new double[] {optimal});	
-	PolynomialFunction pSubopt = new PolynomialFunction(new double[] {suboptimal});
-	
-	
-	LoadDistributionInterval l1= new LoadDistributionInterval(
-			0.0,
-			62490.0,
-			pOpt,//p
-			true//boolean
-	);
-	
-	bullShitSchedule.addTimeInterval(l1);
-	
-	
-	LoadDistributionInterval l2= new LoadDistributionInterval(					
-			62490.0,
-			DecentralizedSmartCharger.SECONDSPERDAY,
-			pSubopt,//p
-			false//boolean
-	);
-
-	bullShitSchedule.addTimeInterval(l2);
-	//bullShitSchedule.printSchedule();
-	
-	return bullShitSchedule;
-}
-
 	
 	
 	

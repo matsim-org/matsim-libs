@@ -70,14 +70,14 @@ public class LPEVTest extends TestCase{
 	final double ev=1.0;
 	final double combustion=0.0;
 	
-	private double chargingSpeed;
+	private double chargingSpeed=3500.0;
 	
 	private TestSimulationSetUp mySimulation;
 	private Controler controler;
 	
 	final double bufferBatteryCharge=0.0;
 	
-	final double MINCHARGINGLENGTH=5*60;
+	final double standardChargingSlotLength=15*60;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -90,6 +90,9 @@ public class LPEVTest extends TestCase{
 	}
 	
 	
+	
+
+
 	/**
 	*  
 	 * @throws MaxIterationsExceededException
@@ -118,29 +121,10 @@ public class LPEVTest extends TestCase{
 				
 				try {
 					
-					HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
-					
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), 
-							mySimulation.getParkingTimesPlugIn(),
-							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
+					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
-							mySimulation.getVehicleTypeCollector()
-							);
-					
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
-					
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							mySimulation.getEnergyConsumptionInit().getVehicles());
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							mySimulation.getDeterministicLoadSchedule(),							
-							mySimulation.getDetermisiticPricing()
-							);
-					
+							bufferBatteryCharge,
+							standardChargingSlotLength);
 					/***********************************
 					 * LP TEST
 					 * *********************************
@@ -151,8 +135,10 @@ public class LPEVTest extends TestCase{
 						
 							agentOne=id;
 							
-							Schedule testSchedule = makeFakeSchedule();
-							
+							/*
+							 * TEST SOLVE FUNCTION
+							 */
+							Schedule testSchedule = mySimulation.makeFakeSchedule();
 							testSchedule=myDecentralizedSmartCharger.lpev.solveLP(testSchedule, 
 									id, 
 									100, 
@@ -305,7 +291,6 @@ public class LPEVTest extends TestCase{
 							    {
 							      System.out.println( name +" , does not exist" );
 							    }
-							 
 							    catch( IOException ioexception )
 							    {
 							      ioexception.printStackTrace( );
@@ -313,9 +298,181 @@ public class LPEVTest extends TestCase{
 						}
 					
 					
-				} catch (Exception e1) {
 					
-					// TODO Auto-generated catch block
+					
+					
+					/*
+					 * RESOLVE
+					 */
+					
+					for(Id id : controler.getPopulation().getPersons().keySet()){
+						
+						agentOne=id;
+						
+						/*
+						 * TEST RESOLVE FUNCTION
+						 */
+						double startingSOC=75.0;
+						Schedule testSchedule = mySimulation.makeFakeSchedule();
+						testSchedule=myDecentralizedSmartCharger.lpev.solveLPReschedule(
+								testSchedule,
+								id, 
+								100.0, 
+								0.1,
+								0.9, 
+								"lpevTEST",
+								startingSOC
+								);
+						
+						testSchedule.printSchedule();
+						String name= outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt";
+						
+						 try
+						    {
+						       FileReader fro = new FileReader( name );
+						       BufferedReader bro = new BufferedReader( fro );
+						       
+						       // declare String variable and prime the read
+						       String stringRead = bro.readLine( ); // model name
+						       stringRead = bro.readLine( ); // C1 C2...
+						       
+						       //*********************
+						       String objStringRead = bro.readLine( );  
+						       // Minimize        -1 -0.0434251        0 -0.146437        0 -0.810138        1 
+						       StringTokenizer st = new StringTokenizer(objStringRead);
+						       st.nextToken(); // minimize
+						       
+						       
+						       /*
+						        * OBJECTIVE FUNCTION
+						        * /*
+								 * /*
+									 * Parking 0  10  true  joules =100
+									 * Parking 10  20 false joules =100
+									 * Driving 20  30  consumption =-10
+									 * Parking 30  40  false joules =100
+									 *
+								 */
+						
+						       
+						       //SOC=-1  
+						       String next= st.nextToken(); 
+						       System.out.println(next);
+						       							       
+						       assertEquals(Integer.toString(-1), next);
+						       /*
+						        * optimal weight
+						        * (-1 )* thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes;
+						        * 
+						        */
+						       
+						       next= st.nextToken(); 
+						       System.out.println(next);
+						       double expected= -1.0*100.0/100.0;							       
+						       int expectedInt = (int)expected;
+						       assertEquals(Integer.toString(expectedInt), next);
+						       /*
+						        * Parking suboptimal
+						        * thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
+						        * 
+						        */
+						       next= st.nextToken(); 
+						       System.out.println(next);
+						       expected= 100.0/200.0;
+						       assertEquals(Double.toString(expected), next);
+							     /*
+							      * Driving 0
+							      * 
+							      */
+						      
+						       assertEquals(Integer.toString(0), st.nextToken());
+						       
+						       /*
+						        * Parking suboptimal
+						        * thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
+						        *  
+						        */
+						       next= st.nextToken(); 
+						       System.out.println(next);
+						       expected= 100.0/200.0;							       
+						       assertEquals(Double.toString(expected), next);
+						       
+						       
+						     //*********************
+						       String constraint1 = bro.readLine( ); 
+						       //R1               1     3500        0        0        0        0        0 <=       90
+						       
+						       st = new StringTokenizer(constraint1);
+						       st.nextToken();
+						       assertEquals(Integer.toString(1), st.nextToken());
+						       assertEquals(Integer.toString(3500), st.nextToken());
+						       assertEquals(Integer.toString(0), st.nextToken());
+						       assertEquals(Integer.toString(0), st.nextToken());
+						      
+						       
+						       //*********************
+						       String constraint2 = bro.readLine( );// R2               1     3500        0        0        0        0        0 >=       10
+						       //*********************
+						       String constraint3 = bro.readLine( );//R3               1     3500 -1.87863e+007        0        0        0        0 <=       90
+						       //*********************
+						       String constraint4 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						       //*********************
+						       String constraint5 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+							     //*********************
+							   String constraint6 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint7 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint8 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint9 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						       st = new StringTokenizer(constraint9);
+						       st.nextToken();
+						       assertEquals(Integer.toString(1), st.nextToken());
+						       assertEquals(Integer.toString(3500), st.nextToken());
+						       assertEquals(Integer.toString(3500), st.nextToken());
+						       
+						       //*********************
+						        //*********************
+						       stringRead = bro.readLine( ); // Type..
+						       //*********************
+						       String upBo = bro.readLine();
+						       //upbo            90    21600        1    13200        1    24450    23910
+						       st = new StringTokenizer(upBo);
+						       st.nextToken();
+						       assertEquals(Integer.toString((int)startingSOC), st.nextToken());
+						       assertEquals(Integer.toString(10), st.nextToken());
+						       assertEquals(Integer.toString(10), st.nextToken());
+						       assertEquals(Integer.toString(1), st.nextToken());
+						       assertEquals(Integer.toString(10), st.nextToken());
+						     
+						       //*********************	
+						       
+						       String lowBo = bro.readLine( );
+						       //lowbo           10        0        1        0        1        0        0 
+						       st = new StringTokenizer(lowBo);
+						       st.nextToken();
+						       assertEquals(Integer.toString((int)startingSOC), st.nextToken());
+						       assertEquals(Integer.toString(0), st.nextToken());
+						       assertEquals(Integer.toString(0), st.nextToken());
+						       assertEquals(Integer.toString(1), st.nextToken());
+						       assertEquals(Integer.toString(0), st.nextToken());
+						      						       
+						       
+						       bro.close( );
+						    }
+						 
+						    catch( FileNotFoundException filenotfoundexxption )
+						    {
+						      System.out.println( name +" , does not exist" );
+						    }
+						    catch( IOException ioexception )
+						    {
+						      ioexception.printStackTrace( );
+						    }
+					}
+				
+				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 				
@@ -326,49 +483,6 @@ public class LPEVTest extends TestCase{
 		
 	
 		
-	}
-	
-	
-	
-		
-	public Schedule makeFakeSchedule(){
-		Id linkId=null;
-		for (Link link:controler.getNetwork().getLinks().values())
-		{
-			linkId=link.getId();
-			break;
-		}
-		/*
-		 * Parking 0  10  true  joules =100
-		 * Parking 10  20 false joules =100
-		 * Driving 20  30  consumption =-10
-		 * Parking 30  40  false joules =100
-		 */
-		Schedule s= new Schedule();
-		ParkingInterval p1= new ParkingInterval (0, 10, linkId);
-		p1.setParkingOptimalBoolean(true);
-		p1.setJoulesInPotentialChargingInterval(100);
-		
-		ParkingInterval p2= new ParkingInterval (10, 20, linkId);
-		p2.setParkingOptimalBoolean(false);
-		p2.setJoulesInPotentialChargingInterval(-100);
-		
-		DrivingInterval d3 = new DrivingInterval(20, 30, 1);
-		
-		ParkingInterval p4= new ParkingInterval (30, 40, linkId);
-		p4.setParkingOptimalBoolean(false);
-		p4.setJoulesInPotentialChargingInterval(-100);
-		
-		s.addTimeInterval(p1);
-		s.addTimeInterval(p2);
-		s.addTimeInterval(d3);
-		s.addTimeInterval(p4);
-		
-		s.addJoulesToTotalSchedule(100);
-		s.addJoulesToTotalSchedule(-200);
-		
-		chargingSpeed= p1.getChargingSpeed();
-		return s;
 	}
 	
 	
