@@ -24,13 +24,14 @@ public class TimeTesting {
 		String configPath="test/input/playground/wrashid/sschieffer/"+configName;
 		final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 		
+		final double standardChargingSlotLength=15*60;
+		
 		final double phev=1.0;
 		final double ev=0.0;
 		final double combustion=0.0;
 		
 		final double bufferBatteryCharge=0.0;
 		
-		final double MINCHARGINGLENGTH=5*60;
 		
 		DecentralizedSmartCharger myDecentralizedSmartCharger;
 		
@@ -49,34 +50,19 @@ public class TimeTesting {
 				
 				try {
 					
-					HubLinkMapping hubLinkMapping = mySimulation.mapHubsTest();
-					
-					DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
-							event.getControler(), 
-							mySimulation.getParkingTimesPlugIn(),
-							mySimulation.getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
+					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
-							mySimulation.getVehicleTypeCollector()
-							);
-					
-					myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge);
-					
-					myDecentralizedSmartCharger.initializeChargingSlotDistributor(MINCHARGINGLENGTH);
-					
-					myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-							mySimulation.getEnergyConsumptionInit().getVehicles());
-					
-					myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
-							hubLinkMapping, 
-							mySimulation.getDeterministicLoadSchedule(),							
-							mySimulation.getDetermisiticPricing()
-							);
+							bufferBatteryCharge,
+							standardChargingSlotLength);
 					
 					
 					myDecentralizedSmartCharger.run();
-					throw new RuntimeException("commented out non-compiling code");
-//					myDecentralizedSmartCharger.writeSummary(configName);
 					
+					myDecentralizedSmartCharger.writeSummary("DSC"+configName);
+					
+					myDecentralizedSmartCharger.initializeAndRunV2G();
+					
+					myDecentralizedSmartCharger.writeSummary("V2G"+configName);
 					
 				} catch (Exception e1) {
 					

@@ -126,7 +126,7 @@ public class V2GTest extends TestCase{
 	public void testGetSOCAtTime(DecentralizedSmartCharger mySmartCharger, Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		V2G localV2G= new V2G(mySmartCharger);
 		
-		Schedule agentSchedule= mySmartCharger.getAllAgentParkingAndDrivingSchedules().getValue(agentId);
+		Schedule agentSchedule= mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId);
 		System.out.println("testV2G - testRegulationDown - agentSChedule: "+agentId.toString());
 		agentSchedule.printSchedule();
 		/*Parking Interval 	 start: 0.0	  end: 21609.0	  ChargingTime:  0.0	  Optimal:  true	  Joules per Interval:  1.897038219281625E14
