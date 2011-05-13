@@ -23,6 +23,8 @@
  */
 package playground.tnicolai.urbansim.utils;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -76,6 +78,7 @@ public class InitMATSimScenario {
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
 			initStrategy();
+			initPopulation(matsimParameter);	// tnicolai: test if this works for warm start ...
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -225,6 +228,23 @@ public class InitMATSimScenario {
 		log.info("Strategy Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability Strategy_1: " + timeAlocationMutator.getProbability() + " Disable After Itereation (Strategy_1): " + timeAlocationMutator.getDisableAfter() + 
 						 " Strategy_2: " + changeExpBeta.getModuleName() + " Probability Strategy_2: " + changeExpBeta.getProbability() +
 						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
+	}
+	
+	/**
+	 * setting plans file
+	 */
+	private void initPopulation(ConfigType matsimParameter){
+		// get the standard MATSim output directory
+		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
+		
+		// check if available
+		if(controlerCG.getOutputDirectory() != null){
+			String popFile = controlerCG.getOutputDirectory() + Constants.OUTPUT_PLANS_FILE_GZ;
+			if( (new File(popFile)).exists() )	
+				scenario.getConfig().plans().setInputFile( popFile );	// set plans file from previous run -> this is mandatory for "WARM START"
+		}
+		else
+			log.warn("No MATSim output directory found (=null). But it is mandatory for \"WARM START\". Threrefore \"WARM START\" can not be used!!!");		
 	}
 	
 	/**

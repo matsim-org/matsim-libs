@@ -84,10 +84,18 @@ public class Constants {
 	public static final String FILE_TYPE_CSV = ".csv";
 	public static final String FILE_TYPE_DBL = ".dbl";
 	public static final String FILE_TYPE_ESRI = ".esri";
-	public static final String FILE_TYPE_GZ = ".gz";
+	public static final String FILE_TYPE_GZ  = ".gz";
 	public static final String FILE_TYPE_XML = ".xml";
 	public static final String FILE_TYPE_KMZ = ".kmz";
 	public static final String FILE_TYPE_TXT = ".txt";
+	
+	/** matsim output files */
+	public static final String OUTPUT_PLANS_FILE_GZ 	= "output_plans.xml.gz";
+	public static final String OUTPUT_PLANS_FILE_XML 	= "output_plans.xml";
+	public static final String OUTPUT_PARCEL_FILE_GZ	= "parcels.xml.gz";
+	public static final String OUTPUT_PARCEL_FILE_XML	= "parcels.xml";
+	public static final String OUTPUT_ZONES_FILE_GZ	 	= "zones.xml.gz";
+	public static final String OUTPUT_ZONES_FILE_XML	= "zones.xml";
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";

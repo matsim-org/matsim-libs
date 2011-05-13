@@ -73,9 +73,9 @@ public class Convert4Gnuplot {
 //			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};
 			
 			
-//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_low_cap_accessibility_indicators", "908"};		
-//			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};		
-			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "908"};		
+//			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_low_cap_accessibility_indicators", "908"};		
+//			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_accessibility_indicators", "908"};		
+			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/ferry_accessibility_indicators", "908"};		
 			
 //			init(args);
 			init(myArgs);

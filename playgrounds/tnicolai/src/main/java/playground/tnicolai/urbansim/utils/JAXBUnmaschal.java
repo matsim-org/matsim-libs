@@ -82,20 +82,6 @@ public class JAXBUnmaschal {
 			LoadFile loadFile = new LoadFile(Constants.MATSim_4_UrbanSim_XSD, tempDir , Constants.XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			
-//			// tnicolai : remove this (only for testing)
-//			String opusHomeTmp = null;
-//			Map<String, String> env = System.getenv();
-//	        for (String envName : env.keySet()) {
-//	        	if(envName.equalsIgnoreCase("opus_home")){
-//	        		opusHomeTmp = env.get(envName);
-//	        		System.out.println("Found OUPUS HOME: " + opusHomeTmp);
-//	        	}
-//	        }
-//	        if (opusHomeTmp == null)
-//	        	return false;
-//			File file2XSD = new File(opusHomeTmp+"/MATSim4UrbanSimConfigSchema.xsd");
-//			// tnicolai : end testing
-			
 			// tnicolai: for debugging
 			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
 			if(file2XSD == null || !file2XSD.exists()){
@@ -122,22 +108,21 @@ public class JAXBUnmaschal {
 				matsimConfig = (MatsimConfigType) object;
 			else
 				matsimConfig = (( JAXBElement<MatsimConfigType>) object).getValue();
-		}
-		catch(JAXBException je){
+			
+		} catch(JAXBException je){
 			je.printStackTrace();
 			return null;
-		}
-		catch(IOException ioe){
+		} catch(IOException ioe){
 			ioe.printStackTrace();
 			return null;
-		}
-		catch(Exception e){
+		} catch(Exception e){
 			e.printStackTrace();
 			return null;
+		} finally{
+			// clean up temp files/dirs
+			TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		}
-		
-		// clean up temp files/dirs
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+
 		log.info("... finished unmarschallig");
 		// return initialized object representation of matsim4urbansim config file
 		return matsimConfig;

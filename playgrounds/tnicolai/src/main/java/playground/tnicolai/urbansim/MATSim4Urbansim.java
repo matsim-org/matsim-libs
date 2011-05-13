@@ -140,9 +140,9 @@ public class MATSim4Urbansim {
 	protected void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
 
 		readFromUrbansim.readFacilities(parcels, zones);
-		// write the facilities from the urbansim parcel model as a compressed locations.xml file into the temporary directory as input for ???
-		new FacilitiesWriter(parcels).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "parcels.xml.gz" );
-		new FacilitiesWriter(zones).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "zones.xml.gz" );
+		// write the facilities from the UrbanSim parcel model as a compressed locations.xml file into the temporary directory if they are need in following runs
+		// new FacilitiesWriter(parcels).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.OUTPUT_PARCEL_FILE_GZ ); 	// disabled, since output file will not be re-used
+		// new FacilitiesWriter(zones).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.OUTPUT_ZONES_FILE_GZ );		// disabled, since output file will not be re-used
 	}
 	
 	/**
@@ -175,7 +175,7 @@ public class MATSim4Urbansim {
 		oldPopulation=null;
 		System.gc();
 		
-		new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
+		// new PopulationWriter(newPopulation,network).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.OUTPUT_PLANS_FILE_GZ );	// disabled, since output file will not be re-used (instead the plans file in MATSim output folder is used)
 		
 		return newPopulation;
 	}

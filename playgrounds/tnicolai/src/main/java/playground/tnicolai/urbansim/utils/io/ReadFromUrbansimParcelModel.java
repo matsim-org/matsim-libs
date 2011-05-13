@@ -210,9 +210,8 @@ public class ReadFromUrbansimParcelModel {
 	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
 
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation() ;
-		long NUrbansimPersons=0 ;
-		long notFoundCnt = 0 ;
-		long jobLocationIdNullCnt = 0 ;
+		Counter cnt = new Counter();
+		
 		boolean flag = false;
 
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
@@ -236,7 +235,7 @@ public class ReadFromUrbansimParcelModel {
 			// In both cases we assume that the new population has the right size.
 
 			while ( (line=reader.readLine()) != null ) {
-				NUrbansimPersons++;
+				cnt.NUrbansimPersons++;
 				String[] parts = line.split( Constants.TAB_SEPERATOR );
 
 				// create new person
@@ -274,8 +273,8 @@ public class ReadFromUrbansimParcelModel {
 					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						// show warning message only once
-						if ( jobLocationIdNullCnt < 1 ) {
-							jobLocationIdNullCnt++ ;
+						if ( cnt.jobLocationIdNullCnt < 1 ) {
+							cnt.jobLocationIdNullCnt++ ;
 							log.warn( "jobLocationId==null, probably out of area. person_id: " + personId
 									+ " workp_prcl_id: " + workParcelId + Gbl.ONLYONCE ) ;
 						}
@@ -295,49 +294,9 @@ public class ReadFromUrbansimParcelModel {
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
-
-				while ( true ) { // loop from which we can "break":
-
-					Person oldPerson ;
-
-					if ( oldPop==null ) { // no pre-existing population.  Accept:
-						newPop.addPerson(newPerson);
-						break;
-					} else if ( (oldPerson=oldPop.getPersons().get(personId))==null ) { // did not find person.  Put in backup:
-						backupPop.addPerson( newPerson );
-						notFoundCnt++;
-						break;
-					} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
-						newPop.addPerson(newPerson);
-						break;
-					}
-					Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-					Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
-					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
-						newPop.addPerson(newPerson);
-						break;
-					}
-
-					// check if new person works
-					if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
-						newPop.addPerson(newPerson) ;
-						break ;
-					}
-
-					// check if work act has changed:
-					ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2) ;
-					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
-						newPop.addPerson(newPerson) ;
-						break ;
-					}
-
-					// no "break" up to here, so new person does the same as the old person.  Keep old person (including its
-					// routes etc.)
-					newPop.addPerson(oldPerson) ;
-					break ;
-				}
+				mergePopulation(oldPop, newPop, network, backupPop, cnt, personId, newPerson);
 			}
+			log.info("Done with merging population ...");
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -346,27 +305,117 @@ public class ReadFromUrbansimParcelModel {
 			e.printStackTrace();
 		}
 		
-		benchmark.stoppMeasurement(rpID);
+		printOverview(oldPop, newPop, samplingRate, backupPop, cnt);
 		
+		benchmark.stoppMeasurement(rpID);
+		log.info( "Done with reading persons. This took " + benchmark.getDurationInSeconds(rpID) +" seconds.") ;
+	}
+
+	/**
+	 * @param oldPop
+	 * @param newPop
+	 * @param samplingRate
+	 * @param backupPop
+	 * @param cnt
+	 */
+	private void printOverview(final Population oldPop,
+			final Population newPop, final double samplingRate,
+			Population backupPop, Counter cnt) {
+		// get size of old population
 		int oldPopSize = oldPop==null ? 0 : oldPop.getPersons().size();
 
 		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPopSize + " newPopSize: " + newPop.getPersons().size()
-				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
-		log.warn("why is bakPopSize not approx as large as samplingRate*NUrbansimPersons?" ) ;
-
-		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
-		Collections.shuffle( bakPersons ) ;
-		for ( Person person : bakPersons ) {
-			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons )
-				break ;
-
-			newPop.addPerson( person ) ;
+				+ " bakPopSize: " + backupPop.getPersons().size() + " NumberUrbansimPersons: " + cnt.NUrbansimPersons );
+		log.warn("why is bakPopSize not approx as large as samplingRate*NumberUrbansimPersons?" );
+		
+		if(newPop.getPersons().size() < samplingRate*cnt.NUrbansimPersons){
+			log.info("Size of new Population (" + newPop.getPersons().size() + ") is smaller than samplingRate*NumberUrbansimPersons (" + Math.round(samplingRate*cnt.NUrbansimPersons) + "). New created persons, stored in bakPersons, are now add.");
+			List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
+			Collections.shuffle( bakPersons );	// pick random person
+			
+			for ( Person person : bakPersons ) {
+				if ( newPop.getPersons().size() >= samplingRate*cnt.NUrbansimPersons )
+					break ;
+				cnt.backupCnt++;
+				newPop.addPerson( person ) ;
+			}
 		}
-
+		
 		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPopSize + " newPopSize: " + newPop.getPersons().size()
-				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
+				+ " bakPopSize: " + backupPop.getPersons().size() + " NumberUrbansimPersons: " + cnt.NUrbansimPersons );
+		
+		log.info("================================================================================");
+		log.info("Population merge overview:");
+		log.info("Re-identified persons from old population = " + cnt.identifiedCnt);
+		log.info("New created persons = " + cnt.populationMergeTotal);
+		log.info("Composition of new created Persons:");
+		log.info("		Person Id not found in old population (bakPersons) = " + cnt.notFoundCnt + ". " + cnt.backupCnt + " of them are taken into the new Population.");
+		log.info("		Employment status changed = " + cnt.employmentChangedCnt);
+		log.info("		Home location changed = " + cnt.homelocationChangedCnt);
+		log.info("		Work location changed = " + cnt.worklocationChangedCnt);
+		log.info("		Person is unemployed (considered as new) = " + cnt.unemployedCnt);
+		log.info("================================================================================");
+	}
 
-		log.info( "Done with reading persons. This took " + benchmark.getDurationInSeconds(rpID) +" seconds.") ;
+	/**
+	 * @param oldPop
+	 * @param newPop
+	 * @param network
+	 * @param backupPop
+	 * @param cnt
+	 * @param personId
+	 * @param newPerson
+	 */
+	private void mergePopulation(final Population oldPop,
+			final Population newPop, final NetworkImpl network,
+			Population backupPop, Counter cnt, Id personId, PersonImpl newPerson) {
+		while ( true ) { // loop from which we can "break":
+
+			Person oldPerson ;
+			cnt.populationMergeTotal++;
+
+			if ( oldPop==null ) { // no pre-existing population.  Accept:
+				newPop.addPerson(newPerson);
+				break;
+			} else if ( (oldPerson=oldPop.getPersons().get(personId))==null ) { // person not found in old population. Store temporarily in backup.
+				backupPop.addPerson( newPerson );
+				cnt.notFoundCnt++;
+				break;
+			} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
+				newPop.addPerson(newPerson);
+				cnt.employmentChangedCnt++;
+				break;
+			}
+			Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
+			Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
+			if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // if act changed.  Accept new person:
+				newPop.addPerson(newPerson);
+				cnt.homelocationChangedCnt++;
+				break;
+			}
+
+			// check if new person works
+			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
+				newPop.addPerson(newPerson);
+				cnt.unemployedCnt++;
+				break ;
+			}
+
+			// check if work act has changed:
+			ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+			ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2) ;
+			if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
+				newPop.addPerson(newPerson);
+				cnt.worklocationChangedCnt++;
+				break ;
+			}
+
+			// no "break" up to here, so new person does the same as the old person.  Keep old person (including its
+			// routes etc.)
+			newPop.addPerson(oldPerson);
+			cnt.identifiedCnt++;
+			break ;
+		}
 	}
 	
 	/**
@@ -567,19 +616,41 @@ public class ReadFromUrbansimParcelModel {
 	 * @return
 	 */
 	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkImpl network ) {
-		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
-			log.info( "act location changed" ) ;
+		
+		if( !( (oldAct.getCoord().getX() == newAct.getCoord().getX()) && 
+			    oldAct.getCoord().getY() == newAct.getCoord().getY() ) ){		
+//		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
+//			log.info( "act location changed" ) ;
 			return true ;
 		}
 		if ( oldAct.getLinkId()==null || network.getLinks().get(oldAct.getLinkId()) == null ) { // careful: only the old activity has a link
-			log.info( "act link does not exist any more" ) ;
+//			log.info( "act link does not exist any more" ) ;
 			return true ;
 		}
 		return false ;
 	}
 	
+	/**
+	 * getter method for year
+	 * @return
+	 */
 	public int getYear(){
 		return this.year;
 	}
 
+	private class Counter{
+		
+		public long NUrbansimPersons =0;
+		public long notFoundCnt = 0;
+		public long identifiedCnt = 0;
+		public long employmentChangedCnt = 0;
+		public long homelocationChangedCnt = 0;
+		public long worklocationChangedCnt = 0;
+		public long unemployedCnt = 0;
+		public long jobLocationIdNullCnt = 0 ;
+		public long backupCnt = 0;
+		public long populationMergeTotal = 0;
+		
+	}
+	
 }

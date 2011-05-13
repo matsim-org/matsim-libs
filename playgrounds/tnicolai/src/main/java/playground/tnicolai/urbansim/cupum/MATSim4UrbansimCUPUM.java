@@ -108,7 +108,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 			capacity = Double.parseDouble(testParam);
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			log.warn("Bridge Scenario detected!!! Entered parameter: " + testParam);
 		}
 		
 		log.info("Modifiying network now ...");
