@@ -81,7 +81,7 @@ public class CottbusFootballBatch {
 		String kreisShapeFile = reposBaseDirectory + "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		CottbusFanCreator fanCreator = new SimpleCottbusFanCreator(kreisShapeFile);
 		//start the runs
-		int increment = 5;
+		int increment = 10;
 		for (int numberOfFootballFans = 0; numberOfFootballFans <= 100; numberOfFootballFans = numberOfFootballFans + increment){
 			if (numberOfFootballFans != 0) fanCreator.createAndAddFans(baseScenario, 20 * increment);
 			baseConfig.controler().setOutputDirectory(baseOutputDirectory + numberOfFootballFans + "_football_fans/");
@@ -95,7 +95,9 @@ public class CottbusFootballBatch {
 				controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
 			}
 			controler.run();
-			percentageOfFans2AverageTTMap.put(numberOfFootballFans, cbfbControllerListener.getAverageTraveltime());
+			if (cbfbControllerListener.getAverageTraveltime() != null){
+				percentageOfFans2AverageTTMap.put(numberOfFootballFans, cbfbControllerListener.getAverageTraveltime());
+			}
 		}
 		
 //		try {

@@ -23,9 +23,12 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -36,52 +39,68 @@ import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballS
  * @author dgrether
  *
  */
-public class CottbusFootballAnalysisControllerListener implements StartupListener, IterationEndsListener {
+public class CottbusFootballAnalysisControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	
 	private CottbusFootballTraveltimeHandler traveltimeHandler;
 
+	private Double averageTravelTime = null;
 
 	@Override
 	public void notifyStartup(StartupEvent e) {
-		this.traveltimeHandler = new CottbusFootballTraveltimeHandler();
-		e.getControler().getEvents().addHandler(this.traveltimeHandler);
 	}
-	
+
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent e) {
-		CottbusFootballTraveltimeWriter traveltimeWriter = new CottbusFootballTraveltimeWriter();
-		
-		String filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.CB2FB +  ".csv");
-		traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesCB2FB(), filename);
-		
-		filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.FB2CB +  ".csv");
-		traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesFB2CB(), filename);
-
-		filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.SPN2FB +  ".csv");
-		traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesSPN2FB(), filename);
-
-		filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.FB2SPN + ".csv");
-		traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesFB2SPN(), filename);
-		
-		filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "latest_arrival_times.csv");
-		traveltimeWriter.exportLatestArrivals(traveltimeHandler, filename);
-		
-		filename = e.getControler().getControlerIO().getOutputFilename("average_travel_time.csv");
-		try {
-			BufferedWriter writer = IOUtils.getAppendingBufferedWriter(filename);
-			writer.append(e.getIteration() + CottbusFootballStrings.SEPARATOR + this.traveltimeHandler.getAverageTravelTime());
-			writer.newLine();
-			writer.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+	public void notifyIterationStarts(IterationStartsEvent e) {
+		Controler controler = e.getControler();
+		if ((controler.getWriteEventsInterval() > 0) && (e.getIteration() % controler.getWriteEventsInterval() == 0)){
+			this.traveltimeHandler = new CottbusFootballTraveltimeHandler();
+			e.getControler().getEvents().addHandler(this.traveltimeHandler);
 		}
 	}
 
-	public Double getAverageTraveltime() {
-		return this.traveltimeHandler.getAverageTravelTime();
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent e) {
+		Controler controler = e.getControler();
+ 		if ((controler.getWriteEventsInterval() > 0) && (e.getIteration() % controler.getWriteEventsInterval() == 0)){
+ 			CottbusFootballTraveltimeWriter traveltimeWriter = new CottbusFootballTraveltimeWriter();
+ 			
+ 			String filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.CB2FB +  ".csv");
+ 			traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesCB2FB(), filename);
+ 			
+ 			filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.FB2CB +  ".csv");
+ 			traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesFB2CB(), filename);
+ 			
+ 			filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.SPN2FB +  ".csv");
+ 			traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesSPN2FB(), filename);
+ 			
+ 			filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.FB2SPN + ".csv");
+ 			traveltimeWriter.writeMapToCsv(traveltimeHandler.getArrivalTimesFB2SPN(), filename);
+ 			
+ 			filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "latest_arrival_times.csv");
+ 			traveltimeWriter.exportLatestArrivals(traveltimeHandler, filename);
+ 			
+ 			filename = e.getControler().getControlerIO().getOutputFilename("average_travel_time.csv");
+ 			try {
+ 				BufferedWriter writer = IOUtils.getAppendingBufferedWriter(filename);
+ 				writer.append(e.getIteration() + CottbusFootballStrings.SEPARATOR + this.traveltimeHandler.getAverageTravelTime());
+ 				writer.newLine();
+ 				writer.close();
+ 			} catch (FileNotFoundException e1) {
+ 				e1.printStackTrace();
+ 			} catch (IOException e1) {
+ 				e1.printStackTrace();
+ 			}
+ 			this.averageTravelTime = this.traveltimeHandler.getAverageTravelTime();
+ 			controler.getEvents().removeHandler(this.traveltimeHandler);
+ 			this.traveltimeHandler = null;
+ 		}
 	}
+
+	public Double getAverageTraveltime() {
+		return this.averageTravelTime;
+	}
+
 	
 }
