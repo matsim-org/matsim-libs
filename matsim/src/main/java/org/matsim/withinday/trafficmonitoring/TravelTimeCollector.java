@@ -61,12 +61,10 @@ import org.matsim.core.utils.misc.Time;
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
  * 
- * TODO: - take transport mode for multi-modal simulations into account Extend
- * link enter / leave events with transport mode field or use a lookup table in
- * this class. - make storedTravelTimesBinSize configurable (e.g. via config) -
- * get rid of WithinDayLinkImpl, would suggest via Customizable - make bin size
- * dynamic - count vehicles per link - react to network change events - make
- * links deactivateable
+ * TODO: 
+ * - take transport mode for multi-modal simulations into account
+ * - make storedTravelTimesBinSize configurable (e.g. via config)
+ * - react to network change events
  * 
  * @author cdobler
  */
@@ -75,19 +73,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		AgentArrivalEventHandler, AgentDepartureEventHandler,
 		SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener {
 
-	private static final Logger log = Logger
-			.getLogger(TravelTimeCollector.class);
-
-	// /*
-	// * If multiple TravelTimeCollectors are used, each of them get its unique
-	// Id.
-	// * This will be needed, if the travel times are attached to the Links via
-	// a
-	// * Customizable attribute. The key of that attribute will then contain the
-	// Id
-	// * of its corresponding TravelTimeCollector.
-	// */
-	// private final int id;
+	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
 
 	private Network network;
 
@@ -153,10 +139,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		tripBin.enterTime = time;
 
 		this.regularActiveTrips.put(personId, tripBin);
-
-		// Id linkId = event.getLinkId();
-		// TravelTimeInfo travelTimeInfo = travelTimeInfos.get(linkId);
-		// travelTimeInfo.numActiveTrips++;
 	}
 
 	@Override
@@ -173,13 +155,12 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 			TravelTimeInfo travelTimeInfo = travelTimeInfos.get(linkId);
 			travelTimeInfo.tripBins.add(tripBin);
-			travelTimeInfo.addedTravelTimes = travelTimeInfo.addedTravelTimes
-					+ tripTime;
+			travelTimeInfo.addedTravelTimes += tripTime;
 			travelTimeInfo.addedTrips++;
-			// travelTimeInfo.numActiveTrips--;
 
 			travelTimeInfo.checkActiveState();
 			travelTimeInfo.checkBinSize(tripTime);
+//			if (linkId.toString().equals("103771")) log.error(time + "," + tripTime);
 		}
 	}
 
@@ -202,10 +183,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		Id personId = event.getPersonId();
 
 		this.regularActiveTrips.remove(personId);
-
-		// Id linkId = event.getLinkId();
-		// TravelTimeInfo travelTimeInfo = travelTimeInfos.get(linkId);
-		// travelTimeInfo.numActiveTrips--;
 	}
 
 	@Override
@@ -252,8 +229,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 				activeLinks += thread.getActiveLinksCount();
 			}
 
-			log.info("TravelTimeCollector at " + Time.writeTime(time)
-					+ " #active links = " + activeLinks);
+			log.info("TravelTimeCollector at " + Time.writeTime(time) + " #links=" + activeLinks);
 
 			this.nextInfoTime += this.infoTimeStep;
 		}
@@ -267,7 +243,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	private static class TripBin {
 		double enterTime;
 		double leaveTime;
-
 	}
 
 	private static class TravelTimeInfo {
@@ -303,10 +278,10 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 		/*package*/ void checkBinSize(double tripTime) {
 			if (tripTime > dynamicBinSize) {
-				dynamicBinSize = tripTime * 2.5;
+				dynamicBinSize = tripTime * 2;
 				enlarge.incCounter();
-			} else if (tripTime * 4 < dynamicBinSize) {
-				dynamicBinSize = tripTime * 4;
+			} else if (tripTime * 3 < dynamicBinSize) {
+				dynamicBinSize = tripTime * 3;
 				shrink.incCounter();
 			}
 		}
@@ -344,40 +319,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		}
 	}
 
-	// /*
-	// * Create equal sized Arrays.
-	// */
-	// private TravelTimeInfo[][] createArrays() {
-	//
-	// List<List<TravelTimeInfo>> infos = new ArrayList<List<TravelTimeInfo>>();
-	// for (int i = 0; i < numOfThreads; i++) {
-	// infos.add(new ArrayList<TravelTimeInfo>());
-	// }
-	//
-	// int roundRobin = 0;
-	// for (Link link : this.network.getLinks().values()) {
-	// Id id = link.getId();
-	// infos.get(roundRobin % numOfThreads).add(travelTimeInfos.get(id));
-	// roundRobin++;
-	// }
-	//
-	// /*
-	// * Now we create Arrays out of our Lists because iterating over them is
-	// * much faster.
-	// */
-	// TravelTimeInfo[][] parallelArrays = new
-	// TravelTimeInfo[this.numOfThreads][];
-	// for (int i = 0; i < infos.size(); i++) {
-	// List<TravelTimeInfo> list = infos.get(i);
-	//
-	// TravelTimeInfo[] array = new TravelTimeInfo[list.size()];
-	// list.toArray(array);
-	// parallelArrays[i] = array;
-	// }
-	//
-	// return parallelArrays;
-	// }
-
 	private void initParallelThreads() {
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
@@ -391,7 +332,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		for (int i = 0; i < numOfThreads; i++) {
 			UpdateMeanTravelTimesThread updateMeanTravelTimesThread = new UpdateMeanTravelTimesThread();
 			updateMeanTravelTimesThread.setName("UpdateMeanTravelTimes" + i);
-			// updateMeanTravelTimesThread.setTravelTimeInfos(parallelArrays[i]);
 			updateMeanTravelTimesThread.setStartBarrier(this.startBarrier);
 			updateMeanTravelTimesThread.setEndBarrier(this.endBarrier);
 			updateMeanTravelTimesThread.setDaemon(true); // make the Thread demons so they will terminate automatically
@@ -405,8 +345,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		 */
 		int roundRobin = 0;
 		for (TravelTimeInfo travelTimeInfo : this.travelTimeInfos.values()) {
-			travelTimeInfo.thread = updateMeanTravelTimesThreads[roundRobin
-					% numOfThreads];
+			travelTimeInfo.thread = updateMeanTravelTimesThreads[roundRobin % numOfThreads];
 			roundRobin++;
 		}
 
@@ -433,7 +372,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		private CyclicBarrier endBarrier;
 
 		private double time = 0.0;
-		// private TravelTimeInfo[] travelTimeInfos;
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
 		public UpdateMeanTravelTimesThread() {
@@ -521,7 +459,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 				TripBin tripBin = iter.next();
 				if (tripBin.leaveTime + travelTimeInfo.dynamicBinSize < time) {
 					double travelTime = tripBin.leaveTime - tripBin.enterTime;
-					removedTravelTimes = removedTravelTimes + travelTime;
+					removedTravelTimes += travelTime;
 					iter.remove();
 				} else break;
 			}
@@ -531,12 +469,9 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 			 * within the current SimStep. The initial FreeSpeedTravelTime has
 			 * to be set correctly via setTravelTime!
 			 */
-			if (removedTravelTimes == 0.0
-					&& travelTimeInfo.addedTravelTimes == 0.0)
-				return;
+			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
 
-			travelTimeInfo.sumTravelTimes = travelTimeInfo.sumTravelTimes
-					- removedTravelTimes + travelTimeInfo.addedTravelTimes;
+			travelTimeInfo.sumTravelTimes = travelTimeInfo.sumTravelTimes - removedTravelTimes + travelTimeInfo.addedTravelTimes;
 
 			travelTimeInfo.addedTravelTimes = 0.0;
 
@@ -545,23 +480,12 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 			 * FreeSpeedTravelTime.
 			 */
 			double meanTravelTime = travelTimeInfo.freeSpeedTravelTime;
-			if (!tripBins.isEmpty())
-				meanTravelTime = travelTimeInfo.sumTravelTimes
-						/ tripBins.size();
+			if (!tripBins.isEmpty()) meanTravelTime = travelTimeInfo.sumTravelTimes / tripBins.size();
 
 			if (meanTravelTime < travelTimeInfo.freeSpeedTravelTime) {
 				log.warn("Mean TravelTime to short?");
 				travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
 			} else travelTimeInfo.travelTime = meanTravelTime;
-
-			// if (meanTravelTime < travelTimeInfo.freeSpeedTravelTime)
-			// {
-			// System.out.println("Warning: Mean TravelTime to short?");
-			// travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
-			// }
-			// else travelTimeInfo.travelTime = meanTravelTime;
-			//
-			// travelTimeInfo.link.setTravelTime(travelTimeInfo.travelTime);
 		}
 
 	} // ReplannerThread
