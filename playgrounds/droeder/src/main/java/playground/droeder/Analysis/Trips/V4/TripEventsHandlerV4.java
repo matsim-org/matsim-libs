@@ -17,9 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.V3;
+package playground.droeder.Analysis.Trips.V4;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -32,13 +34,16 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
 import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 import playground.droeder.Analysis.Trips.AbstractTripEventsHandler;
+import playground.droeder.Analysis.Trips.V3.AnalysisTripV3;
 
 /**
  * @author droeder
  *
  */
-public class TripEventsHandlerV3 extends AbstractTripEventsHandler implements 
+public class TripEventsHandlerV4 extends AbstractTripEventsHandler implements 
 										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+	
+	
 	
 	
 	@Override
@@ -64,37 +69,34 @@ public class TripEventsHandlerV3 extends AbstractTripEventsHandler implements
 	@Override
 	protected void processEvent(PersonEvent e){
 		//process only if this agent has a plan in PlansFile
-		if(super.id2Events.containsKey(e.getPersonId())){
-			
-			//add Event
-			super.id2Events.get(e.getPersonId()).add(e);
-			
-			//if number of elements of the first trip and number of events match, add events
-			if(((AnalysisTripV3) super.id2Trips.get(e.getPersonId()).getFirst()).getNumberOfExpectedEvents() 
-					== super.id2Events.get(e.getPersonId()).size()){
-				this.addEvents2Trip(e.getPersonId());
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((AnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
 			}
 		}
 	}
 
-	private void addEvents2Trip(Id id){
+	private void addTrip2TripSet(Id id){
 		// store number of processed Trips
 		this.nrOfprocessedTrips++;
 		
 		// store this for getUncompletedPlans()
 		this.nrOfTrips.get(id)[1]++;
 		
-		//get and remove the first Trip of this agent and add Events
+		//get and remove the first Trip of this agent
 		AbstractAnalysisTrip trip = this.id2Trips.get(id).removeFirst();
-		((AnalysisTripV3) trip).addEvents(this.id2Events.get(id));
 		
 		//add for all zones
 		for(String s : this.zone2tripSet.keySet()){
 			this.zone2tripSet.get(s).addTrip(trip);
 		}
-		
-		//put a new List for AgentEvents to store events for next trip
-		this.id2Events.put(id, new ArrayList<PersonEvent>());
+	}
+	
+	@Override
+	public void addTrips(Map<Id, LinkedList<AbstractAnalysisTrip>> map) {
+		super.addTrips(map);
+		this.id2Events = null;
 	}
 }
+
 

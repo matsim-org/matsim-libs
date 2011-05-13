@@ -112,26 +112,19 @@ public class TripAnalysisV2 {
 	private void readPlans(String plans, String network){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(sc).parse(network);
+		
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		Plan2TripsFilterV2 planFilter = new Plan2TripsFilterV2(); 
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
-		
-		InputStream in = null;
-		in = IOUtils.getInputstream(plans);
-		
-		new MatsimPopulationReader(sc).parse(in);
+		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
 		
 		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips( planFilter.getTrips());
 	}
 	
 	private void readEvents(String eventsFile){
-		
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(this.eventsHandler);
-		
-		InputStream in = null;
-		in = IOUtils.getInputstream(eventsFile);
-		new EventsReaderXMLv1(manager).parse(in);
+		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(eventsFile));
 	}
 }

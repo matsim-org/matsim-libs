@@ -17,21 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.V1;
+package playground.droeder.Analysis.Trips.V4;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -41,43 +37,71 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.AbstractTripEventsHandler;
 import playground.droeder.Analysis.Trips.AnalysisTripSetAllMode;
 import playground.droeder.Analysis.Trips.AnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.V3.Plan2TripsFilterV3;
 
 import com.vividsolutions.jts.geom.Geometry;
-
 
 /**
  * @author droeder
  *
  */
-public class TripAnalysisV1 {
-	private Geometry zone;
-	private Map<Id, ArrayList<PersonEvent>> events;
-	private Map<Id, ArrayList<PlanElement>> planElements;
-	private AnalysisTripSetAllMode tripSet;
+public class TripAnalysisV4{
+	private static final Logger log = Logger.getLogger(TripAnalysisV4.class);
+	private TripEventsHandlerV4 eventsHandler;
+	private String unProcessedAgents;
 	
-	
-	public TripAnalysisV1 (Geometry g){
-		this.zone = g;
+	public TripAnalysisV4 (){
+		 this.eventsHandler = new TripEventsHandlerV4();
 	}
 	
-	public void run(String plans, String network, String events, String outDir, boolean storeTrips){
+	public void addZones(Map<String, Geometry> zones){
+		this.eventsHandler.addZones(zones);
+	}
+	
+	public void run(String plans, String network, String events, String outDir){
 		this.readPlans(plans, network);
+		log.info("streaming plans finished!");
 		this.readEvents(events);
-		this.tripSet = AnalysisTripGeneratorV1.calculateTripSet(this.events, this.planElements, this.zone, storeTrips);
+		log.info("streaming events finished!");
 		this.write2csv(outDir);
+		log.info("output written to " + outDir);
 	}
 	
 	private void write2csv(String out){
+		BufferedWriter writer;
 		try {
-			BufferedWriter writer;
-			for(Entry<String, AnalysisTripSetOneMode> e : this.tripSet.getTripSets().entrySet()){
-				writer = IOUtils.getBufferedWriter(out + e.getKey() + "_trip_analysis.csv");
-				writer.write(e.getValue().toString());
-				writer.flush();
-				writer.close();
+			// write analysis
+			for(Entry<String, AnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
+				for(Entry<String, AnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
+					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_analysis_v4.csv");
+					writer.write(o.getValue().toString());
+					writer.flush();
+					writer.close();
+				}
 			}
+			
+			//write unprocessed Agents
+			writer = IOUtils.getBufferedWriter(out + "unprocessedAgents_v4.csv");
+			writer.write(this.unProcessedAgents);
+			writer.flush();
+			writer.close();
+			
+			//write uncompletedPlans
+			writer = IOUtils.getBufferedWriter(out + "uncompletedPlans_v4.csv");
+			writer.write(this.eventsHandler.getUncompletedPlans());
+			writer.flush();
+			writer.close();
+			
+			//write stuckAgents
+			writer = IOUtils.getBufferedWriter(out + "stuckAgents_v4.csv");
+			writer.write(this.eventsHandler.getStuckAgents());
+			writer.flush();
+			writer.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -88,21 +112,21 @@ public class TripAnalysisV1 {
 	private void readPlans(String plans, String network){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(sc).parse(network);
-		
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		PlanElementFilterV1 filter = new PlanElementFilterV1();
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(filter);
+		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV4(); 
+		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
+		
 		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
 		
-		this.planElements = filter.getElements();
+		this.unProcessedAgents = planFilter.getUnprocessedAgents();
+		this.eventsHandler.addTrips( planFilter.getTrips());
 	}
 	
 	private void readEvents(String eventsFile){
-		TripEventsHandlerV1 handler = new TripEventsHandlerV1(this.planElements.keySet());
+		
 		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(handler);
+		manager.addHandler(this.eventsHandler);
+		
 		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(eventsFile));
-		this.events = handler.getEvents();
 	}
 }
-

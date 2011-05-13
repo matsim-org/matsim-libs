@@ -116,7 +116,7 @@ public class TripAnalysisV3 {
 		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV3(); 
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
 		
-		new MatsimPopulationReader(sc).parse(plans);
+		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
 		
 		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips( planFilter.getTrips());
@@ -127,8 +127,6 @@ public class TripAnalysisV3 {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(this.eventsHandler);
 		
-		InputStream in = null;
-		in = IOUtils.getInputstream(eventsFile);
-		new EventsReaderXMLv1(manager).parse(in);
+		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(eventsFile));
 	}
 }
