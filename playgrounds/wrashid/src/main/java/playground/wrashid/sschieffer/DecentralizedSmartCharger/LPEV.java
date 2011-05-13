@@ -148,7 +148,7 @@ public class LPEV {
 		
 		if(DecentralizedSmartCharger.debug){
 			System.out.println("LP EV Resolve for Agent: "+ id.toString()); 
-			schedule.printSchedule();
+			/*schedule.printSchedule();*/
 		}
 		
 		

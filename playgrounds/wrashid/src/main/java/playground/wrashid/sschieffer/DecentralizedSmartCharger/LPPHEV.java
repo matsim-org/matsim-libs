@@ -161,8 +161,8 @@ public class LPPHEV {
 		
 		if(DecentralizedSmartCharger.debug){
 			System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
-			System.out.println("Schedule before LPPHEV: "); 
-			schedule.printSchedule();
+			/*System.out.println("Schedule before LPPHEV: "); 
+			schedule.printSchedule();*/
 		}
 		
 		
@@ -194,10 +194,10 @@ public class LPPHEV {
 		}
 		
 		schedule= update();
-		if(DecentralizedSmartCharger.debug){
-			System.out.println("Schedule after update LPPHEV: ");
-			schedule.printSchedule();
-		}
+		/*if(DecentralizedSmartCharger.debug){
+			//System.out.println("Schedule after update LPPHEV: ");
+			//schedule.printSchedule();
+		}*/
 		
 		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
 		

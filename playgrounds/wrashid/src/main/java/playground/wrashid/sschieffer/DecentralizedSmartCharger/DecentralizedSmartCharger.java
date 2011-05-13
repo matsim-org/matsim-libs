@@ -180,6 +180,8 @@ public class DecentralizedSmartCharger {
 		
 		this.myVehicleTypes=myVehicleTypes;
 		
+		myV2G= new V2G(this);
+		
 	}
 	
 	
@@ -570,7 +572,7 @@ public class DecentralizedSmartCharger {
 
 
 
-	public double calculateChargingCostForAgentSchedule(Id id, Schedule s) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public double calculateChargingCostForAgentSchedule(Id id, Schedule s) {
 		double totalCost=0;
 		
 		for(int i=0; i<s.getNumberOfEntries();i++){
@@ -582,10 +584,19 @@ public class DecentralizedSmartCharger {
 				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
 				Schedule charging= ((ParkingInterval)t).getChargingSchedule();
 				for(int c=0; c<charging.getNumberOfEntries(); c++){
-					totalCost+= functionIntegrator.integrate(funcPrice, 
-							charging.timesInSchedule.get(c).getStartTime(),
-							charging.timesInSchedule.get(c).getEndTime()
-							);
+					try {
+						totalCost+= functionIntegrator.integrate(funcPrice, 
+								charging.timesInSchedule.get(c).getStartTime(),
+								charging.timesInSchedule.get(c).getEndTime()
+								);
+					} catch (Exception e) {
+						System.out.println("Method: calculateChargingCostForAgentSchedule");
+						System.out.println("Charging Schedule");
+						charging.printSchedule();
+						System.out.println("Agent Schedule");
+						s.printSchedule();
+						e.printStackTrace();
+					} 
 				}
 				
 			}
@@ -615,7 +626,7 @@ public class DecentralizedSmartCharger {
 	public void initializeAndRunV2G(
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
-		myV2G= new V2G(this);
+		
 		startV2G=System.currentTimeMillis();
 			
 		System.out.println("START CHECKING VEHICLE SOURCES");
@@ -645,6 +656,10 @@ public class DecentralizedSmartCharger {
 				
 		if(myHubLoadReader.stochasticHubLoadDistribution !=null){
 			for(Integer h : myHubLoadReader.stochasticHubLoadDistribution.keySet()){
+				
+				if(DecentralizedSmartCharger.debug){
+					System.out.println("check hubSource for Hub "+ h.toString());
+				}
 				
 				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadDistribution.get(h);
 				
@@ -833,6 +848,9 @@ public class DecentralizedSmartCharger {
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
 				
+				if(DecentralizedSmartCharger.debug){
+					System.out.println("check VehicleSource for"+ id.toString());
+				}
 				//ONLY IF AGENT HAS NOT COMBUSTION VEHICLE
 				if(hasAgentCombustionVehicle(id)==false){
 					
@@ -939,7 +957,7 @@ public class DecentralizedSmartCharger {
 										
 									double compensation= joulesFromSource*compensationPerJouleRegulationDown;
 									
-									agentParkingAndDrivingSchedules.get(id).printSchedule();
+									//agentParkingAndDrivingSchedules.get(id).printSchedule();
 									
 									myV2G.regulationDownVehicleLoad(id, 
 											currentStochasticLoadInterval, 

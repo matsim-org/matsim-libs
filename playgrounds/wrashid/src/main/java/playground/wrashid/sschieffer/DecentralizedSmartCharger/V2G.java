@@ -803,7 +803,9 @@ public class V2G {
 						secondHalf, agentId, batterySize, batteryMin, batteryMax, type, currentSOC);
 				//if still no answer possible
 				if(answerScheduleAfterElectricSourceInterval==null){
-					System.out.println("Reschedule was not possible!");
+					if(DecentralizedSmartCharger.debug){
+						System.out.println("Reschedule was not possible!");
+					}
 					costReschedule= 100000000.0;
 				}else{
 					costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;

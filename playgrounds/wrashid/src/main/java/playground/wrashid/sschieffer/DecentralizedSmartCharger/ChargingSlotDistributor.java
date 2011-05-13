@@ -148,7 +148,7 @@ public class ChargingSlotDistributor {
 				
 			}
 				
-				chargingInParkingInterval=assignRandomChargingSlotInChargingInterval(func, 
+			chargingInParkingInterval=assignRandomChargingSlotInChargingInterval(func, 
 						startTime, 
 						endTime, 
 						joulesInInterval, 

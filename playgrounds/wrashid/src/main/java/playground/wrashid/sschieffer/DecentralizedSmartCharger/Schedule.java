@@ -453,10 +453,7 @@ public class Schedule {
 	
 	public void addLoadDistributionIntervalToExistingLoadDistributionSchedule(LoadDistributionInterval loadToAdd) 
 	throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		//LinkedList<Integer> toDelete = new LinkedList<Integer>();
-		printSchedule();
-		
+		 
 		if (overlapWithTimeInterval(loadToAdd)
 			){
 			Schedule newSchedule=new Schedule();
@@ -498,7 +495,7 @@ public class Schedule {
 								t.getEndTime(),
 								combinedFunc, 
 								newOptimal));
-						newSchedule.printSchedule();
+						//newSchedule.printSchedule();
 						
 						//update loadLeftTOAdd
 						loadLeftToAdd=new LoadDistributionInterval(t.getEndTime(), 
@@ -521,36 +518,36 @@ public class Schedule {
 								loadLeftToAdd.getEndTime(),
 								combinedFunc , 
 								newOptimal));
-						newSchedule.printSchedule();
+						//newSchedule.printSchedule();
 						
 						if(loadLeftToAdd.getEndTime()<t.getEndTime()){
 							newSchedule.addTimeInterval(new LoadDistributionInterval(loadLeftToAdd.getEndTime(),
 									t.getEndTime(),
 									t.getPolynomialFunction() , 
 									t.isOptimal()));
-							newSchedule.printSchedule();
+							//newSchedule.printSchedule();
 						}
 						loadLeftToAdd= new LoadDistributionInterval(0, 0, null, false);
 					}
 					
 				}else{
 					newSchedule.addTimeInterval(t);
-					newSchedule.printSchedule();
+					//newSchedule.printSchedule();
 				}
 				
 			}	
 			
 			if(loadLeftToAdd.getIntervalLength()>0){
 				newSchedule.addTimeInterval(loadLeftToAdd);
-				newSchedule.printSchedule();
+				//newSchedule.printSchedule();
 			}
 			
 			this.timesInSchedule= newSchedule.timesInSchedule;
 			sort();
-			printSchedule();
+			//printSchedule();
 		}else{//if no overlap between schedule and interval
 			addTimeInterval(loadToAdd.clone());
-			printSchedule();
+			//printSchedule();
 			sort();
 			
 		}
