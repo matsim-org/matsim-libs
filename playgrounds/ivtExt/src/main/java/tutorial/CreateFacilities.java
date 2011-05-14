@@ -121,15 +121,15 @@ public class CreateFacilities {
 		((ActivityFacilityImpl) facility).createActivityOption(type);
 		
 		/*
-		 * [[ 1 ]] Specify the opening hours here. An example is given for the activity work.
+		 * [[ 1 ]] Specify the opening hours here for shopping and leisure. An example is given for the activities work and home.
 		 */
 		ActivityOptionImpl actOption = (ActivityOptionImpl)facility.getActivityOptions().get(type);
 		OpeningTimeImpl opentime;
 		if (type.equals("shop")) {
-			opentime = new OpeningTimeImpl(DayType.wkday, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+			opentime = null;
 		}
 		else if (type.equals("leisure") || type.equals("education")) {
-			opentime = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+			opentime = null;
 		}
 		else if (type.equals("work")) {
 			opentime = new OpeningTimeImpl(DayType.wkday, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;

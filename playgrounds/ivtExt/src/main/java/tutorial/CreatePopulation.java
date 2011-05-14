@@ -30,7 +30,7 @@ public class CreatePopulation {
 	private Scenario scenario;
 	
 	// [[ 0 ]] here you have to fill in the path of the census file
-	private String censusFile = "./input/census.txt";	// [[ 0 ]] censusFile = ""	
+	private String censusFile = "...";	
 	private String municipalitiesFile = "./input/swiss_municipalities.txt";
 	
 	private QuadTree<ActivityFacility> homeFacilitiesTree;
@@ -79,11 +79,11 @@ public class CreatePopulation {
 			 * [[ 1 ]] here you have to set the indices accordingly. 
 			 *  Please note that in programming we always start with 0 and not with 1
 			 */
-			int index_personId = 4;		// = [[ 1 ]]  = 0;
-			int index_age = 6;
-			int index_workLocation = 8;
-			int index_xHomeCoord = 10;
-			int index_yHomeCoord = 11;
+			int index_personId = -1;
+			int index_age = -1;
+			int index_workLocation = -1;
+			int index_xHomeCoord = -1;
+			int index_yHomeCoord = -1;
 			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");

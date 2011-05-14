@@ -42,8 +42,8 @@ public class CreateDemand {
 	private Scenario scenarioPUS;
 	
 	// [[ 3 ]] here you have to fill in the path of the pus files
-	private String pusTripsFile = "./input/travelsurvey_trips.txt";		// [[ 3 ]] = "";
-	private String pusPersonsFile = "./input/travelsurvey_persons.txt";
+	private String pusTripsFile = "...";
+	private String pusPersonsFile = "...";
 	
 	private ObjectAttributes personHomeAndWorkLocations;
 	private Random random = new Random(3838494); 
