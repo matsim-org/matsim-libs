@@ -98,8 +98,6 @@ public class TimeTesting {
 					myDecentralizedSmartCharger.writeSummary("V2G"+configName);
 					
 				} catch (Exception e1) {
-					
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				

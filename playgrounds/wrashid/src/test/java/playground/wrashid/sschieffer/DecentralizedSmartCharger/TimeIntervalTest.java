@@ -61,12 +61,21 @@ public class TimeIntervalTest extends TestCase{
 		TimeInterval t2= makeParkingInterval(5, 10);
 		TimeInterval t3= makeParkingInterval(10, 20);
 		TimeInterval t4= makeParkingInterval(11, 20);
-		assertEquals(t1.overlap(t2), true);
+		TimeInterval t5= makeParkingInterval(11, 22);
+		assertEquals(t1.overlap(t2), true);		
+		assertEquals(t1.overlap(t3), false);		
+		assertEquals(t1.overlap(t4), false);		
+		assertEquals(t1.overlap(t1), true);
 		
-		assertEquals(t1.overlap(t3), false);
+		//includes
+		assertEquals(t3.includes(t4), true);
+		assertEquals(t3.isIncluded(t4), false);
+		assertEquals(t4.isIncluded(t3), true);
+		assertEquals(t1.includes(t4), false);
 		
-		assertEquals(t1.overlap(t4), false);
-		
+		//partly includes
+		assertEquals(t3.partlyIncludes(t4), false);
+		assertEquals(t5.partlyIncludes(t3), true);
 	}
 	
 	
@@ -75,8 +84,7 @@ public class TimeIntervalTest extends TestCase{
 		LoadDistributionInterval l1= makeLoadDistributionInterval(5,10);
 		LoadDistributionInterval l2= makeLoadDistributionInterval(11,12);
 		
-		LoadDistributionInterval lAns= 
-			t1.ifOverlapWithLoadDistributionIntervalReturnOverlap(l1);
+		LoadDistributionInterval lAns= 	t1.ifOverlapWithLoadDistributionIntervalReturnOverlap(l1);
 		assertEquals(lAns.getStartTime(), 5.0);
 		assertEquals(lAns.getEndTime(), 10.0);
 		

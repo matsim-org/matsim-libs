@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -581,23 +582,38 @@ public class DecentralizedSmartCharger {
 			
 			if(t.isParking() && ((ParkingInterval)t).getChargingSchedule()!=null){
 				Id linkId = ((ParkingInterval)t).getLocation();
-				PolynomialFunction funcPrice= myHubLoadReader.getPricingPolynomialFunctionAtLinkAndTime(linkId, t);
+				ArrayList <LoadDistributionInterval> loadList= 
+					myHubLoadReader. getPricingLoadDistributionIntervalsnAtLinkAndTime(linkId, t);
+				
 				Schedule charging= ((ParkingInterval)t).getChargingSchedule();
-				for(int c=0; c<charging.getNumberOfEntries(); c++){
-					try {
-						totalCost+= functionIntegrator.integrate(funcPrice, 
-								charging.timesInSchedule.get(c).getStartTime(),
-								charging.timesInSchedule.get(c).getEndTime()
-								);
-					} catch (Exception e) {
-						System.out.println("Method: calculateChargingCostForAgentSchedule");
-						System.out.println("Charging Schedule");
-						charging.printSchedule();
-						System.out.println("Agent Schedule");
-						s.printSchedule();
-						e.printStackTrace();
-					} 
+				
+				for(int loadCount=0; loadCount<loadList.size(); loadCount++){
+					// overlap charging and loadCount
+					LoadDistributionInterval currentLoadInterval= loadList.get(loadCount);
+					PolynomialFunction currentPriceFunc= currentLoadInterval.getPolynomialFunction();
+					
+					Schedule currentOverlapCharging=new Schedule();
+					
+					currentOverlapCharging= charging.getOverlapWithLoadDistributionInterval(currentLoadInterval);
+					
+					for(int c=0; c<currentOverlapCharging.getNumberOfEntries(); c++){
+						try {
+							totalCost+= functionIntegrator.integrate(currentPriceFunc, 
+									currentOverlapCharging.timesInSchedule.get(c).getStartTime(),
+									currentOverlapCharging.timesInSchedule.get(c).getEndTime()
+									);
+							
+						} catch (Exception e) {
+							System.out.println("Method: calculateChargingCostForAgentSchedule");
+							System.out.println("current charging Schedule");
+							currentOverlapCharging.printSchedule();
+							System.out.println("Agent Schedule");
+							s.printSchedule();
+							e.printStackTrace();
+						} 
+					}
 				}
+				
 				
 			}
 			

@@ -228,7 +228,7 @@ public class HubLoadDistributionReader {
 	 * @param t
 	 * @return
 	 */
-	public PolynomialFunction getDeterministicLoadPolynomialFunctionAtLinkAndTime(Id agentId, Id idLink, TimeInterval t){
+	public ArrayList <PolynomialFunction> getDeterministicLoadPolynomialFunctionAtLinkAndTime(Id agentId, Id idLink, TimeInterval t){
 		
 		int hub= getHubForLinkId(idLink);
 		Schedule hubLoadSchedule;
@@ -240,15 +240,51 @@ public class HubLoadDistributionReader {
 		}
 		
 		
-		int interval = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
-				
-		LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(interval);
+		ArrayList <Integer> intervalList = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
 		
-		return l1.getPolynomialFunction();
+		ArrayList <PolynomialFunction> funcList = new ArrayList <PolynomialFunction> (0);
+		for(int i=0; i< intervalList.size(); i++){
+			LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(intervalList.get(i));
+			funcList.add(l1.getPolynomialFunction());
+		}
+		
+		return funcList;
 		
 	}
 	
 
+	
+	/**
+	 * gets the loadDistribution Function for a specific time interval and location idLink
+	 * @param idLink
+	 * @param t
+	 * @return
+	 */
+	public ArrayList <LoadDistributionInterval> getDeterministicLoadDistributionIntervalsAtLinkAndTime(Id agentId, Id idLink, TimeInterval t){
+		
+		int hub= getHubForLinkId(idLink);
+		Schedule hubLoadSchedule;
+		
+		if(DecentralizedSmartCharger.hasAgentEV(agentId)){
+			hubLoadSchedule = deterministicHubLoadDistribution.get(hub);
+		}else{
+			hubLoadSchedule = deterministicHubLoadDistributionPHEVAdjusted.get(hub);
+		}
+		
+		
+		ArrayList <Integer> intervalList = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
+		
+		ArrayList <LoadDistributionInterval> funcList = new ArrayList <LoadDistributionInterval> (0);
+		for(int i=0; i< intervalList.size(); i++){
+			LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(intervalList.get(i));
+			funcList.add(l1);
+		}
+		
+		return funcList;
+		
+	}
+	
+	
 	
 	/**
 	 * gets the pricing Function for a specific time interval and location idLink
@@ -256,16 +292,47 @@ public class HubLoadDistributionReader {
 	 * @param t
 	 * @return
 	 */
-	public PolynomialFunction getPricingPolynomialFunctionAtLinkAndTime(Id idLink, TimeInterval t){
+	public ArrayList <PolynomialFunction> getPricingPolynomialFunctionAtLinkAndTime(Id idLink, TimeInterval t){
 		
 		int hub= getHubForLinkId(idLink);
 		
 		Schedule hubLoadSchedule = pricingHubDistribution.get(hub);
-		int interval = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
-				
-		LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(interval);
 		
-		return l1.getPolynomialFunction();
+		ArrayList <Integer> intervalList = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
+		
+		ArrayList <PolynomialFunction> funcList = new ArrayList <PolynomialFunction> (0);
+		for(int i=0; i< intervalList.size(); i++){
+			LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(intervalList.get(i));
+			funcList.add(l1.getPolynomialFunction());
+		}
+		
+		return funcList;
+		
+	}
+	
+	
+	
+	/**
+	 * gets the pricing LoadDistributionIntervals for a specific time interval and location idLink
+	 * @param idLink
+	 * @param t
+	 * @return
+	 */
+	public ArrayList <LoadDistributionInterval> getPricingLoadDistributionIntervalsnAtLinkAndTime(Id idLink, TimeInterval t){
+		
+		int hub= getHubForLinkId(idLink);
+		
+		Schedule hubLoadSchedule = pricingHubDistribution.get(hub);
+		
+		ArrayList <Integer> intervalList = hubLoadSchedule.intervalIsInWhichTimeInterval(t);
+		
+		ArrayList <LoadDistributionInterval> funcList = new ArrayList <LoadDistributionInterval> (0);
+		for(int i=0; i< intervalList.size(); i++){
+			LoadDistributionInterval l1= (LoadDistributionInterval) hubLoadSchedule.timesInSchedule.get(intervalList.get(i));
+			funcList.add(l1);
+		}
+		
+		return funcList;
 		
 	}
 	

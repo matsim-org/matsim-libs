@@ -473,13 +473,16 @@ public class LPPHEV {
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){
-				if(solution[i+1]>=0.0){
-					((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(solution[i+1]);
+				
+				ParkingInterval thisParking= (ParkingInterval) schedule.timesInSchedule.get(i);
+				
+				if(solution[i+1]>0.0){
+					 thisParking.setRequiredChargingDuration(solution[i+1]);
 					
 				}else{
 					// in case LP has some problem and a negative number is the result
-					((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(0);
-					
+					 thisParking.setRequiredChargingDuration(0);
+					 thisParking.setChargingSchedule(null);
 				}
 				
 			}

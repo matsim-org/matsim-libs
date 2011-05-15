@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -221,12 +222,19 @@ public class AgentTimeIntervalReader {
 				// getFunctionFromHubReader
 				Id idLink= thisParkingInterval.getLocation();
 				
-				PolynomialFunction p= 
+				ArrayList <PolynomialFunction> funcList= 
 					DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
 							id,
 							idLink, 
 							thisParkingInterval);
-					
+				
+				
+				PolynomialFunction p= funcList.get(0);
+				// size can only be 1
+				if( funcList.size()>1){
+					System.out.println("in getJoulesForEachParkingInterval funcList was larger than 1 ERROR");
+				}
+				
 				//Integrate from start to End
 				double joulesInInterval=DecentralizedSmartCharger.functionIntegrator.integrate(p, 
 						thisParkingInterval.getStartTime(), 

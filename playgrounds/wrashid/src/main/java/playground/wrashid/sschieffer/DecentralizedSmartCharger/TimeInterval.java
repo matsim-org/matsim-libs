@@ -50,11 +50,87 @@ public abstract class TimeInterval implements Comparable{
 	}
 	
 	
+	/**
+	 * checks if this time interval is included within he specified time interval
+	 * @param other
+	 * @return
+	 */
+	public boolean isIncluded (TimeInterval other){
+		boolean check=false;
+		if( other.timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(getStartTime())
+				&&
+				other.timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(getEndTime()) 
+				&&
+				getStartTime()<getEndTime()){
+			check=true;
+		}
+		return check;
+	}
+	
+	
+	
+	/**
+	 * checks whether this time interval includes the specified time interval
+	 * @param other
+	 * @return
+	 */
+	public boolean includes(TimeInterval other){
+		boolean check=false;
+		if( timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(other.getStartTime()) 
+				&&
+				timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(other.getEndTime())
+				&&
+				other.getStartTime()<other.getEndTime()) {
+			check=true;
+		}
+		return check;
+	}
+	
+	
+	public boolean equalInterval(TimeInterval other){
+		boolean check=false;
+		if( getStartTime()==other.getStartTime() 
+				&&
+				getEndTime() == other.getEndTime()) {
+			check=true;
+		}
+		return check;
+	}
+	
+	/**
+	 * checks if the specified interval is partly in this interval, i.e. only the start or end time is in the interval
+	 * @param other
+	 * @return
+	 */
+	public boolean partlyIncludes(TimeInterval other){
+		boolean check=false;
+		//only beginning in
+		if( timeIsGreaterThanStartAndSmallerThanEnd(other.getStartTime()) 
+				&& 
+				!timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(other.getEndTime())) {
+			check=true;
+		}
+		
+		//only end in
+		if( !timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(other.getStartTime()) 
+				&& 
+				timeIsGreaterThanStartAndSmallerThanEnd(other.getEndTime())) {
+			check=true;
+		}
+		return check;
+	}
+	
+	
+	/**
+	 * returns true, if the interval includes, is equal, is included or partly includes the specified interval
+	 * @param other
+	 * @return
+	 */
 	public boolean overlap(TimeInterval other){
 		boolean check=false;
-		if( timeIsGreaterThanStartAndSmallerThanEnd(other.getStartTime()) 
-				||
-				timeIsGreaterThanStartAndSmallerThanEnd(other.getEndTime()) ) {
+		if( this.includes(other) || equalInterval(other)
+				||this.partlyIncludes(other) ||
+				this.isIncluded(other) ) {
 			check=true;
 		}
 		return check;
@@ -86,34 +162,28 @@ public abstract class TimeInterval implements Comparable{
 	
 	public LoadDistributionInterval ifOverlapWithLoadDistributionIntervalReturnOverlap(LoadDistributionInterval l){
 		
-		if(timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
-				&&
-				timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
+		if(includes(l)){
 			//if start and end in
 			return l;
 			
 		}else{
-			if(timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
-					&&
-					!timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
+			if( partlyIncludes(l)){
 				//if start in and end not in
-				return new LoadDistributionInterval(l.getStartTime(), 
-						getEndTime(), 
-						l.getPolynomialFunction(), 
-						l.isOptimal());
-				
-			}else{
-				if(!timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())
-						&&
-						timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getEndTime()	)){
-					//if start not in and end in
+				if(timeIsEqualOrGreaterThanStartAndEqualOrSmallerThanEnd(l.getStartTime())){
+					return new LoadDistributionInterval(l.getStartTime(), 
+							getEndTime(), 
+							l.getPolynomialFunction(), 
+							l.isOptimal());
+				}else{//if start not in and end in
 					return new LoadDistributionInterval(getStartTime(), 
 							l.getEndTime(), 
 							l.getPolynomialFunction(), 
 							l.isOptimal());
-					
-				}else{
-					if (start>l.getStartTime() && end< l.getEndTime()){
+				}
+				
+				
+			}else{
+					if (isIncluded(l)){
 						return new LoadDistributionInterval(getStartTime(), 
 								getEndTime(), 
 								l.getPolynomialFunction(), 
@@ -127,8 +197,7 @@ public abstract class TimeInterval implements Comparable{
 				}
 				
 			}
-			
-		}
+		
 	}
 	
 	

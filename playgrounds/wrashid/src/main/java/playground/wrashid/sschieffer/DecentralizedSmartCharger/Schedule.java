@@ -23,6 +23,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -240,13 +241,28 @@ public class Schedule {
 		for(int i=0; i<timesInSchedule.size(); i++){
 			TimeInterval thisT= timesInSchedule.get(i);
 			
-			if(   (t.getStartTime()>=thisT.getStartTime()  && t.getStartTime()<thisT.getEndTime())
-					|| (t.getEndTime()>thisT.getStartTime()  && t.getEndTime()<=thisT.getEndTime())){
+			if( thisT.overlap(t)){
 				//if overlap
 				overlap=true;
 			}
 		}
 		
+		return overlap;
+	}
+	
+	
+	
+	public Schedule getOverlapWithLoadDistributionInterval(LoadDistributionInterval t){
+		Schedule overlap= new Schedule();
+		
+		for(int i=0; i<timesInSchedule.size(); i++){
+			TimeInterval thisT= timesInSchedule.get(i);
+			
+			if( thisT.overlap(t)){
+				overlap.addTimeInterval(thisT.ifOverlapWithLoadDistributionIntervalReturnOverlap(t));
+			}
+		}
+		overlap.sort();
 		return overlap;
 	}
 	
@@ -269,6 +285,11 @@ public class Schedule {
 		if(time==timesInSchedule.get(timesInSchedule.size()-1).getEndTime()){
 			solution =timesInSchedule.size()-1;
 		}
+		if(solution ==-1){
+			System.out.println("timeIsInWhichInterval should not be -1");
+			System.out.println("time: "+time);
+			printSchedule();
+		}
 		return solution;
 	}
 	
@@ -288,16 +309,22 @@ public class Schedule {
 		return solution;
 	}
 	
-	public int intervalIsInWhichTimeInterval(TimeInterval t){
-		int solution =-1;
+	
+	/**
+	 * returns ArrayList of integers of all intervals in schedule 
+	 * @param t
+	 * @return
+	 */
+	public ArrayList <Integer> intervalIsInWhichTimeInterval(TimeInterval t){
+		ArrayList <Integer> intervalList = new ArrayList<Integer>(0);
+		
 		for (int i=0; i<timesInSchedule.size(); i++){
-			if(t.getEndTime()<=timesInSchedule.get(i).getEndTime() && 
-					t.getStartTime()>=timesInSchedule.get(i).getStartTime()){
-				solution =i;
+			if(timesInSchedule.get(i).overlap(t)){
+				intervalList.add(i);
 			}
 		}	
 			
-		return solution;
+		return intervalList;
 	}
 	
 	
@@ -397,55 +424,61 @@ public class Schedule {
 	
 	
 	public void insertChargingIntervalsIntoParkingIntervalSchedule(Schedule intervalsToPutIn){
-		//
-//		System.out.println("InsertChargingInterval: Schedule into which toinsert:");
-//		printSchedule();
-//		System.out.println("InsertChargingInterval: ChargingSChedule to insert:");
-//		intervalsToPutIn.printSchedule();
-		
-		
 		
 		for(int i=0; i<intervalsToPutIn.getNumberOfEntries(); i++){
+		/*	System.out.println("InsertChargingInterval: Schedule into which to insert:");
+			printSchedule();
+			System.out.println("InsertChargingInterval: ChargingSChedule to insert:");
+			intervalsToPutIn.printSchedule();*/
+			
 			TimeInterval t= intervalsToPutIn.timesInSchedule.get(i);
-			int interval= intervalIsInWhichTimeInterval(t);
 			
-			//chck value of interval
-			if (interval==-1){
-				//trouble
-				System.out.println("time is not in schedule: "+ t);
-				printSchedule();
-			}
-			double start=timesInSchedule.get(interval).getStartTime();//currently in schedule
-			double end=timesInSchedule.get(interval).getEndTime();
+			 ArrayList <Integer> intervals= intervalIsInWhichTimeInterval(t);
+			 
+			 //for each overlap
+			 
+			 Schedule newChargingAndParkingIntervals= new Schedule();
+			 int correction=0;
+			 // delete Interval from Schedule and add new Intervals into newChargingAndParkingIntervals
+			 for(int currentInt=0; currentInt<intervals.size();currentInt++){
+				 
+				 	double start=timesInSchedule.get(intervals.get(currentInt)).getStartTime();//currently in schedule
+					double end=timesInSchedule.get(intervals.get(currentInt)).getEndTime();
+					
+					Id linkId = ((ParkingInterval) timesInSchedule.get(intervals.get(currentInt))).getLocation();
+					boolean type= ((ParkingInterval) timesInSchedule.get(intervals.get(currentInt))).isInSystemOptimalChargingTime();
+						
+					//before 
+					if(t.getStartTime()>start){
+						ParkingInterval p= new ParkingInterval(start, t.getStartTime(), linkId);
+						p.setParkingOptimalBoolean(type);
+						p.setRequiredChargingDuration(0);
+						newChargingAndParkingIntervals.addTimeInterval(p);
+					}
+					
+					//charging
+					if(t.getStartTime()>start){
+						ChargingInterval p= new ChargingInterval(t.getStartTime(),t.getEndTime());
+						
+						newChargingAndParkingIntervals.addTimeInterval(p);
+					}
+					
+					//after
+					if(end>t.getEndTime()){
+						ParkingInterval p= new ParkingInterval(t.getEndTime(),end, linkId);
+						p.setParkingOptimalBoolean(type);
+						p.setRequiredChargingDuration(0);
+						newChargingAndParkingIntervals.addTimeInterval(p);
+					}
+					
+					deleteIntervalAtEntry(intervals.get(currentInt)-correction);
+					 correction++;
+			 }
+			 
+			mergeSchedules(newChargingAndParkingIntervals);
+			/*System.out.println("after adding  charging Interval");
+			printSchedule();*/
 			
-			Id linkId = ((ParkingInterval) timesInSchedule.get(interval)).getLocation();
-			boolean type= ((ParkingInterval) timesInSchedule.get(interval)).isInSystemOptimalChargingTime();
-				
-			deleteIntervalAtEntry(interval);
-			
-			//before 
-			if(t.getStartTime()>start){
-				ParkingInterval p= new ParkingInterval(start, t.getStartTime(), linkId);
-				p.setParkingOptimalBoolean(type);
-				p.setRequiredChargingDuration(0);
-				addTimeInterval(p);
-			}
-			
-			//charging
-			if(t.getStartTime()>start){
-				ChargingInterval p= new ChargingInterval(t.getStartTime(),t.getEndTime());
-				
-				addTimeInterval(p);
-			}
-			
-			//after
-			if(end>t.getEndTime()){
-				ParkingInterval p= new ParkingInterval(t.getEndTime(),end, linkId);
-				p.setParkingOptimalBoolean(type);
-				p.setRequiredChargingDuration(0);
-				addTimeInterval(p);
-			}
-			sort();
 		}
 		
 	}
@@ -564,7 +597,148 @@ public class Schedule {
 	}
 	
 	
+public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		Schedule firstHalf=new Schedule();
+		int interval= timeIsInWhichInterval(time); 
+		
+		for(int i=0; i<=interval-1; i++){
+			firstHalf.addTimeInterval(timesInSchedule.get(i));
+			
+		}
+		
+		//last interval To Be Cut
+		TimeInterval lastInterval= timesInSchedule.get(interval);
+		if (lastInterval.isDriving()){
+			
+			DrivingInterval d= new DrivingInterval(lastInterval.getStartTime(), 
+					time, 
+					((DrivingInterval)lastInterval).getConsumption() * (time- lastInterval.getStartTime())/lastInterval.getIntervalLength()
+					);
+			if(d.getIntervalLength()>0){
+				firstHalf.addTimeInterval(d);
+			}
+			
+		}else{
+				ParkingInterval p= new ParkingInterval(lastInterval.getStartTime(), 
+						time, 
+						((ParkingInterval)lastInterval).getLocation() 
+						);
+				p.setParkingOptimalBoolean(((ParkingInterval)lastInterval).isInSystemOptimalChargingTime());
+				
+				if(((ParkingInterval)lastInterval).getChargingSchedule()!= null){
+					p.setChargingSchedule(
+							((ParkingInterval)lastInterval).getChargingSchedule().cutChargingScheduleAtTime(time));
+					
+					double totalTimeChargingInP= p.getChargingSchedule().getTotalTimeOfIntervalsInSchedule();
+					p.setRequiredChargingDuration(totalTimeChargingInP);
+				}else{
+					p.setRequiredChargingDuration(0);
+				}
+					
+				if(p.getIntervalLength()>0){
+					firstHalf.addTimeInterval(p);
+				}
+				
+				
+			
+		}
+		
+		return firstHalf;
+	}
 	
 	
+
+	public Schedule cutScheduleAtTimeSecondHalf (double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		Schedule secondHalf=new Schedule();
+		
+		int interval= timeIsInWhichInterval(time); 
+		
+		//add first
+		TimeInterval firstInterval= timesInSchedule.get(interval);
+		if (firstInterval.isDriving()){
+			
+			DrivingInterval d= new DrivingInterval(time, firstInterval.getEndTime(), 
+					((DrivingInterval)firstInterval).getConsumption() * (firstInterval.getEndTime()-time )/firstInterval.getIntervalLength()
+			);
+			if(d.getIntervalLength()>0){
+				secondHalf.addTimeInterval(d);
+			}
+			
+			
+			
+		}else{
+			
+				
+				ParkingInterval p= new ParkingInterval(time, firstInterval.getEndTime(), 
+						((ParkingInterval)firstInterval).getLocation() 
+						);
+				p.setParkingOptimalBoolean(((ParkingInterval)firstInterval).isInSystemOptimalChargingTime());
+				
+				
+				if(((ParkingInterval)firstInterval).getChargingSchedule()!= null){
+					p.setChargingSchedule(
+							((ParkingInterval)firstInterval).getChargingSchedule().cutChargingScheduleAtTimeSecondHalf(time));
+				}else{
+					p.setRequiredChargingDuration(0);
+				}
+				
+				if(p.getIntervalLength()>0){
+					secondHalf.addTimeInterval(p);
+				}
+							
+				
+			
+		}
+		
+		
+		for(int i=interval+1; i<getNumberOfEntries(); i++){
+			secondHalf.addTimeInterval(timesInSchedule.get(i));
+			
+		}
+		secondHalf.sort();		
+		return secondHalf;
+		
+	}
+
+
+
+	public Schedule cutChargingScheduleAtTime(double time){
+		Schedule newCharging= new Schedule();
+		for(int i=0; i<getNumberOfEntries(); i++){
+			if(time > timesInSchedule.get(i).getEndTime()){
+				//add full interval
+				newCharging.addTimeInterval(timesInSchedule.get(i));
+				
+			}
+			if(time > timesInSchedule.get(i).getStartTime() && time <= timesInSchedule.get(i).getEndTime()){
+				//only take first half
+				newCharging.addTimeInterval(new ChargingInterval(timesInSchedule.get(i).getStartTime(), time));
+			}
+			
+		}
+		return newCharging;
+		
+	}
+	
+	
+	
+	public Schedule cutChargingScheduleAtTimeSecondHalf(double time){
+		Schedule newCharging= new Schedule();
+		for(int i=0; i<getNumberOfEntries(); i++){
+			if(time < timesInSchedule.get(i).getStartTime()){
+				//add full interval
+				newCharging.addTimeInterval(timesInSchedule.get(i));
+				
+			}
+			if(time > timesInSchedule.get(i).getStartTime() && time <= timesInSchedule.get(i).getEndTime()){
+				//only take 2nd half
+				newCharging.addTimeInterval(new ChargingInterval(time, timesInSchedule.get(i).getEndTime()));
+			}
+			
+		}
+		return newCharging;
+		
+	}
 	
 }

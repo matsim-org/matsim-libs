@@ -500,8 +500,16 @@ public class LPEV {
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){
-				((ParkingInterval)schedule.timesInSchedule.get(i)).setRequiredChargingDuration(solution[i+1]);
+				ParkingInterval thisParking= (ParkingInterval) schedule.timesInSchedule.get(i);
 				
+				if(solution[i+1]>0.0){
+					 thisParking.setRequiredChargingDuration(solution[i+1]);
+					
+				}else{
+					// 0 or negative 
+					 thisParking.setRequiredChargingDuration(0);
+					 thisParking.setChargingSchedule(null);
+				}
 			}
 		}
 		return schedule;

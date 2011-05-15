@@ -68,8 +68,15 @@ public class ParkingInterval extends TimeInterval {
 		
 		Schedule newParkingChargingSchedule = new Schedule();
 		newParkingChargingSchedule.addTimeInterval(this);
-		newParkingChargingSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(chargingSchedule);
-		setParkingChargingSchedule(newParkingChargingSchedule);
+		
+		if(chargingSchedule!=null){		
+			newParkingChargingSchedule.insertChargingIntervalsIntoParkingIntervalSchedule(chargingSchedule);
+			setParkingChargingSchedule(newParkingChargingSchedule);
+		}else{
+			// can be reset to null, in a rescheduling procedure, if new required charging time is equal to zero in an interval
+			setParkingChargingSchedule(newParkingChargingSchedule);
+		}
+		
 	}
 	
 	
