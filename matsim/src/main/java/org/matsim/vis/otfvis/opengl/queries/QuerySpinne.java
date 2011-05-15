@@ -74,22 +74,19 @@ import com.sun.opengl.util.BufferUtil;
  * their day/trip.
  *
  * @author dstrippgen
- *
  */
 public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemListener {
 
 	public static class Result implements OTFQueryResult {
 
-		private static final long serialVersionUID = 1L;
-
-		private transient FloatBuffer vert;
+		private transient FloatBuffer vert = null;
 		private transient ByteBuffer colors =  null;
 		private transient InfoText agentText = null;
 		private int[] count = null;
 		private boolean calcOffset = true;
 		private float[] vertex = null;
-		private String linkIdString;
-		private transient OTFOGLDrawer.FastColorizer colorizer3;
+		private String linkIdString = null;
+		private transient OTFOGLDrawer.FastColorizer colorizer3 = null;
 
 		@Override
 		public void draw(OTFDrawer drawer) {
@@ -211,11 +208,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		public boolean isAlive() {
 			return false;
 		}
-
-
 	}
 
-	private static final long serialVersionUID = -749787121253826794L;
 	protected Id queryLinkId;
 	private transient Map<Id, Integer> drivenLinks = null;
 

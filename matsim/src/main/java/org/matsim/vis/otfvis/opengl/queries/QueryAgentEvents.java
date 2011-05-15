@@ -46,13 +46,9 @@ import org.matsim.vis.snapshots.writers.VisMobsimFeature;
  */
 public class QueryAgentEvents extends AbstractQuery implements PersonEventHandler {
 
-	private static final long serialVersionUID = -7388598935268835323L;
-	
 	private static transient Logger logger = Logger.getLogger(QueryAgentEvents.class);
 	
 	public static class Result implements OTFQueryResult {
-
-		private static final long serialVersionUID = 1L;
 
 		private String agentId;
 		private List<String> newEventStrings = new ArrayList<String>();
@@ -77,13 +73,13 @@ public class QueryAgentEvents extends AbstractQuery implements PersonEventHandle
 		
 	}
 
-	private Id agentId;
+	private Id agentId = null;
 	
-	private EventsManager eventsManager;
+	private EventsManager eventsManager = null;
 	
 	private BlockingQueue<PersonEvent> queue = new LinkedBlockingQueue<PersonEvent>();
 	
-	private Result result;
+	private Result result = null;
 
 	@Override
 	public void handleEvent(PersonEvent event) {

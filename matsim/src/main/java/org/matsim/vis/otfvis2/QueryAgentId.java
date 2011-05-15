@@ -49,7 +49,6 @@ import org.matsim.vis.snapshots.writers.VisMobsimFeature;
  */
 public final class QueryAgentId extends AbstractQuery {
 
-	private static final long serialVersionUID = -4466967514266968254L;
 	private final double x;
 	private final double y;
 	private double width = 0;
@@ -115,13 +114,10 @@ public final class QueryAgentId extends AbstractQuery {
 
 	public static class Result implements OTFQueryResult {
 
-		private static final long serialVersionUID = 1L;
-
 		public List<String> agentIds = new ArrayList<String>();
 
 		@Override
 		public void remove() {
-
 		}
 
 		@Override
@@ -131,7 +127,6 @@ public final class QueryAgentId extends AbstractQuery {
 
 		@Override
 		public void draw(OTFDrawer drawer) {
-
 		}
 
 	}

@@ -53,13 +53,10 @@ import com.sun.opengl.util.BufferUtil;
 
 /**
  * QueryAgentPTBus draws certain public transport related informations.
- *
  */
 public class QueryAgentPTBus extends AbstractQuery {
 
 	public static class Result implements OTFQueryResult {
-
-		private static final long serialVersionUID = 1L;
 
 		private final List<String> allIds;
 		private float[] vertex = null;
@@ -137,8 +134,6 @@ public class QueryAgentPTBus extends AbstractQuery {
 		}
 
 	}
-
-	private static final long serialVersionUID = -8415337571576184768L;
 
 	private String agentId;
 	private Result result;

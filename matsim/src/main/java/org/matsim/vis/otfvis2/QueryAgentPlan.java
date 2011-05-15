@@ -79,8 +79,6 @@ import com.sun.opengl.util.BufferUtil;
  */
 public final class QueryAgentPlan extends AbstractQuery {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
 	private Id agentId;
@@ -141,8 +139,6 @@ public final class QueryAgentPlan extends AbstractQuery {
 	public static class Result implements OTFQueryResult {
 
 		private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
-
-		private static final long serialVersionUID = -8415337571576184768L;
 
 		/*package*/ String agentId;
 		/*package*/ boolean hasPlan = false;

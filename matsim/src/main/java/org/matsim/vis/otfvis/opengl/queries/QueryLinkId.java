@@ -54,8 +54,6 @@ public class QueryLinkId extends AbstractQuery {
 
 	public static class Result implements OTFQueryResult {
 
-		private static final long serialVersionUID = 1L;
-
 		public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
 
 		@Override
@@ -75,7 +73,6 @@ public class QueryLinkId extends AbstractQuery {
 
 	}
 
-	private static final long serialVersionUID = -1389950511283282110L;
 	private final double sx;
 	private final double sy;
 	private double width = 0;

@@ -20,8 +20,6 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import java.io.Serializable;
-
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
@@ -41,7 +39,7 @@ import org.matsim.vis.snapshots.writers.VisMobsimFeature;
  *
  * @author dstrippgen
  */
-public interface OTFQuery extends Serializable {
+public interface OTFQuery {
 
 	/**
 	 * Type of Ids that this query will deal with

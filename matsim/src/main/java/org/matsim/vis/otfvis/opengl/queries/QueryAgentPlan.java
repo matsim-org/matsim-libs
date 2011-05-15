@@ -171,8 +171,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
-		private static final long serialVersionUID = -8415337571576184768L;
-
 		/*package*/ String agentId;
 		/*package*/ boolean hasPlan = false;
 		protected float[] vertex = null;
