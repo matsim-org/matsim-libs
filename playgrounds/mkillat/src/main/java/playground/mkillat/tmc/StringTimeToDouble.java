@@ -1,4 +1,4 @@
-package mkillat.tmc;
+package playground.mkillat.tmc;
 
 public class StringTimeToDouble {
 	

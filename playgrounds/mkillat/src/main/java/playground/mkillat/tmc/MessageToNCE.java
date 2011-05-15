@@ -1,4 +1,4 @@
-package mkillat.tmc;
+package playground.mkillat.tmc;
 
 import java.util.ArrayList;
 import java.util.List;

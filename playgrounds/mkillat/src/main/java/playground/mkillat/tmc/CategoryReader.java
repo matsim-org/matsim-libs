@@ -1,4 +1,4 @@
-package mkillat.tmc;
+package playground.mkillat.tmc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageReader {
 
-	public static List <Message>  read(String filename){
+public class CategoryReader {
 
-		List <Message> messages = new ArrayList <Message>();
+	public static List <EventCodeCategorys> read(String filename){
+
+		List <EventCodeCategorys> output = new ArrayList <EventCodeCategorys>();
 		
 		FileReader fr;
 		BufferedReader br;
@@ -24,18 +25,18 @@ public class MessageReader {
 		while ((line = br.readLine()) != null) {
 		String[] result = line.split(";");
 		
+		EventCodeCategorys current = new EventCodeCategorys(Integer.parseInt(result[0]),
+															result[1], 
+															result[2], 
+															result[3], 
+															Double.parseDouble(result[4]));
 		
-		Message current = new Message(	result[0], 
-										result[1],
-										Integer.parseInt(result[2]),
-										result [3],
-										result [4]);
-		
-			messages.add(current);
+			output.add(current);
 		
 		}
 		
 
+		
 		
 	} catch (FileNotFoundException e) {
 		System.err.println("File not found...");
@@ -47,7 +48,7 @@ public class MessageReader {
 		System.err.println("I/O error...");
 		e.printStackTrace();
 		}
-		return messages;
+		return output;
 	}
 	
 }
