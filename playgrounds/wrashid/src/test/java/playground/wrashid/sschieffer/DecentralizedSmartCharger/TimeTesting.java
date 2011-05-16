@@ -66,7 +66,7 @@ public class TimeTesting {
 							bufferBatteryCharge,
 							standardChargingSlotLength);
 					
-					
+					myDecentralizedSmartCharger.setDebug(false);
 					myDecentralizedSmartCharger.run();
 					
 					myDecentralizedSmartCharger.writeSummary("DSC"+configName);
