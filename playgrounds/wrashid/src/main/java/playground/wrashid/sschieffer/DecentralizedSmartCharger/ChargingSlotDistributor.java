@@ -87,7 +87,7 @@ public class ChargingSlotDistributor {
 				}
 					PolynomialFunction func= loadList.get(0).getPolynomialFunction();
 					
-					if(p.getIntervalLength()*0.7 <chargingTime){
+					if(p.getIntervalLength()*0.65 <chargingTime){
 						if(chargingTime>p.getIntervalLength()){
 							if(DecentralizedSmartCharger.debug){
 								System.out.println("rounding error - correction");
@@ -164,7 +164,7 @@ public class ChargingSlotDistributor {
 						bit, 
 						chargingInParkingInterval);
 			
-			
+			// if too many iterations - reduce mincharging length or attribute anything
 			
 		}
 		
@@ -201,11 +201,18 @@ public class ChargingSlotDistributor {
 		
 		boolean notFound=true;
 		boolean run=true;
-		
+		if(DecentralizedSmartCharger.debug){
+			System.out.println("assign random charging slot in interval");
+			System.out.println(bit+ "seconds between "+ startTime + " - "+ endTime);
+			System.out.println("Schedule already:");
+			chargingInParkingInterval.printSchedule();
+		}
 		
 		double upper=endTime;
 		double lower=startTime;
 		double trial=(upper+lower)/2;
+		
+		int countNotFoundInARow=0;
 		
 		while(notFound){
 			
@@ -221,7 +228,7 @@ public class ChargingSlotDistributor {
 			while(run){
 				double integral;
 				if(joulesInInterval>=0){
-					double err=joulesInInterval/1000; // accuracy 0.1%
+					double err=joulesInInterval/100; // accuracy 1%
 					
 					integral=DecentralizedSmartCharger.functionIntegrator.integrate(func, startTime, trial);
 					
@@ -282,20 +289,42 @@ public class ChargingSlotDistributor {
 				//no overlap--> exit loop
 				
 				notFound=false;
+				countNotFoundInARow=0;
 				chargingInParkingInterval.addTimeInterval(c1);
 				
 			}else{
+				countNotFoundInARow++;
 				
-				
+				if(countNotFoundInARow>100){
+					chargingInParkingInterval=exitDistributionIfTooConstrained(startTime, endTime, bit, chargingInParkingInterval);
+					notFound=false;
+				}
 			}
-			//otherwise notFound remains true and it runs again
-			
 		}
-		
+		chargingInParkingInterval.sort();
 		return chargingInParkingInterval;
 		
 	}
 	
+	
+	
+	public Schedule exitDistributionIfTooConstrained(double startTime, 
+			double endTime, 
+			double bit,
+			Schedule chargingInParkingInterval){
+		
+		double timeAlready=chargingInParkingInterval.getTotalTimeOfIntervalsInSchedule();
+		
+		double diff= (endTime-startTime)-(timeAlready+bit);
+		double startRand= Math.random()*diff;
+		
+		ChargingInterval c= new ChargingInterval(startTime+startRand, startTime+startRand+(timeAlready+bit));
+		chargingInParkingInterval=new Schedule();
+		chargingInParkingInterval.addTimeInterval(c);
+		
+		return chargingInParkingInterval;
+		
+	}
 	
 	
 	public PolynomialFunction turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(PolynomialFunction func, double start1, double end1) throws OptimizationException{

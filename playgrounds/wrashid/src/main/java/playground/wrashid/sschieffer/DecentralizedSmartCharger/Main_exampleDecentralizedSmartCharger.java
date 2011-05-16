@@ -135,14 +135,14 @@ public class Main_exampleDecentralizedSmartCharger {
 		mySimulation.addControlerListenerDecentralizedCharging();		
 		mySimulation.controler.run();
 		
+		
+		
 		/***********************
 		 * Examples how to use
 		 * The decentralized smart charger runs after the iteration
 		 * after the run, the results can be obtained as demonstrated in the example below
 		 * **********************
 		 */
-		
-		
 		for(Id id: DecentralizedChargingSimulation.controler.getPopulation().getPersons().keySet()){
 			
 			//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals

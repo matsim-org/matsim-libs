@@ -244,6 +244,7 @@ public class Schedule {
 			if( thisT.overlap(t)){
 				//if overlap
 				overlap=true;
+				i=timesInSchedule.size();
 			}
 		}
 		
