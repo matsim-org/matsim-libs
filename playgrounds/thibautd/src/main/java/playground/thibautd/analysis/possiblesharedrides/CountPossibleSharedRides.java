@@ -107,9 +107,12 @@ public class CountPossibleSharedRides {
 	 * To run before any result getting method.
 	 */
 	public void run() {
+		long count = 0L;
+		long total = this.plans.size();
 		log.info("    computing trip data...");
 		for (Map.Entry<Id, Plan> plan : this.plans.entrySet()) {
-			log.info("   treat new plan");
+			count++;
+			log.info("   treat plan "+count+"/"+total);
 			for (PlanElement pe : plan.getValue().getPlanElements()) {
 				if ((pe instanceof Leg) &&
 						(((Leg) pe).getMode().equals(TransportMode.car))) {
