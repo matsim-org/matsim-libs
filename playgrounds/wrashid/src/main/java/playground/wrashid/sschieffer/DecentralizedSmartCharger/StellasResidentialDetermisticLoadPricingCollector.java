@@ -44,10 +44,16 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	private double peakWattOnGrid=Math.pow(10, 6);
 	private double assumptionBase=peakWattOnGrid*0.85;
 	
-	
 	final int pricingLevels=1;
 	final private int divHubsX=2;
 	final private int divHubsY=2;
+	
+	
+	final double energyPricePerkWh=0.25;
+	double standardConnectionElectricityJPerSecond= 3500; 
+	final double optimalPrice=energyPricePerkWh*1/1000*1/3600*standardConnectionElectricityJPerSecond;//0.25 CHF per kWh		
+	final double suboptimalPrice=optimalPrice*3; // cost/second  
+	
 	
 	int numhubs= divHubsX*divHubsY;
 	
@@ -62,7 +68,8 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 		readLoadFile(file, peakWattOnGrid);
 		
 		setUpHubLoadFromReader(numhubs);
-		setUpPricingLevels();
+		//setUpPricingLevels();
+		setUpContinuousPricingLevels();
 		visualize(DecentralizedSmartCharger.outputPath);
 	}
 	
@@ -96,10 +103,7 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	 */
 	private void  setUpPricingLevels(){
 		//pricinglevels
-		double energyPricePerkWh=0.25;
-		double standardConnectionElectricityJPerSecond= 3500; 
-		double optimalPrice=energyPricePerkWh*1/1000*1/3600*standardConnectionElectricityJPerSecond;//0.25 CHF per kWh		
-		double suboptimalPrice=optimalPrice*3; // cost/second  
+		
 				
 		//**********************
 		// DEFINE HUBS 
@@ -123,7 +127,6 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 								lCurrent.getEndTime(), 
 								new PolynomialFunction(new double[]{suboptimalPrice}), 
 								false));
-					
 				}
 			}
 			// save to pricing
@@ -133,6 +136,69 @@ public class StellasResidentialDetermisticLoadPricingCollector extends Determist
 	}
 	
 	
+	
+	/**
+	 * sets up continuous pricing levels for each hub 
+	 * in each hub the lowest load will correspond to the worst price, the highest available load will have the best price
+	 * 
+	 * a function is set up 
+	 */
+	private void  setUpContinuousPricingLevels(){
+		
+		DomainFinder myDomain=new DomainFinder();		
+		
+		//**********************
+		// DEFINE HUBS 
+		//**********************
+		for(Integer h: hubLoadDistribution.keySet()){
+			
+			//max and min load in hub
+			double minDomain=Double.MAX_VALUE;
+			double maxDomain= Double.MIN_VALUE;
+			
+			Schedule s= hubLoadDistribution.get(h);
+			Schedule pricing = new Schedule();
+			
+			for(int i=0; i<s.getNumberOfEntries(); i++){
+				LoadDistributionInterval currentInterval= (LoadDistributionInterval)s.timesInSchedule.get(i);
+				myDomain.setFunctionAndRange(
+						currentInterval.getStartTime(), 
+						currentInterval.getEndTime(), 
+						currentInterval.getPolynomialFunction());
+				minDomain= Math.min(myDomain.getDomainMin(), minDomain);
+				maxDomain= Math.max(myDomain.getDomainMax(), maxDomain);
+			}
+			
+			//HAVE MIN AND MAX LOAD OVER DAY NOW
+			//Make pricing schedule: price= worstPrice - referenceLoad/amplitudeLoad *(worstPrice-bestPrice)
+			for(int i=0; i<s.getNumberOfEntries(); i++){
+				LoadDistributionInterval currentInterval= (LoadDistributionInterval)s.timesInSchedule.get(i);
+				PolynomialFunction pricingFunc= 
+					new PolynomialFunction (currentInterval.getPolynomialFunction().getCoefficients().clone());
+				
+				//pricing FUnc up to here only copy of loadDistribution
+				
+				// make pricing Func reference load = Load-minL
+				pricingFunc.add(new PolynomialFunction(new double[]{-minDomain}));
+				
+				// multiply lref with (worstPrice-bestPrice/dL)
+				pricingFunc.multiply(new PolynomialFunction(
+						new double[]{(-1*(suboptimalPrice-optimalPrice)/(maxDomain-minDomain))})
+						);
+				
+				// now add worst price
+				
+				pricingFunc.add(new PolynomialFunction(new double[]{suboptimalPrice}));
+				
+				pricing.addTimeInterval(new LoadDistributionInterval(
+						currentInterval.getStartTime(), 
+						currentInterval.getEndTime(), 
+						pricingFunc, 
+						currentInterval.isOptimal()));
+			}
+			
+		}
+	}
 	
 	
 	private Schedule getHubLoadSchedule() throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{

@@ -100,7 +100,6 @@ public class DecentralizedSmartCharger {
 	//In order to perform only absolute checks, the relative tolerance must be set to a negative value.
 	
 	public static SimpsonIntegrator functionIntegrator= new SimpsonIntegrator();
-	public NewtonSolver newtonSolver= new NewtonSolver();	
 	public GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		
 	public static PolynomialFitter polyFit;

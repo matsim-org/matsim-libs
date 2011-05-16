@@ -61,7 +61,6 @@ public class HubLoadDistributionReader {
 	
 	
 	UnivariateRealSolverFactory factory = UnivariateRealSolverFactory.newInstance();
-	UnivariateRealSolver solverBisection = factory.newBisectionSolver();
 	UnivariateRealSolver solverNewton = factory.newNewtonSolver();
 	
 		
