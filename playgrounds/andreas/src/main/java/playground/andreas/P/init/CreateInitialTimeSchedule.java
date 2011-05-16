@@ -19,7 +19,6 @@
 
 package playground.andreas.P.init;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;

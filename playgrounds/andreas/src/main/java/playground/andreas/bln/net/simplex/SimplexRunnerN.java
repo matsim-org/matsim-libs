@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Time;
 
 import playground.andreas.optimization.Objective;
@@ -93,10 +94,10 @@ public class SimplexRunnerN {
 
 						if(i < dimension){
 						
-							if(Math.random() < 0.5){
-								p.setValue(i, p.getValue(i) + p.getValue(i) * (-1 * 5.0 / 20.0 * Math.random()));
+							if(MatsimRandom.getRandom().nextDouble() < 0.5){
+								p.setValue(i, p.getValue(i) + p.getValue(i) * (-1 * 5.0 / 20.0 * MatsimRandom.getRandom().nextDouble()));
 							} else {
-								p.setValue(i, p.getValue(i) + p.getValue(i) * (+1 * 5.0 / 20.0 * Math.random()));
+								p.setValue(i, p.getValue(i) + p.getValue(i) * (+1 * 5.0 / 20.0 * MatsimRandom.getRandom().nextDouble()));
 							}
 
 						}

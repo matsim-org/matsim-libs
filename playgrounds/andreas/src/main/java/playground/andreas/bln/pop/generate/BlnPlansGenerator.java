@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -46,8 +46,6 @@ public class BlnPlansGenerator {
 	 */
 	public static void main(String[] args) {
 		try {
-			Config config = ConfigUtils.loadConfig("./src/playground/andreas/bln/config.xml");
-
 			BlnPlansGenerator myBlnPlanGenerator = new BlnPlansGenerator();
 
 			HashMap<Id, PersonImpl> personMap;
@@ -323,7 +321,7 @@ public class BlnPlansGenerator {
 				// Since data is from survey, it is more likely to get x:00, x:15, x:30, x:45 as answer,
 				// and therefore arbitrary peaks in departure and arrival time histogram -> spread it
 				if (startTime % (15*60) == 0){
-					startTime = (startTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
+					startTime = (startTime - (spreadingTime / 2)) + MatsimRandom.getRandom().nextDouble() * spreadingTime;
 					startTime = Math.max(0.0, startTime);
 					newAct.setStartTime(startTime);
 				} else {
@@ -339,7 +337,7 @@ public class BlnPlansGenerator {
 					}
 
 					if (endTime % (15*60) == 0){
-						endTime = (endTime - (spreadingTime / 2)) + Math.random() * spreadingTime;
+						endTime = (endTime - (spreadingTime / 2)) + MatsimRandom.getRandom().nextDouble() * spreadingTime;
 						endTime = Math.max(0.0, endTime);
 						lastAct.setEndTime(endTime);
 					} else {

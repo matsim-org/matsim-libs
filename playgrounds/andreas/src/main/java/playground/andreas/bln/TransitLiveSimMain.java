@@ -3,8 +3,6 @@ package playground.andreas.bln;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.MobsimConfigGroupI;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -21,8 +19,6 @@ public class TransitLiveSimMain {
 
 		String inputDir = "e:/_out/otflivetest/";
 
-		double snapshotPeriod = 60;
-		MobsimConfigGroupI simulationConfigGroup = new SimulationConfigGroup();
 		String configFilename = inputDir + "config.xml";
 		Config config = new Config();
 		config.addCoreModules();

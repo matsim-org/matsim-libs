@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -88,7 +89,7 @@ public class BBIextraDemand {
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
-					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
@@ -114,7 +115,7 @@ public class BBIextraDemand {
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
-					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
@@ -133,7 +134,7 @@ public class BBIextraDemand {
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
-					act.setEndTime(getStartTime() * 3600 + Math.random() * 3600);
+					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
@@ -168,7 +169,7 @@ public class BBIextraDemand {
 			sum += this.timeStructure[i];
 		}
 		
-		double rnd = Math.random() * sum;
+		double rnd = MatsimRandom.getRandom().nextDouble() * sum;
 		
 		int i = 0;		
 		sum = 0.0;

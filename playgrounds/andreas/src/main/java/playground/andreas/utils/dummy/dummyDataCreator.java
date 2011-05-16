@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.core.gbl.MatsimRandom;
+
 public class dummyDataCreator {
 
 	/**
@@ -19,12 +21,12 @@ public class dummyDataCreator {
 			
 			for (int i = 1; i <= 2000000; i++) {
 				
-				double cars = (int) (Math.random() * 10);
-				double bikes = (int) (Math.random() * 20);
-				double ships = (int) (Math.random() * 5);
-				double busses = (int) (Math.random() * 4);
-				double airplanes = (int) (Math.random() * 2);
-				double trains = (int) (Math.random() * 2);
+				double cars = (int) (MatsimRandom.getRandom().nextDouble() * 10);
+				double bikes = (int) (MatsimRandom.getRandom().nextDouble() * 20);
+				double ships = (int) (MatsimRandom.getRandom().nextDouble() * 5);
+				double busses = (int) (MatsimRandom.getRandom().nextDouble() * 4);
+				double airplanes = (int) (MatsimRandom.getRandom().nextDouble() * 2);
+				double trains = (int) (MatsimRandom.getRandom().nextDouble() * 2);
 				
 				writer.write(i + "; " + cars + "; " + bikes + "; " + ships + "; " + busses + "; " + airplanes + "; " + trains);
 				writer.newLine();

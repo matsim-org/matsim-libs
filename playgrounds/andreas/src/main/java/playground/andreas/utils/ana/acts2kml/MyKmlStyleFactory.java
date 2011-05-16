@@ -12,6 +12,7 @@ import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
@@ -71,7 +72,7 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 		if(this.styleMap.get(type) == null){
 			
 			StyleType styleType = this.kmlObjectFactory.createStyleType();
-			styleType.setId(String.valueOf(Math.random()));
+			styleType.setId(String.valueOf(MatsimRandom.getRandom().nextDouble()));
 			LinkType iconLink = this.kmlObjectFactory.createLinkType();
 			iconLink.setHref(DEFAULTNODEICON);
 			if(this.styleMap.size() == 0){
@@ -84,7 +85,7 @@ public class MyKmlStyleFactory extends MatsimKmlStyleFactory{
 			if(color != null){
 				iStyle.setColor(new byte[]{(byte) 255, (byte) color.getBlue(), (byte) color.getGreen(), (byte) color.getRed()});
 			} else {
-				iStyle.setColor(new byte[]{(byte) 255, (byte) (Math.random() * 255), (byte) (Math.random() * 255), (byte) (Math.random() * 255)});
+				iStyle.setColor(new byte[]{(byte) 255, (byte) (MatsimRandom.getRandom().nextDouble() * 255), (byte) (MatsimRandom.getRandom().nextDouble() * 255), (byte) (MatsimRandom.getRandom().nextDouble() * 255)});
 			}
 			
 			this.blue += 50;
