@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+<!-- For further information or questions, please contact
+     Michal Maciejewski, michal.maciejewski at put dot poznan dot pl -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT zones (zone)*>
+
+<!ELEMENT zone (groups, activities)>
+
+<!ATTLIST zone
+	id	CDATA	#REQUIRED>
+
+<!ELEMENT groups (group)*>
+
+<!ELEMENT group EMPTY>
+
+<!ATTLIST group
+	type	CDATA	#REQUIRED
+	size	CDATA	#REQUIRED>
+	
+<!ELEMENT activities (activity)*>
+
+<!ELEMENT activity EMPTY>
+
+<!ATTLIST activity
+	type	CDATA	#REQUIRED
+	size	CDATA	#REQUIRED>
+

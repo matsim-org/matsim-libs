@@ -1,12 +1,84 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>playgrounds</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>playground</groupId>
-  <artifactId>michalm</artifactId>
-  <name>michalm</name>
-  <version>0.4.0-SNAPSHOT</version>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>playgrounds</artifactId>
+		<version>0.4.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>playground</groupId>
+	<artifactId>michalm</artifactId>
+	<name>michalm</name>
+	<version>0.4.0-SNAPSHOT</version>
+
+	<repositories>
+		<!--repository> <id>geotools</id> <name>Geotools repository</name> <url>http://download.osgeo.org/webdav/geotools</url> 
+			</repository -->
+	</repositories>
+	<dependencies>
+		<!--dependency> <groupId>org.geotools</groupId> <artifactId>gt2-postgis</artifactId> 
+			<version>2.3.5</version> </dependency -->
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-primitives</groupId>
+			<artifactId>commons-primitives</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-math</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>xmlgraphics-commons</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>batik</groupId>
+			<artifactId>batik-util</artifactId>
+			<version>1.6-1</version>
+		</dependency>
+		<dependency>
+			<groupId>batik</groupId>
+			<artifactId>batik-awt-util</artifactId>
+			<version>1.6-1</version>
+		</dependency>
+		<dependency>
+			<groupId>batik</groupId>
+			<artifactId>batik-svggen</artifactId>
+			<version>1.6-1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>put.michalm</groupId>
+			<artifactId>michalm-util</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/michalm-util.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>put.michalm</groupId>
+			<artifactId>michalm-gandalf</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/michalm-gandalf.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>put.michalm</groupId>
+			<artifactId>michalm-vrp</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/michalm-vrp.jar</systemPath>
+		</dependency>
+	</dependencies>
+
 </project>
