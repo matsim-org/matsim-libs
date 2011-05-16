@@ -28,13 +28,13 @@ import pl.poznan.put.vrp.dynamic.simulator.*;
 public class DVRPLauncher
 {
     // means: ArcTravelTimes and ArcTravelCosts are averaged for optimization
-    private static boolean AVG_TRAFFIC_MODE = false;//default: false
-    
-    //means: all requests are known a priori (in advance/static)
-    private static boolean STATIC_MODE = false;//default: false
-    
-    //schedules/routes PNG files, routes SHP files
-    private static boolean VRP_OUT_FILES = true;//default: true
+    private static boolean AVG_TRAFFIC_MODE = false;// default: false
+
+    // means: all requests are known a priori (in advance/static)
+    private static boolean STATIC_MODE = false;// default: false
+
+    // schedules/routes PNG files, routes SHP files
+    private static boolean VRP_OUT_FILES = true;// default: true
 
 
     public static void main(String... args)
@@ -54,7 +54,7 @@ public class DVRPLauncher
             AVG_TRAFFIC_MODE = false;
             STATIC_MODE = false;
             VRP_OUT_FILES = false;
-            
+
             dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
             cfgFileName = dirName + "config-verB.xml";
             vrpDirName = dirName + "dvrp\\";
@@ -67,19 +67,19 @@ public class DVRPLauncher
             // vrpStaticFileName = "A102.txt";
             // vrpDynamicFileName = "A102_scen.txt";
 
-//            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-//            cfgFileName = dirName + "config-verB.xml";
-//            vrpDirName = dirName + "dvrp\\";
-//            vrpStaticFileName = "C101.txt";
-//            vrpDynamicFileName = "C101_scen.txt";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
+            // cfgFileName = dirName + "config-verB.xml";
+            // vrpDirName = dirName + "dvrp\\";
+            // vrpStaticFileName = "C101.txt";
+            // vrpDynamicFileName = "C101_scen.txt";
 
-//            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-//            cfgFileName = dirName + "config-verB.xml";
-//            vrpDirName = dirName + "dvrp\\";
-//            vrpStaticFileName = "C102.txt";
-//             vrpDynamicFileName = "C102_scen.txt";
-            
-             vrpArcTimesFileName = vrpDirName + "arc_times.txt";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
+            // cfgFileName = dirName + "config-verB.xml";
+            // vrpDirName = dirName + "dvrp\\";
+            // vrpStaticFileName = "C102.txt";
+            // vrpDynamicFileName = "C102_scen.txt";
+
+            vrpArcTimesFileName = vrpDirName + "arc_times.txt";
             vrpArcCostsFileName = vrpDirName + "arc_costs.txt";
             vrpArcPathsFileName = vrpDirName + "arc_paths.txt";
             algParamsFileName = "algorithm.txt";
@@ -123,8 +123,8 @@ public class DVRPLauncher
 
         ShortestPathsFinder spf = new ShortestPathsFinder(data);
 
-        //DO NOT READ SHORTEST PATHS, ONLY TIMES/COSTS!!! (
-        //spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+        // DO NOT READ SHORTEST PATHS, ONLY TIMES/COSTS!!! (
+        // spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
         spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
         spf.upadateVRPArcTimesAndCosts();
 
@@ -150,8 +150,8 @@ public class DVRPLauncher
                 24 * 60 * 60);
 
         // simulator.addListener(new ConsoleSimulationListener());
-        
-        String vrpOutDirName = vrpDirName + "\\output"; 
+
+        String vrpOutDirName = vrpDirName + "\\output";
         new File(vrpOutDirName).mkdir();
 
         if (VRP_OUT_FILES) {
@@ -161,7 +161,7 @@ public class DVRPLauncher
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-    
+
             simulator.addListener(new ChartFileSimulationListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
@@ -188,7 +188,7 @@ public class DVRPLauncher
             new ScheduleUpdater(vrpData).updateSchedule();
             vrpData.evaluateVRP();
 
-            //ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(vrpData));
+            // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(vrpData));
             ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(vrpData));
 
             System.out.println("################################################");
