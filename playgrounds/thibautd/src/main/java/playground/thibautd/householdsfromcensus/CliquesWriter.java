@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -36,11 +37,10 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class CliquesWriter extends MatsimXmlWriter {
 
-	private Map<String, ArrayList<String>> cliques;
+	private Map<Id, List<Id>> cliques;
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 
-	//TODO: change String to ID
-	public CliquesWriter(Map<String, ArrayList<String>> cliques) {
+	public CliquesWriter(Map<Id, List<Id>> cliques) {
 		this.cliques = cliques;
 	}
 
@@ -57,15 +57,15 @@ public class CliquesWriter extends MatsimXmlWriter {
 		//this.atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		this.writeStartTag(CliquesSchemaNames.CLIQUES, this.atts);
 
-		for (String id: this.cliques.keySet()) {
+		for (Id id: this.cliques.keySet()) {
 			this.writeClique(id);
 		}
 		this.writeEndTag(CliquesSchemaNames.CLIQUES);
 	}
 
-	private void writeClique(String id) throws IOException {
+	private void writeClique(Id id) throws IOException {
 		this.atts.clear();
-		this.atts.add(this.createTuple(CliquesSchemaNames.CLIQUE_ID, id));
+		this.atts.add(this.createTuple(CliquesSchemaNames.CLIQUE_ID, id.toString()));
 		this.writeStartTag(CliquesSchemaNames.CLIQUE, atts);
 
 		this.writeMembers(this.cliques.get(id));
@@ -73,10 +73,10 @@ public class CliquesWriter extends MatsimXmlWriter {
 		this.writeEndTag(CliquesSchemaNames.CLIQUE);
 	}
 
-	private void writeMembers(ArrayList<String> clique) throws IOException {
-		for (String id : clique) {
+	private void writeMembers(List<Id> clique) throws IOException {
+		for (Id id : clique) {
 			this.atts.clear();
-			this.atts.add(this.createTuple(CliquesSchemaNames.MEMBER_ID, id));
+			this.atts.add(this.createTuple(CliquesSchemaNames.MEMBER_ID, id.toString()));
 			this.writeStartTag(CliquesSchemaNames.MEMBER, atts, true);
 		}
 	}
