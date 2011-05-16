@@ -24,13 +24,17 @@ import java.io.FileReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author thibautd
  */
 public class ExtractHousholdInfo {
-	private Map<String, ArrayList<String>> cliques;
+	private Map<Id, List<Id>> cliques;
 	private static final String FIRST_LINE = "hh_id\tz_id\tf_id\thhtpw\thhtpz\tp_w_list\tp_z_list";
 	private static final String SPLIT_EXPR = "\t";
 	private static final String LIST_SPLIT_EXPR = ";";
@@ -58,14 +62,14 @@ public class ExtractHousholdInfo {
 		}
 	}
 
-	private static Map<String, ArrayList<String>> parse(BufferedReader buf) {
+	private static Map<Id, List<Id>> parse(BufferedReader buf) {
 
 		String[] currentLine;
-		String currentId;
+		Id currentId;
 		String[] currentMembers;
-		ArrayList<String> membersList;
+		List<Id> membersList;
 
-		Map<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+		Map<Id, List<Id>> map = new HashMap<Id, List<Id>>();
 
 		try {
 			if (!buf.readLine().equals(FIRST_LINE)) {
@@ -78,13 +82,13 @@ public class ExtractHousholdInfo {
 						} catch (NullPointerException e) {
 							break;
 						}
-						currentId = currentLine[HH_LOC];
+						currentId = new IdImpl(currentLine[HH_LOC]);
 						currentMembers = currentLine[MEMB_LOC].split(LIST_SPLIT_EXPR);
 			
 						// put info in the specified format
-						membersList = new ArrayList<String>();
+						membersList = new ArrayList<Id>();
 						for (int i=0; i < currentMembers.length; i++) {
-							membersList.add(currentMembers[i]);
+							membersList.add(new IdImpl(currentMembers[i]));
 						}
 						map.put(currentId, membersList);
 				}
@@ -95,7 +99,7 @@ public class ExtractHousholdInfo {
 		return map;
 	}
 
-	public Map<String, ArrayList<String>> getCliques() {
+	public Map<Id, List<Id>> getCliques() {
 		return this.cliques;
 	}
 }

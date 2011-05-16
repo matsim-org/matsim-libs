@@ -23,7 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author thibautd
@@ -33,7 +36,7 @@ public class Extract {
 	private static final String output = "testcases/equil/fakeHouseholds.XML";
 
 	public static void main(String[] args) {
-		Map<String, ArrayList<String>> cliques;
+		Map<Id, List<Id>> cliques;
 		CliquesWriter householdWriter;
 
 		cliques = (new ExtractHousholdInfo(file).getCliques());
