@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CarPassengerLegRouter.java
+ * JointReRouteModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.router;
+package playground.thibautd.jointtripsoptimizer.replanning.reroute;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.LegRouter;
-
-import playground.thibautd.jointtripsoptimizer.population.JointLeg;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * {@link LegRouter} designed to set the route of a "passenger" leg, such that
- * it is consistent with the driver's route.
- *
- * More precisely, it just sets the route to null, which makes JointLeg copy the
- * driver's route at the first call of getRoute. In that way, the driver's route
- * is well defined at the time of the copy.
- *
- * This also allows to use the ReRoute module on a JointPlan, with the insurance
- * that routes will be consistent.
- *
  * @author thibautd
  */
-public class CarPassengerLegRouter implements LegRouter {
+public class JointReRouteModule extends AbstractMultithreadedModule {
+
+	private final Controler controler;
+
+	public JointReRouteModule(final Controler controler) {
+		super(controler.getConfig().global());
+		this.controler = controler;
+	}
+
 	@Override
-	public double routeLeg(
-			final Person person,
-			final Leg leg,
-			final Activity fromAct,
-			final Activity toAct,
-			final double depTime) {
-		leg.setRoute(null);
-		((JointLeg) leg).routeToCopy();
-		return 0d;
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new JointReRouteAlgo(controler);
 	}
 }
 

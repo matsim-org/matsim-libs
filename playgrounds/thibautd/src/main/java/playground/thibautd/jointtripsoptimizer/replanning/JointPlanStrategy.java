@@ -39,32 +39,23 @@ import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFu
  * PlanStrategy aimed at manipulating joint plans and cliques.
  * It mainly reimplements PlanStrategyImpl, but using Cliques instead of
  * PersonImpl agents.
+ *
+ * To implement a strategy, subclass this class and load modules in the
+ * constructor. Then, define the resulting strategy as a module in the
+ * config file.
+ * This is a workaround, as the {@link StrategyManagerConfigLoader} creates
+ * PlanStrategyImpl instances, which do not work with cliques.
+ *
  * @author thibautd
  */
-public class JointPlanStrategy implements PlanStrategy  {
+public abstract class JointPlanStrategy implements PlanStrategy  {
 	private static final Logger log =
 		Logger.getLogger(JointPlanStrategy.class);
 
-	private PlanSelector planSelector;
+	protected PlanSelector planSelector;
 	private ArrayList<PlanStrategyModule> strategyModules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private int counter = 0;
-
-	public JointPlanStrategy(Controler controler) {
-		log.debug("JointPlanStrategy initialized from a controler");
-
-		// TODO: use a JointPlan specific selector?
-		// + pass it from the config file
-		// this.planSelector = new BestPlanSelector();
-		this.planSelector = new ExpBetaPlanSelector(controler.getConfig().planCalcScore());
-
-		//TODO: less hard-coded scoring function factory?
-		this.addStrategyModule(new JointPlanOptimizerModule(
-					controler,
-					new HomogeneousJointScoringFunctionFactory(
-						controler.getConfig().planCalcScore())
-					));
-	}
 
 	/*
 	 * =========================================================================
