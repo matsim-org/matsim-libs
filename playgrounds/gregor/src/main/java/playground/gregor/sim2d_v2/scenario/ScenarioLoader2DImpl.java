@@ -68,9 +68,10 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	@Override
 	public void loadNetwork() {
 		//		if (Sim2DConfig.NETWORK_LOADER_LS) {
-		loadLsMp();
-		NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap());
-		loader.loadNetwork();
+		//		loadLsMp();
+		//		NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap());
+		//		loader.loadNetwork();
+		super.loadNetwork();
 		loadMps();
 		loadStaticEnvironmentDistancesField();
 	}

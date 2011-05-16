@@ -46,7 +46,7 @@ public class Controller2D extends Controler {
 		super(args[0]);
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
-		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
+		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 20* 60);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
 	}

@@ -84,7 +84,7 @@
 <!-- ====================================================================== -->	
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;/90gradNetwork.xml" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
 								       
 	</module>
 	

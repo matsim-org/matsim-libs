@@ -21,11 +21,14 @@ package playground.gregor.pedvis;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,8 +37,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.events.EventsUtils;
@@ -51,6 +56,7 @@ import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -61,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author laemmel
  * 
  */
-public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler {
+public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler {
 
 	private final PeekABotClient pc;
 	private String file;
@@ -75,10 +81,21 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	double ofX = 0;
 	double ofY = 0;
 
-	private final Map<Id,Double> az = new HashMap<Id,Double>();
+	double scale = 0.5;
 
-	public PedVisPeekABot(double speedUp) {
+	private static final double TWO_PI = Math.PI * 2;
+	private static final double PI_HALF = Math.PI/2;
+
+	//	private final Map<Id,Double> az = new HashMap<Id,Double>();
+	private final Map<Id,Coordinate> locations = new HashMap<Id,Coordinate>();
+	private final Set<Id> inSim = new HashSet<Id>();
+
+	private final Set<Id> carAgents = new HashSet<Id>();
+	private Scenario sc;
+
+	public PedVisPeekABot(double speedUp, Scenario sc) {
 		this.speedUp = speedUp;
+		this.sc = sc;
 		this.pc = new PeekABotClient();
 	}
 
@@ -140,10 +157,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	public void drawNetwork(Network net) {
 		for (Link l : net.getLinks().values()){
-			float fromX = (float)(l.getFromNode().getCoord().getX()-this.ofX);
-			float fromY = (float)(l.getFromNode().getCoord().getY()-this.ofY);
-			float toX = (float)(l.getToNode().getCoord().getX()-this.ofX);
-			float toY = (float)(l.getToNode().getCoord().getY()-this.ofY);
+			float fromX = (float) ((l.getFromNode().getCoord().getX()-this.ofX) * this.scale);
+			float fromY = (float) ((l.getFromNode().getCoord().getY()-this.ofY) * this.scale);
+			float toX = (float) ((l.getToNode().getCoord().getX()-this.ofX)  * this.scale);
+			float toY = (float) ((l.getToNode().getCoord().getY()-this.ofY) * this.scale);
 			this.pc.drawLink(Integer.parseInt(l.getId().toString()), 0, 0, fromX, fromY, toX, toY);
 
 		}
@@ -151,14 +168,14 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	private void drawSegment(Point pointN1, Point pointN2) {
 		this.pc.initPolygonII(this.segmentCount, 5, .75f, .75f, .75f, 3.f);
-		float x1 = (float) (pointN1.getX() - this.ofX);
-		float y1 = (float) (pointN1.getY() - this.ofY);
-		float x2 = (float) (pointN2.getX() - this.ofX);
-		float y2 = (float) (pointN2.getY() - this.ofY);
+		float x1 = (float) ((pointN1.getX() - this.ofX)* this.scale);
+		float y1 = (float) ((pointN1.getY() - this.ofY)* this.scale);
+		float x2 = (float) ((pointN2.getX() - this.ofX)* this.scale);
+		float y2 = (float) ((pointN2.getY() - this.ofY)* this.scale);
 		this.pc.addPolygonCoordII(this.segmentCount, x1, y1, 0);
 		this.pc.addPolygonCoordII(this.segmentCount, x2, y2, 0);
-		this.pc.addPolygonCoordII(this.segmentCount, x2, y2, FLOOR_HEIGHT);
-		this.pc.addPolygonCoordII(this.segmentCount, x1, y1, FLOOR_HEIGHT);
+		this.pc.addPolygonCoordII(this.segmentCount, x2, y2, (float) (FLOOR_HEIGHT*this.scale));
+		this.pc.addPolygonCoordII(this.segmentCount, x1, y1, (float) (FLOOR_HEIGHT*this.scale));
 		this.pc.addPolygonCoordII(this.segmentCount++, x1, y1, 0);
 
 	}
@@ -178,7 +195,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		init();
 	}
 
-	private void setOffsets(Network network) {
+	public void setOffsets(Network network) {
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		for (Node n : network.getNodes().values()) {
@@ -227,14 +244,49 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		Double oldAz = this.az.get(e.getPersonId());
-		if (oldAz == null) {
-			oldAz = 0.;
+
+		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
+
+		this.locations.put(e.getPersonId(), e.getCoordinate());
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		if (!this.carAgents.contains(event.getPersonId())) {
+			return;
 		}
+		testWait(event.getTime());
+		Link l = this.sc.getNetwork().getLinks().get(event.getLinkId());
+		double x = l.getFromNode().getCoord().getX();
+		double y = l.getFromNode().getCoord().getY();
+		double az = getAzimuth(l.getFromNode().getCoord(), l.getToNode().getCoord());
+		this.pc.setBotPositionII(Integer.parseInt(event.getPersonId().toString()), (float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0, (float) az,(float)(this.scale));
+		this.locations.put(event.getPersonId(), new Coordinate((float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0));
+	}
 
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) (e.getX() - this.ofX), (float) (e.getY() - this.ofY), (float) e.getZ(), (float) ((oldAz + e.getAzimuth())/2));
-
-		this.az.put(e.getPersonId(), e.getAzimuth());
+	/**
+	 * @param newPos
+	 * @param oldPos
+	 * @return
+	 */
+	private double getAzimuth(Coord oldPos, Coord newPos) {
+		double alpha = 0.0;
+		double dX = oldPos.getX() - newPos.getX();
+		double dY = oldPos.getY() - newPos.getY();
+		if (dX > 0) {
+			alpha = Math.atan(dY / dX);
+		} else if (dX < 0) {
+			alpha = Math.PI + Math.atan(dY / dX);
+		} else { // i.e. DX==0
+			if (dY > 0) {
+				alpha = PI_HALF;
+			} else {
+				alpha = -PI_HALF;
+			}
+		}
+		if (alpha < 0.0)
+			alpha += TWO_PI;
+		return alpha;
 	}
 
 	/**
@@ -277,6 +329,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void reset(int iteration) {
 		this.pc.removeAllBotsII();
+		this.inSim.clear();
 	}
 
 	/*
@@ -288,7 +341,28 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
-		this.pc.addBotII(Integer.parseInt(e.getPersonId().toString()), 10, 10, 10);
+
+		if (this.inSim.contains(e.getPersonId())) {
+			Coordinate c = this.locations.get(e.getPersonId());
+			this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()),(float) c.x, (float)c.y,0,0,(float)this.scale);
+		} else {
+
+
+			Link l = this.sc.getNetwork().getLinks().get(e.getLinkId());
+			Coord cc = l.getToNode().getCoord();
+			float x = (float)((cc.getX()-this.ofX)*this.scale);
+			float y = (float)((cc.getY()-this.ofY)*this.scale);
+			this.pc.addBotII(Integer.parseInt(e.getPersonId().toString()), x, y, 0, (float)this.scale);
+			this.inSim.add(e.getPersonId());
+
+		}
+		if (e.getLegMode().equals("car")) {
+			this.carAgents.add(e.getPersonId());
+		}
+		//			this.pc.setBotShapeII(Integer.parseInt(e.getPersonId().toString()), PeekABotClient.CAR);
+		//		} else {
+		//			this.pc.setBotShapeII(Integer.parseInt(e.getPersonId().toString()), PeekABotClient.WALK_2_D);
+		//		}
 		float r = 0;
 		float g = 0;
 		float b = 0;
@@ -315,6 +389,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			g=0.5f;
 		}
 
+
+
 		this.pc.setBotColorII(Integer.parseInt(e.getPersonId().toString()), r, g, b);
 	}
 
@@ -327,9 +403,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
+		this.carAgents.remove(e.getPersonId());
 		// this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()),
 		// -100, -100, -10, -10);
-		this.pc.removeBotII(Integer.parseInt(e.getPersonId().toString()));
+		//		this.pc.removeBotII(Integer.parseInt(e.getPersonId().toString()));
 	}
 
 	/*
@@ -349,13 +426,15 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float r = event.getR();
 		float g = event.getG();
 		float b = event.getB();
-		float fromX = (float) (event.getFrom().x - this.ofX);
-		float fromY = (float) (event.getFrom().y - this.ofY);
+		float fromX = (float) ((event.getFrom().x - this.ofX)* this.scale);
+		float fromY = (float) ((event.getFrom().y - this.ofY)* this.scale);
 		float fromZ = 0;//event.getFrom().z;
-		float toX = (float) (event.getTo().x - this.ofX);
-		float toY = (float) (event.getTo().y - this.ofY);
+		float toX = (float) ((event.getTo().x - this.ofX)* this.scale);
+		float toY = (float) ((event.getTo().y - this.ofY)* this.scale);
 		float toZ = 0; //event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
 	}
+
+
 }

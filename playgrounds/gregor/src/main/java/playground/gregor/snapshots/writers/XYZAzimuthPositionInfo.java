@@ -28,10 +28,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 
-	private double azimuth;
-	private Coordinate c;
-	private double time;
-	private Id id;
+	private final double azimuth;
+	private final Coordinate c;
+	private final double time;
+	private final Id id;
 
 	public XYZAzimuthPositionInfo(Id id,Coordinate c, double azimuth, double time) {
 		this.c = c;
@@ -44,7 +44,7 @@ public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 	@Override
 	public AgentState getAgentState() {
-		throw new RuntimeException("not yet implemented");
+		return AgentState.PERSON_OTHER_MODE;
 	}
 
 	@Override

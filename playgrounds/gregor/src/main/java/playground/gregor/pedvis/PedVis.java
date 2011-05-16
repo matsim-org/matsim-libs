@@ -81,18 +81,18 @@ public class PedVis {
 						float z = (float) c.z;
 						if (!init.contains(ped.id)) {
 							init.add(ped.id);
-							pc.addBotII(Integer.parseInt(ped.id.toString()), x, y, z);
+							pc.addBotII(Integer.parseInt(ped.id.toString()), x, y, z,1);
 							if (ped.color.equals("red")) {
 								pc.setBotColorII(Integer.parseInt(ped.id.toString()), 1.f, 0, MatsimRandom.getRandom().nextFloat());
 							} else {
 								pc.setBotColorII(Integer.parseInt(ped.id.toString()), 0, 1.f, MatsimRandom.getRandom().nextFloat());
 							}
 						} else {
-							pc.setBotPositionII(Integer.parseInt(ped.id.toString()), x, y, z, a);
+							pc.setBotPositionII(Integer.parseInt(ped.id.toString()), x, y, z, a,1);
 						}
 					}
 					if (time >= ped.arrived) {
-						pc.setBotPositionII(Integer.parseInt(ped.id.toString()), 20, 20, 0, 0.f);
+						pc.setBotPositionII(Integer.parseInt(ped.id.toString()), 20, 20, 0, 0.f,1);
 					}
 				}
 

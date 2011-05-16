@@ -1,6 +1,5 @@
 package playground.gregor.sim2d_v2.helper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -41,8 +40,8 @@ public class EnvironmentDistanceVectorsGeneratorII {
 
 	//physical parameters
 	private final double maxSensingRange = 5;
-	private double res =.05;
-	private double incr = 2 * Math.PI/16;
+	private double res =.5;
+	private double incr = 2 * Math.PI/8;
 	private final double minDist = .001;
 
 	public EnvironmentDistanceVectorsGeneratorII(Config c) {

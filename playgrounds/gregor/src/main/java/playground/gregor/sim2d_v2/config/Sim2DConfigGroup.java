@@ -85,7 +85,7 @@ public class Sim2DConfigGroup extends Module {
 	//Zanlungo et al constant
 	private double Bi=.71;
 	private double Ai=1.13*Agent2D.AGENT_WEIGHT;
-	private double lambda=.75;
+	private double lambda=.35;
 
 	public Sim2DConfigGroup(Module sim2d) {
 		super(GROUP_NAME);
