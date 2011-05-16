@@ -19,11 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
@@ -39,8 +36,6 @@ import playground.thibautd.jointtripsoptimizer.replanning.selectors.WorstJointPl
  * @author thibautd
  */
 public class JointStrategyManager extends StrategyManager {
-	private static final Logger log =
-		Logger.getLogger(JointStrategyManager.class);
 
 	// TODO: pass it in a less hard-coded way. Beware on consistency with
 	// StrategyManager if doing this!
@@ -82,26 +77,6 @@ public class JointStrategyManager extends StrategyManager {
 		while (clique.getPlans().size() > maxNumPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(clique);
 			clique.removePlan(plan);
-			//redondant (already done in clique.removePlan)
-			//if (plan == clique.getSelectedPlan()) { 
-			//	clique.setSelectedPlan(clique.getRandomPlan());
-			//}
 		}
-	}
-
-	@Override
-	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
-	}
-
-	@Override
-	protected void afterStrategyRunHook(Person person, PlanStrategy strategy) {
-	}
-
-	@Override
-	protected void afterRunHook(Population population) {
-	}
-
-	@Override
-	protected void afterRemovePlanHook(Plan plan) {
 	}
 }
