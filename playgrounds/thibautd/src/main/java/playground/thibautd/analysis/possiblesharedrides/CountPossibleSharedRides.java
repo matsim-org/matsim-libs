@@ -109,7 +109,7 @@ public class CountPossibleSharedRides {
 	public void run() {
 		log.info("    computing trip data...");
 		for (Map.Entry<Id, Plan> plan : this.plans.entrySet()) {
-			//log.info("   treat new plan");
+			log.info("   treat new plan");
 			for (PlanElement pe : plan.getValue().getPlanElements()) {
 				if ((pe instanceof Leg) &&
 						(((Leg) pe).getMode().equals(TransportMode.car))) {
