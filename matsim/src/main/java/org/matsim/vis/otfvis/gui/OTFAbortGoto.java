@@ -20,8 +20,6 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import java.rmi.RemoteException;
-
 import javax.swing.ProgressMonitor;
 
 import org.matsim.core.utils.misc.Time;
@@ -34,7 +32,6 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
  * a new time in the input field for the time.
  *
  * @author dstrippgen
- *
  */
 public class OTFAbortGoto extends Thread  {
 	public boolean terminate = false;

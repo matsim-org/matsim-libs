@@ -29,8 +29,8 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
@@ -71,6 +71,7 @@ public class OTFSwingDrawer extends JComponent {
 	private static final long serialVersionUID = 1L;
 
 	private static final float linkWidth = 100;
+	private static final float strokeWidth = Math.round(0.05 * linkWidth);
 
 	private final int frameDefaultWidth;
 
@@ -171,7 +172,7 @@ public class OTFSwingDrawer extends JComponent {
 		Graphics2D g2 = (Graphics2D) g;
 		parentDrawer.mouseMan.drawElements(g2);
 		OTFSwingDrawer.g2d = g2;
-		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
+		g2.setStroke(new BasicStroke(strokeWidth));
 		g2.transform(getBoxTransform());
 		SceneGraph sceneGraph = quad.getSceneGraph(hostControlBar.getOTFHostControl().getSimTime(), null, parentDrawer);
 		sceneGraph.draw();

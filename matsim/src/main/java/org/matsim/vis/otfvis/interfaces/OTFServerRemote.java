@@ -20,7 +20,6 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
@@ -52,7 +51,6 @@ public interface OTFServerRemote {
 
 	/**
 	 * @return (I think) information if the server is "live" (i.e. has user control) or not.  kai, feb'11
-	 * @throws RemoteException
 	 */
 	public boolean isLive();
 

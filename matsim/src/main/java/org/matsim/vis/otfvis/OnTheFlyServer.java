@@ -180,11 +180,11 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	@Override
 	public void pause(){
 		synchronized (updateFinished) {
-			if (status == Status.PLAY) {
+//			if (status == Status.PLAY) {
+//				status = Status.PAUSE;
+//			} else {
 				status = Status.PAUSE;
-			} else {
-				status = Status.PAUSE;
-			}
+//			}
 		}
 	}
 

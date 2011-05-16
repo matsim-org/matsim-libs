@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;

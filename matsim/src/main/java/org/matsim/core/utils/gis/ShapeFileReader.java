@@ -37,6 +37,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -72,13 +73,13 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 *
 	 * @param fileName File name of a shape file (ending in <code>*.shp</code>)
 	 * @return FeatureSource containing all features.
-	 * @throws IOException if the file cannot be found or another error happens during reading
+	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
 	 */
-	public static FeatureSource readDataFile(final String fileName) {
+	public static FeatureSource readDataFile(final String fileName) throws UncheckedIOException {
 		return new ShapeFileReader().openFeatureSource(fileName);
 	}
 
-	private FeatureSource openFeatureSource(final String filename) {
+	private FeatureSource openFeatureSource(final String filename) throws UncheckedIOException {
 		try {
 			log.info("reading features from: " + filename);
 			File dataFile = new File(filename);
@@ -90,16 +91,16 @@ public class ShapeFileReader implements MatsimSomeReader {
 			FeatureSource fs = dataStore.getFeatureSource(typeName);
 			return fs;
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	/**
 	 * Reads all Features in the file into the returned Set and initializes the instance of this class.
 	 */
-	public Set<Feature> readFileAndInitialize(final String filename) {
+	public Set<Feature> readFileAndInitialize(final String filename) throws UncheckedIOException {
 		try {
 			this.featureSource = ShapeFileReader.readDataFile(filename);
 			this.init();
@@ -112,7 +113,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 			}
 			return this.featureSet;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -125,7 +126,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 			this.schema = this.featureSource.getSchema();
 			this.crs = this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -54,12 +55,12 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 	private static final long serialVersionUID = 1L;
 
-	private class TimestepSlider extends JSlider {
+	private static class TimestepSlider extends JSlider {
 
 		private static final long serialVersionUID = 1L;
 
-		public TimestepSlider() {
-			super(hostControl.getSimTimeModel());
+		public TimestepSlider(final BoundedRangeModel model) {
+			super(model);
 		}
 
 		@Override
@@ -92,13 +93,13 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		//Create the slider.
 		Collection<Double> steps = hostControl.getTimeStepsdrawer();
 		if ((steps == null) || (steps.size() == 0)) {
-			timestepSlider = new TimestepSlider();
+			timestepSlider = new TimestepSlider(hostControl.getSimTimeModel());
 			return; // nothing to display
 		}
 
 		int min = hostControl.getSimTimeModel().getMinimum();
 		int max = hostControl.getSimTimeModel().getMaximum();
-		timestepSlider = new TimestepSlider();
+		timestepSlider = new TimestepSlider(hostControl.getSimTimeModel());
 
 		timestepSlider.getModel().addChangeListener(this);
 		timestepSlider.setMajorTickSpacing((min-max)/10);

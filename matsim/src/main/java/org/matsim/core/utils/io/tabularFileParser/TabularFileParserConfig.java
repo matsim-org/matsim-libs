@@ -173,7 +173,7 @@ public class TabularFileParserConfig {
     // ---------- GENERATION OF REGULAR EXPRESSIONS ----------
 
     private String alternativeExpr(String[] alternatives) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         if (alternatives != null)
             for (int i = 0; i < alternatives.length; i++) {
@@ -214,10 +214,9 @@ public class TabularFileParserConfig {
 
     @Override
 		public String toString() {
-        StringBuffer result = new StringBuffer(100);
+        StringBuilder result = new StringBuilder(100);
 
-        result.append("TabularFileParserConfig:\n");
-        result.append("\tfile=");
+        result.append("TabularFileParserConfig:\n\tfile=");
         result.append(file);
         result.append("\n\tstartRegex=");
         result.append(startRegex);

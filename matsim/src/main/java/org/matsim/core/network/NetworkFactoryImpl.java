@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
@@ -47,9 +48,9 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 
-	private final NetworkImpl network;
+	private final Network network;
 
-	public NetworkFactoryImpl(final NetworkImpl network) {
+	public NetworkFactoryImpl(final Network network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());

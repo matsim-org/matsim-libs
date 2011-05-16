@@ -66,7 +66,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
