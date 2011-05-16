@@ -69,7 +69,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
 		+ " is set in PlansCalcRoute, using the default values. Make sure that those values" +
-				"fit your needs, otherwise set it expclicitly.";
+		"fit your needs, otherwise set it expclicitly.";
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -153,10 +153,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		legHandlers = new HashMap<String, LegRouter>();
 		this.addLegHandler(TransportMode.car, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		this.addLegHandler(TransportMode.ride, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
-		this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.routeFactory));
-		this.addLegHandler(TransportMode.bike, new TeleportationLegRouter(this.routeFactory, this.configGroup.getBikeSpeed()));
-		this.addLegHandler(TransportMode.walk, new TeleportationLegRouter(this.routeFactory, this.configGroup.getWalkSpeed()));
-		this.addLegHandler("undefined", new TeleportationLegRouter(this.routeFactory, this.configGroup.getUndefinedModeSpeed()));
+		if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.freespeed) {
+			this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.routeFactory));
+		} else if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.beeline) {
+			this.addLegHandler(TransportMode.pt, new TeleportationLegRouter(this.routeFactory, this.configGroup.getPtSpeed(), this.configGroup.getBeelineDistanceFactor()));
+		}
+		this.addLegHandler(TransportMode.bike, new TeleportationLegRouter(this.routeFactory, this.configGroup.getBikeSpeed(), this.configGroup.getBeelineDistanceFactor()));
+		this.addLegHandler(TransportMode.walk, new TeleportationLegRouter(this.routeFactory, this.configGroup.getWalkSpeed(), this.configGroup.getBeelineDistanceFactor()));
+		this.addLegHandler("undefined", new TeleportationLegRouter(this.routeFactory, this.configGroup.getUndefinedModeSpeed(), this.configGroup.getBeelineDistanceFactor()));
 	}
 
 	public final void addLegHandler(String transportMode, LegRouter legHandler) {

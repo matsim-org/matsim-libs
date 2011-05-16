@@ -33,22 +33,26 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class TeleportationLegRouter implements LegRouter {
 
 	private final NetworkFactoryImpl routeFactory;
-	private final double beelineTravelSpeed;
-
-	public TeleportationLegRouter(final NetworkFactoryImpl routeFactory, final double beelineTravelSpeed) {
+	
+	private final double beelineDistanceFactor;
+	private final double networkTravelSpeed;
+	
+	public TeleportationLegRouter(final NetworkFactoryImpl routeFactory, final double networkTravelSpeed, final double beelineDistanceFactor) {
 		this.routeFactory = routeFactory;
-		this.beelineTravelSpeed = beelineTravelSpeed;
+		this.networkTravelSpeed = networkTravelSpeed;
+		this.beelineDistanceFactor = beelineDistanceFactor;
 	}
 
 	@Override
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		// create an empty route, but with realistic traveltime
+		// create an empty route, but with realistic travel time
 		Route route = this.routeFactory.createRoute(leg.getMode(), fromAct.getLinkId(), toAct.getLinkId());
-		int travTime = (int)(dist / beelineTravelSpeed);
+		double estimatedNetworkDistance = dist * beelineDistanceFactor;
+		int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
 		route.setTravelTime(travTime);
-		route.setDistance(dist * 1.5);
+		route.setDistance(estimatedNetworkDistance);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);

@@ -53,6 +53,10 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 		Config config = new Config();
 		config.addCoreModules();
+		
+		// This test interprets the travel time parameters in the PlansCalcScoreConfigGroup as "beeline distance travel times"
+		// (which used to be correct). michaz may 11
+		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 
 		NetworkImpl network = this.createNetwork();
 
