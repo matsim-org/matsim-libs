@@ -210,7 +210,11 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
-		return new JointPlan(this.plan.getClique(), constructedIndividualPlans, false);
+		return new JointPlan(
+				this.plan.getClique(),
+				constructedIndividualPlans,
+				false, // do not add at individual level
+				false); //do not synchronize at creation
 	}
 
 	private void resetInternalState() {

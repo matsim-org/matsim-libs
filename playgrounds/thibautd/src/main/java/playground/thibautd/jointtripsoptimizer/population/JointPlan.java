@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,6 +43,11 @@ import org.matsim.core.population.PlanImpl;
  * @author thibautd
  */
 public class JointPlan implements Plan {
+	private static final Logger log =
+		Logger.getLogger(JointPlan.class);
+
+
+	private final static double pickUpDuration = 0d;
 
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	/**
@@ -173,10 +180,15 @@ public class JointPlan implements Plan {
 	}
 
 	private void synchronize() {
-		// TODO
-		// problem: quite complicated (Duration decoder is longer than 600 lines)
-		// and impossible to use DurationDecoder here (impossible to pass routing
-		// algorithm and everithing).
+		Map<Id, IndividualValuesWrapper> individualValues =
+			new HashMap<Id, IndividualValuesWrapper>();
+		List<JointLeg> accessedLegs = new ArrayList<JointLeg>();
+		
+		while (notAllPlansSynchronized(individualValues)) {
+			for (Id id : individualValues.keySet()) {
+				examineNextActivity(id, individualValues, accessedLegs);
+			}
+		}
 	}
 
 	public JointPlan(JointPlan plan) {
@@ -495,5 +507,94 @@ public class JointPlan implements Plan {
 
 		return type;
 	}
-}
 
+	/*
+	 * =========================================================================
+	 * plan synchronization helpers
+	 * =========================================================================
+	 */
+	private class IndividualValuesWrapper {
+		public int indexInPlan = 0;
+		public double now = 0d;
+		public boolean isFinished = false;
+	}
+
+	private boolean notAllPlansSynchronized(
+			final Map<Id, IndividualValuesWrapper> IndividualValues) {
+		for (IndividualValuesWrapper value : IndividualValues.values()) {
+			if (value.isFinished == false) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void examineNextActivity(
+			final Id id,
+			final Map<Id, IndividualValuesWrapper> individualValues,
+			final List<JointLeg> accessedLegs) {
+		IndividualValuesWrapper currentIndividualValues = individualValues.get(id);
+		PlanElement currentPlanElement;
+
+		try {
+			currentPlanElement = this.individualPlans.get(id)
+				.getPlanElements().get(currentIndividualValues.indexInPlan);
+		} catch (IndexOutOfBoundsException e) {
+			// no more plan elements for this individual
+			currentIndividualValues.isFinished = true;
+			return;
+		}
+
+		if (currentPlanElement instanceof Leg) {
+			JointLeg leg;
+
+			try {
+				leg = (JointLeg) currentPlanElement;
+			} catch (ClassCastException e) {
+				throw new RuntimeException("JointPlan contained non-JointLeg legs");
+			}
+
+			leg.setDepartureTime(currentIndividualValues.now);
+			currentIndividualValues.now += leg.getTravelTime();
+			leg.setArrivalTime(currentIndividualValues.now);
+
+			currentIndividualValues.indexInPlan++;
+
+			return;
+		}
+
+		Activity act = (Activity) currentPlanElement;
+
+		if (!act.getType().equals(JointActingTypes.PICK_UP)) {
+			act.setStartTime(currentIndividualValues.now);
+			currentIndividualValues.now += act.getMaximumDuration();
+			act.setEndTime(currentIndividualValues.now);
+			currentIndividualValues.indexInPlan++;
+		}
+		else {
+			// test if linked legs are planned
+			JointLeg sharedRide = (JointLeg) this.individualPlans.get(id)
+				.getPlanElements().get(currentIndividualValues.indexInPlan + 1);
+			Map<Id, JointLeg> linkedLegs = sharedRide.getLinkedElements();
+			if (accessedLegs.containsAll(linkedLegs.values())) {
+				// if yes, compute duration and set activity
+				double soonestStartTime = currentIndividualValues.now;
+				for (Id currentId : linkedLegs.keySet()) {
+					soonestStartTime = Math.max(
+							soonestStartTime,
+							individualValues.get(currentId).now);
+				}
+				soonestStartTime += pickUpDuration;
+				act.setStartTime(currentIndividualValues.now);
+				act.setMaximumDuration(soonestStartTime - currentIndividualValues.now);
+				currentIndividualValues.now = soonestStartTime;
+				act.setEndTime(currentIndividualValues.now);
+				currentIndividualValues.indexInPlan++;
+			}
+			// else, add joint leg as accessed 
+			else {
+				accessedLegs.add(sharedRide);
+			}
+		}
+	}
+}

@@ -140,7 +140,11 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 						planAttributes.getValue()));
 		}
 
-		return new JointPlan(inputPlan.getClique(), individualPlans, false);
+		return new JointPlan(
+				inputPlan.getClique(),
+				individualPlans,
+				false, //do not add at individual level
+				false); //do not synchronize
 	}
 
 	/**
