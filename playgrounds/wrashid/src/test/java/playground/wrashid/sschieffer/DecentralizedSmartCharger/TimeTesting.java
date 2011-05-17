@@ -9,6 +9,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.V2G;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.PlanXMLGenerator;
 
 
 /**
@@ -60,6 +62,11 @@ public class TimeTesting {
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				
 				try {
+					
+					PlanXMLGenerator plans= new PlanXMLGenerator(1000);
+					plans.setAgents(10);
+					plans.setAgents(10000);
+					plans.setAgents(20000);
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,

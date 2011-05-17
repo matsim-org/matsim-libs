@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.V2G;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -44,6 +44,11 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.V2G;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 

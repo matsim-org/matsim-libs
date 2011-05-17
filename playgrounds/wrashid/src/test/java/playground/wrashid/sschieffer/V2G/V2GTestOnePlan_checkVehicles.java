@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.V2G;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -36,6 +36,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
 
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
