@@ -38,6 +38,8 @@ public class PtTimeHandler {
 	
 	public PtTimeHandler(){
 		this.times = new ArrayList<SomePtTime>();
+		
+		//here it would be possible to register other instances of SomePtTime
 		times.add(new AccesWait());
 		times.add(new AccesWalk());
 		times.add(new LineTT());
@@ -51,11 +53,16 @@ public class PtTimeHandler {
 		}else{
 			last = e.getTime();
 		}
+		//handle event for all instances of SomePtTime
 		for(SomePtTime t: this.times){
 			t.handleEvent(e);
 		}
 	}
 	
+	/**
+	 * updates all values of the given trip
+	 * @param trip
+	 */
 	public void finish(AnalysisTripV4 trip){
 		trip.tripTTime = last - first;
 		for(SomePtTime t: this.times){

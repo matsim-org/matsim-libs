@@ -49,6 +49,8 @@ public class AnalysisTripV4 extends AbstractAnalysisTrip {
 		this.nrOfElements = elements.size();
 		this.nrOfExpEvents = this.findExpectedNumberOfEvents(elements);
 		super.addElements(elements);
+		
+		//handler is only needed for pt
 		if(this.mode.equals(TransportMode.pt)){
 			this.handler = new PtTimeHandler();
 		}
@@ -62,31 +64,32 @@ public class AnalysisTripV4 extends AbstractAnalysisTrip {
 		int temp = 0;
 		for(PlanElement pe: elements){
 			if( pe instanceof Leg){
-				
+				// +4 for every pt-leg
 				if(((Leg) pe).getMode().equals(TransportMode.pt)){
 					temp +=4;
-				}else{
+				}
+				// +2 for every other leg
+				else{
 					temp +=2;
 				}
 			}
 		}
 		return temp;
 	}
-	
-	/**
-	 * returns true if enough are events handled
-	 * @param e
-	 * @return
-	 */
-	
+
 	private int handledEvents = 0;
 	private Double first = null;
 	private Double last = 0.0;
+	/**
+	 * returns true if enough events are handled and the trip is finished
+	 * @param e
+	 * @return
+	 */
 	public boolean handleEvent(PersonEvent e){
 		this.handledEvents++;
 		if(this.mode.equals(TransportMode.pt)){
 			handler.handleEvent(e);
-			if(this.handledEvents == nrOfExpEvents){
+			if(this.handledEvents == this.nrOfExpEvents){
 				handler.finish(this);
 				return true;
 			}else{

@@ -43,6 +43,11 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public abstract class SomePtTime {
 	private boolean finished = false;
+	
+	/*  stores the start and the end of a time like SwitchWait,
+	 *  so that there is the possibility to get durations of 
+	 *  parts of a trip and the exact # of these times in a trip 
+	 */
 	protected List<Tuple<Double, Double>> times;
 	private Double temp = null;
 	
@@ -56,7 +61,11 @@ public abstract class SomePtTime {
 			}
 		}
 	}
-
+	/**
+	 * should return true if the given event is expect and should be handled
+	 * @param e
+	 * @return
+	 */
 	protected abstract boolean handle(PersonEvent e);
 	
 	private void addTime(PersonEvent e) {
@@ -160,11 +169,16 @@ class SwitchWait extends SomePtTime{
 
 	@Override
 	protected boolean handle(PersonEvent e) {
+		//handle only if the given event is an instance of the next expected event
 		if(nextExp.equals(e.getClass().toString())){
 			if(e instanceof PersonLeavesVehicleEvent){
 				nextExp = AgentDepartureEventImpl.class.toString();
 				return true;
 			}else if(e instanceof AgentDepartureEvent){
+				/*
+				 *after an AgentDepartureEvent a PersonEntersVehicleEvent is thrown only if the LegMode is pt
+				 *the time in the pt-vehicle starts as recently as the agent enters the vehicle  
+				 */
 				if (((AgentDepartureEvent) e).getLegMode().equals(TransportMode.pt)){
 					nextExp = PersonEntersVehicleEventImpl.class.toString();
 					return false;
@@ -205,6 +219,7 @@ class SwitchWalk extends SomePtTime{
 				if(e instanceof AgentDepartureEvent && !first){
 					return true;
 				}else if (e instanceof AgentArrivalEvent){
+					//the first "SwitchWalk" is the AccesWalk
 					if(first){
 						first = false;
 						return false;
@@ -226,6 +241,7 @@ class SwitchWalk extends SomePtTime{
 	@Override
 	public double getTime(){
 		double temp = 0;
+		//the last SwitchWalk is the EgressWalk
 		for(int i = 0; i < this.times.size()-1; i++){
 			temp = this.times.get(i).getSecond() - this.times.get(i).getFirst(); 
 		}
@@ -237,6 +253,7 @@ class SwitchWalk extends SomePtTime{
 		return (this.times.size()-1);
 	}
 	
+	//the last SwitchWalk is the EgressWalk
 	public double getEgressWalkTime(){
 		return (this.times.get(this.times.size() - 1).getSecond() - this.times.get(this.times.size() - 1).getFirst());
 	}
