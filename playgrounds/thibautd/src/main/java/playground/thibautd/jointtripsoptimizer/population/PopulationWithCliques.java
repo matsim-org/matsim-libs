@@ -67,7 +67,7 @@ public class PopulationWithCliques implements Population {
 	 * =========================================================================
 	 */
 	public PopulationFactory getFactory() {
-		log.debug("population factory from populationWithCliques accessed");
+		//log.debug("population factory from populationWithCliques accessed");
 		return populationDelegate.getFactory();
 	}
 
@@ -80,8 +80,8 @@ public class PopulationWithCliques implements Population {
 	}
 
 	public Map<Id, ? extends Person> getPersons() {
-		log.debug("Persons of the PopulationWithCliques accessed");
-		log.debug(populationDelegate.getPersons().size()+" persons returned");
+		//log.debug("Persons of the PopulationWithCliques accessed");
+		//log.debug(populationDelegate.getPersons().size()+" persons returned");
 		return populationDelegate.getPersons();
 	}
 

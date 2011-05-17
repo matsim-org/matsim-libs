@@ -103,7 +103,7 @@ public class PopulationOfCliques implements Population {
 
 	@Override
 	public Map<Id,? extends Person> getPersons() {
-		log.debug("method getPersons() used to retrieve cliques from PopulationOfCliques");
+		//log.debug("method getPersons() used to retrieve cliques from PopulationOfCliques");
 		return this.getCliques();
 	}
 
