@@ -46,7 +46,7 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 		test.handle(event3);
 		test.handle(event4);
 				
-//		test 
+//		test, this works
 				
 		Assert.assertEquals(event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
 		

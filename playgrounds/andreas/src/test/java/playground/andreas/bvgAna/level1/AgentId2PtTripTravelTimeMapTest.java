@@ -58,20 +58,22 @@ public class AgentId2PtTripTravelTimeMapTest {
 	        EventsFactoryImpl ef = new EventsFactoryImpl();
 
 	        ActivityStartEvent event1 = ef.createActivityStartEvent(1.0, agentId1, linkId1, facilId1, "w");
-	        ActivityEndEvent event2 = ef.createActivityEndEvent(1.2, agentId1, linkId2, facilId2, "w");
+	        ActivityEndEvent event2 = ef.createActivityEndEvent(1.2, agentId1, linkId1, facilId1, "w");
 	        
 	        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2, agentId1, linkId2, "pt");        
 	        AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9, agentId1, linkId3, "pt");
+	        
+	        ActivityStartEvent event5 = ef.createActivityStartEvent(1.9, agentId1, linkId3, facilId2, "h");	//home mit anderen werten
+	        ActivityEndEvent event6 = ef.createActivityEndEvent(2.7, agentId1, linkId3, facilId2, "h");
 	                
-//	        only works if event 1 and 2 are handled twice, which seems odd.
 	        test.handleEvent(event1);
 	        test.handleEvent(event2);
 	        test.handleEvent(event3);
 	        test.handleEvent(event4);
-	        test.handleEvent(event1);
-	        test.handleEvent(event2);
+	        test.handleEvent(event5);
+	        test.handleEvent(event6);
 	        
-//	        first tests
+//	        first tests, this works
 	        
 	        Assert.assertEquals(event4.getTime()-event3.getTime(), test.getAgentId2PtTripTravelTimeMap().get(agentId1).get(0).getTotalTripTravelTime(), 0.);
 	        	        

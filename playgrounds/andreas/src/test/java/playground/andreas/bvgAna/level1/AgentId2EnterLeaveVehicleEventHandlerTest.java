@@ -58,6 +58,8 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         PersonLeavesVehicleEvent event6 = ef.createPersonLeavesVehicleEvent(4.2*3600, persId3, vehId1, routeId2);
         handler.handleEvent(event6);
         
+//        run tests
+        
         Assert.assertSame(event1, handler.getAgentId2EnterEventMap().get(persId1).get(0));
         Assert.assertSame(event2, handler.getAgentId2EnterEventMap().get(persId2).get(0));
         Assert.assertSame(event3, handler.getAgentId2EnterEventMap().get(persId3).get(0));

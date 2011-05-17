@@ -51,6 +51,8 @@ public class AgentId2DepartureDelayAtStopMapTest {
         handler.handleEvent(event1);
         PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1*3600, persId2, vehId2, routeId2);
         handler.handleEvent(event2);
+        
+//        run tests
 		
         Assert.assertTrue(handler.getStopId2DelayAtStopMap().containsKey(persId1));
 		Assert.assertEquals(event3.getTime(), handler.getStopId2DelayAtStopMap().get(persId1).getAgentEntersVehicle().get(0));
