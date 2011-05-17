@@ -93,16 +93,18 @@ public class Main_exampleV2G {
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";	
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";
 		
 		final double bufferBatteryCharge=0.0;		
-		final double minChargingLength=15*60;
+		final double minChargingLength=1.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
-		StellasHubMapping myMappingClass= new StellasHubMapping(1,1);
+		int numberOfHubsInX=1;
+		int numberOfHubsInY=1;
+		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		
 		double priceMaxPerkWh=0.25;
 		double priceMinPerkWh=0.40;
-		String freeLoadTxt= "playgrounds/wrashid/test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
+		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
 		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
 		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
@@ -154,7 +156,6 @@ public class Main_exampleV2G {
 		 * </br>
 		 */			
 					
-		StochasticLoadCollector slc= new StochasticLoadCollector(mySimulation);
 		
 		double compensationPerKWHRegulationUp=0.15;
 		double compensationPerKWHRegulationDown=0.15;
@@ -163,7 +164,7 @@ public class Main_exampleV2G {
 				xPercentNone,
 				xPercentDown,
 				xPercentDownUp,
-				slc,
+				new StochasticLoadCollector(mySimulation),
 				compensationPerKWHRegulationUp,
 				compensationPerKWHRegulationDown);
 	

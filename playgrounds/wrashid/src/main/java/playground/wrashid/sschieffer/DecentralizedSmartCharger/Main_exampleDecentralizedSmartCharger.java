@@ -123,7 +123,9 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * linkdId to the hubs in the DecentralizedSmartCharger
 		 * 
 		 */
-		StellasHubMapping myMappingClass= new StellasHubMapping(1,1);
+		int numberOfHubsInX=1;
+		int numberOfHubsInY=1;
+		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		/**
 		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
 		 */

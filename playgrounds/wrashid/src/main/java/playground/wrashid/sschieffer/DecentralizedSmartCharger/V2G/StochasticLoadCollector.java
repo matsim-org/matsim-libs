@@ -13,9 +13,20 @@ import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmar
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.LoadDistributionInterval;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
 
+
+/**
+ * makes stochastic schedules for agent vehicles, hubsources and hubs in general
+ * <li> hub in general 6 hours
+ * <li> hub source - only hub 1 has a short interval with a hubsource
+ * <li> every agent has 2 small sources
+ * 
+ * @author Stella
+ *
+ */
 public class StochasticLoadCollector {
 	
 	private Controler controler;
+	private DecentralizedChargingSimulation mySimulation;
 	
 	private HashMap<Integer, Schedule> stochasticHubLoadDistribution=
 		new  HashMap<Integer, Schedule>();
@@ -28,23 +39,24 @@ public class StochasticLoadCollector {
 	
 	
 	
-	public StochasticLoadCollector(DecentralizedChargingSimulation simulation){
-		this.controler=simulation.controler;
-		makeAgentVehicleSource(controler);
-		readStochasticLoad(simulation.mySmartCharger.myHubLoadReader.getHubKeySet());
-		makeSourceHub();
+	public StochasticLoadCollector(DecentralizedChargingSimulation mySimulation){
+		this.controler=mySimulation.controler;
+		this.mySimulation=mySimulation;
 	}
 	
 	
 	public HashMap<Integer, Schedule> getStochasticHubLoad(){
+		readStochasticHubLoad(mySimulation.mySmartCharger.myHubLoadReader.getHubKeySet());
 		return stochasticHubLoadDistribution;
 	}
 	
 	public HashMap<Id, Schedule> getStochasticAgentVehicleSources(){
+		makeAgentVehicleSource(controler);
 		return agentSource;
 	}
 	
 	public HashMap<Integer, Schedule> getStochasticHubSources(){
+		makeSourceHub();
 		return stochasticHubSource;
 	}
 	
@@ -73,13 +85,13 @@ public class StochasticLoadCollector {
 	
 	
 	
-	public void readStochasticLoad(Set<Integer> hubKeySet){
+	public void readStochasticHubLoad(Set<Integer> hubSet){
 		
 		
-		for (Integer i: hubKeySet){
+		for (Integer i: hubSet){
 			
-			// 3* 30min
-			double secs= 3*30*60;
+			// 6 hours of the day
+			double secs= 6*60*60;
 			
 			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
 			
@@ -96,6 +108,9 @@ public class StochasticLoadCollector {
 	}
 	
 	
+	/**
+	 * only hub 1 has a source of 3500 between 50000 and 62490
+	 */
 	public void makeSourceHub(){
 		
 		Schedule bullShit= new Schedule();
