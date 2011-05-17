@@ -52,7 +52,7 @@ public class DgChartWriter {
 		filename += ".png";
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), jchart, 1200, 800, null, true, 9);
-			log.info("DeltaScoreIncomeChart written to : " +filename);
+			log.info("Chart written to : " +filename);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -114,7 +114,7 @@ public class DgChartWriter {
 					}
 				}
 			} catch(ClassCastException e){ //else instanceof CategoryPlot
-				log.info("caught class cast exception, trying to write CategoryPlot");
+				log.info("Due to a caught class cast exception, it should be a CategoryPlot");
 				CategoryPlot cp = chart.getCategoryPlot();
 				String header = "# CategoryRowKey \t CategoryColumnKey \t CategoryRowIndex \t CategoryColumnIndex \t Value";
 				writer.write(header);
@@ -141,6 +141,7 @@ public class DgChartWriter {
 				
 			}
 		  writer.close();
+		  log.info("Chart data written to: " + filename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
