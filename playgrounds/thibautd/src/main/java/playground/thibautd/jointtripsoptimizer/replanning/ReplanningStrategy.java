@@ -31,7 +31,7 @@ import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFu
  */
 public class ReplanningStrategy extends JointPlanStrategy {
 
-	public ReplanningStrategy(Controler controler) {
+	public ReplanningStrategy(final Controler controler) {
 		// TODO: use a JointPlan specific selector?
 		// + pass it from the config file
 		// this.planSelector = new BestPlanSelector();
