@@ -54,7 +54,7 @@ public class Schedule {
 	double totalJoulesInSubOptimalParkingTimes=0;
 	private double startingSOC;
 	
-	LinkedList<TimeInterval> timesInSchedule= new LinkedList<TimeInterval>();
+	public LinkedList<TimeInterval> timesInSchedule= new LinkedList<TimeInterval>();
 	
 	
 	public Schedule(){

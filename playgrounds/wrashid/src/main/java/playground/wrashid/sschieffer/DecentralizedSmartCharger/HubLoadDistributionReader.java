@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 
 import org.apache.commons.math.ConvergenceException;
@@ -68,12 +69,12 @@ public class HubLoadDistributionReader {
 	
 	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
 	HashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
-	HashMap<Integer, Schedule> stochasticHubLoadDistribution;
+	public HashMap<Integer, Schedule> stochasticHubLoadDistribution;
 	HashMap<Integer, Schedule> pricingHubDistribution;
 	HashMap<Integer, TimeDataCollector> connectivityHubDistribution;
 	
 	HashMap<Integer, Schedule> locationSourceMapping;
-	HashMap<Id, Schedule> agentVehicleSourceMapping;
+	public HashMap<Id, Schedule> agentVehicleSourceMapping;
 	
 	HashMap<Integer, double [][]> originalDeterministicChargingDistribution;
 	HashMap<Integer, double [][]> loadAfterDeterministicChargingDecision;
@@ -109,6 +110,8 @@ public class HubLoadDistributionReader {
 		this.myVehicleTypeCollector= myVehicleTypeCollector;
 		
 		this.outputPath=outputPath;
+		
+		solverNewton.setMaximalIterationCount(10000);
 		checkForPlugInHybrid();// if PHEV then deterministicLoad function changes for this one
 		
 		visualizeLoadDistributionGeneralAndPHEV();
@@ -211,6 +214,10 @@ public class HubLoadDistributionReader {
 		return hubNumber;
 	}
 	
+	
+	public Set<Integer> getHubKeySet(){
+		return deterministicHubLoadDistribution.keySet();
+	}
 	
 	public Schedule getDeterministicHubLoadDistribution(int hubId){
 		return deterministicHubLoadDistribution.get(hubId);
@@ -798,7 +805,7 @@ public class HubLoadDistributionReader {
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart("Prices at Hub "+ i.toString(), 
 					"time [s]", 
-					"available load [W]", 
+					"price [CHF/s]", 
 					prices, 
 					PlotOrientation.VERTICAL, 
 					true, true, false);

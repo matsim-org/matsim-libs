@@ -1,10 +1,30 @@
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 
+
+/**
+ * you can specify number of hubs in X and Y direction and then the network 
+ * automatically divides the links into sections 
+ * 
+			 * example 	divX=2
+			 * 			divY=2
+			 * minX -------------------------->  maxX
+			 *minY				]
+			 *]		1			]		2
+			 *]					]
+			 *]--------------------------------
+			 *]					]
+			 *]		3			]		4
+			 *]					]
+			 *maxY
+			 
+ * @author Stella
+ *
+ */
 public class StellasHubMapping extends MappingClass{
 	
 	private double minX=Integer.MAX_VALUE;
@@ -12,11 +32,13 @@ public class StellasHubMapping extends MappingClass{
 	private double minY=Integer.MAX_VALUE;
 	private double  maxY=Integer.MIN_VALUE;
 	
-	final private int divHubsX=2;
-	final private int divHubsY=2;
+	private int divHubsX;
+	private int divHubsY;
 	
-	public StellasHubMapping(){
-	
+	public StellasHubMapping(int divHubsX, int divHubsY){
+		this.divHubsX=divHubsX;
+		this.divHubsY=divHubsY;
+		
 	}
 	
 	/**

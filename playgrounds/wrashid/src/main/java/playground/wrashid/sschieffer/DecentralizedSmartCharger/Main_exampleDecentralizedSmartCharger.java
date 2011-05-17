@@ -43,6 +43,10 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.StellasHubMapping;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.DetermisticLoadPricingCollector;
+
 import java.util.*;
 
 /**
@@ -117,19 +121,25 @@ public class Main_exampleDecentralizedSmartCharger {
 		/**
 		 * define mapping class that shall be used to map the 
 		 * linkdId to the hubs in the DecentralizedSmartCharger
+		 * 
 		 */
-		StellasHubMapping myMappingClass= new StellasHubMapping();
-		
-		StellasResidentialDetermisticLoadPricingCollector loadPricingCollector= 
-			new StellasResidentialDetermisticLoadPricingCollector();
-		
+		StellasHubMapping myMappingClass= new StellasHubMapping(1,1);
+		/**
+		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
+		 */
+		double priceMaxPerkWh=0.40;
+		double priceMinPerkWh=0.25;
+		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
+		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
+		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+				
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(configPath, 
 				outputPath, 
 				phev, ev, combustion,
 				bufferBatteryCharge,
 				minChargingLength,
 				myMappingClass,
-				loadPricingCollector,
+				myHubInfo,
 				false // indicate if you want graph output for every agent to visualize the SOC over the day
 				);
 		mySimulation.addControlerListenerDecentralizedCharging();		

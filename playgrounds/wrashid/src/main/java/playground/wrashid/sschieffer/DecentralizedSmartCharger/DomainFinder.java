@@ -58,17 +58,17 @@ public class DomainFinder {
 	public void findRange(){
 		
 		domainMin=Double.MAX_VALUE;
-		domainMax= Double.MIN_VALUE;
+		domainMax= - Double.MAX_VALUE;
 		
 		double approxXMin=0;
 		double approxXMax=0;
 		for(double i=rangeMin; i<=rangeMax; ){
-			
-			if(func.value(i)>domainMax){
-				domainMax= Math.max(func.value(i), domainMax);
+			double val=func.value(i);
+			if(val>domainMax){
+				domainMax= Math.max(val, domainMax);
 				approxXMax=i;
 			}
-			if(func.value(i)<domainMin){
+			if(val<domainMin){
 				domainMin= Math.min(func.value(i), domainMin);
 				approxXMin=i;
 			}

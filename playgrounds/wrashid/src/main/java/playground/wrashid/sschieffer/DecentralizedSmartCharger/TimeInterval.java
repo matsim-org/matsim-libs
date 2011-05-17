@@ -41,11 +41,11 @@ public abstract class TimeInterval implements Comparable{
 	}
 	
 	
-	double getStartTime(){
+	public double getStartTime(){
 		return start;
 	}
 	
-	double getEndTime(){
+	public double getEndTime(){
 		return end;
 	}
 	

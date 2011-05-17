@@ -41,6 +41,11 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.StochasticLoadCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.StellasHubMapping;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.DetermisticLoadPricingCollector;
+
 import java.util.*;
 
 
@@ -86,17 +91,20 @@ public class Main_exampleV2G {
 		final double ev=0.0;
 		final double combustion=0.0;
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";		
-		//String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml"; // 1 agent
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
-		final double bufferBatteryCharge=0.0;
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";	
+		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 		
+		final double bufferBatteryCharge=0.0;		
 		final double minChargingLength=15*60;
-	
-		StellasHubMapping myMappingClass= new StellasHubMapping();
 		
-		StellasResidentialDetermisticLoadPricingCollector loadPricingCollector= 
-			new StellasResidentialDetermisticLoadPricingCollector();
+		StellasHubMapping myMappingClass= new StellasHubMapping(1,1);
+		
+		double priceMaxPerkWh=0.25;
+		double priceMinPerkWh=0.40;
+		String freeLoadTxt= "playgrounds/wrashid/test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
+		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
+		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(configPath, 
 				outputPath, 
@@ -104,7 +112,7 @@ public class Main_exampleV2G {
 				bufferBatteryCharge,
 				minChargingLength,
 				myMappingClass,
-				loadPricingCollector,
+				myHubInfo,
 				false // indicate if you want graph output for every agent to visualize the SOC over the day
 				
 				);
@@ -146,7 +154,7 @@ public class Main_exampleV2G {
 		 * </br>
 		 */			
 					
-		StochasticLoadCollector slc= new StochasticLoadCollector(mySimulation.controler);
+		StochasticLoadCollector slc= new StochasticLoadCollector(mySimulation);
 		
 		double compensationPerKWHRegulationUp=0.15;
 		double compensationPerKWHRegulationDown=0.15;

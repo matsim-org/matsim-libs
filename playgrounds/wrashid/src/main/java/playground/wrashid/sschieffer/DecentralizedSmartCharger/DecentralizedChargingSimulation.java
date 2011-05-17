@@ -1,15 +1,22 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.apache.commons.math.ConvergenceException;
+import org.apache.commons.math.FunctionEvaluationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.StochasticLoadCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.DetermisticLoadPricingCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.MappingClass;
  
 
 /**
@@ -59,6 +66,10 @@ public class DecentralizedChargingSimulation {
 	 * @param minChargingLength
 	 * @param myMappingClass
 	 * @param loadPricingCollector
+	 * @throws IOException 
+	 * @throws IllegalArgumentException 
+	 * @throws FunctionEvaluationException 
+	 * @throws ConvergenceException 
 	 */
 	public DecentralizedChargingSimulation(String configPath, 
 			String outputPath,  
@@ -66,15 +77,16 @@ public class DecentralizedChargingSimulation {
 			double bufferBatteryCharge,
 			double minChargingLength,
 			MappingClass myMappingClass,
-			DetermisticLoadPricingCollector loadPricingCollector,
-			boolean LPoutput){
+			ArrayList<HubInfo> myHubInfo,
+			boolean LPoutput) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.outputPath=outputPath;
 		this.bufferBatteryCharge=bufferBatteryCharge;
 		this.minChargingLength=minChargingLength;
 		this.myMappingClass=myMappingClass;
-		this.loadPricingCollector=loadPricingCollector;
 		this.LPoutput=LPoutput;
+		
+		loadPricingCollector= new DetermisticLoadPricingCollector(myHubInfo);
 		
 		controler=new Controler(configPath);
 		parkingTimesPlugin= new ParkingTimesPlugin(controler);

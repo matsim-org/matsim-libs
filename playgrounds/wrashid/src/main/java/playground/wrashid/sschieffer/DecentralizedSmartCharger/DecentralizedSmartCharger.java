@@ -28,10 +28,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYTextAnnotation;
-import org.jfree.chart.axis.Axis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PlotOrientation;
@@ -40,7 +38,6 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
 
@@ -51,9 +48,8 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.Main;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.V2G;
 
 
 /* *********************************************************************** *
@@ -298,6 +294,7 @@ public class DecentralizedSmartCharger {
 		calculateChargingCostsAllAgents();
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
+		writeSummary("DSC"+controler.getPopulation().getPersons().size()+"agents_"+minChargingLength+"chargingLength");
 	}
 
 
@@ -646,7 +643,6 @@ public class DecentralizedSmartCharger {
 			
 		System.out.println("START CHECKING VEHICLE SOURCES");
 		
-		
 		checkVehicleSources();
 		timeCheckVehicles	=System.currentTimeMillis();	
 		
@@ -657,8 +653,9 @@ public class DecentralizedSmartCharger {
 		checkHubStochasticLoads();
 		timeCheckOtherSources=System.currentTimeMillis();
 		
-		
 		System.out.println("DONE V2G");
+		writeSummary("V2G"+controler.getPopulation().getPersons().size()+"agents_"+minChargingLength+"chargingLength");
+		
 		
 	}
 	

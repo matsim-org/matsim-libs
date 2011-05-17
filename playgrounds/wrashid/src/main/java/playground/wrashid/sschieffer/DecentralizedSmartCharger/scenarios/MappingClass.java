@@ -1,4 +1,4 @@
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios;
 
 import org.matsim.core.controler.Controler;
 
