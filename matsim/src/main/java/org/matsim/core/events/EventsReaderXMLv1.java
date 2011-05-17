@@ -22,9 +22,11 @@ package org.matsim.core.events;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -162,6 +164,12 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_LINE_ID)),
 					new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_ROUTE_ID)),
 					new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DEPARTURE_ID))));
+		} else if (SignalGroupStateChangedEvent.EVENT_TYPE.equals(eventType)){
+			Id systemId = new IdImpl(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALSYSTEM_ID));
+			Id groupId = new IdImpl(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_ID));
+			String state = atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_STATE);
+			SignalGroupState newState = SignalGroupState.valueOf(state);
+			this.events.processEvent(this.builder.createSignalGroupStateChangedEvent(time, systemId, groupId, newState));
 		}
 	}
 

@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
 /**
@@ -103,6 +104,10 @@ public class EventsFactoryImpl implements EventsFactory {
 
 	public TransitDriverStartsEvent createTransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
 		return new TransitDriverStartsEvent(time, driverId, vehicleId, transitLineId, transitRouteId, departureId);
+	}
+	
+	public SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
+		return new SignalGroupStateChangedEventImpl(time, systemId, groupId, newState);
 	}
 
 }
