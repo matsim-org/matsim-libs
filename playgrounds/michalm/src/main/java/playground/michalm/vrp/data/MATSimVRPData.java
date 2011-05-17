@@ -18,7 +18,7 @@ public class MATSimVRPData
 
     public Coord[] nodeToCoords;
     public Link[] nodeToLinks;
-    
+
     public ShortestPath[][] shortestPaths;
 
     public String coordSystem = TransformationFactory.WGS84_UTM33N;
@@ -40,7 +40,7 @@ public class MATSimVRPData
 
         nodeToCoords = new Coord[nodes.length];
         nodeToLinks = new Link[nodes.length];
-        
+
         for (int i = 0; i < nodes.length; i++) {
             Coord coord = scenario.createCoord(nodes[i].x, nodes[i].y);
 

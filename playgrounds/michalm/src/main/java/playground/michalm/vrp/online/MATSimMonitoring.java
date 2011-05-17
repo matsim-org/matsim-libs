@@ -7,8 +7,7 @@ import pl.poznan.put.vrp.dynamic.simulator.*;
 public class MATSimMonitoring
     extends SimulatedMonitoring
 {
-    //private MATSimVRPData data;
-
+    // private MATSimVRPData data;
 
     @Override
     public boolean updateData(VRPData vrpData)

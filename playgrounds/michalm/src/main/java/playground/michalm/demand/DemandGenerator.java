@@ -260,11 +260,11 @@ public class DemandGenerator
         String plansFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-//            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-//            networkFileName = dirName + "network.xml";
-//            zonesXMLFileName = dirName + "zones1.xml";
-//            zonesShpFileName = dirName + "zones1.shp";
-//            plansFileName = dirName + "plans1.xml";
+        // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+        // networkFileName = dirName + "network.xml";
+        // zonesXMLFileName = dirName + "zones1.xml";
+        // zonesShpFileName = dirName + "zones1.shp";
+        // plansFileName = dirName + "plans1.xml";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
             // networkFileName = dirName + "network2.xml";
@@ -272,11 +272,11 @@ public class DemandGenerator
             // zonesShpFileName = dirName + "zones2.shp";
             // plansFileName = dirName + "plans2.xml";
 
-//            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-//            networkFileName = dirName + "network.xml";
-//            zonesXMLFileName = dirName + "zone.xml";
-//            zonesShpFileName = dirName + "zone.shp";
-//            plansFileName = dirName + "plans.xml";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
+            // networkFileName = dirName + "network.xml";
+            // zonesXMLFileName = dirName + "zone.xml";
+            // zonesShpFileName = dirName + "zone.shp";
+            // plansFileName = dirName + "plans.xml";
 
             dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
             networkFileName = dirName + "network2.xml";

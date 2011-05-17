@@ -40,7 +40,6 @@ public class Net2QGIS
                     + Arrays.toString(args));
         }
 
-
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -50,20 +49,19 @@ public class Net2QGIS
         Network network = scenario.getNetwork();
         new MatsimNetworkReader(scenario).readFile(netFileName);
 
-        //links as lines
-        FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
-                network, coordSystem);
+        // links as lines
+        FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, coordSystem);
         builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
         builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
         new Links2ESRIShape(network, outFileNameLs, builder).write();
 
-        //links as polygons
+        // links as polygons
         builder = new FeatureGeneratorBuilderImpl(network, coordSystem);// necessary?
         builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
         builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
         new Links2ESRIShape(network, outFileNameP, builder).write();
 
-        //nodes as points
+        // nodes as points
         new Nodes2ESRIShape(network, outFileNameN, coordSystem).write();
     }
 }

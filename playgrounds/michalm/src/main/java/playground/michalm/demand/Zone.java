@@ -24,11 +24,9 @@ public class Zone
     private Id id;
     private Feature zonePolygon;
 
-    private EnumMap<Group, Integer> groupSizes = new EnumMap<Group, Integer>(
-            Group.class);
+    private EnumMap<Group, Integer> groupSizes = new EnumMap<Group, Integer>(Group.class);
 
-    private EnumMap<Act, Integer> actPlaces = new EnumMap<Act, Integer>(
-            Act.class);
+    private EnumMap<Act, Integer> actPlaces = new EnumMap<Act, Integer>(Act.class);
 
 
     public Zone(Id id)

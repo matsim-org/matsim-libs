@@ -29,8 +29,7 @@ public class ZoneShpReader
         FeatureCollection ftColl = fts.getFeatures();
 
         if (ftColl.size() != zones.size()) {
-            throw new RuntimeException("Features: " + ftColl.size()
-                    + "; zones: " + zones.size());
+            throw new RuntimeException("Features: " + ftColl.size() + "; zones: " + zones.size());
         }
 
         @SuppressWarnings("unchecked")

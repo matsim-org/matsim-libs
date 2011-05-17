@@ -123,9 +123,13 @@ public class DVRPLauncher
 
         ShortestPathsFinder spf = new ShortestPathsFinder(data);
 
-        // DO NOT READ SHORTEST PATHS, ONLY TIMES/COSTS!!! (
-        // spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
-        spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+        if (VRP_OUT_FILES) {
+            spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+        }
+        else {
+            spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
+        }
+            
         spf.upadateVRPArcTimesAndCosts();
 
         // ================================================== BELOW: only for comparison reasons...
@@ -174,6 +178,8 @@ public class DVRPLauncher
 
         if (VRP_OUT_FILES) {
             new Routes2QGIS(data.vrpData.routes, data, vrpOutDirName + "\\route_").write();
+            
+            //generate output plans (plans.xml)
         }
 
         ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.vrpData));

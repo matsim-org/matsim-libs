@@ -44,7 +44,7 @@ public class Routes2QGIS
     {
         for (Route route : routes) {
             List<Request> reqs = route.getRequests();
-            
+
             if (reqs.size() == 0) {
                 continue;
             }
@@ -62,7 +62,7 @@ public class Routes2QGIS
 
                 addLineString(route, i, prevNode, currNode, departTime);
 
-                if (req.fromNode != req.toNode) { //i.e. taxi service
+                if (req.fromNode != req.toNode) { // i.e. taxi service
                     currNode = req.toNode;
                     addLineString(route, i, req.fromNode, currNode, req.startTime);
                 }

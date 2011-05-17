@@ -8,12 +8,14 @@ public class TimeAsTravelCost
     implements TravelCost
 {
     private TravelTime travelTime;
-    
+
+
     public TimeAsTravelCost(TravelTime travelTime)
     {
         this.travelTime = travelTime;
     }
-    
+
+
     @Override
     public double getLinkGeneralizedTravelCost(Link link, double time)
     {
