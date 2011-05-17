@@ -24,7 +24,7 @@ public class TimeTesting {
 	
 	public static void main(String[] args) throws IOException {
 		
-		final String configName= "config_plans100.xml";
+		final String configName= "config_plans10.xml";
 		String configPath="test/input/playground/wrashid/sschieffer/"+configName;
 		final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 		
@@ -63,10 +63,10 @@ public class TimeTesting {
 				
 				try {
 					
-					PlanXMLGenerator plans= new PlanXMLGenerator(1000);
+					/*PlanXMLGenerator plans= new PlanXMLGenerator(1000);
 					plans.setAgents(10);
 					plans.setAgents(10000);
-					plans.setAgents(20000);
+					plans.setAgents(20000);*/
 					
 					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
