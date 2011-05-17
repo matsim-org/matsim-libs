@@ -172,15 +172,16 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 					new JointPlanOptimizerJGAPModeGene(this, configGroup.getAvailableModes());
 			}
 
-			log.debug("duration genes: "+this.numEpisodes+
-					", toggle genes: "+this.numToggleGenes+
-					", mode genes: "+this.numModeGenes);
+			//log.debug("duration genes: "+this.numEpisodes+
+			//		", toggle genes: "+this.numToggleGenes+
+			//		", mode genes: "+this.numModeGenes);
 			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
 
 			// population size: the SPX cross-over requires at least one chromosome
 			// per double dimension.
-			int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
-			log.debug("population size set to "+popSize);
+			//int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
+			int popSize = configGroup.getPopulationSize();
+			//log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 
 			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
@@ -232,12 +233,13 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//			this.numToggleGenes,
 			//			this.numEpisodes,
 			//			this.nDurationGenes) );
-			this.addGeneticOperator( new JointPlanOptimizerJGAPEnhancedSpx(
-						this,
-						configGroup,
-						this.numToggleGenes,
-						this.numEpisodes,
-						this.nDurationGenes) );
+			// not efficient at all (results worst than the GENOCOP ones)
+			//this.addGeneticOperator( new JointPlanOptimizerJGAPEnhancedSpx(
+			//			this,
+			//			configGroup,
+			//			this.numToggleGenes,
+			//			this.numEpisodes,
+			//			this.nDurationGenes) );
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,

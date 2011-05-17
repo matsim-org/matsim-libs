@@ -71,7 +71,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		if (plan instanceof JointPlan) {
-			log.debug("joint plan optimization algorithm lanched succesfully");
+			//log.debug("joint plan optimization algorithm lanched succesfully");
 			this.run((JointPlan) plan);
 		} else {
 			throw new IllegalArgumentException("JointPlanOptimizer launched with"+
@@ -100,7 +100,7 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
 
 		if (this.configGroup.getFitnessToMonitor()) {
-			log.debug("monitoring fitness");
+			//log.debug("monitoring fitness");
 			gaPopulation.evolve(jgapConfig.getEvolutionMonitor());
 		}
 		else {

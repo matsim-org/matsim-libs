@@ -101,8 +101,8 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 			if (fitness - this.lastBestFitness < this.minImprovement) {
 				if (fitness < this.allTimeBestFitness) {
 					// new toggle schematas are worst than tabu ones: quit.
-					log.debug("stop GA. current best: "+fitness+
-							", all time best: "+this.allTimeBestFitness);
+					//log.debug("stop GA. current best: "+fitness+
+					//		", all time best: "+this.allTimeBestFitness);
 					this.quitNow = true;
 					return;
 				}
@@ -111,14 +111,14 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 				}
 
 				if (this.indexInTabuList < this.maxNumberOfTabuElems) {
-					log.debug("new tabu element, fitness: "+fitness);
+					//log.debug("new tabu element, fitness: "+fitness);
 					boolean[] newTabuSequence = new boolean[this.numBool];
 					for (int i=0; i < this.numBool; i++) {
 						newTabuSequence[i] =
 							((BooleanGene) fittest.getGene(i)).booleanValue();
 					}
 
-					log.debug("new tabu sequence: "+print(newTabuSequence));
+					//log.debug("new tabu sequence: "+print(newTabuSequence));
 
 					// add the new sequence only if it is not already tabu (possible
 					// only with a "penalty" strategy, where tabu chromosomes are kept)
@@ -139,7 +139,7 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 				}
 				else {
 					//not enough improvement and tabu list full: we quit
-					log.debug("tabu list full. last best: "+fitness);
+					//log.debug("tabu list full. last best: "+fitness);
 					this.quitNow = true;
 				}
 			}
