@@ -50,7 +50,10 @@ public class AgentMatingAlgo {
 
 	private static final String HOME_REGEXP = "h.*";
 	private static final String WORK_REGEXP = "w.*";
-	private static final boolean onlyMateDrivers = false;
+	private final boolean onlyMateDrivers = false;
+
+	private static final double PU_DUR = 0d;
+	private static final double DO_DUR = 0d;
 
 	private final AgentTopology agentTopology;
 	private final Population population;
@@ -203,24 +206,29 @@ public class AgentMatingAlgo {
 		String puName = factory.createName();
 		ActivityImpl passengerHome = (ActivityImpl) passengerElements.get(4);
 		ActivityImpl passengerWork = (ActivityImpl) passengerElements.get(2);
+		ActivityImpl act;
 
 		// /////////// DRIVER //////////////
 		// access leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		// PU
-		planDriver.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					puName, 
-					passengerWork.getCoord(),
-					passengerWork.getLinkId()));
+					passengerHome.getCoord(),
+					passengerHome.getLinkId());
+		act.setMaximumDuration(PU_DUR);
+		planDriver.add(act);
+
 		// shared leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		// DO
-		planDriver.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF, 
-					passengerHome.getCoord(),
-					passengerHome.getLinkId()));
+					passengerWork.getCoord(),
+					passengerWork.getLinkId());
+		act.setMaximumDuration(DO_DUR);
+		planDriver.add(act);
+
 		// egress leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		//home 
@@ -230,20 +238,24 @@ public class AgentMatingAlgo {
 		// access leg
 		planPassenger.add(new LegImpl(TransportMode.walk));
 		// PU
-		planPassenger.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					puName, 
-					passengerWork.getCoord(),
-					passengerWork.getLinkId()));
+					passengerHome.getCoord(),
+					passengerHome.getLinkId());
+		act.setMaximumDuration(PU_DUR);
+		planPassenger.add(act);
+				
 		// shared leg
 		planPassenger.add(new LegImpl(JointActingTypes.PASSENGER));
 		// DO
-		planPassenger.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF, 
-					passengerHome.getCoord(),
-					passengerHome.getLinkId()));
-		// egress leg
+					passengerWork.getCoord(),
+					passengerWork.getLinkId());
+		act.setMaximumDuration(DO_DUR);
+		planPassenger.add(act);
+
+			// egress leg
 		planPassenger.add(new LegImpl(TransportMode.walk));
 		// home
 		planPassenger.add(passengerElements.get(4));
@@ -270,6 +282,7 @@ public class AgentMatingAlgo {
 		String puName = factory.createName();
 		ActivityImpl passengerHome = (ActivityImpl) passengerElements.get(0);
 		ActivityImpl passengerWork = (ActivityImpl) passengerElements.get(2);
+		ActivityImpl act;
 
 		// /////////// DRIVER //////////////
 		//home
@@ -277,19 +290,23 @@ public class AgentMatingAlgo {
 		// access leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		// PU
-		planDriver.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					puName, 
 					passengerHome.getCoord(),
-					passengerHome.getLinkId()));
+					passengerHome.getLinkId());
+		act.setMaximumDuration(PU_DUR);
+		planDriver.add(act);
+				
 		// shared leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		// DO
-		planDriver.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF, 
 					passengerWork.getCoord(),
-					passengerWork.getLinkId()));
+					passengerWork.getLinkId());
+		act.setMaximumDuration(DO_DUR);
+		planDriver.add(act);
+				
 		// egress leg
 		planDriver.add(new LegImpl(TransportMode.car));
 		// work
@@ -301,19 +318,23 @@ public class AgentMatingAlgo {
 		// access leg
 		planPassenger.add(new LegImpl(TransportMode.walk));
 		// PU
-		planPassenger.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					puName, 
 					passengerHome.getCoord(),
-					passengerHome.getLinkId()));
+					passengerHome.getLinkId());
+		act.setMaximumDuration(PU_DUR);
+		planPassenger.add(act);
+				
 		// shared leg
 		planPassenger.add(new LegImpl(JointActingTypes.PASSENGER));
 		// DO
-		planPassenger.add(
-				new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF, 
 					passengerWork.getCoord(),
-					passengerWork.getLinkId()));
+					passengerWork.getLinkId());
+		act.setMaximumDuration(DO_DUR);
+		planPassenger.add(act);
+				
 		// egress leg
 		planPassenger.add(new LegImpl(TransportMode.walk));
 		// work
