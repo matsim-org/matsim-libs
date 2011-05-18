@@ -482,7 +482,14 @@ public class QuadTree<T> implements Serializable {
 
 		/**
 		 * Increases the size of the rectangle by scaleX and scaleY.
+		 * 
+		 * (and "increase by" means:
+		 *   1.0: increase it by 100% (scale it by 2.0)
+		 *   -0.5: decrease it by 50% (scale it by 0.5)
+		 *   0.0: do nothing)   michaz
+		 * 
 		 */
+		
 		public Rect scale(double scaleX, double scaleY) {
 			scaleY *= this.centerY - this.minY;
 			scaleX *= this.centerX - this.minX;

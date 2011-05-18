@@ -184,7 +184,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void updateScaleLabel() {
-		float scale = drawers.get(0).getScale();
+		float scale = drawers.get(1).getScale();
 		scale = (float)(Math.round(scale*100))/100;
 		this.scaleField.setText(String.valueOf(scale));
 	}

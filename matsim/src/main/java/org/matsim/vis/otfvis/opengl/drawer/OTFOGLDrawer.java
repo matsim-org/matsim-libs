@@ -110,7 +110,7 @@ import com.sun.opengl.util.texture.TextureIO;
  * @author dstrippgen
  *
  */
-public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
+public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
@@ -156,6 +156,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	// Experimental mode for michaz
 	private final boolean USE_GLJPANEL = false;
+
+	private float oldWidth = 0.0f;
+	private float oldHeight = 0.0f;
 
 	public static class StatusTextDrawer {
 
@@ -266,19 +269,18 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 
 	public OTFOGLDrawer(OTFClientQuad clientQ, OTFHostControlBar hostControlBar) {
 		this.clientQ = clientQ;
+		this.hostControlBar = hostControlBar;
 		GLCapabilities caps = new GLCapabilities();
 		this.canvas = createGLCanvas(this, caps);
 		this.mouseMan = new VisGUIMouseHandler(this);
-		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
-		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
-		if (initialZoom != null) {
-			this.mouseMan.setToNewPos(initialZoom);
-		}
+		this.mouseMan.setBounds(null, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		if (!USE_GLJPANEL) {
 			this.canvas.addMouseWheelListener(this.mouseMan);
 		}
+		this.scaleBar = new OTFScaleBarDrawer();
+
 		ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
@@ -286,8 +288,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		linkTexWidth = size;
 		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 		this.overlayItems.add(matsimLogo);
-		this.scaleBar = new OTFScaleBarDrawer();
-		this.hostControlBar = hostControlBar;
+
+		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
+		if (initialZoom != null) {
+			this.mouseMan.setToNewPos(initialZoom);
+		}
+
 	}
 
 	public VisGUIMouseHandler getMouseHandler() {
@@ -417,7 +423,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		this.mouseMan.setBounds(drawable, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		this.mouseMan.init(this.gl);
+
 		OTFGLAbstractDrawableReceiver.setGl(this.gl);
 		for (OTFGLAbstractDrawable item : this.overlayItems) {
 			item.glInit();
@@ -430,11 +439,21 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		GL gl = drawable.getGL();
-		gl.glViewport(0, 0, width, height);
-		this.mouseMan.setAspectRatio((double)width / (double)height);
-		this.mouseMan.setFrustrum(gl);
-		this.statusDrawer = new StatusTextDrawer(drawable);
+		if (mouseMan.ORTHO) {
+			if (oldWidth != 0.0f) {
+				double pixelSizeX = (mouseMan.viewBounds.maxX - mouseMan.viewBounds.minX) / oldWidth;
+				double pixelSizeY = (mouseMan.viewBounds.maxY - mouseMan.viewBounds.minY) / oldHeight;
+				mouseMan.viewBounds = new QuadTree.Rect(mouseMan.viewBounds.minX, mouseMan.viewBounds.maxY - pixelSizeY * height, mouseMan.viewBounds.minX + pixelSizeX * width, mouseMan.viewBounds.maxY);
+				redraw();
+			}
+			oldWidth = width;
+			oldHeight = height;
+		} else {
+			GL gl = drawable.getGL();
+			gl.glViewport(0, 0, width, height);
+			this.mouseMan.setFrustrum(gl);
+			this.statusDrawer = new StatusTextDrawer(drawable);
+		}
 	}
 
 	private void showZoomDialog() {
@@ -612,7 +631,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		return this.canvas;
 	}
 
-	@Override
 	public GL getGL() {
 		return this.gl;
 	}
@@ -633,10 +651,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 		hostControlBar.updateScaleLabel();
 	}
 
-	@Override
-	public Point3f getView() {
-		return this.mouseMan.getView();
-	}
 
 	public Rect getViewBounds() {
 		return this.mouseMan.getBounds();
@@ -687,11 +701,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider {
 	@Override
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
-	}
-
-	@Override
-	public Point3f getOGLPos(int x, int y) {
-		return this.mouseMan.getOGLPos(x, y);
 	}
 
 	public void addChangeListener(ChangeListener changeListener) {
