@@ -60,13 +60,15 @@ public class PseudoTransitLegRouterTest {
 		Activity toAct = new ActivityImpl("h", new CoordImpl(0, 3000));
 		((ActivityImpl) toAct).setLinkId(f.s.createId("3"));
 
-		double tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 2.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+		double tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 2.0, 1.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(400.0, tt, 1e-8);
 		Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof GenericRoute);
-		tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 3.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+		Assert.assertEquals(3000.0, ((GenericRoute) leg.getRoute()).getDistance(), 1e-8);
+		tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 3.0, 2.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(600.0, tt, 1e-8);
 		Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
+		Assert.assertEquals(6000.0, ((GenericRoute) leg.getRoute()).getDistance(), 1e-8);
 	}
 
 	private static class Fixture {

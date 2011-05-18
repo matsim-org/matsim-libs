@@ -48,11 +48,13 @@ public class PseudoTransitLegRouter implements LegRouter {
 	private final NetworkFactoryImpl routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private final double speedFactor;
+	private final double beelineDistanceFactor;
 
-	public PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, final NetworkFactoryImpl routeFactory) {
+	public PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final NetworkFactoryImpl routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;
+		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.routeFactory = routeFactory;
 	}
 
@@ -63,14 +65,11 @@ public class PseudoTransitLegRouter implements LegRouter {
 		final Link toLink = this.network.getLinks().get(toAct.getLinkId());
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
-
-		Path path = null;
-//		CarRoute route = null;
 		if (toLink != fromLink) {
 			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
@@ -84,8 +83,7 @@ public class PseudoTransitLegRouter implements LegRouter {
 			} else {
 				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
 			}
-			route.setDistance(dist * 1.5);
-//			route.setTravelCost(path.travelCost);
+			route.setDistance(dist * beelineDistanceFactor);
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink

@@ -154,7 +154,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this.addLegHandler(TransportMode.car, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		this.addLegHandler(TransportMode.ride, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.freespeed) {
-			this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.routeFactory));
+			this.addLegHandler(TransportMode.pt, new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, this.configGroup.getPtSpeedFactor(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
 		} else if (this.configGroup.getPtSpeedMode() == PlansCalcRouteConfigGroup.PtSpeedMode.beeline) {
 			this.addLegHandler(TransportMode.pt, new TeleportationLegRouter(this.routeFactory, this.configGroup.getPtSpeed(), this.configGroup.getBeelineDistanceFactor()));
 		}
