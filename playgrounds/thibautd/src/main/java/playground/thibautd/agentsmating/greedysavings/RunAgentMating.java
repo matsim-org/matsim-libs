@@ -25,9 +25,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -61,6 +63,14 @@ public class RunAgentMating {
 
 		log.info("reading population");
 		(new MatsimPopulationReader(scenario)).readFile(populationFile);
+
+		log.info("trying to read facilities");
+		try {
+			String facilityFile = args[3];
+			(new MatsimFacilitiesReader((ScenarioImpl) scenario)).readFile(facilityFile);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			log.info("no facility file given, nothing loaded");
+		}
 
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
