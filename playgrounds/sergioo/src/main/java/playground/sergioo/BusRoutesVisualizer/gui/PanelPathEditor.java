@@ -18,11 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.PathEditor.gui;
+package playground.sergioo.BusRoutesVisualizer.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -34,17 +33,15 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.PathEditor.gui.Window.Option;
+import playground.sergioo.BusRoutesVisualizer.gui.Window.Option;
 import util.geometry.Point2D;
 
 public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
@@ -56,30 +53,22 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	//Attributes
 	private Camera camera;
 	private Window window;
-	private Color backgroundColor = Color.WHITE;
-	private Color pointsColor = Color.BLUE;
-	private Color pointsColor2 = Color.BLACK;
-	private Color linesColor = Color.GRAY;
-	private Color linesColor2 = Color.ORANGE;
+	private Color backgroundColor = Color.BLACK;
 	private Color selectedColor = Color.RED;
 	private Color nodeSelectedColor = Color.MAGENTA;
-	private Color networkColor = Color.LIGHT_GRAY;
+	private Color networkColor = Color.DARK_GRAY;
 	private int pointsSize = 1;
-	private Stroke pointsStroke = new BasicStroke(1);
-	private Stroke linesStroke = new BasicStroke(1);
 	private Stroke selectedStroke = new BasicStroke(2);
 	private Stroke networkStroke = new BasicStroke(0.5f);
-	private boolean wait;
 	private int iniX;
 	private int iniY;
 	private boolean withStops = false;
+	private boolean withLinks = false;
 	private boolean withNetwork = false;
 	private double xMax;
 	private double yMax;
 	private double xMin;
 	private double yMin;
-	private boolean shapeNums = false;
-	public boolean paintAll = false;
 	
 	//Methods
 	public PanelPathEditor(Window window) {
@@ -94,43 +83,27 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	}
 	private void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		Collection<Coord> points = window.getPoints().values();
-		if(points.size()==0)
-			points = window.getStopPoints();
-		for(Coord point:points) {
-			if(point.getX()<xMin)
-				xMin = point.getX();
-			if(point.getX()>xMax)
-				xMax = point.getX();
-			if(point.getY()<yMin)
-				yMin = point.getY();
-			if(point.getY()>yMax)
-				yMax = point.getY();
+		for(Set<Link> links:window.getLinks()) {
+			for(Link link:links)
+				if(link!=null) {
+					if(link.getFromNode().getCoord().getX()<xMin)
+						xMin = link.getFromNode().getCoord().getX();
+					if(link.getFromNode().getCoord().getX()>xMax)
+						xMax = link.getFromNode().getCoord().getX();
+					if(link.getFromNode().getCoord().getY()<yMin)
+						yMin = link.getFromNode().getCoord().getY();
+					if(link.getFromNode().getCoord().getY()>yMax)
+						yMax = link.getFromNode().getCoord().getY();
+					if(link.getToNode().getCoord().getX()<xMin)
+						xMin = link.getToNode().getCoord().getX();
+					if(link.getToNode().getCoord().getX()>xMax)
+						xMax = link.getToNode().getCoord().getX();
+					if(link.getToNode().getCoord().getY()<yMin)
+						yMin = link.getToNode().getCoord().getY();
+					if(link.getToNode().getCoord().getY()>yMax)
+						yMax = link.getToNode().getCoord().getY();
+				}
 		}
-		setBoundaries();
-	}
-	private void calculateBoundariesAll() {
-		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		Collection<List<Link>> links = window.getAllLinks();
-		for(List<Link> linkR:links)
-			for(Link link:linkR) {
-				if(link.getFromNode().getCoord().getX()<xMin)
-					xMin = link.getFromNode().getCoord().getX();
-				if(link.getFromNode().getCoord().getX()>xMax)
-					xMax = link.getFromNode().getCoord().getX();
-				if(link.getFromNode().getCoord().getY()<yMin)
-					yMin = link.getFromNode().getCoord().getY();
-				if(link.getFromNode().getCoord().getY()>yMax)
-					yMax = link.getFromNode().getCoord().getY();
-				if(link.getToNode().getCoord().getX()<xMin)
-					xMin = link.getToNode().getCoord().getX();
-				if(link.getToNode().getCoord().getX()>xMax)
-					xMax = link.getToNode().getCoord().getX();
-				if(link.getToNode().getCoord().getY()<yMin)
-					yMin = link.getToNode().getCoord().getY();
-				if(link.getToNode().getCoord().getY()>yMax)
-					yMax = link.getToNode().getCoord().getY();
-			}
 		setBoundaries();
 	}
 	private void setBoundaries() {
@@ -140,41 +113,27 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2=(Graphics2D)g;
-		if(paintAll) {
-			paintAllT(g2);
-			paintSelected(g2);
-		}
-		else {
-			if(withNetwork)
-				paintNetwork(g2);
-			paintPoints(g2);
-			paintLines(g2);
-			paintSelected(g2);
-		}
-	}
-	private void paintAllT(Graphics2D g2) {
 		if(withNetwork)
 			paintNetwork(g2);
-		paintAllLines(g2);
+		if(withLinks)
+			paintLines(g2);
+		if(withStops)
+			paintPoints(g2);
+		paintSelected(g2);
 	}
 	private void paintPoints(Graphics2D g2) {
-		g2.setColor(pointsColor);
-		g2.setStroke(pointsStroke);
-		for(Entry<Integer,Coord> ePoint:window.getPoints().entrySet()) {
-			Coord point = ePoint.getValue();
-			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())+pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())-pointsSize);
-			g2.drawLine(camera.getIntX(point.getX())-pointsSize, camera.getIntY(point.getY())-pointsSize, camera.getIntX(point.getX())+pointsSize, camera.getIntY(point.getY())+pointsSize);
-			if(shapeNums) {
-				g2.setFont(new Font("Arial", Font.PLAIN, 8));
-				g2.drawString(ePoint.getKey().toString(), camera.getIntX(point.getX()), camera.getIntY(point.getY())-5);
-			}
-		}
-		if(withStops) {
-			g2.setColor(pointsColor2);
-			for(Coord point:window.getStopPoints()) {
+		Color[] colors = new Color[]{new Color(0x64CCC7),new Color(0xC9503C),new Color(0x575C09)};
+		int i=0;
+		Collection<Coord>[] allStops = window.getStopPoints();
+		for(int k=allStops.length-1; k>=0; k--) {
+			g2.setStroke(new BasicStroke(allStops.length-k));
+			Collection<Coord> points=allStops[k];
+			g2.setColor(colors[k]);
+			for(Coord point:points) {
 				g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
 				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
 			}
+			i++;
 		}
 	}
 	private void paintNetwork(Graphics2D g2) {
@@ -184,29 +143,17 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			paintLink(link,g2);
 	}
 	private void paintLines(Graphics2D g2) {
-		g2.setColor(linesColor);
-		g2.setStroke(linesStroke);
-		for(Link link:window.getLinks())
-			paintLink(link, g2);
-		if(withStops) {
-			g2.setColor(linesColor2);
-			g2.setStroke(selectedStroke);
-			for(Link link:window.getStopLinks())
-				paintLink(link, g2);
-		}
-	}
-	private void paintAllLines(Graphics2D g2) {
-		g2.setStroke(networkStroke);
-		for(List<Link> linksR:window.getAllLinks()) {
-			//g2.setColor(new Color((float)Math.random()*3/4, (float)Math.random()*3/4, (float)Math.random()*3/4));
-			for(Link link:linksR)
-				paintLink(link, g2);
-		}
-		if(withStops) {
-			g2.setColor(linesColor2);
-			g2.setStroke(selectedStroke);
-			for(Link link:window.getAllStopLinks())
-				paintLink(link, g2);
+		Set<Link>[] allLinks = window.getLinks();
+		Color[] colors = new Color[]{new Color(0xC9503C),new Color(0xFFDC62),new Color(0x33445E)};
+		int i=0;
+		for(int k=allLinks.length-1; k>=0; k--) {
+			Set<Link> links = allLinks[k];
+			g2.setColor(colors[k]);
+			g2.setStroke(new BasicStroke(allLinks.length-k));
+			for(Link link:links)
+				if(link!=null)
+					paintLink(link, g2);
+			i++;
 		}
 	}
 	private void paintSelected(Graphics2D g2) {
@@ -238,9 +185,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 				camera.getIntX(link.getToNode().getCoord().getX()),
 				camera.getIntY(link.getToNode().getCoord().getY()));
 	}
-	public void waitSecondCoord() {
-		wait = true;
-	}
 	public void centerCamera(double x, double y) {
 		camera.centerCamera(x, y);
 	}
@@ -253,29 +197,22 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		else {
-			if(wait) {
-				window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
-				wait=false;
-			}
-			else
-				if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
-					window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
-					window.unselectLink();
-				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
-					window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
-					window.unselectStop();
-				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1 && e.getClickCount()==2)
-					window.createNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1)
-					window.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3)
-					window.unselectNode();
-				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-					camera.zoomIn(e.getX(), e.getY());
-				else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-					camera.zoomOut(e.getX(), e.getY());
+			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
+				window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
+				window.unselectLink();
+			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
+				window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
+				window.unselectStop();
+			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1)
+				window.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3)
+				window.unselectNode();
+			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
+				camera.zoomIn(e.getX(), e.getY());
+			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
+				camera.zoomOut(e.getX(), e.getY());
 		}
 		repaint();
 	}
@@ -313,43 +250,17 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	@Override
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
-		case '+':
-			window.increaseSelectedLink();
-			break;
-		case '-':
-			window.decreaseSelectedLink();
-			break;
-		case '>':
-			window.increaseSelectedStop();
-			break;
-		case '<':
-			window.decreaseSelectedStop();
-			break;
 		case 's':
 			withStops = !withStops;
+			break;
+		case 'l':
+			withLinks = !withLinks;
 			break;
 		case 'n':
 			withNetwork  = !withNetwork;
 			break;
 		case 'v':
 			setBoundaries();
-			break;
-		case 'u':
-			window.changeUs();
-			break;
-		case 'r':
-			window.changeReps();
-			break;
-		case 'i':
-			window.changeInStops();
-			break;
-		case 'e':
-			shapeNums = !shapeNums;
-			break;
-		case 'a':
-			paintAll = !paintAll;
-			if(paintAll)
-				calculateBoundariesAll();
 			break;
 		}
 		repaint();

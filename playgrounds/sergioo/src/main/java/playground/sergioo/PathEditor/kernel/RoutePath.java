@@ -52,8 +52,8 @@ public class RoutePath {
 	private boolean withAngleShape = false;
 	private boolean withShapeCost = false;
 	private boolean withInsideStops = true;
-	private boolean us = true;
-	private boolean reps = true;
+	private boolean us = false;
+	private boolean reps = false;
 	private boolean inStops = true;
 	private PreProcessEuclidean preProcessData;
 
@@ -245,7 +245,7 @@ public class RoutePath {
 		Node nearest = links.get(0).getFromNode();
 		double nearestDistance = CoordUtils.calcDistance(point, nearest.getCoord());
 		for(Link link:links) {
-			double distance = CoordUtils.calcDistance(new CoordImpl(x, y),link.getToNode().getCoord());
+			double distance = CoordUtils.calcDistance(point,link.getToNode().getCoord());
 			if(distance<nearestDistance) {
 				nearestDistance = distance;
 				nearest = link.getToNode();

@@ -15,9 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.GTFS.Route;
 import playground.sergioo.GTFS.Stop;
@@ -247,6 +250,20 @@ public class RoutesPathsGenerator {
 			if(stop.isFixedLinkId())
 				allStopLinks.add(network.getLinks().get(new IdImpl(stop.getLinkId())));
 		return allStopLinks;
+	}
+	public Link getNearestLink(double x, double y) {
+		Coord coord = new CoordImpl(x, y);
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		Link nearestLink =null;
+		for(List<Link> linksR:allLinks)
+			for(Link link:linksR) {
+				double distance = ((LinkImpl) link).calcDistance(coord); 
+				if(distance<nearestDistance) {
+					nearestDistance = distance;
+					nearestLink = link;
+				}
+			}
+		return nearestLink;
 	}
 	
 }

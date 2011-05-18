@@ -12,7 +12,7 @@ public class Trip {
 	//Attributes
 	private Service service;
 	private Shape shape;
-	private SortedMap<Double,StopTime> stopTimes; 
+	private SortedMap<Integer,StopTime> stopTimes; 
 	private List<Frequency> frequencies;
 	private List<Link> links;
 	private Route route;
@@ -26,7 +26,7 @@ public class Trip {
 		super();
 		this.service = service;
 		this.shape = shape;
-		this.stopTimes = new TreeMap<Double, StopTime>();
+		this.stopTimes = new TreeMap<Integer, StopTime>();
 		this.frequencies = new ArrayList<Frequency>();
 		this.links = new ArrayList<Link>();
 		this.route = route;
@@ -46,7 +46,7 @@ public class Trip {
 	/**
 	 * @return the stopTimes
 	 */
-	public SortedMap<Double, StopTime> getStopTimes() {
+	public SortedMap<Integer, StopTime> getStopTimes() {
 		return stopTimes;
 	}
 	/**
@@ -72,7 +72,7 @@ public class Trip {
 	 * @param key
 	 * @param stopTime
 	 */
-	public void putStopTime(Double key, StopTime stopTime) {
+	public void putStopTime(Integer key, StopTime stopTime) {
 		stopTimes.put(key, stopTime);
 	}
 	/**

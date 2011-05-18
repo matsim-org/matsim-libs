@@ -1,13 +1,18 @@
 package playground.sergioo.GTFS.auxiliar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.GTFS.Stop;
 import util.geometry.Line2D;
@@ -69,10 +74,20 @@ public class LinkStops {
 		Point2D point = new Point2D(stops.get(i).getPoint().getX(),stops.get(i).getPoint().getY());
 		Point2D nearestPoint = linkLine.getNearestPoint(point);
 		if(linkLine.getParameter(nearestPoint)<0)
-			throw new Exception("Muy mal antes de link");
-		Node fromNode = link.getFromNode();
-		Node toNode = network.getFactory().createNode(new IdImpl(link.getToNode().getId().toString()+"_"+i),new CoordImpl(nearestPoint.getX(), nearestPoint.getY()));
-		Link newLink = network.getFactory().createLink(new IdImpl(link.getId().toString()+"_"+i), fromNode, toNode);
+			throw new Exception("Bad position of stop according tothe link");
+		Node toNode = network.getFactory().createNode(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i),new CoordImpl(nearestPoint.getX(), nearestPoint.getY()));
+		if(network.getNodes().get(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i))==null)
+			network.addNode(toNode);
+		double length = -1;
+		if(((LinkImpl)link).getOrigId()!=null)
+			length=link.getLength()*CoordUtils.calcDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		Link newLink = new LinkFactoryImpl().createLink(new IdImpl(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+		if(((LinkImpl)link).getOrigId()!=null)
+			((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());
+		Set<String> modes = new HashSet<String>();
+		for(String mode:link.getAllowedModes())
+			modes.add(mode);
+		newLink.setAllowedModes(modes);
 		network.addLink(newLink);
 		link.setFromNode(toNode);
 		stops.get(i).forceSetLinkId(link.getId().toString()+"_"+i);

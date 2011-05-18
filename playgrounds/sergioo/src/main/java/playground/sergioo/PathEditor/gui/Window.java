@@ -159,6 +159,7 @@ public class Window extends JFrame implements ActionListener {
 	private JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	private JCheckBox[] checks;
 	private Wait wait;
+	public Link nearestLink;
 	//Methods
 	public Window(String title, Network network, Trip trip, Map<String,Stop> stops) {
 		setTitle(title);
@@ -323,13 +324,13 @@ public class Window extends JFrame implements ActionListener {
 		coordsPanel.add(lblCoords[1]);
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
-		if(linksS!=null) {
+		/*if(linksS!=null) {
 			int first = routePath.isFirstLinkWithStop();
 			if(first!=-1)
 				routePath.removeLinksTo(first);
 			save();
 		}
-		else
+		else*/
 			isOk();
 		
 	}
@@ -343,8 +344,14 @@ public class Window extends JFrame implements ActionListener {
 		return selectedStopId+"("+routePath.getIndexStop(selectedStopId)+")";
 	}
 	public void selectLink(double x, double y) {
-		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
-		labels[Label.LINK.ordinal()].setText(refreshLink());
+		if(!panel.paintAll) {
+			selectedLinkIndex = routePath.getIndexNearestLink(x, y);
+			labels[Label.LINK.ordinal()].setText(refreshLink());
+		}
+		else {
+			nearestLink = routesPathsGenerator.getNearestLink(x, y);
+			labels[Label.LINK.ordinal()].setText(nearestLink.getId()+"");
+		}
 	}
 	public void unselectLink() {
 		selectedLinkIndex = -1;
@@ -542,6 +549,10 @@ public class Window extends JFrame implements ActionListener {
 		saveButton.setEnabled(false);
 		panel.centerCamera(coord.getX(), coord.getY());
 	}
+	/*public void setVisible(boolean visible) {
+		if(!(saveButton.isEnabled() && visible))
+			super.setVisible(visible);
+	}*/
 	public void save() {
 		if(links.size() == 0)
 			links.addAll(routePath.getLinks());
@@ -561,7 +572,10 @@ public class Window extends JFrame implements ActionListener {
 		return routePath.getStopLinks();
 	}
 	public Link getSelectedLink() {
-		return selectedLinkIndex==-1?null:routePath.getLink(selectedLinkIndex);
+		if(!panel.paintAll)
+			return selectedLinkIndex==-1?null:routePath.getLink(selectedLinkIndex);
+		else
+			return nearestLink;
 	}
 	public Coord getSelectedStop() {
 		return selectedStopId==""?null:routePath.getStop(selectedStopId);

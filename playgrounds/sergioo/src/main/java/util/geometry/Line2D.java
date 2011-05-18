@@ -91,7 +91,10 @@ public class Line2D {
 		return this.getSlope()*x+this.getYIntersect();
 	}
 	public double getParameter(Point2D p) {
-		return (p.getX()-pI.getX())/(pF.getX()-pI.getX());
+		if(Math.abs(pF.getX()-pI.getX())>10*Double.MIN_VALUE)
+			return (p.getX()-pI.getX())/(pF.getX()-pI.getX());
+		else
+			return (p.getY()-pI.getY())/(pF.getY()-pI.getY());
 	}
 	public boolean isFromLine(Point2D p) {
 		if(Math.abs(p.getY()-(p.getX()*this.getSlope()+this.getYIntersect()))<2*Double.MIN_VALUE)
@@ -107,7 +110,7 @@ public class Line2D {
 	}
 	public boolean isInside2(Point2D p) {
 		double parameter = getParameter(p);
-		if(0<=parameter && parameter<=1)
+		if(-0.01<=parameter && parameter<=1.01)
 			return true;
 		else
 			return false;
