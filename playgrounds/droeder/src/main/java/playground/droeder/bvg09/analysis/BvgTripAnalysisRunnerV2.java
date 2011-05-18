@@ -27,7 +27,7 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.V2.TripAnalysisV2;
+import playground.droeder.Analysis.Trips.travelTime.V2.TripAnalysisV2;
 
 import com.vividsolutions.jts.geom.Geometry;
 

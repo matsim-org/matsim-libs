@@ -41,8 +41,8 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.AnalysisTripSetOneMode;
-import playground.droeder.Analysis.Trips.V1.AnalysisTripGeneratorV1;
+import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.travelTime.V1.AnalysisTripGeneratorV1;
 
 /**
  * @author droeder
