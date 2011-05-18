@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -95,40 +94,6 @@ public class DgSignalPlanChart {
 		
 	}
 
-	private void addData(Map<Id, TreeMap<Double, SignalGroupState>> id2Time2StateMap) {
-		Integer i = 0;
-		for (Entry<Id, TreeMap<Double, SignalGroupState>> id2mapEntry : id2Time2StateMap.entrySet()) {
-			double lastTime = 0.0;
-			SignalGroupState tempState = SignalGroupState.RED;
-			for (Entry<Double, SignalGroupState> doubleStateEntry : id2mapEntry.getValue().entrySet()) {
-				double time = doubleStateEntry.getKey();
-				if (time >= tMin && time <= tMax) {
-					this.dataset.addValue(time - lastTime, i, id2mapEntry.getKey());
-					setSeriesColor(i, tempState);
-					for (Entry<Id, TreeMap<Double, SignalGroupState>> eee : id2Time2StateMap.entrySet()) {
-						if (!eee.getKey().equals(id2mapEntry.getKey())) {
-							this.dataset.addValue(0, i, eee.getKey());
-						}
-					}
-				}
-				else if (time > tMax) {
-					this.dataset.addValue(time - lastTime, i, id2mapEntry.getKey());
-					setSeriesColor(i, tempState);
-					for (Entry<Id, TreeMap<Double, SignalGroupState>> eee : id2Time2StateMap.entrySet()) {
-						if (!eee.getKey().equals(id2mapEntry.getKey())) {
-							this.dataset.addValue(0, i, eee.getKey());
-						}
-					}
-					i++;
-					break;
-				}
-				i++;
-				lastTime = time;
-				tempState = doubleStateEntry.getValue();
-			}
-			
-		}
-	}
 
 	private void setSeriesColor(Integer i, SignalGroupState state) {
 		if (state == null){
