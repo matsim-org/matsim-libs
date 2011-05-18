@@ -34,7 +34,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.AbstractRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author thibautd
@@ -148,10 +152,12 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 				this.routeToCopy) {
 			//Passenger leg with no route: create it
 			Route route=null;
+			Leg driverLeg=null;
 
 			for (JointLeg linkedLeg : this.getLinkedElements().values()) {
 				if (linkedLeg.getIsDriver()) {
 					route = linkedLeg.getRoute();
+					driverLeg = linkedLeg;
 					break;
 				}
 			}
@@ -162,12 +168,14 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 			try {
 				route = ((AbstractRoute) route).clone();
-				log.debug("Driver leg has been cloned by passenger leg");
+				//log.debug("Driver leg has been cloned by passenger leg");
 			} catch (ClassCastException e) {
 				throw new RuntimeException("JointLeg can currently handle only"+
 						" AbstractRoute driver routes.");
 			}
 
+			this.routeToCopy = false;
+			super.setTravelTime(driverLeg.getTravelTime());
 			super.setRoute(route);
 			return route;
 		}
@@ -177,6 +185,19 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	public void routeToCopy() {
 		this.routeToCopy = true;
 	}
+
+	// impossible: super method is final!
+	//@Override
+	//public double getTravelTime() {
+	//	if (super.getTravelTime() == Time.UNDEFINED_TIME) {
+	//		try {
+	//			this.setTravelTime(this.getRoute().getTravelTime());
+	//		} catch (NullPointerException e) {
+	//			// this is normal before simulation: don't worry.
+	//		}
+	//	}
+	//	return super.getTravelTime();
+	//}
 
 	/*
 	 * =========================================================================
