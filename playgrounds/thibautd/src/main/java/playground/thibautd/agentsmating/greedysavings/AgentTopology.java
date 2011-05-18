@@ -21,7 +21,7 @@ package playground.thibautd.agentsmating.greedysavings;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,12 +37,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 
 /**
  * Defines a topology an agents, based on the distances between home and work
@@ -54,15 +52,19 @@ public class AgentTopology {
 	private static final Logger log =
 		Logger.getLogger(AgentTopology.class);
 
+	private boolean carWarningNotLogged = true;
+
 	//private final static String HOME_REGEXP = "home.*";
-	private final static String WORK_REGEXP = "work.*";
+	private final static String WORK_REGEXP = "w.*";
 
 	private final QuadTree<Person> homeQuadTree;
 	private final QuadTree<Person> workQuadTree;
 	private double acceptableDistance;
 
+	private final boolean onlyMateDrivers;
+
 	private final Map<Person, Tuple<Coord, Coord>> homeWorkLocations =
-		new TreeMap<Person, Tuple<Coord, Coord>>();
+		new TreeMap<Person, Tuple<Coord, Coord>>(new PersonComp());
 
 	/*
 	 * =========================================================================
@@ -72,8 +74,10 @@ public class AgentTopology {
 	public AgentTopology(
 			final Network network,
 			final Population population,
-			final double acceptableDistance) {
+			final double acceptableDistance,
+			final boolean onlyMateDrivers) {
 		this.acceptableDistance = acceptableDistance;
+		this.onlyMateDrivers = onlyMateDrivers;
 		//this.network = network.getLinks();
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minX = Double.POSITIVE_INFINITY;
@@ -125,6 +129,7 @@ public class AgentTopology {
 
 				coord = homeWorkCoords.getSecond();
 				this.workQuadTree.put(coord.getX(), coord.getY(), person);
+				this.homeWorkLocations.put(person, homeWorkCoords);
 			}
 		}
 		log.info("   filling QuadTree... DONE");
@@ -132,13 +137,14 @@ public class AgentTopology {
 
 	/**
 	 * @return the coordinates of home and work locations if the first trip
-	 * of the plan is a H-W car trip; null otherwise.
+	 * of the plan is a H-W trip, and that the car availability corresponds
+	 * to the mating mode; null otherwise.
 	 */
 	private Tuple<Coord, Coord> getHomeWorkLocations(final Plan plan) {
 		//TODO: identify all H-W trips, even if not first leg? (very improbable)
 		List<PlanElement> planElements = plan.getPlanElements();
 
-		if ( ((JointLeg) planElements.get(1)).getMode() != TransportMode.car) {
+		if ( onlyMateDrivers && (!carAvailable(plan.getPerson())) ) {
 			return null;
 		}
 
@@ -162,11 +168,17 @@ public class AgentTopology {
 	 */
 
 	/**
-	 * @return a Tuple defining a pair (agent , saving value) for all "neighbors"
+	 * @return a Tuple defining a pair (agent , saving value) for all "neighbors",
+	 * null if no car available.
 	 *
 	 * @throws UnknownPersonException if the person is not part of the topology
 	 */
 	public List<Tuple<Person, Double>> getNeighbors(final Person person) {
+		if (!onlyMateDrivers && (!carAvailable(person))) {
+			// cannot drive
+			return null;
+		}
+
 		List<Tuple<Person, Double>> output = new ArrayList<Tuple<Person, Double>>();
 		Tuple<Coord, Coord> homeWorkCoords = this.homeWorkLocations.get(person);
 		Coord currentCoord;
@@ -189,9 +201,10 @@ public class AgentTopology {
 				currentCoord.getY(),
 				this.acceptableDistance);
 
+
 		for (Person neighbor : homeNeighbors) {
 			// assume the remove method is implemented.
-			if (workNeighbors.remove(neighbor)) {
+			if ( !(neighbor == person) && (workNeighbors.remove(neighbor)) ) {
 				output.add(
 						new Tuple<Person, Double>(
 							neighbor,
@@ -200,6 +213,20 @@ public class AgentTopology {
 		}
 
 		return output;
+	}
+
+	private boolean carAvailable(final Person person) {
+		boolean out;
+		try {
+			out = !"never".equals(((PersonImpl) person).getCarAvail());
+		} catch (ClassCastException e) {
+			if (carWarningNotLogged) {
+				log.warn("no car availibility information available");
+				carWarningNotLogged = false;
+			}
+			out = true;
+		}
+		return out;
 	}
 
 	/**
@@ -244,6 +271,15 @@ public class AgentTopology {
 	 */
 	public class UnknownPersonException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
+	}
+
+	private class PersonComp implements Comparator<Person> {
+
+		@Override
+		public int compare(Person arg0, Person arg1) {
+			return arg0.getId().compareTo(arg1.getId());
+		}
+
 	}
 }
 

@@ -48,7 +48,9 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  */
 public class AgentMatingAlgo {
 
-	private static final String HOME_REGEXP = "home.*";
+	private static final String HOME_REGEXP = "h.*";
+	private static final String WORK_REGEXP = "w.*";
+	private static final boolean onlyMateDrivers = false;
 
 	private final AgentTopology agentTopology;
 	private final Population population;
@@ -68,7 +70,7 @@ public class AgentMatingAlgo {
 			final Network network,
 			final double acceptableDistance) {
 		this.agentTopology = 
-			new AgentTopology(network, population, acceptableDistance);
+			new AgentTopology(network, population, acceptableDistance, onlyMateDrivers);
 		this.population = population;
 		this.unaffectedAgents = new ArrayList<Person>(population.getPersons().values());
 	}
@@ -93,7 +95,7 @@ public class AgentMatingAlgo {
 				continue;
 			}
 
-			if (neighbors.size() == 0) {
+			if ((neighbors == null) || (neighbors.size() == 0)) {
 				continue;
 			}
 

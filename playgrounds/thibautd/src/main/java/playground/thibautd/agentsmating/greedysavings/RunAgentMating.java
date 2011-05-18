@@ -23,15 +23,14 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.thibautd.analysis.possiblesharedrides.CountPossibleSharedRides;
-import playground.thibautd.analysis.possiblesharedrides.EventsAccumulator;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
 
 /**
@@ -46,34 +45,37 @@ public class RunAgentMating {
 
 	private static final double ACCEPTABLE_DISTANCE = 1000d;
 
+	/**
+	 * usage: RunAgentMating pop net out
+	 */
 	public static void main(String[] args) {
-		String fakeConfig;
-		
-		try {
-			fakeConfig = args[0];
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e.getMessage());
-		}
+		String populationFile = args[0];
+		String networkFile = args[1];
+		String outputPath = args[2];
 
-		Controler dummyControler = new Controler(fakeConfig);
-		dummyControler.setOverwriteFiles(true);
-		dummyControler.run();
-		Network network = dummyControler.getScenario().getNetwork();
-		Population population = dummyControler.getScenario().getPopulation();
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		log.info("reading network");
+		(new MatsimNetworkReader(scenario)).readFile(networkFile);
+
+		log.info("reading population");
+		(new MatsimPopulationReader(scenario)).readFile(populationFile);
+
+		Population population = scenario.getPopulation();
+		Network network = scenario.getNetwork();
 
 		AgentMatingAlgo algo = new AgentMatingAlgo(population, network, ACCEPTABLE_DISTANCE);
 		algo.run();
-		// has the side-effect of modifying the plans, that will be writen back
-		// by the controler
+		// modifies the population: no need for storing it.
 		algo.getPopulation();
 
 		PopulationWriter populationWriter = new PopulationWriter(population , network);
 		CliquesWriter cliqueWriter = new CliquesWriter(algo.getCliques());
 
-		String path = dummyControler.getControlerIO().getOutputPath();
 		try {
-			cliqueWriter.writeFile(path+"/mating_cliques.xml.gz");
-			populationWriter.write(path+"/mating_plans.xml.gz");
+			cliqueWriter.writeFile(outputPath+"mating_cliques.xml.gz");
+			populationWriter.write(outputPath+"mating_plans.xml.gz");
 		} catch (Exception e) {
 			throw new RuntimeException("error while writing clique", e);
 		}
