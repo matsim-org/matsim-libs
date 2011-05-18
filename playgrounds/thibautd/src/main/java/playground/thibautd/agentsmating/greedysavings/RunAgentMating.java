@@ -61,9 +61,6 @@ public class RunAgentMating {
 		log.info("reading network");
 		(new MatsimNetworkReader(scenario)).readFile(networkFile);
 
-		log.info("reading population");
-		(new MatsimPopulationReader(scenario)).readFile(populationFile);
-
 		log.info("trying to read facilities");
 		try {
 			String facilityFile = args[3];
@@ -71,6 +68,9 @@ public class RunAgentMating {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.info("no facility file given, nothing loaded");
 		}
+
+		log.info("reading population");
+		(new MatsimPopulationReader(scenario)).readFile(populationFile);
 
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
