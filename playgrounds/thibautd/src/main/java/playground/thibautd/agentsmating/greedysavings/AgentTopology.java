@@ -150,7 +150,13 @@ public class AgentTopology {
 
 		Coord home = ((Activity) planElements.get(0)).getCoord();
 		Coord work = null;
-		Activity workAct = (Activity) planElements.get(2);
+		Activity workAct;
+		try {
+			 workAct = (Activity) planElements.get(2);
+		} catch (IndexOutOfBoundsException e) {
+			// we are in a home-only plan
+			return null;
+		}
 
 		if (workAct.getType().matches(WORK_REGEXP)) {
 			work = workAct.getCoord();
