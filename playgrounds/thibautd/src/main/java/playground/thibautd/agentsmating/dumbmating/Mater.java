@@ -208,6 +208,7 @@ public class Mater {
 		String accessMode = (mode.equals(TransportMode.car) ?
 				TransportMode.car : TransportMode.walk);
 		List<PlanElement> oldPlan = new ArrayList<PlanElement>(plan);
+		ActivityImpl act;
 
 		plan.clear();
 		// first act
@@ -215,15 +216,19 @@ public class Mater {
 
 		// joint trip
 		plan.add(new LegImpl(accessMode));
-		plan.add(new ActivityImpl(
+		act = new ActivityImpl(
 					firstPuName,
 					firstOD.getFirst().getCoord(),
-					firstOD.getFirst().getLinkId()));
+					firstOD.getFirst().getLinkId());
+		act.setMaximumDuration(0d);
+		plan.add(act);
 		plan.add(new LegImpl(mode));
-		plan.add(new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF,
 					firstOD.getSecond().getCoord(),
-					firstOD.getSecond().getLinkId()));
+					firstOD.getSecond().getLinkId());
+		act.setMaximumDuration(0d);
+		plan.add(act);
 		plan.add(new LegImpl(accessMode));
 
 		// middle
@@ -231,15 +236,19 @@ public class Mater {
 
 		// joint trip
 		plan.add(new LegImpl(accessMode));
-		plan.add(new ActivityImpl(
+		act = new ActivityImpl(
 					secondPuName,
 					secondOD.getFirst().getCoord(),
-					secondOD.getFirst().getLinkId()));
+					secondOD.getFirst().getLinkId());
+		act.setMaximumDuration(0d);
+		plan.add(act);
 		plan.add(new LegImpl(mode));
-		plan.add(new ActivityImpl(
+		act = new ActivityImpl(
 					JointActingTypes.DROP_OFF,
 					secondOD.getSecond().getCoord(),
-					secondOD.getSecond().getLinkId()));
+					secondOD.getSecond().getLinkId());
+		act.setMaximumDuration(0d);
+		plan.add(act);
 		plan.add(new LegImpl(accessMode));
 
 		// last act

@@ -43,8 +43,8 @@ public class RunMating {
 		Mater.TripChaining.ONE_BY_ONE;
 	private static final String popFile = "../../../trunk/examples/equil/plans2000.xml.gz";
 	private static final String netFile = "../../../trunk/examples/equil/network.xml";
-	private static final String outputPrefix = "testcases/matings/1-";
-	private static final int cliqueSize = 1;
+	private static final String outputPrefix = "testcases/matings/3-shuttle";
+	private static final int cliqueSize = 3;
 
 	public static void main(String[] args) {
 		//String popFile = args[0];
