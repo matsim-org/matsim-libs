@@ -14,47 +14,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.Wenden;
-import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -71,12 +58,10 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesFactoryImpl;
-import org.matsim.vehicles.VehiclesImpl;
 
 public class GtfsConverter {
 
 	private String filepath = "";
-	private boolean useFrequencies = false;
 	
 	
 	
@@ -87,15 +72,21 @@ public class GtfsConverter {
 	private Config config;
 	private ScenarioImpl scenario;
 	private List<String> vehicleIds = new ArrayList<String>();
+	private boolean useGivenNetwork = false;
 	
 	public static void main(String[] args) {
 		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed");
+		gtfs.setUseGivenNetwork(false);
 		gtfs.convert(1);
-		System.out.println("Conversion successfull");
-		
 	}
 	
 	
+	private void setUseGivenNetwork(boolean b) {
+		this.useGivenNetwork  = b;
+		
+	}
+
+
 	public GtfsConverter(String filepath){
 		this.filepath = filepath;
 	}
@@ -143,18 +134,29 @@ public class GtfsConverter {
 		// Get the TripIds, which are available for the serviceIds 
 		List<Id> usedTripIds = this.getUsedTripIds(usedServiceIds);
 		System.out.println("Reading of TripIds succesfull: " + usedTripIds);
-		// Build and safe a Network --- you only need this, if you don't have a network
-		NetworkImpl net = this.createNetworkOfStopsAndTrips(ts);
+		NetworkImpl net;
+		if(!useGivenNetwork){
+			// Build and safe a Network --- you only need this, if you don't have a network
+			System.out.println("Creating Network");
+			net = this.createNetworkOfStopsAndTrips(ts);
+		}else{
+			System.out.println("Reading given Network.");
+			new MatsimNetworkReader(scenario).readFile(filepath + "/network.xml");
+			net = scenario.getNetwork();
+		}		
 		new NetworkWriter(net).write("./network.xml");
+		System.out.println("Wrote Network to " + new File("./network.xml").getAbsolutePath());
 		// Assign the links of the Network to the stops
 		this.assignLinksToStops(ts, net);
 		// Get the TripRoutes
+		System.out.println("Create NetworkRoutes");
 		Map<Id,NetworkRoute> tripRoute = createNetworkRoutes2(ts, net);
 		// Convert the schedules for the trips
+		System.out.println("Convert the schedules");
 		this.convertSchedules(ts, routeNames, routeToTripAssignments, usedTripIds, tripRoute);
 		// If you use the optional frequencies.txt, it will be transformed here --> not working yet
-		if(this.useFrequencies){
-			this.convertFrequencies(ts, routeToTripAssignments);
+		if((new File(filepath + "/frequencies.txt")).exists()){
+			this.convertFrequencies(ts, routeToTripAssignments, usedTripIds);
 		}
 		// Create some dummy Vehicles
 		this.createTransitVehiclesDummy();
@@ -165,6 +167,7 @@ public class GtfsConverter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("Conversion successfull");
 	}
 	
 	private List<Id> getUsedTripIds(List<String> usedServiceIds) {
@@ -266,9 +269,8 @@ public class GtfsConverter {
 		return serviceIds;
 	}
 	
-	private void convertFrequencies(TransitSchedule ts, Map<Id, Id> routeToTripAssignments) {
+	private void convertFrequencies(TransitSchedule ts, Map<Id, Id> routeToTripAssignments, List<Id> usedTripIds) {
 		String frequenciesFilename = filepath + "/frequencies.txt";
-		List<Id> usedTripIds = new ArrayList<Id>();
 		int departureCounter = 0;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(frequenciesFilename)));
@@ -284,15 +286,26 @@ public class GtfsConverter {
 				double startTime = Time.parseTime(entries[startTimeIndex]);
 				double endTime = Time.parseTime(entries[endTimeIndex]);
 				double step = Double.parseDouble(entries[stepIndex]);
-				double time = startTime + step;
-				do{
-					Departure d = tf.createDeparture(new IdImpl("f" + departureCounter), time);
-					d.setVehicleId(new IdImpl("dummyf"+departureCounter));
-					this.vehicleIds.add("dummyf"+departureCounter);
-					ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).addDeparture(d);
-					time = time + step;
-					departureCounter++;
-				}while(time < endTime);				
+				if(usedTripIds.contains(tripId)){
+					Map<Id,Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).getDepartures();
+					double latestDeparture = 0;
+					for(Departure d: depatures.values()){
+						if(latestDeparture < d.getDepartureTime()){
+							latestDeparture = d.getDepartureTime();
+						}
+					}
+					double time = latestDeparture + step;				
+					do{
+						if(time>startTime){
+							Departure d = tf.createDeparture(new IdImpl("f" + departureCounter), time);
+							d.setVehicleId(new IdImpl("dummyf"+departureCounter));
+							this.vehicleIds.add("dummyf"+departureCounter);
+							ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).addDeparture(d);
+						}						
+						time = time + step;
+						departureCounter++;
+					}while(time <= endTime);		
+				}
 				row = br.readLine();
 			}while(row!= null);
 		} catch (FileNotFoundException e) {
@@ -580,7 +593,7 @@ public class GtfsConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		(new NetworkCleaner()).run(network);
+//		(new NetworkCleaner()).run(network);
 		return network;
 	}
 
@@ -620,6 +633,7 @@ public class GtfsConverter {
 				sb.append(row.charAt(i));
 			}
 		}
+		entries.add(sb.toString());	
 		return entries.toArray(new String[entries.size()]);
 	}
 
