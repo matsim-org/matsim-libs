@@ -70,9 +70,8 @@ public class JointControlerUtils {
 			throw new RuntimeException("Problem while importing clique information", e);
 		}
 
-		setScoringFunction(controler);
-
 		controler = new JointControler(scenario);
+		setScoringFunction(controler);
 
 		return controler;
 	}
