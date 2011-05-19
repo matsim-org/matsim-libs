@@ -67,6 +67,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -128,8 +129,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private final List<OTFGLAbstractDrawable> overlayItems = new ArrayList<OTFGLAbstractDrawable>();
 
-	private static List<OTFGLAbstractDrawable> newItems = new ArrayList<OTFGLAbstractDrawable>();
-
 	private StatusTextDrawer statusDrawer = null;
 
 	private OTFQueryHandler queryHandler = null;
@@ -141,8 +140,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	private BufferedImage current;
 
 	private ZoomEntry lastZoom = null;
-
-	private final Object blockRefresh = new Object();
 
 	private JDialog zoomD;
 
@@ -603,12 +600,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			this.now = time;
 			this.lastTime = Time.writeTime(time, ':');
 		}
-		synchronized (this.blockRefresh) {
-			QuadTree.Rect rect = this.mouseMan.getBounds();
-			synchronized (newItems) {
-				this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
-			}
-		}
+		QuadTree.Rect rect = this.mouseMan.getBounds();
+		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
 		}

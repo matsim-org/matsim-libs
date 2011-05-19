@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 public abstract class OTFClient implements Runnable {
 
 	private static final Logger log = Logger.getLogger(OTFClient.class);
-	
+
 	// Keine Ahnung.
 	private static final String id = "id";
 
@@ -67,29 +67,17 @@ public abstract class OTFClient implements Runnable {
 	protected OTFHostConnectionManager masterHostControl;
 
 	public OTFClient() {
-		
+
 	}
 
 	@Override
 	public void run() {
-		createMainFrame();
-		log.info("created MainFrame");
-		OTFVisConfigGroup visconf = createOTFVisConfig();
-		OTFClientControl.getInstance().setOTFVisConfig(visconf);
-		log.info("got OTFVis config");
-		createHostControlBar();
-		log.info("created HostControlBar");
-		OTFDrawer mainDrawer = createDrawer();
-		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
-		log.info("created drawer");
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
-		pane.setRightComponent(panel);
-		pane.validate();
-		this.hostControlBar.addDrawer(mainDrawer);
-		mainDrawer.redraw();
-		frame.setVisible(true);
-		log.info("OTFVis finished init");
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				initializeSwingClient();
+			}
+		});
 	}
 
 	public void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
@@ -187,5 +175,26 @@ public abstract class OTFClient implements Runnable {
 	protected abstract OTFDrawer createDrawer();
 
 	protected abstract OTFVisConfigGroup createOTFVisConfig();
+
+	private void initializeSwingClient() {
+		createMainFrame();
+		log.info("created MainFrame");
+		OTFVisConfigGroup visconf = createOTFVisConfig();
+		OTFClientControl.getInstance().setOTFVisConfig(visconf);
+		log.info("got OTFVis config");
+		createHostControlBar();
+		log.info("created HostControlBar");
+		OTFDrawer mainDrawer = createDrawer();
+		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
+		log.info("created drawer");
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
+		pane.setRightComponent(panel);
+		pane.validate();
+		hostControlBar.addDrawer(mainDrawer);
+		mainDrawer.redraw();
+		frame.setVisible(true);
+		log.info("OTFVis finished init");
+	}
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -236,25 +237,33 @@ public class OTFHostControl {
 		@Override
 		public void run() {
 			int delay = 30;
-			int actTime = 0;
 			while (!terminate) {
 				try {
 					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
-					if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServerRemote.TimePreference.LATER))) {
-						requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
-					}
-					actTime = getSimTime();
-					simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
-					for (OTFHostConnectionManager slave : hostControls) {
-						if (!slave.equals(masterHostConnectionManager)) {
-							slave.getOTFServer().requestNewTime(simTime.getValue(), OTFServerRemote.TimePreference.LATER);
+					SwingUtilities.invokeLater(new Runnable() { // This is important. Code below modifies stuff which is "owned" by swing, so it must run on the Swing thread! 
+						
+						int actTime = 0;
+						
+						@Override
+						public void run() {
+							if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServerRemote.TimePreference.LATER))) {
+								requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
+							}
+							actTime = getSimTime();
+							simTime.setValue(masterHostConnectionManager.getOTFServer().getLocalTime());
+							for (OTFHostConnectionManager slave : hostControls) {
+								if (!slave.equals(masterHostConnectionManager)) {
+									slave.getOTFServer().requestNewTime(simTime.getValue(), OTFServerRemote.TimePreference.LATER);
+								}
+							}
+							hostControlBar.updateTimeLabel();
+							if (simTime.getValue() != actTime) {
+								hostControlBar.repaint();
+							}
 						}
-					}
-					hostControlBar.updateTimeLabel();
-					if (simTime.getValue() != actTime) {
-						hostControlBar.repaint();
-					}
+					});
+					
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
