@@ -34,22 +34,31 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 	        Id linkId3 = ida[3];
 	        Id agentId1 = ida[4];
 	        Id facilId1 = ida[5];
-	        Id facilId2 = ida[6];    
 
 		EventsFactoryImpl ef = new EventsFactoryImpl();
-        ActivityEndEvent event = ef.createActivityEndEvent(1.2, agentId1, linkId1, facilId1, "w");	
-        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2, agentId1, linkId2, "pt");        
-        AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9, agentId1, linkId3, "pt");
+        ActivityEndEvent event = ef.createActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w");	
+        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        
+        AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9*3600, agentId1, linkId3, "pt");
+        AgentDepartureEvent event5 = ef.createAgentDepartureEvent(2.1*3600, agentId1, linkId3, "pt");        
+        AgentArrivalEvent event6 = ef.createAgentArrivalEvent(2.5*3600, agentId1, linkId2, "pt");
 		
 		AgentId2PtTripTravelTimeMapData test = new AgentId2PtTripTravelTimeMapData(event);
 		
 		test.handle(event3);
 		test.handle(event4);
+		test.handle(event5);
+		test.handle(event6);
 				
 //		test, this works
-				
-		Assert.assertEquals(event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
 		
+//		System.out.println(test.getNumberOfTransfers());	
+//		System.out.println(test.getTotalTripTravelTime()); System.out.println(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime());
+				
+		Assert.assertEquals(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
+		
+		Assert.assertEquals((long)1, (long)test.getNumberOfTransfers());
+		
+
 		
 	}
 
