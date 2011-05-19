@@ -51,8 +51,8 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 				
 //		test, this works
 		
-//		System.out.println(test.getNumberOfTransfers());	
-//		System.out.println(test.getTotalTripTravelTime()); System.out.println(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime());
+		System.out.println("Number of Transfers should be: 1 and are: "+test.getNumberOfTransfers());	
+		System.out.println("Total travel time should be: "+(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime())+" and is: "+test.getTotalTripTravelTime()); 
 				
 		Assert.assertEquals(event6.getTime()-event5.getTime()+event4.getTime()-event3.getTime(), test.getTotalTripTravelTime(), 0.);
 		
