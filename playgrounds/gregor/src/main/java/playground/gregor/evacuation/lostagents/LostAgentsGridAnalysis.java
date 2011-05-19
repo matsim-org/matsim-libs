@@ -22,9 +22,9 @@ package playground.gregor.evacuation.lostagents;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.gregor.gis.helper.GTH;
@@ -45,7 +45,7 @@ public class LostAgentsGridAnalysis {
 		
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(SVN + "/output_config.xml.gz");
 		
-		ScenarioImpl scenario = sl.getScenario();
+		Scenario scenario = sl.getScenario();
 		scenario.getConfig().network().setInputFile(SVN + "/output_network.xml.gz");
 		
 		int it = scenario.getConfig().controler().getLastIteration();
@@ -53,7 +53,7 @@ public class LostAgentsGridAnalysis {
 		sl.loadNetwork();
 		String eventsFile = SVN + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 		
-		Envelope e = getEnvelope(sl.getScenario().getNetwork());
+		Envelope e = getEnvelope(scenario.getNetwork());
 		List<MultiPolygon> l = getMultiPolygons(e);
 
 		new LostAgentsAnalyser(SVN + "/../analysis/endangeredAgents.shp", eventsFile, l, sl.getScenario().getNetwork()).run();
@@ -78,7 +78,7 @@ public class LostAgentsGridAnalysis {
 		return mps;
 	}
 
-	private static Envelope getEnvelope(NetworkImpl net) {
+	private static Envelope getEnvelope(Network net) {
 		Envelope e = null; 
 		for (Node n : net.getNodes().values()) {
 			if (e == null) {

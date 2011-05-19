@@ -23,9 +23,7 @@ package org.matsim.core.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.utils.io.WriterHandler;
-
-interface FacilitiesWriterHandler extends WriterHandler {
+interface FacilitiesWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <facilities ... > ... </facilities>
@@ -66,4 +64,6 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException;
 
 	public void endOpentime(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

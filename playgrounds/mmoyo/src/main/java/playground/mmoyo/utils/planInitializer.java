@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class planInitializer {
 	Scenario scenario;
 	
-	public planInitializer(ScenarioImpl scenario){
+	public planInitializer(Scenario scenario){
 		this.scenario = scenario;
 	}
 	
@@ -73,7 +73,7 @@ public class planInitializer {
 		}else{
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";	
 		}
-		ScenarioImpl scenario = new DataLoader().loadTransitScenario(configFile);
+		Scenario scenario = new DataLoader().loadTransitScenario(configFile);
 		new planInitializer(scenario).run();
 	}
 

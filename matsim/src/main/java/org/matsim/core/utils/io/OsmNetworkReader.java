@@ -99,7 +99,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
-	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	/*package*/ final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
@@ -153,18 +153,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param osmFilename
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
 	public void parse(final String osmFilename) {
-		try {
-			parse(osmFilename, null);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		parse(osmFilename, null);
 	}
 
 	/*package*/ void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
@@ -176,11 +168,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param osmFilename
 	 * @param stream
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	private void parse(final String osmFilename, final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
+	private void parse(final String osmFilename, final InputStream stream) throws UncheckedIOException {
 		if(this.hierarchyLayers.isEmpty()){
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}

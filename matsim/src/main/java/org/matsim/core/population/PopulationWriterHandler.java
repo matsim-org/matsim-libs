@@ -25,12 +25,11 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.io.WriterHandler;
 
 /**
  * @author mrieser
  */
-public interface PopulationWriterHandler extends WriterHandler {
+public interface PopulationWriterHandler {
 
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
 
@@ -39,4 +38,6 @@ public interface PopulationWriterHandler extends WriterHandler {
 	public void writePerson(final Person person, final BufferedWriter out) throws IOException;
 
 	public void endPlans(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

@@ -24,6 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.matsim.core.utils.io.UncheckedIOException;
+
 /*package*/ class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	private String newline = "\n";
@@ -42,16 +44,24 @@ import java.util.Map;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startConfig(final Config config, final BufferedWriter out) throws IOException {
-		out.write("<config>");
-		out.write(this.newline);
-		out.write(this.newline);
+	public void startConfig(final Config config, final BufferedWriter out) throws UncheckedIOException {
+		try {
+			out.write("<config>");
+			out.write(this.newline);
+			out.write(this.newline);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override
-	public void endConfig(final BufferedWriter out) throws IOException {
-		out.write("</config>");
-		out.write(this.newline);
+	public void endConfig(final BufferedWriter out) throws UncheckedIOException {
+		try {
+			out.write("</config>");
+			out.write(this.newline);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 //////////////////////////////////////////////////////////////////////
@@ -59,26 +69,30 @@ import java.util.Map;
 //////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
+	public void writeModule(final Module module, final BufferedWriter out) throws UncheckedIOException {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
 
-		out.write("\t<module");
-		out.write(" name=\"" + module.getName() + "\" >");
-		out.write(this.newline);
-
-		for (Map.Entry<String, String> entry : params.entrySet()) {
-			if (comments.get(entry.getKey()) != null) {
-				out.write(this.newline);
-				out.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
+		try {
+			out.write("\t<module");
+			out.write(" name=\"" + module.getName() + "\" >");
+			out.write(this.newline);
+			
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				if (comments.get(entry.getKey()) != null) {
+					out.write(this.newline);
+					out.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
+					out.write(this.newline);
+				}
+				out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
 				out.write(this.newline);
 			}
-			out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
+			out.write("\t</module>");
 			out.write(this.newline);
+			out.write(this.newline);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		out.write("\t</module>");
-		out.write(this.newline);
-		out.write(this.newline);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -86,9 +100,13 @@ import java.util.Map;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- ====================================================================== -->");
-		out.write(this.newline);
-		out.write(this.newline);
+	public void writeSeparator(final BufferedWriter out) throws UncheckedIOException {
+		try {
+			out.write("<!-- ====================================================================== -->");
+			out.write(this.newline);
+			out.write(this.newline);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

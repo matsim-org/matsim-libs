@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 
 
-	private final NetworkImpl network;
+	private final Network network;
 	private CoordinateReferenceSystem crs;
 
 	private Constructor<? extends FeatureGenerator> featureGeneratorPrototypeContructor;
@@ -44,7 +44,7 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 
 
 	public FeatureGeneratorBuilderImpl(final Network network, final String coordinateSystem) {
-		this.network = (NetworkImpl) network;
+		this.network = network;
 		this.crs = MGC.getCRS(coordinateSystem);
 		try {
 			this.featureGeneratorPrototypeContructor = PolygonFeatureGenerator.class.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);
@@ -82,7 +82,7 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 			ex = e;
 		}
 		throw new RuntimeException(
-				"Could not instantiate feature generator from prototype!",
+				"Could not instantiate feature generator from prototype! " + this.featureGeneratorPrototypeContructor.getDeclaringClass().getCanonicalName(),
 				ex);
 	}
 

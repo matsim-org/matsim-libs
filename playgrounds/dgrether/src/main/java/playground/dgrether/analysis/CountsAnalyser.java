@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
@@ -87,7 +87,7 @@ public class CountsAnalyser {
 	/**
 	 * the network
 	 */
-	private NetworkImpl network;
+	private Network network;
 
 	/**
 	 * the name(path) to the output file
@@ -141,7 +141,7 @@ public class CountsAnalyser {
 	 * @throws Exception
 	 */
 	private void readConfig(final String configFile) throws Exception {
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 		System.out.println("  reading counts xml file... ");
 		MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
@@ -225,7 +225,7 @@ public class CountsAnalyser {
 		tableWriter.writeFile(filename + "errortable.txt");
 	}
 
-	protected void loadNetwork(ScenarioImpl scenario) {
+	protected void loadNetwork(Scenario scenario) {
 		printNote("", "  reading network xml file... ");
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		printNote("", "  done");

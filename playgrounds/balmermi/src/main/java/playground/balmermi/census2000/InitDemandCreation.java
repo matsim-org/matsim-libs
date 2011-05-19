@@ -66,13 +66,13 @@ public class InitDemandCreation {
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		ScenarioImpl scenario = sl.getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) sl.getScenario();
 		Config config = scenario.getConfig();
 		World world = new World();
 
 		System.out.println("  reading facilities xml file... ");
 		sl.loadActivityFacilities();
-		ActivityFacilitiesImpl facilities = sl.getScenario().getActivityFacilities();
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");

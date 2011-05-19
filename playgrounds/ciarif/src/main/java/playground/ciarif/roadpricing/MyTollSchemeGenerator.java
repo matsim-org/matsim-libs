@@ -1,7 +1,6 @@
 package playground.ciarif.roadpricing;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
@@ -37,6 +35,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -120,7 +119,7 @@ public class MyTollSchemeGenerator {
 
 	private Config config;
 
-	private NetworkImpl network;
+	private Network network;
 
 	private Coord[] usedCoords;
 
@@ -229,11 +228,7 @@ public class MyTollSchemeGenerator {
 
 	private void writeRoadPricingScheme(RoadPricingScheme pricingScheme) {
 		RoadPricingWriterXMLv1 pricingSchemeWriter = new RoadPricingWriterXMLv1(pricingScheme);
-		try {
-			pricingSchemeWriter.writeFile(this.usedSchemeOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		pricingSchemeWriter.writeFile(this.usedSchemeOut);
 		log.info("RoadPricingScheme written to: "  + this.usedSchemeOut);
 	}
 
@@ -339,7 +334,7 @@ public class MyTollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkImpl filterNetwork(final NetworkImpl net, boolean full) {
+	private NetworkImpl filterNetwork(final Network net, boolean full) {
 		MyNetwork n = new MyNetwork();
 		
 		GeometryFactory geofac = new GeometryFactory();

@@ -23,10 +23,10 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -34,7 +34,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.balmermi.modules.FacilitiesRandomizeHectareCoordinates;
 import playground.balmermi.modules.PersonResetCoordAndLink;
 import playground.balmermi.modules.PersonStupidDeleteKnowledgeForStreamingModule;
 
@@ -72,7 +71,7 @@ public class ScenarioStreaming {
 		if (args.length != 1) { printUsage(); return; }
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		ScenarioImpl sc = sl.getScenario();
+		ScenarioImpl sc = (ScenarioImpl) sl.getScenario();
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
@@ -84,9 +83,9 @@ public class ScenarioStreaming {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading network)");
 
-		Config config = sl.getScenario().getConfig();
-		NetworkImpl network = sl.getScenario().getNetwork();
-		ActivityFacilitiesImpl af = sl.getScenario().getActivityFacilities();
+		Config config = sc.getConfig();
+		Network network = sc.getNetwork();
+		ActivityFacilitiesImpl af = sc.getActivityFacilities();
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
@@ -134,16 +133,16 @@ public class ScenarioStreaming {
 //		new FacilitiesWriter(af).write(config.facilities().getOutputFile());
 //		System.out.println("done. (writing facilities)");
 
-		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl population = (PopulationImpl) sc.getPopulation();
 		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());
+		PopulationReader plansReader = new MatsimPopulationReader(sc);
+		PopulationWriter plansWriter = new PopulationWriter(population,network, sc.getKnowledges());
 		plansWriter.startStreaming(null);//sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonResetCoordAndLink(af));
 		population.addAlgorithm(plansWriter);
-		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
+		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sc.getKnowledges()));
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 

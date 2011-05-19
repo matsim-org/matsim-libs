@@ -94,12 +94,16 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * Writes the standard xml 1.0 header to the output.
 	 *
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void writeXmlHead() throws IOException {
-		this.writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (doPrettyPrint) {
-			this.writer.write(NL);
+	protected void writeXmlHead() throws UncheckedIOException {
+		try {
+			this.writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			if (doPrettyPrint) {
+				this.writer.write(NL);
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -108,10 +112,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 *
 	 * @param rootTag The root tag of the written XML document.
 	 * @param dtdUrl The location of the document type definition of this XML document.
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void writeDoctype(String rootTag, String dtdUrl) throws IOException {
-		this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">\n");
+	protected void writeDoctype(String rootTag, String dtdUrl) throws UncheckedIOException {
+		try {
+			this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
@@ -159,56 +167,64 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param tagname
 	 * @param attributes
 	 * @param out
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws IOException{
+	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
 		this.writeStartTag(tagname, attributes, false);
 	}
 
-	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws IOException {
+	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException {
+		try {
 		if (doPrettyPrint) {
 			this.writer.write(NL);
 			indent();
 			this.indentationLevel++;
 		}
-		this.writer.write("<" + tagname);
-		if (attributes != null) {
-			int length = 0;
-			for (Tuple<String, String> t : attributes){
-				if (doPrettyPrint) {
-					length = length + t.getFirst().length() + t.getSecond().length();
-					if (length > 80) {
-						this.writer.write(NL);
-						length = 0;
+			this.writer.write("<" + tagname);
+			if (attributes != null) {
+				int length = 0;
+				for (Tuple<String, String> t : attributes){
+					if (doPrettyPrint) {
+						length = length + t.getFirst().length() + t.getSecond().length();
+						if (length > 80) {
+							this.writer.write(NL);
+							length = 0;
+						}
 					}
+					this.writer.write(" " + t.getFirst() + "=\"" + encodeAttributeValue(t.getSecond()) + "\"");
 				}
-				this.writer.write(" " + t.getFirst() + "=\"" + encodeAttributeValue(t.getSecond()) + "\"");
 			}
-		}
-		if (closeElement) {
-			this.writer.write("/>");
-			if (doPrettyPrint) {
-				this.indentationLevel--;
+			if (closeElement) {
+				this.writer.write("/>");
+				if (doPrettyPrint) {
+					this.indentationLevel--;
+				}
 			}
-		}
-		else {
-			this.writer.write(">");
+			else {
+				this.writer.write(">");
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
 
-	protected void writeContent(String content, boolean allowWhitespaces) throws IOException{
-		if (doPrettyPrint) {
-			this.noWhitespaces = !allowWhitespaces;
-			if (!this.noWhitespaces) {
-				this.writer.write(NL);
-				this.indentationLevel++;
-				indent();
+	protected void writeContent(String content, boolean allowWhitespaces) throws UncheckedIOException{
+		try {
+			if (doPrettyPrint) {
+				this.noWhitespaces = !allowWhitespaces;
+				if (!this.noWhitespaces) {
+					this.writer.write(NL);
+					this.indentationLevel++;
+					indent();
+				}
 			}
-		}
-		writer.write(content);
-		if (!this.noWhitespaces) {
-			this.indentationLevel--;
+				writer.write(content);
+			if (!this.noWhitespaces) {
+				this.indentationLevel--;
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -216,20 +232,24 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Writes a XML end tag with the given name to the given writer instance
 	 * @param tagname
 	 * @param out
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void writeEndTag(String tagname) throws IOException {
-		if (doPrettyPrint) {
-			this.indentationLevel--;
-			if (!this.noWhitespaces) {
-				this.writer.write(NL);
-				indent();
+	protected void writeEndTag(String tagname) throws UncheckedIOException {
+		try {
+			if (doPrettyPrint) {
+				this.indentationLevel--;
+				if (!this.noWhitespaces) {
+					this.writer.write(NL);
+					indent();
+				}
+				else {
+					this.noWhitespaces = false;
+				}
 			}
-			else {
-				this.noWhitespaces = false;
-			}
+			this.writer.write("</" + tagname + ">");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		this.writer.write("</" + tagname + ">");
 	}
 
 	/**

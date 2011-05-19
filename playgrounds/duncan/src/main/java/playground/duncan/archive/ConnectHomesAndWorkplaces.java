@@ -52,7 +52,7 @@ public class ConnectHomesAndWorkplaces {
 		} else {
 			configFile = args[0] ;
 		}
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario());
 
 		this.config = scenario.getConfig();
 		ConfigWriter configwriter = new ConfigWriter(this.config);

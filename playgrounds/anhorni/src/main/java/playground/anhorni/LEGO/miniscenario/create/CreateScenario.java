@@ -20,11 +20,13 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+
 import playground.anhorni.random.RandomFromVarDistr;
 
 public class CreateScenario {
@@ -56,7 +58,7 @@ public class CreateScenario {
 	}
 	
 	private void create() {			
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 		
 		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));

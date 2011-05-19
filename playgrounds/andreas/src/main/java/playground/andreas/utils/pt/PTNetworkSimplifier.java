@@ -20,7 +20,6 @@
 
 package playground.andreas.utils.pt;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -401,13 +400,8 @@ public class PTNetworkSimplifier {
 
 		log.info("Writing network to " + this.netOutFile);
 		new NetworkWriter(this.network).write(this.netOutFile);
-		try {
-			log.info("Writing transit schedule to " + this.scheduleOutFile);
-			new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		log.info("Writing transit schedule to " + this.scheduleOutFile);
+		new TransitScheduleWriter(osmScenario.getTransitSchedule()).writeFile(this.scheduleOutFile);
 
 	}
 }

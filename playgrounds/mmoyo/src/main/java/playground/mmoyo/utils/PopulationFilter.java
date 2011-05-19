@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**reads a multi-modal network and eliminates agents outside the street network area*/
@@ -75,7 +74,7 @@ public class PopulationFilter {
 		String configFile = args[0];
 		
 		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
+		Scenario scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		PopulationFilter populationFilter = new PopulationFilter();
 		populationFilter.run(scenario);

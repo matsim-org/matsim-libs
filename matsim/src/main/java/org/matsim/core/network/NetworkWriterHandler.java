@@ -26,9 +26,8 @@ import java.io.IOException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.io.WriterHandler;
 
-public interface NetworkWriterHandler extends WriterHandler {
+public interface NetworkWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <network ... > ... </network>
@@ -69,4 +68,6 @@ public interface NetworkWriterHandler extends WriterHandler {
 	public void startLink(final Link link, final BufferedWriter out) throws IOException;
 
 	public void endLink(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

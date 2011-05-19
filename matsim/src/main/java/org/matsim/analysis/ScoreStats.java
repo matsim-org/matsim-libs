@@ -21,7 +21,6 @@
 package org.matsim.analysis;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -37,6 +36,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -74,14 +74,17 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * @param population
 	 * @param filename
 	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public ScoreStats(final Population population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
+	public ScoreStats(final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.population = population;
 		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);
-		this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+		try {
+			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override

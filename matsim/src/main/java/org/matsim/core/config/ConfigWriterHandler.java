@@ -21,25 +21,14 @@
 package org.matsim.core.config;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
 
-import org.matsim.core.utils.io.WriterHandler;
+/*package*/ interface ConfigWriterHandler {
 
-interface ConfigWriterHandler extends WriterHandler {
+	public void startConfig(final Config config, final BufferedWriter out);
+	
+	public void endConfig(final BufferedWriter out);
 
-	//////////////////////////////////////////////////////////////////////
-	// <config ... > ... </config>
-	//////////////////////////////////////////////////////////////////////
-
-	public void startConfig(final Config config, final BufferedWriter out)
-			throws IOException;
-
-	public void endConfig(final BufferedWriter out) throws IOException;
-
-	//////////////////////////////////////////////////////////////////////
-	// <module ... > ... </module>
-	//////////////////////////////////////////////////////////////////////
-
-	public void writeModule(final Module module, final BufferedWriter out)
-			throws IOException;
+	public void writeModule(final Module module, final BufferedWriter out);
+	
+	public void writeSeparator(final BufferedWriter out);
 }

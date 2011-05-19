@@ -23,16 +23,12 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -72,7 +68,7 @@ public class ScenarioIO {
 		if (args.length != 1) { printUsage(); return; }
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		ScenarioImpl sc = sl.getScenario();
+		ScenarioImpl sc = (ScenarioImpl) sl.getScenario();
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
@@ -84,9 +80,9 @@ public class ScenarioIO {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading network)");
 
-		Config config = sl.getScenario().getConfig();
-		NetworkImpl network = sl.getScenario().getNetwork();
-		ActivityFacilitiesImpl af = sl.getScenario().getActivityFacilities();
+		Config config = sc.getConfig();
+		Network network = sc.getNetwork();
+		ActivityFacilitiesImpl af = sc.getActivityFacilities();
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
@@ -136,7 +132,7 @@ public class ScenarioIO {
 
 		System.out.println("loading population...");
 		sl.loadPopulation();
-		PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
+		PopulationImpl population = (PopulationImpl) sc.getPopulation();
 		population.setIsStreaming(false);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading population)");
@@ -157,7 +153,7 @@ public class ScenarioIO {
 		System.out.println("done. (running algorithms)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,network, sl.getScenario().getKnowledges()).write(null);//config.plans().getOutputFile());
+		new PopulationWriter(population,network, sc.getKnowledges()).write(null);//config.plans().getOutputFile());
 		System.out.println("done. (writing population)");
 
 //		System.out.println("running algorithms...");

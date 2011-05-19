@@ -19,7 +19,6 @@
 
 package playground.andreas.P.init;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -206,12 +205,7 @@ public class CreateInitialTimeSchedule {
 
 	private void writeTransitSchedule(String transitScheduleOutFile) {
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.tS);
-		try {
-			writer.write(transitScheduleOutFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		writer.write(transitScheduleOutFile);
 	}
 
 	private TransitStopFacility getRandomTransitStop(){

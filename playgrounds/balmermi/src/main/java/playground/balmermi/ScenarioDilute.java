@@ -28,10 +28,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -78,7 +78,7 @@ public class ScenarioDilute {
 		if (args.length != 1) { printUsage(); return; }
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		ScenarioImpl sc = sl.getScenario();
+		ScenarioImpl sc = (ScenarioImpl) sl.getScenario();
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
@@ -90,8 +90,8 @@ public class ScenarioDilute {
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading network)");
 
-		Config config = sl.getScenario().getConfig();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		Config config = sc.getConfig();
+		Network network = sc.getNetwork();
 
 		System.out.println("complete world...");
 		Set<String> exTxpes = new TreeSet<String>();
@@ -128,17 +128,17 @@ public class ScenarioDilute {
 		System.out.println("=> aoi contains: " + areaOfInterest.size() + " links.");
 		System.out.println(" done. " + (new Date()));
 
-		final PopulationImpl population = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl population = (PopulationImpl) sc.getPopulation();
 		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
-		PopulationWriter plansWriter = new PopulationWriter(population,network, sl.getScenario().getKnowledges());
+		PopulationReader plansReader = new MatsimPopulationReader(sc);
+		PopulationWriter plansWriter = new PopulationWriter(population,network, sc.getKnowledges());
 		plansWriter.startStreaming(null);//sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest, network);
 		filter.setAlternativeAOI(center,radius);
 		population.addAlgorithm(filter);
-		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
+		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sc.getKnowledges()));
 		Gbl.printMemoryUsage();
 		System.out.println("done. (adding algorithms)");
 

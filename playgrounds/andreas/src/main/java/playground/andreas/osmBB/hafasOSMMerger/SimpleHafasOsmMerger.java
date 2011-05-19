@@ -1,6 +1,5 @@
 package playground.andreas.osmBB.hafasOSMMerger;
 
-import java.io.IOException;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -75,12 +74,7 @@ public class SimpleHafasOsmMerger {
 
 	private void writeFinalSchedule() {
 		TransitScheduleWriter writer = new TransitScheduleWriter(this.osmScenario.getTransitSchedule());
-		try {
-			writer.writeFile(this.transitScheduleOutFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		writer.writeFile(this.transitScheduleOutFile);
 	}
 
 	private void readTransitSchedules() {

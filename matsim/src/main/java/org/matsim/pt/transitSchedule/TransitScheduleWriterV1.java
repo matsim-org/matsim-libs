@@ -20,7 +20,6 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -52,7 +52,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.schedule = schedule;
 	}
 
-	public void write(final String filename) throws IOException {
+	public void write(final String filename) throws UncheckedIOException {
 		this.openFile(filename);
 		this.writeXmlHead();
 		this.writeDoctype(Constants.TRANSIT_SCHEDULE, "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
@@ -66,7 +66,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.close();
 	}
 
-	private void writeTransitStops() throws IOException {
+	private void writeTransitStops() throws UncheckedIOException {
 		this.writeStartTag(Constants.TRANSIT_STOPS, null);
 
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(5);
@@ -88,7 +88,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.writeEndTag(Constants.TRANSIT_STOPS);
 	}
 
-	private void writeTransitLine(final TransitLine line) throws IOException {
+	private void writeTransitLine(final TransitLine line) throws UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
 		attributes.add(this.createTuple(Constants.ID, line.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
@@ -100,7 +100,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.writeEndTag(Constants.TRANSIT_LINE);
 	}
 
-	private void writeTransitRoute(final TransitRoute route) throws IOException {
+	private void writeTransitRoute(final TransitRoute route) throws UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
 		attributes.add(this.createTuple(Constants.ID, route.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
@@ -122,7 +122,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.writeEndTag(Constants.TRANSIT_ROUTE);
 	}
 
-	private void writeRouteProfile(final List<TransitRouteStop> stops) throws IOException {
+	private void writeRouteProfile(final List<TransitRouteStop> stops) throws UncheckedIOException {
 		this.writeStartTag(Constants.ROUTE_PROFILE, null);
 
 		// optimization: only create one List for multiple departures
@@ -143,7 +143,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		this.writeEndTag(Constants.ROUTE_PROFILE);
 	}
 
-	private void writeRoute(final NetworkRoute route) throws IOException {
+	private void writeRoute(final NetworkRoute route) throws UncheckedIOException {
 		if (route != null) {
 			this.writeStartTag(Constants.ROUTE, null);
 
@@ -166,7 +166,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		}
 	}
 
-	private void writeDepartures(final Map<Id, Departure> departures) throws IOException {
+	private void writeDepartures(final Map<Id, Departure> departures) throws UncheckedIOException {
 		this.writeStartTag(Constants.DEPARTURES, null);
 
 		// optimization: only create one List for multiple departures

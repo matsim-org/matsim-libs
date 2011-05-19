@@ -316,13 +316,7 @@ public class NullFallDataPrepare {
 	private void readVisumNetwork()  {
 		vNetwork = new VisumNetwork();
 		log.info("reading visum network.");
-		try {
-			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new VisumNetworkReader(vNetwork).read(InVisumNetFile);
 	}
 
 	private void writeNetworkAndScheduleAndVehicles() throws IOException,
@@ -334,11 +328,7 @@ public class NullFallDataPrepare {
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(OutTransitScheduleFile);
 		log.info("writing vehicles to file.");
 		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(OutVehicleFile);
-		try {
-			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleFile);
 	}
 
 	public static void main(final String[] args) {

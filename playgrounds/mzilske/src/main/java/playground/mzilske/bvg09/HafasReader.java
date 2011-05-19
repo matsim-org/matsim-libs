@@ -76,11 +76,7 @@ public class HafasReader {
 			transitSchedule.addStopFacility(facility);
 		}
 		TransitScheduleWriter transitScheduleWriter = new TransitScheduleWriter(transitSchedule);
-		try {
-			transitScheduleWriter.writeFile(OUT_FILENAME);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		transitScheduleWriter.writeFile(OUT_FILENAME);
 	}
 
 	private void addLine() {

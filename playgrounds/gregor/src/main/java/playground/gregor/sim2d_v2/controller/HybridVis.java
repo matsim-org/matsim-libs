@@ -20,7 +20,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
@@ -69,7 +68,7 @@ public class HybridVis {
 			loader.getScenario().getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		}
 		loader.loadScenario();
-		ScenarioImpl scenario = loader.getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) loader.getScenario();
 
 		//		ScenarioLoader2DImpl loader2 = new ScenarioLoader2DImpl(this.s/cenarioData);
 		//		loader2.loadScenario();

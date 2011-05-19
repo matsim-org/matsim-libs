@@ -19,7 +19,6 @@
 
 package org.matsim.utils.objectattributes;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
 import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
 import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
@@ -69,7 +69,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
 	}
 
-	public void writeFile(final String filename) throws IOException {
+	public void writeFile(final String filename) throws UncheckedIOException {
 		openFile(filename);
 		writeXmlHead();
 		writeDoctype(TAG_OBJECT_ATTRIBUTES, "http://matsim.org/files/dtd/objectattributes_v1.dtd");

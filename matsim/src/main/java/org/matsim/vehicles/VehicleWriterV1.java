@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author dgrether
@@ -46,19 +46,15 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.vehicles = vehicles.getVehicles();
 	}
 	
-	public void writeFile(String filename) {
-		try {
-			this.openFile(filename);
-			this.writeXmlHead();
-			this.writeRootElement();
-			this.close();
-			log.info("Vehicles written to: " + filename);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public void writeFile(String filename) throws UncheckedIOException {
+		this.openFile(filename);
+		this.writeXmlHead();
+		this.writeRootElement();
+		this.close();
+		log.info("Vehicles written to: " + filename);
 	}
 
-	private void writeRootElement() throws IOException {
+	private void writeRootElement() throws UncheckedIOException {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
@@ -69,7 +65,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS);
 	}
 
-	private void writeVehicles(Map<Id, Vehicle> veh) throws IOException {
+	private void writeVehicles(Map<Id, Vehicle> veh) throws UncheckedIOException {
 		for (Vehicle v : veh.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
@@ -78,7 +74,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeVehicleTypes(Map<Id, VehicleType> vts) throws IOException {
+	private void writeVehicleTypes(Map<Id, VehicleType> vts) throws UncheckedIOException {
 		for (VehicleType vt : vts.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
@@ -123,7 +119,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeEngineInformation(EngineInformation ei) throws IOException {
+	private void writeEngineInformation(EngineInformation ei) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
 		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
 		this.writeContent(ei.getFuelType().toString(), false);
@@ -134,7 +130,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.ENGINEINFORMATION);
 	}
 
-	private void writeCapacity(VehicleCapacity cap) throws IOException {
+	private void writeCapacity(VehicleCapacity cap) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV1Names.CAPACITY, null);
 		if (cap.getSeats() != null) {
 			atts.clear();
@@ -152,7 +148,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
 	}
 
-	private void writeFreightCapacity(FreightCapacity fc) throws IOException {
+	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
 		atts.clear();
 		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));

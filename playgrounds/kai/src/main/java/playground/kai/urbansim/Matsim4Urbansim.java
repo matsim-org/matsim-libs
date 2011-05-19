@@ -1,12 +1,13 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -69,12 +70,12 @@ public class Matsim4Urbansim {
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		Config config = loader.getScenario().getConfig();
 		loader.loadScenario();
-		ScenarioImpl scenarioData = loader.getScenario();
+		Scenario scenarioData = loader.getScenario();
 
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkImpl network = scenarioData.getNetwork() ;
+		Network network = scenarioData.getNetwork() ;
 
 		log.info("") ;
 		log.info("cleaning network ...");
@@ -115,7 +116,7 @@ public class Matsim4Urbansim {
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 
-		scenarioData.setPopulation(newPop);
+		((ScenarioImpl) scenarioData).setPopulation(newPop);
 		Controler controler = new Controler(scenarioData) ;
 		controler.setOverwriteFiles(true) ;
 

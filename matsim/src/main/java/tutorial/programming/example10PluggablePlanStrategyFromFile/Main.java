@@ -19,15 +19,13 @@
 
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 class Main {
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 
 		Config config;
 		if ( args.length==0 ) {

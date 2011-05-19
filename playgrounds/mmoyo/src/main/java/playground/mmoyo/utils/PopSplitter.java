@@ -1,6 +1,7 @@
 package playground.mmoyo.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -13,7 +14,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class PopSplitter {
 	private static final Logger log = Logger.getLogger(PopSplitter.class);
 	
-	public void run(ScenarioImpl sc, int fileNum){
+	public void run(Scenario sc, int fileNum){
 		final String procesing = "processing ";
 		final String writting = "writting until agent: ";
 		final String xml = ".xml";
@@ -51,7 +52,7 @@ public class PopSplitter {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 			strFileNum = "7";
 		}
-		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
+		Scenario scenario = new DataLoader().loadScenario(configFile);
 		int numFiles = Integer.valueOf (strFileNum);
 		
 		new PopSplitter().run(scenario, numFiles);

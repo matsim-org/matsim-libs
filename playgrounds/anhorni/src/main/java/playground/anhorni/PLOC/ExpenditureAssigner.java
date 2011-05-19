@@ -19,7 +19,6 @@
 
 package playground.anhorni.PLOC;
 
-import java.io.IOException;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
@@ -50,11 +49,7 @@ public class ExpenditureAssigner {
 			this.assignExpenditureGaussian((PersonImpl)p);
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(personAttributes);
-		try {
-			attributesWriter.writeFile(path + "input/PLOC/3towns/personExpenditures.xml");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}   
+		attributesWriter.writeFile(path + "input/PLOC/3towns/personExpenditures.xml");
 	}
 				
 	public void assignExpenditureGaussian(PersonImpl person) {		

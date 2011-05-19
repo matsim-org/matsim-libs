@@ -38,7 +38,7 @@ public class AdaptedLauncher {
 	final String routing = "routing ";
 	
 	public AdaptedLauncher(final String configFile) {
-		this(new DataLoader ().loadScenario(configFile)); 
+		this((ScenarioImpl) new DataLoader().loadScenario(configFile)); 
 	}
 	
 	public AdaptedLauncher(final ScenarioImpl scenario) {

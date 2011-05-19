@@ -69,7 +69,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -104,7 +103,7 @@ public class MyRuns {
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		sl.loadNetwork();
-		ScenarioImpl scenario = sl.getScenario();
+		Scenario scenario = sl.getScenario();
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
@@ -135,7 +134,7 @@ public class MyRuns {
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		sl.loadNetwork();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 
 		System.out.println("  extracting aoi... at " + (new Date()));
 		for (Link link : network.getLinks().values()) {
@@ -297,7 +296,7 @@ public class MyRuns {
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		sl.loadNetwork();
 
-		NetworkImpl network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
@@ -336,9 +335,9 @@ public class MyRuns {
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		sl.loadNetwork();
-		ScenarioImpl scenario = sl.getScenario();
+		Scenario scenario = sl.getScenario();
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		System.out.println("  falsifying the network...");
 		new NetworkFalsifier(50).run(network);
@@ -355,7 +354,7 @@ public class MyRuns {
 		plansWriter.startStreaming(null);//scenario.getConfig().plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		population.addAlgorithm(new ActLocationFalsifier(200));
-		population.addAlgorithm(new XY2Links(network));
+		population.addAlgorithm(new XY2Links((NetworkImpl) network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		population.addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), network, timeCostFunction, timeCostFunction));
 		population.addAlgorithm(plansWriter);

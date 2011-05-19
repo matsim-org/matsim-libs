@@ -1,7 +1,5 @@
 package playground.mzilske.bvg09;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -221,22 +219,12 @@ public class VisumHafasScheduleMerger {
 	private void readVisumNetwork()  {
 		vNetwork = new VisumNetwork();
 		log.info("reading visum network.");
-		try {
-			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new VisumNetworkReader(vNetwork).read(InVisumNetFile);
 	}
 
 	private void writeNetworkAndScheduleAndVehicles() {
-		try {
-			new TransitScheduleWriterV1(outScenario.getTransitSchedule())
+		new TransitScheduleWriterV1(outScenario.getTransitSchedule())
 					.write(OutTransitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public static void main(final String[] args) {

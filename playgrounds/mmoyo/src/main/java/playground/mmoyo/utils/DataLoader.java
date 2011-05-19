@@ -1,6 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -23,7 +43,7 @@ public class DataLoader {
 
 	//this is to be used when one need to work with a scenario outside a controler. v.gr. at util classes
 	public ScenarioImpl loadScenarioWithTrSchedule(final String configFile) {
-		ScenarioImpl scenario = this.loadTransitScenario(configFile);
+		ScenarioImpl scenario = (ScenarioImpl) this.loadTransitScenario(configFile);
 
 		//load transit schedule by config
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -34,8 +54,8 @@ public class DataLoader {
 	}
 
 	//Use this with the controler. The transit schedule will be loaded by controler, but the config object is needed as parameter
-	public ScenarioImpl loadTransitScenario(final String configFile) {
-		ScenarioImpl scenario = this.loadScenario(configFile);
+	public Scenario loadTransitScenario(final String configFile) {
+		Scenario scenario = this.loadScenario(configFile);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		return scenario;
@@ -91,7 +111,7 @@ public class DataLoader {
 		return scenario;
 	}
 
-	public ScenarioImpl loadScenario (final String configFile){
+	public Scenario loadScenario (final String configFile){
 		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		scenarioLoader.loadScenario();
 		return scenarioLoader.getScenario();

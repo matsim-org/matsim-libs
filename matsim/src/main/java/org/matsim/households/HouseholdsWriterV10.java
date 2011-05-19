@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 
 /**
@@ -41,18 +42,14 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 		this.households = households;
 	}
 
-	public void writeFile(String filename) {
-		try {
-			this.openFile(filename);
-			this.writeXmlHead();
-			this.writeHouseholds(this.households);
-			this.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public void writeFile(String filename) throws UncheckedIOException {
+		this.openFile(filename);
+		this.writeXmlHead();
+		this.writeHouseholds(this.households);
+		this.close();
 	}
 
-	private void writeHouseholds(Households basicHouseholds) throws IOException {
+	private void writeHouseholds(Households basicHouseholds) throws UncheckedIOException {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
@@ -64,7 +61,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 	}
 
-	private void writeHousehold(Household h) throws IOException {
+	private void writeHousehold(Household h) throws UncheckedIOException {
 		this.atts.clear();
 		atts.add(this.createTuple(HouseholdsSchemaV10Names.ID, h.getId().toString()));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLD, atts);
@@ -86,7 +83,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLD);
 	}
 
-	private void writeIncome(Income income) throws IOException {
+	private void writeIncome(Income income) throws UncheckedIOException {
 		atts.clear();
 		if (income.getCurrency() != null) {
 			atts.add(this.createTuple(HouseholdsSchemaV10Names.CURRENCY,income.getCurrency()));
@@ -97,7 +94,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 		this.writeEndTag(HouseholdsSchemaV10Names.INCOME);
 	}
 
-	private void writeMembers(List<Id> memberIds) throws IOException {
+	private void writeMembers(List<Id> memberIds) throws UncheckedIOException {
 		this.writeStartTag(HouseholdsSchemaV10Names.MEMBERS, null);
 		for (Id id : memberIds){
 			atts.clear();

@@ -3,6 +3,7 @@ package playground.mzilske.postgres;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -12,7 +13,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -22,7 +22,7 @@ public class ExportTripsToSQL {
 
 	private Config config;
 	private String configfile = null;
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	private String outputFile;
 	int nLeg = 0;
 

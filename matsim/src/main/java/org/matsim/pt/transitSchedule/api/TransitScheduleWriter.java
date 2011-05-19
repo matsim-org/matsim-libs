@@ -20,9 +20,8 @@
 
 package org.matsim.pt.transitSchedule.api;
 
-import java.io.IOException;
-
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 
 /**
@@ -44,10 +43,10 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * current file format (currently V1).
 	 *
 	 * @param filename
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 * @see {@link #writeV1(String)}
 	 */
-	public void writeFile(final String filename) throws IOException {
+	public void writeFile(final String filename) throws UncheckedIOException {
 		writeFileV1(filename);
 	}
 
@@ -56,9 +55,9 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * format specified by <tt>transitSchedule_v1.dtd</tt>
 	 *
 	 * @param filename
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public void writeFileV1(final String filename) throws IOException {
+	public void writeFileV1(final String filename) throws UncheckedIOException {
 		new TransitScheduleWriterV1(this.schedule).write(filename);
 	}
 }

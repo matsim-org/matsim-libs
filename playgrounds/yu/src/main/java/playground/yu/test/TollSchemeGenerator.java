@@ -1309,11 +1309,7 @@ public class TollSchemeGenerator {
 	private void writeRoadPricingScheme(final RoadPricingScheme pricingScheme) {
 		RoadPricingWriterXMLv1 pricingSchemeWriter = new RoadPricingWriterXMLv1(
 				pricingScheme);
-		try {
-			pricingSchemeWriter.writeFile(usedSchemeOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		pricingSchemeWriter.writeFile(usedSchemeOut);
 		log.info("RoadPricingScheme written to: " + usedSchemeOut);
 	}
 

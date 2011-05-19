@@ -32,18 +32,18 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -130,7 +130,7 @@ public class MyControler2 {
 		}
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();
-		ScenarioImpl scenarioData = loader.getScenario();
+		Scenario scenarioData = loader.getScenario();
 
 		// create population
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";
@@ -145,7 +145,7 @@ public class MyControler2 {
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.
-		NetworkImpl network = scenarioData.getNetwork() ;
+		Network network = scenarioData.getNetwork() ;
 		log.info("") ; 	log.info("cleaning network ...");
 		NetworkCleaner nwCleaner = new NetworkCleaner() ;
 		nwCleaner.run( network ) ;

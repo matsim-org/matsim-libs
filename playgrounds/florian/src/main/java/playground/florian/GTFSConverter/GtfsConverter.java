@@ -161,12 +161,7 @@ public class GtfsConverter {
 		// Create some dummy Vehicles
 		this.createTransitVehiclesDummy();
 		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
-		try {
-			tsw.writeFile("./transitSchedule.xml");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		tsw.writeFile("./transitSchedule.xml");
 		System.out.println("Conversion successfull");
 	}
 	
@@ -510,7 +505,7 @@ public class GtfsConverter {
 		// To prevent the creation of similiar links in different directions there need to be a Map which assigns the ToNodes to all FromNodes
 		Map<Id,List<Id>> fromNodes = new HashMap<Id,List<Id>>();
 		// Create a new Network
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		// Add all stops as nodes but move them a little
 		Map<Id, TransitStopFacility> stops = ts.getFacilities();
 		for(Id id: stops.keySet()){

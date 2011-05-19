@@ -19,8 +19,6 @@
 
 package playground.mrieser.pt.application;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -91,26 +89,25 @@ public class DataPrepare {
 
 	protected void convertSchedule() {
 		final VisumNetwork vNetwork = new VisumNetwork();
-		try {
-			log.info("reading visum network.");
-			new VisumNetworkReader(vNetwork).read(VISUM_FILE);
-			log.info("converting visum data to TransitSchedule.");
-			Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+		log.info("reading visum network.");
+		new VisumNetworkReader(vNetwork).read(VISUM_FILE);
+		log.info("converting visum data to TransitSchedule.");
+		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
 
-			// configure how transport modes must be converted
-			// the ones for Berlin
-			converter.registerTransportMode("B", "bus");
-			converter.registerTransportMode("F", TransportMode.walk);
-			converter.registerTransportMode("K", "bus");
-			converter.registerTransportMode("L", "other");
-			converter.registerTransportMode("P", TransportMode.car);
-			converter.registerTransportMode("R", TransportMode.bike);
-			converter.registerTransportMode("S", "train");
-			converter.registerTransportMode("T", "tram");
-			converter.registerTransportMode("U", "train");
-			converter.registerTransportMode("V", "other");
-			converter.registerTransportMode("W", "bus");
-			converter.registerTransportMode("Z", "train");
+		// configure how transport modes must be converted
+		// the ones for Berlin
+		converter.registerTransportMode("B", "bus");
+		converter.registerTransportMode("F", TransportMode.walk);
+		converter.registerTransportMode("K", "bus");
+		converter.registerTransportMode("L", "other");
+		converter.registerTransportMode("P", TransportMode.car);
+		converter.registerTransportMode("R", TransportMode.bike);
+		converter.registerTransportMode("S", "train");
+		converter.registerTransportMode("T", "tram");
+		converter.registerTransportMode("U", "train");
+		converter.registerTransportMode("V", "other");
+		converter.registerTransportMode("W", "bus");
+		converter.registerTransportMode("Z", "train");
 
 			// the ones for Zurich
 //			converter.registerTransportMode("B", TransportMode.bus); // BUS
@@ -122,25 +119,18 @@ public class DataPrepare {
 //			converter.registerTransportMode("Y", TransportMode.train); // BERGBAHN
 //			converter.registerTransportMode("Z", TransportMode.train); // FERNVERKEHR
 
-			converter.convert();
-			log.info("writing TransitSchedule to file.");
-			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
-			log.info("writing vehicles to file.");
-			new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		converter.convert();
+		log.info("writing TransitSchedule to file.");
+		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
+		log.info("writing vehicles to file.");
+		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
 	}
 
 	protected void createNetworkFromSchedule() {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
-		try {
-			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
 	}
 
 	protected void mergeNetworks() {

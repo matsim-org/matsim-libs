@@ -113,12 +113,7 @@ public class AddCoordToHafasTransitSchedule {
 	
 	private void writeSchedule(String outputFile){
 		TransitScheduleWriter writer = new TransitScheduleWriter(sc.getTransitSchedule());
-		try {
-			writer.writeFile(outputFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		writer.writeFile(outputFile);
 	}
 	
 	public static void main(String[] args){

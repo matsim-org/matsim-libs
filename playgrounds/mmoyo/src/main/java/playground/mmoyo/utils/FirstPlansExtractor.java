@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -60,7 +61,7 @@ public class FirstPlansExtractor {
 		}
 		
 		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
+		Scenario scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		
 		System.out.println(scenario.getConfig().plans().getInputFile());

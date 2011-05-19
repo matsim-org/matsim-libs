@@ -25,15 +25,15 @@ package playground.yu.newPlans;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
@@ -45,7 +45,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	protected PopulationWriter pw;
 	private final Config config;
 
-	public HwhPlansMaker(NetworkImpl network, Config config, Population plans) {
+	public HwhPlansMaker(Network network, Config config, Population plans) {
 		super(network);
 		this.config = config;
 		for (int i = 0; i <= 24; i++) {
@@ -82,8 +82,8 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("./test/yu/ivtch/config_for_make_hwhPlans.xml");
 
-		ScenarioImpl scenario = sl.getScenario();
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = sl.getScenario();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

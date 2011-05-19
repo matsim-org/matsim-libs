@@ -30,7 +30,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -57,7 +56,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[10];
+		AttributeType [] attribs = new AttributeType[9];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -67,7 +66,6 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
-		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
 
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -86,7 +84,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[10];
+		Object [] attribs = new Object[9];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -96,7 +94,6 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = link.getCapacity();
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
-		attribs[9] = ((LinkImpl) link).getType();
 
 		try {
 			return this.featureType.create(attribs);

@@ -22,6 +22,7 @@ package playground.mmoyo.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,11 +39,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 
-//import com.sleepycat.je.log.FileReader;
-
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
-
-import java.io.FileReader;
 
 /**
  * routes a plan applying many different travel parameter values. Includes method to simulate all routed plans in a directory
@@ -72,7 +69,7 @@ public class AllrouteTest {
 	public AllrouteTest(final String configFile){
 		//load "template scenario" from config
 		this.configFile = configFile;
-		this.scn = new DataLoader().loadScenario(configFile);
+		this.scn = (ScenarioImpl) new DataLoader().loadScenario(configFile);
 		this.outDir = this.scn.getConfig().controler().getOutputDirectory();
 	
 		//create graphs dir where graphs will be stored

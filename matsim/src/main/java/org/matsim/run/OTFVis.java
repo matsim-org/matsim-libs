@@ -231,7 +231,7 @@ public class OTFVis {
 			loader.getScenario().getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		}
 		loader.loadScenario();
-		ScenarioImpl scenario = loader.getScenario();
+		Scenario scenario = loader.getScenario();
 		EventsManager events = EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);

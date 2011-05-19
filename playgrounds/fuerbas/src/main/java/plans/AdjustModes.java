@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -69,7 +69,7 @@ public class AdjustModes {
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
 		sl.loadPopulation();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();	

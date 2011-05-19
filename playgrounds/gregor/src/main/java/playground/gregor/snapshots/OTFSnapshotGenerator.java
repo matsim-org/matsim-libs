@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
@@ -33,7 +34,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -67,7 +67,7 @@ public class OTFSnapshotGenerator {
 	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	private static String LABEL = null;
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private final String eventsFile;
 
 	private final String txtSnapshotFile = null;

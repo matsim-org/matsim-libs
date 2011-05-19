@@ -2,6 +2,7 @@ package playground.wrashid.diverse.erath;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -84,7 +85,7 @@ public class LoadedNetworkRouter {
 		parseArguments(args);
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
@@ -94,7 +95,7 @@ public class LoadedNetworkRouter {
 		plansWriter.startStreaming(outputPlansFile);
 
 		// add algorithm to map coordinates to links
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkImpl) network));
 
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that

@@ -114,7 +114,7 @@ public class ScenarioLoaderImpl {
 	 * 
 	 */
 	@Deprecated
-	public ScenarioImpl getScenario() {
+	public Scenario getScenario() {
 		return this.scenario;
 	}
 
@@ -193,7 +193,7 @@ public class ScenarioLoaderImpl {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
-				new MatsimFacilitiesReader(this.getScenario()).parse(facilitiesFileName);
+				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -222,10 +222,10 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadHouseholds() {
-		if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+		if ((this.scenario.getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			String hhFileName = this.config.households().getInputFile();
 			log.info("loading households from " + hhFileName);
-			new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(hhFileName);
 			log.info("households loaded.");
 		}
 		else {
@@ -238,14 +238,14 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadVehicles() throws UncheckedIOException {
-		new VehicleReaderV1(this.getScenario().getVehicles()).readFile(this.config.transit().getVehiclesFile());
+		new VehicleReaderV1(this.scenario.getVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 
 	private void loadLanes() {
 		LaneDefinitions laneDefinitions;
-		if ((this.getScenario().getLaneDefinitions() != null)
+		if ((this.scenario.getLaneDefinitions() != null)
 				&& (this.config.network().getLaneDefinitionsFile() != null)) {
-			laneDefinitions = this.getScenario().getLaneDefinitions();
+			laneDefinitions = this.scenario.getLaneDefinitions();
 			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(laneDefinitions);
 			reader.readFile(this.config.network().getLaneDefinitionsFile());
 			this.getScenario().addScenarioElement(laneDefinitions);
@@ -254,7 +254,7 @@ public class ScenarioLoaderImpl {
 				"the v2.0 format. For details see LaneDefinitionsV11ToV20Conversion.java.");
 				LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 				laneDefinitions = conversion.convertTo20(laneDefinitions, scenario.getNetwork());
-				this.getScenario().setLaneDefinitions(laneDefinitions);
+				this.scenario.setLaneDefinitions(laneDefinitions);
 			}
 		}
 		else {

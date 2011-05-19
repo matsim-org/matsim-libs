@@ -792,21 +792,13 @@ public class Controler {
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
 		// optional: score stats
-		try {
-			this.scoreStats = new ScoreStats(this.population, this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
-			this.addControlerListener(this.scoreStats);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.scoreStats = new ScoreStats(this.population, this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+		this.addControlerListener(this.scoreStats);
 
 		// optional: travel distance stats
-		try {
-			this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
-					this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
-			this.addControlerListener(this.travelDistanceStats);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
+				this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+		this.addControlerListener(this.travelDistanceStats);
 
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {

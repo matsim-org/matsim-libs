@@ -46,7 +46,7 @@ public class OccupancyCounts {
 		String transitRouteStrId2 = args[3];
 
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		ScenarioImpl scenario = sl.getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) sl.getScenario();
 
 		NetworkImpl network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -68,7 +68,7 @@ public class OccupancyCounts {
 		}
 		//////////////////
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
 		TransitRoute route1 = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(transitLineStrId)).getRoutes().get(new IdImpl(transitRouteStrId1));

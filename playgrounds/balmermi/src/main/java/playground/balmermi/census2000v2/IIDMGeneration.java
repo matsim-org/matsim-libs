@@ -66,7 +66,7 @@ public class IIDMGeneration {
 
 		log.info("MATSim-DB: create iidm.");
 
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario();
 		Config config = scenario.getConfig();
 		World world = new World();
 

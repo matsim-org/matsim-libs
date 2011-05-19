@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -28,12 +27,12 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.EdgeType;
 import org.matsim.visum.VisumNetworkReader;
 
+import playground.mzilske.bvg09.StreamingVisumNetworkReader;
+import playground.mzilske.bvg09.VisumNetworkRowHandler;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.mzilske.bvg09.StreamingVisumNetworkReader;
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
 
 public class DataPrepare {
 
@@ -198,13 +197,7 @@ public class DataPrepare {
 	private void readVisumNetwork() {
 		visumNetwork = new VisumNetwork();
 		log.info("reading visum network.");
-		try {
-			new VisumNetworkReader(visumNetwork).read(InVisumNetFile);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new VisumNetworkReader(visumNetwork).read(InVisumNetFile);
 	}
 
 	private void writeNetwork() throws IOException,

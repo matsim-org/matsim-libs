@@ -23,9 +23,7 @@ package org.matsim.matrices;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.utils.io.WriterHandler;
-
-interface MatricesWriterHandler extends WriterHandler {
+interface MatricesWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <matrices ... > ... </matrices>
@@ -50,4 +48,6 @@ interface MatricesWriterHandler extends WriterHandler {
 	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException;
 
 	public void endEntry(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

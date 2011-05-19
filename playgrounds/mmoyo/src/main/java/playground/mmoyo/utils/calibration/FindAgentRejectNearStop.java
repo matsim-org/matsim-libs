@@ -154,7 +154,7 @@ public class FindAgentRejectNearStop {
 		double distance = 1000.0;
 		final String type =  "pt";   //options:  "pt" , "car"  "pt+car"
 		
-		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
+		ScenarioImpl scenario = (ScenarioImpl) new DataLoader().loadScenario(configFile);
 		FindAgentRejectNearStop agentsNearStop = new FindAgentRejectNearStop(scenario, distance, type);
 		agentsNearStop.writePlan(badStopsArray[1]);                
 		//agentsNearStop.playAvoidingPopulation(badStopsArray[1]);    

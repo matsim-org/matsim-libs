@@ -39,7 +39,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -51,7 +50,7 @@ public class MyControler1 extends Controler {
 
 	private static final Logger log = Logger.getLogger(MyControler1.class);
 
-	public MyControler1(final ScenarioImpl scenario) {
+	public MyControler1(final Scenario scenario) {
 		super(scenario);
 	}
 
@@ -344,7 +343,7 @@ public class MyControler1 extends Controler {
 		} else {
 			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		}
-		ScenarioImpl scenario = sl.getScenario();
+		Scenario scenario = sl.getScenario();
 
 		loadNetwork(scenario);
 		loadPopulation(scenario);

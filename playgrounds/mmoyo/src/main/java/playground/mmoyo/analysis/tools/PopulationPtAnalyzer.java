@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -14,7 +15,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -162,7 +162,7 @@ public class PopulationPtAnalyzer {
 	
 	private static void loadOneScenario(String configFile){
 		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
+		Scenario scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		//new PopulationPtAnalyzer (scenario, "results.txt").run();
 	}

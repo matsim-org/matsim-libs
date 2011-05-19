@@ -58,9 +58,9 @@ public abstract class AbstractMatsimWriter {
 	 * Opens the specified file for writing.
 	 *
 	 * @param filename
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void openFile(final String filename)  throws IOException {
+	protected void openFile(final String filename) throws UncheckedIOException {
 		if (this.useCompression == null) {
 			this.writer = IOUtils.getBufferedWriter(filename);
 		} else {
@@ -71,13 +71,18 @@ public abstract class AbstractMatsimWriter {
 	/**
 	 * Closes the file if it is still open.
 	 *
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	protected void close() throws IOException {
+	protected void close() throws UncheckedIOException {
 		if (this.writer != null) {
-			this.writer.flush();
-			this.writer.close();
-			this.writer = null;
+			try {
+				this.writer.flush();
+				this.writer.close();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			} finally {
+				this.writer = null;
+			}
 		}
 	}
 }

@@ -28,7 +28,6 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -51,7 +50,7 @@ public class Links2ESRIShape {
 	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
-	private final NetworkImpl network;
+	private final Network network;
 	private final String filename;
 
 
@@ -60,7 +59,7 @@ public class Links2ESRIShape {
 	}
 
 	public Links2ESRIShape(final Network network, final String filename, final FeatureGeneratorBuilder builder) {
-		this.network = (NetworkImpl) network;
+		this.network = network;
 		this.filename = filename;
 		this.featureGenerator = builder.createFeatureGenerator();
 

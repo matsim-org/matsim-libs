@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.gregor.snapshots.writers;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
@@ -40,7 +40,7 @@ public class Sim2DOTFSnapshotGenerator {
 
 	private static String LABEL = null;
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private final String eventsFile;
 
 	private final double startTime;

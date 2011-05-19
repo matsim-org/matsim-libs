@@ -146,7 +146,7 @@ public class TollSchemeGenerator {
 
 	private Config config;
 
-	private NetworkImpl network;
+	private Network network;
 
 	private Coord[] usedCoords;
 
@@ -257,11 +257,7 @@ public class TollSchemeGenerator {
 
 	private void writeRoadPricingScheme(RoadPricingScheme pricingScheme) {
 		RoadPricingWriterXMLv1 pricingSchemeWriter = new RoadPricingWriterXMLv1(pricingScheme);
-		try {
-			pricingSchemeWriter.writeFile(this.usedSchemeOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		pricingSchemeWriter.writeFile(this.usedSchemeOut);
 		log.info("RoadPricingScheme written to: "  + this.usedSchemeOut);
 	}
 
@@ -367,7 +363,7 @@ public class TollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkImpl filterNetwork(final NetworkImpl net, boolean full) {
+	private NetworkImpl filterNetwork(final Network net, boolean full) {
 		NetworkImpl n = NetworkImpl.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];

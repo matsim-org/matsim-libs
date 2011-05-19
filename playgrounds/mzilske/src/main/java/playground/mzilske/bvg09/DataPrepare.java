@@ -19,8 +19,6 @@
 
 package playground.mzilske.bvg09;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -103,44 +101,35 @@ public class DataPrepare {
 
 	protected void convertSchedule() {
 		final VisumNetwork vNetwork = new VisumNetwork();
-		try {
-			log.info("reading visum network.");
-			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
-			log.info("converting visum data to TransitSchedule.");
-			Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+		log.info("reading visum network.");
+		new VisumNetworkReader(vNetwork).read(InVisumNetFile);
+		log.info("converting visum data to TransitSchedule.");
+		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
 
-			// configure how transport modes must be converted
-			// the ones for Berlin
-			converter.registerTransportMode("B", "bus");
-			converter.registerTransportMode("F", TransportMode.walk);
-			converter.registerTransportMode("K", "bus");
-			converter.registerTransportMode("L", "other");
-			converter.registerTransportMode("P", TransportMode.car);
-			converter.registerTransportMode("R", TransportMode.bike);
-			converter.registerTransportMode("S", "train");
-			converter.registerTransportMode("T", "tram");
-			converter.registerTransportMode("U", "train");
-			converter.registerTransportMode("V", "other");
-			converter.registerTransportMode("W", "bus");
-			converter.registerTransportMode("Z", "train");
-			converter.convert();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// configure how transport modes must be converted
+		// the ones for Berlin
+		converter.registerTransportMode("B", "bus");
+		converter.registerTransportMode("F", TransportMode.walk);
+		converter.registerTransportMode("K", "bus");
+		converter.registerTransportMode("L", "other");
+		converter.registerTransportMode("P", TransportMode.car);
+		converter.registerTransportMode("R", TransportMode.bike);
+		converter.registerTransportMode("S", "train");
+		converter.registerTransportMode("T", "tram");
+		converter.registerTransportMode("U", "train");
+		converter.registerTransportMode("V", "other");
+		converter.registerTransportMode("W", "bus");
+		converter.registerTransportMode("Z", "train");
+		converter.convert();
 	}
 
-	private void writeScheduleAndVehicles() throws IOException,
-			FileNotFoundException {
+	private void writeScheduleAndVehicles() {
 		log.info("writing TransitSchedule to file.");
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(IntermediateTransitScheduleWithoutNetworkFile);
 		log.info("writing vehicles to file.");
 		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(OutVehicleFile);
 		new NetworkWriter(this.pseudoNetwork).write(IntermediateTransitNetworkFile);
-		try {
-			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleWithNetworkFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleWithNetworkFile);
 	}
 
 	protected void createNetworkFromSchedule() {
@@ -271,15 +260,7 @@ public class DataPrepare {
 		app.emptyVehicles();
 		app.buildUmlaeufe();
 
-		try {
-			app.writeScheduleAndVehicles();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		app.writeScheduleAndVehicles();
 
 
 		app.mergeNetworks();
@@ -297,15 +278,7 @@ public class DataPrepare {
 		app.emptyVehicles();
 		app.buildUmlaeufe();
 
-		try {
-			app.writeScheduleAndVehicles();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		app.writeScheduleAndVehicles();
 
 
 //		app.mergeNetworks();

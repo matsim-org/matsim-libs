@@ -19,15 +19,15 @@
 
 package playground.gregor.demandmodeling;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class RemoveRoutes {
@@ -36,8 +36,8 @@ public class RemoveRoutes {
 	public static void main(String [] args) {
 
 		String cf = "../../inputs/configs/eafEvac.xml";
-		ScenarioImpl sc = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(cf).getScenario();
-		NetworkImpl net = sc.getNetwork();
+		Scenario sc = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(cf).getScenario();
+		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 
 		new MatsimPopulationReader(sc).readFile(sc.getConfig().plans().getInputFile());

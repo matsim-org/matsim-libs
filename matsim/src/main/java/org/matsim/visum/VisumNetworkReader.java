@@ -21,7 +21,6 @@
 package org.matsim.visum;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -29,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.StringUtils;
 
 
@@ -148,7 +148,7 @@ public class VisumNetworkReader {
 		this.network = network;
 	}
 
-	public void read(final String filename) throws FileNotFoundException, IOException {
+	public void read(final String filename) throws UncheckedIOException {
 		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("ISO-8859-1"));
 
 		try {
@@ -205,7 +205,7 @@ public class VisumNetworkReader {
 			} catch (IOException e2) {
 				this.log.warn("could not close reader.", e2);
 			}
-			throw e;
+			throw new UncheckedIOException(e);
 		}
 
 		try {

@@ -85,13 +85,8 @@ public class OsmTransitMain {
 		reader.run();
 		log.info("Writing network to " + this.networkOutFile);
 		new NetworkWriter(scenario.getNetwork()).write(this.networkOutFile);
-		try {
-			log.info("Writing transit schedule to " + this.transitScheduleOutFile);
-			new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		log.info("Writing transit schedule to " + this.transitScheduleOutFile);
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
 		log.info("Done...");
 	}
 

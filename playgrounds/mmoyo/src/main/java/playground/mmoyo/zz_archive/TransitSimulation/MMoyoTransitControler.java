@@ -1,6 +1,7 @@
 package playground.mmoyo.zz_archive.TransitSimulation;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -9,7 +10,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.matsim.core.controler.Controler;
 
 public class MMoyoTransitControler extends Controler {
 	boolean launchOTFDemo=false;
@@ -45,7 +45,7 @@ public class MMoyoTransitControler extends Controler {
 	public static void main(final String[] args) {
 		if (args.length > 0) {
 			ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]); //load from configFile
-			ScenarioImpl scenario = scenarioLoader.getScenario();
+			ScenarioImpl scenario = (ScenarioImpl) scenarioLoader.getScenario();
 			scenarioLoader.loadScenario();
 			new MMoyoTransitControler(scenario, true).run();
 		} 

@@ -19,7 +19,6 @@
 
 package playground.andreas.P.replan;
 
-import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -44,34 +43,28 @@ public class ReplanTimeSchedule {
 		
 		String eventsFile = pConfig.getCurrentOutputBase() + "ITERS/it.0/0.events.xml.gz";
 		
-		try {
-			TransitSchedule inSchedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-			new TransitScheduleReaderV1(inSchedule, net).readFile(pConfig.getCurrentOutputBase() + "transitSchedule.xml");			
-			TreeMap<Id, Double> scores = ScorePlans.scorePlans(eventsFile, net);
-			
-			for (Entry<Id, TransitLine> entry : inSchedule.getTransitLines().entrySet()) {
-				if(this.population.get(entry.getKey()) == null){
-					this.population.put(entry.getKey(), new SchedulePlans(entry.getKey(), pConfig.getNumberOfPlans()));
-				}
-				
-				this.population.get(entry.getKey()).addTransitPlan(entry.getValue(), scores.get(entry.getKey()));
+		TransitSchedule inSchedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
+		new TransitScheduleReaderV1(inSchedule, net).readFile(pConfig.getCurrentOutputBase() + "transitSchedule.xml");			
+		TreeMap<Id, Double> scores = ScorePlans.scorePlans(eventsFile, net);
+		
+		for (Entry<Id, TransitLine> entry : inSchedule.getTransitLines().entrySet()) {
+			if(this.population.get(entry.getKey()) == null){
+				this.population.put(entry.getKey(), new SchedulePlans(entry.getKey(), pConfig.getNumberOfPlans()));
 			}
 			
-			inSchedule = TransitScheduleCleaner.removeAllLines(inSchedule);
-			
-			for (SchedulePlans plan : this.population.values()) {
-				if(plan.getBestPlan() != null){
-					inSchedule.addTransitLine(plan.getBestPlan());
-				} else {
-					inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine(net, inSchedule, plan.getAgentId()));
-				}				
-			}			
-			new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+			this.population.get(entry.getKey()).addTransitPlan(entry.getValue(), scores.get(entry.getKey()));
+		}
+		
+		inSchedule = TransitScheduleCleaner.removeAllLines(inSchedule);
+		
+		for (SchedulePlans plan : this.population.values()) {
+			if(plan.getBestPlan() != null){
+				inSchedule.addTransitLine(plan.getBestPlan());
+			} else {
+				inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine(net, inSchedule, plan.getAgentId()));
+			}				
+		}	
+		new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");
 	}
 
 }

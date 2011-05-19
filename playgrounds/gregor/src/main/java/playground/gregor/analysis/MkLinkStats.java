@@ -40,12 +40,12 @@ public class MkLinkStats {
 		String eventsFile = outDir + "/ITERS/it." + it + "/" + it + ".events.txt.gz";
 		String stats =  outDir + "/ITERS/it." + it + "/" + it + ".linkstats.txt.gz";
 		
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(outDir + "/output_config.xml.gz").getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(outDir + "/output_config.xml.gz").getScenario();
 		
 		NetworkImpl netzzz = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(net);
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer h = new VolumesAnalyzer(60,5*3600,netzzz);
 		CalcLinkStats ls = new CalcLinkStats(netzzz);
 		events.addHandler(h);

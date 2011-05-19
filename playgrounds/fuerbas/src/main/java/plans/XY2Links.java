@@ -98,7 +98,7 @@ public class XY2Links {
 		parseArguments(args);
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
 		sl.loadNetwork();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		NetworkImpl network = (NetworkImpl) sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();

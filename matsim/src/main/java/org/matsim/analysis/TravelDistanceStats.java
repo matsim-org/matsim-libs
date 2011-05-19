@@ -21,7 +21,6 @@
 package org.matsim.analysis;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -41,6 +40,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -82,15 +82,18 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	 * @param population
 	 * @param filename
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Population population, final Network network, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
+	public TravelDistanceStats(final Population population, final Network network, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.population = population;
 		this.network = network;
 		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);
-		this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+		try {
+			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override

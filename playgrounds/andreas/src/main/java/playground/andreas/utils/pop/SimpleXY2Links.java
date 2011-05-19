@@ -83,7 +83,7 @@ public class SimpleXY2Links {
 		scenario.getConfig().plans().setInputFile(this.plansfileIN);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
 		sl.loadNetwork();
-		NetworkImpl network = sl.getScenario().getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);

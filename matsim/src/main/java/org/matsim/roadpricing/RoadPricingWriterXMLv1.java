@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -41,7 +42,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		this.scheme = scheme;
 	}
 
-	public void writeFile(final String filename) throws IOException {
+	public void writeFile(final String filename) throws UncheckedIOException {
 		openFile(filename);
 		writeXmlHead();
 		writeDoctype("roadpricing", DEFAULT_DTD_LOCATION + "roadpricing_v1.dtd");
@@ -49,45 +50,49 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		close();
 	}
 
-	private void write() throws IOException {
-		this.writer.write("<roadpricing type=\"" + this.scheme.getType() + "\" name=\"" + this.scheme.getName() + "\">\n");
+	private void write() throws UncheckedIOException {
+		try {
+			this.writer.write("<roadpricing type=\"" + this.scheme.getType() + "\" name=\"" + this.scheme.getName() + "\">\n");
 
-		// description
-		this.writer.write("\t<description>" + this.scheme.getDescription() + "</description>\n");
-
-		// links
-		this.writer.write("\t<links>\n");
-		for (Id linkId : this.scheme.getLinkIds().keySet()) {
-		  List<Cost> cs = this.scheme.getLinkIds().get(linkId);
-		  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
-		  if (cs == null) {
-		    this.writer.write("/>\n");
-		  }
-		  else {
-		    this.writer.write(">\n");
-		    for (Cost c : cs) {
-		      this.writeCost(c);
-		    }
-		    this.writer.write("</link>");
-		  }
+			// description
+			this.writer.write("\t<description>" + this.scheme.getDescription() + "</description>\n");
+	
+			// links
+			this.writer.write("\t<links>\n");
+			for (Id linkId : this.scheme.getLinkIds().keySet()) {
+			  List<Cost> cs = this.scheme.getLinkIds().get(linkId);
+			  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
+			  if (cs == null) {
+			    this.writer.write("/>\n");
+			  }
+			  else {
+			    this.writer.write(">\n");
+			    for (Cost c : cs) {
+			      this.writeCost(c);
+			    }
+			    this.writer.write("</link>");
+			  }
+			}
+			this.writer.write("\t</links>\n");
+	
+			// cost
+			if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
+				this.writer.write("\t<!-- amount: [monetary unit] / [link length unit] -->\n");
+			} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
+				this.writer.write("\t<!-- amount: [monetary unit] / [simulation] -->\n");
+			} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
+				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
+			}
+	
+			for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
+			  this.writeCost(cost);
+			}
+	
+			// finish
+			this.writer.write("</roadpricing>");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		this.writer.write("\t</links>\n");
-
-		// cost
-		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
-			this.writer.write("\t<!-- amount: [monetary unit] / [link length unit] -->\n");
-		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
-			this.writer.write("\t<!-- amount: [monetary unit] / [simulation] -->\n");
-		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
-			this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
-		}
-
-		for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
-		  this.writeCost(cost);
-		}
-
-		// finish
-		this.writer.write("</roadpricing>");
 	}
 	
 	private void writeCost(Cost cost) throws IOException {

@@ -23,7 +23,6 @@
  */
 package playground.yu.test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -720,12 +719,7 @@ public class BusLineAllocator {
 					idRoutePair.getValue().setRoute(idRoutes.get(id));
 			}
 
-		try {
-			new TransitScheduleWriter(this.schedule)
-					.writeFile(newTransitScheduleFilename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleWriter(this.schedule).writeFile(newTransitScheduleFilename);
 	}
 
 	private Map<Id, List<Id>/* path */> convertResult() {

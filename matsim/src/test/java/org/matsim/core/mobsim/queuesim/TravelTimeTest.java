@@ -25,6 +25,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -54,7 +55,7 @@ public class TravelTimeTest {
 
 		sl.loadScenario();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		QueueSimulationFactory.createMobsimStatic(data, events).run();
@@ -72,7 +73,7 @@ public class TravelTimeTest {
 	public void testEquilTwoAgents() {
 		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
-		ScenarioImpl data = sl.getScenario();
+		Scenario data = sl.getScenario();
 		Config conf = data.getConfig();
 
 		String popFileName = "test/scenarios/equil/plans2.xml";
@@ -80,7 +81,7 @@ public class TravelTimeTest {
 
 		sl.loadScenario();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		QueueSimulationFactory.createMobsimStatic(data, events).run();

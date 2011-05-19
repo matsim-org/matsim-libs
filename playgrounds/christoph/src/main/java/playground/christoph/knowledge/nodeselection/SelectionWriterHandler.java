@@ -28,11 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.io.WriterHandler;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 
-public interface SelectionWriterHandler extends WriterHandler {
+public interface SelectionWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <selection ... > ... </selection>
@@ -89,4 +88,6 @@ public interface SelectionWriterHandler extends WriterHandler {
 	public void links(final Map<Id, Link> links, final BufferedWriter out) throws IOException;
 	
 	public void endLinks(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

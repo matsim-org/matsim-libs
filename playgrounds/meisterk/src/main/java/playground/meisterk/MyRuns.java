@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -453,7 +454,7 @@ public class MyRuns {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 
-		ScenarioImpl scenario = loader.getScenario();
+		Scenario scenario = loader.getScenario();
 		Population population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);

@@ -35,7 +35,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 	//////////////////////////////////////////////////////////////////////
 
 	private final Config config;
-	private ConfigWriterHandler handler = null;
+	private ConfigWriterHandlerImplV1 handler = null;
 	private String dtd = null;
 
 	//////////////////////////////////////////////////////////////////////
@@ -66,9 +66,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public final void writeStream(final java.io.Writer writer, final String newline) {
 		try {
-			if (this.handler instanceof ConfigWriterHandlerImplV1) {
-				((ConfigWriterHandlerImplV1) this.handler).setNewline(newline);
-			}
+			this.handler.setNewline(newline);
 			this.writer = new BufferedWriter(writer);
 			write();
 			this.writer.flush();
@@ -79,15 +77,10 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 	}
 
 	@Override
-	public final void write(final String filename) {
-		try {
-			openFile(filename);
-			write();
-			close();
-		}
-		catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+	public final void write(final String filename) throws UncheckedIOException {
+		openFile(filename);
+		write();
+		close();
 	}
 
 	private final void write() {

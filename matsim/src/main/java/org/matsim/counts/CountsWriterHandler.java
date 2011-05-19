@@ -22,9 +22,7 @@ package org.matsim.counts;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.utils.io.WriterHandler;
-
-interface CountsWriterHandler extends WriterHandler {
+interface CountsWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	// <counts ... > ... </counts>
 	//////////////////////////////////////////////////////////////////////
@@ -40,4 +38,6 @@ interface CountsWriterHandler extends WriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException;
 	public void endVolume(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

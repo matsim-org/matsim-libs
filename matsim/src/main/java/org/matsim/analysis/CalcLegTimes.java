@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +36,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -47,6 +49,8 @@ import org.matsim.core.utils.misc.Time;
  */
 public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
+	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
+	
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
@@ -124,22 +128,19 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 
 	public void writeStats(final String filename) {
 		BufferedWriter legStatsFile = null;
-		try {
-			legStatsFile = IOUtils.getBufferedWriter(filename);
-			writeStats(legStatsFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		legStatsFile = IOUtils.getBufferedWriter(filename);
+		writeStats(legStatsFile);
 		try {
 			if (legStatsFile != null) {
 				legStatsFile.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
-	public void writeStats(final java.io.Writer out) throws IOException {
+	public void writeStats(final java.io.Writer out) throws UncheckedIOException {
+		try {
 		boolean first = true;
 		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
 			String key = entry.getKey();
@@ -167,7 +168,15 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
 		}
 		out.write("\n");
-		out.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			try {
+				out.flush();
+			} catch (IOException e) {
+				log.error(e);
+			}
+		}
 	}
 
 }

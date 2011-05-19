@@ -29,9 +29,10 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	private final CoordsConverter converter = new CoordsConverter(new Ellipsoid("Bessel", 3, 52.4186482777778, 13.6272036666667));
 
+	@Override
 	public Coord transform(final Coord coord) {
 
-		return this.converter.RH2BL(coord.getX()-40000, coord.getY()-10000);
+		return this.converter.rh2bl(coord.getX()-40000, coord.getY()-10000);
 	}
 
 	/* The following inner classes are taken from
@@ -63,20 +64,20 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 
 	private static class CoordsConverter {
-	  private Ellipsoid Ell = null;
+	  private Ellipsoid ell = null;
 	  private static final double rho=180.0/Math.PI;
 
 	  public CoordsConverter(){  }
 
-	  public CoordsConverter(final Ellipsoid Ell){
-	    this.Ell = Ell;
+	  public CoordsConverter(final Ellipsoid ell){
+	    this.ell = ell;
 	  }
 
 	  //Meridianbogenlaenge G aus ellipsoidischen Breite B
 	  private double calcMeridianArcLength(final double B, final int index){
 	    double E[] = new double[6];
-	    double e2 = this.Ell.getE2();
-	    double c = this.Ell.getC();
+	    double e2 = this.ell.getE2();
+	    double c = this.ell.getC();
 	    E[0] = c / rho * (1.0-3.0/4.0*Math.pow(e2,2) +  45.0/64.0*Math.pow(e2,4) -  175.0/256.0*Math.pow(e2,6) + 11025.0/16384.0*Math.pow(e2,8) -  43659.0/65536.0*Math.pow(e2,10));
 	    E[1] = c            * (   -3.0/8.0*Math.pow(e2,2) +  15.0/32.0*Math.pow(e2,4) - 525.0/1024.0*Math.pow(e2,6) +   2205.0/4096.0*Math.pow(e2,8) - 72765.0/131072.0*Math.pow(e2,10));
 	    E[2] = c            * (                             15.0/256.0*Math.pow(e2,4) - 105.0/1024.0*Math.pow(e2,6) +  2205.0/16384.0*Math.pow(e2,8) -  10395.0/65536.0*Math.pow(e2,10));
@@ -92,7 +93,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  private double calcEllLatitude(final double G, final double B) {
 	    //double sigma = (G+B)/this.calcMeridianArcLength(B,0);
 	    double sigma = G/this.calcMeridianArcLength(B,0);
-	    double e2 = this.Ell.getE2();
+	    double e2 = this.ell.getE2();
 	    double F[] = new double[3];
 	    F[0] = rho * (3.0/8.0*Math.pow(e2,2) - 3.0/16.0*Math.pow(e2,4) + 213.0/2048.0*Math.pow(e2,6) -  255.0/4096.0*Math.pow(e2,8));
 	    F[1] = rho * (                       21.0/256.0*Math.pow(e2,4) -   21.0/256.0*Math.pow(e2,6) +  533.0/8192.0*Math.pow(e2,8));
@@ -101,14 +102,14 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	    return sigma + F[0]*Math.sin(2*sigma/rho) + F[1]*Math.sin(4*sigma/rho) + F[2]*Math.sin(6*sigma/rho);
 	  }
 
-	  public Coord BL2RH(final double b, final double l){
+	  public Coord bl2rh(final double b, final double l){
 	  	Coord p = new CoordImpl(0, 0);
-	    if (!this.Ell.isSoldner()) {
-	      int kz = (int)((l+(this.Ell.getDEG()==3?0.5:1)*this.Ell.getDEG())/this.Ell.getDEG());
+	    if (!this.ell.isSoldner()) {
+	      int kz = (int)((l+(this.ell.getDEG()==3?0.5:1)*this.ell.getDEG())/this.ell.getDEG());
 	      //int kz = (int)((P.getLongitude()+0.5*this.Ell.getDEG())/this.Ell.getDEG());
-	      double N = this.Ell.getN(b);
-	      double eta2 = Math.pow(this.Ell.getEta(b),2);
-	      double L0 = kz*this.Ell.getDEG()-(this.Ell.getDEG()==3?0:3);
+	      double N = this.ell.getN(b);
+	      double eta2 = Math.pow(this.ell.getEta(b),2);
+	      double L0 = kz*this.ell.getDEG()-(this.ell.getDEG()==3?0:3);
 	      double dL = l - L0;
 	      double t = Math.tan(b/rho);
 	      double x[] = new double[4];
@@ -123,20 +124,20 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      y[2] = 1.0/( 120.0*Math.pow(rho,5)) * N * Math.pow(Math.cos(l/rho),5) * (5.0-18.0  *Math.pow(t,2) + Math.pow(t,4));
 	      y[3] = 1.0/(5040.0*Math.pow(rho,7)) * N * Math.pow(Math.cos(l/rho),7) * (61.0-479.0*Math.pow(t,2) + 179.0*Math.pow(t,4) - Math.pow(t,6));
 
-	      p.setY(this.Ell.getScale()*(x[0]    + x[1]*Math.pow(dL,2) + x[2]*Math.pow(dL,4) + x[3]*Math.pow(dL,6)));
-	      p.setX( this.Ell.getScale()*(y[0]*dL + y[1]*Math.pow(dL,3) + y[2]*Math.pow(dL,5) + y[3]*Math.pow(dL,7)) + 500000.0 + kz*1000000.0);
+	      p.setY(this.ell.getScale()*(x[0]    + x[1]*Math.pow(dL,2) + x[2]*Math.pow(dL,4) + x[3]*Math.pow(dL,6)));
+	      p.setX( this.ell.getScale()*(y[0]*dL + y[1]*Math.pow(dL,3) + y[2]*Math.pow(dL,5) + y[3]*Math.pow(dL,7)) + 500000.0 + kz*1000000.0);
 	    }
 
 	    else {
 	      double x,y,xB,N,t,cosB,eta,B0,L0,dl;
-	      B0 = this.Ell.getB0();
-	      L0 = this.Ell.getL0();
+	      B0 = this.ell.getB0();
+	      L0 = this.ell.getL0();
 	      dl = l-L0;
 	      xB = this.calcMeridianArcLength(b,-1) - this.calcMeridianArcLength(B0,-1);
 	      t  = Math.tan(b/rho);
 	      cosB = Math.cos(b/rho);
-	      eta  = this.Ell.getEta(b);
-	      N    = this.Ell.getN(b);
+	      eta  = this.ell.getEta(b);
+	      N    = this.ell.getN(b);
 
 	      x  = 0.5*N*Math.pow(cosB,2)*t*Math.pow(dl,2)/Math.pow(rho,2);
 	      x += N*Math.pow(cosB,4)*t*(5.0-Math.pow(t,2)+5.0*Math.pow(eta,2))*Math.pow(dl,4)/(24.0*Math.pow(rho,4));
@@ -151,28 +152,28 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	    return p;
 	  }
 
-	  public Coord RH2BL(final double r, final double h){
+	  public Coord rh2bl(final double r, final double h){
 	  	Coord p = new CoordImpl(0, 0);
 
-	    if (!this.Ell.isSoldner()) {
+	    if (!this.ell.isSoldner()) {
 	      int kz;
 
 	      double G, y0, N, eta2;
 	      double B[] = new double[4];
 	      double L[] = new double[4];
-	      G  = h/this.Ell.getScale();
+	      G  = h/this.ell.getScale();
 	      kz = (int)(r/1000000.0);
-	      y0 = (r-500000.0-1000000.0*kz)/this.Ell.getScale();
+	      y0 = (r-500000.0-1000000.0*kz)/this.ell.getScale();
 
 	      B[0] =  this.calcEllLatitude(G, 0.0);
 
-	      N = this.Ell.getN(B[0]);
-	      eta2 = Math.pow(this.Ell.getEta(B[0]),2);
+	      N = this.ell.getN(B[0]);
+	      eta2 = Math.pow(this.ell.getEta(B[0]),2);
 	      B[1] = -rho/(  2*Math.pow(N,2)) * Math.tan(B[0]/rho) * (    1+eta2);
 	      B[2] =  rho/( 24*Math.pow(N,4)) * Math.tan(B[0]/rho) * (  5+3*Math.pow(Math.tan(B[0]/rho),2)+ 6*eta2*(1-Math.pow(Math.tan(B[0]/rho),2)));
 	      B[3] = -rho/(720*Math.pow(N,6)) * Math.tan(B[0]/rho) * (61+90*Math.pow(Math.tan(B[0]/rho),2)+45*Math.pow(Math.tan(B[0]/rho),4));
 
-	      L[0] =  (kz-(this.Ell.isUTM()?30:0))*this.Ell.getDEG()-(this.Ell.getDEG()-3);
+	      L[0] =  (kz-(this.ell.isUTM()?30:0))*this.ell.getDEG()-(this.ell.getDEG()-3);
 	      L[1] =  rho/(             N   *Math.cos(B[0]/rho));
 	      L[2] = -rho/(  6*Math.pow(N,3)*Math.cos(B[0]/rho)) * (1+ 2*Math.pow(Math.tan(B[0]/rho),2)+eta2);
 	      L[3] =  rho/(120*Math.pow(N,5)*Math.cos(B[0]/rho)) * (5+28*Math.pow(Math.tan(B[0]/rho),2)+24*Math.pow(Math.tan(B[0]/rho),4));
@@ -183,16 +184,16 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 
 	    else {
 	      double GF, BF, VF, B, L, NF, B0, L0, x=h, y=r, tF, etaF, l;
-	      B0 = this.Ell.getB0();
-	      L0 = this.Ell.getL0();
+	      B0 = this.ell.getB0();
+	      L0 = this.ell.getL0();
 	      GF = this.calcMeridianArcLength(B0,-1) + x;
 	      BF = this.calcEllLatitude(GF, this.calcMeridianArcLength(B0,0));
 
 	      tF = Math.tan(BF/rho);
-	      VF = this.Ell.getV(BF);
-	      NF = this.Ell.getN(BF);
+	      VF = this.ell.getV(BF);
+	      NF = this.ell.getN(BF);
 
-	      etaF = this.Ell.getEta(BF);
+	      etaF = this.ell.getEta(BF);
 
 	      B  = 0.5 * Math.pow(VF,2) * tF * rho / Math.pow(NF,2) * Math.pow(y,2);
 	      B -= Math.pow(VF,2) * tF * (1.0 + 3.0*Math.pow(tF,2) + Math.pow(etaF,2) - 9.0*Math.pow(etaF,2)*Math.pow(tF,2)) * rho / (24.0*Math.pow(NF,4)) * Math.pow(y,4);
@@ -219,7 +220,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  private int deg = 6;
 	  private boolean isUTM = false, isSoldner = false;
 	  private static final double roh=180.0/Math.PI;
-	  private double B0 = 0.0, L0 = 0.0;
+	  private double b0 = 0.0, l0 = 0.0;
 	  public Ellipsoid(final String ellName){
 	    this(ellName, 6, false);
 	  }
@@ -228,11 +229,11 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	    this(ellName, deg, false);
 	  }
 
-	  public Ellipsoid(final String ellName, final int deg, final double B0, final double L0){
+	  public Ellipsoid(final String ellName, final int deg, final double b0, final double l0){
 	    this(ellName, deg, false);
 	    this.isSoldner = true;
-	    this.B0 = B0;
-	    this.L0 = L0;
+	    this.b0 = b0;
+	    this.l0 = l0;
 	  }
 
 	  public Ellipsoid(final String ellName, final int deg, final boolean isUTM){
@@ -310,17 +311,17 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  }
 	  //Nullpunkt des Soldnersytems B
 	  public double getB0() {
-	    return this.B0;
+	    return this.b0;
 	  }
 	  //Nullpunkt des Soldnersytems L
 	  public double getL0() {
-	    return this.L0;
+	    return this.l0;
 	  }
-	  public void setB0(final double B0) {
-	    this.B0 = B0;
+	  public void setB0(final double b0) {
+	    this.b0 = b0;
 	  }
-	  public void setL0(final double L0) {
-	    this.L0 = L0;
+	  public void setL0(final double l0) {
+	    this.l0 = l0;
 	  }
 
 	  @Override

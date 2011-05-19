@@ -36,7 +36,9 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -45,8 +47,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -73,7 +73,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private final static double MIN_Y = 9892835;
 
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final String eventsFile;
 	private double oldTime = 3 * 3600;
 
@@ -84,7 +84,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	private FeatureType ft;
 	private final Concaver concaver;
 
-	public StaticSnapshotGenerator(final NetworkImpl network, final String inputFile, final String shapeFilePrefix, final CoordinateReferenceSystem targetCRS) {
+	public StaticSnapshotGenerator(final Network network, final String inputFile, final String shapeFilePrefix, final CoordinateReferenceSystem targetCRS) {
 		this.network = network;
 		this.eventsFile = inputFile;
 		this.shapeFilePrefix = shapeFilePrefix;
@@ -116,7 +116,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 	public void run(){
 		this.agentsOnLink.clear();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventsFile);
 	}
@@ -193,12 +193,12 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 		if (args.length != 1) {
 			throw new RuntimeException("Error using StaticSnapshotGenerator!\n\tUsage:StaticSnapshotGenerator /path/to/configFile");
 		}
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario();
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario();
 		Config config = scenario.getConfig();
 
 		final String shapeFilePrefix =  CVSROOT + "/runs/run314/qgis/evacProgress";
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		final CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);

@@ -20,11 +20,11 @@ OTFVisMobsimFeature * project: org.matsim.*
 
 package playground.mmoyo.demo;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 
@@ -32,8 +32,8 @@ import playground.mmoyo.utils.DataLoader;
 
 public class ScenarioPlayer {
 
-	public static void play(final ScenarioImpl scenario) {
-		final EventsManager events = (EventsManager) EventsUtils.createEventsManager() ;
+	public static void play(final Scenario scenario) {
+		final EventsManager events = EventsUtils.createEventsManager() ;
 		EventWriterXML writer = new EventWriterXML(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.xml");
 		EventWriterTXT writertxt = new EventWriterTXT(scenario.getConfig().controler().getOutputDirectory() + "/testEvents.txt");
 		events.addHandler(writer);
@@ -56,7 +56,7 @@ public class ScenarioPlayer {
 		}else{
 			configFile = args[0];
 		}
-		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
+		Scenario scenario = new DataLoader().loadScenario(configFile);
 		play(scenario);
 	}
 

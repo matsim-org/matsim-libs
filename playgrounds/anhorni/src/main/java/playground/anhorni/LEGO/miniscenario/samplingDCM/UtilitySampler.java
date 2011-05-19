@@ -19,9 +19,9 @@
 
 package playground.anhorni.LEGO.miniscenario.samplingDCM;
 
-import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -56,7 +56,7 @@ public class UtilitySampler {
 	}
 	
 	private void init() {	
-		ScenarioImpl scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
+		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
 				"src/main/java/playground/anhorni/input/LEGO/config.xml").getScenario();
 		this.config = scenario.getConfig();
 		

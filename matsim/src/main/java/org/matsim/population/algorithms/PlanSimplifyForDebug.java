@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -65,7 +65,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final NetworkImpl network) {
+	public PlanSimplifyForDebug(final Network network) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 

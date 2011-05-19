@@ -150,14 +150,8 @@ public class ControlerMFeil extends Controler {
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
 		// optional: score stats
-		try {
-			this.scoreStats = new ScoreStats(this.population, super.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
-			this.addControlerListener(this.scoreStats);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		this.scoreStats = new ScoreStats(this.population, super.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+		this.addControlerListener(this.scoreStats);
 
 		// optional: travel distance stats
 		try {

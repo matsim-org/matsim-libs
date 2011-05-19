@@ -2,7 +2,6 @@ package playground.mmoyo.analysis.tools;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**Counts the number of original agents and expanded agents */ 
@@ -45,7 +44,7 @@ public class ExpandedPopulationAnalyzer {
 		}
 		
 		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		ScenarioImpl scenario = scenarioLoader.getScenario();
+		Scenario scenario = scenarioLoader.getScenario();
 		scenarioLoader.loadScenario();
 		new ExpandedPopulationAnalyzer(scenario).count();
 	}

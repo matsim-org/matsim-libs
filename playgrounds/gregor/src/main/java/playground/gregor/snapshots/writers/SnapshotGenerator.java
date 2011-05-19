@@ -28,7 +28,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -43,7 +45,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -54,7 +55,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
 	private final static Logger log = Logger.getLogger(SnapshotGenerator.class);
 
-	private final NetworkImpl network;
+	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
 	protected final HashMap<Id, EventLink> eventLinks;
@@ -68,7 +69,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	private final double endTime;
 	private double visOutputMod;
 
-	public SnapshotGenerator(ScenarioImpl sc, MVISnapshotWriter writer) {
+	public SnapshotGenerator(Scenario sc, MVISnapshotWriter writer) {
 		this.network = sc.getNetwork();
 		this.eventLinks = new HashMap<Id, EventLink>((int)(this.network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
@@ -130,7 +131,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize(), this.storageCapFactor));
+			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, ((NetworkImpl) this.network).getEffectiveCellSize(), this.storageCapFactor));
 		}
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;

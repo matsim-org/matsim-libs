@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.ptproject.qsim.QSim;
@@ -53,14 +54,14 @@ public class CottbusLiveVis {
 	private void runCottbus() {
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		loader.loadScenario();
-		ScenarioImpl scenario = loader.getScenario();
+		Scenario scenario = loader.getScenario();
 		
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork()));
+		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalc)));
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = new QSim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){

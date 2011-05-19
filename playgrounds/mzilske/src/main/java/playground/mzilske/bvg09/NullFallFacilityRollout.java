@@ -148,13 +148,7 @@ public class NullFallFacilityRollout {
 	private void readVisumNetwork()  {
 		vNetwork = new VisumNetwork();
 		log.info("reading visum network.");
-		try {
-			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		new VisumNetworkReader(vNetwork).read(InVisumNetFile);
 	}
 
 	private void copyRoutes() {
@@ -307,11 +301,7 @@ public class NullFallFacilityRollout {
 		new TransitScheduleWriterV1(outScenario.getTransitSchedule()).write(OutTransitScheduleFile);
 		log.info("writing vehicles to file.");
 		new VehicleWriterV1(outScenario.getVehicles()).writeFile(OutVehicleFile);
-		try {
-			new TransitScheduleWriter(outScenario.getTransitSchedule()).writeFile(OutTransitScheduleFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new TransitScheduleWriter(outScenario.getTransitSchedule()).writeFile(OutTransitScheduleFile);
 	}
 
 	private void emptyVehicles() {
