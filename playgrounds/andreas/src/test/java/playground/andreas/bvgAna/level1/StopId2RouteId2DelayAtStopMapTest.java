@@ -66,13 +66,31 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    // to be completed
 	    
 	    /**
-	     * @TODO complete tests, current version does not work
+	     * @TODO complete tests, first tests working now
 	     */
 	    
-	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().toString());
+	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).toString());
 	    
-//	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getVehicleId()).toString());
-//	        
+	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getLineId());
+	    
+	    Assert.assertEquals(transitLineId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getLineId());
+	    
+	    Assert.assertEquals(transitRouteId1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRouteId());
+	    
+	    Assert.assertEquals(1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(transitRouteId1).getRealizedDepartures().size());
+	    
+	    
+	    
+	    
+	    String test1 = "{"+transitRouteId1+"=Stop: "+event1.getFacilityId()+", Line: "+transitLineId1+", Route: "+transitRouteId1+", # planned Departures: 1, # realized Departures: 1}";
+	    System.out.println(test1);
+	    
+	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event2.getFacilityId()).toString());
+	    
+
+
+	    
+	    
 //	    System.out.println(test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getFacilityId()).getRealizedDepartures().get(0));
 //	    
 //	    Assert.assertEquals(event1, test.getStopId2RouteId2DelayAtStopMap().get(event1.getFacilityId()).get(event1.getFacilityId()).getRealizedDepartures().get(0));
