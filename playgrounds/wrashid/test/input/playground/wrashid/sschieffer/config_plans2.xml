@@ -16,7 +16,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test\scenarios\equil\plans1.xml" />
+		<param name="inputPlansFile" value="test/scenarios/equil/plans2.xml" />
 	</module>
 
 	<module name="controler">

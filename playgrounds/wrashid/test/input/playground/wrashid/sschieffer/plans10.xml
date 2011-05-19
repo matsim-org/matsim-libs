@@ -1,0 +1,206 @@
+<?xml version='1.0' ?> <!DOCTYPE plans SYSTEM 'http://www.matsim.org/files/dtd/plans_v4.dtd'> 
+ 
+<plans xml:lang='de-CH'> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='1'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='2'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='3'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='4'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='5'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='6'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='7'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='8'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='9'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ 
+<person id='10'> 
+<plan selected='yes'> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' end_time='06:00:00' /> 
+<leg num='0' mode='car' dep_time='06:00:00'> 
+<route dist='15000.0'> 
+2 7 12  
+</route> 
+</leg> 
+<act type='w' link='20' facility='20' x='10000.0' y='0.0' dur='08:00:00' /> 
+<leg num='1' mode='car' dep_time='14:00:00'> 
+<route dist='55000.0'> 
+13 14 15 1  
+</route> 
+</leg> 
+<act type='h' link='1' facility='1' x='-25000.0' y='0.0' /> 
+</plan> 
+</person> 
+ 
+<!-- ====================================================================== --> 
+ </plans> 
