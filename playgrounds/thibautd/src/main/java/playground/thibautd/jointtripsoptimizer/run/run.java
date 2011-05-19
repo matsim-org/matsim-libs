@@ -19,16 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.run;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
 
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-
-import playground.thibautd.jointtripsoptimizer.population.CliquesXmlReader;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-
-import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
 
 /**
  * Class responsible of running the custom controler for joint planning
@@ -41,36 +34,11 @@ public class run {
 	 */
 	public static void main(String[] args) {
 		String configFile = args[0];
-		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
-		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
 
-		Config config = new Config();
-		JointControler controler = null;
-		ScenarioWithCliques scenario = null;
-
-		// /////////////////////////////////////////////////////////////////////
-		// initialize the config before passing it to the controler
-		config.addCoreModules();
-		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
-		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
-
-		//read the config file
-		//(new MatsimConfigReader(controler.getConfig())).readFile(args[0]);
-		(new MatsimConfigReader(config)).readFile(configFile);
-
-		scenario = new ScenarioWithCliques(config);
-
-		(new ScenarioLoaderImpl(scenario)).loadScenario();
-		try {
-			new CliquesXmlReader(scenario).parse();
-		} catch (Exception e) {
-			throw new RuntimeException("Problem while importing clique information:"
-					+" "+e.getMessage());
-		}
-
-		controler = new JointControler(scenario);
+		Controler controler = JointControlerUtils.createControler(configFile);
 		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new JointReplanningControlerListener());
+		//controler.addControlerListener(new JointReplanningControlerListener());
+
 		controler.run();
 	}
 }
