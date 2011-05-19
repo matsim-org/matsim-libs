@@ -36,7 +36,7 @@ public class DecentralizedChargingSimulation {
 	
 	public static String outputPath;
 	
-	public static double bufferBatteryCharge, minChargingLength;
+	public static double bufferBatteryCharge, standardChargingLength;
 	
 	public static MappingClass myMappingClass;
 	
@@ -52,7 +52,7 @@ public class DecentralizedChargingSimulation {
 	public static double xPercentNone;
 	public static double xPercentDown;
 	public static double xPercentDownUp;
-	
+	public static double electrification;
 	public static boolean LPoutput;
 	
 	/**
@@ -63,7 +63,7 @@ public class DecentralizedChargingSimulation {
 	 * @param ev
 	 * @param combustion
 	 * @param bufferBatteryCharge
-	 * @param minChargingLength
+	 * @param standardChargingLength
 	 * @param myMappingClass
 	 * @param loadPricingCollector
 	 * @throws IOException 
@@ -71,18 +71,21 @@ public class DecentralizedChargingSimulation {
 	 * @throws FunctionEvaluationException 
 	 * @throws ConvergenceException 
 	 */
-	public DecentralizedChargingSimulation(String configPath, 
+	public DecentralizedChargingSimulation(
+			String configPath, 
 			String outputPath,  
-			double phev, double ev, double combustion,
+			double electrification, 
+			double ev,
 			double bufferBatteryCharge,
-			double minChargingLength,
+			double standardChargingLength,
 			MappingClass myMappingClass,
 			ArrayList<HubInfo> myHubInfo,
-			boolean LPoutput) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+			boolean LPoutput
+			) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.outputPath=outputPath;
 		this.bufferBatteryCharge=bufferBatteryCharge;
-		this.minChargingLength=minChargingLength;
+		this.standardChargingLength=standardChargingLength;
 		this.myMappingClass=myMappingClass;
 		this.LPoutput=LPoutput;
 		
@@ -96,8 +99,8 @@ public class DecentralizedChargingSimulation {
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
 		energyInit= new EnergyConsumptionInit(
-				phev, ev, combustion);
-		
+				electrification, ev);
+		this.electrification=electrification;
 		controler.addControlerListener(energyInit);
 		controler.setOverwriteFiles(true);
 		}

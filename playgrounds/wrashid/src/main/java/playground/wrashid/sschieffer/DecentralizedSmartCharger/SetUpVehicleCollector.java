@@ -38,9 +38,18 @@ public class SetUpVehicleCollector {
 		 * - emissions of Co2 per liter gas [kg]
 		 
 		 */
-		double gasPricePerLiter= 0.25; 
-		double gasJoulesPerLiter = 43.0*1000000.0;// Benzin 42,7–44,2 MJ/kg
-		double emissionPerLiter = 23.2/10; // 23,2kg/10l= xx/mass   1kg=1l
+		
+		/**
+		 * NORMAL GAS
+		 */
+		double gasPricePerLiter= 1.70; //http://www.tanktipp.ch/
+		//JoulesPerLiter = theoretisch moegliche Energie * Wirkungsgrad; 
+		//http://de.wikipedia.org/wiki/Wirkungsgrad
+		
+		//http://de.wikipedia.org/wiki/Motorenbenzin
+		double gasJoulesPerLiter = 43.0*Math.pow(10,6);// Benzin 42,7–44,2 MJ/kg  * 0.3
+		double massPerLiter=0.75;// kg/l
+		double emissionPerLiter = 2.36; // 2,36 kg/L
 		
 		GasType normalGas=new GasType("normal gas", 
 				gasJoulesPerLiter, 
@@ -87,14 +96,16 @@ public class SetUpVehicleCollector {
 		VehicleType EVTypeStandard= new VehicleType("standard EV", 
 				EVBattery, 
 				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
+				ElectricVehicle.class,
+				80000,
+				0.3);// Nissan leaf 80kW Engine
 		
 		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
 				PHEVBattery, 
 				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
+				PlugInHybridElectricVehicle.class,
+				80000,
+				0.9);
 		
 		/*
 		 * The vehicle types are saved within the VehicleTypeCollector

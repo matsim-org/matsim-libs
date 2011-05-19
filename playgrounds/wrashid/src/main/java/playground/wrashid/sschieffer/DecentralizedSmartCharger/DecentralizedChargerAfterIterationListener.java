@@ -58,7 +58,7 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					);
 			
 			// set standard charging slot length
-			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.minChargingLength);
+			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.standardChargingLength);
 			
 			// set LinkedList of vehicles <agentId, vehicle>
 			myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(

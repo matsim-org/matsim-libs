@@ -56,11 +56,11 @@ public class AgentContractCollector {
 			double xPercentDownUp			
 			){
 		
-		int popSize= controler.getPopulation().getPersons().size();
+		int popSize= dsc.vehicles.getKeySet().size();
 		int count = 0;
 		
 		HashMap<Id, ContractTypeAgent> list = new HashMap<Id, ContractTypeAgent>();
-		for(Id id : controler.getPopulation().getPersons().keySet()){
+		for(Id id : dsc.vehicles.getKeySet()){
 			if (count< popSize*xPercentNone){
 			
 				list.put(id, contractNoRegulation);
@@ -91,11 +91,11 @@ public class AgentContractCollector {
 			double xPercentDownUpPHEV
 			){
 		
-		int popSize= controler.getPopulation().getPersons().size();
+		int popSize= dsc.vehicles.getKeySet().size();
 		int countEV = 0;
 		int countPHEV = 0;
 		HashMap<Id, ContractTypeAgent> list = new HashMap<Id, ContractTypeAgent>();
-		for(Id id : controler.getPopulation().getPersons().keySet()){
+		for(Id id : dsc.vehicles.getKeySet()){
 			
 			if(dsc.hasAgentPHEV(id) ){
 				if (countPHEV< popSize*xPercentNonePHEV){				

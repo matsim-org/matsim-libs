@@ -87,16 +87,16 @@ public class Main_exampleV2G {
 		 * SET UP STANDARD Decentralized Smart Charging simulation 
 		 * *************/
 		
-		final double phev=1.0;
-		final double ev=0.0;
-		final double combustion=0.0;
+		final double electrification= 1.0; 
+		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";	
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";
 		
 		final double bufferBatteryCharge=0.0;		
-		final double minChargingLength=1.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
@@ -108,14 +108,15 @@ public class Main_exampleV2G {
 		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
 		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
-		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(configPath, 
+		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
+				configPath, 
 				outputPath, 
-				phev, ev, combustion,
+				electrification, ev,
 				bufferBatteryCharge,
-				minChargingLength,
+				standardChargingLength,
 				myMappingClass,
 				myHubInfo,
-				false // indicate if you want graph output for every agent to visualize the SOC over the day
+				false  // indicate if you want graph output for every agent to visualize the SOC over the day
 				
 				);
 		

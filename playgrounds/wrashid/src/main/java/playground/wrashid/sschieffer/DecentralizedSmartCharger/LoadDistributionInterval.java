@@ -69,8 +69,9 @@ public class LoadDistributionInterval  extends TimeInterval
 		
 		xy  = new XYSeries(seriesName);
 		
-		for(int i=(int)Math.ceil(super.getStartTime()); i<=(int)Math.floor(super.getEndTime()); i++){
+		for(double i=super.getStartTime(); i<=super.getEndTime();){
 			xy.add(i, p.value(i));
+			i+=60;//in one minute bins
 		}
 	}
 	

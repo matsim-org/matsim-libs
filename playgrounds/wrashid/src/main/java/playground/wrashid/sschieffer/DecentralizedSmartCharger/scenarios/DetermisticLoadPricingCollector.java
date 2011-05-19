@@ -239,8 +239,18 @@ public class DetermisticLoadPricingCollector {
 				objective, 
 				after);
 		deterministicSchedule.addTimeInterval(l);
+		
+		/*double totalSchedule=0;
+		for(int i=0; i<deterministicSchedule.getNumberOfEntries(); i++){
+			LoadDistributionInterval entry= (LoadDistributionInterval)deterministicSchedule.timesInSchedule.get(i);
+			
+			if (entry.isOptimal()){
+				totalSchedule+=DecentralizedSmartCharger.functionIntegrator.integrate(entry.getPolynomialFunction(),
+						entry.getStartTime(), entry.getEndTime());
+			}
+		}
 		//deterministicSchedule.printSchedule();
-		return deterministicSchedule;
+*/		return deterministicSchedule;
 	}
 	
 	

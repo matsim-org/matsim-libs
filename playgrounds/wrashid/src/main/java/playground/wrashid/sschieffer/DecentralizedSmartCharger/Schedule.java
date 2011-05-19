@@ -590,7 +590,14 @@ public class Schedule {
 	
 	
 	
-	
+	public Schedule cloneLoadSchedule(){
+		Schedule copy= new Schedule();
+		for(int i=0; i<getNumberOfEntries(); i++){
+			LoadDistributionInterval l=(LoadDistributionInterval) timesInSchedule.get(i);
+			copy.addTimeInterval(l.clone());
+		}
+		return copy;
+	}
 	
 	
 	public void deleteIntervalAtEntry(int i){

@@ -16,9 +16,9 @@ import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
 
 /**
  * makes stochastic schedules for agent vehicles, hubsources and hubs in general
- * <li> hub in general 6 hours
- * <li> hub source - only hub 1 has a short interval with a hubsource
- * <li> every agent has 2 small sources
+ * <li> hub in general 3 hours, 2 hours down, 1 hour up
+ * <li> hub source - currently null
+ * <li> every agent has 1*30 min source or sink
  * 
  * @author Stella
  *
@@ -57,25 +57,31 @@ public class StochasticLoadCollector {
 	
 	public HashMap<Integer, Schedule> getStochasticHubSources(){
 		makeSourceHub();
-		return stochasticHubSource;
+		return null;
+		//return stochasticHubSource;
 	}
 	
 	
 	public void makeAgentVehicleSource(Controler controler){
 		
 		
-		//Id
-		for(Id id : controler.getPopulation().getPersons().keySet()){
+		// at random agents get 30 minutes source
+		for(Id id : mySimulation.mySmartCharger.vehicles.getKeySet()){
+			double secs= 0.5*3600;
+			
+			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
+			double startSec= Math.random()*buffer;
+			
 			if(Math.random()<0.5){
+				
 				Schedule bullShitPlus= new Schedule();
 				PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500.0});
-				bullShitPlus.addTimeInterval(new LoadDistributionInterval(25000, 26000.0, pPlus, true));
-				
+				bullShitPlus.addTimeInterval(new LoadDistributionInterval(startSec, startSec+secs, pPlus, true));
 				agentSource.put(id, bullShitPlus);	
 			}else{
 				Schedule bullShitMinus= new Schedule();
 				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});
-				bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, true));
+				bullShitMinus.addTimeInterval(new LoadDistributionInterval(startSec, startSec+secs, pMinus, false));
 				
 				agentSource.put(id, bullShitMinus);	
 			}
@@ -87,19 +93,22 @@ public class StochasticLoadCollector {
 	
 	public void readStochasticHubLoad(Set<Integer> hubSet){
 		
-		
 		for (Integer i: hubSet){
 			
-			// 6 hours of the day
-			double secs= 6*60*60;
-			
+			// 3 hours - 2 down 1 up
+			double secs= 3*3600;
+						
 			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
-			
 			double startSec= Math.random()*buffer;
-			Schedule bullShitStochastic= new Schedule();
-			PolynomialFunction p = new PolynomialFunction(new double[] {3500});
 			
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+secs, p, true));
+			Schedule bullShitStochastic= new Schedule();
+			int numPpl= mySimulation.mySmartCharger.vehicles.getKeySet().size();
+			PolynomialFunction p1 = new PolynomialFunction(new double[] {numPpl*3500});
+			PolynomialFunction p2 = new PolynomialFunction(new double[] {-numPpl*3500});
+			PolynomialFunction p3 = new PolynomialFunction(new double[] {numPpl*3500});
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+3600, p1, true));
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+3600, startSec+2*3600, p2, true));
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+2*3600, startSec+3*3600, p3, true));
 			
 			stochasticHubLoadDistribution.put(i, bullShitStochastic);
 		}

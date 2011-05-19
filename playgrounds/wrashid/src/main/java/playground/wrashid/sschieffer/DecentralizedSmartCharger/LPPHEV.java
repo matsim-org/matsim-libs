@@ -51,23 +51,11 @@ import lpsolve.LpSolveException;
  * @author Stella
  *
  */
-public class LPPHEV {
+public class LPPHEV extends LP{
 	
-	private Schedule schedule;
-	private LpSolve solver; 
-	private int numberOfVariables;
-	private Id personId;
-	private double energyFromCombustionEngine;
-	
-	private double batterySize;
-	private double  batteryMin;
-	private double  batteryMax;
-	
-	
-	private boolean output;
 	
 	public LPPHEV(boolean output){		
-		this.output=output;
+		super(output);
 	}
 	
 	
@@ -87,22 +75,23 @@ public class LPPHEV {
 			double batteryMax, 
 			String vehicleType) throws LpSolveException, IOException{
 		
-		
-		
-		this.batteryMax=batteryMax;
-		this.batteryMin=batteryMin;
-		this.batterySize=batterySize;
+		super.solveLP(schedule, 
+				id, 
+				batterySize, 
+				batteryMin, 
+				batteryMax);
 		
 		if(DecentralizedSmartCharger.debug){
 			System.out.println("LP PHEV for Agent: "+ id.toString()); 
 		}
 		
 		
-		setUpLP(schedule, id, batterySize, batteryMin, batteryMax);
-		int status = solver.solve();
+		setUpLP();
 		
+		int status = getSolver().solve();
+        
         if(status!=0){
-        	String text = solver.getStatustext(status);
+        	String text = getSolver().getStatustext(status);
         	if(DecentralizedSmartCharger.debug){
         		System.out.println("Status text: "+ text);
     		}
@@ -114,28 +103,24 @@ public class LPPHEV {
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ personId.toString()+"printLp.txt");
-			solver.printLp();
+			getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ id.toString()+"printLp.txt");
+			getSolver().printLp();
 			} catch (Exception e) {	    
 		}
 		
 		schedule= update();
 		if(DecentralizedSmartCharger.debug){
-			double [] solutionNF =solver.getPtrVariables();
-			
-			System.out.println("solution ");
-			for(int i=0; i<solutionNF.length; i++){
-				System.out.println(solutionNF[i] + ",  ");
-			}
+			printSolution();
 		}
 				
-		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
+		setEnergyFromCombustionEngine(calcEnergyUsageFromCombustionEngine(getSolver().getPtrVariables()));
 		
-		if(output){
-			visualizeSOCAgent(solver.getPtrVariables(),vehicleType);
-    	}
+		if(isOutput()){
+			visualizeSOCAgent(getSolver().getPtrVariables(), vehicleType, id);
+			
+		}
 		
-		solver.deleteLp();
+		getSolver().deleteLp();
 		
 		return schedule;
 		
@@ -157,7 +142,7 @@ public class LPPHEV {
 	 * @throws LpSolveException
 	 * @throws IOException
 	 */
-	public Schedule solveLPReschedule(Schedule schedule, Id id,double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
+	public Schedule solveLPReschedule(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, String vehicleType, double startingSOC) throws LpSolveException, IOException{
 		
 		if(DecentralizedSmartCharger.debug){
 			System.out.println("LP PHEV Resolve for Agent: "+ id.toString()); 
@@ -165,19 +150,20 @@ public class LPPHEV {
 			schedule.printSchedule();*/
 		}
 		
+		super.solveLP(schedule, 
+				id, 
+				batterySize, 
+				batteryMin, 
+				batteryMax);
 		
-		this.batteryMax=batteryMax;
-		this.batteryMin=batteryMin;
-		this.batterySize=batterySize;
-		
-		setUpLP(schedule, id, batterySize, batteryMin, batteryMax, startingSOC);
-		solver.solve();
+		setUpLP(startingSOC);
+		getSolver().solve();
 		
 		try {
 			
 			
-			solver.setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ personId.toString()+"printLp.txt");
-			solver.printLp();
+			getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
+			getSolver().printLp();
 			
 			
 		} catch (Exception e) {	    
@@ -185,12 +171,7 @@ public class LPPHEV {
 		
 		
 		if(DecentralizedSmartCharger.debug){
-			double [] solutionNF =solver.getPtrVariables();		
-			
-			System.out.println("solution ");
-			for(int i=0; i<solutionNF.length; i++){
-				System.out.println(solutionNF[i] + ",  ");
-			}
+			printSolution();
 		}
 		
 		schedule= update();
@@ -199,9 +180,9 @@ public class LPPHEV {
 			//schedule.printSchedule();
 		}*/
 		
-		energyFromCombustionEngine= calcEnergyUsageFromCombustionEngine(solver.getPtrVariables());
+		setEnergyFromCombustionEngine(calcEnergyUsageFromCombustionEngine(getSolver().getPtrVariables()));
 		
-		solver.deleteLp();
+		getSolver().deleteLp();
 		
 		return schedule;
 		
@@ -214,313 +195,32 @@ public class LPPHEV {
 	 * @param id
 	 * @throws LpSolveException
 	 */
-	private void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
-		
-		energyFromCombustionEngine=0;
-		this.schedule=schedule;
-		personId=id;
-		
-		
-		numberOfVariables= schedule.getNumberOfEntries()+1;
-		
-		solver = LpSolve.makeLp(0, numberOfVariables);
+	private void setUpLP() throws LpSolveException{		
 		
 		setObjectiveFunction();
 		
-		
-		// at all points should be within battery limit
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			String inequality=setInEqualityBatteryConstraint(i);
-			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
-						
-		}
-		
+		setInequalityContraintsForBatteryUpper();
 		
 		//upper & lower bounds
-		setLowerAndUpperBounds(batterySize, batteryMin, batteryMax);
-		
+		setLowerAndUpperBounds();		
 		
 	}
 	
 	
 	
-	private void setUpLP(Schedule schedule, Id id, double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
+	private void setUpLP(double startingSOC) throws LpSolveException{
 		
-		energyFromCombustionEngine=0;
-		this.schedule=schedule;
-		personId=id;
-		
-		
-		numberOfVariables= schedule.getNumberOfEntries()+1;
-		
-		solver = LpSolve.makeLp(0, numberOfVariables);
 		
 		setObjectiveFunction();
 		
-		
-		// at all points should be within battery limit
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			String inequality=setInEqualityBatteryConstraint(i);
-			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
-			//solver.strAddConstraint(inequality, LpSolve.GE, batterySize*batteryMin);
-			
-		}
-		
-		
+		setInequalityContraintsForBatteryUpper();
 				
 		//upper & lower bounds
-		setLowerAndUpperBoundsWithStartingSOC(batterySize, batteryMin, batteryMax, startingSOC);
+		setLowerAndUpperBoundsWithStartingSOC(startingSOC);
 		
 		
 	}
 	
-	
-	/**
-	 * sets objective function
-	 * 
-	 * minimizing time in peak hours
-	 * minimizing (-)*charging in off peak hours
-	 * @throws LpSolveException
-	 */
-	private void setObjectiveFunction() throws LpSolveException{
-		double [] objective= new double[numberOfVariables];
-		
-		objective[0]= -1;
-		
-		
-		for(int i=0; i<schedule.timesInSchedule.size(); i++){
-			// if Parking interval
-			if(schedule.timesInSchedule.get(i).isParking()){
-				ParkingInterval thisParkingInterval= (ParkingInterval)schedule.timesInSchedule.get(i);
-				
-				if(thisParkingInterval.isInSystemOptimalChargingTime()){
-					
-					// want to maximize charging in this time. thus need to minimize the negative of the weight
-					double weightOptimal=calculateWeightOptimal(thisParkingInterval);
-					//double totalweight= weightOptimal;
-					//double totalweight= weightOptimal-thisParkingInterval.getChargingSpeed();
-					//double totalweight= weightOptimal-(100)*thisParkingInterval.getChargingSpeed();
-					
-					objective[ 1+i] = weightOptimal;
-					
-					}
-				
-				else{
-					// want to minimize charging in this time. thus need to minimize the absolute value of the weight
-					double weightSubOptimal=calculateWeightSubOptimal(thisParkingInterval);
-					//double totalSubWeight= weightSubOptimal;
-					//double totalSubWeight= weightSubOptimal-(100)*thisParkingInterval.getChargingSpeed();
-					objective[ 1+i] = weightSubOptimal;
-					
-				}
-			}else{
-				// Driving
-				//DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
-				//double energyOut=thisDrivingInterval.getConsumption();
-					
-				objective[ 1+i] = 0;
-				//objective[ 1+i] = energyOut;
-				
-				
-			}
-		}
-		
-		
-		// now loop to add maximize SOC after consumption,
-		
-		// setDrivingConsumptionSmallerSOC Inequality
-		for(int i=0; i<schedule.numberOfDrivingTimes();i++){
-			objective=objectiveToMinimizeCombustionEngineUse(objective, i);
-		}
-		
-		
-		String objectiveStr= makeStringObjectiveFromDoubleObjective(objective);
-		
-	
-		solver.strSetObjFn(objectiveStr);	
-		
-		solver.setMinim(); //minimize the objective
-	}
-	
-	
-	
-	
-	/**
-	 * weight is sum of free Joules in interval*(-1) /total free Joules for agent
-	 * @param thisParkingInterval
-	 * @return
-	 */
-	private double calculateWeightOptimal(ParkingInterval thisParkingInterval){
-		// want to maximize charging in this time. thus need to minimize the negative of the weight
-		
-		return (-1 )* thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes;
-		//return (-1 )*Math.pow(1.1, (10*thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes));
-	}
-	
-	
-	
-	/**
-	 * weight is sum of free Joules in interval /total free Joules for agent
-	 * @param thisParkingInterval
-	 * @return
-	 */
-	private double calculateWeightSubOptimal(ParkingInterval thisParkingInterval){
-		// TODO or to think... add constant term or not?
-		// negative joules/negative total = positive
-		
-		return thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
-		//return Math.pow(1.1, 10*thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes) ;
-	}
-	
-	
-	
-	/**
-	 * returns String for inequality vector
-	 * (1  charging speed  -consumption  charging speed  0 0 0) *x <SOC
-	 * @param threshold
-	 * @return
-	 */
-	private String setInEqualityBatteryConstraint(int threshold){
-		
-		String objectiveStr="1 ";// first entry for SOC
-		
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			
-			
-			if (i<=threshold){
-				if(schedule.timesInSchedule.get(i).isParking()){
-					ParkingInterval thisParkingInterval= (ParkingInterval)schedule.timesInSchedule.get(i);
-					String s= Double.toString(thisParkingInterval.getChargingSpeed());
-					s= s.concat(" ");
-					objectiveStr=objectiveStr.concat(s);
-					
-					}
-				if(schedule.timesInSchedule.get(i).isDriving() ){
-					DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
-					String s= Double.toString(thisDrivingInterval.getConsumption()*(-1));
-					s= s.concat(" ");
-					objectiveStr=objectiveStr.concat(s);
-					
-					
-					}
-				
-			}else{
-				objectiveStr=objectiveStr.concat("0 ");
-			}
-		}
-		
-		return objectiveStr;
-	}
-
-	
-	/**
-	 * sets upper and lower bounds on all variables
-	 * 0<SOC<battery capacity
-	 * 0 <t< parking timeS
-	 * 
-	 * @param batterySize
-	 * @param batteryMin
-	 * @param batteryMax
-	 * @throws LpSolveException
-	 */
-	private void setLowerAndUpperBounds(double batterySize, double batteryMin, double batteryMax) throws LpSolveException{
-		solver.setLowbo(1,batterySize*batteryMin);
-		solver.setUpbo(1,batterySize*batteryMax);
-		
-		for(int i=2; i<=numberOfVariables; i++){
-			if(schedule.timesInSchedule.get(i-2).isParking()){
-				solver.setLowbo(i, 0);
-				solver.setUpbo(i, schedule.timesInSchedule.get(i-2).getIntervalLength());
-			}else{
-				// Driving times
-				solver.setLowbo(i, 1);
-				solver.setUpbo(i, 1);
-			}
-			
-		}
-	}
-	
-	
-	
-	private void setLowerAndUpperBoundsWithStartingSOC(double batterySize, double batteryMin, double batteryMax, double startingSOC) throws LpSolveException{
-		solver.setLowbo(1,startingSOC);
-		solver.setUpbo(1,startingSOC);
-		
-		for(int i=2; i<=numberOfVariables; i++){
-			if(schedule.timesInSchedule.get(i-2).isParking()){
-				solver.setLowbo(i, 0);
-				solver.setUpbo(i, schedule.timesInSchedule.get(i-2).getIntervalLength());
-			}else{
-				// Driving times
-				solver.setLowbo(i, 1);
-				solver.setUpbo(i, 1);
-			}
-			
-		}
-	}
-	
-	
-	
-	/**
-	 * updates the required charging times in agentSchedules according to results of LP
-	 * @return
-	 * @throws LpSolveException
-	 */
-	private Schedule update() throws LpSolveException{
-		double[] solution = solver.getPtrVariables();
-		
-		schedule.setStartingSOC(solution[0]);
-		
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			if(schedule.timesInSchedule.get(i).isParking()){
-				
-				ParkingInterval thisParking= (ParkingInterval) schedule.timesInSchedule.get(i);
-				
-				if(solution[i+1]>0.0){
-					 thisParking.setRequiredChargingDuration(solution[i+1]);
-					
-				}else{
-					// in case LP has some problem and a negative number is the result
-					 thisParking.setRequiredChargingDuration(0);
-					 thisParking.setChargingSchedule(null);
-				}
-				
-			}
-		}
-		return schedule;
-	}
-	
-	
-	
-	/**
-	 * results of LP summarized
-	 * prints out Total Charging in Sub/Optimal Time
-	 * 
-	 * @throws LpSolveException
-	 */
-	public void	printLPSolution() throws LpSolveException{
-		double[] solution = solver.getPtrVariables();
-		
-		double optimalChargingParking=0;
-		double suboptimalChargingParking=0;
-		
-		for (int i = 1; i < solution.length; i++) {
-			
-			if (schedule.timesInSchedule.get(i-1).isDriving()){
-				
-			}
-			else {
-				ParkingInterval p = (ParkingInterval)schedule.timesInSchedule.get(i-1);
-				if(p.isInSystemOptimalChargingTime()){
-					optimalChargingParking+=p.getRequiredChargingDuration();
-				}else{
-					suboptimalChargingParking+=p.getRequiredChargingDuration();
-				}
-			}
-		}
-		
-		
-	}
 	
 	
 	
@@ -561,10 +261,10 @@ public class LPPHEV {
 				status=false;
 			}
 		
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			if(schedule.timesInSchedule.get(i).isParking()){
+		for(int i=0; i<getSchedule().getNumberOfEntries(); i++){
+			if(getSchedule().timesInSchedule.get(i).isParking()){
 				
-				ParkingInterval thisP= (ParkingInterval)schedule.timesInSchedule.get(i);
+				ParkingInterval thisP= (ParkingInterval)getSchedule().timesInSchedule.get(i);
 				
 				statusJoule+=thisP.getChargingSpeed()
 							*solution[1+i];// charging speed * time= joules
@@ -576,7 +276,7 @@ public class LPPHEV {
 					}
 				
 			}else{//Driving
-				DrivingInterval thisD = (DrivingInterval)schedule.timesInSchedule.get(i);
+				DrivingInterval thisD = (DrivingInterval)getSchedule().timesInSchedule.get(i);
 							
 				statusJoule+=(-1)*(thisD).getConsumption();
 				
@@ -588,13 +288,13 @@ public class LPPHEV {
 					
 					ParkingInterval precedingP;//only need it for charging speed
 					if(i>0){
-						precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);	
+						precedingP= (ParkingInterval)getSchedule().timesInSchedule.get(i-1);	
 					}else{
 						//if first entry.. then previous parking interval must have been last one on previous day
-						precedingP= (ParkingInterval)schedule.timesInSchedule.get(schedule.getNumberOfEntries()-1);	
+						precedingP= (ParkingInterval)getSchedule().timesInSchedule.get(getSchedule().getNumberOfEntries()-1);	
 					}
 					
-					updatePrecedingParkingAndDrivingInterval(schedule, i, energyFromEngine, thisD, precedingP);		 
+					updatePrecedingParkingAndDrivingInterval(getSchedule(), i, energyFromEngine, thisD, precedingP);		 
 					 
 				}else{
 					
@@ -602,9 +302,9 @@ public class LPPHEV {
 						energyFromEngine=Math.abs(statusJoule);
 						energyFromEngine+=Math.abs(statusJoule-lastFalseJoule);
 						
-						ParkingInterval precedingP= (ParkingInterval)schedule.timesInSchedule.get(i-1);
+						ParkingInterval precedingP= (ParkingInterval)getSchedule().timesInSchedule.get(i-1);
 						
-						updatePrecedingParkingAndDrivingInterval(schedule, i, energyFromEngine, thisD, precedingP);
+						updatePrecedingParkingAndDrivingInterval(getSchedule(), i, energyFromEngine, thisD, precedingP);
 					}
 					
 				}
@@ -614,20 +314,8 @@ public class LPPHEV {
 		return energyFromEngine;
 	}
 	
-	public double getEnergyFromCombustionEngine(){
-		return energyFromCombustionEngine;
-	}
-
-
-
-
-
-	/**
-	 * ONLY FOR DEBUGGING PURPOSES
-	 */
-	public void setSchedule(Schedule s){
-		schedule=s;
-	}
+	
+	
 	
 	/**
 	 * 
@@ -716,206 +404,6 @@ public class LPPHEV {
 	}
 	
 	
-	
-	/**
-	 * modifies objective double array such that the SOC right after every driving trip is maximized
-	 * the battery of the PHEV is not bounded by minBattery restrictions
-	 * thus we have to ensure otherwise that energy is preferably charged from the battery
-	 * 
-	 * 
-	 * @param objective array of coefficients from other objective restrictions so far
-	 * @param a = ath driving time starting at 0th
-	 * @return
-	 * @throws LpSolveException
-	 */
-	private double[] objectiveToMinimizeCombustionEngineUse(double [] objective, int a) throws LpSolveException{
-		
-		objective[0]+=-1;
-		
-		int pos=schedule.positionOfIthDrivingTime(a);
-		
-		for(int i=0; i<schedule.timesInSchedule.size(); i++){
-			if(i<=pos){
-				
-				if(schedule.timesInSchedule.get(i).isParking()){
-					objective[1+i]+= (-1)* ((ParkingInterval)schedule.timesInSchedule.get(i)).getChargingSpeed();
-					
-				}
-				
-				if(schedule.timesInSchedule.get(i).isDriving()){
-					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption();
-					
-				}
-				
-			}
-		}
-		
-		return objective;
-		
-	}
-	
-	
-	/**
-	 * turns a double array into a string separated by spaces
-	 * 
-	 * @param objective
-	 * @return
-	 */
-	private String makeStringObjectiveFromDoubleObjective(double[]  objective){
-		String s="";
-		
-		for(int i=0; i<objective.length; i++){
-			s= s.concat(Double.toString(objective[i]) + " ");
-		}
-		return s;
-	}
-	
-	
-	
-	
-	
-	public void visualizeSOCAgent(double [] solution, String type) throws LpSolveException, IOException{
-		
-		XYSeriesCollection SOCAgent= new XYSeriesCollection();
-		
-		XYSeries SOCAgentSeries= new XYSeries("SOC agent");
-		
-		double [] SOC= solution.clone();	
-		SOCAgentSeries.add(0,SOC[0]);
-		
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			if(schedule.timesInSchedule.get(i).isParking()){
-				ParkingInterval thisP= (ParkingInterval)schedule.timesInSchedule.get(i);
-				SOC[i+1]= SOC[i]+thisP.getChargingSpeed()	*solution[1+i];
-				// add
-				SOCAgentSeries.add(thisP.getEndTime(),SOC[i+1]);
-			}else{
-				//subtract
-				DrivingInterval thisD = (DrivingInterval)schedule.timesInSchedule.get(i);
-				
-				SOC[i+1]=SOC[i] - (thisD).getConsumption();
-				SOCAgentSeries.add(thisD.getEndTime(),SOC[i+1]);
-			}
-		}
-		
-		SOCAgent.addSeries(SOCAgentSeries);
-		
-		
-		//********************************
-		XYSeries SOCMax= new XYSeries("SOC Max");
-		SOCMax.add(0, batterySize);
-		SOCMax.add(DecentralizedSmartCharger.SECONDSPERDAY, batterySize);		
-		
-		XYSeries SOCMin= new XYSeries("SOC Min");
-		SOCMin.add(0, 0);
-		SOCMin.add(DecentralizedSmartCharger.SECONDSPERDAY, 0);
-		//********************************
-		XYSeries SOCMaxSuggested= new XYSeries("SOC Max Suggested");
-		SOCMaxSuggested.add(0, batterySize*batteryMax);
-		SOCMaxSuggested.add(DecentralizedSmartCharger.SECONDSPERDAY, batterySize*batteryMax);
-		
-		XYSeries SOCMinSuggested= new XYSeries("SOC MinSuggested");
-		SOCMinSuggested.add(0,batterySize*batteryMin);
-		SOCMinSuggested.add(DecentralizedSmartCharger.SECONDSPERDAY, batterySize*batteryMin);
-		//********************************
-		
-		SOCAgent.addSeries(SOCMax);
-		SOCAgent.addSeries(SOCMin);
-		SOCAgent.addSeries(SOCMaxSuggested);
-		SOCAgent.addSeries(SOCMinSuggested);
-		
-		JFreeChart chart = ChartFactory.createXYLineChart("SOC for agent"+ personId.toString(), 
-				"time of day [s]", 
-				"SOC[J]", 
-				SOCAgent, 
-				PlotOrientation.VERTICAL, 
-				false, true, false);
-		
-		chart.setBackgroundPaint(Color.white);
-		
-		final XYPlot plot = chart.getXYPlot();
-        plot.setBackgroundPaint(Color.white);
-        plot.setDomainGridlinePaint(Color.gray); 
-        plot.setRangeGridlinePaint(Color.gray);
-        
-        
-    	//******************************** SOC
-        plot.getRenderer().setSeriesPaint(0, Color.black);
-     	plot.getRenderer().setSeriesStroke(
- 	            0, 
- 	            new BasicStroke(
- 	                2.0f,  //float width
- 	                BasicStroke.CAP_ROUND, //int cap
- 	                BasicStroke.JOIN_ROUND, //int join
- 	                1.0f, //float miterlimit
- 	                new float[] {4.0f, 1.0f}, //float[] dash
- 	                0.0f //float dash_phase
- 	            )
- 	        );
-     	
-    	//******************************** SOCMAX
-     	plot.getRenderer().setSeriesPaint(1, Color.red);
-     	plot.getRenderer().setSeriesStroke(
- 	            1, 
- 	            new BasicStroke(
- 	                2.0f,  //float width
- 	                BasicStroke.CAP_ROUND, //int cap
- 	                BasicStroke.JOIN_ROUND, //int join
- 	                1.0f, //float miterlimit
- 	                new float[] {4.0f, 4.0f}, //float[] dash
- 	                0.0f //float dash_phase
- 	            )
- 	        );
-    	//********************************SOCMIN
-     	plot.getRenderer().setSeriesPaint(2, Color.red);
-     	plot.getRenderer().setSeriesStroke(
- 	            2, 
- 	            new BasicStroke(
- 	                2.0f,  //float width
- 	                BasicStroke.CAP_ROUND, //int cap
- 	                BasicStroke.JOIN_ROUND, //int join
- 	                1.0f, //float miterlimit
- 	                new float[] {4.0f, 4.0f}, //float[] dash
- 	                0.0f //float dash_phase
- 	            )
- 	        );
-     	//********************************SOCMaxsugg
-     	plot.getRenderer().setSeriesPaint(3, Color.gray);
-     	plot.getRenderer().setSeriesStroke(
- 	            3, 
- 	            new BasicStroke(
- 	                2.0f,  //float width
- 	                BasicStroke.CAP_ROUND, //int cap
- 	                BasicStroke.JOIN_ROUND, //int join
- 	                1.0f, //float miterlimit
- 	                new float[] {3.0f, 3.0f}, //float[] dash
- 	                0.0f //float dash_phase
- 	            )
- 	        );
-     	//********************************SOCMinsugg
-     	plot.getRenderer().setSeriesPaint(4, Color.gray);
-     	plot.getRenderer().setSeriesStroke(
- 	            4, 
- 	            new BasicStroke(
- 	                2.0f,  //float width
- 	                BasicStroke.CAP_ROUND, //int cap
- 	                BasicStroke.JOIN_ROUND, //int join
- 	                1.0f, //float miterlimit
- 	                new float[] {3.0f, 3.0f}, //float[] dash
- 	                0.0f //float dash_phase
- 	            )
- 	        );
-     	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPPHEV_Agent"+personId.toString()+".png") , chart, 800, 600);
-	  	
-	}
-	
-	
-	public LpSolve getSolver(){
-		return solver;
-	}
-	
-		
 		
 		
 	

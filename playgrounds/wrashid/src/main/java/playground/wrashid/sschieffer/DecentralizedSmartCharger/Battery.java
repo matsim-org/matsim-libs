@@ -52,4 +52,19 @@ public class Battery {
 		return maxSOC;
 	}
 	
+	
+	public String printBatteryAsHTML(){
+		String html="BatterySize: "+ batterySize+ "</br>"+
+		"BatteryMin: "+ minSOC+ ", BatteryMax: "+ maxSOC+"</br>"
+		;
+		return html;
+	}
+	
+	public String printBattery(){
+		String html="BatterySize: "+ batterySize+ "\n"+
+		"BatteryMin: "+ minSOC+ ",  BatteryMax: "+ maxSOC+"\n"
+		;
+		return html;
+	}
+	
 }

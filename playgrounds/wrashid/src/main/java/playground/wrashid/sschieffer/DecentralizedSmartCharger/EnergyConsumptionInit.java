@@ -51,16 +51,15 @@ public class EnergyConsumptionInit implements StartupListener {
 	private ParkingTimesPlugin parkingTimesPlugin;
 	private EnergyConsumptionPlugin energyConsumptionPlugin;
 	
-	double phev=1.0;
-	double ev=0.0;
-	double combustion=0.0;
+	private double electrification;
+	private double ev;
 	
 	public EnergyConsumptionInit(			
-			double phev, double ev, double combustion){
+			double electrification,double ev){
 				
-		this.phev=phev;
+		this.electrification=electrification;
 		this.ev=ev;
-		this.combustion=combustion;
+		
 	}
 	
 	
@@ -79,18 +78,15 @@ public class EnergyConsumptionInit implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
 		
+		int totalPpl= (int) Math.round(controler.getPopulation().getPersons().size()*electrification);
 		
-		int totalPpl= controler.getPopulation().getPersons().size();
 		int count = 0;
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			if (count< totalPpl*phev){
-			
-				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
-			} else if (count<totalPpl*(phev+ev)){
-				
+			if (count< totalPpl*ev){
 				vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
-			} else{
-				vehicles.put(personId, new ConventionalVehicle(null, new IdImpl(2)));
+				
+			}else{
+				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
 			}
 			count++;
 		}

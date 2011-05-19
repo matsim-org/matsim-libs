@@ -57,7 +57,7 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 					DecentralizedChargingSimulation.LPoutput
 					);
 			// set standard charging slot length
-			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.minChargingLength);
+			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.standardChargingLength);
 			
 			// set LinkedList of vehicles <agentId, vehicle>
 			myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(

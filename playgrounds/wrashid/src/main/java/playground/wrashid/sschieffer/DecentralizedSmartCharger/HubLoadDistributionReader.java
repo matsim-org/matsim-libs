@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolver;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolverFactory;
@@ -68,6 +69,7 @@ public class HubLoadDistributionReader {
 	private HubLinkMapping hubLinkMapping;
 	
 	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
+	HashMap<Integer, Schedule> deterministicHubLoadDistributionAfter;
 	HashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
 	public HashMap<Integer, Schedule> stochasticHubLoadDistribution;
 	HashMap<Integer, Schedule> pricingHubDistribution;
@@ -76,10 +78,6 @@ public class HubLoadDistributionReader {
 	HashMap<Integer, Schedule> locationSourceMapping;
 	public HashMap<Id, Schedule> agentVehicleSourceMapping;
 	
-	HashMap<Integer, double [][]> originalDeterministicChargingDistribution;
-	HashMap<Integer, double [][]> loadAfterDeterministicChargingDecision;
-	
-	//double [time - seconds in day] = available free load in W on grid in Hub
 	
 	Controler controler;
 	VehicleTypeCollector myVehicleTypeCollector;
@@ -105,6 +103,8 @@ public class HubLoadDistributionReader {
 		
 		this.deterministicHubLoadDistribution=deterministicHubLoadDistribution; // continuous functions
 		
+		initializeDeterministicHubLoadDistributionAfter();
+		
 		this.pricingHubDistribution=pricingHubDistribution; // continuous functions with same intervals as deterministic HubLoadDistribution!!!
 		
 		this.myVehicleTypeCollector= myVehicleTypeCollector;
@@ -121,13 +121,20 @@ public class HubLoadDistributionReader {
 					"does not have same time intervals as pricing Distribution");
 			controler.wait();
 		}
-		
-		initializeLoadAfterDeterministicChargingDecision();
-		
+	
 		initializeConnectivityHubDistribution();
 		
 	}
 	
+	
+	public void initializeDeterministicHubLoadDistributionAfter(){
+		deterministicHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
+		
+		for(Integer hub: deterministicHubLoadDistribution.keySet()){
+			deterministicHubLoadDistributionAfter.put(
+					hub, deterministicHubLoadDistribution.get(hub).cloneLoadSchedule());
+		}
+	}
 	
 	
 	public void checkForPlugInHybrid() throws IOException{
@@ -365,36 +372,6 @@ public class HubLoadDistributionReader {
 	
 	
 	
-	private void  initializeLoadAfterDeterministicChargingDecision(){
-		loadAfterDeterministicChargingDecision= new HashMap<Integer, double [][]>();
-		originalDeterministicChargingDistribution= new HashMap<Integer, double [][]>();
-		
-		for(Integer i : deterministicHubLoadDistribution.keySet()){
-			Schedule s= deterministicHubLoadDistribution.get(i);
-			
-			double [][] loadBefore= new double [ (int)DecentralizedSmartCharger.MINUTESPERDAY ][2];
-			double [][] loadAfter= new double [ (int)DecentralizedSmartCharger.MINUTESPERDAY ][2];
-			for(int j=0; j<DecentralizedSmartCharger.MINUTESPERDAY; j++){
-				
-				double second= j*DecentralizedSmartCharger.SECONDSPERMIN;
-				
-				int interval= s.timeIsInWhichInterval(second);
-				LoadDistributionInterval l= (LoadDistributionInterval) s.timesInSchedule.get(interval);
-				PolynomialFunction func= l.getPolynomialFunction();
-				
-				loadBefore[j][0]=second; //time in second
-				loadBefore[j][1]=func.value(second); // Watt at second
-				
-				loadAfter[j][0]=second; //time in second
-				loadAfter[j][1]=func.value(second); // Watt at second
-			}
-			loadAfterDeterministicChargingDecision.put(i, loadAfter);
-			originalDeterministicChargingDistribution.put(i, loadBefore);
-		}
-		
-		
-		
-	}
 	
 	
 	
@@ -406,21 +383,20 @@ public class HubLoadDistributionReader {
 	 * @param linkId
 	 * @param minInDay
 	 * @param wattReduction
+	 * @throws IllegalArgumentException 
+	 * @throws FunctionEvaluationException 
+	 * @throws MaxIterationsExceededException 
 	 */
-	public void updateLoadAfterDeterministicChargingDecision(Id linkId, int minInDay, double wattReduction){
-		
+	public void updateLoadAfterDeterministicChargingDecision(double start, double end, Id linkId, double chargingSpeed) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		int hubId= getHubForLinkId(linkId);
 		
-	
-		double [][]loadAfter=loadAfterDeterministicChargingDecision.get(hubId);
-		
-		loadAfter[minInDay][0]=minInDay*DecentralizedSmartCharger.SECONDSPERMIN;
-		loadAfter[minInDay][1]=loadAfter[minInDay][1]-wattReduction;
-		                    
-		loadAfterDeterministicChargingDecision.put(hubId, loadAfter);
-		
-		
+		Schedule toChange=deterministicHubLoadDistributionAfter.get(hubId);
+		//toChange.printSchedule();
+		toChange.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
+				new LoadDistributionInterval(start, end, new PolynomialFunction(new double[]{-chargingSpeed}), false));
+		//toChange.printSchedule();
+		//System.out.println();
 	}
 	
 	

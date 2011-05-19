@@ -45,4 +45,23 @@ public class GasType {
 		return emissionsPerLiter;
 	}
 	
+	
+	public String printGasTypeAsHTML(){
+		String html="Name: "+name+ "</br>"+
+		"Joules per liter: "+ joulesPerLiter+ "</br>"+
+		"Price per liter: "+ pricePerLiter+ "</br>"+
+		"Emissions per liter: "+ emissionsPerLiter+"</br>"
+		;
+		return html;
+	}
+	
+	public String printGasType(){
+		String html="Name: "+name+ "\n"+
+		"Joules per liter: "+ joulesPerLiter+ "\n"+
+		"Price per liter: "+ pricePerLiter+ "\n"+
+		"Emissions per liter: "+ emissionsPerLiter+ "\n"
+		;
+		return html;
+	}
+	
 }
