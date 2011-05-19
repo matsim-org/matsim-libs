@@ -55,7 +55,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, IterationEndsListener {
 
@@ -363,14 +362,14 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		log.info("Number of Agents with Activity in the City of Zurich: " + activityInCityZurich.size());
-		log.info("Mean Travel Time per Agent with Activity in the City of Zurich: " + Time.writeTime(activityInCityZurichTravelTimes / activityInCityZurichCount));
 		log.info("Number of Agents with Trips through in the City of Zurich: " + tripThroughCityZurich.size());
-		log.info("Mean Travel Time per Agent with Trip through the City of Zurich: " + Time.writeTime(tripThroughCityZurichTravelTimes / tripThroughCityZurichCount));
-		
-		log.info("Number of Agents with Activity in the Canton of Zurich: " + activityInCantonZurich.size());
-		log.info("Mean Travel Time per Agent with Activity in the Canton of Zurich: " + Time.writeTime(activityInCantonZurichTravelTimes / activityInCantonZurichCount));
 		log.info("Number of Agents with Trips through in the Canton of Zurich: " + tripThroughCantonZurich.size());
+		log.info("Number of Agents with Activity in the City of Zurich: " + activityInCityZurich.size());
+		log.info("Number of Agents with Activity in the Canton of Zurich: " + activityInCantonZurich.size());
+		
+		log.info("Mean Travel Time per Agent with Trip through the City of Zurich: " + Time.writeTime(tripThroughCityZurichTravelTimes / tripThroughCityZurichCount));
 		log.info("Mean Travel Time per Agent with Trip through the Canton of Zurich: " + Time.writeTime(tripThroughCantonZurichTravelTimes / tripThroughCantonZurichCount));
+		log.info("Mean Travel Time per Agent with Activity in the City of Zurich: " + Time.writeTime(activityInCityZurichTravelTimes / activityInCityZurichCount));
+		log.info("Mean Travel Time per Agent with Activity in the Canton of Zurich: " + Time.writeTime(activityInCantonZurichTravelTimes / activityInCantonZurichCount));
 	}
 }
