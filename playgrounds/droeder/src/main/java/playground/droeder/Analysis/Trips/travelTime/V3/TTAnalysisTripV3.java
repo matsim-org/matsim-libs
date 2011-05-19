@@ -35,20 +35,20 @@ import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripV3 extends AbstractAnalysisTrip {
+public class TTAnalysisTripV3 extends AbstractTTAnalysisTrip {
 	
 //	private static final Logger log = Logger.getLogger(AnalysisTripV3.class);
 	
 	private Integer nrOfExpEvents = null;
 	private Integer nrOfElements = 0;
 	
-	public AnalysisTripV3(){
+	public TTAnalysisTripV3(){
 		
 	}
 	
@@ -97,11 +97,11 @@ public class AnalysisTripV3 extends AbstractAnalysisTrip {
 class TravelTimeHandler{
 	private static final Logger log = Logger.getLogger(TravelTimeHandler.class);
 	
-	private AnalysisTripV3 trip;
+	private TTAnalysisTripV3 trip;
 	private String expEvent = AgentDepartureEventImpl.class.toString();
 	private boolean warn = true;
 	
-	public TravelTimeHandler(AnalysisTripV3 trip){
+	public TravelTimeHandler(TTAnalysisTripV3 trip){
 		this.trip = trip;
 	}
 

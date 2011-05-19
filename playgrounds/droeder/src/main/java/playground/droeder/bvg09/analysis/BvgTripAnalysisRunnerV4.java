@@ -27,7 +27,7 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.travelTime.V4.TripAnalysisV4;
+import playground.droeder.Analysis.Trips.travelTime.V4.TTtripAnalysisV4;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -44,17 +44,17 @@ public class BvgTripAnalysisRunnerV4 {
 		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
 		
 		final String EVENTSFILE = INDIR + "bvg.run128.25pct.100.events.xml.gz";
-		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
+//		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
 		
 //		final String EVENTSFILE = OUTDIR + "testEvents.xml";
-//		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
+		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
 		
 		Set<Feature> features = null;
 		features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
-		TripAnalysisV4 ana = new TripAnalysisV4();
+		TTtripAnalysisV4 ana = new TTtripAnalysisV4();
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
 		zones.put("Berlin", g);
 		ana.addZones(zones);

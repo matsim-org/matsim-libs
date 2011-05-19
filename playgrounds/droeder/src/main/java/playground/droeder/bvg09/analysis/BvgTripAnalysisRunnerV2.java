@@ -27,7 +27,7 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.travelTime.V2.TripAnalysisV2;
+import playground.droeder.Analysis.Trips.travelTime.V2.TTtripAnalysisV2;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -54,7 +54,7 @@ public class BvgTripAnalysisRunnerV2 {
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
-		TripAnalysisV2 ana = new TripAnalysisV2();
+		TTtripAnalysisV2 ana = new TTtripAnalysisV2();
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
 		zones.put("Berlin", g);
 		ana.addZones(zones);

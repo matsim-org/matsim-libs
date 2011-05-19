@@ -23,8 +23,8 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
-import playground.droeder.Analysis.Trips.travelTime.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
 
 /**
  * @author droeder
@@ -33,8 +33,8 @@ import playground.droeder.Analysis.Trips.travelTime.AbstractPlan2TripsFilter;
 public class Plan2TripsFilterV3 extends AbstractPlan2TripsFilter{
 
 	@Override
-	protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
-		AbstractAnalysisTrip trip = new AnalysisTripV3();
+	protected AbstractTTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
+		AbstractTTAnalysisTrip trip = new TTAnalysisTripV3();
 		trip.addElements(elements);
 		return trip;
 	}

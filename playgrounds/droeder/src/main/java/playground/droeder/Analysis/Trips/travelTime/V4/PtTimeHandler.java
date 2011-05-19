@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.travelTime.V3.AnalysisTripV3;
-
 
 /**
  * @author droeder
@@ -63,7 +61,7 @@ public class PtTimeHandler {
 	 * updates all values of the given trip
 	 * @param trip
 	 */
-	public void finish(AnalysisTripV4 trip){
+	public void finish(TTAnalysisTripV4 trip){
 		trip.tripTTime = last - first;
 		for(SomePtTime t: this.times){
 			if ( t instanceof AccesWait){

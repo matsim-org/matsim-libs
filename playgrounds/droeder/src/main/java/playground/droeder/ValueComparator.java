@@ -26,9 +26,9 @@ import java.util.Map;
  * @author droeder
  *
  */
-public class ValueComparator implements Comparator {
-	Map base;
-	public ValueComparator(Map base) {
+public class ValueComparator implements Comparator<Object> {
+	Map<?, ?> base;
+	public ValueComparator(Map<?, ?> base) {
 		this.base = base;
 	}
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.travelTime.V1;
+package playground.droeder.Analysis.Trips.travelTime.V2;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -30,24 +30,30 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
+
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripV1 extends AbstractAnalysisTrip{
+public class TTAnalysisTripV2 extends AbstractTTAnalysisTrip {
 	
-
-	public AnalysisTripV1(ArrayList<PersonEvent> events, ArrayList<PlanElement> elements){
-		this.addElements(elements);
-		this.addEvents(events);
+	private Integer nrOfElements = 0;
+	
+	public TTAnalysisTripV2(){
+		
 	}
 	
-	
-//	public void addElements(ArrayList<PlanElement> elements){
-//		super.analyzeElements(elements);
-//	}
+	@Override
+	public void addElements(ArrayList<PlanElement> elements){
+		super.addElements(elements);
+		this.nrOfElements = elements.size();
+	}
+
+	public Integer getNrOfElements(){
+		return this.nrOfElements;
+	}
 	
 	public void addEvents(ArrayList<PersonEvent> events){
 		this.analyzeEvents(events);
@@ -55,7 +61,7 @@ public class AnalysisTripV1 extends AbstractAnalysisTrip{
 	
 	private void analyzeEvents(ArrayList<PersonEvent> events){
 		this.analyzeValuesForAllModes(events);
-		if(this.mode.equals(TransportMode.pt)){
+		if(super.getMode().equals(TransportMode.pt)){
 			this.analyzeValuesForPT(events);
 		}
 	}

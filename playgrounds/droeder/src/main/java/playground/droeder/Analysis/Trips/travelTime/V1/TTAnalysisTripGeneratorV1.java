@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetAllMode;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetAllMode;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -39,15 +39,15 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class AnalysisTripGeneratorV1 {
+public class TTAnalysisTripGeneratorV1 {
 	
 	private static final Logger log = Logger
-			.getLogger(AnalysisTripGeneratorV1.class);
+			.getLogger(TTAnalysisTripGeneratorV1.class);
 	
-	public static AnalysisTripSetAllMode calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
+	public static TTAnalysisTripSetAllMode calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
 			Map<Id, ArrayList<PlanElement>> planElements, Geometry zone, boolean storeTrips){
 		
-		AnalysisTripSetAllMode tripSet = new AnalysisTripSetAllMode(storeTrips, zone);
+		TTAnalysisTripSetAllMode tripSet = new TTAnalysisTripSetAllMode(storeTrips, zone);
 
 		int nextMsg = 1;
 		int errorCnt = 0;
@@ -89,7 +89,7 @@ public class AnalysisTripGeneratorV1 {
 						// other modes consists only act-leg-act
 						else{
 							splittedElements.add(p);
-							tripSet.addTrip(new AnalysisTripV1(splittedEvents, splittedElements));
+							tripSet.addTrip(new TTAnalysisTripV1(splittedEvents, splittedElements));
 							
 							splittedElements = new ArrayList<PlanElement>();
 							splittedEvents = new ArrayList<PersonEvent>();

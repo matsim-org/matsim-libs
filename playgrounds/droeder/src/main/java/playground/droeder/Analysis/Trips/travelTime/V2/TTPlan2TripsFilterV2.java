@@ -23,18 +23,18 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
-import playground.droeder.Analysis.Trips.travelTime.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
 
 /**
  * @author droeder
  *
  */
-public class Plan2TripsFilterV2 extends AbstractPlan2TripsFilter {
+public class TTPlan2TripsFilterV2 extends AbstractPlan2TripsFilter {
 
 	@Override
-	protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
-		AbstractAnalysisTrip trip =  new AnalysisTripV2();
+	protected AbstractTTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
+		AbstractTTAnalysisTrip trip =  new TTAnalysisTripV2();
 		trip.addElements(elements);
 		return trip;
 	}

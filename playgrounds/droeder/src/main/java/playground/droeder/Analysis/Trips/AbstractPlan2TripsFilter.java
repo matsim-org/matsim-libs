@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.travelTime;
+package playground.droeder.Analysis.Trips;
 
 import java.util.ArrayList;
 import java.util.HashMap;

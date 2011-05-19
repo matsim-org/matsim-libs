@@ -25,7 +25,7 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.travelTime.V1.TripAnalysisV1;
+import playground.droeder.Analysis.Trips.travelTime.V1.TTtripAnalysisV1;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -52,7 +52,7 @@ public class BvgTripAnalysisRunnerV1 {
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
-		TripAnalysisV1 ana = new TripAnalysisV1(g);
+		TTtripAnalysisV1 ana = new TTtripAnalysisV1(g);
 		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTDIR, false);
 	}
 }

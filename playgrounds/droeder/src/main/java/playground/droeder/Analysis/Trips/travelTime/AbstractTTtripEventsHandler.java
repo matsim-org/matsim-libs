@@ -40,22 +40,24 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
  *
  */
-public abstract class AbstractTripEventsHandler implements AgentDepartureEventHandler, 
+public abstract class AbstractTTtripEventsHandler implements AgentDepartureEventHandler, 
 										AgentArrivalEventHandler, ActivityEndEventHandler, 
 										ActivityStartEventHandler, AgentStuckEventHandler{
 	
 	private static final Logger log = Logger
-			.getLogger(AbstractTripEventsHandler.class);
+			.getLogger(AbstractTTtripEventsHandler.class);
 	
 	protected Map<Id, LinkedList<AbstractAnalysisTrip>> id2Trips = null;
 	protected Map<Id, ArrayList<PersonEvent>> id2Events = null;
-	protected Map<String, AnalysisTripSetAllMode> zone2tripSet;
+	protected Map<String, TTAnalysisTripSetAllMode> zone2tripSet;
 	private List<Id> stuckAgents;
 	
 	protected int nrOfprocessedTrips = 0;
@@ -63,10 +65,10 @@ public abstract class AbstractTripEventsHandler implements AgentDepartureEventHa
 	private int possibleTrips = 0;
 	private boolean stuck = false;
 	
-	public AbstractTripEventsHandler(){
+	public AbstractTTtripEventsHandler(){
 		this.id2Events = new HashMap<Id, ArrayList<PersonEvent>>();
-		this.zone2tripSet = new HashMap<String, AnalysisTripSetAllMode>();
-		this.zone2tripSet.put("noZone", new AnalysisTripSetAllMode(false, null));
+		this.zone2tripSet = new HashMap<String, TTAnalysisTripSetAllMode>();
+		this.zone2tripSet.put("noZone", new TTAnalysisTripSetAllMode(false, null));
 		this.stuckAgents = new ArrayList<Id>();
 	}
 
@@ -115,9 +117,9 @@ public abstract class AbstractTripEventsHandler implements AgentDepartureEventHa
 	}
 	
 	public void addZones(Map<String, Geometry> zones){
-		this.zone2tripSet = new HashMap<String, AnalysisTripSetAllMode>();
+		this.zone2tripSet = new HashMap<String, TTAnalysisTripSetAllMode>();
 		for(Entry<String, Geometry> e : zones.entrySet()){
-			this.zone2tripSet.put(e.getKey(), new AnalysisTripSetAllMode(false, e.getValue()));
+			this.zone2tripSet.put(e.getKey(), new TTAnalysisTripSetAllMode(false, e.getValue()));
 		}
 	}
 	
@@ -166,7 +168,7 @@ public abstract class AbstractTripEventsHandler implements AgentDepartureEventHa
 	 * returns all produced <code>AnalysisTripSetAllMode</code>-objects, separated by zones
 	 * @return
 	 */
-	public Map<String, AnalysisTripSetAllMode> getZone2Tripset(){
+	public Map<String, TTAnalysisTripSetAllMode> getZone2Tripset(){
 		log.info(this.nrOfprocessedTrips + " of " + this.possibleTrips + " trips from plansfile are processed");
 		return this.zone2tripSet;
 	}

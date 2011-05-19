@@ -30,14 +30,14 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
-import playground.droeder.Analysis.Trips.travelTime.AbstractTripEventsHandler;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTtripEventsHandler;
 
 /**
  * @author droeder
  *
  */
-public class TripEventsHandlerV3 extends AbstractTripEventsHandler implements 
+public class TTtripEventsHandlerV3 extends AbstractTTtripEventsHandler implements 
 										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	
@@ -70,7 +70,7 @@ public class TripEventsHandlerV3 extends AbstractTripEventsHandler implements
 			super.id2Events.get(e.getPersonId()).add(e);
 			
 			//if number of elements of the first trip and number of events match, add events
-			if(((AnalysisTripV3) super.id2Trips.get(e.getPersonId()).getFirst()).getNumberOfExpectedEvents() 
+			if(((TTAnalysisTripV3) super.id2Trips.get(e.getPersonId()).getFirst()).getNumberOfExpectedEvents() 
 					== super.id2Events.get(e.getPersonId()).size()){
 				this.addEvents2Trip(e.getPersonId());
 			}
@@ -85,12 +85,12 @@ public class TripEventsHandlerV3 extends AbstractTripEventsHandler implements
 		this.nrOfTrips.get(id)[1]++;
 		
 		//get and remove the first Trip of this agent and add Events
-		AbstractAnalysisTrip trip = this.id2Trips.get(id).removeFirst();
-		((AnalysisTripV3) trip).addEvents(this.id2Events.get(id));
+		TTAnalysisTripV3 trip = (TTAnalysisTripV3) this.id2Trips.get(id).removeFirst();
+		trip.addEvents(this.id2Events.get(id));
 		
 		//add for all zones
 		for(String s : this.zone2tripSet.keySet()){
-			this.zone2tripSet.get(s).addTrip(trip);
+			this.zone2tripSet.get(s).addTrip((AbstractTTAnalysisTrip) trip);
 		}
 		
 		//put a new List for AgentEvents to store events for next trip

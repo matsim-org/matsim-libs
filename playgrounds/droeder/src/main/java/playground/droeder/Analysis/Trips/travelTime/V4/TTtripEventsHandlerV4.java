@@ -17,59 +17,85 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.travelTime.V2;
+package playground.droeder.Analysis.Trips.travelTime.V4;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
-import playground.droeder.Analysis.Trips.travelTime.AbstractTripEventsHandler;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTtripEventsHandler;
 
 /**
  * @author droeder
  *
  */
-public class TripEventsHandlerV2 extends AbstractTripEventsHandler{
+public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implements 
+										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	
-	public TripEventsHandlerV2(){
-		super();
+	
+	
+	@Override
+	public void handleEvent(ActivityStartEvent e){
+		// do nothing
 	}
-
 	
+	@Override
+	public void handleEvent(ActivityEndEvent e){
+		//do nothing
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent e) {
+		this.processEvent(e);
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent e) {
+		this.processEvent(e);
+	}
+	
+	@Override
 	protected void processEvent(PersonEvent e){
 		//process only if this agent has a plan in PlansFile
-		if(this.id2Events.containsKey(e.getPersonId())){
-			
-			//add Event
-			this.id2Events.get(e.getPersonId()).add(e);
-			
-			//if number of elements of the first trip and number of events match, add events
-			if(((((AnalysisTripV2) this.id2Trips.get(e.getPersonId()).getFirst()).getNrOfElements() * 2 ) - 2) == this.id2Events.get(e.getPersonId()).size()){
-				this.addEvents2Trip(e.getPersonId());
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
 			}
 		}
 	}
-	
-	private void addEvents2Trip(Id id){
+
+	private void addTrip2TripSet(Id id){
 		// store number of processed Trips
 		this.nrOfprocessedTrips++;
 		
 		// store this for getUncompletedPlans()
 		this.nrOfTrips.get(id)[1]++;
 		
-		//get and remove the first Trip of this agent and add Events
-		AbstractAnalysisTrip trip = this.id2Trips.get(id).removeFirst();
-		((AnalysisTripV2) trip).addEvents(this.id2Events.get(id));
+		//get and remove the first Trip of this agent
+		AbstractTTAnalysisTrip trip = (AbstractTTAnalysisTrip) this.id2Trips.get(id).removeFirst();
 		
 		//add for all zones
 		for(String s : this.zone2tripSet.keySet()){
 			this.zone2tripSet.get(s).addTrip(trip);
 		}
-		
-		//put a new List for AgentEvents to store events for next trip
-		this.id2Events.put(id, new ArrayList<PersonEvent>());
+	}
+	
+	@Override
+	public void addTrips(Map<Id, LinkedList<AbstractAnalysisTrip>> map) {
+		super.addTrips(map);
+		this.id2Events = null;
 	}
 }
+
+

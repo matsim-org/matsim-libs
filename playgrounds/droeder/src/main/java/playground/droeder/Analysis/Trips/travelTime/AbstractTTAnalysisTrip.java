@@ -26,18 +26,18 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author droeder
  *
  */
-public abstract class AbstractAnalysisTrip {
-	protected Coordinate start;
-	protected Coordinate end;
-	protected String mode = null;
+public abstract class AbstractTTAnalysisTrip extends AbstractAnalysisTrip{
+//	protected Coordinate start;
+//	protected Coordinate end;
+//	protected String mode = null;
 
 	//all modes
 	public double tripTTime = 0.0;
@@ -65,10 +65,10 @@ public abstract class AbstractAnalysisTrip {
 		this.findMode(elements);
 		//if no zones in TripSet are defined, coords not necessary
 		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
-			this.start = new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
-					((Activity) elements.get(0)).getCoord().getY());
-			this.end = new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
-					((Activity) elements.get(elements.size() - 1)).getCoord().getY());
+			super.setStart(new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
+					((Activity) elements.get(0)).getCoord().getY()));
+			super.setEnd(new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
+					((Activity) elements.get(elements.size() - 1)).getCoord().getY()));
 		}
 	}
 	
@@ -77,32 +77,32 @@ public abstract class AbstractAnalysisTrip {
 		for(PlanElement p : elements){
 			if(p instanceof Leg){
 				if(((Leg) p).getMode().equals(TransportMode.transit_walk)){
-					this.mode = TransportMode.transit_walk;
+					super.setMode(TransportMode.transit_walk);
 				}else{
-					this.mode = ((Leg) p).getMode();
+					super.setMode(((Leg) p).getMode());
 					return;
 				}
 			}
 		}
 	}
 	
-	public String getMode(){
-		return this.mode;
-	}
+//	public String getMode(){
+//		return this.mode;
+//	}
 	
-	/**
-	 * @return
-	 */
-	public Geometry getStart() {
-		return new GeometryFactory().createPoint(this.start);
-	}
-
-	/**
-	 * @return
-	 */
-	public Geometry getEnd() {
-		return new GeometryFactory().createPoint(this.end);
-	}
+//	/**
+//	 * @return
+//	 */
+//	public Geometry getStart() {
+//		return new GeometryFactory().createPoint(this.start);
+//	}
+//
+//	/**
+//	 * @return
+//	 */
+//	public Geometry getEnd() {
+//		return new GeometryFactory().createPoint(this.end);
+//	}
 	
 	/**
 	 * @return the tripTTime

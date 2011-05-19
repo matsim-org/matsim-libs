@@ -17,47 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.bvg09.analysis;
+package playground.droeder.Analysis.Trips;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.geotools.feature.Feature;
-import org.matsim.core.utils.gis.ShapeFileReader;
-
-import playground.droeder.DaPaths;
-import playground.droeder.Analysis.Trips.travelTime.V3.TTtripAnalysisV3;
-
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
  *
  */
-public class BvgTripAnalysisRunnerV3 {
-	public static void main(String[] args){
-		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
-		final String INDIR = OUTDIR + "input/";
-		
-		final String NETWORKFILE = INDIR + "network.final.xml.gz";
-		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
-		
-		final String EVENTSFILE = INDIR + "bvg.run128.25pct.100.events.xml.gz";
-//		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
-		
-//		final String EVENTSFILE = OUTDIR + "testEvents.xml";
-		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
-		
-		Set<Feature> features = null;
-		features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
-		
-		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
-		
-		TTtripAnalysisV3 ana = new TTtripAnalysisV3();
-		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
-		zones.put("Berlin", g);
-		ana.addZones(zones);
-		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, OUTDIR);
+public abstract class AbstractAnalysisTrip {
+	private Coordinate start;
+	private Coordinate end;
+	private String mode = null;
+	
+	
+	public String getMode(){
+		return this.mode;
 	}
+	
+	public void setMode(String mode){
+		this.mode = mode;
+	}
+
+	public Point getStart() {
+		return new GeometryFactory().createPoint(start);
+	}
+
+	public void setStart(Coordinate start) {
+		this.start = start;
+	}
+
+	public Point getEnd() {
+		return new GeometryFactory().createPoint(end);
+	}
+
+	public void setEnd(Coordinate end) {
+		this.end = end;
+	}
+	
+	
 }

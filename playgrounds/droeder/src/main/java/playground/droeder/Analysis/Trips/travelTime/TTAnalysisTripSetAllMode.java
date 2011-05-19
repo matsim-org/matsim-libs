@@ -28,30 +28,30 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class AnalysisTripSetAllMode {
+public class TTAnalysisTripSetAllMode {
 	
-	private Map<String, AnalysisTripSetOneMode> mode2TripSet = new HashMap<String, AnalysisTripSetOneMode>();
+	private Map<String, TTAnalysisTripSetOneMode> mode2TripSet = new HashMap<String, TTAnalysisTripSetOneMode>();
 	private boolean storeTrips;
 	private Geometry zone;
 	
-	public AnalysisTripSetAllMode(boolean storeTrips, Geometry zone){
+	public TTAnalysisTripSetAllMode(boolean storeTrips, Geometry zone){
 		this.storeTrips = storeTrips;
 		this.zone = zone;
 	}
 	
-	public void addTrip(AbstractAnalysisTrip trip){
+	public void addTrip(AbstractTTAnalysisTrip trip){
 		String mode = trip.getMode();
 		
 		if(this.mode2TripSet.containsKey(mode)){
 			this.mode2TripSet.get(mode).addTrip(trip);
 		}else{
-			AnalysisTripSetOneMode temp = new AnalysisTripSetOneMode(mode, this.zone, this.storeTrips);
+			TTAnalysisTripSetOneMode temp = new TTAnalysisTripSetOneMode(mode, this.zone, this.storeTrips);
 			temp.addTrip(trip);
 			this.mode2TripSet.put(mode, temp);
 		}
 	}
 	
-	public Map<String, AnalysisTripSetOneMode> getTripSets(){
+	public Map<String, TTAnalysisTripSetOneMode> getTripSets(){
 		return this.mode2TripSet;
 	}
 }

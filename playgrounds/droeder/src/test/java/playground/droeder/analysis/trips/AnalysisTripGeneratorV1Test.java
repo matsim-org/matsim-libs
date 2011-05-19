@@ -41,8 +41,8 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetOneMode;
-import playground.droeder.Analysis.Trips.travelTime.V1.AnalysisTripGeneratorV1;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.travelTime.V1.TTAnalysisTripGeneratorV1;
 
 /**
  * @author droeder
@@ -51,7 +51,7 @@ import playground.droeder.Analysis.Trips.travelTime.V1.AnalysisTripGeneratorV1;
 public class AnalysisTripGeneratorV1Test {
 	private Map<Id, ArrayList<PersonEvent>> personEvents;
 	private Map<Id, ArrayList<PlanElement>> planElements;
-	private Map<String, AnalysisTripSetOneMode> sets;
+	private Map<String, TTAnalysisTripSetOneMode> sets;
 	
 	
 	@Before
@@ -170,12 +170,12 @@ public class AnalysisTripGeneratorV1Test {
 			this.planElements.put(agentId, elements);
 		}
 		
-		this.sets = AnalysisTripGeneratorV1.calculateTripSet(this.personEvents, this.planElements, null, false).getTripSets();
+		this.sets = TTAnalysisTripGeneratorV1.calculateTripSet(this.personEvents, this.planElements, null, false).getTripSets();
 	}
 
 	@Test
 	public void testCalculateTripSetAllModes(){
-		AnalysisTripSetOneMode set = this.sets.get(TransportMode.car);
+		TTAnalysisTripSetOneMode set = this.sets.get(TransportMode.car);
 		
 		assertEquals("wrong TTime", 18.0, set.getSumTTime()[0], 0.0);
 		assertEquals("wrong TripCnt", 2.0, set.getTripCnt()[0], 0.0);
@@ -184,7 +184,7 @@ public class AnalysisTripGeneratorV1Test {
 	
 	@Test
 	public void testCalculateTripSetPt(){
-		AnalysisTripSetOneMode set = this.sets.get(TransportMode.pt);
+		TTAnalysisTripSetOneMode set = this.sets.get(TransportMode.pt);
 		
 		assertEquals("wrong TTime", 58.0, set.getSumTTime()[0], 0.0);
 		assertEquals("wrong TripCnt", 2.0, set.getTripCnt()[0], 0.0);

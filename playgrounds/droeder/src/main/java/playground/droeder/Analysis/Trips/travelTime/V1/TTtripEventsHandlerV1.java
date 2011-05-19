@@ -39,7 +39,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
  * @author droeder
  *
  */
-public class TripEventsHandlerV1 implements AgentDepartureEventHandler, AgentArrivalEventHandler,
+public class TTtripEventsHandlerV1 implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 										ActivityEndEventHandler, ActivityStartEventHandler{
 
 	private Map<Id, ArrayList<PersonEvent>> events;
@@ -47,7 +47,7 @@ public class TripEventsHandlerV1 implements AgentDepartureEventHandler, AgentArr
 	/**
 	 * @param keySet
 	 */
-	public TripEventsHandlerV1(Set<Id> keySet) {
+	public TTtripEventsHandlerV1(Set<Id> keySet) {
 		this.initialze(keySet);
 	}
 

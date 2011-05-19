@@ -22,7 +22,6 @@ package playground.droeder.Analysis.Trips.travelTime.V3;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,10 +37,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractPlan2TripsFilter;
-import playground.droeder.Analysis.Trips.travelTime.AbstractTripEventsHandler;
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetAllMode;
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTtripEventsHandler;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetAllMode;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetOneMode;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -49,13 +48,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TripAnalysisV3 {
-	private static final Logger log = Logger.getLogger(TripAnalysisV3.class);
-	private AbstractTripEventsHandler eventsHandler;
+public class TTtripAnalysisV3 {
+	private static final Logger log = Logger.getLogger(TTtripAnalysisV3.class);
+	private AbstractTTtripEventsHandler eventsHandler;
 	private String unProcessedAgents;
 	
-	public TripAnalysisV3 (){
-		 this.eventsHandler = new TripEventsHandlerV3();
+	public TTtripAnalysisV3 (){
+		 this.eventsHandler = new TTtripEventsHandlerV3();
 	}
 	
 	public void addZones(Map<String, Geometry> zones){
@@ -75,8 +74,8 @@ public class TripAnalysisV3 {
 		BufferedWriter writer;
 		try {
 			// write analysis
-			for(Entry<String, AnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
-				for(Entry<String, AnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
+			for(Entry<String, TTAnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
+				for(Entry<String, TTAnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
 					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_analysis_v3.csv");
 					writer.write(o.getValue().toString());
 					writer.flush();

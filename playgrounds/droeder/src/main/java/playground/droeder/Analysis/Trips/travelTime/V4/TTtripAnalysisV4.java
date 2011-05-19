@@ -37,11 +37,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractPlan2TripsFilter;
-import playground.droeder.Analysis.Trips.travelTime.AbstractTripEventsHandler;
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetAllMode;
-import playground.droeder.Analysis.Trips.travelTime.AnalysisTripSetOneMode;
-import playground.droeder.Analysis.Trips.travelTime.V3.Plan2TripsFilterV3;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetAllMode;
+import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetOneMode;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -49,13 +47,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TripAnalysisV4{
-	private static final Logger log = Logger.getLogger(TripAnalysisV4.class);
-	private TripEventsHandlerV4 eventsHandler;
+public class TTtripAnalysisV4{
+	private static final Logger log = Logger.getLogger(TTtripAnalysisV4.class);
+	private TTtripEventsHandlerV4 eventsHandler;
 	private String unProcessedAgents;
 	
-	public TripAnalysisV4 (){
-		 this.eventsHandler = new TripEventsHandlerV4();
+	public TTtripAnalysisV4 (){
+		 this.eventsHandler = new TTtripEventsHandlerV4();
 	}
 	
 	public void addZones(Map<String, Geometry> zones){
@@ -75,8 +73,8 @@ public class TripAnalysisV4{
 		BufferedWriter writer;
 		try {
 			// write analysis
-			for(Entry<String, AnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
-				for(Entry<String, AnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
+			for(Entry<String, TTAnalysisTripSetAllMode> e : this.eventsHandler.getZone2Tripset().entrySet()){
+				for(Entry<String, TTAnalysisTripSetOneMode> o : e.getValue().getTripSets().entrySet()){
 					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_analysis_v4.csv");
 					writer.write(o.getValue().toString());
 					writer.flush();

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
 
-import playground.droeder.Analysis.Trips.travelTime.V1.AnalysisTripV1;
+import playground.droeder.Analysis.Trips.travelTime.V1.TTAnalysisTripV1;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -34,11 +34,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class AnalysisTripSetOneMode {
+public class TTAnalysisTripSetOneMode {
 	
-	private static final Logger log = Logger.getLogger(AnalysisTripSetOneMode.class);
+	private static final Logger log = Logger.getLogger(TTAnalysisTripSetOneMode.class);
 	
-	private List<AbstractAnalysisTrip> trips;
+	private List<AbstractTTAnalysisTrip> trips;
 	private boolean storeTrips;
 	
 	private Geometry zone;
@@ -76,11 +76,11 @@ public class AnalysisTripSetOneMode {
 	private double[] line10cnt = new double[4];
 	private double[] lineGt10cnt = new double[4];
 
-	public AnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
+	public TTAnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
 		this.zone = zone;
 		this.storeTrips = storeTrips;
 		if(storeTrips){
-			this.trips = new LinkedList<AbstractAnalysisTrip>();
+			this.trips = new LinkedList<AbstractTTAnalysisTrip>();
 		}
 		this.mode = mode;
 		this.init();
@@ -122,15 +122,15 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-	public AnalysisTripSetOneMode(String mode, Geometry zone){
+	public TTAnalysisTripSetOneMode(String mode, Geometry zone){
 		this(mode, zone, false);
 	}
 	
-	public AnalysisTripSetOneMode(String mode){
+	public TTAnalysisTripSetOneMode(String mode){
 		this(mode, null, false);
 	}
 
-	public void addTrip(AbstractAnalysisTrip trip) {
+	public void addTrip(AbstractTTAnalysisTrip trip) {
 		if(trip.getMode().equals(this.mode)){
 			this.addTripValues(trip);
 		}else{ 
@@ -144,7 +144,7 @@ public class AnalysisTripSetOneMode {
 		
 	}
 
-	private void addTripValues(AbstractAnalysisTrip trip) {
+	private void addTripValues(AbstractTTAnalysisTrip trip) {
 		Integer zone = this.getTripLocation(trip);
 		this.addAllModeValues(trip, zone);
 		if(trip.getMode().equals(TransportMode.pt)){
@@ -152,12 +152,12 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-	private void addAllModeValues(AbstractAnalysisTrip trip, Integer zone) {
+	private void addAllModeValues(AbstractTTAnalysisTrip trip, Integer zone) {
 		tripCnt[zone]++;
 		sumTTime[zone] += trip.getTripTTime();
 	}
 
-	private void addPtValues(AbstractAnalysisTrip trip, Integer zone) {
+	private void addPtValues(AbstractTTAnalysisTrip trip, Integer zone) {
 		accesWalkCnt[zone] += trip.getAccesWalkCnt(); 
 		accesWalkTTime[zone] += trip.getAccesWalkTTime();
 		
@@ -191,10 +191,10 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 
-	public void addTrips(List<AnalysisTripV1> trips){
+	public void addTrips(List<TTAnalysisTripV1> trips){
 		int nextMsg = 1;
 		int counter = 0;
-		for(AnalysisTripV1 trip : trips){
+		for(TTAnalysisTripV1 trip : trips){
 			this.addTrip(trip);
 			counter++;
 			if(counter % nextMsg == 0){
@@ -205,7 +205,7 @@ public class AnalysisTripSetOneMode {
 	}
 	
 	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
-	private Integer getTripLocation(AbstractAnalysisTrip trip){
+	private Integer getTripLocation(AbstractTTAnalysisTrip trip){
 		if(this.zone == null){
 			return 0;
 		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
@@ -219,7 +219,7 @@ public class AnalysisTripSetOneMode {
 		}
 	}
 	
-	public List<AbstractAnalysisTrip> getTrips(){
+	public List<AbstractTTAnalysisTrip> getTrips(){
 		if(!storeTrips){
 			log.error("Trips not stored. Check constructor!");
 		}

@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.travelTime.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.travelTime.AbstractTTAnalysisTrip;
 
 /**
  * @author droeder
  *
  */
-public class AnalysisTripV4 extends AbstractAnalysisTrip {
+public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 	
 //	private static final Logger log = Logger.getLogger(AnalysisTripV3.class);
 	
@@ -40,7 +40,7 @@ public class AnalysisTripV4 extends AbstractAnalysisTrip {
 	private Integer nrOfElements = 0;
 	private PtTimeHandler handler;
 	
-	public AnalysisTripV4(){
+	public TTAnalysisTripV4(){
 		
 	}
 	
@@ -51,7 +51,7 @@ public class AnalysisTripV4 extends AbstractAnalysisTrip {
 		super.addElements(elements);
 		
 		//handler is only needed for pt
-		if(this.mode.equals(TransportMode.pt)){
+		if(super.getMode().equals(TransportMode.pt)){
 			this.handler = new PtTimeHandler();
 		}
 	}
@@ -87,7 +87,7 @@ public class AnalysisTripV4 extends AbstractAnalysisTrip {
 	 */
 	public boolean handleEvent(PersonEvent e){
 		this.handledEvents++;
-		if(this.mode.equals(TransportMode.pt)){
+		if(super.getMode().equals(TransportMode.pt)){
 			handler.handleEvent(e);
 			if(this.handledEvents == this.nrOfExpEvents){
 				handler.finish(this);
