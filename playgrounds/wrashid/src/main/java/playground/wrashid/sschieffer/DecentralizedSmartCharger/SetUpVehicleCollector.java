@@ -98,14 +98,14 @@ public class SetUpVehicleCollector {
 				null, 
 				ElectricVehicle.class,
 				80000,
-				0.3);// Nissan leaf 80kW Engine
+				0.9);// Nissan leaf 80kW Engine
 		
 		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
 				PHEVBattery, 
 				normalGas, 
 				PlugInHybridElectricVehicle.class,
 				80000,
-				0.9);
+				0.3);
 		
 		/*
 		 * The vehicle types are saved within the VehicleTypeCollector

@@ -251,9 +251,6 @@ public class DecentralizedChargingSimulation {
 	}	
 	
 	
-	public HashMap<Id, Double> getAgentV2GRevenues(){
-		return mySmartCharger.getAgentV2GRevenues();
-	}
 	
 	
 }

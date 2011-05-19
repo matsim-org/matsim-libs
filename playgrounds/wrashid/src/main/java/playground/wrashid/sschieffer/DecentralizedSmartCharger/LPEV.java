@@ -104,9 +104,11 @@ public class LPEV extends LP{
       
 		
 		try {
+			if(DecentralizedSmartCharger.debug){
+				getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"printLp.txt");
+				getSolver().printLp();
+			}
 			
-			getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"printLp.txt");
-			getSolver().printLp();
 			
 			} catch (Exception e) {	    
 		}
@@ -164,9 +166,11 @@ public class LPEV extends LP{
 		
 		try {
 			
+			if(DecentralizedSmartCharger.debug){
+				getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
+				getSolver().printLp();
+			}
 			
-			getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
-			getSolver().printLp();
 		
 		} catch (Exception e) {	    
 		}

@@ -38,34 +38,138 @@ public class V2G {
 	
 	private DecentralizedSmartCharger mySmartCharger;
 	//private LinkedListValueHashMap<Id, Double> agentV2GRevenue = new LinkedListValueHashMap<Id, Double>(); 
-	private HashMap<Id, Double> agentV2GRevenue = new HashMap<Id, Double>(); 
+	private HashMap<Id, V2GAgentStats> agentV2GStatistic = new HashMap<Id, V2GAgentStats>(); 
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
+	private double averageV2GRevenueEV=0;
+	private double averageV2GRevenuePHEV=0;
+	private double averageV2GRevenueAllAgents=0;
+	
+	private double totalRegulationUp=0;
+	private double totalRegulationUpEV=0;
+	private double totalRegulationUpPHEV=0;
+	private double totalRegulationDown=0;
+	private double totalRegulationDownEV=0;
+	private double totalRegulationDownPHEV=0;
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
-		
 		this.mySmartCharger=mySmartCharger;
+		initializeAgentStats();
+		
+	}
+	
+	public void initializeAgentStats(){
+		for (Id id: mySmartCharger.vehicles.getKeySet()){
+			agentV2GStatistic.put(id, new V2GAgentStats());
+		}
+	}
+	
+	public double getAgentV2GRevenues(Id id){
+		return agentV2GStatistic.get(id).getRevenueV2G();
+	}
+	
+	public double getAgentTotalJouleV2GUp(Id id){
+		return agentV2GStatistic.get(id).getTotalJoulesUp();
+	}
+	
+	public double getAgentTotalJouleV2GDown(Id id){
+		return agentV2GStatistic.get(id).getTotalJoulesDown();
+	}
+	
+	public double getAverageV2GRevenueAgent(){
+		return averageV2GRevenueAllAgents;
+	}
+	
+	public double getAverageV2GRevenueEV(){
+		return averageV2GRevenueEV;
+	}
+	
+	public double getAverageV2GRevenuePHEV(){
+		return averageV2GRevenuePHEV;
+	}
+	
+	
+	public double getTotalRegulationUp(){
+		return totalRegulationUp;
+	}
+	
+	public double getTotalRegulationUpEV(){
+		return totalRegulationUpEV;
+	}
+	
+	public double getTotalRegulationUpPHEV(){
+		return totalRegulationUpPHEV;
+	}
+	
+	public double getTotalRegulationDown(){
+		return totalRegulationDown;
+	}
+	
+	public double getTotalRegulationDownEV(){
+		return totalRegulationDownEV;
+	}
+	
+	public double getTotalRegulationDownPHEV(){
+		return totalRegulationDownPHEV;
+	}
+	
+	public void calcV2GRevenueStats(){
+		//EV
+		int totalEV=mySmartCharger.getAllAgentsWithEV().size();
+		for(int i=0; i<totalEV; i++){
+			Id agentId= mySmartCharger.getAllAgentsWithEV().get(i);
+			
+			averageV2GRevenueEV+=getAgentV2GRevenues(agentId);
+			averageV2GRevenueAllAgents+=getAgentV2GRevenues(agentId);
+			
+			totalRegulationDown+=getAgentTotalJouleV2GDown(agentId);
+			totalRegulationDownEV+=getAgentTotalJouleV2GDown(agentId);
+			
+			totalRegulationUp+=getAgentTotalJouleV2GUp(agentId);
+			totalRegulationUpEV+=getAgentTotalJouleV2GUp(agentId);
+		}
+		averageV2GRevenueEV=averageV2GRevenueEV/totalEV;
+		
+		//PHEV
+		int totalPHEV=mySmartCharger.getAllAgentsWithPHEV().size();
+		for(int i=0; i<totalPHEV; i++){
+			Id agentId= mySmartCharger.getAllAgentsWithPHEV().get(i);
+			averageV2GRevenuePHEV+=getAgentV2GRevenues(agentId);
+			averageV2GRevenueAllAgents+=getAgentV2GRevenues(agentId);
+			
+			totalRegulationDown+=getAgentTotalJouleV2GDown(agentId);
+			totalRegulationDownPHEV+=getAgentTotalJouleV2GDown(agentId);
+			
+			totalRegulationUp+=getAgentTotalJouleV2GUp(agentId);
+			totalRegulationUpPHEV+=getAgentTotalJouleV2GUp(agentId);
+		}
+		averageV2GRevenuePHEV=averageV2GRevenuePHEV/totalPHEV;
+		
+		//TOTAL
+		averageV2GRevenueAllAgents=averageV2GRevenueAllAgents/(totalPHEV+totalEV);
+		
 		
 	}
 	
 	
 	
-	public  HashMap<Id, Double> getAgentV2GRevenues(){
-		return agentV2GRevenue;
+	public void addRevenueToAgentFromV2G(double revenue, Id agentId){		
+		agentV2GStatistic.get(agentId).addRevenueV2G(revenue);		
 	}
 	
-	public void addRevenueToAgentFromV2G(double revenue, Id agentId){
-		if (agentV2GRevenue.containsKey(agentId)){
-			double valueBefore= agentV2GRevenue.get(agentId);
-			//update value
-			agentV2GRevenue.put(agentId,valueBefore+revenue);
-			
+	public void addJoulesUpDownToAgentStats(double joulesUpDown, Id agentId){		
+		
+		if (joulesUpDown>0){
+			agentV2GStatistic.get(agentId).addJoulesUp(joulesUpDown);
 		}else{
-			agentV2GRevenue.put(agentId,revenue);
-		}		
+			agentV2GStatistic.get(agentId).addJoulesDown(joulesUpDown);
+		}
+	
 	}
 	
-	public void regulationDownVehicleLoad(Id agentId, 
+	
+	
+	public void regulationUpDownVehicleLoad(Id agentId, 
 			LoadDistributionInterval electricSourceInterval, 
 			Schedule agentParkingDrivingSchedule, 
 			double compensation, // money
@@ -79,7 +183,7 @@ public class V2G {
 			double batteryMax) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
 		
 		double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
-		
+		// joules>0 
 		currentSOC=currentSOC+joules;
 		
 		costComparisonVehicle(agentId, 
@@ -91,152 +195,12 @@ public class V2G {
 				lpev,
 				lpphev,
 				 batterySize,batteryMin,batteryMax,
-				currentSOC);
+				currentSOC, joules);
 		
 	}
 	
 	
 	
-	/**
-	 * calculates if continuation of current plan is cheaper or rescheduling feasible and cheaper
-	 * if rescheduling is the better option, the new schedule is stored in the agentParkingAndDrivingSchedules in DEcentralizedSmartCharger
-	 * and the agentCharginCosts are also updated for the agent
-	 * 
-	 * @param agentId
-	 * @param electricSourceInterval
-	 * @param agentParkingDrivingSchedule
-	 * @param compensation
-	 * @param ev
-	 * @param type
-	 * @param lpev
-	 * @param lpphev
-	 * @param batterySize
-	 * @param batteryMin
-	 * @param batteryMax
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws OptimizationException
-	 */
-	public void regulationUpVehicleLoad(Id agentId, 
-			LoadDistributionInterval electricSourceInterval, 
-			Schedule agentParkingDrivingSchedule, 
-			double compensation,
-			double joules,
-			boolean ev,
-			String type,
-			LPEV lpev,
-			LPPHEV lpphev,
-			double batterySize,
-			double batteryMin,
-			double batteryMax) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
-		
-			
-			double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
-			currentSOC=currentSOC - joules;
-			
-			costComparisonVehicle(agentId, 
-					electricSourceInterval, 
-					agentParkingDrivingSchedule, 
-					compensation, 
-					ev, 
-					type,
-					lpev,
-					lpphev,
-					 batterySize,batteryMin,batteryMax,
-					currentSOC);
-			
-	}
-
-
-
-	/**
-	 * checks if agent is at Hub during this load interval
-	 * for every interval, where the agent is at the specified hub, rescheduling is attempted and if successful the hub load is reduced
-	 * 
-	 * 
-	 * @param agentId
-	 * @param currentStochasticLoadInterval
-	 * @param agentParkingDrivingSchedule
-	 * @param compensation
-	 * @param joules
-	 * @param ev
-	 * @param type
-	 * @param lpev
-	 * @param lpphev
-	 * @param batterySize
-	 * @param batteryMin
-	 * @param batteryMax
-	 * @param hub
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws OptimizationException
-	 */
-	public void regulationUpHubLoad(Id agentId, 
-			LoadDistributionInterval currentStochasticLoadInterval, 
-			Schedule agentParkingDrivingSchedule, 
-			double compensation,
-			double joules,
-			boolean ev,
-			String type,
-			LPEV lpev,
-			LPPHEV lpphev,
-			double batterySize,
-			double batteryMin,
-			double batteryMax,
-			int hub) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
-		
-			
-			Schedule relevantAgentParkingAndDrivingScheduleAtHub= 
-				findAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(hub, 
-				agentParkingDrivingSchedule,
-				currentStochasticLoadInterval);
-		
-			if(relevantAgentParkingAndDrivingScheduleAtHub.getNumberOfEntries()>0){
-				
-				for(int i=0; i<relevantAgentParkingAndDrivingScheduleAtHub.getNumberOfEntries();i++){
-					
-					TimeInterval t= relevantAgentParkingAndDrivingScheduleAtHub.timesInSchedule.get(i);
-					
-					LoadDistributionInterval electricSourceInterval= 
-						new LoadDistributionInterval(t.getStartTime(), 
-								t.getEndTime(), 
-								currentStochasticLoadInterval.getPolynomialFunction(), 
-								currentStochasticLoadInterval.isOptimal());
-					
-					
-					double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
-					currentSOC=currentSOC - joules;
-					
-					costComparisonHubload(agentId, 
-							electricSourceInterval, 
-							agentParkingDrivingSchedule, 
-							compensation,
-							joules,
-							ev,
-							type,
-							lpev,
-							lpphev,
-							batterySize,
-							batteryMin,
-							batteryMax,
-							hub,
-							currentSOC);
-					
-				}
-				
-	
-			}
-		
-	}
-
-
-
 	/**
 	 * attempts to charge agent battery from grid stochastic load,
 	 * - if agent contract allows regulation down 
@@ -265,7 +229,7 @@ public class V2G {
 	 * @throws IOException
 	 * @throws OptimizationException
 	 */
-	public void regulationDownHubLoad(Id agentId, 
+	public void regulationUpDownHubLoad(Id agentId, 
 			LoadDistributionInterval currentStochasticLoadInterval, 
 			Schedule agentParkingDrivingSchedule, 
 			double compensation,
@@ -304,7 +268,7 @@ public class V2G {
 					//*****************************
 	
 					double currentSOC=getSOCAtTime(agentParkingDrivingSchedule, electricSourceInterval.getEndTime());
-					
+					// joules >0
 					currentSOC=currentSOC+joules;
 					//*****************************
 					//*****************************
@@ -368,7 +332,8 @@ public class V2G {
 			double batterySize,
 			double batteryMin,
 			double batteryMax,
-			double currentSOC) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+			double currentSOC,
+			double joules) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		//try reschedule
 		Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
 				agentParkingDrivingSchedule, 
@@ -406,7 +371,8 @@ public class V2G {
 					agentParkingDrivingSchedule,
 					electricSourceInterval,
 					costKeeping,
-					costReschedule);
+					costReschedule,
+					joules);
 			
 			// joules>0 positive function which needs to be reduced
 			reduceAgentVehicleLoadsByGivenLoadInterval(
@@ -480,15 +446,14 @@ public class V2G {
 					agentParkingDrivingSchedule,
 					electricSourceInterval,
 					costKeeping,
-					costReschedule);
+					costReschedule,
+					joules);
 			
 			// e.g. stochastic load on net is -3500
 			// thus car discharges 3500 to balance the net
-			// thus -3500 will be reduced by (-3500)=>0
+			// thus -3500 will be reduced by (-3500)= 0
 			reduceHubLoadByGivenLoadInterval(hub, electricSourceInterval);
 			
-		}else{
-			// nothing load remains in hub and no rescheduling
 		}
 	}
 	
@@ -557,10 +522,15 @@ public class V2G {
 			Schedule agentParkingDrivingSchedule,
 			LoadDistributionInterval electricSourceInterval,
 			double costKeeping,
-			double costReschedule) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
+			double costReschedule,
+			double joules) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
 		
 		//UPDATE CHARGING COSTS 
 		addRevenueToAgentFromV2G(costKeeping-costReschedule, agentId);
+		
+		// add joules to V2G up or down
+		addJoulesUpDownToAgentStats(joules, agentId);
+		
 		// change agents charging costs
 		mySmartCharger.getChargingCostsForAgents().put(
 				agentId, 
@@ -568,9 +538,10 @@ public class V2G {
 				);
 		
 		
-		updateChargingSchedule(agentId, 
+		// distribute new found required charging times for agent
+		answerScheduleAfterElectricSourceInterval=updateChargingSchedule(agentId, 
 				answerScheduleAfterElectricSourceInterval,
-				electricSourceInterval	);
+				electricSourceInterval);
 		
 		
 		//UPDATE AGENTPARKINGADNDRIVINGSCHEDULE
@@ -592,13 +563,17 @@ public class V2G {
 	 * @throws FunctionEvaluationException
 	 * @throws IllegalArgumentException
 	 */
-	public void updateChargingSchedule(Id agentId, 
+	public Schedule updateChargingSchedule(Id agentId, 
 			Schedule answerScheduleAfterElectricSourceInterval,
 			LoadDistributionInterval electricSourceInterval	) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
+		
 		//UPDATE CHARGING SCHEDULE
+		
+		// determine the part which remains (first half )
 		Schedule oldChargingSchedule= mySmartCharger.getAllAgentChargingSchedules().get(agentId);
 		Schedule oldRemainingPartChargingSchedule= oldChargingSchedule.cutChargingScheduleAtTime(
 				electricSourceInterval.getEndTime());
+		
 		if(DecentralizedSmartCharger.debug){
 			if(oldRemainingPartChargingSchedule.getNumberOfEntries()>0){
 				System.out.println("old remaining part of charging schedule of agent "+ agentId.toString());
@@ -606,6 +581,7 @@ public class V2G {
 			}
 		}
 		
+		// determine the new second half
 		Schedule newChargingSecondHalf= mySmartCharger.myChargingSlotDistributor.distribute(agentId, 
 				answerScheduleAfterElectricSourceInterval);
 		if(DecentralizedSmartCharger.debug){
@@ -614,6 +590,10 @@ public class V2G {
 		}
 		oldRemainingPartChargingSchedule.mergeSchedules(newChargingSecondHalf);
 		mySmartCharger.getAllAgentChargingSchedules().put(agentId, oldRemainingPartChargingSchedule);
+		
+		
+		
+		return newChargingSecondHalf;
 				
 	}
 	
@@ -659,8 +639,7 @@ public class V2G {
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		// -3500-(-3500)=0
 		
-		
-		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentId);
+		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentId);
 		
 		PolynomialFunction negativePolynomialFunc= 
 			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
@@ -675,29 +654,14 @@ public class V2G {
 		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
 				negativeElectricSourceInterval);
 		
-		mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.put(agentId, 
+		mySmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.put(agentId, 
 				agentVehicleSource
 				);
 		
 	}
 
 	
-	/*public void reduceAgentVehicleLoadsByGivenLoadInterval(
-			Id agentId, 
-			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		
-		// 3500-(3500)=0
-		Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.getValue(agentId);
-		
-		
-		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(electricSourceInterval);
-		
-		mySmartCharger.myHubLoadReader.agentVehicleSourceMapping.put(agentId, 
-				agentVehicleSource
-				);
-		
-	}*/
+
 
 	/**
 	 * reduces the entry of myHubLoadReader.stochasticHubLoadDistribution.getValue(i)	 * 
@@ -715,7 +679,7 @@ public class V2G {
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		
-		Schedule hubLoadSchedule= mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(i);
+		Schedule hubLoadSchedule= mySmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(i);
 		
 		PolynomialFunction negativePolynomialFunc= 
 			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
@@ -730,7 +694,7 @@ public class V2G {
 		
 		hubLoadSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(negativeElectricSourceInterval);
 		
-		mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.put(i, hubLoadSchedule);
+		mySmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.put(i, hubLoadSchedule);
 		
 		
 	}

@@ -181,11 +181,11 @@ public class Schedule {
 	 * only meant for schedules with loaddistributionIntervals,
 	 * 
 	 * passed String is title String of diagram
-	 * @param name
+	 * @param titleGraph
 	 * @throws IOException
 	 */
 	
-	public void visualizeLoadDistribution(String name) throws IOException{
+	public void visualizeLoadDistribution(String titleGraph, String saveAs) throws IOException{
 		XYSeriesCollection loadDistributionIntervals = new XYSeriesCollection();
 				
 		for(int i=0; i<getNumberOfEntries();i++){
@@ -198,7 +198,7 @@ public class Schedule {
 		
         
         JFreeChart chart = ChartFactory.createXYLineChart(
-        		name, "time of day", "free load [W]", loadDistributionIntervals, 
+        		titleGraph, "time of day", "free load [W]", loadDistributionIntervals, 
         		PlotOrientation.VERTICAL, false, true, false);
         
         final XYPlot plot = chart.getXYPlot();
@@ -220,7 +220,7 @@ public class Schedule {
         plot.setRangeGridlinePaint(Color.gray); 
       
         ChartUtilities.saveChartAsPNG(
-        		new File(DecentralizedSmartCharger.outputPath+"Hub\\"+ name+".png") , 
+        		new File(saveAs) , //DecentralizedSmartCharger.outputPath+"Hub\\"+ name+".png"
         		chart, 800, 600);
        
 	}

@@ -71,12 +71,17 @@ public class HubLoadDistributionReader {
 	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
 	HashMap<Integer, Schedule> deterministicHubLoadDistributionAfter;
 	HashMap<Integer, Schedule> deterministicHubLoadDistributionPHEVAdjusted;
+	
 	public HashMap<Integer, Schedule> stochasticHubLoadDistribution;
+	public HashMap<Integer, Schedule> stochasticHubLoadDistributionAfter;
+	public HashMap<Integer, Schedule> locationSourceMapping;	
+	public HashMap<Id, Schedule> agentVehicleSourceMapping;
+	public HashMap<Id, Schedule> agentVehicleSourceMappingAfter;
+	
 	HashMap<Integer, Schedule> pricingHubDistribution;
 	HashMap<Integer, TimeDataCollector> connectivityHubDistribution;
 	
-	HashMap<Integer, Schedule> locationSourceMapping;
-	public HashMap<Id, Schedule> agentVehicleSourceMapping;
+	
 	
 	
 	Controler controler;
@@ -163,12 +168,50 @@ public class HubLoadDistributionReader {
 	public void setStochasticSources(
 			HashMap<Integer, Schedule> stochasticHubLoadDistribution,
 			HashMap<Integer, Schedule> locationSourceMapping,
-			HashMap<Id, Schedule> agentVehicleSourceMapping){
+			HashMap<Id, Schedule> agentVehicleSourceMapping) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions		
 		this.locationSourceMapping=locationSourceMapping;
 		this.agentVehicleSourceMapping=agentVehicleSourceMapping;
+		sumStochasticGridAndLocationSources();
+		
+		// initialize 
+		initializeStochasticHubLoadDistributionAfter();
 	}
+	
+	
+	public void initializeStochasticHubLoadDistributionAfter(){
+		stochasticHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
+		agentVehicleSourceMappingAfter = new HashMap<Id, Schedule> ();
+		
+		// make a copy of stochasticHubLoadDistribution
+		for(Integer hub: stochasticHubLoadDistribution.keySet()){
+			stochasticHubLoadDistributionAfter.put(
+					hub, stochasticHubLoadDistribution.get(hub).cloneLoadSchedule());
+		}
+		
+		// make a copy of agentVehicleSourceMapping 
+		for(Id id: agentVehicleSourceMapping.keySet()){
+			agentVehicleSourceMappingAfter.put(
+					id, agentVehicleSourceMapping.get(id).cloneLoadSchedule());
+		}
+	}
+	
+	
+	
+	public void sumStochasticGridAndLocationSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		for(Integer hub: locationSourceMapping.keySet()){
+			
+			Schedule locationSchedule= locationSourceMapping.get(hub);
+			for(int i=0; i< locationSchedule.getNumberOfEntries(); i++){
+			
+				stochasticHubLoadDistribution.get(hub).addLoadDistributionIntervalToExistingLoadDistributionSchedule(
+				(LoadDistributionInterval)locationSchedule.timesInSchedule.get(i)
+				);
+			}
+		}
+	}
+	
 	
 	
 	public void initializeConnectivityHubDistribution(){

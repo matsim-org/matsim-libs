@@ -91,11 +91,11 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";
 		
-		final double bufferBatteryCharge=0.0;		
+		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
 		int numberOfHubsInX=1;
@@ -174,9 +174,9 @@ public class Main_exampleV2G {
 		/*********************
 		 * Example how to Use V2G
 		 *********************/
-		
-		HashMap<Id, Double> agentRevenuesFromV2G=
-			mySimulation.getAgentV2GRevenues();	
+		//add new tuff
+	/*	HashMap<Id, Double> agentRevenuesFromV2G=
+			mySimulation.getAgentV2GRevenues();	*/
 	}
 
 }

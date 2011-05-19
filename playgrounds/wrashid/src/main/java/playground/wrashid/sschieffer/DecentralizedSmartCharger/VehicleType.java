@@ -25,8 +25,8 @@ public class VehicleType {
 			Battery myBattery,
 			GasType myGasType, 
 			Class referenceClass,
-			double efficiency,
-			double engineWatt){
+			double engineWatt,
+			double efficiency){
 		
 		this.myBattery=myBattery;
 		this.myGasType=myGasType;

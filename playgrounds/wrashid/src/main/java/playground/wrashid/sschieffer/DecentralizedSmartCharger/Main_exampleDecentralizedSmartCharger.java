@@ -104,7 +104,7 @@ public class Main_exampleDecentralizedSmartCharger {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=1.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\";		
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 				
 		/**

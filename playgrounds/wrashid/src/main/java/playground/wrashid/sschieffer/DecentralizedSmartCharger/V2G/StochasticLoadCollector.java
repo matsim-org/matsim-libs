@@ -56,14 +56,13 @@ public class StochasticLoadCollector {
 	}
 	
 	public HashMap<Integer, Schedule> getStochasticHubSources(){
-		makeSourceHub();
+		//makeSourceHub();
 		return null;
 		//return stochasticHubSource;
 	}
 	
 	
 	public void makeAgentVehicleSource(Controler controler){
-		
 		
 		// at random agents get 30 minutes source
 		for(Id id : mySimulation.mySmartCharger.vehicles.getKeySet()){
@@ -95,8 +94,8 @@ public class StochasticLoadCollector {
 		
 		for (Integer i: hubSet){
 			
-			// 3 hours - 2 down 1 up
-			double secs= 3*3600;
+			// 1 hours - 40min down 20up
+			double secs= 1*3600;
 						
 			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
 			double startSec= Math.random()*buffer;
@@ -106,9 +105,9 @@ public class StochasticLoadCollector {
 			PolynomialFunction p1 = new PolynomialFunction(new double[] {numPpl*3500});
 			PolynomialFunction p2 = new PolynomialFunction(new double[] {-numPpl*3500});
 			PolynomialFunction p3 = new PolynomialFunction(new double[] {numPpl*3500});
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+3600, p1, true));
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+3600, startSec+2*3600, p2, true));
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+2*3600, startSec+3*3600, p3, true));
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+20*60, p1, true));
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+3600, startSec+2*20*60, p2, true));
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+2*3600, startSec+3*20*60, p3, true));
 			
 			stochasticHubLoadDistribution.put(i, bullShitStochastic);
 		}
