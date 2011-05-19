@@ -61,8 +61,16 @@ public class DgCottbusSignalPlanChartGenerator {
 		double endSecond = startSecond + 3600.0;
 		startSecond = 8.0 * 3600.0;
 		endSecond = startSecond + 3600.0;
-
 		baseDir = baseDir + "run" + runId;
+		
+		//cottbus football
+		runId = new IdImpl("1222_20_football_fans");
+		baseDir = DgPaths.REPOS + "runs-svn/run1222/20_football_fans";
+		iteration = 500;
+		startSecond = 17.0  * 3600.0;
+		endSecond = startSecond + 3600.0;
+		signalSystemId = new IdImpl(18);
+		
 //		koehler strehler 2010
 //		runId = null;
 //		baseDir = "/media/data/work/matsimOutput/koehlerStrehler2010Scenario5SelectBest/";
