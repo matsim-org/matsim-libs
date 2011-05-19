@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,16 +54,19 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 	private double end;
 	
 	public static void main(String[] args) {
-		if (args.length != 4) return;
+		if (args.length != 5) return;
 		
 		String eventsFile = args[0];
 		String networkFile = args[1];
-		double begin = Double.parseDouble(args[2]);
-		double end = Double.parseDouble(args[3]);
+		String changeEventsFile = args[2];
+		double begin = Double.parseDouble(args[3]);
+		double end = Double.parseDouble(args[4]);
 		
 		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		config.network().setInputFile(networkFile);
+		config.network().setChangeEventInputFile(changeEventsFile);
+		config.network().setTimeVariantNetwork(true);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		
 		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(network, begin, end);
@@ -151,5 +153,4 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 			inbetweenOnLinkAgents.add(event.getPersonId());
 		}
 	}
-
 }
