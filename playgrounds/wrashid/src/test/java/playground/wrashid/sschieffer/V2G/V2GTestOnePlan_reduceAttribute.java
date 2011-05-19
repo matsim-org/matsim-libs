@@ -67,9 +67,9 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 	
 	Controler controler; 
 	
-	final double phev=1.0;
+	final double electrification= 1.0; 
+	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 	final double ev=0.0;
-	final double combustion=0.0;
 	
 	final double bufferBatteryCharge=0.0;
 	
@@ -101,9 +101,9 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		controler= mySimulation.getControler();
 		
@@ -157,7 +157,7 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 					V2G myV2G= new V2G(myDecentralizedSmartCharger);
 					myDecentralizedSmartCharger.setV2G(myV2G);
 					
-					for(Id id: controler.getPopulation().getPersons().keySet()){
+					for(Id id: myDecentralizedSmartCharger.vehicles.getKeySet()){
 						System.out.println("AGENT VEHICLE SOURCE BEFORE V2G of -3500 between 0-300");
 						
 						agentVehicleSourceMapping.get(id).printSchedule();

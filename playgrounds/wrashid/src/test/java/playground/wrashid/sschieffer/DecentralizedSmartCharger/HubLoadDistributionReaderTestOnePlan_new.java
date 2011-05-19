@@ -47,9 +47,10 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 		
-	final double phev=1.0;
+	final double electrification= 1.0; 
+	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 	final double ev=0.0;
-	final double combustion=0.0;
+	
 	
 	private TestSimulationSetUp mySimulation;
 	private Controler controler;
@@ -71,9 +72,9 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	public Controler setControler() throws IOException{
 		mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		return mySimulation.getControler();
 	}

@@ -43,6 +43,7 @@ import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlug
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
@@ -66,9 +67,9 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 	
 	Controler controler; 
 	
-	final double phev=0.5;
-	final double ev=0.5;
-	final double combustion=0.0;
+	final double electrification= 1.0; 
+	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+	final double ev=0.5; 
 	
 	final double bufferBatteryCharge=0.0;
 	
@@ -94,9 +95,9 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		controler= mySimulation.getControler();
 		
@@ -113,12 +114,12 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							standardChargingSlotLength);
 					
 					myDecentralizedSmartCharger.run();
-					int numPpl= controler.getPopulation().getPersons().size();
+					int numPpl= (myDecentralizedSmartCharger.vehicles.getKeySet().size());
 					
 					
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
-					System.out.println(phev);
-					int sizeExp= (int)Math.round(phev*numPpl);
+					System.out.println(1-ev);
+					int sizeExp= (int)Math.round((1-ev)*numPpl);
 					int sizeAct= agentsWithPHEV.size();
 					assertEquals(sizeExp, sizeAct);
 					
@@ -131,7 +132,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 					/*
 					 * 
 					 */
-					for(Id id : controler.getPopulation().getPersons().keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						Schedule testSchedule = mySimulation.makeFakeSchedule();
 						
 						ParkingInterval p1= (ParkingInterval) testSchedule.timesInSchedule.get(0);
@@ -184,9 +185,9 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							calcCost= myDecentralizedSmartCharger.calculateChargingCostForAgentSchedule(id, testSchedule);
 							assertEquals(calcCost, expectedCost);
 							
-							assertEquals(myDecentralizedSmartCharger.joulesExtraConsumptionToGasCosts(id, gasJoulesPerLiter), gasPricePerLiter);
+							assertEquals(myDecentralizedSmartCharger.joulesExtraConsumptionToGasCosts(id, gasJoulesPerLiter), gasPricePerLiter*1/(0.9));
 							
-							assertEquals(myDecentralizedSmartCharger.joulesToEmissionInKg(id, gasJoulesPerLiter), emissionPerLiter);
+							assertEquals(myDecentralizedSmartCharger.joulesToEmissionInKg(id, gasJoulesPerLiter), emissionPerLiter*1/(0.9));
 							
 							
 						}

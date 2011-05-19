@@ -30,9 +30,10 @@ public class TimeTesting {
 		
 		final double standardChargingSlotLength=15*60;
 		
-		final double phev=1.0;
-		final double ev=0.0;
-		final double combustion=0.0;
+		final double electrification= 1.0; 
+		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+		final double ev=0.0; 
+		
 		
 		final double bufferBatteryCharge=0.0;
 		
@@ -50,9 +51,9 @@ public class TimeTesting {
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		Controler controler= mySimulation.getControler();
 		
@@ -76,7 +77,7 @@ public class TimeTesting {
 					myDecentralizedSmartCharger.setDebug(false);
 					myDecentralizedSmartCharger.run();
 					
-					myDecentralizedSmartCharger.writeSummary("DSC"+configName);
+					myDecentralizedSmartCharger.writeSummaryDSC("DSC"+configName);
 					
 					/*
 					 * V2G
@@ -102,7 +103,7 @@ public class TimeTesting {
 					myDecentralizedSmartCharger.setV2G(myV2G);
 					myDecentralizedSmartCharger.initializeAndRunV2G();
 					
-					myDecentralizedSmartCharger.writeSummary("V2G"+configName);
+					myDecentralizedSmartCharger.writeSummaryV2G("V2G"+configName);
 					
 				} catch (Exception e1) {
 					e1.printStackTrace();

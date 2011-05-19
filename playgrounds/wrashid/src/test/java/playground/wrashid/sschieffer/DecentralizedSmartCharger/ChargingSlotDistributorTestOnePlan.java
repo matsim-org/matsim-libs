@@ -62,10 +62,10 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 	
 	Controler controler; 
 	
-	final double phev=0.0;
+	final double electrification= 1.0; 
+	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 	final double ev=1.0;
-	final double combustion=0.0;
-	
+		
 	final double bufferBatteryCharge=0.0;
 	
 	final double standardChargingSlotLength=15*60;
@@ -92,9 +92,9 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		controler= mySimulation.getControler();
 		
@@ -110,7 +110,7 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 							bufferBatteryCharge,
 							standardChargingSlotLength);
 					
-					for(Id id : controler.getPopulation().getPersons().keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						
 						agentOne=id;						
 						

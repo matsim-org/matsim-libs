@@ -78,14 +78,17 @@ public class TestVehicleCollectorSetUp {
 		VehicleType EVTypeStandard= new VehicleType("standard EV", 
 				EVBattery, 
 				null, 
-				new ElectricVehicle(null, new IdImpl(1)),
-				80000);// Nissan leaf 80kW Engine
+				ElectricVehicle.class,
+				80000,
+				0.3);// Nissan leaf 80kW Engine
 		
 		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
 				PHEVBattery, 
 				normalGas, 
-				new PlugInHybridElectricVehicle(new IdImpl(1)),
-				80000);
+				PlugInHybridElectricVehicle.class,
+				80000,
+				0.9);
+		
 		
 		/*
 		 * The vehicle types are saved within the VehicleTypeCollector

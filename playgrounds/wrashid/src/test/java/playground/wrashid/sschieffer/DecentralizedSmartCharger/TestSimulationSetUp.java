@@ -37,9 +37,9 @@ public class TestSimulationSetUp {
 	 * @throws IOException 
 	 */
 	public TestSimulationSetUp(String configPath, 
-			double phev, 
-			double ev, 
-			double combustion) throws IOException{
+			double electrification, 
+			double ev
+			) throws IOException{
 		
 		controler=new Controler(configPath);
 		
@@ -47,7 +47,7 @@ public class TestSimulationSetUp {
 		parkingTimesPlugin = new ParkingTimesPlugin(controler);
 		
 		energyConsumptionInit= new EnergyConsumptionInit(
-				phev, ev, combustion);
+				electrification, ev);
 		
 		
 		final double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
@@ -369,7 +369,7 @@ public class TestSimulationSetUp {
 			new HashMap<Id, Schedule>();
 		
 		//Id
-		for(Id id : controler.getPopulation().getPersons().keySet()){
+		for(Id id : energyConsumptionInit.getVehicles().getKeySet()){
 			
 				Schedule bullShitMinus= new Schedule();
 				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});

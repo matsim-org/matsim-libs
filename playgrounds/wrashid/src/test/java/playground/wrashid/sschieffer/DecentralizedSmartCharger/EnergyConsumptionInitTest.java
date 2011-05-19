@@ -38,9 +38,9 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 	}
 	
 	public void testVehiclePercentages(){
-		double phev= 0.3;
+		
+		double electrification= 1.0;
 		double ev= 0.2;
-		double combustion =0.5;
 		int error=1;
 		
 		ParkingTimesPlugin parkingTimesPlugin= new ParkingTimesPlugin(controler);
@@ -50,7 +50,7 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
 		EnergyConsumptionInit energyInit= new EnergyConsumptionInit(
-				phev, ev, combustion);
+				electrification, ev);
 		
 		controler.addControlerListener(energyInit);
 		controler.setOverwriteFiles(true);		
@@ -60,25 +60,21 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 		
 		int countPHEV=0;
 		int countEV=0;
-		int countCom=0;
-		
+				
 		for (Id id: vehicles.getKeySet()){
 			if (vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 				countPHEV++;
-			}else{
-				if (vehicles.getValue(id).getClass().equals(ElectricVehicle.class)){
+			}else{				
 					countEV++;
-				}else{
-					countCom++;
 				}
 			}
-		}
-				
 		
-		assertEquals((countPHEV>30-error && countPHEV<30+error), true);
+				
+		//ev 20, phev 80
+		assertEquals((countPHEV>80-error && countPHEV<80+error), true);
 		assertEquals((countEV>20-error && countEV<20+error), true);
-		assertEquals((countCom>50-error && countCom<50+error), true);
 		
 	}
+	
 	
 }

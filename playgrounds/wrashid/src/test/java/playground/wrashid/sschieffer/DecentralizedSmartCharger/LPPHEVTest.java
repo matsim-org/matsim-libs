@@ -69,9 +69,10 @@ public class LPPHEVTest extends TestCase{
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 	
-	final double phev=1.0;
-	final double ev=0.0;
-	final double combustion=0.0;
+	final double electrification= 1.0; 
+	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+	final double ev=0.0; 
+	
 	
 	private double chargingSpeed=3500.0;
 	
@@ -106,9 +107,9 @@ public class LPPHEVTest extends TestCase{
 		
 		mySimulation = new TestSimulationSetUp(
 				configPath, 
-				phev, 
-				ev, 
-				combustion);
+				electrification, 
+				ev 
+				);
 		
 		controler= mySimulation.getControler();
 		
@@ -132,7 +133,7 @@ public class LPPHEVTest extends TestCase{
 					 */
 					
 					
-					for(Id id : controler.getPopulation().getPersons().keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						
 							agentOne=id;
 														
@@ -284,7 +285,7 @@ public class LPPHEVTest extends TestCase{
 					/*
 					 * RESOLVE
 					 */
-					for(Id id : controler.getPopulation().getPersons().keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						
 						agentOne=id;
 						
