@@ -50,7 +50,8 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  */
 public class FacilitiesFactory {
 
-	private static final double EPSILON = 1E-7;
+	//private static final double EPSILON = 1E-7;
+	private static final double EPSILON = 1;
 	private static final OpeningTime OPENING_TIME = 
 		new OpeningTimeImpl(OpeningTime.DayType.wkday, 0d, EPSILON);
 
