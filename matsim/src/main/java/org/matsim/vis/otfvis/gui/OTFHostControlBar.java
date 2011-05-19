@@ -45,6 +45,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
@@ -184,7 +185,12 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void updateScaleLabel() {
-		float scale = drawers.get(1).getScale();
+		float scale = 0.0f;
+		for (OTFDrawer drawer : drawers) {
+			if (!(drawer instanceof OTFTimeLine)) {
+				scale = drawer.getScale();
+			}
+		}
 		scale = (float)(Math.round(scale*100))/100;
 		this.scaleField.setText(String.valueOf(scale));
 	}
