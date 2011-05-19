@@ -281,7 +281,7 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 						assertEquals(1500.0, lFirst.getPolynomialFunction().getCoefficients()[0]);
 						
 						
-						/*
+						/**********************************************
 						 *  * CHECK
 						 * reduceHubLoadByGivenLoadInterval
 						 */
@@ -309,6 +309,30 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 						assertEquals(1500.0, lFirst.getPolynomialFunction().getCoefficients()[0]);
 						assertEquals(3500.0, lSecond.getPolynomialFunction().getCoefficients()[0]);
 						assertEquals(5500.0, lThird.getPolynomialFunction().getCoefficients()[0]);
+						
+						/**********************************************
+						 *  * CHECK
+						 * addJoulesV2G
+						 */
+						
+						double down = myV2G.getTotalRegulationUp();
+						myV2G.addJoulesUpDownToAgentStats(1000.0, id);
+						double newDown = myV2G.getTotalRegulationUp();
+						myV2G.calcV2GRevenueStats();
+						assertEquals(1000.0, newDown-down);
+						
+						down = myV2G.getTotalRegulationDown();
+						myV2G.addJoulesUpDownToAgentStats(-1000.0, id);
+						newDown = myV2G.getTotalRegulationDown();
+						myV2G.calcV2GRevenueStats();
+						assertEquals(1000.0, down-newDown);
+						
+						/**********************************************
+						 *  * CHECK
+						 * sensible outcome averageV2G
+						 */
+						
+						assertEquals(myV2G.getAverageV2GRevenuePHEV(), myV2G.getAverageV2GRevenueAgent());
 						
 					}
 					

@@ -172,11 +172,11 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 								0.0);
 					
 					
-					double revenue=myDecentralizedSmartCharger.getAgentV2GRevenues().get(agentOne);
+					double revenue=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
 					
 					myDecentralizedSmartCharger.myV2G.addRevenueToAgentFromV2G(100.0, agentOne);
 					
-					double revenueNew=myDecentralizedSmartCharger.getAgentV2GRevenues().get(agentOne);
+					double revenueNew=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
 					
 					assertEquals(revenue+100.0, revenueNew);
 					
