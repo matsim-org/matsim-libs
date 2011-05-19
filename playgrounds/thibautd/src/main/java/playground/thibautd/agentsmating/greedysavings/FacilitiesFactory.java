@@ -20,6 +20,7 @@
 package playground.thibautd.agentsmating.greedysavings;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -49,8 +50,9 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  */
 public class FacilitiesFactory {
 
+	private static final double EPSILON = 1E-7;
 	private static final OpeningTime OPENING_TIME = 
-		new OpeningTimeImpl(OpeningTime.DayType.wkday, 0d, 0d);
+		new OpeningTimeImpl(OpeningTime.DayType.wkday, 0d, EPSILON);
 
 	private final ActivityFacilitiesImpl facilities;
 	private final Network network;
@@ -130,7 +132,9 @@ public class FacilitiesFactory {
 		private long currentId;
 
 		public IdFactory(final ActivityFacilities facilities) {
-			Id maxId = Collections.max(facilities.getFacilities().keySet());
+			Id maxId = Collections.max(
+					facilities.getFacilities().keySet(),
+					new IdLongComparator());
 			this.currentId = Long.parseLong(maxId.toString());
 		}
 
@@ -140,5 +144,17 @@ public class FacilitiesFactory {
 		}
 	}
 
+	/**
+	 * Compare Id based on the underlying long value, rather than the
+	 * aphabetical order.
+	 */
+	private final class IdLongComparator implements Comparator<Id> {
+		@Override
+		public int compare(Id id1, Id id2) {
+			long long1 = Long.parseLong(id1.toString());
+			long long2 = Long.parseLong(id2.toString());
+			return (new Long(long1)).compareTo(long2);
+		}
+	}
 }
 
