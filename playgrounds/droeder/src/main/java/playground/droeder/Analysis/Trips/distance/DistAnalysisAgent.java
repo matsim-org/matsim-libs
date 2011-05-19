@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 
 /**
  * @author droeder
@@ -32,23 +35,70 @@ import org.matsim.api.core.v01.population.PlanElement;
  */
 public class DistAnalysisAgent {
 	
-	private Map<Id, DistAnalysisTrip> trips;
+	private LinkedList<DistAnalysisTrip> trips;
+	private Id id;
 	
-	public DistAnalysisAgent(List<PlanElement> elements){
-		this.trips = this.generateTrips(elements);
+	public DistAnalysisAgent(LinkedList<DistAnalysisTrip> trips, Id id){
+		this.trips = trips;
+		this.id = id;
+	}
+
+
+	/**
+	 * @param e
+	 */
+	public boolean processEvent(AgentEvent e) {
+		// TODO Auto-generated method stub
+		if(e instanceof AgentArrivalEvent){
+			
+		}else if(e instanceof AgentDepartureEvent){
+			
+		}
+		return this.trips.getFirst().isFinished();
 	}
 
 	/**
-	 * @param elements
+	 * @param e
+	 * @param length 
+	 */
+	public boolean processLinkEnterEvent(LinkEnterEvent e, double length) {
+		// TODO Auto-generated method stub
+		
+		return this.trips.getFirst().isFinished();
+	}
+
+	public Id getId(){
+		return this.id;
+	}
+	
+	@Override
+	public boolean equals(final Object other){
+		if(!(other instanceof DistAnalysisAgent)){
+			return false;
+		}else{
+			if(((DistAnalysisAgent) other).getId().equals(this.id)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+
+
+	/**
+	 * @param linkLength
+	 */
+	public void passedLinkOnRide(double linkLength) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	/**
 	 * @return
 	 */
-	private Map<Id, DistAnalysisTrip> generateTrips(List<PlanElement> elements) {
-		Map<Id, DistAnalysisTrip> agentTrips = new HashMap<Id, DistAnalysisTrip>();
-		
-		//TODO implement
-		
-		
-		return agentTrips;
+	public AbstractAnalysisTrip removeFinishedTrip() {
+		return this.trips.removeFirst();
 	}
 
 }

@@ -17,10 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.travelTime;
+package playground.droeder.Analysis.Trips.distance;
 
-import java.util.HashMap;
-import java.util.Map;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -28,30 +28,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TTAnalysisTripSetAllMode {
+public class DistanceAnalysisTripSet extends AbstractAnalysisTripSet{
 	
-	private Map<String, TTAnalysisTripSetOneMode> mode2TripSet = new HashMap<String, TTAnalysisTripSetOneMode>();
-	private boolean storeTrips;
-	private Geometry zone;
 	
-	public TTAnalysisTripSetAllMode(boolean storeTrips, Geometry zone){
-		this.storeTrips = storeTrips;
-		this.zone = zone;
+	public DistanceAnalysisTripSet(String mode, Geometry zone){
+		super(mode, zone);
 	}
-	
-	public void addTrip(AbstractTTAnalysisTrip trip){
-		String mode = trip.getMode();
+
+	@Override
+	protected void addTripValues(AbstractAnalysisTrip trip) {
+		// TODO Auto-generated method stub
 		
-		if(this.mode2TripSet.containsKey(mode)){
-			this.mode2TripSet.get(mode).addTrip(trip);
-		}else{
-			TTAnalysisTripSetOneMode temp = new TTAnalysisTripSetOneMode(mode, this.zone, this.storeTrips);
-			temp.addTrip(trip);
-			this.mode2TripSet.put(mode, temp);
-		}
 	}
 	
-	public Map<String, TTAnalysisTripSetOneMode> getTripSets(){
-		return this.mode2TripSet;
-	}
+	
+
 }

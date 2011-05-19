@@ -19,42 +19,10 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
-import org.matsim.api.core.v01.Id;
-
 /**
  * @author droeder
  *
  */
-public class DistAnalysisPtDriver {
-	
-	private Id id;
-	private DistAnalysisVehicle vehicle = null;
-	private double distance = 0;
+public interface DistAnalysisTripI {
 
-	/**
-	 * @param driverId
-	 * @param id 
-	 */
-	public DistAnalysisPtDriver(Id driverId) {
-		this.id  = driverId;
-	}
-
-	/**
-	 * @param v
-	 */
-	public void registerVehicle(DistAnalysisVehicle v) {
-		this.vehicle = v;
-	}
-
-	/**
-	 * @param length
-	 */
-	public void processLinkEnterEvent(double length) {
-		this.vehicle.processLinkEnterEvent(length);		
-		this.distance += length;
-	}
-	
-	public Id getId(){
-		return this.id;
-	}
 }

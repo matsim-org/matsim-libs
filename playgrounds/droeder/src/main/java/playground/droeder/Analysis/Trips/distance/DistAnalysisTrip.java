@@ -19,11 +19,22 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+
 /**
  * @author droeder
  *
  */
-public class DistAnalysisTrip {
+public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalysisTripI{
 	
 	private int nrOfPlanElements;
 	private int nrOfExpEvents;
@@ -40,6 +51,41 @@ public class DistAnalysisTrip {
 	private int switchWalkCnt = 0;
 	private int egressWalkCnt = 0;
 	
+	
+	public DistAnalysisTrip(ArrayList<PlanElement> elements){
+		this.findMode(elements);
+		this.analyzeElements(elements);
+	}
+	
+	private void analyzeElements(ArrayList<PlanElement> elements) {
+		//if no zones in TripSet are defined, coords not necessary
+		this.nrOfPlanElements = elements.size();
+		this.nrOfExpEvents = this.findNrOfExpEvents(elements);
+		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
+			super.setStart(new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
+					((Activity) elements.get(0)).getCoord().getY()));
+			super.setEnd(new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
+					((Activity) elements.get(elements.size() - 1)).getCoord().getY()));
+		}
+	}
+	
+	private int findNrOfExpEvents(ArrayList<PlanElement> elements) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private void findMode(ArrayList<PlanElement> elements) {
+		for(PlanElement p : elements){
+			if(p instanceof Leg){
+				if(((Leg) p).getMode().equals(TransportMode.transit_walk)){
+					super.setMode(TransportMode.transit_walk);
+				}else{
+					super.setMode(((Leg) p).getMode());
+					return;
+				}
+			}
+		}
+	}
 	
 	/**
 	 * @return the nrOfPlanElements
@@ -109,3 +155,5 @@ public class DistAnalysisTrip {
 	}
 	
 }
+
+

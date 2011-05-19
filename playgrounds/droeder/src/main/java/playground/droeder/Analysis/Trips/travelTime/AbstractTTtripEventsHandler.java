@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 
 import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -57,7 +58,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	
 	protected Map<Id, LinkedList<AbstractAnalysisTrip>> id2Trips = null;
 	protected Map<Id, ArrayList<PersonEvent>> id2Events = null;
-	protected Map<String, TTAnalysisTripSetAllMode> zone2tripSet;
+	protected Map<String, AnalysisTripSetStorage> zone2tripSet;
 	private List<Id> stuckAgents;
 	
 	protected int nrOfprocessedTrips = 0;
@@ -67,8 +68,8 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	
 	public AbstractTTtripEventsHandler(){
 		this.id2Events = new HashMap<Id, ArrayList<PersonEvent>>();
-		this.zone2tripSet = new HashMap<String, TTAnalysisTripSetAllMode>();
-		this.zone2tripSet.put("noZone", new TTAnalysisTripSetAllMode(false, null));
+		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
+		this.zone2tripSet.put("noZone", new AnalysisTripSetStorage(false, null));
 		this.stuckAgents = new ArrayList<Id>();
 	}
 
@@ -117,9 +118,9 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	}
 	
 	public void addZones(Map<String, Geometry> zones){
-		this.zone2tripSet = new HashMap<String, TTAnalysisTripSetAllMode>();
+		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
 		for(Entry<String, Geometry> e : zones.entrySet()){
-			this.zone2tripSet.put(e.getKey(), new TTAnalysisTripSetAllMode(false, e.getValue()));
+			this.zone2tripSet.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue()));
 		}
 	}
 	
@@ -168,7 +169,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	 * returns all produced <code>AnalysisTripSetAllMode</code>-objects, separated by zones
 	 * @return
 	 */
-	public Map<String, TTAnalysisTripSetAllMode> getZone2Tripset(){
+	public Map<String, AnalysisTripSetStorage> getZone2Tripset(){
 		log.info(this.nrOfprocessedTrips + " of " + this.possibleTrips + " trips from plansfile are processed");
 		return this.zone2tripSet;
 	}

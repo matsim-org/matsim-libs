@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
 
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTripSet;
 import playground.droeder.Analysis.Trips.travelTime.V1.TTAnalysisTripV1;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -34,15 +36,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TTAnalysisTripSetOneMode {
+public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	
-	private static final Logger log = Logger.getLogger(TTAnalysisTripSetOneMode.class);
+	private static final Logger log = Logger.getLogger(TTAnalysisTripSet.class);
 	
 	private List<AbstractTTAnalysisTrip> trips;
 	private boolean storeTrips;
-	
-	private Geometry zone;
-	private String mode;
 	
 	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
 	//all modes
@@ -76,13 +75,12 @@ public class TTAnalysisTripSetOneMode {
 	private double[] line10cnt = new double[4];
 	private double[] lineGt10cnt = new double[4];
 
-	public TTAnalysisTripSetOneMode(String mode, Geometry zone, boolean storeTrips) {
-		this.zone = zone;
+	public TTAnalysisTripSet(String mode, Geometry zone, boolean storeTrips) {
+		super(mode, zone);
 		this.storeTrips = storeTrips;
 		if(storeTrips){
 			this.trips = new LinkedList<AbstractTTAnalysisTrip>();
 		}
-		this.mode = mode;
 		this.init();
 	}
 	
@@ -91,7 +89,7 @@ public class TTAnalysisTripSetOneMode {
 			sumTTime[i] = 0.0;
 			tripCnt[i] = 0.0;
 			
-			if(this.mode.equals(TransportMode.pt)){
+			if(super.getMode().equals(TransportMode.pt)){
 				accesWalkCnt[i] = 0.0;
 				accesWaitCnt[i] = 0.0;
 				egressWalkCnt[i] = 0.0;
@@ -122,33 +120,34 @@ public class TTAnalysisTripSetOneMode {
 		}
 	}
 
-	public TTAnalysisTripSetOneMode(String mode, Geometry zone){
+	public TTAnalysisTripSet(String mode, Geometry zone){
 		this(mode, zone, false);
 	}
 	
-	public TTAnalysisTripSetOneMode(String mode){
+	public TTAnalysisTripSet(String mode){
 		this(mode, null, false);
 	}
 
-	public void addTrip(AbstractTTAnalysisTrip trip) {
-		if(trip.getMode().equals(this.mode)){
-			this.addTripValues(trip);
-		}else{ 
-			//can only happen if AnalysisTripSetAllMode is not used
-			log.error("wrong tripMode for TripSet");
-		}
-		
-		if(this.storeTrips){
-			this.trips.add(trip);
-		}
-		
-	}
+//	public void addTrip(AbstractTTAnalysisTrip trip) {
+//		if(trip.getMode().equals(super.getMode())){
+//			this.addTripValues(trip);
+//		}else{ 
+//			//can only happen if AnalysisTripSetAllMode is not used
+//			log.error("wrong tripMode for TripSet");
+//		}
+//		
+//		if(this.storeTrips){
+//			this.trips.add(trip);
+//		}
+//		
+//	}
 
-	private void addTripValues(AbstractTTAnalysisTrip trip) {
-		Integer zone = this.getTripLocation(trip);
-		this.addAllModeValues(trip, zone);
+	@Override
+	protected void addTripValues(AbstractAnalysisTrip trip) {
+		Integer zone = super.getTripLocation(trip);
+		this.addAllModeValues((AbstractTTAnalysisTrip) trip, zone);
 		if(trip.getMode().equals(TransportMode.pt)){
-			this.addPtValues(trip, zone);
+			this.addPtValues((AbstractTTAnalysisTrip) trip, zone);
 		}
 	}
 
@@ -204,21 +203,6 @@ public class TTAnalysisTripSetOneMode {
 		}
 	}
 	
-	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
-	private Integer getTripLocation(AbstractTTAnalysisTrip trip){
-		if(this.zone == null){
-			return 0;
-		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
-			return 0;
-		}else if(this.zone.contains(trip.getStart()) && !this.zone.contains(trip.getEnd())){
-			return 1;
-		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
-			return 2;
-		}else {
-			return 3;
-		}
-	}
-	
 	public List<AbstractTTAnalysisTrip> getTrips(){
 		if(!storeTrips){
 			log.error("Trips not stored. Check constructor!");
@@ -239,7 +223,7 @@ public class TTAnalysisTripSetOneMode {
 		b.append("tripCnt;"); println(this.tripCnt, b);
 		
 		//values for pt
-		if(this.mode.equals(TransportMode.pt)){
+		if(super.getMode().equals(TransportMode.pt)){
 			b.append("accesWalkCnt;"); println(this.accesWalkCnt, b);
 			b.append("accesWaitCnt;"); println(this.accesWaitCnt, b);
 			b.append("egressWalkCnt;"); println(this.egressWalkCnt, b);

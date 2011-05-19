@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetAllMode;
+import playground.droeder.Analysis.Trips.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -44,10 +44,10 @@ public class TTAnalysisTripGeneratorV1 {
 	private static final Logger log = Logger
 			.getLogger(TTAnalysisTripGeneratorV1.class);
 	
-	public static TTAnalysisTripSetAllMode calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
+	public static AnalysisTripSetStorage calculateTripSet(Map<Id, ArrayList<PersonEvent>> events, 
 			Map<Id, ArrayList<PlanElement>> planElements, Geometry zone, boolean storeTrips){
 		
-		TTAnalysisTripSetAllMode tripSet = new TTAnalysisTripSetAllMode(storeTrips, zone);
+		AnalysisTripSetStorage tripSet = new AnalysisTripSetStorage(storeTrips, zone);
 
 		int nextMsg = 1;
 		int errorCnt = 0;

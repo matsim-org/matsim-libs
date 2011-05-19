@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author droeder
  *
  */
-public abstract class AbstractTTAnalysisTrip extends AbstractAnalysisTrip{
+public abstract class AbstractTTAnalysisTrip extends AbstractAnalysisTrip implements TTAnalysisTripI{
 //	protected Coordinate start;
 //	protected Coordinate end;
 //	protected String mode = null;

@@ -17,44 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.distance;
+package playground.droeder.Analysis.Trips;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
  *
  */
-public class DistAnalysisPtDriver {
+public abstract class AbstractAnalysisTripSet {
+	private static final Logger log = Logger.getLogger(AbstractAnalysisTripSet.class);
 	
-	private Id id;
-	private DistAnalysisVehicle vehicle = null;
-	private double distance = 0;
+	private String mode;
+	private Geometry zone;
+	
 
-	/**
-	 * @param driverId
-	 * @param id 
-	 */
-	public DistAnalysisPtDriver(Id driverId) {
-		this.id  = driverId;
-	}
-
-	/**
-	 * @param v
-	 */
-	public void registerVehicle(DistAnalysisVehicle v) {
-		this.vehicle = v;
-	}
-
-	/**
-	 * @param length
-	 */
-	public void processLinkEnterEvent(double length) {
-		this.vehicle.processLinkEnterEvent(length);		
-		this.distance += length;
+	public AbstractAnalysisTripSet(String mode, Geometry zone){
+		this.mode = mode;
+		this.zone = zone;
 	}
 	
-	public Id getId(){
-		return this.id;
+	
+	public String getMode(){
+		return this.mode;
 	}
+	/**
+	 * [0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
+	 * @param trip
+	 * @return
+	 */
+	public Integer getTripLocation(AbstractAnalysisTrip trip){
+		if(this.zone == null){
+			return 0;
+		}else if(this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
+			return 0;
+		}else if(this.zone.contains(trip.getStart()) && !this.zone.contains(trip.getEnd())){
+			return 1;
+		}else if(!this.zone.contains(trip.getStart()) && this.zone.contains(trip.getEnd())){
+			return 2;
+		}else {
+			return 3;
+		}
+	}
+	
+	
+	/**
+	 * calls addTripValues()
+	 * @param trip
+	 */
+	public void addTrip(AbstractAnalysisTrip trip) {
+		if(trip.getMode().equals(this.mode)){
+			this.addTripValues(trip);
+		}else{ 
+			//can only happen if AnalysisTripSetAllMode is not used
+			log.error("wrong tripMode for TripSet");
+		}
+	}
+	
+	protected abstract void addTripValues(AbstractAnalysisTrip trip);
+
 }

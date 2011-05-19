@@ -40,8 +40,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetAllMode;
-import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSetOneMode;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTripSet;
+import playground.droeder.Analysis.Trips.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -54,7 +54,7 @@ public class TTtripAnalysisV1 {
 	private Geometry zone;
 	private Map<Id, ArrayList<PersonEvent>> events;
 	private Map<Id, ArrayList<PlanElement>> planElements;
-	private TTAnalysisTripSetAllMode tripSet;
+	private AnalysisTripSetStorage tripSet;
 	
 	
 	public TTtripAnalysisV1 (Geometry g){
@@ -71,7 +71,7 @@ public class TTtripAnalysisV1 {
 	private void write2csv(String out){
 		try {
 			BufferedWriter writer;
-			for(Entry<String, TTAnalysisTripSetOneMode> e : this.tripSet.getTripSets().entrySet()){
+			for(Entry<String, AbstractAnalysisTripSet> e : this.tripSet.getTripSets().entrySet()){
 				writer = IOUtils.getBufferedWriter(out + e.getKey() + "_trip_analysis.csv");
 				writer.write(e.getValue().toString());
 				writer.flush();
