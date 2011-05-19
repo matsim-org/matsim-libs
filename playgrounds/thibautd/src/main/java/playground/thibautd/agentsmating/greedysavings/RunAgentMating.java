@@ -24,7 +24,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -62,9 +65,11 @@ public class RunAgentMating {
 		(new MatsimNetworkReader(scenario)).readFile(networkFile);
 
 		log.info("trying to read facilities");
+		ActivityFacilitiesImpl facilities = null;
 		try {
 			String facilityFile = args[3];
 			(new MatsimFacilitiesReader((ScenarioImpl) scenario)).readFile(facilityFile);
+			facilities =  ((ScenarioImpl) scenario).getActivityFacilities();
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.info("no facility file given, nothing loaded");
 		}
@@ -72,16 +77,24 @@ public class RunAgentMating {
 		log.info("reading population");
 		(new MatsimPopulationReader(scenario)).readFile(populationFile);
 
+
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
 
-		AgentMatingAlgo algo = new AgentMatingAlgo(population, network, ACCEPTABLE_DISTANCE);
+		AgentMatingAlgo algo = new AgentMatingAlgo(
+				population,
+				network,
+				ACCEPTABLE_DISTANCE,
+				facilities);
 		algo.run();
 		// modifies the population: no need for storing it.
 		algo.getPopulation();
 
 		PopulationWriter populationWriter = new PopulationWriter(population , network);
 		CliquesWriter cliqueWriter = new CliquesWriter(algo.getCliques());
+		if (facilities != null) {
+			(new FacilitiesWriter(facilities)).write(outputPath+"mating_facilities.xml.gz");
+		}
 
 		try {
 			cliqueWriter.writeFile(outputPath+"mating_cliques.xml.gz");

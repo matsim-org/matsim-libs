@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -55,6 +57,8 @@ public class AgentMatingAlgo {
 	private static final double PU_DUR = 0d;
 	private static final double DO_DUR = 0d;
 
+	private final FacilitiesFactory facilitiesFactory;
+
 	private final AgentTopology agentTopology;
 	private final Population population;
 	private final List<Person> unaffectedAgents;
@@ -71,11 +75,19 @@ public class AgentMatingAlgo {
 	public AgentMatingAlgo(
 			final Population population,
 			final Network network,
-			final double acceptableDistance) {
+			final double acceptableDistance,
+			final ActivityFacilitiesImpl facilities) {
 		this.agentTopology = 
 			new AgentTopology(network, population, acceptableDistance, onlyMateDrivers);
 		this.population = population;
 		this.unaffectedAgents = new ArrayList<Person>(population.getPersons().values());
+
+		if (facilities != null) {
+			this.facilitiesFactory = new FacilitiesFactory(facilities, network);
+		}
+		else {
+			this.facilitiesFactory = null;
+		}
 	}
 
 	/*
@@ -217,6 +229,7 @@ public class AgentMatingAlgo {
 					passengerHome.getCoord(),
 					passengerHome.getLinkId());
 		act.setMaximumDuration(PU_DUR);
+		setFacility(act, passengerHome.getLinkId());
 		planDriver.add(act);
 
 		// shared leg
@@ -227,6 +240,7 @@ public class AgentMatingAlgo {
 					passengerWork.getCoord(),
 					passengerWork.getLinkId());
 		act.setMaximumDuration(DO_DUR);
+		setFacility(act, passengerWork.getLinkId());
 		planDriver.add(act);
 
 		// egress leg
@@ -243,6 +257,7 @@ public class AgentMatingAlgo {
 					passengerHome.getCoord(),
 					passengerHome.getLinkId());
 		act.setMaximumDuration(PU_DUR);
+		setFacility(act, passengerHome.getLinkId());
 		planPassenger.add(act);
 				
 		// shared leg
@@ -253,6 +268,7 @@ public class AgentMatingAlgo {
 					passengerWork.getCoord(),
 					passengerWork.getLinkId());
 		act.setMaximumDuration(DO_DUR);
+		setFacility(act, passengerWork.getLinkId());
 		planPassenger.add(act);
 
 			// egress leg
@@ -295,6 +311,7 @@ public class AgentMatingAlgo {
 					passengerHome.getCoord(),
 					passengerHome.getLinkId());
 		act.setMaximumDuration(PU_DUR);
+		setFacility(act, passengerHome.getLinkId());
 		planDriver.add(act);
 				
 		// shared leg
@@ -305,6 +322,7 @@ public class AgentMatingAlgo {
 					passengerWork.getCoord(),
 					passengerWork.getLinkId());
 		act.setMaximumDuration(DO_DUR);
+		setFacility(act, passengerWork.getLinkId());
 		planDriver.add(act);
 				
 		// egress leg
@@ -323,6 +341,7 @@ public class AgentMatingAlgo {
 					passengerHome.getCoord(),
 					passengerHome.getLinkId());
 		act.setMaximumDuration(PU_DUR);
+		setFacility(act, passengerHome.getLinkId());
 		planPassenger.add(act);
 				
 		// shared leg
@@ -333,12 +352,20 @@ public class AgentMatingAlgo {
 					passengerWork.getCoord(),
 					passengerWork.getLinkId());
 		act.setMaximumDuration(DO_DUR);
+		setFacility(act, passengerWork.getLinkId());
 		planPassenger.add(act);
 				
 		// egress leg
 		planPassenger.add(new LegImpl(TransportMode.walk));
 		// work
 		planPassenger.add(passengerElements.get(2));
+	}
+
+	private void setFacility(final ActivityImpl act, final Id linkId) {
+		if (this.facilitiesFactory != null) {
+			act.setFacilityId(
+					this.facilitiesFactory.getPickUpDropOffFacility(linkId));
+		}
 	}
 
 	/**
