@@ -83,6 +83,10 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	 * the actual optimisation algorithm, operating on a joint plan.
 	 */
 	private final void run(final JointPlan plan) {
+		if (!isOptimizablePlan(plan)) {
+			return;
+		}
+
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
 			new JointPlanOptimizerJGAPConfiguration(
 					plan,
@@ -93,11 +97,6 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 					this.network,
 					this.outputPath,
 					this.randomGenerator.nextLong());
-
-		if (plan.getPlanElements().size() <= 1) {
-			// home-only plan: do nothing
-			return;
-		}
 
 		JointPlanOptimizerPopulationFactory populationFactory =
 			new JointPlanOptimizerPopulationFactory(jgapConfig);
@@ -118,6 +117,15 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 				((JointPlanOptimizerJGAPBreeder) jgapConfig.getBreeder()).getAllTimesBest());
 		plan.resetFromPlan(evolvedPlan);
 		plan.resetScores();
+	}
+
+	private boolean isOptimizablePlan(final JointPlan plan) {
+		for (Plan indivPlan : plan.getIndividualPlans().values()) {
+			if (indivPlan.getPlanElements().size() > 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
