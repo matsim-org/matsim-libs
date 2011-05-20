@@ -78,7 +78,7 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 		
 		new MatsimEventsReader(eventsManager).readFile(eventsFile);
 		
-		System.out.println("Found " + iaa.getAffectedAgents().size() + " affected agents.");
+		log.info("Found " + iaa.getAffectedAgents().size() + " affected agents.");
 	}
 	
 	/*

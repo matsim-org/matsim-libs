@@ -33,8 +33,11 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
@@ -58,7 +61,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-
 
 /**
  * Controller for the simulation runs presented in the ICEM 2011 paper. 
@@ -88,6 +90,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	 * File that contains a list of all links where agents
 	 * will replan their plans.
 	 */
+	/*package*/ String noEventEventsFile = "";
 	/*package*/ String replanningAgentsFile = "";
 	/*package*/ String replanningLinksFile = "";
 	private Set<Id> replanningAgents;
@@ -167,7 +170,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		 * Use the AgentFilteredDuringLegIdentifier to remove those agents who do not cross a
 		 * certain area when no event occurs and they do not replan their plans.
 		 */
-		this.replanningAgents = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, replanningAgentsFile).getAffectedAgents();
+		getReplanningAgents(this.noEventEventsFile);
 		parseReplanningLinks(this.replanningLinksFile);
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
@@ -278,7 +281,19 @@ public class PaperController extends WithinDayController implements StartupListe
 	    	log.error("Error when trying to parse the replanning links file. No replanning links identified!");
 	    }
 	}
+	
+	private void getReplanningAgents(String eventsFile) {
 		
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, replanningAgentsFile);
+		
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(iaa);
+		
+		new MatsimEventsReader(eventsManager).readFile(eventsFile);
+		
+		this.replanningAgents = iaa.getAffectedAgents();
+	}
+	
 	/*
 	 * Wrapper for a DuringLegIdentifier. Checks for all agents that are identified by
 	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
@@ -338,6 +353,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	 */
 	private final static String NUMOFTHREADS = "-numofthreads";
 	private final static String LEGREPLANNINGSHARE = "-legreplanningshare";
+	private final static String NOEVENTEVENTSFILE = "-noeventeventsfile";
 	private final static String REPLANNINGAGENTSFILE = "-replanningagentsfile";
 	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
 	private final static String STARTEVENT = "-startevent";
@@ -368,6 +384,10 @@ public class PaperController extends WithinDayController implements StartupListe
 					else if (share < 0.0) share = 0.0;
 					controller.pDuringLegReplanning = share;
 					log.info("share of leg replanning agents: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(NOEVENTEVENTSFILE)) {
+					i++;
+					controller.noEventEventsFile = args[i];
+					log.info("no event occuring events file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGAGENTSFILE)) {
 					i++;
 					controller.replanningAgentsFile = args[i];
