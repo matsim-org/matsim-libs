@@ -74,7 +74,7 @@ public class TimeTesting {
 							bufferBatteryCharge,
 							standardChargingSlotLength);
 					
-					myDecentralizedSmartCharger.setDebug(false);
+					myDecentralizedSmartCharger.setDebug(true);
 					myDecentralizedSmartCharger.run();
 					
 					myDecentralizedSmartCharger.writeSummaryDSC("DSC"+configName);
@@ -101,7 +101,8 @@ public class TimeTesting {
 					
 					V2G myV2G= new V2G(myDecentralizedSmartCharger);
 					myDecentralizedSmartCharger.setV2G(myV2G);
-					myDecentralizedSmartCharger.initializeAndRunV2G();
+					myDecentralizedSmartCharger.initializeAndRunV2G(xPercentNone,
+							xPercentDown, xPercentDownUp);
 					
 					myDecentralizedSmartCharger.writeSummaryV2G("V2G"+configName);
 					

@@ -53,7 +53,7 @@ import lpsolve.LpSolveException;
  * @author Stella
  *
  */
-public class V2GTestOnePlan_checkVehicles extends TestCase{
+public class V2GTestOnePlan_general extends TestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
@@ -91,7 +91,7 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 	 * @throws OptimizationException
 	 * @throws IOException
 	 */
-	public void testV2GCheckVehicles() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+	public void testThis() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
@@ -109,7 +109,6 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 				
 				try {
 					
-					mySimulation.setUpStochasticLoadDistributions();
 					
 					myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
@@ -123,20 +122,24 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 					 * *********************************
 					 */
 					// all day 3500
-					HashMap<Integer, Schedule> stochasticLoad = 
-						mySimulation.getStochasticLoadSchedule();
+					HashMap<Integer, Schedule> stochasticLoad = new HashMap<Integer, Schedule>();
+					stochasticLoad.put(1, new Schedule(
+							new LoadDistributionInterval(0.0, 900.0, new PolynomialFunction(new double[]{3500.0}), true)));
 						
-					HashMap<Id, Schedule> agentVehicleSourceMapping =
-						mySimulation.getAgentStochasticLoadSources();
+					HashMap<Id, Schedule> agentVehicleSourceMapping= new HashMap<Id, Schedule>();
+					Id agentOne=null;
+					for(Id id: controler.getPopulation().getPersons().keySet()){
+						agentOne=id;
+						agentVehicleSourceMapping.put(id, new Schedule(
+								new LoadDistributionInterval(0.0, 900.0, new PolynomialFunction(new double[]{3500.0}), true)));
+						
+					}
 					
-					DecentralizedSmartCharger.linkedListIntegerPrinter(stochasticLoad, "Before stochastic general");
-					
-					DecentralizedSmartCharger.linkedListIdPrinter(agentVehicleSourceMapping,  "Before agent");
 					
 					myDecentralizedSmartCharger.setStochasticSources(
-							mySimulation.getStochasticLoadSchedule(), 
+							stochasticLoad, 
 							null, 
-							mySimulation.getAgentStochasticLoadSources());
+							agentVehicleSourceMapping);
 					
 					mySimulation.setUpAgentSchedules(
 							myDecentralizedSmartCharger, 
@@ -147,64 +150,68 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 							xPercentDownUp);
 					
 					myDecentralizedSmartCharger.setAgentContracts(mySimulation.getAgentContracts());
+					myDecentralizedSmartCharger.setV2GRegUpAndDownStats(xPercentNone,xPercentDown,xPercentDownUp);// normally in initializeV2G
 					
 					
-					for(Id id: controler.getPopulation().getPersons().keySet()){
-						agentOne=id;
-						System.out.println("AGENT VEHICLE SOURCE BEFORE V2G of -3500 between 0-300");
-						agentVehicleSourceMapping.get(id).printSchedule();
-						LoadDistributionInterval lFirst= 
-							(LoadDistributionInterval)agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0);
-						assertEquals(lFirst.getPolynomialFunction().getCoefficients()[0], 
-								-3500.0);
+					/**
+					 * CHECK TEST FIND AND RETURN...
+					 */
+					testFindAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(agentOne);
+					
+										
+					/**
+					 * testCalcCompensation (double contributionInJoulesAgent, Id agentId)
+					 */
+					
+					testCalcCompensation (100.0, agentOne);
+					testCalcCompensation (-100.0, agentOne);
+					
+					/**
+					 * CHECK VEHICLE SOURCES
+					 */
+					System.out.println("Parking Driving Schedule before check vehicle sources");
+					myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentOne).printSchedule();
+					
+					myDecentralizedSmartCharger.checkVehicleSources();
+					
+					System.out.println("Parking Driving Schedule after check vehicle sources");
+					myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentOne).printSchedule();
+					System.out.println("agent sources before");
+					myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).printSchedule();
+					System.out.println("agent sources after");
+					myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).printSchedule();
+					assertEquals(3500.0, 
+							((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+					
+					assertEquals(0.0, 
+							((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+					
+					assertEquals(900.0, stochasticLoad.get(1).timesInSchedule.get(0).getIntervalLength());
+					// attributed to hub level
+					assertEquals(7000.0, ((LoadDistributionInterval)stochasticLoad.get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+					
+					
+					
+					
+					/**
+					 * CHECK HUB LOADS
+					 */
+					
+					myDecentralizedSmartCharger.myHubLoadReader.calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader();
+					
+					
+					myDecentralizedSmartCharger.checkHubStochasticLoads();
+					System.out.println("Parking Driving Schedule after check hub loads");
+					myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentOne).printSchedule();
+					try{
+						System.out.println("agent sources before");
+						myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(agentOne).printSchedule();
+						System.out.println("agent sources after");
+						myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(agentOne).printSchedule();
+						
+					}catch(Exception e){
 					}
-					
-					myDecentralizedSmartCharger.initializeAndRunV2G(xPercentNone,
-							xPercentDown, xPercentDownUp);
-						
-					
-					System.out.println("AGENT VEHICLE SOURCE AFTER V2G ");
-					agentVehicleSourceMapping.get(agentOne).printSchedule();
-						
-						
-					LoadDistributionInterval lFirst= 
-							(LoadDistributionInterval)agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0);
-					assertEquals(lFirst.getPolynomialFunction().getCoefficients()[0], 
-								0.0);
-					
-					
-					double revenue=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
-					
-					myDecentralizedSmartCharger.myV2G.addRevenueToAgentFromV2G(100.0, agentOne);
-					
-					double revenueNew=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
-					
-					assertEquals(revenue+100.0, revenueNew);
-					
-					
-					/**********************************************
-					 *  * CHECK
-					 * addJoulesV2G
-					 */
-					
-					double down = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
-					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(1000.0, agentOne);
-					double newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
-					myDecentralizedSmartCharger.myV2G.calcV2GRevenueStats();
-					assertEquals(1000.0, newDown-down);
-					
-					down = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
-					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(-1000.0, agentOne);
-					newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
-					myDecentralizedSmartCharger.myV2G.calcV2GRevenueStats();
-					assertEquals(1000.0, down-newDown);
-					
-					/**********************************************
-					 *  * CHECK
-					 * sensible outcome averageV2G
-					 */
-					
-					assertEquals(myDecentralizedSmartCharger.myV2G.getAverageV2GRevenuePHEV(), myDecentralizedSmartCharger.myV2G.getAverageV2GRevenueAgent());
+				
 					
 					
 				} catch (Exception e1) {
@@ -222,8 +229,29 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 
 
 	
+	public void testFindAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(Id id) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		Schedule agent= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(id);
+		
+		Schedule overlap= myDecentralizedSmartCharger.myV2G.findAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(1, 
+				agent,
+				new LoadDistributionInterval(0.0, 1000.0, null, false));
+		
+		assertEquals(overlap.getTotalTimeOfIntervalsInSchedule(), 1000.0);
+		assertEquals(overlap.timesInSchedule.get(0).getEndTime(), 1000.0);
+		assertEquals(overlap.getNumberOfEntries(), 1);
+		
+	}
 	
 	
+	
+	public void testCalcCompensation (double contributionInJoulesAgent, Id agentId){
+		//ev=0.0;
+		double comp=myDecentralizedSmartCharger.myV2G.calculateCompensationUpDown(contributionInJoulesAgent, agentId);
+		double expectedComp= Math.abs(0.15*myDecentralizedSmartCharger.KWHPERJOULE*contributionInJoulesAgent);
+		assertEquals(comp, expectedComp);
+		
+	}
 	
 	
 }

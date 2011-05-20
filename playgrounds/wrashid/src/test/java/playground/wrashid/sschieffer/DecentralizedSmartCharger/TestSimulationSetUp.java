@@ -203,9 +203,9 @@ public class TestSimulationSetUp {
 	public static HashMap<Integer, Schedule> readHubsTest() throws IOException{
 		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitScheduleTest());
-		hubLoadDistribution1.put(2, makeBullshitScheduleTest());
+		/*hubLoadDistribution1.put(2, makeBullshitScheduleTest());
 		hubLoadDistribution1.put(3, makeBullshitScheduleTest());
-		hubLoadDistribution1.put(4, makeBullshitScheduleTest());
+		hubLoadDistribution1.put(4, makeBullshitScheduleTest());*/
 		return hubLoadDistribution1;
 		
 	}
@@ -223,9 +223,9 @@ public class TestSimulationSetUp {
 	public static HashMap<Integer, Schedule> readHubsPricingTest(double optimal, double suboptimal) throws IOException{
 		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		hubLoadDistribution1.put(2, makeBullshitPricingScheduleTest(optimal, suboptimal));
+	/*	hubLoadDistribution1.put(2, makeBullshitPricingScheduleTest(optimal, suboptimal));
 		hubLoadDistribution1.put(3, makeBullshitPricingScheduleTest(optimal, suboptimal));
-		hubLoadDistribution1.put(4, makeBullshitPricingScheduleTest(optimal, suboptimal));
+		hubLoadDistribution1.put(4, makeBullshitPricingScheduleTest(optimal, suboptimal));*/
 		return hubLoadDistribution1;
 		
 	}
@@ -271,11 +271,22 @@ public class TestSimulationSetUp {
 	}
 	
 	
+	public HubLinkMapping mapHubsTest(){
+		
+		HubLinkMapping hubLinkMapping = new HubLinkMapping(1);
+		for (Link link:controler.getNetwork().getLinks().values()){
+			hubLinkMapping.addMapping(link.getId().toString(), 1);
+			
+		}
+		return hubLinkMapping;
+	}
+	
+	
 	/**
 	 * 4 hubs
 	 * @return
 	 */
-	public HubLinkMapping mapHubsTest(){
+	public HubLinkMapping mapHubsTest4(){
 		
 		HubLinkMapping hubLinkMapping = new HubLinkMapping(4);
 		double maxX=5000;

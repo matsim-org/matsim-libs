@@ -140,7 +140,7 @@ public class LPEVTest extends TestCase{
 							 * TEST SOLVE FUNCTION
 							 */
 							Schedule testSchedule = mySimulation.makeFakeSchedule();
-							testSchedule=myDecentralizedSmartCharger.lpev.solveLP(testSchedule, 
+							testSchedule=myDecentralizedSmartCharger.getLPEV().solveLP(testSchedule, 
 									id, 
 									100, 
 									0.1,
@@ -315,7 +315,7 @@ public class LPEVTest extends TestCase{
 						 */
 						double startingSOC=75.0;
 						Schedule testSchedule = mySimulation.makeFakeSchedule();
-						testSchedule=myDecentralizedSmartCharger.lpev.solveLPReschedule(
+						testSchedule=myDecentralizedSmartCharger.getLPEV().solveLPReschedule(
 								testSchedule,
 								id, 
 								100.0, 

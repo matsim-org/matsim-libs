@@ -139,8 +139,9 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 						System.out.println(
 								myDecentralizedSmartCharger.getAgentChargingSchedule(id).getTotalTimeOfIntervalsInSchedule());
 						
-						assertEquals(myDecentralizedSmartCharger.getAgentChargingSchedule(id).getTotalTimeOfIntervalsInSchedule(),
-								totalChargingTimeParkingDriving
+						assertEquals(
+								Math.abs(myDecentralizedSmartCharger.getAgentChargingSchedule(id).getTotalTimeOfIntervalsInSchedule()-
+								totalChargingTimeParkingDriving)<0.0001, true
 								);
 						
 						

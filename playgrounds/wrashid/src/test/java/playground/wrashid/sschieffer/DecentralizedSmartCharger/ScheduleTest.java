@@ -42,22 +42,9 @@ public class ScheduleTest extends TestCase{
 
 	
 	private Schedule s;
-	/**
-	 * testGetTotalTimeOfIntervalsInSchedule,
-		 * testSorting,
-		 * testGetTotalConsumption,
-		 * testGetOverlaps,
-		 * testAddLoadDistributionIntervalToSchedule
-	 */
+
 	public ScheduleTest(){		
-		/*
-		 * testGetTotalTimeOfIntervalsInSchedule
-		 * testSorting
-		 * testGetTotalConsumption
-		 * testGetOverlaps
-		 * testAddLoadDistributionIntervalToSchedule
-		 * 
-		 */
+		
 	}
 	
 	
@@ -306,6 +293,21 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		
 		
 	}
+	
+	
+	public void testFillNonExistentTimesInLoadScheduleWithZeroLoads(){
+		Schedule sFill= setDummyLoadDistributionSchedule();
+		assertEquals(sFill.getNumberOfEntries(), 2);
+		
+		//affter
+		sFill=sFill.fillNonExistentTimesInLoadScheduleWithZeroLoads();
+		sFill.printSchedule();
+		assertEquals(sFill.getNumberOfEntries(), 4);
+		assertEquals(sFill.timesInSchedule.get(1).isLoadDistributionInterval(), true);
+		assertEquals(sFill.timesInSchedule.get(1).getIntervalLength(), 20.0);
+		assertEquals(((LoadDistributionInterval)sFill.timesInSchedule.get(1)).getPolynomialFunction().getCoefficients()[0], 0.0);
+	}
+	
 	
 	
 	public Schedule setDummyLoadDistributionSchedule(){
