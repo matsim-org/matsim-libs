@@ -72,8 +72,7 @@ public class SetUpVehicleCollector {
 		 */
 		double batterySizeEV= 24*3600*1000; 
 		double batterySizePHEV= 24*3600*1000; 
-		double batteryMinEV= 0.1; 
-		
+		double batteryMinEV= 0.1; 		
 		double batteryMinPHEV= 0.1; 
 		double batteryMaxEV= 0.9; 
 		double batteryMaxPHEV= 0.9; 		
@@ -97,8 +96,8 @@ public class SetUpVehicleCollector {
 				EVBattery, 
 				null, 
 				ElectricVehicle.class,
-				80000,
-				0.9);// Nissan leaf 80kW Engine
+				80000,// Nissan leaf 80kW Engine
+				1.0);
 		
 		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
 				PHEVBattery, 

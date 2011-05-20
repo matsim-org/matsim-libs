@@ -61,6 +61,16 @@ public class TimeDataCollector {
 	}
 	
 	
+	private void makeXYSeriesFromFunction(String nameForSeries){
+		
+		xy  = new XYSeries(nameForSeries);
+		
+		for(int i=0; i<data.length; i++){
+			xy.add(getXAtEntry(i), func.value(getXAtEntry(i)));
+		}
+	}
+	
+	
 	public void addDataPoint(int entry, double x, double y){
 		data[entry][0]= x;
 		data[entry][1]= y;
@@ -120,8 +130,24 @@ public class TimeDataCollector {
 	}
 	
 	
+	public double extrapolateValueAtTime(double time){
+		// assuming 1 minute bins ie. one data point for one minute
+		int minAbove= (int)Math.ceil(time/60.0);
+		int minBelow= (int)Math.floor(time/60.0);
+		
+		// extrapolate with linear function - f = a + b * x
+		double gradient=(getYAtEntry(minAbove)-getYAtEntry(minBelow))/60.0; // rise/run
+		return getYAtEntry(minBelow)+ gradient* (time-getXAtEntry(minBelow));
+		
+	}
+	
 	public XYSeries getXYSeries(String nameForSeries){
 		makeXYSeries(nameForSeries);
+		return xy;
+	}
+	
+	public XYSeries getXYSeriesFromFunction(String nameForSeries){
+		makeXYSeriesFromFunction(nameForSeries);
 		return xy;
 	}
 	

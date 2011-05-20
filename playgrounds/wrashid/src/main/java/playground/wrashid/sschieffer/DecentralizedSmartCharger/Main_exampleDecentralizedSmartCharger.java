@@ -174,12 +174,9 @@ public class Main_exampleDecentralizedSmartCharger {
 			
 			
 			//CHARGING COSTS
-			HashMap<Id, Double> agentChargingCosts= 
-				mySimulation.getChargingCostsForAgents();
-			System.out.println("charging cost of agent "+id.toString() 
-					+ " "+agentChargingCosts.get(id));
-									
-			
+			HashMap<Id, Double> agentChargingCosts= mySimulation.getChargingCostsForAgents();
+			System.out.println("charging cost of agent "+id.toString() 	+ " "+agentChargingCosts.get(id));
+								
 			//CHARGING SCHEDULES FOR EVERY AGENT
 			HashMap<Id, Schedule> agentSchedules= 
 				mySimulation.getAllAgentChargingSchedules();
@@ -195,9 +192,7 @@ public class Main_exampleDecentralizedSmartCharger {
 			
 			// GET ALL IDs OF AGENTS WITH EV, PHEV or Combustion engine car
 			LinkedList<Id> agentsWithEV = mySimulation.getListOfAllEVAgents();
-			LinkedList<Id> agentsWithPHEV = mySimulation.getListOfAllPHEVAgents();
-			LinkedList<Id> agentsWithConventionalCar = mySimulation.getListOfAllCombustionAgents();
-			
+			LinkedList<Id> agentsWithPHEV = mySimulation.getListOfAllPHEVAgents();			
 			
 			// DETAILED DATA PER AGENT
 			if(agentsWithEV.isEmpty()==false){

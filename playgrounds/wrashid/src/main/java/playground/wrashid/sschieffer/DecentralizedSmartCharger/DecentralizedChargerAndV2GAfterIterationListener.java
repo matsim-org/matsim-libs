@@ -151,21 +151,20 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
 					myDecentralizedSmartCharger,
 					DecentralizedChargingSimulation.compensationPerKWHRegulationUp,
-					DecentralizedChargingSimulation.compensationPerKWHRegulationDown);
+					DecentralizedChargingSimulation.compensationPerKWHRegulationDown,
+					DecentralizedChargingSimulation.compensationPERKWHFeedInVehicle);
 			
 			
 			HashMap<Id, ContractTypeAgent> agentContracts= 
 				myAgentContractsCollector.makeAgentContracts(
-						DecentralizedChargingSimulation.controler,
-						DecentralizedChargingSimulation.xPercentNone,
+						DecentralizedChargingSimulation.controler,						
 						DecentralizedChargingSimulation.xPercentDown,
 						DecentralizedChargingSimulation.xPercentDownUp);
 				
 			//set the agent contracts
 			myDecentralizedSmartCharger.setAgentContracts(agentContracts);
 			
-			myDecentralizedSmartCharger.initializeAndRunV2G(
-					DecentralizedChargingSimulation.xPercentNone,
+			myDecentralizedSmartCharger.initializeAndRunV2G(					
 					DecentralizedChargingSimulation.xPercentDown,
 					DecentralizedChargingSimulation.xPercentDownUp);
 			

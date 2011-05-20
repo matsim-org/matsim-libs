@@ -48,7 +48,7 @@ public class DecentralizedChargingSimulation {
 	
 	public static double  compensationPerKWHRegulationUp;
 	public static double compensationPerKWHRegulationDown;
-	
+	public static double compensationPERKWHFeedInVehicle;
 	public static double xPercentNone;
 	public static double xPercentDown;
 	public static double xPercentDownUp;
@@ -127,12 +127,12 @@ public class DecentralizedChargingSimulation {
 	 * @param compensationPerKWHRegulationDown
 	 */
 	public void setUpV2G(
-			double xPercentNone,
 			double xPercentDown,
 			double xPercentDownUp,
 			StochasticLoadCollector slc,
 			double compensationPerKWHRegulationUp,
-			double compensationPerKWHRegulationDown){
+			double compensationPerKWHRegulationDown,
+			double compensationPERKWHFeedInVehicle){
 	
 		this.xPercentNone=xPercentNone;
 		this.xPercentDown=xPercentDown;
@@ -140,6 +140,7 @@ public class DecentralizedChargingSimulation {
 		this.slc=slc;
 		this.compensationPerKWHRegulationUp=compensationPerKWHRegulationUp;
 		this.compensationPerKWHRegulationDown=compensationPerKWHRegulationDown;
+		this.compensationPERKWHFeedInVehicle= compensationPERKWHFeedInVehicle;
 		
 		controler.addControlerListener(new DecentralizedChargerAndV2GAfterIterationListener());		
 	}
@@ -192,6 +193,30 @@ public class DecentralizedChargingSimulation {
 	}
 	
 	/**
+	 * return average charging cost for agents
+	 * @return
+	 */
+	public double getAverageChargingCostPerAgentFromSmartCharging(){
+		return mySmartCharger.getAverageChargingCostAgents();
+	}
+	
+	/**
+	 * return average charging cost for EV agents
+	 * @return
+	 */
+	public double getAverageChargingCostPerEV_AgentFromSmartCharging(){
+		return mySmartCharger.getAverageChargingCostEV();
+	}
+	
+	/**
+	 * return average charging cost for PHEV agents
+	 * @return
+	 */
+	public double getAverageChargingCostPerPHEV_AgentFromSmartCharging(){
+		return mySmartCharger.getAverageChargingCostPHEV();
+	}
+	
+	/**
 	 * return linkedList with charging schedules for all agents over the entire day
 	 * @return
 	 */
@@ -225,14 +250,7 @@ public class DecentralizedChargingSimulation {
 		return mySmartCharger.getAllAgentsWithPHEV();
 	}
 	
-	/**
-	 * GET ALL IDs OF AGENTS Combustion engine car
-	 * @return
-	 */
-	public LinkedList<Id> getListOfAllCombustionAgents(){
-		return mySmartCharger.getAllAgentsWithCombustionVehicle();
-	}
-	
+		
 	
 	public double getTotalDrivingConsumptionOfAgentFromBattery(Id agentId){
 		return mySmartCharger.getTotalDrivingConsumptionOfAgentFromBattery(agentId);

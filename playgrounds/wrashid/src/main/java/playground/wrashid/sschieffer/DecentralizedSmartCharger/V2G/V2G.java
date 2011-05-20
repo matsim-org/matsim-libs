@@ -152,10 +152,24 @@ public class V2G {
 	}
 	
 	
+	public void addRevenueToAgentFromFeedIn(double revenue, Id agentId){		
+		agentV2GStatistic.get(agentId).addRevenueFeedIn(revenue);		
+	}
+	
+	
+	public void addJouleFeedInToAgentStats(double joulesUpDown, Id agentId){		
+		
+		if (joulesUpDown>0){
+			agentV2GStatistic.get(agentId).addJoulesFeedIn(joulesUpDown);
+		}	
+	}
 	
 	public void addRevenueToAgentFromV2G(double revenue, Id agentId){		
 		agentV2GStatistic.get(agentId).addRevenueV2G(revenue);		
 	}
+	
+	
+	
 	
 	public void addJoulesUpDownToAgentStats(double joulesUpDown, Id agentId){		
 		
@@ -319,7 +333,6 @@ public class V2G {
 		secondHalf.setStartingSOC(currentSOC);
 		answerScheduleAfterElectricSourceInterval=null;
 		
-		
 		double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 		
 		double costReschedule;
@@ -359,7 +372,8 @@ public class V2G {
 			// no regulation
 			attributeSuperfluousVehicleLoadsToGridIfPossible(agentId, 
 					agentParkingDrivingSchedule, 
-					electricSourceInterval);
+					electricSourceInterval
+					);
 			
 		}
 	}
@@ -384,7 +398,6 @@ public class V2G {
 		
 		/*System.out.println("schedule before rescheduling");
 		agentParkingDrivingSchedule.printSchedule();*/
-		
 		double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 		
 		double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
@@ -517,7 +530,8 @@ public class V2G {
 		updateAgentDrivingParkingSchedule(agentId, 
 				answerScheduleAfterElectricSourceInterval,
 				agentParkingDrivingSchedule,
-				electricSourceInterval);
+				electricSourceInterval,
+				joules);
 		
 	}
 	
@@ -581,13 +595,17 @@ public class V2G {
 	public void updateAgentDrivingParkingSchedule(Id agentId, 
 			Schedule answerScheduleAfterElectricSourceInterval,
 			Schedule agentParkingDrivingSchedule,
-			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+			LoadDistributionInterval electricSourceInterval,
+			double joules) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
+		double SOCStartBefore=agentParkingDrivingSchedule.getStartingSOC();
 		Schedule rescheduledFirstHalf= agentParkingDrivingSchedule.cutScheduleAtTime( electricSourceInterval.getEndTime());
 		
 		rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
 		
+		// update starting SOC
 		agentParkingDrivingSchedule=rescheduledFirstHalf;
+		agentParkingDrivingSchedule.setStartingSOC(SOCStartBefore+joules);
 		
 		mySmartCharger.getAllAgentParkingAndDrivingSchedules().put(agentId, agentParkingDrivingSchedule);
 	}
@@ -673,46 +691,34 @@ public class V2G {
 	
 	public void attributeSuperfluousVehicleLoadsToGridIfPossible(Id agentId, 
 			Schedule agentParkingDrivingSchedule, 
-			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+			LoadDistributionInterval electricSourceInterval
+			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule agentDuringLoad= 
 			agentParkingDrivingSchedule.cutScheduleAtTimeSecondHalf(electricSourceInterval.getStartTime());
 		
-		agentDuringLoad= agentDuringLoad.cutScheduleAtTime(electricSourceInterval.getEndTime());
-		
-		/*System.out.println("agentDuringLoad:");
-		agentDuringLoad.printSchedule();
-		System.out.println("electricSourceInterval:");
-		electricSourceInterval.printInterval();*/
+		agentDuringLoad= agentDuringLoad.cutScheduleAtTime(electricSourceInterval.getEndTime());	
 		
 		for(int i=0; i<agentDuringLoad.getNumberOfEntries();i++){
-			TimeInterval agentInterval= agentDuringLoad.timesInSchedule.get(i);
-			
-			// if overlap between agentInterval && electricSource
-			LoadDistributionInterval overlapAgentAndElectricSource=
-				agentInterval.ifOverlapWithLoadDistributionIntervalReturnOverlap(electricSourceInterval);
-			
-			if(overlapAgentAndElectricSource!=null){
+			TimeInterval agentIntervalInAgentDuringLoad= agentDuringLoad.timesInSchedule.get(i);
+			if (agentIntervalInAgentDuringLoad.isParking()){
 				
-				if(agentInterval.isParking()){
+				// if overlap between agentInterval && electricSource
+				LoadDistributionInterval overlapAgentAndElectricSource=
+					agentIntervalInAgentDuringLoad.ifOverlapWithLoadDistributionIntervalReturnOverlap(electricSourceInterval);
+				
+				if(overlapAgentAndElectricSource!=null){
 					//IF PARKING					
 					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
-							((ParkingInterval)agentInterval).getLocation());
-					
+							((ParkingInterval)agentIntervalInAgentDuringLoad).getLocation());					
 					
 					Schedule hubSchedule=mySmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(hubId);
-					/*System.out.println("hubSchedule before:");
-					hubSchedule.printSchedule();*/
 					
-					if (hubSchedule.overlapWithTimeInterval(overlapAgentAndElectricSource)){
-						//if there is overlap
-						
-						hubSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(overlapAgentAndElectricSource);
-												
+					if (hubSchedule.overlapWithTimeInterval(overlapAgentAndElectricSource)){						
+						hubSchedule.addLoadDistributionIntervalToExistingLoadDistributionSchedule(overlapAgentAndElectricSource);												
 					}else{
 						hubSchedule.addTimeInterval(overlapAgentAndElectricSource);
-						hubSchedule.sort();
-					
+						hubSchedule.sort();					
 					}
 					
 					// could be transmitted to HUb - thus reduce Vehicle Load
@@ -720,22 +726,50 @@ public class V2G {
 							agentId, 
 							overlapAgentAndElectricSource);
 					
-					/*System.out.println("hubSchedule after adding superfluous loads:");
-					hubSchedule.printSchedule();*/
+					double joulesOfOverlap=DecentralizedSmartCharger.functionIntegrator.integrate(
+							overlapAgentAndElectricSource.getPolynomialFunction(), overlapAgentAndElectricSource.getStartTime(), overlapAgentAndElectricSource.getEndTime());
 					
-				}/*else{
-					//IF NOT PARKING - ENERGY LOST
-					//save as impossible request for Joules
+					if(joulesOfOverlap>0){
+						// add revenue from feed in of renewable energy
+						double revenue=calculateCompensationFeedIn(joulesOfOverlap, agentId);//compensationPerFeedIn 
+						addRevenueToAgentFromFeedIn(revenue, agentId);
+						addJouleFeedInToAgentStats(joulesOfOverlap, agentId);						
+						
+					}else{
+						// increase charging costs
+						// approximation of costs of charging
+						double extraCost=approximateChargingCostOfVariableLoad(((ParkingInterval)agentIntervalInAgentDuringLoad), joulesOfOverlap);
+												
+						mySmartCharger.getChargingCostsForAgents().put(
+								agentId, 
+								(mySmartCharger.getChargingCostsForAgents().get(agentId)+extraCost)
+								);
+						
+					}
 					
-					setLoadAsLost(overlapAgentAndElectricSource.getPolynomialFunction(),
-							overlapAgentAndElectricSource.getStartTime(),
-							overlapAgentAndElectricSource.getEndTime(),
-							agentId);
 					
-				}*/
-			}
-			
+					if(DecentralizedSmartCharger.debug){
+						System.out.println("hubSchedule after adding superfluous loads:");
+						hubSchedule.printSchedule();
+					}
+				}
+			}							
+				
 		}
+	}
+	
+	
+	
+	
+	public double approximateChargingCostOfVariableLoad(
+			ParkingInterval agentIntervalInAgentDuringLoad, double joulesOfOverlap){
+		
+		double pricingValueOfTime= mySmartCharger.myHubLoadReader.getValueOfPricingPolynomialFunctionAtLinkAndTime(agentIntervalInAgentDuringLoad.getLocation(), 
+				agentIntervalInAgentDuringLoad.getStartTime());
+		
+		//pricingValueOfTime *1s = CHF/s*1s = 3500W
+		
+		return pricingValueOfTime*joulesOfOverlap/3500.0;
 	}
 	
 	
@@ -893,6 +927,24 @@ public class V2G {
 				mySmartCharger.getAgentContracts().get(agentId).compensationUp()*mySmartCharger.KWHPERJOULE;
 				
 			return  Math.abs(contributionInJoulesAgent*compensationPerJouleRegulationUp);
+		}
+		
+	}
+	
+	
+	public double calculateCompensationFeedIn(double contributionInJoulesAgent, Id agentId){
+		/*
+		 * if regulation up   joules<0
+		 * if regulation down  joules>0
+		 */
+		if (contributionInJoulesAgent>0){//feedin
+			double compensationPerJouleRegulationDown= 
+				mySmartCharger.getAgentContracts().get(agentId).compensationUpFeedIn()*mySmartCharger.KWHPERJOULE;
+				
+			return  Math.abs(contributionInJoulesAgent*compensationPerJouleRegulationDown);
+		}else{//charging
+			
+			return  0.0;
 		}
 		
 	}

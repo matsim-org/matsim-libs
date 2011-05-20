@@ -51,8 +51,9 @@ public class StochasticLoadCollector {
 	}
 	
 	public HashMap<Id, Schedule> getStochasticAgentVehicleSources(){
-		makeAgentVehicleSource(controler);
-		return agentSource;
+		//makeAgentVehicleSource(controler);
+		return null;
+		//return agentSource;
 	}
 	
 	public HashMap<Integer, Schedule> getStochasticHubSources(){
@@ -94,10 +95,11 @@ public class StochasticLoadCollector {
 		
 		for (Integer i: hubSet){
 			
-			// 1 hours - 40min down 20up
-			double secs= 1*3600;
+			// 4 * 15 minutes = 1 hour
+			// 15 minutes in 6 hours
+			double secs= 15*60.0;
 						
-			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
+			double buffer= DecentralizedSmartCharger.SECONDSPERDAY/4-secs;
 			double startSec= Math.random()*buffer;
 			
 			Schedule bullShitStochastic= new Schedule();
@@ -105,9 +107,15 @@ public class StochasticLoadCollector {
 			PolynomialFunction p1 = new PolynomialFunction(new double[] {numPpl*3500});
 			PolynomialFunction p2 = new PolynomialFunction(new double[] {-numPpl*3500});
 			PolynomialFunction p3 = new PolynomialFunction(new double[] {numPpl*3500});
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+20*60, p1, true));
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+3600, startSec+2*20*60, p2, true));
-			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec+2*3600, startSec+3*20*60, p3, true));
+			PolynomialFunction p4 = new PolynomialFunction(new double[] {numPpl*3500});
+			
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(startSec, startSec+secs, p1, true));
+			double newStart=startSec+(DecentralizedSmartCharger.SECONDSPERDAY/4);
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(newStart, newStart+secs, p2, true));
+			newStart+=(DecentralizedSmartCharger.SECONDSPERDAY/4);
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(newStart, newStart+secs, p3, true));
+			newStart+=(DecentralizedSmartCharger.SECONDSPERDAY/4);
+			bullShitStochastic.addTimeInterval(new LoadDistributionInterval(newStart, newStart+secs, p4, true));
 			
 			stochasticHubLoadDistribution.put(i, bullShitStochastic);
 		}

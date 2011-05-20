@@ -38,6 +38,7 @@ import org.apache.commons.math.analysis.solvers.UnivariateRealSolverFactory;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.Effect3D;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -61,10 +62,11 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  */
 public class HubLoadDistributionReader {
 	
+	Controler controler;
+	private String outputPath;
 	
 	UnivariateRealSolverFactory factory = UnivariateRealSolverFactory.newInstance();
 	UnivariateRealSolver solverNewton = factory.newNewtonSolver();
-	
 		
 	private HubLinkMapping hubLinkMapping;
 	
@@ -81,15 +83,17 @@ public class HubLoadDistributionReader {
 	HashMap<Integer, Schedule> pricingHubDistribution;
 	HashMap<Integer, TimeDataCollector> connectivityHubDistribution;
 	
-	
-	
-	
-	Controler controler;
 	VehicleTypeCollector myVehicleTypeCollector;
 	
-	private String outputPath;
-	/**e 
-	 * Reads in load data for all hubs and stores PolynomialFunctions 
+	
+	
+	
+	
+	/** 
+	 * Stores all load information of the various hubs
+	 * <li> determinisitc load before and after charging
+	 * <li> stochastic loads before and after V2G
+	 * 
 	 * of load valleys and peak load times
 	 * @throws IOException 
 	 * @throws OptimizationException 
@@ -132,6 +136,10 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	
+	/**
+	 * initializes deterministicHubLoadDistributionAfter with the values initially passed in
+	 */
 	public void initializeDeterministicHubLoadDistributionAfter(){
 		deterministicHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
 		
@@ -142,17 +150,28 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	
+	/**
+	 * if there are PHEVs in the simulation the deterministic load is adjusted for them
+	 * for all periods of time where charging electricity is necessarily more expensive than driving on gas
+	 * </br>
+	 * PHEVS use deterministicHubLoadDistributionPHEVAdjusted to guide their charging decisions
+	 *
+	 * @throws IOException
+	 */
 	public void checkForPlugInHybrid() throws IOException{
 		
 		PlugInHybridElectricVehicle p= new PlugInHybridElectricVehicle(new IdImpl(1));
 		
-		if (myVehicleTypeCollector.containsVehicleTypeForThisVehicle(p)){
-			
-			double gasPriceInCostPerSecond; // cost/second = cost/liter * liter/joules * joules/second			
+		if (myVehicleTypeCollector.containsVehicleTypeForThisVehicle(p)){			
 			
 			GasType phevGasType= myVehicleTypeCollector.getGasType(p);
 			double engineWatt =  myVehicleTypeCollector.getWattOfEngine(p);
-			gasPriceInCostPerSecond=phevGasType.getPricePerLiter() * 1/(phevGasType.getJoulesPerLiter()) * engineWatt;
+			double engineEfficiency = myVehicleTypeCollector.getEfficiencyOfEngine(p);
+			
+			// gasPriceInCostPerSecond;= cost/second = cost/liter * liter/joules * joules/second * 1/efficiency			
+			double  gasPriceInCostPerSecond=phevGasType.getPricePerLiter() * 1/(phevGasType.getJoulesPerLiter()) 
+											*(1/engineEfficiency) * engineWatt;
 						
 			deterministicHubLoadDistributionPHEVAdjusted=getPHEVDeterministicHubLoad(gasPriceInCostPerSecond);
 			visualizePricingAndGas(gasPriceInCostPerSecond);
@@ -165,6 +184,18 @@ public class HubLoadDistributionReader {
 	
 	
 	
+	/**
+	 * <li>initializes the stochastic loads before and after
+	 * <li>sums up location sources and stochastic hub loads - since they are all relevant on the hub level
+	 * 	
+	 * 
+	 * @param stochasticHubLoadDistribution
+	 * @param locationSourceMapping
+	 * @param agentVehicleSourceMapping
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
 	public void setStochasticSources(
 			HashMap<Integer, Schedule> stochasticHubLoadDistribution,
 			HashMap<Integer, Schedule> locationSourceMapping,
@@ -180,6 +211,10 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	/**
+	 * initialize the stochastic hub loads after
+	 * 
+	 */
 	public void initializeStochasticHubLoadDistributionAfter(){
 		stochasticHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
 		agentVehicleSourceMappingAfter = new HashMap<Id, Schedule> ();
@@ -198,7 +233,14 @@ public class HubLoadDistributionReader {
 	}
 	
 	
-	
+	/**
+	 * sums the locationSourceMapping and the stochasticHubLoadDistribution
+	 * to get the effective total hub stochastic load
+	 * 
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
 	public void sumStochasticGridAndLocationSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		if(locationSourceMapping!=null){
 			for(Integer hub: locationSourceMapping.keySet()){				
@@ -214,7 +256,11 @@ public class HubLoadDistributionReader {
 	}
 	
 	
-	
+	/**
+	 * initialize the connectivityHubDistribution
+	 * the  HashMap<Integer, TimeDataCollector> connectivityHubDistribution has a time data collector object for every hub
+	 * and records for the first second in every minute, if an agent is parking in the particular hub
+	 */
 	public void initializeConnectivityHubDistribution(){
 		connectivityHubDistribution= new HashMap<Integer, TimeDataCollector> ();
 		
@@ -266,9 +312,15 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	
+	/**
+	 * returns the keySet with all Hub Integer Ids
+	 * @return
+	 */
 	public Set<Integer> getHubKeySet(){
 		return deterministicHubLoadDistribution.keySet();
 	}
+	
 	
 	public Schedule getDeterministicHubLoadDistribution(int hubId){
 		return deterministicHubLoadDistribution.get(hubId);
@@ -312,7 +364,7 @@ public class HubLoadDistributionReader {
 
 	
 	/**
-	 * gets the loadDistribution Function for a specific time interval and location idLink
+	 * gets the loadDistribution intervals for a specific time interval and location idLink
 	 * @param idLink
 	 * @param t
 	 * @return
@@ -368,6 +420,20 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	public double getValueOfPricingPolynomialFunctionAtLinkAndTime(Id idLink, double time){
+		
+		int hub= getHubForLinkId(idLink);
+		
+		Schedule hubLoadSchedule = pricingHubDistribution.get(hub);
+		
+		int intervalOfTime= hubLoadSchedule.timeIsInWhichInterval(time);
+		
+		LoadDistributionInterval importantLoad=(LoadDistributionInterval)hubLoadSchedule.timesInSchedule.get(intervalOfTime);
+				
+		return importantLoad.getPolynomialFunction().value(time);		
+		
+	}
+	
 	
 	/**
 	 * gets the pricing LoadDistributionIntervals for a specific time interval and location idLink
@@ -375,7 +441,7 @@ public class HubLoadDistributionReader {
 	 * @param t
 	 * @return
 	 */
-	public ArrayList <LoadDistributionInterval> getPricingLoadDistributionIntervalsnAtLinkAndTime(Id idLink, TimeInterval t){
+	public ArrayList <LoadDistributionInterval> getPricingLoadDistributionIntervalsAtLinkAndTime(Id idLink, TimeInterval t){
 		
 		int hub= getHubForLinkId(idLink);
 		
@@ -395,6 +461,10 @@ public class HubLoadDistributionReader {
 	
 	
 	/**
+	 * returns the deterministicHubLoadDistribution relevant for the current position of the agent (idLink--> hub)
+	 * 
+	 * for PHEV agents, the deterministicHubLoadDistribution is altered to reflect the preference for gas in those periods, 
+	 * where gas is always cheaper than charging electricity
 	 * 
 	 * @param agentId - Id agent
 	 * @param idLink - location Link
@@ -412,10 +482,7 @@ public class HubLoadDistributionReader {
 	}
 	
 
-	
-	
-	
-	
+		
 	
 	
 	
@@ -463,15 +530,33 @@ public class HubLoadDistributionReader {
 	
 	
 	
-	
+	/**
+	 * extrapolates a value for the estimated number of parking vehicles at the hub
+	 * from the recorded data in connectivityHubDistribution
+	 * 
+	 * <p> this function is called in the Decentralized Smart Charger within the function checkHubStochasticLoads()</p>
+	 * @param hub
+	 * @param time
+	 * @return
+	 */
 	public double getExpectedNumberOfParkingAgentsAtHubAtTime(int hub, double time){
-		return connectivityHubDistribution.get(hub).getFunction().value(time);
+		/*
+		 * using the function is not accurate enough
+		 * extrapolation of values works better
+		 */	
+		return connectivityHubDistribution.get(hub).extrapolateValueAtTime( time);
+		
 	}
 	
 	
 	
 	
-	
+	/**
+	 * visualizes the connectivity of agents at hubs from recorded connectivityHubDistribution data
+	 * called after findChargingDistribution() in the Decentralized Smart Charger
+	 * @throws OptimizationException
+	 * @throws IOException
+	 */
 	public void calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader() throws OptimizationException, IOException{
 		
 		XYSeriesCollection connectivity= new XYSeriesCollection();
@@ -487,6 +572,9 @@ public class HubLoadDistributionReader {
 			
 			XYSeries xx= data.getXYSeries("Parking Vehicles at Hub"+ i);
 			connectivity.addSeries(xx);
+			
+		/*	XYSeries xxFit= data.getXYSeriesFromFunction("Parking Vehicles at Hub"+ i+ "(fitted function)");			
+			connectivity.addSeries(xxFit);*/
 		}
 		
 		JFreeChart chart = ChartFactory.createXYLineChart("Number of parking agents at hubs over the day", 
@@ -503,10 +591,11 @@ public class HubLoadDistributionReader {
         plot.setDomainGridlinePaint(Color.gray); 
         plot.setRangeGridlinePaint(Color.gray);
 		
-        int i=0;
-        for(Integer j:  connectivityHubDistribution.keySet()){
+     
+        for(Integer i:  connectivityHubDistribution.keySet()){
         	
         	plot.getRenderer().setSeriesPaint(i, Color.black);//after
+        	
         	plot.getRenderer().setSeriesStroke(
                     i, 
                   
@@ -515,11 +604,11 @@ public class HubLoadDistributionReader {
                         BasicStroke.CAP_ROUND, //int cap
                         BasicStroke.JOIN_ROUND, //int join
                         1.0f, //float miterlimit
-                        new float[] {(1+i)*2.0f, i*3f}, //float[] dash
+                        new float[] {1.0f, 1.0f}, //float[] dash
                         0.0f //float dash_phase
                     )
                 );
-        	i++;
+      
         }
         String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
@@ -640,11 +729,9 @@ public class HubLoadDistributionReader {
 					
 				}
 				
-				
 			}
 			
-			sPHEV.sort();
-			//sPHEV.printSchedule();
+			sPHEV.sort();		
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
 			
 		}
@@ -784,8 +871,10 @@ public class HubLoadDistributionReader {
 
 	
 	
-	/*
-	 * Debugging purposes convenience method
+	/**
+	 * prints an arrayList of Charging Intervals
+	 * good for debugging
+	 * @param b
 	 */
 	private void printArrayList(ArrayList<ChargingInterval> b){
 		for(int i=0; i<b.size();i++){
@@ -794,6 +883,14 @@ public class HubLoadDistributionReader {
 	}
 
 	
+	
+	/**
+	 * visualizes the price distribution of gas and electricitz at the different hubs over the day
+	 * 
+	 * <p> for every hub a .png file is saved under: outputPath+ "Hub\\pricesHub_"+ i.toString()+".png" </p>
+	 * @param gasPriceInCostPerSecond
+	 * @throws IOException
+	 */
 	private void visualizePricingAndGas(double gasPriceInCostPerSecond) throws IOException{
 		for( Integer i : pricingHubDistribution.keySet() ){
 			
@@ -820,7 +917,6 @@ public class HubLoadDistributionReader {
 			
 			prices.addSeries(hubPricing);
 			prices.addSeries(gasPriceXY);
-			//************************************
 			
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart("Prices at Hub "+ i.toString(), 
@@ -863,7 +959,12 @@ public class HubLoadDistributionReader {
 
 	
 	
-	
+	/**
+	 * saves a visualization of the deterministic load as applicable for EVs and PHEVs
+	 * under:
+	 * outputPath+ "Hub\\hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png"
+	 * @throws IOException
+	 */
 	private void visualizeLoadDistributionGeneralAndPHEV() throws IOException{
 				
 		for( Integer i : deterministicHubLoadDistribution.keySet()){
@@ -901,10 +1002,7 @@ public class HubLoadDistributionReader {
 			}
 			
 			deterministicGeneral.addSeries(hubDeterministicPHEV);
-		
-			
-			//************************************
-			
+					
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart("Deterministic LoadDistribution "+ i.toString(), 
 					"time [s]", 
@@ -950,7 +1048,7 @@ public class HubLoadDistributionReader {
     	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\hubDeterministic_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		}

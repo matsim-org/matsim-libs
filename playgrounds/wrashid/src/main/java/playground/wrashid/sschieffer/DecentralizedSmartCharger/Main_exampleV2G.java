@@ -102,8 +102,9 @@ public class Main_exampleV2G {
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		
-		double priceMaxPerkWh=0.25;
-		double priceMinPerkWh=0.40;
+		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
+		double priceMinPerkWh=0.07;
+		
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
 		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
 		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
@@ -133,10 +134,9 @@ public class Main_exampleV2G {
 		 * i.e. 0/0.5/0.5
 		 * 50% do only down, 50% do up and down
 		 */
-		final double xPercentNone=0.0;
+		
 		final double xPercentDown=0.0;
 		final double xPercentDownUp=1.0;
-		
 		
 		/*
 		 * ************************
@@ -161,16 +161,17 @@ public class Main_exampleV2G {
 		 */			
 					
 		
-		double compensationPerKWHRegulationUp=0.15;
-		double compensationPerKWHRegulationDown=0.15;
+		double compensationPerKWHRegulationUp=0.1;
+		double compensationPerKWHRegulationDown=0.005;
+		double compensationPERKWHFeedInVehicle=0.005;
 		
-		mySimulation.setUpV2G(
-				xPercentNone,
+		mySimulation.setUpV2G(				
 				xPercentDown,
 				xPercentDownUp,
 				new StochasticLoadCollector(mySimulation),
 				compensationPerKWHRegulationUp,
-				compensationPerKWHRegulationDown);
+				compensationPerKWHRegulationDown,
+				compensationPERKWHFeedInVehicle);
 	
 		mySimulation.controler.run();
 		

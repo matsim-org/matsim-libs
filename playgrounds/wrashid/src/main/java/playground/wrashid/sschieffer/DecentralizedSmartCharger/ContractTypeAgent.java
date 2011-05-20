@@ -21,20 +21,25 @@ public class ContractTypeAgent {
 	
 	private double compensationRegulationUpPerKWH, compensationRegulationDownPerKWH;
 	
+	private double compensationPERKWHFeedInVehicle;
 	//private boolean reschedule;
 	
 	public ContractTypeAgent(boolean up, 
 			boolean down,
 			double compensationRegulationUpPerKWH,
-			double compensationRegulationDownPerKWH){
+			double compensationRegulationDownPerKWH,
+			double compensationPERKWHFeedInVehicle){
 		regulationUp=up;
 		regulationDown=down;
-		
+		this.compensationPERKWHFeedInVehicle=compensationPERKWHFeedInVehicle;
 		this.compensationRegulationDownPerKWH=compensationRegulationDownPerKWH;
 		this.compensationRegulationUpPerKWH=compensationRegulationUpPerKWH;
 	}
 	
 	
+	public double compensationUpFeedIn(){
+		return compensationPERKWHFeedInVehicle;
+	}
 	
 	public double compensationUp(){
 		return compensationRegulationUpPerKWH;

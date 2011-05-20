@@ -3,6 +3,10 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G;
 public class V2GAgentStats {
 
 	private double revenueV2G;
+	
+	private double revenueFeedIn;
+	private double totalJouleFeedIn;
+	
 	private double totalJouleUp;
 	private double totalJouleDown;
 	
@@ -10,6 +14,15 @@ public class V2GAgentStats {
 		revenueV2G=0;
 		totalJouleUp=0;
 		totalJouleDown=0;
+	}
+	
+	
+	public void addRevenueFeedIn(double money){
+		revenueFeedIn+=money;
+	}
+	
+	public void addJoulesFeedIn(double joules){
+		totalJouleFeedIn+=joules;
 	}
 	
 	
@@ -27,6 +40,14 @@ public class V2GAgentStats {
 	
 	public double getRevenueV2G(){
 		return revenueV2G;
+	}
+	
+	public double getRevenueFeedIn(){
+		return revenueFeedIn;
+	}
+	
+	public double getTotalJoulesFeedIn(){
+		return totalJouleFeedIn;
 	}
 	
 	public double getTotalJoulesUp(){

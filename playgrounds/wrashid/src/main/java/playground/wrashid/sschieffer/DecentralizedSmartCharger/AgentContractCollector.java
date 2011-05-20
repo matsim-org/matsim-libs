@@ -21,26 +21,30 @@ public class AgentContractCollector {
 	 
 	 public AgentContractCollector (DecentralizedSmartCharger dsc,
 			 double  compensationPerKWHRegulationUp,
-			 double compensationPerKWHRegulationDown){
+			 double compensationPerKWHRegulationDown,
+			 double compensationPERKWHFeedInVehicle){
 		 this.dsc=dsc;
 		 
 		 contractRegUpRegDown= new ContractTypeAgent(
 					true, // up
 					true, //down
 					compensationPerKWHRegulationUp,
-					compensationPerKWHRegulationDown);
+					compensationPerKWHRegulationDown,
+					compensationPERKWHFeedInVehicle);
 		 
 		contractRegDown= new ContractTypeAgent(
 					false,
 					true, 
 					0,
-					compensationPerKWHRegulationDown);
+					compensationPerKWHRegulationDown,
+					compensationPERKWHFeedInVehicle);
 		 
 		  contractNoRegulation= new ContractTypeAgent(
 					false, // up
 					false, //down
 					0,
-					0);
+					0,
+					compensationPERKWHFeedInVehicle);
 			
 	 }
 	
@@ -52,13 +56,12 @@ public class AgentContractCollector {
 	 * no regulation, only regulation down or regulation up and down
 	 */
 	public HashMap<Id, ContractTypeAgent>  makeAgentContracts(
-			Controler controler,
-			double xPercentNone,
+			Controler controler,		
 			double xPercentDown,
 			double xPercentDownUp			
 			){
 		
-		
+		double  xPercentNone = 1.0-xPercentDownUp-xPercentDown;
 		int popSize= dsc.vehicles.getKeySet().size();
 		int count = 0;
 		
