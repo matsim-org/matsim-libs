@@ -77,6 +77,7 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 		
 	double compensationPerKWHRegulationUp=0.15;
 	double compensationPerKWHRegulationDown=0.15;
+	double compensationPERKWHFeedInVehicle=0.15;
 	double xPercentNone=0;
 	double xPercentDown=0;
 	double xPercentDownUp=1.0;
@@ -148,7 +149,7 @@ public class V2GTestOnePlan_reduceAttribute extends TestCase{
 							myDecentralizedSmartCharger, 
 							compensationPerKWHRegulationUp, 
 							compensationPerKWHRegulationDown, 
-							xPercentNone, 
+							compensationPERKWHFeedInVehicle,
 							xPercentDown, 
 							xPercentDownUp);
 					

@@ -39,8 +39,8 @@ public class TimeTesting {
 		
 		final double compensationPerKWHRegulationUp=0.15;
 		final double compensationPerKWHRegulationDown=0.15;
-		
-		final double xPercentNone=0.0;
+		final double compensationPERKWHFeedInVehicle=0.15;
+	
 		final double xPercentDown=0.0;
 		final double xPercentDownUp=1.0;
 		
@@ -74,7 +74,7 @@ public class TimeTesting {
 							bufferBatteryCharge,
 							standardChargingSlotLength);
 					
-					myDecentralizedSmartCharger.setDebug(true);
+					myDecentralizedSmartCharger.setDebug(false);
 					myDecentralizedSmartCharger.run();
 					
 					myDecentralizedSmartCharger.writeSummaryDSC("DSC"+configName);
@@ -92,8 +92,8 @@ public class TimeTesting {
 					mySimulation.setUpAgentSchedules(
 							myDecentralizedSmartCharger, 
 							compensationPerKWHRegulationUp, 
-							compensationPerKWHRegulationDown, 
-							xPercentNone, 
+							compensationPerKWHRegulationDown,
+							compensationPERKWHFeedInVehicle,
 							xPercentDown, 
 							xPercentDownUp);
 					
@@ -101,7 +101,7 @@ public class TimeTesting {
 					
 					V2G myV2G= new V2G(myDecentralizedSmartCharger);
 					myDecentralizedSmartCharger.setV2G(myV2G);
-					myDecentralizedSmartCharger.initializeAndRunV2G(xPercentNone,
+					myDecentralizedSmartCharger.initializeAndRunV2G(
 							xPercentDown, xPercentDownUp);
 					
 					myDecentralizedSmartCharger.writeSummaryV2G("V2G"+configName);

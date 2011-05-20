@@ -139,18 +139,18 @@ public class TestSimulationSetUp {
 			DecentralizedSmartCharger myDecentralizedSmartCharger,
 			double compensationPerKWHRegulationUp,
 			double compensationPerKWHRegulationDown,
-			double xPercentNone,
+			double compensationPERKWHFeedInVehicle,
 			double xPercentDown,
 			double xPercentDownUp){
 		
 		AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
 				myDecentralizedSmartCharger,
 				 compensationPerKWHRegulationUp,
-				 compensationPerKWHRegulationDown);
+				 compensationPerKWHRegulationDown,
+				 compensationPERKWHFeedInVehicle);
 		
 		agentContracts= myAgentContractsCollector.makeAgentContracts(
 					controler,
-					xPercentNone,
 					xPercentDown,
 					xPercentDownUp);
 		

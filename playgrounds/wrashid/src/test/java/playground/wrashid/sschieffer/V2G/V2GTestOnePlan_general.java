@@ -71,6 +71,7 @@ public class V2GTestOnePlan_general extends TestCase{
 	
 	double compensationPerKWHRegulationUp=0.15;
 	double compensationPerKWHRegulationDown=0.15;
+	double compensationPERKWHFeedInVehicle=0.15;
 	double xPercentNone=0;
 	double xPercentDown=0;
 	double xPercentDownUp=1.0;
@@ -144,13 +145,13 @@ public class V2GTestOnePlan_general extends TestCase{
 					mySimulation.setUpAgentSchedules(
 							myDecentralizedSmartCharger, 
 							compensationPerKWHRegulationUp, 
-							compensationPerKWHRegulationDown, 
-							xPercentNone, 
+							compensationPerKWHRegulationDown, 		
+							compensationPERKWHFeedInVehicle,
 							xPercentDown, 
 							xPercentDownUp);
 					
 					myDecentralizedSmartCharger.setAgentContracts(mySimulation.getAgentContracts());
-					myDecentralizedSmartCharger.setV2GRegUpAndDownStats(xPercentNone,xPercentDown,xPercentDownUp);// normally in initializeV2G
+					myDecentralizedSmartCharger.setV2GRegUpAndDownStats(xPercentDown,xPercentDownUp);// normally in initializeV2G
 					
 					
 					/**
