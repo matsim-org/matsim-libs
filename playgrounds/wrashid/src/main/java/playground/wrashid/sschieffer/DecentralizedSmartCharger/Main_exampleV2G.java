@@ -93,7 +93,7 @@ public class Main_exampleV2G {
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans10.xml";
 		
 		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
@@ -129,6 +129,9 @@ public class Main_exampleV2G {
 		 * <li> no V2G
 		 * <li> only down (only charging)
 		 * <li> up and down (charging and discharging)
+		 * 
+		 * i.e. 0/0.5/0.5
+		 * 50% do only down, 50% do up and down
 		 */
 		final double xPercentNone=0.0;
 		final double xPercentDown=0.0;
@@ -174,9 +177,28 @@ public class Main_exampleV2G {
 		/*********************
 		 * Example how to Use V2G
 		 *********************/
-		//add new tuff
-	/*	HashMap<Id, Double> agentRevenuesFromV2G=
-			mySimulation.getAgentV2GRevenues();	*/
+		
+		// REVENUES FROM V2G
+		double averageRevenueV2GAgent= mySimulation.getAverageRevenueV2GPerAgent();
+		
+		double averageRevenueV2perEV= mySimulation.getAverageRevenueV2GPerEV();
+		
+		double averageRevenueV2GperPHEV= mySimulation.getAverageRevenueV2GPerPHEV();
+		
+		//JOULES PROVIDED IN REGULATION UP OR DOWN
+		double totalJoulesV2GRegulationUp= mySimulation.getTotalJoulesV2GRegulationUp();
+		
+		double totalJoulesV2GRegulationUpEV= mySimulation.getTotalJoulesV2GRegulationUpEV();
+		
+		double totalJoulesV2GRegulationUpPHEV= mySimulation.getTotalJoulesV2GRegulationUpPHEV();
+		
+		//JOULES PROVIDED IN REGULATION UP OR DOWN
+		double totalJoulesV2GRegulationDown= mySimulation.getTotalJoulesV2GRegulationDown();
+		
+		double totalJoulesV2GRegulationDownEV= mySimulation.getTotalJoulesV2GRegulationDownEV();
+		
+		double totalJoulesV2GRegulationDownPHEV= mySimulation.getTotalJoulesV2GRegulationDownPHEV();
+		
 	}
 
 }

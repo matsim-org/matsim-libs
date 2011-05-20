@@ -62,6 +62,10 @@ public class Schedule {
 	}
 	
 	
+	public Schedule(TimeInterval t){
+		timesInSchedule.add(t);
+	}
+	
 	public void clearJoules(){
 		totalJoulesInOptimalParkingTimes=0;
 		totalJoulesInSubOptimalParkingTimes=0;
@@ -275,6 +279,7 @@ public class Schedule {
 	 * @return
 	 */
 	public int timeIsInWhichInterval(double time){
+		printSchedule();
 		int solution=-1;
 		for (int i=0; i<timesInSchedule.size(); i++){
 			if(time<timesInSchedule.get(i).getEndTime() && 
@@ -611,12 +616,15 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 		int interval= timeIsInWhichInterval(time); 
 		
 		for(int i=0; i<=interval-1; i++){
-			firstHalf.addTimeInterval(timesInSchedule.get(i));
+			firstHalf.addTimeInterval(timesInSchedule.get(i).clone());
 			
 		}
 		
 		//last interval To Be Cut
 		TimeInterval lastInterval= timesInSchedule.get(interval);
+		if(lastInterval.isCharging()){
+			System.out.println("Exception");
+		}
 		if (lastInterval.isDriving()){
 			
 			DrivingInterval d= new DrivingInterval(lastInterval.getStartTime(), 
@@ -676,7 +684,6 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 			
 			
 		}else{
-			
 				
 				ParkingInterval p= new ParkingInterval(time, firstInterval.getEndTime(), 
 						((ParkingInterval)firstInterval).getLocation() 
@@ -693,15 +700,13 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 				
 				if(p.getIntervalLength()>0){
 					secondHalf.addTimeInterval(p);
-				}
-							
-				
+				}				
 			
 		}
 		
 		
 		for(int i=interval+1; i<getNumberOfEntries(); i++){
-			secondHalf.addTimeInterval(timesInSchedule.get(i));
+			secondHalf.addTimeInterval(timesInSchedule.get(i).clone());
 			
 		}
 		secondHalf.sort();		
@@ -711,12 +716,20 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 
 
 
+	/**
+	 * makes a clone of first half of charging schedule
+	 * @param time
+	 * @return
+	 */
 	public Schedule cutChargingScheduleAtTime(double time){
 		Schedule newCharging= new Schedule();
 		for(int i=0; i<getNumberOfEntries(); i++){
 			if(time > timesInSchedule.get(i).getEndTime()){
 				//add full interval
-				newCharging.addTimeInterval(timesInSchedule.get(i));
+				
+				newCharging.addTimeInterval(new ChargingInterval(timesInSchedule.get(i).getStartTime(), 
+						timesInSchedule.get(i).getEndTime()));
+				
 				
 			}
 			if(time > timesInSchedule.get(i).getStartTime() && time <= timesInSchedule.get(i).getEndTime()){
@@ -730,14 +743,18 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 	}
 	
 	
-	
+	/**
+	 * returns a clone of the second half of the charging schedule
+	 * @param time
+	 * @return
+	 */
 	public Schedule cutChargingScheduleAtTimeSecondHalf(double time){
 		Schedule newCharging= new Schedule();
 		for(int i=0; i<getNumberOfEntries(); i++){
 			if(time < timesInSchedule.get(i).getStartTime()){
 				//add full interval
-				newCharging.addTimeInterval(timesInSchedule.get(i));
-				
+				newCharging.addTimeInterval(new ChargingInterval(timesInSchedule.get(i).getStartTime(), 
+						timesInSchedule.get(i).getEndTime()));
 			}
 			if(time > timesInSchedule.get(i).getStartTime() && time <= timesInSchedule.get(i).getEndTime()){
 				//only take 2nd half
@@ -748,5 +765,43 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 		return newCharging;
 		
 	}
+	
+	
+	
+	
+	public Schedule fillNonExistentTimesInLoadScheduleWithZeroLoads(){
+		Schedule filled= new Schedule();
+		
+		filled.mergeSchedules(this.cloneLoadSchedule());
+		
+		// fill beginning 
+		if(timesInSchedule.get(0).getStartTime()>0.0){
+			filled.addTimeInterval(new LoadDistributionInterval(0.0, 
+					timesInSchedule.get(0).getStartTime(), 
+					new PolynomialFunction(new double[]{0.0}),false));
+		}
+				
+		for(int i=1; i< getNumberOfEntries(); i++){
+			// if there is a distante between consecutive intervals fill it
+			if(timesInSchedule.get(i).getStartTime()- timesInSchedule.get(i-1).getEndTime()>0.0){
+				filled.addTimeInterval(new LoadDistributionInterval(
+						 timesInSchedule.get(i-1).getEndTime(), 
+						 timesInSchedule.get(i).getStartTime(), 
+						new PolynomialFunction(new double[]{0.0}),false));
+			}
+		}
+		
+		// up to end
+		if(timesInSchedule.get(getNumberOfEntries()-1).getEndTime()<DecentralizedSmartCharger.SECONDSPERDAY){
+			filled.addTimeInterval(new LoadDistributionInterval(
+					timesInSchedule.get(getNumberOfEntries()-1).getEndTime(), 
+					DecentralizedSmartCharger.SECONDSPERDAY, 
+					new PolynomialFunction(new double[]{0.0}),false));
+		}
+		filled.sort();
+		return filled;
+	}
+	
+	
 	
 }

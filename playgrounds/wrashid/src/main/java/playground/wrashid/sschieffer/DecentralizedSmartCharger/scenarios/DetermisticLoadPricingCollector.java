@@ -67,7 +67,7 @@ public class DetermisticLoadPricingCollector {
 			
 			setUpContinuousPricingLevels(hub, hubId);
 			
-			visualize(DecentralizedSmartCharger.outputPath, myHubInfo.get(hub).getId());
+			//visualize(DecentralizedSmartCharger.outputPath, myHubInfo.get(hub).getId());
 		}
 		
 	}

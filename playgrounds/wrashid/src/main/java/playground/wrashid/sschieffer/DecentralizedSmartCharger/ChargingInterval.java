@@ -35,6 +35,11 @@ public class ChargingInterval extends TimeInterval {
 		battery=true;
 	}
 	
+	@Override
+	public ChargingInterval clone(){
+		return new ChargingInterval(getStartTime(), getEndTime());
+	}
+	
 	
 	/**
 	 * 

@@ -200,14 +200,15 @@ public class HubLoadDistributionReader {
 	
 	
 	public void sumStochasticGridAndLocationSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		for(Integer hub: locationSourceMapping.keySet()){
-			
-			Schedule locationSchedule= locationSourceMapping.get(hub);
-			for(int i=0; i< locationSchedule.getNumberOfEntries(); i++){
-			
-				stochasticHubLoadDistribution.get(hub).addLoadDistributionIntervalToExistingLoadDistributionSchedule(
-				(LoadDistributionInterval)locationSchedule.timesInSchedule.get(i)
-				);
+		if(locationSourceMapping!=null){
+			for(Integer hub: locationSourceMapping.keySet()){				
+				Schedule locationSchedule= locationSourceMapping.get(hub);
+				for(int i=0; i< locationSchedule.getNumberOfEntries(); i++){
+				
+					stochasticHubLoadDistribution.get(hub).addLoadDistributionIntervalToExistingLoadDistributionSchedule(
+					(LoadDistributionInterval)locationSchedule.timesInSchedule.get(i)
+					);
+				}
 			}
 		}
 	}

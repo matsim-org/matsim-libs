@@ -164,7 +164,10 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			//set the agent contracts
 			myDecentralizedSmartCharger.setAgentContracts(agentContracts);
 			
-			myDecentralizedSmartCharger.initializeAndRunV2G();
+			myDecentralizedSmartCharger.initializeAndRunV2G(
+					DecentralizedChargingSimulation.xPercentNone,
+					DecentralizedChargingSimulation.xPercentDown,
+					DecentralizedChargingSimulation.xPercentDownUp);
 			
 			DecentralizedChargingSimulation.setDecentralizedSmartCharger(myDecentralizedSmartCharger);
 			

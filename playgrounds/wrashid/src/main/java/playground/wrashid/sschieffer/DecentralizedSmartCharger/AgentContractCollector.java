@@ -17,6 +17,8 @@ public class AgentContractCollector {
 	 
 	 private static ContractTypeAgent contractNoRegulation;
 	 
+	 
+	 
 	 public AgentContractCollector (DecentralizedSmartCharger dsc,
 			 double  compensationPerKWHRegulationUp,
 			 double compensationPerKWHRegulationDown){
@@ -56,6 +58,7 @@ public class AgentContractCollector {
 			double xPercentDownUp			
 			){
 		
+		
 		int popSize= dsc.vehicles.getKeySet().size();
 		int count = 0;
 		
@@ -90,6 +93,8 @@ public class AgentContractCollector {
 			double xPercentDownPHEV,
 			double xPercentDownUpPHEV
 			){
+		
+		
 		
 		int popSize= dsc.vehicles.getKeySet().size();
 		int countEV = 0;

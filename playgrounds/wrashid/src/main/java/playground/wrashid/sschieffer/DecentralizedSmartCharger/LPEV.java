@@ -115,7 +115,7 @@ public class LPEV extends LP{
 		
 		schedule= update();
 	
-		if(isOutput()){
+		if(isOutput()|| id.toString().equals(Integer.toString(1))){
 			visualizeSOCAgent(getSolver().getPtrVariables(), vehicleType, id);
 			
 		}

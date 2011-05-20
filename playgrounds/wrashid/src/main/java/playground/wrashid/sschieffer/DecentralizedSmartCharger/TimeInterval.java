@@ -34,6 +34,9 @@ public abstract class TimeInterval implements Comparable{
 	
 	
 	
+	public TimeInterval clone(){
+		return null;
+	}
 	
 	TimeInterval(double start, double end){
 		this.start=start;

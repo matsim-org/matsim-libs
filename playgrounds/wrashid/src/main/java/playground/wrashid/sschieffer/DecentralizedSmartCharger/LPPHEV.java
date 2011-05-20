@@ -117,7 +117,7 @@ public class LPPHEV extends LP{
 				
 		setEnergyFromCombustionEngine(calcEnergyUsageFromCombustionEngine(getSolver().getPtrVariables()));
 		
-		if(isOutput()){
+		if(isOutput()|| id.toString().equals(Integer.toString(1)) ){
 			visualizeSOCAgent(getSolver().getPtrVariables(), vehicleType, id);
 			
 		}

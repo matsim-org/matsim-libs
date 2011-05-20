@@ -58,7 +58,10 @@ public class ParkingInterval extends TimeInterval {
 		this.linkId=linkId;
 	}
 	
-	
+	@Override
+	public ParkingInterval clone(){
+		return new ParkingInterval(getStartTime(), getEndTime(), getLocation());
+	}
 	
 	
 	
@@ -159,6 +162,6 @@ public class ParkingInterval extends TimeInterval {
 				+ "\t  ChargingTime:  " + requiredChargingDuration
 				+ "\t  Optimal:  " + optimal
 				+ "\t  Joules per Interval:  " + joulesInTimeInterval
-				+ "\t  ChargingSchedule:  " + getSizeOfChargingSchedule());
+				+ "\t  ChargingSchedule of size:  " + getSizeOfChargingSchedule());
 	}
 }

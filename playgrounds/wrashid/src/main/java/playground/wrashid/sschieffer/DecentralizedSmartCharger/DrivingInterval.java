@@ -55,6 +55,12 @@ public class DrivingInterval extends TimeInterval {
 		this.consumption=consumption;
 	}
 	
+	@Override
+	public DrivingInterval clone(){
+		DrivingInterval d = new DrivingInterval(getStartTime(), getEndTime(), getConsumption());
+		return d;
+	}
+	
 	
 	public double getConsumption(){
 		return consumption;

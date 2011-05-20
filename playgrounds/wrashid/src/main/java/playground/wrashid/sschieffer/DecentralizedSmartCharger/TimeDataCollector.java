@@ -1,7 +1,12 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math.optimization.DifferentiableMultivariateVectorialOptimizer;
 import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math.optimization.SimpleVectorialValueChecker;
+import org.apache.commons.math.optimization.VectorialConvergenceChecker;
+import org.apache.commons.math.optimization.fitting.PolynomialFitter;
+import org.apache.commons.math.optimization.general.GaussNewtonOptimizer;
 import org.jfree.data.xy.XYSeries;
 
 /**
@@ -22,6 +27,11 @@ import org.jfree.data.xy.XYSeries;
  */
 public class TimeDataCollector {
 
+	private DifferentiableMultivariateVectorialOptimizer optimizer;
+	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(-1,2);//relative tol, absolute tol
+	private GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); 
+	private PolynomialFitter fitter;
+	
 	
 	private double[][] data;
 	
@@ -32,6 +42,11 @@ public class TimeDataCollector {
 	
 	public TimeDataCollector(int numberOfDataPoints){
 		data= new double[numberOfDataPoints][2];
+		
+		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
+		optimizer.setMaxIterations(1000);		
+		optimizer.setConvergenceChecker(checker);		
+		fitter= new PolynomialFitter(5, optimizer);
 	}
 	
 
@@ -51,9 +66,11 @@ public class TimeDataCollector {
 		data[entry][1]= y;
 	}
 	
+	
+	
 	public void fitFunction() throws OptimizationException{
 		try {
-			func= DecentralizedSmartCharger.fitCurve(data);
+			func= fitCurve(data);
 	    } catch (Exception e) {
 	        // if singular with all entries = 0.0
 	    	if(allDataZero()){
@@ -62,6 +79,22 @@ public class TimeDataCollector {
 	    }
 		
 	}
+	
+	
+	
+	private PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
+		
+		fitter.clearObservations();
+		
+		for (int i=0;i<data.length;i++){
+			fitter.addObservedPoint(1.0, data[i][0], data[i][1]);
+		  }		
+		
+		PolynomialFunction poly = fitter.fit();
+		
+		return poly;
+	}
+	
 	
 	
 	public boolean allDataZero(){

@@ -243,7 +243,7 @@ public class DecentralizedChargingSimulation {
 	}
 	
 	/**
-	 * returns total emissions in kg from PHEVs and Combustion engine vehicles
+	 * returns total emissions in kg from PHEVs vehicles
 	 * @return
 	 */
 	public double getTotalEmissions(){
@@ -252,5 +252,42 @@ public class DecentralizedChargingSimulation {
 	
 	
 	
+	public double getAverageRevenueV2GPerAgent(){
+		return mySmartCharger.myV2G.getAverageV2GRevenueAgent();
+	}	
+	
+	
+	public double getAverageRevenueV2GPerEV(){
+		return mySmartCharger.myV2G.getAverageV2GRevenueEV();
+	}
+	
+	public double getAverageRevenueV2GPerPHEV(){
+		return mySmartCharger.myV2G.getAverageV2GRevenuePHEV();
+	}
+	
+	
+	public double getTotalJoulesV2GRegulationUp(){
+		return mySmartCharger.myV2G.getTotalRegulationUp();
+	}
+	
+	public double getTotalJoulesV2GRegulationUpEV(){
+		return mySmartCharger.myV2G.getTotalRegulationUpEV();
+	}
+	
+	public double getTotalJoulesV2GRegulationUpPHEV(){
+		return mySmartCharger.myV2G.getTotalRegulationUpPHEV();
+	}
+	
+	public double getTotalJoulesV2GRegulationDown(){
+		return mySmartCharger.myV2G.getTotalRegulationUp();
+	}
+	
+	public double getTotalJoulesV2GRegulationDownEV(){
+		return mySmartCharger.myV2G.getTotalRegulationDownEV();
+	}
+	
+	public double getTotalJoulesV2GRegulationDownPHEV(){
+		return mySmartCharger.myV2G.getTotalRegulationDownPHEV();
+	}
 	
 }

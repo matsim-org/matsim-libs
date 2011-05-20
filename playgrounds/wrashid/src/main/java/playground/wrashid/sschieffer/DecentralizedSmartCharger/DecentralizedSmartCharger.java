@@ -90,14 +90,13 @@ public class DecentralizedSmartCharger {
 	private double startTime, agentReadTime, LPTime, distributeTime, wrapUpTime;
 	private double startV2G, timeCheckVehicles,timeCheckOtherSources;
 	
-	public DifferentiableMultivariateVectorialOptimizer optimizer;
-	public VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,-10000);//
+	private DifferentiableMultivariateVectorialOptimizer optimizer;
+	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,-10000);//
 	//(double relativeThreshold, double absoluteThreshold)
 	//In order to perform only relative checks, the absolute tolerance must be set to a negative value. 
 	//In order to perform only absolute checks, the relative tolerance must be set to a negative value.
 	
 	public static SimpsonIntegrator functionIntegrator= new SimpsonIntegrator();
-	public GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		
 	public static PolynomialFitter polyFit;
 	public static boolean debug=false;
@@ -125,8 +124,8 @@ public class DecentralizedSmartCharger {
 	
 	final Controler controler;
 	
-	public LPEV lpev;
-	public LPPHEV lpphev;
+	private LPEV lpev;
+	private LPPHEV lpphev;
 		
 	public LinkedList<Id> chargingFailureEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithEV=new LinkedList<Id>();
@@ -134,6 +133,7 @@ public class DecentralizedSmartCharger {
 	public LinkedList<Id> agentsWithCombustion=new LinkedList<Id>();
 	
 	private HashMap<Id, Double> agentChargingCosts = new HashMap<Id,  Double>();
+	private double  xPercentNone, xPercentDown, xPercentDownUp;
 	
 	public static String outputPath;
 	
@@ -163,12 +163,11 @@ public class DecentralizedSmartCharger {
 		
 		this.controler=controler;
 						
-		this.outputPath=outputPath;		
+		this.outputPath=outputPath;	
 		
-		gaussNewtonOptimizer.setMaxIterations(100000);		
-		gaussNewtonOptimizer.setConvergenceChecker(checker);		
-		optimizer=gaussNewtonOptimizer;
-		
+		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
+		optimizer.setMaxIterations(1000);		
+		optimizer.setConvergenceChecker(checker);		
 		polyFit= new PolynomialFitter(20, optimizer);
 			
 		myAgentTimeReader= new AgentTimeIntervalReader(
@@ -177,7 +176,7 @@ public class DecentralizedSmartCharger {
 		
 		this.myVehicleTypes=myVehicleTypes;
 		
-		myV2G= new V2G(this);
+		
 		
 	}
 	
@@ -221,10 +220,21 @@ public class DecentralizedSmartCharger {
 
 	public void setLinkedListValueHashMapVehicles(LinkedListValueHashMap<Id, Vehicle> vehicles){
 		this.vehicles=vehicles;
+		myV2G= new V2G(this);
 	}
 
+	public HashMap<Id, ContractTypeAgent> getAgentContracts(){
+		return agentContracts;
+	}
 
-
+	public LPEV getLPEV(){
+		return lpev;
+	}
+	
+	public LPPHEV getLPPHEV(){
+		return lpphev;
+	}
+	
 	/**
 	 * initializes HubLoadDistributionReader with its basic parameters
 	 * @param hubLinkMapping
@@ -318,8 +328,9 @@ public class DecentralizedSmartCharger {
 	 * @throws IllegalArgumentException 
 	 * @throws FunctionEvaluationException 
 	 * @throws MaxIterationsExceededException 
+	 * @throws IOException 
 	 */
-	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		for (Id id : vehicles.getKeySet()){
 			if(DecentralizedSmartCharger.debug){
@@ -420,9 +431,18 @@ public class DecentralizedSmartCharger {
 			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.get(id));
 			
 			agentChargingSchedules.put(id, chargingSchedule);
+			
+			if(id.toString().equals(Integer.toString(1))){
+				visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.get(id), 
+						agentChargingSchedules.get(id), 
+						id);
+			}
 		}
 		
-		printGraphChargingTimesAllAgents();
+		if(debug || vehicles.getKeySet().size()<1000){
+			printGraphChargingTimesAllAgents();
+		}
+		
 		
 	}
 
@@ -505,7 +525,7 @@ public class DecentralizedSmartCharger {
 			}
 		}
 		
-		visualizeChargingParkingDrivingDistribution();
+		/*visualizeChargingParkingDrivingDistribution();*/
 		
 		
 	}
@@ -628,10 +648,32 @@ public class DecentralizedSmartCharger {
 	}
 
 
-
-	public void initializeAndRunV2G(
+	public double getPercentDownUp(){
+		return xPercentDownUp;
+		
+	}
+	 
+	public double getPercentDown(){
+		return xPercentDown;
+		
+	}
+	
+	
+	public void setV2GRegUpAndDownStats(double xPercentNone,
+			double xPercentDown,
+			double xPercentDownUp){
+		this.xPercentNone=xPercentNone;
+		this.xPercentDownUp=xPercentDownUp;
+		this.xPercentDown=xPercentDown;
+	}
+	
+	
+	public void initializeAndRunV2G(double xPercentNone,
+			double xPercentDown,
+			double xPercentDownUp
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
 		
+		setV2GRegUpAndDownStats(xPercentNone,xPercentDown,xPercentDownUp);
 		
 		startV2G=System.currentTimeMillis();
 			
@@ -663,9 +705,116 @@ public class DecentralizedSmartCharger {
 	
 	
 
+	public void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+		
+		if(myHubLoadReader.agentVehicleSourceMapping!=null){
+			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
+				
+				if(DecentralizedSmartCharger.debug){
+					System.out.println("check VehicleSource for"+ id.toString());
+				}
+					
+					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
+					
+					
+					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
+						
+						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
+						
+						// split up in small intervals of maximum length= mincharging length
+						int intervals= (int) Math.ceil(electricSourceInterval.getIntervalLength()/minChargingLength);
+						
+						for(int intervalNum=0; intervalNum<intervals; intervalNum++){
+							
+							double bit=0;
+							
+							if(intervalNum<intervals-1){
+								bit=minChargingLength;
+								
+							}else{// i=intervals-1
+								bit=electricSourceInterval.getIntervalLength()- (intervals-1)*minChargingLength;
+								
+							}
+							if(bit>30.0){
+								// sometimes numeric inaccuracies. e.g. if bit 10^-12, then start==end and integration fails
+								double start=electricSourceInterval.getStartTime()+intervalNum*minChargingLength;
+								double end= start+bit;
+																
+								PolynomialFunction func= new PolynomialFunction(
+										electricSourceInterval.getPolynomialFunction().getCoefficients().clone()
+										);
+								
+								LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
+										end, 
+										func, 
+										electricSourceInterval.isOptimal());								
+								
+								double joulesFromSource= functionIntegrator.integrate(func, 
+										currentStochasticLoadInterval.getStartTime(), 
+										currentStochasticLoadInterval.getEndTime());
+								
+								String type;
+								
+								if(hasAgentPHEV(id)){
+									
+									type="PHEVRescheduleVehicleSourceAgent_"+id.toString();
+									
+								}else{
+									type="EVRescheduleVehicleSourceAgent_"+id.toString();
+								}
+								
+								// joulesFromSource negative --> SINK = discharging battery - regulation up
+								if(joulesFromSource<0 ){
+									
+									if(isAgentRegulationUp(id)){
+										
+										double compensationPerJouleRegulationUp= agentContracts.get(id).compensationUp()*KWHPERJOULE; 
+										double compensation= Math.abs(joulesFromSource)*compensationPerJouleRegulationUp;
+																			
+										myV2G.regulationUpDownVehicleLoad(id,
+													currentStochasticLoadInterval,
+													agentParkingAndDrivingSchedules.get(id),
+													compensation,
+													joulesFromSource,													
+													type									
+													);
+									}
+									
+								}else{// joulesFromSource<0 	
+									if(isAgentRegulationDown(id)){
+										
+										double compensationPerJouleRegulationDown= 	agentContracts.get(id).compensationDown()*KWHPERJOULE; 
+										double compensation= joulesFromSource*compensationPerJouleRegulationDown;
+										
+										myV2G.regulationUpDownVehicleLoad(id, 
+												currentStochasticLoadInterval, 
+												agentParkingAndDrivingSchedules.get(id), 
+												compensation,
+												joulesFromSource,												
+												type);
+									}
+								}
+								
+							}							
+							
+						}	
+						
+					}
+					// check V2G effect
+					if(debug|| id.toString().equals(Integer.toString(1))  ){
+						visualizeStochasticLoadVehicleBeforeAfterV2G(id);
+												
+					}
+							
+			}
+		}
+		
+	}
+
+
+	
 	public void checkHubStochasticLoads() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
 		
-				
 		if(myHubLoadReader.stochasticHubLoadDistribution !=null){
 			for(Integer h : myHubLoadReader.stochasticHubLoadDistribution.keySet()){
 				
@@ -699,273 +848,123 @@ public class DecentralizedSmartCharger {
 						
 						//*********************************
 						//*********************************
-						if(bit>30){
+						if(bit>30.0){
 							// sometimes numeric inaccuracies. e.g. if bit 10^-12, then start==end and integration fails
 							//FINALLY HAVE INTERVAL TO LOOK AT IN THIS ITERATION
 							double start=stochasticLoad.getStartTime()+i*minChargingLength;
 							double end= start+bit;
 							
-							LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
-									end, 
-									func, 
-									stochasticLoad.isOptimal());
-							
 							//*********************************
-							
 													
 							double joulesFromSource= functionIntegrator.integrate(func, start, end);
-							
-							
-							double expectedNumberOfParkingAgents=
-								myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
-										h, 
-										currentStochasticLoadInterval.getStartTime());
-//							
-							double contributionInJoulesPerAgent=Math.abs(joulesFromSource/expectedNumberOfParkingAgents);
-							
+														
 							if(joulesFromSource<0 ){
 								// regulation UP
-															
+								double expectedNumberOfParkingAgents=getPercentDownUp()*
+									myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
+											h, 
+											start);
 								
-								// loop over all agents 
-								// find who is in regulation up and do regulation up for him
+								// SANITY CHECK
+								if(expectedNumberOfParkingAgents>0.0){
+									func=func.multiply(new PolynomialFunction(new double []{1/expectedNumberOfParkingAgents}));
+									LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
+											end, 
+											func, 
+											stochasticLoad.isOptimal());						
+									
+									// loop over all agents 
+									// find who is in regulation up and do regulation up for him
+									
+									for(Id agentId :vehicles.getKeySet()){
+										
+										String type;									
+										
+										if(hasAgentPHEV(agentId)){
+											
+											type="PHEVStochasticLoadRegulationUp";
+											
+										}else{																			
+											type="EVStochasticLoadRegulationUp";
+										}
+										
+										if(isAgentRegulationUp(agentId)){
+											
+											myV2G.regulationUpDownHubLoad(agentId, 
+													currentStochasticLoadInterval, 
+													agentParkingAndDrivingSchedules.get(agentId), 
+													type,												
+													h);
+										}
+									}
 								
-								for(Id agentId :vehicles.getKeySet()){
-									
-									double compensationPerJouleRegulationUp= 
-										agentContracts.get(agentId).compensationUp()*1/(1000*3600); 
-										
-									double compensation= contributionInJoulesPerAgent*compensationPerJouleRegulationUp;
-									
-									String type;
-									
-									double batterySize = getBatteryOfAgent(agentId).getBatterySize(); 
-									double batteryMin =getBatteryOfAgent(agentId).getMinSOC();
-									double batteryMax= getBatteryOfAgent(agentId).getMaxSOC();
-									
-									
-									
-									if(hasAgentPHEV(agentId)){
-										
-										type="PHEVStochasticLoadRegulationUp";
-										
-									}else{
-																			
-										type="EVStochasticLoadRegulationUp";
-									}
-									
-									if(isAgentRegulationUp(agentId)){
-										
-										myV2G.regulationUpDownHubLoad(agentId, 
-												currentStochasticLoadInterval, 
-												agentParkingAndDrivingSchedules.get(agentId), 
-												compensation,
-												joulesFromSource,
-												hasAgentEV(agentId),
-												type,
-												lpev,
-												lpphev,
-												batterySize,
-												batteryMin,
-												batteryMax,
-												h);
-										
-									}
 								}
-
+							
 								
-							}else{// joulesFromSource<0
-								
-								for(Id agentId : vehicles.getKeySet()){
-									
-									double compensationPerJouleRegulationDown= 
-										agentContracts.get(agentId).compensationDown()*1/(1000*3600);
-										
-									double compensation= contributionInJoulesPerAgent*compensationPerJouleRegulationDown;
-																		
-									String type;
-									
-									double batterySize = getBatteryOfAgent(agentId).getBatterySize(); 
-									double batteryMin =getBatteryOfAgent(agentId).getMinSOC();
-									double batteryMax= getBatteryOfAgent(agentId).getMaxSOC();
-									
-									if(hasAgentPHEV(agentId)){
-										
-										type="PHEVStochasticLoadRegulationDown";
-										
-									}else{
-																			
-										type="EVStochasticLoadRegulationDown";
-									}
-									
-									if(isAgentRegulationDown(agentId)){
-										
-										myV2G.regulationUpDownHubLoad(agentId, 
-												currentStochasticLoadInterval, 
-												agentParkingAndDrivingSchedules.get(agentId), 
-												compensation,
-												joulesFromSource,
-												hasAgentEV(agentId),
-												type,
-												lpev,
-												lpphev,
-												batterySize,
-												batteryMin,
-												batteryMax,
-												h);
-										
-									}
+							}else{// joulesFromSource>0
+								double expectedNumberOfParkingAgents=(getPercentDown()+getPercentDownUp())*myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
+										h, 
+										start);
+								if (debug){
+									System.out.println("expected number of agents: "+ myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
+											h, start));
+									System.out.println("of which reg only down"+ getPercentDown()+" of which reg up and down"+getPercentDownUp());
+									System.out.println("expected number of agents: "+ myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
+											h, start));
 								}
 								
+								
+								if(expectedNumberOfParkingAgents>0.0){
+									func=func.multiply(new PolynomialFunction(new double []{1/expectedNumberOfParkingAgents}));
+									LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
+											end, 
+											func, 
+											stochasticLoad.isOptimal());
+									
+									
+									for(Id agentId : vehicles.getKeySet()){
+										
+										String type;									
+										
+										if(hasAgentPHEV(agentId)){
+											
+											type="PHEVStochasticLoadRegulationDown";
+											
+										}else{
+																				
+											type="EVStochasticLoadRegulationDown";
+										}
+										
+										if(isAgentRegulationDown(agentId)){
+											
+											myV2G.regulationUpDownHubLoad(agentId, 
+													currentStochasticLoadInterval, 
+													agentParkingAndDrivingSchedules.get(agentId), 
+													type,												
+													h);
+											
+										}
+									}
+								}
+																
 							}
 							
 						}
-						
 						
 					}//end for(int i=0; i<intervals; i++){
 					
 				}
 				
 			// VISUALIZE
-				 visualizeStochasticLoadBeforeAfterV2G();
+				visualizeStochasticLoadBeforeAfterV2G();
 				
-			}
-		}
-		
-	}
-	
-	
-	public void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
-		
-		if(myHubLoadReader.agentVehicleSourceMapping!=null){
-			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
-				
-				if(DecentralizedSmartCharger.debug){
-					System.out.println("check VehicleSource for"+ id.toString());
-				}
-					
-					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
-					
-					
-					//VISUALIZE SCHEDULE BEFORE
-					if(debug|| id.toString()=="1"){
-						String strAgentVehicleLoad="AgentVehicleLoad_BeforeV2G_"+id.toString();
-						electricSource.visualizeLoadDistribution(strAgentVehicleLoad, outputPath+"V2G/"+strAgentVehicleLoad+".png");				
-													
-					}
-					
-					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
-						
-						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
-						
-						// split up in small intervals of maximum length= mincharging length
-						int intervals= (int) Math.ceil(electricSourceInterval.getIntervalLength()/minChargingLength);
-						
-						for(int intervalNum=0; intervalNum<intervals; intervalNum++){
-							
-							double bit=0;
-							
-							if(intervalNum<intervals-1){
-								bit=minChargingLength;
-								
-							}else{// i=intervals-1
-								bit=electricSourceInterval.getIntervalLength()- (intervals-1)*minChargingLength;
-								
-							}
-							if(bit>30){
-								// sometimes numeric inaccuracies. e.g. if bit 10^-12, then start==end and integration fails
-								double start=electricSourceInterval.getStartTime()+intervalNum*minChargingLength;
-								double end= start+bit;
-																
-								PolynomialFunction func= new PolynomialFunction(
-										electricSourceInterval.getPolynomialFunction().getCoefficients().clone()
-										);
-								
-								LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
-										end, 
-										func, 
-										electricSourceInterval.isOptimal());
-								
-								
-								double joulesFromSource= functionIntegrator.integrate(func, 
-										currentStochasticLoadInterval.getStartTime(), 
-										currentStochasticLoadInterval.getEndTime());
-								
-								String type;
-								
-								double batterySize= getBatteryOfAgent(id).getBatterySize();
-								double batteryMin=getBatteryOfAgent(id).getMinSOC();
-								double batteryMax=getBatteryOfAgent(id).getMaxSOC(); 
-								
-								if(hasAgentPHEV(id)){
-									
-									type="PHEVRescheduleVehicleSourceAgent_"+id.toString();
-									
-								}else{
-									type="EVRescheduleVehicleSourceAgent_"+id.toString();
-								}
-								
-								// joulesFromSource negative --> SINK = discharging battery - regulation up
-								if(joulesFromSource<0 ){
-									
-									if(isAgentRegulationUp(id)){
-										
-										double compensationPerJouleRegulationUp= agentContracts.get(id).compensationUp()*KWHPERJOULE; 
-										double compensation= Math.abs(joulesFromSource)*compensationPerJouleRegulationUp;
-																			
-										myV2G.regulationUpDownVehicleLoad(id,
-													currentStochasticLoadInterval,
-													agentParkingAndDrivingSchedules.get(id),
-													compensation,
-													joulesFromSource,
-													hasAgentEV(id),
-													type,
-													lpev,
-													lpphev,
-													batterySize,
-													batteryMin,
-													batteryMax);
-									}
-									
-								}else{// joulesFromSource<0 	
-									if(isAgentRegulationDown(id)){
-										
-										double compensationPerJouleRegulationDown= 	agentContracts.get(id).compensationDown()*KWHPERJOULE; 
-										double compensation= joulesFromSource*compensationPerJouleRegulationDown;
-										
-										myV2G.regulationUpDownVehicleLoad(id, 
-												currentStochasticLoadInterval, 
-												agentParkingAndDrivingSchedules.get(id), 
-												compensation,
-												Math.abs(joulesFromSource),
-												hasAgentEV(id),
-												type,
-												lpev,
-												lpphev,
-												batterySize, 
-												batteryMin,
-												batteryMax);
-									}
-								}
-								
-							}							
-							
-						}	
-						
-					}
-					// check V2G effect
-					if(debug|| id.toString()=="1"){
-						visualizeStochasticLoadVehicleBeforeAfterV2G(id);
-					
-					}
-							
 			}
 		}
 		
 	}
 
 
-	
+
 	public double getV2GRevenueForAgent(Id id){
 		return myV2G.getAgentV2GRevenues(id);
 	}
@@ -1306,9 +1305,10 @@ public class DecentralizedSmartCharger {
 			// and make chart before-after
 			//************************************
 			for( Integer i : myHubLoadReader.stochasticHubLoadDistribution.keySet()){
-				visualizeTwoLoadSchedulesBeforeAfter(
-						myHubLoadReader.stochasticHubLoadDistribution.get(i), 
-						myHubLoadReader.stochasticHubLoadDistributionAfter.get(i),
+				Schedule sBefore= myHubLoadReader.stochasticHubLoadDistribution.get(i).fillNonExistentTimesInLoadScheduleWithZeroLoads();
+				Schedule sAfter=myHubLoadReader.stochasticHubLoadDistributionAfter.get(i).fillNonExistentTimesInLoadScheduleWithZeroLoads();
+				
+				visualizeTwoLoadSchedulesBeforeAfter(sBefore, sAfter, 
 						"Stochastic free load at hub "+ i.toString()+ " before V2G",
 						"Stochastic free load at hub "+ i.toString()+ " after V2G",
 						outputPath+"V2G/stochasticLoadBeforeAfter_hub"+i.toString()+".png", 
@@ -1321,10 +1321,12 @@ public class DecentralizedSmartCharger {
 	
 	private void visualizeStochasticLoadVehicleBeforeAfterV2G(Id id) throws IOException{
 		
+		Schedule sBefore= myHubLoadReader.agentVehicleSourceMapping.get(id).fillNonExistentTimesInLoadScheduleWithZeroLoads();
+		Schedule sAfter=myHubLoadReader.agentVehicleSourceMappingAfter.get(id).fillNonExistentTimesInLoadScheduleWithZeroLoads();
 		
 				visualizeTwoLoadSchedulesBeforeAfter(
-						myHubLoadReader.agentVehicleSourceMapping.get(id), 
-						myHubLoadReader.agentVehicleSourceMappingAfter.get(id),
+						sBefore, 
+						sAfter,
 						"Stochastic free load Agent "+ id.toString()+ " before V2G",
 						"Stochastic free load Agent "+ id.toString()+ " after V2G",
 						outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle"+id.toString()+".png", 
@@ -1450,6 +1452,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	
+	
 	private void printGraphChargingTimesAllAgents() throws IOException{
 		
 		XYSeriesCollection allAgentsOverview= new XYSeriesCollection();
@@ -1485,13 +1488,16 @@ public class DecentralizedSmartCharger {
 		
 		final XYPlot plot = chart.getXYPlot();
         plot.setDrawingSupplier(supplier);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.gray); 
+        plot.setRangeGridlinePaint(Color.gray);
         
         NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
         xAxis.setTickUnit(new NumberTickUnit(3600));
         xAxis.setRange(0, SECONDSPERDAY);
-        
+       
         NumberAxis yaxis = (NumberAxis) plot.getRangeAxis();
-        yaxis.setRange(0, 100);
+        yaxis.setRange(0, vehicles.getKeySet().size()); // y axis size dependent on number of agents
         
         for(int j=0; j<seriesCount; j++){
         	plot.getRenderer().setSeriesPaint(j, Color.black);
@@ -1512,13 +1518,13 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, 2000);	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)10*(vehicles.getKeySet().size()));//width, height	
 	
 	}
 	
 	
 	
-	private void visualizeChargingParkingDrivingDistribution() throws IOException{
+	/*private void visualizeChargingParkingDrivingDistribution() throws IOException{
 		// make graph out of it
 		XYSeriesCollection distributionTotal= new XYSeriesCollection();
 		
@@ -1607,7 +1613,7 @@ public class DecentralizedSmartCharger {
 	  	
 	
 	}
-	
+	*/
 		
 	
 	
