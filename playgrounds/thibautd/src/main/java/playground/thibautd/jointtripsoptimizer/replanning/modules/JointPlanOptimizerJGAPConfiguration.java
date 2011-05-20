@@ -115,7 +115,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		this.optimizeToggle = configGroup.getOptimizeToggle();
 
 		// get info on the plan structure
-		this.countEpisodes(plan);
+		this.countEpisodes(plan, configGroup);
 
 		this.monitor = new TabuAndEvolutionMonitor(this, configGroup);
 
@@ -261,8 +261,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * an episode corresponds to an activity and its eventual access trip.
 	 * a joint episode is an episode which involves a joint trip.
 	 */
-	private void countEpisodes(JointPlan plan) {
+	private void countEpisodes(
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup) {
 		PlanAnalyzeSubtours analyseSubtours = new PlanAnalyzeSubtours();
+		analyseSubtours.setTripStructureAnalysisLayer(configGroup.getTripStructureAnalysisLayer());
 		Id[] ids = new Id[1];
 		ids = plan.getClique().getMembers().keySet().toArray(ids);
 		//List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
