@@ -254,6 +254,8 @@ public class JointEventsToScore implements
 		ScoringFunction scoringFunction;
 		boolean removeIndividual;
 		List<Id> toRemove = new ArrayList<Id>();
+		Plan selectedPlan;
+		Double oldScore;
 
 		for (Clique clique : cliques.getCliques().values()) {
 			individualsToScore = new ArrayList<Id>(clique.getMembers().keySet());
@@ -278,7 +280,12 @@ public class JointEventsToScore implements
 			for (Person member : clique.getMembers().values()) {
 				scoringFunction = this.getScoringFunctionForAgent(member.getId());
 				scoringFunction.finish();
-				member.getSelectedPlan().setScore(scoringFunction.getScore());
+				selectedPlan = member.getSelectedPlan();
+				oldScore = selectedPlan.getScore();
+				selectedPlan.setScore(oldScore == null ?
+						scoringFunction.getScore() :
+						this.learningRate * scoringFunction.getScore() +
+						(1 - this.learningRate) * oldScore);
 			}
 		}
 	}
