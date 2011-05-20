@@ -43,7 +43,6 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
 
-	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
 	private final Network network;
 	private final Controler controler;
@@ -52,8 +51,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 
 	public JointPlanOptimizerModule(
-			Controler controler,
-			ScoringFunctionFactory scoringFunctionFactory) {
+			final Controler controler) {
 		super(controler.getConfig().global());
 		log.debug("JointPlanOptimizerModule constructor called with controler "+
 				controler);
@@ -62,7 +60,6 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 		this.controler = controler;
 
 		this.network = controler.getScenario().getNetwork();
-		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.configGroup = (JointReplanningConfigGroup)
 			controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);
 
@@ -79,11 +76,6 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 				tDepDelayCalc);
 	}
 
-	//public JointPlanOptimizerModule(int numOfThreads) {
-	//	super(numOfThreads);
-	//	log.debug("JointPlanOptimizerModule constructed with numOfThreads");
-	//}
-
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		log.debug("JointPlanOptimizerModule.getPlanAlgoInstance called");
@@ -93,7 +85,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 
 		return new JointPlanOptimizer(
 					this.configGroup,
-					this.scoringFunctionFactory,
+					controler.getScoringFunctionFactory(),
 					this.legTravelTimeEstimatorFactory,
 					routingAlgorithm,
 					this.network,

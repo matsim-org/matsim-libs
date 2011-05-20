@@ -23,7 +23,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFunctionFactory;
 
 /**
  * a {@link JointPlanStrategy} using a {@link JointPlanOptimizerModule}
@@ -37,12 +36,7 @@ public class ReplanningStrategy extends JointPlanStrategy {
 		// this.planSelector = new BestPlanSelector();
 		this.planSelector = new ExpBetaPlanSelector(controler.getConfig().planCalcScore());
 
-		//TODO: less hard-coded scoring function factory?
-		this.addStrategyModule(new JointPlanOptimizerModule(
-					controler,
-					new HomogeneousJointScoringFunctionFactory(
-						controler.getConfig().planCalcScore())
-					));
+		this.addStrategyModule(new JointPlanOptimizerModule(controler));
 	}
 }
 

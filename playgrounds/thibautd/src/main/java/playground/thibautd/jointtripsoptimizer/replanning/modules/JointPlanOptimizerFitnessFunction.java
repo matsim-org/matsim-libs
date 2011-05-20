@@ -27,6 +27,7 @@ import org.jgap.IChromosome;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -80,35 +81,73 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	}
 
 	private double getScore(JointPlan plan) {
-		ScoringFunction fitnessFunction =
-			this.scoringFunctionFactory.createNewScoringFunction(plan);
+		ScoringFunction fitnessFunction;
 		Activity currentActivity;
 		Leg currentLeg;
-		double now = 0d;
+		double now;
 
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				currentActivity = (Activity) pe;
-				fitnessFunction.startActivity(now, currentActivity);
-				now = currentActivity.getEndTime();
-				fitnessFunction.endActivity(now);
+		for (Plan indivPlan : plan.getIndividualPlans().values()) {
+			fitnessFunction =
+				this.scoringFunctionFactory.createNewScoringFunction(indivPlan);
+			now = 0d;
+	
+			// step through plan and score it
+			for (PlanElement pe : indivPlan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					currentActivity = (Activity) pe;
+					fitnessFunction.startActivity(now, currentActivity);
+					now = currentActivity.getEndTime();
+					fitnessFunction.endActivity(now);
+				}
+				else if (pe instanceof Leg) {
+					currentLeg = (Leg) pe;
+					now = currentLeg.getDepartureTime();
+					fitnessFunction.startLeg(now, currentLeg);
+					now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
+					fitnessFunction.endLeg(now);
+				}
+				else {
+					throw new IllegalArgumentException("unrecognized plan element type");
+				}
 			}
-			else if (pe instanceof Leg) {
-				currentLeg = (Leg) pe;
-				now = currentLeg.getDepartureTime();
-				fitnessFunction.startLeg(now, currentLeg);
-				now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
-				fitnessFunction.endLeg(now);
-			}
-			else {
-				throw new IllegalArgumentException("unrecognized plan element type");
-			}
+
+			fitnessFunction.finish();
+			indivPlan.setScore(fitnessFunction.getScore());
 		}
 
-		fitnessFunction.finish();
-
-		return fitnessFunction.getScore();
+		return plan.getScore();
 	}
+
+	//private double getScore(JointPlan plan) {
+	//	ScoringFunction fitnessFunction =
+	//		this.scoringFunctionFactory.createNewScoringFunction(plan);
+	//	Activity currentActivity;
+	//	Leg currentLeg;
+	//	double now = 0d;
+
+	//	for (PlanElement pe : plan.getPlanElements()) {
+	//		if (pe instanceof Activity) {
+	//			currentActivity = (Activity) pe;
+	//			fitnessFunction.startActivity(now, currentActivity);
+	//			now = currentActivity.getEndTime();
+	//			fitnessFunction.endActivity(now);
+	//		}
+	//		else if (pe instanceof Leg) {
+	//			currentLeg = (Leg) pe;
+	//			now = currentLeg.getDepartureTime();
+	//			fitnessFunction.startLeg(now, currentLeg);
+	//			now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
+	//			fitnessFunction.endLeg(now);
+	//		}
+	//		else {
+	//			throw new IllegalArgumentException("unrecognized plan element type");
+	//		}
+	//	}
+
+	//	fitnessFunction.finish();
+
+	//	return fitnessFunction.getScore();
+	//}
 
 	public JointPlanOptimizerDecoder getDecoder() {
 		return this.decoder;
