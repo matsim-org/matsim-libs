@@ -325,7 +325,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 				this.plan.getClique(),
 				constructedIndividualPlans,
 				false, //do not add at individual level
-				false); //do not synchronize
+				false, //do not synchronize
+				this.plan.getScoresAggregatorFactory());
 	}
 
 	private List<PlanElement> identifySharedLegs(final Map<Id, List<PlanElement>> incoherentPlan) {

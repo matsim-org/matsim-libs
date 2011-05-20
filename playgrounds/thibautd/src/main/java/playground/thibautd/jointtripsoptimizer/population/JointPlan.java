@@ -66,6 +66,8 @@ public class JointPlan implements Plan {
 	private final Clique clique;
 
 	private final ScoresAggregator aggregator;
+	// for replanning modules to be able to replicate aggregator
+	private final ScoresAggregatorFactory aggregatorFactory;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -197,6 +199,7 @@ public class JointPlan implements Plan {
 			this.synchronize();
 		}
 
+		this.aggregatorFactory = aggregatorFactory;
 		this.aggregator =
 			aggregatorFactory.createScoresAggregator(this.individualPlans.values());
 	}
@@ -529,6 +532,10 @@ public class JointPlan implements Plan {
 		}
 
 		return type;
+	}
+
+	public ScoresAggregatorFactory getScoresAggregatorFactory() {
+		return this.aggregatorFactory;
 	}
 
 	/*

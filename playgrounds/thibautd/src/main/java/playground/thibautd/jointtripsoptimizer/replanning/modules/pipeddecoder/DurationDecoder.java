@@ -214,7 +214,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 				this.plan.getClique(),
 				constructedIndividualPlans,
 				false, // do not add at individual level
-				false); //do not synchronize at creation
+				false, //do not synchronize at creation
+				this.plan.getScoresAggregatorFactory());
 	}
 
 	private void resetInternalState() {

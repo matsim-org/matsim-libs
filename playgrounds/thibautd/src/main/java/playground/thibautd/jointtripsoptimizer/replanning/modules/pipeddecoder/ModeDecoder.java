@@ -144,7 +144,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 				inputPlan.getClique(),
 				individualPlans,
 				false, //do not add at individual level
-				false); //do not synchronize
+				false, //do not synchronize
+				inputPlan.getScoresAggregatorFactory());
 	}
 
 	/**
