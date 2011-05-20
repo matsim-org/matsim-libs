@@ -6,6 +6,7 @@ import java.util.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 
+import org.matsim.api.core.v01.*;
 import org.matsim.core.controler.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
@@ -26,10 +27,10 @@ public class SimLauncherWithArcEstimator
         String vrpArcPathsFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-        // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-        // cfgFileName = dirName + "config-verB.xml";
-        // vrpDirName = dirName + "dvrp\\";
-        // vrpStaticFileName = "A101.txt";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+            // cfgFileName = dirName + "config-verB.xml";
+            // vrpDirName = dirName + "dvrp\\";
+            // vrpStaticFileName = "A101.txt";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
             // cfgFileName = dirName + "config-verB.xml";
@@ -68,8 +69,10 @@ public class SimLauncherWithArcEstimator
         controler.setOverwriteFiles(true);
         controler.run();
 
-        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName);
-        MATSimVRPData data = new MATSimVRPData(vrpData, controler.getScenario());
+        Scenario scenario = controler.getScenario();
+        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+                new MATSimVertexImpl.Builder(scenario));
+        MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
         ShortestPathsFinder spf = new ShortestPathsFinder(data);
         spf.findShortestPaths(controler);

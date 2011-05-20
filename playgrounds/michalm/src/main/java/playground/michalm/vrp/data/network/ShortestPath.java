@@ -14,7 +14,13 @@ public class ShortestPath
     private boolean cyclic;
 
     // can be used to create NetworkRoute (in Leg).
-    public Path[] paths;
+    private Path[] paths;
+
+
+    public Path[] getPaths()
+    {
+        return paths;
+    }
 
 
     public ShortestPath(int numIntervals, int timeInterval, boolean cyclic)

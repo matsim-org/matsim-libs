@@ -39,19 +39,19 @@ public class Localizables2QGIS
         Collection<Feature> features = new ArrayList<Feature>();
 
         for (Localizable localizable : localizables) {
-            features.add(getFeature(localizable.getNode()));
+            features.add(getFeature(localizable.getVertex()));
         }
 
         ShapeFileWriter.writeGeometries(features, filename);
     }
 
 
-    private Feature getFeature(Node node)
+    private Feature getFeature(Vertex vertex)
     {
-        Point p = MGC.xy2Point(node.x, node.y);
+        Point p = MGC.xy2Point(vertex.getX(), vertex.getY());
 
         try {
-            return featureType.create(new Object[] { p, node.id, node.name });
+            return featureType.create(new Object[] { p, vertex.getId(), vertex.getName() });
         }
         catch (IllegalAttributeException e) {
             throw new RuntimeException(e);
@@ -105,7 +105,8 @@ public class Localizables2QGIS
                     + Arrays.toString(args));
         }
 
-        VRPData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName);
+        VRPData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+                new VertexImpl.Builder());
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 
         new Localizables2QGIS(data.customers, outFileNameCust, coordSystem).write();

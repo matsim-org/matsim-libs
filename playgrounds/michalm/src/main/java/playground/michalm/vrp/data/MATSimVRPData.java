@@ -1,51 +1,63 @@
 package playground.michalm.vrp.data;
 
-import playground.michalm.vrp.data.network.*;
-
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.network.*;
 import org.matsim.core.utils.geometry.transformations.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.network.Node;
+import playground.michalm.vrp.data.network.*;
 
 
 public class MATSimVRPData
 {
-    public VRPData vrpData;
-    public Scenario scenario;
+    private VRPData vrpData;
+    private Scenario scenario;
 
-    public Coord[] nodeToCoords;
-    public Link[] nodeToLinks;
+    private ShortestPath[][] shortestPaths;
 
-    public ShortestPath[][] shortestPaths;
-
-    public String coordSystem = TransformationFactory.WGS84_UTM33N;
+    private String coordSystem;
 
 
     public MATSimVRPData(VRPData vrpData, Scenario scenario)
     {
-        this.vrpData = vrpData;
-        this.scenario = scenario;
-
-        initNodeMaps();
+        this(vrpData, scenario, TransformationFactory.WGS84_UTM33N);
     }
 
 
-    private void initNodeMaps()
+    public MATSimVRPData(VRPData vrpData, Scenario scenario, String coordSystem)
     {
-        NetworkImpl network = (NetworkImpl)scenario.getNetwork();
-        Node[] nodes = vrpData.nodes;
+        this.vrpData = vrpData;
+        this.scenario = scenario;
+        this.coordSystem = coordSystem;
+    }
 
-        nodeToCoords = new Coord[nodes.length];
-        nodeToLinks = new Link[nodes.length];
 
-        for (int i = 0; i < nodes.length; i++) {
-            Coord coord = scenario.createCoord(nodes[i].x, nodes[i].y);
+    public VRPData getVrpData()
+    {
+        return vrpData;
+    }
 
-            nodeToCoords[i] = coord;
-            nodeToLinks[i] = network.getNearestLink(coord);
-        }
+
+    public Scenario getScenario()
+    {
+        return scenario;
+    }
+
+
+    // TODO This should go into DVRPGraph
+    public ShortestPath[][] getShortestPaths()
+    {
+        return shortestPaths;
+    }
+
+
+    public void setShortestPaths(ShortestPath[][] sPaths)
+    {
+        this.shortestPaths = sPaths;
+    }
+
+
+    public String getCoordSystem()
+    {
+        return coordSystem;
     }
 }

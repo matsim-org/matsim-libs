@@ -3,10 +3,6 @@ package playground.michalm.vrp.offline;
 import java.io.*;
 import java.util.*;
 
-import playground.michalm.vrp.*;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
-
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.core.config.*;
@@ -23,6 +19,9 @@ import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
+import playground.michalm.vrp.*;
+import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
 
 
 public class DVRPLauncher
@@ -108,7 +107,8 @@ public class DVRPLauncher
         // Controler controler = new Controler(new String[] { cfgFileName });
         // controler.setOverwriteFiles(true);
 
-        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName);
+        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
+                new MATSimVertexImpl.Builder(scenario));
 
         Queue<CustomerAction> caQueue = null;
 
@@ -129,20 +129,22 @@ public class DVRPLauncher
         else {
             spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
         }
-            
+
         spf.upadateVRPArcTimesAndCosts();
 
         // ================================================== BELOW: only for comparison reasons...
+
+        VRPGraph graph = vrpData.getVrpGraph();
 
         InterpolatedArcCost[][] simulatedArcCosts = null;
         InterpolatedArcTime[][] simulatedArcTimes = null;
 
         if (AVG_TRAFFIC_MODE) {
-            simulatedArcCosts = (InterpolatedArcCost[][])vrpData.costs;
-            simulatedArcTimes = (InterpolatedArcTime[][])vrpData.times;
+            simulatedArcCosts = (InterpolatedArcCost[][])graph.getCosts();
+            simulatedArcTimes = (InterpolatedArcTime[][])graph.getTimes();
 
-            vrpData.costs = ConstantArcCost.averageInterpolatedArcCosts(simulatedArcCosts);
-            vrpData.times = ConstantArcTime.averageInterpolatedArcTimes(simulatedArcTimes);
+            graph.setCosts(ConstantArcCost.averageInterpolatedArcCosts(simulatedArcCosts));
+            graph.setTimes(ConstantArcTime.averageInterpolatedArcTimes(simulatedArcTimes));
 
             System.err.println("RUNNING WITH AVERAGED ArcTimes/Costs");
         }
@@ -177,19 +179,19 @@ public class DVRPLauncher
         simulator.simulate();
 
         if (VRP_OUT_FILES) {
-            new Routes2QGIS(data.vrpData.routes, data, vrpOutDirName + "\\route_").write();
-            
-            //generate output plans (plans.xml)
+            new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
+
+            // generate output plans (plans.xml)
         }
 
-        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.vrpData));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.vrpData));
+        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
+        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
         // ================================================== BELOW: only for comparison reasons...
 
         if (AVG_TRAFFIC_MODE) {
-            vrpData.costs = simulatedArcCosts;
-            vrpData.times = simulatedArcTimes;
+            graph.setCosts(simulatedArcCosts);
+            graph.setTimes(simulatedArcTimes);
 
             new ScheduleUpdater(vrpData).updateSchedule();
             vrpData.evaluateVRP();

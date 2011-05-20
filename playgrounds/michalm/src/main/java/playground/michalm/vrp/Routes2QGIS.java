@@ -2,12 +2,10 @@ package playground.michalm.vrp;
 
 import java.util.*;
 
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
-
 import org.geotools.factory.*;
 import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.geotools.*;
 import org.matsim.core.utils.gis.*;
@@ -15,6 +13,8 @@ import org.opengis.referencing.crs.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
 
 import com.vividsolutions.jts.geom.*;
 
@@ -36,7 +36,7 @@ public class Routes2QGIS
         this.filename = filename;
 
         geofac = new GeometryFactory();
-        initFeatureType(data.coordSystem);
+        initFeatureType(data.getCoordSystem());
     }
 
 
@@ -52,35 +52,36 @@ public class Routes2QGIS
             features = new ArrayList<Feature>();
 
             // starting from the depot
-            Node depotNode = route.vehicle.depot.node;
-            Node prevNode = depotNode;
+            Vertex depotVertex = route.vehicle.depot.vertex;
+            Vertex prevVertex = depotVertex;
             int departTime = route.beginTime;
 
             for (int i = 0; i < reqs.size(); i++) {
                 Request req = reqs.get(i);
-                Node currNode = req.fromNode;
+                Vertex currVertex = req.fromVertex;
 
-                addLineString(route, i, prevNode, currNode, departTime);
+                addLineString(route, i, prevVertex, currVertex, departTime);
 
-                if (req.fromNode != req.toNode) { // i.e. taxi service
-                    currNode = req.toNode;
-                    addLineString(route, i, req.fromNode, currNode, req.startTime);
+                if (req.fromVertex != req.toVertex) { // i.e. taxi service
+                    currVertex = req.toVertex;
+                    addLineString(route, i, req.fromVertex, currVertex, req.startTime);
                 }
 
-                prevNode = currNode;
+                prevVertex = currVertex;
                 departTime = req.departureTime;
             }
 
-            addLineString(route, reqs.size(), prevNode, depotNode, departTime);
+            addLineString(route, reqs.size(), prevVertex, depotVertex, departTime);
 
             ShapeFileWriter.writeGeometries(features, filename + route.id + ".shp");
         }
     }
 
 
-    private void addLineString(Route route, int arcIdx, Node fromNode, Node toNode, int departTime)
+    private void addLineString(Route route, int arcIdx, Vertex fromVertex, Vertex toVertex,
+            int departTime)
     {
-        LineString ls = createLineString(fromNode, toNode, departTime);
+        LineString ls = createLineString(fromVertex, toVertex, departTime);
 
         if (ls != null) {
             try {
@@ -95,9 +96,10 @@ public class Routes2QGIS
     }
 
 
-    private LineString createLineString(Node fromNode, Node toNode, int departTime)
+    private LineString createLineString(Vertex fromVertex, Vertex toVertex, int departTime)
     {
-        Path path = data.shortestPaths[fromNode.id][toNode.id].getPath(departTime);
+        Path path = data.getShortestPaths()[fromVertex.getId()][toVertex.getId()]
+                .getPath(departTime);
 
         if (path == ShortestPath.ZERO_PATH) {
             return null;
@@ -106,7 +108,8 @@ public class Routes2QGIS
         List<Coordinate> coordList = new ArrayList<Coordinate>();
 
         // starting coordinate
-        Coord c = data.nodeToLinks[fromNode.id].getFromNode().getCoord();
+        Link link = ((MATSimVertex)fromVertex).getLink();
+        Coord c = link.getFromNode().getCoord();
         coordList.add(new Coordinate(c.getX(), c.getY()));
 
         // path coordinates
