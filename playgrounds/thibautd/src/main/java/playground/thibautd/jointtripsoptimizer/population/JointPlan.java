@@ -37,6 +37,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousScoreAggregatorFactory;
+import playground.thibautd.jointtripsoptimizer.scoring.ScoresAggregator;
+import playground.thibautd.jointtripsoptimizer.scoring.ScoresAggregatorFactory;
+
 /**
  * class for handling synchronized plans.
  * It implements the plan interface to be compatible with the StrategyManager.
@@ -60,6 +64,8 @@ public class JointPlan implements Plan {
 	private final boolean setAtIndividualLevel;
 
 	private final Clique clique;
+
+	private final ScoresAggregator aggregator;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -85,6 +91,18 @@ public class JointPlan implements Plan {
 		this(clique, plans, addAtIndividualLevel, true);
 	}
 
+
+	/**
+	 * Initilizes with an {@link HomogeneousScoreAggregatorFactory}
+	 */
+	public JointPlan(
+			final Clique clique,
+			final Map<Id, ? extends Plan> plans,
+			final boolean addAtIndividualLevel,
+			final boolean toSynchronize) {
+		this(clique, plans, addAtIndividualLevel, toSynchronize, new HomogeneousScoreAggregatorFactory());
+	}
+
 	/**
 	 * Creates a joint plan from individual plans.
 	 * Two individual trips to be shared must have their Pick-Up activity type set
@@ -99,7 +117,8 @@ public class JointPlan implements Plan {
 			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
-			final boolean toSynchronize) {
+			final boolean toSynchronize,
+			final ScoresAggregatorFactory aggregatorFactory) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
 		Plan currentPlan;
 		this.clique = clique;
@@ -177,6 +196,9 @@ public class JointPlan implements Plan {
 		if (toSynchronize) {
 			this.synchronize();
 		}
+
+		this.aggregator =
+			aggregatorFactory.createScoresAggregator(this.individualPlans.values());
 	}
 
 	private void synchronize() {
@@ -292,17 +314,18 @@ public class JointPlan implements Plan {
 	public Double getScore() {
 		//TODO: call to an external aggregation function, to initialize in the
 		//constructor.
-		Double score = 0.0;
-		for (Plan plan : this.getIndividualPlans().values()) {
-			try {
-				score += plan.getScore();
-			} catch (NullPointerException e) {
-				// if at least one of the individual is null, return null
-				// (ie unscored).
-				return null;
-			}
-		}
-		return score;
+		//Double score = 0.0;
+		//for (Plan plan : this.getIndividualPlans().values()) {
+		//	try {
+		//		score += plan.getScore();
+		//	} catch (NullPointerException e) {
+		//		// if at least one of the individual is null, return null
+		//		// (ie unscored).
+		//		return null;
+		//	}
+		//}
+		//return score;
+		return this.aggregator.getJointScore();
 	}
 
 	/**
