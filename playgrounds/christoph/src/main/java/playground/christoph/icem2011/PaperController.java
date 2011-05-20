@@ -88,16 +88,24 @@ public class PaperController extends WithinDayController implements StartupListe
 	 * File that contains a list of all links where agents
 	 * will replan their plans.
 	 */
+	/*package*/ String replanningAgentsFile = "";
 	/*package*/ String replanningLinksFile = "";
+	private Set<Id> replanningAgents;
 	private Set<Id> replanningLinks;
 	private Charset charset = Charset.forName("UTF-8");
 	
 	/*
+	 * Define when the affected agents start and end being collected.
+	 */
+	/*package*/ int tBeginEvent = 7*3600;	// 07:00
+	/*package*/ int tEndEvent = 9*3600;		// 09:00
+	
+	/*
 	 * Define when the Replanning is en- and disabled.
 	 */
-	protected int tWithinDayEnabled = 8*3600 + 00*00;	// 08:00
-	protected int tWithinDayDisabled = 16*3600 + 00*60;	// 16:00
-	protected boolean enabled = false;
+	/*package*/ int tWithinDayEnabled = 7*3600;		// 07:00
+	/*package*/ int tWithinDayDisabled = 12*3600;	// 12:00
+	/*package*/ boolean enabled = false;
 	
 	/*package*/ String cityZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_City.shp";
 	/*package*/ String cantonZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_Canton.shp";
@@ -154,14 +162,17 @@ public class PaperController extends WithinDayController implements StartupListe
 //		this.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 		
 		/*
-		 * Use the FilteredDuringLegIdentifier to remove those agents that are not within
+		 * Use the LinkFilteredDuringLegIdentifier to remove those agents that are not within
 		 * a given distance to the affected links.
+		 * Use the AgentFilteredDuringLegIdentifier to remove those agents who do not cross a
+		 * certain area when no event occurs and they do not replan their plans.
 		 */
+		this.replanningAgents = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, replanningAgentsFile).getAffectedAgents();
 		parseReplanningLinks(this.replanningLinksFile);
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
-		this.duringLegIdentifier = new FilteredDuringLegIdentifier(identifier, this.replanningLinks);
+		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
@@ -183,7 +194,6 @@ public class PaperController extends WithinDayController implements StartupListe
 		this.getReplanningManager().doDuringActivityReplanning(false);
 		this.getReplanningManager().doDuringLegReplanning(false);
 		
-		
 		// Module to analyze expected travel time on a single link
 		Collection<Link> changedLinks = new HashSet<Link>();
 		for (NetworkChangeEvent networkChangeEvent : super.getNetwork().getNetworkChangeEvents()) {
@@ -199,7 +209,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		initReplanners((QSim)e.getQueueSimulation());
 		
 		// Module to analyze the travel times
-		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile);
+		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile, replanningAgents);
 		super.addControlerListener(analyzeTravelTimes);
 		super.getEvents().addHandler(analyzeTravelTimes);
 	}
@@ -268,19 +278,18 @@ public class PaperController extends WithinDayController implements StartupListe
 	    	log.error("Error when trying to parse the replanning links file. No replanning links identified!");
 	    }
 	}
-	
-	
+		
 	/*
 	 * Wrapper for a DuringLegIdentifier. Checks for all agents that are identified by
 	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
 	 * replanning shall be performed.
 	 */
-	private static class FilteredDuringLegIdentifier extends DuringLegIdentifier {
+	private static class LinkFilteredDuringLegIdentifier extends DuringLegIdentifier {
 
 		private DuringLegIdentifier delegate;
 		private Set<Id> replanningLinks;
 		
-		public FilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningLinks) {
+		public LinkFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningLinks) {
 			this.delegate = identifier;
 			this.replanningLinks = replanningLinks;
 		}	
@@ -297,13 +306,42 @@ public class PaperController extends WithinDayController implements StartupListe
 	}
 	
 	/*
+	 * Wrapper for a DuringLegIdentifier. Checks for all agents that are identified by
+	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
+	 * replanning shall be performed.
+	 */
+	private static class AgentFilteredDuringLegIdentifier extends DuringLegIdentifier {
+
+		private DuringLegIdentifier delegate;
+		private Set<Id> replanningAgents;
+		
+		public AgentFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningAgents) {
+			this.delegate = identifier;
+			this.replanningAgents = replanningAgents;
+		}	
+		
+		@Override
+		public Set<WithinDayAgent> getAgentsToReplan(double time) {
+			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			for (WithinDayAgent agent : agentsFromDelegate) {
+				if (replanningAgents.contains(agent.getPerson().getId())) filteredAgents.add(agent);
+			}
+			return filteredAgents;
+		}
+	}
+	
+	/*
 	 * ===================================================================
 	 * main
 	 * ===================================================================
 	 */
 	private final static String NUMOFTHREADS = "-numofthreads";
 	private final static String LEGREPLANNINGSHARE = "-legreplanningshare";
+	private final static String REPLANNINGAGENTSFILE = "-replanningagentsfile";
 	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
+	private final static String STARTEVENT = "-startevent";
+	private final static String ENDEVENT = "-endevent";
 	private final static String STARTREPLANNING = "-startreplanning";
 	private final static String ENDREPLANNING = "-endreplanning";
 	private final static String ZURICHCITYSHP = "-cityshp";
@@ -330,11 +368,23 @@ public class PaperController extends WithinDayController implements StartupListe
 					else if (share < 0.0) share = 0.0;
 					controller.pDuringLegReplanning = share;
 					log.info("share of leg replanning agents: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(REPLANNINGAGENTSFILE)) {
+					i++;
+					controller.replanningAgentsFile = args[i];
+					log.info("leg replanning agents file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGLINKSFILE)) {
 					i++;
 					controller.replanningLinksFile = args[i];
 					log.info("leg replanning links file: " + args[i]);
-				} else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
+				} else if (args[i].equalsIgnoreCase(STARTEVENT)) {
+					i++;
+					controller.tBeginEvent = Integer.parseInt(args[i]);
+					log.info("start event: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(ENDEVENT)) {
+					i++;
+					controller.tEndEvent = Integer.parseInt(args[i]);
+					log.info("end event: " + args[i]);
+				}  else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
 					i++;
 					controller.tWithinDayEnabled = Integer.parseInt(args[i]);
 					log.info("start within-day replanning: " + args[i]);

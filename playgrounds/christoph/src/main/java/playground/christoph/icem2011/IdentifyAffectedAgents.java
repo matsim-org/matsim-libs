@@ -20,13 +20,17 @@
 
 package playground.christoph.icem2011;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,37 +43,35 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.Counter;
 
 public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	AgentArrivalEventHandler, AgentDepartureEventHandler {
 
+	private static final Logger log = Logger.getLogger(IdentifyAffectedAgents.class);
+	
+	private Scenario scenario;
 	private Set<Id> affectedLinks;
 	private Set<Id> inbetweenOnLinkAgents;
 	private Set<Id> beforeBeginOnLinkAgents;
 	private double begin;
 	private double end;
+	private Charset charset = Charset.forName("UTF-8");
 	
 	public static void main(String[] args) {
-		if (args.length != 5) return;
+		if (args.length != 4) return;
 		
 		String eventsFile = args[0];
-		String networkFile = args[1];
-		String changeEventsFile = args[2];
-		double begin = Double.parseDouble(args[3]);
-		double end = Double.parseDouble(args[4]);
+		String affectedLinksFile = args[1];
+		double begin = Double.parseDouble(args[2]);
+		double end = Double.parseDouble(args[3]);
 		
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(networkFile);
-		config.network().setChangeEventInputFile(changeEventsFile);
-		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Network network = scenario.getNetwork();
 		
-		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(network, begin, end);
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenario, begin, end, affectedLinksFile);
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(iaa);
@@ -85,19 +87,16 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 	 * the links. After beginning, all agents that enter one of the links
 	 * are automatically affected. After ending, nothing is done anymore.
 	 */
-	public IdentifyAffectedAgents(Network network, double begin, double end) {
+	public IdentifyAffectedAgents(Scenario scenario, double begin, double end, String affectedLinksFile) {
+		this.scenario = scenario;
 		this.begin = begin;
 		this.end = end;
 		
 		inbetweenOnLinkAgents = new HashSet<Id>();
 		beforeBeginOnLinkAgents = new HashSet<Id>();
-		
 		affectedLinks = new HashSet<Id>();
-		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl)network).getNetworkChangeEvents()) {
-			for (Link link : networkChangeEvent.getLinks()) {
-				affectedLinks.add(link.getId());				
-			}
-		}
+		
+		parseAffectedLinks(affectedLinksFile);
 	}
 	
 	public Set<Id> getAffectedAgents() {
@@ -152,5 +151,40 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 		else {
 			inbetweenOnLinkAgents.add(event.getPersonId());
 		}
+	}
+	
+	private void parseAffectedLinks(String affectedLinksFile) {
+	    	    
+	    try {
+	    	Counter lineCounter = new Counter("Parsed replanning link ids ");
+
+	    	FileInputStream fis = null;
+	    	InputStreamReader isr = null;
+	    	BufferedReader br = null;
+
+	    	log.info("start parsing...");
+	    	fis = new FileInputStream(affectedLinksFile);
+	    	isr = new InputStreamReader(fis, charset);
+	    	br = new BufferedReader(isr);
+
+	    	// skip first Line which is only a header
+	    	br.readLine();
+	    	
+	    	String line;
+	    	while((line = br.readLine()) != null) {
+	    		
+	    		affectedLinks.add(this.scenario.createId(line));
+	    		lineCounter.incCounter();
+	    	}	    	
+
+	    	br.close();
+	    	isr.close();
+	    	fis.close();
+	    	
+	    	log.info("done.");
+	    	log.info("Found " + affectedLinks.size() + " replanning links.");
+	    } catch (IOException e) {
+	    	log.error("Error when trying to parse the replanning links file. No replanning links identified!");
+	    }
 	}
 }
