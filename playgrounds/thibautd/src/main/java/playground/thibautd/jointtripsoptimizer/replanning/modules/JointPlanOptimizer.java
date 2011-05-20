@@ -94,6 +94,11 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 					this.outputPath,
 					this.randomGenerator.nextLong());
 
+		if (plan.getPlanElements().size() <= 1) {
+			// home-only plan: do nothing
+			return;
+		}
+
 		JointPlanOptimizerPopulationFactory populationFactory =
 			new JointPlanOptimizerPopulationFactory(jgapConfig);
 
