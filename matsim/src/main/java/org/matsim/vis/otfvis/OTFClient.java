@@ -29,7 +29,6 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -58,8 +57,6 @@ public abstract class OTFClient implements Runnable {
 
 	protected OTFFrame frame;
 
-	protected JSplitPane pane = null;
-
 	protected OTFHostControlBar hostControlBar = null;
 
 	protected SettingsSaver saver;
@@ -71,7 +68,7 @@ public abstract class OTFClient implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public final void run() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -80,11 +77,11 @@ public abstract class OTFClient implements Runnable {
 		});
 	}
 
-	public void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
+	public final void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
 		this.masterHostControl = otfHostConnectionManager;
 	}
 
-	public OTFClientQuad createNewView(OTFConnectionManager connect, OTFHostConnectionManager hostControl) {
+	public final OTFClientQuad createNewView(OTFConnectionManager connect, OTFHostConnectionManager hostControl) {
 		log.info("Getting Quad id " + id);
 		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
@@ -96,14 +93,6 @@ public abstract class OTFClient implements Runnable {
 		this.hostControlBar.updateTimeLabel();
 		log.info("Created OTFClientQuad!");
 		return clientQ;
-	}
-
-	protected void createHostControlBar() {
-		this.hostControlBar = new OTFHostControlBar(masterHostControl);
-		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
-		preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
-		buildMenu(frame, hostControlBar, saver);
 	}
 
 	@SuppressWarnings("serial")
@@ -164,33 +153,28 @@ public abstract class OTFClient implements Runnable {
 		SwingUtilities.updateComponentTreeUI(frame);
 	}
 
-	protected void createMainFrame(){
-		this.frame = new OTFFrame("MATSim OTFVis");
-		this.pane = frame.getSplitPane();
-		this.pane.setDividerLocation(0.5);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.frame.setSize(screenSize.width/2,screenSize.height/2);
-	}
-
 	protected abstract OTFDrawer createDrawer();
 
 	protected abstract OTFVisConfigGroup createOTFVisConfig();
 
 	private void initializeSwingClient() {
-		createMainFrame();
+		this.frame = new OTFFrame("MATSim OTFVis");
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.frame.setSize(screenSize.width/2,screenSize.height/2);
 		log.info("created MainFrame");
 		OTFVisConfigGroup visconf = createOTFVisConfig();
 		OTFClientControl.getInstance().setOTFVisConfig(visconf);
 		log.info("got OTFVis config");
-		createHostControlBar();
+		this.hostControlBar = new OTFHostControlBar(masterHostControl);
+		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
+		buildMenu(frame, hostControlBar, saver);
 		log.info("created HostControlBar");
 		OTFDrawer mainDrawer = createDrawer();
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
-		pane.setRightComponent(panel);
-		pane.validate();
+		this.frame.getContentPane().add(panel);
 		hostControlBar.addDrawer(mainDrawer);
 		mainDrawer.redraw();
 		frame.setVisible(true);

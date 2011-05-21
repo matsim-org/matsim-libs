@@ -29,7 +29,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 
@@ -40,7 +39,10 @@ import org.matsim.vis.otfvis.OTFClientControl;
  */
 public class OTFFrame extends JFrame {
 
-	private JSplitPane pane;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public OTFFrame(String title) {
 		super(title);
@@ -51,62 +53,52 @@ public class OTFFrame extends JFrame {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			this.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
 		}
-		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		pane.setContinuousLayout(true);
-		pane.setOneTouchExpandable(true);
-		this.getContentPane().add(pane);
-		this.pane = pane;
 		//Make sure menus appear above JOGL Layer
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
 	}
 
-	public  JSplitPane getSplitPane(){
-		return this.pane;
-	}
-
 	@Override
 	protected void processWindowEvent(WindowEvent e) {
-
-	        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-	        	this.endProgram(0);
-	        } else {
-		        super.processWindowEvent(e);
-	        }
-	    }
+		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+			this.endProgram(0);
+		} else {
+			super.processWindowEvent(e);
+		}
+	}
 
 	public void endProgram(int code) {
 		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
 			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
 			final JOptionPane optionPane = new JOptionPane(
-				    "There are potentially unsaved changes in Preferences.\nQuit anyway?",
-				    JOptionPane.QUESTION_MESSAGE,
-				    JOptionPane.YES_NO_OPTION);
+					"There are potentially unsaved changes in Preferences.\nQuit anyway?",
+					JOptionPane.QUESTION_MESSAGE,
+					JOptionPane.YES_NO_OPTION);
 			dialog.setContentPane(optionPane);
 			dialog.setDefaultCloseOperation(
-				    JDialog.DO_NOTHING_ON_CLOSE);
-				dialog.addWindowListener(new WindowAdapter() {
-				    @Override
-						public void windowClosing(WindowEvent we) {
+					JDialog.DO_NOTHING_ON_CLOSE);
+			dialog.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent we) {
 
-				    }
-				});
-				optionPane.addPropertyChangeListener(
-				    new PropertyChangeListener() {
-				        @Override
-								public void propertyChange(PropertyChangeEvent e) {
-				            String prop = e.getPropertyName();
+				}
+			});
+			optionPane.addPropertyChangeListener(
+					new PropertyChangeListener() {
+						@Override
+						public void propertyChange(PropertyChangeEvent e) {
+							String prop = e.getPropertyName();
 
-				            if (dialog.isVisible()
-				             && (e.getSource() == optionPane)
-				             && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-				                //If you were going to check something
-				                //before closing the window, you'd do
-				                //it here.
-				                dialog.setVisible(false);
-				            }
-				        }
-				    });
+							if (dialog.isVisible()
+									&& (e.getSource() == optionPane)
+									&& (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+								//If you were going to check something
+								//before closing the window, you'd do
+								//it here.
+								dialog.setVisible(false);
+							}
+						}
+					});
 			dialog.pack();
 			dialog.setVisible(true);
 			int value = ((Integer)optionPane.getValue()).intValue();
@@ -117,7 +109,5 @@ public class OTFFrame extends JFrame {
 		}
 		System.exit(code);
 	}
-
-
 
 }
