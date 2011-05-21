@@ -22,6 +22,8 @@ package org.matsim.vis.otfvis;
 
 import java.awt.BorderLayout;
 
+import javax.swing.SwingUtilities;
+
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
@@ -32,18 +34,24 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
-public class OTFClientLive extends OTFClient {
+public class OTFClientLive implements Runnable {
+
+	private OTFClient otfClient = new OTFClient();
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
+	private SettingsSaver saver;
+
+	private OTFHostConnectionManager masterHostControl;
+
 	public OTFClientLive(OnTheFlyServer otfServer, OTFConnectionManager connectionManager) {
 		super();
-		setHostConnectionManager(new OTFHostConnectionManager("live", otfServer));
+		masterHostControl = new OTFHostConnectionManager("live", otfServer);
+		otfClient.setHostConnectionManager(masterHostControl);
 		this.connect = connectionManager;
 	}
 
-	@Override
-	protected OTFVisConfigGroup createOTFVisConfig() {
+	private OTFVisConfigGroup createOTFVisConfig() {
 		saver = new SettingsSaver("otfsettings");
 		OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
 		if (visconf == null) {
@@ -53,18 +61,27 @@ public class OTFClientLive extends OTFClient {
 		return visconf;
 	}
 
-	@Override
-	protected OTFDrawer createDrawer(){
-		OTFClientQuad clientQ = createNewView(connect, this.hostControlBar.getOTFHostConnectionManager());
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, this.hostControlBar);
-		if (hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
-			OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
-			OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
-			queryControl.setQueryTextField(queryControlBar.getTextField());
-			frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-			mainDrawer.setQueryHandler(queryControl);
-		}
+	private OTFDrawer createDrawer(){
+		OTFClientQuad clientQ = otfClient.createNewView(connect);
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfClient.getHostControlBar());
+		OTFQueryControl queryControl = new OTFQueryControl(otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
+		OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
+		queryControl.setQueryTextField(queryControlBar.getTextField());
+		otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+		mainDrawer.setQueryHandler(queryControl);
 		return mainDrawer;
+	}
+	
+	@Override
+	public final void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig());
+				otfClient.addDrawerAndInitialize(createDrawer(), saver);
+				otfClient.show();
+			}
+		});
 	}
 
 }

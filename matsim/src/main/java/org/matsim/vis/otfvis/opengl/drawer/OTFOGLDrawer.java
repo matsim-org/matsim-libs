@@ -153,7 +153,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	private Collection<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
 	// Experimental mode for michaz
-	private final boolean USE_GLJPANEL = false;
+	public final boolean USE_GLJPANEL = false;
 
 	private float oldWidth = 0.0f;
 	private float oldHeight = 0.0f;

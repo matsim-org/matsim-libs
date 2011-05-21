@@ -1,31 +1,29 @@
 package playground.mzilske.osm;
 
 import java.awt.BorderLayout;
-import java.awt.geom.Rectangle2D.Double;
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
 
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
-import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
-import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.gui.QueryEntry;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -39,17 +37,24 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.otfvis2.LinkHandler;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
-import org.matsim.vis.otfvis2.QueryAgentId;
-import org.matsim.vis.otfvis2.QueryAgentPlan;
+import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
-public final class OTFVisClient extends OTFClient {
+public final class OTFVisClient implements Runnable {
 
 	private boolean swing = false;
-	
+
+	private OTFClient otfClient = new OTFClient();
+
+	private OTFHostConnectionManager masterHostControl;
+
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
 	public OTFVisClient() {
-		super("dummyURL");
+		super();
+	}
+	
+	double log2 (float scale) {
+		return Math.log(scale) / Math.log(2);
 	}
 
 	private void prepareConnectionManager() {
@@ -68,60 +73,78 @@ public final class OTFVisClient extends OTFClient {
 		}
 	}
 
-	protected OTFClientQuad getRightDrawerComponent() {
+	private OTFClientQuad getRightDrawerComponent() {
 		OTFConnectionManager connectR = this.connect.clone();
-		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostConnectionManager());
+		OTFClientQuad clientQ2 = otfClient.createNewView(connectR);
 		return clientQ2;
 	}
 
-	@Override
-	protected OTFDrawer createDrawer(){
+	private void createDrawer(){
+		OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig());
 		prepareConnectionManager();
-		OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
-		frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
-		hostControlBar.addDrawer(timeLine);
-		OTFDrawer mainDrawer;
+		OTFTimeLine timeLine = new OTFTimeLine("time", otfClient.getHostControlBar().getOTFHostControl());
+		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
+		otfClient.getHostControlBar().addDrawer(timeLine);
+		final OTFDrawer mainDrawer;
 		if (swing) {
-			mainDrawer = new OTFSwingDrawerContainer(this.getRightDrawerComponent(), hostControlBar);
+			mainDrawer = new OTFSwingDrawerContainer(this.getRightDrawerComponent(), otfClient.getHostControlBar());
 		} else {
-			mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), hostControlBar);
+			mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), otfClient.getHostControlBar());
 		}
-		if (hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
-			final OTFQueryControl queryControl = new OTFQueryControl(hostControlBar, OTFClientControl.getInstance().getOTFVisConfig());
-			queryControl.getQueries().clear();
-			queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));
-			queryControl.setAgentIdResolver(new IdResolver() {
+		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(masterHostControl.getAddress()));
+		
+		final JPanel compositePanel = otfClient.getCompositePanel();
+		final JMapViewer jMapViewer = new MyJMapViewer(compositePanel);
 
-				@Override
-				public List<String> resolveId(Double origRect) {
-					QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) queryControl.createQuery(new QueryAgentId(origRect));
-					return agentIdQuery.agentIds;
-				}
+		final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
 
 
-			});
-			OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
-			queryControl.setQueryTextField(queryControlBar.getTextField());
-			frame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-			mainDrawer.setQueryHandler(queryControl);
-		}
-		return mainDrawer;
+		compositePanel.add(jMapViewer);
+
+		((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
+				double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
+				Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+				float scale = mainDrawer.getScale();
+				int zoomDiff = (int) log2(scale);
+				jMapViewer.setDisplayPositionByLatLon(center.getY(), center.getX(), WGS84ToOSMMercator.SCALE - zoomDiff);
+				compositePanel.repaint();
+			}
+
+		});
+		otfClient.show();
 	}
 
-	@Override
-	protected OTFVisConfigGroup createOTFVisConfig() {
-		saver = new SettingsSaver(this.masterHostControl.getAddress());
+	private OTFVisConfigGroup createOTFVisConfig() {
 		return this.masterHostControl.getOTFServer().getOTFVisConfig();
 	}
 
 	public void setSwing(boolean swing) {
 		this.swing = swing;
 	}
-	
+
+	@Override
+	public final void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				createDrawer();
+			}
+		});
+	}
+
+	public void setHostConnectionManager(OTFHostConnectionManager hostConnectionManager) {
+		this.masterHostControl = hostConnectionManager;
+		this.otfClient.setHostConnectionManager(hostConnectionManager);
+	}
+
 	public static final void playNetwork(final String filename) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(filename);
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager(filename, server);
 		OTFVisClient client = new OTFVisClient();
@@ -131,38 +154,8 @@ public final class OTFVisClient extends OTFClient {
 		server.getSnapshotReceiver().finish();
 	}
 	
-	public static void main(final String[] args) {
-		play("input/network.xml", false); 
+	public static void main(String[] args) {
+		playNetwork("input/network.xml");
 	}
 	
-	private static final String chooseFile() {
-		JFileChooser fc = new JFileChooser();
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-			}
-			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
-		} );
-
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
-			}
-			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
-		} );
-
-		int state = fc.showOpenDialog( null );
-		if ( state == JFileChooser.APPROVE_OPTION ) {
-			String filename = fc.getSelectedFile().getAbsolutePath();
-			return filename;
-		}
-		System.out.println( "No file selected." );
-		return null;
-	}
-	
-	private static final void play(String filename, boolean useSwing) {
-		String lowerCaseFilename = filename.toLowerCase();
-		playNetwork(filename);
-	}
-
 }

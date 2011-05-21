@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -48,44 +49,41 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  * @author dgrether
  *
  */
-public abstract class OTFClient implements Runnable {
+public class OTFClient {
 
 	private static final Logger log = Logger.getLogger(OTFClient.class);
 
 	// Keine Ahnung.
 	private static final String id = "id";
 
-	protected OTFFrame frame;
+	private OTFFrame frame;
 
-	protected OTFHostControlBar hostControlBar = null;
+	private OTFHostControlBar hostControlBar;
 
-	protected SettingsSaver saver;
+	private OTFHostConnectionManager hostConnectionManager;
 
-	protected OTFHostConnectionManager masterHostControl;
+	private JPanel compositePanel;
+
+	private OTFDrawer mainDrawer;
+
 
 	public OTFClient() {
-
-	}
-
-	@Override
-	public final void run() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				initializeSwingClient();
-			}
-		});
+		this.frame = new OTFFrame("MATSim OTFVis");
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.frame.setSize(screenSize.width/2,screenSize.height/2);
+		log.info("created MainFrame");
 	}
 
 	public final void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
-		this.masterHostControl = otfHostConnectionManager;
+		this.hostConnectionManager = otfHostConnectionManager;
+		this.hostControlBar = new OTFHostControlBar(otfHostConnectionManager);
 	}
 
-	public final OTFClientQuad createNewView(OTFConnectionManager connect, OTFHostConnectionManager hostControl) {
+	public final OTFClientQuad createNewView(OTFConnectionManager connect) {
 		log.info("Getting Quad id " + id);
-		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
+		OTFServerQuadI servQ = hostConnectionManager.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
-		OTFClientQuad clientQ = servQ.convertToClient(id, hostControl.getOTFServer(), connect);
+		OTFClientQuad clientQ = servQ.convertToClient(id, hostConnectionManager.getOTFServer(), connect);
 		log.info("Creating receivers...");
 		clientQ.createReceiver(connect);
 		log.info("Reading data...");
@@ -153,32 +151,38 @@ public abstract class OTFClient implements Runnable {
 		SwingUtilities.updateComponentTreeUI(frame);
 	}
 
-	protected abstract OTFDrawer createDrawer();
-
-	protected abstract OTFVisConfigGroup createOTFVisConfig();
-
-	private void initializeSwingClient() {
-		this.frame = new OTFFrame("MATSim OTFVis");
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.frame.setSize(screenSize.width/2,screenSize.height/2);
-		log.info("created MainFrame");
-		OTFVisConfigGroup visconf = createOTFVisConfig();
-		OTFClientControl.getInstance().setOTFVisConfig(visconf);
+	public void addDrawerAndInitialize(OTFDrawer mainDrawer, SettingsSaver saver) {
+		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
-		this.hostControlBar = new OTFHostControlBar(masterHostControl);
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
 		buildMenu(frame, hostControlBar, saver);
 		log.info("created HostControlBar");
-		OTFDrawer mainDrawer = createDrawer();
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
+		compositePanel = new JPanel();
+		compositePanel.setLayout(new OverlayLayout(compositePanel));
+		compositePanel.add(mainDrawer.getComponent());
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(mainDrawer.getComponent(), BorderLayout.CENTER);
+		panel.add(compositePanel, BorderLayout.CENTER);
 		this.frame.getContentPane().add(panel);
 		hostControlBar.addDrawer(mainDrawer);
+	}
+
+	public void show() {
 		mainDrawer.redraw();
 		frame.setVisible(true);
-		log.info("OTFVis finished init");
+	}
+
+	public JPanel getCompositePanel() {
+		return compositePanel;
+	}
+
+	public OTFHostControlBar getHostControlBar() {
+		return hostControlBar;
+	}
+
+	public OTFFrame getFrame() {
+		return frame;
 	}
 
 }

@@ -22,6 +22,8 @@ package org.matsim.vis.otfvis;
 
 import java.awt.BorderLayout;
 
+import javax.swing.SwingUtilities;
+
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -50,16 +52,21 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
  * @author dstrippgen
  * @author dgrether
  */
-public class OTFClientFile extends OTFClient {
+public class OTFClientFile implements Runnable {
 
-	protected OTFConnectionManager connect = new OTFConnectionManager();
+	private OTFClient otfClient = new OTFClient();
+	
+	private OTFConnectionManager connect = new OTFConnectionManager();
 
 	private final String url;
+
+	private OTFHostConnectionManager masterHostControl;
 	
 	public OTFClientFile(String filename) {
 		super();
 		this.url = filename;
-		setHostConnectionManager(new OTFHostConnectionManager(this.url, new OTFFileReader(filename)));
+		masterHostControl = new OTFHostConnectionManager(this.url, new OTFFileReader(filename));
+		otfClient.setHostConnectionManager(masterHostControl);
 		Gbl.printMemoryUsage();
 
 		this.connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
@@ -78,20 +85,29 @@ public class OTFClientFile extends OTFClient {
 		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 	}
 
-	@Override
-	protected OTFDrawer createDrawer(){
-		OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
-		frame.getContentPane().add(timeLine, BorderLayout.SOUTH);
-		hostControlBar.addDrawer(timeLine);
-		OTFClientQuad clientQ2 = createNewView(this.connect, this.hostControlBar.getOTFHostConnectionManager());
-		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ2, hostControlBar);
+	private OTFDrawer createDrawer(){
+		OTFTimeLine timeLine = new OTFTimeLine("time", otfClient.getHostControlBar().getOTFHostControl());
+		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
+		otfClient.getHostControlBar().addDrawer(timeLine);
+		OTFClientQuad clientQ2 = otfClient.createNewView(this.connect);
+		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ2, otfClient.getHostControlBar());
 		return mainDrawer;
 	}
 
-	@Override
-	protected OTFVisConfigGroup createOTFVisConfig() {
-		saver = new SettingsSaver(this.url);
+	private OTFVisConfigGroup createOTFVisConfig() {
 		return this.masterHostControl.getOTFServer().getOTFVisConfig();
+	}
+
+	@Override
+	public final void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig());
+				otfClient.addDrawerAndInitialize(createDrawer(), new SettingsSaver(url));
+				otfClient.show();
+			}
+		});
 	}
 
 }
