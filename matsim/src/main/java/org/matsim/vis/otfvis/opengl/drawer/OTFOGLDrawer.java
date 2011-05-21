@@ -114,6 +114,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
+	private boolean glInited = false;
+
 	private static int linkTexWidth = 0;
 
 	private GL gl = null;
@@ -272,9 +274,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.mouseMan.setBounds(null, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
-		if (!USE_GLJPANEL) {
-			this.canvas.addMouseWheelListener(this.mouseMan);
-		}
+		this.canvas.addMouseWheelListener(this.mouseMan);
 		this.scaleBar = new OTFScaleBarDrawer();
 
 		ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
@@ -420,7 +420,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		this.mouseMan.setBounds(drawable, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+		if (!glInited) {
+			this.mouseMan.setBounds(drawable, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+		}
 		this.mouseMan.init(this.gl);
 
 		OTFGLAbstractDrawableReceiver.setGl(this.gl);
@@ -430,6 +432,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		if (currentSceneGraph != null) {
 			currentSceneGraph.glInit();
 		}
+		glInited = true;
 	}
 
 	@Override

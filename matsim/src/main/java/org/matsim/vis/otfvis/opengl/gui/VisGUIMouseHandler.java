@@ -384,6 +384,10 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		double aspectRatio;
 		if (drawable != null) {
 			aspectRatio = (double) drawable.getWidth() / (double) drawable.getHeight();
+			double pixelRatio = (double) drawable.getHeight() / (double) (maxNorthing-minNorthing);
+			if (ORTHO) {
+				this.scale = 1.0f / (float) pixelRatio;
+			}
 		} else {
 			aspectRatio = 1;
 		}
