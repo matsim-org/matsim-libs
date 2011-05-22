@@ -359,8 +359,9 @@ public class V2GTestOnePlan_general extends TestCase{
 		
 		Schedule agent= myDecentralizedSmartCharger.getAllAgentParkingAndDrivingSchedules().get(id);
 		
-		Schedule overlap= myDecentralizedSmartCharger.myV2G.findAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(1, 
-				agent,
+		Schedule overlap= myDecentralizedSmartCharger.myV2G.findAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(
+				id, 
+				1, 				
 				new LoadDistributionInterval(0.0, 1000.0, null, false));
 		
 		assertEquals(overlap.getTotalTimeOfIntervalsInSchedule(), 1000.0);

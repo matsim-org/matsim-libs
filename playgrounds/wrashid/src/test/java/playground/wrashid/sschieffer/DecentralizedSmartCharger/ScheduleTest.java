@@ -180,7 +180,7 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		someSchedule.sort();
 		System.out.println("schedule before");
 		someSchedule.printSchedule();
-		someSchedule=someSchedule.cutScheduleAtTime(40);
+		someSchedule=someSchedule.cutScheduleAtTimeWithoutJouleReassignment(40.0);
 		System.out.println("schedule 1st half after cut at 40");
 		someSchedule.printSchedule();
 		
@@ -191,7 +191,7 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		someSchedule.sort();
 		System.out.println("schedule before");
 		someSchedule.printSchedule();
-		someSchedule=someSchedule.cutScheduleAtTimeSecondHalf(40, 0.0);
+		someSchedule=someSchedule.cutScheduleAtTimeSecondHalfWithoutJouleReassignment(40, 0.0);
 		System.out.println("schedule second half after cut at 40");
 		someSchedule.printSchedule();
 		

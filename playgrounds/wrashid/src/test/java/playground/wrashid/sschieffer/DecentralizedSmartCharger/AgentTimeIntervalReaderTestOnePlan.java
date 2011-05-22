@@ -176,7 +176,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 						
 						//***************
 						// check joules  Function 10 or /-10 in last interval
-						parkingTimes = myDecentralizedSmartCharger.myAgentTimeReader.getJoulesForEachParkingInterval(id, parkingTimes);
+						parkingTimes.getJoulesForEachParkingInterval(id);
 						
 						TimeInterval tFirst= parkingTimes.timesInSchedule.get(0);
 						TimeInterval tLast= parkingTimes.timesInSchedule.get(5);
