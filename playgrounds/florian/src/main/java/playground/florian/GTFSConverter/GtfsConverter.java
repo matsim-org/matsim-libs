@@ -175,12 +175,7 @@ public class GtfsConverter {
 		// Create some dummy Vehicles
 		this.createTransitVehiclesDummy();
 		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
-		try {
-			tsw.writeFile("./transitSchedule.xml");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		tsw.writeFile("./transitSchedule.xml");
 		System.out.println("Conversion successfull");
 	}
 	
