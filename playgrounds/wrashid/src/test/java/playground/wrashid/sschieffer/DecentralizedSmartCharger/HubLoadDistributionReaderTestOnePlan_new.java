@@ -109,7 +109,8 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				readHubsTest(),				
 				readHubsPricingTest(optimalPrice, suboptimalPrice),
 				mySimulation.getVehicleTypeCollector(),
-				outputPath);
+				outputPath,
+				optimalPrice, suboptimalPrice);
 		
 		//determistic load
 		
@@ -193,7 +194,8 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				readHubsTest(),				
 				readHubsPricingTestLinear(),
 				mySimulation.getVehicleTypeCollector(),
-				outputPath);
+				outputPath,
+				0,0);
 			
 		/**
 		 * determistic load
@@ -304,7 +306,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 				readHubsTest(),				
 				readHubsPricingTestParabolic(),
 				mySimulation.getVehicleTypeCollector(),
-				outputPath);
+				outputPath, 0,0);
 		
 		
 			

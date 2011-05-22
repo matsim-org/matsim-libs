@@ -23,6 +23,9 @@ public class TestSimulationSetUp {
 	
 	final VehicleTypeCollector myVehicleTypes;
 	
+	final double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
+	final double suboptimalPrice=optimalPrice*3; // cost/second  
+	
 	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
 	HashMap<Integer, Schedule> pricingHubDistribution;
 	HashMap<Integer, Schedule> stochastic;
@@ -49,9 +52,6 @@ public class TestSimulationSetUp {
 		energyConsumptionInit= new EnergyConsumptionInit(
 				electrification, ev);
 		
-		
-		final double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
-		final double suboptimalPrice=optimalPrice*3; // cost/second  
 		
 		deterministicHubLoadDistribution= readHubsTest();
 		pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
@@ -106,7 +106,9 @@ public class TestSimulationSetUp {
 		myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 				mapHubsTest(), 
 				getDeterministicLoadSchedule(),							
-				getDeterministicPricing()
+				getDeterministicPricing(),
+				optimalPrice,
+				suboptimalPrice
 				);
 		myDecentralizedSmartCharger.setDebug(true);
 		

@@ -191,7 +191,7 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		someSchedule.sort();
 		System.out.println("schedule before");
 		someSchedule.printSchedule();
-		someSchedule=someSchedule.cutScheduleAtTimeSecondHalf(40);
+		someSchedule=someSchedule.cutScheduleAtTimeSecondHalf(40, 0.0);
 		System.out.println("schedule second half after cut at 40");
 		someSchedule.printSchedule();
 		
