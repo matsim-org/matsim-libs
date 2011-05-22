@@ -77,8 +77,7 @@ public class AgentTimeIntervalReader {
 		schedule = checkTimesWithHubSubAndOptimalTimes(schedule, id);
 		
 		//System.out.println("calculating Joules per Interval");
-		schedule = getJoulesForEachParkingInterval(id, schedule);
-		
+		schedule.getJoulesForEachParkingInterval(id);
 		
 		return schedule;
 	}
@@ -213,43 +212,6 @@ public class AgentTimeIntervalReader {
 	
 	
 	
-	public Schedule getJoulesForEachParkingInterval(Id id, Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		
-		for(int i=0; i<schedule.getNumberOfEntries(); i++){
-			
-			if(schedule.timesInSchedule.get(i).isParking()){
-				ParkingInterval thisParkingInterval= (ParkingInterval)schedule.timesInSchedule.get(i);
-				// getFunctionFromHubReader
-				Id idLink= thisParkingInterval.getLocation();
-				
-				ArrayList <PolynomialFunction> funcList= 
-					DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
-							id,
-							idLink, 
-							thisParkingInterval);
-				
-				
-				PolynomialFunction p= funcList.get(0);
-				// size can only be 1
-				if( funcList.size()>1){
-					System.out.println("in getJoulesForEachParkingInterval funcList was larger than 1 ERROR");
-				}
-				
-				//Integrate from start to End
-				double joulesInInterval=DecentralizedSmartCharger.functionIntegrator.integrate(p, 
-						thisParkingInterval.getStartTime(), 
-						thisParkingInterval.getEndTime());
-				
-				schedule.addJoulesToTotalSchedule(joulesInInterval);
-				//save results in Parking Interval
-				thisParkingInterval.setJoulesInPotentialChargingInterval(joulesInInterval);
-				
-			}
-			
-		}
-		
-		return schedule;
-	}
 	
 	
 	

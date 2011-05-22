@@ -14,6 +14,8 @@ public class V2GAgentStats {
 		revenueV2G=0;
 		totalJouleUp=0;
 		totalJouleDown=0;
+		revenueFeedIn=0;
+		totalJouleFeedIn=0;
 	}
 	
 	

@@ -416,10 +416,10 @@ public void visualizeSOCAgent(double [] solution, String filename, Id id) throws
 		
 		XYSeriesCollection SOCAgent= new XYSeriesCollection();
 		
-		XYSeries SOCAgentSeries= new XYSeries("SOC agent");
+		XYSeries SOCAgentSeries= new XYSeries("SOC agent"+ id.toString());
 		
 		double [] SOC= solution.clone();	
-		SOCAgentSeries.add(0,SOC[0]);
+		SOCAgentSeries.add(schedule.timesInSchedule.get(0).getStartTime(),SOC[0]);
 		
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){

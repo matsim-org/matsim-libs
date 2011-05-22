@@ -797,14 +797,11 @@ public class DecentralizedSmartCharger {
 								 * conservative estimate - worst case = compensation is cheapest possible cost/kWh
 								 */
 								double compensation=myHubLoadReader.getMinPricePerKWHAllHubs()*KWHPERJOULE*joulesFromSource; 
-								
 								myV2G.regulationUpDownVehicleLoad(id,
-											currentStochasticLoadInterval,
-											agentParkingAndDrivingSchedules.get(id),
+											currentStochasticLoadInterval,											
 											compensation,
 											joulesFromSource,													
-											type									
-											);															
+											type);															
 							}
 						}	
 					}
@@ -1605,7 +1602,7 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)10*(vehicles.getKeySet().size()));//width, height	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
 	
 	}
 	

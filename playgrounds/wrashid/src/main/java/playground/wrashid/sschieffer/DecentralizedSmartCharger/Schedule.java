@@ -610,7 +610,20 @@ public class Schedule {
 	}
 	
 	
-public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	
+	
+	public Schedule cutScheduleAtTime(double time, Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		Schedule firstHalf=new Schedule();
+		
+		firstHalf= cutScheduleAtTimeWithoutJouleReassignment(time);
+		firstHalf.getJoulesForEachParkingInterval(agentId);
+		return firstHalf;
+	}
+	
+	
+	
+public Schedule cutScheduleAtTimeWithoutJouleReassignment(double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule firstHalf=new Schedule();
 		
@@ -657,17 +670,34 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 				if(p.getIntervalLength()>0){
 					firstHalf.addTimeInterval(p);
 				}
-				
-				
 			
 		}
 		
 		return firstHalf;
 	}
-	
-	
 
-	public Schedule cutScheduleAtTimeSecondHalf (double time, double startingSOC) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	/**
+	 * cuts the schedule and reassigns joules to the parking intervals
+	 * 
+	 * @param time
+	 * @param startingSOC
+	 * @param agentId
+	 * @return
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public Schedule cutScheduleAtTimeSecondHalf (double time, double startingSOC, Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		Schedule secondHalf=new Schedule();
+		secondHalf=cutScheduleAtTimeSecondHalfWithoutJouleReassignment(time,  startingSOC);
+		secondHalf.getJoulesForEachParkingInterval(agentId);
+		return secondHalf;
+		
+	}
+
+	
+	
+	public Schedule cutScheduleAtTimeSecondHalfWithoutJouleReassignment(double time, double startingSOC) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		Schedule secondHalf=new Schedule();
 		secondHalf.setStartingSOC(startingSOC);
 		int interval= timeIsInWhichInterval(time); 
@@ -682,8 +712,6 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 			if(d.getIntervalLength()>0){
 				secondHalf.addTimeInterval(d);
 			}
-			
-			
 			
 		}else{
 				
@@ -702,21 +730,18 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 				
 				if(p.getIntervalLength()>0){
 					secondHalf.addTimeInterval(p);
-				}				
-			
+				}
 		}
-		
 		
 		for(int i=interval+1; i<getNumberOfEntries(); i++){
 			secondHalf.addTimeInterval(timesInSchedule.get(i).clone());
 			
 		}
-		secondHalf.sort();		
+		secondHalf.sort();	
+	
 		return secondHalf;
 		
 	}
-
-
 
 	/**
 	 * makes a clone of first half of charging schedule
@@ -804,6 +829,45 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 		return filled;
 	}
 	
+	
+	
+public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+	clearJoules();
+		for(int i=0; i<getNumberOfEntries(); i++){
+			
+			if(timesInSchedule.get(i).isParking()){
+				ParkingInterval thisParkingInterval= (ParkingInterval)timesInSchedule.get(i);
+				// getFunctionFromHubReader
+				Id idLink= thisParkingInterval.getLocation();
+				
+				ArrayList <PolynomialFunction> funcList= 
+					DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadPolynomialFunctionAtLinkAndTime(
+							id,
+							idLink, 
+							thisParkingInterval);
+				
+				
+				PolynomialFunction p= funcList.get(0);
+				// size can only be 1
+				if( funcList.size()>1){
+					System.out.println("in getJoulesForEachParkingInterval funcList was larger than 1 ERROR");
+				}
+				
+				//Integrate from start to End
+				double joulesInInterval=DecentralizedSmartCharger.functionIntegrator.integrate(p, 
+						thisParkingInterval.getStartTime(), 
+						thisParkingInterval.getEndTime());
+				
+				addJoulesToTotalSchedule(joulesInInterval);
+				//save results in Parking Interval
+				thisParkingInterval.setJoulesInPotentialChargingInterval(joulesInInterval);
+				
+			}
+			
+		}
+		
+	}
 	
 	
 	/**

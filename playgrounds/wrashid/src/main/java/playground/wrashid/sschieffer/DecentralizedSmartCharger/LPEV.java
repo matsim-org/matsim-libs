@@ -172,23 +172,20 @@ public class LPEV extends LP{
 				getSolver().printLp();
 			}
 			if(isOutput()|| id.toString().equals(Integer.toString(1))){
-				int currentMilli= (int) Math.round(System.currentTimeMillis()/1000.0);
+				double currentM= System.currentTimeMillis();
+				int currentMilli= (int) Math.round(currentM-(System.currentTimeMillis()%100000.0));
 				String filename= DecentralizedSmartCharger.outputPath+ "V2G\\SOC_of_"+vehicleType+"afterLPEV_Agent" + id.toString()+currentMilli+".png";
-				visualizeSOCAgent(getSolver().getPtrVariables(), vehicleType+"_rescheduleV2G"+currentMilli, id);
-				
+				visualizeSOCAgent(getSolver().getPtrVariables(), filename, id);
 			}
-			
 		
 		} catch (Exception e) {	    
 		}
 		
 		schedule= update();
-
 		
 		getSolver().deleteLp();
 		
 		return schedule;
-		
 		
 	}
 	

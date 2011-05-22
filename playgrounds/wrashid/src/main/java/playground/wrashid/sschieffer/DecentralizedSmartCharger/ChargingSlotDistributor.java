@@ -235,14 +235,20 @@ public class ChargingSlotDistributor {
 			while(run){
 				double integral;
 				if(joulesInInterval>=0){
-					double err=joulesInInterval/100; // accuracy 1%
-					
+					double err=Math.max(joulesInInterval/100.0, 1.0); // accuracy 1%
+					//double err=joulesInInterval/100.0; // accuracy 1%
+					if (DecentralizedSmartCharger.debug){
+						System.out.println("integrate stat:"+ startTime+ " upto "+ trial+ " Function"+ func.toString());
+						if(startTime==trial){
+							System.out.println("TROUBLEt:");
+							System.out.println("error:"+ err+ " joules in interval"+ joulesInInterval+ " Function"+ func.toString());
+						}
+					}
 					integral=DecentralizedSmartCharger.functionIntegrator.integrate(func, startTime, trial);
 					
 					if(integral<rand*joulesInInterval){
 						lower=trial;					
 						trial=(upper+lower)/2;
-						
 					}else{
 						upper=trial;
 						trial=(upper+lower)/2;

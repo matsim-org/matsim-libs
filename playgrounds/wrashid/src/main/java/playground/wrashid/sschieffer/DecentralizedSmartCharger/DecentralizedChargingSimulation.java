@@ -297,7 +297,7 @@ public class DecentralizedChargingSimulation {
 	}
 	
 	public double getTotalJoulesV2GRegulationDown(){
-		return mySmartCharger.myV2G.getTotalRegulationUp();
+		return mySmartCharger.myV2G.getTotalRegulationDown();
 	}
 	
 	public double getTotalJoulesV2GRegulationDownEV(){

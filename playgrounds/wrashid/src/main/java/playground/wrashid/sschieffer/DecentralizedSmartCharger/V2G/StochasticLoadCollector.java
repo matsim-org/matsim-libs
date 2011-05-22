@@ -103,7 +103,7 @@ public class StochasticLoadCollector {
 			double startSec= Math.random()*buffer;
 			
 			Schedule bullShitStochastic= new Schedule();
-			int numPpl= mySimulation.mySmartCharger.vehicles.getKeySet().size();
+			int numPpl= (int)(mySimulation.mySmartCharger.vehicles.getKeySet().size()*1.5);
 			PolynomialFunction p1 = new PolynomialFunction(new double[] {numPpl*3500});
 			PolynomialFunction p2 = new PolynomialFunction(new double[] {-numPpl*3500});
 			PolynomialFunction p3 = new PolynomialFunction(new double[] {numPpl*3500});
