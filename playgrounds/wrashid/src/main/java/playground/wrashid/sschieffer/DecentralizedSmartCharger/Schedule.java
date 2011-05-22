@@ -279,7 +279,7 @@ public class Schedule {
 	 * @return
 	 */
 	public int timeIsInWhichInterval(double time){
-		printSchedule();
+		
 		int solution=-1;
 		for (int i=0; i<timesInSchedule.size(); i++){
 			if(time<timesInSchedule.get(i).getEndTime() && 
@@ -595,10 +595,10 @@ public class Schedule {
 	
 	
 	
-	public Schedule cloneLoadSchedule(){
+	public Schedule cloneSchedule(){
 		Schedule copy= new Schedule();
 		for(int i=0; i<getNumberOfEntries(); i++){
-			LoadDistributionInterval l=(LoadDistributionInterval) timesInSchedule.get(i);
+			TimeInterval l= timesInSchedule.get(i);
 			copy.addTimeInterval(l.clone());
 		}
 		return copy;
@@ -613,6 +613,8 @@ public class Schedule {
 public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule firstHalf=new Schedule();
+		
+		firstHalf.setStartingSOC(getStartingSOC());
 		int interval= timeIsInWhichInterval(time); 
 		
 		for(int i=0; i<=interval-1; i++){
@@ -665,9 +667,9 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 	
 	
 
-	public Schedule cutScheduleAtTimeSecondHalf (double time) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public Schedule cutScheduleAtTimeSecondHalf (double time, double startingSOC) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		Schedule secondHalf=new Schedule();
-		
+		secondHalf.setStartingSOC(startingSOC);
 		int interval= timeIsInWhichInterval(time); 
 		
 		//add first
@@ -772,7 +774,7 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 	public Schedule fillNonExistentTimesInLoadScheduleWithZeroLoads(){
 		Schedule filled= new Schedule();
 		
-		filled.mergeSchedules(this.cloneLoadSchedule());
+		filled.mergeSchedules(this.cloneSchedule());
 		
 		// fill beginning 
 		if(timesInSchedule.get(0).getStartTime()>0.0){
@@ -803,5 +805,69 @@ public Schedule cutScheduleAtTime(double time) throws MaxIterationsExceededExcep
 	}
 	
 	
+	
+	/**
+	 * adds the given extra time and extra consumption to preceding driving times
+	 * @param s
+	 * @param pos
+	 * @param extraTime
+	 * @param extraC
+	 */
+	public void addExtraConsumptionDriving( int pos, double extraTime, double extraC){
+		for(int i=pos;i>0; i--){
+			
+			if(timesInSchedule.get(i).isDriving()){
+				
+				DrivingInterval thisD = (DrivingInterval) timesInSchedule.get(i);
+				if(thisD.getIntervalLength()>=extraTime ){
+					
+					thisD.setExtraConsumption(extraC, extraTime);
+					i=0;
+					
+				}else{
+					double consLeft= extraC- thisD.getConsumption();
+					double timeLeft= extraTime-thisD.getIntervalLength();
+					
+					addExtraConsumptionDriving( i, timeLeft, consLeft);
+					thisD.setExtraConsumption(thisD.getConsumption(), thisD.getIntervalLength());
+					i=0;
+				}
+			}
+		}
+		
+		
+	}
+	
+	
+	/**
+	 * reduces the req charging times in preceding parking time(s) by given value
+	 * @param s
+	 * @param pos
+	 * @param deduct
+	 */
+	void reducePrecedingParkingBy( int pos, double deduct){
+			
+		for(int i=pos-1;i>0; i--){
+			
+			if(timesInSchedule.get(i).isParking()){
+				
+				ParkingInterval thisP = (ParkingInterval) timesInSchedule.get(i);
+				
+				if(thisP.getRequiredChargingDuration()>=deduct ){
+					
+					thisP.setRequiredChargingDuration(thisP.getRequiredChargingDuration()-deduct);
+					i=0;
+				}else{
+					
+					double stillLeft= deduct-thisP.getRequiredChargingDuration();
+					thisP.setRequiredChargingDuration(0);
+					reducePrecedingParkingBy( i, stillLeft);
+					i=0;
+				}
+				
+			}
+		}
+			
+	}
 	
 }

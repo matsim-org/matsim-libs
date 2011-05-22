@@ -412,7 +412,7 @@ public abstract class LP {
 	
 	
 	
-public void visualizeSOCAgent(double [] solution, String type, Id id) throws LpSolveException, IOException{
+public void visualizeSOCAgent(double [] solution, String filename, Id id) throws LpSolveException, IOException{
 		
 		XYSeriesCollection SOCAgent= new XYSeriesCollection();
 		
@@ -544,7 +544,7 @@ public void visualizeSOCAgent(double [] solution, String type, Id id) throws LpS
  	            )
  	        );
      	
-     	ChartUtilities.saveChartAsPNG(new File(DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+type+"afterLPEV_Agent" + id.toString()+".png") , chart, 800, 600);
+     	ChartUtilities.saveChartAsPNG(new File(filename) , chart, 800, 600);
 	  	
 	}
 	

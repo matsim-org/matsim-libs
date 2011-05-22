@@ -94,7 +94,7 @@ public class DecentralizedSmartCharger {
 	final public static double SECONDSPERDAY=24*60*60;
 	final public static int MINUTESPERDAY=24*60;
 	
-	final public static double KWHPERJOULE=1/(3600*1000);
+	final public static double KWHPERJOULE=1.0/(3600.0*1000.0);
 	//***********************************************************************	
 	public static String outputPath;
 	final Controler controler;
@@ -230,6 +230,8 @@ public class DecentralizedSmartCharger {
 		return agentContracts;
 	}
 
+	
+	
 	public LPEV getLPEV(){
 		return lpev;
 	}
@@ -250,7 +252,9 @@ public class DecentralizedSmartCharger {
 	public void initializeHubLoadDistributionReader(
 			HubLinkMapping hubLinkMapping, 
 			HashMap<Integer, Schedule> deterministicHubLoadDistribution,			
-			HashMap<Integer, Schedule> pricingHubDistribution
+			HashMap<Integer, Schedule> pricingHubDistribution,
+			double minPricePerkWhAllHubs,
+			double maxPricePerkWhAllHubs
 			) throws OptimizationException, IOException, InterruptedException{
 		
 		myHubLoadReader=new HubLoadDistributionReader(controler, 
@@ -258,7 +262,9 @@ public class DecentralizedSmartCharger {
 				deterministicHubLoadDistribution,				
 				pricingHubDistribution,
 				myVehicleTypes,
-				outputPath
+				outputPath,
+				minPricePerkWhAllHubs,
+				maxPricePerkWhAllHubs
 				);
 	}
 
@@ -747,8 +753,7 @@ public class DecentralizedSmartCharger {
 						
 						for(int intervalNum=0; intervalNum<intervals; intervalNum++){
 							
-							double bit=0;
-							
+							double bit=0;							
 							if(intervalNum<intervals-1){
 								bit=minChargingLength;								
 							}else{// i=intervals-1
@@ -774,22 +779,24 @@ public class DecentralizedSmartCharger {
 								
 								String type;								
 								if(hasAgentPHEV(id)){									
-									type="PHEVRescheduleVehicleSourceAgent_"+id.toString();
-									
+									type="PHEVRescheduleVehicleSourceAgent_"+id.toString();									
 								}else{
 									type="EVRescheduleVehicleSourceAgent_"+id.toString();
 								}
-								
-									
+																	
 								/*
 								 * NO CONTRACTS NECESSARY
 								 * IN Any case it will be attempted to provide regulation up down
 								 * if within correct battery state and if rescheduling is possible
 								 */
-								
-								// compensation for providing your own energy = self produced is 0.0
-								// could also put installation costs
-								double compensation= 0.0;
+								/*
+								 * compensation for providing your own energy
+								 * self production is 0.0
+								 * but saving costs of charging for the joules
+								 * so has to reflect costs saved
+								 * conservative estimate - worst case = compensation is cheapest possible cost/kWh
+								 */
+								double compensation=myHubLoadReader.getMinPricePerKWHAllHubs()*KWHPERJOULE*joulesFromSource; 
 								
 								myV2G.regulationUpDownVehicleLoad(id,
 											currentStochasticLoadInterval,
@@ -797,18 +804,14 @@ public class DecentralizedSmartCharger {
 											compensation,
 											joulesFromSource,													
 											type									
-											);
-															
-							}						
-							
+											);															
+							}
 						}	
-						
 					}
 					// check V2G effect
 					if(debug|| id.toString().equals(Integer.toString(1))  ){
 						visualizeStochasticLoadVehicleBeforeAfterV2G(id);												
-					}
-							
+					}	
 			}
 		}
 		
@@ -890,15 +893,11 @@ public class DecentralizedSmartCharger {
 									
 									for(Id agentId :vehicles.getKeySet()){
 										
-										String type;									
-										
-										if(hasAgentPHEV(agentId)){
-											
-											type="PHEVStochasticLoadRegulationUp";
-											
+										String type;						
+										if(hasAgentPHEV(agentId)){											
+											type="PHEVStochasticLoadRegulationUp";											
 										}else{																			
-											type="EVStochasticLoadRegulationUp";
-										}
+											type="EVStochasticLoadRegulationUp";										}
 										
 										if(isAgentRegulationUp(agentId)){
 											
@@ -1820,19 +1819,24 @@ public class DecentralizedSmartCharger {
 		   
 		    
 		    //LOAD CURVES BEFORE AND AFTER
-		    //Vehicle 1
-		    out.write("Vehicle 1 </br> </br>");
-	    	out.write("Stochastic load before and after </br>");
-	    	String picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle1.png";
-	    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
-	    	out.write("</br> </br>");
+		    if(myHubLoadReader.agentVehicleSourceMapping!=null){
+		    	 //Vehicle 1
+			    out.write("Vehicle Load of agent: 1 </br> </br>");
+		    	out.write("Stochastic load before and after </br>");
+		    	String picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle1.png";
+		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
+		    	out.write("</br> </br>");
+		    }else{
+		    	out.write("No Vehicle Loads </br> </br>");
+		    }
+		   
 	    	
 		    //HUB
 		    for(Integer hub: myHubLoadReader.stochasticHubLoadDistribution.keySet()){
 		    	out.write("HUB"+hub.toString()+"</br> </br>");
 		    			    	
 		    	out.write("Stochastic load before and after </br>");
-		    	picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_hub"+hub.toString()+".png";
+		    	String picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_hub"+hub.toString()+".png";
 		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    }

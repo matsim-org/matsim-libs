@@ -58,6 +58,8 @@ public class DrivingInterval extends TimeInterval {
 	@Override
 	public DrivingInterval clone(){
 		DrivingInterval d = new DrivingInterval(getStartTime(), getEndTime(), getConsumption());
+		d.setExtraConsumption(extraConsumption, timeEngine);
+		
 		return d;
 	}
 	

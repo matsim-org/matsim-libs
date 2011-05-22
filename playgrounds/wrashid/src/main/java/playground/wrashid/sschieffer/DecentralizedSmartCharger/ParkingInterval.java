@@ -60,7 +60,13 @@ public class ParkingInterval extends TimeInterval {
 	
 	@Override
 	public ParkingInterval clone(){
-		return new ParkingInterval(getStartTime(), getEndTime(), getLocation());
+		ParkingInterval clone= new ParkingInterval(getStartTime(), getEndTime(), getLocation());
+		if(chargingSchedule!=null){
+			clone.setChargingSchedule(chargingSchedule.cloneSchedule());
+		}	
+		clone.setRequiredChargingDuration(requiredChargingDuration);
+		clone.setJoulesInPotentialChargingInterval(joulesInTimeInterval);
+		return clone;
 	}
 	
 	

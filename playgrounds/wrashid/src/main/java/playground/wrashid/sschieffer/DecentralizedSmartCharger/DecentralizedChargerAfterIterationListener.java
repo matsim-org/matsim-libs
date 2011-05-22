@@ -51,6 +51,8 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					myVehicleTypes // the defined vehicle types(gas, battery)
 					);
 			
+			
+			
 			//set battery reserve
 			myDecentralizedSmartCharger.initializeLP(
 					DecentralizedChargingSimulation.bufferBatteryCharge,
@@ -119,8 +121,15 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 					hubLinkMapping, 
 					deterministicHubLoadDistribution,							
-					pricingHubDistribution							
+					pricingHubDistribution,
+					DecentralizedChargingSimulation.loadPricingCollector.getLowestPriceKWHAllHubs(),
+					DecentralizedChargingSimulation.loadPricingCollector.getHighestPriceKWHAllHubs()
 					);
+			
+			
+			
+			
+			
 			
 			myDecentralizedSmartCharger.run();			
 			

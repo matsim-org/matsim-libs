@@ -49,11 +49,41 @@ public class DetermisticLoadPricingCollector {
 	UnivariateRealSolverFactory factory = UnivariateRealSolverFactory.newInstance();
 	UnivariateRealSolver solverNewton = factory.newNewtonSolver();
 	
-
+	private double allHubsPriceMax,	allHubsPriceMin;
+	
 	
 	public DetermisticLoadPricingCollector(	ArrayList<HubInfo> myHubInfo) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 			this.myHubInfo=myHubInfo;
 	}
+	
+	
+	public double getHighestPriceKWHAllHubs(){
+		return allHubsPriceMax;
+	}
+	
+	
+	public double getLowestPriceKWHAllHubs(){
+		return allHubsPriceMin;
+	}
+	
+	
+	public void findHighestAndLowestPricesInAllHubs(){
+		allHubsPriceMax=-(Double.MAX_VALUE);
+		allHubsPriceMin= Double.MAX_VALUE;
+		for(int i=0; i< myHubInfo.size(); i++){
+			if (myHubInfo.get(i).getPriceMax()>allHubsPriceMax){
+				allHubsPriceMax=myHubInfo.get(i).getPriceMax();
+			}
+			if(myHubInfo.get(i).getPriceMin()<allHubsPriceMin){
+				allHubsPriceMin=myHubInfo.get(i).getPriceMin();
+			}
+		}
+	}
+	
+	public ArrayList<HubInfo> getHubInfo(){
+		return myHubInfo;
+	}
+	
 	
 	
 	public void setUp() throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{

@@ -118,7 +118,9 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 					hubLinkMapping, 
 					deterministicHubLoadDistribution,							
-					pricingHubDistribution							
+					pricingHubDistribution,
+					DecentralizedChargingSimulation.loadPricingCollector.getLowestPriceKWHAllHubs(),
+					DecentralizedChargingSimulation.loadPricingCollector.getHighestPriceKWHAllHubs()
 					);
 			
 			myDecentralizedSmartCharger.run();

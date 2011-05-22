@@ -56,7 +56,9 @@ public class LoadDistributionInterval  extends TimeInterval
 		
 	}
 	
-	
+	public void negatePolynomialFunc(){
+		p=p.negate();
+	}
 	
 	
 	public LoadDistributionInterval clone(){

@@ -180,26 +180,29 @@ public class Main_exampleV2G {
 		 *********************/
 		
 		// REVENUES FROM V2G
-		double averageRevenueV2GAgent= mySimulation.getAverageRevenueV2GPerAgent();
+		System.out.println("average revenue from V2G for agents: "+mySimulation.getAverageRevenueV2GPerAgent());
 		
-		double averageRevenueV2perEV= mySimulation.getAverageRevenueV2GPerEV();
+		System.out.println("average revenue from V2G for EV agents: "+mySimulation.getAverageRevenueV2GPerEV());
+				
+		System.out.println("average revenue from V2G for PHEV agents: "+mySimulation.getAverageRevenueV2GPerPHEV());
 		
-		double averageRevenueV2GperPHEV= mySimulation.getAverageRevenueV2GPerPHEV();
-		
-		//JOULES PROVIDED IN REGULATION UP OR DOWN
-		double totalJoulesV2GRegulationUp= mySimulation.getTotalJoulesV2GRegulationUp();
-		
-		double totalJoulesV2GRegulationUpEV= mySimulation.getTotalJoulesV2GRegulationUpEV();
-		
-		double totalJoulesV2GRegulationUpPHEV= mySimulation.getTotalJoulesV2GRegulationUpPHEV();
 		
 		//JOULES PROVIDED IN REGULATION UP OR DOWN
-		double totalJoulesV2GRegulationDown= mySimulation.getTotalJoulesV2GRegulationDown();
+		System.out.println("total joules from V2G for regulation up: "+mySimulation.getTotalJoulesV2GRegulationUp());
 		
-		double totalJoulesV2GRegulationDownEV= mySimulation.getTotalJoulesV2GRegulationDownEV();
+		System.out.println("total joules from V2G for regulation up from EVs: "+mySimulation.getTotalJoulesV2GRegulationUpEV());
 		
-		double totalJoulesV2GRegulationDownPHEV= mySimulation.getTotalJoulesV2GRegulationDownPHEV();
+		System.out.println("total joules from V2G for regulation up from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationUpPHEV());
 		
+		
+		//JOULES PROVIDED IN REGULATION UP OR DOWN
+		System.out.println("total joules from V2G for regulation down: "+mySimulation.getTotalJoulesV2GRegulationDown());
+		
+		System.out.println("total joules from V2G for regulation down from EVs: "+mySimulation.getTotalJoulesV2GRegulationDownEV());
+		
+		System.out.println("total joules from V2G for regulation down from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationDownPHEV());
+		
+	
 	}
 
 }

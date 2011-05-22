@@ -118,7 +118,9 @@ public class LPPHEV extends LP{
 		setEnergyFromCombustionEngine(calcEnergyUsageFromCombustionEngine(getSolver().getPtrVariables()));
 		
 		if(isOutput()|| id.toString().equals(Integer.toString(1)) ){
-			visualizeSOCAgent(getSolver().getPtrVariables(), vehicleType, id);
+			String filename= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger\\SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+".png";
+			visualizeSOCAgent(getSolver().getPtrVariables(),filename, id);
+			
 			
 		}
 		
@@ -167,7 +169,12 @@ public class LPPHEV extends LP{
 				getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"V2G\\LP\\PHEV\\LP_agent_reschedule"+ id.toString()+"printLp.txt");
 				getSolver().printLp();
 			}
-			
+			if(isOutput()|| id.toString().equals(Integer.toString(1))){
+				int currentMilli= (int) Math.round(System.currentTimeMillis()/1000.0);
+				String filename= DecentralizedSmartCharger.outputPath+ "V2G\\SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+currentMilli+".png";
+				
+				
+			}
 			
 			
 		} catch (Exception e) {	    
@@ -298,7 +305,9 @@ public class LPPHEV extends LP{
 						precedingP= (ParkingInterval)getSchedule().timesInSchedule.get(getSchedule().getNumberOfEntries()-1);	
 					}
 					
-					updatePrecedingParkingAndDrivingInterval(getSchedule(), i, energyFromEngine, thisD, precedingP);		 
+					updatePrecedingParkingAndDrivingInterval(getSchedule(), 
+							i, energyFromEngine, 
+							thisD, precedingP);		 
 					 
 				}else{
 					
@@ -333,79 +342,17 @@ public class LPPHEV extends LP{
 		double engineTime=energyFromEngine/
 		( precedingP).getChargingSpeed();
 		
-		reducePrecedingParkingBy(s , pos, engineTime);
+		s.reducePrecedingParkingBy( pos, engineTime);
 		
-		addExtraConsumptionDriving(s, pos, engineTime, energyFromEngine);
-		
-		
-	}
-	
-	
-	
-	/**
-	 * reduces the req charging times in preceding parking time(s) by given value
-	 * @param s
-	 * @param pos
-	 * @param deduct
-	 */
-	private void reducePrecedingParkingBy(Schedule s, int pos, double deduct){
-			
-		for(int i=pos-1;i>0; i--){
-			
-			if(s.timesInSchedule.get(i).isParking()){
-				
-				ParkingInterval thisP = (ParkingInterval) s.timesInSchedule.get(i);
-				
-				if(thisP.getRequiredChargingDuration()>=deduct ){
-					
-					thisP.setRequiredChargingDuration(thisP.getRequiredChargingDuration()-deduct);
-					i=0;
-				}else{
-					
-					double stillLeft= deduct-thisP.getRequiredChargingDuration();
-					thisP.setRequiredChargingDuration(0);
-					reducePrecedingParkingBy( s, i, stillLeft);
-					i=0;
-				}
-				
-			}
-		}
-			
-	}
-	
-	
-	
-	/**
-	 * adds the given extra time and extra consumption to preceding driving times
-	 * @param s
-	 * @param pos
-	 * @param extraTime
-	 * @param extraC
-	 */
-	private void addExtraConsumptionDriving(Schedule s, int pos, double extraTime, double extraC){
-		for(int i=pos;i>0; i--){
-			
-			if(s.timesInSchedule.get(i).isDriving()){
-				
-				DrivingInterval thisD = (DrivingInterval) s.timesInSchedule.get(i);
-				if(thisD.getIntervalLength()>=extraTime ){
-					
-					thisD.setExtraConsumption(extraC, extraTime);
-					i=0;
-					
-				}else{
-					double consLeft= extraC- thisD.getConsumption();
-					double timeLeft= extraTime-thisD.getIntervalLength();
-					
-					addExtraConsumptionDriving(s, i, timeLeft, consLeft);
-					thisD.setExtraConsumption(thisD.getConsumption(), thisD.getIntervalLength());
-					i=0;
-				}
-			}
-		}
+		s.addExtraConsumptionDriving( pos, engineTime, energyFromEngine);
 		
 		
 	}
+	
+	
+	
+	
+	
 	
 	
 		

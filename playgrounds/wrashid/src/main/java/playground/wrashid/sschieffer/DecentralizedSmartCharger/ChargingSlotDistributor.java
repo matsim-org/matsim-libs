@@ -72,55 +72,62 @@ public class ChargingSlotDistributor {
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
 			
 			TimeInterval t= schedule.timesInSchedule.get(i);
-			if(t.isParking()){
+			if(t.isParking() ){
 				ParkingInterval p= (ParkingInterval) t;
-				double chargingTime=p.getRequiredChargingDuration();
-				
-				ArrayList <LoadDistributionInterval> loadList= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadDistributionIntervalsAtLinkAndTime(
-						agentId, //agentId
-						p.getLocation(),
-						p);
-				
-				// in this case loadList can only be size=1
-				if(loadList.size()>1){
-					System.out.println("check distribute.. loadList should not be possible to be larger than 1");
-				}
-					PolynomialFunction func= loadList.get(0).getPolynomialFunction();
+				if(p.getRequiredChargingDuration()>0.0){//standard charging case
 					
-					if(p.getIntervalLength()*0.65 <chargingTime){
-						if(chargingTime>p.getIntervalLength()){
-							if(DecentralizedSmartCharger.debug){
-								System.out.println("rounding error - correction");
-							}
-							
-							chargingTime=p.getIntervalLength();
-							p.setRequiredChargingDuration(p.getIntervalLength());
-						}
-						double diff= p.getIntervalLength()-chargingTime;
-						double startRand= Math.random()*diff;
-						
-						ChargingInterval c= new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime);
-						chargingScheduleAllIntervalsAgent.addTimeInterval(c);
-						
-						Schedule chargingScheduleForParkingInterval= new Schedule();
-						chargingScheduleForParkingInterval.addTimeInterval(c);
-						p.setChargingSchedule(chargingScheduleForParkingInterval);
-						
-					}else{
-						Schedule chargingScheduleForParkingInterval= 
-							assignChargingScheduleForParkingInterval(func, 
-								p.getJoulesInInterval(), 
-								p.getStartTime(), 
-								p.getEndTime(), 
-								chargingTime);
-						
-						p.setChargingSchedule(chargingScheduleForParkingInterval);
-						
-						chargingScheduleAllIntervalsAgent.mergeSchedules(chargingScheduleForParkingInterval);
+					double chargingTime=p.getRequiredChargingDuration();
+					if(chargingTime>0){
 						
 					}
+					ArrayList <LoadDistributionInterval> loadList= DecentralizedSmartCharger.myHubLoadReader.getDeterministicLoadDistributionIntervalsAtLinkAndTime(
+							agentId, //agentId
+							p.getLocation(),
+							p);
 					
-				}
+					// in this case loadList can only be size=1
+					if(loadList.size()>1){
+						System.out.println("check distribute.. loadList should not be possible to be larger than 1");
+					}
+						PolynomialFunction func= loadList.get(0).getPolynomialFunction();
+						
+						if(p.getIntervalLength()*0.65 <chargingTime){
+							if(chargingTime>p.getIntervalLength()){
+								if(DecentralizedSmartCharger.debug){
+									System.out.println("rounding error - correction");
+								}
+								
+								chargingTime=p.getIntervalLength();
+								p.setRequiredChargingDuration(p.getIntervalLength());
+							}
+							double diff= p.getIntervalLength()-chargingTime;
+							double startRand= Math.random()*diff;
+							
+							ChargingInterval c= new ChargingInterval(p.getStartTime()+startRand, p.getStartTime()+startRand+chargingTime);
+							chargingScheduleAllIntervalsAgent.addTimeInterval(c);
+							
+							Schedule chargingScheduleForParkingInterval= new Schedule();
+							chargingScheduleForParkingInterval.addTimeInterval(c);
+							p.setChargingSchedule(chargingScheduleForParkingInterval);
+							
+						}else{
+							Schedule chargingScheduleForParkingInterval= 
+								assignChargingScheduleForParkingInterval(func, 
+									p.getJoulesInInterval(), 
+									p.getStartTime(), 
+									p.getEndTime(), 
+									chargingTime);
+							
+							p.setChargingSchedule(chargingScheduleForParkingInterval);
+							
+							chargingScheduleAllIntervalsAgent.mergeSchedules(chargingScheduleForParkingInterval);
+							
+						}
+						
+					}else{// if charging durtion<0 meaning it is discharging
+						p.setChargingSchedule(null);
+					}
+			}
 				
 			
 		}

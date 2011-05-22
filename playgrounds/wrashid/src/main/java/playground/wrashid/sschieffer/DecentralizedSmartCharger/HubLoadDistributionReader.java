@@ -50,6 +50,7 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
 
 
 
@@ -85,9 +86,8 @@ public class HubLoadDistributionReader {
 	
 	VehicleTypeCollector myVehicleTypeCollector;
 	
-	
-	
-	
+	private double minPricePerkWhAllHubs, maxPricePerkWhAllHubs;
+		 
 	
 	/** 
 	 * Stores all load information of the various hubs
@@ -104,7 +104,12 @@ public class HubLoadDistributionReader {
 			HashMap<Integer, Schedule> deterministicHubLoadDistribution,			
 			HashMap<Integer, Schedule> pricingHubDistribution,		
 			VehicleTypeCollector myVehicleTypeCollector,
-			String outputPath) throws IOException, OptimizationException, InterruptedException{
+			String outputPath,
+			double minPricePerkWhAllHubs,
+			double maxPricePerkWhAllHubs) throws IOException, OptimizationException, InterruptedException{
+		
+		this.minPricePerkWhAllHubs= minPricePerkWhAllHubs;
+		this.maxPricePerkWhAllHubs = maxPricePerkWhAllHubs;
 		
 		this.controler=controler;
 		
@@ -135,7 +140,13 @@ public class HubLoadDistributionReader {
 		
 	}
 	
+	public double getMinPricePerKWHAllHubs(){
+		return minPricePerkWhAllHubs;
+	}
 	
+	public double getMaxPricePerKWHAllHubs(){		
+		return maxPricePerkWhAllHubs;
+	}
 	
 	/**
 	 * initializes deterministicHubLoadDistributionAfter with the values initially passed in
@@ -145,8 +156,9 @@ public class HubLoadDistributionReader {
 		
 		for(Integer hub: deterministicHubLoadDistribution.keySet()){
 			deterministicHubLoadDistributionAfter.put(
-					hub, deterministicHubLoadDistribution.get(hub).cloneLoadSchedule());
+					hub, deterministicHubLoadDistribution.get(hub).cloneSchedule());
 		}
+		
 	}
 	
 	
@@ -216,20 +228,23 @@ public class HubLoadDistributionReader {
 	 * 
 	 */
 	public void initializeStochasticHubLoadDistributionAfter(){
-		stochasticHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
-		agentVehicleSourceMappingAfter = new HashMap<Id, Schedule> ();
-		
-		// make a copy of stochasticHubLoadDistribution
-		for(Integer hub: stochasticHubLoadDistribution.keySet()){
-			stochasticHubLoadDistributionAfter.put(
-					hub, stochasticHubLoadDistribution.get(hub).cloneLoadSchedule());
+		if (stochasticHubLoadDistribution!=null){
+			stochasticHubLoadDistributionAfter= new HashMap<Integer, Schedule> ();
+			for(Integer hub: stochasticHubLoadDistribution.keySet()){
+				stochasticHubLoadDistributionAfter.put(
+						hub, stochasticHubLoadDistribution.get(hub).cloneSchedule());
+			}
 		}
 		
-		// make a copy of agentVehicleSourceMapping 
-		for(Id id: agentVehicleSourceMapping.keySet()){
-			agentVehicleSourceMappingAfter.put(
-					id, agentVehicleSourceMapping.get(id).cloneLoadSchedule());
+		if (agentVehicleSourceMapping!=null){
+			agentVehicleSourceMappingAfter = new HashMap<Id, Schedule> ();
+			// make a copy of agentVehicleSourceMapping 
+			for(Id id: agentVehicleSourceMapping.keySet()){
+				agentVehicleSourceMappingAfter.put(
+						id, agentVehicleSourceMapping.get(id).cloneSchedule());
+			}
 		}
+		
 	}
 	
 	
@@ -506,8 +521,7 @@ public class HubLoadDistributionReader {
 		//toChange.printSchedule();
 		toChange.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
 				new LoadDistributionInterval(start, end, new PolynomialFunction(new double[]{-chargingSpeed}), false));
-		//toChange.printSchedule();
-		//System.out.println();
+		
 	}
 	
 	

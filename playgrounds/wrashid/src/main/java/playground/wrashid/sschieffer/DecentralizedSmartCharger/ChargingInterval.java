@@ -37,7 +37,10 @@ public class ChargingInterval extends TimeInterval {
 	
 	@Override
 	public ChargingInterval clone(){
-		return new ChargingInterval(getStartTime(), getEndTime());
+		ChargingInterval c= new ChargingInterval(getStartTime(), getEndTime());
+		
+		return c;
+		
 	}
 	
 	
