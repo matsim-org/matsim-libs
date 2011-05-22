@@ -112,8 +112,12 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
-		map.put(TRAVEL_TIME_GETTER, "Defines the strategy that the TravelTimeCalculator uses to calculate the travel times. Currently supported: average, linearinterpolation");
+		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for " +
+				"the router") ;
+		map.put(TRAVEL_TIME_GETTER, "How to deal with link entry times at different positions during the time bin. Currently " +
+				"supported: average, linearinterpolation");
+		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
+				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
 		return map;
 	}
 
