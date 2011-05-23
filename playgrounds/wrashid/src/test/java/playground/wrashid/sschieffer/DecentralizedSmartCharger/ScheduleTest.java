@@ -78,7 +78,7 @@ public class ScheduleTest extends TestCase{
 	public void testTotalConsumption(){
 		s= setDummySchedule();
 		s.sort();
-		assertEquals(s.getTotalConsumption(), 100.0);
+		assertEquals(s.getTotalBatteryConsumption(), 100.0);
 	}
 	
 	

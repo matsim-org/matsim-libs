@@ -52,7 +52,6 @@ public class TestSimulationSetUp {
 		energyConsumptionInit= new EnergyConsumptionInit(
 				electrification, ev);
 		
-		
 		deterministicHubLoadDistribution= readHubsTest();
 		pricingHubDistribution=readHubsPricingTest(optimalPrice, suboptimalPrice);
 		

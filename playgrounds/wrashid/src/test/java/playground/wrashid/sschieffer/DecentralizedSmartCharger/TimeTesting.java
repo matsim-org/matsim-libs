@@ -30,7 +30,7 @@ public class TimeTesting {
 		
 		final double standardChargingSlotLength=15*60;
 		
-		final double electrification= 1.0; 
+		final double electrification= 0.8; 
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		

@@ -473,7 +473,7 @@ public class LPPHEVTest extends TestCase{
 		DrivingInterval d= (DrivingInterval) sTestEnergyCalc.timesInSchedule.get(1);
 		
 		assertEquals(15000.0, d.getExtraConsumption());
-		assertEquals(35000.0, d.getConsumption());
+		assertEquals(35000.0, d.getBatteryConsumption());
 		
 	}
 	
