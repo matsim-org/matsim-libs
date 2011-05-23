@@ -314,5 +314,28 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 
 		return true;
 	}
+
+	/**
+	 * Exactly the same as the Chromosome method, but with a more efficient
+	 * implementation (less getter calls). Pass from 6% of CPU time used to 3%.
+	 */
+	public int hashCode() {
+		Gene[] genes = getGenes();
+		int geneHashcode;
+		int hashCode = 1;
+		if (genes != null) {
+			for (int i = 0; i < genes.length; i++) {
+				Gene gene = genes[i];
+				if (gene == null) {
+					geneHashcode = -55;
+				}
+				else {
+					geneHashcode = gene.hashCode();
+				}
+				hashCode = 31 * hashCode + geneHashcode;
+			}
+		}
+		return hashCode;
+	}
 }
 

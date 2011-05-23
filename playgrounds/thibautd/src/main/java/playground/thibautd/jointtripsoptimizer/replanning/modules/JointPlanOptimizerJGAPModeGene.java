@@ -164,5 +164,15 @@ public class JointPlanOptimizerJGAPModeGene extends BaseGene {
 	public String toString() {
 		return this.geneValue.toString();
 	}
+
+	/**
+	 * Returns the hashCode of the internal list value.
+	 * Much more efficient than the BaseGene one (which was consuming as much
+	 * as 16% of the CPU time of a run, now is 3%).
+	 */
+	@Override
+	public int hashCode() {
+		return this.geneValue.hashCode();
+	}
 }
 
