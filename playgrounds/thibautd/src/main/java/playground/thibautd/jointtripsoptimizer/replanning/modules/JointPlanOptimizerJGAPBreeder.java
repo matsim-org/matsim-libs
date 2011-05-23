@@ -41,8 +41,11 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private IChromosome allTimesBest;
-	private double allTimesBestFitness = Double.NEGATIVE_INFINITY;
+	// this allows to:
+	// -always retrieve the best solution found, even without elitism, for every selector
+	// -use tabu restart (not used anymore)
+	//private IChromosome allTimesBest;
+	//private double allTimesBestFitness = Double.NEGATIVE_INFINITY;
 
 	/**
 	 * Evolves the population. This is done with the following properties:
@@ -60,8 +63,7 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    int originalPopSize = a_conf.getPopulationSize();
 	    IChromosome fittest = null;
 
-	    // If first generation: Set age to one to allow genetic operations,
-	    // see CrossoverOperator for an illustration.
+	    // If first generation: Set age to one to allow genetic operations
 	    // ----------------------------------------------------------------
 	    if (a_conf.getGenerationNr() == 0) {
 	    	int size = pop.size();
@@ -73,18 +75,15 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    else {
 	    	// Select fittest chromosome in case it should be preserved and we are
 	    	// not in the very first generation.
-			// CLONE this chromosome, as some genetic operators and selectors act
-			// "in place"
 	    	// -------------------------------------------------------------------
-	    	//if (a_conf.isPreserveFittestIndividual()) {
+	    	if (a_conf.isPreserveFittestIndividual()) {
 	    		fittest = (IChromosome)
-					//pop.determineFittestChromosome(0, pop.size() - 1).clone();
 					pop.determineFittestChromosome(0, pop.size() - 1);
-			//}
-			if (fittest.getFitnessValue() > this.allTimesBestFitness) {
-				this.allTimesBest = (IChromosome) fittest.clone();
-				this.allTimesBestFitness = fittest.getFitnessValue();
 			}
+			//if (fittest.getFitnessValue() > this.allTimesBestFitness) {
+			//	this.allTimesBest = (IChromosome) fittest.clone();
+			//	this.allTimesBestFitness = fittest.getFitnessValue();
+			//}
 	    }
 	    if (a_conf.getGenerationNr() > 0) {
 	    	// Adjust population size to configured size (if wanted).
@@ -151,7 +150,9 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	    pop = applyNaturalSelectors(a_conf, pop, false);
 
 	    if (a_conf.getMinimumPopSizePercent() > 0) {
-			//TODO: add chromosomes generated randomly with respect of the constraints.
+			// this should not occur. If a selector which can generate such a
+			// behaviour was to be implemented, use here the chromosome's
+			// factory method to create new chromosomes respecting the constaints
 			log.warn("GA population decreases!");
 	    }
 		if (a_conf.isPreserveFittestIndividual()) {
@@ -185,7 +186,7 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 		throw new UnsupportedOperationException();
 	}
 
-	public IChromosome getAllTimesBest() {
-		return this.allTimesBest;
-	}
+	//public IChromosome getAllTimesBest() {
+	//	return this.allTimesBest;
+	//}
 }

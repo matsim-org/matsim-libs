@@ -108,8 +108,8 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 
 		//get fittest chromosome, and modify the given plan accordingly
 		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(
-				//gaPopulation.getFittestChromosome());
-				((JointPlanOptimizerJGAPBreeder) jgapConfig.getBreeder()).getAllTimesBest());
+				gaPopulation.getFittestChromosome());
+				//((JointPlanOptimizerJGAPBreeder) jgapConfig.getBreeder()).getAllTimesBest());
 		plan.resetFromPlan(evolvedPlan);
 		plan.resetScores();
 	}
