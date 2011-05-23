@@ -48,11 +48,12 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 
 	public JointPlanOptimizerJGAPEvolutionMonitor(
 			final Configuration jgapConfig,
-			final JointReplanningConfigGroup configGroup) {
+			final JointReplanningConfigGroup configGroup,
+			final int nMembers) {
 		this.period = configGroup.getMonitoringPeriod();
 		this.minIterations = configGroup.getMinIterations();
 		this.maxIterations = configGroup.getMaxIterations();
-		this.minImprovement = configGroup.getMinImprovement();
+		this.minImprovement = nMembers * configGroup.getMinImprovement();
 		this.jgapConfig = jgapConfig;
 	}
 

@@ -89,6 +89,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	private int numEpisodes;
 	private int numToggleGenes;
 	private int numModeGenes;
+	private int nMembers;
 	/**
 	 * stores the number of duration genes relatives to each individual plan in
 	 * the joint plan.
@@ -128,7 +129,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
 			this.monitor =
-				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup);
+				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup, this.nMembers);
 
 			// selector
 			RestrictedTournamentSelector selector = 
@@ -233,6 +234,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		this.numToggleGenes = 0;
 		this.numModeGenes = 0;
 		this.nDurationGenes.clear();
+		this.nMembers = 0;
 
 		for (Id id : ids) {
 			currentPlan = plan.getIndividualPlan(id);
@@ -272,6 +274,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//finally, count subtours
 			analyseSubtours.run(currentPlan);
 			this.numModeGenes += analyseSubtours.getNumSubtours();
+
+			this.nMembers++;
 		 }
 	 }
 
