@@ -57,7 +57,7 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	}
 
 	@Override
-	public void start(Configuration config) {
+	public void start(final Configuration config) {
 		if (this.jgapConfig != config) {
 			throw new IllegalArgumentException("the monitor must be ran "+
 					"with the config used to initialize it");
@@ -65,7 +65,9 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	}
 
 	@Override
-	public boolean nextCycle(Population population, List<String> messages) {
+	public boolean nextCycle(
+			final Population population,
+			final List<String> messages) {
 		int iteration = this.jgapConfig.getGenerationNr();
 
 		if (iteration < this.minIterations) {
@@ -77,7 +79,7 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 		return enoughImprovement(population);
 	}
 
-	private boolean enoughImprovement(Population population) {
+	private boolean enoughImprovement(final Population population) {
 
 		if (iterationsToEval == 0) {
 			iterationsToEval = this.period;

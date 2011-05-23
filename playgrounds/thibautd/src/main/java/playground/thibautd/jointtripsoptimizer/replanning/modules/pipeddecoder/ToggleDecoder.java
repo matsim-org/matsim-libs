@@ -297,7 +297,9 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		return constructedIndividualPlans;
 	}
 
-	private boolean toPlan(PlanElement pe, List<Boolean> geneValues) {
+	private boolean toPlan(
+			final PlanElement pe,
+			final List<Boolean> geneValues) {
 		return (this.associatedGene.containsKey(pe) ?
 				geneValues.get(this.associatedGene.get(pe)) :
 				true);

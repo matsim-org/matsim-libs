@@ -21,8 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -38,9 +36,6 @@ import org.jgap.RandomGenerator;
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPChromosome extends Chromosome {
-	private static final Logger log =
-		Logger.getLogger(JointPlanOptimizerJGAPChromosome.class);
-
 	private static final long serialVersionUID = 1L;
 	private static final double EPSILON = 1E-7;
 
@@ -50,7 +45,9 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	private final double dayDuration;
 	private final List<Integer> nDurationGenes;
 
-	public JointPlanOptimizerJGAPChromosome(Configuration a_configuration, Gene[] genes) throws InvalidConfigurationException {
+	public JointPlanOptimizerJGAPChromosome(
+			final Configuration a_configuration,
+			final Gene[] genes) throws InvalidConfigurationException {
 		super(a_configuration, genes);
 		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
 
@@ -66,7 +63,8 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		}
 	}
 
-	public JointPlanOptimizerJGAPChromosome(Configuration a_configuration) throws InvalidConfigurationException {
+	public JointPlanOptimizerJGAPChromosome(
+			final Configuration a_configuration) throws InvalidConfigurationException {
 		super(a_configuration);
 		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
 
@@ -158,12 +156,17 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	}
 
 	@Override
-	public boolean isHandlerFor(Object a_obj, Class a_class) {
+	public boolean isHandlerFor(
+			final Object a_obj,
+			final Class a_class) {
 		return (a_class == JointPlanOptimizerJGAPChromosome.class);
 	}
 
 	@Override
-	public Object perform(Object a_obj, Class a_class, Object a_params)
+	public Object perform(
+			final Object a_obj,
+			final Class a_class,
+			final Object a_params)
 	throws Exception {
 		return randomInitialJointPlanOptimizerJGAPChromosome();
 	}
@@ -279,7 +282,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	}
 
 	@Override
-	public void setFitnessValue(double a_newFitnessValue) {
+	public void setFitnessValue(final double a_newFitnessValue) {
 		if (
 				(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != a_newFitnessValue) &&
 				(Math.abs(m_fitnessValue - a_newFitnessValue) > 0.0000001)) {

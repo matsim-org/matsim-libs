@@ -21,8 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-
 import org.jgap.Genotype;
 
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
@@ -41,8 +38,6 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * @author thibautd
  */
 public class JointPlanOptimizer implements PlanAlgorithm {
-	private static final Logger log = Logger.getLogger(JointPlanOptimizer.class);
-
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
@@ -53,12 +48,12 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
 	public JointPlanOptimizer(
-			JointReplanningConfigGroup configGroup,
-			ScoringFunctionFactory scoringFunctionFactory,
-			JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			PlansCalcRoute routingAlgorithm,
-			Network network,
-			String iterationOutputPath
+			final JointReplanningConfigGroup configGroup,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network,
+			final String iterationOutputPath
 			) {
 		this.fitnessFunctionFactory = scoringFunctionFactory;
 		this.configGroup = configGroup;

@@ -206,7 +206,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 
 	//for debugging
 	//to move in a unit test
-	private void checkConstr(IChromosome chrom, String message) {
+	private void checkConstr(final IChromosome chrom, String message) {
 		if (!((JointPlanOptimizerJGAPChromosome) chrom).respectsConstraints()) {
 			log.error("offspring does not respects the constraints: "+message);
 		}

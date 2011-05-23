@@ -225,10 +225,10 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	}
 
 	private final void planNextActivity(
-			IChromosome chromosome,
-			Map<Id, IndividualValuesWrapper> individualValuesMap,
-			Id id,
-			Map<Id, PlanImpl> constructedIndividualPlans) {
+			final IChromosome chromosome,
+			final Map<Id, IndividualValuesWrapper> individualValuesMap,
+			final Id id,
+			final Map<Id, PlanImpl> constructedIndividualPlans) {
 		IndividualValuesWrapper individualValues = individualValuesMap.get(id);
 		PlanImpl constructedPlan = constructedIndividualPlans.get(id);
 		List<PlanElement> planElements = this.individualPlanElements.get(id);
@@ -504,7 +504,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		individualValues.addToJointTravelTime(currentTravelTime);
 	}
 
-	private void updateDriverLegs(JointLeg driverLeg, JointLeg legInPlan) {
+	private void updateDriverLegs(
+			final JointLeg driverLeg,
+			final JointLeg legInPlan) {
 		for (JointLeg leg : legInPlan.getLinkedElements().values()) {
 			this.driverLegs.put(leg, driverLeg);
 		}
@@ -518,7 +520,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	 *
 	 * returns true for all other activities
 	 */
-	private final boolean isReadyForPlanning(List<PlanElement> planElements, int index) {
+	private final boolean isReadyForPlanning(
+			final List<PlanElement> planElements,
+			final int index) {
 		JointLeg sharedRide = (JointLeg) planElements.get(index + 1);
 		// test PUs and DOs followed by a shared ride
 		boolean test = (isPickUp(planElements.get(index)) ? true :
@@ -537,9 +541,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	}
 
 	private final JointActivity createActivity(
-			JointActivity act,
-			double now,
-			double duration) {
+			final JointActivity act,
+			final double now,
+			final double duration) {
 		JointActivity newAct = new JointActivity(act);
 		newAct.setMaximumDuration(duration);
 		newAct.setEndTime(now + duration);
@@ -571,8 +575,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	}
 
 	private final double getTimeToJointTrip(
-			Collection<? extends JointLeg> linkedElements,
-			double now) {
+			final Collection<? extends JointLeg> linkedElements,
+			final double now) {
 		// the min start time should not be before now
 		double max = now;
 		double currentTime;
@@ -590,10 +594,10 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	 * @param now time of day after the travel
 	 */
 	private final double getDuration(
-			IChromosome chromosome,
-			Integer geneIndex,
-			double now,
-			double travelTime) {
+			final IChromosome chromosome,
+			final Integer geneIndex,
+			final double now,
+			final double travelTime) {
 		double duration = 0d;
 
 		if (geneIndex != null) {
@@ -606,11 +610,11 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		return (duration > 0 ? duration : MIN_DURATION);
 	}
 
-	private boolean isPickUp(PlanElement pe) {
+	private boolean isPickUp(final PlanElement pe) {
 		return ((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP);
 	}
 
-	private boolean isDropOff(PlanElement pe) {
+	private boolean isDropOff(final PlanElement pe) {
 		return ((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF);
 	}
 

@@ -43,11 +43,11 @@ public class JointPlanOptimizerLegTravelTimeEstimatorFactory {
 
 	//TODO: pass everything except the plan by the constructor?
 	public LegTravelTimeEstimator getLegTravelTimeEstimator(
-			Plan plan,
-			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
-			PlanomatConfigGroup.RoutingCapability routingCapability,
-			PlansCalcRoute routingAlgorithm,
-			Network network) {
+			final Plan plan,
+			final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
+			final PlanomatConfigGroup.RoutingCapability routingCapability,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network) {
 		return new ODBasedFixedRouteLegTravelTimeEstimator(
 				plan,
 				this.travelTime,

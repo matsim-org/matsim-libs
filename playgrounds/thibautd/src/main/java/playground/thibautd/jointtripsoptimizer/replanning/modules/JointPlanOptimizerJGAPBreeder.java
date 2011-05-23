@@ -22,7 +22,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import org.apache.log4j.Logger;
 
-import org.jgap.BulkFitnessFunction;
 import org.jgap.Configuration;
 import org.jgap.IChromosome;
 import org.jgap.Population;
@@ -54,7 +53,9 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 	 *  with JointPlanOptimizerJGAPChromosome.clone() method).
 	 */
 	@Override
-	public Population evolve(Population a_pop, Configuration a_conf) {
+	public Population evolve(
+			final Population a_pop,
+			final Configuration a_conf) {
 	    Population pop = a_pop;
 	    int originalPopSize = a_conf.getPopulationSize();
 	    IChromosome fittest = null;

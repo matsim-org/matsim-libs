@@ -59,14 +59,14 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
 
 	public JointPlanOptimizerFitnessFunction(
-			JointPlan plan,
-			JointReplanningConfigGroup configGroup,
-			JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			PlansCalcRoute routingAlgorithm,
-			Network network,
-			int numJointEpisodes,
-			int numEpisodes,
-			ScoringFunctionFactory scoringFunctionFactory) {
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network,
+			final int numJointEpisodes,
+			final int numEpisodes,
+			final ScoringFunctionFactory scoringFunctionFactory) {
 		super();
 		this.decoder = (new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
 				routingAlgorithm, network, numJointEpisodes, numEpisodes)).createDecoder();
@@ -74,13 +74,13 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 	}
 
 	@Override
-	protected double evaluate(IChromosome chromosome) {
+	protected double evaluate(final IChromosome chromosome) {
 		JointPlan plan = this.decoder.decode(chromosome);
 		double score = this.getScore(plan);
 		return score;
 	}
 
-	private double getScore(JointPlan plan) {
+	private double getScore(final JointPlan plan) {
 		ScoringFunction fitnessFunction;
 		Activity currentActivity;
 		Leg currentLeg;
@@ -117,37 +117,6 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 
 		return plan.getScore();
 	}
-
-	//private double getScore(JointPlan plan) {
-	//	ScoringFunction fitnessFunction =
-	//		this.scoringFunctionFactory.createNewScoringFunction(plan);
-	//	Activity currentActivity;
-	//	Leg currentLeg;
-	//	double now = 0d;
-
-	//	for (PlanElement pe : plan.getPlanElements()) {
-	//		if (pe instanceof Activity) {
-	//			currentActivity = (Activity) pe;
-	//			fitnessFunction.startActivity(now, currentActivity);
-	//			now = currentActivity.getEndTime();
-	//			fitnessFunction.endActivity(now);
-	//		}
-	//		else if (pe instanceof Leg) {
-	//			currentLeg = (Leg) pe;
-	//			now = currentLeg.getDepartureTime();
-	//			fitnessFunction.startLeg(now, currentLeg);
-	//			now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
-	//			fitnessFunction.endLeg(now);
-	//		}
-	//		else {
-	//			throw new IllegalArgumentException("unrecognized plan element type");
-	//		}
-	//	}
-
-	//	fitnessFunction.finish();
-
-	//	return fitnessFunction.getScore();
-	//}
 
 	public JointPlanOptimizerDecoder getDecoder() {
 		return this.decoder;

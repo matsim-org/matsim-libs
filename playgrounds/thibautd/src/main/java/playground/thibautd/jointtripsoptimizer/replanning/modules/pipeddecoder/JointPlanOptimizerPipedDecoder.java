@@ -36,7 +36,7 @@ public class JointPlanOptimizerPipedDecoder implements JointPlanOptimizerDecoder
 		new ArrayList<JointPlanOptimizerDimensionDecoder>();
 	private final JointPlan plan;
 
-	public JointPlanOptimizerPipedDecoder(JointPlan plan) {
+	public JointPlanOptimizerPipedDecoder(final JointPlan plan) {
 		this.plan = plan;
 	}
 
@@ -44,7 +44,7 @@ public class JointPlanOptimizerPipedDecoder implements JointPlanOptimizerDecoder
 	 * Add a decoder.
 	 * The order is important.
 	 */
-	public void addDecoder(JointPlanOptimizerDimensionDecoder decoder) {
+	public void addDecoder(final JointPlanOptimizerDimensionDecoder decoder) {
 		this.decoders.add(decoder);
 	}
 
@@ -52,7 +52,7 @@ public class JointPlanOptimizerPipedDecoder implements JointPlanOptimizerDecoder
 	 * execute the decoders in the order they were added.
 	 */
 	@Override
-	public JointPlan decode(IChromosome chromosome) {
+	public JointPlan decode(final IChromosome chromosome) {
 		JointPlan outputPlan = this.plan;
 
 		for (JointPlanOptimizerDimensionDecoder decoder : this.decoders) {

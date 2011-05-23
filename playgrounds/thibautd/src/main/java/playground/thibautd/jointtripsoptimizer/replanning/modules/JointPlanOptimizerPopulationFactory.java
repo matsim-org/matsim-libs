@@ -32,7 +32,7 @@ public class JointPlanOptimizerPopulationFactory {
 	private final JointPlanOptimizerJGAPConfiguration jgapConfig;
 
 	public JointPlanOptimizerPopulationFactory(
-			JointPlanOptimizerJGAPConfiguration jgapConfig) {
+			final JointPlanOptimizerJGAPConfiguration jgapConfig) {
 		this.jgapConfig = jgapConfig;
 	}
 

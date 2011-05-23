@@ -95,19 +95,19 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 	private final JointPlanOptimizerFitnessFunction fitnessFunction;
-	private final TabuAndEvolutionMonitor monitor;
+	private final IEvolutionMonitor monitor;
 
 	private final boolean optimizeToggle;
 
 	public JointPlanOptimizerJGAPConfiguration(
-			JointPlan plan,
-			JointReplanningConfigGroup configGroup,
-			ScoringFunctionFactory scoringFunctionFactory,
-			JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			PlansCalcRoute routingAlgorithm,
-			Network network,
-			String outputPath,
-			long randomSeed
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network,
+			final String outputPath,
+			final long randomSeed
 			) {
 		super(null);
 		Configuration.reset();
@@ -116,8 +116,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 		// get info on the plan structure
 		this.countEpisodes(plan, configGroup);
-
-		this.monitor = new TabuAndEvolutionMonitor(this, configGroup);
 
 		try {
 			// default JGAP objects initializations
@@ -129,29 +127,18 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
-			// this selector ensures that a certain proportion of the genes (named
-			// "Threshold") is selected using a "best first" strategy.
-			// The rest of the new generation is selected randomly, with replacement.
-			//ThresholdSelector selector =
-			//	new ThresholdSelector(this, configGroup.getSelectionThreshold());
-			//	this reimplementation allows to choose whether to use replacement
-			//	or not (TODO: import from config group)
-			//JointPlanOptimizerJGAPThresholdSelector selector = 
-			//	new JointPlanOptimizerJGAPThresholdSelector(
-			//			this, 
-			//			configGroup.getSelectionThreshold());
-			//selector.setDoubletteChromosomesAllowed(configGroup.getAllowDoublettes());
-			//TournamentSelector selector = new TournamentSelector(this, 2, 0.6d);
+			this.monitor =
+				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup);
+
+			// selector
 			RestrictedTournamentSelector selector = 
-				new TabuRestrictedTournamentSelector(
+				new RestrictedTournamentSelector(
 						this,
 						new DefaultChromosomeDistanceComparator(
-							configGroup.getDiscreteDistanceScale()),
-						this.monitor); 
-			//TabuBestFitnessSelector selector =
-			//	new TabuBestFitnessSelector(this, configGroup);
+							configGroup.getDiscreteDistanceScale()));
 			this.addNaturalSelector(selector, false);
 
+			// do not try to reintroduce fittest: RTS never eliminates it
 			this.setPreservFittestIndividual(false);
 
 			// Chromosome: construction
@@ -200,56 +187,25 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setChromosomePool(new ChromosomePool());
 
 			// genetic operators definitions
-			// TODO: use SPX if more individuals than double genes,
-			// use GENOCOP COs otherwise, loging a warning.
 			if (configGroup.getPlotFitness()) {
 				this.addGeneticOperator( new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
 							configGroup.getMaxIterations(),
 							outputPath));
 			}
-			if (configGroup.getIsDynamicCO()) {
-				this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
-							this,
-							configGroup,
-							new CrossOverRateCalculator(configGroup, outputPath),
-							this.numToggleGenes,
-							this.numEpisodes,
-							this.numModeGenes,
-							this.nDurationGenes) );
-			}
-			else {
-				this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
-							this,
-							configGroup,
-							this.numToggleGenes,
-							this.numEpisodes,
-							this.numModeGenes,
-							this.nDurationGenes) );
-			}
-			//this.addGeneticOperator( new JointPlanOptimizerJGAPSpx(
-			//			this,
-			//			configGroup,
-			//			this.numToggleGenes,
-			//			this.numEpisodes,
-			//			this.nDurationGenes) );
-			// not efficient at all (results worst than the GENOCOP ones)
-			//this.addGeneticOperator( new JointPlanOptimizerJGAPEnhancedSpx(
-			//			this,
-			//			configGroup,
-			//			this.numToggleGenes,
-			//			this.numEpisodes,
-			//			this.nDurationGenes) );
+			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
+						this,
+						configGroup,
+						this.numToggleGenes,
+						this.numEpisodes,
+						this.numModeGenes,
+						this.nDurationGenes) );
+
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
 						this.numToggleGenes + this.numEpisodes + this.numModeGenes,
 						this.nDurationGenes));
-			//this.addGeneticOperator( new JointPlanOptimizerJGAPInPlaceMutation(
-			//			this,
-			//			configGroup,
-			//			this.numToggleGenes + this.numEpisodes + this.numModeGenes,
-			//			this.nDurationGenes));
 
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e.getMessage());
@@ -346,10 +302,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 */
 	public double getDayDuration() {
 		return DAY_DUR;
-	}
-
-	public TabuMonitor getTabuMonitor() {
-		return this.monitor;
 	}
 
 	public IEvolutionMonitor getEvolutionMonitor() {
