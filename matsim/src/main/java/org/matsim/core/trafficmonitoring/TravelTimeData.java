@@ -26,6 +26,15 @@ public interface TravelTimeData {
 
 	abstract void addTravelTime(final int timeSlot, final double traveltime);
 
+	/**Returns the travel time (presumably in seconds), given both the time slot and the time-of-day for the request.
+	 * <p/>
+	 * Design thoughts:<ul>
+	 * <li> yy It does not make sense to me that both "timeSlot" and "now" are needed.  I guess that historically it was
+	 * "timeSlot", and then "now" was needed for the time-dependent network.  But I would think that the conversion
+	 * from "now" to "timeSlot" should be done inside the data class (implementation hiding) and so the "timeSlot" 
+	 * argument should be removed.  kai, may'2011
+	 * </ul> 
+	 */
 	abstract double getTravelTime(final int timeSlot, final double now);
 
 }
