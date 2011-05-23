@@ -78,11 +78,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.ClassCountExecutor;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
@@ -116,8 +114,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	private boolean glInited = false;
 	
 	private int nRedrawn = 0;
-
-	private static int linkTexWidth = 0;
 
 	private GL gl = null;
 
@@ -281,11 +277,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.canvas.addMouseWheelListener(this.mouseMan);
 		this.scaleBar = new OTFScaleBarDrawer();
 
-		ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
-		clientQ.execute(null, counter);
-		double linkcount = counter.getCount();
-		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
-		linkTexWidth = size;
 		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 		this.overlayItems.add(matsimLogo);
 
