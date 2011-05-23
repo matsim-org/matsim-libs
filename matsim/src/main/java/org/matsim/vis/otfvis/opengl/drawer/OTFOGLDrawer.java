@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +114,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
 	private boolean glInited = false;
+	
+	private int nRedrawn = 0;
 
 	private static int linkTexWidth = 0;
 
@@ -271,7 +272,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		GLCapabilities caps = new GLCapabilities();
 		this.canvas = createGLCanvas(this, caps);
 		this.mouseMan = new VisGUIMouseHandler(this);
-		this.mouseMan.setBounds(null, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+		// Don't call this here! It is a straight lie, because the Drawer has now idea at this point what its bounds are (because it isn't visible yet).
+		// This was apparently just a hack to fetch the whole area the first time "redraw" is called. Fixed this elsewhere.
+		// michaz May '11
+		// this.mouseMan.setBounds(null, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
@@ -599,7 +603,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			this.now = time;
 			this.lastTime = Time.writeTime(time, ':');
 		}
-		QuadTree.Rect rect = this.mouseMan.getBounds();
+		QuadTree.Rect rect;
+		if (nRedrawn > 0) {
+			rect = this.mouseMan.getBounds();
+		} else {
+			// The first time redraw() is called, it is important that clientQ.getSceneGraph() is called with the whole area rather with what may be visible.
+			// This is because the display-list based StaticNetLayer is initialized then, and it must contain the whole network.
+			// Secondly, we can't really know which part is visible the first time, because the window hasn't been opened and doesn't know its size yet.
+			// So we pass the size of the whole network here and don't rely on anybody else for that.
+			// michaz May '11
+			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+		}
 		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
@@ -607,6 +621,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		hostControlBar.updateScaleLabel();
 		this.canvas.repaint();
 		fireChangeListeners();
+		++nRedrawn;
 	}
 
 	private void fireChangeListeners() {
