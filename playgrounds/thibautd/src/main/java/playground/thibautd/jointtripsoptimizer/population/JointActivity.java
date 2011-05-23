@@ -82,7 +82,7 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		} 
 	}
 
-	private void constructFromJointActivity(JointActivity act) {
+	private void constructFromJointActivity(final JointActivity act) {
 		this.person = act.getPerson();
 	}
 
@@ -98,12 +98,14 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	}
 
 	@Override
-	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements) {
+	public void setLinkedElements(final Map<Id, ? extends JointActing> linkedElements) {
 		this.linkageError();
 	}
 
 	@Override
-	public void addLinkedElement(Id id, JointActing act) {
+	public void addLinkedElement(
+			final Id id,
+			final JointActing act) {
 		this.linkageError();
 	}
 
@@ -119,17 +121,17 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	}
 	
 	@Override
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
 	@Override
-	public void setLinkedElementsById(List<? extends Id> linkedElements) {
+	public void setLinkedElementsById(final List<? extends Id> linkedElements) {
 		this.linkageError();
 	}
 
 	@Override
-	public void addLinkedElementById(Id linkedElement) {
+	public void addLinkedElementById(final Id linkedElement) {
 		this.linkageError();
 	}
 

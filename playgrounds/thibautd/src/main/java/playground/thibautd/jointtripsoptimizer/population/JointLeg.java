@@ -95,7 +95,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	/**
 	 * Converts a legImpl instance into an individual JointLeg instance.
 	 */
-	public JointLeg(Leg leg, Person pers) {
+	public JointLeg(final Leg leg, final Person pers) {
 		super((LegImpl) leg);
 		if (leg instanceof JointLeg) {
 			this.legId = ((JointLeg) leg).getId();
@@ -112,13 +112,13 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * leg. 
 	 * Particularly, the new leg will have the same id as the old one.
 	 */
-	public JointLeg(LegImpl leg, JointLeg jointLeg) {
+	public JointLeg(final LegImpl leg, final JointLeg jointLeg) {
 		super(leg);
 		this.legId = jointLeg.getId();
 		constructFromJointLeg(jointLeg);
 	}
 
-	private void constructFromJointLeg(JointLeg leg) {
+	private void constructFromJointLeg(final JointLeg leg) {
 		this.linkedLegsIds.addAll(leg.getLinkedElementsIds());
 		//this.isDriver = leg.getIsDriver();
 		//this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
@@ -215,7 +215,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	@Override
-	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements) {
+	public void setLinkedElements(
+			final Map<Id, ? extends JointActing> linkedElements) {
 		try {
 			this.linkedLegsIds.clear();
 			for (JointActing currentElement : linkedElements.values()) {
@@ -228,7 +229,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	@Override
-	public void addLinkedElement(Id id, JointActing act) {
+	public void addLinkedElement(final Id id, final JointActing act) {
 		try {
 			this.addLinkedElementById(((JointLeg) act).getId());
 		} catch (ClassCastException e) {
@@ -255,7 +256,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * @see JointActing#setLinkedElementsById(List<Id>)
 	 */
 	@Override
-	public void setLinkedElementsById(List<? extends Id> linkedElements) {
+	public void setLinkedElementsById(final List<? extends Id> linkedElements) {
 		try {
 			this.linkedLegsIds.clear();
 			for (Id linkedId : linkedElements) {
@@ -272,7 +273,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * @see JointActing#addLinkedElementsById(List<Id>)
 	 */
 	@Override
-	public void addLinkedElementById(Id linkedId) {
+	public void addLinkedElementById(final Id linkedId) {
 		try {
 			this.linkedLegsIds.add((IdLeg) linkedId);
 		} catch (ClassCastException e) {
@@ -294,7 +295,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * for use when adding to a joint plan.
 	 * Necessary to resolve the linked elements in a way robust with copy.
 	 */
-	/*package*/ void setJointPlan(JointPlan plan) {
+	/*package*/ void setJointPlan(final JointPlan plan) {
 		this.jointPlan = plan;
 	}
 
@@ -304,7 +305,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 	
 	@Override
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 
@@ -325,7 +326,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	@Deprecated
-	public void setIsDriver(boolean isDriver) {
+	public void setIsDriver(final boolean isDriver) {
 		//log.warn("deprecated method JointLeg.setIsDriver called. This method "+
 		//		"does not do anything");
 	}
