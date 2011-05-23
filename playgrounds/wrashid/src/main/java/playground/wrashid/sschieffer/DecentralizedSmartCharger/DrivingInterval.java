@@ -35,9 +35,9 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
  */
 public class DrivingInterval extends TimeInterval {
 	
-	double consumption;
+	double consumptionFromBattery; // consumption from battery
 	
-	double extraConsumption=0;
+	double extraConsumption=0; // consumption from engine
 	double timeEngine=0;
 	
 	boolean extra=false;
@@ -52,20 +52,28 @@ public class DrivingInterval extends TimeInterval {
 	public  DrivingInterval(double start, double end, double consumption){
 		super(start, end);
 		
-		this.consumption=consumption;
+		this.consumptionFromBattery=consumption;
 	}
 	
 	@Override
 	public DrivingInterval clone(){
-		DrivingInterval d = new DrivingInterval(getStartTime(), getEndTime(), getConsumption());
-		d.setExtraConsumption(extraConsumption, timeEngine);
-		
+		DrivingInterval d = new DrivingInterval(getStartTime(), getEndTime(), getBatteryConsumption());
+		d.setValueForExtraConsumption(extraConsumption);
+		d.setValueForExtraTime(timeEngine);
 		return d;
 	}
 	
 	
-	public double getConsumption(){
-		return consumption;
+	private void setValueForExtraConsumption(double extra){
+		this.extraConsumption=extra;
+	}
+	
+	private void setValueForExtraTime(double extra){
+		this.timeEngine=extra;
+	}
+	
+	public double getBatteryConsumption(){
+		return consumptionFromBattery;
 	}
 	
 	
@@ -78,7 +86,7 @@ public class DrivingInterval extends TimeInterval {
 	 * @param extraTime extra time required prior to this driving interval to charge the necessary missing consumption
 	 */
 	public void setExtraConsumption(double extraC, double extraTime){
-		consumption=consumption-extraC;
+		consumptionFromBattery=consumptionFromBattery-extraC;
 		extraConsumption+=extraC;
 		timeEngine=extraTime;
 		
@@ -102,7 +110,7 @@ public class DrivingInterval extends TimeInterval {
 	
 	 @Override
 	public void printInterval(){
-		System.out.println("Driving Interval \t  start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  consumption: " + getConsumption());
+		System.out.println("Driving Interval \t  start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  consumption: " + getBatteryConsumption());
 	}
 	
 }

@@ -521,7 +521,7 @@ public class HubLoadDistributionReader {
 		//toChange.printSchedule();
 		toChange.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
 				new LoadDistributionInterval(start, end, new PolynomialFunction(new double[]{-chargingSpeed}), false));
-		
+		deterministicHubLoadDistributionAfter.put(hubId, toChange);
 	}
 	
 	

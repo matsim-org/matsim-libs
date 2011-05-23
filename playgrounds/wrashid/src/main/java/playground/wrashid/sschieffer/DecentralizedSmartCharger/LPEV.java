@@ -316,7 +316,7 @@ public class LPEV extends LP{
 				
 				if(getSchedule().timesInSchedule.get(i).isDriving()){
 					objectiveStr=objectiveStr.concat(Double.toString(
-							((DrivingInterval)getSchedule().timesInSchedule.get(i)).getConsumption()*(-1))+ " ");
+							((DrivingInterval)getSchedule().timesInSchedule.get(i)).getBatteryConsumption()*(-1))+ " ");
 				}
 				
 			}else{
@@ -327,7 +327,7 @@ public class LPEV extends LP{
 		DrivingInterval d= (DrivingInterval)getSchedule().timesInSchedule.get(pos);
 		getSolver().strAddConstraint(objectiveStr, 
 				LpSolve.GE, 
-				(1+buffer)*d.getConsumption());
+				(1+buffer)*d.getBatteryConsumption());
 	}
 	
 	

@@ -303,19 +303,24 @@ public class DecentralizedSmartCharger {
 	public void run() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		startTime = System.currentTimeMillis();
-		
+		System.out.println("\n Reading agent Schedules");
 		readAgentSchedules();
 		
 		agentReadTime = System.currentTimeMillis();
+		System.out.println("\n Starting LP");
 		findRequiredChargingTimes();
 		
 		LPTime = System.currentTimeMillis();
+		System.out.println("\n ssigning charging times");
 		assignChargingTimes();
 		
 		distributeTime = System.currentTimeMillis();
-		findChargingDistribution();
-		updateDeterministicLoad();
 		
+		System.out.println("\n Find Charging distribution");
+		findChargingDistribution();
+		System.out.println("\n Update loads ");
+		updateDeterministicLoad(); // bottle neck of wrap up
+		System.out.println("\n Update costs ");
 		calculateChargingCostsAllAgents();
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
@@ -341,9 +346,14 @@ public class DecentralizedSmartCharger {
 			if(DecentralizedSmartCharger.debug){
 				System.out.println("getAgentSchedule: "+ id.toString());
 			}
-			
+			if(id.toString().equals(Integer.toString(8797))){
+				System.out.println("Attention agent "+ id.toString());
+			}
 			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
 			
+			if(id.toString().equals(Integer.toString(8797))){
+				agentParkingAndDrivingSchedules.get(id).printSchedule();
+			}
 		}		
 		
 	}
@@ -357,9 +367,11 @@ public class DecentralizedSmartCharger {
 	 */
 	public void findRequiredChargingTimes() throws LpSolveException, IOException{
 		
-		System.out.println("Find required charging times - LP");
 		
 		for (Id id : vehicles.getKeySet()){			
+			if (debug){
+				System.out.println("Find required charging times - LP - agent"+id.toString() );
+			}
 			String type="";			
 				/*
 				 * EV OR PHEV
@@ -430,6 +442,10 @@ public class DecentralizedSmartCharger {
 		
 			System.out.println("Assign charging times agent "+ id.toString());
 			
+			if(id.toString().equals(Integer.toString(8797))){
+				System.out.println("Attention agent "+ id.toString());
+				agentParkingAndDrivingSchedules.get(id).printSchedule();
+			}
 			Schedule chargingSchedule=myChargingSlotDistributor.distribute(id, agentParkingAndDrivingSchedules.get(id));
 			
 			agentChargingSchedules.put(id, chargingSchedule);
@@ -494,6 +510,11 @@ public class DecentralizedSmartCharger {
 			for(Id id : vehicles.getKeySet()){
 				
 				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.get(id);
+				if (debug){
+					System.out.println("Finding Charging distribution Agent "+ id.toString());
+					thisAgentParkAndDrive.printSchedule();
+				}
+				
 				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
 				
 				//PARKING
@@ -529,6 +550,7 @@ public class DecentralizedSmartCharger {
 	public void updateDeterministicLoad() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 	for(Id id : vehicles.getKeySet()){
+		System.out.println("update deterministic hub load with agent "+ id.toString());
 			Schedule thisAgent= agentParkingAndDrivingSchedules.get(id);
 			for(int i=0; i< thisAgent.getNumberOfEntries(); i++){
 				if (thisAgent.timesInSchedule.get(i).isParking()){
@@ -544,7 +566,6 @@ public class DecentralizedSmartCharger {
 									p.getChargingSpeed());
 									
 						}
-						
 					}
 					
 				}
@@ -1099,8 +1120,8 @@ public class DecentralizedSmartCharger {
 	 */
 	public double getTotalDrivingConsumptionOfAgent(Id id){
 		
-		return agentChargingSchedules.get(id).getTotalConsumption()
-		+agentChargingSchedules.get(id).getTotalConsumptionFromEngine();
+		return agentParkingAndDrivingSchedules.get(id).getTotalBatteryConsumption()
+		+agentParkingAndDrivingSchedules.get(id).getTotalConsumptionFromEngine();
 	}
 	
 	
@@ -1111,7 +1132,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public double getTotalDrivingConsumptionOfAgentFromBattery(Id id){
 		
-		return agentChargingSchedules.get(id).getTotalConsumption();
+		return agentParkingAndDrivingSchedules.get(id).getTotalBatteryConsumption();
 	}
 	
 	
@@ -1124,7 +1145,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public double getTotalDrivingConsumptionOfAgentFromOtherSources(Id id){
 		
-		return agentChargingSchedules.get(id).getTotalConsumptionFromEngine();
+		return agentParkingAndDrivingSchedules.get(id).getTotalConsumptionFromEngine();
 	}
 	
 	/**

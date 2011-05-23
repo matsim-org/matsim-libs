@@ -42,16 +42,16 @@ public class V2G {
 	private HashMap<Id, V2GAgentStats> agentV2GStatistic; 
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
-	private double averageV2GRevenueEV=0;
-	private double averageV2GRevenuePHEV=0;
-	private double averageV2GRevenueAllAgents=0;
+	private double averageV2GRevenueEV;
+	private double averageV2GRevenuePHEV;
+	private double averageV2GRevenueAllAgents;
 	
-	private double totalRegulationUp=0;
-	private double totalRegulationUpEV=0;
-	private double totalRegulationUpPHEV=0;
-	private double totalRegulationDown=0;
-	private double totalRegulationDownEV=0;
-	private double totalRegulationDownPHEV=0;
+	private double totalRegulationUp;
+	private double totalRegulationUpEV;
+	private double totalRegulationUpPHEV;
+	private double totalRegulationDown;
+	private double totalRegulationDownEV;
+	private double totalRegulationDownPHEV;
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
 		this.mySmartCharger=mySmartCharger;
@@ -63,6 +63,15 @@ public class V2G {
 		for (Id id: mySmartCharger.vehicles.getKeySet()){
 			agentV2GStatistic.put(id, new V2GAgentStats());
 		}
+		averageV2GRevenueEV=0;
+		averageV2GRevenuePHEV=0;
+		averageV2GRevenueAllAgents=0;		
+		totalRegulationUp=0;
+		totalRegulationUpEV=0;
+		totalRegulationUpPHEV=0;
+		totalRegulationDown=0;
+		totalRegulationDownEV=0;
+		totalRegulationDownPHEV=0;
 	}
 	
 	public double getAgentV2GRevenues(Id id){
@@ -130,6 +139,9 @@ public class V2G {
 			totalRegulationUpEV+=getAgentTotalJouleV2GUp(agentId);
 		}
 		averageV2GRevenueEV=averageV2GRevenueEV/totalEV;
+		if(totalEV==0){
+			averageV2GRevenueEV=0;
+		}
 		
 		//PHEV
 		int totalPHEV=mySmartCharger.getAllAgentsWithPHEV().size();
@@ -145,7 +157,9 @@ public class V2G {
 			totalRegulationUpPHEV+=getAgentTotalJouleV2GUp(agentId);
 		}
 		averageV2GRevenuePHEV=averageV2GRevenuePHEV/totalPHEV;
-		
+		if(totalPHEV==0){
+			averageV2GRevenuePHEV=0;
+		}
 		//TOTAL
 		averageV2GRevenueAllAgents=averageV2GRevenueAllAgents/(totalPHEV+totalEV);
 		
@@ -955,7 +969,7 @@ public class V2G {
 		for(int i=0; i<cutSchedule.getNumberOfEntries(); i++){
 			TimeInterval t= cutSchedule.timesInSchedule.get(i);
 			if(t.isDriving()){
-				SOCAtStart=SOCAtStart - ((DrivingInterval) t).getConsumption();
+				SOCAtStart=SOCAtStart - ((DrivingInterval) t).getBatteryConsumption();
 				
 			}else{
 				//Parking

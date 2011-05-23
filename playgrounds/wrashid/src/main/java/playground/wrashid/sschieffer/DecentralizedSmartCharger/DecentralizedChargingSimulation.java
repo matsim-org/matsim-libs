@@ -250,7 +250,6 @@ public class DecentralizedChargingSimulation {
 		return mySmartCharger.getAllAgentsWithPHEV();
 	}
 	
-		
 	
 	public double getTotalDrivingConsumptionOfAgentFromBattery(Id agentId){
 		return mySmartCharger.getTotalDrivingConsumptionOfAgentFromBattery(agentId);

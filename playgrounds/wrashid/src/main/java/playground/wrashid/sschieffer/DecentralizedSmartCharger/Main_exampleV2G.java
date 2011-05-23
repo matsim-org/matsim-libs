@@ -91,16 +91,9 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";
-		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans10.xml";
-		
-		final double bufferBatteryCharge=0.0;
-		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
-		
-		int numberOfHubsInX=1;
-		int numberOfHubsInY=1;
-		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\1000Plans5Min\\";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";// 100 agents
+		//String configPath="test/input/playground/wrashid/sschieffer/config_plans1_8797.xml";
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -108,6 +101,14 @@ public class Main_exampleV2G {
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec.txt";
 		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
 		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		
+		final double standardChargingLength=5.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double bufferBatteryCharge=0.0;
+		
+		int numberOfHubsInX=1;
+		int numberOfHubsInY=1;
+		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
+		
 		
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 

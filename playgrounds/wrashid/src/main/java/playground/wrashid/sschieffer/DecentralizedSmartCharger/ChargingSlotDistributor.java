@@ -128,8 +128,6 @@ public class ChargingSlotDistributor {
 						p.setChargingSchedule(null);
 					}
 			}
-				
-			
 		}
 	
 		return chargingScheduleAllIntervalsAgent;

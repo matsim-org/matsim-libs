@@ -290,7 +290,7 @@ public class LPPHEV extends LP{
 			}else{//Driving
 				DrivingInterval thisD = (DrivingInterval)getSchedule().timesInSchedule.get(i);
 							
-				statusJoule+=(-1)*(thisD).getConsumption();
+				statusJoule+=(-1)*(thisD).getBatteryConsumption();
 				
 				if(statusJoule<0 && status==true){
 					

@@ -106,7 +106,27 @@ public class Main_exampleDecentralizedSmartCharger {
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-				
+		
+		/**
+		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
+		 * for multiple hubs, you can add multiple entries to myHubInfo
+		 */
+		double priceMaxPerkWh=0.40;
+		double priceMinPerkWh=0.25;
+		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
+		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
+		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		
+		/**
+		 * define mapping class that shall be used to map the 
+		 * linkdId to the hubs in the DecentralizedSmartCharger
+		 * 
+		 */
+		int numberOfHubsInX=1;
+		int numberOfHubsInY=1;
+		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
+		
+		
 		/**
 		 * LP Optimization parameters
 		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
@@ -120,24 +140,7 @@ public class Main_exampleDecentralizedSmartCharger {
 		 */
 		final double standardChargingLength=15*60;
 		
-		/**
-		 * define mapping class that shall be used to map the 
-		 * linkdId to the hubs in the DecentralizedSmartCharger
-		 * 
-		 */
-		int numberOfHubsInX=1;
-		int numberOfHubsInY=1;
-		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
-		/**
-		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
-		 * for multiple hubs, you can add multiple entries to myHubInfo
-		 */
-		double priceMaxPerkWh=0.40;
-		double priceMinPerkWh=0.25;
-		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
-		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
-		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
-				
+			
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 

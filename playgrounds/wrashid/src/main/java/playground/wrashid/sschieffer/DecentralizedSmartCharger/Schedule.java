@@ -97,12 +97,12 @@ public class Schedule {
 	}
 
 
-	public double getTotalConsumption(){
+	public double getTotalBatteryConsumption(){
 		
 		double total=0;
 		for(int i=0; i<getNumberOfEntries();i++){
 			if(timesInSchedule.get(i).isDriving()){
-				total+=((DrivingInterval) timesInSchedule.get(i)).getConsumption();
+				total+=((DrivingInterval) timesInSchedule.get(i)).getBatteryConsumption();
 			}
 		}
 		return total;
@@ -287,10 +287,16 @@ public class Schedule {
 				solution =i;
 			}				
 		}
-		
-		if(time==timesInSchedule.get(timesInSchedule.size()-1).getEndTime()){
-			solution =timesInSchedule.size()-1;
+		if (getNumberOfEntries()==0){
+			System.out.println("Find time in schedule fails because schedule length ==0: ");
+			printSchedule();
+			System.out.println("time: "+time);
+		}else{
+			if(time==timesInSchedule.get(timesInSchedule.size()-1).getEndTime()){
+				solution =timesInSchedule.size()-1;
+			}
 		}
+		
 		if(solution ==-1){
 			System.out.println("timeIsInWhichInterval should not be -1");
 			System.out.println("time: "+time);
@@ -644,7 +650,7 @@ public Schedule cutScheduleAtTimeWithoutJouleReassignment(double time) throws Ma
 			
 			DrivingInterval d= new DrivingInterval(lastInterval.getStartTime(), 
 					time, 
-					((DrivingInterval)lastInterval).getConsumption() * (time- lastInterval.getStartTime())/lastInterval.getIntervalLength()
+					((DrivingInterval)lastInterval).getBatteryConsumption() * (time- lastInterval.getStartTime())/lastInterval.getIntervalLength()
 					);
 			if(d.getIntervalLength()>0){
 				firstHalf.addTimeInterval(d);
@@ -707,7 +713,7 @@ public Schedule cutScheduleAtTimeWithoutJouleReassignment(double time) throws Ma
 		if (firstInterval.isDriving()){
 			
 			DrivingInterval d= new DrivingInterval(time, firstInterval.getEndTime(), 
-					((DrivingInterval)firstInterval).getConsumption() * (firstInterval.getEndTime()-time )/firstInterval.getIntervalLength()
+					((DrivingInterval)firstInterval).getBatteryConsumption() * (firstInterval.getEndTime()-time )/firstInterval.getIntervalLength()
 			);
 			if(d.getIntervalLength()>0){
 				secondHalf.addTimeInterval(d);
@@ -852,6 +858,7 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 				// size can only be 1
 				if( funcList.size()>1){
 					System.out.println("in getJoulesForEachParkingInterval funcList was larger than 1 ERROR");
+					printSchedule();
 				}
 				
 				//Integrate from start to End
@@ -889,11 +896,11 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 					i=0;
 					
 				}else{
-					double consLeft= extraC- thisD.getConsumption();
+					double consLeft= extraC- thisD.getBatteryConsumption();
 					double timeLeft= extraTime-thisD.getIntervalLength();
 					
 					addExtraConsumptionDriving( i, timeLeft, consLeft);
-					thisD.setExtraConsumption(thisD.getConsumption(), thisD.getIntervalLength());
+					thisD.setExtraConsumption(thisD.getBatteryConsumption(), thisD.getIntervalLength());
 					i=0;
 				}
 			}

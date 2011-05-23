@@ -82,13 +82,15 @@ public class EnergyConsumptionInit implements StartupListener {
 		
 		int count = 0;
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			if (count< totalPpl*ev){
-				vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
-				
-			}else{
-				this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
-			}
-			count++;
+			if (count<totalPpl){
+				if (count< totalPpl*ev){
+					vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
+					
+				}else{
+					this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
+				}
+				count++;
+			}else{break;}
 		}
 		
 		EnergyConsumptionModelPSL energyConsumptionModel = new EnergyConsumptionModelPSL(140);

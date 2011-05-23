@@ -215,7 +215,7 @@ public abstract class LP {
 					}
 				if(schedule.timesInSchedule.get(i).isDriving() ){
 					DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
-					String s= Double.toString(thisDrivingInterval.getConsumption()*(-1));
+					String s= Double.toString(thisDrivingInterval.getBatteryConsumption()*(-1));
 					s= s.concat(" ");
 					objectiveStr=objectiveStr.concat(s);
 					
@@ -359,7 +359,7 @@ public abstract class LP {
 				}
 				
 				if(schedule.timesInSchedule.get(i).isDriving()){
-					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getConsumption();
+					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getBatteryConsumption();
 					
 				}
 				
@@ -431,7 +431,7 @@ public void visualizeSOCAgent(double [] solution, String filename, Id id) throws
 				//subtract
 				DrivingInterval thisD = (DrivingInterval)schedule.timesInSchedule.get(i);
 				
-				SOC[i+1]=SOC[i] - (thisD).getConsumption();
+				SOC[i+1]=SOC[i] - (thisD).getBatteryConsumption();
 				SOCAgentSeries.add(thisD.getEndTime(),SOC[i+1]);
 			}
 		}

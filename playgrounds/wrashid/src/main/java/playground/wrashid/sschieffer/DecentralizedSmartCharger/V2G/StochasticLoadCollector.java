@@ -97,10 +97,8 @@ public class StochasticLoadCollector {
 			
 			// 4 * 15 minutes = 1 hour
 			// 15 minutes in 6 hours
-			double secs= 15*60.0;
-						
-			double buffer= DecentralizedSmartCharger.SECONDSPERDAY/4-secs;
-			double startSec= Math.random()*buffer;
+			double secs= 15*60.0;									
+			double startSec= 0.0;
 			
 			Schedule bullShitStochastic= new Schedule();
 			int numPpl= (int)(mySimulation.mySmartCharger.vehicles.getKeySet().size()*1.5);

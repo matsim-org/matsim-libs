@@ -68,10 +68,8 @@ public class AgentTimeIntervalReader {
 		Schedule schedule=new Schedule();
 		
 		schedule=readParkingTimes(id, schedule);	
-		
-		
-		schedule=addDrivingTimes(id, schedule);		
-		
+			
+		schedule=addDrivingTimes(id, schedule);			
 		
 		//System.out.println("controlling optimal vs nonOptimal charging times");
 		schedule = checkTimesWithHubSubAndOptimalTimes(schedule, id);
@@ -108,16 +106,10 @@ public class AgentTimeIntervalReader {
 						
 						parkingTimeIntervals.get(i).getLinkId()//id
 						));
-			}
-			
+			}			
 		}
-		
-		//System.out.println("Schedule unsorted");
-		//schedule.printSchedule();
+			
 		schedule.sort();
-		//System.out.println("Schedule sorted");
-		//schedule.printSchedule();
-		
 		
 		return schedule;
 	}
