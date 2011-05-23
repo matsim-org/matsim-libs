@@ -336,15 +336,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	private Map<Coord, String> findVisibleLinks() {
-		if (isZoomBigEnoughForLabels()) {
-			Rect rect = this.mouseMan.getBounds();
-			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
-			CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
-			linkIdQuery.prepare(this.clientQ);
-			Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
-			return linkIds;
-		}
-		return Collections.emptyMap();
+		Rect rect = this.mouseMan.getBounds();
+		Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
+		CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
+		linkIdQuery.prepare(this.clientQ);
+		Map<Coord, String> linkIds = linkIdQuery.getLinkIds();
+		return linkIds;
 	}
 
 	@Override
@@ -365,14 +362,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		if (this.queryHandler != null) {
 			this.queryHandler.drawQueries(this);
 		}
-		Map<Coord, String> coordStringPairs = findVisibleLinks();
-		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds()) {
+
+		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
+			Map<Coord, String> coordStringPairs = findVisibleLinks();
 			displayLinkIds(coordStringPairs);
+			Collection<String> visibleLinkIds = coordStringPairs.values();
+			InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
 		}
 		this.gl.glDisable(GL.GL_BLEND);
-
-		Collection<String> visibleLinkIds = coordStringPairs.values();
-		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
 
 		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
 			this.statusDrawer.displayStatusText(this.lastTime);
