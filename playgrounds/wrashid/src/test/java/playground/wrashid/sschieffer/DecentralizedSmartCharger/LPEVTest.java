@@ -162,7 +162,6 @@ public class LPEVTest extends TestCase{
 							       
 							       //*********************
 							       String objStringRead = bro.readLine( );  
-							       // Minimize        -1 -0.0434251        0 -0.146437        0 -0.810138        1 
 							       StringTokenizer st = new StringTokenizer(objStringRead);
 							       st.nextToken(); // minimize
 							       
@@ -171,19 +170,19 @@ public class LPEVTest extends TestCase{
 							        * OBJECTIVE FUNCTION
 							        * /*
 									 * /*
-										 * Parking 0  10  true  joules =100
-										 * Parking 10  20 false joules =100
-										 * Driving 20  30  consumption =-10
-										 * Parking 30  40  false joules =100
-										 *
+										/*
+									 * Parking 0  10  true  joules =100
+									 * Parking 10  20 false joules =100
+									 * Driving 20  30  consumption =1
+									 * Parking 30  40  false joules =100
 									 */
-							
+									 
 							       
-							       //SOC=-1  
+							       //SOC=-2
 							       String next= st.nextToken(); 
 							       System.out.println(next);
 							       							       
-							       assertEquals(Integer.toString(-1), next);
+							       assertEquals(Integer.toString(-2), next);
 							       /*
 							        * optimal weight
 							        * (-1 )* thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes;
@@ -192,7 +191,7 @@ public class LPEVTest extends TestCase{
 							       
 							       next= st.nextToken(); 
 							       System.out.println(next);
-							       double expected= -1.0*100.0/100.0;							       
+							       double expected= -1.0*100.0/100.0 - 2*3500.0;							       
 							       int expectedInt = (int)expected;
 							       assertEquals(Integer.toString(expectedInt), next);
 							       /*
@@ -202,14 +201,15 @@ public class LPEVTest extends TestCase{
 							        */
 							       next= st.nextToken(); 
 							       System.out.println(next);
-							       expected= 100.0/200.0;
+							       expected= - 2*3500.0+100.0/200.0;
 							       assertEquals(Double.toString(expected), next);
 								     /*
-								      * Driving 0
-								      * 
+								      * Driving  = btteryconsumption
+								      * objectiveToMinimizeCombustionEngineUse
 								      */
-							      
-							       assertEquals(Integer.toString(0), st.nextToken());
+							       next= st.nextToken(); 
+							       System.out.println(next);
+							       assertEquals(Integer.toString(1),  next);
 							       
 							       /*
 							        * Parking suboptimal
@@ -217,17 +217,17 @@ public class LPEVTest extends TestCase{
 							        *  
 							        */
 							       next= st.nextToken(); 
-							       System.out.println(next);
+							       System.out.println(next);							       
 							       expected= 100.0/200.0;							       
 							       assertEquals(Double.toString(expected), next);
 							       
 							       
 							     //*********************
-							       String constraint1 = bro.readLine( ); 
+							       String rowbla = bro.readLine( ); 
 							       //R1               1     3500        0        0        0        0        0 <=       90
-							       
+							       String constraint1 = bro.readLine( ); 
 							       st = new StringTokenizer(constraint1);
-							       st.nextToken();
+							       next= st.nextToken(); 							      
 							       assertEquals(Integer.toString(1), st.nextToken());
 							       assertEquals(Integer.toString(3500), st.nextToken());
 							       assertEquals(Integer.toString(0), st.nextToken());
@@ -235,30 +235,15 @@ public class LPEVTest extends TestCase{
 							      
 							       
 							       //*********************
-							       String constraint2 = bro.readLine( );// R2               1     3500        0        0        0        0        0 >=       10
-							       //*********************
-							       String constraint3 = bro.readLine( );//R3               1     3500 -1.87863e+007        0        0        0        0 <=       90
-							       //*********************
-							       String constraint4 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-							       //*********************
-							       String constraint5 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-								     //*********************
-								   String constraint6 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-							     //*********************
-							       String constraint7 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-							     //*********************
-							       String constraint8 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-							     //*********************
-							       String constraint9 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
-							       st = new StringTokenizer(constraint9);
-							       st.nextToken();
-							       assertEquals(Integer.toString(1), st.nextToken());
-							       assertEquals(Integer.toString(3500), st.nextToken());
-							       assertEquals(Integer.toString(3500), st.nextToken());
+							       String constraint2 = bro.readLine( );//*********************
+							       String constraint3 = bro.readLine( );//*********************
+							       String constraint4 = bro.readLine( );//*********************
+							       String constraint5 = bro.readLine( ); //*********************
+								   String constraint6 = bro.readLine( ); //*********************
+							       String constraint7 = bro.readLine( );//*********************
+							       String constraint8 = bro.readLine( );//*********************
+							       String constraint9 = bro.readLine( );//*********************
 							       
-							       //*********************
-							        //*********************
-							       stringRead = bro.readLine( ); // Type..
 							       //*********************
 							       String upBo = bro.readLine();
 							       //upbo            90    21600        1    13200        1    24450    23910

@@ -246,6 +246,35 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		
 	}
 	
+	
+	
+	public void testCleanUpLoadSchedule(){
+		Schedule someLoadSchedule= new Schedule();
+		LoadDistributionInterval l1= new LoadDistributionInterval(0.0, 10.0, 
+				new PolynomialFunction(new double[]{1.0}), true);
+		LoadDistributionInterval l2= new LoadDistributionInterval(10.0, 11.0, 
+				new PolynomialFunction(new double[]{11.0}), true);
+		LoadDistributionInterval l3= new LoadDistributionInterval(11.0, 12.0, 
+				new PolynomialFunction(new double[]{1.0}), true);
+		LoadDistributionInterval l4= new LoadDistributionInterval(12.0, 13.0, 
+				new PolynomialFunction(new double[]{1.0}), true);
+		
+		someLoadSchedule.addTimeInterval(l1);
+		someLoadSchedule.addTimeInterval(l2);
+		someLoadSchedule.addTimeInterval(l3);
+		someLoadSchedule.addTimeInterval(l4);
+		
+		someLoadSchedule.printSchedule();
+		someLoadSchedule.cleanUpLoadSchedule();
+		
+		someLoadSchedule.printSchedule();
+		assertEquals(3, someLoadSchedule.getNumberOfEntries());
+		assertEquals(11.0, someLoadSchedule.timesInSchedule.get(2).getStartTime());
+		assertEquals(13.0, someLoadSchedule.timesInSchedule.get(2).getEndTime());
+		assertEquals(1.0, ((LoadDistributionInterval)someLoadSchedule.timesInSchedule.get(2)).getPolynomialFunction().getCoefficients()[0]);
+	}
+	
+	
 	public Schedule makeSimpleChargingSchedule(){
 		Schedule someChargingSchedule= new Schedule();
 		someChargingSchedule.addTimeInterval(new ChargingInterval(0, 10));

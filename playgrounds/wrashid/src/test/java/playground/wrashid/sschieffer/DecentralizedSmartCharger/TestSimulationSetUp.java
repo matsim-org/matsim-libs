@@ -396,7 +396,16 @@ public class TestSimulationSetUp {
 	}
 
 	
-	
+	/**
+	 * makes and returns fake schedule
+	 * </br>
+	 * Parking 0  10  true  joules =100
+		 * Parking 10  20 false joules =100
+		 * Driving 20  30  consumption =1
+		 * Parking 30  40  false joules =100
+	 * 
+	 * @return
+	 */
 	public Schedule makeFakeSchedule(){
 		Id linkId=null;
 		for (Link link:controler.getNetwork().getLinks().values())
@@ -407,7 +416,7 @@ public class TestSimulationSetUp {
 		/*
 		 * Parking 0  10  true  joules =100
 		 * Parking 10  20 false joules =100
-		 * Driving 20  30  consumption =-10
+		 * Driving 20  30  consumption =1
 		 * Parking 30  40  false joules =100
 		 */
 		Schedule s= new Schedule();

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
+
 import junit.framework.TestCase;
 
 /**
@@ -171,6 +173,19 @@ public class TimeIntervalTest extends TestCase{
 		
 		assertEquals(p1.isLoadDistributionInterval(), false);
 		assertEquals(l1.isLoadDistributionInterval(), true);
+	}
+	
+	
+	public void testSameFuncLoadInterval(){
+		LoadDistributionInterval l1= new LoadDistributionInterval(0.0, 10.0, 
+				new PolynomialFunction(new double[]{1.0}), true);
+		LoadDistributionInterval l2= new LoadDistributionInterval(0.0, 11.0, 
+				new PolynomialFunction(new double[]{11.0}), true);
+		LoadDistributionInterval l3= new LoadDistributionInterval(0.0, 10.0, 
+				new PolynomialFunction(new double[]{1.0}), true);
+		
+		assertEquals(l1.haveSamePolynomialFuncCoeffs(l2), false);
+		assertEquals(l1.haveSamePolynomialFuncCoeffs(l3), true);
 	}
 	
 }
