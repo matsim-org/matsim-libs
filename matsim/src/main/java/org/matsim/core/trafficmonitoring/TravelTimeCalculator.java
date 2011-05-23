@@ -229,18 +229,19 @@ public class TravelTimeCalculator
 	}
 	
 	/**
-	 * Makes sure that the travel times returned "make sense".
-	 * 
-	 * Image short bin sizes (e.g. 5min), small links (e.g. 300 veh/hour)
-	 * and small sample sizes (e.g. 2%). This would mean, that effectively
+	 * Makes sure that the travel times "make sense".
+	 * <p/>
+	 * Imagine short bin sizes (e.g. 5min), small links (e.g. 300 veh/hour)
+	 * and small sample sizes (e.g. 2%). This would mean that effectively
 	 * in the simulation only 6 vehicles can pass the link in one hour,
-	 * every 10min one. So, the travel time in one time slot could be 
+	 * one every 10min. So, the travel time in one time slot could be 
 	 * >= 10min if two cars enter the link at the same time. If no car
 	 * enters in the next time bin, the travel time in that time bin should
 	 * still be >=5 minutes (10min - binSize), and not freespeedTraveltime,
 	 * because actually every car entering the link in this bin will be behind
 	 * the car entered before, which still needs >=5min until it can leave.
-	 * This method ensures exactly that, that the travel time in a time bin
+	 * <p/>
+	 * This method ensures that the travel time in a time bin
 	 * cannot be smaller than the travel time in the bin before minus the
 	 * bin size.
 	 * 
