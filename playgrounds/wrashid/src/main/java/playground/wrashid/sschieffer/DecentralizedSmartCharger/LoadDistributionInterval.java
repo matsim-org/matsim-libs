@@ -100,4 +100,22 @@ public class LoadDistributionInterval  extends TimeInterval
 		return p;
 	}
 	
+	
+	public boolean haveSamePolynomialFuncCoeffs(LoadDistributionInterval second){
+		double [] d1= getPolynomialFunction().getCoefficients();
+		double [] d2= second.getPolynomialFunction().getCoefficients();
+		//compare PolynomialFuncs
+		boolean sameFunc=true;
+		if(d1.length==d2.length){
+			for(int i=0; i< d1.length; i++){
+				if(d1[i]!= d2[i]){
+					sameFunc=false;
+				}
+			}
+		}else{
+			sameFunc= false;
+		}
+		return sameFunc;
+	}
+	
 }

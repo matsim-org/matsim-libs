@@ -549,9 +549,11 @@ public class DecentralizedSmartCharger {
 	 */
 	public void updateDeterministicLoad() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
+	// clean up every now and then
+	int cleanUp=0;// every 100 agents, cleanUp DetermisiticHubLoadAfter - otherwise too many small intervals
 	for(Id id : vehicles.getKeySet()){
-		System.out.println("update deterministic hub load with agent "+ id.toString());
-			Schedule thisAgent= agentParkingAndDrivingSchedules.get(id);
+			System.out.println("update deterministic hub load with agent "+ id.toString());
+			Schedule thisAgent= agentParkingAndDrivingSchedules.get(id);			
 			for(int i=0; i< thisAgent.getNumberOfEntries(); i++){
 				if (thisAgent.timesInSchedule.get(i).isParking()){
 					ParkingInterval p= (ParkingInterval)thisAgent.timesInSchedule.get(i);
@@ -569,8 +571,11 @@ public class DecentralizedSmartCharger {
 					}
 					
 				}
-				
 			}
+			if (cleanUp==100){
+				 // cleanup
+				myHubLoadReader.cleanUpDeterministicAfterSchedules();
+			}else{cleanUp++;}
 		}
 		
 		visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger();

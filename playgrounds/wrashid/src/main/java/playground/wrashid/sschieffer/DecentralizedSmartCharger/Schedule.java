@@ -941,4 +941,29 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 			
 	}
 	
+	
+	
+	public void cleanUpLoadSchedule(){
+		Schedule newSchedule= new Schedule();
+		
+		for(int i=0; i<getNumberOfEntries()-1; i++){
+			LoadDistributionInterval l1=(LoadDistributionInterval)timesInSchedule.get(i);
+			LoadDistributionInterval l2=(LoadDistributionInterval)timesInSchedule.get(i+1);
+			
+			if(l1.haveSamePolynomialFuncCoeffs(l2)){
+				//merge them
+				newSchedule.addTimeInterval(new LoadDistributionInterval(l1.getStartTime(), 
+						l2.getEndTime(), 
+						l1.getPolynomialFunction(),l1.isOptimal()));
+				i++;
+			}else{
+				newSchedule.addTimeInterval(l1);
+				
+			}
+			
+		}
+		this.timesInSchedule=newSchedule.timesInSchedule;
+		
+	}
+	
 }

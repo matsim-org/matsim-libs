@@ -525,6 +525,12 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	public void cleanUpDeterministicAfterSchedules(){
+		for(Integer i: deterministicHubLoadDistributionAfter.keySet()){			 
+			deterministicHubLoadDistributionAfter.get(i).cleanUpLoadSchedule();
+		}
+	}
+	
 	
 	/**
 	 * provide minute in which agent is parking, and hub at which he is parking
