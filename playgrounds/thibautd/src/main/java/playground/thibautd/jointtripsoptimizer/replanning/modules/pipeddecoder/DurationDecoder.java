@@ -663,7 +663,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		}
 
 		public void resetTravelTime() {
-			this.jointTravelTime += 0;
+			this.jointTravelTime = 0d;
 		}
 	}
 
