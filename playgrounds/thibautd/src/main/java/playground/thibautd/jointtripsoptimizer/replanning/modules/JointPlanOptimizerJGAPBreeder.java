@@ -73,11 +73,11 @@ public class JointPlanOptimizerJGAPBreeder extends GABreeder {
 			}
 		}
 		else {
-		// Select fittest chromosome in case it should be preserved and we are
-		// not in the very first generation.
-		// -------------------------------------------------------------------
-		if (a_conf.isPreserveFittestIndividual()) {
-			fittest = (IChromosome)
+			// Select fittest chromosome in case it should be preserved and we are
+			// not in the very first generation.
+			// -------------------------------------------------------------------
+			if (a_conf.isPreserveFittestIndividual()) {
+				fittest = (IChromosome)
 					pop.determineFittestChromosome(0, pop.size() - 1);
 			}
 			//if (fittest.getFitnessValue() > this.allTimesBestFitness) {
