@@ -20,15 +20,22 @@
 package playground.droeder.Analysis.Trips.distance;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-
-import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author droeder
@@ -36,30 +43,49 @@ import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
  */
 public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalysisTripI{
 	
-	private int nrOfPlanElements;
+	private static final Logger log = Logger.getLogger(DistAnalysisTrip.class);
+	
 	private int nrOfExpEvents;
 	private boolean finished = false;
+	private LinkedList<Coord> actLocations;
 	
-//	private double tripDist = 0; 
-	private double inVehDist = 0;
-	private double accesWalkDist = 0;
-	private double switchWalkDist = 0;
-	private double egressWalkDist = 0;
+	private Double tripDist = null; 
 	
-	private int lineCnt = 0;
-	private int accesWalkCnt = 0;
-	private int switchWalkCnt = 0;
-	private int egressWalkCnt = 0;
+	private Double inPtDist = null;
+	private Integer lineCnt = null;
+
+	private Double accesWalkDist = null;
+	private Integer accesWalkCnt = null;
+
+	private Double switchWalkDist = null;
+	private Integer switchWalkCnt = null;
+
+	private Double egressWalkDist = null;
+	private Integer egressWalkCnt = null;
 	
 	
 	public DistAnalysisTrip(ArrayList<PlanElement> elements){
 		this.findMode(elements);
 		this.analyzeElements(elements);
+		this.init();
 	}
 	
+	private void init() {
+		this.tripDist = 0.0;
+		if(super.getMode().equals(TransportMode.pt)){
+			this.inPtDist = 0.0;
+			this.lineCnt = 0;
+			this.accesWalkDist = 0.0;
+			this.accesWalkCnt = 0;
+			this.switchWalkDist = 0.0;
+			this.switchWalkCnt = 0;
+			this.egressWalkDist = 0.0;
+			this.egressWalkCnt = 0;
+		}
+	}
+
 	private void analyzeElements(ArrayList<PlanElement> elements) {
 		//if no zones in TripSet are defined, coords not necessary
-		this.nrOfPlanElements = elements.size();
 		this.nrOfExpEvents = this.findNrOfExpEvents(elements);
 		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
 			super.setStart(new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
@@ -67,11 +93,18 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 			super.setEnd(new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
 					((Activity) elements.get(elements.size() - 1)).getCoord().getY()));
 		}
+		
+		this.actLocations = new LinkedList<Coord>();
+		for(PlanElement p: elements){
+			if(p instanceof Activity){
+				this.actLocations.add(((Activity) p).getCoord());
+			}
+		}
 	}
 	
 	private int findNrOfExpEvents(ArrayList<PlanElement> elements) {
-		// TODO Auto-generated method stub
-		return 0;
+		//every second pe has to be a leg
+		return (elements.size() -1 ) ;
 	}
 
 	private void findMode(ArrayList<PlanElement> elements) {
@@ -87,16 +120,72 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 		}
 	}
 	
-	/**
-	 * @return the nrOfPlanElements
-	 */
-	public int getNrOfPlanElements() {
-		return nrOfPlanElements;
+	public void processLinkEnterEvent(double length) {
+		this.tripDist += length;
+	}
+	
+	private int processedEvents = 0;
+	private ArrayList<Tuple<Coord, Coord>> legStartEnd = new ArrayList<Tuple<Coord,Coord>>();
+	private Coord start = null;
+	public void processAgentEvent(AgentEvent e) {
+		this.processedEvents++;
+		
+		if(e instanceof AgentDepartureEvent){
+			this.start = actLocations.removeFirst();
+			if(e.getLegMode().equals(TransportMode.pt)){
+				this.lineCnt++;
+			}else {
+			}
+		}else if(e instanceof AgentArrivalEvent){
+			if(!e.getLegMode().equals(TransportMode.pt) && !e.getLegMode().equals(TransportMode.car)){
+				this.legStartEnd.add(new Tuple<Coord, Coord>(start, actLocations.getFirst()));
+			}
+		}
+
+		if(this.processedEvents == this.nrOfExpEvents){
+			this.finish();
+		}
+	}
+	
+	private void finish() {
+		if(super.getMode().equals(TransportMode.pt)){
+			if(this.legStartEnd.size() == 2){
+				this.accesWalkCnt++;
+				this.egressWalkCnt++;
+				this.accesWalkDist = this.getDist(this.legStartEnd.get(0));
+				this.egressWalkDist = this.getDist(this.legStartEnd.get(1));
+			}else if(this.legStartEnd.size() >= 2){
+				this.accesWalkCnt++;
+				this.egressWalkCnt++;
+				this.accesWalkDist = this.getDist(this.legStartEnd.get(0));
+				this.egressWalkDist = this.getDist(this.legStartEnd.get(this.legStartEnd.size() - 1));
+				
+				for(int i = 1; i < this.legStartEnd.size() - 1; i++){
+					this.switchWalkCnt++;
+					this.switchWalkDist += this.getDist(this.legStartEnd.get(i));
+				}
+			}else{
+				log.error("a pt-trip need's at least an acces and an egressWalk!");
+			}
+			
+		}else if(!super.getMode().equals(TransportMode.car)){
+			this.tripDist = this.getDist(this.legStartEnd.get(0));
+		}
+		this.finished = true;
+	}
+
+	private double getDist(Tuple<Coord, Coord> startEnd){
+		double a = startEnd.getFirst().getX() - startEnd.getSecond().getX();
+		double b = startEnd.getFirst().getY() - startEnd.getSecond().getY();
+		return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+	}
+	public void passedLinkInPt(double length) {
+		this.inPtDist += length;
 	}
 	/**
 	 * @return the nrOfExpEvents
 	 */
-	public int getNrOfExpEvents() {
+	public Integer getNrOfExpEvents() {
 		return nrOfExpEvents;
 	}
 	/**
@@ -108,52 +197,55 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 	/**
 	 * @return the inVehDist
 	 */
-	public double getInVehDist() {
-		return inVehDist;
+	public Double getInPtDist() {
+		return inPtDist;
 	}
 	/**
 	 * @return the accesWalkDist
 	 */
-	public double getAccesWalkDist() {
+	public Double getAccesWalkDist() {
 		return accesWalkDist;
 	}
 	/**
 	 * @return the switchWalkDist
 	 */
-	public double getSwitchWalkDist() {
+	public Double getSwitchWalkDist() {
 		return switchWalkDist;
 	}
 	/**
 	 * @return the egressWalkDist
 	 */
-	public double getEgressWalkDist() {
+	public Double getEgressWalkDist() {
 		return egressWalkDist;
 	}
 	/**
 	 * @return the lineCnt
 	 */
-	public int getLineCnt() {
+	public Integer getLineCnt() {
 		return lineCnt;
 	}
 	/**
 	 * @return the accesWalkCnt
 	 */
-	public int getAccesWalkCnt() {
+	public Integer getAccesWalkCnt() {
 		return accesWalkCnt;
 	}
 	/**
 	 * @return the switchWalkCnt
 	 */
-	public int getSwitchWalkCnt() {
+	public Integer getSwitchWalkCnt() {
 		return switchWalkCnt;
 	}
 	/**
 	 * @return the egressWalkCnt
 	 */
-	public int getEgressWalkCnt() {
+	public Integer getEgressWalkCnt() {
 		return egressWalkCnt;
 	}
-	
+
+	public Double getTripDist(){
+		return tripDist;
+	}
 }
 
 

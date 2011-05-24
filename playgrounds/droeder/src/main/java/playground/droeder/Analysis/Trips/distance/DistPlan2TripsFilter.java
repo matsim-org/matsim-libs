@@ -19,62 +19,25 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.api.core.v01.population.PlanElement;
 
 import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder
  *
  */
-public class DistAnalysisAgent {
-	
-	private LinkedList<AbstractAnalysisTrip> trips;
-	private Id id;
-	
-	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id id){
-		this.trips = linkedList;
-		this.id = id;
-	}
+public class DistPlan2TripsFilter extends AbstractPlan2TripsFilter {
 
-	public boolean processAgentEvent(AgentEvent e) {
-		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
-		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
-	}
-
-	public void processLinkEnterEvent(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
-	}
-	
-	public void passedLinkOnPt(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
-	}
-
-	public Id getId(){
-		return this.id;
-	}
-	
-	@Override
-	public boolean equals(final Object other){
-		if(!(other instanceof DistAnalysisAgent)){
-			return false;
-		}else{
-			if(((DistAnalysisAgent) other).getId().equals(this.id)){
-				return true;
-			}else{
-				return false;
-			}
-		}
-	}
-
-	/**
-	 * @return
+	/* (non-Javadoc)
+	 * @see playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter#generateTrip(java.util.ArrayList)
 	 */
-	public AbstractAnalysisTrip removeFinishedTrip() {
-		return this.trips.removeFirst();
+	@Override
+	protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> temp) {
+		return new DistAnalysisTrip(temp);
 	}
 
 }

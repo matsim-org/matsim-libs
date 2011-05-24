@@ -19,10 +19,131 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.Analysis.Trips.AbstractAnalysisTripSet;
+import playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter;
+import playground.droeder.Analysis.Trips.AnalysisTripSetStorage;
+
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * @author droeder
  *
  */
 public class DistanceAnalysis {
+	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
+	
+	private DistAnalysisHandler eventsHandler;
+	
+	public DistanceAnalysis(){
+		this.eventsHandler = new DistAnalysisHandler();
+	}
+	
+	public void addZones(Map<String, Geometry> zones){
+		this.eventsHandler.addZones(zones);
+	}
+	
+	public void run(String plans, String network, String events, String outDir){
+		this.readPlansAndNetwork(plans, network);
+		log.info("streaming plans finished!");
+		this.readEvents(events);
+		log.info("streaming events finished!");
+		this.write2csv(outDir);
+		log.info("output written to " + outDir);
+	}
+
+	/**
+	 * @param plans
+	 * @param network
+	 */
+	@SuppressWarnings("unchecked")
+	private void readPlansAndNetwork(String plans, String network) {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new NetworkReaderMatsimV1(sc).parse(network);
+		this.eventsHandler.addLinks((Map<Id, Link>) sc.getNetwork().getLinks());
+		
+		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
+		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter(); 
+		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
+		
+		new MatsimPopulationReader(sc).parse(IOUtils.getInputstream(plans));
+		
+		for(Entry<Id, LinkedList<AbstractAnalysisTrip>> e:  planFilter.getTrips().entrySet()){
+			this.eventsHandler.addPerson(new DistAnalysisAgent(e.getValue(), e.getKey()));
+		}
+	}
+	
+	/**
+	 * @param events
+	 */
+	private void readEvents(String events) {
+		EventsManager manager = EventsUtils.createEventsManager();
+		manager.addHandler(this.eventsHandler);
+		
+		new EventsReaderXMLv1(manager).parse(IOUtils.getInputstream(events));		
+	}
+
+	/**
+	 * @param outDir
+	 */
+	private void write2csv(String out) {
+		BufferedWriter writer;
+		try {
+			// write analysis
+			for(Entry<String, AnalysisTripSetStorage> e : this.eventsHandler.getAnalysisTripSetStorage().entrySet()){
+				for(Entry<String, AbstractAnalysisTripSet> o : e.getValue().getTripSets().entrySet()){
+					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_distance_analysis.csv");
+					writer.write(o.getValue().toString());
+					writer.flush();
+					writer.close();
+				}
+			}
+			
+//			//write unprocessed Agents
+//			writer = IOUtils.getBufferedWriter(out + "unprocessedAgents_v4.csv");
+//			writer.write(this.unProcessedAgents);
+//			writer.flush();
+//			writer.close();
+//			
+//			//write uncompletedPlans
+//			writer = IOUtils.getBufferedWriter(out + "uncompletedPlans_v4.csv");
+//			writer.write(this.eventsHandler.getUncompletedPlans());
+//			writer.flush();
+//			writer.close();
+//			
+//			//write stuckAgents
+//			writer = IOUtils.getBufferedWriter(out + "stuckAgents_v4.csv");
+//			writer.write(this.eventsHandler.getStuckAgents());
+//			writer.flush();
+//			writer.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
 }

@@ -77,5 +77,16 @@ public abstract class AbstractAnalysisTripSet {
 	}
 	
 	protected abstract void addTripValues(AbstractAnalysisTrip trip);
-
+	
+	/**
+	 * appends the given array to the <code> StringBuffer</code> in one line, separates it by semicolon and begins a new Line
+	 * @param d
+	 * @param b
+	 */
+	public void println(Number[] d, StringBuffer b){
+		for(int i = 0; i< d.length; i++){
+			b.append(String.valueOf(d[i]) + ";");
+		}
+		b.append("\n");
+	}
 }

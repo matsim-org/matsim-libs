@@ -17,64 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.Analysis.Trips.distance;
+package playground.droeder.bvg09.analysis;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentEvent;
+import org.geotools.feature.Feature;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
+import playground.droeder.DaPaths;
+import playground.droeder.Analysis.Trips.distance.DistanceAnalysis;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
  *
  */
-public class DistAnalysisAgent {
-	
-	private LinkedList<AbstractAnalysisTrip> trips;
-	private Id id;
-	
-	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id id){
-		this.trips = linkedList;
-		this.id = id;
+public class BvgDistanceAnalysisRunner {
+	public static void main(String[] args){
+		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
+		final String INDIR = OUTDIR + "input/";
+		
+		final String NETWORKFILE = INDIR + "network.final.xml.gz";
+		final String SHAPEFILE = OUTDIR + "BerlinSHP/Berlin.shp"; 
+		
+		final String EVENTSFILE = INDIR + "bvg.run128.25pct.100.events.xml.gz";
+//		final String PLANSFILE = INDIR + "bvg.run128.25pct.100.plans.selected.xml.gz";
+		
+//		final String EVENTSFILE = OUTDIR + "testEvents.xml";
+		final String PLANSFILE = OUTDIR + "testPopulation1.xml.gz";
+		
+		Set<Feature> features = null;
+		features = new ShapeFileReader().readFileAndInitialize(SHAPEFILE);
+		
+		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
+		
+		DistanceAnalysis ana = new DistanceAnalysis();
+		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
+		zones.put("Berlin", g);
+		ana.addZones(zones);
+		ana.run(PLANSFILE, NETWORKFILE, EVENTSFILE, DaPaths.VSP + "BVG09_Auswertung2/");
 	}
-
-	public boolean processAgentEvent(AgentEvent e) {
-		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
-		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
-	}
-
-	public void processLinkEnterEvent(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
-	}
-	
-	public void passedLinkOnPt(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
-	}
-
-	public Id getId(){
-		return this.id;
-	}
-	
-	@Override
-	public boolean equals(final Object other){
-		if(!(other instanceof DistAnalysisAgent)){
-			return false;
-		}else{
-			if(((DistAnalysisAgent) other).getId().equals(this.id)){
-				return true;
-			}else{
-				return false;
-			}
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	public AbstractAnalysisTrip removeFinishedTrip() {
-		return this.trips.removeFirst();
-	}
-
 }

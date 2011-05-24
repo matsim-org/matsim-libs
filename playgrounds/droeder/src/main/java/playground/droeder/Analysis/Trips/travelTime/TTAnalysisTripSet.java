@@ -45,35 +45,35 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	
 	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
 	//all modes
-	private double[] sumTTime = new double[4];
-	private double[] tripCnt = new double[4];
+	private Double[] sumTTime = new Double[4];
+	private Integer[] tripCnt = new Integer[4];
 
 	//pt only
-	private double[] accesWalkCnt = new double[4];
-	private double[] accesWaitCnt = new double[4];
-	private double[] egressWalkCnt = new double[4];
-	private double[] switchWalkCnt = new double[4];
-	private double[] switchWaitCnt = new double[4];
-	private double[] lineCnt = new double[4];
+	private Integer[] accesWalkCnt;
+	private Integer[] accesWaitCnt;
+	private Integer[] egressWalkCnt;
+	private Integer[] switchWalkCnt;
+	private Integer[] switchWaitCnt;
+	private Integer[] lineCnt;
 	
-	private double[] accesWalkTTime = new double[4];
-	private double[] accesWaitTime = new double[4];
-	private double[] egressWalkTTime = new double[4];
-	private double[] switchWalkTTime = new double[4];
-	private double[] switchWaitTime = new double[4];
-	private double[] lineTTime = new double[4];
+	private Double[] accesWalkTTime;
+	private Double[] accesWaitTime;
+	private Double[] egressWalkTTime;
+	private Double[] switchWalkTTime;
+	private Double[] switchWaitTime;
+	private Double[] lineTTime;
 	
-	private double[] line1cnt = new double[4];
-	private double[] line2cnt = new double[4];
-	private double[] line3cnt = new double[4];
-	private double[] line4cnt = new double[4];
-	private double[] line5cnt = new double[4];
-	private double[] line6cnt = new double[4];
-	private double[] line7cnt = new double[4];
-	private double[] line8cnt = new double[4];
-	private double[] line9cnt = new double[4];
-	private double[] line10cnt = new double[4];
-	private double[] lineGt10cnt = new double[4];
+	private Integer[] line1cnt;
+	private Integer[] line2cnt;
+	private Integer[] line3cnt;
+	private Integer[] line4cnt;
+	private Integer[] line5cnt;
+	private Integer[] line6cnt;
+	private Integer[] line7cnt;
+	private Integer[] line8cnt;
+	private Integer[] line9cnt;
+	private Integer[] line10cnt;
+	private Integer[] lineGt10cnt;
 
 	public TTAnalysisTripSet(String mode, Geometry zone, boolean storeTrips) {
 		super(mode, zone);
@@ -85,17 +85,45 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	}
 	
 	private void init() {
+		if(super.getMode().equals(TransportMode.pt)){
+			accesWalkCnt = new Integer[4];
+			accesWaitCnt = new Integer[4];
+			egressWalkCnt = new Integer[4];
+			switchWalkCnt = new Integer[4];
+			switchWaitCnt = new Integer[4];
+			lineCnt = new Integer[4];
+			
+			accesWalkTTime = new Double[4];
+			accesWaitTime = new Double[4];
+			egressWalkTTime = new Double[4];
+			switchWalkTTime = new Double[4];
+			switchWaitTime = new Double[4];
+			lineTTime = new Double[4];
+			
+			line1cnt = new Integer[4];
+			line2cnt = new Integer[4];
+			line3cnt = new Integer[4];
+			line4cnt = new Integer[4];
+			line5cnt = new Integer[4];
+			line6cnt = new Integer[4];
+			line7cnt = new Integer[4];
+			line8cnt = new Integer[4];
+			line9cnt = new Integer[4];
+			line10cnt = new Integer[4];
+			lineGt10cnt = new Integer[4];
+		}
+		
 		for(int i = 0; i < 4; i++){
 			sumTTime[i] = 0.0;
-			tripCnt[i] = 0.0;
+			tripCnt[i] = 0;
 			
 			if(super.getMode().equals(TransportMode.pt)){
-				accesWalkCnt[i] = 0.0;
-				accesWaitCnt[i] = 0.0;
-				egressWalkCnt[i] = 0.0;
-				switchWalkCnt[i] = 0.0;
-				switchWaitCnt[i] = 0.0;
-				lineCnt[i] = 0.0;
+				accesWalkCnt[i] = 0;
+				accesWaitCnt[i] = 0;
+				egressWalkCnt[i] = 0;
+				switchWalkCnt[i] = 0;
+				switchWaitCnt[i] = 0;
+				lineCnt[i] = 0;
 				
 				accesWalkTTime[i] = 0.0;
 				accesWaitTime[i] = 0.0;
@@ -104,17 +132,17 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 				switchWaitTime[i] = 0.0;
 				lineTTime[i] = 0.0;
 				
-				line1cnt[i] = 0.0;
-				line2cnt[i] = 0.0;
-				line3cnt[i] = 0.0;
-				line4cnt[i] = 0.0;
-				line5cnt[i] = 0.0;
-				line6cnt[i] = 0.0;
-				line7cnt[i] = 0.0;
-				line8cnt[i] = 0.0;
-				line9cnt[i] = 0.0;
-				line10cnt[i] = 0.0;
-				lineGt10cnt[i] = 0.0;
+				line1cnt[i] = 0;
+				line2cnt[i] = 0;
+				line3cnt[i] = 0;
+				line4cnt[i] = 0;
+				line5cnt[i] = 0;
+				line6cnt[i] = 0;
+				line7cnt[i] = 0;
+				line8cnt[i] = 0;
+				line9cnt[i] = 0;
+				line10cnt[i] = 0;
+				lineGt10cnt[i] = 0;
 				
 			}
 		}
@@ -219,52 +247,52 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 		b.append(";inside Zone;leaving Zone;entering Zone;outside Zone; \n");
 		
 		//values for all modes	
-		b.append("sumTTime;"); println(this.sumTTime, b);
-		b.append("tripCnt;"); println(this.tripCnt, b);
+		b.append("sumTTime;"); super.println(this.sumTTime, b);
+		b.append("tripCnt;"); super.println(this.tripCnt, b);
 		
 		//values for pt
 		if(super.getMode().equals(TransportMode.pt)){
-			b.append("accesWalkCnt;"); println(this.accesWalkCnt, b);
-			b.append("accesWaitCnt;"); println(this.accesWaitCnt, b);
-			b.append("egressWalkCnt;"); println(this.egressWalkCnt, b);
-			b.append("switchWalkCnt;"); println(this.switchWalkCnt, b);
-			b.append("switchWaitCnt;"); println(this.switchWaitCnt, b);
-			b.append("lineCnt;"); println(this.lineCnt, b);
+			b.append("accesWalkCnt;"); super.println(this.accesWalkCnt, b);
+			b.append("accesWaitCnt;"); super.println(this.accesWaitCnt, b);
+			b.append("egressWalkCnt;"); super.println(this.egressWalkCnt, b);
+			b.append("switchWalkCnt;"); super.println(this.switchWalkCnt, b);
+			b.append("switchWaitCnt;"); super.println(this.switchWaitCnt, b);
+			b.append("lineCnt;"); super.println(this.lineCnt, b);
 			
-			b.append("accesWalkTTime;"); println(this.accesWalkTTime, b);
-			b.append("accesWaitTime;"); println(this.accesWaitTime, b);
-			b.append("egressWalkTTime;"); println(this.egressWalkTTime, b);
-			b.append("switchWalkTTime;"); println(this.switchWalkTTime, b);
-			b.append("switchWaitTime;"); println(this.switchWaitTime, b);
-			b.append("lineTTime;"); println(this.lineTTime, b);
+			b.append("accesWalkTTime;"); super.println(this.accesWalkTTime, b);
+			b.append("accesWaitTime;"); super.println(this.accesWaitTime, b);
+			b.append("egressWalkTTime;"); super.println(this.egressWalkTTime, b);
+			b.append("switchWalkTTime;"); super.println(this.switchWalkTTime, b);
+			b.append("switchWaitTime;"); super.println(this.switchWaitTime, b);
+			b.append("lineTTime;"); super.println(this.lineTTime, b);
 			
-			b.append("line1cnt;"); println(this.line1cnt, b);
-			b.append("line2cnt;"); println(this.line2cnt, b);
-			b.append("line3cnt;");println(this.line3cnt, b);
-			b.append("line4cnt;");println(this.line4cnt, b);
-			b.append("line5cnt;");println(this.line5cnt, b);
-			b.append("line6cnt;");println(this.line6cnt, b);
-			b.append("line7cnt;");println(this.line7cnt, b);
-			b.append("line8cnt;");println(this.line8cnt, b);
-			b.append("line9cnt;");println(this.line9cnt, b);
-			b.append("line10cnt;");println(this.line10cnt, b);
-			b.append("lineGt10cnt;");println(this.lineGt10cnt, b);
+			b.append("line1cnt;"); super.println(this.line1cnt, b);
+			b.append("line2cnt;"); super.println(this.line2cnt, b);
+			b.append("line3cnt;");super.println(this.line3cnt, b);
+			b.append("line4cnt;");super.println(this.line4cnt, b);
+			b.append("line5cnt;");super.println(this.line5cnt, b);
+			b.append("line6cnt;");super.println(this.line6cnt, b);
+			b.append("line7cnt;");super.println(this.line7cnt, b);
+			b.append("line8cnt;");super.println(this.line8cnt, b);
+			b.append("line9cnt;");super.println(this.line9cnt, b);
+			b.append("line10cnt;");super.println(this.line10cnt, b);
+			b.append("lineGt10cnt;");super.println(this.lineGt10cnt, b);
 		}
 		return b.toString();
 	}
 	
-	private void println(double[] d, StringBuffer b){
-		for(int i = 0; i< d.length; i++){
-			b.append(String.valueOf(d[i]) + ";");
-		}
-		b.append("\n");
-	}
+//	private void println(double[] d, StringBuffer b){
+//		for(int i = 0; i< d.length; i++){
+//			b.append(String.valueOf(d[i]) + ";");
+//		}
+//		b.append("\n");
+//	}
 	
-	public double[] getSumTTime(){
+	public Double[] getSumTTime(){
 		return this.sumTTime;
 	}
 	
-	public double[] getTripCnt(){
+	public Integer[] getTripCnt(){
 		return this.tripCnt;
 	}
 	
@@ -272,84 +300,84 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	/**
 	 * @return the accesWalkCnt
 	 */
-	public double[] getAccesWalkCnt() {
+	public Integer[] getAccesWalkCnt() {
 		return accesWalkCnt;
 	}
 
 	/**
 	 * @return the accesWaitCnt
 	 */
-	public double[] getAccesWaitCnt() {
+	public Integer[] getAccesWaitCnt() {
 		return accesWaitCnt;
 	}
 
 	/**
 	 * @return the egressWalkCnt
 	 */
-	public double[] getEgressWalkCnt() {
+	public Integer[] getEgressWalkCnt() {
 		return egressWalkCnt;
 	}
 
 	/**
 	 * @return the switchWalkCnt
 	 */
-	public double[] getSwitchWalkCnt() {
+	public Integer[] getSwitchWalkCnt() {
 		return switchWalkCnt;
 	}
 
 	/**
 	 * @return the switchWaitCnt
 	 */
-	public double[] getSwitchWaitCnt() {
+	public Integer[] getSwitchWaitCnt() {
 		return switchWaitCnt;
 	}
 
 	/**
 	 * @return the lineCnt
 	 */
-	public double[] getLineCnt() {
+	public Integer[] getLineCnt() {
 		return lineCnt;
 	}
 
 	/**
 	 * @return the accesWalkTTime
 	 */
-	public double[] getAccesWalkTTime() {
+	public Double[] getAccesWalkTTime() {
 		return accesWalkTTime;
 	}
 
 	/**
 	 * @return the accesWaitTime
 	 */
-	public double[] getAccesWaitTime() {
+	public Double[] getAccesWaitTime() {
 		return accesWaitTime;
 	}
 
 	/**
 	 * @return the egressWalkTTime
 	 */
-	public double[] getEgressWalkTTime() {
+	public Double[] getEgressWalkTTime() {
 		return egressWalkTTime;
 	}
 
 	/**
 	 * @return the switchWalkTTime
 	 */
-	public double[] getSwitchWalkTTime() {
+	public Double[] getSwitchWalkTTime() {
 		return switchWalkTTime;
 	}
 
 	/**
 	 * @return the switchWaitTime
 	 */
-	public double[] getSwitchWaitTime() {
+	public Double[] getSwitchWaitTime() {
 		return switchWaitTime;
 	}
 
 	/**
 	 * @return the lineTTime
 	 */
-	public double[] getLineTTime() {
+	public Double[] getLineTTime() {
 		return lineTTime;
 	}
 
@@ -357,28 +385,28 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	/**
 	 * @return the line1cnt
 	 */
-	public double[] getLine1cnt() {
+	public Integer[] getLine1cnt() {
 		return line1cnt;
 	}
 
 	/**
 	 * @return the line2cnt
 	 */
-	public double[] getLine2cnt() {
+	public Integer[] getLine2cnt() {
 		return line2cnt;
 	}
 
 	/**
 	 * @return the line3cnt
 	 */
-	public double[] getLine3cnt() {
+	public Integer[] getLine3cnt() {
 		return line3cnt;
 	}
 
 	/**
 	 * @return the lineGt3cnt
 	 */
-	public double[] getLineGt3cnt() {
+	public Integer[] getLineGt10cnt() {
 		return lineGt10cnt;
 	}
 

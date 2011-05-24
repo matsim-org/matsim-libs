@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,6 +44,7 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
+import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 import playground.droeder.Analysis.Trips.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -61,24 +65,37 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	private Map<Id, DistAnalysisTransitRoute> routes;
 	private Map<Id, DistAnalysisVehicle> vehicles;
 	private List<Id> stuckAgents;
-	private AnalysisTripSetStorage sets;
+	private Map<String, AnalysisTripSetStorage> tripSets;
 	
+	private Map<Id, Link> links;
 	
-	private Map<Id, ? extends Link> links;
-	
-	public DistAnalysisHandler(Map<Id, Link> links, Geometry zone){
+	public DistAnalysisHandler(){
 		this.persons = new HashMap<Id, DistAnalysisAgent>();
 		this.drivers = new HashMap<Id, DistAnalysisPtDriver>();
 		this.routes = new HashMap<Id, DistAnalysisTransitRoute>();
 		this.vehicles = new HashMap<Id, DistAnalysisVehicle>();
-		this.links = links;
-		this.sets = new AnalysisTripSetStorage(false, zone);
+		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
+			this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null));
+		this.stuckAgents = new ArrayList<Id>();
+	}
+	
+	
+	public void addLinks(Map<Id, Link> map){
+		this.links = map;
+	}
+	public void addZones(Map<String, Geometry> zones){
+		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
+		for(Entry<String, Geometry> e : zones.entrySet()){
+			this.tripSets.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue()));
+		}
+	}
+	
+	public void addPerson(DistAnalysisAgent person){
+		this.persons.put(person.getId(), person);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -100,8 +117,8 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
-			if(this.persons.get(e.getPersonId()).processEvent(e)){
-				this.sets.addTrip(this.persons.get(e.getPersonId()).removeFinishedTrip());
+			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
+				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
 			}
 		}
 //		else{
@@ -112,13 +129,20 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
-			if(this.persons.get(e.getPersonId()).processEvent(e)){
-				this.sets.addTrip(this.persons.get(e.getPersonId()).removeFinishedTrip());
+			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
+				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
 			}
 		}
 //		else{
 //			log.error("Person does not exist: " + e.getPersonId());
 //		}
+	}
+	
+	private void addTrip2TripSetsAndRemoveFromPerson(Id id){
+		AbstractAnalysisTrip t = this.persons.get(id).removeFinishedTrip();
+		for(AnalysisTripSetStorage s: this.tripSets.values()){
+			s.addTrip(t);
+		}
 	}
 
 	@Override
@@ -146,9 +170,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
-			if(this.persons.get(e.getPersonId()).processLinkEnterEvent(e, this.links.get(e.getLinkId()).getLength())){
-				this.sets.addTrip(this.persons.get(e.getPersonId()).removeFinishedTrip());
-			}
+			this.persons.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}else if(this.drivers.containsKey(e.getPersonId())){
 			this.drivers.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}
@@ -169,4 +191,19 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		this.persons.remove(e.getPersonId());
 	}
 
+	public Map<String, AnalysisTripSetStorage> getAnalysisTripSetStorage(){
+		return this.tripSets;
+	}
+	
+	public Collection<DistAnalysisTransitRoute> getRoutes(){
+		return this.routes.values();
+	}
+	
+	public Collection<DistAnalysisVehicle> getVehicles(){
+		return this.vehicles.values();
+	}
+	
+	public List<Id> getStuckAgents(){
+		return this.stuckAgents;
+	}
 }

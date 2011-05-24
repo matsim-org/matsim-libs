@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.Analysis.Trips.distance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -40,6 +41,7 @@ public class DistAnalysisVehicle {
 	 */
 	public DistAnalysisVehicle(Id vehicleId) {
 		this.vehicleId = vehicleId;
+		this.passengers = new ArrayList<DistAnalysisAgent>();
 	}
 
 	
@@ -80,7 +82,7 @@ public class DistAnalysisVehicle {
 	public void processLinkEnterEvent(double linkLength){
 		this.distance += linkLength;
 		for(DistAnalysisAgent passenger : this.passengers){
-			passenger.passedLinkOnRide(linkLength);
+			passenger.passedLinkOnPt(linkLength);
 		}
 		this.route.passedLink(linkLength, this.passengers.size());
 	}
