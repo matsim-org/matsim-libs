@@ -106,7 +106,7 @@ public class DecentralizedSmartCharger {
 	private LPPHEV lpphev;
 	
 	private VehicleTypeCollector myVehicleTypes;
-	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
+	public static HashMap<Id, Vehicle> vehicles;
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
 
@@ -121,6 +121,8 @@ public class DecentralizedSmartCharger {
 	public LinkedList<Id> agentsWithEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithPHEV=new LinkedList<Id>();
 	public LinkedList<Id> agentsWithCombustion=new LinkedList<Id>();
+	
+	public LinkedList<Id> deletedAgents=new LinkedList<Id>();// agents where ParkingTimes were not found
 	
 	private HashMap<Id, Double> agentChargingCosts = new HashMap<Id,  Double>();	
 	//***********************************************************************
@@ -221,7 +223,7 @@ public class DecentralizedSmartCharger {
 
 
 
-	public void setLinkedListValueHashMapVehicles(LinkedListValueHashMap<Id, Vehicle> vehicles){
+	public void setLinkedListValueHashMapVehicles(HashMap<Id, Vehicle> vehicles){
 		this.vehicles=vehicles;
 		myV2G= new V2G(this);
 	}
@@ -324,7 +326,7 @@ public class DecentralizedSmartCharger {
 		calculateChargingCostsAllAgents();
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
-		writeSummaryDSC("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		writeSummaryDSC("DSC"+vehicles.keySet().size()+"agents_"+minChargingLength+"chargingLength");
 	}
 
 
@@ -342,22 +344,30 @@ public class DecentralizedSmartCharger {
 	 */
 	public void readAgentSchedules() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
-		for (Id id : vehicles.getKeySet()){
+		for (Id id : vehicles.keySet()){
 			if(DecentralizedSmartCharger.debug){
 				System.out.println("getAgentSchedule: "+ id.toString());
 			}
-			if(id.toString().equals(Integer.toString(8797))){
-				System.out.println("Attention agent "+ id.toString());
-			}
+			// in 10000 id 8797 had error with schedulesize=0
 			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
 			
-			if(id.toString().equals(Integer.toString(8797))){
-				agentParkingAndDrivingSchedules.get(id).printSchedule();
+			if(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()==0){
+				deleteAgentEverywhere(id);
+				
 			}
 		}		
 		
 	}
 
+	
+	public void deleteAgentEverywhere(Id id){
+		System.out.println("agent "+id.toString()+
+				" had to be deleted - no parking times were found for him -- schedule == empty");
+		agentParkingAndDrivingSchedules.remove(id);
+		vehicles.remove(id);
+		agentContracts.remove(id);
+		deletedAgents.add(id);
+	}
 	
 	/**
 	 * finds the required charging times for all parking intervals based on the daily plan of the agent
@@ -368,7 +378,7 @@ public class DecentralizedSmartCharger {
 	public void findRequiredChargingTimes() throws LpSolveException, IOException{
 		
 		
-		for (Id id : vehicles.getKeySet()){			
+		for (Id id : vehicles.keySet()){			
 			if (debug){
 				System.out.println("Find required charging times - LP - agent"+id.toString() );
 			}
@@ -438,7 +448,7 @@ public class DecentralizedSmartCharger {
 	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException, OptimizationException{
 		
 				
-		for (Id id : vehicles.getKeySet()){
+		for (Id id : vehicles.keySet()){
 		
 			System.out.println("Assign charging times agent "+ id.toString());
 			
@@ -457,7 +467,7 @@ public class DecentralizedSmartCharger {
 			}
 		}
 		
-		if(debug || vehicles.getKeySet().size()<1000){
+		if(debug || vehicles.keySet().size()<1000){
 			printGraphChargingTimesAllAgents();
 		}
 		
@@ -472,7 +482,7 @@ public class DecentralizedSmartCharger {
 	 * @throws IOException
 	 */
 	public void visualizeDailyPlanForAllAgents() throws IOException{
-		for (Id id : vehicles.getKeySet()){
+		for (Id id : vehicles.keySet()){
 			
 			visualizeAgentChargingProfile(agentParkingAndDrivingSchedules.get(id), 
 					agentChargingSchedules.get(id), 
@@ -507,7 +517,7 @@ public class DecentralizedSmartCharger {
 		
 		for(int i=0; i<MINUTESPERDAY; i++){
 			double thisSecond= i*SECONDSPERMIN;
-			for(Id id : vehicles.getKeySet()){
+			for(Id id : vehicles.keySet()){
 				
 				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.get(id);
 				if (debug){
@@ -551,7 +561,7 @@ public class DecentralizedSmartCharger {
 		
 	// clean up every now and then
 	int cleanUp=0;// every 100 agents, cleanUp DetermisiticHubLoadAfter - otherwise too many small intervals
-	for(Id id : vehicles.getKeySet()){
+	for(Id id : vehicles.keySet()){
 			System.out.println("update deterministic hub load with agent "+ id.toString());
 			Schedule thisAgent= agentParkingAndDrivingSchedules.get(id);			
 			for(int i=0; i< thisAgent.getNumberOfEntries(); i++){
@@ -594,7 +604,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public void calculateChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
-		for(Id id : vehicles.getKeySet()){			
+		for(Id id : vehicles.keySet()){			
 			Schedule s= agentParkingAndDrivingSchedules.get(id);
 			double thisChargingCost=calculateChargingCostForAgentSchedule(id, s) ;
 			agentChargingCosts.put(id,thisChargingCost );
@@ -733,7 +743,7 @@ public class DecentralizedSmartCharger {
 		timeCheckVehicles	=System.currentTimeMillis();		
 		
 		// temporary life sign - because simulation takes so long, I want to know how long the first part takes
-		writeLifeSignV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLengthLIFESIGN");
+		writeLifeSignV2G("V2G"+vehicles.keySet().size()+"agents_"+minChargingLength+"chargingLengthLIFESIGN");
 		
 		System.out.println("START CHECKING STOCHASTIC HUB LOADS");
 		checkHubStochasticLoads();
@@ -742,7 +752,7 @@ public class DecentralizedSmartCharger {
 		myV2G.calcV2GRevenueStats();
 		
 		System.out.println("DONE V2G");
-		writeSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		writeSummaryV2G("V2G"+vehicles.keySet().size()+"agents_"+minChargingLength+"chargingLength");
 		
 		
 	}
@@ -914,7 +924,7 @@ public class DecentralizedSmartCharger {
 									// loop over all agents 
 									// find who is in regulation up and do regulation up for him
 									
-									for(Id agentId :vehicles.getKeySet()){
+									for(Id agentId :vehicles.keySet()){
 										
 										String type;						
 										if(hasAgentPHEV(agentId)){											
@@ -956,7 +966,7 @@ public class DecentralizedSmartCharger {
 											stochasticLoad.isOptimal());
 									
 									
-									for(Id agentId : vehicles.getKeySet()){
+									for(Id agentId : vehicles.keySet()){
 										
 										String type;									
 										
@@ -1034,7 +1044,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public static boolean hasAgentPHEV(Id id){
 		
-		Vehicle v= vehicles.getValue(id);
+		Vehicle v= vehicles.get(id);
 		
 		if(v.getClass().equals(PlugInHybridElectricVehicle.class)){
 			return true;
@@ -1049,7 +1059,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public static  boolean hasAgentEV(Id id){
 		
-		Vehicle v= vehicles.getValue(id);
+		Vehicle v= vehicles.get(id);
 		
 		if(v.getClass().equals(ElectricVehicle.class)){
 			return true;
@@ -1228,7 +1238,7 @@ public class DecentralizedSmartCharger {
 		int extraConsumptionCount=0;
 		
 		
-		if(vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
+		if(vehicles.get(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 			
 			
 			for(int i=0; i<dailySchedule.getNumberOfEntries();i++){
@@ -1569,7 +1579,7 @@ public class DecentralizedSmartCharger {
 		
 		int seriesCount=0;
 		
-		for(Id id : vehicles.getKeySet()){
+		for(Id id : vehicles.keySet()){
 			
 			Schedule s1= agentChargingSchedules.get(id);
 			
@@ -1607,7 +1617,7 @@ public class DecentralizedSmartCharger {
         xAxis.setRange(0, SECONDSPERDAY);
        
         NumberAxis yaxis = (NumberAxis) plot.getRangeAxis();
-        yaxis.setRange(0, vehicles.getKeySet().size()); // y axis size dependent on number of agents
+        yaxis.setRange(0, vehicles.keySet().size()); // y axis size dependent on number of agents
         
         for(int j=0; j<seriesCount; j++){
         	plot.getRenderer().setSeriesPaint(j, Color.black);
@@ -1628,7 +1638,7 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.keySet().size())));//width, height	
 	
 	}
 	
@@ -1648,7 +1658,7 @@ public class DecentralizedSmartCharger {
 	 * @return
 	 */
 	public double joulesToEmissionInKg(Id agentId, double joules){
-		Vehicle v= vehicles.getValue(agentId);
+		Vehicle v= vehicles.get(agentId);
 		GasType vGT= myVehicleTypes.getGasType(v);
 		
 		// joules used = numLiter * possiblejoulesPer liter/efficiecy
@@ -1673,7 +1683,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public double joulesExtraConsumptionToGasCosts(Id agentId, double joules){
 		
-		Vehicle v= vehicles.getValue(agentId);
+		Vehicle v= vehicles.get(agentId);
 		GasType vGT= myVehicleTypes.getGasType(v);
 		double liter=1/(vGT.getJoulesPerLiter())*1/myVehicleTypes.getEfficiencyOfEngine(v)*joules; 
 		
@@ -1689,7 +1699,7 @@ public class DecentralizedSmartCharger {
 	 * @return
 	 */
 	public Battery getBatteryOfAgent(Id agentId){
-		return myVehicleTypes.getBattery(vehicles.getValue(agentId));
+		return myVehicleTypes.getBattery(vehicles.get(agentId));
 		
 	}
 	
@@ -1699,7 +1709,7 @@ public class DecentralizedSmartCharger {
 	 * @return
 	 */
 	public GasType getGasTypeOfAgent(Id agentId){
-		return myVehicleTypes.getGasType(vehicles.getValue(agentId));
+		return myVehicleTypes.getGasType(vehicles.get(agentId));
 		
 	}
 	
@@ -1752,6 +1762,14 @@ public class DecentralizedSmartCharger {
 		    		+"</br>");
 		    out.write("Time [ms] wrapping up:"+ (wrapUpTime-distributeTime)
 		    		+"</br>");
+		    
+		    //deletedAgents
+		    for(int i=0; i<deletedAgents.size(); i++){
+		    	out.write("</br>");
+			    out.write("DELETED AGENT: ");
+			    out.write("id: "+deletedAgents.get(i).toString());
+			    out.write("</br>");
+		    }
 		    
 		    out.write("</br>");
 		    out.write("CHARGING TIMES </br>");

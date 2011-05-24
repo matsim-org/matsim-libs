@@ -97,10 +97,10 @@ public class DecentralizedChargingSimulation {
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
 		controler.addControlerListener(eventHandlerAtStartupAdder);
-		
+		this.electrification=electrification;
 		energyInit= new EnergyConsumptionInit(
 				electrification, ev);
-		this.electrification=electrification;
+		
 		controler.addControlerListener(energyInit);
 		controler.setOverwriteFiles(true);
 		}

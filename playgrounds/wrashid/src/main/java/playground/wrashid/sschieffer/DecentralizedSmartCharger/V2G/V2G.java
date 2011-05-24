@@ -60,7 +60,7 @@ public class V2G {
 	
 	public void initializeAgentStats(){
 		agentV2GStatistic = new HashMap<Id, V2GAgentStats>(); 
-		for (Id id: mySmartCharger.vehicles.getKeySet()){
+		for (Id id: mySmartCharger.vehicles.keySet()){
 			agentV2GStatistic.put(id, new V2GAgentStats());
 		}
 		averageV2GRevenueEV=0;

@@ -66,7 +66,7 @@ public class StochasticLoadCollector {
 	public void makeAgentVehicleSource(Controler controler){
 		
 		// at random agents get 30 minutes source
-		for(Id id : mySimulation.mySmartCharger.vehicles.getKeySet()){
+		for(Id id : mySimulation.mySmartCharger.vehicles.keySet()){
 			double secs= 0.5*3600;
 			
 			double buffer= DecentralizedSmartCharger.SECONDSPERDAY-secs;
@@ -101,7 +101,7 @@ public class StochasticLoadCollector {
 			double startSec= 0.0;
 			
 			Schedule bullShitStochastic= new Schedule();
-			int numPpl= (int)(mySimulation.mySmartCharger.vehicles.getKeySet().size()*1.5);
+			int numPpl= (int)(mySimulation.mySmartCharger.vehicles.keySet().size()*1.5);
 			PolynomialFunction p1 = new PolynomialFunction(new double[] {numPpl*3500});
 			PolynomialFunction p2 = new PolynomialFunction(new double[] {-numPpl*3500});
 			PolynomialFunction p3 = new PolynomialFunction(new double[] {numPpl*3500});

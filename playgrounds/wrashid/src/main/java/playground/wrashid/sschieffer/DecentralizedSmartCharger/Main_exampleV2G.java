@@ -91,18 +91,18 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\1000Plans10Min\\";
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans1000.xml";// 100 agents
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\20000Plans15Min\\";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans20000.xml";// 100 agents
 		//String configPath="test/input/playground/wrashid/sschieffer/config_plans1_8797.xml";
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
-		
-		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
+		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
+		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
 		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
 		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
-		final double standardChargingLength=10.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
 		
 		int numberOfHubsInX=1;

@@ -61,7 +61,7 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			
 			// set LinkedList of vehicles <agentId, vehicle>
 			myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-					DecentralizedChargingSimulation.energyInit.getVehicles());
+					DecentralizedChargingSimulation.energyInit.getElectricVehicles());
 			
 			
 			/*

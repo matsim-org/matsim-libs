@@ -162,7 +162,7 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * after the run, the results can be obtained as demonstrated in the example below
 		 * **********************
 		 */
-		for(Id id: mySimulation.mySmartCharger.vehicles.getKeySet()){
+		for(Id id: mySimulation.mySmartCharger.vehicles.keySet()){
 			
 			//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
 			HashMap<Id, Schedule> agentPDSchedules= 

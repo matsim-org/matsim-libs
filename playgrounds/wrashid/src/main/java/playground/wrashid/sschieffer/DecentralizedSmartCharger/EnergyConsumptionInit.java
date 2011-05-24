@@ -20,6 +20,8 @@
 
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 
 import org.matsim.core.basic.v01.IdImpl;
@@ -47,7 +49,8 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class EnergyConsumptionInit implements StartupListener {
 	
 	
-	private LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();;
+	private LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
+	private HashMap<Id, Vehicle> electricVehicles=new HashMap<Id, Vehicle>();
 	private ParkingTimesPlugin parkingTimesPlugin;
 	private EnergyConsumptionPlugin energyConsumptionPlugin;
 	
@@ -64,8 +67,8 @@ public class EnergyConsumptionInit implements StartupListener {
 	
 	
 	
-	public LinkedListValueHashMap<Id, Vehicle> getVehicles(){
-		return this.vehicles;
+	public HashMap<Id, Vehicle> getElectricVehicles(){
+		return electricVehicles;
 	}
 	
 	
@@ -84,13 +87,21 @@ public class EnergyConsumptionInit implements StartupListener {
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
 			if (count<totalPpl){
 				if (count< totalPpl*ev){
-					vehicles.put(personId, new ElectricVehicle(null, new IdImpl(1)));
-					
+					ElectricVehicle ev= new ElectricVehicle(null, new IdImpl(1));
+					vehicles.put(personId, ev);
+					electricVehicles.put(personId, ev);
 				}else{
-					this.vehicles.put(personId, new PlugInHybridElectricVehicle(new IdImpl(1)));
+					if(count< totalPpl){
+						PlugInHybridElectricVehicle phev= new PlugInHybridElectricVehicle(new IdImpl(1));
+						vehicles.put(personId,phev );
+						electricVehicles.put(personId, phev);
+					}else{
+						vehicles.put(personId,new ConventionalVehicle(null, new IdImpl(2)) );
+					}
+					
 				}
 				count++;
-			}else{break;}
+			}
 		}
 		
 		EnergyConsumptionModelPSL energyConsumptionModel = new EnergyConsumptionModelPSL(140);
