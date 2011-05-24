@@ -33,36 +33,46 @@ import org.jgap.IChromosome;
  */
 public abstract class ChromosomeDistanceComparator implements Comparator<IChromosome> {
 
-	private final Map<IChromosome, Double> distanceMap = 
-		new HashMap<IChromosome, Double>();
+	//private final Map<IChromosome, Double> distanceMap = 
+	//	new HashMap<IChromosome, Double>();
+	private IChromosome newBorn;
 
 	public void setComparisonData(
 			final IChromosome newBorn, 
 			final List<IChromosome> window) {
-		distanceMap.clear();
+		//distanceMap.clear();
 
-		for (IChromosome chrom : window) {
-			distanceMap.put(chrom, getDistance(newBorn, chrom));
-		}
+		//for (IChromosome chrom : window) {
+		//	distanceMap.put(chrom, getDistance(newBorn, chrom));
+		//}
+		this.newBorn = newBorn;
 	}
 
+	/**
+	 * A chromosome is "greater" than another if it is closer to the new borned.
+	 * This method computes distances on the fly.
+	 */
 	@Override
 	public int compare(
 			final IChromosome chr1,
 			final IChromosome chr2) {
 		double d1, d2;
 
-		try {
-			d1 = this.distanceMap.get(chr1);
-			d2 = this.distanceMap.get(chr2);
-		} catch (NullPointerException e) {
-			throw new IllegalArgumentException("can only compare chromosomes in"
-					+" the comparison data");
-		}
+		//try {
+		//	d1 = this.distanceMap.get(chr1);
+		//	d2 = this.distanceMap.get(chr2);
+		//} catch (NullPointerException e) {
+		//	throw new IllegalArgumentException("can only compare chromosomes in"
+		//			+" the comparison data");
+		//}
 
 		if (chr1.equals(chr2)) {
 			return 0;
 		}
+
+		d1 = getDistance(newBorn, chr1);
+		d2 = getDistance(newBorn, chr2);
+
 		return (d1 > d2 ? 1 : -1);
 	}
 
