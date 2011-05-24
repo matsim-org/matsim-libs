@@ -48,6 +48,10 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * 
  * The first/last parking is at the last position in the list.
  * 
+ * TODO: tidy up this handler -> see ParkingSimulation class as example
+ * => current implementation is too complicated.
+ * 
+ * 
  * @author wrashid
  * 
  */

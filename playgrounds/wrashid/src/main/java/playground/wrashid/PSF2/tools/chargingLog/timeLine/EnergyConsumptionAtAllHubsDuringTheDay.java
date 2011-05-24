@@ -12,7 +12,7 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class EnergyConsumptionAtAllHubsDuringTheDay {
 
 	public static void main(String[] args) {
-		String chargingLogFileNamePath = "H:/data/experiments/ARTEMIS/zh/dumb charging/output/run6/ITERS/it.0/0.chargingLog.txt";
+		String chargingLogFileNamePath = "H:/data/experiments/ARTEMIS/zh/dumb charging/output/run7/ITERS/it.0/0.chargingLog.txt";
 		String linkHubMappingTable = "H:/data/experiments/ARTEMIS/zh/dumb charging/input/run1/linkHub_orig.mappingTable.txt";
 		
 		HashMap<Id, double[]> energyConsumptionPerLink = EnergyConsumptionAtAllLinksTimeLine.readChargingLog(chargingLogFileNamePath);
