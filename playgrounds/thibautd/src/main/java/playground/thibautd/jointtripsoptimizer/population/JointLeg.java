@@ -138,8 +138,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * Returns the associated route.
 	 * In the case of a passenger leg, the route is created at the first call of
 	 * this method, by copying the driver's route.
-	 * <u>This requires the route to be set to null initially for passenger legs,
-	 * as well as the "routeToCopy" method to be called.</u>
+	 * <u>This requires the "routeToCopy" method to be called.</u>
 	 * . If the route is not null or the method "routeToCopy" as not been called,
 	 * the route will not be changed (this may be wanted: for example, the joint
 	 * replanning module already creates consistent routes).
@@ -148,7 +147,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	public Route getRoute() {
 		if ( (this.getJoint()) && 
 				(!this.getMode().equals(TransportMode.car)) &&
-				(super.getRoute()==null) &&
+				//(super.getRoute()==null) &&
 				this.routeToCopy) {
 			//Passenger leg with no route: create it
 			Route route=null;
@@ -163,7 +162,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 			}
 
 			if (route==null) {
-				throw new RuntimeException("Driver leg not found");
+				super.setRoute(null);
+				return null;
 			}
 
 			try {

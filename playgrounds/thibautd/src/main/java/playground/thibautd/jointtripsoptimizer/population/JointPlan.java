@@ -198,7 +198,7 @@ public class JointPlan implements Plan {
 		this.constructLegsMap();
 
 		if (toSynchronize) {
-			this.synchronize();
+//			this.synchronize();
 		}
 
 		this.aggregatorFactory = aggregatorFactory;
@@ -575,6 +575,15 @@ public class JointPlan implements Plan {
 		return false;
 	}
 
+	/**
+	 * To call iteratively to synchronize plans.
+	 * It works in the following way:
+	 * <ul>
+	 * <li> for individual legs/activities, it just make them begin
+	 * at the end of the last act/leg </li>
+	 * <li> for joint legs, it makes the PU end at the latest passenger arrival </li>
+	 * </ul>
+	 */
 	private void examineNextActivity(
 			final Id id,
 			final Map<Id, IndividualValuesWrapper> individualValues,
@@ -618,9 +627,6 @@ public class JointPlan implements Plan {
 
 		if (!act.getType().equals(JointActingTypes.PICK_UP)) {
 			double endTime = act.getEndTime();
-			double dur = Math.max(
-					act.getMaximumDuration(),
-					endTime - act.getStartTime());
 
 			act.setStartTime(currentIndividualValues.now);
 			currentIndividualValues.now =
@@ -628,7 +634,6 @@ public class JointPlan implements Plan {
 				endTime :
 				currentIndividualValues.now + minimalDuration;
 			act.setEndTime(currentIndividualValues.now);
-			act.setMaximumDuration(dur);
 
 			currentIndividualValues.indexInPlan++;
 		}
