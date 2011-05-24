@@ -77,7 +77,8 @@ public class JointPlanOptimizerDecoderFactory {
 						this.numEpisodes));
 		}
 
-		output.addDecoder(new DurationDecoder(
+		//output.addDecoder(new DurationDecoder(
+		output.addDecoder(new DurationDecoderAPosterioriSyncing(
 			this.plan,
 			this.configGroup,
 			this.legTravelTimeEstimatorFactory,
