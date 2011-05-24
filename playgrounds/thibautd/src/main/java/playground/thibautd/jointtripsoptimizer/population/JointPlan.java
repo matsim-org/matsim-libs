@@ -52,8 +52,10 @@ public class JointPlan implements Plan {
 		Logger.getLogger(JointPlan.class);
 
 
+	// durations for syncing:
 	private final static double pickUpDuration = 0d;
-	private final static double minimalDuration = 1*3600d;
+	// this will also be used for DO
+	private final static double minimalDuration = 1d;
 
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	/**
@@ -626,6 +628,9 @@ public class JointPlan implements Plan {
 
 		if (!act.getType().equals(JointActingTypes.PICK_UP)) {
 			double endTime = act.getEndTime();
+			if (endTime == Time.UNDEFINED_TIME) {
+				endTime = currentIndividualValues.now + act.getMaximumDuration();
+			}
 
 			act.setStartTime(currentIndividualValues.now);
 			currentIndividualValues.now =
@@ -654,6 +659,7 @@ public class JointPlan implements Plan {
 				act.setStartTime(currentIndividualValues.now);
 				currentIndividualValues.now = soonestStartTime;
 				act.setEndTime(currentIndividualValues.now);
+				sharedRide.setDepartureTime(currentIndividualValues.now);
 				currentIndividualValues.indexInPlan++;
 			}
 			// else, add joint leg as accessed 
