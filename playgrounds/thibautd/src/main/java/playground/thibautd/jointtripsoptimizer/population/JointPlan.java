@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousScoreAggregatorFactory;
 import playground.thibautd.jointtripsoptimizer.scoring.ScoresAggregator;
@@ -52,6 +53,7 @@ public class JointPlan implements Plan {
 
 
 	private final static double pickUpDuration = 0d;
+	private final static double minimalDuration = 1*3600d;
 
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	/**
@@ -205,8 +207,8 @@ public class JointPlan implements Plan {
 	}
 
 	private void synchronize() {
-		Map<Id, IndividualValuesWrapper> individualValues =
-			new HashMap<Id, IndividualValuesWrapper>();
+		log.warn("plans syncing...");
+		Map<Id, IndividualValuesWrapper> individualValues = getIndividualValueWrappers();
 		List<JointLeg> accessedLegs = new ArrayList<JointLeg>();
 		
 		while (notAllPlansSynchronized(individualValues)) {
@@ -216,8 +218,22 @@ public class JointPlan implements Plan {
 		}
 	}
 
+	private Map<Id, IndividualValuesWrapper> getIndividualValueWrappers() {
+		Map<Id, IndividualValuesWrapper> out = new HashMap<Id, IndividualValuesWrapper>();
+
+		for (Id id : individualPlans.keySet()) {
+			out.put(id, new IndividualValuesWrapper());
+		}
+
+		return out;
+	}
+
 	public JointPlan(JointPlan plan) {
-		this(plan.getClique(), plan.getIndividualPlans());
+		this(	plan.getClique(),
+				plan.getIndividualPlans(),
+				plan.setAtIndividualLevel,
+				false, // just copy the plan: do not try to synchronize
+				plan.getScoresAggregatorFactory());
 	}
 
 	private void constructLegsMap() {
@@ -577,6 +593,7 @@ public class JointPlan implements Plan {
 
 		if (currentPlanElement instanceof Leg) {
 			JointLeg leg;
+			double travelTime;
 
 			try {
 				leg = (JointLeg) currentPlanElement;
@@ -585,8 +602,12 @@ public class JointPlan implements Plan {
 			}
 
 			leg.setDepartureTime(currentIndividualValues.now);
-			currentIndividualValues.now += leg.getTravelTime();
+			travelTime = leg.getTravelTime();
+			currentIndividualValues.now += (travelTime == Time.UNDEFINED_TIME ?
+					0d : travelTime);
 			leg.setArrivalTime(currentIndividualValues.now);
+			// ensures that passenger legs with new times will be copied again.
+			leg.routeToCopy();
 
 			currentIndividualValues.indexInPlan++;
 
@@ -596,9 +617,19 @@ public class JointPlan implements Plan {
 		Activity act = (Activity) currentPlanElement;
 
 		if (!act.getType().equals(JointActingTypes.PICK_UP)) {
+			double endTime = act.getEndTime();
+			double dur = Math.max(
+					act.getMaximumDuration(),
+					endTime - act.getStartTime());
+
 			act.setStartTime(currentIndividualValues.now);
-			currentIndividualValues.now += act.getMaximumDuration();
+			currentIndividualValues.now =
+				currentIndividualValues.now < endTime ?
+				endTime :
+				currentIndividualValues.now + minimalDuration;
 			act.setEndTime(currentIndividualValues.now);
+			act.setMaximumDuration(dur);
+
 			currentIndividualValues.indexInPlan++;
 		}
 		else {
@@ -607,16 +638,16 @@ public class JointPlan implements Plan {
 				.getPlanElements().get(currentIndividualValues.indexInPlan + 1);
 			Map<Id, JointLeg> linkedLegs = sharedRide.getLinkedElements();
 			if (accessedLegs.containsAll(linkedLegs.values())) {
+				// for other legs to be aware
+				accessedLegs.add(sharedRide);
 				// if yes, compute duration and set activity
 				double soonestStartTime = currentIndividualValues.now;
-				for (Id currentId : linkedLegs.keySet()) {
+				for (JointLeg leg : linkedLegs.values()) {
 					soonestStartTime = Math.max(
 							soonestStartTime,
-							individualValues.get(currentId).now);
+							leg.getDepartureTime());
 				}
-				soonestStartTime += pickUpDuration;
 				act.setStartTime(currentIndividualValues.now);
-				act.setMaximumDuration(soonestStartTime - currentIndividualValues.now);
 				currentIndividualValues.now = soonestStartTime;
 				act.setEndTime(currentIndividualValues.now);
 				currentIndividualValues.indexInPlan++;
@@ -624,6 +655,8 @@ public class JointPlan implements Plan {
 			// else, add joint leg as accessed 
 			else {
 				accessedLegs.add(sharedRide);
+				sharedRide.setDepartureTime(
+						currentIndividualValues.now + pickUpDuration);
 			}
 		}
 	}
