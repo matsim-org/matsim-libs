@@ -54,7 +54,7 @@ public class CommuterDemandWriter {
 	private Scenario scenario;
 	private Population population;
 	private double scalefactor;
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N, TransformationFactory.WGS84_UTM33N);
+	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]", TransformationFactory.WGS84_UTM33N);
 	//adjust Coordinate System to your needs
 	private double offset;
 	private double start;
@@ -80,13 +80,21 @@ public class CommuterDemandWriter {
 	}
 	private void generatePopulation(){
 		int pnr = 0;
+		
 		for (CommuterDataElement commuterDataElement : demand){
+			int car = 0;
+			int pt = 0;
 			for (int i = 0; i<commuterDataElement.getCommuters() * scalefactor; i++){
-				generatePlanForZones(pnr,commuterDataElement.getFromId(),commuterDataElement.getToId());
-				pnr++;
+				
+				if (i <0.67*commuterDataElement.getCommuters() * scalefactor) {generatePlanForZones(pnr,commuterDataElement.getFromId(),commuterDataElement.getToId(),"car");
+				car++;
+				}
+				else {generatePlanForZones(pnr,commuterDataElement.getFromId(),commuterDataElement.getToId(),"pt");
+				pt++;
+				}pnr++;
 			}
 			
-		log.info("Created "+ commuterDataElement.getCommuters() + " commuters from "+commuterDataElement.getFromName()+" ("+commuterDataElement.getFromId()+") to "+commuterDataElement.getToName()+" ("+commuterDataElement.getToId()+")");
+		log.info("Created "+ car+ "car and "+pt+ " pt commuters from "+commuterDataElement.getFromName()+" ("+commuterDataElement.getFromId()+") to "+commuterDataElement.getToName()+" ("+commuterDataElement.getToId()+")");
 		}
 		log.info("Created "+pnr+" commuters in total." );
 	
@@ -95,31 +103,31 @@ public class CommuterDemandWriter {
 	
 	
 	
-	private void generatePlanForZones(int pnr, String home, String work ){
+	private void generatePlanForZones(int pnr, String home, String work, String mode ){
 		double poffset = this.offset * 3600 * Math.random();
 		double pstart = this.start * 3600 + poffset;
 		double pend = (this.start+this.duration)*3600+poffset;
 		
 		Person p;
-		p = generatePerson(home, work, pstart, pend, pnr);
+		p = generatePerson(home, work, pstart, pend, pnr, mode);
 		population.addPerson(p);
 		
 		
 	}
 	
-	private Person generatePerson(String home, String work, double workStart, double workEnd, int pnr){
+	private Person generatePerson(String home, String work, double workStart, double workEnd, int pnr, String mode){
 		Person p;
 		Id id;
 		Plan plan;
 		id = scenario.createId(pnr+"_"+home.toString()+"_"+work.toString());
 		p = population.getFactory().createPerson(id);
-		plan = generatePlan(home,work,workStart,workEnd);
+		plan = generatePlan(home,work,workStart,workEnd,mode);
 		p.addPlan(plan);
 		return p;
 	}
 	
 	
-	private Plan generatePlan(String home, String work, double workStart, double workEnd){
+	private Plan generatePlan(String home, String work, double workStart, double workEnd, String mode){
 		Plan plan= population.getFactory().createPlan(); 
 		
 		Coord homeCoord = this.shoot(home); 
@@ -127,9 +135,9 @@ public class CommuterDemandWriter {
 	
 
 		plan.addActivity(this.addActivity( "home", 0.0, workStart-1.0, homeCoord));
-		plan.addLeg(this.addLeg(workStart -1)); 
+		plan.addLeg(this.addLeg(workStart -1, mode)); 
 		plan.addActivity(this.addActivity( "work",	workStart, workEnd, workCoord)); 
-		plan.addLeg(this.addLeg(workEnd));
+		plan.addLeg(this.addLeg(workEnd, mode));
 		plan.addActivity(this.addActivity( "home", workEnd + 1.0, 24.0 * 3600, homeCoord));
 		return plan;
 		
@@ -142,8 +150,8 @@ public class CommuterDemandWriter {
 			return activity;
 		}
 			
-			private Leg addLeg (double departure){ 
-				Leg leg = population.getFactory().createLeg("car");
+			private Leg addLeg (double departure,String mode){ 
+				Leg leg = population.getFactory().createLeg(mode);
 				leg.setDepartureTime(departure+1);
 			return leg;
 			}
