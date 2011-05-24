@@ -210,7 +210,7 @@ public class ReadFromUrbansimParcelModel {
 	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
 
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation() ;
-		Counter cnt = new Counter();
+		PopulationCounter cnt = new PopulationCounter();
 		
 		boolean flag = false;
 
@@ -320,7 +320,7 @@ public class ReadFromUrbansimParcelModel {
 	 */
 	private void printOverview(final Population oldPop,
 			final Population newPop, final double samplingRate,
-			Population backupPop, Counter cnt) {
+			Population backupPop, PopulationCounter cnt) {
 		// get size of old population
 		int oldPopSize = oldPop==null ? 0 : oldPop.getPersons().size();
 
@@ -329,7 +329,7 @@ public class ReadFromUrbansimParcelModel {
 		log.warn("why is bakPopSize not approx as large as samplingRate*NumberUrbansimPersons?" );
 		
 		if(newPop.getPersons().size() < samplingRate*cnt.NUrbansimPersons){
-			log.info("Size of new Population (" + newPop.getPersons().size() + ") is smaller than samplingRate*NumberUrbansimPersons (" + Math.round(samplingRate*cnt.NUrbansimPersons) + "). New created persons, stored in bakPersons, are now add.");
+			log.info("Size of new Population (" + newPop.getPersons().size() + ") is smaller than samplingRate*NumberUrbansimPersons (" + Math.round(samplingRate*cnt.NUrbansimPersons) + "). Adding persons, stored in bakPopSize ... .");
 			List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
 			Collections.shuffle( bakPersons );	// pick random person
 			
@@ -368,7 +368,7 @@ public class ReadFromUrbansimParcelModel {
 	 */
 	private void mergePopulation(final Population oldPop,
 			final Population newPop, final NetworkImpl network,
-			Population backupPop, Counter cnt, Id personId, PersonImpl newPerson) {
+			Population backupPop, PopulationCounter cnt, Id personId, PersonImpl newPerson) {
 		while ( true ) { // loop from which we can "break":
 
 			Person oldPerson ;
@@ -485,10 +485,10 @@ public class ReadFromUrbansimParcelModel {
 		
 		Id jobID, parcelID, zoneID;
 		Coord coord;
+		JobCounter cnt = new JobCounter();
 		
 		Map<Id, JobsObject> jobObjectMap = new HashMap<Id, JobsObject>();
-		int jobCounter = 0; // counting number of jobs ...
-		int skipCounter = 0;// counting number of skipped jobs ...
+		List<JobsObject> backupList = new ArrayList<JobsObject>();
 		
 		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int jmID = benchmark.addMeasure("Reading Job Table", filename, true);
@@ -510,11 +510,15 @@ public class ReadFromUrbansimParcelModel {
 				final int indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
 				final int indexZoneID =idxFromKey.get( Constants.ZONE_ID_WORK );
 				
+				boolean isBackup = false;
+				
 				while ( (line=reader.readLine()) != null ) {
+					cnt.NUrbansimJobs++;
+					isBackup = false;
 					
 					// tnicolai: for debugging, remove later !!!
 					if(MatsimRandom.getRandom().nextDouble() > jobSample)
-						continue;
+						isBackup = true;
 					
 					String[] parts = line.split( Constants.TAB );
 					
@@ -530,14 +534,22 @@ public class ReadFromUrbansimParcelModel {
 						coord = parcelsMap.get( parcelID ).getCoord();
 						assert( coord != null );
 						
-						jobObjectMap.put(jobID, new JobsObject(jobID, parcelID, zoneID, coord));
-						jobCounter++;
+						if(isBackup){
+							backupList.add( new JobsObject(jobID, parcelID, zoneID, coord) );
+							cnt.backupJobs++;
+						}
+						else{
+							jobObjectMap.put(jobID, new JobsObject(jobID, parcelID, zoneID, coord));
+							cnt.addedJobs++;  	// counting number of jobs ...
+						}
 					}
-					else skipCounter++;
+					else
+						cnt.skippedJobs++;	// counting number of skipped jobs ...
+					
 				}
 				
 				reader.close();
-				benchmark.stoppMeasurement(jmID);
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -545,9 +557,44 @@ public class ReadFromUrbansimParcelModel {
 			}
 		}
 		
+		printOverview(jobSample, cnt, jobObjectMap, backupList);
+		
+		benchmark.stoppMeasurement(jmID);
 		log.info( "Done with reading jobs. This took " + benchmark.getDurationInSeconds(jmID) + "seconds." );
-		log.info(jobCounter + " jobs were were found and " + skipCounter + " jobs were skipped (because they don't provide any parcel id)!");
+				
 		return jobObjectMap;		
+	}
+
+	/**
+	 * @param jobSample
+	 * @param cnt
+	 * @param jobObjectMap
+	 * @param backupList
+	 */
+	private void printOverview(double jobSample, JobCounter cnt, Map<Id, JobsObject> jobObjectMap, List<JobsObject> backupList) {
+		
+		cnt.allowedJobs = Math.round( jobSample*cnt.NUrbansimJobs );
+		
+		log.info(" samplingRate: " + jobSample + " total number of jobs; " + cnt.NUrbansimJobs + " number jobs schould count: " + cnt.allowedJobs +
+				 " actual number jobs: " + cnt.addedJobs + " number of jobs in backupList: " +cnt.backupJobs + " skipped jobs (without parcel id):" + cnt.skippedJobs);
+		
+		if(cnt.allowedJobs > cnt.addedJobs){
+			log.info("Size of actual added jobs (" + cnt.addedJobs + ") is smaller than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Adding jobs, stored in backupList ... ");
+			Collections.shuffle( backupList );
+			
+			for(JobsObject jObject : backupList){
+				if(cnt.allowedJobs > jobObjectMap.size()){
+					jobObjectMap.put(jObject.getJobID(), jObject);
+					cnt.addedJobsFromBackup++;
+					cnt.addedJobs++;
+				}
+				else break;
+			}
+		}
+		
+		log.info(" samplingRate: " + jobSample + " total number of jobs; " + cnt.NUrbansimJobs + " number jobs schould count: " + cnt.allowedJobs +
+				 " actual number jobs: " + cnt.addedJobs + " number of jobs in backupList: " +cnt.backupJobs + " skipped jobs (without parcel id):" + cnt.skippedJobs +
+				 " number of jobs added from backupList: " + cnt.addedJobsFromBackup);
 	}
 
 	/**
@@ -638,9 +685,9 @@ public class ReadFromUrbansimParcelModel {
 		return this.year;
 	}
 
-	private class Counter{
+	private class PopulationCounter{
 		
-		public long NUrbansimPersons =0;
+		public long NUrbansimPersons = 0;
 		public long notFoundCnt = 0;
 		public long identifiedCnt = 0;
 		public long employmentChangedCnt = 0;
@@ -651,6 +698,15 @@ public class ReadFromUrbansimParcelModel {
 		public long backupCnt = 0;
 		public long populationMergeTotal = 0;
 		
+	}
+	
+	private class JobCounter{
+		public long NUrbansimJobs = 0;
+		public long addedJobs = 0;
+		public long skippedJobs = 0;
+		public long backupJobs = 0;
+		public long allowedJobs = 0;
+		public long addedJobsFromBackup = 0;
 	}
 	
 }

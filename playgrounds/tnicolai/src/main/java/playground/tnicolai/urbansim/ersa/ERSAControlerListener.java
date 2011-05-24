@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,7 @@ import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
 import playground.toronto.ttimematrix.SpanningTree;
+import playground.toronto.ttimematrix.SpanningTree.NodeData;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -134,7 +136,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
 	
 			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
-			
+		
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startZoneIterator.hasNext() ){
 				
@@ -161,8 +163,8 @@ public class ERSAControlerListener implements ShutdownListener{
 					// travel costs in utils
 					double travelCosts = st.getTree().get( toNode.getId() ).getCost();
 					// travel distance by car in meter
-					double travelDistance = getZone2ZoneDistance(coordFromZone, job.getCoord(), network, controler, sc, depatureTime);
-					
+//					double travelDistance = getZone2ZoneDistance(coordFromZone, job.getCoord(), network, controler, sc, depatureTime);
+					double travelDistance = getZone2WorkplaceDistance(st, toNode);					
 					
 					double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
 					double beta = beta_per_hr / 60.; // get utility per minute
@@ -194,6 +196,44 @@ public class ERSAControlerListener implements ShutdownListener{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @param st
+	 * @param toNode
+	 */
+	private double getZone2WorkplaceDistance(SpanningTree st, Node toNode) {
+		HashMap<Id, NodeData> tree = st.getTree();
+		List<Node> nodeList = new ArrayList<Node>();
+		
+		// set destination node ...
+		// ... from there we get the route to the origin node by the following iteration
+		Node tmpNode = toNode;
+		while(true){
+			
+			nodeList.add( tmpNode );
+			
+			NodeData nodeData = tree.get(tmpNode.getId());
+			assert(nodeData != null);
+			tmpNode = nodeData.getPrevNode();
+			
+			if(tmpNode == null)
+				break;
+		}
+		
+		// now we have list with all nodes on the route between "fromNode" and "toNode"
+		// out of that we create a list with all the links (which connect the nodes)
+		List<Link> linkList = RouteUtils.getLinksFromNodes(nodeList);
+		
+		// we are now able to compute the distance
+		// this calculation includes the distance traveled on the start- and end-link of the route
+		// if you don't want that, you can exclude the first and the last link in "linkList"
+		
+		double distance = 0.;
+		for(Link link: linkList)
+			distance += link.getLength();
+		
+		return distance;
 	}
 
 	/**
@@ -301,8 +341,8 @@ public class ERSAControlerListener implements ShutdownListener{
 		assert( coordFromZone!=null );
 		Node fromNode = network.getNearestNode(coordFromZone);
 		assert( fromNode != null );
-		st.setOrigin(fromNode);
-		st.run(network);
+		st.setOrigin(fromNode); // setting starting point
+		st.run(network);		// run dijkstra on network
 		
 		return coordFromZone;
 	}
@@ -316,6 +356,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param controler
 	 * @return distance in meter between a given origin and destination coordinate
 	 */
+	@Deprecated
 	private double getZone2ZoneDistance(Coord originCoordinate, Coord destinationCoordinate, NetworkImpl network, Controler controler, Scenario sc, double depatureTime){
 
 		double distance = 0.;

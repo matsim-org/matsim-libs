@@ -28,6 +28,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.core.utils.charts.XYLineChart;
@@ -73,18 +74,24 @@ public class Convert4Gnuplot {
 //			String[] myArgs = new String[]{"/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/ferry_accessibility_indicators", "/Users/thomas/Documents/SVN_Studies/tnicolai/cupum/Indicators/highway_accessibility_indicators", "908"};
 			
 			
-//			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_low_cap_accessibility_indicators", "908"};		
-//			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_accessibility_indicators", "908"};		
-			String[] myArgs = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/ferry_accessibility_indicators", "908"};		
+			String[] args1 = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_low_cap_accessibility_indicators", "908"};		
+			String[] args2 = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/highway_accessibility_indicators", "908"};		
+			String[] args3 = new String[]{"/Users/thomas/Development/opus_home/vsp_configs/re-estimate_travel_data_related_models/create_plots/ferry_accessibility_indicators", "908"};		
 			
-//			init(args);
-			init(myArgs);
-			System.out.println("Starting queue process ...");
-			if(isSingleDataSet)
-				queueSingleDataSet();
-			else
-				queueMultipleDataSets();
-
+			ArrayList<String[]>tasks = new ArrayList<String[]>();
+			tasks.add(args1);
+			tasks.add(args2);	
+			tasks.add(args3);
+			
+			for(int i = 0; i < tasks.size(); i++){
+	//			init(args);
+				init(tasks.get(i));
+				System.out.println("Starting queue process ...");
+				if(isSingleDataSet)
+					queueSingleDataSet();
+				else
+					queueMultipleDataSets();
+			}
 			System.out.println("Finished!");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -227,7 +234,7 @@ public class Convert4Gnuplot {
 			checkAndRestoreZoneID(source);
 			
 			BufferedReader br = IOUtils.getBufferedReader(source);
-			// BufferedWriter and StringBuffer for gnuplot olny 
+			// BufferedWriter and StringBuffer for gnuplot only 
 			BufferedWriter bw = IOUtils.getBufferedWriter(destinationDAT);
 			StringBuffer content = new StringBuffer("");
 			
@@ -250,8 +257,9 @@ public class Convert4Gnuplot {
 				parts = line.split("\t");
 				id = Integer.parseInt(parts[ho1.getZoneId()]);
 				
-				if( id == zone_id){
+				if( id == zone_id ){
 					
+					System.out.print("");
 					System.out.println("Found zone : " + id);
 					
 					for(int i = 1; i < parts.length; i++){
