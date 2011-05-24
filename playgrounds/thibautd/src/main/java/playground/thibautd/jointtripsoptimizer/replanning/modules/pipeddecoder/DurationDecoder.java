@@ -391,6 +391,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 				geneIndex,
 				individualValues.getNow(),
 				individualValues.getJointTravelTime());
+		destination.setStartTime(individualValues.getNow());
 		destination.setMaximumDuration(currentDuration);
 		individualValues.addToNow(currentDuration);
 		destination.setEndTime(individualValues.getNow());
@@ -461,9 +462,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			leg = driverLeg;
 		} else {
 			// get driver trip
-			leg = new JointLeg((LegImpl) this.driverLegs.get(leg), leg);
+			leg = new JointLeg(this.driverLegs.get(leg), leg);
 			leg.setMode(JointActingTypes.PASSENGER);
-			leg.setIsDriver(false);
+			//leg.setIsDriver(false);
 		}
 
 		individualValues.addToNow(leg.getTravelTime());
@@ -549,6 +550,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			final double now,
 			final double duration) {
 		JointActivity newAct = new JointActivity(act);
+		newAct.setStartTime(now);
 		newAct.setMaximumDuration(duration);
 		newAct.setEndTime(now + duration);
 
