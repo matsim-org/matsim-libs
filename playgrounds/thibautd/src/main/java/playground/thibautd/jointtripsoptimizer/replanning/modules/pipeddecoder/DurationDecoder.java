@@ -37,11 +37,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActing;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
