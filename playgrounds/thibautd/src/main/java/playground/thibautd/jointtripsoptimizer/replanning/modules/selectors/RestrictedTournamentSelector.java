@@ -96,15 +96,14 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 			final Population nextGeneration) {
 		List<IChromosome> window;
 		IChromosome closestOldCompetitor;
-		RandomGenerator generator = this.jgapConfig.getRandomGenerator();
 
 		// examine all new borned and make them compete with old fellows by RTS
 		for (IChromosome competitor : this.newBorned) {
-			Collections.shuffle(this.agedIndividuals, (Random) generator);
-			window = this.agedIndividuals.subList(0, this.windowSize);
+			window = getWindow();
 			this.distanceComparator.setComparisonData(competitor, window);
-			Collections.sort(window, this.distanceComparator);
-			closestOldCompetitor = window.get(0);
+			//Collections.sort(window, this.distanceComparator);
+			//closestOldCompetitor = window.get(0);
+			closestOldCompetitor = Collections.min(window, this.distanceComparator);
 
 			if (competitor.getFitnessValue() > closestOldCompetitor.getFitnessValue()) {
 				this.agedIndividuals.add(competitor);
@@ -121,6 +120,24 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 					+" full population: toSelect="+nToSelect+", generationSize="+
 					nextGeneration.size());
 		}
+	}
+
+	private List<IChromosome> getWindow() {
+		List<IChromosome> window = new ArrayList<IChromosome>(this.windowSize);
+		int index;
+		List<Integer> selected = new ArrayList<Integer>(this.windowSize);
+		RandomGenerator generator =  this.jgapConfig.getRandomGenerator();
+		
+		for (int i=0; i < this.windowSize; i++) {
+			do {
+				index = generator.nextInt(this.windowSize);
+			} while (selected.contains(index));
+
+			selected.add(index);
+			window.add(this.agedIndividuals.get(index));
+		}
+
+		return window;
 	}
 }
 

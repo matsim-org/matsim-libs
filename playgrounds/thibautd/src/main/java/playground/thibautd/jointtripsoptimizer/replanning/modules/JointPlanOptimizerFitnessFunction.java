@@ -66,10 +66,11 @@ public class JointPlanOptimizerFitnessFunction extends FitnessFunction {
 			final Network network,
 			final int numJointEpisodes,
 			final int numEpisodes,
+			final int nMembers,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		super();
 		this.decoder = (new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
-				routingAlgorithm, network, numJointEpisodes, numEpisodes)).createDecoder();
+				routingAlgorithm, network, numJointEpisodes, numEpisodes, nMembers)).createDecoder();
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 

@@ -180,6 +180,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						network,
 						this.numToggleGenes,
 						this.numEpisodes,
+						this.nMembers,
 						scoringFunctionFactory);
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			this.setFitnessFunction(this.fitnessFunction);

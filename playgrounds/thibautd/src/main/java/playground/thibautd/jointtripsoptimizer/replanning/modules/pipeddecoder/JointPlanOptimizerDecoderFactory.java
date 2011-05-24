@@ -40,6 +40,7 @@ public class JointPlanOptimizerDecoderFactory {
 	private final Network network;
 	private final int numJointEpisodes;
 	private final int numEpisodes;
+	private final int nMembers;
 
 	public JointPlanOptimizerDecoderFactory(
 			final JointPlan plan,
@@ -48,7 +49,8 @@ public class JointPlanOptimizerDecoderFactory {
 			final PlansCalcRoute routingAlgorithm,
 			final Network network,
 			final int numJointEpisodes,
-			final int numEpisodes) {
+			final int numEpisodes,
+			final int nMembers) {
 		this.plan = plan;
 		this.configGroup = configGroup;
 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
@@ -56,6 +58,7 @@ public class JointPlanOptimizerDecoderFactory {
 		this.network = network;
 		this.numJointEpisodes = numJointEpisodes;
 		this.numEpisodes = numEpisodes;
+		this.nMembers = nMembers;
 	}
 
 	public JointPlanOptimizerDecoder createDecoder() {
@@ -81,7 +84,8 @@ public class JointPlanOptimizerDecoderFactory {
 			this.routingAlgorithm,
 			this.network,
 			this.numJointEpisodes,
-			this.numEpisodes));
+			this.numEpisodes,
+			this.nMembers));
 
 		return output;
 	}

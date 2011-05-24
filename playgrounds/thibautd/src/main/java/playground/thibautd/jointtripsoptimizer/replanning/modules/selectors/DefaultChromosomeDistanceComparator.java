@@ -38,7 +38,7 @@ public class DefaultChromosomeDistanceComparator extends ChromosomeDistanceCompa
 	}
 
 	@Override
-	protected double getDistance(IChromosome chr1, IChromosome chr2) {
+	protected double getDistance(final IChromosome chr1, final IChromosome chr2) {
 		double distance = 0d;
 		int size = chr1.size();
 

@@ -94,6 +94,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private	final PlansCalcRoute routingAlgorithm;
 	private	final Network network;
+	private final int nMembers;
 
 	/**
 	 * initializes a decoder, which can be used on any modification of {@param plan}.
@@ -106,11 +107,13 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			final PlansCalcRoute routingAlgorithm,
 			final Network network,
 			final int numJointEpisodes,
-			final int numEpisodes) {
+			final int numEpisodes,
+			final int nMembers) {
 		//initialisation of final fields
 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
 		this.routingAlgorithm = routingAlgorithm;
 		this.network = network;
+		this.nMembers = nMembers;
 
 		//construction
 		//Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
@@ -149,6 +152,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 
 	private void initializeLegEstimators(final JointPlan plan) {
 		LegTravelTimeEstimator currentLegTTEstimator;
+		// TODO: use individual plans map instead of clique
 		for (Id id : plan.getClique().getMembers().keySet()) {
 			currentLegTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 					plan.getIndividualPlan(id),
@@ -630,15 +634,15 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		 */
 		private double jointTravelTime = 0d;
 
-		public void addToIndexInPlan(int i) {
+		public void addToIndexInPlan(final int i) {
 			indexInPlan += i;
 		}
 
-		public void addToIndexInChromosome(int i) {
+		public void addToIndexInChromosome(final int i) {
 			indexInChromosome += i;
 		}
 
-		public void addToNow(double d) {
+		public void addToNow(final double d) {
 			now += d;
 		}
 
@@ -658,7 +662,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			return this.jointTravelTime;
 		}
 
-		public void addToJointTravelTime(double d) {
+		public void addToJointTravelTime(final double d) {
 			this.jointTravelTime += d;
 		}
 
