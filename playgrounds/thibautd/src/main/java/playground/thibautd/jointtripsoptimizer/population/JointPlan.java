@@ -198,7 +198,7 @@ public class JointPlan implements Plan {
 		this.constructLegsMap();
 
 		if (toSynchronize) {
-//			this.synchronize();
+			this.synchronize();
 		}
 
 		this.aggregatorFactory = aggregatorFactory;
@@ -207,7 +207,6 @@ public class JointPlan implements Plan {
 	}
 
 	private void synchronize() {
-		log.warn("plans syncing...");
 		Map<Id, IndividualValuesWrapper> individualValues = getIndividualValueWrappers();
 		List<JointLeg> accessedLegs = new ArrayList<JointLeg>();
 		
