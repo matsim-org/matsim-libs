@@ -117,7 +117,7 @@ public class Main_exampleDSCTest extends TestCase{
 		
 		// all evs - no emissions
 		assertEquals(mySimulation.getTotalEmissions(), 0.0);
-		for(Id id: mySimulation.mySmartCharger.vehicles.getKeySet()){
+		for(Id id: mySimulation.mySmartCharger.vehicles.keySet()){
 			// check parkingDrivingSchedule
 			if(id.toString().equals(Integer.toString(2))){
 				System.out.println("parking and driving schedule agent "+id.toString());

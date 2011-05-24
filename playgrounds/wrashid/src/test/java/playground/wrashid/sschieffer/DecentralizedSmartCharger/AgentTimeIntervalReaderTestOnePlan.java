@@ -122,7 +122,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 					 * *********************************
 					 */
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						agentOne=id;						
 						System.out.println(id.toString());
 						

@@ -1,12 +1,14 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import lpsolve.LpSolveException;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.optimization.OptimizationException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,13 +58,13 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 		controler.setOverwriteFiles(true);		
 		controler.run();
 		
-		LinkedListValueHashMap<Id, Vehicle> vehicles =energyInit.getVehicles();
+		HashMap<Id, Vehicle> vehicles =energyInit.getElectricVehicles();
 		
 		int countPHEV=0;
 		int countEV=0;
 				
-		for (Id id: vehicles.getKeySet()){
-			if (vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
+		for (Id id: vehicles.keySet()){
+			if (vehicles.get(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 				countPHEV++;
 			}else{				
 					countEV++;

@@ -110,7 +110,7 @@ public class ChargingSlotDistributorTestOnePlan extends TestCase{
 							bufferBatteryCharge,
 							standardChargingSlotLength);
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						
 						agentOne=id;						
 						

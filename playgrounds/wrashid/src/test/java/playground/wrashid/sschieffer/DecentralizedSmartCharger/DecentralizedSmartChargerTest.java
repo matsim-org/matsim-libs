@@ -114,7 +114,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							standardChargingSlotLength);
 					
 					myDecentralizedSmartCharger.run();
-					int numPpl= (myDecentralizedSmartCharger.vehicles.getKeySet().size());
+					int numPpl= (myDecentralizedSmartCharger.vehicles.keySet().size());
 					
 					
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
@@ -132,7 +132,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 					/*
 					 * 
 					 */
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						Schedule testSchedule = mySimulation.makeFakeSchedule();
 						
 						ParkingInterval p1= (ParkingInterval) testSchedule.timesInSchedule.get(0);

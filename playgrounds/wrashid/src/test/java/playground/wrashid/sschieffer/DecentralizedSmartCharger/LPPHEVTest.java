@@ -133,7 +133,7 @@ public class LPPHEVTest extends TestCase{
 					 */
 					
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						
 							agentOne=id;
 														
@@ -280,7 +280,7 @@ public class LPPHEVTest extends TestCase{
 					/*
 					 * RESOLVE
 					 */
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						
 						agentOne=id;
 						

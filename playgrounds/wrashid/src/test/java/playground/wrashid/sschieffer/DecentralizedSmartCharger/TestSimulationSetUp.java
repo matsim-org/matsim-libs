@@ -100,7 +100,7 @@ public class TestSimulationSetUp {
 		myDecentralizedSmartCharger.initializeChargingSlotDistributor(standardChargingSlotLength);
 		
 		myDecentralizedSmartCharger.setLinkedListValueHashMapVehicles(
-				getEnergyConsumptionInit().getVehicles());
+				getEnergyConsumptionInit().getElectricVehicles());
 		
 		myDecentralizedSmartCharger.initializeHubLoadDistributionReader(
 				mapHubsTest(), 
@@ -381,7 +381,7 @@ public class TestSimulationSetUp {
 			new HashMap<Id, Schedule>();
 		
 		//Id
-		for(Id id : energyConsumptionInit.getVehicles().getKeySet()){
+		for(Id id : energyConsumptionInit.getElectricVehicles().keySet()){
 			
 				Schedule bullShitMinus= new Schedule();
 				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});

@@ -291,7 +291,7 @@ public class LPEVTest extends TestCase{
 					 * RESOLVE
 					 */
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
 						
 						agentOne=id;
 						
