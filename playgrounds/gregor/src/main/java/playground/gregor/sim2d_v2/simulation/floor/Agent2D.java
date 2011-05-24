@@ -20,7 +20,6 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 
 
@@ -49,7 +48,7 @@ public class Agent2D  {
 	public Agent2D(PersonDriverAgent pda) {
 		this.pda = pda;
 		// TODO think about this
-		this.desiredVelocity = 0.8 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 8;
+		this.desiredVelocity = 1.34; //0.8 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 8;
 
 	}
 

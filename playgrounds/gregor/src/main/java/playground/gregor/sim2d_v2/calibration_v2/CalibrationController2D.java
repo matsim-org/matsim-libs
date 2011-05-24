@@ -2,39 +2,46 @@ package playground.gregor.sim2d_v2.calibration_v2;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomPopulationLoader;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.controller.Controller2D;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 public class CalibrationController2D  {
 
 
-	private PedVisPeekABot vis;
-	private final List<Double> allDiffs = new ArrayList<Double>();
-	private final  List<Double>  allAi = new ArrayList<Double>();
+	private static final int THREADS = 4;
+
+	private final Mutator mut = new Mutator();
 
 	private final Config config;
 	private Sim2DConfigGroup sim2dConfig;
 	private final Scenario scenario;
 	private final PhantomEvents phantomEvents;
+
+	private double[] params;
+
+	double c = 1000;
+	int it = 0;
+	private final Tuple<Double,Double>[] ranges;
+
+	private double[] target;
+
+	private double targetLL;
 
 	public CalibrationController2D(String[] args) {
 		String configFile = args[0];
@@ -43,16 +50,81 @@ public class CalibrationController2D  {
 		this.scenario = ScenarioUtils.createScenario(this.config);
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
 		loader.loadScenario();
-		this.sim2dConfig.setEnableCircularAgentInterActionModule("false");
-		this.sim2dConfig.setEnableCollisionPredictionAgentInteractionModule("true");
-		this.sim2dConfig.setEnableCollisionPredictionEnvironmentForceModule("true");
-		this.sim2dConfig.setEnableDrivingForceModule("true");
-		this.sim2dConfig.setEnableEnvironmentForceModule("false");
-		this.sim2dConfig.setEnablePathForceModule("true");
 		this.sim2dConfig.setPhantomPopulationEventsFile("/Users/laemmel/devel/dfg/phantomEvents.xml.gz");
-		this.sim2dConfig.setAi(50);
 		this.phantomEvents = new PhantomPopulationLoader(this.sim2dConfig.getPhantomPopulationEventsFile()).getPhantomPopulation();
+
+		this.params = new double[3];
+		this.ranges = new Tuple[3];
+		this.params[0] = 0.5; //MatsimRandom.getRandom().nextDouble();
+		this.params[1] = 1.2; //MatsimRandom.getRandom().nextDouble()*5;
+		this.params[2] = 12; //MatsimRandom.getRandom().nextDouble()*2000;;
+		this.ranges[0] = new Tuple<Double, Double>(0.01, 1.);
+		this.ranges[1] = new Tuple<Double, Double>(0.01, 5.);
+		this.ranges[2] = new Tuple<Double, Double>(1., 200.);
 	}
+
+
+
+	private void run() {
+		List<Id> ids = new ArrayList<Id>();
+		for (int i = 0; i < 480; i++) {
+			ids.add(new IdImpl(i));
+		}
+		Collections.shuffle(ids);
+
+		this.target = new double[3];
+		this.target[0] = this.sim2dConfig.getLambda();
+		this.target[1] = this.sim2dConfig.getBi();
+		this.target[2] = this.sim2dConfig.getAi();
+		this.targetLL = run(ids);
+
+		this.sim2dConfig.setLambda(this.params[0]);
+		this.sim2dConfig.setBi(this.params[1]);
+		this.sim2dConfig.setAi(this.params[2]);
+		double actualLL = run(ids);
+
+		for (; this.it < 2000; this.it++) {
+			this.c = this.c*0.99;
+			double[] proposed = Arrays.copyOf(this.params, 3);
+			this.mut.mutate(proposed, this.ranges);
+			this.sim2dConfig.setLambda(proposed[0]);
+			this.sim2dConfig.setBi(proposed[1]);
+			this.sim2dConfig.setAi(proposed[2]);
+			double proposedLL = run(ids);
+
+			if (proposedLL > actualLL) {
+				actualLL = proposedLL;
+				this.params = proposed;
+				printStats(actualLL);
+			} else {
+				double exp = Math.exp((proposedLL - actualLL)/ this.c);
+				double rand = MatsimRandom.getRandom().nextDouble();
+				if (exp > rand) {
+					actualLL = proposedLL;
+					this.params = proposed;
+
+					System.out.println("------------------------------------------");
+					printStats(actualLL);
+				} else {
+					this.sim2dConfig.setLambda(this.params[0]);
+					this.sim2dConfig.setBi(this.params[1]);
+					this.sim2dConfig.setAi(this.params[2]);
+				}
+			}
+
+
+			//			System.out.println("ITERATION " + it + " finished");
+
+		}
+		System.out.println("target: LL:" + this.targetLL + "  lambda:" + this.target[0] + " Bi:" + this.target[1] + " Ai:" + this.target[2]);
+	}
+
+	private void printStats(double actualLL) {
+		System.out.println("LL:" + actualLL + "  lambda:" + this.params[0] + " Bi:" + this.params[1] + " Ai:" + this.params[2] + " iteration:" + this.it);
+		//		System.out.println("target: LL:" + this.targetLL + "  lambda:" + this.target[0] + " Bi:" + this.target[1] + " Ai:" + this.target[2]);
+	}
+
+
 
 	/**
 	 * 
@@ -70,79 +142,61 @@ public class CalibrationController2D  {
 	}
 
 
-	public void run() {
+	public double run(List<Id> ids) {
 
-		List<Id> ids = new ArrayList<Id>();
-		for (int i = 0; i < 480; i++) {
-			ids.add(new IdImpl(i));
+
+
+
+
+
+
+		LLCalculator llCalc = new LLCalculator();
+		List<Thread> ts = new ArrayList<Thread>();
+
+		int size = 20/ THREADS;
+		for (int i = 0; i < THREADS; i++) {
+
+			int lb = i*size;
+			int ub = i*size+size-1;
+
+			List<Id> sub = ids.subList(lb, ub);
+			Worker w1 = new Worker(this.scenario,this.phantomEvents,llCalc,sub);
+			Thread t1 = new Thread(w1);
+			ts.add(t1);
+			t1.start();
 		}
 
-		int numOfThreads = 4;
 
-		for (int it = 0; it < 20; it++){
-
-			List<Validator> vs = new ArrayList<Validator>();
-			List<Thread> ts = new ArrayList<Thread>();
-
-			int size = 40/ numOfThreads;
-			for (int i = 0; i < numOfThreads; i++) {
-				Collections.shuffle(ids);
-				List<Id> sub = ids.subList(0, size-1);
-				Validator v1 = new Validator(null);
-				Worker w1 = new Worker(this.scenario,this.phantomEvents,v1,sub);
-				Thread t1 = new Thread(w1);
-				vs.add(v1);
-				ts.add(t1);
-				t1.start();
+		for (int i = 0; i < THREADS; i++) {
+			try {
+				ts.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-
-			double diff = 0;
-
-			for (int i = 0; i < numOfThreads; i++) {
-				Thread t1 = ts.get(i);
-				try {
-					t1.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				Validator v1 = vs.get(i);
-				diff += v1.getAndResetAllDiff();
-			}
-
-			this.allDiffs.add(diff);
-			this.allAi .add(this.sim2dConfig.getAi());
-			System.out.println("ITERATION " + it + " finished");
-			this.sim2dConfig.setAi(this.sim2dConfig.getAi()+5);
 		}
-
-
-
-
-		System.err.println("=================================================");
-		for (int i = 0; i <this.allAi.size(); i++) {
-			System.err.println("diff:" + this.allDiffs.get(i) + "  Ai:" + this.allAi.get(i));
-		}
-		System.err.println("=================================================");
+		double ll = llCalc.getLL();
+		//		System.out.println("n:" + llCalc.getSamples());
+		return ll;
 	}
 
 	private static class Worker implements Runnable {
 
 		private final Scenario scenario;
 		private final PhantomEvents phantomEvents;
-		private final Validator validator;
 		private final List<Id> ids;
+		private final LLCalculator llCalc;
 
 
-		public Worker( Scenario scenario, PhantomEvents phantomEvents, Validator validator, List<Id> ids) {
+		public Worker( Scenario scenario, PhantomEvents phantomEvents, LLCalculator llCalc, List<Id> ids) {
 			this.scenario = scenario;
 			this.phantomEvents = phantomEvents;
-			this.validator = validator;
+			this.llCalc = llCalc;
 			this.ids = ids;
 		}
 
 		@Override
 		public void run() {
-			CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario, this.phantomEvents, this.validator);
+			CalibrationSimulationEngine cse = new CalibrationSimulationEngine(this.scenario, this.phantomEvents, this.llCalc);
 			cse.doOneIteration(this.ids);
 
 		}
@@ -155,6 +209,8 @@ public class CalibrationController2D  {
 		CalibrationController2D controller = new CalibrationController2D(args);
 		controller.run();
 	}
+
+
 
 
 

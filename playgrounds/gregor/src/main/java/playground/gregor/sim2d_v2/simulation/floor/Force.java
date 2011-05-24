@@ -32,11 +32,11 @@ public class Force {
 	private double vy = 0;
 
 
-	/* package */double getXComponent() {
+	public double getXComponent() {
 		return this.fx;
 	}
 
-	/* package */double getYComponent() {
+	public double getYComponent() {
 		return this.fy;
 	}
 
@@ -78,14 +78,12 @@ public class Force {
 	public void update(double weight, double deltaT) {
 		this.vx += (deltaT*this.fx)/weight;
 		this.vy += (deltaT*this.fy)/weight;
-		if (Double.isNaN(this.vx)){
-			int i =0;
-			i++;
-		}
+		reset();
+	}
+
+	public void reset() {
 		this.fx = 0;
 		this.fy = 0;
 	}
-
-
 
 }
