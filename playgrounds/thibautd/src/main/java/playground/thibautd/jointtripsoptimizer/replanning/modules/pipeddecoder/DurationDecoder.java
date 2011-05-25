@@ -148,13 +148,14 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			}
 		}
 
-		this.initializeLegEstimators(this.plan, configGroup.getSimLegInterpretation());
+		this.initializeLegEstimators(plan, configGroup.getSimLegInterpretation());
 	}
 
 	private void initializeLegEstimators(
 			final JointPlan plan,
 			final SimLegInterpretation simLegInt) {
 		LegTravelTimeEstimator currentLegTTEstimator;
+
 		// TODO: use individual plans map instead of clique
 		for (Id id : plan.getClique().getMembers().keySet()) {
 			currentLegTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -225,7 +226,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	private void resetInternalState() {
 		this.readyJointLegs.clear();
 		this.driverLegs.clear();
-		this.legTTEstimators.clear();
+		//this.legTTEstimators.clear();
 	}
 
 	private final void planNextActivity(
