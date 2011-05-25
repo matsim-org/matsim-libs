@@ -61,7 +61,7 @@ public class JointPlan implements Plan {
 	/**
 	 * for robust resolution of links between activities.
 	 */
-	private final Map<IdLeg, JointLeg> legsMap = new TreeMap<IdLeg, JointLeg>();
+	private final Map<IdLeg, JointLeg> legsMap = new HashMap<IdLeg, JointLeg>();
 	/**
 	 * true if the individual plans are maintained at the individual level.
 	 */
