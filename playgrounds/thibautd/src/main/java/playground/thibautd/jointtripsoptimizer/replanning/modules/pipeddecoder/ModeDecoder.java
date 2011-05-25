@@ -61,6 +61,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	// index and "mode" of the "root" tour (ie, the father of the "from home to
 	// home" tour(s))
 	private static final int NO_FATHER = Integer.MIN_VALUE;
+	// mode of the "root" tour, that is, the (dummy) father tour of home-based
+	// tours
 	private static final String ROOT_MODE = "rootMode";
 
 	// TODO: let possibility of defining it from the config group
@@ -223,6 +225,10 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		return output;
 	}
 
+	/**
+	 * @return a list of the modes, the ith element being the mode for the
+	 * subtour with index i
+	 */
 	private String[] getModeChoice(
 			final List<JointPlanOptimizerJGAPModeGene> modeGenes,
 			final String[] subtourLabels,
@@ -287,11 +293,14 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		if (subtourLabel.equals(DRIVER_LABEL)) {
 			return (mode.equals(TransportMode.car));
 		}
+		if (mode.equals(TransportMode.car) && (!hasCar)) {
+			return false;
+		}
+
 		boolean notAPassengerSubtour = (!subtourLabel.equals(PASSENGER_LABEL));
 		boolean vehicleAvailable = fatherMode.equals(ROOT_MODE) ||
 			mode.equals(fatherMode);
-		boolean isCarAndNoDriver = mode.equals(TransportMode.car) && (!hasCar);
-		return notAPassengerSubtour && vehicleAvailable && (!isCarAndNoDriver);
+		return notAPassengerSubtour && vehicleAvailable;
 	}
 
 	private boolean isChainBased(final String mode) {
@@ -375,8 +384,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	 * @return true if the leg corresponds to a shared ride driver leg.
 	 */
 	private boolean isDriver(final PlanElement pe) {
-		return ((((JointLeg) pe).getJoint()) &&
-			(((JointLeg) pe).getIsDriver()) );
+		return ((JointLeg) pe).getIsDriver();
 	}
 
 	/**
