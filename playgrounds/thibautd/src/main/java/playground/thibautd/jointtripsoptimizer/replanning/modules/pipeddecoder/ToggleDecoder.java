@@ -65,6 +65,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	private static String DEFAULT_REMP_MODE = TransportMode.pt;
 
 	private final JointPlan plan;
+	private final List<PlanElement> jointPlanElements;
 	private final Map<PlanElement, Tuple<PlanElement, PlanElement>> sharedRideOD =
 		new HashMap<PlanElement, Tuple<PlanElement, PlanElement>>();
 	private final Map<PlanElement, Integer> associatedGene =
@@ -81,6 +82,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	 */
 	public ToggleDecoder(final JointPlan plan) {
 		this.plan = plan;
+		this.jointPlanElements = plan.getPlanElements();
 		this.constructODAssociation();
 		this.constructGeneAssociation();
 	}
@@ -102,7 +104,7 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		PlanElement currentDestination = null;
 		List<PlanElement> toAssociate = new ArrayList<PlanElement>();
 
-		for (PlanElement pe : this.plan.getPlanElements()) {
+		for (PlanElement pe : this.jointPlanElements) {
 			if (pe instanceof JointActivity) {
 				if (((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP)) {
 					currentOrigin = (currentOrigin==null ? pe : currentOrigin);
@@ -406,11 +408,12 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 			final List<PlanElement> correctPlan,
 			final List<PlanElement> plannedSharedLegs) {
 		if (act.getType().equals(JointActingTypes.PICK_UP)) {
+			JointLeg leg = (JointLeg) incorrectPlan.get(i+1);
 			if (isUsefulPU(
-						(JointLeg) incorrectPlan.get(i+1),
+						leg,
 						plannedSharedLegs)) {
 				correctPlan.add(new JointActivity(act));
-				correctPlan.add(new JointLeg((JointLeg) incorrectPlan.get(i+1)));
+				correctPlan.add(new JointLeg(leg));
 				return 1;
 			}
 			else {
@@ -451,8 +454,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		PlanElement pickUp;
 
 		//is it useful for this leg?
-		index = this.plan.getPlanElements().indexOf(leg);
-		pickUp = this.plan.getPlanElements().get(index - 1);
+		index = this.jointPlanElements.indexOf(leg);
+		pickUp = this.jointPlanElements.get(index - 1);
 		if ((!leg.getIsDriver()) &&
 					(pickUp == this.sharedRideOD.get(leg).getFirst())) {
 			// the individual to which this PU is useful travels
@@ -462,8 +465,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		//The PU does not correspond to this leg. Perhaps another planned leg?
 		for (JointLeg linkedLeg : leg.getLinkedElements().values()) {
 			if (plannedSharedLegs.contains(linkedLeg)) {
-				index = this.plan.getPlanElements().indexOf(linkedLeg);
-				pickUp = this.plan.getPlanElements().get(index - 1);
+				index = jointPlanElements.indexOf(linkedLeg);
+				pickUp = jointPlanElements.get(index - 1);
 				if ((!linkedLeg.getIsDriver()) &&
 							(pickUp == this.sharedRideOD.get(linkedLeg).getFirst())) {
 					// the individual to which this PU is useful travels
@@ -483,8 +486,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		PlanElement dropOff;
 
 		//is it useful for this leg?
-		index = this.plan.getPlanElements().indexOf(leg);
-		dropOff = this.plan.getPlanElements().get(index + 1);
+		index = jointPlanElements.indexOf(leg);
+		dropOff = jointPlanElements.get(index + 1);
 		if ((!leg.getIsDriver()) &&
 				(dropOff == this.sharedRideOD.get(leg).getSecond())) {
 			return true;
@@ -493,8 +496,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		//The DO does not correspond to this leg. Perhaps another planned leg?
 		for (JointLeg linkedLeg : leg.getLinkedElements().values()) {
 			if (plannedSharedLegs.contains(linkedLeg)) {
-				index = this.plan.getPlanElements().indexOf(linkedLeg);
-				dropOff = this.plan.getPlanElements().get(index + 1);
+				index = jointPlanElements.indexOf(linkedLeg);
+				dropOff = jointPlanElements.get(index + 1);
 				if ((!linkedLeg.getIsDriver()) &&
 						(dropOff == this.sharedRideOD.get(linkedLeg).getSecond())) {
 					// the individual to which this DO is useful travels
@@ -520,8 +523,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	private void correctLegLinks(final Map<Id, PlanImpl> individualPlans) {
 		List<IdLeg> toRemove = new ArrayList<IdLeg>();
 
-		for (PlanImpl plan : individualPlans.values()) {
-			for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanImpl individualPlan : individualPlans.values()) {
+			for (PlanElement pe : individualPlan.getPlanElements()) {
 				if (((JointActing) pe).getJoint()) {
 					toRemove.clear();
 					for (IdLeg linkedElement :
