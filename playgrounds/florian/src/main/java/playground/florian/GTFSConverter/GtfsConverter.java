@@ -41,6 +41,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.NetworkUtilsTest;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -150,8 +151,10 @@ public class GtfsConverter {
 		new NetworkWriter(net).write("./network.xml");
 		System.out.println("Wrote Network to " + new File("./network.xml").getAbsolutePath());
 		
-		// Assign the links of the Network to the stops
-		this.assignLinksToStops(ts, net);
+		// Assign the links of the Network to the stops - this is only necessary if you use a given network
+		if(useGivenNetwork){
+			this.assignLinksToStops(ts, net);
+		}
 		
 		// Get the TripRoutes
 		Map<Id,NetworkRoute> tripRoute;
@@ -428,20 +431,38 @@ public class GtfsConverter {
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
 			String row = br.readLine();
-			String[] entries = row.split(",");
-			String currentTrip = entries[tripIdIndex];
+			String[] entries = row.split(",");			
 			LinkedList<Id> route = new LinkedList<Id>();
+			String currentTrip = entries[tripIdIndex];
+			String startStation = entries[stopIdIndex];
 			do {
 				entries = this.splitRow(row);
-				if(currentTrip.equals(entries[tripIdIndex])){
-					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
-				}else{				
+				String nextStation = entries[stopIdIndex];				
+				if(currentTrip.equals(entries[tripIdIndex])){					
+					if(!(startStation.equals(nextStation))){
+						Id linkId = null;
+						for(Id fromId: net.getNodes().get(new IdImpl(startStation)).getOutLinks().keySet()){
+							for(Id toId: net.getNodes().get(new IdImpl(nextStation)).getInLinks().keySet()){
+								if(fromId.equals(toId)){
+									linkId = fromId;
+								}
+							}
+						}
+						route.add(linkId);
+						route.add(new IdImpl("dL2_" + nextStation));
+						route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
+					}else{
+						route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
+					}
+					startStation = nextStation;
+				}else{
 					NetworkRoute netRoute = (NetworkRoute) (new LinkNetworkRouteFactory()).createRoute(route.getFirst(), route.getLast());
 					netRoute.setLinkIds(route.getFirst(), route.subList(1, route.size()-1), route.getLast());
 					tripRoutes.put(new IdImpl(currentTrip), netRoute);
 					currentTrip = entries[tripIdIndex];
 					route = new LinkedList<Id>();
 					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
+					startStation = entries[stopIdIndex];
 				}
 				row = br.readLine();
 			}while(row!= null);		
@@ -532,6 +553,7 @@ public class GtfsConverter {
 			NodeImpl n = new NodeImpl(id);
 			n.setCoord(new CoordImpl(stop.getCoord().getX()-1,stop.getCoord().getY()-1));
 			network.addNode(n);
+			stop.setLinkId(new IdImpl("dL1_"+ stop.getId().toString()));
 		}
 		// Get the Links from the trips in stop_times.txt
 		String stopTimesFilename = filepath + "/stop_times.txt";
