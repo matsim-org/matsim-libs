@@ -24,6 +24,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * Quick implementation of a RTS with tabu capabilities on toggle genes.
@@ -37,10 +38,11 @@ public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelect
 
 	public TabuRestrictedTournamentSelector(
 			final JointPlanOptimizerJGAPConfiguration jgapConfig,
+			final JointReplanningConfigGroup configGroup,
 			final ChromosomeDistanceComparator distanceComparator,
 			final TabuMonitor monitor
 			) throws InvalidConfigurationException {
-		super(jgapConfig, distanceComparator);
+		super(jgapConfig, configGroup, distanceComparator);
 		this.monitor = monitor;
 	}
 
