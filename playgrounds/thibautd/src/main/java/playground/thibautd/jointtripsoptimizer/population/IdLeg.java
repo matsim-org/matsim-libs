@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
  * Identifier for joint legs.
  * The idea behind the re-implementation of id types is allow easy check of the
  * identified object type.
+ *
  * @author thibautd
  */
 public class IdLeg implements Id {
@@ -43,7 +44,7 @@ public class IdLeg implements Id {
 		try {
 			return (int) (this.id - ((IdLeg) arg).id);
 		} catch (ClassCastException e) {
-			throw new IllegalArgumentException("can only compare IdActivity with IdActivity instances");
+			throw new IllegalArgumentException("can only compare IdLeg with IdLeg instances");
 		}
 	}
 
