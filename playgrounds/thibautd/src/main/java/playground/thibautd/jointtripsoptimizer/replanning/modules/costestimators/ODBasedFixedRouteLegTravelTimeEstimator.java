@@ -54,7 +54,9 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
  *
  * This class assumes no time-dependance of travel times for non-car modes, as:
  * <ul>
- * <li> this is the case with the default routers </li>
+ * <li> this is the case with the default routers, if we trust the documentation.
+ * <u>however</u>, evidences show that Time-dependant tt is sometimes used (for
+ * example in PseudoTransit).</li>
  * </li> the way {@link PlansCalcRoute} is implemented for those modes is very
  * expensive: basically, it computes the least-cost path each time it is asked
  * to handle such a mode. To handle such a mode with time dependance, {@link
@@ -68,7 +70,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
  */
 public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator {
 
-	private static final double FALSE_NOW = 0d;
+	private static final double FALSE_NOW = 12*3600d;
 
 	private final Plan plan;
 	protected final TravelTime linkTravelTimeEstimator;
@@ -93,11 +95,6 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		this.simLegInterpretation = simLegInterpretation;
 		this.network = network;
 
-		// TODO: choose wether to use this or not (not using it: the least cost
-		// route for the first computed leg is used. this may not lead to better
-		// routes, as the first solutions are mainly non-sense. It is even possible
-		// that this leads to worst results, aside from increasing computationnal
-		// cost)
 		this.initPlanSpecificInformation();
 	}
 
