@@ -78,7 +78,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final Network network;
-	private Map<Tuple<Id, Id>, Map<String, LegImpl>> fixedRoutes = 
+	private final Map<Tuple<Id, Id>, Map<String, LegImpl>> fixedRoutes = 
 		new HashMap<Tuple<Id, Id>, Map<String, LegImpl>>();
 
 	protected ODBasedFixedRouteLegTravelTimeEstimator(
