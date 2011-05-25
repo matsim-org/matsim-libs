@@ -1,4 +1,4 @@
-package playground.wrashid.parkingChoice;
+package playground.wrashid.parkingChoice.scoring;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,8 +18,11 @@ import playground.wrashid.PSF.parking.ParkingTimes;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.parkingChoice.ParkingManager;
 
-public class ParkingScoring implements ScoringListener {
+
+//TODO: make method for getting averageActPerformanceEarningRate for a certain person.
+public class ParkingScoreAccumulator implements ScoringListener {
 
 
 	private final ParkingTimesPlugin parkingTimes;
@@ -27,7 +30,7 @@ public class ParkingScoring implements ScoringListener {
 	private final ParkingManager parkingManager;
 
 	//TODO: probably remove ParkingTimesPlugin again from this class, as do not need it
-	public ParkingScoring(ParkingTimesPlugin parkingTimes, Controler controler, ParkingManager parkingManager){
+	public ParkingScoreAccumulator(ParkingTimesPlugin parkingTimes, Controler controler, ParkingManager parkingManager){
 		this.parkingTimes = parkingTimes;
 		this.controler = controler;
 		this.parkingManager = parkingManager;
