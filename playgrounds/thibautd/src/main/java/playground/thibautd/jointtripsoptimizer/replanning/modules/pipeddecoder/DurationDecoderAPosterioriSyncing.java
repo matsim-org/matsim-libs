@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -153,18 +154,19 @@ public class DurationDecoderAPosterioriSyncing implements JointPlanOptimizerDime
 			}
 		}
 
-		this.initializeLegEstimators(plan);
+		this.initializeLegEstimators(plan, configGroup.getSimLegInterpretation());
 	}
 
-	private void initializeLegEstimators(final JointPlan plan) {
+	private void initializeLegEstimators(
+			final JointPlan plan,
+			final SimLegInterpretation simLegInt) {
 		LegTravelTimeEstimator currentLegTTEstimator;
+
 		// TODO: use individual plans map instead of clique
 		for (Id id : plan.getClique().getMembers().keySet()) {
 			currentLegTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 					plan.getIndividualPlan(id),
-					//TODO: pass it by the config group
-					//PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-					PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible,
+					simLegInt,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					routingAlgorithm,
 					network);

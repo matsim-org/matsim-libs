@@ -135,6 +135,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			RestrictedTournamentSelector selector = 
 				new RestrictedTournamentSelector(
 						this,
+						configGroup,
 						new DefaultChromosomeDistanceComparator(
 							configGroup.getDiscreteDistanceScale()));
 			this.addNaturalSelector(selector, false);

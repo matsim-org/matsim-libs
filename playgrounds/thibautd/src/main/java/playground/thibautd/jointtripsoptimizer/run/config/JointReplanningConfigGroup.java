@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.config.Module;
 
 /**
@@ -72,6 +74,8 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String SPX_SONS = "SPXOffspringRate";
 	private static final String DISCRETE_DIST_SCALE = "discreteDistanceScale";
 	private static final String MAX_TABU_LENGTH = "tabuListMaxLength";
+	private static final String SIM_LEG_INT = "simLegInterpretation";
+	private static final String RTS_WINDOW = "rtsWindowSize";
 
 	//parameter values, initialized to defaults.
 	private int numTimeIntervals;
@@ -92,14 +96,16 @@ public class JointReplanningConfigGroup extends Module {
 	private int monitoringPeriod = 5;
 	private boolean doMonitor = true;
 	private double minImprovement = 1d;
-	private PlanomatConfigGroup.TripStructureAnalysisLayerOption
-		tripStructureAnalysisLayer = PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
+	private TripStructureAnalysisLayerOption
+		tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
 	private boolean allowDoublettes = false;
 	private boolean dynamicCoRate = true;
 	private double spxRate = 0.6d;
 	private int spxOffspringRate = 4;
 	private double discreteDistScale = 100d;
 	private int maxTabuLength = Integer.MAX_VALUE;
+	private SimLegInterpretation simLegInt = SimLegInterpretation.CharyparEtAlCompatible;
+	private int rtsWindowSize = 15;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -188,6 +194,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_TABU_LENGTH)) {
 			this.setTabuListMaxLength(value);
 		}
+		else if (param_name.equals(RTS_WINDOW)) {
+			this.setRtsWindowSize(value);
+		}
+		else if (param_name.equals(SIM_LEG_INT)) {
+			this.setSimLegInterpretation(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -272,6 +284,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_TABU_LENGTH)) {
 			return String.valueOf(this.getTabuListMaxLength());
 		}
+		else if (param_name.equals(RTS_WINDOW)) {
+			return String.valueOf(this.getRtsWindowSize());
+		}
+		else if (param_name.equals(SIM_LEG_INT)) {
+			return String.valueOf(this.getSimLegInterpretation());
+		}
 
 		return null;
 	}
@@ -302,7 +320,8 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, SPX_RATE);
 		this.addParameterToMap(map, SPX_SONS);
 		this.addParameterToMap(map, DISCRETE_DIST_SCALE);
-		this.addParameterToMap(map, MAX_TABU_LENGTH);
+		this.addParameterToMap(map, RTS_WINDOW);
+		this.addParameterToMap(map, SIM_LEG_INT);
 		return map;
 	}
 
@@ -562,8 +581,7 @@ public class JointReplanningConfigGroup extends Module {
 		}
 	}
 
-	public PlanomatConfigGroup.TripStructureAnalysisLayerOption 
-		getTripStructureAnalysisLayer() {
+	public TripStructureAnalysisLayerOption getTripStructureAnalysisLayer() {
 			return this.tripStructureAnalysisLayer;
 	}
 
@@ -620,6 +638,22 @@ public class JointReplanningConfigGroup extends Module {
 
 	public int getTabuListMaxLength() {
 		return this.maxTabuLength;
+	}
+
+	public void setSimLegInterpretation(String value) {
+		this.simLegInt = SimLegInterpretation.valueOf(value);
+	}
+
+	public SimLegInterpretation getSimLegInterpretation() {
+		return this.simLegInt;
+	}
+
+	public void setRtsWindowSize(String value) {
+		this.rtsWindowSize = Integer.valueOf(value);
+	}
+
+	public int getRtsWindowSize() {
+		return this.rtsWindowSize;
 	}
 }
 

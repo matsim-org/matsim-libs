@@ -31,6 +31,8 @@ import org.jgap.NaturalSelectorExt;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
+
 /**
  * Selector using a "restricted tournament" (cf Harik 1995) to generate the new 
  * population.
@@ -57,10 +59,11 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 
 	public RestrictedTournamentSelector(
 			final Configuration jgapConfig,
+			final JointReplanningConfigGroup configGroup,
 			final ChromosomeDistanceComparator distanceComparator
 			) throws InvalidConfigurationException {
 		super(jgapConfig);
-		this.windowSize = 15;
+		this.windowSize = configGroup.getRtsWindowSize();
 		this.jgapConfig = jgapConfig;
 		this.distanceComparator = distanceComparator;
 	}
