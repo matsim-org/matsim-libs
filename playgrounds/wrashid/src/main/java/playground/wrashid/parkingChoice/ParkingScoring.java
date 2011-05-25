@@ -26,6 +26,7 @@ public class ParkingScoring implements ScoringListener {
 	private Controler controler;
 	private final ParkingManager parkingManager;
 
+	//TODO: probably remove ParkingTimesPlugin again from this class, as do not need it
 	public ParkingScoring(ParkingTimesPlugin parkingTimes, Controler controler, ParkingManager parkingManager){
 		this.parkingTimes = parkingTimes;
 		this.controler = controler;
