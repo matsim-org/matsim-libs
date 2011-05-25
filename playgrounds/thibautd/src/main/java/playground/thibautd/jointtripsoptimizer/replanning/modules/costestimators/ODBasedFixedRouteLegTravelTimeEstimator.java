@@ -76,7 +76,12 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		this.simLegInterpretation = simLegInterpretation;
 		this.network = network;
 
-		//this.initPlanSpecificInformation();
+		// TODO: choose wether to use this or not (not using it: the least cost
+		// route for the first computed leg is used. this may not lead to better
+		// routes, as the first solutions are mainly non-sense. It is even possible
+		// that this leads to worst results, aside from increasing computationnal
+		// cost)
+		this.initPlanSpecificInformation();
 	}
 
 	/*
@@ -310,6 +315,10 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		return linkEnd;
 	}
 
+	/**
+	 * Stores the routes of the plan.
+	 * That is, the router will only be used for newly created ODs.
+	 */
 	private void initPlanSpecificInformation() {
 		if (this.plan != null) {
 			for (PlanElement planElement : this.plan.getPlanElements()) {
