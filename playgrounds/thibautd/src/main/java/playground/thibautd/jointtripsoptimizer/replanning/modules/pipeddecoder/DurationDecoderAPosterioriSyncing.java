@@ -152,6 +152,8 @@ public class DurationDecoderAPosterioriSyncing implements JointPlanOptimizerDime
 						indexToAdd);
 			}
 		}
+
+		this.initializeLegEstimators(plan);
 	}
 
 	private void initializeLegEstimators(final JointPlan plan) {
@@ -188,7 +190,7 @@ public class DurationDecoderAPosterioriSyncing implements JointPlanOptimizerDime
 		this.plan = inputPlan;
 
 		resetInternalState();
-		this.initializeLegEstimators(this.plan);
+		//this.initializeLegEstimators(this.plan);
 
 		for (Person individual : plan.getClique().getMembers().values()) {
 			individualPlan = new PlanImpl(individual);
@@ -208,7 +210,7 @@ public class DurationDecoderAPosterioriSyncing implements JointPlanOptimizerDime
 	private void resetInternalState() {
 		this.readyJointLegs.clear();
 		this.driverLegs.clear();
-		this.legTTEstimators.clear();
+		//this.legTTEstimators.clear();
 	}
 
 	private final void plan(
