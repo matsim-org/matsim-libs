@@ -23,10 +23,9 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
@@ -41,9 +40,6 @@ import org.matsim.signalsystems.model.SignalGroupState;
 public class SignalGroupStateTimeHandler implements
 		SignalGroupStateChangedEventHandler {
 	
-	
-	private static final Logger log = Logger
-			.getLogger(SignalGroupStateTimeHandler.class);
 	Map<Id, TreeMap<Id, TreeMap<Double, SignalGroupState>>> systemGroupTimeState = new TreeMap<Id, TreeMap<Id,TreeMap<Double,SignalGroupState>>>();
 	
 	TreeMap<Double, SignalGroupState> temp;

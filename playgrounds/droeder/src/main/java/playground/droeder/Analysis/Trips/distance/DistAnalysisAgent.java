@@ -39,7 +39,12 @@ public class DistAnalysisAgent {
 		this.trips = linkedList;
 		this.id = id;
 	}
-
+	
+	/**
+	 * returns true true if the trip is finished
+	 * @param e
+	 * @return
+	 */
 	public boolean processAgentEvent(AgentEvent e) {
 		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
 		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();

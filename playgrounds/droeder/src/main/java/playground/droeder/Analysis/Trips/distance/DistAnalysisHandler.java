@@ -79,7 +79,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		this.stuckAgents = new ArrayList<Id>();
 	}
 	
-	
 	public void addLinks(Map<Id, Link> map){
 		this.links = map;
 	}
@@ -100,6 +99,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	
 	@Override
 	public void handleEvent(TransitDriverStartsEvent e) {
+		//create a new instance if no exists
 		if(!this.drivers.containsKey(e.getDriverId())){
 			this.drivers.put(e.getDriverId(), new DistAnalysisPtDriver(e.getDriverId()));
 		}
@@ -110,15 +110,17 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 			this.routes.put(e.getTransitRouteId(), new DistAnalysisTransitRoute(e.getTransitRouteId()));
 		}
 		
-		this.drivers.get(e.getDriverId()).registerVehicle(this.vehicles.get(e.getVehicleId()));
+		//register route to vehicle and vehicle to driver
 		this.vehicles.get(e.getVehicleId()).registerRoute(this.routes.get(e.getTransitRouteId()));
+		this.drivers.get(e.getDriverId()).registerVehicle(this.vehicles.get(e.getVehicleId()));
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
 			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
-				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
+				//if the trip is finished, add to tripStorage
+				this.addTrip2TripStorageAndRemoveFromPerson(e.getPersonId());
 			}
 		}
 	}
@@ -127,12 +129,13 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	public void handleEvent(AgentArrivalEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
 			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
-				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
+				//if the trip is finished, add to tripStorage
+				this.addTrip2TripStorageAndRemoveFromPerson(e.getPersonId());
 			}
 		}
 	}
 	
-	private void addTrip2TripSetsAndRemoveFromPerson(Id id){
+	private void addTrip2TripStorageAndRemoveFromPerson(Id id){
 		AbstractAnalysisTrip t = this.persons.get(id).removeFinishedTrip();
 		for(AnalysisTripSetStorage s: this.tripSets.values()){
 			s.addTrip(t);
@@ -150,6 +153,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent e) {
+		// an agent should have an AgentDepartureEvent before he enters a vehicle
 		if(this.persons.containsKey(e.getPersonId())){
 			this.vehicles.get(e.getVehicleId()).enterVehicle(this.persons.get(e.getPersonId()));
 		}
@@ -157,6 +161,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
+		//agents and drivers can process a LinkEnterEvent 
 		if(this.persons.containsKey(e.getPersonId())){
 			this.persons.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}else if(this.drivers.containsKey(e.getPersonId())){

@@ -69,6 +69,7 @@ public class DistAnalysisVehicle {
 
 	/**
 	 * remove the agent from passengerlist if it is in
+	 * returns false if the passenger is not in the vehicle
 	 * @param a
 	 */
 	public boolean leaveVehicle(DistAnalysisAgent a) {
