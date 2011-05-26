@@ -5,9 +5,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -17,12 +19,10 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-
-import utils.BuildTrees;
 
 
 public class CreatePopulation {
@@ -40,6 +40,7 @@ public class CreatePopulation {
 	private Random random = new Random(3838494); 
 	
 	private ObjectAttributes personHomeAndWorkLocations = new ObjectAttributes();
+	private final static Logger log = Logger.getLogger(CreatePopulation.class);
 
 	// --------------------------------------------------------------------------
 	
@@ -53,9 +54,8 @@ public class CreatePopulation {
 		/*
 		 * Build quad trees for assigning home and work locations
 		 */
-		BuildTrees quadTreeCreator = new BuildTrees();
-		this.homeFacilitiesTree = quadTreeCreator.createActivitiesTree("home", this.scenario); 
-		this.workFacilitiesTree = quadTreeCreator.createActivitiesTree("work", this.scenario); 
+		this.homeFacilitiesTree = this.createActivitiesTree("home", this.scenario); 
+		this.workFacilitiesTree = this.createActivitiesTree("work", this.scenario); 
 		
 		this.readMunicipalities();
 	}
@@ -165,5 +165,45 @@ public class CreatePopulation {
 
 	public ObjectAttributes getPersonHomeAndWorkLocations() {
 		return personHomeAndWorkLocations;
+	}
+	
+	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
+		QuadTree<ActivityFacility> facQuadTree;
+		
+		if (activityType.equals("all")) {
+			facQuadTree = this.builFacQuadTree(
+					activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilities());	
+		}
+		else {
+			facQuadTree = this.builFacQuadTree(
+				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
+		}
+		return facQuadTree;
+	}
+
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id,ActivityFacility> facilities_of_type) {
+		log.info(" building " + type + " facility quad tree");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+	
+		for (final ActivityFacility f : facilities_of_type.values()) {
+			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
+			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
+			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
+			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (final ActivityFacility f : facilities_of_type.values()) {
+			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
+		}
+		log.info("Quadtree size: " + quadtree.size());
+		return quadtree;
 	}
 }
