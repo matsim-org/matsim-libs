@@ -196,9 +196,9 @@ public class DurationOnTheFlyScorer {
 			final JointPlan inputPlan) {
 
 		Map<Id, IndividualValuesWrapper> individualValuesMap = 
-			new HashMap<Id, IndividualValuesWrapper>();
-		List<Id> individualsToPlan = new ArrayList<Id>();
-		List<Id> toRemove = new ArrayList<Id>();
+			new HashMap<Id, IndividualValuesWrapper>(nMembers);
+		List<Id> individualsToPlan = new ArrayList<Id>(nMembers);
+		List<Id> toRemove = new ArrayList<Id>(nMembers);
 		Id currentId = null;
 		Plan individualPlan = null;
 
@@ -206,7 +206,8 @@ public class DurationOnTheFlyScorer {
 
 		resetInternalState();
 
-		for (Map.Entry<Id, Plan> inputIndivPlan : plan.getIndividualPlans().entrySet()) {
+		for (Map.Entry<Id, Plan> inputIndivPlan :
+				plan.getIndividualPlans().entrySet()) {
 			individualPlan = inputIndivPlan.getValue();
 			currentId = inputIndivPlan.getKey();
 			individualsToPlan.add(currentId);
@@ -261,7 +262,8 @@ public class DurationOnTheFlyScorer {
 		IndividualValuesWrapper individualValues = individualValuesMap.get(id);
 		// CAUTION: THOSE ARE THE ELEMENTS OF THE INITIAL PLAN, POSSIBLY MODIFIED
 		List<PlanElement> planElements = this.individualPlanElements.get(id);
-		PlanElement currentElement = individualValues.planElements.get(individualValues.getIndexInPlan());
+		PlanElement currentElement =
+			individualValues.planElements.get(individualValues.getIndexInPlan());
 		LegTravelTimeEstimator currentLegTTEstimator =
 			this.legTTEstimators.get(id);
 		double currentDuration;
@@ -284,11 +286,15 @@ public class DurationOnTheFlyScorer {
 		}
 		else if (currentElement instanceof JointLeg) {
 			// Assumes that a plan begins by an activity, with a strict Act-Leg alternance.
-			origin = (JointActivity) individualValues.planElements.get(individualValues.getIndexInPlan() - 1);
-			destination = (JointActivity) individualValues.planElements.get(individualValues.getIndexInPlan() + 1);
+			origin = (JointActivity) individualValues.planElements.get(
+					individualValues.getIndexInPlan() - 1);
+			destination = (JointActivity) individualValues.planElements.get(
+					individualValues.getIndexInPlan() + 1);
 
 			if (isPickUp(destination)) {
-				if (!this.readyJointLegs.containsKey(individualValues.planElements.get(individualValues.getIndexInPlan() + 2))) {
+				if (!this.readyJointLegs.containsKey(
+							individualValues.planElements.get(
+								individualValues.getIndexInPlan() + 2))) {
 					// case of an affected PU activity without access:
 					// plan the access leg
 					scorePuAccessLeg(
@@ -319,7 +325,9 @@ public class DurationOnTheFlyScorer {
 			}
 		}
 		else if (isPickUp(currentElement) || isDropOff(currentElement)) {
-			if (isReadyForPlanning(individualValues.planElements, individualValues.getIndexInPlan())) {
+			if (isReadyForPlanning(
+						individualValues.planElements,
+						individualValues.getIndexInPlan())) {
 				scoreSharedLegAct(
 						planElements,
 						id,
@@ -348,7 +356,8 @@ public class DurationOnTheFlyScorer {
 		JointLeg leg = ((JointLeg) currentElement);
 		JointActivity origin = (JointActivity) individualValues.planElements.get(
 				individualValues.getIndexInPlan() - 1);
-		JointActivity destination = (JointActivity) individualValues.planElements.get(individualValues.getIndexInPlan() + 1);
+		JointActivity destination = (JointActivity)
+			individualValues.planElements.get(individualValues.getIndexInPlan() + 1);
 		double currentTravelTime;
 
 		currentTravelTime = scoreLeg(
@@ -364,7 +373,8 @@ public class DurationOnTheFlyScorer {
 
 		// mark the PU as accessed
 		this.readyJointLegs.put(
-				(JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 2),
+				(JointLeg) individualValues.planElements.get(
+					individualValues.getIndexInPlan() + 2),
 				individualValues.getNow());
 
 		individualValues.addToIndexInPlan(1);
@@ -408,7 +418,9 @@ public class DurationOnTheFlyScorer {
 				geneIndex,
 				individualValues.getNow(),
 				individualValues.getJointTravelTime());
-		individualValues.scoringFunction.startActivity(individualValues.getNow(), destination);
+		individualValues.scoringFunction.startActivity(
+				individualValues.getNow(),
+				destination);
 		individualValues.addToNow(currentDuration);
 		individualValues.scoringFunction.endActivity(individualValues.getNow());
 		individualValues.addToIndexInChromosome(1);
@@ -497,7 +509,8 @@ public class DurationOnTheFlyScorer {
 		// /////////////////////////////////////////////////////////////////
 		// plan destination activity
 		if (isDropOff(destination)) {
-			if (!((JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 3))
+			if (!((JointLeg) individualValues.planElements.get(
+							individualValues.getIndexInPlan() + 3))
 				.getJoint()) {
 				//"terminal" DO
 				individualValues.scoringFunction.startActivity(
@@ -518,7 +531,8 @@ public class DurationOnTheFlyScorer {
 		else if (isPickUp(destination)) {
 			// mark the PU as accessed
 			this.readyJointLegs.put(
-					(JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 3),
+					(JointLeg) individualValues.planElements.get(
+						individualValues.getIndexInPlan() + 3),
 					individualValues.getNow());
 
 			//restart planning at the PU
@@ -557,7 +571,8 @@ public class DurationOnTheFlyScorer {
 
 		if (test) {
 			boolean allRelativesArePlanned = 
-				this.readyJointLegs.keySet().containsAll(sharedRide.getLinkedElements().values());
+				this.readyJointLegs.keySet().containsAll(
+						sharedRide.getLinkedElements().values());
 			boolean isDriver = sharedRide.getIsDriver();
 			boolean driverIsPlanned = this.driverLegs.containsKey(sharedRide);
 			

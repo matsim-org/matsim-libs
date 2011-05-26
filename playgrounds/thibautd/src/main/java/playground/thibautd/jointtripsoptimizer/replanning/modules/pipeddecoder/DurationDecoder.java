@@ -33,7 +33,6 @@ import org.jgap.impl.DoubleGene;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -180,11 +179,11 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			final IChromosome chromosome,
 			final JointPlan inputPlan) {
 
-		Map<Id, PlanImpl> constructedIndividualPlans = new HashMap<Id, PlanImpl>();
+		Map<Id, PlanImpl> constructedIndividualPlans = new HashMap<Id, PlanImpl>(nMembers);
 		Map<Id, IndividualValuesWrapper> individualValuesMap = 
-			new HashMap<Id, IndividualValuesWrapper>();
-		List<Id> individualsToPlan = new ArrayList<Id>();
-		List<Id> toRemove = new ArrayList<Id>();
+			new HashMap<Id, IndividualValuesWrapper>(nMembers);
+		List<Id> individualsToPlan = new ArrayList<Id>(nMembers);
+		List<Id> toRemove = new ArrayList<Id>(nMembers);
 		Id currentId = null;
 		PlanImpl individualPlan = null;
 
@@ -241,7 +240,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		IndividualValuesWrapper individualValues = individualValuesMap.get(id);
 		PlanImpl constructedPlan = constructedIndividualPlans.get(id);
 		List<PlanElement> planElements = this.individualPlanElements.get(id);
-		PlanElement currentElement = individualValues.planElements.get(individualValues.getIndexInPlan());
+		PlanElement currentElement =
+			individualValues.planElements.get(individualValues.getIndexInPlan());
 		LegTravelTimeEstimator currentLegTTEstimator =
 			this.legTTEstimators.get(id);
 		double currentDuration;
@@ -266,11 +266,15 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		}
 		else if (currentElement instanceof JointLeg) {
 			// Assumes that a plan begins by an activity, with a strict Act-Leg alternance.
-			origin = (JointActivity) individualValues.planElements.get(individualValues.getIndexInPlan() - 1);
-			destination = new JointActivity((JointActivity) individualValues.planElements.get(individualValues.getIndexInPlan() + 1));
+			origin = (JointActivity) 
+				individualValues.planElements.get(individualValues.getIndexInPlan() - 1);
+			destination = new JointActivity((JointActivity)
+					individualValues.planElements.get(individualValues.getIndexInPlan() + 1));
 
 			if (isPickUp(destination)) {
-				if (!this.readyJointLegs.containsKey(individualValues.planElements.get(individualValues.getIndexInPlan() + 2))) {
+				if (!this.readyJointLegs.containsKey(
+							individualValues.planElements.get(
+								individualValues.getIndexInPlan() + 2))) {
 					// case of an affected PU activity without access:
 					// plan the access leg
 					planPuAccessLeg(
@@ -301,7 +305,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 			}
 		}
 		else if (isPickUp(currentElement) || isDropOff(currentElement)) {
-			if (isReadyForPlanning(individualValues.planElements, individualValues.getIndexInPlan())) {
+			if (isReadyForPlanning(
+						individualValues.planElements,
+						individualValues.getIndexInPlan())) {
 				planSharedLegAct(
 						planElements,
 						currentElement,
@@ -331,7 +337,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		JointActivity origin = (JointActivity) individualValues.planElements.get(
 				individualValues.getIndexInPlan() - 1);
 		JointActivity destination = new JointActivity((JointActivity)
-				individualValues.planElements.get(individualValues.getIndexInPlan() + 1));
+				individualValues.planElements.get(
+					individualValues.getIndexInPlan() + 1));
 		double currentTravelTime;
 
 		leg = createLeg(
@@ -349,7 +356,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		// mark the PU as accessed
 		this.readyJointLegs.put(
-				(JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 2),
+				(JointLeg) individualValues.planElements.get(
+					individualValues.getIndexInPlan() + 2),
 				individualValues.getNow());
 
 		individualValues.addToIndexInPlan(1);
@@ -479,8 +487,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		// /////////////////////////////////////////////////////////////////
 		// plan destination activity
 		if (isDropOff(destination)) {
-			if (!((JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 3))
-				.getJoint()) {
+			if (!((JointLeg) individualValues.planElements.get(
+							individualValues.getIndexInPlan() + 3)).getJoint()) {
 				//"terminal" DO
 				destination = createActivity(
 						destination,
@@ -501,7 +509,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		else if (isPickUp(destination)) {
 			// mark the PU as accessed
 			this.readyJointLegs.put(
-					(JointLeg) individualValues.planElements.get(individualValues.getIndexInPlan() + 3),
+					(JointLeg) individualValues.planElements.get(
+						individualValues.getIndexInPlan() + 3),
 					individualValues.getNow());
 
 			//restart planning at the PU
@@ -540,7 +549,8 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		if (test) {
 			boolean allRelativesArePlanned = 
-				this.readyJointLegs.keySet().containsAll(sharedRide.getLinkedElements().values());
+				this.readyJointLegs.keySet().containsAll(
+						sharedRide.getLinkedElements().values());
 			boolean isDriver = sharedRide.getIsDriver();
 			boolean driverIsPlanned = this.driverLegs.containsKey(sharedRide);
 			
