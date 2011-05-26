@@ -134,7 +134,6 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 			this.start = actLocations.removeFirst();
 			if(e.getLegMode().equals(TransportMode.pt)){
 				this.lineCnt++;
-			}else {
 			}
 		}else if(e instanceof AgentArrivalEvent){
 			if(!e.getLegMode().equals(TransportMode.pt) && !e.getLegMode().equals(TransportMode.car)){
@@ -154,6 +153,7 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 				this.egressWalkCnt++;
 				this.accesWalkDist = this.getDist(this.legStartEnd.get(0));
 				this.egressWalkDist = this.getDist(this.legStartEnd.get(1));
+//				System.out.println(this.accesWalkCnt + " " + this.accesWalkDist + "; " + this.egressWalkCnt + " " + this.egressWalkDist);
 			}else if(this.legStartEnd.size() >= 2){
 				this.accesWalkCnt++;
 				this.egressWalkCnt++;
@@ -164,10 +164,11 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 					this.switchWalkCnt++;
 					this.switchWalkDist += this.getDist(this.legStartEnd.get(i));
 				}
+//				System.out.println(this.accesWalkCnt + " " + this.accesWalkDist + "; " + this.egressWalkCnt + " " + this.egressWalkDist + "; " + this.switchWalkCnt + " " + this.switchWalkDist);
 			}else{
 				log.error("a pt-trip need's at least an acces and an egressWalk!");
 			}
-			
+		this.tripDist = this.accesWalkDist + this.inPtDist + this.switchWalkDist + this.egressWalkDist;	
 		}else if(!super.getMode().equals(TransportMode.car)){
 			this.tripDist = this.getDist(this.legStartEnd.get(0));
 		}

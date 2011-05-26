@@ -75,7 +75,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		this.routes = new HashMap<Id, DistAnalysisTransitRoute>();
 		this.vehicles = new HashMap<Id, DistAnalysisVehicle>();
 		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
-			this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null));
+		this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null));
 		this.stuckAgents = new ArrayList<Id>();
 	}
 	
@@ -121,9 +121,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
 			}
 		}
-//		else{
-//			log.error("Person does not exist: " + e.getPersonId());
-//		}		
 	}
 
 	@Override
@@ -133,9 +130,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 				this.addTrip2TripSetsAndRemoveFromPerson(e.getPersonId());
 			}
 		}
-//		else{
-//			log.error("Person does not exist: " + e.getPersonId());
-//		}
 	}
 	
 	private void addTrip2TripSetsAndRemoveFromPerson(Id id){
@@ -152,9 +146,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 				log.error("agent " + e.getPersonId() + " try to leave vehicle " + e.getVehicleId() + " but isn't in there");
 			}
 		}
-//		else{
-//			log.error("Person does not exist: " + e.getPersonId());
-//		}
 	}
 
 	@Override
@@ -162,9 +153,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		if(this.persons.containsKey(e.getPersonId())){
 			this.vehicles.get(e.getVehicleId()).enterVehicle(this.persons.get(e.getPersonId()));
 		}
-//		else{
-//			log.error("Person does not exist: " + e.getPersonId());
-//		}
 	}
 
 	@Override
@@ -174,9 +162,6 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		}else if(this.drivers.containsKey(e.getPersonId())){
 			this.drivers.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}
-//		else{
-//		log.error("Person does not exist: " + e.getPersonId());
-//	}
 	}
 	
 	

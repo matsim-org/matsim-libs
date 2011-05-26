@@ -49,7 +49,7 @@ public class DistAnalysisAgent {
 		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
 	}
 	
-	public void passedLinkOnPt(double length) {
+	public void passedLinkInPt(double length) {
 		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
 	}
 

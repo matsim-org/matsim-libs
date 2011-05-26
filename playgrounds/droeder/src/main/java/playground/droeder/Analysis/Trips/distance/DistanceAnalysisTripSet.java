@@ -90,7 +90,10 @@ public class DistanceAnalysisTripSet extends AbstractAnalysisTripSet{
 
 	@Override
 	protected void addTripValues(AbstractAnalysisTrip trip) {
-		if(!(trip instanceof DistAnalysisTripI)) log.error("given Trip has the wrong type!");
+		if(!(trip instanceof DistAnalysisTripI)){
+			log.error("given Trip has the wrong type and is not processed!"); 
+			return;
+		}
 		
 		int location = super.getTripLocation(trip);
 		this.tripCnt[location]++;
@@ -104,11 +107,11 @@ public class DistanceAnalysisTripSet extends AbstractAnalysisTripSet{
 			this.inPtDist[location] += t.getInPtDist();
 			this.lineCnt[location] += t.getLineCnt();
 			
-			this.switchWalkCnt[location] = t.getSwitchWalkCnt();
-			this.switchWalkDist[location] = t.getSwitchWalkDist();
+			this.switchWalkCnt[location] += t.getSwitchWalkCnt();
+			this.switchWalkDist[location] += t.getSwitchWalkDist();
 
-			this.egressWalkCnt[location] = t.getEgressWalkCnt();
-			this.egressWalkDist[location] = t.getEgressWalkDist();
+			this.egressWalkCnt[location] += t.getEgressWalkCnt();
+			this.egressWalkDist[location] += t.getEgressWalkDist();
 		}
 	}
 	
@@ -120,18 +123,18 @@ public class DistanceAnalysisTripSet extends AbstractAnalysisTripSet{
 		b.append(";inside Zone;leaving Zone;entering Zone;outside Zone; \n");
 		
 		b.append("tripCnt;"); super.println(this.tripCnt, b);
-		b.append("tripDist;"); super.println(this.tripDist, b);
+		b.append("tripDist [m];"); super.println(this.tripDist, b);
 		
 		if(super.getMode().equals(TransportMode.pt)){
 			b.append("accesWalkCnt;"); super.println(this.accesWalkCnt, b);
 			b.append("lineCnt;"); super.println(this.lineCnt, b);
-			b.append("switchWalkCnt"); super.println(this.switchWalkCnt, b);
+			b.append("switchWalkCnt;"); super.println(this.switchWalkCnt, b);
 			b.append("egressWalkCnt;"); super.println(this.egressWalkCnt, b);
 			
-			b.append("accesWalkDist;"); super.println(this.accesWalkDist, b);
-			b.append("inPtDist;"); super.println(this.inPtDist, b);
-			b.append("switchWalkDist;"); super.println(this.switchWalkDist, b);
-			b.append("egressWalkDist;"); super.println(this.egressWalkDist, b);
+			b.append("accesWalkDist [m];"); super.println(this.accesWalkDist, b);
+			b.append("inPtDist [m];"); super.println(this.inPtDist, b);
+			b.append("switchWalkDist [m];"); super.println(this.switchWalkDist, b);
+			b.append("egressWalkDist [m];"); super.println(this.egressWalkDist, b);
 		}
 		return b.toString();
 	}

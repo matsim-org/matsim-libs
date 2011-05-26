@@ -80,5 +80,17 @@ public class DistAnalysisTransitRoute {
 		return id;
 	}
 
+	public String toString(boolean header){
+		StringBuffer b =  new StringBuffer();
+		if(header){
+			b.append("RouteId;Distance [m];nr of Pers. * meters ; transported Persons\n");
+		}
+		b.append(this.id.toString() + ";" + this.travelDistance + ";" + this.trafficPerformance + ";" + this.transportedPersons + "\n");
+		return b.toString();
+	}
 	
+	@Override
+	public String toString(){
+		return this.toString(true);
+	}
 }

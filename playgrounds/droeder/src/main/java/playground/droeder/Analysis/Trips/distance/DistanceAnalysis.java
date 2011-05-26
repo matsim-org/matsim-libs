@@ -55,6 +55,8 @@ public class DistanceAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
 	
 	private DistAnalysisHandler eventsHandler;
+
+	private String unprocessedAgents;
 	
 	public DistanceAnalysis(){
 		this.eventsHandler = new DistAnalysisHandler();
@@ -92,6 +94,7 @@ public class DistanceAnalysis {
 		for(Entry<Id, LinkedList<AbstractAnalysisTrip>> e:  planFilter.getTrips().entrySet()){
 			this.eventsHandler.addPerson(new DistAnalysisAgent(e.getValue(), e.getKey()));
 		}
+		this.unprocessedAgents = planFilter.getUnprocessedAgents();
 	}
 	
 	/**
@@ -120,23 +123,39 @@ public class DistanceAnalysis {
 				}
 			}
 			
-//			//write unprocessed Agents
-//			writer = IOUtils.getBufferedWriter(out + "unprocessedAgents_v4.csv");
-//			writer.write(this.unProcessedAgents);
-//			writer.flush();
-//			writer.close();
-//			
-//			//write uncompletedPlans
-//			writer = IOUtils.getBufferedWriter(out + "uncompletedPlans_v4.csv");
-//			writer.write(this.eventsHandler.getUncompletedPlans());
-//			writer.flush();
-//			writer.close();
-//			
-//			//write stuckAgents
-//			writer = IOUtils.getBufferedWriter(out + "stuckAgents_v4.csv");
-//			writer.write(this.eventsHandler.getStuckAgents());
-//			writer.flush();
-//			writer.close();
+			//write stuckAgents
+			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_stuckAgents.csv");
+			for(Id id : this.eventsHandler.getStuckAgents()) {
+				writer.write(id.toString() + "\n");
+			}
+			writer.flush();
+			writer.close();
+			
+			//write routes
+			boolean header = true;
+			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_routes.csv");
+			for(DistAnalysisTransitRoute r: this.eventsHandler.getRoutes()){
+				writer.write(r.toString(header));
+				header = false;
+			}
+			writer.flush();
+			writer.close();
+			
+			//write vehicles
+			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_vehicles.csv");
+			header = true;
+			for(DistAnalysisVehicle v : this.eventsHandler.getVehicles()){
+				writer.write(v.toString(header));
+				header = false;
+			}
+			writer.flush();
+			writer.close();
+			
+			//write unprocessed Agents
+			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_uprocessed_Agents.csv");
+			writer.write(this.unprocessedAgents);
+			writer.flush();
+			writer.close();
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

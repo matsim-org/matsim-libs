@@ -82,7 +82,7 @@ public class DistAnalysisVehicle {
 	public void processLinkEnterEvent(double linkLength){
 		this.distance += linkLength;
 		for(DistAnalysisAgent passenger : this.passengers){
-			passenger.passedLinkOnPt(linkLength);
+			passenger.passedLinkInPt(linkLength);
 		}
 		this.route.passedLink(linkLength, this.passengers.size());
 	}
@@ -111,5 +111,17 @@ public class DistAnalysisVehicle {
 		return totalPassengers;
 	}
 	
+	public String toString(boolean header){
+		StringBuffer b = new StringBuffer();
+		if(header){
+			b.append("vehicleId;PassengerCnt;Dist[m]\n");
+		}
+		b.append(this.vehicleId.toString() + ";" + this.totalPassengers + ";" + this.distance + "\n");
+		return b.toString();
+	}
 	
+	@Override
+	public String toString(){
+		return this.toString(true);
+	}
 }
