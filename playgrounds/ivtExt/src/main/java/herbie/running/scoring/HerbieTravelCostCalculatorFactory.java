@@ -33,6 +33,7 @@ public class HerbieTravelCostCalculatorFactory implements
 	}
 
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
+//		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
+		return null;
 	}
 }

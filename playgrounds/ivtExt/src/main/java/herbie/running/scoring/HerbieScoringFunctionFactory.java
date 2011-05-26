@@ -62,11 +62,11 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyp
 				super.getParams(), 
 				this.facilityPenalties,
 				this.facilities));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-				plan, 
-				super.getParams(),
-				config,
-				this.ktiConfigGroup));
+//		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
+//				plan, 
+//				super.getParams(),
+//				config,
+//				this.ktiConfigGroup));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		
