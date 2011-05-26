@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointPlanOptimizerDecoderFactory.java
+ * JointPlanOptimizerPartialDecoderFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
@@ -29,57 +28,44 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * Creates decoders which does not decodes durations, for usage with "on the fly"
+ * duration scoring.
+ *
  * @author thibautd
  */
-public class JointPlanOptimizerDecoderFactory {
+public class JointPlanOptimizerPartialDecoderFactory {
 
 	private final JointPlan plan;
 	private final JointReplanningConfigGroup configGroup;
-	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private final PlansCalcRoute routingAlgorithm;
-	private final Network network;
 	private final int numJointEpisodes;
 	private final int numEpisodes;
-	private final int nMembers;
-	private final JointPlanOptimizerPartialDecoderFactory partialFactory;
 
-	public JointPlanOptimizerDecoderFactory(
+	public JointPlanOptimizerPartialDecoderFactory(
 			final JointPlan plan,
 			final JointReplanningConfigGroup configGroup,
-			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
-			final Network network,
 			final int numJointEpisodes,
-			final int numEpisodes,
-			final int nMembers) {
+			final int numEpisodes) {
 		this.plan = plan;
 		this.configGroup = configGroup;
-		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
-		this.routingAlgorithm = routingAlgorithm;
-		this.network = network;
 		this.numJointEpisodes = numJointEpisodes;
 		this.numEpisodes = numEpisodes;
-		this.nMembers = nMembers;
-		// "externalize" the creation of part common between the full and the
-		// partial decoder, for consistency reasons
-		this.partialFactory = new JointPlanOptimizerPartialDecoderFactory(
-				plan, configGroup, numJointEpisodes, numEpisodes);
 	}
 
 	public JointPlanOptimizerDecoder createDecoder() {
-		JointPlanOptimizerPipedDecoder output = (JointPlanOptimizerPipedDecoder)
-			this.partialFactory.createDecoder();
+		JointPlanOptimizerPipedDecoder output =
+			new JointPlanOptimizerPipedDecoder(this.plan);
 
-		output.addDecoder(new DurationDecoder(
-		//output.addDecoder(new DurationDecoderAPosterioriSyncing(
-			this.plan,
-			this.configGroup,
-			this.legTravelTimeEstimatorFactory,
-			this.routingAlgorithm,
-			this.network,
-			this.numJointEpisodes,
-			this.numEpisodes,
-			this.nMembers));
+		if (configGroup.getOptimizeToggle()) {
+			output.addDecoder(new ToggleDecoder(this.plan));
+		}
+
+		if (configGroup.getModeToOptimize()) {
+			output.addDecoder(new ModeDecoder(
+						this.plan,
+						this.configGroup,
+						this.numJointEpisodes,
+						this.numEpisodes));
+		}
 
 		return output;
 	}

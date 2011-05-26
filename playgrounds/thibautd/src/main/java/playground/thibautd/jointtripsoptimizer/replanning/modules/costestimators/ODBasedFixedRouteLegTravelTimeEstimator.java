@@ -215,10 +215,8 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		}
 		else {
 			Route route = getFixedRoute(odTuple, actOrigin, actDestination, mode);
-			// XXX do not actually sets the route for the leg!
 			legTravelTimeEstimation = route.getTravelTime();
-			Route legRoute = legIntermediate.getRoute();
-			legRoute.setDistance(route.getDistance());
+			legIntermediate.setRoute(route);
 		}
 
 		return legTravelTimeEstimation;

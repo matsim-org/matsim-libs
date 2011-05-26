@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointPlanOptimizerFitnessFunction.java
+ * JointPlanOptimizerOTFFitnessFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -33,16 +33,15 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationOnTheFlyScorer;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDecoderFactory;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerPartialDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
- * A fitness function which uses a {@link JointPlanOptimizerDecoderFactory}
- * decoder and scores the resulting plan.
- *
  * @author thibautd
  */
-public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimizerFitnessFunction {
+public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptimizerFitnessFunction {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,9 +52,10 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 	private double lastComputedFitnessValue;
 
 	private final JointPlanOptimizerDecoder decoder;
-	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final JointPlanOptimizerDecoder fullDecoder;
+	private final DurationOnTheFlyScorer scorer;
 
-	public JointPlanOptimizerFitnessFunction(
+	public JointPlanOptimizerOTFFitnessFunction(
 			final JointPlan plan,
 			final JointReplanningConfigGroup configGroup,
 			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
@@ -66,58 +66,40 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 			final int nMembers,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		super();
-		this.decoder = (new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
-				routingAlgorithm, network, numJointEpisodes, numEpisodes, nMembers)).createDecoder();
-		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.decoder = (new JointPlanOptimizerPartialDecoderFactory(
+					plan,
+					configGroup,
+					numJointEpisodes,
+					numEpisodes)).createDecoder();
+		this.fullDecoder = (new JointPlanOptimizerDecoderFactory(
+					plan,
+					configGroup,
+					legTravelTimeEstimatorFactory,
+					routingAlgorithm,
+					network,
+					numJointEpisodes,
+					numEpisodes,
+					nMembers)).createDecoder();
+		this.scorer = new DurationOnTheFlyScorer(
+					plan,
+					configGroup,
+					scoringFunctionFactory,
+					legTravelTimeEstimatorFactory,
+					routingAlgorithm,
+					network,
+					numJointEpisodes,
+					numEpisodes,
+					nMembers);
 	}
 
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
 		JointPlan plan = this.decoder.decode(chromosome);
-		double score = this.getScore(plan);
-		return score;
-	}
-
-	private double getScore(final JointPlan plan) {
-		ScoringFunction fitnessFunction;
-		Activity currentActivity;
-		Leg currentLeg;
-		double now;
-
-		for (Plan indivPlan : plan.getIndividualPlans().values()) {
-			fitnessFunction =
-				this.scoringFunctionFactory.createNewScoringFunction(indivPlan);
-			now = 0d;
-	
-			// step through plan and score it
-			for (PlanElement pe : indivPlan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					currentActivity = (Activity) pe;
-					fitnessFunction.startActivity(now, currentActivity);
-					now = currentActivity.getEndTime();
-					fitnessFunction.endActivity(now);
-				}
-				else if (pe instanceof Leg) {
-					currentLeg = (Leg) pe;
-					now = currentLeg.getDepartureTime();
-					fitnessFunction.startLeg(now, currentLeg);
-					now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
-					fitnessFunction.endLeg(now);
-				}
-				else {
-					throw new IllegalArgumentException("unrecognized plan element type");
-				}
-			}
-
-			fitnessFunction.finish();
-			indivPlan.setScore(fitnessFunction.getScore());
-		}
-
-		return plan.getScore();
+		return this.scorer.score(chromosome, plan);
 	}
 
 	public JointPlanOptimizerDecoder getDecoder() {
-		return this.decoder;
+		return this.fullDecoder;
 	}
 
 	/**

@@ -95,7 +95,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	 * the joint plan.
 	 */
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
-	private final JointPlanOptimizerFitnessFunction fitnessFunction;
+	private final AbstractJointPlanOptimizerFitnessFunction fitnessFunction;
 	private final IEvolutionMonitor monitor;
 
 	private final boolean optimizeToggle;
@@ -173,7 +173,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 
-			this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
+			this.fitnessFunction = new JointPlanOptimizerOTFFitnessFunction(
+			//this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
 						plan,
 						configGroup,
 						legTravelTimeEstimatorFactory,
