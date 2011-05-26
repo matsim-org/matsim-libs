@@ -1,9 +1,6 @@
 package playground.droeder.gis;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
@@ -16,7 +13,7 @@ public class AnalyzeMyShapeFile {
 	}
 	
 	
-	private Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();
+//	private Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();
 	
 	public void run(String shapeFile) throws IOException{
 		FeatureSource features = ShapeFileReader.readDataFile(shapeFile);

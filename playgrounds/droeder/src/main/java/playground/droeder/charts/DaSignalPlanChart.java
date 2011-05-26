@@ -25,8 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -44,7 +44,6 @@ import org.matsim.signalsystems.model.SignalGroupState;
  */
 public class DaSignalPlanChart {
 	  private DefaultCategoryDataset dataset;
-	  private JFreeChart jChart;
 	  private Map<Integer, Color> seriesColor = new HashMap<Integer, Color>();
 	  
 	  public DaSignalPlanChart(){

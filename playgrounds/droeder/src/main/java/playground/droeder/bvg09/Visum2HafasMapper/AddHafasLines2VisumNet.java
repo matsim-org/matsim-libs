@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -65,8 +64,8 @@ public class AddHafasLines2VisumNet {
 	private final String NETFILE = PATH + "intermediateNetwork.xml";
 	private final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 	private final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
-	private final String FINALTRANSITFILE = PATH + "finalTransit.xml";
-	private final String NEWLINESSHAPE = PATH + "newLines.shp";
+//	private final String FINALTRANSITFILE = PATH + "finalTransit.xml";
+//	private final String NEWLINESSHAPE = PATH + "newLines.shp";
 
 	private final Id ERROR = new IdImpl("Error");
 
@@ -159,25 +158,25 @@ public class AddHafasLines2VisumNet {
 		haf2VisNearestStop.put(new IdImpl("9160021"), new IdImpl("1600210"));
 	}
 
-	private Map<String, SortedMap<Integer, Coord>> prepareNewRoutesForShape(){
-		Map<String, SortedMap<Integer, Coord>> preparedRoutes = new HashMap<String, SortedMap<Integer,Coord>>();
-
-		for(TransitLine l : finalTransitSchedule.getTransitLines().values()){
-			for(TransitRoute r : l.getRoutes().values()){
-				int  i = 0;
-				SortedMap<Integer, Coord> temp = new TreeMap<Integer, Coord>();
-				for(Id id : r.getRoute().getLinkIds()){
-					temp.put(i, visumNet.getLinks().get(id).getFromNode().getCoord());
-					i++;
-					temp.put(i, visumNet.getLinks().get(id).getToNode().getCoord());
-					i++;
-				}
-				preparedRoutes.put(l.getId().toString() + "_" + r.getId().toString(), temp);
-			}
-
-		}
-		return preparedRoutes;
-	}
+//	private Map<String, SortedMap<Integer, Coord>> prepareNewRoutesForShape(){
+//		Map<String, SortedMap<Integer, Coord>> preparedRoutes = new HashMap<String, SortedMap<Integer,Coord>>();
+//
+//		for(TransitLine l : finalTransitSchedule.getTransitLines().values()){
+//			for(TransitRoute r : l.getRoutes().values()){
+//				int  i = 0;
+//				SortedMap<Integer, Coord> temp = new TreeMap<Integer, Coord>();
+//				for(Id id : r.getRoute().getLinkIds()){
+//					temp.put(i, visumNet.getLinks().get(id).getFromNode().getCoord());
+//					i++;
+//					temp.put(i, visumNet.getLinks().get(id).getToNode().getCoord());
+//					i++;
+//				}
+//				preparedRoutes.put(l.getId().toString() + "_" + r.getId().toString(), temp);
+//			}
+//
+//		}
+//		return preparedRoutes;
+//	}
 
 	private void getNewRoutesFromMatchedStops(){
 		TransitLine newLine;

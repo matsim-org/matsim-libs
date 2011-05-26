@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class DaVisum2HafasMapper7 extends AbstractDaVisum2HafasMapper {
 
-	private final Id TOMATCH = new IdImpl("TOMATCH");
+//	private final Id TOMATCH = new IdImpl("TOMATCH");
 	private final Map<Id, Id> prematched;
 	
 	public static void main(String[] args) {

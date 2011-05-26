@@ -38,7 +38,6 @@ import playground.droeder.DaColorScheme;
  */
 public class DaBarChart {
 	  private DefaultCategoryDataset dataset;
-	  private JFreeChart jChart;
 	  
 	  public DaBarChart(){
 		  this.dataset = new DefaultCategoryDataset();

@@ -2,13 +2,10 @@ package playground.droeder.bvg09.Visum2HafasMapper;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.geotools.feature.FeatureType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -17,21 +14,16 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.droeder.DaPaths;
 import playground.droeder.gis.DaShapeWriter;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-
 public class StopsAndRoutes2Shape{
 	
-	private FeatureType featureType;
-	
-	private GeometryFactory geometryFactory = new GeometryFactory();
+//	private FeatureType featureType;
+//	
+//	private GeometryFactory geometryFactory = new GeometryFactory();
 	
 	ScenarioImpl vSc;
 	ScenarioImpl hSc;
@@ -52,16 +44,16 @@ public class StopsAndRoutes2Shape{
 	
 	private final String VISUMSCHEDULEFILE = PATH + "intermediateTransitSchedule.xml";
 	private final String VISUMNETWORK = PATH + "intermediateNetwork.xml";
-	private final String VISUMSTOP2SHAPE = PATH + "VisumStops2Shape.shp";
-	private final String VISUMROUTE2SHAPE = PATH + "VisumRoutes2Shape.shp";
-	private final String VISUMLINKS2SHAPE = PATH + "VisumLinks2Shape.shp";
-	private final String VISUMNODES2SHAPE = PATH + "VisumNodes2Shape.shp";
+//	private final String VISUMSTOP2SHAPE = PATH + "VisumStops2Shape.shp";
+//	private final String VISUMROUTE2SHAPE = PATH + "VisumRoutes2Shape.shp";
+//	private final String VISUMLINKS2SHAPE = PATH + "VisumLinks2Shape.shp";
+//	private final String VISUMNODES2SHAPE = PATH + "VisumNodes2Shape.shp";
 	
 	private final String HAFASSCHEDULEFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
-	private final String HAFASSTOP2SHAPE = PATH + "HafasStops2Shape.shp";
-	private final String HAFASROUTE2SHAPE = PATH + "HafasRoutes2Shape.shp";
+//	private final String HAFASSTOP2SHAPE = PATH + "HafasStops2Shape.shp";
+//	private final String HAFASROUTE2SHAPE = PATH + "HafasRoutes2Shape.shp";
 	
-	private final String MATCHEDSTOPS2SHAPE = PATH + "MatchedStops2Shape.shp";
+//	private final String MATCHEDSTOPS2SHAPE = PATH + "MatchedStops2Shape.shp";
 
 	private final String NETWORK2SHAPE = PATH + "visumNet2shape.shp";
  	
@@ -111,45 +103,45 @@ public class StopsAndRoutes2Shape{
 //		DaShapeWriter.writeNodes2Shape(VISUMNODES2SHAPE, vSc.getNetwork().getNodes());
 	}
 	
-	private void preProcessStopsAndRoutes(){
-
-		hStops = new HashSet<Id>();
-		vStops = new HashSet<Id>();
-		hLines = new HashSet<Id>();
-		vLines = new HashSet<Id>();
-		//search for Lines and Stops 2 draw
-		for(TransitLine line : vSc.getTransitSchedule().getTransitLines().values()){
-			if (lines.containsKey(line.getId()) && hSc.getTransitSchedule().getTransitLines().containsKey(lines.get(line.getId()))){
-				hLines.add(lines.get(line.getId()));
-				vLines.add(line.getId());
-				for(TransitRoute route : line.getRoutes().values()){
-					for(TransitRouteStop stop : route.getStops()){
-						if(!vStops.contains(stop.getStopFacility().getId())){
-							vStops.add(stop.getStopFacility().getId());
-						}
-					}
-				}
-				
-				for (TransitRoute route : hSc.getTransitSchedule().getTransitLines().get(lines.get(line.getId())).getRoutes().values()){
-					for(TransitRouteStop stop : route.getStops()){
-						if(!hStops.contains(stop.getStopFacility().getId())){
-							hStops.add(stop.getStopFacility().getId());
-						}
-					}
-				}
-			}
-		}
-		
-		preMatched = new HashMap<String, Tuple<Coord,Coord>>();
-		//sort preMatchedStops
-		
-		for(Entry<Id, Id> e : preMatchedStops.entrySet()){
-			preMatched.put(e.getKey().toString() + "_" + e.getValue().toString(), 
-					new Tuple<Coord, Coord>(vSc.getTransitSchedule().getFacilities().get(e.getKey()).getCoord(),
-					hSc.getTransitSchedule().getFacilities().get(e.getValue()).getCoord()));
-		}
-	
-	}
+//	private void preProcessStopsAndRoutes(){
+//
+//		hStops = new HashSet<Id>();
+//		vStops = new HashSet<Id>();
+//		hLines = new HashSet<Id>();
+//		vLines = new HashSet<Id>();
+//		//search for Lines and Stops 2 draw
+//		for(TransitLine line : vSc.getTransitSchedule().getTransitLines().values()){
+//			if (lines.containsKey(line.getId()) && hSc.getTransitSchedule().getTransitLines().containsKey(lines.get(line.getId()))){
+//				hLines.add(lines.get(line.getId()));
+//				vLines.add(line.getId());
+//				for(TransitRoute route : line.getRoutes().values()){
+//					for(TransitRouteStop stop : route.getStops()){
+//						if(!vStops.contains(stop.getStopFacility().getId())){
+//							vStops.add(stop.getStopFacility().getId());
+//						}
+//					}
+//				}
+//				
+//				for (TransitRoute route : hSc.getTransitSchedule().getTransitLines().get(lines.get(line.getId())).getRoutes().values()){
+//					for(TransitRouteStop stop : route.getStops()){
+//						if(!hStops.contains(stop.getStopFacility().getId())){
+//							hStops.add(stop.getStopFacility().getId());
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		preMatched = new HashMap<String, Tuple<Coord,Coord>>();
+//		//sort preMatchedStops
+//		
+//		for(Entry<Id, Id> e : preMatchedStops.entrySet()){
+//			preMatched.put(e.getKey().toString() + "_" + e.getValue().toString(), 
+//					new Tuple<Coord, Coord>(vSc.getTransitSchedule().getFacilities().get(e.getKey()).getCoord(),
+//					hSc.getTransitSchedule().getFacilities().get(e.getValue()).getCoord()));
+//		}
+//	
+//	}
 	
 	private void preProcessLinks(){
 		this.linkAttributes = new HashMap<Id, SortedMap<String,String>>();

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.bvg09.Visum2HafasMapper;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,11 +34,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -62,8 +57,8 @@ public abstract class AbstractDaVisum2HafasMapper {
 	private static String VISUM = PATH + "intermediateTransitSchedule.xml";
 	private static String HAFAS = PATH + "transitSchedule-HAFAS-Coord.xml";
 	
-	private String UNMATCHED = PATH + "unmatchedLines.txt";
-	private String MATCHED = PATH + "matchedRoutes.txt";
+//	private String UNMATCHED = PATH + "unmatchedLines.txt";
+//	private String MATCHED = PATH + "matchedRoutes.txt";
 	
 	private ScenarioImpl visumSc = null;
 	private ScenarioImpl hafasSc = null;
@@ -402,75 +397,71 @@ public abstract class AbstractDaVisum2HafasMapper {
 		return equal;
 	}
 	
-	private void unmatched2txt(){
-		BufferedWriter writer;
-		
-		try {
-			writer = IOUtils.getBufferedWriter(UNMATCHED);
-			
-			for(Id id : unmatched){
-				writer.write("visumLine: " + id);
-				writer.newLine();
-				for(TransitRoute route : visumSc.getTransitSchedule().getTransitLines().get(id).getRoutes().values()){
-					writer.write(route.getId() + "\t");
-					for(TransitRouteStop stop : route.getStops()){
-						writer.write(stop.getStopFacility().getId() + "\t");
-					}
-					writer.newLine();
-				}
-				
-				for(TransitRoute route : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(id)).getRoutes().values()){
-					writer.write(route.getId() + "\t");
-					for(TransitRouteStop stop : route.getStops()){
-						writer.write(stop.getStopFacility().getId() + "\t");
-					}
-					writer.newLine();
-				}
-				writer.newLine();
-			}
-			
-			writer.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void matched2txt(){
-		BufferedWriter writer;
-		
-		try {
-			writer = IOUtils.getBufferedWriter(MATCHED);
-			
-			for(Entry<Id, Id> e : vRoute2vLine.entrySet()){
-				if(!(e.getValue() == null) ){
-					writer.write(e.getKey() + "\t");
-					for(TransitRouteStop stop : visumSc.getTransitSchedule().getTransitLines().get(e.getValue()).getRoutes().get(e.getKey()).getStops()){
-						writer.write(stop.getStopFacility().getId().toString() + "\t");
-					}
-					writer.newLine();
-					
-					writer.write(vis2hafRoutes.get(e.getKey()) + "\t");
-					for(TransitRouteStop stop : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(e.getValue())).getRoutes().get(vis2hafRoutes.get(e.getKey())).getStops()){
-						writer.write(stop.getStopFacility().getId().toString() + "\t");
-					}
-					writer.newLine();
-					writer.newLine();
-				}
-			}
-			
-			writer.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	private void unmatched2txt(){
+//		BufferedWriter writer;
+//		
+//		try {
+//			writer = IOUtils.getBufferedWriter(UNMATCHED);
+//			
+//			for(Id id : unmatched){
+//				writer.write("visumLine: " + id);
+//				writer.newLine();
+//				for(TransitRoute route : visumSc.getTransitSchedule().getTransitLines().get(id).getRoutes().values()){
+//					writer.write(route.getId() + "\t");
+//					for(TransitRouteStop stop : route.getStops()){
+//						writer.write(stop.getStopFacility().getId() + "\t");
+//					}
+//					writer.newLine();
+//				}
+//				
+//				for(TransitRoute route : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(id)).getRoutes().values()){
+//					writer.write(route.getId() + "\t");
+//					for(TransitRouteStop stop : route.getStops()){
+//						writer.write(stop.getStopFacility().getId() + "\t");
+//					}
+//					writer.newLine();
+//				}
+//				writer.newLine();
+//			}
+//			
+//			writer.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	private void matched2txt(){
+//		BufferedWriter writer;
+//		
+//		try {
+//			writer = IOUtils.getBufferedWriter(MATCHED);
+//			
+//			for(Entry<Id, Id> e : vRoute2vLine.entrySet()){
+//				if(!(e.getValue() == null) ){
+//					writer.write(e.getKey() + "\t");
+//					for(TransitRouteStop stop : visumSc.getTransitSchedule().getTransitLines().get(e.getValue()).getRoutes().get(e.getKey()).getStops()){
+//						writer.write(stop.getStopFacility().getId().toString() + "\t");
+//					}
+//					writer.newLine();
+//					
+//					writer.write(vis2hafRoutes.get(e.getKey()) + "\t");
+//					for(TransitRouteStop stop : hafasSc.getTransitSchedule().getTransitLines().get(vis2HafLines.get(e.getValue())).getRoutes().get(vis2hafRoutes.get(e.getKey())).getStops()){
+//						writer.write(stop.getStopFacility().getId().toString() + "\t");
+//					}
+//					writer.newLine();
+//					writer.newLine();
+//				}
+//			}
+//			
+//			writer.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	/**
 	 *  transforms matched positions of stops to Id-pairs and check if the order of stops is possible

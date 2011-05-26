@@ -246,6 +246,7 @@ public abstract class AbstractResizeLinksByCount {
 		log.info("done...");
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void writeUnmodifiedLinks2Shape(){
 		//preprocess
 		if(!(this.modifiedLinks2shp==null)){

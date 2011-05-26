@@ -1,11 +1,10 @@
 package playground.droeder.bvg09.Visum2HafasMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -55,7 +54,7 @@ public class DaVisum2HafasMapper5 extends AbstractDaVisum2HafasMapper {
 		
 		SortedMap<Integer, Integer> temp = new TreeMap<Integer, Integer>();
 		
-		List<Map<Integer, Integer>>	solutions = new ArrayList<Map<Integer,Integer>>();	
+//		List<Map<Integer, Integer>>	solutions = new ArrayList<Map<Integer,Integer>>();	
 
 		int hStart = 0;
 		for(int v = 0; v < visPart.size(); v++){
