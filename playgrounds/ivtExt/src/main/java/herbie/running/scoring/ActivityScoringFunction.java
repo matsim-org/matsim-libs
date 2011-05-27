@@ -207,6 +207,16 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
 				this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - timeSpentPerforming);
 			}
+			
+			if (act.getType().startsWith("pt interaction")){
+				
+				// ###########################################
+				// Ansatz: Hier entweder config reinnehmen oder params anpassen oder config parameter Modul herbie!!!
+				// eg. config.planCalcScore().getUtilityOfLineSwitch()
+				
+				return 0.0;
+			}
+			
 
 		}
 
