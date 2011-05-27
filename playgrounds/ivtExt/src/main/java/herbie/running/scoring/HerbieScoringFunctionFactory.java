@@ -25,6 +25,7 @@ import herbie.running.config.HerbieConfigGroup;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -39,17 +40,20 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	private final HerbieConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
+	private Network network;
 	
 	public HerbieScoringFunctionFactory(
 			final Config config, 
 			final HerbieConfigGroup ktiConfigGroup,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			final ActivityFacilities facilities) {
+			final ActivityFacilities facilities, 
+			final Network network) {
 		super(config.planCalcScore());
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
+		this.network = network;
 	}
 
 	@Override
@@ -62,11 +66,12 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyp
 				super.getParams(), 
 				this.facilityPenalties,
 				this.facilities));
-//		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-//				plan, 
-//				super.getParams(),
-//				config,
-//				this.ktiConfigGroup));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
+				plan, 
+				super.getParams(),
+				config,
+				this.network,
+				this.ktiConfigGroup));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		
