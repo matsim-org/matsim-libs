@@ -23,47 +23,51 @@ public class MultipleRunsControler {
     	runControler.run();
 	}
 	
-	private void init(String configFile) {
-		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(configFile);
+	private void init(String createConfigFile) {
+		Config createConfig = new Config();
+    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(createConfig);
+    	matsimConfigReader.readFile(createConfigFile);
     	
-    	int numberOfRuns = Integer.parseInt(config.findParam("PLOC", "numberOfRuns"));
+    	int numberOfRuns = Integer.parseInt(createConfig.findParam("PLOC", "numberOfRuns"));
     	log.info("number of Runs: " + numberOfRuns);
     	
-    	this.createPlansAndConfigs(config);
+    	this.createPlansAndConfigs(createConfig);
     	
     	for (int i = 0; i < 100000; i++) {
     		this.randomNumberGenerator.nextLong();
     	}
 	}
 	
-	private void createPlansAndConfigs(Config config) {    	
+	private void createPlansAndConfigs(Config createConfig) {
+		Config runConfig = new Config();
+    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(runConfig);
+    	String runConfigFile = createConfig.findParam("PLOC", "runConfig");
+    	String inPathStub = createConfig.findParam("PLOC", "inPath");
+    	matsimConfigReader.readFile(runConfigFile);
+    	
     	for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
     		long seed = randomNumberGenerator.nextLong();
-    		// first adapt plans and facilities
-    		String path = "./input/PLOC/zh/1Pct/";
-			new File(path).mkdirs();
-			config.setParam("controler", "outputDirectory", path);
-			config.setParam("global", "randomSeed", Long.toString(seed));
-			config.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
+    		
+    		createConfig.setParam("global", "randomSeed", Long.toString(seed));
+    		createConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
+    		
+    		runConfig.setParam("global", "randomSeed", Long.toString(seed));
+    		runConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
+        			
     		String configPath = "./input/PLOC/zh/1Pct/runs/";
         	new File(configPath).mkdirs();
-        	ConfigWriter configWriter = new ConfigWriter(config);
-        	configWriter.write(configPath + "/configTmp.xml");	
-        	this.adaptPlansAndFacilities(configPath + "/configTmp.xml");
+        	ConfigWriter configWriter = new ConfigWriter(createConfig);
+        	configWriter.write(configPath + "/createConfig.xml");	
+        	this.adaptPlansAndFacilities(configPath + "/createConfig.xml");
     		
     		// now write the final config  		
-			config.setParam("plans", "inputPlansFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/plans.xml.gz");
-        	config.setParam("controler", "runId", Integer.toString(runIndex));
-        	config.setParam("facilities", "inputFacilitiesFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/facilities.xml.gz");
-        	path = "./output/PLOC/zh/run" + runIndex;
-        	config.setParam("controler", "outputDirectory", path);
-        	config.setParam("counts", "countsScaleFactor", "100");
-        	
-        	configPath = "./input/PLOC/zh/1Pct/runs/run" + runIndex;
-        	new File(configPath).mkdirs();
-        	configWriter.write(configPath + "/config.xml");			
+        	runConfig.setParam("plans", "inputPlansFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/plans.xml.gz");
+        	runConfig.setParam("controler", "runId", Integer.toString(runIndex));
+        	runConfig.setParam("facilities", "inputFacilitiesFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/facilities.xml.gz");
+        	String path = inPathStub + "/run" + runIndex;
+        	        	
+        	new File(path).mkdirs();
+        	configWriter.write(path + "/config.xml");			
     	}	
 	}
 	
