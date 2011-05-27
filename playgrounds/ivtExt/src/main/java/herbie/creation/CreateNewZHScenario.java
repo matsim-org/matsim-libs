@@ -248,6 +248,7 @@ public class CreateNewZHScenario {
 		return persons2remove;
 	}
 	
+	// need to add start and end times
 	private void convertFromV1toV2(Scenario inScenario) {		
 		for (Person p : inScenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
@@ -255,7 +256,7 @@ public class CreateNewZHScenario {
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
-						double duration = 12.0;
+						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {
 							duration = Double.parseDouble(act.getType().substring(1));
 						}
