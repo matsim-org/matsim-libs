@@ -93,6 +93,7 @@ public class CreateNewZHScenario {
 		this.addSpecialPlans2Population(this.crossBorderPlansFilePath, "cross-border");
 		log.info("\tAdding freight traffic .................................");
 		this.addSpecialPlans2Population(this.freightPlansFilePath, "freight");
+		this.resetRoutes();
 		this.write();
 	}
 	
@@ -283,8 +284,6 @@ public class CreateNewZHScenario {
 		}
 	}
 	
-	
-	
 	private void convertFromV1toV2(Scenario inScenario) {		
 		for (Person p : inScenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
@@ -301,6 +300,19 @@ public class CreateNewZHScenario {
 						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
 					}
 					//reset route
+					if (pe instanceof Leg) {
+						LegImpl leg = (LegImpl)pe;
+						leg.setRoute(null);
+					}
+				}
+			}
+		}
+	}
+	
+	private void resetRoutes() {
+		for (Person p : this.scenario.getPopulation().getPersons().values()){
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						LegImpl leg = (LegImpl)pe;
 						leg.setRoute(null);
