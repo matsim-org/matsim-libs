@@ -24,6 +24,13 @@ import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.api.core.v01.Id;
 
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ChargingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.TimeInterval;
+
 import junit.framework.TestCase;
 
 /**
@@ -126,60 +133,106 @@ public class ScheduleTest extends TestCase{
 	
 	
 	public void testAddLoadDistributionIntervalToExistingLoadDistributionSchedule() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		Schedule loads= setDummyLoadDistributionSchedule(); // 0-20  and 40-50
+		Schedule s1= new Schedule();
+		s1.addTimeInterval(new LoadDistributionInterval(0.0, 20.0, new PolynomialFunction(new double[]{10}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(20.0, 40.0, new PolynomialFunction(new double[]{5}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(40.0, 50.0, new PolynomialFunction(new double[]{10}), true));
+		
+		
 		System.out.println("Start:");
-		loads.printSchedule();
-		
-		
-		// **************
-		// NO OVERLAP
-		//**************
-		LoadDistributionInterval noOverlap= new LoadDistributionInterval(20, 30, new PolynomialFunction( new double[]{-10}), false);
-		
-		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(noOverlap);
-		System.out.println("After insertion of noOverlap LoadInterval");
-		loads.printSchedule();
-		assertEquals(3, loads.getNumberOfEntries());
-		
+		s1.printSchedule();
 		
 		// **************
 		// OVERLAP case 1
 		//**************
-		loads= setDummyLoadDistributionSchedule(); 
-		LoadDistributionInterval withinFirst= new LoadDistributionInterval(10, 20, new PolynomialFunction( new double[]{-5}), false);
-		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(withinFirst);
+		LoadDistributionInterval withinFirst= new LoadDistributionInterval(10, 25, new PolynomialFunction( new double[]{-5}), false);
+		s1.addLoadDistributionIntervalToExistingLoadDistributionSchedule(withinFirst);
 		System.out.println("After insertion of Overlap LoadInterval");
-		loads.printSchedule();
-		assertEquals(3, loads.getNumberOfEntries());
-		PolynomialFunction func=((LoadDistributionInterval)loads.timesInSchedule.get(1)).getPolynomialFunction();
-		assertEquals(func.getCoefficients()[0], 5.0);
+		s1.printSchedule();
+		assertEquals(5, s1.getNumberOfEntries());
+		//first 0-10
+		PolynomialFunction func=((LoadDistributionInterval)s1.timesInSchedule.get(0)).getPolynomialFunction();
 		
+		//020  20-40  40 50
 		
-		// **************
-		// OVERLAP CAse 2
-		//**************
-		loads= setDummyLoadDistributionSchedule(); 
-		LoadDistributionInterval withinFirstAndEmptyInterval= new LoadDistributionInterval(10, 30, new PolynomialFunction( new double[]{-5}), false);
-		loads.addLoadDistributionIntervalToExistingLoadDistributionSchedule(withinFirstAndEmptyInterval);
-		System.out.println("After insertion of long Overlap LoadInterval");
-		loads.printSchedule();
-		assertEquals(4, loads.getNumberOfEntries());
-		func=((LoadDistributionInterval)loads.timesInSchedule.get(1)).getPolynomialFunction();
-		assertEquals(func.getCoefficients()[0], 5.0);
-		func=((LoadDistributionInterval)loads.timesInSchedule.get(2)).getPolynomialFunction();
-		assertEquals(func.getCoefficients()[0], -5.0);
-		func=((LoadDistributionInterval)loads.timesInSchedule.get(3)).getPolynomialFunction();
+		//0-10
 		assertEquals(func.getCoefficients()[0], 10.0);
+		assertEquals(s1.timesInSchedule.get(0).getEndTime(), 10.0);
 		
+		//10-20
+		func=((LoadDistributionInterval)s1.timesInSchedule.get(1)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], 5.0);
+		assertEquals(s1.timesInSchedule.get(1).getEndTime(), 20.0);
+		
+		//20-25
+		func=((LoadDistributionInterval)s1.timesInSchedule.get(2)).getPolynomialFunction();
+		assertEquals(func.getCoefficients()[0], 0.0);
+		assertEquals(s1.timesInSchedule.get(2).getEndTime(), 25.0);
+		
+		
+		//////////////////////
+		s1= new Schedule();
+		s1.addTimeInterval(new LoadDistributionInterval(0.0, 20.0, new PolynomialFunction(new double[]{10}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(20.0, 40.0, new PolynomialFunction(new double[]{5}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(40.0, 50.0, new PolynomialFunction(new double[]{10}), true));
+		
+		
+		System.out.println("Start:");
+		s1.printSchedule();
+		LoadDistributionInterval sameStart= new LoadDistributionInterval(0.0, 15.0, new PolynomialFunction( new double[]{-5}), false);
+		s1.addLoadDistributionIntervalToExistingLoadDistributionSchedule(sameStart);
+		//020  20-40  40 50
+		
+		//0-15 15-20 20-40  40 50
+		func=((LoadDistributionInterval)s1.timesInSchedule.get(0)).getPolynomialFunction();
+		assertEquals(s1.getNumberOfEntries(), 4);
+		assertEquals(func.getCoefficients()[0], 5.0);
+		assertEquals(s1.timesInSchedule.get(0).getEndTime(), 15.0);
+		assertEquals(s1.timesInSchedule.get(1).getEndTime(), 20.0);
+		assertEquals(s1.timesInSchedule.get(2).getEndTime(), 40.0);
+		
+		
+		//////////////////////
+		System.out.println("Start:");
+		s1= new Schedule();
+		s1.addTimeInterval(new LoadDistributionInterval(0.0, 20.0, new PolynomialFunction(new double[]{10}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(20.0, 40.0, new PolynomialFunction(new double[]{5}), true));
+		s1.addTimeInterval(new LoadDistributionInterval(40.0, 50.0, new PolynomialFunction(new double[]{10}), true));
+		s1.printSchedule();
+		LoadDistributionInterval sameStartAndEnd= new LoadDistributionInterval(0.0, 20.0, new PolynomialFunction( new double[]{-5}), false);
+		s1.addLoadDistributionIntervalToExistingLoadDistributionSchedule(sameStartAndEnd);
+		//020  20-40  40 50
+		
+		//0-20 20-40  40-50
+		func=((LoadDistributionInterval)s1.timesInSchedule.get(0)).getPolynomialFunction();
+		assertEquals(s1.getNumberOfEntries(), 3);
+		assertEquals(func.getCoefficients()[0], 5.0);
+		assertEquals(s1.timesInSchedule.get(0).getEndTime(), 20.0);
+		assertEquals(s1.timesInSchedule.get(1).getEndTime(),40.0);
+		assertEquals(s1.timesInSchedule.get(2).getEndTime(), 50.0);
 	}
+	
+	
+	
+	
 	
 	
 public void testCutSchedule() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		Schedule someSchedule= setDummySchedule();
+		/*s1.addTimeInterval(new ParkingInterval(0, 10, null));
+		 * s1.addTimeInterval(new DrivingInterval(10,15, 100.0) );
+		 * s1.addTimeInterval(new ParkingInterval(15, 30, null))
+		 * s1.addTimeInterval(new ParkingInterval(30, 50, null));
+		*/
+		
+		
 		someSchedule.sort();
+		// CUTTING first half at 40
+		// expect 0-10, 10-15, 15-30, 30-40
 		System.out.println("schedule before");
 		someSchedule.printSchedule();
+		
 		someSchedule=someSchedule.cutScheduleAtTimeWithoutJouleReassignment(40.0);
 		System.out.println("schedule 1st half after cut at 40");
 		someSchedule.printSchedule();
@@ -187,18 +240,42 @@ public void testCutSchedule() throws MaxIterationsExceededException, FunctionEva
 		assertEquals(4, someSchedule.getNumberOfEntries());
 		assertEquals(40.0, someSchedule.timesInSchedule.get(3).getEndTime());
 		
+		//AGAIN CUT AT 40 SEcond half only one interval 40-50 should be left
 		someSchedule= setDummySchedule();
 		someSchedule.sort();
-		System.out.println("schedule before");
-		someSchedule.printSchedule();
+		
 		someSchedule=someSchedule.cutScheduleAtTimeSecondHalfWithoutJouleReassignment(40, 0.0);
-		System.out.println("schedule second half after cut at 40");
+		System.out.println("schedule first half after cut at 40");
 		someSchedule.printSchedule();
 		
 		assertEquals(1, someSchedule.getNumberOfEntries());
 		assertEquals(50.0, someSchedule.timesInSchedule.get(0).getEndTime());
 		assertEquals(40.0, someSchedule.timesInSchedule.get(0).getStartTime());
-	
+		
+		
+		//AGAIN CUTTING AT 15 SECOND HALF expect 15-30, 30-50
+		someSchedule= setDummySchedule();
+		someSchedule.sort();
+		
+		someSchedule=someSchedule.cutScheduleAtTimeSecondHalfWithoutJouleReassignment(15.0, 0.0);
+		System.out.println("schedule second half after cut at 15");
+		someSchedule.printSchedule();
+		
+		assertEquals(2, someSchedule.getNumberOfEntries());
+		assertEquals(15.0, someSchedule.timesInSchedule.get(0).getStartTime());
+		assertEquals(30.0, someSchedule.timesInSchedule.get(1).getStartTime());
+		
+		//AGAIN CUTTING AT 15 FIRST HALF expect 0-10, 10-15
+		someSchedule= setDummySchedule();
+		someSchedule.sort();
+		
+		someSchedule=someSchedule.cutScheduleAtTimeWithoutJouleReassignment(15.0);
+		System.out.println("schedule second half after cut at 15");
+		someSchedule.printSchedule();
+		
+		assertEquals(2, someSchedule.getNumberOfEntries());
+		assertEquals(10.0, someSchedule.timesInSchedule.get(0).getEndTime());
+		assertEquals(15.0, someSchedule.timesInSchedule.get(1).getEndTime());
 	}
 
 

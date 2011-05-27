@@ -37,10 +37,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
 
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
@@ -191,13 +191,13 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 					double down = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
 					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(1000.0, agentOne);
 					double newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
-					myDecentralizedSmartCharger.myV2G.calcV2GRevenueStats();
+					myDecentralizedSmartCharger.myV2G.calcV2GVehicleStats();
 					assertEquals(1000.0, newDown-down);
 					
 					down = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
 					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(-1000.0, agentOne);
 					newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
-					myDecentralizedSmartCharger.myV2G.calcV2GRevenueStats();
+					myDecentralizedSmartCharger.myV2G.calcV2GVehicleStats();
 					assertEquals(1000.0, down-newDown);
 					
 					/**********************************************

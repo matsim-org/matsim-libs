@@ -41,12 +41,12 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedChargingSimulation;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedChargingSimulation;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DetermisticLoadPricingCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.HubInfo;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.SetUp.StellasHubMapping;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.V2G.StochasticLoadCollector;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.StellasHubMapping;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.DetermisticLoadPricingCollector;
 
 import java.util.*;
 

@@ -19,6 +19,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.EnergyConsumptionInit;
 
 /**
  * tests if the vehicles List produced by the class EnergyConsumptionInitTest
@@ -58,12 +59,12 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 		controler.setOverwriteFiles(true);		
 		controler.run();
 		
-		HashMap<Id, Vehicle> vehicles =energyInit.getElectricVehicles();
+		LinkedListValueHashMap<Id, Vehicle> vehicles =energyInit.getElectricVehicles();
 		
 		int countPHEV=0;
 		int countEV=0;
 				
-		for (Id id: vehicles.keySet()){
+		for (Id id: vehicles.getKeySet()){
 			if (vehicles.get(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 				countPHEV++;
 			}else{				

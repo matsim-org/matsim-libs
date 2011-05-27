@@ -1,5 +1,6 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.TimeDataCollector;
 import junit.framework.TestCase;
 
 public class TimeDataCollectorTest extends TestCase{
@@ -20,6 +21,17 @@ public class TimeDataCollectorTest extends TestCase{
 	}
 	
 	
+	public void testIncreaseDatPoint(){
+		TimeDataCollector myCollector= setUpTimeDataCollector();
+		
+		myCollector.increaseYEntryAtEntryByDouble(0, 10.0);
+		assertEquals(15.0, myCollector.getYAtEntry(0));
+		
+		myCollector.increaseYEntryAtEntryByDouble(1, -20.0);
+		assertEquals(-10.0, myCollector.getYAtEntry(1));
+		
+		
+	}
 	
 	public TimeDataCollector setUpTimeDataCollector(){
 		TimeDataCollector myCollector = new TimeDataCollector(3);

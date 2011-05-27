@@ -43,9 +43,10 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.HubInfo;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.StellasHubMapping;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.scenarios.DetermisticLoadPricingCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedChargingSimulation;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.HubInfo;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.SetUp.StellasHubMapping;
 
 import java.util.*;
 
@@ -117,7 +118,7 @@ public class Main_exampleDSCTest extends TestCase{
 		
 		// all evs - no emissions
 		assertEquals(mySimulation.getTotalEmissions(), 0.0);
-		for(Id id: mySimulation.mySmartCharger.vehicles.keySet()){
+		for(Id id: mySimulation.mySmartCharger.vehicles.getKeySet()){
 			// check parkingDrivingSchedule
 			if(id.toString().equals(Integer.toString(2))){
 				System.out.println("parking and driving schedule agent "+id.toString());

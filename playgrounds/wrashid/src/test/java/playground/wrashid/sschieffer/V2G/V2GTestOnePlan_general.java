@@ -37,10 +37,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.Schedule;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
 
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
@@ -91,7 +91,7 @@ public class V2GTestOnePlan_general extends TestCase{
 	 * @throws LpSolveException
 	 * @throws OptimizationException
 	 * @throws IOException
-	 */
+	 *//*
 	public void testThis() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
@@ -118,7 +118,7 @@ public class V2GTestOnePlan_general extends TestCase{
 					
 					myDecentralizedSmartCharger.run();
 					
-					/***********************************
+					*//***********************************
 					 * V2G
 					 * vehicle load
 					 * sec 0-900   -3500  -- energy use locally requires battery discharge
@@ -126,7 +126,7 @@ public class V2GTestOnePlan_general extends TestCase{
 					 * stochastic
 					 * sec 0-900    3500  -- energy regulation down
 					 * *********************************
-					 */
+					 *//*
 					
 					HashMap<Integer, Schedule> stochasticLoad = new HashMap<Integer, Schedule>();
 					stochasticLoad.put(1, new Schedule(
@@ -160,26 +160,25 @@ public class V2GTestOnePlan_general extends TestCase{
 					myDecentralizedSmartCharger.setV2GRegUpAndDownStats(xPercentDown,xPercentDownUp);// normally in initializeV2G
 					
 					
-					/**
+					*//**
 					 * CHECK TEST FIND AND RETURN...
-					 */
+					 *//*
 					testFindAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(agentOne);
 					
 										
-					/**
+					*//**
 					 * testCalcCompensation (double contributionInJoulesAgent, Id agentId)
-					 */
+					 *//*
 					
 					testCalcCompensation (100.0, agentOne);
 					testCalcCompensation (-100.0, agentOne);
 					
 					
 					checkVehiclesDischarge();
-					
 					checkStochasticregDown();
 					
 					
-					/***********************************
+					*//***********************************
 					 * V2G
 					 * vehicle load
 					 * sec 0-900   3500  -- energy production locally
@@ -187,7 +186,7 @@ public class V2GTestOnePlan_general extends TestCase{
 					 * stochastic
 					 * slast 900 sec  -- -3500 energy regulation up
 					 * *********************************
-					 */
+					 *//*
 					
 					stochasticLoad = new HashMap<Integer, Schedule>();
 					stochasticLoad.put(1, new Schedule(
@@ -225,21 +224,21 @@ public class V2GTestOnePlan_general extends TestCase{
 
 
 	public void checkStochasticregUp() throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
-		/**
+		*//**
 		 * vehicle load
 					 * sec 0-900   3500  -- energy production locally
 					 * 
 					 * stochastic
 					 * last 900 sec  --   -3500 energy regulation up
-		 */
+		 *//*
 		double revBegin=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
 		myDecentralizedSmartCharger.checkHubStochasticLoads();
 		//load is -3500W in first 900 sec -- cheap charging
 					
 		System.out.println("stochastic load after");
-		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).printSchedule();
 		assertEquals(0.0, 
-				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.
+				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.
 						get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		// CHECK REVENUE FOR REG DOWN
@@ -253,24 +252,24 @@ public class V2GTestOnePlan_general extends TestCase{
 	
 	
 	public void checkStochasticregDown() throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
-		/**
+		*//**
 		 *  * vehicle load
 					 * sec 0-900   -3500  -- energy use locally requires battery discharge
 					 * 
 					 * stochastic
 					 * sec 0-900    7000  -- energy regulation down
-		 */
+		 *//*
 		
 		myDecentralizedSmartCharger.myHubLoadReader.calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader();
 		
 		myDecentralizedSmartCharger.checkHubStochasticLoads();
 		//load is 3500W in first 900 sec -- cheap charging				
 		System.out.println("stochastic load after");
-		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).printSchedule();
 		//was 7000 after lat vehicle check
 		// minus 3500 now
 		assertEquals(3500.0, 
-				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).
+				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).
 						timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		// CHECK REVENUE FOR REG DOWN
@@ -282,14 +281,14 @@ public class V2GTestOnePlan_general extends TestCase{
 	
 	
 	public void checkVehiclesGeneration() throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
-		/**
+		*//**
 		 * CHECK VEHICLE SOURCES
 		 *   * vehicle load
 					 * sec 0-900   3500  -- energy production locally
 					 * 
 					 * stochastic
 					 * slast 900 sec  -- -3500 energy regulation up
-		 */
+		 *//*
 		
 				
 		double chargingCosts = myDecentralizedSmartCharger.getChargingCostsForAgents().get(agentOne); 
@@ -298,19 +297,19 @@ public class V2GTestOnePlan_general extends TestCase{
 		System.out.println("agent sources before");
 		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).printSchedule();
 		System.out.println("agent sources after");
-		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.get(agentOne).printSchedule();
 		assertEquals(3500.0, 
 				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		assertEquals(0.0, 
-				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		System.out.println("stochastic load after vehicle  check");
-		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).printSchedule();
 		
 		// stochastic load was 3500 and should still be 3500 - generted energy will just be taken up by engine
-		assertEquals(900.0, myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).timesInSchedule.get(0).getIntervalLength());
+		assertEquals(900.0, myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).timesInSchedule.get(0).getIntervalLength());
 		
-		assertEquals(-3500.0, ((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+		assertEquals(-3500.0, ((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		double chargingCostsAfter = myDecentralizedSmartCharger.getChargingCostsForAgents().get(agentOne); 
 		// change charging costs
@@ -319,13 +318,13 @@ public class V2GTestOnePlan_general extends TestCase{
 	
 	
 	public void checkVehiclesDischarge() throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
-		/**
+		*//**
 		 * CHECK VEHICLE SOURCES
 		 *  * sec 0-900   -3500  -- energy use locally requires battery discharge
 					 * 
 					 * stochastic
 					 * sec 0-900    3500  -- energy regulation down
-		 */
+		 *//*
 		double chargingCosts = myDecentralizedSmartCharger.getChargingCostsForAgents().get(agentOne); 
 		
 		myDecentralizedSmartCharger.checkVehicleSources();
@@ -335,18 +334,18 @@ public class V2GTestOnePlan_general extends TestCase{
 		System.out.println("agent sources before");
 		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).printSchedule();
 		System.out.println("agent sources after");
-		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.get(agentOne).printSchedule();
 		assertEquals(-3500.0, 
 				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		assertEquals(0.0, 
-				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfter.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+				((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.get(agentOne).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		System.out.println("stochastic load after vehicle  check");
-		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).printSchedule();
+		myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).printSchedule();
 		
 		assertEquals(900.0, myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistribution.get(1).timesInSchedule.get(0).getIntervalLength());
 		// extra charging done thus stochastic load increases by 3500
-		assertEquals(7000.0, ((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfter.get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
+		assertEquals(7000.0, ((LoadDistributionInterval)myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(1).timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0]);
 		
 		//charging costs increase
 		double chargingCostsAfter = myDecentralizedSmartCharger.getChargingCostsForAgents().get(agentOne); 
@@ -379,7 +378,7 @@ public class V2GTestOnePlan_general extends TestCase{
 		assertEquals(comp, expectedComp);
 		
 	}
-	
+	*/
 	
 }
 

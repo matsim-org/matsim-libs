@@ -44,6 +44,10 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.TimeInterval;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
@@ -122,7 +126,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 					 * *********************************
 					 */
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						agentOne=id;						
 						System.out.println(id.toString());
 						

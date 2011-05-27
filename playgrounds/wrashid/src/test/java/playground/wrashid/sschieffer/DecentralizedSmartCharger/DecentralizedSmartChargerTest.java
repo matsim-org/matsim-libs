@@ -46,6 +46,11 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ChargingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
 
 /**
  * 
@@ -114,7 +119,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							standardChargingSlotLength);
 					
 					myDecentralizedSmartCharger.run();
-					int numPpl= (myDecentralizedSmartCharger.vehicles.keySet().size());
+					int numPpl= (myDecentralizedSmartCharger.vehicles.getKeySet().size());
 					
 					
 					LinkedList<Id> agentsWithPHEV = myDecentralizedSmartCharger.getAllAgentsWithPHEV();
@@ -132,7 +137,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 					/*
 					 * 
 					 */
-					for(Id id : myDecentralizedSmartCharger.vehicles.keySet()){
+					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						Schedule testSchedule = mySimulation.makeFakeSchedule();
 						
 						ParkingInterval p1= (ParkingInterval) testSchedule.timesInSchedule.get(0);

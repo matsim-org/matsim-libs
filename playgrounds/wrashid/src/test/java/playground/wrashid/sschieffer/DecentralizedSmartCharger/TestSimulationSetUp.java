@@ -13,6 +13,15 @@ import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.AgentContractCollector;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ContractTypeAgent;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.EnergyConsumptionInit;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.VehicleTypeCollector;
 
 public class TestSimulationSetUp {
 
@@ -381,7 +390,7 @@ public class TestSimulationSetUp {
 			new HashMap<Id, Schedule>();
 		
 		//Id
-		for(Id id : energyConsumptionInit.getElectricVehicles().keySet()){
+		for(Id id : energyConsumptionInit.getElectricVehicles().getKeySet()){
 			
 				Schedule bullShitMinus= new Schedule();
 				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});

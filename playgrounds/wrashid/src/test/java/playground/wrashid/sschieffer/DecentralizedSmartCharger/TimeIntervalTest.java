@@ -21,6 +21,12 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ChargingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.TimeInterval;
+
 import junit.framework.TestCase;
 
 /**
