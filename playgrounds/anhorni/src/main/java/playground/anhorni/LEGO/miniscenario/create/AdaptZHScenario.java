@@ -20,6 +20,7 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -86,6 +88,12 @@ public class AdaptZHScenario {
 		
 		this.outputFolder = config.getModule("controler").getValue("outputDirectory");
 		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
+		
+		double sampleFraction = 100.0 / Double.parseDouble(config.getModule("counts").getValue("countsScaleFactor"));
+		log.info("Sample fraction: " + sampleFraction);
+		if (sampleFraction < 100.0) {
+			this.samplePlans(sampleFraction);
+		}
 		
 		log.info("Handling heterogeneity ...");		
 		RandomFromVarDistr rnd = new RandomFromVarDistr();
@@ -245,6 +253,25 @@ public class AdaptZHScenario {
 		}
 		log.info("Quadtree size: " + quadtree.size());
 		return quadtree;
+	}
+	
+	private void samplePlans(double percent) {
+		int newPopulationSize = (int)(this.scenario.getPopulation().getPersons().size() * percent / 100.0);
+		log.info("\tSampling plans " + percent + " percent: new population size: " + newPopulationSize + "...............................");
+		
+		int counter = 0;
+		int nextMsg = 1;
+		while (this.scenario.getPopulation().getPersons().size() > newPopulationSize) {
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+			}
+			Random random = new Random();
+			int index = random.nextInt(this.scenario.getPopulation().getPersons().size());
+			Id id = (Id) this.scenario.getPopulation().getPersons().keySet().toArray()[index];
+			this.scenario.getPopulation().getPersons().remove(id);
+		}
 	}
 	
 	private void write() {
