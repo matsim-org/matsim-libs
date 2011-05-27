@@ -63,7 +63,8 @@ public class HerbieControler extends Controler {
 				super.config,
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
-				this.getFacilities());
+				this.getFacilities(),
+				this.getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 
 //		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory();
