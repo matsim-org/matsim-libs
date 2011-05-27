@@ -36,6 +36,10 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
 	private static final Logger log = Logger
 			.getLogger(ConfigConsistencyCheckerImpl.class);
+	
+	public ConfigConsistencyCheckerImpl() { // explicit constructor so that I can eclipse-search for instantiation.  kai, may'11
+		// nothing to do
+	}
 
 	@Override
 	public void checkConsistency(Config config) {
