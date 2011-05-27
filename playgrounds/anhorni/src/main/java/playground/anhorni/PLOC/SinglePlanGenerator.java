@@ -39,7 +39,29 @@ public class SinglePlanGenerator {
 	public PlanImpl generatePlan(boolean worker, boolean shortWorker, PersonImpl p) {
 		PlanImpl plan;
 		if (worker) plan = generateWorkPlan(p, shortWorker);
-		else plan = generateNonWorkPlan(p); 
+		//else plan = generateNonWorkPlan(p);
+		else plan = generateHomePlan(p);
+		return plan;
+	}
+	
+	private PlanImpl generateHomePlan(PersonImpl p) {
+		int homeIndex = 1;
+		int facilityIndex = 1;
+		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
+			homeIndex = 8;
+			facilityIndex = 2;
+		}
+		Id facilityId = new IdImpl(facilityIndex);
+		
+		PlanImpl plan = new PlanImpl();
+		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
+		actH.setFacilityId(facilityId);
+		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
+		
+		actH.setStartTime(0.0);
+		actH.setMaximumDuration(24.0 * 3600.0);
+		
+		plan.addActivity(actH);
 		return plan;
 	}
 	
