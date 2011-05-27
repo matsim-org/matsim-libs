@@ -4,6 +4,7 @@ public class V2GAgentStats {
 
 	private double revenueV2G;
 	
+	private double costChargingExtra;
 	private double revenueFeedIn;
 	private double totalJouleFeedIn;
 	
@@ -18,6 +19,10 @@ public class V2GAgentStats {
 		totalJouleFeedIn=0;
 	}
 	
+	
+	public void addExtraChargingCosts(double money){
+		costChargingExtra-=money;
+	}
 	
 	public void addRevenueFeedIn(double money){
 		revenueFeedIn+=money;
@@ -46,6 +51,10 @@ public class V2GAgentStats {
 	
 	public double getRevenueFeedIn(){
 		return revenueFeedIn;
+	}
+	
+	public double getExtraChargingCosts(){
+		return costChargingExtra;
 	}
 	
 	public double getTotalJoulesFeedIn(){
