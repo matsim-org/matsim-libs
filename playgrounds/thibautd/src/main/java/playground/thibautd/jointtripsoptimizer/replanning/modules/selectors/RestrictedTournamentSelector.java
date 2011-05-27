@@ -63,7 +63,9 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 			final ChromosomeDistanceComparator distanceComparator
 			) throws InvalidConfigurationException {
 		super(jgapConfig);
-		this.windowSize = configGroup.getRtsWindowSize();
+		this.windowSize = Math.min(
+				configGroup.getRtsWindowSize(),
+				jgapConfig.getPopulationSize());
 		this.jgapConfig = jgapConfig;
 		this.distanceComparator = distanceComparator;
 	}
