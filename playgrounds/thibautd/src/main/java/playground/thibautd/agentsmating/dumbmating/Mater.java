@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -36,6 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
@@ -62,6 +64,9 @@ public class Mater {
 	private final int cliquesSize;
 	private final IdFactory idFactory = new IdFactory();
 	private final PuNameFactory puFactory = new PuNameFactory();
+	// probability that car availability is set to "never" for passenger
+	private final double pNoCar;
+	private final Random randomGen = new Random(123);
 
 	/**
 	 * Defines the way shared rides are created.
@@ -77,11 +82,13 @@ public class Mater {
 	public Mater(
 			final Scenario scenario,
 			final TripChaining chainingMode,
-			final int cliquesSize) {
+			final int cliquesSize,
+			final double pNoCar) {
 		this.population = scenario.getPopulation();
 		this.scenario = scenario;
 		this.chainingMode = chainingMode;
 		this.cliquesSize = cliquesSize;
+		this.pNoCar = pNoCar;
 	}
 
 	/**
@@ -158,13 +165,17 @@ public class Mater {
 				secondOD);
 
 		for (int i=1; i < clique.size(); i++) {
+			Person currentMember = clique.get(i);
 			putJointTrips(
-					clique.get(i).getSelectedPlan().getPlanElements(),
+					currentMember.getSelectedPlan().getPlanElements(),
 					JointActingTypes.PASSENGER,
 					firstPuName,
 					secondPuName,
 					firstOD,
 					secondOD);
+			if (this.randomGen.nextDouble() < pNoCar) {
+				((PersonImpl) currentMember).setCarAvail("never");
+			}
 		}
 	}
 

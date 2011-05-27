@@ -45,6 +45,7 @@ public class RunMating {
 	private static final String netFile = "../../../trunk/examples/equil/network.xml";
 	private static final String outputPrefix = "testcases/matings/3-shuttle";
 	private static final int cliqueSize = 3;
+	private static final double pNoCar = 0.7d;
 
 	public static void main(String[] args) {
 		//String popFile = args[0];
@@ -61,7 +62,7 @@ public class RunMating {
 		(new MatsimPopulationReader(scenario)).readFile(popFile);
 
 		log.info("mating");
-		Mater matingAlgo = new Mater(scenario, chainingMode, cliqueSize);
+		Mater matingAlgo = new Mater(scenario, chainingMode, cliqueSize, pNoCar);
 		matingAlgo.run();
 
 		log.info("writing output");
