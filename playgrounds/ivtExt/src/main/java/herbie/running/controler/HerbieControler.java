@@ -21,17 +21,14 @@
 package herbie.running.controler;
 
 import herbie.running.config.HerbieConfigGroup;
-import herbie.running.controler.listeners.CalcLegTimesKTIListener;
-import herbie.running.controler.listeners.KtiPopulationPreparation;
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -40,7 +37,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class HerbieControler extends Controler {
 
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
-	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
+	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
@@ -49,6 +46,7 @@ public class HerbieControler extends Controler {
 	public HerbieControler(String[] args) {
 		super(args);
 		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		super.setOverwriteFiles(true);
 	}
 
 	@Override
@@ -68,9 +66,9 @@ public class HerbieControler extends Controler {
 				this.getFacilities());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory();
-		this.setTravelCostCalculatorFactory(costCalculatorFactory);
-
+//		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory();
+//		this.setTravelCostCalculatorFactory(costCalculatorFactory);
+		
 		super.setUp();
 	}
 
@@ -78,12 +76,10 @@ public class HerbieControler extends Controler {
 	@Override
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
-		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
+		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
+//		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
 	@Override
