@@ -42,6 +42,10 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * Fitness function for the meta-GA.
+ * The fitness is calculated based on the best fitness and the computation time
+ * of several runs of the replanning algorithm on different cliques.
+ *
  * @author thibautd
  */
 public class ParameterOptimizerFitness extends FitnessFunction {
@@ -91,6 +95,16 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 				network, iterationOutputPath);
 	}
 
+	/**
+	 * Scores a parameter set.
+	 *
+	 * The replanning algorithm is ran on the test instances, and best fitness
+	 * and CPU time are measured.
+	 *
+	 * The fitness is the sum, over all test instance, of F_best - alpha*CPU_time.
+	 * alpha can be interpreted as the "acceptable time" to gain one fitness unit.
+	 * The fitness is understood as the fitness per clique member.
+	 */
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
 		double[] scores = new double[nPlans];
@@ -164,6 +178,9 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		return new Chromosome(this.jgapConfig, genes);
 	}
 
+	/**
+	 * "Decodes" a chromosome.
+	 */
 	public final static JointReplanningConfigGroup fromChromosomeToConfig(
 			final IChromosome chromosome) {
 		JointReplanningConfigGroup configGroup = new JointReplanningConfigGroup();

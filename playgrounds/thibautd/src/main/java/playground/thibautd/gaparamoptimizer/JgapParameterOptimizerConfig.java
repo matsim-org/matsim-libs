@@ -60,6 +60,14 @@ public class JgapParameterOptimizerConfig extends Configuration {
 	private static final double CO_RATE = 0.6d;
 	private static final double ORIG_RATE = 0.9d;
 
+	/**
+	 * @param plans the JointPlans to use as test instances
+	 * @param scoringFunctionFactory parameter of the replanning algorithm
+	 * @param legTravelTimeEstimatorFactory parameter of the replanning algorithm
+	 * @param routingAlgorithm parameter of the replanning algorithm
+	 * @param network parameter of the replanning algorithm
+	 * @param iterationOutputPath parameter of the replanning algorithm
+	 */
 	public JgapParameterOptimizerConfig(
 			final List<JointPlan> plans,
 			final ScoringFunctionFactory scoringFunctionFactory,

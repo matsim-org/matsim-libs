@@ -50,6 +50,12 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
 
 /**
+ * Core of the meta-GA.
+ *
+ * When the replanning event is fired, this class takes random cliques from the
+ * population, and uses them as test instances for scoring the parameters encoded
+ * in the meta-GA's population.
+ *
  * @author thibautd
  */
 public class JPOParametersOptimizerListener implements ReplanningListener {
