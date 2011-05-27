@@ -59,9 +59,20 @@ public class SinglePlanGenerator {
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		
 		actH.setStartTime(0.0);
-		actH.setMaximumDuration(24.0 * 3600.0);
-		
+		actH.setMaximumDuration(1.0 * 3600.0);
+		actH.setEndTime(1.0 * 3600.0);
+				
 		plan.addActivity(actH);
+		plan.addLeg(new LegImpl("car"));
+		
+		ActivityImpl actH1 = new ActivityImpl("h", new IdImpl(homeIndex));
+		
+		actH1.setStartTime(1.0 * 3600);
+		actH1.setFacilityId(facilityId);
+		
+		actH1.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
+		plan.addActivity(actH1);
+
 		return plan;
 	}
 	
