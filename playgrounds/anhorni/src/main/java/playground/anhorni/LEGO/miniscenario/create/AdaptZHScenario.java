@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -80,7 +79,7 @@ public class AdaptZHScenario {
 		populationReader.readFile(plansFilePath);
 	}
 
-	private void run(String configFile) {			
+	public void run(String configFile) {			
 		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario()).getConfig();
 		this.init(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"), 
