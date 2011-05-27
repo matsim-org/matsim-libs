@@ -735,6 +735,7 @@ public class DecentralizedSmartCharger {
 			double xPercentDownUp
 			) throws FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, ConvergenceException{
 		
+		myV2G.initializeAgentStats();
 		setV2GRegUpAndDownStats(xPercentDown,xPercentDownUp);
 		
 		startV2G=System.currentTimeMillis();

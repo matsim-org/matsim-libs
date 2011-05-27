@@ -15,6 +15,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ChargingInterval;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.GeneralSource;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LPEV;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LPPHEV;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
@@ -73,7 +74,7 @@ public class V2G {
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
 		this.mySmartCharger=mySmartCharger;
-		initializeAgentStats();		
+				
 	}
 	
 	public void initializeAgentStats(){
@@ -82,7 +83,7 @@ public class V2G {
 		for (Id id: mySmartCharger.vehicles.getKeySet()){
 			agentV2GStatistic.put(id, new V2GAgentStats());
 		}
-		
+		HashMap<Id, GeneralSource> m= mySmartCharger.myHubLoadReader.locationSourceMapping;
 		if (mySmartCharger.myHubLoadReader.locationSourceMapping!= null){
 			for (Id id: mySmartCharger.myHubLoadReader.locationSourceMapping.keySet()){
 				hubSourceStatistic.put(id, new V2GAgentStats()); //linkId, Stats
