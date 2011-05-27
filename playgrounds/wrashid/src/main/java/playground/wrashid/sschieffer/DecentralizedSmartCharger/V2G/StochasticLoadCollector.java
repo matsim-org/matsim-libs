@@ -100,7 +100,7 @@ public StochasticLoadCollector(	DecentralizedChargingSimulation mySimulation) th
 						LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
 								96, 
 								"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
-								"sstochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
+								"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
 						
 						stochasticGeneralSources.get(i).setLoadSchedule
 							(LoadFileReader.makeSchedule(stochasticHubSourceLoad.getFittedFunction()));

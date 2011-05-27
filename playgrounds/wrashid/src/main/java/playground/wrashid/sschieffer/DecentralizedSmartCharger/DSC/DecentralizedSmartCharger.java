@@ -165,7 +165,7 @@ public class DecentralizedSmartCharger {
 		this.outputPath=outputPath;	
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
-		optimizer.setMaxIterations(1000);		
+		optimizer.setMaxIterations(10000);		
 		optimizer.setConvergenceChecker(checker);		
 		polyFit= new PolynomialFitter(20, optimizer);
 		
@@ -760,7 +760,6 @@ public class DecentralizedSmartCharger {
 		System.out.println("DONE V2G");
 		writeSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		
-		
 	}
 	
 	
@@ -833,37 +832,37 @@ public class DecentralizedSmartCharger {
 								 */
 								
 								double compensation;
-								if (joulesFromSource>0){//regulation down = local production
-									/*
-									 * compensation for providing your own energy
-									 * self production cost is 0.0
-									 * but saving costs of charging for the joules
-									 * so has to reflect costs saved
-									 * conservative estimate - worst case = compensation is cheapest possible cost/kWh
-									 */
-									compensation=myHubLoadReader.getMinPricePerKWHAllHubs()*KWHPERJOULE*joulesFromSource; 
-									
-									myV2G.regulationUpDownVehicleLoad(id,
-											currentStochasticLoadInterval,											
-											compensation,
-											joulesFromSource,													
-											type);
-								}else{
-									/*
-									 * using up own battery for local extra load, e.g. music or air conditioning
-									 * no compensation, has to charge all energy fully from electric grid later
-									 * compensation =0.0
-									 */
-									if (joulesFromSource<0){// regulation up = local demand
-										compensation=0.0;
+								if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+									if (joulesFromSource>0){//regulation down = local production
+										/*
+										 * compensation for providing your own energy
+										 * self production cost is 0.0
+										 * but saving costs of charging for the joules
+										 * so has to reflect costs saved
+										 * conservative estimate - worst case = compensation is cheapest possible cost/kWh
+										 */
+										compensation=myHubLoadReader.getMinPricePerKWHAllHubs()*KWHPERJOULE*joulesFromSource; 
+										
 										myV2G.regulationUpDownVehicleLoad(id,
 												currentStochasticLoadInterval,											
 												compensation,
 												joulesFromSource,													
 												type);
 									}else{
-										//nothing if 0
+										/*
+										 * using up own battery for local extra load, e.g. music or air conditioning
+										 * no compensation, has to charge all energy fully from electric grid later
+										 * compensation =0.0
+										 */
+										// regulation up = local demand
+											compensation=0.0;
+											myV2G.regulationUpDownVehicleLoad(id,
+													currentStochasticLoadInterval,											
+													compensation,
+													joulesFromSource,													
+													type);
 									}
+								
 								}
 																						
 							}
@@ -903,33 +902,35 @@ public class DecentralizedSmartCharger {
 						
 						///////////////////////////
 						double compensation;
-						
-						if (joulesFromSource>0){//regulation down = local production
-							/*
-							 * feed in 
-							 */
-							compensation=myHubLoadReader.locationSourceMapping.get(linkId).getFeedInCompensationPerKWH()
-										*KWHPERJOULE*joulesFromSource; 
-							
-							myV2G.feedInHubSource(linkId,
-									electricSourceInterval,											
-									compensation,
-									joulesFromSource													
-									);
-						}else{
-							/*
-							 * using up own battery for local extra load, e.g. music or air conditioning
-							 * no compensation, has to charge all energy fully from electric grid later
-							 * compensation =0.0
-							 */
-							if (joulesFromSource<0){// regulation up = local demand
+						if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+							if (joulesFromSource>0){//regulation down = local production
+								/*
+								 * feed in 
+								 */
+								compensation=myHubLoadReader.locationSourceMapping.get(linkId).getFeedInCompensationPerKWH()
+											*KWHPERJOULE*joulesFromSource; 
 								
-								myV2G.hubSourceChargeExtra(linkId,
-										electricSourceInterval,	
+								myV2G.feedInHubSource(linkId,
+										electricSourceInterval,											
+										compensation,
 										joulesFromSource													
 										);
+							}else{
+								/*
+								 * using up own battery for local extra load, e.g. music or air conditioning
+								 * no compensation, has to charge all energy fully from electric grid later
+								 * compensation =0.0
+								 */
+								if (joulesFromSource<0){// regulation up = local demand
+									
+									myV2G.hubSourceChargeExtra(linkId,
+											electricSourceInterval,	
+											joulesFromSource													
+											);
+								}
 							}
 						}
+						
 					}
 					visualizeStochasticLoadHubSourceBeforeAfterV2G(linkId);
 			}
@@ -990,47 +991,47 @@ public class DecentralizedSmartCharger {
 							double end= start+bit;							
 							//*********************************													
 							double joulesFromSource= functionIntegrator.integrate(func, start, end);
-														
-							if(joulesFromSource<0 ){
-								// regulation UP
-								double expectedNumberOfParkingAgents=getPercentDownUp()*
-									myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
-											h, 
-											start);
-								
-								// SANITY CHECK
-								if(expectedNumberOfParkingAgents>0.0){
-									func=func.multiply(new PolynomialFunction(new double []{1/expectedNumberOfParkingAgents}));
-									LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
-											end, 
-											func, 
-											stochasticLoad.isOptimal());						
-									
-									// loop over all agents 
-									// find who is in regulation up and do regulation up for him
-									
-									for(Id agentId :vehicles.getKeySet()){
-										
-										String type;						
-										if(hasAgentPHEV(agentId)){											
-											type="PHEVStochasticLoadRegulationUp";											
-										}else{																			
-											type="EVStochasticLoadRegulationUp";										}
-										
-										if(isAgentRegulationUp(agentId)){
-											
-											myV2G.regulationUpDownHubLoad(agentId, 
-													currentStochasticLoadInterval, 
-													agentParkingAndDrivingSchedules.get(agentId), 
-													type,												
-													h);
-										}
-									}
-								
-								}
 							
+							if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+								if(joulesFromSource<0 ){
+									// regulation UP
+									double expectedNumberOfParkingAgents=getPercentDownUp()*
+										myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
+												h, 
+												start);
+									
+									// SANITY CHECK
+									if(expectedNumberOfParkingAgents>0.0){
+										func=func.multiply(new PolynomialFunction(new double []{1/expectedNumberOfParkingAgents}));
+										LoadDistributionInterval currentStochasticLoadInterval= new LoadDistributionInterval(start, 
+												end, 
+												func, 
+												stochasticLoad.isOptimal());						
+										
+										// loop over all agents 
+										// find who is in regulation up and do regulation up for him
+										
+										for(Id agentId :vehicles.getKeySet()){
+											
+											String type;						
+											if(hasAgentPHEV(agentId)){											
+												type="PHEVStochasticLoadRegulationUp";											
+											}else{																			
+												type="EVStochasticLoadRegulationUp";										}
+											
+											if(isAgentRegulationUp(agentId)){
+												
+												myV2G.regulationUpDownHubLoad(agentId, 
+														currentStochasticLoadInterval, 
+														agentParkingAndDrivingSchedules.get(agentId), 
+														type,												
+														h);
+											}
+										}
+									
+									}
+								}
 								
-							}else{// joulesFromSource>0
 								if(joulesFromSource>0 ){
 									double expectedNumberOfParkingAgents=(getPercentDown()+getPercentDownUp())*myHubLoadReader.getExpectedNumberOfParkingAgentsAtHubAtTime(
 											h, 
@@ -1076,8 +1077,9 @@ public class DecentralizedSmartCharger {
 											}
 										}
 									}
-								}							
-							}
+								}
+							}// if absolute value target of 1 not hit
+							
 							
 						}
 						

@@ -28,7 +28,7 @@ import org.jfree.data.xy.XYSeries;
 public class TimeDataCollector {
 
 	private DifferentiableMultivariateVectorialOptimizer optimizer;
-	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(-1,2);//relative tol, absolute tol
+	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(-1,DecentralizedSmartCharger.STANDARDCONNECTIONSWATT);//relative tol, absolute tol
 	private GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); 
 	private PolynomialFitter fitter;
 	
@@ -44,7 +44,7 @@ public class TimeDataCollector {
 		data= new double[numberOfDataPoints][2];
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
-		optimizer.setMaxIterations(1000);		
+		optimizer.setMaxIterations(100000);		
 		optimizer.setConvergenceChecker(checker);		
 		fitter= new PolynomialFitter(20, optimizer);
 	}
@@ -77,13 +77,14 @@ public class TimeDataCollector {
 	
 	
 	
-	public void fitFunction() throws OptimizationException{
+	public void fitFunction() {
 		try {
-			func= fitCurve(data);
+			this.func= fitCurve(data);
 	    } catch (Exception e) {
 	        // if singular with all entries = 0.0
+	    	e.printStackTrace();
 	    	if(allDataZero()){
-	    		func= new PolynomialFunction(new double[]{0.0});
+	    		this.func= new PolynomialFunction(new double[]{0.0});
 	    	}
 	    }
 		
@@ -118,7 +119,7 @@ public class TimeDataCollector {
 	
 	public PolynomialFunction getFunction() throws OptimizationException{
 		fitFunction();
-		return func;
+		return this.func;
 	}
 	
 	public double getXAtEntry(int i){

@@ -90,7 +90,10 @@ public class LPEV extends LP{
 		setUpLP();
 		
 		int status = getSolver().solve();
-        
+		
+		System.out.println("TimeOut: "+ getSolver().getTimeout()); 
+		System.out.println("Totla iterations: "+ getSolver().getTotalIter()); 
+		System.out.println("Time elapsed: "+ getSolver().timeElapsed()); 
         if(status!=0){
         	
         	if(DecentralizedSmartCharger.debug){

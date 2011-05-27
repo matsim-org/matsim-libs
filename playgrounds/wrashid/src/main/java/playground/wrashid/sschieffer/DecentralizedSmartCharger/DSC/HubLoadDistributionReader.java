@@ -299,6 +299,7 @@ public class HubLoadDistributionReader {
 				
 		for (Integer hub: stochasticHubLoadAfter15MinBins.keySet()){
 			
+			
 			PolynomialFunction newFit= stochasticHubLoadAfter15MinBins.get(hub).getFunction();
 			
 			stochasticHubLoadAfterVehicleAndHubSources.put(hub,

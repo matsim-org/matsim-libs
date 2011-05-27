@@ -37,6 +37,7 @@ public abstract class LP {
 	
 	public LP(boolean output){		
 		this.output=output;
+		
 	}
 	
 	protected Schedule getSchedule(){
