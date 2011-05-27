@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
+import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -47,6 +48,7 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -68,7 +70,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	PersonEventHandler, AgentWait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AdditionalTeleportationDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
@@ -145,6 +147,11 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		log.info("VehicleDepartsAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
+
+	@Override
+	public void handleEvent(AdditionalTeleportationDepartureEvent eve) {
+		log.info("AdditionTeleportationDepartureEvent at " + Time.writeTime(eve.getTime()) + " " + eve.getMode() + " " + eve.getTravelTime());
 	}
 
 }

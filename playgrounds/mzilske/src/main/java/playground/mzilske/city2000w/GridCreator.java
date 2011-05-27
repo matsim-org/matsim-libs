@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -27,11 +26,14 @@ public class GridCreator {
 
 	private Scenario scenario;
 
-	private void createGrid(int size) {
-		Config config = new Config();
-		config.addCoreModules();
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		Network network = scenario.getNetwork();
+	private Network network;
+
+	public GridCreator(Scenario scenario) {
+		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+	}
+
+	public void createGrid(int size) {
 		for (int i = 0; i <= size; i++) {
 			for (int j = 0; j <= size; j++) {
 				Node node = network.getFactory().createNode(makeId(i, j), makeCoord(i, j));
@@ -81,14 +83,13 @@ public class GridCreator {
 		new NetworkWriter(network).write(NETWORK_FILENAME);
 	}
 	
-	void run() {
-		createGrid(8);
-		writeNetwork();
-	}
-	
 	public static void main(String[] args) {
-		GridCreator gridCreator = new GridCreator();
-		gridCreator.run();
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		GridCreator gridCreator = new GridCreator(scenario);
+		gridCreator.createGrid(GRID_SIZE);
+		gridCreator.writeNetwork();
 	}
 	
 }

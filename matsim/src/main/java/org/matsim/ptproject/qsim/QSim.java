@@ -121,7 +121,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	private MultiModalSimEngine multiModalEngine = null;
 
 	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
-	
+
 	private MobsimTimerI simTimer;
 
 	private Collection<PlanAgent> transitAgents;
@@ -170,11 +170,11 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		this.listenerManager = new SimulationListenerManager(this);
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
-		
+
 		// create the NetworkEngine ...
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
 		this.addDepartureHandler( this.netEngine.getDepartureHandler() ) ;
-		
+
 		// create the QNetwork ...
 		NetsimNetwork network = null ;
 		if (sc.getConfig().scenario().isUseLanes()) {
@@ -187,38 +187,38 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 			// yyyyyy the above is now a hack; replace by non-static factory method.  kai, feb'11
 		}
 		else {
-//			network = DefaultQNetworkFactory.staticCreateQNetwork(this);
+			//			network = DefaultQNetworkFactory.staticCreateQNetwork(this);
 			network = this.netEngine.getNetsimNetworkFactory().createNetsimNetwork(this) ;
 		}
 		// overall, one could wonder why this is not done inside the NetsimEngine.  kai, feb'11
 		// well, we may want to see the construction explicitly as long as we use factories (and not builders).  kai, feb'11
-		
+
 		// then tell the QNetwork to use the netsimEngine (this also creates qlinks and qnodes)
 		// yyyy feels a bit weird to me ...  kai, feb'11
 		network.initialize(this.netEngine);
-		
-		
+
+
 		// configuring signalSystems:
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			log.info("Signals enabled...");
 			// ... but not clear where this is actually configured??  Maybe drop completely from here??  kai, feb'11
 		}
-		
+
 		// configuring multiModalEngine ...
 		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
-		
+
 			// create MultiModalSimEngine
 			multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(this);
-		
+
 			// add MultiModalDepartureHandler
 			this.addDepartureHandler(new MultiModalDepartureHandler(this, multiModalEngine, scenario.getConfig().multiModal()));
 
 		}
-		
+
 		// set the agent factory.  might be better to have this in the c'tor, but difficult to do as long
 		// as the transitEngine changes the AgentFactory.  kai, feb'11
 		this.agentFactory = new DefaultAgentFactory(this);
-		
+
 		// configuring transit (this changes the agent factory as a side effect).
 		if (sc.getConfig().scenario().isUseTransit()){
 			this.transitEngine = new TransitQSimEngine(this);
@@ -254,7 +254,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		cleanupSim(time);
 
 		//delete reference to clear memory
-//		this.listenerManager = null;
+		//		this.listenerManager = null;
 	}
 
 	// ============================================================================================================================
@@ -266,14 +266,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// into the QSim.  But I can't change into that direction because the TransitEngine changes the AgentFactory fairly
 	// late in the initialization sequence ...
 
-//	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
-//		if ( !locked ) {
-//			this.multiModalEngine = multiModalEngine;
-//		} else {
-//			throw new RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
-//		}
-//	}
-// this is never used, and it is not clear to me how it should be used given the initialization sequence
+	//	public final void setMultiModalSimEngine(MultiModalSimEngine multiModalEngine) {
+	//		if ( !locked ) {
+	//			this.multiModalEngine = multiModalEngine;
+	//		} else {
+	//			throw new RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
+	//		}
+	//	}
+	// this is never used, and it is not clear to me how it should be used given the initialization sequence
 	// (in particular the departure handlers).  kai, feb'11
 
 	@Override
@@ -350,9 +350,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	}
 
 	protected void createAdditionalAgents() {
-		
+
 		// Empty for inheritance. (only one test)
-		
+
 	}
 
 	private void createVehicles() {
@@ -452,8 +452,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 			writer.finish();
 		}
 
-//		this.netEngine = null;
-//		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
+		//		this.netEngine = null;
+		//		this.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
 	protected void beforeSimStep() {
@@ -491,7 +491,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
 		}
-		
+
 		this.printSimLog(time);
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -552,16 +552,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	private void registerAgentAtActivityLocation(final PlanAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
-		if (agent instanceof PersonDriverAgentImpl) { // yyyyyy is this necessary?
-			PlanElement pe = agent.getCurrentPlanElement();
-			if (pe instanceof Leg) {
-				throw new RuntimeException();
-			} else {
-				Activity act = (Activity) pe;
-				Id linkId = act.getLinkId();
-				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
-				qLink.registerAgentOnLink(agent);
-			}
+		PlanElement pe = agent.getCurrentPlanElement();
+		if (pe instanceof Leg) {
+			throw new RuntimeException();
+		} else {
+			Activity act = (Activity) pe;
+			Id linkId = act.getLinkId();
+			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
+			qLink.registerAgentOnLink(agent);
 		}
 	}
 
@@ -577,16 +575,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	}
 
 	private void unregisterAgentAtActivityLocation(final PlanAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
-			PlanElement pe = agent.getCurrentPlanElement();
-			if (pe instanceof Leg) {
-				throw new RuntimeException();
-			} else {
-				Activity act = (Activity) pe;
-				Id linkId = act.getLinkId();
-				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
-				qLink.unregisterAgentOnLink(agent);
-			}
+		PlanElement pe = agent.getCurrentPlanElement();
+		if (pe instanceof Leg) {
+			throw new RuntimeException();
+		} else {
+			Activity act = (Activity) pe;
+			Id linkId = act.getLinkId();
+			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
+			qLink.unregisterAgentOnLink(agent);
 		}
 	}
 
@@ -800,7 +796,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotManager.addSnapshotWriter(snapshotWriter);
 	}
-	
+
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
 		this.mobsimEngines.add(mobsimEngine);
 	}

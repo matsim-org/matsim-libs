@@ -168,7 +168,7 @@ public class TransitNetworkSink implements Sink {
 			NodeContainer nodeContainer = nodeIterator.next();
 			Node node = nodeContainer.getEntity();
 			if (stopNodes.get(node.getId())) {
-//				System.out.println(node.getId());
+				System.out.println(node.getId());
 				stopNodeStore.add(node.getId(), nodeContainer);
 			}
 		}
@@ -362,23 +362,17 @@ public class TransitNetworkSink implements Sink {
 
 	public void setTransitModes(String[] transitModes) {
 		if(transitModes == null){
-			setTransitModes(transitModes);
+			this.transitModes = new TreeSet<String>();
 		} else {
 			TreeSet<String> modes = new TreeSet<String>();
 			for (String string : transitModes) {
 				modes.add(string);
 			}
-			setTransitModes(modes);
+			this.transitModes = modes;
 		}
 	}
 
-	public void setTransitModes(TreeSet<String> transitModes) {
-		if(transitModes == null){
-			this.transitModes = new TreeSet<String>();
-		} else {
-			this.transitModes = transitModes;
-		}
-	}
+
 
 	public TreeSet<String> getTransitModes() {
 		return this.transitModes;

@@ -33,7 +33,7 @@ public class OsmTransitMain {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new OsmTransitMain("/Users/michaelzilske/Desktop/wurst/neu.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "/Users/michaelzilske/Desktop/wurst/net.osm", "/Users/michaelzilske/Desktop/wurst/transit.osm").convertOsm2Matsim();
+		new OsmTransitMain("/Users/michaelzilske/Desktop/lv/potsdam.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "/Users/michaelzilske/Desktop/lv/transit-network.xml", "/Users/michaelzilske/Desktop/lv/transitschedule.xml").convertOsm2Matsim();
 	}
 	
 	public void convertOsm2Matsim(){

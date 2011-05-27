@@ -28,7 +28,7 @@ public class OsmMain {
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
 		new NetworkCleaner().run(scenario.getNetwork());
-		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/osm/motorway_germany.xml");
+		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/Desktop/lv/network.xml");
 	}
 
 	private static Scenario createScenario() {
@@ -37,7 +37,7 @@ public class OsmMain {
 		// tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
 		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link")));
 	//	String filename = "inputs/schweiz/zurich.osm";
-		String filename = "/Users/michaelzilske/osm/motorway_germany.osm";
+		String filename = "/Users/michaelzilske/Desktop/lv/potsdam.osm";
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter tagFilter = new TagFilter("accept-way", tagKeys, tagKeyValues);
 		
@@ -45,7 +45,7 @@ public class OsmMain {
 		
 		SimplifyTask simplify = new SimplifyTask(IdTrackerType.BitSet);
 		
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+		CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Project();
 		NetworkSink sink = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		sink.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		sink.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
