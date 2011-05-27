@@ -78,34 +78,37 @@ public class JointReplanningConfigGroup extends Module {
 	private static final String RTS_WINDOW = "rtsWindowSize";
 
 	//parameter values, initialized to defaults.
-	private int numTimeIntervals;
-	private int populationSize = 10;
-	private double dropOffDuration = 0;
+
+	private int populationSize = 70;
 	private double mutationProb = 0.1;
-	private double wholeCrossOverProb = 0.1;
-	private double simpleCrossOverProb = 0.1;
-	private double singleCrossOverProb = 0.1;
+	private double wholeCrossOverProb = 0.3;
+	private double simpleCrossOverProb = 0.5;
+	private double singleCrossOverProb = 0.3;
 	private int numberOfIterations = 100;
 	private double betaNonUniformity = 1;
-	private boolean optimizeToggle = false;
-	private double selectionThreshold = 0.1d;
+	private boolean optimizeToggle = true;
 	private boolean plotFitness = false;
-	private boolean optimizeMode = false;
+	private boolean optimizeMode = true;
 	private List<String> availableModes = null;
-	private int minNumberOfIterations = 0;
-	private int monitoringPeriod = 5;
+	private static final String defaultModes = "car,pt,walk,bike";
+	private int minNumberOfIterations = 3;
+	private int monitoringPeriod = 1;
 	private boolean doMonitor = true;
-	private double minImprovement = 1d;
+	private double minImprovement = 0.075d;
 	private TripStructureAnalysisLayerOption
-		tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
+		tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.link;
+	private double discreteDistScale = 17000d;
+	private SimLegInterpretation simLegInt = SimLegInterpretation.CharyparEtAlCompatible;
+	private int rtsWindowSize = 15;
+	//deprecated fields:
+	private int numTimeIntervals;
+	private double dropOffDuration = 0;
+	private double selectionThreshold = 0.1d;
 	private boolean allowDoublettes = false;
 	private boolean dynamicCoRate = true;
 	private double spxRate = 0.6d;
 	private int spxOffspringRate = 4;
-	private double discreteDistScale = 100d;
 	private int maxTabuLength = Integer.MAX_VALUE;
-	private SimLegInterpretation simLegInt = SimLegInterpretation.CharyparEtAlCompatible;
-	private int rtsWindowSize = 15;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -477,9 +480,11 @@ public class JointReplanningConfigGroup extends Module {
 
 	public List<String> getAvailableModes() {
 		if (this.availableModes == null) {
-			log.warn("modes available for the optimisation initialized to the "+
-					"set of all available values");
-			this.availableModes = getAllModes();
+			//log.warn("modes available for the optimisation initialized to the "+
+			//		"set of all available values");
+			//this.availableModes = getAllModes();
+			log.info("using default mode choice set: "+defaultModes);
+			this.setAvailableModes(defaultModes);
 		}
 		return this.availableModes;
 	}
@@ -655,5 +660,81 @@ public class JointReplanningConfigGroup extends Module {
 	public int getRtsWindowSize() {
 		return this.rtsWindowSize;
 	}
+
+	// allow setting of GA params "directly"
+	public void setPopulationSize(final int populationSize) {
+		this.populationSize = (populationSize);
+	}
+
+	public void setMutationProbability(final double mutationProb) {
+		this.mutationProb = (mutationProb);
+
+		if ((this.mutationProb < 0)||(this.mutationProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public void setWholeCrossOverProbability(final double coProb) {
+		this.wholeCrossOverProb = (coProb);
+
+		if ((this.wholeCrossOverProb < 0)||(this.wholeCrossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public void setSingleCrossOverProbability(final double coProb) {
+		this.singleCrossOverProb = (coProb);
+
+		if ((this.singleCrossOverProb < 0)||(this.singleCrossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public void setSimpleCrossOverProbability(final double coProb) {
+		this.simpleCrossOverProb = (coProb);
+
+		if ((this.simpleCrossOverProb < 0)||(this.simpleCrossOverProb > 1)) {
+			throw new IllegalArgumentException("probability values must in [0,1]");
+		}
+	}
+
+	public void setMaxIterations(final int iterations) {
+		this.numberOfIterations = (iterations);
+
+		if (this.numberOfIterations < 0) {
+			throw new IllegalArgumentException("number of iterations must be positive");
+		}
+	}
+
+	public void setMutationNonUniformity(final double beta) {
+		this.betaNonUniformity = (beta);
+
+		if (this.betaNonUniformity <= 0d) {
+			throw new IllegalArgumentException("non uniformity mutation parameter"+
+					" must be positive");
+		}
+	}
+
+	public void setMinIterations(final int value) {
+		this.minNumberOfIterations = (value);
+	}
+
+	public void setMonitoringPeriod(final int  value) {
+		this.monitoringPeriod = value;
+	}
+
+	public void setMinImprovement(final double value) {
+		this.minImprovement = value;
+	}
+
+	public void setDiscreteDistanceScale(final double value) {
+		this.discreteDistScale = value;
+	}
+
+	public void setRtsWindowSize(final int value) {
+		this.rtsWindowSize = value;
+	}
+
+
 }
 
