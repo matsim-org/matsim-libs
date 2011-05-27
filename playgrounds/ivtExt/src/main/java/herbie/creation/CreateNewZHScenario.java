@@ -254,10 +254,11 @@ public class CreateNewZHScenario {
 	
 	// TODO: maybe there are more reasonable time settings!
 	private void completeBoderCrossingPlans(Scenario inScenario) {
+		log.info("completing border crossing plans");
 		for (Person p : inScenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
+				int cnt = 0;
 				for (PlanElement pe : plan.getPlanElements()) {
-					int cnt = 0;
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
 						
@@ -293,7 +294,7 @@ public class CreateNewZHScenario {
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {
-							duration = Double.parseDouble(act.getType().substring(1));
+							duration = Double.parseDouble(act.getType().substring(1)) * 3600.0;
 						}
 						act.setType(v2Type);
 						((PersonImpl)p).createDesires(v2Type);
