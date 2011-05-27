@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,8 +40,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -142,6 +145,7 @@ public class CreateNewZHScenario {
 		if (type.equals("cross-border")) {
 			log.info(sTmp.getPopulation().getPersons().size() + " cross-border agents ##########################################");
 			this.convertFromV1toV2(sTmp);
+			this.completeBoderCrossingPlans(sTmp);
 			this.mapActivities2Facilities((PopulationImpl) sTmp.getPopulation());
 			List<Id> persons2remove = this.dilutedZH(sTmp.getPopulation());
 			for (Id personId : persons2remove) {
@@ -248,7 +252,38 @@ public class CreateNewZHScenario {
 		return persons2remove;
 	}
 	
-	// need to add start and end times
+	// TODO: maybe there are more reasonable time settings!
+	private void completeBoderCrossingPlans(Scenario inScenario) {
+		for (Person p : inScenario.getPopulation().getPersons().values()){
+			for (Plan plan : p.getPlans()) {
+				for (PlanElement pe : plan.getPlanElements()) {
+					int cnt = 0;
+					if (pe instanceof Activity) {
+						ActivityImpl act = (ActivityImpl)pe;
+						
+						// activity is not first or last activity
+						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
+							double duration = ((PersonImpl)p).getDesires().getActivityDuration(act.getType());
+							act.setEndTime(act.getStartTime() + duration);
+						}
+						else if (cnt == 0) {
+							act.setStartTime(0.0);
+							act.setMaximumDuration(act.getEndTime());
+						}
+						else if (cnt == plan.getPlanElements().size() - 1) {
+							// get end time of previous activity and set it as start time
+							double previousEndTime = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act)).getEndTime();
+							act.setStartTime(previousEndTime);
+						}						
+					}
+					cnt++;
+				}
+			}
+		}
+	}
+	
+	
+	
 	private void convertFromV1toV2(Scenario inScenario) {		
 		for (Person p : inScenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
@@ -263,6 +298,11 @@ public class CreateNewZHScenario {
 						act.setType(v2Type);
 						((PersonImpl)p).createDesires(v2Type);
 						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
+					}
+					//reset route
+					if (pe instanceof Leg) {
+						LegImpl leg = (LegImpl)pe;
+						leg.setRoute(null);
 					}
 				}
 			}
