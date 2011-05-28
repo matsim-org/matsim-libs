@@ -63,7 +63,7 @@ public class SinglePlanGenerator {
 		actH.setEndTime(1.0 * 3600.0);
 				
 		plan.addActivity(actH);
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl("walk"));
 		
 		ActivityImpl actH1 = new ActivityImpl("h", new IdImpl(homeIndex));
 		
