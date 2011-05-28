@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="./src/test/java/playground/michalm/ttcalc_error/error_2/network.xml"/>
+	</module>
+	<module name="plans">
+		<param name="inputPlansFile" value="./src/test/java/playground/michalm/ttcalc_error/error_2/output_plans.xml"/>
+	</module>
+	<module name="controler">
+		<param name="outputDirectory" value="./src/test/java/playground/michalm/ttcalc_error/error_2/output"/>
+		<param name="firstIteration" value="0" />
+		<param name="writeEventsInterval" value="0" />
+		<!--param name="eventsFileFormat" value="xml" /-->
+	</module>
+
+
+	<module name="qsim">
+		<param name="startTime" value="00:00:00"/>
+		<param name="endTime" value="30:00:00"/>
+		<param name="snapshotperiod" value="00:00:00"/>
+		<param name="flowCapacityFactor" value="1" />
+		<param name="storageCapacityFactor" value="1" />
+		
+		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
+		<param name="removeStuckVehicles" value="false" />
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="100.0" />
+		
+		<!-- added when otfvis -->
+		<!--param name="snapshotStyle" value="equidist"/-->
+		<param name="snapshotStyle" value="queue"/>
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<!-- home -->
+		<param name="activityType_0"            value="h" />
+		<param name="activityTypicalDuration_0" value="08:00:00" />
+		<param name="activityMinimalDuration_0" value="03:00:00" />
+		
+		<!-- work -->
+		<!--param name="activityType_1"            value="w" /-->
+		<!--param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="03:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityClosingTime_1"     value="18:00:00" /-->
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="ChangeExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute_Dijkstra" />
+
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+	</module> 
+	
+	
+	<module name="vis">
+		<param name="logo" value="(c) Michal M."/>
+		<param name="delay" value="200"/>
+		<param name="linkwidthfactor" value="15"/>
+		<param name="shownodelabels" value="false"/>
+		<param name="showlinklabels" value="true"/>
+	</module>
+	
+	<module name="otfvis">
+		<param name="showTeleportation" value="false"/>
+	</module>
+
+
+</config>

@@ -1,0 +1,22 @@
+departure time [min] : travel time [s]
+
+0 : 821.7894736842105
+5 : 821.7894736842105
+10 : 821.7894736842105
+15 : 1342.5
+20 : 1342.5
+25 : 1342.5
+30 : 224.25 !!! more than 900 s of the difference between the 3rd and the 2nd quarter - breaks FIFO
+35 : 224.25
+40 : 224.25
+
+
+
+void org.matsim.core.trafficmonitoring.TravelTimeCalculator.consolidateData(DataContainer data)
+Line: 259
+
+Is:
+				r.addTravelTime(i, minTime);
+
+Should be:
+				r.setTravelTime(i, minTime); //SET instead of ADD

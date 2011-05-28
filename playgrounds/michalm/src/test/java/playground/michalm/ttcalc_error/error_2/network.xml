@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+	<nodes>
+		<node id="1" x="0" y="0"/>
+		<node id="2" x="500" y="0"/>
+		<node id="3" x="500" y="500"/>
+		<node id="4" x="1000" y="500"/>
+	</nodes>
+	<links capperiod="01:00:00">
+		<link id="A" from="1" to="2" length="75" freespeed="15" capacity="200" permlanes="1"/>
+		<link id="B" from="2" to="3" length="75" freespeed="15" capacity="30" permlanes="1"/>
+		<link id="C" from="3" to="4" length="75" freespeed="15" capacity="1000" permlanes="1"/>
+	</links>
+</network>
