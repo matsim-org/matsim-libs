@@ -55,6 +55,8 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.qsim.AbstractTransitDriver;
+import org.matsim.pt.qsim.TransitDriver;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
@@ -552,14 +554,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	private void registerAgentAtActivityLocation(final PlanAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
-		PlanElement pe = agent.getCurrentPlanElement();
-		if (pe instanceof Leg) {
-			throw new RuntimeException();
-		} else {
-			Activity act = (Activity) pe;
-			Id linkId = act.getLinkId();
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
-			qLink.registerAgentOnLink(agent);
+		if (! (agent instanceof AbstractTransitDriver)) {
+			PlanElement pe = agent.getCurrentPlanElement();
+			if (pe instanceof Leg) {
+				throw new RuntimeException();
+			} else {
+				Activity act = (Activity) pe;
+				Id linkId = act.getLinkId();
+				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
+				qLink.registerAgentOnLink(agent);
+			}
 		}
 	}
 
@@ -575,14 +579,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	}
 
 	private void unregisterAgentAtActivityLocation(final PlanAgent agent) {
-		PlanElement pe = agent.getCurrentPlanElement();
-		if (pe instanceof Leg) {
-			throw new RuntimeException();
-		} else {
-			Activity act = (Activity) pe;
-			Id linkId = act.getLinkId();
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
-			qLink.unregisterAgentOnLink(agent);
+		if (! (agent instanceof TransitDriver)) {
+			PlanElement pe = agent.getCurrentPlanElement();
+			if (pe instanceof Leg) {
+				throw new RuntimeException();
+			} else {
+				Activity act = (Activity) pe;
+				Id linkId = act.getLinkId();
+				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
+				qLink.unregisterAgentOnLink(agent);
+			}
 		}
 	}
 
