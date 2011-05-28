@@ -34,15 +34,26 @@ public class SimulatedLinkVolumesAndCounts {
 	}
 	
 	public void run() {
-		this.readVolumes();
-		this.write();
+		this.readVolumes("inter");
+		this.write("stdDevInter");
+		
+		this.ensembles.clear();
+		
+		this.readVolumes("intra");
+		this.write("stdDevIntra");	
 	}
 		
-	private void readVolumes() {
+	private void readVolumes(String type) {
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
-			String p = this.path + "/" + i + "/countspost/countscompare.txt";
-			//String p = this.path + "/" + i + "/zh10PctEps.100.countscompare.txt";
-			this.readCountsCompare(p);
+			if (type.equals("inter")) {
+				String p = this.path + "/interrun/" + i + "/zh10PctEps.200.countscompare.txt";
+				this.readCountsCompare(p);
+			}
+			else if (type.equals("intra")) {
+				int cnt = 191 + i;
+				String p = this.path + "/intrarun/zh10PctEps." + cnt + ".countscompare.txt";
+				this.readCountsCompare(p);
+			}
 		}
 	}
 	
@@ -68,10 +79,10 @@ public class SimulatedLinkVolumesAndCounts {
 		this.ensembles.get(id).addVolume(hour, volume);
 	}
 	
-	private void write() {
+	private void write(String name) {
 		try {
 			new File(this.outpath).mkdirs();
-			BufferedWriter out = IOUtils.getBufferedWriter(this.outpath + "/stdDevsPct0-23.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(this.outpath + "/" + name + ".txt");
 			log.info("files written to: " + this.outpath);
 			String header = "Station\tLinkId";
 			for (int hour = 0; hour < 24; hour++) {
@@ -97,9 +108,10 @@ public class SimulatedLinkVolumesAndCounts {
 			out.close();
 			
 			LinkVolumesShapeFileWriter shapeFileWriter = new LinkVolumesShapeFileWriter();
-			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath, links, 7);
-			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath, links, 11);
-			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath, links, 17);
+			new File(this.outpath + "/" + name).mkdirs();
+			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath + "/" + name, links, 7);
+			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath + "/" + name, links, 11);
+			shapeFileWriter.writeLinkVolumesAtCountStations(this.outpath + "/" + name, links, 17);
 			
 		} // end try
 		catch (IOException e) {
