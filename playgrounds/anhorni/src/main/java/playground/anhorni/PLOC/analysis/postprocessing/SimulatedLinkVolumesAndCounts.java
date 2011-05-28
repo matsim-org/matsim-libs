@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -22,6 +23,8 @@ public class SimulatedLinkVolumesAndCounts {
 	private String outpath;
 	private Network network;
 	private TreeMap<Id, EnsemblePerLink> ensembles = new TreeMap<Id, EnsemblePerLink>();
+	
+	private final static Logger log = Logger.getLogger(SimulatedLinkVolumesAndCounts.class);
 	
 	public SimulatedLinkVolumesAndCounts(int numberOfAnalyses, String path, String outpath, Network network) {
 		this.numberOfAnalyses = numberOfAnalyses;
@@ -69,6 +72,7 @@ public class SimulatedLinkVolumesAndCounts {
 		try {
 			new File(this.outpath).mkdirs();
 			BufferedWriter out = IOUtils.getBufferedWriter(this.outpath + "/stdDevsPct0-23.txt");
+			log.info("files written to: " + this.outpath);
 			String header = "Station\tLinkId";
 			for (int hour = 0; hour < 24; hour++) {
 				header += "\tHour" + hour;
