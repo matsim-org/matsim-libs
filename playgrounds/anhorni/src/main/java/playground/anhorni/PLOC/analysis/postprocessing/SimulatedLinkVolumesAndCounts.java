@@ -38,6 +38,11 @@ public class SimulatedLinkVolumesAndCounts {
 		this.write("stdDevInter");
 		
 		this.ensembles.clear();
+
+		this.readVolumes("interAWTV");
+		this.write("stdDevInterAWTV");
+		
+		this.ensembles.clear();
 		
 		this.readVolumes("intra");
 		this.write("stdDevIntra");	
@@ -49,12 +54,34 @@ public class SimulatedLinkVolumesAndCounts {
 				String p = this.path + "/interrun/" + i + "/zh10PctEps.200.countscompare.txt";
 				this.readCountsCompare(p);
 			}
+			else if (type.equals("interAWTV")) {
+				String p = this.path + "/interrun/" + i + "/zh10PctEps.200.countscompareAWTV.txt";
+				this.readAWTV(p);
+			}
 			else if (type.equals("intra")) {
 				int cnt = 191 + i;
 				String p = this.path + "/intrarun/zh10PctEps." + cnt + ".countscompare.txt";
 				this.readCountsCompare(p);
 			}
 		}
+	}
+	
+	private void readAWTV(String p) {
+		try {
+	          BufferedReader bufferedReader = new BufferedReader(new FileReader(p));
+	          String line = bufferedReader.readLine(); //skip header
+	          while ((line = bufferedReader.readLine()) != null) {
+	        	  String parts[] = line.split("\t");
+	        	  Id id = new IdImpl(parts[0]);
+	        	  double simVal = Double.parseDouble(parts[1]);
+	        	  for (int i = 0; i < 24; i++) {
+	        		  this.addSimVal(id, i, simVal);
+	        	  }
+	          }	          
+	        } // end try
+		catch (IOException e) {
+      	e.printStackTrace();
+      }		
 	}
 	
 	private void readCountsCompare(String p) {
