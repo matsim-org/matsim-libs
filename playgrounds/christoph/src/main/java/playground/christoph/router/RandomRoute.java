@@ -131,5 +131,10 @@ public class RandomRoute extends SimpleRouter {
 	public static void setErrorCounter(int i) {
 		errorCounter = i;
 	}
+	
+	@Override
+	public SimpleRouter createInstance() {
+		return new RandomRoute(network);
+	}
 
 }

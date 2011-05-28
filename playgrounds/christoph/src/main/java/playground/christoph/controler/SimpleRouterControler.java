@@ -37,7 +37,10 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -128,10 +131,9 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 	protected WithinDayInitialReplanner randomCompassReplanner;
 	protected WithinDayInitialReplanner randomDijkstraReplanner;
 
-//	protected FixedOrderSimulationListener fosl;
-		
-	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTimeCalculator();
-	protected PersonalizableTravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
+	protected PersonalizableTravelTime travelTime = new FreeSpeedTravelTimeCalculator();
+	protected TravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+	protected PersonalizableTravelCost travelCost = travelCostFactory.createTravelCostCalculator(travelTime, null);
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -211,7 +213,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.randomCompassReplanner);
 
-		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
+		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, this.travelCostFactory, this.travelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
 		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
 		this.dijkstraIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();

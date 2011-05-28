@@ -199,4 +199,9 @@ public class CompassRoute extends SimpleRouter {
 		
 		return phi;
 	}
+
+	@Override
+	public SimpleRouter createInstance() {
+		return new CompassRoute(network);
+	}
 }

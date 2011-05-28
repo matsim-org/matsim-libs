@@ -35,6 +35,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
@@ -48,7 +49,6 @@ import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
-import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.KnowledgeTools;
 
 public class TestSubNetwork {
@@ -137,7 +137,7 @@ public class TestSubNetwork {
 		travelCostWrapper.checkNodeKnowledge(false);
 
 		dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(),
-				travelCostWrapper, travelTimeWrapper, new CloningDijkstraFactory());
+				travelCostWrapper, travelTimeWrapper, new DijkstraFactory());
 	}
 
 	private void createSubNetworks() {

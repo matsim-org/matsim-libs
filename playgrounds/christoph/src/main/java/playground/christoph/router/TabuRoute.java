@@ -138,4 +138,9 @@ public class TabuRoute extends SimpleRouter {
 		errorCounter = i;
 	}
 	
+	@Override
+	public SimpleRouter createInstance() {
+		return new TabuRoute(network);
+	}
+	
 }

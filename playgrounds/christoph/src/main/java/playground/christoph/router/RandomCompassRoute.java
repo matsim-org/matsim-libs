@@ -213,5 +213,10 @@ public class RandomCompassRoute extends SimpleRouter {
 	
 	public static void setErrorCounter(int i) {
 		errorCounter = i;
-	}	
+	}
+	
+	@Override
+	public SimpleRouter createInstance() {
+		return new RandomCompassRoute(network);
+	}
 }

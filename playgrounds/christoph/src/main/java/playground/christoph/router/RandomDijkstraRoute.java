@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.router;
 
 import java.util.ArrayList;
@@ -25,16 +26,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.network.SubLink;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
-import playground.christoph.router.util.CloningDijkstraFactory;
 import playground.christoph.router.util.SimpleRouter;
 
 public class RandomDijkstraRoute extends SimpleRouter {
@@ -44,17 +46,19 @@ public class RandomDijkstraRoute extends SimpleRouter {
 	protected boolean removeLoops = false;
 	protected double dijkstraWeightFactor = 0.5;
 	protected LeastCostPathCalculator leastCostPathCalculator;
+	protected TravelCostCalculatorFactory travelCostFactory;
 	protected PersonalizableTravelCost travelCost;
-	protected TravelTime travelTime;
+	protected PersonalizableTravelTime travelTime;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	private final static Logger log = Logger.getLogger(RandomDijkstraRoute.class);
 	
-	public RandomDijkstraRoute(Network network, PersonalizableTravelCost travelCost, TravelTime travelTime) {	
+	public RandomDijkstraRoute(Network network, TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime) {
 		super(network);
-		this.travelCost = travelCost;
+		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;
-		this.leastCostPathCalculator = new CloningDijkstraFactory().createPathCalculator((NetworkImpl)network, travelCost, travelTime);
+		this.travelCost = travelCostFactory.createTravelCostCalculator(travelTime, new PlanCalcScoreConfigGroup());
+		this.leastCostPathCalculator = new DijkstraFactory().createPathCalculator(network, travelCost, travelTime);
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
@@ -232,5 +236,12 @@ public class RandomDijkstraRoute extends SimpleRouter {
 	
 	public static void setErrorCounter(int i) {
 		errorCounter = i;
-	}	
+	}
+	
+	@Override
+	public SimpleRouter createInstance() {
+		RandomDijkstraRoute route = new RandomDijkstraRoute(network, travelCostFactory, travelTime);
+		route.setDijsktraWeightFactor(dijkstraWeightFactor);
+		return route;
+	}
 }

@@ -64,4 +64,7 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, Personali
 	public double getLinkGeneralizedTravelCost(Link link, double time) {
 		return 0;
 	}
+	
+	public abstract SimpleRouter createInstance();
+	
 }
