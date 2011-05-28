@@ -64,7 +64,7 @@ public class CompareScenarios {
 		scoreComparator.openScoresFile(this.outpath + "/scores.txt");
 		
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
-			String p = this.path + "/" + i + "/" + this.plansFileName;
+			String p = this.path + "/interrun/" + i + "/" + this.plansFileName;
 			log.info("reading: " + p);
 			this.readPopulation(p);
 			scoreComparator.handleScenario(this.baseScenario);
@@ -77,7 +77,7 @@ public class CompareScenarios {
 		
 		CompareDestinations destinationComparator = new CompareDestinations();
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
-			String p = this.path + "/" + i + "/" + this.plansFileName;
+			String p = this.path + "/interrun/" + i + "/" + this.plansFileName;
 			log.info("reading: " + p);
 			this.readPopulation(p);
 			destinationComparator.handleScenario(this.baseScenario);
