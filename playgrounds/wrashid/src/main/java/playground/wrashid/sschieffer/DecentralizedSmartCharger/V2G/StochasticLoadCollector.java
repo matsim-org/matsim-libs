@@ -64,11 +64,17 @@ public StochasticLoadCollector(	DecentralizedChargingSimulation mySimulation) th
 	
 	
 	
+	public void setTestCase(boolean bla){
+		testCase=bla;
+	}
+
 	public void setUp() throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{
 		if(testCase){
 			 makeStochasticHubLoad();
-			 makeAgentVehicleSource();
-			 makeSourceHub();
+			 agentSource=null;
+			 stochasticHubSource=null;
+			 //makeAgentVehicleSource();
+			 //makeSourceHub();
 			
 		}else{
 			for(int hub=0;hub< myHubInfo.size();hub++){

@@ -138,7 +138,8 @@ public class DecentralizedSmartCharger {
 	//(double relativeThreshold, double absoluteThreshold)
 	//In order to perform only relative checks, the absolute tolerance must be set to a negative value. 
 	
-	public static SimpsonIntegrator functionIntegrator= new SimpsonIntegrator();		
+	public static SimpsonIntegrator functionIntegrator= new SimpsonIntegrator();
+	
 	public static PolynomialFitter polyFit;
 	
 	final public static DrawingSupplier supplier = new DefaultDrawingSupplier();
@@ -966,7 +967,7 @@ public class DecentralizedSmartCharger {
 				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.get(h);
 				
 				for(int j=0; j<hubStochasticSchedule.getNumberOfEntries(); j++){
-					
+					//System.out.println("entry "+ j+"of "+hubStochasticSchedule.getNumberOfEntries());
 					//each entry needs to be split down into sufficiently small time intervals					
 					LoadDistributionInterval stochasticLoad= (LoadDistributionInterval)hubStochasticSchedule.timesInSchedule.get(j);
 					PolynomialFunction func= stochasticLoad.getPolynomialFunction();

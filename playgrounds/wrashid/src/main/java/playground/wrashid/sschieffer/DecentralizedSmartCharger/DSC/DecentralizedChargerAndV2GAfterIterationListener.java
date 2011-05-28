@@ -126,8 +126,10 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			
 			myDecentralizedSmartCharger.run();
 			
+			DecentralizedChargingSimulation.slc.setTestCase(true);
 			DecentralizedChargingSimulation.slc.setUp();
-							
+			
+			
 			// SET STOCHASTIC LOADS
 			myDecentralizedSmartCharger.setStochasticSources(
 					DecentralizedChargingSimulation.slc.getStochasticHubLoad(),

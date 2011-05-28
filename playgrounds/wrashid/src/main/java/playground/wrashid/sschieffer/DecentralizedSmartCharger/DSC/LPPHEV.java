@@ -87,9 +87,10 @@ public class LPPHEV extends LP{
 		
 		
 		setUpLP();
-		
+		getSolver().setTimeout(10); 
+		getSolver().setScalelimit(3.0);
 		int status = getSolver().solve();
-        
+		
         if(status!=0){
         	String text = getSolver().getStatustext(status);
         	if(DecentralizedSmartCharger.debug){

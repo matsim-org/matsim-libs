@@ -88,7 +88,8 @@ public class LPEV extends LP{
 		}
 		
 		setUpLP();
-		
+		getSolver().setTimeout(10); 
+		getSolver().setScalelimit(3.0);
 		int status = getSolver().solve();
 		
 		System.out.println("TimeOut: "+ getSolver().getTimeout()); 

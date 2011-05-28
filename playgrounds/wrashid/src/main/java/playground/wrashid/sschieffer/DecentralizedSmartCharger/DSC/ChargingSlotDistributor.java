@@ -227,11 +227,14 @@ public class ChargingSlotDistributor {
 			lower=startTime;
 			trial=(upper+lower)/2;
 			
-			double rand=Math.random();
-			//double rand=Math.random()*joulesInInterval;
+			double rand=Math.random();//double rand=Math.random()*joulesInInterval;
 			
+			double integral;
+			PolynomialFunction funcSubOpt=null;
+			double fullSubOptIntegral=0;
 			while(run){
-				double integral;
+				
+				
 				if(joulesInInterval>=0){
 					double err=Math.max(joulesInInterval/100.0, 1.0); // accuracy 1%
 					//double err=joulesInInterval/100.0; // accuracy 1%
@@ -258,20 +261,25 @@ public class ChargingSlotDistributor {
 					
 				}else{
 					
-					// negative suboptimal interval
-					PolynomialFunction funcSubOpt= turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(func, startTime, endTime);
+					// negative suboptimal interval will only be calculated first time when func is stil null
+					if (funcSubOpt==null){
+						funcSubOpt= turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(func, startTime, endTime);
+						
+					}
 					
 					integral=DecentralizedSmartCharger.functionIntegrator.integrate(
 							funcSubOpt, 
 							startTime, 
 							trial);
+					// limit integration only to first run through when value still 0
+					if (fullSubOptIntegral==0){
+						fullSubOptIntegral= DecentralizedSmartCharger.functionIntegrator.integrate(
+								funcSubOpt, startTime, endTime);
+					}
 					
-					double fullSubOptIntegral= DecentralizedSmartCharger.functionIntegrator.integrate(
-							funcSubOpt, startTime, endTime);
+					double err=Math.max(fullSubOptIntegral/100.0, 1.0); // accuracy 0.1%
 					
-					double err=fullSubOptIntegral/1000; // accuracy 0.1%
-					
-					if(integral<rand*fullSubOptIntegral){
+					if(Math.abs(integral)<Math.abs(rand*fullSubOptIntegral)){
 						lower=trial;					
 						trial=(upper+lower)/2;
 						
@@ -279,8 +287,8 @@ public class ChargingSlotDistributor {
 						upper=trial;
 						trial=(upper+lower)/2;
 					}
-					
-					if(Math.abs(integral-rand*fullSubOptIntegral)<=err){
+					//System.out.println(Math.abs(Math.abs(integral)-Math.abs(rand*fullSubOptIntegral)) +"<="+ err);
+					if(Math.abs(Math.abs(integral)-Math.abs(rand*fullSubOptIntegral))<=err){
 						run=false;
 					}
 					
@@ -340,17 +348,25 @@ public class ChargingSlotDistributor {
 	
 	public PolynomialFunction turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(PolynomialFunction func, double start1, double end1) throws OptimizationException{
 		
-		double start= Math.floor(start1);
-		double end= Math.ceil(end1);
-		int steps= ((int) end)-((int)start);
+		//-1/f(x)
+		/*func= func.negate();
+		PolynomialFunction modFunc= new PolynomialFunction(new double[]{1});
+		*/
+		DomainFinder d= new DomainFinder(start1, end1, func);
+		
+		double minDomain= d.getDomainMin();
+		int start= (int)Math.floor(start1);
+		int end= (int)Math.ceil(end1);
+		int steps= (int)Math.floor((( end-start)/(60.0*5.0)));
 		
 		double [][] newFunc= new double[steps][2];
 		
 		for(int i=0; i<steps; i++){
-			newFunc[i][0]=start+i;
-			newFunc[i][1]=(-1)/func.value(start+i);
+			newFunc[i][0]=start+(i*(60.0*5.0));
+			newFunc[i][1]=func.value(start+(i*(60.0*5.0)))-minDomain;
+			
 		}
-		
+				
 		return DecentralizedSmartCharger.fitCurve(newFunc);
 		
 		
