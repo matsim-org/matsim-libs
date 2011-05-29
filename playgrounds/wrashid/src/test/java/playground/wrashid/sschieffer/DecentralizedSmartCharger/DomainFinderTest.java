@@ -3,7 +3,7 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DomainFinder;
+import playground.wrashid.sschieffer.DSC.DomainFinder;
 
 public class DomainFinderTest extends MatsimTestCase{
 

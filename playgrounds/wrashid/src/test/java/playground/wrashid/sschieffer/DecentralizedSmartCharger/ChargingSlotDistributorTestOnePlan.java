@@ -43,9 +43,9 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
+import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DSC.Schedule;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 

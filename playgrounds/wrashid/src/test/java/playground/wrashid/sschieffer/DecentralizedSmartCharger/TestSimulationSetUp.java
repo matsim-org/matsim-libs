@@ -13,15 +13,15 @@ import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.AgentContractCollector;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ContractTypeAgent;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.EnergyConsumptionInit;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.VehicleTypeCollector;
+import playground.wrashid.sschieffer.DSC.AgentContractCollector;
+import playground.wrashid.sschieffer.DSC.ContractTypeAgent;
+import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DSC.EnergyConsumptionInit;
+import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.DSC.VehicleTypeCollector;
 
 public class TestSimulationSetUp {
 

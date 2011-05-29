@@ -4,10 +4,10 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Battery;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.GasType;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.VehicleType;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.VehicleTypeCollector;
+import playground.wrashid.sschieffer.DSC.Battery;
+import playground.wrashid.sschieffer.DSC.GasType;
+import playground.wrashid.sschieffer.DSC.VehicleType;
+import playground.wrashid.sschieffer.DSC.VehicleTypeCollector;
 
 public class TestVehicleCollectorSetUp {
 

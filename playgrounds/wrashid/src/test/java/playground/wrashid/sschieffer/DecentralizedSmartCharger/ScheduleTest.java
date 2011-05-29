@@ -24,12 +24,12 @@ import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ChargingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.TimeInterval;
+import playground.wrashid.sschieffer.DSC.ChargingInterval;
+import playground.wrashid.sschieffer.DSC.DrivingInterval;
+import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.DSC.TimeInterval;
 
 import junit.framework.TestCase;
 

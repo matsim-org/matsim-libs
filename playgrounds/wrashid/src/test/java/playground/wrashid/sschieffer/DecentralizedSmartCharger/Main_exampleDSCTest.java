@@ -43,10 +43,10 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedChargingSimulation;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.HubInfo;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.SetUp.StellasHubMapping;
+import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
+import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
+import playground.wrashid.sschieffer.DSC.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.StellasHubMapping;
 
 import java.util.*;
 
@@ -86,8 +86,8 @@ public class Main_exampleDSCTest extends TestCase{
 		double priceMaxPerkWh=0.40;
 		double priceMinPerkWh=0.25;
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
-		ArrayList<HubInfo> myHubInfo = new ArrayList<HubInfo>(0);
-		myHubInfo.add(new HubInfo(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
+		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 				
 		mySimulation= new DecentralizedChargingSimulation(
 				configPath, 

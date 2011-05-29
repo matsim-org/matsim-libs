@@ -30,10 +30,10 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF.data.HubLinkMapping;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.HubLoadDistributionReader;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DecentralizedSmartCharger.DSC.Schedule;
+import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DSC.HubLoadDistributionReader;
+import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
+import playground.wrashid.sschieffer.DSC.Schedule;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
