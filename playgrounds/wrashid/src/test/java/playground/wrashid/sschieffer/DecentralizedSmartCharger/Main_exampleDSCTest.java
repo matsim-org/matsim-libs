@@ -89,6 +89,9 @@ public class Main_exampleDSCTest extends TestCase{
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 				
+		double kWHEV =24;
+		double kWHPHEV =24;
+		boolean gasHigh = false;
 		mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -97,8 +100,10 @@ public class Main_exampleDSCTest extends TestCase{
 				standardChargingLength,
 				myMappingClass,
 				myHubInfo,
-				false // indicate if you want graph output for every agent to visualize the SOC over the day
+				false, // indicate if you want graph output for every agent to visualize the SOC over the day
+				kWHEV,kWHPHEV, gasHigh
 				);
+		
 		mySimulation.addControlerListenerDecentralizedCharging();		
 		mySimulation.controler.run();
 		
