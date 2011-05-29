@@ -301,15 +301,9 @@ public class DecentralizedSmartCharger {
 
 	/**
 	 * get agent schedules, find required charging times, assign charging times
-	 * 
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws OptimizationException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void run() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+	public void run() throws Exception{
 		
 		startTime = System.currentTimeMillis();
 		System.out.println("\n Reading agent Schedules");
@@ -452,13 +446,9 @@ public class DecentralizedSmartCharger {
 	 * passes schedule with required charging information to
 	 * ChargingSlotDistributor to obtain exact charging Slots
 	 * Saves charging slots in agentChargignSchedule
-	 * @throws IllegalArgumentException 
-	 * @throws FunctionEvaluationException 
-	 * @throws MaxIterationsExceededException 
-	 * @throws IOException 
-	 * @throws OptimizationException 
+	 * @throws Exception 
 	 */
-	public void assignChargingTimes() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, IOException, OptimizationException{
+	public void assignChargingTimes() throws Exception{
 		
 				
 		for (Id id : vehicles.getKeySet()){
@@ -517,12 +507,9 @@ public class DecentralizedSmartCharger {
 	
 	/**
 	 * records the parking times of all agents at hubs and visualizes the distribition for each hub over the day
-	 * 
-	 * 
-	 * @throws IOException
-	 * @throws OptimizationException 
+	 * @throws Exception 
 	 */
-	private void findChargingDistribution() throws IOException, OptimizationException{
+	private void findChargingDistribution() throws Exception{
 		
 		for(int i=0; i<MINUTESPERDAY; i++){
 			double thisSecond= i*SECONDSPERMIN;
@@ -737,7 +724,7 @@ public class DecentralizedSmartCharger {
 	public void initializeAndRunV2G(
 			double xPercentDown,
 			double xPercentDownUp
-			) throws FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, ConvergenceException{
+			) throws Exception{
 		
 		myV2G.initializeAgentStats();
 		setV2GRegUpAndDownStats(xPercentDown,xPercentDownUp);
@@ -772,15 +759,9 @@ public class DecentralizedSmartCharger {
 
 	/**
 	 * loops over all vehicle sources and tries to provide regulation up or down if this function is activated by the agent
-	 * 
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
-	public void checkVehicleSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+	public void checkVehicleSources() throws Exception{
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
 				
@@ -950,14 +931,9 @@ public class DecentralizedSmartCharger {
 	 *  </br>   </br> 
 	 * the result is then visualized </br> 
 	 * visualizeStochasticLoadBeforeAfterV2G();
-	 * 
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws ConvergenceException 
+	 * @throws Exception 
 	 */
-	public void checkHubStochasticLoads() throws FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, ConvergenceException{
+	public void checkHubStochasticLoads() throws Exception{
 		
 		if(myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources !=null){
 			for(Integer h : myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.keySet()){
@@ -2148,7 +2124,7 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	public static PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
+	public static PolynomialFunction fitCurve(double [][] data) throws Exception{
 		
 		TimeDataCollector timeC = new TimeDataCollector(data);
 		

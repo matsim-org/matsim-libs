@@ -82,7 +82,7 @@ public class DetermisticLoadPricingCollector {
 		return hubPricingDistribution;
 	}
 	
-	public void setUp() throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{
+	public void setUp() throws Exception{
 		
 		for(int hub=0;hub< myHubInfo.size();hub++){
 			int hubId= myHubInfo.get(hub).getId();

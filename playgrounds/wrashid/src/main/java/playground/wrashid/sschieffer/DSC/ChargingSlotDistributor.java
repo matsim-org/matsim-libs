@@ -61,12 +61,9 @@ public class ChargingSlotDistributor {
 	 * 
 	 * @param schedule
 	 * @return
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
-	public Schedule distribute(Id agentId, Schedule schedule) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
+	public Schedule distribute(Id agentId, Schedule schedule) throws Exception{
 		Schedule chargingScheduleAllIntervalsAgent = new Schedule();
 		
 		for (int i=0; i<schedule.getNumberOfEntries(); i++){
@@ -144,7 +141,7 @@ public class ChargingSlotDistributor {
 			double joulesInInterval, 
 			double startTime, 
 			double endTime, 
-			double chargingTime) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
+			double chargingTime) throws Exception{
 		//
 		Schedule chargingInParkingInterval = new Schedule();
 		int intervals=(int) Math.ceil(chargingTime/minChargingLength);
@@ -191,17 +188,14 @@ public class ChargingSlotDistributor {
 	 * @param bit
 	 * @param chargingInParkingInterval
 	 * @return
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
 	public Schedule assignRandomChargingSlotInChargingInterval(PolynomialFunction func, 
 			double startTime, 
 			double endTime, 
 			double joulesInInterval, 
 			double bit, 
-			Schedule chargingInParkingInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException{
+			Schedule chargingInParkingInterval) throws Exception{
 		// random and test
 		
 		boolean notFound=true;
@@ -346,7 +340,7 @@ public class ChargingSlotDistributor {
 	}
 	
 	
-	public PolynomialFunction turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(PolynomialFunction func, double start1, double end1) throws OptimizationException{
+	public PolynomialFunction turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(PolynomialFunction func, double start1, double end1) throws Exception{
 		
 		//-1/f(x)
 		/*func= func.negate();

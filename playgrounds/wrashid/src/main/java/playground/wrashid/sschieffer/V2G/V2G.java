@@ -337,7 +337,7 @@ public class V2G {
 			double compensation, // money
 			double joules,		
 			String type			
-			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, OptimizationException, LpSolveException, IOException{
+			) throws Exception{
 		
 	
 		double currentSOC=getSOCAtTime(agentId, electricSourceInterval.getEndTime());
@@ -422,18 +422,13 @@ public class V2G {
 	 * @param agentParkingDrivingSchedule
 	 * @param type
 	 * @param hub
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
 	public void regulationUpDownHubLoad(Id agentId, 
 			LoadDistributionInterval currentStochasticLoadInterval, 
 			Schedule agentParkingDrivingSchedule, 			
 			String type,			
-			int hub) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+			int hub) throws Exception{
 		
 		//*****************************
 		//*****************************
@@ -520,19 +515,14 @@ public class V2G {
 	 * @param batteryMin
 	 * @param batteryMax
 	 * @param currentSOC
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws IOException
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
 	public void costComparisonVehicle(Id agentId, 
 			LoadDistributionInterval electricSourceInterval,			
 			double compensation, // money		
 			String type,				
 			double currentSOC,
-			double joules) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+			double joules) throws Exception{
 		
 		double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
 		double batteryMin=mySmartCharger.getBatteryOfAgent(agentId).getMinSOC();
@@ -606,7 +596,7 @@ public class V2G {
 			double joules,			
 			String type,			
 			int hub,
-			double currentSOC) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException, OptimizationException{
+			double currentSOC) throws Exception{
 		
 		Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
 				mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId), 
@@ -725,17 +715,14 @@ public class V2G {
 	 * @param electricSourceInterval
 	 * @param costKeeping
 	 * @param costReschedule
-	 * @throws MaxIterationsExceededException
-	 * @throws OptimizationException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
+	 * @throws Exception 
 	 */
 	public void reschedule(Id agentId, 
 			Schedule answerScheduleAfterElectricSourceInterval,
 			LoadDistributionInterval electricSourceInterval,
 			double costKeeping,
 			double costReschedule,
-			double joules) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
+			double joules) throws Exception{
 		
 		
 		// change agents charging costs
@@ -765,15 +752,12 @@ public class V2G {
 	 * @param agentId
 	 * @param answerScheduleAfterElectricSourceInterval
 	 * @param electricSourceInterval
-	 * @throws MaxIterationsExceededException
-	 * @throws OptimizationException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
+	 * @throws Exception 
 	 */
 	public void  updateChargingSchedule(Id agentId, 
 			Schedule answerScheduleAfterElectricSourceInterval,
 			LoadDistributionInterval electricSourceInterval, 
-			double joules	) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException{
+			double joules	) throws Exception{
 		
 		//UPDATE CHARGING SCHEDULE
 		

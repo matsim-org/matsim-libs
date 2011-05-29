@@ -37,7 +37,7 @@ public class LoadFileReader {
 	public LoadFileReader(String file, 
 			int numEntries, 
 			String nameXYSeriesFromFile, 
-			String nameXYSeriesFitted) throws OptimizationException{
+			String nameXYSeriesFitted) throws Exception{
 		
 		readLoadFile(file, numEntries, nameXYSeriesFromFile, nameXYSeriesFitted);
 	}
@@ -59,7 +59,7 @@ public class LoadFileReader {
 	private void readLoadFile(String file, 
 			int numEntries, 
 			String nameXYSeriesFromFile, 
-			String nameXYSeriesFitted) throws OptimizationException{
+			String nameXYSeriesFitted) throws Exception{
 		// maximum Leistung Schweizer netz an einem Tag ca. 10600MW
 		
 		

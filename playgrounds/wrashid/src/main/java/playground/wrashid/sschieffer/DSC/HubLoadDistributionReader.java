@@ -307,7 +307,7 @@ public class HubLoadDistributionReader {
 	}
 	
 	
-	public void recalculateStochasticHubLoadCurveAfterVehicleAndHubSources() throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	public void recalculateStochasticHubLoadCurveAfterVehicleAndHubSources() throws Exception{
 		stochasticHubLoadAfterVehicleAndHubSources= new HashMap<Integer, Schedule>();
 				
 		for (Integer hub: stochasticHubLoadAfter15MinBins.keySet()){
@@ -675,10 +675,9 @@ public class HubLoadDistributionReader {
 	/**
 	 * visualizes the connectivity of agents at hubs from recorded connectivityHubDistribution data
 	 * called after findChargingDistribution() in the Decentralized Smart Charger
-	 * @throws OptimizationException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader() throws OptimizationException, IOException{
+	public void calculateAndVisualizeConnectivityDistributionsAtHubsInHubLoadReader() throws Exception{
 		
 		XYSeriesCollection connectivity= new XYSeriesCollection();
 		

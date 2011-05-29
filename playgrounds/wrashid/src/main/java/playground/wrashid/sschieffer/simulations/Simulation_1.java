@@ -43,8 +43,6 @@ import java.util.*;
  *price of gas US prices : low
  *battery size : large
  *regulation up percentage 67%
- 
- *
  * @author Stella
  *
  */
@@ -52,9 +50,7 @@ public class Simulation_1{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
-		
 		final double electrification= 1.0; 
-		
 		final double ev=0.75; 
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";
 		String configPath="test/input/playground/wrashid/test/scenarios/berlin/config.xml";// 100 agents
@@ -72,10 +68,13 @@ public class Simulation_1{
 		double kWHPHEV =24;
 		boolean gasHigh = false;
 		
+		final double xPercentDownUp=0.67;
+		final double xPercentDown=1.0-xPercentDownUp;
+		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
-		
+	
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -88,9 +87,6 @@ public class Simulation_1{
 				kWHEV,kWHPHEV, gasHigh
 				);
 		
-		
-		final double xPercentDown=0.0;
-		final double xPercentDownUp=1.0;
 		
 		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad10.txt";
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);

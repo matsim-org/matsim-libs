@@ -74,7 +74,7 @@ public class StochasticLoadCollector {
 	}
 
 	
-	public void setUp() throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException{
+	public void setUp() throws Exception{
 		if(testCase){
 			 makeStochasticHubLoad();
 			 agentSource=null;
@@ -99,7 +99,7 @@ public class StochasticLoadCollector {
 	}
 	
 	
-	private void readGeneralStochasticLoad(int hub) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	private void readGeneralStochasticLoad(int hub) throws Exception{
 		int hubId= myHubInfo.get(hub).getId();
 		//GENERAL LOAD
 		if(myHubInfo.get(hub).isTxtGeneralStochastic()){
@@ -138,7 +138,7 @@ public class StochasticLoadCollector {
 	
 	
 	
-	private void readHubSources(int hub) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	private void readHubSources(int hub) throws Exception{
 		int hubId= myHubInfo.get(hub).getId();
 		
 		ArrayList<GeneralSource> stochasticGeneralSources= myHubInfo.get(hub).getStochasticGeneralSources();
@@ -177,12 +177,9 @@ public class StochasticLoadCollector {
 	 * either from txt file or from LoadDistributionIntervals
 	 *  
 	 * @param hub
-	 * @throws ConvergenceException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private  void readAgentVehicles(int hub) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+	private  void readAgentVehicles(int hub) throws Exception{
 		
 		if (myHubInfo.get(hub).isTxtVehicleStochastic()){
 			HashMap <Id, String> vehicleLoads= myHubInfo.get(hub).geStochasticVehicleLoadTxt();

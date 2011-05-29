@@ -60,7 +60,7 @@ public class TurnLoadCurveIntoFreeLoadTxt {
 			String file, 
 			double peakWattOnGrid, 
 			double assumptionBase,
-			String outputFile) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
+			String outputFile) throws Exception{
 		this.file=file;
 		file= "test\\input\\playground\\wrashid\\sschieffer\\baseLoadCurve15minBinsSecLoad.txt";
 		this.peakWattOnGrid=peakWattOnGrid;
@@ -83,9 +83,9 @@ public class TurnLoadCurveIntoFreeLoadTxt {
 	 * 
 	 * @param file
 	 * @param peakWattOnGrid
-	 * @throws OptimizationException
+	 * @throws Exception 
 	 */
-	private void readLoadFile(String file, double peakWattOnGrid) throws OptimizationException{
+	private void readLoadFile(String file, double peakWattOnGrid) throws Exception{
 				
 		double[][] slotBaseLoad = GeneralLib.readMatrix(96, 2, false, file);
 		

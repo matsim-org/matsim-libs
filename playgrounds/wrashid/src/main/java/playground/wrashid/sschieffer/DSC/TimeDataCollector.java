@@ -86,14 +86,20 @@ public class TimeDataCollector {
 	
 	
 	
-	public void fitFunction() {
+	public void fitFunction() throws Exception {
 		try {
 			this.func= fitCurve(data);
 	    } catch (Exception e) {
 	        // if singular with all entries =one value e.g.0
-	    	e.printStackTrace();
 	    	if(allDataSameValue()){
 	    		this.func= new PolynomialFunction(new double[]{getYAtEntry(0)});
+	    	}else{
+	    		e.printStackTrace();
+	    		System.out.println("Fitting data in TimeDataCollector has encountered a problem");
+	    		for(int i=0; i< Math.min(10, data.length); i++){
+	    			System.out.println(data[i][0]+", "+data[i][1]);
+	    		}
+	    		throw e;
 	    	}
 	    }
 		
@@ -169,7 +175,7 @@ public class TimeDataCollector {
 	}
 	
 	
-	public PolynomialFunction getFunction() throws OptimizationException{
+	public PolynomialFunction getFunction() throws Exception{
 		fitFunction();
 		return this.func;
 	}
