@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DSC;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+import org.apache.commons.math.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.jfree.data.xy.XYSeries;
 
@@ -39,6 +42,51 @@ public class LoadDistributionInterval  extends TimeInterval
 	private boolean optimal;	
 	private PolynomialFunction p;
 	private XYSeries xy;
+	
+	private SimpsonIntegrator integrator= new SimpsonIntegrator();
+	
+	
+	/**
+	 * creates LoadDistributionInterval with certain start, end value and a give PolynomialFunction
+	 * @param start
+	 * @param end
+	 * @param p
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public LoadDistributionInterval(double start, double end, PolynomialFunction p) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		super(start, end);
+		this.p=p;
+		if(integrator.integrate(p, start, end)>0){
+			optimal=true;
+		}else{
+			optimal=false;
+		}
+	}
+	
+	
+	
+	/**
+	 * creates a LoadDistribution Interval with given start and end value and a constant function over the load interval 
+	 * @param start
+	 * @param end
+	 * @param constantValue
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public LoadDistributionInterval(double start, double end, double constantValue) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		super(start, end);
+		PolynomialFunction pX= new PolynomialFunction(new double[]{constantValue});
+		this.p=pX;
+		if(constantValue>0){
+			optimal=true;
+		}else{
+			optimal=false;
+		}
+	}
+	
 	
 	
 	/**

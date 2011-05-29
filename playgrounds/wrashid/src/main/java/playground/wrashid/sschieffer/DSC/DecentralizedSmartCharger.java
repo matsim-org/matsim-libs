@@ -2147,21 +2147,15 @@ public class DecentralizedSmartCharger {
 		myV2G=setV2G;
 	}
 	
+	
 	public static PolynomialFunction fitCurve(double [][] data) throws OptimizationException{
 		
-		DecentralizedSmartCharger.polyFit.clearObservations();
+		TimeDataCollector timeC = new TimeDataCollector(data);
 		
-		for (int i=0;i<data.length;i++){
-			DecentralizedSmartCharger.polyFit.addObservedPoint(1.0, data[i][0], data[i][1]);
-			
-		  }		
-		
-		PolynomialFunction poly = DecentralizedSmartCharger.polyFit.fit();
-		 
-		DecentralizedSmartCharger.polyFit.clearObservations();
-		return poly;
+		return timeC.getFunction();
 	}
 
+	
 	public static void linkedListIdPrinter(HashMap<Id, Schedule> list, String info){
 		System.out.println("Print LinkedList "+ info);
 		for(Id id: list.keySet()){

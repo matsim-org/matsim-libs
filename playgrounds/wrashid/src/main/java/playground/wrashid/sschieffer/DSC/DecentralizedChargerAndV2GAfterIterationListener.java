@@ -37,7 +37,10 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			 * you can modify the default values in the class
 			 */
 			SetUpVehicleCollector sv= new SetUpVehicleCollector();
-			final VehicleTypeCollector myVehicleTypes = sv.setUp();
+			final VehicleTypeCollector myVehicleTypes = sv.setUp(
+					DecentralizedChargingSimulation.kWHEV, 
+					DecentralizedChargingSimulation.kWHPHEV, 
+					DecentralizedChargingSimulation.gasHigh);
 			
 			
 			/******************************************
@@ -80,32 +83,7 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			 * Network  - Electric Grid Information
 			 * 
 			 * - distribution of free load [W] available for charging over the day (deterministicHubLoadDistribution)
-			 * this is given in form of a LinkedListValueHashMap, where Integer corresponds to a hub and 
-			 * the Schedule includes LoadDistributionIntervals which represent the free load 
-			 * THe LoadDistributionIntervals indicate 
-			 * <li> a time interval: start second, end second 
-			 * <li>PolynomialFunction indicating the free Watts over the time interval
-			 * <li> an optimality boolean(true, if free load is positive=electricity for charging available and false if not)
-			 * </br>
-			 * </br>
-			 * - pricing (pricingHubDistribution)
-			 * is also given as LinkedListValueHashMap analogous to the determisticiHubLoadDIstribution
-			 *  where Integer corresponds to a hub and
-			 * the Schedule includes LoadDistributionIntervals which represent the price per second 
-			 * of charging at a 3500W connection over the day
-			 * </br>
-			 * !!!!!!!!!!!!!!!!!!!!!!
-			 * IMPORTANT 
-			 * !!!!!!!!!!!!!!!!!!!!!!
-			 * 1) the day can be split into as many time intervals as you wish, however 
-			 * positive and negative determisticLoad Intervals should be different intervals (either optimal or suboptimal intervals)
-			 * 2) Also the pricingHubDistribution and the deterministicHubLoadDistribution 
-			 * Should have the SAME time intervals (start and end)
-			 * 
-			 * 
-			 * DetermisticLoadAndPricingCollector is an example how you can define 
-			 * these determisticLoad curves for your scenario
-			 * 
+			
 			 */
 			
 			DecentralizedChargingSimulation.loadPricingCollector.setUp();

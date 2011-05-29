@@ -30,17 +30,24 @@ import org.jfree.data.xy.XYSeries;
 public class TimeDataCollector {
 
 	private DifferentiableMultivariateVectorialOptimizer optimizer;
-	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(-1,DecentralizedSmartCharger.STANDARDCONNECTIONSWATT);//relative tol, absolute tol
+	private VectorialConvergenceChecker checker= new SimpleVectorialValueChecker(10000,-10000);//relative tol, absolute tol
 	private GaussNewtonOptimizer gaussNewtonOptimizer= new GaussNewtonOptimizer(true); 
 	private PolynomialFitter fitter;
-	
-	
 	private double[][] data;
 	
 	private PolynomialFunction func;//= new PolynomialFunction(new double[]{0});
 	
 	private XYSeries xy;
 	
+	
+	public TimeDataCollector(double[][] data){
+		this.data=data;
+		
+		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
+		optimizer.setMaxIterations(10000);		
+		optimizer.setConvergenceChecker(checker);		
+		fitter= new PolynomialFitter(20, optimizer);
+	}
 	
 	public TimeDataCollector(int numberOfDataPoints){
 		data= new double[numberOfDataPoints][2];
@@ -83,10 +90,10 @@ public class TimeDataCollector {
 		try {
 			this.func= fitCurve(data);
 	    } catch (Exception e) {
-	        // if singular with all entries = 0.0
+	        // if singular with all entries =one value e.g.0
 	    	e.printStackTrace();
-	    	if(allDataZero()){
-	    		this.func= new PolynomialFunction(new double[]{0.0});
+	    	if(allDataSameValue()){
+	    		this.func= new PolynomialFunction(new double[]{getYAtEntry(0)});
 	    	}
 	    }
 		
@@ -122,14 +129,16 @@ public class TimeDataCollector {
 	}
 	
 	
-	public boolean allDataZero(){
-		boolean allZero=true;
+	public boolean allDataSameValue(){
+		double firstEntry= getYAtEntry(0);
+		
+		boolean allSame=true;
 		for(int i=0; i< data.length; i++){
-			if (getYAtEntry(i)!=0.0){
-				allZero=false;
+			if (getYAtEntry(i)!=firstEntry){
+				allSame=false;
 			}
 		}
-		return allZero;
+		return allSame;
 	}
 	
 	

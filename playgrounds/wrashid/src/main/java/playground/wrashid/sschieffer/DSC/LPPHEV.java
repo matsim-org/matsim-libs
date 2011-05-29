@@ -87,8 +87,8 @@ public class LPPHEV extends LP{
 		
 		
 		setUpLP();
-		getSolver().setTimeout(10); 
-		getSolver().setScalelimit(3.0);
+		getSolver().setTimeout(100); 
+	
 		int status = getSolver().solve();
 		
         if(status!=0){

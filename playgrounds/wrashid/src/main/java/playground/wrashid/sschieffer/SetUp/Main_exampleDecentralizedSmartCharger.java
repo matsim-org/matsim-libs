@@ -106,13 +106,16 @@ public class Main_exampleDecentralizedSmartCharger {
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		double kWHEV =24;
+		double kWHPHEV =24;
+		boolean gasHigh = false;
 		
 		/**
 		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
 		 * for multiple hubs, you can add multiple entries to myHubInfo
 		 */
-		double priceMaxPerkWh=0.40;
-		double priceMinPerkWh=0.25;
+		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
+		double priceMinPerkWh=0.07;
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
@@ -149,8 +152,10 @@ public class Main_exampleDecentralizedSmartCharger {
 				standardChargingLength,
 				myMappingClass,
 				myHubInfo,
-				false // indicate if you want graph output for every agent to visualize the SOC over the day
+				false, // indicate if you want graph output for every agent to visualize the SOC over the day
+				kWHEV,kWHPHEV, gasHigh
 				);
+		
 		mySimulation.addControlerListenerDecentralizedCharging();		
 		mySimulation.controler.run();
 		

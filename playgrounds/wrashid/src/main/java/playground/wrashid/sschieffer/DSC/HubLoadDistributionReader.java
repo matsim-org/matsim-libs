@@ -1014,13 +1014,13 @@ public class HubLoadDistributionReader {
 	 */
 	private void visualizePricingAndGas(double gasPriceInCostPerSecond) throws IOException{
 		for( Integer i : pricingHubDistribution.keySet() ){
-			
+			XYSeriesCollection onlyChargingPrices= new XYSeriesCollection();
 			XYSeriesCollection prices= new XYSeriesCollection();
 			//************************************
 			//AFTER//BEFORE
 			
-			XYSeries hubPricing= new XYSeries("hub"+i.toString()+"pricing");
-			XYSeries gasPriceXY= new XYSeries("gasprice");
+			XYSeries hubPricing= new XYSeries("electricity prices at hub"+i.toString());
+			XYSeries gasPriceXY= new XYSeries("gas price");
 			
 			gasPriceXY.add(0, gasPriceInCostPerSecond);
 			gasPriceXY.add(DecentralizedSmartCharger.SECONDSPERDAY,gasPriceInCostPerSecond);
@@ -1035,21 +1035,20 @@ public class HubLoadDistributionReader {
 				
 				
 			}
-			
+			onlyChargingPrices.addSeries(hubPricing);
 			prices.addSeries(hubPricing);
 			prices.addSeries(gasPriceXY);
 			
-			//************************************
-			JFreeChart chart = ChartFactory.createXYLineChart("Prices at Hub "+ i.toString(), 
+			JFreeChart chartOnlyCharging = ChartFactory.createXYLineChart("Prices at Hub "+ i.toString(), 
 					"time [s]", 
 					"price [CHF/s]", 
-					prices, 
+					onlyChargingPrices, 
 					PlotOrientation.VERTICAL, 
 					true, true, false);
 			
-			chart.setBackgroundPaint(Color.white);
+			chartOnlyCharging.setBackgroundPaint(Color.white);
 			
-			final XYPlot plot = chart.getXYPlot();
+			final XYPlot plot = chartOnlyCharging.getXYPlot();
 	        plot.setBackgroundPaint(Color.white);
 	        plot.setDomainGridlinePaint(Color.gray); 
 	        plot.setRangeGridlinePaint(Color.gray);
@@ -1059,6 +1058,42 @@ public class HubLoadDistributionReader {
 	        plot.getRenderer().setSeriesPaint(1, Color.red);//after
 	        
         	plot.getRenderer().setSeriesStroke(
+	            0, 
+	          
+	            new BasicStroke(
+	                1.0f,  //float width
+	                BasicStroke.CAP_ROUND, //int cap
+	                BasicStroke.JOIN_ROUND, //int join
+	                1.0f, //float miterlimit
+	                new float[] {1.0f, 0.0f}, //float[] dash
+	                0.0f //float dash_phase
+	            )
+	        );
+        	
+        	
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
+            
+			
+			//************************************
+			JFreeChart chart = ChartFactory.createXYLineChart("Electricity And Gas Prices at Hub "+ i.toString(), 
+					"time [s]", 
+					"price [CHF/s]", 
+					prices, 
+					PlotOrientation.VERTICAL, 
+					true, true, false);
+			
+			chart.setBackgroundPaint(Color.white);
+			
+			final XYPlot  plot2 = chart.getXYPlot();
+	        plot2.setBackgroundPaint(Color.white);
+	        plot2.setDomainGridlinePaint(Color.gray); 
+	        plot2.setRangeGridlinePaint(Color.gray);
+			
+	        plot2.getRenderer().setSeriesPaint(0, Color.black);//after
+	        
+	        plot2.getRenderer().setSeriesPaint(1, Color.red);//after
+	        
+        	plot2.getRenderer().setSeriesStroke(
 	            0, 
 	          
 	            new BasicStroke(

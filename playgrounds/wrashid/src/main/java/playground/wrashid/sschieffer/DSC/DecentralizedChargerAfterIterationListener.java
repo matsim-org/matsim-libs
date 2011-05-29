@@ -37,7 +37,11 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			 * you can modify the default values in the class
 			 */
 			SetUpVehicleCollector sv= new SetUpVehicleCollector();
-			final VehicleTypeCollector myVehicleTypes = sv.setUp();
+			//double kWHEV, double kWHPHEV, boolean gasHigh
+			final VehicleTypeCollector myVehicleTypes = sv.setUp(
+					DecentralizedChargingSimulation.kWHEV, 
+					DecentralizedChargingSimulation.kWHPHEV, 
+					DecentralizedChargingSimulation.gasHigh);
 			
 			
 			/******************************************

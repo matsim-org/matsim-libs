@@ -39,6 +39,11 @@ import java.util.*;
 
 
 /**
+ *EV penetration 75%
+ *price of gas US prices : low
+ *battery size : large
+ *regulation up percentage 67%
+ 
  *
  * @author Stella
  *
@@ -50,9 +55,9 @@ public class Simulation_1{
 		
 		final double electrification= 1.0; 
 		
-		final double ev=0.0; 
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\4hrV2G\\Testing\\";
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans10.xml";// 100 agents
+		final double ev=0.75; 
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";
+		String configPath="test/input/playground/wrashid/test/scenarios/berlin/config.xml";// 100 agents
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -63,6 +68,9 @@ public class Simulation_1{
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
+		double kWHEV =24;
+		double kWHPHEV =24;
+		boolean gasHigh = false;
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
@@ -76,8 +84,8 @@ public class Simulation_1{
 				standardChargingLength,
 				myMappingClass,
 				myHubInfo,
-				false  // indicate if you want graph output for every agent to visualize the SOC over the day
-				
+				false, // indicate if you want graph output for every agent to visualize the SOC over the day
+				kWHEV,kWHPHEV, gasHigh
 				);
 		
 		

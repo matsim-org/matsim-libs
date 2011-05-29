@@ -45,6 +45,7 @@ import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
 import playground.wrashid.sschieffer.DSC.HubInfoStochastic;
+import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
 import java.util.*;
@@ -92,8 +93,11 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\4hrV2G\\Testing\\";
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans10.xml";// 100 agents
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\4hrV2G\\10000Plans15Min\\";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans10000.xml";// 100 agents
+		double kWHEV =24;
+		double kWHPHEV =24;
+		boolean gasHigh = false;
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -105,21 +109,32 @@ public class Main_exampleV2G {
 		/*
 		 * ************************
 		 * Stochastic Sources
-		
-		 * StochasticLoadSources can be defined
-		 * <li> general hub Stochastic Load given in 96 bin txt file (String stochasticGeneral) OR as an ArrayList of discrete load intervals
-		 * <li> for vehicles (i.e. solar roof) given as HashMap with AgentId and String for (HashMap <Id, String> stochasticVehicleLoad
-		 * OR HashMap <Id, ArrayList<LoadDIstrubitionIntervals>>
-		 * <li> local sources for hubs (wind turbine, etc) given in 96 bin txt file  (String stochasticHubLoadTxt)
+		 * <p>
+		 * the information about the stochastic load distribution over the day is given in Watt. 
+		 * It can be given as a txt file with 96 bins (15 min intervals) 
+		 * or with discrete load intervals which reflects the intermittent character of some loads better (ArrayList<LoadDistributionIntervals>)</p>
 		 * 
-		 * the sources are given as Schedules of LoadDistributionIntervalsdistribution [Watt]
+		 *  * the sources are given in [Watt]
 		 * <li> negative values mean, that the source needs energy --> regulation up
 		 * <li> positive values mean, that the source has too much energy--> regulation down
 		 * 
+		 * StochasticLoadSources can be defined for
+		 * <li> general hub stochastic Load 
+		 * <li> for vehicles (i.e. solar roof) given as HashMap with AgentId and String for (HashMap <Id, String> stochasticVehicleLoad)
+		 * OR HashMap <Id, ArrayList<LoadDIstrubitionIntervals>>
+		 * <li> local sources for hubs (wind turbine, etc) given in 96 bin txt file  (String stochasticHubLoadTxt)
+	
+	
+			The example below only adds the generalStochastic load in form of a txt file to Hub1
+			Instead one could do the following:
+			ArrayList<LoadDistributionInterval> discreteLoadIntervals= new ArrayList<LoadDistributionInterval>;
+			// the following line adds a loadInterval between seconds 0- 30000 of 100000W to the load Distribution
+			discreteLoadIntervals.add(new LoadDistributionInterval(0, 30000, 100000));
+			hubInfo1.setStochasticVehicleSourcesIntervals(discreteLoadIntervals);
 		 */			
 					
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad10.txt";
+		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad16000.txt";
 		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
 		myStochasticHubInfo.add(hubInfo1);
 		
@@ -130,7 +145,6 @@ public class Main_exampleV2G {
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		
-		
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -139,8 +153,8 @@ public class Main_exampleV2G {
 				standardChargingLength,
 				myMappingClass,
 				myHubInfo,
-				false  // indicate if you want graph output for every agent to visualize the SOC over the day
-				
+				false, // indicate if you want graph output for every agent to visualize the SOC over the day
+				kWHEV,kWHPHEV, gasHigh
 				);
 		
 		/******************************************

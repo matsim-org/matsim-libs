@@ -31,7 +31,7 @@ public class SetUpVehicleCollector {
 	 * defines and sets up the gas types for the simulation
 	 * @return
 	 */
-	public VehicleTypeCollector setUp(){
+	public VehicleTypeCollector setUp(double kWHEV, double kWHPHEV, boolean gasHigh){
 		
 		/*
 		 * GAS TYPES
@@ -49,14 +49,20 @@ public class SetUpVehicleCollector {
 		
 		// GAS PRICE CH //http://www.tanktipp.ch/
 		// GAS PRICE USA //	http://gasbuddy.com/ //3.75 (U.S. dollars / US gallon) = 0.849974428 Swiss francs / l
-		double gasPricePerLiter= 1.70; 
-		
+		double gasPricePerLiter;
+		if(gasHigh){
+			gasPricePerLiter= 1.70; 
+		}else{
+			gasPricePerLiter= 0.85; 
+		}
+	
 		
 		//JoulesPerLiter = theoretisch moegliche Energie * Wirkungsgrad; 
 		//http://de.wikipedia.org/wiki/Wirkungsgrad
 		//http://de.wikipedia.org/wiki/Motorenbenzin
-		double gasJoulesPerLiter = 43.0*Math.pow(10,6);// Benzin 42,7–44,2 MJ/kg  * 0.3
 		double massPerLiter=0.75;// kg/l
+		double gasJoulesPerLiter = 43.0*Math.pow(10,6)*massPerLiter;// Benzin 42,7–44,2 MJ/kg  * 0.3
+		
 		double emissionPerLiter = 2.36; // 2,36 kg/L
 		
 		GasType normalGas=new GasType("normal gas", 
@@ -78,8 +84,8 @@ public class SetUpVehicleCollector {
 		 * 
 		 * Create desired Battery Types
 		 */
-		double batterySizeEV= 24*3600*1000; 
-		double batterySizePHEV= 24*3600*1000; 
+		double batterySizeEV= kWHEV*3600*1000; 
+		double batterySizePHEV= kWHPHEV*3600*1000; 
 		double batteryMinEV= 0.1; 		
 		double batteryMinPHEV= 0.1; 
 		double batteryMaxEV= 0.9; 

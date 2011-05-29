@@ -277,7 +277,7 @@ public class ChargingSlotDistributor {
 								funcSubOpt, startTime, endTime);
 					}
 					
-					double err=Math.max(fullSubOptIntegral/100.0, 1.0); // accuracy 0.1%
+					double err=Math.max(Math.abs(fullSubOptIntegral)/100.0, 1.0); // accuracy 0.1%
 					
 					if(Math.abs(integral)<Math.abs(rand*fullSubOptIntegral)){
 						lower=trial;					
