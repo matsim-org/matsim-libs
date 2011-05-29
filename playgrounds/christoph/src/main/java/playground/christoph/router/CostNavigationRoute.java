@@ -89,7 +89,8 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		 */
 		double randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
 		if (randomNumber <= costNavigationTravelTimeLogger.getTrust(personId)) {
-
+			costNavigationTravelTimeLogger.setFollowed(personId, true);
+			
 			int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
@@ -100,6 +101,8 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		 * The person does not trust the navigation system. Therefore select the next link.
 		 */
 		else {
+			costNavigationTravelTimeLogger.setFollowed(personId, false);
+			
 			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 			Id currentLinkId = withinDayAgent.getCurrentLinkId();
 			Link currentLink = scenario.getNetwork().getLinks().get(currentLinkId);

@@ -1,4 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CostNavigationRouteController.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.controler;
+
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.StartupEvent;
@@ -10,8 +32,8 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -43,6 +65,8 @@ public class CostNavigationRouteController extends WithinDayController implement
 
 	protected SelectHandledAgentsByProbability selector;
 
+	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
+	
 	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
 	public CostNavigationRouteController(String[] args) {
@@ -51,10 +75,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		init();
 	}
 
-	private void init() {
-		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
-		
+	private void init() {	
 		// register this as a Controller and Simulation Listener
 		super.getFixedOrderSimulationListener().addSimulationListener(this);
 		super.addControlerListener(this);
@@ -62,7 +83,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
+	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners(QSim sim) {
 
@@ -70,7 +91,8 @@ public class CostNavigationRouteController extends WithinDayController implement
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
-		CostNavigationTravelTimeLogger costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData, this.getTravelTimeCalculator());
+		costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData, this.getTravelTimeCalculator());
+		this.events.addHandler(costNavigationTravelTimeLogger);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
@@ -89,7 +111,6 @@ public class CostNavigationRouteController extends WithinDayController implement
 	public void notifyStartup(StartupEvent event) {
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
-		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
 	}
 	
@@ -105,8 +126,21 @@ public class CostNavigationRouteController extends WithinDayController implement
 		super.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
 		super.runMobSim();
+		
+		printStatistics();
 	}
 
+	private void printStatistics() {
+		Set<WithinDayAgent> handledAgents = duringLegIdentifier.getHandledAgents();
+		log.info("Persons using CostNavigationRoute: " + handledAgents.size());
+		
+		double sumTrust = 0.0;
+		for (WithinDayAgent agent : handledAgents) {
+			sumTrust += costNavigationTravelTimeLogger.getTrust(agent.getPerson().getId());
+		}
+		log.info("Mean trust per person: " + sumTrust / handledAgents.size());
+	}
+	
 	/*
 	 * ===================================================================
 	 * main

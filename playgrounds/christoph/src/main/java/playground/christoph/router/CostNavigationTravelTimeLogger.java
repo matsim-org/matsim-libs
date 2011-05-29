@@ -48,11 +48,13 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	private Map<Id, Double> enterTimes;
 	private Map<Id, Double> expectedTravelTimes;
 	
-	protected double toleranceSlower = 1.2;
-	protected double toleranceFaster = 0.9;
+	protected double toleranceSlower = 1.25;
+	protected double toleranceFaster = 0.75;
+//	protected double toleranceSlower = 4.00;
+//	protected double toleranceFaster = 0.25;
 	
 //	protected double initialGamma = 0.5;
-	
+		
 	public CostNavigationTravelTimeLogger(Scenario scenario, TravelTime travelTime) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
@@ -67,7 +69,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	
 	private void init() {
 		
-		// set initial gammas for the whole population
+		// set initial trust for the whole population
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			personInfos.put(person.getId(), new PersonInfo());
 		}
@@ -99,6 +101,12 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		 * else to do.
 		 */
 		if (!enterTimes.containsKey(personId)) return;
+		
+		/*
+		 * If the agent does not use Within-Day Replanning there will be
+		 * no entry for its personId in the Map.
+		 */
+		if (!followed.containsKey(personId)) return;
 		
 		double enterTime = enterTimes.get(personId);
 		double expectedTravelTime = expectedTravelTimes.get(personId);
@@ -154,6 +162,10 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		return personInfos.get(personId).getTrust();
 	}
 	
+	public void setFollowed(Id personId, boolean followed) {
+		this.followed.put(personId, followed);
+	}
+	
 //	public double getTrustFollowedAndAccepted(Id personId) {
 //		return personInfos.get(personId).getTrustFollowedAndAccepted();
 //	}
@@ -179,16 +191,17 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		Random random = MatsimRandom.getLocalInstance();
 		
 		public double getTrust() {
-			int observations = (followedAndAccepted + followedAndNotAccepted + notFollowedAndAccepted + notFollowedAndNotAccepted);
-			return (followedAndAccepted + notFollowedAndNotAccepted) / observations;
+			double observations = followedAndAccepted + followedAndNotAccepted + notFollowedAndAccepted + notFollowedAndNotAccepted;
+//			return ((double)(followedAndAccepted + notFollowedAndNotAccepted)) / observations;
+			return ((double)(followedAndAccepted + notFollowedAndAccepted)) / observations;
 		}
 		
 //		public double getTrustFollowedAndAccepted() {
-//			return followedAndAccepted / (followedAndAccepted + followedAndNotAccepted);
+//			return ((double)followedAndAccepted) / ((double)(followedAndAccepted + followedAndNotAccepted));
 //		}
 		
 //		public double getTrustNotFollowedAndNotAccepted() {
-//			return notFollowedAndNotAccepted / (notFollowedAndAccepted + notFollowedAndNotAccepted);
+//			return ((double)notFollowedAndNotAccepted) / /(double)(notFollowedAndAccepted + notFollowedAndNotAccepted));
 //		}
 		
 		public double getRandomNumber() {
