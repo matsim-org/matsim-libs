@@ -54,6 +54,7 @@ public class MultipleRunsControler {
     		long seed = randomNumberGenerator.nextLong();
     		log.info("seed :" + seed);
     		createConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
+    		createConfig.setParam("controler", "outputDirectory", this.inPathStub + "/runs/run" + runIndex);
     			
     		String configPath = inPathStub + "/runs/";
         	new File(configPath).mkdirs();
@@ -66,10 +67,12 @@ public class MultipleRunsControler {
     		runConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
         	runConfig.setParam("plans", "inputPlansFile", inPathStub + "/runs/run" + runIndex + "/plans.xml.gz");
         	runConfig.setParam("controler", "runId", Integer.toString(runIndex));
+        	runConfig.setParam("controler", "outputDirectory", this.outPathStub + "/runs/run" + runIndex);
         	runConfig.setParam("facilities", "inputFacilitiesFile", inPathStub + "/runs/run" + runIndex + "/facilities.xml.gz");
-        	String path = inPathStub + "/run" + runIndex;
-        	        	
+        	String path = inPathStub + "/runs/run" + runIndex;
+        	
         	new File(path).mkdirs();
+        	configWriter = new ConfigWriter(runConfig);       	        	
         	configWriter.write(path + "/config.xml");			
     	}	
 	}
