@@ -16,6 +16,8 @@ public class MultipleRunsControler {
 	private final static Logger log = Logger.getLogger(MultipleRunsControler.class);
 	private int numberOfRuns = 10;
 	private Random randomNumberGenerator = new Random(834273782);
+	private String inPathStub;
+	private String outPathStub;
 
 	public static void main(String[] args) {
 		MultipleRunsControler runControler = new MultipleRunsControler();
@@ -31,6 +33,9 @@ public class MultipleRunsControler {
     	int numberOfRuns = Integer.parseInt(createConfig.findParam("PLOC", "numberOfRuns"));
     	log.info("number of Runs: " + numberOfRuns);
     	
+    	inPathStub = createConfig.findParam("PLOC", "inPathStub");
+    	outPathStub = createConfig.findParam("PLOC", "outPathStub");
+    	
     	this.createPlansAndConfigs(createConfig);
     	
     	for (int i = 0; i < 100000; i++) {
@@ -42,7 +47,6 @@ public class MultipleRunsControler {
 		Config runConfig = new Config();
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(runConfig);
     	String runConfigFile = createConfig.findParam("PLOC", "runConfig");
-    	String inPathStub = createConfig.findParam("PLOC", "inPath");
     	matsimConfigReader.readFile(runConfigFile);
     	
     	for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
@@ -55,16 +59,16 @@ public class MultipleRunsControler {
     		runConfig.setParam("global", "randomSeed", Long.toString(seed));
     		runConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
         			
-    		String configPath = "./input/PLOC/zh/1Pct/runs/";
+    		String configPath = inPathStub + "/runs/";
         	new File(configPath).mkdirs();
         	ConfigWriter configWriter = new ConfigWriter(createConfig);
-        	configWriter.write(configPath + "/createConfig.xml");	
-        	this.adaptPlansAndFacilities(configPath + "/createConfig.xml");
+        	configWriter.write(configPath + "/createConfigAdapted.xml");	
+        	this.adaptPlansAndFacilities(configPath + "/createConfigAdapted.xml");
     		
     		// now write the final config  		
-        	runConfig.setParam("plans", "inputPlansFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/plans.xml.gz");
+        	runConfig.setParam("plans", "inputPlansFile", inPathStub + "/runs/run" + runIndex + "/plans.xml.gz");
         	runConfig.setParam("controler", "runId", Integer.toString(runIndex));
-        	runConfig.setParam("facilities", "inputFacilitiesFile", "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/facilities.xml.gz");
+        	runConfig.setParam("facilities", "inputFacilitiesFile", inPathStub + "/runs/run" + runIndex + "/facilities.xml.gz");
         	String path = inPathStub + "/run" + runIndex;
         	        	
         	new File(path).mkdirs();
@@ -80,7 +84,7 @@ public class MultipleRunsControler {
 	
 	public void run() {
 		for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
-			String configFile = "./input/PLOC/zh/1Pct/runs/run" + runIndex + "/config.xml";
+			String configFile = inPathStub + "/run" + runIndex + "/config.xml";
 			String config[] = {configFile};
 			SingleRunControler controler;
     		controler = new SingleRunControler(config);	 
