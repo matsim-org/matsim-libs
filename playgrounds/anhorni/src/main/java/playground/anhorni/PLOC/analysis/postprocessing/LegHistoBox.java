@@ -48,9 +48,9 @@ public class LegHistoBox {
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t"); 
 	        	  int time = Integer.parseInt(parts[1]);
-	        	  double deps = Double.parseDouble(parts[2]);
+	        	  double deps = Double.parseDouble(parts[6]);
 	        	  run.addDepartures(day, time, deps);
-	        	  double arrs = Double.parseDouble(parts[3]);
+	        	  double arrs = Double.parseDouble(parts[7]);
 	        	  run.addArrivals(day, time, arrs);
 	          }
 	        } // end try
