@@ -46,8 +46,9 @@ public class MultipleRunsControler {
     	matsimConfigReader.readFile(runConfigFile);
     	
     	for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
-    		long seed = randomNumberGenerator.nextLong();
     		
+    		long seed = randomNumberGenerator.nextLong();
+    		log.info("seed :" + seed);
     		createConfig.setParam("global", "randomSeed", Long.toString(seed));
     		createConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
     		
@@ -72,6 +73,7 @@ public class MultipleRunsControler {
 	}
 	
 	private void adaptPlansAndFacilities(String configFile) {
+		log.info("adapting the scenario .... " );
 		AdaptZHScenario adapter = new AdaptZHScenario();
 		adapter.run(configFile);
 	}
