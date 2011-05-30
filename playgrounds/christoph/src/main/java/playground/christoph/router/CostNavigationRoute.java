@@ -127,19 +127,20 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 				if (outLink.getToNode().equals(endNode)) return true;
 			}
 			
-			double sumLeastCosts = 0.0;
+			double inverseSumLeastCosts = 0.0;
 			for (Link outLink : outLinksMap.values()) {
 				Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time);
 				paths.put(outLink.getId(), path);
 				costs.put(outLink.getId(), path.travelCost);
-				sumLeastCosts += path.travelCost;
+				inverseSumLeastCosts += 1 / path.travelCost;
 			}
 			
 			/*
-			 * Calculate the probabilities for each path.
+			 * Calculate the probabilities for each path. We use inverse values to
+			 * give short travel times a higher probability.
 			 */
 			for (Entry<Id, Double> entry : costs.entrySet()) {
-				probabilities.put(entry.getKey(), entry.getValue() / sumLeastCosts);
+				probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
 			}
 			
 			/*
