@@ -30,7 +30,7 @@ public class MultipleRunsControler {
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(createConfig);
     	matsimConfigReader.readFile(createConfigFile);
     	
-    	int numberOfRuns = Integer.parseInt(createConfig.findParam("PLOC", "numberOfRuns"));
+    	this.numberOfRuns = Integer.parseInt(createConfig.findParam("PLOC", "numberOfRuns"));
     	log.info("number of Runs: " + numberOfRuns);
     	
     	inPathStub = createConfig.findParam("PLOC", "inPathStub");
