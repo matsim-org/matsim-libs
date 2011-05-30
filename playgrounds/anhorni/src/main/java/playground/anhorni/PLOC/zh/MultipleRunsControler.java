@@ -53,19 +53,17 @@ public class MultipleRunsControler {
     		
     		long seed = randomNumberGenerator.nextLong();
     		log.info("seed :" + seed);
-    		createConfig.setParam("global", "randomSeed", Long.toString(seed));
     		createConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
-    		
-    		runConfig.setParam("global", "randomSeed", Long.toString(seed));
-    		runConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
-        			
+    			
     		String configPath = inPathStub + "/runs/";
         	new File(configPath).mkdirs();
         	ConfigWriter configWriter = new ConfigWriter(createConfig);
         	configWriter.write(configPath + "/createConfigAdapted.xml");	
         	this.adaptPlansAndFacilities(configPath + "/createConfigAdapted.xml");
     		
-    		// now write the final config  		
+    		// now write the final config  	
+        	runConfig.setParam("global", "randomSeed", Long.toString(seed));
+    		runConfig.setParam("locationchoiceExperimental", "randomSeed", Long.toString(seed));
         	runConfig.setParam("plans", "inputPlansFile", inPathStub + "/runs/run" + runIndex + "/plans.xml.gz");
         	runConfig.setParam("controler", "runId", Integer.toString(runIndex));
         	runConfig.setParam("facilities", "inputFacilitiesFile", inPathStub + "/runs/run" + runIndex + "/facilities.xml.gz");
