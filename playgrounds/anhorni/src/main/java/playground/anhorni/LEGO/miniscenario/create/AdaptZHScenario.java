@@ -19,6 +19,7 @@
 
 package playground.anhorni.LEGO.miniscenario.create;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedSet;
@@ -266,7 +267,7 @@ public class AdaptZHScenario {
 				nextMsg *= 2;
 				log.info(" person # " + counter);
 			}
-			Random random = new Random();
+			Random random = new Random(37835409);
 			int index = random.nextInt(this.scenario.getPopulation().getPersons().size());
 			Id id = (Id) this.scenario.getPopulation().getPersons().keySet().toArray()[index];
 			this.scenario.getPopulation().getPersons().remove(id);
@@ -274,6 +275,7 @@ public class AdaptZHScenario {
 	}
 	
 	private void write() {
+		new File(this.outputFolder).mkdirs();
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(this.outputFolder + "facilities.xml.gz");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
 	}
