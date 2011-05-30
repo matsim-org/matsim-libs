@@ -64,7 +64,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private String outputFileName = "optimizedConf.xml";
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 5;
+	private final static int N_PLANS = 6;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -92,9 +92,12 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		List<Clique> cliques = new ArrayList<Clique>(popOfCliques.getCliques().values());
 		Collections.shuffle(cliques);
 		List<JointPlan> output = new ArrayList<JointPlan>(N_PLANS);
+		JointPlan currentPlan;
 
 		for (int i=0; i < N_PLANS; i++) {
-			output.add((JointPlan) cliques.get(i).getSelectedPlan());
+			currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
+			log.debug("adding test instance of type: "+currentPlan.getType());
+			output.add(currentPlan);
 		}
 
 		return output;

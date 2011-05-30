@@ -68,6 +68,8 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	private final RandomGenerator randomGenerator;
 	private final Configuration jgapConfig;
+	private final boolean inPlace;
+	private final double nonUniformProb;
 
 	public JointPlanOptimizerJGAPMutation(
 			final JointPlanOptimizerJGAPConfiguration config,
@@ -79,6 +81,8 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		this.NUM_ITER = configGroup.getMaxIterations();
 		this.NON_UNIFORMITY_PARAM = configGroup.getMutationNonUniformity();
 		this.DAY_DURATION = config.getDayDuration();
+		this.inPlace = configGroup.getInPlaceMutation();
+		this.nonUniformProb = configGroup.getNonUniformMutationProbability();
 
 		// construct the list of gene indices.
 		// the order in which genes are examined is determined by the
@@ -99,6 +103,71 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	@Override
 	public void operate(
+			final Population a_population,
+			final List a_candidateChromosomes) {
+		if (inPlace) {
+			operateInPlace(a_population, a_candidateChromosomes);
+		}
+		else {
+			operateOnPreviousGen(a_population, a_candidateChromosomes);
+		}
+	}
+
+	/**
+	 * Randomly mutates the offsprings of the previously applied operators
+	 * (classical mutation)
+	 */
+	public void operateInPlace(
+			final Population a_population,
+			final List a_candidateChromosome
+			) {
+		int populationSize = a_population.size();
+		int nOffsprings = a_candidateChromosome.size();
+		Gene geneToMute;
+		double freeSpace;
+		IChromosome currentChromosome;
+		//IChromosome copyOfChromosome = null;
+
+		for (int j= populationSize; j < nOffsprings; j++) {
+			currentChromosome = a_population.getChromosome(j);
+			Collections.shuffle(this.geneIndices, (Random) this.randomGenerator);
+
+			//for each gene in the chromosome:
+			for (int i : this.geneIndices) {
+				if (this.randomGenerator.nextDouble() < this.MUTATION_PROB) {
+					//perform mutation
+
+					geneToMute = currentChromosome.getGene(i);
+
+					if (geneToMute instanceof BooleanGene) {
+						mutateBoolean((BooleanGene) geneToMute);
+					}
+					else if (geneToMute instanceof DoubleGene) {
+
+						freeSpace = getFreeSpace(
+								i,
+								currentChromosome);
+
+						if (this.randomGenerator.nextDouble() < this.nonUniformProb) {
+							mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+						}
+						else {
+							mutateDouble((DoubleGene) geneToMute, freeSpace);
+						}
+					}
+					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
+						geneToMute.setToRandomValue(this.randomGenerator);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Mutates copies of the chromosomes of the previous generation ("jgap-like"
+	 * mutation)
+	 */
+	public void operateOnPreviousGen(
 			final Population a_population,
 			final List a_candidateChromosome
 			) {
@@ -134,8 +203,12 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 								i,
 								copyOfChromosome);
 
-						//mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
-						mutateDouble((DoubleGene) geneToMute, freeSpace);
+						if (this.randomGenerator.nextDouble() < this.nonUniformProb) {
+							mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+						}
+						else {
+							mutateDouble((DoubleGene) geneToMute, freeSpace);
+						}
 					}
 					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
 						geneToMute.setToRandomValue(this.randomGenerator);

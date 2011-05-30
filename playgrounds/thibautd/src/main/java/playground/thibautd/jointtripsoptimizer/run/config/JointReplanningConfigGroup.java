@@ -45,37 +45,36 @@ public class JointReplanningConfigGroup extends Module {
 	public static final String GROUP_NAME = "JointReplanning";
 
 	//parameter names
+	public static final String POP_SIZE = "gaPopulationSize";
+	public static final String MUTATION_PROB = "mutationProbability";
+	public static final String WHOLE_CO_PROB = "WholeArithmeticalCrossOverRate";
+	public static final String SIMPLE_CO_PROB = "SimpleArithmeticalCrossOverRate";
+	public static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverRate";
+	public static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
+	public static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
+	public static final String PLOT_FITNESS = "plotFitnessEvolution";
+	public static final String OPTIMIZE_MODE = "modeToOptimize";
+	public static final String AVAIL_MODES = "availableModes";
+	public static final String DO_MONITOR = "fitnessToMonitor";
+	public static final String ITER_MIN_NUM = "minNumberOfGAIterations";
+	public static final String ITER_NUM = "maxNumberOfGAIterations";
+	public static final String MONITORING_PERIOD = "fitnessMonitoringPeriod";
+	public static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
+	public static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
+	public static final String DISCRETE_DIST_SCALE = "discreteDistanceScale";
+	public static final String SIM_LEG_INT = "simLegInterpretation";
+	public static final String RTS_WINDOW = "rtsWindowSize";
+	public static final String IN_PLACE = "mutationInPlace";
+	public static final String P_NON_UNIFORM = "probNonUniform";
+	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
-	private static final String POP_SIZE = "gaPopulationSize";
-	/**
-	 * the drop-off activity duration, in seconds
-	 * NOT USED
-	 */
 	private static final String DO_DUR = "dropOffDuration";
-	private static final String MUTATION_PROB = "mutationProbability";
-	private static final String WHOLE_CO_PROB = "WholeArithmeticalCrossOverRate";
-	private static final String SIMPLE_CO_PROB = "SimpleArithmeticalCrossOverRate";
-	private static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverRate";
-	private static final String ITER_NUM = "maxNumberOfGAIterations";
-	private static final String NON_UNIFORMITY_PARAM = "mutationNonUniformity";
-	private static final String OPTIMIZE_TOGGLE = "toggleToOptimize";
 	private static final String SELECTION_THRESHOLD = "bestSelectionThreshold";
-	private static final String PLOT_FITNESS = "plotFitnessEvolution";
-	private static final String OPTIMIZE_MODE = "modeToOptimize";
-	private static final String AVAIL_MODES = "availableModes";
-	private static final String ITER_MIN_NUM = "minNumberOfGAIterations";
-	private static final String MONITORING_PERIOD = "fitnessMonitoringPeriod";
-	private static final String DO_MONITOR = "fitnessToMonitor";
-	private static final String MIN_IMPROVEMENT = "minimumFitnessImprovementCHF";
-	private static final String STRUCTURE_LAYER = "tripStructureAnalysisLayer";
 	private static final String DOUBLETTES = "geneticSelectionWithReplacement";
 	private static final String DYNAMIC_CO_RATES = "allowAdaptiveCrossOverRates";
 	private static final String SPX_RATE = "SPXCrossOverRate";
 	private static final String SPX_SONS = "SPXOffspringRate";
-	private static final String DISCRETE_DIST_SCALE = "discreteDistanceScale";
 	private static final String MAX_TABU_LENGTH = "tabuListMaxLength";
-	private static final String SIM_LEG_INT = "simLegInterpretation";
-	private static final String RTS_WINDOW = "rtsWindowSize";
 
 	//parameter values, initialized to defaults.
 
@@ -84,7 +83,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double wholeCrossOverProb = 0.3;
 	private double simpleCrossOverProb = 0.5;
 	private double singleCrossOverProb = 0.3;
-	private int numberOfIterations = 100;
+	private int numberOfIterations = 30;
 	private double betaNonUniformity = 1;
 	private boolean optimizeToggle = true;
 	private boolean plotFitness = false;
@@ -100,14 +99,16 @@ public class JointReplanningConfigGroup extends Module {
 	private double discreteDistScale = 17000d;
 	private SimLegInterpretation simLegInt = SimLegInterpretation.CharyparEtAlCompatible;
 	private int rtsWindowSize = 15;
+	private boolean inPlaceMutation = true;
+	private double pNonUniform = 0.5d;
 	//deprecated fields:
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
 	private double selectionThreshold = 0.1d;
 	private boolean allowDoublettes = false;
 	private boolean dynamicCoRate = true;
-	private double spxRate = 0.6d;
-	private int spxOffspringRate = 4;
+	private double spxRate = 0.0d;
+	private int spxOffspringRate = 0;
 	private int maxTabuLength = Integer.MAX_VALUE;
 
 	public JointReplanningConfigGroup() {
@@ -203,6 +204,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(SIM_LEG_INT)) {
 			this.setSimLegInterpretation(value);
 		}
+		else if (param_name.equals(IN_PLACE)) {
+			this.setInPlaceMutation(value);
+		}
+		else if (param_name.equals(P_NON_UNIFORM)) {
+			this.setNonUniformMutationProbability(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -218,7 +225,7 @@ public class JointReplanningConfigGroup extends Module {
 			return String.valueOf(this.getPopulationSize());
 		}
 		else if (param_name.equals(DO_DUR)) {
-			return String.valueOf(this.getPopulationSize());
+			return String.valueOf(this.getDropOffDuration());
 		}
 		else if (param_name.equals(MUTATION_PROB)) {
 			return String.valueOf(this.getMutationProbability());
@@ -293,6 +300,12 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(SIM_LEG_INT)) {
 			return String.valueOf(this.getSimLegInterpretation());
 		}
+		else if (param_name.equals(IN_PLACE)) {
+			return String.valueOf(this.getInPlaceMutation());
+		}
+		else if (param_name.equals(P_NON_UNIFORM)) {
+			return String.valueOf(this.getNonUniformMutationProbability());
+		}
 
 		return null;
 	}
@@ -325,6 +338,8 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, DISCRETE_DIST_SCALE);
 		this.addParameterToMap(map, RTS_WINDOW);
 		this.addParameterToMap(map, SIM_LEG_INT);
+		this.addParameterToMap(map, IN_PLACE);
+		this.addParameterToMap(map, P_NON_UNIFORM);
 		return map;
 	}
 
@@ -661,6 +676,22 @@ public class JointReplanningConfigGroup extends Module {
 		return this.rtsWindowSize;
 	}
 
+	public void setInPlaceMutation(final String value) {
+		this.inPlaceMutation = Boolean.valueOf(value);
+	}
+
+	public boolean getInPlaceMutation() {
+		return this.inPlaceMutation;
+	}
+
+	public void setNonUniformMutationProbability(final String value) {
+		this.pNonUniform = Double.parseDouble(value);
+	}
+
+	public double getNonUniformMutationProbability() {
+		return this.pNonUniform;
+	}
+
 	// allow setting of GA params "directly"
 	public void setPopulationSize(final int populationSize) {
 		this.populationSize = (populationSize);
@@ -735,6 +766,12 @@ public class JointReplanningConfigGroup extends Module {
 		this.rtsWindowSize = value;
 	}
 
+	public void setInPlaceMutation(final boolean value) {
+		this.inPlaceMutation = (value);
+	}
 
+	public void setNonUniformMutationProbability(final double value) {
+		this.pNonUniform = (value);
+	}
 }
 

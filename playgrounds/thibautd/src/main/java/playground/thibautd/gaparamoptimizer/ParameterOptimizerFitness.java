@@ -29,6 +29,7 @@ import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
+import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.InvalidConfigurationException;
@@ -52,13 +53,14 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final long serialVersionUID = 1L;
 
 	// to avoid negative fitness errors
-	private static final double START_FITNESS = 1E9;
+	private static final double START_FITNESS = 1E7;
 	// parameters of the fitness
-	private static final double CHF_PER_MICROSEC = 10;
+	private static final double CHF_PER_MICROSEC = 1E-9;
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
+	private static final int N_PLAN_EXEC = 1;
 
 	// indices of the genes in the chromosome:
-	private static final int CHROM_LENGTH = 7;
+	private static final int CHROM_LENGTH = 10;
 	private static final int POP_SIZE_GENE = 0;
 	private static final int MUT_PROB_GENE = 1;
 	private static final int WHOLE_PROB_GENE = 2;
@@ -66,11 +68,15 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int SINGLE_PROB_GENE = 4;
 	private static final int DISCRETE_SCALE_GENE = 5;
 	private static final int RTS_WINDOW_GENE = 6;
+	private static final int NON_UNIFORM_GENE = 7;
+	private static final int IN_PLACE_GENE = 8;
+	private static final int P_NON_UNIFORM_GENE = 9;
 
 	// bounds
 	private static final int MAX_POP_SIZE = 200;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	private static final int MAX_WINDOW_SIZE = 20;
+	private static final double MAX_NON_UNIFORM = 10d;
 
 	// instance fields
 	private final List<JointPlan> plans;
@@ -115,10 +121,14 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		long endTime;
 
 		for (int i=0; i < nPlans; i++) {
-			startTime = thread.getCurrentThreadCpuTime();
-			scores[i] = this.jpoAlgo.run(configGroup, this.plans.get(i));
-			endTime = thread.getCurrentThreadCpuTime();
-			cpuTimesNanoSecs[i] = endTime - startTime;
+			scores[i] = 0d;
+			cpuTimesNanoSecs[i] = 0L;
+			for (int j=0; j < N_PLAN_EXEC; j++) {
+				startTime = thread.getCurrentThreadCpuTime();
+				scores[i] += this.jpoAlgo.run(configGroup, this.plans.get(i));
+				endTime = thread.getCurrentThreadCpuTime();
+				cpuTimesNanoSecs[i] += endTime - startTime;
+			}
 		}
 
 		return getScore(scores, cpuTimesNanoSecs);
@@ -174,6 +184,9 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		genes[SINGLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[DISCRETE_SCALE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_DISCRETE_SCALE);
 		genes[RTS_WINDOW_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_WINDOW_SIZE);
+		genes[NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_NON_UNIFORM);
+		genes[IN_PLACE_GENE] = new BooleanGene(this.jgapConfig);
+		genes[P_NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 
 		return new Chromosome(this.jgapConfig, genes);
 	}
@@ -194,6 +207,9 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		configGroup.setSingleCrossOverProbability(getDoubleValue(genes[SINGLE_PROB_GENE]));
 		configGroup.setDiscreteDistanceScale(getDoubleValue(genes[DISCRETE_SCALE_GENE]));
 		configGroup.setRtsWindowSize(getIntValue(genes[RTS_WINDOW_GENE]));
+		configGroup.setMutationNonUniformity(getDoubleValue(genes[NON_UNIFORM_GENE]));
+		configGroup.setInPlaceMutation(getBooleanValue(genes[IN_PLACE_GENE]));
+		configGroup.setNonUniformMutationProbability(getDoubleValue(genes[P_NON_UNIFORM_GENE]));
 
 		return configGroup;
 	}
@@ -204,6 +220,10 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 
 	private static double getDoubleValue(final Gene gene) {
 		return ((DoubleGene) gene).doubleValue();
+	}
+
+	private static boolean getBooleanValue(final Gene gene) {
+		return ((BooleanGene) gene).booleanValue();
 	}
 }
 
