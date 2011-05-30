@@ -52,6 +52,11 @@ public class IOUtils {
 	public static final String LOGFILE = "logfile.log";
 
 	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
+	
+	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
+	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
+	
+	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
 
