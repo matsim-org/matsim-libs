@@ -41,6 +41,7 @@ import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
@@ -272,7 +273,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 			Id sourceLinkId = makeLinkId(1, sourceColumn);
 			for (int destinationColumn = 0; destinationColumn <= GRID_SIZE; destinationColumn++) {
 				Id destinationLinkId = makeLinkId(GRID_SIZE, destinationColumn);
-				tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+				tsp.getContracts().add(createContract(tsp.getId(),sourceLinkId, destinationLinkId));
 			}
 		}
 		logger.debug("he has " + tsp.getContracts().size() + " contracts");
@@ -285,7 +286,7 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 	//	for (int destinationColumn = 0; destinationColumn <= 0; destinationColumn++) {
 			Id sourceLinkId = makeLinkId(GRID_SIZE, destinationColumn);
 			Id destinationLinkId = makeLinkId(1, destinationColumn);
-			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
+			tsp.getContracts().add(createContract(tsp.getId(),sourceLinkId, destinationLinkId));
 		}
 //		for (int destinationColumn = 5; destinationColumn <= 5; destinationColumn++) {
 //			Id sourceLinkId = makeLinkId(1, destinationColumn);
@@ -296,8 +297,11 @@ public class RunChessboard implements StartupListener, ScoringListener, Replanni
 		printContracts(tsp.getContracts());
 	}
 
-	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
-		TSPContract tspContract = new TSPContract(Arrays.asList(new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600))));
+	private TSPContract createContract(Id tspId, Id sourceLinkId, Id destinationLinkId) {
+		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
+		TSPOffer offer = new TSPOffer();
+		offer.setTspId(tspId);
+		TSPContract tspContract = new TSPContract(tspShipment,offer);
 		return tspContract;
 	}
 

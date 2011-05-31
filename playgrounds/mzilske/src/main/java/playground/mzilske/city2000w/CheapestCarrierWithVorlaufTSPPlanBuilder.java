@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.CarrierAgentTracker;
@@ -21,6 +22,8 @@ import playground.mzilske.freight.TransportChainBuilder;
 
 
 public class CheapestCarrierWithVorlaufTSPPlanBuilder {
+	
+	private Logger logger = Logger.getLogger(CheapestCarrierWithVorlaufTSPPlanBuilder.class);
 	
 	private List<Id> transshipmentCentres;
 
@@ -42,12 +45,12 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 				TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
 				chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
 				for (Id transshipmentCentre : transshipmentCentres) { 
-					Offer acceptedOffer = pickKnownOffer(fromLocation, transshipmentCentre, s.getSize(), tspKnowledge);
+					Offer acceptedOffer = pickUnknownOffer(fromLocation, transshipmentCentre, s.getSize(), tspKnowledge);
 					
 //					Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
 					chainBuilder.scheduleLeg(acceptedOffer);
 					chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
-					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(240,24*3600)); // works
+					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(6*3600,24*3600)); // works
 					// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
 					fromLocation = transshipmentCentre;
 				}
@@ -61,44 +64,11 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 		return plan;
 	}
 
-	private Offer pickKnownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
-		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
-		boolean offerFound = false;
-		Offer cheapestKnownOffer = null;
-		for(Offer o : offers){
-			if(tspKnowledge.getKnownCarriers().contains(o.getCarrierId())){
-				offerFound = true;
-				if(cheapestKnownOffer == null){
-					cheapestKnownOffer = o;
-				}
-				else if(o.getPrice() < cheapestKnownOffer.getPrice()){
-					cheapestKnownOffer = o;
-				}
-			}
-		}
-		if(offerFound){
-			return cheapestKnownOffer;
-		}
-		else{
-			sortOffers(offers);
-			return offers.get(0);
-		}
-	}
-
 	private Offer pickUnknownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
 		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
-		Offer cheapestUnknownOffer = null;
-		for(Offer o : offers){
-			if(!tspKnowledge.getKnownCarriers().contains(o.getCarrierId())){
-				if(cheapestUnknownOffer == null){
-					cheapestUnknownOffer = o;
-				}
-				else if(o.getPrice() < cheapestUnknownOffer.getPrice()){
-					cheapestUnknownOffer = o;
-				}
-			}
-		}
-		return cheapestUnknownOffer;
+		sortOffers(offers);
+		logger.info("pick carrierId=" + offers.get(0).getCarrierId() + " for " + sourceLinkId + " to " + destinationLinkId + " with price of " + offers.get(0).getPrice());
+		return offers.get(0);
 	}
 
 	private void sortOffers(ArrayList<Offer> offers) {

@@ -38,44 +38,62 @@ public class GridWithSpikeCreator {
 				network.addNode(node);
 				if (i != 0) {
 					Link iLink = network.getFactory().createLink(makeLinkId(i, j), makeId(i-1, j), makeId(i, j));
-					iLink.setLength(100);
-					iLink.setFreespeed(100);
+					iLink.setLength(1000);
+					iLink.setFreespeed(14);
 					iLink.setCapacity(1000);
 					Link iLinkR = network.getFactory().createLink(scenario.createId("i("+i+","+j+")"+"R"), makeId(i, j),makeId(i-1, j));
-					iLinkR.setLength(100);
-					iLinkR.setFreespeed(100);
+					iLinkR.setLength(1000);
+					iLinkR.setFreespeed(14);
 					iLinkR.setCapacity(1000);
 					network.addLink(iLink);
 					network.addLink(iLinkR);
 				}
 				if (j != 0) {
 					Link jLink = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"), makeId(i, j-1), makeId(i, j));
-					jLink.setLength(100);
-					jLink.setFreespeed(100);
+					jLink.setLength(1000);
+					jLink.setFreespeed(14);
 					jLink.setCapacity(1000);
 					Link jLinkR = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"+"R"), makeId(i, j), makeId(i, j-1));
-					jLinkR.setLength(100);
-					jLinkR.setFreespeed(100);
+					jLinkR.setLength(1000);
+					jLinkR.setFreespeed(14);
 					jLinkR.setCapacity(1000);
 					network.addLink(jLink);
 					network.addLink(jLinkR);
 				}
 			}
 		}
-		createSpike(network);
+		createSpike(network,88,4,80000,"spike","spikeR");
+		createIndustrySpike(network,89,4,100, "industry","industryR");
 	}
 
-	private void createSpike(Network network) {
-		Node spikeNode = network.getFactory().createNode(scenario.createId("sNodeID"), makeCoord(16,4));
+	private void createIndustrySpike(Network network, int x, int y, int length, String linkName, String returnLinkName) {
+		Node spikeNode = network.getFactory().createNode(scenario.createId("indNodeID"), makeCoord(x,y));
 		network.addNode(spikeNode);
 		
-		Link spike = network.getFactory().createLink(scenario.createId("spike"),spikeNode.getId(), makeId(8,4));
-		spike.setLength(800);
-		spike.setFreespeed(100);
+		Link spike = network.getFactory().createLink(scenario.createId(linkName),spikeNode.getId(), scenario.createId("sNodeID"));
+		spike.setLength(length);
+		spike.setFreespeed(28);
 		spike.setCapacity(1000);
-		Link spikeR = network.getFactory().createLink(scenario.createId("spikeR"), makeId(8,4), spikeNode.getId());
-		spikeR.setLength(800);
-		spikeR.setFreespeed(100);
+		Link spikeR = network.getFactory().createLink(scenario.createId(returnLinkName), scenario.createId("sNodeID"), spikeNode.getId());
+		spikeR.setLength(length);
+		spikeR.setFreespeed(28);
+		spikeR.setCapacity(1000);
+		network.addLink(spike);
+		network.addLink(spikeR);
+		
+	}
+
+	private void createSpike(Network network, int x, int y, int length, String linkName, String returnLinkName) {
+		Node spikeNode = network.getFactory().createNode(scenario.createId("sNodeID"), makeCoord(x,y));
+		network.addNode(spikeNode);
+		
+		Link spike = network.getFactory().createLink(scenario.createId(linkName),spikeNode.getId(), makeId(8,4));
+		spike.setLength(length);
+		spike.setFreespeed(28);
+		spike.setCapacity(1000);
+		Link spikeR = network.getFactory().createLink(scenario.createId(returnLinkName), makeId(8,4), spikeNode.getId());
+		spikeR.setLength(length);
+		spikeR.setFreespeed(28);
 		spikeR.setCapacity(1000);
 		network.addLink(spike);
 		network.addLink(spikeR);
@@ -86,7 +104,7 @@ public class GridWithSpikeCreator {
 	}
 
 	private Coord makeCoord(int i, int j) {
-		return scenario.createCoord(i * 100, j * 100);
+		return scenario.createCoord(i * 1000, j * 1000);
 	}
 
 	private Id makeId(int i, int j) {

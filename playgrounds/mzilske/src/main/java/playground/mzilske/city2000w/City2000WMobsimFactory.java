@@ -77,7 +77,7 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		PlanMobsimImpl planSim = new PlanMobsimImpl(scenario);
 		DefaultTimestepSimEngine engine = new DefaultTimestepSimEngine(planSim, eventsManager);
 		planSim.setMobsimEngine(engine);
-
+		engine.setStopTime(48*3600);
 		// setup network
 		FastQueueNetworkFeature netFeature;
 		if (this.nOfThreads == 0) {
