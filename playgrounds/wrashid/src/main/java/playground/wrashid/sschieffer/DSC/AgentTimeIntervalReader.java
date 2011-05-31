@@ -68,15 +68,15 @@ public class AgentTimeIntervalReader {
 		Schedule schedule=new Schedule();
 		
 		schedule=readParkingTimes(id, schedule);	
-			
+		//schedule.printSchedule();
 		schedule=addDrivingTimes(id, schedule);			
-		
+		//schedule.printSchedule();
 		//System.out.println("controlling optimal vs nonOptimal charging times");
 		schedule = checkTimesWithHubSubAndOptimalTimes(schedule, id);
 		
 		//System.out.println("calculating Joules per Interval");
 		schedule.getJoulesForEachParkingInterval(id);
-		
+		//schedule.printSchedule();
 		return schedule;
 	}
 	

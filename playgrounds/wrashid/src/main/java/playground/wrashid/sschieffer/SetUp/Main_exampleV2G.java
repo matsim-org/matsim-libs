@@ -93,7 +93,7 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\4hrV2G\\updated alg\\20000Plans5Min\\";
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\24hrV2G runs\\20000Plans15Min\\";
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans20000.xml";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		double kWHEV =24;
@@ -135,11 +135,11 @@ public class Main_exampleV2G {
 		 */			
 					
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad16000.txt";
+		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt.txt";
 		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
 		myStochasticHubInfo.add(hubInfo1);
 		
-		final double standardChargingLength=5.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
 		
 		int numberOfHubsInX=1;

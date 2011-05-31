@@ -35,6 +35,8 @@ public class TimeDataCollector {
 	private PolynomialFitter fitter;
 	private double[][] data;
 	
+	int num;
+	double secBin;
 	private PolynomialFunction func;//= new PolynomialFunction(new double[]{0});
 	
 	private XYSeries xy;
@@ -42,6 +44,8 @@ public class TimeDataCollector {
 	
 	public TimeDataCollector(double[][] data){
 		this.data=data;
+		this.num= data.length;
+		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/num;
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		optimizer.setMaxIterations(10000);		
@@ -49,8 +53,13 @@ public class TimeDataCollector {
 		fitter= new PolynomialFitter(20, optimizer);
 	}
 	
+	
+	
+	
 	public TimeDataCollector(int numberOfDataPoints){
 		data= new double[numberOfDataPoints][2];
+		this.num= numberOfDataPoints;
+		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/num;
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		optimizer.setMaxIterations(100000);		
@@ -95,7 +104,7 @@ public class TimeDataCollector {
 	    		this.func= new PolynomialFunction(new double[]{getYAtEntry(0)});
 	    	}else{
 	    		e.printStackTrace();
-	    		System.out.println("Fitting data in TimeDataCollector has encountered a problem");
+	    		System.out.println("Fitting data in TimeDataCollector has encountered a problem, here first few entries of the double array");
 	    		for(int i=0; i< Math.min(10, data.length); i++){
 	    			System.out.println(data[i][0]+", "+data[i][1]);
 	    		}
@@ -157,8 +166,8 @@ public class TimeDataCollector {
 			double startTime= timeSchedule.timesInSchedule.get(i).getStartTime();
 			double endTime= timeSchedule.timesInSchedule.get(i).getEndTime();
 			
-			int minAbove= (int)Math.ceil(startTime/(15*60.0));
-			int maxBelow= (int)Math.floor(endTime/(15*60.0));
+			int minAbove= (int)Math.ceil(startTime/(secBin));
+			int maxBelow= (int)Math.floor(endTime/(secBin));
 			
 			refit= new double[maxBelow-minAbove+1][2];
 			for(int entry=minAbove; entry<=maxBelow; entry++){
@@ -224,8 +233,8 @@ public class TimeDataCollector {
 	
 	
 	public void increaseYEntryOf96EntryBinCollectorBetweenSecStartEnd(double start, double end, double increase){
-		double first= Math.ceil(start/(60.0*15));
-		double last= Math.floor(end/(60.0*15));
+		double first= Math.ceil(start/(secBin));
+		double last= Math.floor(end/(secBin));
 		int firstEntry= (int) (first);
 		for( int i=0; i< (int)(last-first); i++){
 			increaseYEntryAtEntryByDouble(firstEntry+i, increase);
@@ -235,11 +244,11 @@ public class TimeDataCollector {
 	
 	public void increaseYEntryOf96EntryBinCollectorBetweenSecStartEndByFunction(
 			double start, double end, PolynomialFunction func){
-		double first= Math.ceil(start/(60.0*15));
-		double last= Math.floor(end/(60.0*15));
+		double first= Math.ceil(start/(secBin));
+		double last= Math.floor(end/(secBin));
 		int firstEntry= (int) (first);
 		for( int i=0; i< (int)(last-first); i++){
-			double increase= func.value(firstEntry+i*(60.0*15));
+			double increase= func.value(firstEntry+i*(secBin));
 			increaseYEntryAtEntryByDouble(firstEntry+i, increase);
 		}
 	}

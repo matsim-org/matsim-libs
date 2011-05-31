@@ -354,9 +354,13 @@ public class DecentralizedSmartCharger {
 			}
 			// in 10000 id 8797 had error with schedulesize=0
 			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
-			
-			if(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()==0){
+						
+			if(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()==0 
+					|| agentParkingAndDrivingSchedules.get(id).timesInSchedule.get(0).getStartTime()!=0.0 
+					||agentParkingAndDrivingSchedules.get(id).timesInSchedule.get(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()-1).getEndTime()!=SECONDSPERDAY){
 				deletedAgents.add(id);
+				System.out.println("deleted agent : "+ id.toString());
+				agentParkingAndDrivingSchedules.get(id).printSchedule();
 				
 			}
 		}
@@ -519,6 +523,7 @@ public class DecentralizedSmartCharger {
 				if (debug){
 					System.out.println("Finding Charging distribution Agent "+ id.toString());
 					thisAgentParkAndDrive.printSchedule();
+					//Finding Charging distribution Agent 183148
 				}
 				
 				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
@@ -627,7 +632,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public double calculateChargingCostForAgentSchedule(Id id, Schedule s) {
 		double totalCost=0;
-		
+		//s.printSchedule();
 		for(int i=0; i<s.getNumberOfEntries();i++){
 			
 			TimeInterval t = s.timesInSchedule.get(i); 
@@ -1999,11 +2004,11 @@ public class DecentralizedSmartCharger {
 		    for(Integer hub: myHubLoadReader.deterministicHubLoadDistribution.keySet()){
 		    	out.write("HUB"+hub.toString()+"</br> </br>");
 		    	
-		    	out.write("Prices </br>");
+		    	out.write("Prices </br>");		    	
 		    	String picPrices=  outputPath+ "Hub\\pricesHub_"+ hub.toString()+".png";
 		    	out.write("<img src='"+picPrices+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
-		    	
+		    
 		    	out.write("Load Before and after </br>");
 		    	String picBeforeAfter= outputPath+"Hub/deterministicLoadBeforeAfter_hub1.png";
 		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");

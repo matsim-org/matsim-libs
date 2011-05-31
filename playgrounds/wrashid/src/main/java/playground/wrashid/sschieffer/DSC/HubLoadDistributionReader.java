@@ -749,6 +749,8 @@ public class HubLoadDistributionReader {
 		
 		for(Integer i : pricingHubDistribution.keySet()){
 			
+			DomainFinder minMaxLoad= new DomainFinder();
+			minMaxLoad.setLoadSchedule(deterministicHubLoadDistribution.get(i));
 			Schedule pricingS= pricingHubDistribution.get(i);
 			
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.get(i);
@@ -774,7 +776,7 @@ public class HubLoadDistributionReader {
 						gasPriceInCostPerSecond,
 						badIntervals);
 				
-				PolynomialFunction pBad= new PolynomialFunction(new double[]{-1000000});
+				PolynomialFunction pBad= new PolynomialFunction(new double[]{minMaxLoad.getDomainMin()});
 				
 				if(badIntervals.size()==0){
 					sPHEV.addTimeInterval(currentDeterministicLoadInterval);
@@ -848,12 +850,10 @@ public class HubLoadDistributionReader {
 					}
 					
 				}
-				
 			}
 			
 			sPHEV.sort();		
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
-			
 		}
 		
 		return hubLoadDistributionPHEVAdjusted;
@@ -925,7 +925,13 @@ public class HubLoadDistributionReader {
 					if(Math.abs(objective.value(i))<0.0001){
 						
 						try {
-							double c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime(), i);
+							double c;
+							if (i!=l.getStartTime() && i!=l.getEndTime() ){
+								 c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime(), i);
+							}else{
+								 c = solverNewton.solve(objective, l.getStartTime(), l.getEndTime());
+							}
+							
 							
 							//System.out.println("c: "+c);
 							//System.out.println("start: "+l.getStartTime()+", end: "+ l.getEndTime()+ " guess "+ i);

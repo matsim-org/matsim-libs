@@ -47,13 +47,16 @@ public class SetUpVehicleCollector {
 		 * NORMAL GAS
 		 */
 		
-		// GAS PRICE CH //http://www.tanktipp.ch/
-		// GAS PRICE USA //	http://gasbuddy.com/ //3.75 (U.S. dollars / US gallon) = 0.849974428 Swiss francs / l
+		
 		double gasPricePerLiter;
 		if(gasHigh){
+			// GAS PRICE CH //http://www.tanktipp.ch/
 			gasPricePerLiter= 1.70; 
 		}else{
-			gasPricePerLiter= 0.85; 
+			// GAS PRICE USA //	http://gasbuddy.com/ //3.75 (U.S. dollars / US gallon) = 0.849974428 Swiss francs / l
+			//gasPricePerLiter= 0.85;
+			//calc of gas price per second = gasPricePerLiter * 1/ 43*10^6 * 80000 < 0.00007 - 0.00011
+			gasPricePerLiter=0.043; // --> 0.00008
 		}
 	
 		

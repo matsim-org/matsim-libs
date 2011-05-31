@@ -39,23 +39,23 @@ import java.util.*;
 
 
 /**
- * 0.75	1.00	2.00	0.67
+ * 0.10	2.00	2.00	0.33
 
- *EV penetration 75%
- *price of gas US prices : low
+ *EV penetration 10%
+ *price of gas US prices : high
  *battery size : large
- *regulation up percentage 67%
+ *regulation up percentage 33%
  * @author Stella
  *
  */
-public class Simulation_1{
+public class Simulation_5{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
 		final double electrification= 1.0; 
-		final double ev=0.75; 
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
-		String configPath="test/scenarios/berlin/config.xml";// 100 agents
+		final double ev=0.10; 
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation5\\";
+		String configPath="test/input/playground/wrashid/test/scenarios/berlin/config.xml";// 100 agents
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -68,9 +68,9 @@ public class Simulation_1{
 		final double bufferBatteryCharge=0.0;
 		double kWHEV =24;
 		double kWHPHEV =24;
-		boolean gasHigh = false;
+		boolean gasHigh = true;
 		
-		final double xPercentDownUp=0.67;
+		final double xPercentDownUp=0.33;
 		final double xPercentDown=1.0-xPercentDownUp;
 		
 		int numberOfHubsInX=1;

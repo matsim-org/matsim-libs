@@ -39,23 +39,33 @@ import java.util.*;
 
 
 /**
- * 0.75	1.00	2.00	0.67
+ * 0.75	1.00	1.00	0.00
 
  *EV penetration 75%
  *price of gas US prices : low
- *battery size : large
- *regulation up percentage 67%
+ *battery size : low
+ *regulation up percentage 00%
  * @author Stella
  *
  */
-public class Simulation_1{
+public class Simulation_16{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
-		final double electrification= 1.0; 
 		final double ev=0.75; 
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
-		String configPath="test/scenarios/berlin/config.xml";// 100 agents
+		double kWHEV =16;
+		double kWHPHEV =16;
+		//boolean gasHigh =true; // high gas price
+		boolean gasHigh =false;// low gas price
+		final double xPercentDownUp=0.00;
+		final double xPercentDown=1.0-xPercentDownUp;
+		
+		final double electrification= 1.0; 
+		final double bufferBatteryCharge=0.0;
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		
+		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation16\\";
+		String configPath="test/input/playground/wrashid/test/scenarios/berlin/config.xml";// 100 agents
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -63,15 +73,6 @@ public class Simulation_1{
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
-		
-		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
-		final double bufferBatteryCharge=0.0;
-		double kWHEV =24;
-		double kWHPHEV =24;
-		boolean gasHigh = false;
-		
-		final double xPercentDownUp=0.67;
-		final double xPercentDown=1.0-xPercentDownUp;
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;

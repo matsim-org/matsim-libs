@@ -258,7 +258,6 @@ public class ChargingSlotDistributor {
 					// negative suboptimal interval will only be calculated first time when func is stil null
 					if (funcSubOpt==null){
 						funcSubOpt= turnSubOptimalSlotDistributionIntoProbDensityOfFindingAvailableSlot(func, startTime, endTime);
-						
 					}
 					
 					integral=DecentralizedSmartCharger.functionSimpsonIntegrator.integrate(
@@ -348,18 +347,25 @@ public class ChargingSlotDistributor {
 		*/
 		DomainFinder d= new DomainFinder(start1, end1, func);
 		
+		
 		double minDomain= d.getDomainMin();
 		int start= (int)Math.floor(start1);
 		int end= (int)Math.ceil(end1);
-		int steps= (int)Math.floor((( end-start)/(60.0*5.0)));
+		int steps= (int)Math.floor((( end-start)/(60.0*1.0)));
+		
+		if(steps==0){
+			steps=Math.max(1, steps);// if steps =0, then take at least 1
+			System.out.println(" \n start " + start + " end "+ end+ " steps " + steps);
+		}
 		
 		double [][] newFunc= new double[steps][2];
 		
 		for(int i=0; i<steps; i++){
-			newFunc[i][0]=start+(i*(60.0*5.0));
-			newFunc[i][1]=func.value(start+(i*(60.0*5.0)))-minDomain;
+			newFunc[i][0]=start+(i*(60.0*1.0));
+			newFunc[i][1]=func.value(start+(i*(60.0*1.0)))-minDomain;
 			
 		}
+		
 				
 		return DecentralizedSmartCharger.fitCurve(newFunc);
 		

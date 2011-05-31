@@ -40,6 +40,22 @@ public class DomainFinder {
 	}
 	
 	
+	
+	public void setLoadSchedule(Schedule s){
+		domainMin=Double.MAX_VALUE;
+		domainMax= - Double.MAX_VALUE;
+		
+		DomainFinder help= new DomainFinder();
+		
+		for(int i=0; i<s.getNumberOfEntries(); i++){
+			LoadDistributionInterval thisL= (LoadDistributionInterval)s.timesInSchedule.get(i);
+			help.setFunctionAndRange(thisL.getStartTime(), thisL.getEndTime(), thisL.getPolynomialFunction());
+			domainMin=Math.min(help.getDomainMin(), domainMin);
+			domainMax= Math.max(help.getDomainMax(), domainMax);
+		}
+	}
+	
+	
 	public double getDomainMax(){
 		return domainMax;
 	}

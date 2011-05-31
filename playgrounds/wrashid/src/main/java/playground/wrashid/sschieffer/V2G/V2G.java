@@ -552,7 +552,11 @@ public class V2G {
 		}
 			
 		// reschedule if equal - hopefully the load can be balanced elsewhere in the grid
-		if(costKeeping>=costReschedule){
+		if(costKeeping>=costReschedule && answerScheduleAfterElectricSourceInterval!=null){
+			if(answerScheduleAfterElectricSourceInterval==null){
+				System.out.println("Something fishy" + costKeeping +  ", "+ costReschedule);
+				secondHalf.printSchedule();
+			}
 			
 			//reschedule
 			reschedule(agentId, 
@@ -603,10 +607,8 @@ public class V2G {
 				electricSourceInterval.getEndTime());
 		//secondHalf.printSchedule();
 		secondHalf.setStartingSOC(currentSOC);
-		answerScheduleAfterElectricSourceInterval=null;
+		answerScheduleAfterElectricSourceInterval=null;		
 		
-		/*System.out.println("schedule before rescheduling");
-		agentParkingDrivingSchedule.printSchedule();*/
 		double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 		
 		double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
@@ -631,7 +633,9 @@ public class V2G {
 		}
 		
 		// if costs are equal = also reschedule, because its good for the system
-		if(costKeeping>=costReschedule){
+		// if EV failure then costKeeping can be Infinity > DOuble.Max=costReschedule
+		// with answerScheduleAfterElectricSourceInterval=null
+		if(costKeeping>=costReschedule && answerScheduleAfterElectricSourceInterval!=null){
 			
 			//UPDATE CHARGING COSTS 
 			addRevenueToAgentFromV2G(costKeeping-costReschedule, agentId);
@@ -816,17 +820,24 @@ public class V2G {
 		 */
 		thisParking.setRequiredChargingDuration( thisParking.getRequiredChargingDuration()+newChargingLength);
 		
-		
 		//first remaining part
 		rescheduledFirstHalf= rescheduledFirstHalf.cutScheduleAtTime(electricSourceInterval.getStartTime(), agentId);
 		
-		rescheduledFirstHalf.mergeSchedules(rescheduledElectricLoadPart);
-		rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
-				
-		mySmartCharger.getAllAgentParkingAndDrivingSchedules().put(agentId, rescheduledFirstHalf);
-		if(DecentralizedSmartCharger.debug){		
-			System.out.println("parking driving schedule of agent After"+ agentId.toString());
-			mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId).printSchedule();
+		try{
+			rescheduledFirstHalf.mergeSchedules(rescheduledElectricLoadPart);
+			rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
+					
+			mySmartCharger.getAllAgentParkingAndDrivingSchedules().put(agentId, rescheduledFirstHalf);
+			if(DecentralizedSmartCharger.debug){		
+				System.out.println("parking driving schedule of agent After"+ agentId.toString());
+				mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId).printSchedule();
+			}
+		}
+		catch(Exception e){
+			System.out.println("Exception merging schedules" + agentId.toString());
+			rescheduledFirstHalf.printSchedule();
+			e.printStackTrace();
+			
 		}
 	}
 	
