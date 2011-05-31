@@ -295,7 +295,7 @@ public class HubLoadDistributionReader {
 	
 	
 	public boolean isHubSourceAtHub(int hub){
-		if (locationSourceMapping==null){
+		if (locationSourceMapping==null || locationSourceMapping.size()==0){
 			return false;
 		}
 		for(Id linkId: locationSourceMapping.keySet()){
@@ -315,7 +315,8 @@ public class HubLoadDistributionReader {
 			 * if no vehicle or hub loads are in the system
 			 * copy the load schedule to stochasticHubLoadAfterVehicleAndHubSources to avoid unnecessary information loss by fitting
 			 */
-			if (agentVehicleSourceMapping==null && !isHubSourceAtHub(hub)){
+			if ((agentVehicleSourceMapping==null||agentVehicleSourceMapping.size()==0)
+					&& false==isHubSourceAtHub(hub)){
 				stochasticHubLoadAfterVehicleAndHubSources.put(hub, stochasticHubLoadDistribution.get(hub).cloneSchedule());
 								
 				DecentralizedSmartCharger.visualizeTwoXYLoadSeriesBeforeAfter(
@@ -665,7 +666,7 @@ public class HubLoadDistributionReader {
 		 * using the function is not accurate enough
 		 * extrapolation of values works better
 		 */	
-		return connectivityHubDistribution.get(hub).extrapolateValueAtTimeFromDataCollectorEveryMin( time);
+		return connectivityHubDistribution.get(hub).extrapolateValueAtTimeFromDataCollector( time);
 		
 	}
 	

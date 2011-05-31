@@ -89,7 +89,7 @@ public class DetermisticLoadPricingCollector {
 			
 			String file= myHubInfo.get(hub).getDeterministicFreeLoadTxt();
 			LoadFileReader deterministicFreeLoad = new LoadFileReader(file,  
-					96, 
+					95, 
 					"deterministic free load for hub "+ hubId +" from file", 
 					"deterministic free load for hub "+ hubId +" fitted");
 			

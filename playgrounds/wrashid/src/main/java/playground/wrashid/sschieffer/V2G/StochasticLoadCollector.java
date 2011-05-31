@@ -105,7 +105,7 @@ public class StochasticLoadCollector {
 		if(myHubInfo.get(hub).isTxtGeneralStochastic()){
 			String file= myHubInfo.get(hub).geStochasticGeneralLoadTxt();
 			LoadFileReader stochasticFreeLoad = new LoadFileReader(file,  
-					96, 
+					95, 
 					"stochastic free load for hub "+ hubId +" from file", 
 					"stochastic free load for hub "+ hubId +" fitted");
 			
@@ -139,34 +139,38 @@ public class StochasticLoadCollector {
 	
 	
 	private void readHubSources(int hub) throws Exception{
-		int hubId= myHubInfo.get(hub).getId();
 		
-		ArrayList<GeneralSource> stochasticGeneralSources= myHubInfo.get(hub).getStochasticGeneralSources();
-		if (stochasticGeneralSources!= null){
-			for(int i=0; i<stochasticGeneralSources.size(); i++){
-				
-				String file= stochasticGeneralSources.get(i).getInputLoad96Bins();
-				
-				Id linkId= stochasticGeneralSources.get(i).getlinkId();
-				hubId = mySimulation.mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
-				String name= stochasticGeneralSources.get(i).getName();
-				
-				LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
-						96, 
-						"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
-						"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
-				
-				stochasticGeneralSources.get(i).setLoadSchedule
-					(LoadFileReader.makeSchedule(stochasticHubSourceLoad.getFittedFunction()));
-				
-				stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
-				
-				LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+".png",
-						"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
-						stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
-				
+		if(myHubInfo.get(hub).hasGeneralHubSourcesStochasticLoad()){
+			int hubId= myHubInfo.get(hub).getId();
+			
+			ArrayList<GeneralSource> stochasticGeneralSources= myHubInfo.get(hub).getStochasticGeneralSources();
+			if (stochasticGeneralSources!= null){
+				for(int i=0; i<stochasticGeneralSources.size(); i++){
+					
+					String file= stochasticGeneralSources.get(i).getInputLoad96Bins();
+					
+					Id linkId= stochasticGeneralSources.get(i).getlinkId();
+					hubId = mySimulation.mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
+					String name= stochasticGeneralSources.get(i).getName();
+					
+					LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
+							95, 
+							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
+							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
+					
+					stochasticGeneralSources.get(i).setLoadSchedule
+						(LoadFileReader.makeSchedule(stochasticHubSourceLoad.getFittedFunction()));
+					
+					stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
+					
+					LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+".png",
+							"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
+							stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
+					
+				}
 			}
 		}
+		
 	}
 	
 	
@@ -181,36 +185,39 @@ public class StochasticLoadCollector {
 	 */
 	private  void readAgentVehicles(int hub) throws Exception{
 		
-		if (myHubInfo.get(hub).isTxtVehicleStochastic()){
-			HashMap <Id, String> vehicleLoads= myHubInfo.get(hub).geStochasticVehicleLoadTxt();
-			
-			for(Id id: vehicleLoads.keySet()){
-				String file= vehicleLoads.get(id);
-				LoadFileReader stochasticVehicleLoad = new LoadFileReader(file,  
-						96, 
-						"stochastic vehicle load "+ id.toString() +" from file", 
-						"sstochastic vehicle load "+ id.toString() +" fitted");
+		if(myHubInfo.get(hub).hasVehicleStochasticLoad()){
+			if (myHubInfo.get(hub).isTxtVehicleStochastic()){
+				HashMap <Id, String> vehicleLoads= myHubInfo.get(hub).geStochasticVehicleLoadTxt();
 				
-				agentSource.put(id, 
-						LoadFileReader.makeSchedule(stochasticVehicleLoad.getFittedFunction()));
-				
-				LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png","stochastic vehicle load "+ id.toString(), "Load [W]", 
-						stochasticVehicleLoad.getLoadFigureData(), stochasticVehicleLoad.getFittedLoadFigureData());
-				
-			}
-		}else{
-			HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoads= myHubInfo.get(hub).getStochasticVehicleSourcesIntervals();
-			for(Id id: vehicleLoads.keySet()){
-				ArrayList<LoadDistributionInterval> list= vehicleLoads.get(id);
-				
-				agentSource.put(id, 
-						makeScheduleFromArrayListLoadIntervals(list));
-				
-				agentSource.get(id).visualizeLoadDistribution("stochastic vehicle load "+ id.toString() +" from input schedule",
-						mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png");
-				
+				for(Id id: vehicleLoads.keySet()){
+					String file= vehicleLoads.get(id);
+					LoadFileReader stochasticVehicleLoad = new LoadFileReader(file,  
+							95, 
+							"stochastic vehicle load "+ id.toString() +" from file", 
+							"sstochastic vehicle load "+ id.toString() +" fitted");
+					
+					agentSource.put(id, 
+							LoadFileReader.makeSchedule(stochasticVehicleLoad.getFittedFunction()));
+					
+					LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png","stochastic vehicle load "+ id.toString(), "Load [W]", 
+							stochasticVehicleLoad.getLoadFigureData(), stochasticVehicleLoad.getFittedLoadFigureData());
+					
+				}
+			}else{
+				HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoads= myHubInfo.get(hub).getStochasticVehicleSourcesIntervals();
+				for(Id id: vehicleLoads.keySet()){
+					ArrayList<LoadDistributionInterval> list= vehicleLoads.get(id);
+					
+					agentSource.put(id, 
+							makeScheduleFromArrayListLoadIntervals(list));
+					
+					agentSource.get(id).visualizeLoadDistribution("stochastic vehicle load "+ id.toString() +" from input schedule",
+							mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png");
+					
+				}
 			}
 		}
+		
 		
 	}
 	

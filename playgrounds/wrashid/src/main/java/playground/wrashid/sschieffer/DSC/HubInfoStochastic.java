@@ -141,6 +141,19 @@ public class HubInfoStochastic {
 	}
 	
 	
+	
+	public boolean hasVehicleStochasticLoad(){
+		if(stochasticVehicleLoadTxt!=null && stochasticVehicleLoadIntervals!=null){
+			return true;
+		}else{return false;}
+	}
+	
+	public boolean hasGeneralHubSourcesStochasticLoad(){
+		if(stochasticGeneralSources!=null){
+			return true;
+		}else{return false;}
+	}
+	
 	public boolean isTxtGeneralStochastic(){
 		if (stochasticGeneralLoadTxt!=null){
 			return true;

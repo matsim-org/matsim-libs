@@ -104,7 +104,6 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 			
 			myDecentralizedSmartCharger.run();
 			
-			DecentralizedChargingSimulation.slc.setTestCase(true);
 			DecentralizedChargingSimulation.slc.setUp();
 			
 			

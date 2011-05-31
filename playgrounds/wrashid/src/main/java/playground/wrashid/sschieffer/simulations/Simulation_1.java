@@ -54,6 +54,7 @@ public class Simulation_1{
 		
 		final double electrification= 1.0; 
 		final double ev=0.75; 
+		//final String outputPath="/cluster/home/baug/stellas/Runs/Simulation1/Results";
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
 		String configPath="test/scenarios/berlin/config.xml";// 100 agents
 		
@@ -63,6 +64,7 @@ public class Simulation_1{
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
@@ -90,7 +92,6 @@ public class Simulation_1{
 				);
 		
 		
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad10.txt";
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
 		myStochasticHubInfo.add(new HubInfoStochastic(1, stochasticGeneral));
 						

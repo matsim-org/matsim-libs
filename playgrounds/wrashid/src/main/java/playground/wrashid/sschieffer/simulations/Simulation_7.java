@@ -63,7 +63,8 @@ public class Simulation_7{
 		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation7\\";
+		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation7/Results";
+		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation7\\";
 		String configPath="test/input/playground/wrashid/test/scenarios/berlin/config.xml";// 100 agents
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
@@ -73,6 +74,7 @@ public class Simulation_7{
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
+		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
@@ -91,7 +93,6 @@ public class Simulation_7{
 				);
 		
 		
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticGeneralHubLoad10.txt";
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
 		myStochasticHubInfo.add(new HubInfoStochastic(1, stochasticGeneral));
 						

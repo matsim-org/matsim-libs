@@ -162,22 +162,42 @@ public class TimeDataCollector {
 		double [][] refit;
 		
 		Schedule newS= new Schedule();
+		
 		for(int i=0; i<timeSchedule.getNumberOfEntries(); i++){
+			
+			PolynomialFunction fittedFunc;
 			double startTime= timeSchedule.timesInSchedule.get(i).getStartTime();
 			double endTime= timeSchedule.timesInSchedule.get(i).getEndTime();
 			
-			int minAbove= (int)Math.ceil(startTime/(secBin));
-			int maxBelow= (int)Math.floor(endTime/(secBin));
-			
-			refit= new double[maxBelow-minAbove+1][2];
-			for(int entry=minAbove; entry<=maxBelow; entry++){
-				if(entry==data.length){
-					break;
+			if(endTime-startTime>=3*secBin){
+				int minAbove= (int)Math.ceil(startTime/(secBin));
+				int maxBelow= (int)Math.floor(endTime/(secBin));
+				
+				refit= new double[maxBelow-minAbove+1][2];
+				for(int entry=minAbove; entry<=maxBelow; entry++){
+					if(entry==data.length){
+						break;
+					}
+					refit[entry-minAbove][0]= getXAtEntry(entry);
+					refit[entry-minAbove][1]= getYAtEntry(entry);
 				}
-				refit[entry-minAbove][0]= getXAtEntry(entry);
-				refit[entry-minAbove][1]= getYAtEntry(entry);
+				fittedFunc= fitCurve(refit);
+			}else{
+				int numBins=4;
+				double alternativeBin= (endTime-startTime)/numBins;
+				
+				refit= new double[numBins+1][2];
+				int count=0; 
+				for(double time=startTime;time<=endTime; ){
+					
+					refit[count][0]= time;
+					refit[count][1]= extrapolateValueAtTimeFromDataCollector(time);
+					count++;
+					time+=alternativeBin;
+				}
+				fittedFunc= fitCurve(refit);
 			}
-			PolynomialFunction fittedFunc= fitCurve(refit);
+			
 			newS.addTimeInterval(new LoadDistributionInterval(startTime, endTime, fittedFunc, true));			
 		}
 		return newS;
@@ -205,13 +225,16 @@ public class TimeDataCollector {
 	 * @param time
 	 * @return
 	 */
-	public double extrapolateValueAtTimeFromDataCollectorEveryMin(double time){
+	public double extrapolateValueAtTimeFromDataCollector(double time){
 		// assuming 1 minute bins ie. one data point for one minute
-		int minAbove= (int)Math.ceil(time/60.0);
-		int minBelow= (int)Math.floor(time/60.0);
+		int minAbove= (int)Math.ceil(time/secBin);
+		int minBelow= (int)Math.floor(time/secBin);
+		if(minAbove==data.length){
+			minAbove=data.length-1;
+		}
 		
 		// extrapolate with linear function - f = a + b * x
-		double gradient=(getYAtEntry(minAbove)-getYAtEntry(minBelow))/60.0; // rise/run
+		double gradient=(getYAtEntry(minAbove)-getYAtEntry(minBelow))/secBin; // rise/run
 		return getYAtEntry(minBelow)+ gradient* (time-getXAtEntry(minBelow));
 		
 	}
@@ -235,6 +258,9 @@ public class TimeDataCollector {
 	public void increaseYEntryOf96EntryBinCollectorBetweenSecStartEnd(double start, double end, double increase){
 		double first= Math.ceil(start/(secBin));
 		double last= Math.floor(end/(secBin));
+		if(last==data.length){
+			last=data.length-1;
+		}
 		int firstEntry= (int) (first);
 		for( int i=0; i< (int)(last-first); i++){
 			increaseYEntryAtEntryByDouble(firstEntry+i, increase);
@@ -246,6 +272,7 @@ public class TimeDataCollector {
 			double start, double end, PolynomialFunction func){
 		double first= Math.ceil(start/(secBin));
 		double last= Math.floor(end/(secBin));
+		
 		int firstEntry= (int) (first);
 		for( int i=0; i< (int)(last-first); i++){
 			double increase= func.value(firstEntry+i*(secBin));
