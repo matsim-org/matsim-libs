@@ -83,7 +83,7 @@ public class BkVis {
 //		String otffile = "../../detailedEval/teststrecke/sim/input/liveConfig_benjamin.xml";
 //		String otffile = "../../detailedEval/testRuns/input/config.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
-		String otffile = BkPaths.RUNSSVN + "run970/ITERS/it.1000/970.1000.events.mvi";
+		String otffile = BkPaths.RUNSSVN + "run980/ITERS/it.1000/980.1000.otfvis.mvi";
 		
 		OTFVis.main(new String[] {otffile});
 		}
