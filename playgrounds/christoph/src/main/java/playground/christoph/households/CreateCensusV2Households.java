@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -79,9 +80,9 @@ public class CreateCensusV2Households {
 	private ObjectAttributes householdAttributes;
 	
 	public static void main(String[] args) throws Exception {	
-		if (args.length != 6) return;
+		if (args.length != 7) return;
 		
-		new CreateCensusV2Households(args[0], args[1], args[2], args[3], args[4], args[5]);
+		new CreateCensusV2Households(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
 	}
 	
 	/**
@@ -99,12 +100,14 @@ public class CreateCensusV2Households {
 	 * @param populationFile ... the input population file
 	 * @param facilitiesFile ... the input facilities file
 	 * @param networkFile ... the input network file
-	 * @param householdsFile ... the output households file
-	 * @param objectAttributesFile ... the output household object attributes file
 	 * @param censusFile ... the input Swiss census file
+	 * @param outHouseholdsFile ... the output households file
+	 * @param outObjectAttributesFile ... the output household object attributes file
+	 * @param outPopulationFile ... the output population file
 	 * @throws Exception ... if an error occurred when writing the object attributes file
 	 */
-	public CreateCensusV2Households(String populationFile, String facilitiesFile, String networkFile, String householdsFile, String objectAttributesFile, String censusFile) throws Exception {
+	public CreateCensusV2Households(String populationFile, String facilitiesFile, String networkFile, String censusFile, 
+			String outHouseholdsFile, String outObjectAttributesFile, String outPopulationFile) throws Exception {
 		
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseKnowledge(true);
@@ -123,9 +126,11 @@ public class CreateCensusV2Households {
 		
 		reassignCollectiveHouseholds();
 		
-		writeHouseHolds(householdsFile);
+		writeHouseHolds(outHouseholdsFile);
 		
-		writeHouseHoldObjectAttributes(objectAttributesFile);
+		writeHouseHoldObjectAttributes(outObjectAttributesFile);
+		
+		writePopulation(outPopulationFile);
 		
 		printStatistics();
 	}
@@ -352,6 +357,9 @@ public class CreateCensusV2Households {
 		new ObjectAttributesXmlWriter(householdAttributes).writeFile(objectAttributesFile);
 	}
 	
+	private void writePopulation(String populationFile) {
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(populationFile);
+	}
 	
 	private void printStatistics() {
 		int s1 = 0;
