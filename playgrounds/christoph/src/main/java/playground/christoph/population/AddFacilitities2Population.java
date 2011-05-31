@@ -18,10 +18,10 @@ public class AddFacilitities2Population {
 
 	private static final Logger log = Logger.getLogger(AddFacilitities2Population.class);
 	
-	private String populationFile = "../../matsim/mysimulations/crossboarder/plansCB_updated.xml.gz";
+	private String populationFile = "../../matsim/mysimulations/crossboarder/plansCBV2.xml.gz";
 	private String networkFile = "../../matsim/mysimulations/crossboarder/network.xml.gz";
 	private String facilitiesFile = "../../matsim/mysimulations/crossboarder/facilities.xml.gz";
-	private String outFile = "../../matsim/mysimulations/crossboarder/plansCB_updated_with_facilities.xml.gz";
+	private String outFile = "../../matsim/mysimulations/crossboarder/plansCBV2_with_facilities.xml.gz";
 		
 	public static void main(String[] args) {
 		try {

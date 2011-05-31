@@ -45,6 +45,11 @@ public class PersonSetKnowledges extends AbstractPersonAlgorithm implements Plan
 
 	private static final Logger log = Logger.getLogger(UpdateCrossboarderPopulation.class);
 	
+	private static final String HOME = "home";
+	private static final String WORK_SECTOR2 = "work_sector2";
+	private static final String WORK_SECTOR3 = "work_sector3";
+	private static final String TTA = "tta";
+	
 	private ActivityFacilities activityFacilities;
 	private Knowledges knowledges;
 	
@@ -84,7 +89,14 @@ public class PersonSetKnowledges extends AbstractPersonAlgorithm implements Plan
 				
 				ActivityOption activityOption = ((ActivityFacility) facility).getActivityOptions().get(activity.getType());
 				
-				knowledge.addActivityOption((ActivityOptionImpl)activityOption, true);
+				// By default an activity is not primary. If it is home, work or tta, we set it to primary.
+				boolean isPrimary = false;
+				if (activity.getType().equals(HOME)) isPrimary = true;
+				else if (activity.getType().equals(WORK_SECTOR2)) isPrimary = true;
+				else if (activity.getType().equals(WORK_SECTOR3)) isPrimary = true;
+				else if (activity.getType().equals(TTA)) isPrimary = true;
+
+				knowledge.addActivityOption((ActivityOptionImpl)activityOption, isPrimary);
 			}
 		}
 		int i = 0;
