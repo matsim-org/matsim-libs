@@ -93,7 +93,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 			}
 		}
 		sumOfTotalDistance += distance/1000;
-		logger.info("Link Enter: " + linkId + " CarrierId=" + event.getPersonId() + " length="+ distance);
+//		logger.info("Link Enter: " + linkId + " CarrierId=" + event.getPersonId() + " length="+ distance);
 		// logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
 		
 	}

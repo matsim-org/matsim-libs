@@ -5,12 +5,9 @@ package playground.mzilske.freight;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -28,6 +25,14 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	
 	private Collection<TSPCostListener> costListeners = new ArrayList<TSPCostListener>();
 	
+	private TSPOfferMaker offerMaker;
+	
+	public void setOfferMaker(TSPOfferMaker offerMaker) {
+		for(TSPAgent a : tspAgents){
+			a.setOfferMaker(offerMaker);
+		}
+	}
+
 	public TSPAgentTracker(Collection<TransportServiceProviderImpl> transportServiceProviders) {
 		this.transportServiceProviders = transportServiceProviders;
 		createTSPAgents();
@@ -97,6 +102,7 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	private void createTSPAgents() {
 		for(TransportServiceProviderImpl tsp : transportServiceProviders){
 			TSPAgent tspAgent = new TSPAgent(tsp);
+//			tspAgent.setOfferMaker(new Carrie);
 			tspAgents.add(tspAgent);
 		}
 	}
@@ -106,6 +112,15 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 			logger.info("reset tspAgent");
 			a.reset();
 		}
+	}
+	
+	public Collection<TSPOffer> requestServices(Collection<TSPShipment> shipments){
+		Collection<TSPOffer> offers = new ArrayList<TSPOffer>();
+		for(TSPAgent tspAgent : tspAgents){
+			TSPOffer offer = tspAgent.requestService(shipments);
+			offers.add(offer);
+		}
+		return offers;
 	}
 	
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.Tour.Delivery;
+import playground.mzilske.freight.Tour.GeneralActivity;
 import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 
@@ -65,6 +66,15 @@ public class TourBuilder {
 		} else {
 			throw new RuntimeException("Cannot happen.");
 		}
+	}
+	
+	public void scheduleGeneralActivity(String type, Id locationLink, Double duration){
+		tourElements.add(createGeneralActivity(type,locationLink,duration));
+	}
+
+	private TourElement createGeneralActivity(String type, Id locationLink,Double duration) {
+		GeneralActivity act = new GeneralActivity(type, locationLink, duration);
+		return act;
 	}
 
 }

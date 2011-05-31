@@ -23,6 +23,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.mzilske.freight.Tour.Delivery;
+import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 
 public class CarrierAgent {
@@ -164,6 +166,9 @@ public class CarrierAgent {
 	public List<Plan> createFreightDriverPlans() {
 		clear();
 		List<Plan> plans = new ArrayList<Plan>();
+		if(carrier.getSelectedPlan() == null){
+			return plans;
+		}
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
@@ -173,7 +178,9 @@ public class CarrierAgent {
 			plan.addLeg(startLeg);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				Activity tourElementActivity = new ActivityImpl(tourElement.getActivityType(), tourElement.getLocation());
-				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
+				((ActivityImpl) tourElementActivity).setMaximumDuration(tourElement.getDuration());
+//				((ActivityImpl) tourElementActivity).setEndTime(3600*24);
+//				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
 				plan.addActivity(tourElementActivity);
 				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
@@ -210,12 +217,12 @@ public class CarrierAgent {
 
 	public void activityStartOccurs(Id personId, String activityType, double time) {
 		carrierDriverAgents.get(personId).activityStartOccurs(activityType, time);
-		logger.info("driver had a start of an activity " + activityType + ", time=" + time);
+//		logger.info("driver had a start of an activity " + activityType + ", time=" + time);
 	}
 
 	public void activityEndOccurs(Id personId, String activityType, double time) {
 		carrierDriverAgents.get(personId).activityEndOccurs(activityType, time);
-		logger.info("driver had an end of an activity " + activityType + ", time=" + time);
+//		logger.info("driver had an end of an activity " + activityType + ", time=" + time);
 	}
 	
 	public void tellDistance(Id personId, double distance) {

@@ -31,5 +31,9 @@ public class Offer {
 	public void setPrice(double d) {
 		this.price = d;
 	}
+	
+	public String toString(){
+		return "[carrierId="+carrierId+"][price="+price+"][duration="+duration+"]";
+	}
 
 }

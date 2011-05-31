@@ -32,6 +32,8 @@ public class TSPAgent {
 	private Collection<TransportChainAgent> transportChainAgents = new ArrayList<TransportChainAgent>();
 
 	private Map<Shipment,TransportChainAgent> shipmentChainMap = new HashMap<Shipment, TransportChainAgent>();
+	
+	private TSPOfferMaker offerMaker;
 
 	public TSPAgent(TransportServiceProviderImpl tsp){
 		this.tsp = tsp;
@@ -56,6 +58,10 @@ public class TSPAgent {
 		return shipments;
 	}
 	
+	public void setOfferMaker(TSPOfferMaker offerMaker) {
+		this.offerMaker = offerMaker;
+	}
+
 	private void clear() {
 		transportChainAgents.clear();
 		shipmentChainMap.clear();
@@ -102,7 +108,6 @@ public class TSPAgent {
 	
 	private double calculateOtherCosts() {
 		double cost = 0.0;
-		
 		return 0;
 	}
 
@@ -116,6 +121,10 @@ public class TSPAgent {
 			cost += tca.getFees() + tca.getNumberOfStopps()*CostParameter.transshipmentCost;
 		}
 		return cost;
+	}
+
+	public TSPOffer requestService(Collection<TSPShipment> shipments) {
+		return offerMaker.makeOffer(tsp,shipments);
 	}
 	
 }

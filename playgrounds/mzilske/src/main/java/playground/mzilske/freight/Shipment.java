@@ -68,7 +68,7 @@ public class Shipment {
 
 	@Override
 	public String toString() {
-		return from.toString() + " -> " + to.toString() + ": " + size;
+		return "[from="+from.toString()+"][to="+ to.toString() + "][size=" + size +"]";
 	}
 	
 }

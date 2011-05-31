@@ -49,7 +49,7 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getSize();
+			return shipment.getSize()*60;
 		}
 
 		@Override
@@ -83,7 +83,7 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getSize();
+			return shipment.getSize()*60;
 		}
 
 		@Override
@@ -92,6 +92,53 @@ public class Tour {
 		}
 		
 	};
+	
+	public static class GeneralActivity extends TourElement {
+
+		private String type;
+		
+		private Id location;
+		
+		private Double duration;
+		
+		public GeneralActivity(String type, Id location, Double duration) {
+			super();
+			this.type = type;
+			this.location = location;
+			if(duration != null){
+				this.duration = duration;
+			}
+			else{
+				this.duration = 0.0;
+			}
+		}
+
+		@Override
+		public String getActivityType() {
+			return type;
+		}
+
+		@Override
+		public Id getLocation() {
+			return location;
+		}
+
+		@Override
+		public double getDuration() {
+			return this.duration;
+		}
+
+		@Override
+		public Shipment getShipment() {
+			return null;
+		}
+
+		@Override
+		public TimeWindow getTimeWindow() {
+			return new TimeWindow(0.0, 3600*24);
+		}
+		
+	}
 
 	private List<TourElement> tourElements;
 	private Id startLinkId;
