@@ -22,6 +22,7 @@ package playground.droeder.data.matching;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
@@ -38,6 +39,8 @@ public class MatchingEdge {
 		this.id = id;
 		this.toNode = to;
 		this.fromNode = from;
+		this.segments = new ArrayList<MatchingSegment>();
+		this.segments.add(new MatchingSegment(from.getCoord(), to.getCoord(), new IdImpl("base")));
 	}
 
 	/**

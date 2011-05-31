@@ -44,20 +44,15 @@ public class MatchingGraph implements Cloneable{
 
 	private QuadTree<MatchingNode> quadtree;
 
-	private Class<MatchingNode> expectedNodes;
 
-	public MatchingGraph(Class<MatchingNode> clazz){
+	public MatchingGraph(){
 		this.nodes = new HashMap<Id, MatchingNode>();
 		this.edges = new HashMap<Id, MatchingEdge>();
-		this.expectedNodes  = clazz; 
 	}
 
 	public boolean addNode(MatchingNode n){
 		if(this.nodes.containsKey(n.getId())){
 			log.error("graph already contains a node with id: " + n.getId());
-			return false;
-		}else if(!(n.getClass().equals(this.expectedNodes))){
-			log.error("wrong node-type!");
 			return false;
 		}
 		this.nodes.put(n.getId(), n);
@@ -69,6 +64,8 @@ public class MatchingGraph implements Cloneable{
 			log.error("graph already contains an edge with id: " + e.getId());
 			return false;
 		}
+		this.nodes.get(e.getFromNode().getId()).addIncidentEdge(e);
+		this.nodes.get(e.getToNode().getId()).addIncidentEdge(e);
 		this.edges.put(e.getId(), e);
 		return true;
 	}

@@ -23,10 +23,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.droeder.DaPaths;
+import playground.droeder.data.matching.MatchingEdge;
 import playground.droeder.data.matching.MatchingGraph;
 import playground.droeder.data.matching.MatchingNode;
 import playground.droeder.data.matching.algorithms.NodeAngleAlgo;
@@ -41,6 +53,66 @@ public class MatchingRunner {
 	
 	private MatchingGraph reference;
 	private MatchingGraph matching;
+	
+	public static void main(String[] args){
+		final String PATH = DaPaths.OUTPUT + "bvg09/";
+		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
+		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
+		
+		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		visumSc.getConfig().scenario().setUseTransit(true);
+		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
+		reader.readFile(VISUMTRANSITFILE);
+		MatchingGraph v = new MatchingGraph();
+		
+		for(TransitStopFacility stop : visumSc.getTransitSchedule().getFacilities().values()){
+			v.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
+		}
+		
+		TransitStopFacility fac = null;
+		int i = 0;
+		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
+			for(TransitRoute route: line.getRoutes().values()){
+				for(TransitRouteStop stop : route.getStops()){
+					if(!(fac == null)){
+						v.addEdge(new MatchingEdge(new IdImpl(i), v.getNodes().get(fac.getId()), v.getNodes().get(stop.getStopFacility().getId())));
+					}
+					fac = stop.getStopFacility();
+					i++;
+				}
+			}
+		}
+		
+		ScenarioImpl hafasSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		hafasSc.getConfig().scenario().setUseTransit(true);
+		TransitScheduleReader reader2 = new TransitScheduleReader(hafasSc);
+		reader2.readFile(HAFASTRANSITFILE);
+		MatchingGraph h = new MatchingGraph();
+		
+		for(TransitStopFacility stop : hafasSc.getTransitSchedule().getFacilities().values()){
+			h.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
+		}
+		
+		fac = null;
+		i = 0;
+		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
+			for(TransitRoute route: line.getRoutes().values()){
+				for(TransitRouteStop stop : route.getStops()){
+					if(!(fac == null)){
+						h.addEdge(new MatchingEdge(new IdImpl(i), h.getNodes().get(fac.getId()), h.getNodes().get(stop.getStopFacility().getId())));
+					}
+					fac = stop.getStopFacility();
+					i++;
+				}
+			}
+		}
+		
+		MatchingRunner r = new MatchingRunner(v, h);
+		r.topDownMatching(300.0, 1.0);
+//		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
+//			System.out.println(e.getKey() + " " + e.getValue());
+//		}
+	}
 	
 	public MatchingRunner(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
@@ -62,7 +134,7 @@ public class MatchingRunner {
 	private List<Id> unmatchedRefNodes;
 
 	private void nodeMatching(Double deltaDist, Double deltaPhi) {
-		log.info("start Matching Nodes...");
+		log.info("start matching Nodes...");
 		this.nodeReference2match = new HashMap<Id, Id>();
 		this.unmatchedRefNodes = new ArrayList<Id>();
 		
@@ -77,11 +149,10 @@ public class MatchingRunner {
 			}else{
 				this.unmatchedRefNodes.add(refNode.getId());
 			}
-			
 		}
 		
 		log.info("matching nodes finished. " + this.nodeReference2match.size() + " of " 
-				+ (this.nodeReference2match.size() + this.unmatchedRefNodes.size()) + " are matched...");
+				+ reference.getNodes().size() + " nodes are matched...");
 	}
 	
 
@@ -96,6 +167,10 @@ public class MatchingRunner {
 //		// TODO Auto-generated method stub
 //		
 //	}
+	
+	public Map<Id, Id> getNodeRef2Match(){
+		return this.nodeReference2match;
+	}
 
 }
 
