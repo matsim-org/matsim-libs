@@ -144,5 +144,54 @@
     		</exclusion>
     	</exclusions>
   	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>mrieser</artifactId>
+  		<version>0.4.0-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  		<exclusions>
+			<exclusion>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt2-main</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt2-shapefile</artifactId>
+			</exclusion>
+			<exclusion>
+	    		<groupId>org.geotools</groupId>
+    			<artifactId>gt2-epsg-hsql</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>org.geotools</groupId>
+				<artifactId>gt2-referencing</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>com.vividsolutions</groupId>
+				<artifactId>jts</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>org.opengis</groupId>
+				<artifactId>geoapi-nogenerics</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>org.geotools</groupId>
+				<artifactId>gt2-api</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>kml</groupId>
+				<artifactId>kml</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>javax.xml.bind.jaxb</groupId>
+				<artifactId>jsr173</artifactId>
+    		</exclusion>
+    		<exclusion>
+	    		<groupId>hsqldb</groupId>
+				<artifactId>hsqldb</artifactId>
+    		</exclusion>
+    	</exclusions>
+  	</dependency>
   </dependencies>
 </project>
