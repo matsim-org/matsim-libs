@@ -354,7 +354,7 @@ public class CreateCensusV2Households {
 		log.info("done.");
 	}
 	
-	private void writeHouseHoldObjectAttributes(String objectAttributesFile) throws Exception {
+	private void writeHouseHoldObjectAttributes(String objectAttributesFile) {
 		// add an entry for the municipality where the household is located
 		log.info("Adding municipality information to household object attributes...");
 		for (Entry<Id, List<Id>> entry : municipalityHouseholdMap.entrySet()) {
