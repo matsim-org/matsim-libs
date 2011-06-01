@@ -42,8 +42,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -51,6 +51,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -79,7 +80,7 @@ public class CreateCensusV2Households {
 	
 	private ObjectAttributes householdAttributes;
 	
-	public static void main(String[] args) throws Exception {	
+	public static void main(String[] args) throws Exception {
 		if (args.length != 7) return;
 		
 		new CreateCensusV2Households(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
@@ -96,6 +97,7 @@ public class CreateCensusV2Households {
 	 * Additionally, the persons home activities as well as his/her knowledge are adapted.
 	 * 
 	 * For each household it is checked, whether all members have the same home facility.
+	 * The scores of all plans are removed.
 	 * 
 	 * @param populationFile ... the input population file
 	 * @param facilitiesFile ... the input facilities file
@@ -117,7 +119,7 @@ public class CreateCensusV2Households {
 		config.facilities().setInputFile(facilitiesFile);
 		config.network().setInputFile(networkFile);
 		scenario = ScenarioUtils.loadScenario(config);
-
+		
 		householdAttributes = new ObjectAttributes();
 		
 		readCensusFile(censusFile);
@@ -256,7 +258,7 @@ public class CreateCensusV2Households {
 	    	}
 	    	list.add(householdId);
 	    	
-	    	// Add the household to the list of households located in the muncipality
+	    	// Add the household to the list of households located in the municipality
 	    	Id muncipalityId = scenario.createId(String.valueOf(censusData.ZGDE));
 	    	list = municipalityHouseholdMap.get(muncipalityId);
 	    	if (list == null) {
@@ -347,18 +349,43 @@ public class CreateCensusV2Households {
 	}
 	
 	private void writeHouseHolds(String householdsFile) {
+		log.info("Writing households...");
 		new HouseholdsWriterV10(((ScenarioImpl) scenario).getHouseholds()).writeFile(householdsFile);
+		log.info("done.");
 	}
 	
 	private void writeHouseHoldObjectAttributes(String objectAttributesFile) throws Exception {
+		// add an entry for the municipality where the household is located
+		log.info("Adding municipality information to household object attributes...");
+		for (Entry<Id, List<Id>> entry : municipalityHouseholdMap.entrySet()) {
+			List<Id> householdIds = entry.getValue();
+			for (Id id : householdIds) {
+				householdAttributes.putAttribute(id.toString(), "municipality", Integer.valueOf(entry.getKey().toString()));
+			}
+		}
+		log.info("done.");
+
+		// and an entry for the HHTP code of the household
+		log.info("Adding HTTP codes to households...");
 		for (Entry<Id, Integer> entry : householdHHTPMap.entrySet()) {
 			householdAttributes.putAttribute(entry.getKey().toString(), "HHTP", entry.getValue());
 		}
+		log.info("done.");
+		
+		log.info("Writing household object attributes...");
 		new ObjectAttributesXmlWriter(householdAttributes).writeFile(objectAttributesFile);
+		log.info("done.");
 	}
 	
 	private void writePopulation(String populationFile) {
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(populationFile);
+		// remove scores from all plans
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				plan.setScore(null);				
+			}
+		}
+		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), ((ScenarioImpl) scenario).getKnowledges()).write(populationFile);
 	}
 	
 	private void printStatistics() {
@@ -456,20 +483,24 @@ public class CreateCensusV2Households {
 	 * Assign persons from collective households to "real household".
 	 */
 	private void reassignCollectiveHouseholds() {
-
 		log.info("Re-assigning collective households...");
 		
 		Counter reassignmentCounter = new Counter("Re-assigned collective households ");
 		Counter notReassignableInBuilding = new Counter("Not Re-assignable in building ");
 		Counter notReassignableInMunicipality = new Counter("Not Re-assignable in municipality ");
+		
+		Counter removedHouseholds = new Counter("Removed households ");
+	
 		Random random = MatsimRandom.getLocalInstance();
 		
 		int reassigned9802 = 0;
 		int reassigned9803 = 0;
 		int reassigned9804 = 0;
 		
-		Households houseHolds = ((ScenarioImpl) scenario).getHouseholds();
-		for (Household household : houseHolds.getHouseholds().values()) {
+		Households households = ((ScenarioImpl) scenario).getHouseholds();
+		Iterator<Household> householdIter = households.getHouseholds().values().iterator();
+		while (householdIter.hasNext()) {
+			Household household = householdIter.next();
 			
 			// get HHTP Code
 			int HHTP = householdHHTPMap.get(household.getId());
@@ -479,10 +510,10 @@ public class CreateCensusV2Households {
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 					
-					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
-					if(!reassigned) {
-						notReassignableInMunicipality.incCounter();
-					}
+//					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
+					boolean reassigned = reassignInMunicipality(personId, households, random);
+					if (!reassigned) notReassignableInMunicipality.incCounter();
+					if (!reassigned) log.info("Not reassignable HHPT 9802: " + personId.toString());
 					
 					if (reassigned) {
 						/*
@@ -498,10 +529,10 @@ public class CreateCensusV2Households {
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 					
-					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
-					if(!reassigned) {
-						notReassignableInMunicipality.incCounter();
-					}
+//					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
+					boolean reassigned = reassignInMunicipality(personId, households, random);
+					if (!reassigned) notReassignableInMunicipality.incCounter();
+					if (!reassigned) log.info("Not reassignable HHPT 9803: " + personId.toString());
 					
 					if (reassigned) {
 						/*
@@ -516,11 +547,12 @@ public class CreateCensusV2Households {
 				while (iter.hasNext()) {
 					Id personId = iter.next();
 					
-					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
+					boolean reassigned = reassignInBuilding(personId, households, random);
 					if(!reassigned) {
 						notReassignableInBuilding.incCounter();
-						reassigned = reassignInMunicipality(personId, houseHolds, random);
+						reassigned = reassignInMunicipality(personId, households, random);
 						if (!reassigned) notReassignableInMunicipality.incCounter();
+						if (!reassigned) log.info("Not reassignable HHPT 9804: " + personId.toString());
 					}
 					
 					if (reassigned) {
@@ -536,7 +568,13 @@ public class CreateCensusV2Households {
 				continue;
 			}
 			reassignmentCounter.incCounter();
+			
+			if (household.getMemberIds().size() == 0) {
+				householdIter.remove();
+				removedHouseholds.incCounter();
+			}
 		}
+		removedHouseholds.printCounter();
 		reassignmentCounter.printCounter();
 		
 		log.info("Reassigned persons from households with HHTP Code 9082: " + reassigned9802);
@@ -562,11 +600,11 @@ public class CreateCensusV2Households {
 			 */
 			if (!houseHolds.getHouseholds().containsKey(id)) continue;
 			
-			int HHTP2 = householdHHTPMap.get(id);
-			if (HHTP2 > 2000 && HHTP2 < 9000) useableHouseholds.add(id);
+			int HHTP = householdHHTPMap.get(id);
+			if (HHTP > 2000 && HHTP < 9000) useableHouseholds.add(id);
 		}
 		if (useableHouseholds.size() == 0) {
-//			log.warn("Could not reassign person within municipality!");
+			log.warn("Could not reassign person within municipality - no valid households found! Municipality Id: " + municipalityId);
 			return false;
 		}
 		

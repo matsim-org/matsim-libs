@@ -26,9 +26,9 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -36,6 +36,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.knowledges.Knowledges;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -106,6 +107,7 @@ public class CreateCensusSample {
 		log.info("Expected output population size: " + Math.round(scenario.getPopulation().getPersons().size() * fraction));
 		
 		Households households = ((ScenarioImpl) scenario).getHouseholds();
+		Knowledges knowledges = ((ScenarioImpl) scenario).getKnowledges();
 		
 		Counter removedHouseholds = new Counter("Removed households ");
 		Counter removedPersons = new Counter("Removed persons ");
@@ -172,7 +174,7 @@ public class CreateCensusSample {
 		log.info("Sample size: " + scenario.getPopulation().getPersons().size() * 100.0 / inputPopulation + "%");
 		
 		log.info("Writing population...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(outPopulationFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), knowledges).write(outPopulationFile);
 		log.info("done.");
 		
 		log.info("Writing households...");
