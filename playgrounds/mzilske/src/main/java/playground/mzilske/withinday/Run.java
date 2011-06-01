@@ -61,7 +61,7 @@ public class Run {
 
 			@Override
 			public PersonAgent createPersonAgent(Person p) {
-				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), queueSimulation, events);
+				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), queueSimulation);
 				queueSimulation.addQueueSimulationListeners(adapterAgent);
 				return adapterAgent;
 			}

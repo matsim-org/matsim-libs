@@ -56,6 +56,13 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	
 	DrivingWorld drivingWorld = new DrivingWorld() {
 
+	    @Override
+	    public double getTime()
+	    {
+	        return now;
+	    }
+	    
+	    
 		@Override
 		public void park() {
 			
@@ -127,6 +134,7 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		public void done() {
 			System.out.println("I'm done. I am at: " + currentLinkId);
 			simulation.getAgentCounter().decLiving();
+			AdapterAgent.this.living = false;
 		}
 
 		@Override
@@ -189,17 +197,31 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 
 	private Plan selectedPlan;
 
-	public AdapterAgent(Plan selectedPlan, Mobsim simulation, EventsManager eventsManager) {
+	public AdapterAgent(Plan selectedPlan, Mobsim simulation) {
+	    this(selectedPlan, simulation, new MzPlanAgentImpl(selectedPlan));
+    }
+	
+	public AdapterAgent(Plan selectedPlan, Mobsim simulation, RealAgent realAgent) {
 		id = selectedPlan.getPerson().getId();
 		this.selectedPlan = selectedPlan;
-		realAgent = new MzPlanAgentImpl(selectedPlan);
+
+		//realAgent = new MzPlanAgentImpl(selectedPlan);
+		this.realAgent = realAgent;
+		
 		currentLinkId = ((Activity) selectedPlan.getPlanElements().get(0)).getLinkId();
 		this.simulation = simulation;
-		this.eventsManager = eventsManager;
+		this.eventsManager = simulation.getEventsManager();
 	}
+	
+	
+	private boolean living = true;
 
 	@Override
 	public void notifySimulationBeforeSimStep(@SuppressWarnings("rawtypes") SimulationBeforeSimStepEvent e) {
+	    if (!living) {
+	        return;//or maybe should be unregistered from listeners in World.done() method
+	    }
+	    
 		now = e.getSimulationTime();
 		if (teleportationBehavior != null) {
 			teleportationBehavior.doSimStep(teleportationWorld);
@@ -305,12 +327,25 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// but sometimes they also want to know the car Route I am taking. This is strange because I am asked at every time
 		// step what link I want to go to. Then I realized that I am only asked this so the Simulation knows if maybe I already
 		// am where I want to go.
-		return (Leg) getCurrentPlanElement();
+	    
+        PlanElement currentPlanElement = this.getCurrentPlanElement();
+
+        if (!(currentPlanElement instanceof Leg)) {
+            return null;
+        }
+        
+        return (Leg) currentPlanElement;
 	}
 
 	@Override
 	public Activity getCurrentActivity() {
-		return (Activity) getCurrentPlanElement();
+	    PlanElement currentPlanElement = this.getCurrentPlanElement();
+	    
+	    if (!(currentPlanElement instanceof Activity)) {
+            return null;
+        }
+	    
+        return (Activity) currentPlanElement;
 	}
 
 	@Override
