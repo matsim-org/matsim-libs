@@ -78,6 +78,7 @@
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/michalm-vrp.jar</systemPath>
+		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>mzilske</artifactId>
