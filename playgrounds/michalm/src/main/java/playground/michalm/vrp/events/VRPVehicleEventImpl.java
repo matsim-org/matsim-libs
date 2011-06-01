@@ -3,6 +3,7 @@ package playground.michalm.vrp.events;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.*;
 
 import pl.poznan.put.vrp.dynamic.monitoring.*;
@@ -16,23 +17,33 @@ public class VRPVehicleEventImpl
     public static final String EVENT_TYPE = "VRP_vehicle";
 
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicleId";
-    public static final String ATTRIBUTE_ROUTE_ID = "routeId";
 
-    private MonitoringEvent monitoringEvent;
+    private final VRPVehicleAgent vehicleAgent;
+    private final MonitoringEvent monitoringEvent;
+    private final PersonEvent cause;
 
 
-    public VRPVehicleEventImpl(double time, VRPVehicleAgent vrpVehicleAgent)
+    public VRPVehicleEventImpl(double time, VRPVehicleAgent vrpVehicleAgent, PersonEvent cause,
+            MonitoringEvent monitoringEvent)
     {
         super(time);
-
+        this.vehicleAgent = vrpVehicleAgent;
+        this.monitoringEvent = monitoringEvent;
+        this.cause = cause;
     }
 
 
     @Override
-    public Id getVRPVehicleAgentId()
+    public Id getVehicleAgentId()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return vehicleAgent.getId();
+    }
+
+
+    @Override
+    public VRPVehicleAgent getVehicleAgent()
+    {
+        return vehicleAgent;
     }
 
 
@@ -51,12 +62,18 @@ public class VRPVehicleEventImpl
 
 
     @Override
+    public PersonEvent getCause()
+    {
+        return cause;
+    }
+
+
+    @Override
     public Map<String, String> getAttributes()
     {
         Map<String, String> attr = super.getAttributes();
 
-        attr.put(ATTRIBUTE_VEHICLE_ID, Integer.toString(monitoringEvent.route.vehicle.id));
-        attr.put(ATTRIBUTE_ROUTE_ID, Integer.toString(monitoringEvent.route.id));
+        attr.put(ATTRIBUTE_VEHICLE_ID, vehicleAgent.getId().toString());
 
         return attr;
     }

@@ -5,10 +5,15 @@ import java.util.*;
 
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.*;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.utils.misc.*;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -17,14 +22,16 @@ import pl.poznan.put.vrp.dynamic.customer.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Route;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.vrp.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.supply.*;
 
 
-public class DVRPLauncher
+public class OfflineDVRPLauncher
 {
     // means: ArcTravelTimes and ArcTravelCosts are averaged for optimization
     private static boolean AVG_TRAFFIC_MODE = false;// default: false
@@ -52,7 +59,7 @@ public class DVRPLauncher
         if (args.length == 1 && args[0].equals("test")) {// for testing
             AVG_TRAFFIC_MODE = false;
             STATIC_MODE = false;
-            VRP_OUT_FILES = false;
+            VRP_OUT_FILES = true;
 
             dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
             cfgFileName = dirName + "config-verB.xml";
@@ -106,6 +113,9 @@ public class DVRPLauncher
 
         // Controler controler = new Controler(new String[] { cfgFileName });
         // controler.setOverwriteFiles(true);
+
+        // to have TravelTimeCalculatorWithBuffer instead of TravelTimeCalculator use:
+        // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
         VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
                 new MATSimVertexImpl.Builder(scenario));
@@ -181,7 +191,22 @@ public class DVRPLauncher
         if (VRP_OUT_FILES) {
             new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
 
+            Population popul = scenario.getPopulation();
+            PopulationFactory pf = popul.getFactory();
+
             // generate output plans (plans.xml)
+            for (Route rt : data.getVrpData().routes) {
+                Person person = pf.createPerson(scenario.createId("vrpDriver_" + rt.id));
+
+                VRPRoutePlan plan = new VRPRoutePlan(new PersonImpl(scenario.createId(Integer
+                        .toString(rt.id))), rt, data);
+
+                person.addPlan(plan);
+                scenario.getPopulation().addPerson(person);
+            }
+
+            new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())
+                    .writeV4(vrpOutDirName + "\\vrpDriverPlans.xml");
         }
 
         ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));

@@ -27,10 +27,10 @@ public class SimLauncherWithArcEstimator
         String vrpArcPathsFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-            // cfgFileName = dirName + "config-verB.xml";
-            // vrpDirName = dirName + "dvrp\\";
-            // vrpStaticFileName = "A101.txt";
+            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+            cfgFileName = dirName + "config-verB.xml";
+            vrpDirName = dirName + "dvrp\\";
+            vrpStaticFileName = "A101.txt";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
             // cfgFileName = dirName + "config-verB.xml";
@@ -42,10 +42,10 @@ public class SimLauncherWithArcEstimator
             // vrpDirName = dirName + "dvrp\\";
             // vrpStaticFileName = "C101.txt";
 
-            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-            cfgFileName = dirName + "config-verB.xml";
-            vrpDirName = dirName + "dvrp\\";
-            vrpStaticFileName = "C102.txt";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
+            // cfgFileName = dirName + "config-verB.xml";
+            // vrpDirName = dirName + "dvrp\\";
+            // vrpStaticFileName = "C102.txt";
 
             vrpArcTimesFileName = vrpDirName + "arc_times.txt";
             vrpArcCostsFileName = vrpDirName + "arc_costs.txt";

@@ -89,13 +89,19 @@ public class ShortestPathsFinder
                         int departTime = k * travelTimeBinSize;// + travelTimeBinSize/2 TODO
                         Path path = router.calcLeastCostPath(fromLink.getToNode(),
                                 toLink.getFromNode(), departTime);
-                        sPath_AB.setPath(departTime, path);
+                        sPath_AB.paths[k] = path;
+
+                        double toLinkTravelTime = travelTime.getLinkTravelTime(toLink, departTime);
+                        sPath_AB.travelTimes[k] = (int) (path.travelTime + toLinkTravelTime);
                     }
                 }
                 else {
                     for (int k = 0; k < numSlots; k++) {
-                        int departTime = k * travelTimeBinSize;
-                        sPath_AB.setPath(departTime, ShortestPath.ZERO_PATH);
+                        // int departTime = k * travelTimeBinSize;
+                        sPath_AB.paths[k] = ShortestPath.ZERO_PATH;
+
+                        sPath_AB.travelTimes[k] = 0;
+
                     }
                 }
             }
@@ -129,11 +135,11 @@ public class ShortestPathsFinder
                 costsBW.write(i + "->" + j + "\t");
                 pathsBW.write(i + "->" + j + "\t");
 
-                Path[] paths = sPath_ij.getPaths();
+                Path[] paths = sPath_ij.paths;
 
                 for (int k = 0; k < numSlots; k++) {
                     Path path = paths[k];
-                    timesBW.write(path.travelTime + "\t");
+                    timesBW.write(sPath_ij.travelTimes[k] + "\t");
                     costsBW.write(path.travelCost + "\t");
 
                     if (path == ShortestPath.ZERO_PATH) {
@@ -210,7 +216,7 @@ public class ShortestPathsFinder
                 ShortestPath sPath_ij = sPath_i[j] = new ShortestPath(numSlots, travelTimeBinSize,
                         true);
 
-                Path[] paths = sPath_ij.getPaths();
+                Path[] paths = sPath_ij.paths;
 
                 for (int k = 0; k < numSlots; k++) {
                     List<Link> links = null;
@@ -258,7 +264,7 @@ public class ShortestPathsFinder
 
         timesBR.close();
         costsBR.close();
-        
+
         if (readPaths) {
             pathsBR.close();
         }
@@ -283,16 +289,13 @@ public class ShortestPathsFinder
 
             for (Vertex vB : vertices) {
                 ShortestPath sPath_ij = sPath_i[vB.getId()];
+                Path[] paths = sPath_ij.paths;
 
-                int[] timesOnDeparture = new int[numSlots];
+                int[] timesOnDeparture = sPath_ij.travelTimes;
                 double[] costsOnDeparture = new double[numSlots];
 
-                Path[] paths = sPath_ij.getPaths();
-
                 for (int k = 0; k < numSlots; k++) {
-                    Path path = paths[k];
-                    timesOnDeparture[k] = (int)path.travelTime;
-                    costsOnDeparture[k] = path.travelCost;
+                    costsOnDeparture[k] = paths[k].travelCost;
                 }
 
                 graph.setTime(vA, vB, new InterpolatedArcTime(timesOnDeparture, travelTimeBinSize,

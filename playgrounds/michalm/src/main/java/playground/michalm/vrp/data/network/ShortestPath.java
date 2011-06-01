@@ -1,58 +1,78 @@
 package playground.michalm.vrp.data.network;
 
+import java.util.*;
+
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
 public class ShortestPath
 {
-    public static final Path ZERO_PATH = new Path(null, null, 0, 0);
+    public static final Path ZERO_PATH = new Path(new ArrayList<Node>(0), new ArrayList<Link>(0),
+            0, 0);
 
     public static final ShortestPath NO_SHORTEST_PATH = new ShortestPath(0, 0, false);
 
     private int timeInterval;
-    private int numIntervals;
+    private int intervalCoutn;
     private boolean cyclic;
 
-    // can be used to create NetworkRoute (in Leg).
-    private Path[] paths;
-
-
-    public Path[] getPaths()
-    {
-        return paths;
-    }
+    Path[] paths;// this contains travel times in-between "fromLink" and "toLink".
+    int[] travelTimes;// in QSim a vehicle traverses also "toLink"
 
 
     public ShortestPath(int numIntervals, int timeInterval, boolean cyclic)
     {
         this.timeInterval = timeInterval;
-        this.numIntervals = numIntervals;
+        this.intervalCoutn = numIntervals;
         this.cyclic = cyclic;
 
         paths = new Path[numIntervals];
+        travelTimes = new int[numIntervals];
     }
 
 
-    public void setPath(int departTime, Path path)
+    // public void setPath(int departTime, Path path, double toLinkTravelTime)
+    // {
+    // int idx = departTime / timeInterval;
+    // paths[idx] = path;
+    // travelTimes[idx] = (int) (path.travelTime + toLinkTravelTime);
+    // }
+    //
+
+    private int getIdx(int departTime)
     {
-        paths[departTime / timeInterval] = path;
+        int idx = (departTime / timeInterval);
+        return cyclic ? (idx % intervalCoutn) : idx;
     }
 
 
     public Path getPath(int departTime)
     {
-        int idx = (departTime / timeInterval);
-
-        if (cyclic) {
-            idx %= numIntervals;
-        }
-
-        return paths[idx];
+        return paths[getIdx(departTime)];
     }
 
 
-    public double getTravelTime(int departTime)
+    public int getTravelTime(int departTime)
     {
-        return getPath(departTime).travelTime;
+        return travelTimes[getIdx(departTime)];
+    }
+
+
+    public int getIntervalCount()
+    {
+        return intervalCoutn;
+    }
+
+
+    public int getTimeInterval()
+    {
+        return timeInterval;
+    }
+
+
+    public boolean isCyclic()
+    {
+        return cyclic;
     }
 }

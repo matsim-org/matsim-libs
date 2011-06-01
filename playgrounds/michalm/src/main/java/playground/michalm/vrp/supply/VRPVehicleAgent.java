@@ -2,11 +2,11 @@ package playground.michalm.vrp.supply;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.*;
 import org.matsim.ptproject.qsim.agents.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import playground.michalm.vrp.data.*;
 
 
 public class VRPVehicleAgent
@@ -14,31 +14,45 @@ public class VRPVehicleAgent
 {
     private Vehicle vrpVehicle;
     private VRPRoutePlan vrpRoutePlan;
+    private MATSimVRPData data;
 
 
-    public VRPVehicleAgent(Person driver, Netsim simulation, Vehicle vrpVehicle)
+    private VRPVehicleAgent(Person driver, Netsim simulation, Vehicle vrpVehicle, MATSimVRPData data)
     {
         super(driver, simulation);
 
+        this.data = data;
         this.vrpVehicle = vrpVehicle;
-        vrpRoutePlan = new VRPRoutePlan(driver, vrpVehicle.route);
+
+        vrpRoutePlan = new VRPRoutePlan(driver, vrpVehicle.route, data);
+        driver.addPlan(vrpRoutePlan);
     }
 
 
     @Override
     public Id chooseNextLinkId()
     {
-        //should depend on the vrpRoutePlan:
-        
-        
+        // should depend on the vrpRoutePlan:
+
         return super.chooseNextLinkId();
     }
 
+    
+    public Vehicle getVrpVehicle()
+    {
+        return vrpVehicle;
+    }
+    
 
-    @Override
-    public Plan getExecutedPlan()
+    public VRPRoutePlan getVrpRoutePlan()
     {
         return vrpRoutePlan;
     }
 
+
+    @Override
+    public VRPRoutePlan getExecutedPlan()
+    {
+        return vrpRoutePlan;
+    }
 }

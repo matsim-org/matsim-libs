@@ -20,10 +20,9 @@ import playground.michalm.vrp.data.network.*;
 
 public class VRPRoutePlan
     extends PlanImpl
-    implements Plan
 {
-    // private VRPData vrpData;
     private MATSimVRPData data;
+
     private PopulationFactory populFactory;
     private Network network;
     private NetworkFactoryImpl networkFactory;
@@ -33,10 +32,12 @@ public class VRPRoutePlan
     private Route vrpRoute;
 
 
-    public VRPRoutePlan(Person driver, Route vrpRoute)
+    public VRPRoutePlan(Person driver, Route vrpRoute, MATSimVRPData data)
     {
         super(driver);
         this.vrpRoute = vrpRoute;
+        this.data = data;
+
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
         networkFactory = (NetworkFactoryImpl)network.getFactory();
@@ -47,13 +48,19 @@ public class VRPRoutePlan
     }
 
 
+    public Route getVrpRoute()
+    {
+        return vrpRoute;
+    }
+
+
     private void init()
     {
         MATSimVertex depotVertex = (MATSimVertex)vrpRoute.vehicle.depot.vertex;
 
         if (vrpRoute.isUnplanned()) {// vehicle stays at the depot
             // Activity
-            addActivity(depotVertex, 24 * 60 * 60, "RtU");// 24hr??
+            addActivity(depotVertex, -1, "RtU", null);
 
             return;
         }
@@ -64,6 +71,9 @@ public class VRPRoutePlan
         MATSimVertex prevVertex = (MATSimVertex)depotVertex;
         int departTime = vrpRoute.beginTime;
 
+        // Activity
+        addActivity(depotVertex, departTime, "RtP", null);
+
         for (int i = 0; i < reqs.size(); i++) {
             Request req = reqs.get(i);
             MATSimVertex currVertex = (MATSimVertex)req.fromVertex;
@@ -72,16 +82,21 @@ public class VRPRoutePlan
             addLeg(prevVertex, currVertex, departTime, req.arrivalTime);
 
             if (req.fromVertex != req.toVertex) { // i.e. taxi service
+                System.err.println("DOESN'T WORK - ACT-LEG PAIRS!!!");
                 // Leg
                 currVertex = (MATSimVertex)req.toVertex;
                 addLeg((MATSimVertex)req.fromVertex, currVertex, req.startTime, req.finishTime);
             }
-            else {
-                addActivity(currVertex, req.finishTime, "Request_" + req.id);
-            }
+            // else { //THIS DOES NOT WORK! LEG-ACT-LEG-ACT PAIRS MUST BE IN PLAN.........
+            //
+            // addActivity(currVertex, req.finishTime, "Request_" + req.id);
+            // }
+            //
+            // // Activity
+            // addActivity(currVertex, req.departureTime, "W");
 
-            // Activity
-            addActivity(currVertex, req.departureTime, "W");
+            // Activity (Request + possible Waiting)
+            addActivity(currVertex, req.departureTime, "" + req.id, req);
 
             prevVertex = currVertex;
             departTime = req.departureTime;
@@ -95,8 +110,7 @@ public class VRPRoutePlan
         addLeg(prevVertex, depotVertex, departTime, departTime + travelTime);
 
         // Activity
-        addActivity(depotVertex, 24 * 60 * 60, "RtC");// 24hr??
-
+        addActivity(depotVertex, -1, "RtC", null);
     }
 
 
@@ -146,11 +160,22 @@ public class VRPRoutePlan
     }
 
 
-    private void addActivity(MATSimVertex vertex, int endTime, String type)
+    // it is posssible only to update the future elements of the plan
+    public void updatePlan()
     {
-        Activity act = populFactory.createActivityFromLinkId("service", vertex.getLink().getId());
-        act.setEndTime(endTime);
-        act.setType(type);
+
+    }
+
+
+    private void addActivity(MATSimVertex vertex, int endTime, String type, Request vrpRequest)
+    {
+        // Activity act = populFactory.createActivityFromLinkId("service",
+        // vertex.getLink().getId());
+        Activity act = new ActivityImpl(type, vertex.getCoord(), vertex.getLink().getId());
+
+        if (endTime != -1) {
+            act.setEndTime(endTime);
+        }
 
         addActivity(act);
     }

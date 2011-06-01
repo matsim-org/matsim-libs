@@ -7,6 +7,9 @@ import org.matsim.core.api.experimental.events.*;
 public interface VRPCustomerEvent
     extends Event
 {
+    Id getCustomerAgentId();
+
+
     Id getFromLinkId();
 
 

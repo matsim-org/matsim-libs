@@ -17,18 +17,18 @@ public class VRPCustomerEventImpl
     public static final String ATTRIBUTE_CUSTOMER_ID = "customerId";
     public static final String ATTRIBUTE_REQUEST_ID = "requestId";
 
+    private final Id customerAgentId;
     private final Id fromLinkId;
     private final Id toLinkId;
-    private final Id customerId;
 
 
-    public VRPCustomerEventImpl(double time, Id fromLinkId, Id toLinkId, Id customerId)
+    public VRPCustomerEventImpl(double time, Id customerAgentId, Id fromLinkId, Id toLinkId)
     {
         super(time);
 
+        this.customerAgentId = customerAgentId;
         this.fromLinkId = fromLinkId;
         this.toLinkId = toLinkId;
-        this.customerId = customerId;
 
         // MISSING (currently)
         // public int quantity;
@@ -37,7 +37,13 @@ public class VRPCustomerEventImpl
         // public int duration;
         // public int t0;// earliest start time
         // public int t1;// latest start time
+    }
 
+
+    @Override
+    public Id getCustomerAgentId()
+    {
+        return customerAgentId;
     }
 
 
@@ -69,7 +75,7 @@ public class VRPCustomerEventImpl
 
         attr.put(ATTRIBUTE_FROM_LINK, fromLinkId.toString());
         attr.put(ATTRIBUTE_TO_LINK, toLinkId.toString());
-        attr.put(ATTRIBUTE_CUSTOMER_ID, customerId.toString());
+        attr.put(ATTRIBUTE_CUSTOMER_ID, customerAgentId.toString());
 
         return attr;
     }
