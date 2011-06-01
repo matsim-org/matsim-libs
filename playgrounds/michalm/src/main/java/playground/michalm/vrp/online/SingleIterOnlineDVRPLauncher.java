@@ -188,10 +188,16 @@ public class SingleIterOnlineDVRPLauncher
     {
         QSim sim = new QSim(sc, eventsManager);
         sim.setAgentFactory(new VRPAgentFactory(sim, data));
-
+        
         VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, algParams);
         data.setVrpSimEngine(vrpSimEngine);
         sim.addMobsimEngine(vrpSimEngine);
+        
+        // The above is slighly confusing: 
+        // (1) The VRPSimEngine adds "VRP" persons to the population (in onPrepareSim) ...
+        // (2) ... which are then converted into VRP agents by the agent factory.
+        // One wonders if they really need to be added to the population, and if so, if this is the best way to do this.
+        // kai, jun'11
 
         if (VRP_OUT_FILES) {
             vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
