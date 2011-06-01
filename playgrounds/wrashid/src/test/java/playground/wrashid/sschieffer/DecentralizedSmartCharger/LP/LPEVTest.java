@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LPPHEVTest.java
+ * LPTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.LP;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -48,37 +48,32 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DSC.LPPHEV;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
 import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
 import junit.framework.TestCase;
 import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
 
 /**
- * 1) at example schedule, test if the LP PHEV is set up correctly
+ * at example schedule, test if the LP is set up correctly
  *<li>objective
  *<li>(in)equalities
  *<li>bounds
  *
- *2) checks if calcEnergyUsageFromCombustionEngine returns correct result for mock case
- *
  * @author Stella
  *
  */
-public class LPPHEVTest extends TestCase{
+public class LPEVTest extends TestCase{
 
-	private Schedule sTestEnergyCalc;
 	
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 	
 	final double electrification= 1.0; 
 	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
-	final double ev=0.0; 
+	final double ev=1.0; 
 	
-	
+		
 	private double chargingSpeed=3500.0;
 	
 	private TestSimulationSetUp mySimulation;
@@ -99,6 +94,9 @@ public class LPPHEVTest extends TestCase{
 	}
 	
 	
+	
+
+
 	/**
 	*  
 	 * @throws MaxIterationsExceededException
@@ -108,7 +106,7 @@ public class LPPHEVTest extends TestCase{
 	 * @throws OptimizationException
 	 * @throws IOException
 	 */
-	public void testLPPHEV() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+	public void testLPEV() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		mySimulation = new TestSimulationSetUp(
 				configPath, 
@@ -131,33 +129,34 @@ public class LPPHEVTest extends TestCase{
 							outputPath,
 							bufferBatteryCharge,
 							standardChargingSlotLength);
-					
 					/***********************************
 					 * LP TEST
 					 * *********************************
 					 */
 					
 					
-					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
+					for(Id id : controler.getPopulation().getPersons().keySet()){
 						
 							agentOne=id;
-														
-							Schedule testSchedule = mySimulation.makeFakeSchedule();
 							
-							testSchedule=myDecentralizedSmartCharger.getLPPHEV().solveLP(testSchedule, 
+							/*
+							 * TEST SOLVE FUNCTION
+							 */
+							Schedule testSchedule = mySimulation.makeFakeSchedule();
+							testSchedule=myDecentralizedSmartCharger.getLPEV().solveLP(testSchedule, 
 									id, 
 									100, 
 									0.1,
 									0.9, 
-									"lpphevTEST"
+									"lpevTEST"
 									);
 							
 							testSchedule.printSchedule();
-							String name= outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent"+ id.toString()+"printLp.txt";
+							String name= outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent"+ id.toString()+"printLp.txt";
 							
 							 try
 							    {
-								 FileReader fro = new FileReader( name );
+							       FileReader fro = new FileReader( name );
 							       BufferedReader bro = new BufferedReader( fro );
 							       
 							       // declare String variable and prime the read
@@ -225,7 +224,9 @@ public class LPPHEVTest extends TestCase{
 							       expected= 100.0/200.0;							       
 							       assertEquals(Double.toString(expected), next);
 							       
-							     //*********************							      
+							       
+							     //*********************
+							       String rowbla = bro.readLine( ); 
 							       //R1               1     3500        0        0        0        0        0 <=       90
 							       String constraint1 = bro.readLine( ); 
 							       st = new StringTokenizer(constraint1);
@@ -241,8 +242,12 @@ public class LPPHEVTest extends TestCase{
 							       String constraint3 = bro.readLine( );//*********************
 							       String constraint4 = bro.readLine( );//*********************
 							       String constraint5 = bro.readLine( ); //*********************
-								  
-							     //*********************
+								   String constraint6 = bro.readLine( ); //*********************
+							       String constraint7 = bro.readLine( );//*********************
+							       String constraint8 = bro.readLine( );//*********************
+							       String constraint9 = bro.readLine( );//*********************
+							       
+							       //*********************
 							       String upBo = bro.readLine();
 							       //upbo            90    21600        1    13200        1    24450    23910
 							       st = new StringTokenizer(upBo);
@@ -266,45 +271,52 @@ public class LPPHEVTest extends TestCase{
 							       assertEquals(Integer.toString(0), st.nextToken());
 							      
 							       
-							       bro.close( );  
 							       
 							       
+							       bro.close( );
 							    }
 							 
 							    catch( FileNotFoundException filenotfoundexxption )
 							    {
 							      System.out.println( name +" , does not exist" );
 							    }
-							 
 							    catch( IOException ioexception )
 							    {
 							      ioexception.printStackTrace( );
 							    }
 						}
 					
+					
+					
+					
+					
 					/*
 					 * RESOLVE
 					 */
+					
 					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						
 						agentOne=id;
 						
-						Schedule testSchedule = mySimulation.makeFakeSchedule();
+						/*
+						 * TEST RESOLVE FUNCTION
+						 */
 						double startingSOC=75.0;
-						testSchedule=myDecentralizedSmartCharger.getLPPHEV().solveLPReschedule(
-								testSchedule, 
+						Schedule testSchedule = mySimulation.makeFakeSchedule();
+						testSchedule=myDecentralizedSmartCharger.getLPEV().solveLPReschedule(
+								testSchedule,
 								id, 
-								100, 
+								100.0, 
 								0.1,
 								0.9, 
-								"lpphevTEST",
+								"lpevTEST",
 								startingSOC
 								);
 						
 						testSchedule.printSchedule();
-						String name= outputPath+"DecentralizedCharger\\LP\\PHEV\\LP_agent_reschedule"+ id.toString()+"printLp.txt";
+						String name= outputPath+"DecentralizedCharger\\LP\\EV\\LP_agent_reschedule"+ id.toString()+"printLp.txt";
 						
-						try
+						 try
 						    {
 						       FileReader fro = new FileReader( name );
 						       BufferedReader bro = new BufferedReader( fro );
@@ -332,54 +344,52 @@ public class LPPHEVTest extends TestCase{
 								 */
 						
 						       
-						       //SOC=-1  +  minimize time with SOC<0  -1
-						       String next= st.nextToken(); //-2
+						       //SOC=-1  
+						       String next= st.nextToken(); 
 						       System.out.println(next);
 						       							       
-						       assertEquals(Integer.toString(-2), next);
+						       assertEquals(Integer.toString(-1), next);
 						       /*
 						        * optimal weight
 						        * (-1 )* thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInOptimalParkingTimes;
-						        * +
-						        * minimize time with SOC<0  - chargingSpeed
+						        * 
 						        */
 						       
 						       next= st.nextToken(); 
 						       System.out.println(next);
-						       double expected= -1.0*100.0/100.0 - chargingSpeed;							       
+						       double expected= -1.0*100.0/100.0;							       
 						       int expectedInt = (int)expected;
 						       assertEquals(Integer.toString(expectedInt), next);
 						       /*
 						        * Parking suboptimal
 						        * thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
-						        * +
-						        * minimize time with SOC<0  - chargingSpeed
+						        * 
 						        */
 						       next= st.nextToken(); 
 						       System.out.println(next);
-						       expected= 100.0/200.0 - chargingSpeed;
+						       expected= 100.0/200.0;
 						       assertEquals(Double.toString(expected), next);
 							     /*
-							      * Driving 0								      * +
-							      * minimize time with SOC<0  + Energyout=1
+							      * Driving 0
+							      * 
 							      */
-						       next= st.nextToken(); 
-						       assertEquals(Integer.toString(1), next);
+						      
+						       assertEquals(Integer.toString(0), st.nextToken());
 						       
 						       /*
 						        * Parking suboptimal
 						        * thisParkingInterval.getJoulesInInterval()/schedule.totalJoulesInSubOptimalParkingTimes;
-						        *   * +
-						        * minimize time with SOC<0  =0 because after driving interval
+						        *  
 						        */
 						       next= st.nextToken(); 
 						       System.out.println(next);
 						       expected= 100.0/200.0;							       
 						       assertEquals(Double.toString(expected), next);
 						       
+						       
 						     //*********************
 						       String constraint1 = bro.readLine( ); 
-						       //R1               1     3500        0        0        0        <=       90
+						       //R1               1     3500        0        0        0        0        0 <=       90
 						       
 						       st = new StringTokenizer(constraint1);
 						       st.nextToken();
@@ -396,7 +406,23 @@ public class LPPHEVTest extends TestCase{
 						       //*********************
 						       String constraint4 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
 						       //*********************
+						       String constraint5 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+							     //*********************
+							   String constraint6 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint7 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint8 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						     //*********************
+						       String constraint9 = bro.readLine( );//R4               1     3500 -1.87863e+007        0        0        0        0 >=       10
+						       st = new StringTokenizer(constraint9);
+						       st.nextToken();
+						       assertEquals(Integer.toString(1), st.nextToken());
+						       assertEquals(Integer.toString(3500), st.nextToken());
+						       assertEquals(Integer.toString(3500), st.nextToken());
+						       
 						       //*********************
+						        //*********************
 						       stringRead = bro.readLine( ); // Type..
 						       //*********************
 						       String upBo = bro.readLine();
@@ -420,8 +446,8 @@ public class LPPHEVTest extends TestCase{
 						       assertEquals(Integer.toString(0), st.nextToken());
 						       assertEquals(Integer.toString(1), st.nextToken());
 						       assertEquals(Integer.toString(0), st.nextToken());
-						      
-						       							       
+						      						       
+						       
 						       bro.close( );
 						    }
 						 
@@ -429,16 +455,13 @@ public class LPPHEVTest extends TestCase{
 						    {
 						      System.out.println( name +" , does not exist" );
 						    }
-						 
 						    catch( IOException ioexception )
 						    {
 						      ioexception.printStackTrace( );
 						    }
 					}
-					
+				
 				} catch (Exception e1) {
-					
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				
@@ -452,56 +475,6 @@ public class LPPHEVTest extends TestCase{
 	}
 	
 	
-	
-		
-	/*
-	 * calcEnergyUsageFromCombustionEngine
-	 * check energy use from engine/battery for one case
-	 */
-	public void testLPPHEVEnergyUsageFromCombustionEngine() throws LpSolveException{
-		LPPHEV lp= new LPPHEV(false);
-		double [] solution = setUpEnergyUsageFromCombustionEngine();
-		lp.setSchedule(sTestEnergyCalc);
-		double eEngine= lp.calcEnergyUsageFromCombustionEngine(solution);
-		assertEquals(eEngine, 15000.0);
-		// * parking times-->  the required charging times is adjusted;
-		// dependent on charing speed.. currently 3500 but should be flexible in future..
-		// so not implemented right now test for this
-		
-		
-		// * driving times --> consumption from engine for an interval is reduced 
-		DrivingInterval d= (DrivingInterval) sTestEnergyCalc.timesInSchedule.get(1);
-		
-		assertEquals(15000.0, d.getExtraConsumption());
-		assertEquals(35000.0, d.getBatteryConsumption());
-		
-	}
-	
-	
-	
-	
-	public double [] setUpEnergyUsageFromCombustionEngine(){
-		
-		sTestEnergyCalc= new Schedule();
-		
-		sTestEnergyCalc.addTimeInterval(new ParkingInterval(0, 10, null));
-		
-		sTestEnergyCalc.addTimeInterval(new DrivingInterval(10, 20, 50000));
-		
-		sTestEnergyCalc.addTimeInterval(new ParkingInterval(20, 30, null));
-		sTestEnergyCalc.addTimeInterval(new ParkingInterval(30, 40, null));
-		
-		for (int i=0; i<sTestEnergyCalc.getNumberOfEntries(); i++){
-			if (sTestEnergyCalc.timesInSchedule.get(i).isParking()){
-				
-				ParkingInterval p= (ParkingInterval) sTestEnergyCalc.timesInSchedule.get(i);
-				p.setRequiredChargingDuration(0.0);
-			}
-		}
-		
-		double[] solution={0.0, 10.0, 1.0, 0.0, 0.0};
-		return solution;
-	}
 
 	
 }

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.SlotDistribution;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -46,6 +46,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.DSC.ParkingInterval;
 import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 

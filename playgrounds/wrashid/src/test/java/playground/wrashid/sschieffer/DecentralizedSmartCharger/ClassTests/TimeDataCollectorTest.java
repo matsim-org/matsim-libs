@@ -1,4 +1,4 @@
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
 import playground.wrashid.sschieffer.DSC.TimeDataCollector;
 import junit.framework.TestCase;
@@ -10,11 +10,11 @@ public class TimeDataCollectorTest extends TestCase{
 	
 	public void testExtrapolateValueAtTime( ){
 		TimeDataCollector myCollector =setUpTimeDataCollector();
-		
-		double ex1= myCollector.extrapolateValueAtTimeFromDataCollectorEveryMin(0.5*60.0);
+	
+		double ex1= myCollector.extrapolateValueAtTimeFromDataCollector(0.5*(3600*24.0/3));
 		assertEquals(7.5, ex1);
 		
-		double ex2= myCollector.extrapolateValueAtTimeFromDataCollectorEveryMin(1.2*60.0);
+		double ex2= myCollector.extrapolateValueAtTimeFromDataCollector(1.2*(3600*24.0/3));
 		assertEquals(12.0, ex2);
 		
 		
@@ -35,10 +35,10 @@ public class TimeDataCollectorTest extends TestCase{
 	
 	public TimeDataCollector setUpTimeDataCollector(){
 		TimeDataCollector myCollector = new TimeDataCollector(3);
-		
-		myCollector.addDataPoint(0, 0*60.0, 5);
-		myCollector.addDataPoint(1, 1*60.0, 10);
-		myCollector.addDataPoint(2, 2*60.0, 20);
+		// 3 entries
+		myCollector.addDataPoint(0, 0.0, 5);
+		myCollector.addDataPoint(1, 1*(3600*24.0/3), 10);
+		myCollector.addDataPoint(2, 2*(3600*24.0/3), 20);
 		return myCollector;
 	}
 	

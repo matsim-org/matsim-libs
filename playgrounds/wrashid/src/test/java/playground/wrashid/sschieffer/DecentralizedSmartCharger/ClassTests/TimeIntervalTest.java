@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 

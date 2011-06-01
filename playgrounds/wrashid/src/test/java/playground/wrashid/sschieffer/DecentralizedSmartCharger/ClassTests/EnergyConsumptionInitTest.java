@@ -1,4 +1,4 @@
-package playground.wrashid.sschieffer.DecentralizedSmartCharger;
+package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
 import java.io.IOException;
 import java.util.HashMap;
