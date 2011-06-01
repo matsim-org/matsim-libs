@@ -115,14 +115,14 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		/** If the used input data comes from PSRC-PARCEL (URBANSIM) than the following spatial layer attributes will apply:
 			Storage type of this layer: ESRI Shapefile
-	Source for this layer: /Users/thomas/Development/opus_home/data/psrc_parcel/shapefiles/zone.shp
-	Geometry type of the features in this layer: Polygon
-	The number of features in this layer: 938
-	Editing capabilities of this layer: Add Features, Delete Features, Change Attribute Values, Add Attributes, Create Spatial Index, Fast Access to Features at ID, Change Geometries
-	Extents:
-	In layer spatial reference system units : xMin,yMin 1095791.50,-97422.8 : xMax,yMax 1622634.62,477503.72
-	Layer Spatial Reference System:
-	+proj=lcc +lat_1=47.5 +lat_2=48.73333333333333 +lat_0=47 +lon_0=-120.8333333333333 +x_0=500000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=us-ft +no_defs
+			Source for this layer: OPUS_HOME/data/psrc_parcel/shapefiles/zone.shp
+			Geometry type of the features in this layer: Polygon
+			The number of features in this layer: 938
+			Editing capabilities of this layer: Add Features, Delete Features, Change Attribute Values, Add Attributes, Create Spatial Index, Fast Access to Features at ID, Change Geometries
+			Extents:
+			In layer spatial reference system units : xMin,yMin 1095791.50,-97422.8 : xMax,yMax 1622634.62,477503.72
+			Layer Spatial Reference System:
+			+proj=lcc +lat_1=47.5 +lat_2=48.73333333333333 +lat_0=47 +lon_0=-120.8333333333333 +x_0=500000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=us-ft +no_defs
 		 * @param args
 		 */
 	}
@@ -312,7 +312,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		
 		// set starting points to measure accessibility (KMZ and CSV output)
 		int szID = benchmark.addMeasure("Creating Grid (startingZomes)");
-		ZoneLayer<ZoneObject> startZones = getStratZones(boundary);
+		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSizeInFeet, boundary);
 		benchmark.stoppMeasurement(szID);
 		logger.info("Creating Grid took " + benchmark.getDurationInSeconds(szID) + "seconds.");
 		
@@ -358,17 +358,6 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 
 		Map<Id, JobsObject> jobObjectMap = readFromUrbansim.readDisaggregatedJobs(parcels, jobSample);
 		return jobObjectMap;
-	}
-
-	/**
-	 * @return
-	 * @throws IOException
-	 */
-	private ZoneLayer<ZoneObject> getStratZones(Geometry boundary) throws IOException {
-		
-		ZoneLayer<ZoneObject> startZones = createGridLayerByGridSize(gridSizeInFeet, boundary);
-		
-		return startZones;
 	}
 
 	/**

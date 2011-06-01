@@ -56,8 +56,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -150,6 +150,9 @@ public class ERSAControlerListener implements ShutdownListener{
 				double accessibilityTravelCosts = 0.;
 				double accessibilityTravelDistance = 0.;
 
+				double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
+				double beta = beta_per_hr / 60.; // get utility per minute
+
 				// go through all jobs and calculate workplace accessibility
 				for(JobsObject job :jobObjectMap.values()){
 					
@@ -165,9 +168,6 @@ public class ERSAControlerListener implements ShutdownListener{
 					// travel distance by car in meter
 //					double travelDistance = getZone2ZoneDistance(coordFromZone, job.getCoord(), network, controler, sc, depatureTime);
 					double travelDistance = getZone2WorkplaceDistance(st, toNode);					
-					
-					double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
-					double beta = beta_per_hr / 60.; // get utility per minute
 					
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta * travelTime );
