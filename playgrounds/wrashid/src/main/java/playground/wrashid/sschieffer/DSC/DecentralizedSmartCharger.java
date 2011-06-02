@@ -77,7 +77,7 @@ import playground.wrashid.sschieffer.V2G.V2G;
  * *********************************************************************** */
 
 
-/**
+/**berlinInput
  * Controls the charging algorithm
 	 * 1) determining and sorting agents schedules
 	 * 2) LP
@@ -115,21 +115,21 @@ public class DecentralizedSmartCharger {
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
 
-	private HashMap<Id, Schedule> agentParkingAndDrivingSchedules = new HashMap<Id, Schedule>(); 
-	private HashMap<Id, Schedule> agentChargingSchedules = new HashMap<Id, Schedule>();
+	private HashMap<Id, Schedule> agentParkingAndDrivingSchedules; 
+	private HashMap<Id, Schedule> agentChargingSchedules;
 	private double averageChargingCostsAgent, averageChargingCostsAgentEV, averageChargingCostsAgentPHEV;	
 	
 	public double minChargingLength;	
 	public double emissionCounter=0.0;	
 	
-	public LinkedList<Id> chargingFailureEV=new LinkedList<Id>();
-	public LinkedList<Id> agentsWithEV=new LinkedList<Id>();
-	public LinkedList<Id> agentsWithPHEV=new LinkedList<Id>();
-	public LinkedList<Id> agentsWithCombustion=new LinkedList<Id>();
+	public LinkedList<Id> chargingFailureEV;
+	public LinkedList<Id> agentsWithEV;
+	public LinkedList<Id> agentsWithPHEV;
+	public LinkedList<Id> agentsWithCombustion;
 	
-	public LinkedList<Id> deletedAgents=new LinkedList<Id>();// agents where ParkingTimes were not found
+	public LinkedList<Id> deletedAgents;// agents where ParkingTimes were not found
 	
-	private HashMap<Id, Double> agentChargingCosts = new HashMap<Id,  Double>();
+	private HashMap<Id, Double> agentChargingCosts;
 	
 	//***********************************************************************
 	public static V2G myV2G;
@@ -178,6 +178,15 @@ public class DecentralizedSmartCharger {
 				energyConsumptionPlugin);
 		
 		this.myVehicleTypes=myVehicleTypes;
+		
+		chargingFailureEV=new LinkedList<Id>();
+		agentsWithEV=new LinkedList<Id>();
+		agentsWithPHEV=new LinkedList<Id>();
+		agentsWithCombustion=new LinkedList<Id>();
+		deletedAgents=new LinkedList<Id>();// agents where ParkingTimes were not found
+		agentChargingCosts = new HashMap<Id,  Double>();
+		agentParkingAndDrivingSchedules = new HashMap<Id, Schedule>(); 
+		agentChargingSchedules = new HashMap<Id, Schedule>();
 	}
 	
 	
@@ -481,7 +490,7 @@ public class DecentralizedSmartCharger {
 	
 	/**
 	 * visualizes the daily plans (parking driving charging)of all agents and saves the files in the format
-	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png"
 	 * @throws IOException
 	 */
 	public void visualizeDailyPlanForAllAgents() throws IOException{
@@ -496,7 +505,7 @@ public class DecentralizedSmartCharger {
 
 	/**
 	 *  visualizes the daily plan for agent with given id and saves the file in the format
-	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png"
 	 * @param id
 	 * @throws IOException
 	 */
@@ -950,6 +959,8 @@ public class DecentralizedSmartCharger {
 				Schedule hubStochasticSchedule= myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.get(h);
 				
 				for(int j=0; j<hubStochasticSchedule.getNumberOfEntries(); j++){
+					
+					
 					//System.out.println("entry "+ j+"of "+hubStochasticSchedule.getNumberOfEntries());
 					//each entry needs to be split down into sufficiently small time intervals					
 					LoadDistributionInterval stochasticLoad= (LoadDistributionInterval)hubStochasticSchedule.timesInSchedule.get(j);
@@ -974,8 +985,6 @@ public class DecentralizedSmartCharger {
 							double start=stochasticLoad.getStartTime()+i*minChargingLength;
 							double end= start+bit;							
 							//*********************************													
-							/*double joulesFromSourceRom=integrateRomberg(func, start, end);
-							double joulesFromSourceTra=integrateTrapezoidal(func, start, end);*/
 							
 							double joulesFromSource= functionSimpsonIntegrator.integrate(func, start, end);
 							
@@ -1066,7 +1075,7 @@ public class DecentralizedSmartCharger {
 										}
 									}
 								}
-							}// if absolute value target of 1 not hit
+							}
 							
 							
 						}
@@ -1318,7 +1327,7 @@ public class DecentralizedSmartCharger {
 	/**
 	 * plots daily schedule and charging times of agent 
 	 * and save it in: 
-	 * outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png"
+	 * outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png"
 		  
 	 * @param dailySchedule
 	 * @param chargingSchedule
@@ -1484,7 +1493,7 @@ public class DecentralizedSmartCharger {
     	        );
             
         }
-        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger\\agentPlans\\"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
+        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
 	
@@ -1809,7 +1818,7 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger\\allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
 	
 	}
 	
@@ -2005,7 +2014,7 @@ public class DecentralizedSmartCharger {
 		    	out.write("HUB"+hub.toString()+"</br> </br>");
 		    	
 		    	out.write("Prices </br>");		    	
-		    	String picPrices=  outputPath+ "Hub\\pricesHub_"+ hub.toString()+".png";
+		    	String picPrices=  outputPath+ "Hub/pricesHub_"+ hub.toString()+".png";
 		    	out.write("<img src='"+picPrices+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    

@@ -826,6 +826,7 @@ public Schedule cutScheduleAtTimeWithoutJouleReassignment(double time) throws Ma
 					new PolynomialFunction(new double[]{0.0}),false));
 		}
 		filled.sort();
+		//filled.printSchedule();
 		return filled;
 	}
 	
@@ -958,6 +959,17 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 			}
 		}
 		this.timesInSchedule=newSchedule.timesInSchedule;
+	}
+	
+	
+	
+	public static Schedule makeScheduleFromArrayListLoadIntervals(ArrayList<LoadDistributionInterval> list){
+		Schedule stochasticSchedule= new Schedule();
+		for(int i=0; i< list.size(); i++){
+			stochasticSchedule.addTimeInterval(list.get(i));
+		}
+		stochasticSchedule=stochasticSchedule.fillNonExistentTimesInLoadScheduleWithZeroLoads();
+		return stochasticSchedule;
 	}
 	
 }

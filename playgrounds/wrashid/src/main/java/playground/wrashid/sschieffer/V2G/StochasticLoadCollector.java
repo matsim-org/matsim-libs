@@ -58,12 +58,21 @@ public class StochasticLoadCollector {
 	}
 	
 	
-	
+	/**
+	 * initializer for debug modus, sets test case automatically true
+	 * @param mySimulation
+	 * @throws ConvergenceException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
 	public StochasticLoadCollector(	DecentralizedChargingSimulation mySimulation) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.mySimulation=mySimulation;
 		testCase=true;
-		
+		stochasticHubLoadDistribution=	new  HashMap<Integer, Schedule>();
+		stochasticHubSource=new  HashMap<Id, GeneralSource>();
+		agentSource= new HashMap<Id, Schedule>();
 		
 	}
 	
@@ -119,7 +128,7 @@ public class StochasticLoadCollector {
 			ArrayList<LoadDistributionInterval> list =myHubInfo.get(hub).getGeneralStochasticLoadIntervals();
 			
 			stochasticHubLoadDistribution.put(hubId, 
-					makeScheduleFromArrayListLoadIntervals(list));
+					Schedule.makeScheduleFromArrayListLoadIntervals(list));
 		}
 		
 		
@@ -127,14 +136,7 @@ public class StochasticLoadCollector {
 	
 	
 	
-	public Schedule makeScheduleFromArrayListLoadIntervals(ArrayList<LoadDistributionInterval> list){
-		Schedule stochasticSchedule= new Schedule();
-		for(int i=0; i< list.size(); i++){
-			stochasticSchedule.addTimeInterval(list.get(i));
-		}
-		stochasticSchedule.fillNonExistentTimesInLoadScheduleWithZeroLoads();
-		return stochasticSchedule;
-	}
+	
 	
 	
 	
@@ -209,7 +211,7 @@ public class StochasticLoadCollector {
 					ArrayList<LoadDistributionInterval> list= vehicleLoads.get(id);
 					
 					agentSource.put(id, 
-							makeScheduleFromArrayListLoadIntervals(list));
+							Schedule.makeScheduleFromArrayListLoadIntervals(list));
 					
 					agentSource.get(id).visualizeLoadDistribution("stochastic vehicle load "+ id.toString() +" from input schedule",
 							mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png");

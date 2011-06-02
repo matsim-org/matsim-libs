@@ -228,8 +228,7 @@ public class HubLoadDistributionReader {
 		this.stochasticHubLoadDistribution=stochasticHubLoadDistribution; // continuous functions		
 		this.locationSourceMapping=locationSourceMapping;
 		this.agentVehicleSourceMapping=agentVehicleSourceMapping;
-		//sumStochasticGridAndLocationSources();
-		
+			
 		// initialize 
 		initializeStochasticHubLoadDistributionAfter();
 	}
@@ -247,9 +246,7 @@ public class HubLoadDistributionReader {
 				
 				stochasticHubLoadAfter15MinBins.put(hub, 
 						make96BinCollectorFromDayLoadSchedule(stochasticHubLoadDistribution.get(hub)));
-						
-				/*stochasticHubLoadDistributionAfterContinuous.put(
-						hub, stochasticHubLoadDistribution.get(hub).cloneSchedule());*/
+			
 			}
 		}
 		
@@ -259,11 +256,8 @@ public class HubLoadDistributionReader {
 			// make a copy of agentVehicleSourceMapping 
 			for(Id id: agentVehicleSourceMapping.keySet()){				
 				agentVehicleSourceAfter15MinBins.put(id, 
-						make96BinCollectorFromDayLoadSchedule(agentVehicleSourceMapping.get(id)));
-				
-				/*agentVehicleSourceMappingAfterContinuous.put(
-						id, agentVehicleSourceMapping.get(id).cloneSchedule());*/
-			}
+						make96BinCollectorFromDayLoadSchedule(agentVehicleSourceMapping.get(id)));			
+				}
 		}
 		
 		if (locationSourceMapping!=null){			
@@ -282,7 +276,7 @@ public class HubLoadDistributionReader {
 		
 		TimeDataCollector dataC= new TimeDataCollector(96);
 		for(int i=0; i<96; i++){
-			double sec= (60.0*15)*i;
+			double sec= (dataC.secBin)*i;
 			int interval= s.timeIsInWhichInterval(sec);
 			dataC.addDataPoint(i, 
 					sec, 
@@ -731,7 +725,7 @@ public class HubLoadDistributionReader {
                 );
       
         }
-        String s= outputPath+ "Hub\\connectivityOfAgentsOverDay.png";
+        String s= outputPath+ "Hub/connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
 	}
@@ -1014,7 +1008,7 @@ public class HubLoadDistributionReader {
 	/**
 	 * visualizes the price distribution of gas and electricitz at the different hubs over the day
 	 * 
-	 * <p> for every hub a .png file is saved under: outputPath+ "Hub\\pricesHub_"+ i.toString()+".png" </p>
+	 * <p> for every hub a .png file is saved under: outputPath+ "Hub/pricesHub_"+ i.toString()+".png" </p>
 	 * @param gasPriceInCostPerSecond
 	 * @throws IOException
 	 */
@@ -1077,7 +1071,7 @@ public class HubLoadDistributionReader {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
             
 			
 			//************************************
@@ -1113,7 +1107,7 @@ public class HubLoadDistributionReader {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		
@@ -1124,7 +1118,7 @@ public class HubLoadDistributionReader {
 	/**
 	 * saves a visualization of the deterministic load as applicable for EVs and PHEVs
 	 * under:
-	 * outputPath+ "Hub\\hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png"
+	 * outputPath+ "Hub/hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png"
 	 * @throws IOException
 	 */
 	private void visualizeLoadDistributionGeneralAndPHEV() throws IOException{
@@ -1210,7 +1204,7 @@ public class HubLoadDistributionReader {
     	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub\\hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		}

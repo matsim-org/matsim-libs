@@ -273,6 +273,13 @@ public class TimeDataCollector {
 		double first= Math.ceil(start/(secBin));
 		double last= Math.floor(end/(secBin));
 		
+		if(last<=first){
+			// do at least for the firstEntry
+			int firstEntry= (int) (first);
+			double increase= func.value(firstEntry);
+			increaseYEntryAtEntryByDouble(firstEntry, increase);
+		}
+		
 		int firstEntry= (int) (first);
 		for( int i=0; i< (int)(last-first); i++){
 			double increase= func.value(firstEntry+i*(secBin));

@@ -90,7 +90,7 @@ public class EnergyConsumptionInit implements StartupListener {
 		
 		int count = 0;
 		for (Id personId: controler.getPopulation().getPersons().keySet()){
-			if (count<totalPpl){
+			
 				if (count< totalPpl*ev){
 					ElectricVehicle ev= new ElectricVehicle(null, new IdImpl(1));
 					vehicles.put(personId, ev);
@@ -101,11 +101,10 @@ public class EnergyConsumptionInit implements StartupListener {
 						vehicles.put(personId,phev );
 						electricVehicles.put(personId, phev);
 					}else{
-						vehicles.put(personId,new ConventionalVehicle(null, new IdImpl(2)) );
+						vehicles.put(personId,new ConventionalVehicle(null, new IdImpl(2)));
 					}
 				}
 				count++;
-			}
 		}
 		
 		EnergyConsumptionModelPSL energyConsumptionModel = new EnergyConsumptionModelPSL(140);
@@ -117,23 +116,7 @@ public class EnergyConsumptionInit implements StartupListener {
 		controler.getEvents().addHandler(energyConsumptionPlugin);
 		
 		
-				/*EnergyStateMaintainer energyStateMaintainer = new EnergyStateMaintainer(new EnergyConsumptionTable(null)) {
-					
-					@Override
-					public void processVehicleEnergyState(Vehicle vehicle,
-							double timeSpendOnLink, Link link) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void chargeVehicle(Vehicle vehicle, double arrivalTime,
-							double departureTime, double plugSizeInWatt, Id linkId,
-							Id facilityId) {
-						// TODO Auto-generated method stub
-						
-					}
-				};*/
+				
 	}
 
 }

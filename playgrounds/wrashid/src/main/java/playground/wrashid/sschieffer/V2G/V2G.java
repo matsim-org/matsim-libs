@@ -30,7 +30,7 @@ import playground.wrashid.sschieffer.DSC.TimeInterval;
  * 
  * <ul>
  * <li> reschedule according to V2G loads if possible
- * <li> save revenues from V2G fro everz agent in LinkedList agentV2GRevenue
+ * <li> save revenues from V2G from every agent in LinkedList agentV2GRevenue
  * </ul>
  * 
  * @author Stella
@@ -77,6 +77,8 @@ public class V2G {
 				
 	}
 	
+	
+	
 	public void initializeAgentStats(){
 		agentV2GStatistic = new HashMap<Id, V2GAgentStats>(); 
 		hubSourceStatistic = new HashMap<Id, V2GAgentStats>(); 
@@ -89,6 +91,11 @@ public class V2G {
 				hubSourceStatistic.put(id, new V2GAgentStats()); //linkId, Stats
 			}
 		}
+	}
+	
+	
+	public HashMap<Id, V2GAgentStats> getHubSourceStatistic(){
+		return hubSourceStatistic;
 	}
 	
 	
@@ -255,9 +262,9 @@ public class V2G {
 		averageRevenueFeedInPHEV=averageRevenueFeedInPHEV/totalPHEV;
 		averageExtraChargingCostPHEV=averageExtraChargingCostPHEV/totalPHEV;
 		if(totalPHEV==0){
-			averageV2GRevenuePHEV=0;
-			averageRevenueFeedInPHEV=0;
-			averageExtraChargingCostPHEV=0;
+			averageV2GRevenuePHEV=0.0;
+			averageRevenueFeedInPHEV=0.0;
+			averageExtraChargingCostPHEV=0.0;
 		}
 		//TOTAL
 		averageV2GRevenueAllAgents=averageV2GRevenueAllAgents/(totalPHEV+totalEV);
@@ -392,6 +399,7 @@ public class V2G {
 			double joulesFromSource	) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		// REDUCE HUBSOURCE LOAD
+		// interval < 0   (-negVal) - (-negVal)=0
 		reduceHubSourceLoadsByGivenLoadInterval(
 				linkId, 
 				electricSourceInterval);
@@ -403,7 +411,9 @@ public class V2G {
 		hubSourceStatistic.get(linkId).addExtraChargingCosts(extraCost);
 		
 		// reduce hubLoadfromCharge
+		//(posVal) - (-(-negVal))=0
 		int hubId= mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
+		electricSourceInterval.negatePolynomialFunc();
 		reduceHubLoadByGivenLoadInterval(hubId, electricSourceInterval);
 		
 	}
@@ -869,22 +879,6 @@ public class V2G {
 		mySmartCharger.myHubLoadReader.agentVehicleSourceAfter15MinBins.get(agentId).increaseYEntryOf96EntryBinCollectorBetweenSecStartEndByFunction(
 					 electricSourceInterval.getStartTime(), 
 					 electricSourceInterval.getEndTime(), negativePolynomialFunc);
-		
-		
-		//CONTINUOUS
-		/*LoadDistributionInterval negativeElectricSourceInterval= new LoadDistributionInterval(
-				electricSourceInterval.getStartTime(),
-				electricSourceInterval.getEndTime(),
-				negativePolynomialFunc,			
-				!electricSourceInterval.isOptimal());
-		
-		agentVehicleSource.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
-				negativeElectricSourceInterval);
-		
-		mySmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.put(agentId, 
-				agentVehicleSource
-				);*/
-			
 	}
 
 	
@@ -1032,10 +1026,11 @@ public class V2G {
 					
 					/*
 					 * REDUCE HUB LOAD
+					 * loadInterval is negative so negat it first
 					 */
 					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
 							((ParkingInterval)agentIntervalInAgentDuringLoad).getLocation());
-					
+					overlapAgentAndElectricSource.negatePolynomialFunc();
 					reduceHubLoadByGivenLoadInterval(
 							hubId, 
 							overlapAgentAndElectricSource);
@@ -1048,9 +1043,21 @@ public class V2G {
 	
 	
 	
+	/**
+	 * approximates the charging costs for the interval with variable load by
+	 * <li> determining the price for charging per second at the beginning of the interval
+	 * <li> assuming that this price is similar over the entire interval
+	 * <li> assuming standard connection of 3500W
+	 * 
+	 * @param linkId
+	 * @param time
+	 * @param joulesOfOverlap
+	 * @return
+	 */
 	public double approximateChargingCostOfVariableLoad(Id linkId, double time,
 			double joulesOfOverlap){
 		
+				
 		double pricingValueOfTime= mySmartCharger.myHubLoadReader.getValueOfPricingPolynomialFunctionAtLinkAndTime(
 				linkId, 
 				time);

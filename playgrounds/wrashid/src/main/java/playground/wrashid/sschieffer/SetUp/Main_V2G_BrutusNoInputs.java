@@ -81,8 +81,9 @@ import java.util.*;
  * @author Stella
  *
  */
-public class Main_exampleV2G {
+public class Main_V2G_BrutusNoInputs {
 	
+	// INPUT ARGUMENTS - (0)output Folder (1) config file and (2) slotLength
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
 		/*************
@@ -93,17 +94,25 @@ public class Main_exampleV2G {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\24hrV2G\\20000Plans15Min\\";
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans20000.xml";
-		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
+		final String outputPath= "/cluster/home/baug/stellas/Runs/TimeRuns/100_5Min/Results/";
+		
+		String configPath="/cluster/home/baug/stellas/Runs/equilInput/100/config.xml";
+		
+		int slotMin= 5; //Integer.parseInt(args[2]);
+		String freeLoadTxt="/cluster/home/baug/stellas/Runs/equilInput/freeLoad15minBinSec_berlin16000.txt";
+		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/equilInput/stochasticRandom+-5000.txt";
+		
+		final double standardChargingLength=slotMin*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double bufferBatteryCharge=0.0;
+		
 		double kWHEV =24;
 		double kWHPHEV =24;
 		boolean gasHigh = false;
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
-		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
-		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
+		
+		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
@@ -135,12 +144,9 @@ public class Main_exampleV2G {
 		 */			
 					
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
 		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
 		myStochasticHubInfo.add(hubInfo1);
 		
-		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
-		final double bufferBatteryCharge=0.0;
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
