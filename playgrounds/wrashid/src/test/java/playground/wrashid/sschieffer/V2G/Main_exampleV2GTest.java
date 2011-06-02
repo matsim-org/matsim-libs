@@ -148,14 +148,14 @@ public class Main_exampleV2GTest extends TestCase{
 		System.out.println("total joules from V2G for regulation up from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationUpPHEV());
 		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV(), mySimulation.getTotalJoulesV2GRegulationUp());
 		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpPHEV(), 0.0);
-		//assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV(), -6300000.0);
+		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV()!=0.0, true);
 		
 		System.out.println("total joules from V2G for regulation down: "+mySimulation.getTotalJoulesV2GRegulationDown());		
 		System.out.println("total joules from V2G for regulation down from EVs: "+mySimulation.getTotalJoulesV2GRegulationDownEV());		
 		System.out.println("total joules from V2G for regulation down from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationDownPHEV());
 		assertEquals(mySimulation.getTotalJoulesV2GRegulationDownEV(), mySimulation.getTotalJoulesV2GRegulationDown());
 		assertEquals(mySimulation.getTotalJoulesV2GRegulationDownPHEV(), 0.0);
-		//assertEquals(1.89E7, mySimulation.getTotalJoulesV2GRegulationDown());
+		assertEquals(mySimulation.getTotalJoulesV2GRegulationDown()!=0.0, true);
 		
 		assertEquals(mySimulation.getListOfAllEVAgents().size(), 2);
 	}

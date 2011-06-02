@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
+import java.util.ArrayList;
+
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
@@ -55,9 +57,26 @@ public class ScheduleTest extends TestCase{
 	}
 	
 	
-	/*
-	 * 
-	 */
+	
+	public void testMakeScheduleFromArrayListLoadIntervals() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		ArrayList<LoadDistributionInterval> list= new ArrayList<LoadDistributionInterval>(0);
+		list.add(new LoadDistributionInterval(0, 100, 1));
+		
+		Schedule test= Schedule.makeScheduleFromArrayListLoadIntervals(list);
+		test.printSchedule();
+		assertEquals(test.getNumberOfEntries(), 2);
+		assertEquals(((LoadDistributionInterval)test.timesInSchedule.get(0)).getPolynomialFunction().getCoefficients()[0],
+				1.0);
+		assertEquals(((LoadDistributionInterval)test.timesInSchedule.get(1)).getPolynomialFunction().getCoefficients()[0],
+				0.0);
+		assertEquals(test.timesInSchedule.get(1).getStartTime(),
+				100.0);
+		assertEquals(test.timesInSchedule.get(1).getEndTime(),
+				24*3600.0);
+	}
+	
+	
+	
 	public void testGetTotalTimeOfIntervalsInSchedule(){
 		s= setDummySchedule();
 		s.sort();

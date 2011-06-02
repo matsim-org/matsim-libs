@@ -1,8 +1,11 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
@@ -12,12 +15,14 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.sschieffer.DSC.AgentContractCollector;
 import playground.wrashid.sschieffer.DSC.ContractTypeAgent;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.DSC.DrivingInterval;
 import playground.wrashid.sschieffer.DSC.EnergyConsumptionInit;
+import playground.wrashid.sschieffer.DSC.GeneralSource;
 import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
 import playground.wrashid.sschieffer.DSC.ParkingInterval;
 import playground.wrashid.sschieffer.DSC.Schedule;
@@ -38,6 +43,7 @@ public class TestSimulationSetUp {
 	HashMap<Integer, Schedule> deterministicHubLoadDistribution;
 	HashMap<Integer, Schedule> pricingHubDistribution;
 	HashMap<Integer, Schedule> stochastic;
+	HashMap<Id, GeneralSource> stochasticHub;
 	HashMap<Id, Schedule> agentSource;
 	HashMap<Id, ContractTypeAgent> agentContracts;
 	/**
@@ -124,11 +130,33 @@ public class TestSimulationSetUp {
 	}
 	
 	
+	/**
+	 * sets up stochastic load for V2G hub load and agent loads
+	 * @throws IOException
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public void setUpStochasticLoadDistributions() throws IOException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		stochastic= readStochasticLoad(1);
+		agentSource= makeAgentVehicleSourceNegativeAndPositive();
+	}
 	
 	
-	public void setUpStochasticLoadDistributions() throws IOException{
+	/**
+	 * sets up stochastic loads for hub, agents and general
+	 * 
+	 * @param linkId
+	 * @throws IOException
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public void setUpStochasticLoadDistributions(Id linkId) throws IOException, MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 			
 		stochastic= readStochasticLoad(1);
+		stochasticHub = makeStochasticHubSource(linkId);//3500 between 0-2000
 		agentSource= makeAgentVehicleSourceNegativeAndPositive();
 	}
 	
@@ -178,6 +206,11 @@ public class TestSimulationSetUp {
 	public HashMap<Integer, Schedule> getStochasticLoadSchedule(){
 		return stochastic;
 	}
+	
+	public HashMap<Id, GeneralSource> getStochasticHubSource(){
+		return stochasticHub;
+	}
+	
 	
 	public HashMap<Integer, Schedule> getDeterministicLoadSchedule(){
 		return deterministicHubLoadDistribution;
@@ -278,6 +311,27 @@ public class TestSimulationSetUp {
 		//bullShitSchedule.printSchedule();
 		
 		return bullShitSchedule;
+	}
+	
+	
+	/**
+	 * 3500 between 0-2000
+	 * @param linkId
+	 * @return
+	 * @throws MaxIterationsExceededException
+	 * @throws FunctionEvaluationException
+	 * @throws IllegalArgumentException
+	 */
+	public HashMap<Id, GeneralSource> makeStochasticHubSource(Id linkId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		HashMap<Id, GeneralSource> tada = new HashMap<Id, GeneralSource>();
+		
+		ArrayList<LoadDistributionInterval> list = new ArrayList<LoadDistributionInterval>(0);
+		list.add(new LoadDistributionInterval(0, 2000, 3500));
+		GeneralSource g = new GeneralSource(list, linkId, "test0-2000", 0.0);
+		g.setLoadSchedule(Schedule.makeScheduleFromArrayListLoadIntervals(list));
+		
+		tada.put(linkId, g);
+		return tada;
 	}
 	
 	
@@ -383,23 +437,28 @@ public class TestSimulationSetUp {
 
 	
 	
-	//-3500 between 0 and 2000
+	
+	/**
+	 * //-3500 between 0 and 2000
 	// 3500 between 20000 and 20300
+	 */
 	public HashMap<Id, Schedule> makeAgentVehicleSourceNegativeAndPositive(){
 		HashMap<Id, Schedule> agentSource= 
 			new HashMap<Id, Schedule>();
 		
 		//Id
 		for(Id id : energyConsumptionInit.getElectricVehicles().getKeySet()){
-			
+			if(!id.equals(Vehicle.getPlaceholderForUnmappedPersonIds())){
 				Schedule bullShitMinus= new Schedule();
 				PolynomialFunction pMinus = new PolynomialFunction(new double[] {-3500.0});
 				bullShitMinus.addTimeInterval(new LoadDistributionInterval(0, 2000.0, pMinus, false));
 				
 				PolynomialFunction pPlus = new PolynomialFunction(new double[] {3500.0});
-				bullShitMinus.addTimeInterval(new LoadDistributionInterval(20000.0, 20300.0, pPlus, true));
+				bullShitMinus.addTimeInterval(new LoadDistributionInterval(20000.0, 21000.0, pPlus, true));
 				
+				bullShitMinus=bullShitMinus.fillNonExistentTimesInLoadScheduleWithZeroLoads();
 				agentSource.put(id, bullShitMinus);	
+			}
 		}
 		return agentSource;
 	}

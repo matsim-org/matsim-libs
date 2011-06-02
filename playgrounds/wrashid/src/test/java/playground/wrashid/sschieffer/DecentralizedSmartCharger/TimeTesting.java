@@ -65,11 +65,7 @@ public class TimeTesting {
 				
 				try {
 					
-					/*PlanXMLGenerator plans= new PlanXMLGenerator(1000);
-					plans.setAgents(10);
-					plans.setAgents(10000);
-					plans.setAgents(20000);*/
-					
+										
 					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
 							bufferBatteryCharge,

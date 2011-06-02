@@ -194,7 +194,9 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 						assertEquals(pLast.isInSystemOptimalChargingTime(), false);
 						
 						assertEquals(pFirst.getJoulesInInterval(), 10.0*pFirst.getIntervalLength());
-						assertEquals(pLast.getJoulesInInterval(), -1000000.0*pLast.getIntervalLength());
+						
+						// lowest Deterministic value = -10.0  
+						assertEquals(pLast.getJoulesInInterval(), -10.0*pLast.getIntervalLength());
 					}
 					
 					

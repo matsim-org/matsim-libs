@@ -38,8 +38,10 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DSC.GeneralSource;
 import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
 import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.DSC.TimeDataCollector;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
 
 import junit.framework.TestCase;
@@ -47,13 +49,16 @@ import lpsolve.LpSolveException;
 
 /**
  * tests methods:
- * <li> checks if vehicle source is reduced in simulation as expected
- * <li> check if addRevenueToAgentFromV2G has expected results
+ * <li> checks reducing agent vehicle load
+ * <li> checks reducing hub load
+ * <li> checks calc of feed in revenue
+ * <li> checks if feed in revenue is correctly attributed
+ * <li> checks attributeSuperfluousVehicleLoads Function
  * 
  * @author Stella
  *
  */
-public class V2GTestOnePlan_checkVehicles extends TestCase{
+public class V2GTestOnePlan_hubsourceV2G extends TestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
@@ -92,7 +97,7 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 	 * @throws OptimizationException
 	 * @throws IOException
 	 */
-	public void testV2GCheckVehicles() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
+	public void testV2GCheckHubSources() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException{
 		
 		final TestSimulationSetUp mySimulation = new TestSimulationSetUp(
 				configPath, 
@@ -102,42 +107,34 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 		
 		controler= mySimulation.getControler();
 		
-		
 		controler.addControlerListener(new IterationEndsListener() {
 			
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				
 				try {
+					Id linkId=null;
+					for (Id link: mySimulation.getControler().getNetwork().getLinks().keySet()){
+						linkId=link;
+						break;
+					}
 					
-					mySimulation.setUpStochasticLoadDistributions();
-					
+					mySimulation.setUpStochasticLoadDistributions(linkId);
 					myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
 							bufferBatteryCharge,
 							standardChargingSlotLength);
-					
 					myDecentralizedSmartCharger.run();
 					
-					/***********************************
-					 * V2G
-					 * *********************************
-					 */
-					// all day 3500
-					HashMap<Integer, Schedule> stochasticLoad = 
-						mySimulation.getStochasticLoadSchedule();
-						
-					HashMap<Id, Schedule> agentVehicleSourceMapping =
-						mySimulation.getAgentStochasticLoadSources();
+					HashMap<Integer, Schedule> stochasticLoad = mySimulation.getStochasticLoadSchedule();
+					HashMap<Id, GeneralSource> g= mySimulation.getStochasticHubSource();
+					HashMap<Id, Schedule> agentVehicleSourceMapping =mySimulation.getAgentStochasticLoadSources();
 					
-					DecentralizedSmartCharger.linkedListIntegerPrinter(stochasticLoad, "Before stochastic general");
-					
-					DecentralizedSmartCharger.linkedListIdPrinter(agentVehicleSourceMapping,  "Before agent");
-					
+										
 					myDecentralizedSmartCharger.setStochasticSources(
-							mySimulation.getStochasticLoadSchedule(), 
-							null, 
-							mySimulation.getAgentStochasticLoadSources());
+							stochasticLoad, 
+							g, 
+							agentVehicleSourceMapping);
 					
 					mySimulation.setUpAgentSchedules(
 							myDecentralizedSmartCharger, 
@@ -148,65 +145,11 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 							xPercentDownUp);
 					
 					myDecentralizedSmartCharger.setAgentContracts(mySimulation.getAgentContracts());
+					myDecentralizedSmartCharger.myV2G.initializeAgentStats();
 					
+					checkHubSource(linkId);
 					
-					for(Id id: controler.getPopulation().getPersons().keySet()){
-						agentOne=id;
-						System.out.println("AGENT VEHICLE SOURCE BEFORE V2G of -3500 between 0-300");
-						agentVehicleSourceMapping.get(id).printSchedule();
-						LoadDistributionInterval lFirst= 
-							(LoadDistributionInterval)agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0);
-						assertEquals(lFirst.getPolynomialFunction().getCoefficients()[0], 
-								-3500.0);
-					}
-					
-					myDecentralizedSmartCharger.initializeAndRunV2G(
-							xPercentDown, xPercentDownUp);
-						
-					
-					System.out.println("AGENT VEHICLE SOURCE AFTER V2G ");
-					agentVehicleSourceMapping.get(agentOne).printSchedule();
-						
-						
-					LoadDistributionInterval lFirst= 
-							(LoadDistributionInterval)agentVehicleSourceMapping.get(agentOne).timesInSchedule.get(0);
-					assertEquals(lFirst.getPolynomialFunction().getCoefficients()[0], 
-								0.0);
-					
-					
-					double revenue=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
-					
-					myDecentralizedSmartCharger.myV2G.addRevenueToAgentFromV2G(100.0, agentOne);
-					
-					double revenueNew=myDecentralizedSmartCharger.getV2GRevenueForAgent(agentOne);
-					
-					assertEquals(revenue+100.0, revenueNew);
-					
-					
-					/**********************************************
-					 *  * CHECK
-					 * addJoulesV2G
-					 */
-					
-					double down = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
-					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(1000.0, agentOne);
-					double newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationUp();
-					myDecentralizedSmartCharger.myV2G.calcV2GVehicleStats();
-					assertEquals(1000.0, newDown-down);
-					
-					down = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
-					myDecentralizedSmartCharger.myV2G.addJoulesUpDownToAgentStats(-1000.0, agentOne);
-					newDown = myDecentralizedSmartCharger.myV2G.getTotalRegulationDown();
-					myDecentralizedSmartCharger.myV2G.calcV2GVehicleStats();
-					assertEquals(1000.0, down-newDown);
-					
-					/**********************************************
-					 *  * CHECK
-					 * sensible outcome averageV2G
-					 */
-					
-					assertEquals(myDecentralizedSmartCharger.myV2G.getAverageV2GRevenuePHEV(), myDecentralizedSmartCharger.myV2G.getAverageV2GRevenueAgent());
-					
+					checkHubSourceChargeExtra();
 					
 				} catch (Exception e1) {
 					
@@ -223,9 +166,52 @@ public class V2GTestOnePlan_checkVehicles extends TestCase{
 
 
 	
+	public void checkHubSource(Id linkId) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException{
+		/*
+		 * reduceHubLoadByGivenLoadInterval(hub, electricSourceInterval);
+		 * //3500 between 0-2000
+		 */
+		
+		myDecentralizedSmartCharger.checkHubSources();
+		// expect hubSource to be 0 and grid 3500 up =7000
+		TimeDataCollector dataC= myDecentralizedSmartCharger.myHubLoadReader.locationSourceMappingAfter15MinBins.get(linkId);
+		double exp1=dataC.extrapolateValueAtTimeFromDataCollector(0.0);
+		assertEquals(exp1, 0.0);
+		
+		dataC= myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadAfter15MinBins.get(1);
+		assertEquals(dataC.getYAtEntry(0),7000.0 );
+		
+	}
 	
 	
-	
+	public void checkHubSourceChargeExtra() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		//myDecentralizedSmartCharger.myV2G.reduceHubLoadByGivenLoadInterval(hubId, electricSourceInterval)
+		for(Id linkId:myDecentralizedSmartCharger.myHubLoadReader.locationSourceMapping.keySet()){
+			myDecentralizedSmartCharger.myV2G.hubSourceChargeExtra(
+					linkId, 
+					new LoadDistributionInterval(0.0, 900, -3500), 
+					900*3500.0
+			);
+			
+			// check that extra cost assigned
+			double extraChargingCost=myDecentralizedSmartCharger.myV2G.getHubSourceStatistic().get(linkId).getExtraChargingCosts();
+			assertEquals(extraChargingCost<0.0, true);
+			
+			
+			// check that hub source reduced by 3500
+			//reduceHubLoadByGivenLoadInterval by 3500
+			// expect hubSource to be 3500 and grid 7000-3500=3500
+			TimeDataCollector dataC= myDecentralizedSmartCharger.myHubLoadReader.locationSourceMappingAfter15MinBins.get(linkId);
+			double exp1=dataC.extrapolateValueAtTimeFromDataCollector(0.0);
+			assertEquals(exp1, 3500.0);
+			
+			dataC= myDecentralizedSmartCharger.myHubLoadReader.stochasticHubLoadAfter15MinBins.get(1);
+			double act= dataC.getYAtEntry(0);
+			assertEquals(act,3500.0 );
+			
+		}
+		
+	}
 	
 }
 

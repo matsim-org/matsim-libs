@@ -160,8 +160,9 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		coeffs=tPHEV1.getPolynomialFunction().getCoefficients();
 		assertEquals(coeffs[0],10.0
 				);
+		// expect minDomain
 		coeffs=tPHEV2.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-1000000.0);
+		assertEquals(coeffs[0],-10.0);
 		
 		
 		
@@ -271,13 +272,13 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		// * Interval 2 from 0-intersectAtX
 		 
 		coeffs=tPHEV2.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-1000000.0);
+		assertEquals(coeffs[0],-10.0);
 		
 		
 		// * Interval 3 from 0-intersectAtX
 		 
 		coeffs=tPHEV3.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-1000000.0);
+		assertEquals(coeffs[0],-10.0);
 		
 	}
 
@@ -384,13 +385,13 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		 * Interval 2 from 0-intersectAtX
 		 */
 		coeffs=tPHEV2.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-1000000.0);
+		assertEquals(coeffs[0],-10.0);
 		
 		/*
 		 * Interval 3 from 0-intersectAtX
 		 */
 		coeffs=tPHEV3.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-1000000.0);
+		assertEquals(coeffs[0],-10.0);
 		
 	}
 

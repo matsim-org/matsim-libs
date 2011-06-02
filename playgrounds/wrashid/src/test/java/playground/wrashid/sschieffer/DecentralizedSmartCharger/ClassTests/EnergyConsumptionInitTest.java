@@ -2,6 +2,7 @@ package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import lpsolve.LpSolveException;
 
@@ -42,7 +43,7 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 	
 	public void testVehiclePercentages(){
 		
-		double electrification= 1.0;
+		double electrification= 0.8;
 		double ev= 0.2;
 		int error=1;
 		
@@ -63,19 +64,24 @@ public class EnergyConsumptionInitTest extends MatsimTestCase{
 		
 		int countPHEV=0;
 		int countEV=0;
+		
 				
 		for (Id id: vehicles.getKeySet()){
-			if (vehicles.get(id).getClass().equals(PlugInHybridElectricVehicle.class)){
+			//System.out.println(vehicles.getValue(id).getClass());
+			
+			if (vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
 				countPHEV++;
 			}else{				
+				if (vehicles.getValue(id).getClass().equals(ElectricVehicle.class)){
 					countEV++;
+				}
 				}
 			}
 		
-				
-		//ev 20, phev 80
-		assertEquals((countPHEV>80-error && countPHEV<80+error), true);
-		assertEquals((countEV>20-error && countEV<20+error), true);
+		// electrification 0.8
+		//ev 100*0.2*0.8=   16, phev 64
+		assertEquals((countPHEV>64-error && countPHEV<64+error), true);
+		assertEquals((countEV>16-error && countEV<16+error), true);
 		
 	}
 	
