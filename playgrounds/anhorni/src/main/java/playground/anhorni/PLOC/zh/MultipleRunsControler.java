@@ -36,11 +36,13 @@ public class MultipleRunsControler {
     	inPathStub = createConfig.findParam("PLOC", "inPathStub");
     	outPathStub = createConfig.findParam("PLOC", "outPathStub");
     	
-    	this.createPlansAndConfigs(createConfig);
+    	boolean runOnly = Boolean.parseBoolean(createConfig.findParam("PLOC", "runOnly"));
     	
     	for (int i = 0; i < 100000; i++) {
     		this.randomNumberGenerator.nextLong();
     	}
+    	
+    	if (!runOnly) this.createPlansAndConfigs(createConfig);	
 	}
 	
 	private void createPlansAndConfigs(Config createConfig) {
