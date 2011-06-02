@@ -719,10 +719,10 @@ public Schedule cutScheduleAtTimeWithoutJouleReassignment(double time) throws Ma
 						);
 				p.setParkingOptimalBoolean(((ParkingInterval)firstInterval).isInSystemOptimalChargingTime());
 				
-				
 				if(((ParkingInterval)firstInterval).getChargingSchedule()!= null){
 					p.setChargingSchedule(
 							((ParkingInterval)firstInterval).getChargingSchedule().cutChargingScheduleAtTimeSecondHalf(time));
+					p.setRequiredChargingDuration(p.getChargingSchedule().getTotalTimeOfIntervalsInSchedule());
 				}else{
 					p.setRequiredChargingDuration(0);
 				}
