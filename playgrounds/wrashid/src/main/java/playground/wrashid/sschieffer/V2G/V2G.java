@@ -812,11 +812,19 @@ public class V2G {
 			mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId).printSchedule();
 		}
 		
+		
+		//mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId).printSchedule();
+		
 		Schedule rescheduledFirstHalf= mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId).cutScheduleAtTime(
 				electricSourceInterval.getEndTime(), agentId);
+		
+		//rescheduledFirstHalf.printSchedule();
+		
 		//inbetween part with new load
 		Schedule rescheduledElectricLoadPart= rescheduledFirstHalf.cutScheduleAtTimeSecondHalf(
 				electricSourceInterval.getStartTime(), 0.0, agentId);
+		
+		//rescheduledElectricLoadPart.printSchedule();
 		
 		// insert new bit
 		// joules/charging speed = secs
@@ -834,6 +842,8 @@ public class V2G {
 		rescheduledFirstHalf= rescheduledFirstHalf.cutScheduleAtTime(electricSourceInterval.getStartTime(), agentId);
 		
 		try{
+		
+			
 			rescheduledFirstHalf.mergeSchedules(rescheduledElectricLoadPart);
 			rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
 					
