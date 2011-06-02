@@ -57,29 +57,31 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Camera camera;
 	private Window window;
 	private Color backgroundColor = Color.WHITE;
-	private Color pointsColor = Color.BLUE;
-	private Color pointsColor2 = Color.BLACK;
-	private Color linesColor = Color.GRAY;
+	private Color pointsColor = new Color(127,127,255);
+	private Color pointsColor2 = Color.RED;
+	private Color linesColor = Color.BLACK;
 	private Color linesColor2 = Color.ORANGE;
-	private Color selectedColor = Color.RED;
+	private Color selectedColor = Color.GREEN;
 	private Color nodeSelectedColor = Color.MAGENTA;
 	private Color networkColor = Color.LIGHT_GRAY;
-	private int pointsSize = 1;
-	private Stroke pointsStroke = new BasicStroke(1);
-	private Stroke linesStroke = new BasicStroke(1);
+	private int pointsSize = 2;
+	private Stroke pointsStroke = new BasicStroke(2.5f);
+	private Stroke linesStroke = new BasicStroke(1.5f);
 	private Stroke selectedStroke = new BasicStroke(2);
-	private Stroke networkStroke = new BasicStroke(0.5f);
+	private Stroke networkStroke = new BasicStroke(1f);
 	private boolean wait;
 	private int iniX;
 	private int iniY;
-	private boolean withStops = false;
-	private boolean withNetwork = false;
 	private double xMax;
 	private double yMax;
 	private double xMin;
 	private double yMin;
 	private boolean shapeNums = false;
 	public boolean paintAll = false;
+	private boolean withStops = true;
+	private boolean withNetwork = true;
+	private boolean withLinksStops = false;
+	private boolean withLines = false;
 	
 	//Methods
 	public PanelPathEditor(Window window) {
@@ -133,7 +135,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			}
 		setBoundaries();
 	}
-	private void setBoundaries() {
+	public void setBoundaries() {
 		camera.setBoundaries(xMin, yMin, xMax, yMax);
 	}
 	@Override
@@ -148,7 +150,8 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			if(withNetwork)
 				paintNetwork(g2);
 			paintPoints(g2);
-			paintLines(g2);
+			if(withLines)
+				paintLines(g2);
 			paintSelected(g2);
 		}
 	}
@@ -187,12 +190,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		g2.setColor(linesColor);
 		g2.setStroke(linesStroke);
 		for(Link link:window.getLinks())
-			paintLink(link, g2);
-		if(withStops) {
+			paintLink2(link, g2);
+		if(withLinksStops) {
 			g2.setColor(linesColor2);
 			g2.setStroke(selectedStroke);
 			for(Link link:window.getStopLinks())
-				paintLink(link, g2);
+				paintLink2(link, g2);
 		}
 	}
 	private void paintAllLines(Graphics2D g2) {
@@ -237,6 +240,16 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 				camera.getIntY(link.getFromNode().getCoord().getY()),
 				camera.getIntX(link.getToNode().getCoord().getX()),
 				camera.getIntY(link.getToNode().getCoord().getY()));
+		Shape circle = new Ellipse2D.Double(camera.getIntX(link.getToNode().getCoord().getX())-pointsSize*0.5,camera.getIntY(link.getToNode().getCoord().getY())-pointsSize*0.5,pointsSize*1,pointsSize*1);
+		g2.fill(circle);
+	}
+	private void paintLink2(Link link, Graphics2D g2) {
+		g2.drawLine(camera.getIntX(link.getFromNode().getCoord().getX()),
+				camera.getIntY(link.getFromNode().getCoord().getY()),
+				camera.getIntX(link.getToNode().getCoord().getX()),
+				camera.getIntY(link.getToNode().getCoord().getY()));
+		Shape circle = new Ellipse2D.Double(camera.getIntX(link.getToNode().getCoord().getX())-pointsSize*1,camera.getIntY(link.getToNode().getCoord().getY())-pointsSize*1,pointsSize*2,pointsSize*2);
+		g2.fill(circle);
 	}
 	public void waitSecondCoord() {
 		wait = true;
@@ -280,7 +293,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		repaint();
 	}
 	public void withStops() {
-		withStops = true;
+		withLinksStops = true;
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -327,6 +340,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			break;
 		case 's':
 			withStops = !withStops;
+			break;
+		case 'x':
+			withLinksStops = !withLinksStops;
+			break;
+		case 'l':
+			withLines  = !withLines;
 			break;
 		case 'n':
 			withNetwork  = !withNetwork;

@@ -52,8 +52,8 @@ public class RoutePath {
 	private boolean withAngleShape = false;
 	private boolean withShapeCost = false;
 	private boolean withInsideStops = true;
-	private boolean us = false;
-	private boolean reps = false;
+	private boolean us = true;
+	private boolean reps = true;
 	private boolean inStops = true;
 	private PreProcessEuclidean preProcessData;
 

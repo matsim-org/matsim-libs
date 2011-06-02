@@ -120,7 +120,9 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE));
 			line = reader.readLine();
 			while(line!=null) {
-				Link link = new LinkFactoryImpl().createLink(new IdImpl(line), network.getNodes().get(new IdImpl(reader.readLine())), network.getNodes().get(new IdImpl(reader.readLine())), network, -1, DEFAULT_FREE_SPEED, DEFAULT_CAPCITY, 1);
+				String fromNode = reader.readLine(), toNode = reader.readLine();
+				double distance = CoordUtils.calcDistance(network.getNodes().get(new IdImpl(fromNode)).getCoord(),network.getNodes().get(new IdImpl(toNode)).getCoord());
+				Link link = new LinkFactoryImpl().createLink(new IdImpl(line), network.getNodes().get(new IdImpl(fromNode)), network.getNodes().get(new IdImpl(toNode)), network, distance, DEFAULT_FREE_SPEED, DEFAULT_CAPCITY, 1);
 				Set<String> modes = new HashSet<String>();
 				modes.add("Car");
 				modes.add("Bus");
@@ -690,8 +692,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	 */
 	private void addNewLinksSequence(Trip trip, RouteTypes routeType, String routeKey, int r) {
 		double length;
-		double freeSpeed=100;
-		double capacity=100;
+		double freeSpeed=50;
+		double capacity=20;
 		double nOfLanes=1;
 		StopTime stopTime = trip.getStopTimes().get(1);
 		String id = stopTime.getStopId();

@@ -508,6 +508,7 @@ public class Window extends JFrame implements ActionListener {
 								if(selectedLinkIndex==-1) {
 									JOptionPane.showMessageDialog(this, "Yes!!!");
 									saveButton.setEnabled(true);
+									panel.setBoundaries();
 									return;
 								}
 								else {

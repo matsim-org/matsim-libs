@@ -296,7 +296,7 @@ public class VisumFile2MatsimNetwork {
 				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
 				Set<String> modes = new HashSet<String>();
-				modes.add("Car");
+				modes.add("car");
 				link.setAllowedModes(modes);
 				network.addLink(link);
 				id++;
