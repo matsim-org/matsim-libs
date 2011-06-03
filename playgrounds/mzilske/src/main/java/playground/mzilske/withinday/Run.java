@@ -60,7 +60,7 @@ public class Run {
 		queueSimulation.setAgentFactory(new AgentFactory() {
 
 			@Override
-			public PersonAgent createPersonAgent(Person p) {
+			public PersonAgent createMobsimAgentFromPerson(Person p) {
 				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), queueSimulation);
 				queueSimulation.addQueueSimulationListeners(adapterAgent);
 				return adapterAgent;

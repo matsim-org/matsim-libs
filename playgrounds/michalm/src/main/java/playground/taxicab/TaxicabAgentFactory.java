@@ -33,7 +33,7 @@ public final class TaxicabAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public PersonDriverAgent createPersonAgent(final Person p) {
+	public PersonDriverAgent createMobsimAgentFromPerson(final Person p) {
 		TaxicabAgent agent = new TaxicabAgent(p, this.simulation);
 		this.simulation.getEventsManager().addHandler(agent) ;
 		return agent;

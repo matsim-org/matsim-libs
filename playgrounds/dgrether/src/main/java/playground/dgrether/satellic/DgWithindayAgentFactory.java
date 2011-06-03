@@ -41,7 +41,7 @@ public class DgWithindayAgentFactory extends DefaultAgentFactory {
 	}
 
 	@Override
-	public PersonDriverAgentImpl createPersonAgent(final Person p) {
+	public PersonDriverAgentImpl createMobsimAgentFromPerson(final Person p) {
 		PersonDriverAgentImpl agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
 		return agent;
 	}

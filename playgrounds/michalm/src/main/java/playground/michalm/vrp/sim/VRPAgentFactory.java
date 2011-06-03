@@ -32,7 +32,7 @@ public class VRPAgentFactory
 
 
     @Override
-    public PersonAgent createPersonAgent(Person p)
+    public PersonAgent createMobsimAgentFromPerson(Person p)
     {
         if (p instanceof VRPDriverPerson) {
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
