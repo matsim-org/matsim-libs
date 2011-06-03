@@ -3,6 +3,7 @@ package playground.michalm.vrp.data.network;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.zip.*;
 
 import org.apache.log4j.*;
 import org.matsim.api.core.v01.*;
@@ -176,6 +177,19 @@ public class ShortestPathsFinder
     }
 
 
+    private BufferedReader getReader(File file)
+        throws IOException
+    {
+        if (file.getName().endsWith(".gz")) {
+            return new BufferedReader(
+                    new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+        }
+        else {
+            return new BufferedReader(new FileReader(file));
+        }
+    }
+
+
     public void readShortestPaths(String timesFileName, String costsFileName, String pathsFileName)
         throws IOException
     {
@@ -192,9 +206,9 @@ public class ShortestPathsFinder
                 n);
         data.setShortestPaths(shortestPaths);
 
-        BufferedReader timesBR = new BufferedReader(new FileReader(timesFileName));
-        BufferedReader costsBR = new BufferedReader(new FileReader(costsFileName));
-        BufferedReader pathsBR = readPaths ? new BufferedReader(new FileReader(pathsFileName))
+        BufferedReader timesBR = getReader(new File(timesFileName));
+        BufferedReader costsBR = getReader(new File(costsFileName));
+        BufferedReader pathsBR = readPaths ? getReader(new File(pathsFileName))
                 : null;
 
         for (int i = 0; i < n; i++) {

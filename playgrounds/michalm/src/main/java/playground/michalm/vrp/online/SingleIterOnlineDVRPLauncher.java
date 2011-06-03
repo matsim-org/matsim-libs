@@ -93,9 +93,9 @@ public class SingleIterOnlineDVRPLauncher
             // vrpStaticFileName = "C102.txt";
             // vrpDynamicFileName = "C102_scen.txt";
 
-            vrpArcTimesFileName = vrpDirName + "arc_times.txt";
-            vrpArcCostsFileName = vrpDirName + "arc_costs.txt";
-            vrpArcPathsFileName = vrpDirName + "arc_paths.txt";
+            vrpArcTimesFileName = vrpDirName + "arc_times.txt.gz";
+            vrpArcCostsFileName = vrpDirName + "arc_costs.txt.gz";
+            vrpArcPathsFileName = vrpDirName + "arc_paths.txt.gz";
             algParamsFileName = "algorithm.txt";
         }
         else if (args.length == 9) {
@@ -166,12 +166,12 @@ public class SingleIterOnlineDVRPLauncher
 
         sim.run();
 
-        if (VRP_OUT_FILES) {
-            new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
-        }
+//        if (VRP_OUT_FILES) {
+//            new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
+//        }
 
-        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+//        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
+//        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
     }
 
 
@@ -191,21 +191,21 @@ public class SingleIterOnlineDVRPLauncher
         // One wonders if they really need to be added to the population, and if so, if this is the best way to do this.
         // kai, jun'11
 
-        if (VRP_OUT_FILES) {
-            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
-                {
-                    return RouteChartUtils.chartRoutesByStatus(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-
-            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
-                public JFreeChart createChart(VRPData data)
-                {
-                    return ScheduleChartUtils.chartSchedule(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
-        }
+//        if (VRP_OUT_FILES) {
+//            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+//                public JFreeChart createChart(VRPData data)
+//                {
+//                    return RouteChartUtils.chartRoutesByStatus(data);
+//                }
+//            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
+//
+//            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+//                public JFreeChart createChart(VRPData data)
+//                {
+//                    return ScheduleChartUtils.chartSchedule(data);
+//                }
+//            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
+//        }
 
         return sim;
     }
