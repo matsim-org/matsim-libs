@@ -39,6 +39,8 @@ public interface DriverAgent extends NetworkAgent {
 
 //	// yyyy would be nice if this was (Basic)Vehicle, not QVehicle.  kai, may'10
 	public void setVehicle( final QVehicle veh ) ;
+	
+	@Deprecated // there is no reason why this should be needed from outside.  kai/mz, jun'11 
 	public QVehicle getVehicle() ;
 	
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
@@ -46,6 +48,7 @@ public interface DriverAgent extends NetworkAgent {
 	/**
 	 * notifies the agent that it was moved over the node
 	 * @deprecated the argument list of this method should be sort out, suggestion add node id as parameter dg/kn jf oct. 2010
+	 * Probably also or better (new)linkId.  kai, jun'11
 	 */
 	@Deprecated
 	public void notifyMoveOverNode();
