@@ -120,11 +120,13 @@ public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 	/**
 	 * @return "(Leg) getCurrentPlanElement()" if the current plan element is a leg, otherwise null.
 	 */
+	@Deprecated // try to use getCurrentPlanElement()
 	public Leg getCurrentLeg();
 
 	/**
 	 * @return "(Activity) getCurrentPlanElement()" if the current plan element is an activity, otherwise null.
 	 */
+	@Deprecated // try to use getCurrentPlanElement()
 	public Activity getCurrentActivity();
 
 	/** Design thoughts:<ul>
