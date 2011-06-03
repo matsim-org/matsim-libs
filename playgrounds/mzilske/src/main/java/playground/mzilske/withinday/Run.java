@@ -11,7 +11,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -60,7 +60,7 @@ public class Run {
 		queueSimulation.setAgentFactory(new AgentFactory() {
 
 			@Override
-			public PersonAgent createMobsimAgentFromPerson(Person p) {
+			public MobsimAgent createMobsimAgentFromPerson(Person p) {
 				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), queueSimulation);
 				queueSimulation.addQueueSimulationListeners(adapterAgent);
 				return adapterAgent;
