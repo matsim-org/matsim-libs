@@ -100,8 +100,8 @@ public class Agent2D  {
 		return AGENT_WEIGHT;
 	}
 
-	public void notifyMoveOverNode() {
-		this.pda.notifyMoveOverNode();
+	public void notifyMoveOverNode(Id newLinkId) {
+		this.pda.notifyMoveOverNode(newLinkId);
 	}
 
 	public Id getId() {

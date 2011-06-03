@@ -478,14 +478,14 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public void notifyMoveOverNode() {
+	public void notifyMoveOverNode(Id newLinkId) {
 		// I think I am told this some time after I was asked about my next link. I think this means that I have entered it now. mz
 		//
 		// yes, exactly.  It may have happened that it was not possible to cross the intersection, and the mobsim may have made you
 		// "stuckAndAbort", or a police person may have waved you into a link into which you did not want to go.  
 		// (It is, however, quite strange that this does not pass on the new link as an argument.)
 		// kai, jun'11
-		this.nextLinkId = null;
+		this.nextLinkId = null; // this is set to null because it means the "next" linkId, not the "current" linkId.  kai, jun'11
 	}
 
 	@Override

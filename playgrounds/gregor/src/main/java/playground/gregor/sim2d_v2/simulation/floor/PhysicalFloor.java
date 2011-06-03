@@ -270,7 +270,7 @@ public class PhysicalFloor implements Floor {
 				return true;
 
 			} else {
-				agent.notifyMoveOverNode();
+				agent.notifyMoveOverNode(id);
 				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId());
 				this.em.processEvent(e2);
 			}
