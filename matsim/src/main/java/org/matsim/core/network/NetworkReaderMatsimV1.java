@@ -78,12 +78,15 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startNetwork(final Attributes atts) {
 		if (atts.getValue("type") != null) {
-			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which transportation mode is allowed to use it (for the future)");
+			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which " +
+					"transportation mode is allowed to use it (for the future)");
 		}
 		if (this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setName(atts.getValue("name"));
 			if (atts.getValue("capDivider") != null) {
-				log.warn("capDivider defined. it will be used but should be gone somewhen");
+				log.warn("capDivider defined. it will be used but should be gone eventually. " +
+						"-- This is a weird comment, since the matsim public api tells to put this into the network rather than" +
+						" into the ``links''.  kai, jun'11");
 				String capperiod = atts.getValue("capDivider") + ":00:00";
 				((NetworkImpl) this.network).setCapacityPeriod(Time.parseTime(capperiod));
 			}
@@ -117,7 +120,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			}
 
 			if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-				log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they should be set in the network element.");
+				log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they " +
+						"should be set in the network element. -- This is a weird warning, since setting them in the " +
+						"network element also produces a warning.");
+				log.warn("At this point, it seems that, in network.xml, one sets capperiod in the `links' section, but in the " +
+						"matsim api, the corresponding entry belongs into the `network' object. kai, jun'11") ;
 			}
 		}
 	}
