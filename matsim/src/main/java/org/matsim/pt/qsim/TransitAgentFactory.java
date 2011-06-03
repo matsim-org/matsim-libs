@@ -40,7 +40,7 @@ public class TransitAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public PersonDriverPassengerAgent createPersonAgent(final Person p) {
+	public PersonDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
 		PersonDriverPassengerAgent agent = new TransitAgent(p, this.simulation);
 		this.agentsMap.put(p, agent);
 		return agent;

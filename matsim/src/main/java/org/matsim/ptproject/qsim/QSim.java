@@ -46,6 +46,7 @@ import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.Initializable;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
@@ -374,9 +375,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			PersonAgent agent = this.agentFactory.createPersonAgent(p);
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			agents.add(agent);
-			agent.initialize();
+			
+			// I would prefer to get rid of the following or understand why it is needed.  But tests fail if I move the material
+			// into the ctor.  kai, jun'11
+			if ( agent instanceof Initializable ) {
+				((Initializable)agent).initialize();
+			}
 		}
 	}
 

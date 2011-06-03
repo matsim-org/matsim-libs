@@ -79,7 +79,7 @@ import org.matsim.api.core.v01.population.PlanElement;
  * @author nagel
  *
  */
-public interface PlanAgent extends NetworkAgent, Identifiable {
+public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
@@ -142,13 +142,6 @@ public interface PlanAgent extends NetworkAgent, Identifiable {
 	*/
 	public void notifyTeleportToLink(final Id linkId);
 
-	/**
-	 * Design thoughts:<ul>
-	 * <li> yyyy I don't like this "initialize" method that one can easily forget to call.
-	 * And I am confident that one can do without it.  kai, may'10
-	 */
-	public void initialize();
-	
 	/**
 	 * Design thoughts:<ul>
 	 * <li> yyyy Many methods call PersonAgent.getPerson.getSelectedPlan(). This method should replace

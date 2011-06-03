@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: matsim
+ * Initializable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.agents;
+package org.matsim.core.mobsim.framework;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+/**
+ * @author nagel
+ *
+ */
+@Deprecated // IMHO, one should try to do without this interface until we really have a reason why it is necessary.  kai, jun'11
+public interface Initializable {
+	/**
+	 * Design thoughts:<ul>
+	 * <li> yyyy I don't like this "initialize" method that one can easily forget to call.
+	 * And I am confident that one can do without it.  kai, may'10
+	 * <p/>
+	 * Moving the material of this method into the ctor of PersonDriverAgentImpl makes a larger number of tests fail.
+	 * So it ain't that easy.  
+	 * <p/> 
+	 * I am thus extracting the interface from PlanAgent so that I can test separately in the initialization sequence
+	 * if this interface is fulfilled.  Maybe not so great.  kai, jun'11
+	 * </ul>
+	 */
+	public void initialize();
+	
 
-public final class ExperimentalBasicWithindayAgentFactory implements AgentFactory {
-
-	private final Netsim simulation;
-
-	public ExperimentalBasicWithindayAgentFactory(final Netsim simulation) {
-		this.simulation = simulation;
-	}
-
-	@Override
-	public PersonDriverAgent createMobsimAgentFromPerson(final Person p) {
-		PersonDriverAgent agent = new ExperimentalBasicWithindayAgent(p, this.simulation);
-		return agent;
-	}
 
 }
