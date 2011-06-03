@@ -60,6 +60,7 @@ public interface Network extends MatsimToplevelContainer {
    * <p/>
    * Notes:<ul>
    * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
+   * The default is in the network dtd, but it is an attribute under "links", not under "network".
    * </ul>
    * @return the time period in seconds
    */
