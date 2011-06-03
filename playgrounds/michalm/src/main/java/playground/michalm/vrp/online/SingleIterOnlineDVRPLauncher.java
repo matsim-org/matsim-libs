@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -14,6 +15,7 @@ import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.network.*;
+import org.matsim.core.population.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.*;
 import org.matsim.core.router.util.*;
@@ -33,6 +35,7 @@ import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.customer.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.vrp.*;
 import playground.michalm.vrp.data.*;
@@ -113,26 +116,10 @@ public class SingleIterOnlineDVRPLauncher
 
         // read MATSim data
         Config config = ConfigUtils.loadConfig(cfgFileName);
-        final Scenario scenario = ScenarioUtils.loadScenario(config);
-        final NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
-        TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-        TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-        TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory
-                .createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-        final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
-                scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(
-                        travelTimeCalculator, config.planCalcScore()), travelTimeCalculator,
-                leastCostPathCalculatorFactory);
-        ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 1,
-                new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-                    public AbstractPersonAlgorithm getPersonAlgorithm()
-                    {
-                        return new PersonPrepareForSim(routingAlgorithm, network);
-                    }
-                });
-
+        preparePlansForPersons(scenario);
+        
         // init DVRP data
         AlgorithmParams algParams = new AlgorithmParams(new File(vrpDirName + algParamsFileName));
 
@@ -150,6 +137,10 @@ public class SingleIterOnlineDVRPLauncher
 
         final MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
+        //create VRPDriverPersons and add them to the population
+        createDriverPersons(scenario, vrpData);
+        
+        //read ShortestPaths from file
         ShortestPathsFinder spf = new ShortestPathsFinder(data);
         spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
         spf.upadateVRPArcTimesAndCosts();
@@ -163,14 +154,15 @@ public class SingleIterOnlineDVRPLauncher
         EventsManager events = EventsUtils.createEventsManager();
         QSim sim = createMobsim(scenario, events, data, algParams, vrpOutDirName);
 
-//        ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler()
-//                .getOutputDirectory());
-//        OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(sim);
-//        sim.addFeature(queueSimulationFeature);
-//        queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis()
-//                .isShowTeleportedAgents());
-//        sim.setControlerIO(controlerIO);
-//        sim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+        //OFTVis visualization
+        // ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler()
+        // .getOutputDirectory());
+        // OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(sim);
+        // sim.addFeature(queueSimulationFeature);
+        // queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis()
+        // .isShowTeleportedAgents());
+        // sim.setControlerIO(controlerIO);
+        // sim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 
         sim.run();
 
@@ -217,4 +209,51 @@ public class SingleIterOnlineDVRPLauncher
 
         return sim;
     }
+
+
+    private static void preparePlansForPersons(Scenario scenario)
+    {
+        Config config = scenario.getConfig();
+        final NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+
+        DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
+        TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+        TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+        TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory
+                .createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
+
+        final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
+                scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(
+                        travelTimeCalculator, config.planCalcScore()), travelTimeCalculator,
+                leastCostPathCalculatorFactory);
+
+        ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 1,
+                new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+                    public AbstractPersonAlgorithm getPersonAlgorithm()
+                    {
+                        return new PersonPrepareForSim(routingAlgorithm, network);
+                    }
+                });
+    }
+    
+    
+    private static void createDriverPersons(Scenario scenario, VRPData vrpData)
+    {
+        Population population = scenario.getPopulation();
+        Vehicle[] vrpVehicles = vrpData.vehicles;
+
+        for (Vehicle vrpVeh : vrpVehicles) {
+            Id personId = scenario.createId("vrpDriver_" + vrpVeh.id);
+            VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
+
+            Plan dummyPlan = new PlanImpl(vrpDriver);
+            MATSimVertex vertex = (MATSimVertex)vrpVeh.depot.vertex;
+            Activity dummyAct = new ActivityImpl("w", vertex.getCoord(), vertex.getLink().getId());
+            dummyPlan.addActivity(dummyAct);
+            vrpDriver.addPlan(dummyPlan);
+
+            population.addPerson(vrpDriver);
+        }
+    }
+
 }
