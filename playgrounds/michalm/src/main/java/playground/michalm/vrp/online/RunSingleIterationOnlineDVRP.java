@@ -10,9 +10,9 @@ public class RunSingleIterationOnlineDVRP
     public static void main(String[] args) throws IOException
     {
         String[] arguments = new String[9];
-        arguments[0] = "input\\test\\single_iteration\\";
+        arguments[0] = "../../maciejewski/input/test/single_iteration/";
         arguments[1] = "config-verB.xml";
-        arguments[2] = "dvrp\\";
+        arguments[2] = "dvrp/";
         arguments[3] = "A101.txt";
         arguments[4] = "arc_times.txt.gz";
         arguments[5] = "arc_costs.txt.gz";
