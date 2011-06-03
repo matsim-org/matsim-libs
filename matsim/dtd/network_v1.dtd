@@ -20,7 +20,7 @@
 <!ATTLIST links capperiod  CDATA "01:00:00"
 				effectivecellsize CDATA "7.5"
 				effectivelanewidth CDATA "3.75"
-                capPeriod  CDATA "01:00:00"
+                capPeriod  CDATA #IMPLIED
                 capDivider CDATA #IMPLIED
                 capdivider CDATA #IMPLIED>
 
