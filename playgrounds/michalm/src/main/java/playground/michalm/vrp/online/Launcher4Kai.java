@@ -5,7 +5,7 @@ import java.io.*;
 import playground.michalm.vrp.online.*;
 
 
-public class RunSingleIterationOnlineDVRP
+public class Launcher4Kai
 {
     public static void main(String[] args) throws IOException
     {
