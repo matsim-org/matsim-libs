@@ -544,6 +544,8 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		this.activityEndsList.remove( agent ) ;
 		this.activityEndsList.add( agent ) ;
 
+		// The intention in the following is that an agent that is no longer alive has an activity end time of infinity.  The number of
+		// alive agents is only modified when an activity end time is changed between a finite time and infinite.  kai, jun'11
 		if ( oldTime==Double.POSITIVE_INFINITY && newTime!=Double.POSITIVE_INFINITY) {
 			this.getAgentCounter().incLiving() ;
 		} else if ( oldTime!=Double.POSITIVE_INFINITY && newTime==Double.POSITIVE_INFINITY ) {

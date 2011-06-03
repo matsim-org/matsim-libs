@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -173,6 +174,11 @@ public class Config {
 
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
+
+		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl()) ;
+		// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
+		// because at this point my intuition is that one should assume that this is _always_ added ... and not just
+		// in one specific execution path but not in another.  kai, may'11)
 
 		this.otfVis = new OTFVisConfigGroup();
 		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
