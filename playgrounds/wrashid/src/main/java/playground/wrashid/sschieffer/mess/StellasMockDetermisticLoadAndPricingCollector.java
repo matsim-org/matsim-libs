@@ -4,7 +4,7 @@ import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 
 public class StellasMockDetermisticLoadAndPricingCollector {
 	

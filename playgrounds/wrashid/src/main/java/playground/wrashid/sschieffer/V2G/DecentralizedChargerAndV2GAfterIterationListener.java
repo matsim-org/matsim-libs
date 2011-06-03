@@ -1,8 +1,7 @@
-package playground.wrashid.sschieffer.DSC;
+package playground.wrashid.sschieffer.V2G;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -10,19 +9,22 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
+import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 import playground.wrashid.sschieffer.SetUp.VehicleDefinition.SetUpVehicleCollector;
 import playground.wrashid.sschieffer.SetUp.VehicleDefinition.VehicleTypeCollector;
 
 /**
  * implements IterationEndsListener
- * to be called after an iteration, if the DecentralizedSmartCharging Optimization shall be run.
- * 
+ * to be called after an iteration, 
+ * if the DecentralizedSmartCharging Optimization And V2G shall be run
  * 
  * @author Stella
  *
  */
-public class DecentralizedChargerAfterIterationListener implements IterationEndsListener{
+public class DecentralizedChargerAndV2GAfterIterationListener implements IterationEndsListener{
+	
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -39,7 +41,6 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			 * you can modify the default values in the class
 			 */
 			SetUpVehicleCollector sv= new SetUpVehicleCollector();
-			//double kWHEV, double kWHPHEV, boolean gasHigh
 			final VehicleTypeCollector myVehicleTypes = sv.setUp(
 					DecentralizedChargingSimulation.kWHEV, 
 					DecentralizedChargingSimulation.kWHPHEV, 
@@ -58,14 +59,11 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					myVehicleTypes // the defined vehicle types(gas, battery)
 					);
 			
-			
-			
 			//set battery reserve
 			myDecentralizedSmartCharger.initializeLP(
 					DecentralizedChargingSimulation.bufferBatteryCharge,
 					DecentralizedChargingSimulation.LPoutput
 					);
-			
 			// set standard charging slot length
 			myDecentralizedSmartCharger.initializeChargingSlotDistributor(DecentralizedChargingSimulation.standardChargingLength);
 			
@@ -85,7 +83,13 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 			final HubLinkMapping hubLinkMapping=
 				DecentralizedChargingSimulation.myMappingClass.mapHubs(DecentralizedChargingSimulation.controler);
 			
-					
+			/*
+			 * Network  - Electric Grid Information
+			 * 
+			 * - distribution of free load [W] available for charging over the day (deterministicHubLoadDistribution)
+			
+			 */
+			
 			DecentralizedChargingSimulation.loadPricingCollector.setUp();
 			
 			final HashMap<Integer, Schedule> deterministicHubLoadDistribution
@@ -102,13 +106,52 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					DecentralizedChargingSimulation.loadPricingCollector.getHighestPriceKWHAllHubs()
 					);
 			
+			myDecentralizedSmartCharger.run();
 			
-						
-			myDecentralizedSmartCharger.run();			
+			DecentralizedChargingSimulation.slc.setUp();
+			
+			
+			// SET STOCHASTIC LOADS
+			myDecentralizedSmartCharger.setStochasticSources(
+					DecentralizedChargingSimulation.slc.getStochasticHubLoad(),
+					DecentralizedChargingSimulation.slc.getStochasticHubSources(),
+					DecentralizedChargingSimulation.slc.getStochasticAgentVehicleSources());			
+					
+			/*
+			 * ************************
+			 * Agent contracts
+			 * the convenience class AgentContractCollector 
+			 * helps you to create the necessary List
+			 * LinkedListValueHashMap<Id, ContractTypeAgent> agentContracts
+			 * 
+			 * provide the compensationPerKWHRegulationUp/Down in your currency
+			 */
+			 
+			AgentContractCollector myAgentContractsCollector= new AgentContractCollector (
+					myDecentralizedSmartCharger,
+					DecentralizedChargingSimulation.compensationPerKWHRegulationUp,
+					DecentralizedChargingSimulation.compensationPerKWHRegulationDown,
+					DecentralizedChargingSimulation.compensationPERKWHFeedInVehicle);
+			
+			
+			HashMap<Id, ContractTypeAgent> agentContracts= 
+				myAgentContractsCollector.makeAgentContracts(
+						DecentralizedChargingSimulation.controler,						
+						DecentralizedChargingSimulation.xPercentDown,
+						DecentralizedChargingSimulation.xPercentDownUp);
+				
+			//set the agent contracts
+			myDecentralizedSmartCharger.setAgentContracts(agentContracts);
+			
+			myDecentralizedSmartCharger.initializeAndRunV2G(					
+					DecentralizedChargingSimulation.xPercentDown,
+					DecentralizedChargingSimulation.xPercentDownUp);
 			
 			DecentralizedChargingSimulation.setDecentralizedSmartCharger(myDecentralizedSmartCharger);
 			
 		} catch (Exception e1) {
+			
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		

@@ -25,7 +25,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 
 /**
  * this is a help class to create txt files describing the distribution of free load over a day

@@ -12,16 +12,16 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DSC.ChargingInterval;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DSC.GeneralSource;
-import playground.wrashid.sschieffer.DSC.LPEV;
-import playground.wrashid.sschieffer.DSC.LPPHEV;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
-import playground.wrashid.sschieffer.DSC.TimeInterval;
+import playground.wrashid.sschieffer.DSC.LP.LPEV;
+import playground.wrashid.sschieffer.DSC.LP.LPPHEV;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ChargingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.DrivingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.TimeInterval;
 
 
 /**

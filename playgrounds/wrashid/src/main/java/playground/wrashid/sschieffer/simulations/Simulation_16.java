@@ -30,9 +30,9 @@ import org.apache.commons.math.FunctionEvaluationException;
 
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
-import playground.wrashid.sschieffer.DSC.HubInfoStochastic;
-import playground.wrashid.sschieffer.SetUp.StellasHubMapping;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
+import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
 import java.util.*;

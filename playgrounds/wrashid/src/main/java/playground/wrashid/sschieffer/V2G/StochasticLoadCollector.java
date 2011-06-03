@@ -16,12 +16,12 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.GeneralSource;
-import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
-import playground.wrashid.sschieffer.DSC.HubInfoStochastic;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.LoadFileReader;
-import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.SetUp.LoadFileReader;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 
 
 /**

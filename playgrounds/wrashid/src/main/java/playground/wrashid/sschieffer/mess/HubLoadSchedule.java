@@ -2,8 +2,8 @@ package playground.wrashid.sschieffer.mess;
 
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 
 
 /**
