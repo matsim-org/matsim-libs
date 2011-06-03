@@ -81,8 +81,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	public Events2Score4PC(Config config, ScoringFunctionFactory factory,
 			Population population) {
-		super(population, factory, config.planCalcScore()
-				.getLearningRate());
+		super(population, factory, config.planCalcScore().getLearningRate());
+		attrNameList.clear();
 		this.config = config;
 		// #####################################
 		// travelTime
@@ -146,9 +146,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 			if (person == null) {
 				return null;
 			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(),
-					sfFactory
-							.createNewScoringFunction(person.getSelectedPlan()));
+			data = new Tuple<Plan, ScoringFunction>(
+					person.getSelectedPlan(),
+					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
 			agentScorers.put(agentId, data);
 		}
 		return data;
@@ -231,8 +231,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	}
 
 	/**
-	 * this method will be called in {@code
-	 * DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
+	 * this method will be called in
+	 * {@code DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
 	 */
 	@Override
 	public void finish() {
@@ -366,8 +366,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 			agentPlanElementIndex.put(personId, Integer.valueOf(1));
 			return 1;
 		}
-		agentPlanElementIndex.put(personId, Integer.valueOf(1 + index
-				.intValue()));
+		agentPlanElementIndex.put(personId,
+				Integer.valueOf(1 + index.intValue()));
 		return 1 + index.intValue();
 	}
 

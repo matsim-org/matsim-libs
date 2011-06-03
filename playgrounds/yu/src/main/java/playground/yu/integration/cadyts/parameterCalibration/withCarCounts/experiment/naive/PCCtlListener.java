@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.naive;
 
 import java.util.Map;
 
@@ -43,8 +43,8 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
@@ -550,8 +550,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writerCV.flush();
 
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
-			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
-					.getParameters();
+			// Vector params = ((ChoiceParameterCalibrator<Link>)
+			// calibrator).getParameters();
 			PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 			// VERY IMPORTANT #########################################
@@ -569,30 +569,29 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 					for (int i = 0; i < paramNames.length; i++) {
 						int paramNameIndex = Events2Score4PC.attrNameList
-								.indexOf(paramNames[i]/*
-													 * pos. of param in
-													 * Parameters in Cadyts
-													 */);
+								.indexOf(paramNames[i]
+								/* pos. of param in Parameters in Cadyts */);
 						double paramScaleFactor = Events2Score4PC.paramScaleFactorList
 								.get(paramNameIndex);
 
-						double value = params.get(i);
-						if (scoringCfg.getParams().containsKey(paramNames[i])) {
-							scoringCfg.addParam(paramNames[i],
-									Double.toString(value / paramScaleFactor));
-						} else/* bse */{
-							config.setParam(BSE_CONFIG_MODULE_NAME,
-									paramNames[i],
-									Double.toString(value / paramScaleFactor));
-						}
+						// double value = params.get(i);
+						// if
+						// (scoringCfg.getParams().containsKey(paramNames[i])) {
+						// // scoringCfg.addParam(paramNames[i],
+						// // Double.toString(value / paramScaleFactor));
+						// } else/* bse */{
+						// // config.setParam(BSE_CONFIG_MODULE_NAME,
+						// // paramNames[i],
+						// // Double.toString(value / paramScaleFactor));
+						// }
 
-						mnl.setParameter(paramNameIndex, value);
+						// mnl.setParameter(paramNameIndex, value);
 
 						// text output
-						paramArrays[i][iter - firstIter] = value
-								/ paramScaleFactor;
+						// paramArrays[i][iter - firstIter] = value
+						// / paramScaleFactor;
 						sb.append("\t");
-						sb.append(value / paramScaleFactor);
+						// sb.append(value / paramScaleFactor);
 					}
 
 					writer.writeln(sb);
