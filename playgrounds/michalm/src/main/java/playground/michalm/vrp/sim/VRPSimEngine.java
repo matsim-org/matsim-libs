@@ -59,8 +59,6 @@ public class VRPSimEngine
     @Override
     public void onPrepareSim()
     {
-        createDriverPersons();
-
         // vrpVehAgentMonitoring = new VRPVehicleAgentMonitoring(netsim.getEventsManager(),
         // data.getIdToVehAgent(), this);
 
@@ -68,27 +66,6 @@ public class VRPSimEngine
 
         optimizer = new VRPOptimizer(algParams);
         optimize();
-    }
-
-
-    private void createDriverPersons()
-    {
-        Scenario scenario = netsim.getScenario();
-        Population population = scenario.getPopulation();
-        Vehicle[] vrpVehicles = vrpData.vehicles;
-
-        for (Vehicle vrpVeh : vrpVehicles) {
-            Id personId = scenario.createId("vrpDriver_" + vrpVeh.id);
-            VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
-
-            Plan dummyPlan = new PlanImpl(vrpDriver);
-            MATSimVertex vertex = (MATSimVertex)vrpVeh.depot.vertex;
-            Activity dummyAct = new ActivityImpl("w", vertex.getCoord(), vertex.getLink().getId());
-            dummyPlan.addActivity(dummyAct);
-            vrpDriver.addPlan(dummyPlan);
-
-            population.addPerson(vrpDriver);
-        }
     }
 
 
