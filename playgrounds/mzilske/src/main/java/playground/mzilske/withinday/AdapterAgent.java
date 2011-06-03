@@ -189,7 +189,13 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 			eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
 			((Activity) currentPlanElement).setEndTime(now);
 			simulation.rescheduleActivityEnd(AdapterAgent.this, Double.POSITIVE_INFINITY, now);
-			simulation.getAgentCounter().decLiving(); // This is necessary because the QSim thinks it must increase the living agents counter in the rescheduling step.
+
+			simulation.getAgentCounter().decLiving(); 
+			// This is necessary because the QSim thinks it must increase the living agents counter in the rescheduling step.  mz
+			// The intention there was that an agent that is no longer alive has an activity end time of infinity (rather
+			// than removing it completely from teh mobsim).  The number of
+			// alive agents is only modified when an activity end time is changed between a finite time and infinite.  kai, jun'11
+
 			activityBehavior = null;
 		}
 		
@@ -237,7 +243,9 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	@Override
 	public Person getPerson() {
 		// I often get asked about my Person, but all they really want to know
-		// is my Id. Except for the visualizer, when it wants to visualize my Plan.
+		// is my Id. Except for the visualizer, when it wants to visualize my Plan. mz
+		// The PlanAgent is in fact directly Identifiable, exactly for that reason.  Should be push this up 
+		// even further (to MobsimAgent)?  kai, jun'11
 		return new Person() {
 
 			@Override
@@ -301,7 +309,15 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	@Override
 	public void endLegAndAssumeControl(double now) {
 		// The simulation tells me I have arrived.
-		// Interestingly, I have to throw the event myself.
+		// Interestingly, I have to throw the event myself. mz
+		//
+		// In theory, transport-related events should be thrown by the transport part of the simulation, activity-related
+		// events should be thrown by the agent.  In practice, there are many transport-related modules, such as teleportation, 
+		// walk, public transit, etc., and many of them are pluggable.  It is quite possible that one of them forgets the 
+		// corresponding arrival event.  So it seems easier to ensure consistency in the agent than in the framework.
+		// In part also because the user of the agent arrival event is probably the agent programmer, not the framework
+		// programmer.  Given that this was also the structure that I found, I decided to leave it that way.  kai, jun'11
+
 		currentLinkId = ((Leg) currentPlanElement).getRoute().getEndLinkId();
 		eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id, currentLinkId, ((Leg) currentPlanElement).getMode()));
 		currentPlanElement = null;
@@ -326,7 +342,13 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// occasions. Most of the time, what they really want to know is only the mode I am choosing,
 		// but sometimes they also want to know the car Route I am taking. This is strange because I am asked at every time
 		// step what link I want to go to. Then I realized that I am only asked this so the Simulation knows if maybe I already
-		// am where I want to go.
+		// am where I want to go. mz
+		//
+		// I am not fully sure but I seem to remember that the problem is that someone (not me) put the arrival link id into the 
+		// route rather than into the leg.  So you either have to ask the activity or the route if you have arrived.  Out of these
+		// two, I would say that route is the less awkward.  
+		//
+		// There is also getDestinationLinkId(), and it is not clear if "getCurrentLeg()" is even still necessary.  kai, jun'11
 	    
         PlanElement currentPlanElement = this.getCurrentPlanElement();
 
@@ -353,7 +375,11 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// I am told this when the Simulation decides to not move me to my destination over the network, but to teleport me there.
 		// This is a little silly - apparently the Simulation thinks that when I'm moved over the network, I can keep track of
 		// my current link myself, but when I'm "teleported", I can't do that. But I can! After all, the Simulation just asked me where I 
-		// want to go.
+		// want to go. mz
+		//
+		// Actually no.  The teleportation arrival is much later than the teleportation departure.  Also, there is no guarantee
+		// that the mobsim delivers to where it should deliver.  The corresponding notification method for network movement 
+		// is "notifyMoveOverNode". kai, jun'11
 	}
 
 	@Override
@@ -390,7 +416,9 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// this because it is in my Leg, which it already used to determine
 		// that I need to be teleported.
 		// I just have to be honest in answering that question. The simulation will
-		// immediately notify me that I was teleported to the link which I answer here.
+		// immediately notify me that I was teleported to the link which I answer here. mz
+		//
+		// The idea was/is to make the mobsim run without knowing about legs and routes.  kai, jun'11
 		return ((Leg) currentPlanElement).getRoute().getEndLinkId();
 	}
 
@@ -407,19 +435,33 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	@Override
 	public void setVehicle(QVehicle veh) {
 		// The Simulation tells me what vehicle I get to use. Don't know what I should do with that information.
-		// I need to remember it so I can give it back when getVehicle is called.
+		// I need to remember it so I can give it back when getVehicle is called. mz
+		//
+		// This is just a back pointer.  I would prefer bi-directional pointers (i.e. connectors), but they
+		// don't exist in java.  As an example: Person may receive a recommendation to change lanes via his/her iPhone.
+		// The person would need to be able to do give this info to the steering wheel of the vehicle.
+		// It is, however, not clear why the agent needs to expose that info.  kai, jun'11
+
 		this.veh = veh;
 	}
 
 	@Override
 	public QVehicle getVehicle() {
 		// The simulation asks me what vehicle I am using. This is silly. I am an agent! Nobody should use me as a data container.
+		// mz
+		//
+		// agreed.  it is used only in two locations; maybe we can get rid of it.  kai, jun'11
 		return this.veh;
 	}
 
 	@Override
 	public void notifyMoveOverNode() {
-		// I think I am told this some time after I was asked about my next link. I think this means that I have entered it now.
+		// I think I am told this some time after I was asked about my next link. I think this means that I have entered it now. mz
+		//
+		// yes, exactly.  It may have happened that it was not possible to cross the intersection, and the mobsim may have made you
+		// "stuckAndAbort", or a police person may have waved you into a link into which you did not want to go.  
+		// (It is, however, quite strange that this does not pass on the new link as an argument.)
+		// kai, jun'11
 		this.nextLinkId = null;
 	}
 
@@ -438,7 +480,11 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 
 	@Override
 	public double getWeight() {
-		// whatever
+		// whatever. mz
+		//
+		// yyyy well, would be better to set this to "1" since this is, in the end, the space that the agent uses, say in the
+		// bus.  But it is one of these functions that someone added without thinking it through, and nobody has used so far. 
+		// kai, jun'11
 		return 0;
 	}
 
