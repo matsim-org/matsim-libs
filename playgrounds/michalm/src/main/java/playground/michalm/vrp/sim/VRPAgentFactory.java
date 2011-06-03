@@ -37,7 +37,7 @@ public class VRPAgentFactory
         if (p instanceof VRPDriverPerson) {
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
 
-            LightweightVRPVehicleAgent vrpAgent = new LightweightVRPVehicleAgent(
+            RealAgent vrpAgent = new LightweightVRPVehicleAgent(
                     driverPerson.getVrpVehicle(), data.getShortestPaths());
             
             AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), netsim, vrpAgent);

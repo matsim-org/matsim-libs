@@ -1,12 +1,16 @@
 package playground.michalm.vrp.supply;
 
-import java.util.*;
+import java.util.List;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.Route;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
-import playground.mzilske.withinday.*;
+import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.ShortestPath;
+import playground.mzilske.withinday.ActivityBehavior;
+import playground.mzilske.withinday.RealAgent;
+import playground.mzilske.withinday.World;
 
 
 public class LightweightVRPVehicleAgent
@@ -42,7 +46,7 @@ public class LightweightVRPVehicleAgent
         // route.completed
 
         if (!route.hasBeenStarted()) {
-            VRPActivityBehaviour vrpActivityBehaviour = VRPActivityBehaviour
+            ActivityBehavior vrpActivityBehaviour = VRPActivityBehaviour
                     .createWaitingBeforeStartingRoute(route);
             world.getActivityPlane().startDoing(vrpActivityBehaviour);
         }

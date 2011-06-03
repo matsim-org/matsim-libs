@@ -50,6 +50,8 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		@Override
 		public void stop() {
 			System.out.println("Agent wants to stop, but stopping teleportation isn't supported.");
+			// yy stopping is supported nearly nowhere, since it does not make sense.  An airplane can also not
+			// just stop.  Shouldn't we get rid of this method?  kai, jun'11
 		}
 		
 	};
@@ -70,7 +72,11 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 
 		@Override
 		public void nextTurn(Id nextLinkId) {
+			// storing nextLinkId internally:
 			AdapterAgent.this.nextLinkId = nextLinkId;
+			
+			// pushing nextLinkId to the "plan" agent (this should not really be necessary ... although it might make sense
+			// also in the context of getExecutedPlan()) 
 			((NetworkRoute) ((Leg) currentPlanElement).getRoute()).setEndLinkId(nextLinkId);
 		}
 
@@ -237,6 +243,9 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 			drivingBehavior.doSimStep(drivingWorld);
 		}else {
 			realAgent.doSimStep(world);
+			// I guess you get here in the time step after endLeg/ActAndAssumeControl, since this particular agent does not 
+			// do anything in those methods.  So the agent is in limbo for the time being.  Is "being in limbo" consistent with
+			// the original design?  kai, jun'11
 		}
 	}
 
@@ -244,6 +253,7 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	public Person getPerson() {
 		// I often get asked about my Person, but all they really want to know
 		// is my Id. Except for the visualizer, when it wants to visualize my Plan. mz
+		//
 		// The PlanAgent is in fact directly Identifiable, exactly for that reason.  Should be push this up 
 		// even further (to MobsimAgent)?  kai, jun'11
 		return new Person() {
@@ -286,7 +296,10 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// I get asked about this first thing in the morning.
 		// After I have decided I am in an activity, I need to give the
 		// same answer again every time I am asked (until I am told my activity
-		// is over), or I will confuse the simulation.
+		// is over), or I will confuse the simulation. mz
+		//
+		// The main reason for this is that the activity end queue is time-sorted, so that not all agents need to be asked
+		// if they want to depart.  If you take care of agent departure yourself, this could just return infinity.
 		return ((Activity) currentPlanElement).getEndTime();
 	}
 
@@ -332,11 +345,14 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 
 	@Override
 	public PlanElement getNextPlanElement() {
-		// I am never asked this.
+		// I am never asked this. mz
+		//
+		// Then why is it in the interface? :-) kai, jun'11
 		throw new RuntimeException();
 	}
 
 	@Override
+	@Deprecated // try to use getCurrentPlanElement()
 	public Leg getCurrentLeg() {
 		// I am getting asked about this as soon as I tell the Simulation I want to depart and on several other
 		// occasions. Most of the time, what they really want to know is only the mode I am choosing,
@@ -349,6 +365,8 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// two, I would say that route is the less awkward.  
 		//
 		// There is also getDestinationLinkId(), and it is not clear if "getCurrentLeg()" is even still necessary.  kai, jun'11
+		//
+		// Personally, I also think that getCurrentLeg and getCurrentActivity should simply be removed.
 	    
         PlanElement currentPlanElement = this.getCurrentPlanElement();
 
@@ -360,6 +378,7 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
+	@Deprecated // try to use getCurrentPlanElement()
 	public Activity getCurrentActivity() {
 	    PlanElement currentPlanElement = this.getCurrentPlanElement();
 	    
@@ -396,7 +415,10 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 
 	@Override
 	public Id getCurrentLinkId() {
-		// I am asked this right at the beginning so the Simulation can park my vehicle on that link.
+		// I am asked this right at the beginning so the Simulation can park my vehicle on that link. mz
+		//
+		// Many pieces of the code are easier if the agent knows where she is.  In most places, this is retrieved over the
+		// person, but this seems the better way (I think).  kai, jun'11
 		if (firstTimeGetCurrentLinkId) {
 			return currentLinkId ;
 		} else {
@@ -450,7 +472,8 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		// The simulation asks me what vehicle I am using. This is silly. I am an agent! Nobody should use me as a data container.
 		// mz
 		//
-		// agreed.  it is used only in two locations; maybe we can get rid of it.  kai, jun'11
+		// agreed.  it is used only in two locations; maybe we can get rid of it.  
+		// (I fact, both places where it is needed have to do with non-physical behavior.)  kai, jun'11
 		return this.veh;
 	}
 
