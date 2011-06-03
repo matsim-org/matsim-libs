@@ -23,6 +23,8 @@
  */
 package playground.yu.newPlans;
 
+import java.util.logging.Logger;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -43,6 +45,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
  */
 public class PopComplementer extends NewPopulation {
 	private final int maxPlansPerAgent;
+	private final Logger log = Logger
+			.getLogger(PopComplementer.class.getName());
 
 	/**
 	 * @param network
@@ -60,6 +64,8 @@ public class PopComplementer extends NewPopulation {
 		int size = person.getPlans().size();
 		while (size < maxPlansPerAgent) {
 			person.addPlan(new RandomPlanSelector().selectPlan(person));
+			log.info("Person (\t" + person.getId()
+					+ "\t) added a Plan in choice set.");
 			size = person.getPlans().size();
 		}
 		pw.writePerson(person);
@@ -70,8 +76,9 @@ public class PopComplementer extends NewPopulation {
 	 */
 	public static void main(String[] args) {
 		String netFilename = "../../matsim/examples/equil/network.xml";
-		String oldPopFilename = "test/input/10.plans.xml.gz";
-		String newPopFilename = "test/input/10.plansFull.xml.gz";
+		String oldPopFilename = "test/input/200.plans.xml.gz";
+		String newPopFilename = "test/input/200.plansComplemented.xml.gz";
+		int maxPlansPerAgent = 4;
 
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -81,7 +88,8 @@ public class PopComplementer extends NewPopulation {
 		Population pop = s.getPopulation();
 		new MatsimPopulationReader(s).readFile(oldPopFilename);
 
-		PopComplementer pp = new PopComplementer(net, pop, newPopFilename, 2);
+		PopComplementer pp = new PopComplementer(net, pop, newPopFilename,
+				maxPlansPerAgent);
 		pp.run(pop);
 		pp.writeEndPlans();
 	}

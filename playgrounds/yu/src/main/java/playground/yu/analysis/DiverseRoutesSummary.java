@@ -49,7 +49,7 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * summarize information of routes in different plans in choice set of AN agent
- * 
+ *
  * @author ychen
  */
 
@@ -84,6 +84,7 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 			return routeLinkIds;
 		}
 
+		@Override
 		public String toString() {
 			// StringBuffer sb = new StringBuffer(personId.toString());
 			// sb.append("\t");
@@ -207,11 +208,12 @@ public class DiverseRoutesSummary extends AbstractPersonAlgorithm {
 	}
 
 	public static void main(String[] args) {
-		String networkFilename = "../matsimTests/ParamCalibration/network.xml"//
-		, populationFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz"//
-		, outputFilename = "../matsimTests/dailyJourney_Route2QGIS/equilTest1of2.txt";
+		String networkFilename = "test/input/network.xml"//
+		, populationFilename = "test/input/it103baseTimeDistCombi0_0.5_1plans.xml.gz"//
+		, outputFilename = "test/output/it103baseTimeDistCombi0_0.5_1plansRouteSummary.log";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 

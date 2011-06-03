@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newPlans;
 
@@ -39,7 +39,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author yu
- * 
+ *
  */
 public class InsertExtraneousSelectedPlans extends NewPopulation {
 	private Population[] extraneousPopulations;
@@ -51,6 +51,7 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 		this.extraneousPopulations = extraneousPopulations;
 	}
 
+	@Override
 	public void beforeWritePersonHook(Person person) {
 		Id personId = person.getId();
 		for (Population extraneousPopulation : extraneousPopulations) {
@@ -60,8 +61,7 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 			if (extraneousPerson != null) {
 				person.addPlan(extraneousPerson.getSelectedPlan());
 			} else {
-				Logger
-						.getLogger("INSERT_EXTRANEOUS_PLAN")
+				Logger.getLogger("INSERT_EXTRANEOUS_PLAN")
 						.warning(
 								"Person\t"
 										+ person.getId()
@@ -83,14 +83,13 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 			}
 			outputPopulationFilename = args[args.length - 1];
 		} else {
-			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			populationFilename = "../matsimTests/ParamCalibration/general2/basePop.xml.gz";
+			netFilename = "test/input/network.xml";
+			populationFilename = "test/input/it200basePop.xml.gz";
 			extraneousPopulationFilenames = new String[] {
-					"../matsimTests/ParamCalibration/general2/leftTurn/ITERS/it.42/minimizeLeftTurns.42.plans.xml.gz",
-					"../matsimTests/ParamCalibration/general2/tightTurn/ITERS/it.42/TightTurnPenalty.42.plans.xml.gz",
-					"../matsimTests/ParamCalibration/general2/distance/ITERS/it.42/distance.42.plans.xml.gz",
-					"../matsimTests/ParamCalibration/general2/linkAmount/ITERS/it.42/linkAmount.42.plans.xml.gz" };
-			outputPopulationFilename = "../matsimTests/ParamCalibration/general2/fixChoiceSetPop.xml.gz";
+					"test/output/normal1/ITERS/it.201/201.plans.xml.gz",
+					"test/output/normal2/ITERS/it.201/201.plans.xml.gz",
+					"test/output/normal3/ITERS/it.201/201.plans.xml.gz" };
+			outputPopulationFilename = "test/input/it201baseTimeDistCombi0_0.5_1plans.xml.gz";
 			extraneousPopSize = extraneousPopulationFilenames.length;
 		}
 

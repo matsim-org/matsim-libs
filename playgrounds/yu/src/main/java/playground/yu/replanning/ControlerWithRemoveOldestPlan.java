@@ -42,6 +42,10 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 		super(args);
 	}
 
+	public ControlerWithRemoveOldestPlan(String configFilename) {
+		super(configFilename);
+	}
+
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();

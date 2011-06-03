@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.travelCost;
 
@@ -34,23 +34,33 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import playground.yu.replanning.ControlerWithRemoveOldestPlan;
 
 /**
- * switch TravelCostCalculatorFactory evetually also PersonalizableTravelCost
- * before Replanning only with ReRoute to create diverse routes
- * 
+ * switch TravelCostCalculatorFactory eventually also PersonalizableTravelCost
+ * before Replanning only with ReRoute to create diverse routes with different
+ * travel time and distance combination as impedance
+ *
  * @author yu
- * 
+ *
  */
-public class DiverseRouteListener implements IterationStartsListener,
+public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 		IterationEndsListener {
+	private final int nbOfCombi;
+
+	/**
+	 * @param nbOfCombi
+	 *            number of variations of possible combinations of travel time
+	 *            and distance as impedance for "ReRoute"
+	 */
+	public ReRouteWithDiffTimeDistWeight(int nbOfCombi) {
+		this.nbOfCombi = nbOfCombi;
+	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		int iter = event.getIteration();/* firstIter+1, +2, +3 */
 		int firstIter = ctl.getFirstIteration();
-		ctl
-				.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
-						1d - (iter - firstIter - 1) / 3d/* A -> travelTime */));
+		ctl.setTravelCostCalculatorFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
+				1d - (iter - firstIter - 1) / (nbOfCombi - 1d)/* A -> travelTime */));
 	}
 
 	/**
@@ -64,17 +74,24 @@ public class DiverseRouteListener implements IterationStartsListener,
 		if (iter == ctl.getFirstIteration()) {
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
-			scoringCfg.setMonetaryDistanceCostRateCar(-0.00012 * 3d);
-			ctl
-					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-							scoringCfg));
+			scoringCfg.setMonetaryDistanceCostRateCar(-0.000245);
+			ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
+					scoringCfg));
 		}
 	}
 
+	/**
+	 * @param args
+	 *            [0] configFilename;
+	 *            <p>
+	 * @param args
+	 *            [1] number of variations of possible combinations of travel
+	 *            time and distance as impedance for "ReRoute"
+	 */
 	public static void main(String[] args) {
-		Controler controler = new ControlerWithRemoveOldestPlan(args);
-		controler.addControlerListener(new DiverseRouteListener());
-		controler.setWriteEventsInterval(0);
+		Controler controler = new ControlerWithRemoveOldestPlan(args[0]);
+		controler.addControlerListener(new ReRouteWithDiffTimeDistWeight(
+				Integer.parseInt(args[1])));
 		controler.setCreateGraphs(false);
 		controler.run();
 	}

@@ -30,7 +30,7 @@ import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class ParameterizedTravelCostCalculatorFactoryImpl implements
 		TravelCostCalculatorFactory {
@@ -57,8 +57,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 			 * utility.
 			 */
 			travelCostFactor = (-cnScoringGroup.getTraveling_utils_hr() / 3600d + cnScoringGroup
-					.getPerforming_utils_hr() / 3600d)
-					* A;
+					.getPerforming_utils_hr() / 3600d) * A;
 
 			// this.marginalUtlOfDistance =
 			// cnScoringGroup.getMarginalUtlOfDistanceCar();
@@ -97,10 +96,15 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements
 
 	private final double A;
 
+	/**
+	 * @param A
+	 *            - weight of travel time as impedance
+	 */
 	public ParameterizedTravelCostCalculatorFactoryImpl(double A) {
 		this.A = A;
 	}
 
+	@Override
 	public PersonalizableTravelCost createTravelCostCalculator(
 			PersonalizableTravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup) {

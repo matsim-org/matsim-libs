@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.charts.txt2chart;
 
@@ -29,9 +29,9 @@ import playground.yu.utils.io.SimpleReader;
 
 /**
  * makes chart graphs derived from scorestats.txt or traveldistancestats.txt
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class XStats2Chart {
 
@@ -39,15 +39,15 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../../runs-svn/run696/696.";
+		String fileBase = "../../runs-svn/run1109/1109.";
 		// String fileBase = "../matsimTests/breakdown/output/";
 
-		// String inputFile = fileBase + "traveldistancestats.txt";
-		String inputFile = fileBase + "scorestats.txt";
+		String inputFile = fileBase + "traveldistancestats.txt";
+		// String inputFile = fileBase + "scorestats.txt";
 
 		String chartFile = inputFile.replace("txt", "png");
 		// /////////////////////////////////////////////
-		int maxIter = 1501;
+		int maxIter = 1001;
 		// ////////////////////////////////////////////
 		String avgExec, avgWorst, avgAvg, avgBest;
 		double[] exec = new double[maxIter];
@@ -66,8 +66,9 @@ public class XStats2Chart {
 
 		line = reader.readLine();// first line
 		while (line != null) {
-			if (line.startsWith("I"))
+			if (line.startsWith("I")) {
 				line = reader.readLine();
+			}
 			series = line.split("\t");
 			int iter = Integer.parseInt(series[0]);
 			exec[iter] = Double.parseDouble(series[1]);
@@ -80,8 +81,9 @@ public class XStats2Chart {
 		reader.close();
 
 		double[] xs = new double[maxIter];
-		for (int i = 0; i < maxIter; i++)
+		for (int i = 0; i < maxIter; i++) {
 			xs[i] = i;
+		}
 
 		XYLineChart chart = null;
 		String serie = "";

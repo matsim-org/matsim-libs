@@ -204,7 +204,9 @@ public class ModalSplitLogExtractor {
 		String outputFilename = filenameBase + "legMode.txt";
 		// String logFilename2 = filenameBase + "logfile.log";
 		// String logFilename3 = filenameBase + "logfile2.log";
+		// ###################################
 		int maxIter = 1001;
+		// ###################################
 		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
 		// reading
 		readLog(logFilename, msle);

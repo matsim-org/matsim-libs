@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.travelCost;
 
@@ -32,7 +32,7 @@ import playground.yu.replanning.reRoute.tightTurnPenalty.TightTurnPenaltyControl
 
 /**
  * @author yu
- * 
+ *
  */
 public class SingleReRouteSelectedControler extends Controler {
 
@@ -61,10 +61,10 @@ public class SingleReRouteSelectedControler extends Controler {
 	 * ../matsimTests/diverseRoutes/A0B3.xml
 	 */
 	public static void travelTimeCostWeight(String[] args) {
-		for (int i = 0; i <= 3; i++) {
+		for (int i = 0; i <= 2; i++) {
 			Controler controler = new SingleReRouteSelectedControler(args[i]);
 			controler.addControlerListener(new SingleReRouteSelectedListener(
-					(double) (3 - i) / (double) 3));
+					1d - i / 2d));
 			controler.setWriteEventsInterval(0);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -97,8 +97,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	/* ../matsimTests/diverseRoutes/capacityWeighted.xml */
 	public static void capacityWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
-		controler
-				.addControlerListener(new LinkCapacityWeightedTimeListener());
+		controler.addControlerListener(new LinkCapacityWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -136,8 +135,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	/* ../matsimTests/diverseRoutes/speedSquareWeighted.xml */
 	public static void speedSquareWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
-		controler
-				.addControlerListener(new SpeedSquareWeightedTimeListener());
+		controler.addControlerListener(new SpeedSquareWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -146,8 +144,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	/* ../matsimTests/diverseRoutes/speedSqrtWeighted.xml */
 	public static void speedSqrtWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
-		controler
-				.addControlerListener(new SpeedSqrtWeightedTimeListener());
+		controler.addControlerListener(new SpeedSqrtWeightedTimeListener());
 		controler.setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
@@ -165,7 +162,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	}
 
 	public static void main(String[] args) {
-		// travelTimeCostWeight(args);
+		travelTimeCostWeight(args);
 		// tightTurnPenalty(args);
 		// capacityWeightedTravelTimeCost(args);
 		// capacitySquareWeightedTravelTimeCost(args);
@@ -174,6 +171,6 @@ public class SingleReRouteSelectedControler extends Controler {
 		// speedSquareWeightedTravelTimeCost(args);
 		// speedSqrtWeightedTravelTimeCost(args);
 		// speedCapacitySqrtCombiWeightedTravelTimeCost(args);
-		distance(args);
+		// distance(args);
 	}
 }

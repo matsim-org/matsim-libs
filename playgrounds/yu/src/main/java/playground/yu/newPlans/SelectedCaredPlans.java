@@ -39,16 +39,16 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * writes a new Plansfile, in which every person will only have ONE {@code Plan}
- * , that also is the selected Plan of the old Plan, and the transport mode of
- * this Plan will be changed to "car".
- * 
+ * , that also is the selected {@code Plan} of the old {@code Population}, and
+ * the transport mode of this Plan will be changed to "car".
+ *
  * @author ychen
- * 
+ *
  */
 public class SelectedCaredPlans extends NewPopulation {
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -88,9 +88,9 @@ public class SelectedCaredPlans extends NewPopulation {
 			populationFilename = args[1];
 			outputPopulationFilename = args[2];
 		} else {
-			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			populationFilename = "../matsimTests/ParamCalibration/40.plans.xml.gz";
-			outputPopulationFilename = "../matsimTests/ParamCalibration/general2/baseCarPop.xml.gz";
+			netFilename = "test/input/network.xml";
+			populationFilename = "test/input/200.plans.xml.gz";
+			outputPopulationFilename = "test/input/it200basePop.xml.gz";
 		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
