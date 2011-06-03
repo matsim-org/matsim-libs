@@ -189,7 +189,11 @@ public class PersonDriverAgentImpl implements PersonDriverAgent {
 	}
 
 	@Override
-	public final void notifyMoveOverNode() {
+	public final void notifyMoveOverNode(Id newLinkId) {
+		if ( this.cachedNextLinkId != newLinkId ) {
+			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
+					"anyway ...") ;
+		}
 		this.currentLinkId = this.cachedNextLinkId;
 		this.currentLinkIdIndex++;
 		this.cachedNextLinkId = null; //reset cached nextLink

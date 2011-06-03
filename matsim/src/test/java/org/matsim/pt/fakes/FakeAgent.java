@@ -121,7 +121,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void notifyMoveOverNode() {
+	public void notifyMoveOverNode(Id nextLinkId) {
 	}
 
 	@Override

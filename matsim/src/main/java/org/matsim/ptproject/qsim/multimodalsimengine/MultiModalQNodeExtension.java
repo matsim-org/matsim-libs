@@ -133,7 +133,7 @@ public class MultiModalQNodeExtension {
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
 			
 			// move Agent over the Node
-			((PersonDriverAgent)personAgent).notifyMoveOverNode();
+			((PersonDriverAgent)personAgent).notifyMoveOverNode(nextLink.getId());
 			simEngine.getMultiModalQLinkExtension(nextQLink).addAgentFromIntersection(personAgent, now);
 		}
 		// --> nextLink == null

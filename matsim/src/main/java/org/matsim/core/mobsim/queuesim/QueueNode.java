@@ -115,7 +115,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 
 			if (nextQueueLink.hasSpace()) {
 				link.popFirstFromBuffer();
-				veh.getDriver().notifyMoveOverNode();
+				veh.getDriver().notifyMoveOverNode(nextLinkId);
 				nextQueueLink.addFromIntersection(veh);
 				return true;
 			}
@@ -139,7 +139,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
 					link.popFirstFromBuffer();
-					veh.getDriver().notifyMoveOverNode();
+					veh.getDriver().notifyMoveOverNode(nextLinkId);
 					nextQueueLink.addFromIntersection(veh);
 					return true;
 				}

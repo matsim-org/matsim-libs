@@ -229,7 +229,7 @@ public class QNode implements NetsimNode {
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {
         qbufferedItem.popFirstFromBuffer();
-        veh.getDriver().notifyMoveOverNode();
+        veh.getDriver().notifyMoveOverNode(nextLinkId);
         nextQueueLink.addFromIntersection(veh);
         return true;
       }
@@ -249,7 +249,7 @@ public class QNode implements NetsimNode {
               new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           qbufferedItem.popFirstFromBuffer();
-          veh.getDriver().notifyMoveOverNode();
+          veh.getDriver().notifyMoveOverNode(nextLinkId);
           nextQueueLink.addFromIntersection(veh);
           return true;
         }
