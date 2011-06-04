@@ -408,7 +408,7 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException();
 	}

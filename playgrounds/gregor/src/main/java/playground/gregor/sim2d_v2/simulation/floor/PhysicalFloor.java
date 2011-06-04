@@ -380,7 +380,7 @@ public class PhysicalFloor implements Floor {
 	private PlanElement getPreviousPlanElement(PlanAgent pda) {
 
 		Leg leg = (Leg) pda.getCurrentPlanElement();
-		Plan plan = pda.getExecutedPlan();
+		Plan plan = pda.getSelectedPlan();
 		List<PlanElement> l = plan.getPlanElements();
 		for (int i = 1; i < l.size(); i++) {
 			if (l.get(i).equals(leg)) {

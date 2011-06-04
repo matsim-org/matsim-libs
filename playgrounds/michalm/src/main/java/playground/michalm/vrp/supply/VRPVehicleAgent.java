@@ -51,7 +51,7 @@ public class VRPVehicleAgent
 
 
     @Override
-    public VRPRoutePlan getExecutedPlan()
+    public VRPRoutePlan getSelectedPlan()
     {
         return vrpRoutePlan;
     }

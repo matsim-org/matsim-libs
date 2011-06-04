@@ -27,7 +27,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
 
-		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
+		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
