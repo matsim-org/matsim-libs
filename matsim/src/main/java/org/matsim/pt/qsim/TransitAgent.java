@@ -36,7 +36,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 /**
  * @author mrieser
  */
-public class TransitAgent extends PersonDriverAgentImpl implements PersonDriverPassengerAgent {
+public class TransitAgent extends PersonDriverAgentImpl implements PlanDriverPassengerAgent {
 
 	public TransitAgent(final Person p, final Netsim simulation) {
 		super(p, simulation);

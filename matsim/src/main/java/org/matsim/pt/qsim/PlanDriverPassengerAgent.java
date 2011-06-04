@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: matsim
- * PersonPassengerAgent.java
+ * PersonDriverPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +20,15 @@
 
 package org.matsim.pt.qsim;
 
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 
 /**
  * @author nagel
  *
  */
-public interface PersonPassengerAgent extends PlanAgent, PassengerAgent {
-
+public interface PlanDriverPassengerAgent extends PlanAgent, DriverAgent, PassengerAgent, PlanDriverAgent, PlanPassengerAgent {
+	// note: this needs the combined interfaces (currently: PersonDriverAgent) in addition to the atomistic interfaces
+	// because of "instanceof" conditions.  kai, nov'10
 }
