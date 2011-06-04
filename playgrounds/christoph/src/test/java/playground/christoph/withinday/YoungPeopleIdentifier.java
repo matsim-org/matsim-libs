@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
@@ -37,7 +38,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
+				if (((PersonImpl) ((HasPerson)agent).getPerson()).getAge() == 18) {
 					System.out.println("found agent");
 					set.add((WithinDayAgent)agent);
 				}

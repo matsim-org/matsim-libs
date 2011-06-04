@@ -1,8 +1,6 @@
 package playground.christoph.knowledge.container.dbtools;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -11,8 +9,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
@@ -188,7 +186,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 			if (agent.getActivityEndTime() <= time + timeOffset)
 			{
 				this.offsetActivityEndsList.poll();
-				this.addPerson((PersonImpl) agent.getPerson());
+				this.addPerson((PersonImpl) ((HasPerson)agent).getPerson());
 			} 
 			else
 			{

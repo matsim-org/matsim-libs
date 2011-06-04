@@ -3,11 +3,12 @@ package playground.christoph.withinday2;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PersonDriverAgent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
@@ -33,7 +34,7 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
+				if (((PersonImpl) ((HasPerson)agent).getPerson()).getAge() == 18) {
 					System.out.println("found agent");
 					set.add((WithinDayAgent)agent);
 				}
