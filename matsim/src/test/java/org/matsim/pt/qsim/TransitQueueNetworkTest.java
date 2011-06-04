@@ -1054,7 +1054,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			vehicleType.setCapacity(capacity);
 
 			TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, qsim);
-			this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
+			this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getId(), vehicleType), 1.0);
 			this.qlink1.addParkedVehicle(this.transitVehicle);
 			this.transitVehicle.setEarliestLinkExitTime(100);
 			this.transitVehicle.setDriver(tDriver);

@@ -117,7 +117,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	public void endLegAndAssumeControl(final double now) {
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();

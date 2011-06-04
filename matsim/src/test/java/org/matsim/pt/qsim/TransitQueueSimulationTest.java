@@ -536,7 +536,7 @@ public class TransitQueueSimulationTest {
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 
-			TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(this.driver.getPerson().getId(), vehicleType), 5);
+			TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(this.driver.getId(), vehicleType), 5);
 			veh.setDriver(this.driver);
 			veh.setStopHandler(new SimpleTransitStopHandler());
 			this.driver.setVehicle(veh);

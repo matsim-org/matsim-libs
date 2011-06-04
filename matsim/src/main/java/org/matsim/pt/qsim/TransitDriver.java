@@ -90,7 +90,7 @@ public class TransitDriver extends AbstractTransitDriver {
 //		this.getSimulation().handleAgentArrival(now, this);
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 
 		this.getSimulation().getAgentCounter().decLiving();
 	}
