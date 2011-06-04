@@ -24,19 +24,19 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
- * Compares two {@link PersonAgent}s according to their Id.
+ * Compares two {@link PlanAgent}s according to their Id.
  *
  * @author cdobler
  */
-public class PersonAgentComparator implements Comparator<PersonAgent>, Serializable, MatsimComparator {
+public class PersonAgentComparator implements Comparator<PlanAgent>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public int compare(PersonAgent agent1, PersonAgent agent2) {
+	public int compare(PlanAgent agent1, PlanAgent agent2) {
 		return agent1.getId().compareTo(agent2.getId());
 	}
 

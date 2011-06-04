@@ -33,8 +33,8 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -168,8 +168,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return this.sim;
 	}
 
-	@Override
-	public Person getPerson() {
+	/**Design comments:<ul>
+	 * <li> Keeping this for the time being, since the derived methods somehow need to get the selected plan.  Might
+	 * keep track of the selected plan directly, but someone would need to look more into the design. kai, jun'11
+	 * <li> For that reason, I made the method package-private.  There is, however, probably not much harm to make 
+	 * it public again as long as it is not part of the PlanDriverAgent interface.  kai, jun'11
+	 * </ul>
+	 */
+	Person getPerson() {
 		return this.dummyPerson;
 	}
 
@@ -241,8 +247,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility().getId());
-			this.getSimulation().unregisterAgentAtPtWaitLocation( (PersonAgent) passenger ) ;
-			PersonDriverAgent agent = (PersonDriverAgent) passenger;
+			this.getSimulation().unregisterAgentAtPtWaitLocation( (PlanAgent) passenger ) ;
+			PlanDriverAgent agent = (PlanDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
@@ -254,7 +260,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
-			PersonDriverAgent agent = (PersonDriverAgent) passenger;
+			PlanDriverAgent agent = (PlanDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());

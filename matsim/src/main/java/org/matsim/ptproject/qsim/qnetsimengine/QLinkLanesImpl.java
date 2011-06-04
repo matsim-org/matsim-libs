@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.lanes.Lane;
@@ -607,7 +607,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 
 	@Override
-	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now) {
+	void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {

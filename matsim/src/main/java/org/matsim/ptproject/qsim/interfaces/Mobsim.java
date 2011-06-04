@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 
@@ -112,7 +112,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * @param newTime - time when the activity end is now scheduled.  This is here so that "oldTime" and "newTime" do not get
 	 * confused.
 	 */
-	void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) ;
+	void rescheduleActivityEnd(final PlanAgent agent, final double oldTime, final double newTime ) ;
 
 	Scenario getScenario();
 

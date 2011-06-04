@@ -23,18 +23,18 @@ package org.matsim.pt.qsim;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 public class TransitAgentFactory implements AgentFactory {
 
-	private final Map<Person, PersonAgent> agentsMap;
+	private final Map<Person, PlanAgent> agentsMap;
 	private final Netsim simulation;
 
 
-	public TransitAgentFactory(final Netsim simulation, final Map<Person, PersonAgent> agents) {
+	public TransitAgentFactory(final Netsim simulation, final Map<Person, PlanAgent> agents) {
 		this.simulation = simulation ;
 		this.agentsMap = agents;
 	}

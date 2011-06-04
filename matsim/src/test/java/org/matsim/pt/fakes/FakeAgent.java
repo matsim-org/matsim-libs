@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -47,7 +47,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 /**
  * @author mrieser
  */
-public class FakeAgent implements PersonDriverAgent, PassengerAgent {
+public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
@@ -111,10 +111,10 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 		return null;
 	}
 
-	@Override
-	public PersonImpl getPerson() {
-		return this.dummyPerson;
-	}
+//	@Override
+//	public PersonImpl getPerson() {
+//		return this.dummyPerson;
+//	}
 
 	@Override
 	public void endLegAndAssumeControl(final double now) {

@@ -49,8 +49,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
@@ -238,10 +238,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		Collection<PersonAgent> agents = new ArrayList<PersonAgent>();
+		Collection<PlanAgent> agents = new ArrayList<PlanAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
-			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
+			PlanDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
 			QVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			//not needed in new agent class
@@ -492,7 +492,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	 *
 	 * @param agent
 	 *
-	 * @see PersonDriverAgent#getActivityEndTime()
+	 * @see PlanDriverAgent#getActivityEndTime()
 	 */
 	@Override
 	public void scheduleActivityEnd(final PlanAgent agent) {
@@ -535,10 +535,10 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	protected void handleKnownLegModeDeparture(double now, PlanAgent planAgent, Id linkId, String mode) {
 		Leg leg = planAgent.getCurrentLeg();
 		if (mode.equals(TransportMode.car)) {
-			if ( !(planAgent instanceof PersonDriverAgent) ) {
+			if ( !(planAgent instanceof PlanDriverAgent) ) {
 				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;
 			}
-			PersonDriverAgent driverAgent = (PersonDriverAgent) planAgent ;
+			PlanDriverAgent driverAgent = (PlanDriverAgent) planAgent ;
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
@@ -715,7 +715,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 
 	@Override
-	public void rescheduleActivityEnd(PersonAgent agent, double oldTime, double newTime) {
+	public void rescheduleActivityEnd(PlanAgent agent, double oldTime, double newTime) {
 		throw new UnsupportedOperationException() ;
 	}
 

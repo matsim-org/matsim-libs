@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
 public class MultiModalQNodeExtension {
@@ -84,7 +84,7 @@ public class MultiModalQNodeExtension {
 		 * modes. Therefore we move all agents over the node.
 		 */
 		for (MultiModalQLinkExtension link : this.inLinksArrayCache) {			
-			PersonAgent personAgent = null;
+			PlanAgent personAgent = null;
 			while ( (personAgent = link.getNextWaitingAgent(now)) != null ) {
 				this.moveAgentOverNode(personAgent, now);
 			}
@@ -102,7 +102,7 @@ public class MultiModalQNodeExtension {
 		simEngine.activateNode(this);
 	}
 	
-	private void checkNextLinkSemantics(Link currentLink, Link nextLink, PersonAgent personAgent){
+	private void checkNextLinkSemantics(Link currentLink, Link nextLink, PlanAgent personAgent){
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
 	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getId() +
 	          " from link " + currentLink.getId() + " to link " + nextLink.getId());
@@ -118,10 +118,10 @@ public class MultiModalQNodeExtension {
 	   * @return <code>true</code> if the agent was successfully moved over the node, <code>false</code>
 	   * otherwise (e.g. in case where the next link is jammed - not yet implemented)
 	   */
-	protected boolean moveAgentOverNode(final PersonAgent personAgent, final double now) {
+	protected boolean moveAgentOverNode(final PlanAgent personAgent, final double now) {
 		
-		Id currentLinkId = ((PersonDriverAgent)personAgent).getCurrentLinkId();
-		Id nextLinkId = ((PersonDriverAgent)personAgent).chooseNextLinkId();
+		Id currentLinkId = ((PlanDriverAgent)personAgent).getCurrentLinkId();
+		Id nextLinkId = ((PlanDriverAgent)personAgent).chooseNextLinkId();
 		
 		NetsimLink currentQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(currentLinkId);
 		Link currentLink = currentQLink.getLink();
@@ -133,7 +133,7 @@ public class MultiModalQNodeExtension {
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
 			
 			// move Agent over the Node
-			((PersonDriverAgent)personAgent).notifyMoveOverNode(nextLink.getId());
+			((PlanDriverAgent)personAgent).notifyMoveOverNode(nextLink.getId());
 			simEngine.getMultiModalQLinkExtension(nextQLink).addAgentFromIntersection(personAgent, now);
 		}
 		// --> nextLink == null

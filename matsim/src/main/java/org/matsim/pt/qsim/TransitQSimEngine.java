@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -77,7 +77,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final Map<Person, PersonAgent> agents = new HashMap<Person, PersonAgent>(100);
+	private final Map<Person, PlanAgent> agents = new HashMap<Person, PlanAgent>(100);
 
 	private boolean useUmlaeufe = false;
 
@@ -153,7 +153,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		for (Umlauf umlauf : umlaeufe) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				PersonAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
+				PlanAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
 				drivers.add(driver);
 			}
 		}

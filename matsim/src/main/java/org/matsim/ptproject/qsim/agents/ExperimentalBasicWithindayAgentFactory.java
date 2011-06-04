@@ -20,7 +20,7 @@
 package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 public final class ExperimentalBasicWithindayAgentFactory implements AgentFactory {
@@ -32,8 +32,8 @@ public final class ExperimentalBasicWithindayAgentFactory implements AgentFactor
 	}
 
 	@Override
-	public PersonDriverAgent createMobsimAgentFromPerson(final Person p) {
-		PersonDriverAgent agent = new ExperimentalBasicWithindayAgent(p, this.simulation);
+	public PlanDriverAgent createMobsimAgentFromPerson(final Person p) {
+		PlanDriverAgent agent = new ExperimentalBasicWithindayAgent(p, this.simulation);
 		return agent;
 	}
 

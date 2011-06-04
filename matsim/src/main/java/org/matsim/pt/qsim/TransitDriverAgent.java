@@ -20,7 +20,7 @@
 
 package org.matsim.pt.qsim;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author mrieser
  */
-public interface TransitDriverAgent extends PersonDriverAgent {
+public interface TransitDriverAgent extends PlanDriverAgent {
 
 	public TransitStopFacility getNextTransitStop();
 	

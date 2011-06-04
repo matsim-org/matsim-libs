@@ -20,6 +20,6 @@
 
 package org.matsim.core.mobsim.framework;
 
-public interface PersonDriverAgent extends PersonAgent, DriverAgent {
+public interface PlanDriverAgent extends PlanAgent, DriverAgent {
 
 }

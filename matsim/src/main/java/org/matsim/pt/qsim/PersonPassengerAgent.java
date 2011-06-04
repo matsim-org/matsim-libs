@@ -20,12 +20,12 @@
 
 package org.matsim.pt.qsim;
 
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
  * @author nagel
  *
  */
-public interface PersonPassengerAgent extends PersonAgent, PassengerAgent {
+public interface PersonPassengerAgent extends PlanAgent, PassengerAgent {
 
 }

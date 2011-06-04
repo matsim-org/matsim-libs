@@ -22,7 +22,7 @@ package org.matsim.pt.qsim;
 
 import java.util.Collection;
 
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
@@ -62,7 +62,7 @@ public interface TransitVehicle extends QVehicle {
 	public Vehicle getVehicle();
 
 	@Override
-	public PersonDriverAgent getDriver();
+	public PlanDriverAgent getDriver();
 	
 	public TransitStopHandler getStopHandler();
 

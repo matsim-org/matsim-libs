@@ -22,7 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
 public class QVehicleImpl implements QVehicle {
@@ -30,7 +30,7 @@ public class QVehicleImpl implements QVehicle {
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
 
-	private PersonDriverAgent driver = null;
+	private PlanDriverAgent driver = null;
 
 	private final Id id;
 	
@@ -81,12 +81,12 @@ public class QVehicleImpl implements QVehicle {
 	}
 
 	@Override
-	public PersonDriverAgent getDriver() {
+	public PlanDriverAgent getDriver() {
 		return this.driver;
 	}
 
 	@Override
-	public void setDriver(final PersonDriverAgent driver) {
+	public void setDriver(final PlanDriverAgent driver) {
 		this.driver = driver;
 	}
 

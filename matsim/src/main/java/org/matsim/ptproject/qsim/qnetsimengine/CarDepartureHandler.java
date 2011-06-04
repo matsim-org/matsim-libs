@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.ptproject.qsim.QSim;
@@ -58,8 +58,8 @@ class CarDepartureHandler implements DepartureHandler {
 	@Override
 	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
 		if (leg.getMode().equals(TransportMode.car)) {
-			if ( agent instanceof PersonDriverAgent ) {
-				handleCarDeparture(now, (PersonDriverAgent)agent, linkId, leg);
+			if ( agent instanceof PlanDriverAgent ) {
+				handleCarDeparture(now, (PlanDriverAgent)agent, linkId, leg);
 				return true ;
 			} else {
 				throw new UnsupportedOperationException("wrong agent type to use a car") ;
@@ -68,7 +68,7 @@ class CarDepartureHandler implements DepartureHandler {
 		return false ;
 	}
 
-	private void handleCarDeparture(double now, PersonDriverAgent agent, Id linkId, Leg leg) {
+	private void handleCarDeparture(double now, PlanDriverAgent agent, Id linkId, Leg leg) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id vehicleId = route.getVehicleId();
 		if (vehicleId == null) {

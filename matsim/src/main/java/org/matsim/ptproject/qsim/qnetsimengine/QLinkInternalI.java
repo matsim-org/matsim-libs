@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -65,6 +65,6 @@ public abstract class QLinkInternalI extends VisLane implements NetsimLink {
 	@Override
 	public abstract QSim getMobsim() ;
 
-	abstract void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now);
+	abstract void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now);
 
 }

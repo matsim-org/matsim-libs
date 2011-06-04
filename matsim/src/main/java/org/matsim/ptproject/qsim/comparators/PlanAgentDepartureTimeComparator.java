@@ -24,16 +24,16 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
- * Compares two {@link PersonDriverAgent}s according to their (planned) departure time. If the 
+ * Compares two {@link PlanDriverAgent}s according to their (planned) departure time. If the 
  * departure times are the same, the agent with the higher id is considered smaller.
  *
  * @author mrieser
  * 
- * @see PersonDriverAgent#getActivityEndTime()
+ * @see PlanDriverAgent#getActivityEndTime()
  */
 public class PlanAgentDepartureTimeComparator implements Comparator<PlanAgent>, Serializable, MatsimComparator {
 

@@ -22,7 +22,7 @@ package org.matsim.ptproject.qsim.agents;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 public interface AgentFactory extends MatsimFactory {
 

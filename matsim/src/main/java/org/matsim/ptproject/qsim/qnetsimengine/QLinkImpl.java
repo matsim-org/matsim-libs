@@ -39,7 +39,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -336,7 +336,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
-			PersonDriverAgent driver = veh.getDriver();
+			PlanDriverAgent driver = veh.getDriver();
 
 			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 
@@ -417,7 +417,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				}
 				if (veh.getId().equals(requiredVehicleId)) {
 					i.remove();
-					this.letAgentDepartWithVehicle((PersonDriverAgent) agent, veh, now);
+					this.letAgentDepartWithVehicle((PlanDriverAgent) agent, veh, now);
 					return;
 				}
 			}
@@ -425,7 +425,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	void letAgentDepartWithVehicle(PersonDriverAgent agent, QVehicle vehicle, double now) {
+	void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {

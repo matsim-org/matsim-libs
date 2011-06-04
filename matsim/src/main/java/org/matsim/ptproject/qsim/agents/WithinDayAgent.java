@@ -21,13 +21,13 @@
 package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 /*
  * Interface for Agents with within-day functionality. Might get some
  * further methods like resetCaches(). cdobler, Nov'10
  */
-public interface WithinDayAgent extends PersonAgent {
+public interface WithinDayAgent extends PlanAgent {
 	
 	public void resetCaches();
 

@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -103,12 +103,12 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				if (mobsimAgent instanceof PersonAgent) {
+				if (mobsimAgent instanceof PlanAgent) {
 					WithinDayAgent withinDayAgent = (WithinDayAgent) mobsimAgent;
 					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
 					
 					// mark the agent as currently performing an Activity
-					replanningSet.add(((PersonAgent) mobsimAgent).getId());
+					replanningSet.add(((PlanAgent) mobsimAgent).getId());
 				}
 			}
 		}
@@ -124,7 +124,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 
 		for (Id id : startingAgents) {
-			PersonAgent personAgent = personAgentMapping.get(id);
+			PlanAgent personAgent = personAgentMapping.get(id);
 
 			double now = e.getSimulationTime();
 			double departureTime = personAgent.getActivityEndTime();

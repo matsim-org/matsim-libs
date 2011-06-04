@@ -48,8 +48,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.Initializable;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
@@ -361,9 +361,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	private void createVehicles() {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
-			if ( agent instanceof PersonDriverAgent ) {
-				createAndAddDefaultVehicle((PersonAgent) agent, defaultVehicleType);
-				parkVehicleOnInitialLink((PersonAgent) agent);
+			if ( agent instanceof PlanDriverAgent ) {
+				createAndAddDefaultVehicle((PlanAgent) agent, defaultVehicleType);
+				parkVehicleOnInitialLink((PlanAgent) agent);
 			}
 		}
 	}
@@ -394,13 +394,13 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		}
 	}
 
-	private void parkVehicleOnInitialLink(PersonAgent agent) {
-		QVehicle veh = ((PersonDriverAgent) agent).getVehicle();
-		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(((PersonDriverAgent)agent).getCurrentLinkId());
+	private void parkVehicleOnInitialLink(PlanAgent agent) {
+		QVehicle veh = ((PlanDriverAgent) agent).getVehicle();
+		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(((PlanDriverAgent)agent).getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
 	}
 
-	private void createAndAddDefaultVehicle(PersonAgent agent, VehicleType defaultVehicleType) {
+	private void createAndAddDefaultVehicle(PlanAgent agent, VehicleType defaultVehicleType) {
 		QVehicleImpl veh = null ;
 		if ( vehWrnCnt < 1 ) {
 			log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
@@ -409,7 +409,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		}
 		VehicleImpl vehicle = new VehicleImpl(agent.getId(), defaultVehicleType);
 		veh = new QVehicleImpl(vehicle);
-		veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
+		veh.setDriver((PlanDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
 		((DriverAgent)agent).setVehicle(veh);
 		vehicles.put(veh.getId(), veh);
 	}
@@ -533,7 +533,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
 	 *
-	 * @see PersonDriverAgent#getActivityEndTime()
+	 * @see PlanDriverAgent#getActivityEndTime()
 	 */
 	@Override
 	public final void scheduleActivityEnd(final PlanAgent agent) {
@@ -542,7 +542,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	}
 
 	@Override
-	public final void rescheduleActivityEnd(final PersonAgent agent, final double oldTime, final double newTime ) {
+	public final void rescheduleActivityEnd(final PlanAgent agent, final double oldTime, final double newTime ) {
 		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
 		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
 
