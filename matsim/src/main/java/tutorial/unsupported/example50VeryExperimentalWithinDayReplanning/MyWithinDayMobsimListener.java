@@ -90,7 +90,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
+				if ( true ) { // some condition ...
 					System.out.println("found agent");
 					set.add(agent);
 				}

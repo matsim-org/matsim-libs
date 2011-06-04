@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PersonAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -278,9 +279,11 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	}
 
 	public Person findPersonAgent(Id agentId) {
+		// yy should probably be called findPerson.  kai, jun'11 
+
 		PersonAgent personAgent = agents.get(agentId);
-		if (personAgent != null) {
-			Person person = personAgent.getPerson();
+		if (personAgent != null && personAgent instanceof HasPerson ) {
+			Person person = ((HasPerson)personAgent).getPerson();
 			return person ;
 		}
 		return null;
