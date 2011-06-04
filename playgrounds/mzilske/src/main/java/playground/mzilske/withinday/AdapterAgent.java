@@ -18,7 +18,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.qsim.PersonDriverPassengerAgent;
+import org.matsim.pt.qsim.PlanDriverPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -26,7 +26,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
-public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBeforeSimStepListener {
+public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeSimStepListener {
 	
 	Id id;
 	
