@@ -374,17 +374,17 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
         return (Leg) currentPlanElement;
 	}
 
-	@Override
-	@Deprecated // try to use getCurrentPlanElement()
-	public Activity getCurrentActivity() {
-	    PlanElement currentPlanElement = this.getCurrentPlanElement();
-	    
-	    if (!(currentPlanElement instanceof Activity)) {
-            return null;
-        }
-	    
-        return (Activity) currentPlanElement;
-	}
+//	@Override
+//	@Deprecated // try to use getCurrentPlanElement()
+//	public Activity getCurrentActivity() {
+//	    PlanElement currentPlanElement = this.getCurrentPlanElement();
+//	    
+//	    if (!(currentPlanElement instanceof Activity)) {
+//            return null;
+//        }
+//	    
+//        return (Activity) currentPlanElement;
+//	}
 
 	@Override
 	public void notifyTeleportToLink(Id linkId) {
