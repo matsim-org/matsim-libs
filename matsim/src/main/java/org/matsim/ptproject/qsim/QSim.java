@@ -439,7 +439,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
 			PlanAgent agent = entry.getSecond();
 			events.processEvent(events.getFactory().
-					createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+					createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		this.teleportationList.clear();
 

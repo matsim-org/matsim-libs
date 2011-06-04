@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -35,6 +34,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -89,6 +89,17 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 	public Leg getCurrentLeg() {
 		return this.dummyLeg;
 	}
+	
+	@Override
+	public String getMode() {
+		return this.dummyLeg.getMode() ;
+	}
+	
+	@Override
+	public Id getPlannedVehicleId() {
+		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId() ; // not sure if this is very clever.  kai, jun'11
+	}
+	
 
 //	@Override
 //	public Activity getCurrentActivity() {

@@ -461,6 +461,28 @@ public class PersonDriverAgentImpl implements PlanDriverAgent, HasPerson {
 		}
 		return (Leg) currentPlanElement;
 	}
+	
+	@Override
+	public final String getMode() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return ((Leg) currentPlanElement).getMode() ;
+	}
+	
+	@Override
+	public final Id getPlannedVehicleId() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		Route route = ((Leg) currentPlanElement).getRoute() ;
+		if ( !(route instanceof NetworkRoute) ) {
+			return null ;
+		}
+		return ((NetworkRoute)route).getVehicleId() ;
+	}
 
 //	@Override
 //	public final Activity getCurrentActivity() {

@@ -246,7 +246,7 @@ public class QNode implements NetsimNode {
           this.simEngine.getMobsim().getAgentCounter().decLiving();
           this.simEngine.getMobsim().getAgentCounter().incLost();
           this.simEngine.getMobsim().getEventsManager().processEvent(
-              new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
+              new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
         } else {
           qbufferedItem.popFirstFromBuffer();
           veh.getDriver().notifyMoveOverNode(nextLinkId);

@@ -236,7 +236,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.waitingList) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
@@ -244,7 +244,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.vehQueue) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.vehQueue.size());
@@ -252,7 +252,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.buffer) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.buffer.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.buffer.size());
@@ -405,13 +405,16 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		Iterator<PlanAgent> i = additionalAgentsOnLink.values().iterator();
 		while (i.hasNext()) {
 			PlanAgent agent = i.next();
-			Leg currentLeg = agent.getCurrentLeg();
-			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
+//			Leg currentLeg = agent.getCurrentLeg();
+			String mode = agent.getMode() ;
+//			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
+			if (mode != null && mode.equals(TransportMode.car)) {
 				// We are not in an activity, but in a car leg, and we are an "additional agent".
 				// This currently means that we are waiting for our car to become available.
 				// So our current route must be a NetworkRoute.
-				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
-				Id requiredVehicleId = route.getVehicleId();
+//				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+//				Id requiredVehicleId = route.getVehicleId();
+				Id requiredVehicleId = agent.getPlannedVehicleId() ;
 				if (requiredVehicleId == null) {
 					requiredVehicleId = agent.getId();
 				}
@@ -427,8 +430,9 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	@Override
 	void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
-		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
+//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
+//		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
+		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
 
 			agent.endLegAndAssumeControl(now);

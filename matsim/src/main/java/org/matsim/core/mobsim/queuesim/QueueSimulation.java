@@ -362,7 +362,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
 			PlanAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getId(), agent.getDestinationLinkId(), agent.getCurrentLeg().getMode()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		this.teleportationList.clear();
 
@@ -520,10 +520,9 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	@Override
 	public void arrangeAgentDeparture(final PlanAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
-		Leg leg = agent.getCurrentLeg();
-		String mode = leg.getMode();
+		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
-		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, leg.getMode() ) ) ;
+		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, mode ) ) ;
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
 		}

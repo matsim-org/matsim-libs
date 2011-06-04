@@ -20,14 +20,16 @@
 
 package org.matsim.ptproject.qsim.agents;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.PlanAgent;
 
-/*
+/**
  * Interface for Agents with within-day functionality. Might get some
  * further methods like resetCaches(). cdobler, Nov'10
  */
 public interface WithinDayAgent extends PlanAgent {
+	// yyyyyy this should be renamed WithinDayPlanAgent!!!! kai, jun'11
 	
 	public void resetCaches();
 
@@ -36,5 +38,7 @@ public interface WithinDayAgent extends PlanAgent {
 	public Integer getCurrentRouteLinkIdIndex();
 	
 	public Plan getModifiablePlan();
+	
+	public Leg getCurrentLeg() ;
 
 }

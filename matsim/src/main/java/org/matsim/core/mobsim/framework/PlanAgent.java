@@ -123,6 +123,20 @@ public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 	@Deprecated // try to use getCurrentPlanElement()
 	public Leg getCurrentLeg();
 	
+	/**
+	 * Convenience method for Leg.getMode(), in an attempt to get rid of getCurrentLeg().  If the agent is not on a leg, 
+	 * the behavior of this method is undefined (so don't rely on it).
+	 */
+	public String getMode() ;
+	
+	/**
+	 * Convenience method for Leg.getRoute().getVehicleId(), in an attempt to get rid of getCurrentLeg().  If the agent is not
+	 * on a leg, the behavior of this method is undefined (so don't rely on it).
+	 * <p/>
+	 * yyyyyy Really belongs into the driver!!  
+	 */
+	public Id getPlannedVehicleId() ;
+	
 //	/**
 //	 * @return "(Activity) getCurrentPlanElement()" if the current plan element is an activity, otherwise null.
 //	 */

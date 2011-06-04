@@ -564,7 +564,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	void clearVehicles(double now) {
 		for (QVehicle veh : this.vehQueue) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.queueLink.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
 		this.queueLink.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
@@ -572,7 +572,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.vehQueueEnterTimeMap.clear();
 		for (QVehicle veh : this.buffer) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.queueLink.getMobsim().getAgentCounter().decLiving(this.buffer.size());
 		this.queueLink.getMobsim().getAgentCounter().incLost(this.buffer.size());

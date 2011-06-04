@@ -89,7 +89,7 @@ public class MultiModalQLinkExtension {
 	}
 
 	private void addAgent(PlanAgent personAgent, double now) {
-		double travelTime = simEngine.getMultiModalTravelTime().getModalLinkTravelTime(qLink.getLink(), now, personAgent.getCurrentLeg().getMode());
+		double travelTime = simEngine.getMultiModalTravelTime().getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode());
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);
@@ -186,7 +186,7 @@ public class MultiModalQLinkExtension {
 		for (Tuple<Double, PlanAgent> tuple : agents) {
 			PlanAgent personAgent = tuple.getSecond();
 			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getMode()));
 		}
 		this.simEngine.getMobsim().getAgentCounter().decLiving(this.agents.size());
 		this.simEngine.getMobsim().getAgentCounter().incLost(this.agents.size());

@@ -25,6 +25,7 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -305,6 +306,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public Id getId() {
 		return this.dummyPerson.getId() ;
 	}
+	
+//	/**
+//	 * for junit tests in same package
+//	 */
+//	abstract public Leg getCurrentLeg() ;
+	// yyyyyy reduce visibility!
+
 
 	/**
 	 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods

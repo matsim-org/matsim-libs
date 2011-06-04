@@ -136,7 +136,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 					this.queueNetwork.getMobsim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
+							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);

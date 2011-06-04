@@ -228,7 +228,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		for (QVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
-							.getDriver().getCurrentLeg().getMode()));
+							.getDriver().getMode()));
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.waitingList.size());
@@ -244,7 +244,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		for (QVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
-							.getDriver().getCurrentLeg().getMode()));
+							.getDriver().getMode()));
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.vehQueue.size());
@@ -259,8 +259,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
-							.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.buffer.size());

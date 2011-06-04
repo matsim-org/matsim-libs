@@ -119,6 +119,19 @@ public class TransitDriver extends AbstractTransitDriver {
 	public Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
+	// yyyyyy reduce visibility!
+	
+	@Override 
+	public String getMode() {
+		return this.currentLeg.getMode();
+	}
+	
+	@Override
+	public Id getPlannedVehicleId() {
+		return ((NetworkRoute)this.currentLeg.getRoute()).getVehicleId() ;
+	}
+	
+	
 
 //	@Override
 //	public Activity getCurrentActivity() {

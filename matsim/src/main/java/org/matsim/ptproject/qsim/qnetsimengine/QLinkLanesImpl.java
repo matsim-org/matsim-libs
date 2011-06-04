@@ -281,7 +281,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.parkedVehicles.clear();
 		for (QVehicle veh : this.waitingList) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
