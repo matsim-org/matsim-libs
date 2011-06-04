@@ -22,7 +22,7 @@ package playground.kai.ptproject.qsim.interfaces;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.vehicles.Vehicle;
 
 class Teleportation implements Updateable {
@@ -36,7 +36,7 @@ class Mobsim {
 
 	void run() {
 		Teleportation teleportation = new Teleportation() ;
-		PersonAgent person = null ; // dummy
+		PlanAgent person = null ; // dummy
 		Vehicle veh = null ; // dummy
 		MobsimFacility linkFac = new MobsimFacility() ; // dummy
 

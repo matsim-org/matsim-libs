@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.PersonAgent;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -71,24 +71,24 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
-		Collection<PersonAgent> agentsToReplan = getAgentsToReplan( mobsim ) ;
+		Collection<PlanAgent> agentsToReplan = getAgentsToReplan( mobsim ) ;
 
 		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(),
 				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
 
-		for ( PersonAgent pa : agentsToReplan ) {
+		for ( PlanAgent pa : agentsToReplan ) {
 			doReplanning( pa, mobsim ) ;
 		}
 	}
 
-	private List<PersonAgent> getAgentsToReplan(Netsim mobsim ) {
+	private List<PlanAgent> getAgentsToReplan(Netsim mobsim ) {
 
-		List<PersonAgent> set = new ArrayList<PersonAgent>();
+		List<PlanAgent> set = new ArrayList<PlanAgent>();
 
 		// somehow find the agents (this is just an example):
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
-				PersonDriverAgent agent=vehicle.getDriver();
+				PlanDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
 				if ( true ) { // some condition ...
 					System.out.println("found agent");
@@ -101,7 +101,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 	}
 
-	private boolean doReplanning(PersonAgent personAgent, Netsim mobsim ) {
+	private boolean doReplanning(PlanAgent personAgent, Netsim mobsim ) {
 
 		// preconditions:
 

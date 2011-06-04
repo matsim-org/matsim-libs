@@ -1,7 +1,7 @@
 package playground.kai.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -19,7 +19,7 @@ public class MobsimVehicle implements Vehicle {
 		return null;
 	}
 
-	public void setDriver(PersonAgent person) {
+	public void setDriver(PlanAgent person) {
 		// TODO Auto-generated method stub
 		
 	}

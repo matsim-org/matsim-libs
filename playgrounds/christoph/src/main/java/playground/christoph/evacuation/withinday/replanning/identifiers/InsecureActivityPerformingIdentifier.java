@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
@@ -56,7 +56,7 @@ public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifi
 		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 		
-		for (PersonAgent personAgent : activityPerformingAgents) {			
+		for (PlanAgent personAgent : activityPerformingAgents) {			
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */

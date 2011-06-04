@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -34,7 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * @author nagel
  *
  */
-public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements PersonDriverAgent, AgentDepartureEventHandler {
+public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements PlanDriverAgent, AgentDepartureEventHandler {
 	
 	Netsim netsim ;
 	Scenario sc ;

@@ -207,15 +207,12 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		
 	};
 
-	private Plan selectedPlan;
-
 	public AdapterAgent(Plan selectedPlan, Mobsim simulation) {
 	    this(selectedPlan, simulation, new MzPlanAgentImpl(selectedPlan));
     }
 	
 	public AdapterAgent(Plan selectedPlan, Mobsim simulation, RealAgent realAgent) {
 		id = selectedPlan.getPerson().getId();
-		this.selectedPlan = selectedPlan;
 
 		//realAgent = new MzPlanAgentImpl(selectedPlan);
 		this.realAgent = realAgent;
@@ -249,47 +246,47 @@ public class AdapterAgent implements PersonDriverPassengerAgent, SimulationBefor
 		}
 	}
 
-	@Override
-	public Person getPerson() {
-		// I often get asked about my Person, but all they really want to know
-		// is my Id. Except for the visualizer, when it wants to visualize my Plan. mz
-		//
-		// The PlanAgent is in fact directly Identifiable, exactly for that reason.  Should be push this up 
-		// even further (to MobsimAgent)?  kai, jun'11
-		return new Person() {
-
-			@Override
-			public Map<String, Object> getCustomAttributes() {
-				throw new RuntimeException();
-			}
-
-			@Override
-			public Id getId() {
-				return id;
-			}
-
-			@Override
-			public List<? extends Plan> getPlans() {
-				throw new RuntimeException();
-			}
-
-			@Override
-			public void setId(Id id) {
-				throw new RuntimeException();
-			}
-
-			@Override
-			public boolean addPlan(Plan p) {
-				throw new RuntimeException();
-			}
-
-			@Override
-			public Plan getSelectedPlan() {
-				return selectedPlan;
-			}
-			
-		};
-	}
+//	@Override
+//	public Person getPerson() {
+//		// I often get asked about my Person, but all they really want to know
+//		// is my Id. Except for the visualizer, when it wants to visualize my Plan. mz
+//		//
+//		// The PlanAgent is in fact directly Identifiable, exactly for that reason.  Should be push this up 
+//		// even further (to MobsimAgent)?  kai, jun'11
+//		return new Person() {
+//
+//			@Override
+//			public Map<String, Object> getCustomAttributes() {
+//				throw new RuntimeException();
+//			}
+//
+//			@Override
+//			public Id getId() {
+//				return id;
+//			}
+//
+//			@Override
+//			public List<? extends Plan> getPlans() {
+//				throw new RuntimeException();
+//			}
+//
+//			@Override
+//			public void setId(Id id) {
+//				throw new RuntimeException();
+//			}
+//
+//			@Override
+//			public boolean addPlan(Plan p) {
+//				throw new RuntimeException();
+//			}
+//
+//			@Override
+//			public Plan getSelectedPlan() {
+//				return selectedPlan;
+//			}
+//			
+//		};
+//	}
 
 	@Override
 	public double getActivityEndTime() {

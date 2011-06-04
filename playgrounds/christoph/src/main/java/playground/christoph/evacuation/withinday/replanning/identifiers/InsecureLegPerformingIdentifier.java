@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.WithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
@@ -61,7 +61,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		
 		if (handledAgents == null) return agentsToReplan;	
 		
-		for (PersonAgent personAgent : legPerformingAgents) {		
+		for (PlanAgent personAgent : legPerformingAgents) {		
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */

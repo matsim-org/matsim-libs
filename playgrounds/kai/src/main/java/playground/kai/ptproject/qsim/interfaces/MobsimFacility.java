@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.vehicles.Vehicle;
 
 public class MobsimFacility implements Updateable {
@@ -43,12 +43,12 @@ public class MobsimFacility implements Updateable {
 	private Map<Id,Vehicle> parking = new TreeMap<Id,Vehicle>() ;
 
 	/** data structure for activities needs to be sorted by departure time */
-	private Queue<PersonAgent> agentsAtActivities = new PriorityQueue<PersonAgent>(1, new DepartureTimeComparator() ) ;
+	private Queue<PlanAgent> agentsAtActivities = new PriorityQueue<PlanAgent>(1, new DepartureTimeComparator() ) ;
 
 	// buses somehow via the "feature" --???
 	
 	/** Plain "add" of a person, normally during initialization */
-	void addPerson( PersonAgent person ) {
+	void addPerson( PlanAgent person ) {
 		agentsAtActivities.add( person ) ;
 	}
 
@@ -61,7 +61,7 @@ public class MobsimFacility implements Updateable {
 	}
 
 	public void update() {
-		PersonAgent person = agentsAtActivities.peek();
+		PlanAgent person = agentsAtActivities.peek();
 		if ( person.getActivityEndTime() <= now() ) {
 			agentsAtActivities.remove();
 			person.endActivityAndAssumeControl(now()) ;
@@ -90,9 +90,9 @@ public class MobsimFacility implements Updateable {
 		return 0. ;
 	}
 
-	private static class DepartureTimeComparator implements Comparator<PersonAgent> {
+	private static class DepartureTimeComparator implements Comparator<PlanAgent> {
 		@Override
-		public int compare(PersonAgent o1, PersonAgent o2) {
+		public int compare(PlanAgent o1, PlanAgent o2) {
 			return 0 ; // dummy
 		}
 

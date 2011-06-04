@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PersonAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -393,8 +393,8 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 			this.withinDayAgents = new ArrayList<WithinDayAgent>();
 
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
-				if (mobsimAgent instanceof PersonAgent) {
-					PersonAgent personAgent = (PersonAgent) mobsimAgent;
+				if (mobsimAgent instanceof PlanAgent) {
+					PlanAgent personAgent = (PlanAgent) mobsimAgent;
 					withinDayAgents.add((WithinDayAgent) personAgent);
 				} else {
 					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());

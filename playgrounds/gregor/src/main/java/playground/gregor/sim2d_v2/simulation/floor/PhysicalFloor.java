@@ -39,7 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -361,7 +361,7 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * @param agent
 	 */
-	public void agentDepart(PersonDriverAgent pda) {
+	public void agentDepart(PlanDriverAgent pda) {
 		Agent2D agent = new Agent2D(pda);
 		Activity act = (Activity) getPreviousPlanElement(pda);
 		if (act.getCoord() != null) {

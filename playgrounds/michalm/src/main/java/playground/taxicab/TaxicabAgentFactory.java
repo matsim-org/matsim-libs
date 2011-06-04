@@ -20,7 +20,7 @@
 package playground.taxicab;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.PersonDriverAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -33,7 +33,7 @@ public final class TaxicabAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public PersonDriverAgent createMobsimAgentFromPerson(final Person p) {
+	public PlanDriverAgent createMobsimAgentFromPerson(final Person p) {
 		TaxicabAgent agent = new TaxicabAgent(p, this.simulation);
 		this.simulation.getEventsManager().addHandler(agent) ;
 		return agent;
