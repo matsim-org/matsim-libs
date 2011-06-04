@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * PAgent
+ * project: matsim
+ * HasPerson.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.mobsim.framework;
 
+import org.matsim.api.core.v01.population.Person;
 
+/**
+ * @author nagel
+ *
+ */
+public interface HasPerson {
+	
+	/**
+	 * @return the underlying person (data class)
+	 */
+	public Person getPerson();
+	
 
-/**PersonAgent is a PlanAgent with the additional getPerson() capability.  This is because not every PlanAgent needs to
- * be a person.  (In turn, this implies that access to the Plan should <i>not</i> be planAgent.getPerson().getSelectedPlan().) 
-* 
-* @author dgrether
-* @author nagel
-*
-*/
-public interface PersonAgent extends PlanAgent, HasPerson {
 }
