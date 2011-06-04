@@ -89,7 +89,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				PersonDriverAgent agent=vehicle.getDriver();
-				System.out.println(agent.getPerson().getId());
+				System.out.println(agent.getId());
 				if (((PersonImpl) agent.getPerson()).getAge() == 18) {
 					System.out.println("found agent");
 					set.add(agent);
