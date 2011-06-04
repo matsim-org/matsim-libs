@@ -68,12 +68,12 @@ public class MobsimFacility implements Updateable {
 			// call departure handler
 			// how does the departure handler get access to the vehicle?
 			// or to the bus stop?
-			if ( person.getCurrentLeg().getMode().equals( TransportMode.car )) {
+			if ( person.getMode().equals( TransportMode.car )) {
 				Id vehId = new IdImpl("13") ; // dummy
 				MobsimVehicle veh = (MobsimVehicle) parking.get( vehId ) ;
 				veh.setDriver( person ) ;
 				mobsimLink.addVehicleFromFacilityNormal(veh) ;
-			} else if ( person.getCurrentLeg().getMode().equals( TransportMode.pt ) ) {
+			} else if ( person.getMode().equals( TransportMode.pt ) ) {
 				// transit wait queue ... where?
 				// Departure Handler ???
 			} else {

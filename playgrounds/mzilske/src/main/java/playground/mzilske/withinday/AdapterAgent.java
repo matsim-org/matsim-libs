@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
@@ -373,6 +374,29 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
         
         return (Leg) currentPlanElement;
 	}
+	
+	@Override
+	public String getMode() {
+        if (!(this.getCurrentPlanElement() instanceof Leg)) {
+            return null;
+        }
+        return ((Leg)this.getCurrentPlanElement()).getMode() ;
+	}
+	
+	@Override
+	public final Id getPlannedVehicleId() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		Route route = ((Leg) currentPlanElement).getRoute() ;
+		if ( !(route instanceof NetworkRoute) ) {
+			return null ;
+		}
+		return ((NetworkRoute)route).getVehicleId() ;
+	}
+
+
 
 //	@Override
 //	@Deprecated // try to use getCurrentPlanElement()
