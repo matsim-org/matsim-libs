@@ -136,7 +136,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 					this.queueNetwork.getMobsim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
+							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);
@@ -152,7 +152,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 		this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 		this.queueNetwork.getMobsim().getAgentCounter().incLost();
 		log.error(
-				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
+				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 						+ " currentLink=" + currentLink.getId().toString()
 						+ ". The agent is removed from the simulation.");
 		return true;

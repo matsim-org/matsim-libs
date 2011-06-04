@@ -271,7 +271,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());
 		this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
+				new LinkEnterEventImpl(now, veh.getDriver().getId(),
 						this.getLink().getId()));
 	}
 
@@ -281,7 +281,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.parkedVehicles.clear();
 		for (QVehicle veh : this.waitingList) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
@@ -347,7 +347,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 			}
 			movedAtLeastOne = true;
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);

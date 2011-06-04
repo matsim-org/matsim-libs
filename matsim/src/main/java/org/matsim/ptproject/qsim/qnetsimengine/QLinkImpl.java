@@ -197,7 +197,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
+				new LinkEnterEventImpl(now, veh.getDriver().getId(),
 						this.getLink().getId()));
 		if ( HOLES ) {
 			holes.poll();
@@ -236,7 +236,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.waitingList) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
@@ -244,7 +244,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.vehQueue) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.vehQueue.size());
@@ -252,7 +252,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : this.buffer) {
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.buffer.size());
 		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.buffer.size());
@@ -452,7 +452,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			}
 
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 			boolean handled = this.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
 			if (!handled) {
@@ -786,7 +786,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		this.getQSimEngine().getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+		this.getQSimEngine().getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 		return veh;
 	}
 

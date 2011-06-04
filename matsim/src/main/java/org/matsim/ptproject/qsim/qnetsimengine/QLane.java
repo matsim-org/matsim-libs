@@ -404,7 +404,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
 					this.getQLink().getMobsim().getEventsManager().processEvent(
-							new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
+							new LaneLeaveEventImpl(now, veh.getDriver().getId(), this.queueLink.getLink().getId(), this.getId()));
 					toQueueLane.addToVehicleQueue(veh, now);
 					movedAtLeastOne = true;
 				}
@@ -415,7 +415,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			else {
 				StringBuilder b = new StringBuilder();
 				b.append("Person Id: ");
-				b.append(veh.getDriver().getPerson().getId());
+				b.append(veh.getDriver().getId());
 				b.append(" is on Lane Id ");
 				b.append(this.getLane().getId());
 				b.append(" on Link Id ");
@@ -449,7 +449,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()) {
 			this.queueLink.getMobsim().getEventsManager()
-			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()));
+			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getId(), this.queueLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
 		if (this.isOriginalLane) {
@@ -506,11 +506,11 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(new LaneLeaveEventImpl(
-					now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getId()
+					now, veh.getDriver().getId(), this.queueLink.getLink().getId(), this.getId()
 			));
 		}
 		this.getQLink().getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(
-				now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()
+				now, veh.getDriver().getId(), this.queueLink.getLink().getId()
 		));
 		return veh;
 	}
@@ -564,7 +564,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	void clearVehicles(double now) {
 		for (QVehicle veh : this.vehQueue) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.queueLink.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
 		this.queueLink.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
@@ -572,7 +572,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.vehQueueEnterTimeMap.clear();
 		for (QVehicle veh : this.buffer) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		this.queueLink.getMobsim().getAgentCounter().decLiving(this.buffer.size());
 		this.queueLink.getMobsim().getAgentCounter().incLost(this.buffer.size());

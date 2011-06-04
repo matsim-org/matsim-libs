@@ -246,7 +246,7 @@ public class QNode implements NetsimNode {
           this.simEngine.getMobsim().getAgentCounter().decLiving();
           this.simEngine.getMobsim().getAgentCounter().incLost();
           this.simEngine.getMobsim().getEventsManager().processEvent(
-              new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
+              new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
         } else {
           qbufferedItem.popFirstFromBuffer();
           veh.getDriver().notifyMoveOverNode(nextLinkId);
@@ -262,7 +262,7 @@ public class QNode implements NetsimNode {
     this.simEngine.getMobsim().getAgentCounter().decLiving();
     this.simEngine.getMobsim().getAgentCounter().incLost();
     log.error(
-        "Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
+        "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
             + " currentLink=" + currentLink.getId().toString()
             + ". The agent is removed from the simulation.");
     return true;

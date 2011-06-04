@@ -245,7 +245,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
-					agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
+					agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 		}
 		return handled;
 	}
@@ -256,7 +256,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		if(handled){
 			PersonDriverAgent agent = (PersonDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getPerson().getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndAssumeControl(time);
 		}

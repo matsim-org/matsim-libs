@@ -72,7 +72,7 @@ class CarDepartureHandler implements DepartureHandler {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id vehicleId = route.getVehicleId();
 		if (vehicleId == null) {
-			vehicleId = agent.getPerson().getId(); // backwards-compatibility
+			vehicleId = agent.getId(); // backwards-compatibility
 		}
 		QLinkInternalI qlink = (QLinkInternalI) queueSimulation.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicleImpl vehicle = (QVehicleImpl) qlink.removeParkedVehicle(vehicleId);
@@ -85,7 +85,7 @@ class CarDepartureHandler implements DepartureHandler {
 				// While we are waiting for our car
 				qlink.registerAgentOnLink(agent);
 			} else {
-				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
+				throw new RuntimeException("vehicle not available for agent " + agent.getId() + " on link " + linkId);
 			}
 		} else {
 			qlink.letAgentDepartWithVehicle(agent, vehicle, now);

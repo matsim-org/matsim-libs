@@ -243,7 +243,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		for (Person p : this.population.getPersons().values()) {
 			PersonDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
-			QVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getPerson().getId(), defaultVehicleType));
+			QVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
@@ -542,7 +542,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
-				vehicleId = driverAgent.getPerson().getId(); // backwards-compatibility
+				vehicleId = driverAgent.getId(); // backwards-compatibility
 			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
 			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
@@ -564,7 +564,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 				}
 			}
 			if (vehicle == null) {
-				throw new RuntimeException("vehicle not available for agent " + driverAgent.getPerson().getId() + " on link " + linkId);
+				throw new RuntimeException("vehicle not available for agent " + driverAgent.getId() + " on link " + linkId);
 			}
 			vehicle.setDriver(driverAgent);
 			if ((route.getEndLinkId().equals(linkId)) && (driverAgent.chooseNextLinkId() == null)) {
