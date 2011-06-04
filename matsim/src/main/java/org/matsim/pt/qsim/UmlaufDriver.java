@@ -160,10 +160,10 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		return (Leg) this.currentPlanElement;
 	}
 
-	@Override
-	public Activity getCurrentActivity() {
-		return (Activity) this.currentPlanElement;
-	}
+//	@Override
+//	public Activity getCurrentActivity() {
+//		return (Activity) this.currentPlanElement;
+//	}
 
 	@Override
 	public PlanElement getCurrentPlanElement() {

@@ -90,11 +90,11 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 		return this.dummyLeg;
 	}
 
-	@Override
-	public Activity getCurrentActivity() {
-		// As far as I can see, there is never a current Activity. cdobler, nov'10
-		return null;
-	}
+//	@Override
+//	public Activity getCurrentActivity() {
+//		// As far as I can see, there is never a current Activity. cdobler, nov'10
+//		return null;
+//	}
 
 	@Override
 	public PlanElement getCurrentPlanElement() {

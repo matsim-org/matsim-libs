@@ -462,14 +462,14 @@ public class PersonDriverAgentImpl implements PlanDriverAgent, HasPerson {
 		return (Leg) currentPlanElement;
 	}
 
-	@Override
-	public final Activity getCurrentActivity() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Activity)) {
-			return null;
-		}
-		return (Activity) currentPlanElement;
-	}
+//	@Override
+//	public final Activity getCurrentActivity() {
+//		PlanElement currentPlanElement = this.getCurrentPlanElement();
+//		if (!(currentPlanElement instanceof Activity)) {
+//			return null;
+//		}
+//		return (Activity) currentPlanElement;
+//	}
 
 	@Override
 	public final Id getDestinationLinkId() {

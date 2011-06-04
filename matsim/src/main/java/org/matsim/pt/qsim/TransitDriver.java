@@ -120,11 +120,11 @@ public class TransitDriver extends AbstractTransitDriver {
 		return this.currentLeg;
 	}
 
-	@Override
-	public Activity getCurrentActivity() {
-		// As far as I can see, there is never a current Activity. cdobler, nov'10
-		return null;
-	}
+//	@Override
+//	public Activity getCurrentActivity() {
+//		// As far as I can see, there is never a current Activity. cdobler, nov'10
+//		return null;
+//	}
 
 	@Override
 	public PlanElement getCurrentPlanElement() {

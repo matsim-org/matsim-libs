@@ -122,12 +122,14 @@ public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 	 */
 	@Deprecated // try to use getCurrentPlanElement()
 	public Leg getCurrentLeg();
-
-	/**
-	 * @return "(Activity) getCurrentPlanElement()" if the current plan element is an activity, otherwise null.
-	 */
-	@Deprecated // try to use getCurrentPlanElement()
-	public Activity getCurrentActivity();
+	
+//	/**
+//	 * @return "(Activity) getCurrentPlanElement()" if the current plan element is an activity, otherwise null.
+//	 */
+//	@Deprecated // try to use getCurrentPlanElement()
+//	public Activity getCurrentActivity();
+	//
+	// nobody seems to need this.  so it is gone now.  kai, jun'11
 
 	/** Design thoughts:<ul>
 	* <li>"Teleportation" certainly does NOT belong into a vehicle.  Also not into the driver.
