@@ -340,7 +340,7 @@ public class PaperController extends WithinDayController implements StartupListe
 			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
 			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
 			for (WithinDayAgent agent : agentsFromDelegate) {
-				if (replanningAgents.contains(agent.getPerson().getId())) filteredAgents.add(agent);
+				if (replanningAgents.contains(agent.getId())) filteredAgents.add(agent);
 			}
 			return filteredAgents;
 		}

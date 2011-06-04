@@ -136,7 +136,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		
 		double sumTrust = 0.0;
 		for (WithinDayAgent agent : handledAgents) {
-			sumTrust += costNavigationTravelTimeLogger.getTrust(agent.getPerson().getId());
+			sumTrust += costNavigationTravelTimeLogger.getTrust(agent.getId());
 		}
 		log.info("Mean trust per person: " + sumTrust / handledAgents.size());
 	}

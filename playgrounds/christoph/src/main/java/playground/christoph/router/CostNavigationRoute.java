@@ -82,7 +82,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
-		Id personId = withinDayAgent.getPerson().getId();
+		Id personId = withinDayAgent.getId();
 		
 		/*
 		 * If the person trusts the navigation system replan its leg
