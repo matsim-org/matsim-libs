@@ -150,7 +150,14 @@ public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 	 * all those calls. This might be useful, for multiple reasons.<br>
 	 * E.g. an unmodifyable plan could be returned or a copy of the selected plan, which then could
 	 * be edited by a within day replanning module.  cdobler, feb'11
+	 * <li> This was called "getExecutedPlan" for some time.  Renaming this back into "getSelectedPlan" because this is what
+	 * it is.  I.e. it is <i>not</i> necessarily the plan that gets/got executed, but the plan that was selected 
+	 * throughout the day.  Note that this is by design: Agents go with a selected, unmodifiable plan into the day; that
+	 * plan is scored.  If they use some internal logic to ignore some or all of this plan, it is still the same plan that
+	 * may trigger the same behavior.  If the actually executed plan is useful, it should be added explicitly as a new plan 
+	 * to the agent afterwards.  If the agent wants to use some more complicated internal model, it should ignore some
+	 * or all of the plan.  kai, jun'11
 	 * </ul>
 	 */
-	public Plan getExecutedPlan();
+	public Plan getSelectedPlan();
 }

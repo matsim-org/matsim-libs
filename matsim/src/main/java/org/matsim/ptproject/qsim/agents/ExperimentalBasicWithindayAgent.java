@@ -87,7 +87,7 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	}
 
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		return executedPlan;
 	}
 	

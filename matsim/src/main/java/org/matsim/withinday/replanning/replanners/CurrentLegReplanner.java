@@ -66,7 +66,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = withinDayAgent.getExecutedPlan();
+		Plan executedPlan = withinDayAgent.getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

@@ -212,7 +212,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 	
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
 	}
 

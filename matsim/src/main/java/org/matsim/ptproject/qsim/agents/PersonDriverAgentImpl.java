@@ -404,7 +404,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent, HasPerson {
 	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return Collections.unmodifiableList( this.getExecutedPlan().getPlanElements() ) ;
+		return Collections.unmodifiableList( this.getSelectedPlan().getPlanElements() ) ;
 	}
 
 	public final Netsim getMobsim(){
@@ -497,7 +497,7 @@ public class PersonDriverAgentImpl implements PersonDriverAgent, HasPerson {
 //	}
 
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.person.getSelectedPlan());
 	}
 

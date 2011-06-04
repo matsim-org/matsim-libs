@@ -168,7 +168,7 @@ public class FakeAgent implements PersonDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());
 	}
 }

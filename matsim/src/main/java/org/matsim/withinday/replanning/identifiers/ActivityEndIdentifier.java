@@ -79,7 +79,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			 * next Activity with duration 0)
 			 */
 			// get executed plan
-			PlanImpl executedPlan = (PlanImpl)withinDayAgent.getExecutedPlan();
+			PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
 			
 			// If we don't have a selected plan
 			if (executedPlan == null) {

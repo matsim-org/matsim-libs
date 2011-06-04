@@ -147,7 +147,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public Plan getExecutedPlan() {
+	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
 	}
 
