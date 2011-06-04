@@ -124,7 +124,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
 			if ( mag instanceof PersonAgent ) {
 				PersonAgent pag = (PersonAgent) mag ;
-				agents.put( pag.getPerson().getId(), pag) ;
+				agents.put( pag.getId(), pag) ;
 			}
 		}
 

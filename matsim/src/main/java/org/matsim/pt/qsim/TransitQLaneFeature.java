@@ -173,8 +173,8 @@ public class TransitQLaneFeature {
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
-					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), this.queueLane.getLink(), cnt2); // for the time being, same position as facilities
-					if ( passenger.getPerson().getId().toString().startsWith("pt")) {
+					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), this.queueLane.getLink(), cnt2); // for the time being, same position as facilities
+					if ( passenger.getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 					} else if (last) {
 						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);

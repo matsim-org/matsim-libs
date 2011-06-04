@@ -85,7 +85,7 @@ public class MultiModalQLinkExtension {
 		this.addAgent(personAgent, now);
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-			new LinkEnterEventImpl(now, personAgent.getPerson().getId(), qLink.getLink().getId()));
+			new LinkEnterEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
 	}
 
 	private void addAgent(PersonAgent personAgent, double now) {
@@ -102,7 +102,7 @@ public class MultiModalQLinkExtension {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEventImpl(now, personAgent.getPerson().getId(), qLink.getLink().getId()));
+				new AgentWait2LinkEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
 	}
 
 	protected boolean moveLink(double now) {
@@ -175,7 +175,7 @@ public class MultiModalQLinkExtension {
 	public PersonAgent getNextWaitingAgent(double now) {
 		PersonAgent personAgent = waitingToLeaveAgents.poll();
 		if (personAgent != null) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getPerson().getId(), qLink.getLink().getId()));
+			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
 		}
 		return personAgent;
 	}
@@ -186,7 +186,7 @@ public class MultiModalQLinkExtension {
 		for (Tuple<Double, PersonAgent> tuple : agents) {
 			PersonAgent personAgent = tuple.getSecond();
 			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, personAgent.getPerson().getId(), qLink.getLink().getId(), personAgent.getCurrentLeg().getMode()));
+					new AgentStuckEventImpl(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getCurrentLeg().getMode()));
 		}
 		this.simEngine.getMobsim().getAgentCounter().decLiving(this.agents.size());
 		this.simEngine.getMobsim().getAgentCounter().incLost(this.agents.size());
@@ -199,7 +199,7 @@ public class MultiModalQLinkExtension {
 		public int compare(final Tuple<Double, PersonAgent> o1, final Tuple<Double, PersonAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
-				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
 			}
 			return ret;
 		}

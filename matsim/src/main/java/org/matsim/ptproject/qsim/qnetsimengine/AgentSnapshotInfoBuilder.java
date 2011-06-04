@@ -413,11 +413,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		for ( ListIterator<PersonAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
 			PersonAgent passenger = it.previous();
-			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), link, distanceOnLink, lane, cnt);
+			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane, cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 //			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
 //			passengerPosition.setColorValueBetweenZeroAndOne(tmp);
-			if (passenger.getPerson().getId().toString().startsWith("pt")) {
+			if (passenger.getId().toString().startsWith("pt")) {
 				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 			} else if (cnt==0) {
 				passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
@@ -455,8 +455,8 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 			Collection<PersonAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			boolean first = true;
 			for (PersonAgent passenger : peopleInVehicle) {
-				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getPerson().getId(), link, cnt2); // for the time being, same position as facilities
-				if (passenger.getPerson().getId().toString().startsWith("pt")) {
+				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
+				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 				}
 				else if (first) {

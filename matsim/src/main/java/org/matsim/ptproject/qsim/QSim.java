@@ -407,7 +407,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 			log.warn( Gbl.ONLYONCE ) ;
 			vehWrnCnt++ ;
 		}
-		VehicleImpl vehicle = new VehicleImpl(agent.getPerson().getId(), defaultVehicleType);
+		VehicleImpl vehicle = new VehicleImpl(agent.getId(), defaultVehicleType);
 		veh = new QVehicleImpl(vehicle);
 		veh.setDriver((PersonDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
 		((DriverAgent)agent).setVehicle(veh);

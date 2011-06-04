@@ -44,7 +44,7 @@ public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgen
 		int cmp = Double.compare(agent1.getActivityEndTime(), agent2.getActivityEndTime());
 		if (cmp == 0) {
 			// Both depart at the same time -> let the one with the larger id be first (=smaller)
-			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+			return agent2.getId().compareTo(agent1.getId());
 		}
 		return cmp;
 	}

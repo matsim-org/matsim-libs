@@ -104,7 +104,7 @@ public class MultiModalQNodeExtension {
 	
 	private void checkNextLinkSemantics(Link currentLink, Link nextLink, PersonAgent personAgent){
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
-	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getPerson().getId() +
+	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getId() +
 	          " from link " + currentLink.getId() + " to link " + nextLink.getId());
 	   	}
 	}
@@ -142,7 +142,7 @@ public class MultiModalQNodeExtension {
 			this.simEngine.getMobsim().getAgentCounter().decLiving();
 			this.simEngine.getMobsim().getAgentCounter().incLost();
 			log.error(
-					"Agent has no or wrong route! agentId=" + personAgent.getPerson().getId()
+					"Agent has no or wrong route! agentId=" + personAgent.getId()
 					+ " currentLink=" + currentLink.getId().toString()
 					+ ". The agent is removed from the simulation.");			
 		}
