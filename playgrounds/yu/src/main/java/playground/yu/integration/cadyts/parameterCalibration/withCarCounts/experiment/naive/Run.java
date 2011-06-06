@@ -36,34 +36,48 @@ import org.matsim.core.utils.misc.ConfigUtils;
  */
 public class Run {
 
+	private static void run(Config config, String outputPath, double val) {
+		config.planCalcScore().setTraveling_utils_hr(val);
+		config.controler().setOutputDirectory(outputPath + val);
+
+		System.out
+				.println("################################################\nNAIVE Tests mit\t\"traveling\"\t=\t"
+						+ val + "\tBEGAN!");
+
+		Controler ctl = new PCCtl(config);
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
+
+		System.out.println("NAIVE Tests mit\t\"traveling\"\t=\t" + val
+				+ "\tENDED!\n################################################");
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		double minTravVal = Double.parseDouble(config.findParam("naivePC",
-				"minTravVal")), maxTravVal = Double.parseDouble(config
-				.findParam("naivePC", "maxTravVal")), stepSize = Double
-				.parseDouble(config.findParam("naivePC", "stepSize"));
 		String outputPath = config.controler().getOutputDirectory();
-		for (double val = minTravVal; val <= maxTravVal; val += stepSize) {
-			config.planCalcScore().setTraveling_utils_hr(val);
-			config.controler().setOutputDirectory(outputPath + val);
+		/*
+		 * the outputPath should NOT end with"/", otherwise there could be
+		 * problems by command in linux
+		 */
 
-			System.out
-					.println("################################################\nNAIVE Tests mit\t\"traveling\"\t=\t"
-							+ val + "\tBEGAN!");
+		if (args[1].equals("small")) { // small senarios
+			double minTravVal = Double.parseDouble(config.findParam("naivePC",
+					"minTravVal")), maxTravVal = Double.parseDouble(config
+					.findParam("naivePC", "maxTravVal")), stepSize = Double
+					.parseDouble(config.findParam("naivePC", "stepSize"));
 
-			Controler ctl = new PCCtl(config);
-			ctl.setCreateGraphs(false);
-			ctl.setOverwriteFiles(true);
-			ctl.run();
-
-			System.out
-					.println("NAIVE Tests mit\t\"traveling\"\t=\t"
-							+ val
-							+ "\tENDED!\n################################################");
+			for (double val = minTravVal; val <= maxTravVal; val += stepSize) {
+				run(config, outputPath, val);
+			}
+		} else if (args[1].equals("real")) { // real senarios
+			double travVal = -Double.parseDouble(args[2]) / 10d;
+			run(config, outputPath, travVal);
 		}
+
 	}
 
 }
