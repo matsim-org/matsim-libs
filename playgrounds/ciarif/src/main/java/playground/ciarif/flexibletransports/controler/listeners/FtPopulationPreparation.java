@@ -9,6 +9,7 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
+import playground.meisterk.kti.population.algorithms.PersonInvalidateScores;
 
 
 
@@ -29,7 +30,7 @@ public class FtPopulationPreparation implements StartupListener {
 		/*
 		 * make sure every pt leg has a kti pt route when the kti pt router is used
 		 */
-		if (this.ftConfigGroup.isUsePlansCalcRouteKti()) {
+		if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
 			ParallelPersonAlgorithmRunner.run(
 					pop, 
 					config.global().getNumberOfThreads(),
@@ -39,6 +40,15 @@ public class FtPopulationPreparation implements StartupListener {
 						}
 					});
 		}
-		
+		if (this.ftConfigGroup.isInvalidateScores()) {
+			ParallelPersonAlgorithmRunner.run(
+					pop, 
+					config.global().getNumberOfThreads(),
+					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+						public AbstractPersonAlgorithm getPersonAlgorithm() {
+							return new PersonInvalidateScores();
+						}
+					});
+		}
 	}
 }

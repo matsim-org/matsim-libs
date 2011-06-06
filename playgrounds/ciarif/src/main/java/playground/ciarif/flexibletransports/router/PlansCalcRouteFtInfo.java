@@ -36,13 +36,13 @@ public class PlansCalcRouteFtInfo
   {
     log.info("config group= " + this.ftConfigGroup);
 
-    if (!(this.ftConfigGroup.isUsePlansCalcRouteFT())) {
+    if (!(this.ftConfigGroup.isUsePlansCalcRouteFt())) {
       log.error("The FT module is missing.");
     }
 
     ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     //this.localWorld = localScenario.getWorld();
-     new MatsimWorldReader(localScenario, this.localWorld).parse(this.ftConfigGroup.getWorldInputFilename());
+     //new MatsimWorldReader(localScenario, this.localWorld).parse(this.ftConfigGroup.getWorldInputFilename());
 
     log.info("Reading car stations...");
     this.carStations = new CarSharingStations(network);

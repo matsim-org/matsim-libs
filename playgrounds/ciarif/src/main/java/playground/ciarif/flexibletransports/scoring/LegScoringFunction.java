@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
@@ -34,6 +35,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
     this.plansCalcRouteConfigGroup = config.plansCalcRoute();
   }
 
+  @Override
   protected double calcLegScore(double departureTime, double arrivalTime, Leg leg)
   {
     double tmpScore = 0.0D;
@@ -48,7 +50,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
       tmpScore += this.ftConfigGroup.getConstCar();
 
       if (this.params.marginalUtilityOfDistanceCar_m != 0.0D) {
-        RouteWRefs route = (RouteWRefs)leg.getRoute();
+        Route route = leg.getRoute();
         dist = route.getDistance();
         tmpScore += this.params.marginalUtilityOfDistanceCar_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
       }
@@ -72,22 +74,23 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
     }
     else if (TransportMode.pt.equals(leg.getMode()))
     {
-      FtPtRoute ftPtRoute = (FtPtRoute)leg.getRoute();
-
+     
+      //FtPtRoute ftPtRoute = null;
+     /* new FtPtRoute (leg.getRoute(),this.plansCalcRouteConfigGroup.);
       if (ftPtRoute.getFromStop() != null)
       {
         dist = ((FtPtRoute)leg.getRoute()).calcAccessEgressDistance((ActivityImpl)((PlanImpl)this.plan).getPreviousActivity(leg), (ActivityImpl)((PlanImpl)this.plan).getNextActivity(leg));
-        travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+        travelTime = PlansCalcRouteFT.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
         tmpScore += getWalkScore(dist, travelTime);
         dist = ((FtPtRoute)leg.getRoute()).calcInVehicleDistance();
         travelTime = ((FtPtRoute)leg.getRoute()).getInVehicleTime().doubleValue();
         tmpScore += getPtScore(dist, travelTime);
       }
       else
-      {
+      {*/
         dist = leg.getRoute().getDistance();
         tmpScore += getPtScore(dist, travelTime);
-      }
+      //}
 
     }
     else if (TransportMode.walk.equals(leg.getMode()))

@@ -19,6 +19,11 @@ public class FtPtRoute extends GenericRouteImpl
   private BasicLocation toMunicipality;
   private SwissHaltestelle toStop;
   private Double inVehicleTime;
+  
+  public FtPtRoute (GenericRouteImpl genericRouteImpl, PlansCalcRouteFtInfo plansCalcRouteFtInfo) {
+	  super(genericRouteImpl.getStartLinkId(),genericRouteImpl.getEndLinkId());
+	  this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;
+  }
 
   public FtPtRoute(Id startLinkId, Id endLinkId, PlansCalcRouteFtInfo plansCalcRouteFtInfo)
   {

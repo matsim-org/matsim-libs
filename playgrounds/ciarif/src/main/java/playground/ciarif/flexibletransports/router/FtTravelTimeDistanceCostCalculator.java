@@ -23,7 +23,7 @@ public class FtTravelTimeDistanceCostCalculator
 //    this.marginalUtlOfDistance = (ftConfigGroup.getDistanceCostCar() / 1000.0D * cnScoringGroup.getMarginalUtlOfDistanceCar());
     this.marginalUtlOfDistance = (ftConfigGroup.getDistanceCostCar() / 1000.0D * cnScoringGroup.getMonetaryDistanceCostRateCar() 
     		* cnScoringGroup.getMarginalUtilityOfMoney() );
-    throw new RuntimeException("this is the exact translation but I am not sure what this means maybe check.  kai, dec'10") ;
+   // throw new RuntimeException("this is the exact translation but I am not sure what this means maybe check.  kai, dec'10") ;
     
   }
 

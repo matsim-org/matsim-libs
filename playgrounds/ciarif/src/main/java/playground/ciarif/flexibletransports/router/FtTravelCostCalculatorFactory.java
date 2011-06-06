@@ -14,18 +14,17 @@ public class FtTravelCostCalculatorFactory
 
   public FtTravelCostCalculatorFactory(FtConfigGroup ftConfigGroup)
   {
+    super();
     this.ftConfigGroup = ftConfigGroup;
   }
 
-  public PersonalizableTravelCost createTravelCostCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-    return new FtTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, this.ftConfigGroup);
-  }
 
-@Override
+//@Override
 public PersonalizableTravelCost createTravelCostCalculator(
 		PersonalizableTravelTime timeCalculator,
 		PlanCalcScoreConfigGroup cnScoringGroup) {
 	// TODO Auto-generated method stub
-	return null;
+	  return new FtTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, this.ftConfigGroup);
+	  
 }
 }

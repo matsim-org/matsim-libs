@@ -36,7 +36,12 @@ public class PlansCalcRouteFT extends PlansCalcRoute
   private MyLinkUtils myLinkUtils;
   private static final Logger log = Logger.getLogger(PlansCalcRouteFT.class);
 
-  public PlansCalcRouteFT(PlansCalcRouteConfigGroup group, Network network, PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory, PlansCalcRouteFtInfo ptRoutingInfo)
+  public PlansCalcRouteFT(PlansCalcRouteConfigGroup group, 
+		  Network network, 
+		  PersonalizableTravelCost costCalculator, 
+		  PersonalizableTravelTime timeCalculator, 
+		  LeastCostPathCalculatorFactory factory, 
+		  PlansCalcRouteFtInfo ptRoutingInfo)
   {
     super(group, network, costCalculator, timeCalculator, factory);
     this.network = network;
@@ -66,15 +71,17 @@ public class PlansCalcRouteFT extends PlansCalcRoute
       ((LegImpl)leg).setArrivalTime(depTime + travelTime);
     }
 
-    if (mode.equals(TransportMode.pt))
+    /*if (mode.equals(TransportMode.pt))
     {
       travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
-    }
-    else if (mode.equals(MyTransportMode.carsharing))
+    }*/
+    //else if
+    if (mode.equals(MyTransportMode.carsharing))
     {
       travelTime = handleCarSharingLeg(person,(LegImpl) leg, (ActivityImpl)fromAct, (ActivityImpl)toAct, depTime);
     }
     else {
+    	log.info("mode = " + mode.toString());
       travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
     }
 
@@ -109,7 +116,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute
     return travelTime;
   }
 
-  public double handleSwissPtLeg(Activity fromAct, Leg leg, Activity toAct, double depTime)
+  /*public double handleSwissPtLeg(Activity fromAct, Leg leg, Activity toAct, double depTime)
   {
     double travelTime = 0.0D;
 
@@ -139,14 +146,19 @@ public class PlansCalcRouteFT extends PlansCalcRoute
     ((LegImpl)leg).setArrivalTime(depTime + travelTime);
 
     return travelTime;
-  }
+  }*/
 
   public static double getAccessEgressTime(double distance, PlansCalcRouteConfigGroup group) {
     return (distance / group.getWalkSpeed());
   }
+  
+  public  PlansCalcRouteFtInfo getPlansCalcRouteFtInfo (){
+	  return this.plansCalcRouteFtInfo;
+  }
 
   protected double calcCarTime(Person person, CarSharingStation fromStation, CarSharingStation toStation, double carStartTime) {
-    LegImpl leg = new LegImpl(MyTransportMode.carsharing);
+	  //LegImpl leg = new LegImpl(MyTransportMode.carsharing);
+	  LegImpl leg = new LegImpl(MyTransportMode.car);
 
     double travelTime = 0.0D;
     Activity getCarSharingCar = new ActivityImpl("getCarSharingCar", fromStation.getCoord(), fromStation.getLink().getId());

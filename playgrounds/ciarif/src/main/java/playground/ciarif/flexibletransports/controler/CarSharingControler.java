@@ -24,27 +24,28 @@ import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 
-public class FlexibleTransportControler extends Controler
+public class CarSharingControler extends Controler
 {
-//  protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
-//  protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
-//  protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
-//  protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
-//  protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
+  protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
+  protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
+  protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
+  protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
+  protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
+  private KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
   private FtConfigGroup ftConfigGroup = new FtConfigGroup();
   private final PlansCalcRouteFtInfo plansCalcRouteFtInfo = new PlansCalcRouteFtInfo(this.ftConfigGroup);
 
   private static final Logger log = Logger.getLogger(FlexibleTransportControler.class);
 
-  public FlexibleTransportControler(String[] args) {
+  public CarSharingControler(String[] args) {
    super(args);
-//
-   //super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+
+  // super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
    super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
-//
+
     this.getNetwork().getFactory().setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), super.getConfig().planomat()));
     this.getNetwork().getFactory().setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
-    this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+    //this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
     this.getNetwork().getFactory().setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
   }
 
@@ -58,26 +59,29 @@ public class FlexibleTransportControler extends Controler
 			this.scenarioLoaded = true;
 	}
   }
+  @Override
+  protected void setUp(){
   
-  protected void setUp()
   {
-//    if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
-//      log.info("Using ftRouter");
-//      this.plansCalcRouteFtInfo.prepare(getNetwork());
-//    }
-	
+    if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
+      log.info("Using ftRouter");
+      this.plansCalcRouteFtInfo.prepare(getNetwork());
+    }
+
     FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
       this.config, 
       this.ftConfigGroup, 
       this.getFacilityPenalties(), 
       this.getFacilities());
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
-
+//
     FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
     setTravelCostCalculatorFactory(costCalculatorFactory);
     super.setUp();
+  	}
   }
-
+  
+  @Override
   protected void loadControlerListeners()
   {
     super.loadControlerListeners();
@@ -90,9 +94,11 @@ public class FlexibleTransportControler extends Controler
     this.addControlerListener(new CarSharingListener(this.ftConfigGroup));
   }
 
+  @Override
   public PlanAlgorithm createRoutingAlgorithm(PersonalizableTravelCost travelCosts, PersonalizableTravelTime travelTimes)
   {
     PlanAlgorithm router = null;
+    log.info("travelcosts = " + travelCosts );
 
     if (!(this.ftConfigGroup.isUsePlansCalcRouteFt())) {
       router = super.createRoutingAlgorithm(travelCosts, travelTimes);
@@ -114,10 +120,10 @@ public class FlexibleTransportControler extends Controler
   {
     if ((args == null) || (args.length == 0)) {
       System.out.println("No argument given!");
-      System.out.println("Usage: FlexibleTransportControler config-file [dtd-file]");
+      System.out.println("Usage: CarSharingControler config-file [dtd-file]");
       System.out.println();
     } else {
-      final Controler controler = new FlexibleTransportControler(args);
+      final Controler controler = new CarSharingControler(args);
       controler.run();
     }
     System.exit(0);
