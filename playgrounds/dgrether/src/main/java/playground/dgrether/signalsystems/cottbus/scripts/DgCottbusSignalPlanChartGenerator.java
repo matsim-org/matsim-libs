@@ -64,12 +64,12 @@ public class DgCottbusSignalPlanChartGenerator {
 		baseDir = baseDir + "run" + runId;
 		
 		//cottbus football
-		runId = new IdImpl("1222_20_football_fans");
-		baseDir = DgPaths.REPOS + "runs-svn/run1222/20_football_fans";
+		runId = new IdImpl("1222_100_football_fans");
+		baseDir = DgPaths.REPOS + "runs-svn/run1222/100_football_fans";
 		iteration = 500;
 		startSecond = 17.0  * 3600.0;
 		endSecond = startSecond + 3600.0;
-		signalSystemId = new IdImpl(18);
+		signalSystemId = new IdImpl(1);
 		
 //		koehler strehler 2010
 //		runId = null;
