@@ -74,7 +74,7 @@ public class CreateCensusSample {
 	 * @param facilitiesFile ... the input facilities file
 	 * @param householdsFile ... the input households file
 	 * @param objectAttributesFile ... the input household object attributes file
-	 * @param outPopulationFile ... the output households file
+	 * @param outPopulationFile ... the output population file
 	 * @param outHouseholdsFile ... the output households file
 	 * @param outObjectAttributesFile ... the output household object attributes file
 	 */
@@ -123,7 +123,7 @@ public class CreateCensusSample {
 			
 			/*
 			 * If it is no collective household we either the the entire household or remove the entire household.
-			 * If it is a very small collective household, we can handle it like a general household
+			 * If it is a very small collective household, we can handle it like a general household.
 			 */
 			if (HHTP < 9000 || household.getMemberIds().size() < minCollectiveSize) {
 				
@@ -160,7 +160,7 @@ public class CreateCensusSample {
 					 */
 					if (r > fraction) {
 						// remove person from household
-						iter.remove();
+						personIter.remove();
 						
 						// remove person from population
 						scenario.getPopulation().getPersons().remove(personId);
