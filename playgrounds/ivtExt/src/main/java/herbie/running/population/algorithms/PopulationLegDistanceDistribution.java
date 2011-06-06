@@ -20,14 +20,18 @@
 
 package herbie.running.population.algorithms;
 
+import herbie.running.pt.DistanceCalculations;
+
 import java.io.PrintStream;
 
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -40,8 +44,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequencyAnalysis implements PlanAlgorithm {
 
-	public PopulationLegDistanceDistribution(PrintStream out) {
+	private Network network;
+
+	public PopulationLegDistanceDistribution(PrintStream out, Network network) {
 		super(out);
+		this.network = network;
 	}
 
 	@Override
@@ -68,9 +75,18 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 					frequency = this.frequencies.get(mode);
 					rawData = this.rawData.get(mode);
 				}
-
-				frequency.addValue(leg.getRoute().getDistance());
-				rawData.addElement(leg.getRoute().getDistance());
+				
+				double distance = 0.0;
+				if(mode.equals("transit_walk")){
+					distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl)leg.getRoute(), network);
+				}
+				else if (leg.getRoute() != null) {
+					distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
+				}
+				frequency.addValue(distance);
+				rawData.addElement(distance);
+//				frequency.addValue(leg.getRoute().getDistance());
+//				rawData.addElement(leg.getRoute().getDistance());
 			}
 		}
 
