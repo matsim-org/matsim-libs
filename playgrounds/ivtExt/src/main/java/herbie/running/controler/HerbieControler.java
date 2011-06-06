@@ -25,10 +25,13 @@ import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -66,9 +69,15 @@ public class HerbieControler extends Controler {
 				this.getFacilities(),
 				this.getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
-
-//		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory();
-//		this.setTravelCostCalculatorFactory(costCalculatorFactory);
+				
+		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
+		
+		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params);
+		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
+		PlanCalcScoreConfigGroup cnScoringGroup = null;
+		costCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup);
+		
+		this.setTravelCostCalculatorFactory(costCalculatorFactory);
 		
 		super.setUp();
 	}
@@ -79,7 +88,7 @@ public class HerbieControler extends Controler {
 		super.loadControlerListeners();
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME,  this.scenarioData.getNetwork()));
+		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.scenarioData.getNetwork()));
 //		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
