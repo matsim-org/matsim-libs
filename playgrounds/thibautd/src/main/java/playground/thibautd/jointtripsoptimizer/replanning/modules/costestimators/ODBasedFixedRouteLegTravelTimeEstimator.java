@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
@@ -209,14 +209,22 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 					actOrigin.getLinkId(),
 					route.getLinkIds(),
 					actDestination.getLinkId());
-			legIntermediate.setRoute(networkRoute);
+			networkRoute.setDistance(route.getDistance());
+
+			if (doModifyLeg) {
+				legIntermediate.setRoute(networkRoute);
+			}
 
 			legTravelTimeEstimation = now - departureTime;
 		}
 		else {
 			Route route = getFixedRoute(odTuple, actOrigin, actDestination, mode);
 			legTravelTimeEstimation = route.getTravelTime();
-			legIntermediate.setRoute(route);
+
+			if (doModifyLeg) {
+				//TODO: clone route
+				legIntermediate.setRoute(route);
+			}
 		}
 
 		return legTravelTimeEstimation;
@@ -277,6 +285,21 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 					startLink.getId(),
 					NetworkUtils.getLinkIds(path.links),
 					endLink.getId());
+
+			// set route distance
+			double distance = RouteUtils.calcDistance(route, this.network);
+
+			//if (simLegInterpretation.equals(
+			//			PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
+			//	distance += endLink.getLength();
+			//}
+			//else if (simLegInterpretation.equals(
+			//			PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
+			//	distance += startLink.getLength();
+			//}
+
+			route.setDistance(distance);
+
 			infoLeg.setRoute(route);
 		}
 		else {
@@ -348,6 +371,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 					// generic routes correctly
 					route = leg.getRoute();
 					if (route instanceof NetworkRoute) {
+						//FIXME: OD impossible to extract from route!
 						odTuple = getOdTuple(route);
 						odInformation = this.fixedRoutes.get(odTuple);
 
