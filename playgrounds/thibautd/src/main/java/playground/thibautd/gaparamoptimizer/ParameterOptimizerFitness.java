@@ -24,6 +24,8 @@ import java.lang.management.ThreadMXBean;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
@@ -50,12 +52,15 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * @author thibautd
  */
 public class ParameterOptimizerFitness extends FitnessFunction {
+	private static final Logger log =
+		Logger.getLogger(ParameterOptimizerFitness.class);
+
 	private static final long serialVersionUID = 1L;
 
 	// to avoid negative fitness errors
 	private static final double START_FITNESS = 1E7;
 	// parameters of the fitness
-	private static final double CHF_PER_MICROSEC = 1E-9;
+	private static final double CHF_PER_MICROSEC = 1E-6;
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
 	private static final int N_PLAN_EXEC = 1;
 
@@ -76,7 +81,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int MAX_POP_SIZE = 200;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	private static final int MAX_WINDOW_SIZE = 20;
-	private static final double MAX_NON_UNIFORM = 10d;
+	private static final double MAX_NON_UNIFORM = 30d;
 
 	// instance fields
 	private final List<JointPlan> plans;
@@ -99,6 +104,13 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		this.jpoAlgo = new JPOForOptimization(
 				scoringFunctionFactory, legTravelTimeEstimatorFactory, routingAlgorithm,
 				network, iterationOutputPath);
+		log.debug("fitness function initialized");
+		log.debug("max pop size: "+MAX_POP_SIZE);
+		log.debug("max discrete scale: "+MAX_DISCRETE_SCALE);
+		log.debug("max window size: "+MAX_WINDOW_SIZE);
+		log.debug("max non uniformity: "+MAX_NON_UNIFORM);
+		log.debug("n plan execs: "+N_PLAN_EXEC);
+		log.debug("CHF per microsec: "+CHF_PER_MICROSEC);
 	}
 
 	/**
@@ -113,6 +125,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	 */
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
+		log.debug("computing fitness: generation #"+this.jgapConfig.getGenerationNr());
 		double[] scores = new double[nPlans];
 		long[] cpuTimesNanoSecs = new long[nPlans];
 		JointReplanningConfigGroup configGroup = fromChromosomeToConfig(chromosome);
@@ -126,6 +139,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			for (int j=0; j < N_PLAN_EXEC; j++) {
 				startTime = thread.getCurrentThreadCpuTime();
 				scores[i] += this.jpoAlgo.run(configGroup, this.plans.get(i));
+				log.debug("plan score: "+scores[i]);
 				endTime = thread.getCurrentThreadCpuTime();
 				cpuTimesNanoSecs[i] += endTime - startTime;
 			}

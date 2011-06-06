@@ -21,6 +21,8 @@ package playground.thibautd.gaparamoptimizer;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import org.jgap.Genotype;
 
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +42,9 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * @author thibautd
  */
 public class JPOForOptimization {
+	private static final Logger log =
+		Logger.getLogger(JPOForOptimization.class);
+
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final PlansCalcRoute routingAlgorithm;
@@ -93,6 +98,8 @@ public class JPOForOptimization {
 			gaPopulation.evolve(configGroup.getMaxIterations());
 		}
 
+		log.debug("best fitness: "+gaPopulation.getFittestChromosome().getFitnessValue());
+		log.debug("clique size: "+plan.getClique().getMembers().size());
 		return gaPopulation.getFittestChromosome().getFitnessValue() /
 			plan.getClique().getMembers().size();
 	}

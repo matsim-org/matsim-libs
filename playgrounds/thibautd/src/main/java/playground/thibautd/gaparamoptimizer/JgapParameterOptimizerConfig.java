@@ -80,6 +80,10 @@ public class JgapParameterOptimizerConfig extends Configuration {
 			) {
 		super(null);
 		log.debug("initializing jgap conf...");
+		log.debug("population size: "+POP_SIZE);
+		log.debug("p_mut: "+1d/MUTATION_RATE);
+		log.debug("co_rate: "+CO_RATE);
+		log.debug("orig rate: "+ORIG_RATE);
 		Configuration.reset();
 		ParameterOptimizerFitness fitness = new ParameterOptimizerFitness(
 				this, plans, scoringFunctionFactory, legTravelTimeEstimatorFactory,

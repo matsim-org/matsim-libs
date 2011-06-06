@@ -64,7 +64,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private String outputFileName = "optimizedConf.xml";
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 6;
+	private final static int N_PLANS = 1;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -94,10 +94,24 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		List<JointPlan> output = new ArrayList<JointPlan>(N_PLANS);
 		JointPlan currentPlan;
 
-		for (int i=0; i < N_PLANS; i++) {
+		//for (int i=0; i < N_PLANS; i++) {
+		//	currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
+		//	log.debug("adding test instance of type: "+currentPlan.getType());
+		//	output.add(currentPlan);
+		//}
+
+		int count = 0;
+		int i = 0;
+		while (count < N_PLANS) {
 			currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
-			log.debug("adding test instance of type: "+currentPlan.getType());
-			output.add(currentPlan);
+			i++;
+
+			// only consider joint plans
+			if (currentPlan.getClique().getMembers().size() > 1) {
+				log.debug("adding test instance of type: "+currentPlan.getType());
+				output.add(currentPlan);
+				count++;
+			}
 		}
 
 		return output;
@@ -112,6 +126,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			final String iterationOutputPath
 			) {
 		log.debug("optimizing parameters...");
+		log.debug("nGenerations: "+N_GEN);
+		log.debug("nPlans: "+N_PLANS);
 		Configuration jgapConfig = new JgapParameterOptimizerConfig(
 				plans,
 				scoringFunctionFactory,
@@ -127,6 +143,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			throw new RuntimeException(e);
 		}
 
+		log.debug("always compute fitness = "+jgapConfig.isAlwaysCalculateFitness());
 		population.evolve(N_GEN);
 
 		log.debug("optimizing parameters... DONE");
