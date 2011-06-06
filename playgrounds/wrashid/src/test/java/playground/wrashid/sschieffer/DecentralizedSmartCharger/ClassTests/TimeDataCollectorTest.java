@@ -1,6 +1,6 @@
 package playground.wrashid.sschieffer.DecentralizedSmartCharger.ClassTests;
 
-import playground.wrashid.sschieffer.DSC.TimeDataCollector;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.TimeDataCollector;
 import junit.framework.TestCase;
 
 public class TimeDataCollectorTest extends TestCase{

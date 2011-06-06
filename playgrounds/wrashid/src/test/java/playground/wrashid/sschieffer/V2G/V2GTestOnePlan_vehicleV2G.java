@@ -38,11 +38,11 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.GeneralSource;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
-import playground.wrashid.sschieffer.DSC.TimeDataCollector;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.TimeDataCollector;
 
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;

@@ -20,7 +20,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DSC.EnergyConsumptionInit;
+import playground.wrashid.sschieffer.SetUp.EnergyConsumptionInit;
 
 /**
  * tests if the vehicles List produced by the class EnergyConsumptionInitTest

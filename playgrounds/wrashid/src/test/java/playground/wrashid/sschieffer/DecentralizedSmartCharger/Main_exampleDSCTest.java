@@ -44,9 +44,9 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
-import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.SetUp.StellasHubMapping;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 
 import java.util.*;
 

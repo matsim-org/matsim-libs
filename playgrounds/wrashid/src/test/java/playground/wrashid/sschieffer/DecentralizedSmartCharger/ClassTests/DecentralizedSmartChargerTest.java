@@ -46,12 +46,12 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.sschieffer.DSC.ChargingInterval;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ChargingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.DrivingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 
 /**
  * 

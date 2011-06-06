@@ -38,11 +38,11 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
-import playground.wrashid.sschieffer.DSC.TimeDataCollector;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.TimeDataCollector;
 
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
@@ -50,11 +50,12 @@ import lpsolve.LpSolveException;
 /**
  * tests methods:
  * <li> checks if adding revenue from V2G works and statistik calc function works
+ * <li> checks the most important V2G function reschedule at the example of one agent
  * 
  * @author Stella
  *
  */
-public class V2GTestOnePlan_StatisticCheck extends TestCase{
+public class V2GTestOnePlan extends TestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";

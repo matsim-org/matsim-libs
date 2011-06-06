@@ -43,9 +43,9 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.DetermisticLoadPricingCollector;
-import playground.wrashid.sschieffer.DSC.HubInfoDeterministic;
-import playground.wrashid.sschieffer.SetUp.StellasHubMapping;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.DetermisticLoadPricingCollector;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
+import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
 import java.util.*;

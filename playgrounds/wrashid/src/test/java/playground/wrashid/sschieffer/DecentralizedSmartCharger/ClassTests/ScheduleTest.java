@@ -26,12 +26,12 @@ import org.apache.commons.math.MaxIterationsExceededException;
 import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 import org.matsim.api.core.v01.Id;
 
-import playground.wrashid.sschieffer.DSC.ChargingInterval;
-import playground.wrashid.sschieffer.DSC.DrivingInterval;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.ParkingInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
-import playground.wrashid.sschieffer.DSC.TimeInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ChargingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.DrivingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.ParkingInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.TimeInterval;
 
 import junit.framework.TestCase;
 

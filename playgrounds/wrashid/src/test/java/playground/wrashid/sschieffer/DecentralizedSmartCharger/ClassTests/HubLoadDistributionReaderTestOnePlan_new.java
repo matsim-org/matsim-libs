@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
-import playground.wrashid.sschieffer.DSC.HubLoadDistributionReader;
-import playground.wrashid.sschieffer.DSC.LoadDistributionInterval;
-import playground.wrashid.sschieffer.DSC.Schedule;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubLoadDistributionReader;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
