@@ -156,7 +156,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.startElement("", "", LIGHTS, atts);
 			for (DgStreet light : crossing.getLights().values()) {
 				atts.clear();
-				log.debug("writing light:  " + light.getId());
+//				log.debug("writing light:  " + light.getId());
 				atts.addAttribute("", "", ID, CDATA, light.getId().toString());
 				atts.addAttribute("", "", FROM, CDATA, light.getFromNode().getId().toString());
 				atts.addAttribute("", "", TO, CDATA, light.getToNode().getId().toString());
