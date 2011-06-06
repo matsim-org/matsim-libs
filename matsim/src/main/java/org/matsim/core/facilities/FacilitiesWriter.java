@@ -27,12 +27,14 @@ import java.util.SortedSet;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 
 public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private FacilitiesWriterHandler handler = null;
 	private final ActivityFacilitiesImpl facilities;
 	private String dtd;
+	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped facility # ");
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -60,8 +62,11 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 		this.writeOpenAndInit(filename);
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			this.writeFacility((ActivityFacilityImpl) f);
+			counter.incCounter();
 		}
 		this.writeFinish();
+		counter.printCounter();
+		counter.reset();
 	}
 
 	private final void writeOpenAndInit(final String filename) {

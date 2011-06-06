@@ -32,6 +32,7 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.households.HouseholdsReaderV10;
@@ -194,6 +195,8 @@ public class ScenarioLoaderImpl {
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
 				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+				
+				this.scenario.getActivityFacilities().printFacilitiesCount();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -215,6 +218,10 @@ public class ScenarioLoaderImpl {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
 			new MatsimPopulationReader(this.getScenario()).parse(populationFileName);
+			
+			if (this.scenario.getPopulation() instanceof PopulationImpl) {
+				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
+			}
 		}
 		else {
 			log.info("no population file set in config, not able to load population");

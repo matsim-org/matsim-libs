@@ -31,6 +31,7 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -43,7 +44,8 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	private final Population population;
 	private Knowledges knowledges = null;
 	private final Network network;
-
+	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
+	
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
 	/**
@@ -129,6 +131,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 				return;
 			}
 			this.handler.writePerson(person, this.writer);
+			counter.incCounter();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -164,6 +167,8 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		this.writeStartPlans(filename);
 		this.writePersons();
 		this.writeEndPlans();
+		counter.printCounter();
+		counter.reset();
 		log.info("Population written to: " + filename);
 	}
 
