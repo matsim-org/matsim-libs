@@ -207,7 +207,7 @@ public class DurationOnTheFlyScorer {
 		resetInternalState();
 
 		for (Map.Entry<Id, Plan> inputIndivPlan :
-				plan.getIndividualPlans().entrySet()) {
+				inputPlan.getIndividualPlans().entrySet()) {
 			individualPlan = inputIndivPlan.getValue();
 			currentId = inputIndivPlan.getKey();
 			individualsToPlan.add(currentId);
@@ -233,7 +233,9 @@ public class DurationOnTheFlyScorer {
 			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
-		return getScore(individualValuesMap);
+		double score = getScore(individualValuesMap);
+		//log.debug("score: "+score);
+		return score;
 	}
 
 	private void resetInternalState() {
@@ -579,7 +581,9 @@ public class DurationOnTheFlyScorer {
 			return (allRelativesArePlanned && (isDriver || driverIsPlanned));
 		}
 
-		return true;
+		throw new RuntimeException("ready for planning should only be checked for"+
+				" shared legs");
+		//return true;
 	}
 
 	/**
@@ -599,7 +603,8 @@ public class DurationOnTheFlyScorer {
 				origin,
 				destination,
 				leg,
-				false //ie do not modify leg
+				//false //ie do not modify leg
+				true //ie do modify leg
 				);
 
 		individualValues.scoringFunction.startLeg(individualValues.getNow(), leg);
