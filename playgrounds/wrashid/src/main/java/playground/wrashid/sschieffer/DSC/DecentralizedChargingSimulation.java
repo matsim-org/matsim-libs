@@ -226,6 +226,30 @@ public class DecentralizedChargingSimulation {
 	}
 	
 	/**
+	 * return average charging time of all agents
+	 * @return
+	 */
+	public double getAverageChargingTimeAgents_FromSmartCharging(){
+		return mySmartCharger.getAverageChargingTimeAgents();
+	}
+	
+	/**
+	 * return average charging time of all PHEV agents
+	 * @return
+	 */
+	public double getAverageChargingTimePHEV_FromSmartCharging(){
+		return mySmartCharger.getAverageChargingTimePHEV();
+	}
+	
+	/**
+	 * return average charging time of all EV agents
+	 * @return
+	 */
+	public double getAverageChargingTimeEV_FromSmartCharging(){
+		return mySmartCharger.getAverageChargingTimeEV();
+	}
+	
+	/**
 	 * return linkedList with charging schedules for all agents over the entire day
 	 * @return
 	 */

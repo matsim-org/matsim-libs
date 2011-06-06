@@ -279,9 +279,9 @@ public class HubLoadDistributionReader {
 	
 	
 	public TimeDataCollector make96BinCollectorFromDayLoadSchedule(Schedule s){
-		
-		TimeDataCollector dataC= new TimeDataCollector(96);
-		for(int i=0; i<96; i++){
+		// 96 bins a 15 min = 97 data points
+		TimeDataCollector dataC= new TimeDataCollector(97);
+		for(int i=0; i<97; i++){
 			double sec= (dataC.getSecPerBin())*i;
 			int interval= s.timeIsInWhichInterval(sec);
 			dataC.addDataPoint(i, 

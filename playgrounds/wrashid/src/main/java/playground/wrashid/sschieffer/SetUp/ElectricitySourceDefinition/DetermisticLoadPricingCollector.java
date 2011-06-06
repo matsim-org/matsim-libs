@@ -94,13 +94,12 @@ public class DetermisticLoadPricingCollector {
 			
 			String file= myHubInfo.get(hub).getDeterministicFreeLoadTxt();
 			LoadFileReader deterministicFreeLoad = new LoadFileReader(file,  
-					95, 
+					97, 
 					"deterministic free load for hub "+ hubId +" from file", 
 					"deterministic free load for hub "+ hubId +" fitted");
-			
+		
 			hubLoadDistribution.put(hubId, 
 					LoadFileReader.makeSchedule(deterministicFreeLoad.getFittedFunction()));
-			
 			setUpContinuousPricingLevels(hub, hubId);						
 		}
 		

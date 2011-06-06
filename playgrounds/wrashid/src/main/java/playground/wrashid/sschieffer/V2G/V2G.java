@@ -44,37 +44,63 @@ public class V2G {
 	private HashMap<Id, V2GAgentStats> hubSourceStatistic; 
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
-	private double averageV2GRevenueEV=0;
-	private double averageV2GRevenuePHEV=0;
-	private double averageV2GRevenueAllAgents=0;
+	private double averageV2GRevenueEV ;
+	private double averageV2GRevenuePHEV ;
+	private double averageV2GRevenueAllAgents ;
 	
-	private double averageExtraChargingCostEV=0;
-	private double averageExtraChargingCostPHEV=0;
+	private double averageExtraChargingCostEV ;
+	private double averageExtraChargingCostPHEV ;
 	private double averageExtraChargingCostAllAgents=0;
 	
-	private double totalRegulationUp=0;
-	private double totalRegulationUpEV=0;
-	private double totalRegulationUpPHEV=0;
+	private double totalRegulationUp ;
+	private double totalRegulationUpEV ;
+	private double totalRegulationUpPHEV ;
 	
-	private double totalRegulationDown=0;
-	private double totalRegulationDownEV=0;
-	private double totalRegulationDownPHEV=0;
+	private double totalRegulationDown ;
+	private double totalRegulationDownEV ;
+	private double totalRegulationDownPHEV ;
 	
-	private double averageRevenueFeedInEV=0;
-	private double averageRevenueFeedInPHEV=0;
-	private double averageRevenueFeedInAllAgents=0;
+	private double averageRevenueFeedInEV ;
+	private double averageRevenueFeedInPHEV ;
+	private double averageRevenueFeedInAllAgents ;
 	
-	private double totalJoulesFeedInEV=0;
-	private double totalJoulesFeedInPHEV=0;
-	private double totalJoulesFeedInAllAgents=0;
+	private double totalJoulesFeedInEV ;
+	private double totalJoulesFeedInPHEV ;
+	private double totalJoulesFeedInAllAgents ;
 	
-	private double totalJoulesFeedInHubSources=0;
-	private double averageRevenueFeedInHubSources=0;
-	private double averageExtraChargingHubSources=0;
+	private double totalJoulesFeedInHubSources;
+	private double averageRevenueFeedInHubSources ;
+	private double averageExtraChargingHubSources ;
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
 		this.mySmartCharger=mySmartCharger;
-				
+		 averageV2GRevenueEV=0;
+		 averageV2GRevenuePHEV=0;
+		 averageV2GRevenueAllAgents=0;
+		
+		 averageExtraChargingCostEV=0;
+		 averageExtraChargingCostPHEV=0;
+		 averageExtraChargingCostAllAgents=0;
+		
+		 totalRegulationUp=0;
+		 totalRegulationUpEV=0;
+		 totalRegulationUpPHEV=0;
+		
+		 totalRegulationDown=0;
+		 totalRegulationDownEV=0;
+		 totalRegulationDownPHEV=0;
+		
+		 averageRevenueFeedInEV=0;
+		 averageRevenueFeedInPHEV=0;
+		 averageRevenueFeedInAllAgents=0;
+		
+		 totalJoulesFeedInEV=0;
+		 totalJoulesFeedInPHEV=0;
+		 totalJoulesFeedInAllAgents=0;
+		
+		 totalJoulesFeedInHubSources=0;
+		 averageRevenueFeedInHubSources=0;
+		 averageExtraChargingHubSources=0;	
 	}
 	
 	
@@ -230,14 +256,16 @@ public class V2G {
 			averageExtraChargingCostEV+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
 			averageExtraChargingCostAllAgents+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
 		}
-		averageV2GRevenueEV=averageV2GRevenueEV/totalEV;
-		averageRevenueFeedInEV=averageRevenueFeedInEV/totalEV;
-		averageExtraChargingCostEV=averageExtraChargingCostEV/totalEV;
-		if(totalEV==0){
+		if (totalEV==0){
 			averageV2GRevenueEV=0;
 			averageRevenueFeedInEV=0;
 			averageExtraChargingCostEV=0;
+		}else{
+			averageV2GRevenueEV=averageV2GRevenueEV/totalEV;
+			averageRevenueFeedInEV=averageRevenueFeedInEV/totalEV;
+			averageExtraChargingCostEV=averageExtraChargingCostEV/totalEV;
 		}
+	
 		
 		//PHEV
 		int totalPHEV=mySmartCharger.getAllAgentsWithPHEV().size();
@@ -258,13 +286,15 @@ public class V2G {
 			averageExtraChargingCostPHEV+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
 			averageExtraChargingCostAllAgents+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
 		}
-		averageV2GRevenuePHEV=averageV2GRevenuePHEV/totalPHEV;
-		averageRevenueFeedInPHEV=averageRevenueFeedInPHEV/totalPHEV;
-		averageExtraChargingCostPHEV=averageExtraChargingCostPHEV/totalPHEV;
+	
 		if(totalPHEV==0){
 			averageV2GRevenuePHEV=0.0;
 			averageRevenueFeedInPHEV=0.0;
 			averageExtraChargingCostPHEV=0.0;
+		}else{
+			averageV2GRevenuePHEV=averageV2GRevenuePHEV/totalPHEV;
+			averageRevenueFeedInPHEV=averageRevenueFeedInPHEV/totalPHEV;
+			averageExtraChargingCostPHEV=averageExtraChargingCostPHEV/totalPHEV;
 		}
 		//TOTAL
 		averageV2GRevenueAllAgents=averageV2GRevenueAllAgents/(totalPHEV+totalEV);

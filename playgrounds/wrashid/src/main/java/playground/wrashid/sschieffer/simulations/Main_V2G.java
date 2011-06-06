@@ -62,8 +62,8 @@ import java.util.*;
  * and if the utility of the agent can be increased by rescheduling.
  * 
  * 
- * PLease provide the following folders in the output path to store results locally
- * please provide a folder Output with the following sub-folders
+ * PLease provide the following folders and sub-folders in the output path to store results locally
+ * 
  * <ul>
  * 		<li>DecentralizedCharger
  * 			<ul>
@@ -96,8 +96,8 @@ public class Main_V2G {
 		
 		//final String outputPath="/cluster/home/baug/stellas/Runs/24hrV2G20000Plans15Min/Results";
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\24hrV2G\\20000Plans15Min\\";
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans20000.xml";
+		final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		double kWHEV =24;
 		double kWHPHEV =24;

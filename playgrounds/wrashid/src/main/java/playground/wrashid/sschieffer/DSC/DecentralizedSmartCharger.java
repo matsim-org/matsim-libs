@@ -639,9 +639,16 @@ public class DecentralizedSmartCharger {
 				averageChargingCostsAgentPHEV+=thisChargingCost;	
 			}
 		}
+		
 		averageChargingCostsAgent=averageChargingCostsAgent/(agentsWithEV.size()+agentsWithPHEV.size());
-		averageChargingCostsAgentEV=averageChargingCostsAgentEV/(agentsWithEV.size());
-		averageChargingCostsAgentPHEV=averageChargingCostsAgentPHEV/(agentsWithPHEV.size());
+		if(agentsWithEV.size()==0){
+			averageChargingCostsAgentEV=0;
+		}else{averageChargingCostsAgentEV=averageChargingCostsAgentEV/(agentsWithEV.size());}
+		
+		if(agentsWithPHEV.size()==0){
+			averageChargingCostsAgentPHEV=0;
+		}else{averageChargingCostsAgentPHEV=averageChargingCostsAgentPHEV/(agentsWithPHEV.size());}
+		
 	}
 
 
@@ -1297,7 +1304,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	/**
-	 * return average charging time of agents
+	 * return average charging  cost   of agents
 	 * @return
 	 */
 	public double getAverageChargingCostAgents(){
@@ -1306,7 +1313,7 @@ public class DecentralizedSmartCharger {
 	
 	
 	/**
-	 * return average charging time of EV agents
+	 * return average charging cost   of EV agents
 	 * @return
 	 */
 	public double getAverageChargingCostEV(){
@@ -1314,11 +1321,28 @@ public class DecentralizedSmartCharger {
 	}
 	
 	/**
-	 * return average charging time of PHEV agents
+	 * return average charging cost  of PHEV agents
 	 * @return
 	 */
 	public double getAverageChargingCostPHEV(){
 		return averageChargingCostsAgentPHEV;
+	}
+	
+	
+	/**
+	 * returns the average charging time of all agents
+	 * @return
+	 */
+	public double getAverageChargingTimeAgents(){
+		return getAverageChargingTimeAgents();
+	}
+	
+	public double getAverageChargingTimePHEV(){
+		return getAverageChargingTimePHEV();
+	}
+	
+	public double getAverageChargingTimeEV(){
+		return getAverageChargingTimeEV();
 	}
 	
 	
@@ -1993,7 +2017,7 @@ public class DecentralizedSmartCharger {
 		    out.write("</br>");
 			   
 		    out.write("Time </br> </br>");
-		    out.write("Standard charging sloth length [s]:"+ minChargingLength
+		    out.write("Standard charging slot length [s]:"+ minChargingLength
 		    		+"</br>");
 		    
 		    out.write("Time [ms] reading agent schedules:"+ (agentReadTime-startTime)
@@ -2014,10 +2038,18 @@ public class DecentralizedSmartCharger {
 		    }
 		    
 		    out.write("</br>");
-		    out.write("CHARGING TIMES </br>");
-		    out.write("Average charging time of agents: "+getAverageChargingCostAgents()+"</br>");
-		    out.write("Average charging time of EV agents: "+getAverageChargingCostEV()+"</br>");			   
-		    out.write("Average charging time of PHEV agents: "+getAverageChargingCostPHEV()+"</br>");
+		    out.write("CHARGING COSTS </br>");
+		    out.write("Average charging cost of agents: "+getAverageChargingCostAgents()+"</br>");
+		    out.write("Average charging cost of EV agents: "+getAverageChargingCostEV()+"</br>");			   
+		    out.write("Average charging cost of PHEV agents: "+getAverageChargingCostPHEV()+"</br>");
+		    out.write("</br>");
+		    
+		   
+		    out.write("</br>");
+		    out.write("CHARGING TIME </br>");
+		    out.write("Average charging time of agents: "+averageChargingCostsAgent+"</br>");
+		    out.write("Average charging time of EV agents: "+ averageChargingCostsAgentEV+"</br>");			   
+		    out.write("Average charging time of PHEV agents: "+averageChargingCostsAgentPHEV+"</br>");
 		    out.write("</br>");
 		    
 		    out.write("TOTAL EMISSIONS: "+ getTotalEmissions() +"</br>");

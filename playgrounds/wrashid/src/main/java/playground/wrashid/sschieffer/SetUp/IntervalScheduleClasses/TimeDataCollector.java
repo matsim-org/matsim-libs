@@ -44,10 +44,19 @@ public class TimeDataCollector {
 	private XYSeries xy;
 	
 	
+	/**
+	 * pass an array with data
+	 * the data should have an entry at start second.... end second
+	 * in regular intervals
+	 * it is assumed, that the data is distributed over an entire day
+	 * 
+	 * @param data
+	 */
 	public TimeDataCollector(double[][] data){
 		this.data=data;
 		this.num= data.length;
-		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/num;
+		int intervals= num-1;
+		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/intervals;
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		optimizer.setMaxIterations(10000);		
@@ -61,7 +70,8 @@ public class TimeDataCollector {
 	public TimeDataCollector(int numberOfDataPoints){
 		data= new double[numberOfDataPoints][2];
 		this.num= numberOfDataPoints;
-		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/num;
+		int intervals= num-1;
+		this.secBin=DecentralizedSmartCharger.SECONDSPERDAY/intervals;
 		
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		optimizer.setMaxIterations(100000);		

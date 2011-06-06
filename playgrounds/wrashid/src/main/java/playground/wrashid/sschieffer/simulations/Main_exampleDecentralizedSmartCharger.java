@@ -190,6 +190,13 @@ public class Main_exampleDecentralizedSmartCharger {
 			System.out.println("average charging cost for EV agents "+mySimulation.getAverageChargingCostPerEV_AgentFromSmartCharging());
 			System.out.println("average charging cost for PHEV agents "+mySimulation.getAverageChargingCostPerPHEV_AgentFromSmartCharging());
 			
+			//CHARGING TIME
+			System.out.println("average charging time of all agents "+mySimulation.getAverageChargingTimeAgents_FromSmartCharging());
+			System.out.println("average charging time for EV agents "+mySimulation.getAverageChargingTimeEV_FromSmartCharging());
+			System.out.println("average charging time for PHEV agents "+mySimulation.getAverageChargingTimePHEV_FromSmartCharging());
+			
+			
+			
 			//CHARGING SCHEDULES FOR EVERY AGENT
 			HashMap<Id, Schedule> agentSchedules= 
 				mySimulation.getAllAgentChargingSchedules();

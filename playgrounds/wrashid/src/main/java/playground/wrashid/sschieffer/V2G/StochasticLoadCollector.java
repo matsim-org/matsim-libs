@@ -114,7 +114,7 @@ public class StochasticLoadCollector {
 		if(myHubInfo.get(hub).isTxtGeneralStochastic()){
 			String file= myHubInfo.get(hub).geStochasticGeneralLoadTxt();
 			LoadFileReader stochasticFreeLoad = new LoadFileReader(file,  
-					95, 
+					97, 
 					"stochastic free load for hub "+ hubId +" from file", 
 					"stochastic free load for hub "+ hubId +" fitted");
 			
@@ -156,7 +156,7 @@ public class StochasticLoadCollector {
 					String name= stochasticGeneralSources.get(i).getName();
 					
 					LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
-							95, 
+							97, 
 							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
 							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
 					
@@ -194,7 +194,7 @@ public class StochasticLoadCollector {
 				for(Id id: vehicleLoads.keySet()){
 					String file= vehicleLoads.get(id);
 					LoadFileReader stochasticVehicleLoad = new LoadFileReader(file,  
-							95, 
+							97, 
 							"stochastic vehicle load "+ id.toString() +" from file", 
 							"sstochastic vehicle load "+ id.toString() +" fitted");
 					
