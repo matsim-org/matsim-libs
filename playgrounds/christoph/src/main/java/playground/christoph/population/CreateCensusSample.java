@@ -43,7 +43,15 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class CreateCensusSample {
 
-	/*
+	private static final Logger log = Logger.getLogger(CreateCensusSample.class);
+
+	public static void main(String[] args) {
+		if (args.length != 10) return;
+		else new CreateCensusSample(Double.valueOf(args[0]), Integer.valueOf(args[1]), args[2], args[3], args[4], 
+				args[5], args[6], args[7], args[8], args[9]);
+	}
+		
+	/**
 	 * If we create a sample population from a Census2000V2 population where we
 	 * also use households, we cannot just draw a random sample. Instead we have
 	 * to draw a sample of households, including all members of a selected
@@ -56,31 +64,25 @@ public class CreateCensusSample {
 	 * 
 	 * Additionally, this should help to avoid some scaling problems (e.g. a
 	 * large household with 1000+ members could be located at a link that is
-	 * scaled down to 10%.
-	 */
-	private static final Logger log = Logger.getLogger(CreateCensusSample.class);
-	
-	private String populationFile = "../../matsim/mysimulations/crossboarder/plansCBV2_with_facilities.xml.gz";
-	private String networkFile = "../../matsim/mysimulations/crossboarder/network.xml.gz";
-	private String facilitiesFile = "../../matsim/mysimulations/crossboarder/facilities.xml.gz";
-	private String householdsFile = "../../matsim/mysimulations/crossboarder/households.xml.gz";
-	private String objectAttributesFile = "../../matsim/mysimulations/crossboarder/householdObjectAttributes.xml.gz";
-	
-	private String outPopulationFile = "../../matsim/mysimulations/crossboarder/plansCBV2_with_facilities_sample.xml.gz";
-	private String outHouseholdsFile = "../../matsim/mysimulations/crossboarder/households_sample.xml.gz";
-	private String outObjectAttributesFile = "../../matsim/mysimulations/crossboarder/householdObjectAttributes_sample.xml.gz";
-	
-	public static void main(String[] args) throws Exception {
-		if (args.length != 2) return;
-		else new CreateCensusSample(Double.valueOf(args[0]), Integer.valueOf(args[1]));
-	}
-	
-	/**
+	 * scaled down to 10%).
+	 * 
 	 * @param fraction ... the fraction of the to be created population
 	 * @param minCollectiveSize ... minimum size of a collective household to be treated as a collective household.
 	 * 		Otherwise it is handled as a non collective household.
+	 * @param populationFile ... the input population file
+	 * @param networkFile ... the input network file
+	 * @param facilitiesFile ... the input facilities file
+	 * @param householdsFile ... the input households file
+	 * @param objectAttributesFile ... the input household object attributes file
+	 * @param outPopulationFile ... the output households file
+	 * @param outHouseholdsFile ... the output households file
+	 * @param outObjectAttributesFile ... the output household object attributes file
 	 */
-	public CreateCensusSample(double fraction, int minCollectiveSize) throws Exception {
+	public CreateCensusSample(double fraction, int minCollectiveSize, String populationFile, String networkFile, String facilitiesFile,
+			String householdsFile, String objectAttributesFile, String outPopulationFile, String outHouseholdsFile, String outObjectAttributesFile) {
+		
+		log.info("Sample fraction: " + fraction);
+		log.info("Minimum size of collective households to be sampled within the household: " + minCollectiveSize);
 		
 		if (fraction <= 0.0 || fraction >= 1.0) {
 			log.error("Fraction is expected to be > 0.0 and < 1.0!"); return;
