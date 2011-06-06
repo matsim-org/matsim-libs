@@ -24,16 +24,19 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 public class HerbieTravelCostCalculatorFactory implements
 		TravelCostCalculatorFactory {
 	
-	public HerbieTravelCostCalculatorFactory() {
+	private CharyparNagelScoringParameters params = null;
+
+	public HerbieTravelCostCalculatorFactory(CharyparNagelScoringParameters params) {
 		super();
+		this.params  = params;
 	}
 
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
-//		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
-		return null;
+		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, params);
 	}
 }
