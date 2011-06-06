@@ -86,6 +86,12 @@ public class DgKoehlerStrehler2010ModelWriter {
 	private static final String FLOW = "flow";
 	private static final String DRAINS = "drains";
 
+	
+	public void write(ScenarioImpl sc, DgNetwork network, String outFile) {
+		this.write(sc, network, null, outFile);
+	}
+
+	
 	public void write(ScenarioImpl sc, DgNetwork network, DgCommodities coms, String outFile) {
 		Writer writer;
 		try {
@@ -94,7 +100,9 @@ public class DgKoehlerStrehler2010ModelWriter {
 			this.writeDocumentStart(hd, sc);
 			this.writeCrossings(network, hd);
 			this.writeStreets(network, sc.getNetwork(), hd);
-			this.writeCommodities(coms, hd);
+			if (coms != null){
+				this.writeCommodities(coms, hd);
+			}
 			hd.endElement("", "", NETWORK);
 			hd.endDocument();
 			writer.flush();
@@ -148,6 +156,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.startElement("", "", LIGHTS, atts);
 			for (DgStreet light : crossing.getLights().values()) {
 				atts.clear();
+				log.debug("writing light:  " + light.getId());
 				atts.addAttribute("", "", ID, CDATA, light.getId().toString());
 				atts.addAttribute("", "", FROM, CDATA, light.getFromNode().getId().toString());
 				atts.addAttribute("", "", TO, CDATA, light.getToNode().getId().toString());

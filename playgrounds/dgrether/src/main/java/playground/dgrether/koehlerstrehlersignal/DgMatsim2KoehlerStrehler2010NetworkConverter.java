@@ -117,15 +117,18 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			//prepare some objects/data
 			DgCrossing crossing = dgnet.getCrossings().get(link.getToNode().getId()); //The node id of the matsim network is the crossing id
 			Link backLink = this.getBackLink(link);
+			Id backLinkId = (backLink == null) ?  null : backLink.getId();
 			DgCrossingNode inLinkToNode = crossing.getNodes().get(this.convertLinkId2ToCrossingNodeId(link.getId()));
 			LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 			//create crossing layout
 			if (signalizedLinks.contains(link.getId())){
+				log.info("link: " + link.getId() + " is signalized...");
 				SignalSystemData system = this.getSignalSystem4SignalizedLinkId(signalsData.getSignalSystemsData(), link.getId());
-				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLink, l2l, system, signalsData);
+				this.createCrossing4SignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l, system, signalsData);
 			}
 			else {
-				this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLink, l2l);
+				log.info("link: " + link.getId() + " not signalized...");
+				this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l);
 			}
 		}
 		return dgnet;
@@ -200,8 +203,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 * the input data:  thus the programs/plans for the signal might be ambiguous, an exception is thrown.
 	 * 
 	 */
-	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l, SignalSystemData system, SignalsData signalsData) {
-		log.info("link: " + link.getId());
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment l2l, SignalSystemData system, SignalsData signalsData) {
 		List<SignalData> signals4Link = this.getSignals4LinkId(system, link.getId());
 		DgProgram program = crossing.getPrograms().get(this.programId);
 		//first get the outlinks that are controlled by the signal
@@ -236,7 +238,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			//create lights and green settings
 			for (Id outLinkId : outLinkIds){
 				log.error("       outLinkId: " + outLinkId);
-				Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+				Id lightId = this.createLights(link.getId(), outLinkId, backLinkId, inLinkToNode, crossing);
 				if (lightId != null){
 					Tuple<SignalPlanData, SignalGroupSettingsData> planGroupSettings = this.getPlanAndSignalGroupSettings4Signal(system.getId(), signal.getId(), signalsData);
 					SignalPlanData signalPlan = planGroupSettings.getFirst();
@@ -251,12 +253,12 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	
 
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
-			DgCrossingNode inLinkToNode, Link backLink, LanesToLinkAssignment l2l) {
+			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment l2l) {
 		DgProgram program = crossing.getPrograms().get(this.programId);
 		if (l2l == null){
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
 			for (Id outLinkId : toLinks){
-				Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+				Id lightId = this.createLights(link.getId(), outLinkId, backLinkId, inLinkToNode, crossing);
 				if (lightId != null){
 					this.createAndAddAllTimeGreen(lightId, program);
 				}
@@ -266,7 +268,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			for (Lane lane : l2l.getLanes().values()){
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){ // check for outlanes
 					for (Id outLinkId : lane.getToLinkIds()){
-						Id lightId = this.createLights(link.getId(), outLinkId, backLink.getId(), inLinkToNode, crossing);
+						Id lightId = this.createLights(link.getId(), outLinkId, backLinkId, inLinkToNode, crossing);
 						if (lightId != null){
 							this.createAndAddAllTimeGreen(lightId, program);
 						}
