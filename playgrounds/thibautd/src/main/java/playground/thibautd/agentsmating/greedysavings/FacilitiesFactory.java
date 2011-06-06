@@ -52,8 +52,8 @@ public class FacilitiesFactory {
 
 	//private static final double EPSILON = 1E-7;
 	private static final double EPSILON = 1;
-	private static final OpeningTime OPENING_TIME = 
-		new OpeningTimeImpl(OpeningTime.DayType.wkday, 0d, EPSILON);
+	//private static final OpeningTime OPENING_TIME = 
+	//	new OpeningTimeImpl(OpeningTime.DayType.wkday, 0d, EPSILON);
 
 	private final ActivityFacilitiesImpl facilities;
 	private final Network network;
@@ -114,12 +114,16 @@ public class FacilitiesFactory {
 
 	private void createPUOption(final ActivityFacilityImpl facility) {
 		ActivityOption option = facility.createActivityOption(JointActingTypes.PICK_UP);
-		option.addOpeningTime(OPENING_TIME);
+		for (OpeningTime.DayType day : OpeningTime.DayType.values()) {
+			option.addOpeningTime(new OpeningTimeImpl(day, 0d, EPSILON));
+		}
 	}
 
 	private void createDOOption(final ActivityFacilityImpl facility) {
 		ActivityOption option = facility.createActivityOption(JointActingTypes.DROP_OFF);
-		option.addOpeningTime(OPENING_TIME);
+		for (OpeningTime.DayType day : OpeningTime.DayType.values()) {
+			option.addOpeningTime(new OpeningTimeImpl(day, 0d, EPSILON));
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
