@@ -28,7 +28,7 @@ import org.matsim.testcases.utils.LogCounter;
 /**
  * @author mrieser
  */
-public class TestConfigConsistencyCheckerImplTest {
+public class ConfigConsistencyCheckerImplTest {
 
 	@Test
 	public void testCheckTransitReplanningConfiguration() {
@@ -66,5 +66,94 @@ public class TestConfigConsistencyCheckerImplTest {
 			logger.deactiviate();
 		}
 	}
+
+	@Test
+	public void testCheckPlanCalcScore_DefaultsOk() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activiate();
+			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			Assert.assertEquals(0, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactiviate();
+		}
+	}
+
+	@Test
+	public void testCheckPlanCalcScore_Traveling() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		config.planCalcScore().setTraveling_utils_hr(3.0);
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activiate();
+			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			Assert.assertEquals(1, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactiviate();
+		}
+	}
+
+	@Test
+	public void testCheckPlanCalcScore_TravelingPt() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		config.planCalcScore().setTravelingPt_utils_hr(3.0);
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activiate();
+			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			Assert.assertEquals(1, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactiviate();
+		}
+	}
+
+	@Test
+	public void testCheckPlanCalcScore_TravelingBike() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		config.planCalcScore().setTravelingBike_utils_hr(3.0);
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activiate();
+			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			Assert.assertEquals(1, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactiviate();
+		}
+	}
+
+	@Test
+	public void testCheckPlanCalcScore_TravelingWalk() {
+		Config config = new Config();
+		config.addCoreModules();
+
+		config.planCalcScore().setTravelingWalk_utils_hr(3.0);
+
+		LogCounter logger = new LogCounter(Level.WARN);
+		try {
+			logger.activiate();
+			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
+			Assert.assertEquals(1, logger.getWarnCount());
+		} finally {
+			// make sure counter is deactivated at the end
+			logger.deactiviate();
+		}
+	}
+
 
 }

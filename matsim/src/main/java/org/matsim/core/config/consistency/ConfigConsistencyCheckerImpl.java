@@ -22,6 +22,7 @@ package org.matsim.core.config.consistency;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -36,24 +37,25 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
 	private static final Logger log = Logger
 			.getLogger(ConfigConsistencyCheckerImpl.class);
-	
+
 	public ConfigConsistencyCheckerImpl() { // explicit constructor so that I can eclipse-search for instantiation.  kai, may'11
 		// nothing to do
 	}
 
 	@Override
-	public void checkConsistency(Config config) {
+	public void checkConsistency(final Config config) {
 		this.checkScenarioFeaturesEnabled(config);
 		this.checkEventsFormatLanesSignals(config);
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkSignalSystemConfiguration(config);
 		this.checkTransitReplanningConfiguration(config);
+		this.checkPlanCalcScore(config);
 		this.checkMobsimSelection(config) ;
 		this.checkMultimodalMobsim(config);
 	}
 
-	private void checkMobsimSelection(Config config) {
+	private void checkMobsimSelection(final Config config) {
 		if (config.controler().getMobsim() == null) {
 			log.warn("You should specify which mobsim is to used in the configuration (controler.mobsim).");
 		}
@@ -78,7 +80,26 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 	}
 
-	private void checkMultimodalMobsim(Config c) {
+	/*package*/ void checkPlanCalcScore(final Config c) {
+		if (c.planCalcScore().getTravelingPt_utils_hr() > 0) {
+			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
+					"Typically, this should be a disutility, i.e. have a negative value.");
+		}
+		if (c.planCalcScore().getTraveling_utils_hr() > 0) {
+			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
+			"Typically, this should be a disutility, i.e. have a negative value.");
+		}
+		if (c.planCalcScore().getTravelingBike_utils_hr() > 0) {
+			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
+			"Typically, this should be a disutility, i.e. have a negative value.");
+		}
+		if (c.planCalcScore().getTravelingWalk_utils_hr() > 0) {
+			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
+			"Typically, this should be a disutility, i.e. have a negative value.");
+		}
+	}
+
+	private void checkMultimodalMobsim(final Config c) {
 		if ("multimodalQSim".equals(c.controler().getMobsim()) && (!c.multiModal().isMultiModalSimulationEnabled())) {
 			log.error("A multimodal mobsim should be used according to controler.mobsim, but the multimodal-simulation feature is not enabled in multimodal.multiModalSimulationEnabled.");
 		}
@@ -89,7 +110,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 	}
 
-	private void checkEventsFormatLanesSignals(Config c) {
+	private void checkEventsFormatLanesSignals(final Config c) {
 		ScenarioConfigGroup scg = c.scenario();
 		if (scg.isUseLanes() || scg.isUseSignalSystems()) {
 			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
@@ -100,7 +121,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 	}
 
-	private void checkScenarioFeaturesEnabled(Config c) {
+	private void checkScenarioFeaturesEnabled(final Config c) {
 		ScenarioConfigGroup scg = c.scenario();
 		if (!scg.isUseLanes() && scg.isUseSignalSystems()) {
 			throw new IllegalStateException("Cannot use the signal systems framework without" +
@@ -112,7 +133,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 	}
 
-	private void checkSignalSystemConfiguration(Config config) {
+	private void checkSignalSystemConfiguration(final Config config) {
 			if ((config.signalSystems().getSignalSystemFile() != null) &&
 					(config.signalSystems().getSignalSystemConfigFile() == null)){
 				log.error("Signal systems are defined in config however there is no" +
@@ -135,7 +156,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 	}
 
 
-	private void checkTravelTimeCalculationRoutingConfiguration(Config config){
+	private void checkTravelTimeCalculationRoutingConfiguration(final Config config){
 		if (config.controler().isLinkToLinkRoutingEnabled() &&
 				!config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes()){
 			throw new IllegalStateException("LinkToLinkRouting is activated in config and" +
@@ -166,7 +187,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 	}
 
 
-	private void checkLaneDefinitionRoutingConfiguration(Config config) {
+	private void checkLaneDefinitionRoutingConfiguration(final Config config) {
 		if ((config.scenario().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
