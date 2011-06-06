@@ -86,7 +86,7 @@ public class DgFigure9ScenarioGenerator {
 	private int cycle = 120;
 	
 	public ScenarioImpl loadScenario(){
-		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals.xml");
+		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals_coordinated.xml");
 		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(sc.getConfig().signalSystems());
 		SignalsData signals = signalsLoader.loadSignalsData();
@@ -96,7 +96,7 @@ public class DgFigure9ScenarioGenerator {
 	
 	private void createScenario() {
 		this.initIds();
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseLanes(true);
 		//network
 		Network net = this.createNetwork(sc);
