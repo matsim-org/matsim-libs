@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -44,11 +45,14 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		1000000};
 
 	private final String filename;
+
+	private Network network;
 	
 	private final static Logger log = Logger.getLogger(LegDistanceDistributionWriter.class);
 
-	public LegDistanceDistributionWriter(String filename) {
+	public LegDistanceDistributionWriter(String filename, Network network) {
 		super();
+		this.network = network;
 		this.filename = filename;
 	}
 
@@ -65,7 +69,8 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			AbstractClassifiedFrequencyAnalysis algo = new PopulationLegDistanceDistribution(out);
+			AbstractClassifiedFrequencyAnalysis algo = new PopulationLegDistanceDistribution(out, network);
+			
 			algo.run(pop);
 			
 			log.info("Writing results file...");
