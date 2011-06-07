@@ -65,8 +65,8 @@ public class VehicleFleetBuilder {
 	
 	/**
 	 * Wie berichtet ein Unternehmen?
-	 * Mšglichkeit 1: nur ein Fahrzeug
-	 * Mšglichkeit 2: sŠmtliche Fahrzeuge aus Fuhrpark an einem Tag
+	 * Moeglichkeit 1: nur ein Fahrzeug
+	 * Moeglichkeit 2: saemtliche Fahrzeuge aus Fuhrpark an einem Tag
 	 * 
 	 * 
 	 * vorgefilterte vehicles, d.h. z.B. nach Wirtschaftszweig gefiltert 
