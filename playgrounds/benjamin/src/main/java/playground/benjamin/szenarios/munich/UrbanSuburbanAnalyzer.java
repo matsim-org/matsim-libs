@@ -60,62 +60,66 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run30/";
+	//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run30/";
+	private static String runNumber = "970";
+	private static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
-	
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
-//	private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified---withLanes.xml";
-//	private static String plansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
-	
+
+	//	private static String netFile = runDirectory + "output_network.xml.gz";
+	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	private static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
+
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
+	private static String cityShapeFile = shapeDirectory + "cityArea.shp";
 
 	// OUTPUT
 	private static String outputPath = runDirectory + "urbanSuburban/";
 
 	//===
-	private final Scenario scenario;
+	private Scenario scenario;
 
 
 	public UrbanSuburbanAnalyzer(){
 		Config config = ConfigUtils.createConfig();
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	}
 
-	//	public UrbanSuburbanAnalyzer(Scenario scenario){
-	//		this.scenario = scenario;
-	//	}
+	public UrbanSuburbanAnalyzer(Scenario scenario){
+		this.scenario = scenario;
+	}
 
 	public static void main(String[] args) {
 		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer();
-		usa.run(args);
+		usa.loadScenario();
+		usa.run();
 	}
 
-	private void run(String[] args) {
-		loadScenario();
-//		Set<Feature> urbanShape = readShape(urbanShapeFile);
-//		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
+	public void run() {
+		Set<Feature> urbanShape = readShape(urbanShapeFile);
+		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
+		Set<Feature> cityShape = readShape(cityShapeFile);
 
 		Population population = scenario.getPopulation();
-		Population miDPop = getMiDPopulation(population);
-//		Population urbanMiDPop = getRelevantPopulation(population, urbanShape);
-//		Population suburbanMiDPop = getRelevantPopulation(population, suburbanShape);
+		Population mucPop = getRelevantPopulation(population, cityShape);
+		Population urbanMucPop = getRelevantPopulation(population, urbanShape);
+		Population suburbanMucPop = getRelevantPopulation(population, suburbanShape);
 
-		miDPop.setName("MiDPop");
-//		urbanMiDPop.setName("urbanMiDPop");
-//		suburbanMiDPop.setName("suburbanMiDPop");
+		mucPop.setName("mucPop");
+		urbanMucPop.setName("urbanMucPop");
+		suburbanMucPop.setName("suburbanMucPop");
 
-		Map<String, Integer> miDMode2NoOfLegs = getMode2NoOfLegs(miDPop);
-//		Map<String, Integer> urbanMode2NoOfLegs = calculateNoOfLegsPerMode(urbanMiDPop);
-//		Map<String, Integer> suburbanMode2NoOfLegs = calculateNoOfLegsPerMode(suburbanMiDPop);
-		Integer miDTotalLegs = calculateTotalLegs(miDPop);
-//		Integer urbanTotalLegs = calculateTotalLegs(urbanMiDPop);
-//		Integer suburbanTotalLegs = calculateTotalLegs(suburbanMiDPop);
+		Map<String, Integer> mucMode2NoOfLegs = getMode2NoOfLegs(mucPop);
+		Map<String, Integer> urbanMode2NoOfLegs = getMode2NoOfLegs(urbanMucPop);
+		Map<String, Integer> suburbanMode2NoOfLegs = getMode2NoOfLegs(suburbanMucPop);
+		Integer mucTotalLegs = calculateTotalLegs(mucPop);
+		Integer urbanTotalLegs = calculateTotalLegs(urbanMucPop);
+		Integer suburbanTotalLegs = calculateTotalLegs(suburbanMucPop);
 
-		writeInformation(miDPop, miDMode2NoOfLegs, miDTotalLegs);
-//		writeInformation(urbanMiDPop, urbanMode2NoOfLegs, urbanTotalLegs);
-//		writeInformation(suburbanMiDPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
+		writeInformation(mucPop, mucMode2NoOfLegs, mucTotalLegs);
+		writeInformation(urbanMucPop, urbanMode2NoOfLegs, urbanTotalLegs);
+		writeInformation(suburbanMucPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
 	}
 
 	private void writeInformation(Population population, Map<String, Integer> mode2NoOfLegs, Integer totalLegs) {
@@ -181,7 +185,7 @@ public class UrbanSuburbanAnalyzer {
 		return noOfLegs;
 	}
 
-	private Population getMiDPopulation(Population population) {
+	public Population getMiDPopulation(Population population) {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
@@ -189,57 +193,65 @@ public class UrbanSuburbanAnalyzer {
 				filteredPopulation.addPerson(person);
 			}
 		}
-			return filteredPopulation;
-		}
-
-		private Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
-			ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			Population filteredPopulation = new PopulationImpl(emptyScenario);
-			for(Person person : population.getPersons().values()){
-				if(isPersonFromMID(person)){
-					if(isPersonInShape(person, featuresInShape)){
-						filteredPopulation.addPerson(person);
-					}
-				}
-			}
-			return filteredPopulation;
-		}
-
-		private boolean isPersonFromMID(Person person) {
-			boolean isFromMID = false;
-			if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
-				isFromMID = true;
-			}
-			return isFromMID;
-		}
-
-		private boolean isPersonInShape(Person person, Set<Feature> featuresInShape) {
-			boolean isInShape = false;
-			Activity homeAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			Coord homeCoord = homeAct.getCoord();
-			GeometryFactory factory = new GeometryFactory();
-			Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
-			for(Feature feature : featuresInShape){
-				if(feature.getDefaultGeometry().contains(geo)){
-					//					logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
-					isInShape = true;
-					break;
-				}
-			}
-			return isInShape;
-		}
-
-		private Set<Feature> readShape(String shapeFile) {
-			final Set<Feature> featuresInShape;
-			featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
-			return featuresInShape;
-		}
-
-		private void loadScenario() {
-			Config config = scenario.getConfig();
-			config.network().setInputFile(netFile);
-			config.plans().setInputFile(plansFile);
-			ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
-			scenarioLoader.loadScenario() ;
-		}
+		return filteredPopulation;
 	}
+
+	public Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
+		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		for(Person person : population.getPersons().values()){
+			if(isPersonFromMID(person)){
+				if(isPersonsHomeInShape(person, featuresInShape)){
+					filteredPopulation.addPerson(person);
+				}
+			}
+		}
+		return filteredPopulation;
+	}
+
+	private boolean isPersonNonFreight(Person person) {
+		boolean isNonFreight = false;
+		if(!person.getId().toString().contains("gv_")){
+			isNonFreight = true;
+		}
+		return isNonFreight;
+	}
+
+	private boolean isPersonFromMID(Person person) {
+		boolean isFromMID = false;
+		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
+			isFromMID = true;
+		}
+		return isFromMID;
+	}
+
+	private boolean isPersonsHomeInShape(Person person, Set<Feature> featuresInShape) {
+		boolean isInShape = false;
+		Activity homeAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+		Coord homeCoord = homeAct.getCoord();
+		GeometryFactory factory = new GeometryFactory();
+		Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
+		for(Feature feature : featuresInShape){
+			if(feature.getDefaultGeometry().contains(geo)){
+				//					logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
+				isInShape = true;
+				break;
+			}
+		}
+		return isInShape;
+	}
+
+	public Set<Feature> readShape(String shapeFile) {
+		final Set<Feature> featuresInShape;
+		featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		return featuresInShape;
+	}
+
+	private void loadScenario() {
+		Config config = scenario.getConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile);
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
+		scenarioLoader.loadScenario() ;
+	}
+}

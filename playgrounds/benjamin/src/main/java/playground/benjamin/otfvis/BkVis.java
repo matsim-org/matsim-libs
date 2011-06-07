@@ -29,14 +29,18 @@ public class BkVis {
 	public static void main(String[] args) {
 		
 		boolean convert = false;
+		String runNumber = "975";
+		String eventsNumber = "1000";
+		
+		String runPath = BkPaths.RUNSSVN + "run" + runNumber + "/";
+		String eventsPath = runPath + "ITERS/it." + eventsNumber + "/";
 		
 //===========================================================================================================
 //		Für den converter-modus:
-			
 		if(convert){
-			String networkFile = BkPaths.RUNSSVN + "run970/970.output_network.xml.gz";
-			String eventsFile = BkPaths.RUNSSVN + "run970/ITERS/it.1000/970.1000.events.txt.gz";
-			String outputFile = BkPaths.RUNSSVN + "run970/ITERS/it.1000/970.1000.events.mvi";
+			String networkFile = runPath + ".output_network.xml.gz";
+			String eventsFile =  eventsPath + runNumber + "." + eventsNumber + ".events.txt.gz";
+			String outputFile = eventsPath + runNumber + "." + eventsNumber + ".events.mvi";
 			String[] array = {
 					"blah",
 					eventsFile, 
@@ -50,13 +54,7 @@ public class BkVis {
 //===========================================================================================================		
 //		Für den mvi-modus:
 //			String otffile = "../../detailedEval/teststrecke/sim/output/20090707/ITERS/it.0/0.otfvis.mvi";
-//			String otffile = "../../detailedEval/testRuns/output/10pct/run2/it.100/100.otfvis.mvi";
-//			String otffile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
-//			String otffile = "../../matsim/output/singleIteration/ITERS/it.0/0.otfvis.mvi";
-//			String otffile = BkPaths.RUNSSVN + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
-//			String otffile = BkPaths.RUNSSVN + "run953/it.1000/953.1000.events.mvi";
-		
-//			String otffile = "../../detailedEval/Net/network-86-85-87-84.xml";
+			String otffile = eventsPath + runNumber + "." + eventsNumber + ".otfvis.mvi";
 
 //===========================================================================================================		
 /*	Für den interactiven Modus:
@@ -75,15 +73,7 @@ public class BkVis {
 		</module>
 		
 		2. Pfade zu output_network und zu den output_plans anpassen!*/
-			
-		
-//		String otffile = "../../matsim/examples/tutorial/singleIteration.xml";
-//		String otffile = BkPaths.RUNSSVN + "run749/TestOTFVis_interactive/749.output_config.xml";
-//		String otffile = "../../detailedEval/pop/140k-synthetische-personen/config-for-visualisation.xml";
-//		String otffile = "../../detailedEval/teststrecke/sim/input/liveConfig_benjamin.xml";
-//		String otffile = "../../detailedEval/testRuns/input/config.xml";
 //		String otffile = BkPaths.RUNSSVN + "run950/950.output_config.xml";
-		String otffile = BkPaths.RUNSSVN + "run980/ITERS/it.1000/980.1000.otfvis.mvi";
 		
 		OTFVis.main(new String[] {otffile});
 		}
