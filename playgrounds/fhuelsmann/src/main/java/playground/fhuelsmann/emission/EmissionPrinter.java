@@ -44,13 +44,18 @@ public class EmissionPrinter {
 	}
 
 	void printHomeLocation2Emissions(Population population,	Map<Id, double[]> personId2emissionsInGrammPerType, String filename) {
+		Double fcEmissions = null;
+		Double noxEmissions = null;
 		Double co2Emissions = null;
+		Double no2Emissions = null;
+		Double pmEmissions = null;
+		
 		String outLine = null;
 		String outFile = runDirectory + filename;
 		try{ 
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("personId \t xHome \t yHome \t nox[g] \n");   
+			out.write("personId \t xHome \t yHome \t fc[g] \t nox[g] \t co2[g] \t no2[g] \t pm[g] \n");   
 
 			for(Person person: population.getPersons().values()){
 				Id personId = person.getId();
@@ -60,17 +65,25 @@ public class EmissionPrinter {
 				Double xHome = homeCoord.getX();
 				Double yHome = homeCoord.getY();
 				if(!personId2emissionsInGrammPerType.containsKey(personId)){
+					// pt, bike, and walk are assumed to run emission free.
+					fcEmissions = 0.0;
+					noxEmissions = 0.0;
 					co2Emissions = 0.0;
+					no2Emissions = 0.0;
+					pmEmissions = 0.0;
 				}
 				else{
-					co2Emissions = personId2emissionsInGrammPerType.get(personId)[6];
+					// only values of the fraction approach
+					fcEmissions = personId2emissionsInGrammPerType.get(personId)[5];
+					noxEmissions = personId2emissionsInGrammPerType.get(personId)[6];
+					co2Emissions = personId2emissionsInGrammPerType.get(personId)[7];
+					no2Emissions = personId2emissionsInGrammPerType.get(personId)[8];
+					pmEmissions = personId2emissionsInGrammPerType.get(personId)[9];
 				}
-				//				for(Integer i = 0 ; i < personIdEntry.getValue().length ; i++){
-				//					Double emissionLevel = personIdEntry.getValue()[7];
-				//					String emissionLevelString = emissionLevel.toString();
-				outLine = personId.toString()+ "\t" + xHome.toString() + "\t" + yHome.toString() + "\t" + co2Emissions.toString() + "\n";
+				outLine = personId.toString()+ "\t" + xHome.toString() + "\t" + yHome.toString() + "\t"
+				+ fcEmissions.toString() + "\t" + noxEmissions.toString() + "\t" + co2Emissions.toString() + "\t" 
+				+ no2Emissions.toString() + "\t" + pmEmissions.toString() + "\n";
 				out.write(outLine);
-				//				}
 			}
 			//Close the output stream
 			out.close();
