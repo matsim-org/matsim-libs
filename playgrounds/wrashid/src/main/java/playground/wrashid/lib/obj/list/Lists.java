@@ -1,6 +1,7 @@
 package playground.wrashid.lib.obj.list;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 
 public class Lists {
@@ -11,6 +12,16 @@ public class Lists {
 		arrayList.addAll(linkedList);
 
 		return arrayList;
+	}
+	
+	public static double getSum(Collection<Double> collection){
+		int sum=0;
+		
+		for (Double d:collection){
+			sum+=d;
+		}
+		
+		return sum;
 	}
 
 	public static LinkedList arrayListToLinkedList(ArrayList arrayList) {
