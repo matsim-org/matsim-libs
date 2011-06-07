@@ -32,12 +32,13 @@ public class ChessScenarioParking {
 		for (int i=0;i<10;i++){
 			for (int j=0;j<10;j++){
 				Parking parking = new Parking(new CoordImpl(i*1000+500,j*1000+500));
-				parking.setMaxCapacity(2);
+				parking.setMaxCapacity(10);
 				parkingCollection.add(parking);
 			}
 		}
 		
-		// TODO: remove, just here due to the output graph (walking distance)
+		// TODO: remove this in refactoring, just here due to the output graph
+		// class: playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph
 		ParkingRoot.setParkingWalkingDistanceScalingFactorForOutput(1.0);
 		
 		ParkingManager parkingManager = new ParkingManager(controler, parkingCollection);
@@ -45,7 +46,6 @@ public class ChessScenarioParking {
 		ParkingScoreCollector parkingScoreCollector=new ParkingScoreCollector(controler);
 		parkingSimulation.addParkingArrivalEventHandler(parkingScoreCollector);
 		parkingSimulation.addParkingDepartureEventHandler(parkingScoreCollector);
-		
 		controler.addControlerListener(parkingManager);
 		controler.addControlerListener(new ParkingScoreAccumulator(parkingScoreCollector));
 		
