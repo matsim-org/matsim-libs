@@ -20,59 +20,29 @@
 
 package playground.christoph.energyflows.facilities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.misc.Counter;
 
 public class RemoveFacilitiesFromZH {
-
-	private static String facilitiesInFile = "../../matsim/mysimulations/2kw/facilities/facilities.xml.gz";
-	private static String facilitiesOutFile = "../../matsim/mysimulations/2kw/facilities/facilities_without_ZH.xml.gz";
-	private static String textFile = "../../matsim/mysimulations/2kw/facilities/Facilities2CutFromMATSim.txt";
-
-	public RemoveFacilitiesFromZH(ActivityFacilitiesImpl facilities, Set<Id> facilitiesToRemove) {
+	
+	public List<ActivityFacility> removeFacilities(ActivityFacilitiesImpl facilities, Set<Id> facilitiesToRemove) {
+		
+		List<ActivityFacility> removedFacilities = new ArrayList<ActivityFacility>();
 		Counter counter = new Counter("removed facilities: ");
 		for (Id id : facilitiesToRemove) {
-			Object removed = facilities.getFacilities().remove(id);
-			if (removed != null) counter.incCounter();
+			ActivityFacility removedFacility = facilities.getFacilities().remove(id);
+			if (removedFacility != null) {
+				removedFacilities.add(removedFacility);
+				counter.incCounter();
+			}
 		}
 		counter.printCounter();
+		return removedFacilities;
 	}
-	
-//	public static void main(String[] args) throws Exception {
-//		
-//		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		
-//		new MatsimFacilitiesReader(scenario).parse(facilitiesInFile);
-//		
-//		FileInputStream fis = null;
-//		InputStreamReader isr = null;
-//	    BufferedReader br = null;
-//  		
-//		fis = new FileInputStream(textFile);
-//		isr = new InputStreamReader(fis, charset);
-//		br = new BufferedReader(isr);
-//		Counter counter = new Counter("removed facilities: ");
-//		
-//		// skip first Line with the Header
-//		br.readLine();
-//		 
-//		String line;
-//		while((line = br.readLine()) != null) {
-//			String[] cols = line.split(separator);
-//			
-//			Id id = scenario.createId(cols[1]);
-//			scenario.getActivityFacilities().getFacilities().remove(id);
-//			counter.incCounter();
-//		}
-//		counter.printCounter();
-//		
-//		br.close();
-//		isr.close();
-//		fis.close();
-//		
-//		new FacilitiesWriter(scenario.getActivityFacilities()).write(facilitiesOutFile);
-//	}
 }

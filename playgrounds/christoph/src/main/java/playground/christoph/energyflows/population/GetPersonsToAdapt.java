@@ -35,27 +35,28 @@ import org.matsim.core.utils.misc.Counter;
 public class GetPersonsToAdapt {
 
 	private Counter counter;
+	private Set<Id> persons;
 	
-	public Set<Person> getPersons(Population population, Set<Id> facilities) {
-		Set<Person> persons = new TreeSet<Person>();
+	public Set<Id> getPersons(Population population, Set<Id> facilities) {
+		persons = new TreeSet<Id>();
 		
 		counter = new Counter("persons to adapt: ");
 		for (Person person : population.getPersons().values()) {
-			checkPerson(persons, facilities, person);
+			checkPerson(facilities, person);
 		}
 		counter.printCounter();
 		
 		return persons;
 	}
 	
-	private void checkPerson(Set<Person> persons, Set<Id> facilities, Person person) {
+	private void checkPerson(Set<Id> facilities, Person person) {
 		for (Plan plan : person.getPlans()) {
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if (planElement instanceof Leg) continue;
 				else {
 					Activity activity = (Activity) planElement;
 					if (facilities.contains(activity.getFacilityId())) {
-						persons.add(person);
+						persons.add(person.getId());
 						counter.incCounter();
 						return;
 					}
