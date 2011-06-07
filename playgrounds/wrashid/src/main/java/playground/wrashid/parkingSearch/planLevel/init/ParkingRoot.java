@@ -49,6 +49,10 @@ public class ParkingRoot {
 		return parkingWalkingDistanceGraph;
 	}
 
+	public static void setParkingWalkingDistanceScalingFactorForOutput(Double parkingWalkingDistanceScalingFactorForOutput) {
+		ParkingRoot.parkingWalkingDistanceScalingFactorForOutput = parkingWalkingDistanceScalingFactorForOutput;
+	}
+
 	public static BasicPointVisualizer getMapDebugTrace() {
 		return mapDebugTrace;
 	}

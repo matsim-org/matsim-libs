@@ -16,6 +16,7 @@ import playground.wrashid.parkingChoice.ParkingSimulation;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreCollector;
+import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ChessScenarioParking {
 
@@ -36,7 +37,8 @@ public class ChessScenarioParking {
 			}
 		}
 		
-		
+		// TODO: remove, just here due to the output graph (walking distance)
+		ParkingRoot.setParkingWalkingDistanceScalingFactorForOutput(1.0);
 		
 		ParkingManager parkingManager = new ParkingManager(controler, parkingCollection);
 		ParkingSimulation parkingSimulation=new ParkingSimulation(parkingManager);

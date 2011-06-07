@@ -1,6 +1,7 @@
 package playground.wrashid.parkingChoice.scoring;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -13,16 +14,23 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 
+import playground.wrashid.lib.DebugLib;
+import playground.wrashid.parkingChoice.ParkingChoiceLib;
+import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
+
 public class ParkingScoreAccumulator implements ScoringListener {
 
 	private final ParkingScoreCollector parkingScoreCollector;
 
+	private ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph=new ParkingWalkingDistanceMeanAndStandardDeviationGraph();
+	
 	public ParkingScoreAccumulator(ParkingScoreCollector parkingScoreCollector) {
 		this.parkingScoreCollector = parkingScoreCollector;
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
+		HashMap<Id, Double> walkingDistances=new HashMap<Id, Double>();
 		parkingScoreCollector.finishHandling();		
 		
 		Controler controler=event.getControler();
@@ -49,8 +57,9 @@ public class ParkingScoreAccumulator implements ScoringListener {
 				double disutilityOfWalking=0;
 				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
+				walkingDistances.put(personId, sumOfWalkingTimes*ParkingChoiceLib.getWalkingSpeed());
 				
-				disutilityOfWalking=-1*sumOfActTotalScore*sumOfWalkingTimes/sumOfParkingDurations;
+				disutilityOfWalking=-1*Math.abs(sumOfActTotalScore)*sumOfWalkingTimes/sumOfParkingDurations;
 				
 				System.out.println("sum of act score:" + sumOfActTotalScore);
 				System.out.println("sum of parking duration: "+ sumOfParkingDurations);
@@ -58,14 +67,22 @@ public class ParkingScoreAccumulator implements ScoringListener {
 				System.out.println("disutilityOfWalking:" + disutilityOfWalking);
 				System.out.println("================");
 				
+				
+				
 				scoringFuncAccumulator.addMoney(disutilityOfWalking);
+				
+				writeWalkingDistanceStatisticsGraph(controler,walkingDistances);
 			}
 		
 		}
 		
-		
-		
-		
+	}
+	
+	
+	private void writeWalkingDistanceStatisticsGraph(Controler controler, HashMap<Id, Double> walkingDistance){
+		parkingWalkingDistanceGraph.updateStatisticsForIteration(controler.getIterationNumber(), walkingDistance);
+		String fileName = controler.getControlerIO().getOutputFilename("walkingDistance.png");
+		parkingWalkingDistanceGraph.writeGraphic(fileName);
 	}
 
 	
