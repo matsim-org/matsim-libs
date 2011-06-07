@@ -7,6 +7,14 @@ import playground.wrashid.parkingChoice.infrastructure.Parking;
 
 public class ParkingDepartureEvent {
 
+	public AgentDepartureEvent getAgentDepartureEvent() {
+		return agentDepartureEvent;
+	}
+
+	public Parking getParking() {
+		return parking;
+	}
+
 	private AgentDepartureEvent agentDepartureEvent;
 	private Parking parking;
 

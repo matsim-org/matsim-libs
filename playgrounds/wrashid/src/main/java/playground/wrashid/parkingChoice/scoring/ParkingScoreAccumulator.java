@@ -1,7 +1,6 @@
 package playground.wrashid.parkingChoice.scoring;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -14,51 +13,23 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 
-import playground.wrashid.PSF.parking.ParkingTimes;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.parkingChoice.ParkingManager;
-
-
-//TODO: make method for getting averageActPerformanceEarningRate for a certain person.
 public class ParkingScoreAccumulator implements ScoringListener {
 
+	private final ParkingScoreCollector parkingScoreCollector;
 
-	private final ParkingTimesPlugin parkingTimes;
-	private Controler controler;
-	private final ParkingManager parkingManager;
-
-	//TODO: probably remove ParkingTimesPlugin again from this class, as do not need it
-	public ParkingScoreAccumulator(ParkingTimesPlugin parkingTimes, Controler controler, ParkingManager parkingManager){
-		this.parkingTimes = parkingTimes;
-		this.controler = controler;
-		this.parkingManager = parkingManager;
+	public ParkingScoreAccumulator(ParkingScoreCollector parkingScoreCollector) {
+		this.parkingScoreCollector = parkingScoreCollector;
 	}
-	
+
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		parkingTimes.closeLastAndFirstParkingIntervals();
-
-		performVehicleParkingForAllVehicles();
+		parkingScoreCollector.finishHandling();		
 		
-		
-		LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals = parkingTimes.getParkingTimeIntervals();
+		Controler controler=event.getControler();
 		
 		EventsToScore eventsToScore = controler.getPlansScoring().getPlanScorer();
 		
-		for (Person person : controler.getPopulation().getPersons().values()) {
-			
-			Id personId = person.getId();
-			
-			double sumOfActivityDurations=0.0;
-			double actTotalScore=0;
-			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimeIntervals.get(personId);
-			for (ParkingIntervalInfo parkingInterval:parkingIntervals){
-				sumOfActivityDurations+=parkingInterval.getDuration();
-			}
-			
-			System.out.println("person:" + personId);
+		for (Id personId : parkingScoreCollector.getPersonIdsWhoUsedCar()) {
 			
 			ScoringFunction scoringFunction = eventsToScore.getScoringFunctionForAgent(personId);
 			
@@ -69,37 +40,32 @@ public class ParkingScoreAccumulator implements ScoringListener {
 			
 				ArrayList<ActivityScoring> activityScoringFunctions = scoringFuncAccumulator.getActivityScoringFunctions();
 				
+				double sumOfActTotalScore=0;
 				for (ActivityScoring activityScoring:activityScoringFunctions){
 					BasicScoring bs=(BasicScoring) activityScoring;
-					actTotalScore+=bs.getScore();
+					sumOfActTotalScore+=bs.getScore();
 				}
-				System.out.println("act total score:" + actTotalScore);
 				
-				// perform scoring for the car parking.
-				performParkingScoring(scoringFuncAccumulator);
+				double disutilityOfWalking=0;
+				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
+				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
+				
+				disutilityOfWalking=-1*sumOfActTotalScore*sumOfWalkingTimes/sumOfParkingDurations;
+				
+				System.out.println("sum of act score:" + sumOfActTotalScore);
+				System.out.println("sum of parking duration: "+ sumOfParkingDurations);
+				System.out.println("sum of walking durations: "+ sumOfWalkingTimes);
+				System.out.println("disutilityOfWalking:" + disutilityOfWalking);
+				System.out.println("================");
+				
+				scoringFuncAccumulator.addMoney(disutilityOfWalking);
 			}
-			
-			double averageActPerformanceEarningRate =actTotalScore/sumOfActivityDurations;
-			System.out.println("averageActPerformanceEarningRate:" + averageActPerformanceEarningRate);
-			
-			
-			System.out.println("total score:" + scoringFunction.getScore());
+		
 		}
 		
-	
-	}
-
-	private void performVehicleParkingForAllVehicles() {
-		LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals = parkingTimes.getParkingTimeIntervals();
 		
-		for (Person person : controler.getPopulation().getPersons().values()) {
-			parkingManager.parkVehicle(person.getId(), null);
-		}
 		
-	}
-
-	private void performParkingScoring(ScoringFunctionAccumulator sfAccum) {
-		sfAccum.addMoney(-1000);
+		
 	}
 
 	

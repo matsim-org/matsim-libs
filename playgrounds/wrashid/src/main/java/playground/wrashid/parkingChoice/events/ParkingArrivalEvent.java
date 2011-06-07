@@ -8,6 +8,14 @@ import playground.wrashid.parkingChoice.infrastructure.Parking;
 
 public class ParkingArrivalEvent {
 
+	public ActivityStartEvent getActStartEvent() {
+		return actStartEvent;
+	}
+
+	public Parking getParking() {
+		return parking;
+	}
+
 	private ActivityStartEvent actStartEvent;
 	private Parking parking;
 

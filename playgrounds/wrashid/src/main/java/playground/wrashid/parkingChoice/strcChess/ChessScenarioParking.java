@@ -20,21 +20,18 @@ import playground.wrashid.parkingChoice.scoring.ParkingScoreCollector;
 public class ChessScenarioParking {
 
 	public static void main(String[] args) {
-		Config config=ConfigUtils.loadConfig("C:/data/Java Workspace/64_bit_20.06.2010/playgrounds/wrashid/test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+		Config config=ConfigUtils.loadConfig("C:/data/workspace/playgrounds/wrashid/test/input/playground/wrashid/parkingChoice/chessConfig2.xml");
 		Controler controler=new Controler(config);
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);
-		
-		ParkingTimesPlugin parkingTimesPlugin=new ParkingTimesPlugin(controler);
-		//TODO: Try to remove the parking times plug-in and instead only use data, which is really needed.
 		
 		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
 
 		for (int i=0;i<10;i++){
 			for (int j=0;j<10;j++){
 				Parking parking = new Parking(new CoordImpl(i*1000+500,j*1000+500));
-				parking.setMaxCapacity(1);
+				parking.setMaxCapacity(2);
 				parkingCollection.add(parking);
 			}
 		}
@@ -43,14 +40,13 @@ public class ChessScenarioParking {
 		
 		ParkingManager parkingManager = new ParkingManager(controler, parkingCollection);
 		ParkingSimulation parkingSimulation=new ParkingSimulation(parkingManager);
-		ParkingScoreCollector parkingScoreCollector=new ParkingScoreCollector();
+		ParkingScoreCollector parkingScoreCollector=new ParkingScoreCollector(controler);
 		parkingSimulation.addParkingArrivalEventHandler(parkingScoreCollector);
 		parkingSimulation.addParkingDepartureEventHandler(parkingScoreCollector);
 		
 		controler.addControlerListener(parkingManager);
-		controler.addControlerListener(new ParkingScoreAccumulator(parkingTimesPlugin,controler, parkingManager));
+		controler.addControlerListener(new ParkingScoreAccumulator(parkingScoreCollector));
 		
-		eventHandlerAtStartupAdder.addEventHandler(parkingTimesPlugin);
 		eventHandlerAtStartupAdder.addEventHandler(parkingSimulation);
 		
 		controler.setOverwriteFiles(true);

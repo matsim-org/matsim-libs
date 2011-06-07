@@ -35,6 +35,8 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	
 	public ParkingSimulation(ParkingManager parkingManager){
 		this.parkingManager=parkingManager;
+		this.parkingArrivalEventHandlers=new LinkedList<ParkingArrivalEventHandler>();
+		this.parkingDepartureEventHandlers=new LinkedList<ParkingDepartureEventHandler>();
 	}
 	
 	public void addParkingArrivalEventHandler(ParkingArrivalEventHandler parkingArrivalEventHandlers){
@@ -49,6 +51,13 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	public void reset(int iteration) {
 		lastTransportModeWasCar=new HashSet<Id>();
 		carIsParked=new HashSet<Id>();
+		
+		for (ParkingArrivalEventHandler parkingArrivalHandler:parkingArrivalEventHandlers){
+			parkingArrivalHandler.reset(iteration);
+		}
+		for (ParkingDepartureEventHandler parkingDepartureHandler:parkingDepartureEventHandlers){
+			parkingDepartureHandler.reset(iteration);
+		}
 	}
 
 	@Override
@@ -57,16 +66,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			carIsParked.add(event.getPersonId());
 			lastTransportModeWasCar.remove(event.getPersonId());
 			
-			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord());
-			
-			
 			// TODO: this selection should happen according to best parking available for the
 			// given activity location (not only according to the best walking distance).
-
+			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord());
 			parkingManager.parkVehicle(event.getPersonId(), selectedParking);
 			
-			
-			// TODO: assign the car to that parking internall (update parking count)
 			
 			// TODO: update score here or below?
 			// should this be done in the handler????
