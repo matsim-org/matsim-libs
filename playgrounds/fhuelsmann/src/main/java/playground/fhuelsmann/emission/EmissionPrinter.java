@@ -50,7 +50,7 @@ public class EmissionPrinter {
 		try{ 
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("personId \t xHome \t yHome \t co2[g] \n");   
+			out.write("personId \t xHome \t yHome \t nox[g] \n");   
 
 			for(Person person: population.getPersons().values()){
 				Id personId = person.getId();
@@ -63,7 +63,7 @@ public class EmissionPrinter {
 					co2Emissions = 0.0;
 				}
 				else{
-					co2Emissions = personId2emissionsInGrammPerType.get(personId)[7];
+					co2Emissions = personId2emissionsInGrammPerType.get(personId)[6];
 				}
 				//				for(Integer i = 0 ; i < personIdEntry.getValue().length ; i++){
 				//					Double emissionLevel = personIdEntry.getValue()[7];

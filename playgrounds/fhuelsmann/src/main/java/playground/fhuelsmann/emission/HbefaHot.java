@@ -8,6 +8,7 @@ import playground.fhuelsmann.emission.objects.HotValue;
 
 public class HbefaHot {
 	
+	Map<String,HotValue> HbefaHot = new HashMap<String,HotValue>() ;
 		
 		public void makeHbefaHot(String filename){
 		
@@ -43,7 +44,7 @@ public class HbefaHot {
 					// erstllen von HbefaHot
 						
 						HbefaHot.put(key, new HotValue(value));
-					//	System.out.println(key);
+						System.out.println(key);
 						
 						
 				}
@@ -53,6 +54,14 @@ public class HbefaHot {
 				}
 				
 			}
+		
+		public Map<String, HotValue> getHbefaHot() {
+			return HbefaHot;
+		}
+		
+		public void setHbefaHot(Map<String, HotValue> hbefaHot) {
+			HbefaHot = hbefaHot;
+		}
 		
 		private String[] split(String hbefa,String symbol) {
 			

@@ -20,10 +20,11 @@
 
 package playground.fhuelsmann.emission;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
+
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,10 +37,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.households.Household;
-import org.matsim.households.Households;
-import org.matsim.households.HouseholdsImpl;
-import org.matsim.households.HouseholdsReaderV10;
+
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
@@ -50,11 +48,11 @@ import playground.fhuelsmann.emission.objects.VisumObject;
 public class EmissionTool {
 
 	// INPUT
-		private static String runDirectory = "../../detailedEval/testRuns/output/run8/";
-		private static String eventsFile = runDirectory + "100.events.txt.gz";
+		private static String runDirectory = "../../detailedEval/policies/nectar/baseCase/";
+		private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.txt.gz";
 		//		private static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplified.xml";
-		private static String netFile = runDirectory + "output_network.xml.gz";
-		private static String plansFile = runDirectory + "output_plans.xml.gz";
+		private static String netFile = runDirectory + "980.output_network.xml.gz";
+		private static String plansFile = runDirectory + "980.output_plans.xml.gz";
 
 /*	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run12/";
 	private static String eventsFile = runDirectory + "ITERS/it.100/100.events.txt.gz";
@@ -67,10 +65,10 @@ public class EmissionTool {
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-	private static String vehicleFile="../../detailedEval/pop/befragte-personen/vehicles.xml";
-//	private static String householdsFile="../../detailedEval/pop/befragte-personen/households.xml";
+	private static String vehicleFile="../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
+
 	
-	
+	private static final ArrayList<String> listOfPollutant = new ArrayList<String>();
 	
 	//	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	//	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
@@ -93,6 +91,23 @@ public class EmissionTool {
 	}
 
 	private void run(String[] args) {
+		
+/*		listOfPollutant.add("Benzene");
+		listOfPollutant.add("CH4");
+		listOfPollutant.add("CO");
+		listOfPollutant.add("CO(rep.)");
+		listOfPollutant.add("CO2(total)");
+		listOfPollutant.add("FC");
+		listOfPollutant.add("HC");
+		listOfPollutant.add("N2O");
+		listOfPollutant.add("NH3");
+		listOfPollutant.add("NMHC");
+		listOfPollutant.add("NO2");
+		listOfPollutant.add("NOX");
+		listOfPollutant.add("Pb");
+		listOfPollutant.add("PM");
+		listOfPollutant.add("PN");
+		listOfPollutant.add("SO2");*/
 
 		// load the scenario
 		loadScenario();
@@ -106,8 +121,8 @@ public class EmissionTool {
 		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
 		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
-		HbefaHot hbefaHot = new HbefaHot();
-		hbefaHot.makeHbefaHot(hbefaHotFile);
+//		HbefaHot hbefaHot = new HbefaHot();
+//		hbefaHot.makeHbefaHot(hbefaHotFile);
 		
 		Vehicles vehicles = new VehiclesImpl();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
@@ -120,18 +135,19 @@ public class EmissionTool {
 
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
-//		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeFile);
+//		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 
 		// create an event object
 //		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
+//		warmEmissionHandler.setListOfPollutant(listOfPollutant);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
 		eventsManager.addHandler(warmEmissionHandler);
-		eventsManager.addHandler(coldEmissionHandler);
+//		eventsManager.addHandler(coldEmissionHandler);
 		//create the reader and read the file
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
@@ -161,7 +177,7 @@ public class EmissionTool {
 //		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 //		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
 //
-		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
+//		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
 //		
 //		printer.printEmissionTable(personId2TotalEmissionsInGrammPerType, "EmissionsPerPersonTotal");
 	}		
