@@ -34,10 +34,16 @@ public class ParkingManager implements StartupListener {
 	public Controler getControler() {
 		return controler;
 	}
-
+	
 	private Collection<Parking> parkingCollection;
 	// key: personId
 	private HashMap<Id,Parking> currentParkingLocation;
+	
+	public void resetAllParkingOccupancies(){
+		for (Parking parking:parkings.values()){
+			parking.resetParkingOccupancy();
+		}
+	}
 	
 	public Parking getCurrentParkingLocation(Id personId){
 		return currentParkingLocation.get(personId);

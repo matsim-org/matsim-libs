@@ -23,6 +23,12 @@ import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -61,9 +67,8 @@ import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
 
-	
-	public static String eclipseLocalTempPath="C:/eTmp";
-	
+	public static String eclipseLocalTempPath = "C:/eTmp";
+
 	/*
 	 * Reads the population from the plans file.
 	 * 
@@ -81,10 +86,9 @@ public class GeneralLib {
 
 		return scenario;
 	}
-	
+
 	/*
 	 * Reads the population from the plans file.
-	 * 
 	 */
 	public static Scenario readScenario(String plansFile, String networkFile, String facilititiesPath) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -99,7 +103,7 @@ public class GeneralLib {
 
 		return sc;
 	}
-	
+
 	/*
 	 * Reads the network from the network file.
 	 */
@@ -114,11 +118,10 @@ public class GeneralLib {
 
 		return sc.getNetwork();
 	}
-	
-	public static void writeNetwork(Network network, String outputNetworkFileName){
+
+	public static void writeNetwork(Network network, String outputNetworkFileName) {
 		new NetworkWriter(network).write(outputNetworkFileName);
 	}
-	
 
 	/*
 	 * Write the population to the specified file.
@@ -140,9 +143,6 @@ public class GeneralLib {
 		return facilities;
 	}
 
-	
-	
-	
 	/*
 	 * Write the facilities to the specified file.
 	 */
@@ -163,9 +163,9 @@ public class GeneralLib {
 			FileOutputStream fos = new FileOutputStream(fileName);
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
-			char[] charArray=Lists.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
-			outputStreamWriter.write(charArray);			
-			
+			char[] charArray = Lists.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
+			outputStreamWriter.write(charArray);
+
 			outputStreamWriter.flush();
 			outputStreamWriter.close();
 		} catch (Exception e) {
@@ -278,8 +278,7 @@ public class GeneralLib {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
-			
-			
+
 			throw new RuntimeException("Error reading the matrix from the file");
 		}
 
@@ -391,7 +390,7 @@ public class GeneralLib {
 	public static void writeHubGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel) {
 		int numberOfXValues = matrix.length;
 		int numberOfFunctions = matrix[0].length;
-		String[] seriesLabels= new String[numberOfFunctions];
+		String[] seriesLabels = new String[numberOfFunctions];
 
 		double[] time = new double[numberOfXValues];
 
@@ -400,13 +399,14 @@ public class GeneralLib {
 		}
 
 		for (int i = 0; i < numberOfFunctions; i++) {
-			seriesLabels[i]= "hub-" + i;
+			seriesLabels[i] = "hub-" + i;
 		}
 
 		writeGraphic(fileName, matrix, title, xLabel, yLabel, seriesLabels, time);
 	}
-	
-	public static void writeGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel, String[] seriesLabels, double[] xValues){
+
+	public static void writeGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
+			String[] seriesLabels, double[] xValues) {
 		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
 
 		int numberOfXValues = matrix.length;
@@ -422,47 +422,67 @@ public class GeneralLib {
 
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
-		
-		
-		if (GlobalRegistry.doPrintGraficDataToConsole){
+
+		if (GlobalRegistry.doPrintGraficDataToConsole) {
 			printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
 		}
 	}
-	
-	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel, String[] seriesLabels, double[] xValues){
+
+	public static void generateHistogram(String fileName, double[] value, int numberOfBins, String title, String xLabel,
+			String yLabel) {
+		HistogramDataset dataset = new HistogramDataset();
+		dataset.setType(HistogramType.FREQUENCY);
+		dataset.addSeries(title, value, numberOfBins);
+		String plotTitle = title;
+		String xaxis = xLabel;
+		String yaxis = yLabel;
+		PlotOrientation orientation = PlotOrientation.VERTICAL;
+		boolean show = false;
+		boolean toolTips = false;
+		boolean urls = false;
+		JFreeChart chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis, dataset, orientation, show, toolTips, urls);
+		int width = 500;
+		int height = 300;
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width, height);
+		} catch (IOException e) {
+
+		}
+	}
+
+	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
+			String[] seriesLabels, double[] xValues) {
 		int numberOfXValues = matrix.length;
 		int numberOfFunctions = matrix[0].length;
-		
+
 		System.out.println("===================================================");
-		
+
 		System.out.println("title:" + title);
 		System.out.println("xLabel:" + xLabel);
 		System.out.println("yLabel:" + yLabel);
-		
+
 		System.out.println("----------------------------------------------------");
-		
+
 		System.out.print("xValues");
-		
-		for (int i=0;i<numberOfFunctions;i++){
-			System.out.print("\t"+seriesLabels[i]);
+
+		for (int i = 0; i < numberOfFunctions; i++) {
+			System.out.print("\t" + seriesLabels[i]);
 		}
-		
+
 		System.out.print("\n");
 		System.out.println("----------------------------------------------------");
-		
+
 		for (int i = 0; i < numberOfXValues; i++) {
 			System.out.print(xValues[i]);
-			
+
 			for (int j = 0; j < numberOfFunctions; j++) {
-				System.out.print("\t"+matrix[i][j]);
+				System.out.print("\t" + matrix[i][j]);
 			}
 			System.out.print("\n");
 		}
-		
-		
+
 		System.out.println("==================================================");
 	}
-	
 
 	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor) {
 		int numberOfRows = matrix.length;
@@ -585,12 +605,13 @@ public class GeneralLib {
 
 	/**
 	 * copy the person and the selected plan of the person
+	 * 
 	 * @param person
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		PersonImpl newPerson=new PersonImpl(person.getId());
-		PlanImpl newPlan=new PlanImpl();
+		PersonImpl newPerson = new PersonImpl(person.getId());
+		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyPlan(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
@@ -598,122 +619,125 @@ public class GeneralLib {
 		newPerson.removeUnselectedPlans();
 		return newPerson;
 	}
-	
-	
+
 	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName, String outputKmzFileName) throws IOException {
 		Network network = readNetwork(matsimNetworkFileName);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KMZWriter kmzWriter = new KMZWriter(outputKmzFileName);
-		
+
 		KmlType mainKml = kmlObjectFactory.createKmlType();
 		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
 		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
-		
-		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,new CH1903LV03toWGS84(), kmzWriter, mainDoc);
-		//KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), kmzWriter, mainDoc);
-		
+
+		// KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new
+		// AtlantisToWGS84(), kmzWriter, mainDoc);
+		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new CH1903LV03toWGS84(), kmzWriter, mainDoc);
+		// KmlNetworkWriter kmlNetworkWriter = new
+		// KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S,
+		// TransformationFactory.WGS84), kmzWriter, mainDoc);
+
 		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
-		
+
 		kmzWriter.writeMainKml(mainKml);
 		kmzWriter.close();
 	}
-	
-	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException, ParserConfigurationException, IOException{
+
+	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException,
+			ParserConfigurationException, IOException {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = new WGS84toCH1903LV03();
 
-		OsmNetworkReader reader = new OsmNetworkReader(net,ct);
+		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
 		reader.setKeepPaths(true);
 		reader.parse(osmNetworkFile);
 
 		new NetworkCleaner().run(net);
 		return net;
 	}
-	
-	//TODO: there are some classes (e.g. playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
+
+	// TODO: there are some classes (e.g.
+	// playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
 	// be refactored by calling this method.
-	public static StringMatrix readStringMatrix(String fileName){
-		StringMatrix matrix=new StringMatrix();
-		
+	public static StringMatrix readStringMatrix(String fileName) {
+		StringMatrix matrix = new StringMatrix();
+
 		try {
-			
+
 			FileReader fr = new FileReader(fileName);
-			
+
 			BufferedReader br = new BufferedReader(fr);
 			String line;
 			StringTokenizer tokenizer;
 			line = br.readLine();
 			while (line != null) {
-				LinkedList<String> row=new LinkedList<String>();
-				
+				LinkedList<String> row = new LinkedList<String>();
+
 				tokenizer = new StringTokenizer(line);
-				
-				while (tokenizer.hasMoreTokens()){
+
+				while (tokenizer.hasMoreTokens()) {
 					row.add(tokenizer.nextToken());
 				}
-				
+
 				matrix.addRow(row);
-				
+
 				line = br.readLine();
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 			throw new Error("Error reading the file: " + fileName);
-		}		
-				
-		
+		}
+
 		return matrix;
 	}
-		
+
 	/**
-	 * TODO: move method to approporaite place where the data structures are located.
+	 * TODO: move method to approporaite place where the data structures are
+	 * located.
+	 * 
 	 * @param hm
 	 */
-	public static void printHashmapToConsole(HashMap hm){
-		for (Object key:hm.keySet()){
-			if (key==null){
-				System.out.println("null" +"\t"+hm.get(key));
+	public static void printHashmapToConsole(HashMap hm) {
+		for (Object key : hm.keySet()) {
+			if (key == null) {
+				System.out.println("null" + "\t" + hm.get(key));
 			} else {
-				System.out.println(key.toString() +"\t"+hm.get(key));
+				System.out.println(key.toString() + "\t" + hm.get(key));
 			}
-		}	
+		}
 	}
-	
-	
-	
-	public static void printLinkedListToConsole(LinkedList list){
-		for (Object value:list){
+
+	public static void printLinkedListToConsole(LinkedList list) {
+		for (Object value : list) {
 			System.out.println(value);
-		}	
+		}
 	}
-	
+
 	public static int getTimeBinIndex(double time, double binSizeInSeconds) {
 
-		time=GeneralLib.projectTimeWithin24Hours(time);
-		
+		time = GeneralLib.projectTimeWithin24Hours(time);
+
 		return Math.round((float) Math.floor(time / binSizeInSeconds));
 	}
-	
-	public static boolean isNumberInBetween(double numberOne, double numberTwo, double numberToCheck){
-		if (numberOne<numberTwo){
-			return isNumberInBetweenOrdered(numberOne,numberTwo,numberToCheck);
-		} else if (numberOne>numberTwo) {
-			return isNumberInBetweenOrdered(numberTwo,numberOne,numberToCheck);
+
+	public static boolean isNumberInBetween(double numberOne, double numberTwo, double numberToCheck) {
+		if (numberOne < numberTwo) {
+			return isNumberInBetweenOrdered(numberOne, numberTwo, numberToCheck);
+		} else if (numberOne > numberTwo) {
+			return isNumberInBetweenOrdered(numberTwo, numberOne, numberToCheck);
 		}
-		
+
 		return false;
 	}
-	
-	private static boolean isNumberInBetweenOrdered(double smallerNumber, double biggerNumber, double numberToCheck){
-		if (smallerNumber<numberToCheck && biggerNumber>numberToCheck){
+
+	private static boolean isNumberInBetweenOrdered(double smallerNumber, double biggerNumber, double numberToCheck) {
+		if (smallerNumber < numberToCheck && biggerNumber > numberToCheck) {
 			return true;
 		}
 		return false;
 	}
-	
+
 }

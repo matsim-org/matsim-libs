@@ -43,6 +43,10 @@ public class Parking implements Comparable<Parking> {
 	Coord coord = null;
 	double score = 0;
 
+	public void resetParkingOccupancy(){
+		currentOccupancy=0;
+	}
+	
 	public double getScore() {
 		return score;
 	}

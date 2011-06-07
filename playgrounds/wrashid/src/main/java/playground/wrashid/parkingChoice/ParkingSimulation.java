@@ -24,6 +24,8 @@ import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 
 public class ParkingSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler {
+	// key: personId, value: parking
+	HashMap<Id, Parking> lastParkingUsed;
 	// key: personId
 	HashSet<Id> lastTransportModeWasCar;
 	// key: personId
@@ -37,6 +39,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		this.parkingManager=parkingManager;
 		this.parkingArrivalEventHandlers=new LinkedList<ParkingArrivalEventHandler>();
 		this.parkingDepartureEventHandlers=new LinkedList<ParkingDepartureEventHandler>();
+		this.lastParkingUsed=new HashMap<Id, Parking>();
 	}
 	
 	public void addParkingArrivalEventHandler(ParkingArrivalEventHandler parkingArrivalEventHandlers){
@@ -49,6 +52,14 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	
 	@Override
 	public void reset(int iteration) {
+		// for starting the next day, park each vehicle at the location
+		// where it parked at the evening
+		parkingManager.resetAllParkingOccupancies();
+		for (Parking parking:lastParkingUsed.values()){
+			parking.parkVehicle();
+		}
+		
+		lastParkingUsed=new HashMap<Id, Parking>();
 		lastTransportModeWasCar=new HashSet<Id>();
 		carIsParked=new HashSet<Id>();
 		
@@ -62,21 +73,16 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (lastTransportModeWasCar.contains(event.getPersonId())){
-			carIsParked.add(event.getPersonId());
-			lastTransportModeWasCar.remove(event.getPersonId());
+		Id personId = event.getPersonId();
+		if (lastTransportModeWasCar.contains(personId)){
+			carIsParked.add(personId);
+			lastTransportModeWasCar.remove(personId);
 			
 			// TODO: this selection should happen according to best parking available for the
 			// given activity location (not only according to the best walking distance).
 			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord());
-			parkingManager.parkVehicle(event.getPersonId(), selectedParking);
-			
-			
-			// TODO: update score here or below?
-			// should this be done in the handler????
-			// at least log it for later scoring => add handler
-			
-			
+			parkingManager.parkVehicle(personId, selectedParking);
+			lastParkingUsed.put(personId, selectedParking);
 			
 			for (ParkingArrivalEventHandler parkingArrivalEH: parkingArrivalEventHandlers){
 				parkingArrivalEH.handleEvent(new ParkingArrivalEvent(event, selectedParking));
