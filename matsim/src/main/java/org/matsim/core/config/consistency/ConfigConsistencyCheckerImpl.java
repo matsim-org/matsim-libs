@@ -48,7 +48,6 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkEventsFormatLanesSignals(config);
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
-		this.checkSignalSystemConfiguration(config);
 		this.checkTransitReplanningConfiguration(config);
 		this.checkPlanCalcScore(config);
 		this.checkMobsimSelection(config) ;
@@ -123,36 +122,10 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
 	private void checkScenarioFeaturesEnabled(final Config c) {
 		ScenarioConfigGroup scg = c.scenario();
-		if (!scg.isUseLanes() && scg.isUseSignalSystems()) {
-			throw new IllegalStateException("Cannot use the signal systems framework without" +
-			"using lanes. Please enable lanes in scenario config group");
-		}
-		if (scg.isUseSignalSystems() && c.getQSimConfigGroup() == null){
+		if (scg.isUseSignalSystems() && ! ("qsim".equals(c.controler().getMobsim()) ||  c.getQSimConfigGroup() != null)){
 		  log.warn("The signal system implementation is only supported by the org.matsim.ptproject.qsim mobility simulation that is not activated. Please make sure you are using the correct" +
 		  		"mobility simulation. This warning can be ingored if a customized mobility simulation developed outside of org.matsim is used and set correctly.");
 		}
-	}
-
-	private void checkSignalSystemConfiguration(final Config config) {
-			if ((config.signalSystems().getSignalSystemFile() != null) &&
-					(config.signalSystems().getSignalSystemConfigFile() == null)){
-				log.error("Signal systems are defined in config however there is no" +
-						"configuration file for the systems. This may not be fatal if " +
-				"incode custom configuration is implemented. ");
-			}
-
-			if ((config.signalSystems().getSignalSystemFile() == null) &&
-					(config.signalSystems().getSignalSystemConfigFile() != null)){
-				throw new IllegalStateException("SignalSystemConfigurations are set " +
-				"in config but no input file for the SignalSystems is specified.!");
-			}
-
-			if ((config.network().getLaneDefinitionsFile() == null) &&
-					(config.signalSystems().getSignalSystemFile() != null) &&
-					(config.signalSystems().getSignalSystemConfigFile() != null)) {
-				throw new IllegalStateException("Cannot use the signal systems framework without" +
-				"a definition of lanes.");
-			}
 	}
 
 
