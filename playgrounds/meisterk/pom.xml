@@ -33,7 +33,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <forkMode>once</forkMode>
-          <argLine>-Xmx400m -Djava.awt.headless=true</argLine>
+          <argLine>-Xmx500m -Djava.awt.headless=true</argLine>
         </configuration>
       </plugin>
 		</plugins>
