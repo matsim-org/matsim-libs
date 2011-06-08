@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.apache.commons.math.stat.descriptive.moment.Mean;
+import org.geotools.math.Statistics;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -34,6 +36,11 @@ import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanc
 public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	private final ParkingScoreCollector parkingScoreCollector;
+	private Double averageWalkingDistance=null;
+
+	public Double getAverageWalkingDistance() {
+		return averageWalkingDistance;
+	}
 
 	private ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph = new ParkingWalkingDistanceMeanAndStandardDeviationGraph();
 
@@ -94,6 +101,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	private void printWalkingDistanceHistogramm(Controler controler, HashMap<Id, Double> walkingDistance){
 		double[] values=Collections.convertDoubleCollectionToArray(walkingDistance.values());
+		
+		averageWalkingDistance=new Mean().evaluate(values);
 		
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceHistogramm.png");
 		
