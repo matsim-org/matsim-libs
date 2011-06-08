@@ -139,9 +139,9 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			for (int j=0; j < N_PLAN_EXEC; j++) {
 				startTime = thread.getCurrentThreadCpuTime();
 				scores[i] += this.jpoAlgo.run(configGroup, this.plans.get(i));
-				log.debug("plan score: "+scores[i]);
 				endTime = thread.getCurrentThreadCpuTime();
 				cpuTimesNanoSecs[i] += endTime - startTime;
+				log.debug("plan score: "+scores[i]);
 			}
 		}
 
