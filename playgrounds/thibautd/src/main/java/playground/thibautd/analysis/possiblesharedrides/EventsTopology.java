@@ -41,10 +41,13 @@ public class EventsTopology {
 		Logger.getLogger(EventsTopology.class);
 
 
+	// should be made unmuttable
 	private final List<? extends LinkEvent> events;
 	private final LinkTopology linkTopology;
 	private final Comparator<Event> timeComparator = new TimeComparator();
 	private final double timeWindowRadius;
+	private boolean lastExplorationWasExhaustive = false;
+	private final int nEvents;
 	
 	public EventsTopology(
 			final List<? extends LinkEvent> events,
@@ -53,6 +56,7 @@ public class EventsTopology {
 		log.info("constructing event topology...");
 		// not safe, clone events!
 		this.events = events;
+		this.nEvents = events.size();
 		Collections.sort(events, this.timeComparator); 
 		this.linkTopology = linkTopology;
 		this.timeWindowRadius = timeWindowRadius;
@@ -103,6 +107,14 @@ public class EventsTopology {
 		return output;
 	}
 
+	public int getNumberOfEvents() {
+		return this.events.size();
+	}
+
+	public boolean wasLastExplorationExhaustive() {
+		return this.lastExplorationWasExhaustive;
+	}
+
 	/*
 	 * =========================================================================
 	 * helpers
@@ -147,7 +159,10 @@ public class EventsTopology {
 				}
 			}
 			else {
-				lowIndex = upperIndex = midIndex;
+				//log.warn("exact equality found for time"+searchedLowValue+", may not be handled correctly");
+				//lowIndex = upperIndex = midIndex;
+				lowIndex = (lowIndex + midIndex) / 2;
+				upperIndex = (upperIndex + midIndex) / 2;
 			}
 		}
 
@@ -163,10 +178,16 @@ public class EventsTopology {
 				upperIndexUpperBound = midIndex;
 			}
 			else {
-				lowerIndexUpperBound = upperIndexUpperBound = midIndex;
+				//log.warn("exact equality found for time"+searchedUpperValue+", may not be handled correctly");
+				//lowerIndexUpperBound = upperIndexUpperBound = midIndex;
+				lowerIndexUpperBound = (lowerIndexUpperBound + midIndex) / 2;
+				upperIndexUpperBound = (upperIndexUpperBound + midIndex) / 2;
 			}
 		}
 
+		this.lastExplorationWasExhaustive = ((lowIndex == 0) && (upperIndexUpperBound == this.nEvents));
+
+		//log.debug("getting events("+lowIndex+", "+upperIndexUpperBound+")");
 		return this.events.subList(lowIndex, upperIndexUpperBound);
 	}
 

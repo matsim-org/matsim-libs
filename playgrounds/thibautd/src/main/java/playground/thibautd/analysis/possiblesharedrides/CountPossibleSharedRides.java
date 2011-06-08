@@ -109,6 +109,8 @@ public class CountPossibleSharedRides {
 	public void run() {
 		long count = 0L;
 		long total = this.plans.size();
+		TripData currentTripData;
+
 		log.info("    computing trip data...");
 		for (Map.Entry<Id, Plan> plan : this.plans.entrySet()) {
 			count++;
@@ -116,7 +118,14 @@ public class CountPossibleSharedRides {
 			for (PlanElement pe : plan.getValue().getPlanElements()) {
 				if ((pe instanceof Leg) &&
 						(((Leg) pe).getMode().equals(TransportMode.car))) {
-					this.results.add(getTripData((Leg) pe, plan.getKey()));
+					currentTripData = getTripData((Leg) pe, plan.getKey());
+
+					if (currentTripData == null) {
+						log.debug("stopping plan examination.");
+						break;
+					}
+
+					this.results.add(currentTripData);
 				}
 			}
 		}
@@ -253,10 +262,16 @@ public class CountPossibleSharedRides {
 		Id arrivalId = route.getEndLinkId();
 
 		// correct leg info based on events
-		//log.debug("getting departure and arrival events...");
+		//log.debug("getting departure events...");
 		LinkEvent departure = getDepartureEvent(personId, departureTime, departureId);
+		//log.debug("getting departure events... DONE");
+		//log.debug("getting arrival events...");
 		LinkEvent arrival = getArrivalEvent(personId, arrivalTime, arrivalId);
-		//log.debug("getting departure and arrival events... DONE");
+		if (arrival == null) {
+			log.debug("arrival unfound: agent may have been stucked and removed.");
+			return null;
+		}
+		//log.debug("getting arrival events... DONE");
 
 		//log.debug("counting possible shared rides...");
 		numberOfJoinableTrips = countPossibleSharedRides(departure, arrival);
@@ -269,6 +284,7 @@ public class CountPossibleSharedRides {
 			final Id person,
 			final double expectedTime,
 			final Id link) {
+		//log.debug("expected time: "+(expectedTime/3600d)+"h");
 		return this.getEvent(person, expectedTime, link, this.departuresTopology);
 	}
 
@@ -276,9 +292,14 @@ public class CountPossibleSharedRides {
 			final Id person,
 			final double expectedTime,
 			final Id link) {
+		//log.debug("expected time: "+(expectedTime/3600d)+"h");
 		return this.getEvent(person, expectedTime, link, this.arrivalsTopology);
 	}
 
+	/**
+	 * @return the event of the given person at the given link which is the closer
+	 * to expectedTime in the given topology.
+	 */
 	private LinkEvent getEvent(
 			final Id person,
 			final double expectedTime,
@@ -286,6 +307,7 @@ public class CountPossibleSharedRides {
 			final EventsTopology searchEvents) {
 		double timeWindow = this.eventInitialSearchWindow;
 		List<LinkEvent> currentEventList;
+		int lastSize = -1;
 
 		// increment the tw size until an event corresponding to the agent is
 		// found.
@@ -295,12 +317,21 @@ public class CountPossibleSharedRides {
 					link,
 					expectedTime,
 					timeWindow);
+			// todo: cross a list sorted by temporal distance to the expected value
 			for (LinkEvent currentEvent : currentEventList) {
 				if (currentEvent.getPersonId().equals(person)) {
 					return currentEvent;
 				}
 			}
-			timeWindow +=  this.eventSeachWindowIncr;
+
+			if (searchEvents.wasLastExplorationExhaustive()) {
+				// we explored all events
+				return null;
+			}
+			lastSize = currentEventList.size();
+
+			//timeWindow +=  this.eventSeachWindowIncr;
+			timeWindow *= 2d;
 			//System.out.println("tac, tw: "+(timeWindow/3600d)+", personId: "+person);
 		}
 	}
