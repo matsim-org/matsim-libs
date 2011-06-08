@@ -20,6 +20,7 @@
 
 package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -45,6 +46,8 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup) {
 		this(plansCalcGroup, TransportMode.walk);
 	}
+	
+	private static int wrnCnt = 0 ;
 
 	public MultiModalTravelTimeCost(PlansCalcRouteConfigGroup plansCalcGroup, String transportMode) {
 		this.plansCalcGroup = plansCalcGroup;
@@ -62,6 +65,14 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 		 * By default: use FreeSpeedTravelTimes.
 		 */
 		travelTime = new FreeSpeedTravelTime();
+		
+		if ( wrnCnt < 1 ) {
+			wrnCnt++ ;
+			Logger.getLogger(this.getClass()).warn("Multi-modal routing ignores all marginal utilities except for time. " +
+					"Make sure this is what you want/need.") ;
+			Logger.getLogger(this.getClass()).warn("Multi-modal routing uses different walk speed factors by age. " +
+					"Make sure this is what you want/need.") ;
+		}
 	}
 	
 	public void setTravelTime(TravelTime travelTime) {
@@ -97,6 +108,8 @@ public class MultiModalTravelTimeCost implements MultiModalTravelTime, Personali
 	 * 		85-90 years:	0.60
 	 * 		90-95 years:	0.55
 	 * 		95+ years:		0.50
+	 * <p/>
+	 * yy Is there a reference for these values somewhere?  kai, jun'11
 	 */
 	private double calculateAgeScaleFactor() {
 		if (person != null && person instanceof PersonImpl) {
