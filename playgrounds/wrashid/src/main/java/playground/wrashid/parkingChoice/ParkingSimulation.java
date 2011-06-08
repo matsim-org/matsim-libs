@@ -81,7 +81,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			
 			// TODO: this selection should happen according to best parking available for the
 			// given activity location (not only according to the best walking distance).
-			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord(),new ActInfo(event.getFacilityId(),event.getActType()));
+			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord(),new ActInfo(event.getFacilityId(),event.getActType()), event.getPersonId());
 			parkingManager.parkVehicle(personId, selectedParking);
 			lastParkingUsed.put(personId, selectedParking);
 			

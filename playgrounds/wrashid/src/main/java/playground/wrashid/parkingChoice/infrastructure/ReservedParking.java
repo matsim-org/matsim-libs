@@ -3,12 +3,16 @@ package playground.wrashid.parkingChoice.infrastructure;
 import org.matsim.api.core.v01.Coord;
 
 public class ReservedParking extends Parking {
-	public ReservedParking(Coord coord) {
+	public ReservedParking(Coord coord, String attributes) {
 		super(coord);
-		// TODO Auto-generated constructor stub
+		this.attributes=attributes;
 	}
 
-	String typeAttribute=null;
+	public String getAttributes() {
+		return attributes;
+	}
+
+	String attributes=null;
 	
 	// LinkedList 
 	// => provide instead a function, which does this?????

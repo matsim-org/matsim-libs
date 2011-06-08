@@ -65,10 +65,10 @@ public class ParkingManager implements StartupListener {
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 	}
 	
-	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo){
+	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo, Id personId){
 		double minDistanceOfSearchSpaceInMeters=1000; //TODO: needs also be set from configuration file (we can't narrow too much our search).
 		
-		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), null, 0, targetActInfo);
+		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), personId, 0, targetActInfo);
 		
 		return getParkingWithShortestWalkingDistance(destCoord,parkingsInSurroundings);
 	}
@@ -89,20 +89,20 @@ public class ParkingManager implements StartupListener {
 	}
 	
 	
-	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Person person, double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo){
+	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Id personId, double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo){
 		double maxWalkingDistanceSearchSpaceInMeters=20000; //TODO: add this parameter in the configuration file
 		
 		
 		Collection<Parking> collection = parkings.get(coord.getX() , coord.getY(), minSearchDistance);
 		
-		Collection<Parking> resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, targetActInfo,
+		Collection<Parking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
 				collection);
 		
 		// widen search space, if no parking found
 		while (resultCollection.size()==0){
 			minSearchDistance*=2;
 			collection = parkings.get(coord.getX() , coord.getY(), minSearchDistance);
-			resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, targetActInfo,
+			resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
 					collection);
 			
 			if (minSearchDistance>maxWalkingDistanceSearchSpaceInMeters){
@@ -113,7 +113,7 @@ public class ParkingManager implements StartupListener {
 		return resultCollection;
 	}
 
-	private Collection<Parking> filterReservedAndFullParkings(Person person, double OPTIONALtimeOfDayInSeconds,
+	private Collection<Parking> filterReservedAndFullParkings(Id personId, double OPTIONALtimeOfDayInSeconds,
 			ActInfo targetActInfo, Collection<Parking> collection) {
 		Collection<Parking> resultCollection=new LinkedList<Parking>();
 		
@@ -130,7 +130,7 @@ public class ParkingManager implements StartupListener {
 				
 				ReservedParking reservedParking=(ReservedParking) parking;
 				
-				if (reservedParkingManager.considerForChoiceSet(reservedParking, person, OPTIONALtimeOfDayInSeconds, targetActInfo)){
+				if (reservedParkingManager.considerForChoiceSet(reservedParking, personId, OPTIONALtimeOfDayInSeconds, targetActInfo)){
 					resultCollection.add(parking);
 				}
 			} else if (parking instanceof PrivateParking){
@@ -197,7 +197,7 @@ public class ParkingManager implements StartupListener {
 			Coord activityCoord = activityFacility.getCoord();
 		
 			// park car
-			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person, 0, lastActivityInfo);
+			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person.getId(), 0, lastActivityInfo);
 			
 			// score parkings (only according to distance)
 			for (Parking parking:parkingsInSurroundings){
