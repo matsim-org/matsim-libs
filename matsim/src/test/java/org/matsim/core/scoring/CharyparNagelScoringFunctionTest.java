@@ -126,6 +126,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.plan.createAndAddActivity("w", link3.getId());
 		leg = this.plan.createAndAddLeg(TransportMode.pt);
 		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
+		// (why is this "car"?  We found it that way. benjamin/kai, jun'11)
 		leg.setRoute(route);
 		// does not match the network distances or travel times! WHY? --- benjamin mar'11
 		route.setDistance(20000.0);
