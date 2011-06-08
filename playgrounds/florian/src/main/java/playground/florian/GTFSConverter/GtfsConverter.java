@@ -74,10 +74,13 @@ public class GtfsConverter {
 	private List<String> vehicleIds = new ArrayList<String>();
 	private boolean useGivenNetwork = false;
 	
+	private long date = 0;
+	
+	
 	public static void main(String[] args) {
 		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed");
 		gtfs.setUseGivenNetwork(false);
-		gtfs.convert(6);
+		gtfs.convert(3);
 	}
 	
 	
@@ -90,8 +93,8 @@ public class GtfsConverter {
 		c.scenario().setUseTransit(true);
 		c.scenario().setUseVehicles(true);
 		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setStartTime(Time.parseTime("05:30:00"));
-		qsim.setEndTime(Time.parseTime("17:00:00"));
+//		qsim.setStartTime(Time.parseTime("00:00:00"));
+//		qsim.setEndTime(Time.parseTime("17:00:00"));
 		c.addQSimConfigGroup(qsim);
 		Set<ControlerConfigGroup.EventsFileFormat> eventsFileFormats = new HashSet<ControlerConfigGroup.EventsFileFormat>();
 		eventsFileFormats.add(ControlerConfigGroup.EventsFileFormat.xml);
@@ -128,8 +131,24 @@ public class GtfsConverter {
 		// Create Transitlines
 		this.createTransitLines(ts, routeNames);
 		
-		// Get the used service Id for the choosen weekday
-		List<String> usedServiceIds = this.getUsedServiceIds(weekday);
+		// Get the used service Id for the choosen weekday and date
+		List<String> usedServiceIds = new ArrayList<String>();
+		if((new File(filepath + "/calendar.txt")).exists()){
+			System.out.println("Reading calendar.txt");
+			usedServiceIds.addAll(this.getUsedServiceIds(weekday));
+		}
+		if((new File(filepath + "/calendar_dates.txt")).exists()){
+			System.out.println("Reading calendar_dates.txt");
+			for(String serviceId: this.getUsedServiceIdsForSpecialDates()){
+				if(serviceId.charAt(0) == '+'){
+					usedServiceIds.add(serviceId.substring(1));
+				}else{
+					if(usedServiceIds.contains(serviceId.substring(1))){
+						usedServiceIds.remove(serviceId.substring(1));
+					}
+				}
+			}
+		}		
 		System.out.println("Reading of ServiceIds succesfull: " + usedServiceIds);
 		
 		// Get the TripIds, which are available for the serviceIds 
@@ -181,6 +200,11 @@ public class GtfsConverter {
 		System.out.println("Conversion successfull");
 	}
 	
+	public void setDate(long date) {
+		this.date = date;
+	}
+
+
 	private List<Id> getUsedTripIds(List<String> usedServiceIds) {
 		String tripsFilename = filepath + "/trips.txt";
 		List<Id> usedTripIds = new ArrayList<Id>();
@@ -256,6 +280,8 @@ public class GtfsConverter {
 			BufferedReader br = new BufferedReader(new FileReader(new File(calendarFilename)));
 			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int serviceIdIndex = header.indexOf("service_id");
+			int startDateIndex = header.indexOf("start_date");
+			int endDateIndex = header.indexOf("end_date");
 			int[] weekdayIndexes= new int[7];
 			weekdayIndexes[0] = header.indexOf("monday");
 			weekdayIndexes[1] = header.indexOf("tuesday");
@@ -267,8 +293,50 @@ public class GtfsConverter {
 			String row = br.readLine();
 			do {
 				String[] entries = this.splitRow(row);
+				if(this.date == 0){
+					this.date = Long.parseLong(entries[endDateIndex].trim());
+					System.out.println("Used Date for active schedules: " + this.date + ". If you want to choose another date, please specify it, before running the converter");
+				}
 				if(entries[weekdayIndexes[weekday-1]].equals("1")){
-					serviceIds.add(entries[serviceIdIndex]);
+					if((this.date >= Double.parseDouble(entries[startDateIndex].trim())) && (this.date <= Double.parseDouble(entries[endDateIndex].trim()))){
+						serviceIds.add(entries[serviceIdIndex]);
+					}
+				}
+				row = br.readLine();
+			}while(row!= null);
+		} catch (FileNotFoundException e) {
+			System.out.println(calendarFilename + " not found!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return serviceIds;
+	}
+	
+	private List<String> getUsedServiceIdsForSpecialDates(){
+		String calendarFilename = filepath + "/calendar_dates.txt";
+		List<String> serviceIds = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(calendarFilename)));
+			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
+			int serviceIdIndex = header.indexOf("service_id");
+			int dateIndex = header.indexOf("date");
+			int exceptionTypeIndex = header.indexOf("exception_type");
+			String row = br.readLine();
+			do {
+				String[] entries = this.splitRow(row);
+				String serviceId = entries[serviceIdIndex];
+				long exceptionDate = Long.parseLong(entries[dateIndex].trim());
+				int exceptionType = Integer.parseInt(entries[exceptionTypeIndex].trim());
+				if(this.date == 0){
+					this.date = exceptionDate;
+					System.out.println("Used Date for active schedules: " + this.date + ". If you want to choose another date, please specify it, before running the converter");
+				}
+				if(exceptionDate == this.date){
+					if(exceptionType == 1){
+						serviceIds.add("+" + serviceId);
+					}else{
+						serviceIds.add("-" + serviceId);
+					}
 				}
 				row = br.readLine();
 			}while(row!= null);
@@ -295,8 +363,8 @@ public class GtfsConverter {
 			do {
 				String[] entries = this.splitRow(row);
 				Id tripId = new IdImpl(entries[tripIdIndex]);
-				double startTime = Time.parseTime(entries[startTimeIndex]);
-				double endTime = Time.parseTime(entries[endTimeIndex]);
+				double startTime = Time.parseTime(entries[startTimeIndex].trim());
+				double endTime = Time.parseTime(entries[endTimeIndex].trim());
 				double step = Double.parseDouble(entries[stepIndex]);
 				if((!(entries[tripIdIndex].equals(oldTripId))) && (usedTripIds.contains(tripId))){					
 					departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).getDepartures().size();
@@ -346,7 +414,7 @@ public class GtfsConverter {
 			String row = br.readLine();
 			String[] entries = this.splitRow(row);
 			String currentTrip = entries[tripIdIndex];
-			Double departureTime = Time.parseTime(entries[arrivalTimeIndex]);
+			Double departureTime = Time.parseTime(entries[arrivalTimeIndex].trim());
 			Departure departure = tf.createDeparture(new IdImpl(entries[tripIdIndex] + "." + idCounter), departureTime);
 			String vehicleId = entries[tripIdIndex] + "." + idCounter;
 			departure.setVehicleId(new IdImpl(vehicleId));		
@@ -359,7 +427,7 @@ public class GtfsConverter {
 				if(tripIds.contains(tripId)){
 					if(entries[tripIdIndex].equals(currentTrip)){
 						TransitStopFacility stop = ts.getFacilities().get(stopId);
-						TransitRouteStop routeStop = tf.createTransitRouteStop(stop, Time.parseTime(entries[arrivalTimeIndex])-departureTime, Time.parseTime(entries[departureTimeIndex])-departureTime);
+						TransitRouteStop routeStop = tf.createTransitRouteStop(stop, Time.parseTime(entries[arrivalTimeIndex].trim())-departureTime, Time.parseTime(entries[departureTimeIndex].trim())-departureTime);
 						routeStop.setAwaitDepartureTime(true);
 						stops.add(routeStop);
 					}else{
@@ -369,13 +437,13 @@ public class GtfsConverter {
 						tl.addRoute(tr);
 						stops = new LinkedList<TransitRouteStop>();
 						currentTrip = entries[tripIdIndex];
-						departureTime = Time.parseTime(entries[arrivalTimeIndex]);
+						departureTime = Time.parseTime(entries[arrivalTimeIndex].trim());
 						departure = tf.createDeparture(new IdImpl(entries[tripIdIndex] + "." + idCounter), departureTime);
 						vehicleId = tripId.toString() + "." + idCounter;
 						departure.setVehicleId(new IdImpl(vehicleId));
 						this.vehicleIds.add(vehicleId);
 						TransitStopFacility stop = ts.getFacilities().get(stopId);
-						TransitRouteStop routeStop = tf.createTransitRouteStop(stop, Time.parseTime(entries[arrivalTimeIndex])-departureTime, Time.parseTime(entries[departureTimeIndex])-departureTime);
+						TransitRouteStop routeStop = tf.createTransitRouteStop(stop, 0, Time.parseTime(entries[departureTimeIndex].trim())-departureTime);
 						stops.add(routeStop);
 					}
 				}		
@@ -456,7 +524,9 @@ public class GtfsConverter {
 					startStation = nextStation;
 				}else{
 					NetworkRoute netRoute = (NetworkRoute) (new LinkNetworkRouteFactory()).createRoute(route.getFirst(), route.getLast());
-					netRoute.setLinkIds(route.getFirst(), route.subList(1, route.size()-1), route.getLast());
+					if(route.size() > 2){
+						netRoute.setLinkIds(route.getFirst(), route.subList(1, route.size()-1), route.getLast());
+					}
 					tripRoutes.put(new IdImpl(currentTrip), netRoute);
 					currentTrip = entries[tripIdIndex];
 					route = new LinkedList<Id>();
@@ -538,7 +608,7 @@ public class GtfsConverter {
 		// Standartvalues for links
 		double freespeedKmPerHour=50; //km/h
 		double capacity = 1500.0;
-		double freespeed = freespeedKmPerHour / 3.6;
+//		double freespeed = freespeedKmPerHour / 3.6;
 		int numLanes = 1;
 		long i = 0;
 		// To prevent the creation of similiar links in different directions there need to be a Map which assigns the ToNodes to all FromNodes
@@ -562,16 +632,20 @@ public class GtfsConverter {
 			List<String> header = new ArrayList<String>(Arrays.asList(this.splitRow(br.readLine())));
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopIdIndex = header.indexOf("stop_id");
+			int arrivalTimeIndex = header.indexOf("arrival_time");
+			int departureTimeIndex = header.indexOf("departure_time");
 			String row = br.readLine();
 			do {
 				boolean addLink = false;
 				String[] entries = this.splitRow(row);
-				Id fromNodeId = new IdImpl(entries[stopIdIndex]); // This works only as long as the nodes have the same ID as the stops;
+				Id fromNodeId = new IdImpl(entries[stopIdIndex]);
+				double departureTime = Time.parseTime(entries[departureTimeIndex].trim());
 				String usedTripId = entries[tripIdIndex];
 				row = br.readLine();
 				if(row!=null){
 					entries = this.splitRow(row);
 					Id toNodeId = new IdImpl(entries[stopIdIndex]);
+					double arrivalTime = Time.parseTime(entries[arrivalTimeIndex].trim());
 					if(fromNodes.containsKey(fromNodeId)){
 						if(!(fromNodes.get(fromNodeId)).contains(toNodeId)){
 							addLink = true;
@@ -591,7 +665,7 @@ public class GtfsConverter {
 					if(!usedTripId.equals(entries[tripIdIndex])){
 						addLink = false;
 					}
-					// for each stop should exist one dummyLink --> does it need one?
+					// for each stop should exist one dummyLink
 					Id dummyId = new IdImpl("dN_" + toNodeId);
 					if(!(network.getNodes().containsKey(dummyId))){
 						NodeImpl n = new NodeImpl(dummyId);
@@ -599,17 +673,21 @@ public class GtfsConverter {
 //						n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+10,nodes.get(toNodeId).getCoord().getY()+10));
 						network.addNode(n);
 						double length = CoordUtils.calcDistance(n.getCoord(), nodes.get(toNodeId).getCoord());
-						Link link = network.createAndAddLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId), length, freespeed, capacity, numLanes);
+						Link link = network.createAndAddLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId), length, 1000, capacity, numLanes);
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
 						modes.add(TransportMode.pt);
 						link.setAllowedModes(modes);
 						// Backwards
-						Link link2 = network.createAndAddLink(new IdImpl("dL2_" + toNodeId), nodes.get(toNodeId),n , length, freespeed, capacity, numLanes);
+						Link link2 = network.createAndAddLink(new IdImpl("dL2_" + toNodeId), nodes.get(toNodeId),n , length, 1000, capacity, numLanes);
 						link2.setAllowedModes(modes);
 					}
 					if(addLink){
 						double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
+						double freespeed = freespeedKmPerHour/3.6;
+						if(length > 0.0){
+							freespeed = length/(arrivalTime - departureTime);
+						}
 						Link link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);						
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
@@ -668,13 +746,13 @@ public class GtfsConverter {
 			if(row.charAt(i) == '"'){
 				quotes = !(quotes);
 			}else if((row.charAt(i) == ',') && !(quotes)){
-				entries.add(sb.toString());	
+				entries.add(sb.toString().trim());	
 				sb = new StringBuilder();
 			}else{
 				sb.append(row.charAt(i));
 			}
 		}
-		entries.add(sb.toString());	
+		entries.add(sb.toString().trim());	
 		return entries.toArray(new String[entries.size()]);
 	}
 
