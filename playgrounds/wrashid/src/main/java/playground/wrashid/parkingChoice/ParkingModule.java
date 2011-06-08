@@ -32,7 +32,7 @@ public class ParkingModule {
 		ParkingRoot.setParkingWalkingDistanceScalingFactorForOutput(1.0);
 		
 		parkingManager = new ParkingManager(controler, parkingCollection);
-		ParkingSimulation parkingSimulation=new ParkingSimulation(parkingManager);
+		ParkingSimulation parkingSimulation=new ParkingSimulation(parkingManager, controler);
 		ParkingScoreCollector parkingScoreCollector=new ParkingScoreCollector(controler);
 		parkingSimulation.addParkingArrivalEventHandler(parkingScoreCollector);
 		parkingSimulation.addParkingDepartureEventHandler(parkingScoreCollector);

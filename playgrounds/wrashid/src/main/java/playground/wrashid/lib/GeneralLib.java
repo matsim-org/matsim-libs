@@ -512,6 +512,10 @@ public class GeneralLib {
 	public static double projectTimeWithin24Hours(double time) {
 		double secondsInOneDay = 60 * 60 * 24;
 
+		if (time==Double.NEGATIVE_INFINITY || time==Double.POSITIVE_INFINITY){
+			DebugLib.stopSystemAndReportInconsistency("time is not allowed to be minus or plus infinity");
+		}
+		
 		while (time < 0) {
 			time += secondsInOneDay;
 		}

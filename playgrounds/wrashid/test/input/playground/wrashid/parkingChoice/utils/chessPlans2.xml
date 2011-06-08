@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans name="Plans_Test1">
+
+<!-- ====================================================================== -->
+
+	<person id="1" age="30">
+		<plan>
+			<act type="home" facility="1" x="0.0" y="500.0" end_time="08:00:00" />
+			
+			<leg  mode="car"  >
+			</leg>
+			
+			<act type="work" facility="36" x="8500.0" y="9000.0" dur="08:00:00" />
+			
+			<leg  mode="car" >
+			</leg>
+			
+			<act type="home" facility="1" x="0.0" y="500.0" />
+		</plan>
+	</person>
+	
+	<!-- ====================================================================== -->
+
+</plans>

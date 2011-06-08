@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -16,6 +18,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.Controler;
 
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
@@ -35,9 +38,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	LinkedList<ParkingArrivalEventHandler> parkingArrivalEventHandlers;
 	LinkedList<ParkingDepartureEventHandler> parkingDepartureEventHandlers;
 	private ParkingManager parkingManager;
+	private final Controler controler;
 	
-	public ParkingSimulation(ParkingManager parkingManager){
+	public ParkingSimulation(ParkingManager parkingManager, Controler controler){
 		this.parkingManager=parkingManager;
+		this.controler = controler;
 		this.parkingArrivalEventHandlers=new LinkedList<ParkingArrivalEventHandler>();
 		this.parkingDepartureEventHandlers=new LinkedList<ParkingDepartureEventHandler>();
 		this.lastParkingUsed=new HashMap<Id, Parking>();
@@ -84,6 +89,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord(),new ActInfo(event.getFacilityId(),event.getActType()), event.getPersonId());
 			parkingManager.parkVehicle(personId, selectedParking);
 			lastParkingUsed.put(personId, selectedParking);
+			
+			Person person = controler.getPopulation().getPersons().get(personId);
+			
+			Plan selectedPlan = person.getSelectedPlan();
+			
 			
 			for (ParkingArrivalEventHandler parkingArrivalEH: parkingArrivalEventHandlers){
 				parkingArrivalEH.handleEvent(new ParkingArrivalEvent(event, selectedParking));

@@ -107,7 +107,9 @@ public class ParkingManager implements StartupListener {
 		//+ TO solve problem above the user of this module should provide appropriate parkings
 		// Far away with appropriate capacity.
 		// In this case this parameter could even be left out (although, 1000km is really a long way to walk...)
-
+		// aber dies factor is wichtig, weil parking far away could still be relevant due to the price
+		// so this parameter needs to be chosen in a way keeping this in mind.
+		
 		Collection<Parking> collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
 
 		Collection<Parking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
@@ -230,6 +232,9 @@ public class ParkingManager implements StartupListener {
 
 			Coord activityCoord = activityFacility.getCoord();
 
+			// TODO: carve this out, so that the same code is invoked here and from
+			// Simulation handler + use it in the tests...
+			
 			// park car
 			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord,
 					ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person.getId(), 0, lastActivityInfo);
@@ -251,6 +256,9 @@ public class ParkingManager implements StartupListener {
 		}
 	}
 
+	
+	
+	
 	public void parkVehicle(Id personId, Parking parking) {
 		parking.parkVehicle();
 		currentParkingLocation.put(personId, parking);
