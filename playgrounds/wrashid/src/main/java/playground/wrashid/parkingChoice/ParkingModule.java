@@ -8,6 +8,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.PreferredParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreCollector;
@@ -46,8 +47,21 @@ public class ParkingModule {
 		return parkingScoreAccumulator.getAverageWalkingDistance();
 	}
 	
+	/**
+	 * If you want to use reserved Parkings in the simulation, you must set the ReservedParkingManager
+	 * @param reservedParkingManager
+	 */
 	public void setReservedParkingManager(ReservedParkingManager reservedParkingManager){
 		parkingManager.setReservedParkingManager(reservedParkingManager);
+	}
+	
+	
+	/**
+	 * If you want to use Preferred Parkings, set this first
+	 * @param reservedParkingManager
+	 */
+	public void setPreferredParkingManager(PreferredParkingManager preferredParkingManager){
+		parkingManager.setPreferredParkingManager(preferredParkingManager);
 	}
 	
 }

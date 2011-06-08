@@ -47,7 +47,7 @@ public class ReservedParkingTest extends TestCase {
 				if (personId.equals(new IdImpl(2)) && reservedParking.getAttributes().contains("disabled")) {
 					return true;
 				}
-				if (personId.equals(new IdImpl(3)) && reservedParking.getAttributes().contains("Mobility")) {
+				if (personId.equals(new IdImpl(3)) && reservedParking.getAttributes().contains("EV")) {
 					return true;
 				}
 				return false;
@@ -73,7 +73,7 @@ public class ReservedParkingTest extends TestCase {
 			}
 		}
 
-		ReservedParking reservedParking = new ReservedParking(new CoordImpl(8500.0, 9000), "disabled, EV, Mobility");
+		ReservedParking reservedParking = new ReservedParking(new CoordImpl(8500.0, 9000), "disabled, EV");
 		reservedParking.setMaxCapacity(parkingCapacity);
 		parkingCollection.add(reservedParking);
 
