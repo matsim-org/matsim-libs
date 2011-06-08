@@ -31,8 +31,8 @@ import playground.thibautd.jointtripsoptimizer.replanning.selectors.WorstJointPl
 /**
  * Custom StrategyManager allowing to select and optimize joint schedules
  * rather than individual ones.
- * Implements the hools provided by StrategyManager.
- * XXX: nothing done for the moment, and perhaps never.
+ * Implements the hooks provided by StrategyManager.
+ *
  * @author thibautd
  */
 public class JointStrategyManager extends StrategyManager {
