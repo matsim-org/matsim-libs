@@ -38,6 +38,8 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
 	private final double marginalCostOfDistance;
+	
+	private static int wrnCnt = 0 ;
 
 	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator;
@@ -47,18 +49,23 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
 //		this.marginalUtlOfDistance = cnScoringGroup.getMarginalUtlOfDistanceCar();
-		this.marginalCostOfDistance = cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		if ( wrnCnt < 1 ) {
+			wrnCnt++ ;
+			Logger.getLogger(this.getClass()).warn("Assuming that monetary distance cost rate care is NEGATIVE!!  This may " +
+					"be changed.") ;
+		}
 		
-		if ( cnScoringGroup.getMonetaryDistanceCostRateCar() < 0. ) {
-			Logger.getLogger( this.getClass() ).error("you are using a monetary distance cost rate < 0.  If this worked for you " +
-					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
-			throw new RuntimeException("aborting, see log file for reason") ;
-		}
-		if ( cnScoringGroup.getMarginalUtilityOfMoney() < 0. ) {
-			Logger.getLogger( this.getClass() ).error("you are using a marginal utility of money < 0.  If this worked for you " +
-					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
-			throw new RuntimeException("aborting, see log file for reason") ;
-		}
+//		if ( cnScoringGroup.getMonetaryDistanceCostRateCar() < 0. ) {
+//			Logger.getLogger( this.getClass() ).error("you are using a monetary distance cost rate < 0.  If this worked for you " +
+//					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
+//			throw new RuntimeException("aborting, see log file for reason") ;
+//		}
+//		if ( cnScoringGroup.getMarginalUtilityOfMoney() < 0. ) {
+//			Logger.getLogger( this.getClass() ).error("you are using a marginal utility of money < 0.  If this worked for you " +
+//					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
+//			throw new RuntimeException("aborting, see log file for reason") ;
+//		}
 		
 	}
 
