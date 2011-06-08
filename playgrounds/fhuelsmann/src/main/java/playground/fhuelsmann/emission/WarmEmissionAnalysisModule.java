@@ -66,7 +66,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 
 	@Override
 	public void calculateEmissionsPerLink(double travelTime, Id linkId, Id personId, double averageSpeed, 
-			int roadType,  String fuelSizeAge, double freeVelocity, double distance, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable) {
+			int roadType,  /*String fuelSizeAge,*/ double freeVelocity, double distance, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable) {
 
 		//linkage between Hbefa road types and Visum road types
 		int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
@@ -115,7 +115,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 	public void calculateEmissionsPerPerson(double travelTime, Id personId, 
 			double averageSpeed,
 			int roadType,
-			String fuelSizeAge, 
+			//String fuelSizeAge, 
 			double freeVelocity, 
 			double distance,
 			HbefaObject[][] hbefaTable,

@@ -28,10 +28,12 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -49,6 +51,8 @@ import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class EmissionTool {
+	
+	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
 	// INPUT
 	private static String runDirectory = "../../runs-svn/run970/";
@@ -67,7 +71,7 @@ public class EmissionTool {
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 //	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-	private static String vehicleFile="../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
+//	private static String vehicleFile="../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
 
 //	private static final ArrayList<String> listOfPollutant = new ArrayList<String>();
 
@@ -121,9 +125,9 @@ public class EmissionTool {
 		//		HbefaHot hbefaHot = new HbefaHot();
 		//		hbefaHot.makeHbefaHot(hbefaHotFile);
 
-		Vehicles vehicles = new VehiclesImpl();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-		vehicleReader.readFile(vehicleFile);
+//		Vehicles vehicles = new VehiclesImpl();
+//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+//		vehicleReader.readFile(vehicleFile);
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
@@ -137,7 +141,8 @@ public class EmissionTool {
 		//		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(//vehicles,
+				network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
 		//		warmEmissionHandler.setListOfPollutant(listOfPollutant);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
@@ -171,22 +176,60 @@ public class EmissionTool {
 		Population urbanPop = usa.getRelevantPopulation(population, urbanShape);
 		Set<Feature> suburbanShape = usa.readShape(suburbanShapeFile);
 		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);
-
+		
 		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2TotalEmissionsInGrammPerType);
 		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2TotalEmissionsInGrammPerType);
+		
+//		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2WarmEmissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2WarmEmissionsInGrammPerType);
 
-		System.out.println(emissionType2AvgEmissionsUrbanArea);
-		System.out.println(emissionType2AvgEmissionsSuburbanArea);
+		System.out.println("urbanArea: " + emissionType2AvgEmissionsUrbanArea);
+		System.out.println("suburbanArea: " + emissionType2AvgEmissionsSuburbanArea);
+	}
+
+	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType) {
+		List<Double> avgEmissionsPerTypeandArea = new ArrayList<Double>();
+		double totalFc = 0.0;
+		double totalNox = 0.0;
+		double totalCo2 = 0.0;
+		double totalNo2 = 0.0;
+		double totalPM = 0.0;
+
+		Integer populationSize = population.getPersons().size();
+		logger.warn(populationSize.toString());
+
+		for(Person person : population.getPersons().values()){
+			Id personId = person.getId();
+			if(personId2emissionsInGrammPerType.containsKey(personId)){
+				double fc =  personId2emissionsInGrammPerType.get(personId)[5];
+				double nox = personId2emissionsInGrammPerType.get(personId)[6];
+				double co2 = personId2emissionsInGrammPerType.get(personId)[7];
+				double no2 = personId2emissionsInGrammPerType.get(personId)[8];
+				double pm = personId2emissionsInGrammPerType.get(personId)[9];
+				
+				totalFc = totalFc + fc;
+				totalNox = totalNox + nox;
+				totalCo2 = totalCo2 + co2;
+				totalNo2 = totalNo2 + no2;
+				totalPM = totalPM + pm;
+			}
+		}
+		avgEmissionsPerTypeandArea.add(totalFc / populationSize);
+		avgEmissionsPerTypeandArea.add(totalNox / populationSize);
+		avgEmissionsPerTypeandArea.add(totalCo2 / populationSize);
+		avgEmissionsPerTypeandArea.add(totalNo2 / populationSize);
+		avgEmissionsPerTypeandArea.add(totalPM / populationSize);
+		return avgEmissionsPerTypeandArea;
 	}
 
 	private Map<Id, double[]> getTotalEmissions(Map<Id, double[]> personId2WarmEmissionsInGrammPerType,	Map<Id, Map<String, Double>> personId2ColdEmissions) {
 		Map<Id, double[]> personId2totalEmissions = new HashMap<Id, double[]>();
-
+	
 		for(Entry<Id, double[]> entry : personId2WarmEmissionsInGrammPerType.entrySet()){
 			Id personId = entry.getKey();
 			double[] warmEmissions = entry.getValue();
 			double[] totalEmissions = new double[10];
-
+	
 			if(personId2ColdEmissions.containsKey(personId)){
 				// average speed based
 				totalEmissions[0] = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
@@ -194,7 +237,7 @@ public class EmissionTool {
 				totalEmissions[2] = warmEmissions[2]; //TODO: CO2 not directly available for cold emissions; try through fc!
 				totalEmissions[3] = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
 				totalEmissions[4] = warmEmissions[4] + personId2ColdEmissions.get(personId).get("PM");
-
+	
 				// fraction based
 				totalEmissions[5] = warmEmissions[5] + personId2ColdEmissions.get(personId).get("FC");
 				totalEmissions[6] = warmEmissions[6] + personId2ColdEmissions.get(personId).get("NOx");
@@ -208,37 +251,6 @@ public class EmissionTool {
 			personId2totalEmissions.put(personId, totalEmissions);
 		}
 		return personId2totalEmissions;
-	}
-
-	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType) {
-		List<Double> emissionType2AvgEmissionsUrbanArea = new ArrayList<Double>();
-		double totalFc = 0.0;
-		double totalNox = 0.0;
-		double totalCo2 = 0.0;
-		double totalNo2 = 0.0;
-		double totalPM = 0.0;
-
-		double populationSize = population.getPersons().size();
-
-		for(Id personId : personId2emissionsInGrammPerType.keySet()){
-			double fc =  personId2emissionsInGrammPerType.get(personId)[5];
-			double nox = personId2emissionsInGrammPerType.get(personId)[6];
-			double co2 = personId2emissionsInGrammPerType.get(personId)[7];
-			double no2 = personId2emissionsInGrammPerType.get(personId)[8];
-			double pm = personId2emissionsInGrammPerType.get(personId)[9];
-
-			totalFc = totalFc + fc;
-			totalNox = totalNox + nox;
-			totalCo2 = totalCo2 + co2;
-			totalNo2 = totalNo2 + no2;
-			totalPM = totalPM + pm;
-		}
-		emissionType2AvgEmissionsUrbanArea.add(totalFc / populationSize);
-		emissionType2AvgEmissionsUrbanArea.add(totalNox / populationSize);
-		emissionType2AvgEmissionsUrbanArea.add(totalCo2 / populationSize);
-		emissionType2AvgEmissionsUrbanArea.add(totalNo2 / populationSize);
-		emissionType2AvgEmissionsUrbanArea.add(totalPM / populationSize);
-		return emissionType2AvgEmissionsUrbanArea;
 	}
 
 	private void loadScenario() {

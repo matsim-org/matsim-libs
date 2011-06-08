@@ -32,12 +32,13 @@ import playground.fhuelsmann.emission.objects.HotValue;
 public interface AnalysisModule {
 	
 	public void calculateEmissionsPerPerson(final double travelTime, final Id personId, 
-			final double averageSpeed, final int roadType, final String fuelSizeAge,  
+			final double averageSpeed, final int roadType, //final String fuelSizeAge,  
 			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable, Map<String,HotValue> HbefaHot,ArrayList<String> listOfPollutant);
 	
 	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, 
 			final Id personId, final double averageSpeed, final int roadType, 
-			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
+			//final String fuelSizeAge,
+			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
 
 }
