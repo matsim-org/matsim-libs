@@ -76,7 +76,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				double disutilityOfWalking = 0;
 				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
-				walkingDistances.put(personId, sumOfWalkingTimes * ParkingChoiceLib.getWalkingSpeed());
+				walkingDistances.put(personId, sumOfWalkingTimes * event.getControler().getConfig().plansCalcRoute().getWalkSpeed());
 
 				disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
 

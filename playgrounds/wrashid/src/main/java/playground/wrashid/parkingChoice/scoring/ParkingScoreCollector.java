@@ -71,7 +71,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler,Parking
 
 	private void updateWalkingTime(ParkingArrivalEvent event, Id personId) {
 		Coord activityCoord=getActivityCoordinate(event.getActStartEvent().getFacilityId(), event.getActStartEvent().getLinkId());
-		double walkingTime=GeneralLib.getDistance(event.getParking().getCoord(),activityCoord)/ParkingChoiceLib.getWalkingSpeed();
+		double walkingTime=GeneralLib.getDistance(event.getParking().getCoord(),activityCoord)/controler.getConfig().plansCalcRoute().getWalkSpeed();
 		walkingTimesAtParkingArrival.put(personId, walkingTime);
 	}
 
@@ -109,7 +109,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler,Parking
 
 	private void updateWalkingTime(ParkingDepartureEvent event, Id personId) {
 		Coord activityCoord=controler.getNetwork().getLinks().get(event.getAgentDepartureEvent().getLinkId()).getCoord();
-		double walkingTime=GeneralLib.getDistance(event.getParking().getCoord(),activityCoord)/ParkingChoiceLib.getWalkingSpeed();
+		double walkingTime=GeneralLib.getDistance(event.getParking().getCoord(),activityCoord)/controler.getConfig().plansCalcRoute().getWalkSpeed();
 		walkingTimesAtParkingDeparture.put(personId, walkingTime);
 	}
 

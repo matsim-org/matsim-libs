@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -68,6 +69,7 @@ import playground.wrashid.lib.obj.list.Lists;
 public class GeneralLib {
 
 	public static String eclipseLocalTempPath = "C:/eTmp";
+	public static Controler controler;
 
 	/*
 	 * Reads the population from the plans file.
@@ -742,6 +744,18 @@ public class GeneralLib {
 			return true;
 		}
 		return false;
+	}
+	
+	public static double getWalkingTravelDuration(double distance){
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getWalkSpeed();
+	}
+	
+	public static double getPtTravelDuration(double distance){
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getPtSpeed();
+	}
+	
+	public static double getBikeTravelDuration(double distance){
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getBikeSpeed();
 	}
 
 }

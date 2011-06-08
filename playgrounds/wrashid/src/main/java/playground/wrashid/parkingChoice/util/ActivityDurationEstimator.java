@@ -12,9 +12,11 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, AgentDepartureEventHandler {
@@ -22,8 +24,9 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	private Controler controler;
 	private LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
 	private Id selectedPersonId;
-	private int indexOfActivity = 0;
-	private Double startTimeFirstAct = null;
+	//private int indexOfActivity = 0;
+	//private Double startTimeFirstAct = null;
+	private ActDurEstContainer actDurationEstimationContainer=new ActDurEstContainer();
 
 	public ActivityDurationEstimator(Controler controler, Id selectedPersonId) {
 		this.controler = controler;
@@ -44,34 +47,42 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getPersonId().equals(selectedPersonId)) {
 
-			indexOfActivity += 2;
-			Person person = controler.getPopulation().getPersons().get(event.getPersonId());
-			double estimatedActduration = getEstimatedActDuration(event,indexOfActivity,person,startTimeFirstAct);
-			activityDurationEstimations.add(estimatedActduration);
+			GeneralLib.controler=controler;
+			
+			actDurationEstimationContainer.registerNeuActivity();
+			if (actDurationEstimationContainer.isCurrentParkingTimeOver()){
+				double estimatedActduration = getEstimatedActDuration(event, controler, actDurationEstimationContainer);
+				activityDurationEstimations.add(estimatedActduration);
+			}
 		}
 	}
 
-	public static double getEstimatedActDuration(ActivityStartEvent event, int indexOfActivity, Person person, double startTimeOfFirstAct) {
-		Plan selectedPlan = person.getSelectedPlan();
-
+	public static double getEstimatedActDuration(ActivityStartEvent event, Controler controler,
+			ActDurEstContainer actDurationEstimationContainer) {
 		
+		Plan selectedPlan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 
 		List<PlanElement> planElement = selectedPlan.getPlanElements();
 
+		int indexOfActivity=actDurationEstimationContainer.indexOfCurrentActivity;
+		double startTimeOfFirstAct=actDurationEstimationContainer.startTimeOfFirstAct;
 		if (isLastAct(indexOfActivity, planElement)) {
+			
 			return GeneralLib.getIntervalDuration(event.getTime(), startTimeOfFirstAct);
 		}
 
 		int indexOfFirstCarLegAfterCurrentAct = getIndexOfFirstCarLegAfterCurrentAct(indexOfActivity, planElement);
 
+		actDurationEstimationContainer.skipAllPlanElementsTillIndex=indexOfFirstCarLegAfterCurrentAct;
+		
 		double estimatedActduration = 0;
 
-		for (int i = indexOfActivity; i < indexOfFirstCarLegAfterCurrentAct; i ++) {
+		for (int i = indexOfActivity; i < indexOfFirstCarLegAfterCurrentAct; i++) {
 			if (planElement.get(i) instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) planElement.get(i);
 				double endTime = act.getEndTime();
 				double maximumDuration = act.getMaximumDuration();
-				if (endTime!=Double.NEGATIVE_INFINITY){
+				if (endTime != Double.NEGATIVE_INFINITY) {
 					estimatedActduration += GeneralLib.getIntervalDuration(event.getTime(), endTime);
 				} else {
 					estimatedActduration += maximumDuration;
@@ -79,8 +90,21 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 			} else {
 				// TODO: estimate travel time according to mode of travel...
 				Leg leg = (Leg) planElement.get(i);
-				double travelTime = leg.getTravelTime();
-				estimatedActduration+=travelTime;
+				ActivityImpl prevAct = (ActivityImpl) planElement.get(i - 1);
+				ActivityImpl nextAct = (ActivityImpl) planElement.get(i + 1);
+				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
+				PlansCalcRouteConfigGroup plansCalcRoute = controler.getConfig().plansCalcRoute();
+				if (leg.getMode().equalsIgnoreCase("walk")) {
+					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance);
+				} else if (leg.getMode().equalsIgnoreCase("bike")) {
+					estimatedActduration += GeneralLib.getBikeTravelDuration(distance);
+				} else if (leg.getMode().equalsIgnoreCase("pt")) {
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+				} else {
+					// estimatedActduration +=
+					// distance/plansCalcRoute.getUndefinedModeSpeed();
+					DebugLib.stopSystemAndReportInconsistency("handle mode:" + leg.getMode());
+				}
 			}
 
 		}
@@ -108,8 +132,8 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getPersonId().equals(selectedPersonId)) {
-			if (startTimeFirstAct == null) {
-				startTimeFirstAct = event.getTime();
+			if (actDurationEstimationContainer.startTimeOfFirstAct == null) {
+				actDurationEstimationContainer.startTimeOfFirstAct = event.getTime();
 			}
 		}
 	}
