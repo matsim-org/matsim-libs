@@ -37,6 +37,7 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 	
 		for(Entry<String,Map<Integer,Map<Integer,HbefaColdObject>>> component : hbefaColdTable.getHbefaColdTable().entrySet()){
 			
+			
 			double coldEfOtherAct = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(dis).get(time).getColdEF();	
 			
 			if(this.coldEmissionsPerson.get(personId) == null){
@@ -46,14 +47,22 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 		
 			if (!this.coldEmissionsPerson.get(personId).containsKey(component.getKey())) {
 			
-					double coldEfNight=0.0;		
-					if(!personId.toString().contains("gv_")){ 
+					double coldEfNight=0.0;	
+					
+					if(personId.toString().contains("pv_pt_")){ 
+						coldEfOtherAct =0.0;}
+				
+					
+					if(!personId.toString().contains("gv_")&& !personId.toString().contains("pv_pt_")){ 
 					coldEfNight = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(initDis).get(nightTime).getColdEF();}
 					
 				this.coldEmissionsPerson.get(personId).put(component.getKey(), coldEfNight + coldEfOtherAct );
 			
 			}else if(this.coldEmissionsPerson.get(personId).containsKey(component.getKey())){
-					
+			
+				if(personId.toString().contains("pv_pt_")){
+					coldEfOtherAct =0.0;}
+			
 					double oldValue = this.coldEmissionsPerson.get(personId).get(component.getKey());
 					this.coldEmissionsPerson.get(personId).put(component.getKey(),oldValue+coldEfOtherAct );
 					
