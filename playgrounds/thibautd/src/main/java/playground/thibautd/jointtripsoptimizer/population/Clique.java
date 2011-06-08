@@ -48,9 +48,9 @@ public class Clique implements Person {
 		Logger.getLogger(Clique.class);
 
 	// private fields
-	private Id id;
-	private HashMap<Id,Person> members;
-	private ArrayList<JointPlan> plans;
+	private final Id id;
+	private final Map<Id,Person> members;
+	private final List<JointPlan> plans;
 	private JointPlan selectedPlan;
 
 	/*
@@ -58,11 +58,18 @@ public class Clique implements Person {
 	 * constructors
 	 * =========================================================================
 	 */
-	public Clique(Id id) {
-		this.members = new HashMap<Id,Person>();
+	/**
+	 * @deprecated
+	 */
+	public Clique(final Id id) {
+		this(id, new HashMap<Id, Person>());
+	}
+
+	public Clique(final Id id, final Map<Id, Person> members) {
+		this.members = members;
 		this.plans = new ArrayList<JointPlan>();
 		this.selectedPlan = null;
-		this.setId(id);
+		this.id = id;
 	}
 
 	/*
@@ -71,7 +78,7 @@ public class Clique implements Person {
 	 * =========================================================================
 	 */
 	/**
-	 * @return the<i>joint</i> plans of the clique.
+	 * @return the <i>joint</i> plans of the clique.
 	 */
 	@Override
 	public List<? extends Plan> getPlans() {
@@ -81,11 +88,23 @@ public class Clique implements Person {
 		return this.plans;
 	}
 
+	/**
+	 * Unimplemented method: changing id after initialisation may lead to inconsistencies.
+	 *
+	 * @deprecated
+	 * @throws UnsupportedOperationException
+	 */
 	@Override
 	public void setId(Id id) {
-		this.id = id;
+		//this.id = id;
+		throw new UnsupportedOperationException("cannot change clique id");
 	}
 
+	/**
+	 * Currently unimplemented.
+	 * @deprecated
+	 * @throws UnsupportedOperationException
+	 */
 	@Override
 	public boolean addPlan(Plan p) {
 		//cast to joint plan
@@ -180,15 +199,26 @@ public class Clique implements Person {
 		return this.members;
 	}
 
-	public void addMember(Person p) {
+	/**
+	 * This should be moved in the constructor some day.
+	 * Currently used to initialize clique.
+	 * @deprecated
+	 */
+	public void addMember(final Person p) {
 		this.members.put(p.getId(),p);
 	}
 
 	/**
+	 * Unimplemented, as it would break the consistency between clique and JointPlan.
+	 *
+	 * May, or not, be implemented in the future to allow dynamic cliques.
+	 *
+	 * @deprecated
+	 * @throws UnsupportedOperationException
 	 */
-	public void removeMember(Person p) {
-		//TODO: check if person belongs to clique and log error/throw an exception if not
-		this.members.remove(p.getId());
+	public void removeMember(final Person p) {
+		throw new UnsupportedOperationException("currently impossible to remove"+
+				" a member from a clique");
 	}
 
 	public boolean removePlan(final Plan plan) {
