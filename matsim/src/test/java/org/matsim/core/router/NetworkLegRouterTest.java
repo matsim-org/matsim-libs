@@ -37,10 +37,16 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -64,6 +70,57 @@ public class NetworkLegRouterTest {
 		Assert.assertEquals(100.0, tt, 1e-8);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+	}
+
+	@Test
+	public void testRouteLegWithDistance() {
+		Fixture f = new Fixture();
+
+		Person person = new PersonImpl(new IdImpl(1));
+		Leg leg = new LegImpl(TransportMode.car);
+		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
+		((ActivityImpl) fromAct).setLinkId(f.s.createId("1"));
+		Activity toAct = new ActivityImpl("h", new CoordImpl(0, 3000));
+		((ActivityImpl) toAct).setLinkId(f.s.createId("3"));
+		
+		NetworkFactoryImpl routeFactory = ((NetworkImpl) f.s.getNetwork()).getFactory();
+
+		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl()  ;
+		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()) ;
+
+		{
+			TravelCost costObject = new TravelTimeDistanceCostCalculator(timeObject, f.s.getConfig().planCalcScore() ) ;
+
+			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
+
+			NetworkLegRouter router = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory) ;
+
+			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+			Assert.assertEquals(100.0, tt, 1e-8);
+			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
+			Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+
+			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
+			Assert.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
+		}
+		// and now with a monetary distance rate different from zero:
+		
+		{
+			f.s.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(1.) ;
+			TravelCost costObject = new TravelTimeDistanceCostCalculator(timeObject, f.s.getConfig().planCalcScore() ) ;
+
+			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
+
+			NetworkLegRouter router = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory) ;
+
+			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+			Assert.assertEquals(100.0, tt, 1e-8);
+			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
+			Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+
+			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
+			Assert.assertEquals(1000.3333333333, route.getTravelCost(), 1e-8 ) ;
+		}
 	}
 
 	private static class Fixture {
