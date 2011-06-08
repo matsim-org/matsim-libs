@@ -33,9 +33,6 @@ import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.StockRandomGenerator;
-import org.jgap.impl.ThresholdSelector;
-import org.jgap.impl.TournamentSelector;
-import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.Id;
@@ -44,7 +41,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
@@ -52,28 +48,16 @@ import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.CrossOverRateCalculator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPEnhancedSpx;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPInPlaceMutation;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPSpx;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.RestrictedTournamentSelector;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuAndEvolutionMonitor;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuBestFitnessSelector;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuMonitor;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.TabuRestrictedTournamentSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
- * JGAP configuration object for the joint replanning algorithm.
+ * JGAP {@link Configuration} object for the joint replanning algorithm.
  *
- * @todo improve substantially:
- *   - correct the number of "toggle" chromosomes
- *   - include a "engagement/desengagement" functionality
- *   - make possible the joint trips where several passengers have different O/D
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPConfiguration extends Configuration {

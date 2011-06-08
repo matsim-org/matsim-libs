@@ -34,7 +34,13 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
- * TODO: implement
+ * Defines a "clique" agregating several agents.
+ *
+ * The "clique", in the context of the joint plan optimisation,
+ * represents a group of agents which plans are interdependant.
+ *
+ * It constitutes the level at which strategies are processed.
+ *
  * @author thibautd
  */
 public class Clique implements Person {
@@ -179,7 +185,6 @@ public class Clique implements Person {
 	}
 
 	/**
-	 * Not pertinent for households, but here for completeness.
 	 */
 	public void removeMember(Person p) {
 		//TODO: check if person belongs to clique and log error/throw an exception if not

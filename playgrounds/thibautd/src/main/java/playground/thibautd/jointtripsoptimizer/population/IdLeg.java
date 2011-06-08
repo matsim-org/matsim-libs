@@ -36,10 +36,6 @@ public class IdLeg implements Id {
 		this.id = idValue;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @see Comparable#compareTo(Id)
-	 */
 	public int compareTo(Id arg) {
 		try {
 			return (int) (this.id - ((IdLeg) arg).id);

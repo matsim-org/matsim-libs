@@ -35,10 +35,6 @@ public class IdActivity implements Id {
 		this.id = idValue;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @see Comparable#compareTo(Id)
-	 */
 	public int compareTo(Id arg) {
 		try {
 			return (int) (this.id - ((IdActivity) arg).id);

@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.scoring;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -29,13 +28,12 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scoring.EventsToScore;
 
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
 
 /**
- * Same as {@link import org.matsim.core.controler.corelisteners.PlansScoring},
+ * Same as {@link org.matsim.core.controler.corelisteners.PlansScoring},
  * but using a JointEventsToScore instance instead of a {@link org.matsim.core.scoring.EventsToScore}
  * one.
  *

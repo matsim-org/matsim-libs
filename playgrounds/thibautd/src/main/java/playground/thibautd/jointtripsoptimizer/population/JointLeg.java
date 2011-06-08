@@ -34,11 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author thibautd
@@ -253,7 +249,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	/**
 	 * {@inheritDoc}
-	 * @see JointActing#setLinkedElementsById(List<Id>)
+	 * @see JointActing#setLinkedElementsById(List) JointActing.setLinkedElementsById(List<Id>)
 	 */
 	@Override
 	public void setLinkedElementsById(final List<? extends Id> linkedElements) {
@@ -270,7 +266,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	/**
 	 * {@inheritDoc}
-	 * @see JointActing#addLinkedElementsById(List<Id>)
+	 * @see JointActing#addLinkedElementById(Id) JointActing.addLinkedElementById(Id)
 	 */
 	@Override
 	public void addLinkedElementById(final Id linkedId) {
@@ -284,7 +280,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	/**
 	 * {@inheritDoc}
-	 * @see JointActing#getLinkedElementsIds()
+	 * @see JointActing#getLinkedElementsIds() JointActing.getLinkedElementsIds()
 	 */
 	@Override
 	public List<IdLeg> getLinkedElementsIds() {

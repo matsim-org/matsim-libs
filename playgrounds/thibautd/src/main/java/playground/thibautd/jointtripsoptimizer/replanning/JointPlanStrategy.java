@@ -26,14 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFunctionFactory;
 
 /**
  * PlanStrategy aimed at manipulating joint plans and cliques.
@@ -43,7 +39,7 @@ import playground.thibautd.jointtripsoptimizer.scoring.HomogeneousJointScoringFu
  * To implement a strategy, subclass this class and load modules in the
  * constructor. Then, define the resulting strategy as a module in the
  * config file.
- * This is a workaround, as the {@link StrategyManagerConfigLoader} creates
+ * This is a workaround, as the {@link org.matsim.core.replanning.StrategyManagerConfigLoader} creates
  * PlanStrategyImpl instances, which do not work with cliques.
  *
  * @author thibautd

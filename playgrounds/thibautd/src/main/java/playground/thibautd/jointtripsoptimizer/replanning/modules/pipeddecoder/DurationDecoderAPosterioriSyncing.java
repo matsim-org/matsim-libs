@@ -102,7 +102,7 @@ public class DurationDecoderAPosterioriSyncing implements JointPlanOptimizerDime
 	private final int nMembers;
 
 	/**
-	 * initializes a decoder, which can be used on any modification of {@param plan}.
+	 * initializes a decoder, which can be used on any modification of the parameter plan.
 	 * This constructor initializes the relation between activities and genes.
 	 */
 	public DurationDecoderAPosterioriSyncing(

@@ -40,7 +40,6 @@ public class AgentEventWrapper implements AgentEvent, LinkEvent {
 	}
 
 	/**
-	 * @return
 	 * @see org.matsim.core.api.experimental.events.PersonEvent#getPersonId()
 	 */
 	public Id getPersonId() {
@@ -48,7 +47,6 @@ public class AgentEventWrapper implements AgentEvent, LinkEvent {
 	}
 
 	/**
-	 * @return
 	 * @see org.matsim.core.api.experimental.events.AgentEvent#getLinkId()
 	 */
 	public Id getLinkId() {
@@ -56,7 +54,6 @@ public class AgentEventWrapper implements AgentEvent, LinkEvent {
 	}
 
 	/**
-	 * @return
 	 * @see org.matsim.core.api.experimental.events.AgentEvent#getLegMode()
 	 */
 	public String getLegMode() {
@@ -64,7 +61,6 @@ public class AgentEventWrapper implements AgentEvent, LinkEvent {
 	}
 
 	/**
-	 * @return
 	 * @see org.matsim.core.api.experimental.events.Event#getTime()
 	 */
 	public double getTime() {
@@ -72,7 +68,6 @@ public class AgentEventWrapper implements AgentEvent, LinkEvent {
 	}
 
 	/**
-	 * @return
 	 * @see org.matsim.core.api.experimental.events.Event#getAttributes()
 	 */
 	public Map<String, String> getAttributes() {

@@ -327,7 +327,8 @@ public class JointPlan implements Plan {
 
 	/**
 	 * Returns the global score as the sum of the individual scores.
-	 * @todo in the future, this should include the usage of weights or
+	 *
+	 * TODO in the future, this should include the usage of weights or
 	 * the call to an external function.
 	 */
 	@Override

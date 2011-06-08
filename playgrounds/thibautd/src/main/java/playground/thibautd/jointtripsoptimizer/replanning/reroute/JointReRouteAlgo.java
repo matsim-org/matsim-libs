@@ -27,7 +27,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 
 /**
- * Similar to the {@link ReRoute} algorithm, on all plans of a joint plan.
+ * Similar to the {@link org.matsim.core.replanning.modules.ReRoute} algorithm, on all plans of a joint plan.
  *
  * Execution of the ReRoute on a JointPlan fails, as a strict act/leg
  * alternance is expected (which is not the case between the individual 

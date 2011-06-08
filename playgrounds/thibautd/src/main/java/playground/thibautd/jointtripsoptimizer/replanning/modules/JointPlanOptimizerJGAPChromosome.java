@@ -172,10 +172,9 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	}
 
 	/**
-	 * Copied from Chromosome.randomInitialChromosome, but just returning a JointPlanOptimizerJGAPChromosome instance rather than a org.jgap.Chromosome instance
+	 * Copied from Chromosome.randomInitialChromosome, but just returning a {@link JointPlanOptimizerJGAPChromosome} instance rather than a {@link org.jgap.Chromosome} instance
 	 *
-	 * @param a_configuration
-	 * @return
+	 * @return a new instance, with random gene values
 	 * @throws InvalidConfigurationException
 	 */
 	public IChromosome randomInitialJointPlanOptimizerJGAPChromosome()
