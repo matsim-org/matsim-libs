@@ -64,7 +64,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private String outputFileName = "optimizedConf.xml";
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 1;
+	private final static int N_PLANS = 20;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {

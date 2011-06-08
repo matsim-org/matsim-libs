@@ -98,8 +98,8 @@ public class JPOForOptimization {
 			gaPopulation.evolve(configGroup.getMaxIterations());
 		}
 
-		log.debug("best fitness: "+gaPopulation.getFittestChromosome().getFitnessValue());
-		log.debug("clique size: "+plan.getClique().getMembers().size());
+		//log.debug("best fitness: "+gaPopulation.getFittestChromosome().getFitnessValue());
+		//log.debug("clique size: "+plan.getClique().getMembers().size());
 		return gaPopulation.getFittestChromosome().getFitnessValue() /
 			plan.getClique().getMembers().size();
 	}
