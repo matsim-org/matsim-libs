@@ -48,7 +48,7 @@ public class RunAgentMating {
 	private static final Logger log =
 		Logger.getLogger(RunAgentMating.class);
 
-	private static final double ACCEPTABLE_DISTANCE = 3000d;
+	private static final double ACCEPTABLE_DISTANCE = 5000d;
 
 	/**
 	 * usage: RunAgentMating pop net out
