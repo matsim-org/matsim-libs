@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 public class ParkingModuleTest extends TestCase {
 
 	public void testBaseCase(){
-		assertEquals(3489, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),1.0);
+		assertEquals(3155, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),1.0);
 	}
 	
 	public void testHigherParkingCapacityMakesWalkingDistanceShorter(){

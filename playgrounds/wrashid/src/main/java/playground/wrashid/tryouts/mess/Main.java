@@ -10,20 +10,23 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.GeneralLib;
 
 public class Main {
 
 	public static void main(String[] args) {
-		
-			double[] value = new double[100];
-			Random generator = new Random();
-			for (int i = 1; i < 100; i++) {
-				value[i] = generator.nextDouble();
-			}
-			GeneralLib.generateHistogram("c:/tmp/abc.png", value, 10, "histo", "number", "value");
+		QuadTree<Integer> quadTree = new QuadTree<Integer>(0, 0, 9000, 9000);
 
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				quadTree.put(i * 1000 + 500, j * 1000 + 500, 1);
+			}
+		}
+
+		quadTree.put(8500.0, 9000, 1);
+		
 	}
-	
+
 }

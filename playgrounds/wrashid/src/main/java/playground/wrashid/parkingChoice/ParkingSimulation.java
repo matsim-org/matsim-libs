@@ -21,6 +21,7 @@ import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
+import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 
 public class ParkingSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler {
@@ -80,7 +81,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			
 			// TODO: this selection should happen according to best parking available for the
 			// given activity location (not only according to the best walking distance).
-			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord());
+			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord(),new ActInfo(event.getFacilityId(),event.getActType()));
 			parkingManager.parkVehicle(personId, selectedParking);
 			lastParkingUsed.put(personId, selectedParking);
 			

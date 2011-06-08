@@ -6,13 +6,16 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class PrivateParking extends Parking {
 
-	public PrivateParking(Coord coord) {
+	public PrivateParking(Coord coord, ActInfo actInfo) {
 		super(coord);
-		// TODO Auto-generated constructor stub
+		this.belongsToAct=actInfo;
 	}
 
-	ActivityFacility activityFacility=null;
 	ActInfo belongsToAct=null;
+	
+	public ActInfo getCorrespondingActInfo(){
+		return belongsToAct;
+	}
 	
 	
 }

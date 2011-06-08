@@ -5,6 +5,6 @@ import org.matsim.api.core.v01.population.Person;
 
 public interface ReservedParkingManager {
 
-	boolean considerForChoiceSet(ReservedParking reservedParking, Person person, double OPTIONALtimeOfDayInSeconds, Activity targetActivity);
+	boolean considerForChoiceSet(ReservedParking reservedParking, Person person, double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo);
 	
 }

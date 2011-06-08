@@ -23,6 +23,7 @@ import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 
@@ -64,10 +65,10 @@ public class ParkingManager implements StartupListener {
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 	}
 	
-	public Parking getParkingWithShortestWalkingDistance(Coord destCoord){
+	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo){
 		double minDistanceOfSearchSpaceInMeters=1000; //TODO: needs also be set from configuration file (we can't narrow too much our search).
 		
-		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), null, 0, null);
+		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), null, 0, targetActInfo);
 		
 		return getParkingWithShortestWalkingDistance(destCoord,parkingsInSurroundings);
 	}
@@ -88,20 +89,20 @@ public class ParkingManager implements StartupListener {
 	}
 	
 	
-	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Person person, double OPTIONALtimeOfDayInSeconds, Activity OPTIONALtargetActivity){
+	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Person person, double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo){
 		double maxWalkingDistanceSearchSpaceInMeters=20000; //TODO: add this parameter in the configuration file
 		
 		
 		Collection<Parking> collection = parkings.get(coord.getX() , coord.getY(), minSearchDistance);
 		
-		Collection<Parking> resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, OPTIONALtargetActivity,
+		Collection<Parking> resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, targetActInfo,
 				collection);
 		
 		// widen search space, if no parking found
 		while (resultCollection.size()==0){
 			minSearchDistance*=2;
 			collection = parkings.get(coord.getX() , coord.getY(), minSearchDistance);
-			resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, OPTIONALtargetActivity,
+			resultCollection = filterReservedAndFullParkings(person, OPTIONALtimeOfDayInSeconds, targetActInfo,
 					collection);
 			
 			if (minSearchDistance>maxWalkingDistanceSearchSpaceInMeters){
@@ -113,7 +114,7 @@ public class ParkingManager implements StartupListener {
 	}
 
 	private Collection<Parking> filterReservedAndFullParkings(Person person, double OPTIONALtimeOfDayInSeconds,
-			Activity OPTIONALtargetActivity, Collection<Parking> collection) {
+			ActInfo targetActInfo, Collection<Parking> collection) {
 		Collection<Parking> resultCollection=new LinkedList<Parking>();
 		
 		for (Parking parking:collection){
@@ -129,7 +130,12 @@ public class ParkingManager implements StartupListener {
 				
 				ReservedParking reservedParking=(ReservedParking) parking;
 				
-				if (reservedParkingManager.considerForChoiceSet(reservedParking, person, OPTIONALtimeOfDayInSeconds, OPTIONALtargetActivity)){
+				if (reservedParkingManager.considerForChoiceSet(reservedParking, person, OPTIONALtimeOfDayInSeconds, targetActInfo)){
+					resultCollection.add(parking);
+				}
+			} else if (parking instanceof PrivateParking){
+				PrivateParking privateParking=(PrivateParking) parking;
+				if (privateParking.getCorrespondingActInfo().getFacilityId().equals(targetActInfo.getFacilityId()) && privateParking.getCorrespondingActInfo().getActType().equals(targetActInfo.getActType())){
 					resultCollection.add(parking);
 				}
 			} else {
@@ -171,7 +177,7 @@ public class ParkingManager implements StartupListener {
 			}
 		}
 		
-		parkings=new QuadTree<Parking>(minX,minY, maxX, maxY);
+		parkings=new QuadTree<Parking>(minX,minY, maxX+1.0, maxY+1.0);
 	}
 
 	@Override
@@ -191,7 +197,7 @@ public class ParkingManager implements StartupListener {
 			Coord activityCoord = activityFacility.getCoord();
 		
 			// park car
-			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person, 0, null);
+			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord, ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person, 0, lastActivityInfo);
 			
 			// score parkings (only according to distance)
 			for (Parking parking:parkingsInSurroundings){
