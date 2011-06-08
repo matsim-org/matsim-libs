@@ -35,8 +35,16 @@ public interface NetworkRoute extends RouteWRefs {
 
 	public void setLinkIds(final Id startLinkId, final List<Id> linkIds, final Id endLinkId);
 
+	/**Design thoughts:<ul>
+	 * <li> It this general cost or monetary cost?  kai/benjamin, jun'11
+	 * </ul>
+	 */
 	public void setTravelCost(final double travelCost);
 
+	/**Design thoughts:<ul>
+	 * <li> It this general cost or monetary cost?  kai/benjamin, jun'11
+	 * </ul>
+	 */
 	public double getTravelCost();
 
 	/**
