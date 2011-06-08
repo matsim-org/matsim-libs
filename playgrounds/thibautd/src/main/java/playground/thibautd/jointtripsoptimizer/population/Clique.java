@@ -221,7 +221,7 @@ public class Clique implements Person {
 			
 			for (Person member : this.getMembers().values()) {
 				if (member.getPlans().size()>1) {
-					log.warn("only keeping the selected plan for agent "+member+" with multiple plans");
+					log.warn("only keeping the selected plan for agent "+member.getId()+" with multiple plans");
 					currentPlan = (PlanImpl) member.getSelectedPlan();
 				} else {
 					currentPlan = (PlanImpl) member.getPlans().get(0);

@@ -42,6 +42,7 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	//private List<Person> participants = null;
 	//private Map<Id, JointActivity> linkedActivities = new HashMap<Id, JointActivity>();
 	private Person person;
+	private final String initialType;
 
 	/*
 	 * =========================================================================
@@ -51,34 +52,41 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	public JointActivity(final String type, final Id linkId, final Person person) {
 		super(type, linkId);
 		this.person = person;
+		this.initialType = type;
 	}
 
 	public JointActivity(final String type, final Coord coord, final Person person) {
 		super(type, coord);
 		this.person = person;
+		this.initialType = type;
 	}
 
 	public JointActivity(final String type, final Coord coord, final Id linkId, final Person person) {
 		super(type, coord, linkId);
 		this.person = person;
+		this.initialType = type;
 	}
 
 	public JointActivity(final ActivityImpl act, final Person person) {
 		super(act);
 		this.person = person;
+		this.initialType = act.getType();
 	}
 
 	public JointActivity(final JointActivity act) {
 		super((ActivityImpl) act);
 		constructFromJointActivity(act);
+		this.initialType = act.getInitialType();
 	}
 
 	public JointActivity(Activity act, Person pers) {
 		super((ActivityImpl) act);
 		if (act instanceof JointActivity) {
 			constructFromJointActivity((JointActivity) act);
-		} else if (act instanceof ActivityImpl) {
+			this.initialType = ((JointActivity) act).getInitialType();
+		} else {
 			this.person = pers;
+			this.initialType = act.getType();
 		} 
 	}
 
@@ -147,6 +155,13 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	@Deprecated
 	protected Activity getDelegate() {
 		return (ActivityImpl) this;
+	}
+
+	/**
+	 * Useful for Pick ups, which initial type "encode" the links between them.
+	 */
+	public String getInitialType() {
+		return this.initialType;
 	}
 
 }

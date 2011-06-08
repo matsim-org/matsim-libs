@@ -26,6 +26,7 @@ import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
@@ -35,6 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
+import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.JointPlansReplanning;
 import playground.thibautd.jointtripsoptimizer.replanning.JointStrategyManager;
@@ -161,4 +163,15 @@ public class JointControler extends Controler {
 		return router;
 	}
 
+	/**
+	 * Exports plans in an importable format
+	 */
+	@Override
+	protected void shutdown(final boolean unexpected) {
+		super.shutdown(unexpected);
+		PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
+		popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
+		//TODO: write
+		popWriter.write(this.getControlerIO().getOutputFilename(FILENAME_POPULATION));
+	}
 }
