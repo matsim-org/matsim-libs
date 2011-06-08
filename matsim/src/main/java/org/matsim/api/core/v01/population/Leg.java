@@ -38,8 +38,20 @@ public interface Leg extends PlanElement {
 
 	public void setDepartureTime(final double seconds);
 
+	/**Design thoughts:<ul>
+	 * <li>There is also a get/set(Expected)TravelTime in the route.  One of these should go.  Given that there is also an
+	 * get/set(Expected)Distance in the Route, but not in the leg, it is maybe more pragmatic to remove it from the leg?
+	 * kai/benjamin, jun'11
+	 * </ul>
+	 */
 	public double getTravelTime();
 
+	/**Design thoughts:<ul>
+	 * <li>There is also a get/set(Expected)TravelTime in the route.  One of these should go.  Given that there is also an
+	 * get/set(Expected)Distance in the Route, but not in the leg, it is maybe more pragmatic to remove it from the leg?
+	 * kai/benjamin, jun'11
+	 * </ul>
+	 */
 	public void setTravelTime(final double seconds);
 
 }
