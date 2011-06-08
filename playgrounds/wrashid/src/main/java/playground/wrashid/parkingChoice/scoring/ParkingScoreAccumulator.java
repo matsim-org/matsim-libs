@@ -15,7 +15,9 @@ import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
@@ -29,7 +31,7 @@ import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 
-public class ParkingScoreAccumulator implements ScoringListener {
+public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	private final ParkingScoreCollector parkingScoreCollector;
 
@@ -40,7 +42,7 @@ public class ParkingScoreAccumulator implements ScoringListener {
 	}
 
 	@Override
-	public void notifyScoring(ScoringEvent event) {
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		HashMap<Id, Double> walkingDistances = new HashMap<Id, Double>();
 		parkingScoreCollector.finishHandling();
 
@@ -87,7 +89,7 @@ public class ParkingScoreAccumulator implements ScoringListener {
 		writeWalkingDistanceStatisticsGraph(controler, walkingDistances);
 		printWalkingDistanceHistogramm(controler, walkingDistances);
 		
-		eventsToScore.finish();
+		//eventsToScore.finish();
 	}
 
 	private void printWalkingDistanceHistogramm(Controler controler, HashMap<Id, Double> walkingDistance){
@@ -103,5 +105,7 @@ public class ParkingScoreAccumulator implements ScoringListener {
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceOverIterations.png");
 		parkingWalkingDistanceGraph.writeGraphic(fileName);
 	}
+
+	
 
 }
