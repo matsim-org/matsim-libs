@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -65,11 +66,14 @@ public class RouteChoiceCostcalculatorTest {
 		double distanceTravelTime = spDistance.getTree().get( destination.getId() ).getTime();
 		double distanceTravelCost = spDistance.getTree().get( destination.getId() ).getCost();
 		printResults(distanceTravelTime, distanceTravelCost, "Results based on Travel Distance", spDistance, destination );
+		Assert.assertEquals(1000.,distanceTravelTime,1.e-8) ;
+		Assert.assertEquals( 100.,distanceTravelCost,1.e-8) ;
 		
 		double timeTravelTime = spTime.getTree().get( destination.getId() ).getTime();
 		double timeTravelCost = spTime.getTree().get( destination.getId() ).getCost();
 		printResults(timeTravelTime, timeTravelCost, "Results based on Travel Times", spTime, destination);
-		
+		Assert.assertEquals(100.,timeTravelTime,1.e-8) ;
+		Assert.assertEquals(100.,timeTravelCost,1.e-8) ;
 	}
 	
 	private void printResults(double tt, double tc, String costType, SpanningTree st, Node destination){
