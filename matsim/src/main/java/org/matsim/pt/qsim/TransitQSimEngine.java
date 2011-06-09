@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
@@ -46,8 +45,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -215,8 +214,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 //	}
 	// this method is not used anywhere.  kai, nov'10
 
-	private void handleAgentPTDeparture(final PlanAgent planAgent, Id linkId, Leg leg) {
+	private void handleAgentPTDeparture(final PlanAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.
+		Leg leg = planAgent.getCurrentLeg() ;
+		
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + planAgent.getId().toString());
 			log.info("route: "
@@ -250,9 +251,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 
 	@Override
-	public boolean handleDeparture(double now, PlanAgent agent, Id linkId, Leg leg) {
-		if (leg.getMode().equals(TransportMode.pt)) {
-			handleAgentPTDeparture(agent, linkId, leg);
+	public boolean handleDeparture(double now, PlanAgent agent, Id linkId) {
+		if (agent.getMode().equals(TransportMode.pt)) {
+			handleAgentPTDeparture(agent, linkId);
 			return true ;
 		}
 		return false ;

@@ -1,22 +1,22 @@
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 
 public class MyPlanStrategyModule implements PlanStrategyModule,
 ActivityEndEventHandler // this is just there as an example
 {
 	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
-	ScenarioImpl sc;
-	NetworkImpl net;
+	Scenario sc;
+	Network net;
 	Population pop;
 
 	public MyPlanStrategyModule(Controler controler) {

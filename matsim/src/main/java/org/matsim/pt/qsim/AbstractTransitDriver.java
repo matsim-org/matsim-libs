@@ -25,7 +25,6 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -310,8 +309,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 //	/**
 //	 * for junit tests in same package
 //	 */
-//	abstract public Leg getCurrentLeg() ;
-	// yyyyyy reduce visibility!
+//	abstract /*package*/ Leg getCurrentLeg() ;
+	// yyyyyy reduce visibility of derived methods!
 
 
 	/**

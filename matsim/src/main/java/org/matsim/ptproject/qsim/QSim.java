@@ -50,7 +50,6 @@ import org.matsim.core.mobsim.framework.Initializable;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.PlanDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -645,7 +644,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		String mode = leg.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode ));
-		if (handleKnownLegModeDeparture(now, agent, linkId, leg)) {
+		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
 		} else {
 			handleUnknownLegMode(now, agent);
@@ -658,9 +657,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, planAgent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PlanAgent planAgent, final Id linkId, final Leg leg) {
+	private boolean handleKnownLegModeDeparture(final double now, final PlanAgent planAgent, final Id linkId) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, planAgent, linkId, leg)) {
+			if (departureHandler.handleDeparture(now, planAgent, linkId)) {
 				return true;
 			}
 			// The code is not (yet?) very beautiful.  But structurally, this goes through all departure handlers and tries to

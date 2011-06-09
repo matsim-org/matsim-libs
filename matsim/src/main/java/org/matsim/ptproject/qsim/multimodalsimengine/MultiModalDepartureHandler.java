@@ -25,11 +25,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.PlanDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
@@ -51,11 +49,11 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 	}
 	
 	@Override
-	public boolean handleDeparture(double now, PlanAgent personAgent, Id linkId, Leg leg) {
+	public boolean handleDeparture(double now, PlanAgent personAgent, Id linkId) {
 
-		if (handledModes.contains(leg.getMode())) {
+		if (handledModes.contains(personAgent.getMode())) {
 			if (personAgent instanceof PlanDriverAgent) {
-				handleMultiModalDeparture(now, (PlanDriverAgent)personAgent, linkId, leg);
+				handleMultiModalDeparture(now, (PlanDriverAgent)personAgent, linkId);
 				return true;
 			} else {
 				throw new UnsupportedOperationException("PersonAgent is not from type PersonDriverAgent - cannot handle departure. Found PersonAgent class is " + personAgent.getClass().toString());
@@ -65,12 +63,13 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		return false;
 	}
 	
-	private void handleMultiModalDeparture(double now, PlanDriverAgent personAgent, Id linkId, Leg leg) {
+	private void handleMultiModalDeparture(double now, PlanDriverAgent personAgent, Id linkId) {
 		
-		Route route = leg.getRoute();
+//		Route route = leg.getRoute();
 		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(qSim.getNetsimNetwork().getNetsimLink(linkId));
 		
-		if ((route.getEndLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
+//		if ((route.getEndLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
+		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndAssumeControl(now);
 		} else {
 			extension.addDepartingAgent(personAgent, now);

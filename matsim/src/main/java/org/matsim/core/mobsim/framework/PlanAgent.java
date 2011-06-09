@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -117,10 +116,19 @@ public interface PlanAgent extends NetworkAgent, Identifiable, Initializable {
 	
 	public PlanElement getNextPlanElement() ;
 
-	/**
-	 * @return "(Leg) getCurrentPlanElement()" if the current plan element is a leg, otherwise null.
+	/**Design thoughts:<ul>
+	 * <li>I am trying to remove all access to plans in the innermost mobsim logic, since this stands in the way of within-day
+	 * replanning: The mobsim should just ask what to do at every plan.  The _agent_ can then decide if it feeds the answers
+	 * from a plan, or from elsewhere. kai, jun'11
+	 * <li>This is slightly harder to do for pt than for car.  Also, pt is really more marcel's domain than mine. kai, jun'11
+	 * <li>Finally, the situation is not so bad for pt passengers, since the only additional info that the pt leg contains
+	 * is the stop where to get off. kai, jun'11
+	 * <li>pt drivers also use the pt leg and from this the full network route, but I think this is only used for testing and
+	 * can thus be fixed by other means.  kai, jun'11
+	 * <li>This method _may_ return the Leg also for non-pt-travellers.  This should not be used. kai, jun'11
+	 * </ul>
+	 * @return "(Leg) getCurrentPlanElement()" if the current plan element is a leg, otherwise undefined.
 	 */
-	@Deprecated // try to use getCurrentPlanElement()
 	public Leg getCurrentLeg();
 	
 	/**
