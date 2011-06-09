@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -53,13 +55,16 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  * @author thibautd
  */
 public class Converter {
+	private static final Logger log =
+		Logger.getLogger(Converter.class);
+
 
 	private static final String SPLIT_EXPR = "\t";
 	// fields position
-	private static final int DRIVER = 1;
-	private static final int DRIVER_LEG = 2;
-	private static final int PASSENGER = 3;
-	private static final int PASSENGER_LEG = 4;
+	private static final int DRIVER = 0;
+	private static final int DRIVER_LEG = 1;
+	private static final int PASSENGER = 2;
+	private static final int PASSENGER_LEG = 3;
 
 	private final Random random = new Random();
 	private final IdFactory cliqueIdFactory = new IdFactory();
@@ -108,7 +113,9 @@ public class Converter {
 			id = person.getKey();
 			plan = person.getValue().getSelectedPlan();
 			this.unaffectedAgents.add(id);
-			this.plansToConstruct.put(id, plan.getPlanElements());
+			this.plansToConstruct.put(
+					id,
+					new ArrayList<PlanElement>(plan.getPlanElements()));
 		}
 	}
 
@@ -128,9 +135,9 @@ public class Converter {
 				currentLine =  getNextDataLine()) {
 			data = currentLine.split(SPLIT_EXPR);
 			driver = new IdImpl(data[DRIVER]);
-			driverLeg = Integer.valueOf(data[DRIVER_LEG]);
+			driverLeg = getLegIndex(data[DRIVER_LEG]);
 			passenger = new IdImpl(data[PASSENGER]);
-			passengerLeg = Integer.valueOf(data[PASSENGER_LEG]);
+			passengerLeg = getLegIndex(data[PASSENGER_LEG]);
 
 			markSharedRide(driver, driverLeg, passenger, passengerLeg);
 
@@ -139,6 +146,11 @@ public class Converter {
 		}
 
 		constructCliques();
+	}
+
+	private int getLegIndex(String tripId) {
+		int i = Integer.valueOf(tripId);
+		return i*2 - 1;
 	}
 
 	private void markSharedRide(
@@ -193,6 +205,7 @@ public class Converter {
 		Id root;
 
 		while (true) {
+			//log.debug("constructing clique");
 			try {
 				root = this.unaffectedAgents.remove(0);
 			} catch (IndexOutOfBoundsException e) {
@@ -218,6 +231,7 @@ public class Converter {
 	 * Performs an in depth search to construct cliques.
 	 */
 	private void inDepthSearch(final Id node, final List<Id> marks) {
+		//log.debug("marking node");
 		marks.add(node);
 		
 		for (Id neighboor : getMates(node)) {
@@ -250,6 +264,7 @@ public class Converter {
 
 		for (Map.Entry<Id, ? extends Person> entry :
 				samplePopulation.getPersons().entrySet()) {
+			//log.debug("constructing individual plan");
 			id = entry.getKey();
 			person = entry.getValue();
 			// clear person plans and modify the selected plan
@@ -266,6 +281,7 @@ public class Converter {
 		planElements.clear();
 
 		for (PlanElement pe : planToConstruct) {
+			//log.debug("adding plan element");
 			if (pe instanceof SharedRide) {
 				planSharedRide((SharedRide) pe, planElements);
 			}
@@ -337,6 +353,7 @@ public class Converter {
 		String populationFile = filePath + "/plans-" + endName;
 
 		(new CliquesWriter(sampleCliques)).writeFile(cliqueFile);
+		log.debug("writting population of size "+samplePopulation.getPersons().size());
 		(new PopulationWriter(samplePopulation, this.scenario.getNetwork())).write(populationFile);
 	}
 
@@ -413,7 +430,18 @@ public class Converter {
 			strata.add(clique.getKey());
 		}
 
+		logStrataInfo(tempStratas);
+
 		return new ArrayList<List<Id>>(tempStratas.values());
+	}
+
+	private void logStrataInfo(final Map<Integer, List<Id>> stratas) {
+		log.debug("Strata sizes:");
+
+		for (Map.Entry<Integer, List<Id>> entry : stratas.entrySet()) {
+			log.debug("size "+entry.getKey()+": "+entry.getValue().size()+
+					" cliques in the whole population");
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
