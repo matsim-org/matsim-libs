@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.householdsfromcensus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Writes clique pertenancy information to an XML file.
@@ -44,10 +44,14 @@ public class CliquesWriter extends MatsimXmlWriter {
 		this.cliques = cliques;
 	}
 
-	public void writeFile(String fileName) throws FileNotFoundException, IOException {
+	public void writeFile(String fileName) {
 		this.openFile(fileName);
 		this.writeXmlHead();
-		this.writeCliques();
+		try {
+			this.writeCliques();
+		} catch (IOException e) {
+			throw new UncheckedIOException("problem while writing cliques", e);
+		}
 		this.close();
 	}
 

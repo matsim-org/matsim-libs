@@ -42,13 +42,7 @@ public class Extract {
 		cliques = (new ExtractHousholdInfo(file).getCliques());
 
 		householdWriter = new CliquesWriter(cliques);
-		try {
-			householdWriter.writeFile(output);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		householdWriter.writeFile(output);
 	}
 }
 
