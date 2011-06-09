@@ -151,7 +151,7 @@ public class ERSAControlerListener implements ShutdownListener{
 				double accessibilityTravelDistance = 0.;
 
 				double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
-				double beta = beta_per_hr / 60.; // get utility per minute
+				double beta_per_min = beta_per_hr / 60.; // get utility per minute
 
 				// go through all jobs and calculate workplace accessibility
 				for(JobsObject job :jobObjectMap.values()){
@@ -162,7 +162,7 @@ public class ERSAControlerListener implements ShutdownListener{
 					double arrivalTime = st.getTree().get( toNode.getId() ).getTime();
 					
 					// travel times in minutes
-					double travelTime = (arrivalTime - depatureTime) / 60.;
+					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// travel costs in utils
 					double travelCosts = st.getTree().get( toNode.getId() ).getCost();
 					// travel distance by car in meter
@@ -170,11 +170,11 @@ public class ERSAControlerListener implements ShutdownListener{
 					double travelDistance = getZone2WorkplaceDistance(st, toNode);					
 					
 					// sum travel times
-					accessibilityTravelTimes += Math.exp( beta * travelTime );
+					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min );
 					// sum travel costs
-					accessibilityTravelCosts += Math.exp( beta * travelCosts ); // tnicolai: find another beta for travel costs
+					accessibilityTravelCosts += Math.exp( beta_per_min * travelCosts ); // tnicolai: find another beta for travel costs
 					// sum travel distances
-					accessibilityTravelDistance += Math.exp( beta * travelDistance ); // tnicolai: find another beta for travel distance
+					accessibilityTravelDistance += Math.exp( beta_per_min * travelDistance ); // tnicolai: find another beta for travel distance
 				}
 				
 				setAccessibilityValue2StartZone(startZone,
