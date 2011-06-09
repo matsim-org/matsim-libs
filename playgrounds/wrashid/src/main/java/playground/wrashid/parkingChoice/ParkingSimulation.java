@@ -20,12 +20,16 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.util.ActDurationEstimationContainer;
+import playground.wrashid.parkingChoice.util.ActivityDurationEstimator;
 
 public class ParkingSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler {
 	// key: personId, value: parking
@@ -39,6 +43,9 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	LinkedList<ParkingDepartureEventHandler> parkingDepartureEventHandlers;
 	private ParkingManager parkingManager;
 	private final Controler controler;
+	
+	HashMap<Id,ActDurationEstimationContainer> actDurEstimationContainer;
+	
 	
 	public ParkingSimulation(ParkingManager parkingManager, Controler controler){
 		this.parkingManager=parkingManager;
@@ -75,11 +82,20 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		for (ParkingDepartureEventHandler parkingDepartureHandler:parkingDepartureEventHandlers){
 			parkingDepartureHandler.reset(iteration);
 		}
+		
+		actDurEstimationContainer=new HashMap<Id, ActDurationEstimationContainer>();
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
+		
+		GeneralLib.controler=controler;
+		
+		ActDurationEstimationContainer actDurEstContainer= actDurEstimationContainer.get(event.getPersonId());
+		actDurEstContainer.registerNewActivity();
+		
+		
 		if (lastTransportModeWasCar.contains(personId)){
 			carIsParked.add(personId);
 			lastTransportModeWasCar.remove(personId);
@@ -93,6 +109,24 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			Person person = controler.getPopulation().getPersons().get(personId);
 			
 			Plan selectedPlan = person.getSelectedPlan();
+			double estimatedActduration=0;
+			
+			if (actDurEstContainer.isCurrentParkingTimeOver()){
+				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, controler, actDurEstContainer);
+			} else {
+				DebugLib.stopSystemAndReportInconsistency("there might be some inconsitency???");
+			}
+			
+			//TODO: get the best possible parking at the moment for the given estimated act duration and walking dist. etc.
+			// 
+			
+			
+			// TODO: perhaps I should calculate from the first iteration also the rate of performing for the agent
+			// and then use that later? 
+			
+			// TODO: perhaps also add explicit earning and add them here? => I think, the paper from Schlüssler
+			// should give me the solution.
+			
 			
 			
 			for (ParkingArrivalEventHandler parkingArrivalEH: parkingArrivalEventHandlers){
@@ -107,8 +141,13 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {	
 		if (TransportMode.car.equalsIgnoreCase(event.getLegMode())){
+			detectAndRegisterEndTimeOfFirstAct(event);
+			
+			
+			
+			
 			lastTransportModeWasCar.add(event.getPersonId());
 			carIsParked.remove(event.getPersonId());
 			
@@ -119,5 +158,18 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 				parkingDepartureEH.handleEvent(new ParkingDepartureEvent(event, lastUsedParking));
 			}
 		}
+	}
+
+	private void detectAndRegisterEndTimeOfFirstAct(AgentDepartureEvent event) {
+		if (!actDurEstimationContainer.containsKey(event.getPersonId())){
+			actDurEstimationContainer.put(event.getPersonId(), new ActDurationEstimationContainer());
+		}
+		
+		ActDurationEstimationContainer actDurEstContainer= actDurEstimationContainer.get(event.getPersonId());
+		
+		if (actDurEstContainer.endTimeOfFirstAct == null) {
+			actDurEstContainer.endTimeOfFirstAct = event.getTime();
+		}
+		
 	}
 }

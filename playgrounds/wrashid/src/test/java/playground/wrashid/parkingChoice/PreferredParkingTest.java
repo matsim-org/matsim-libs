@@ -46,7 +46,7 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(9720, walkingDistanceFor3CarScenario(reservedParkingManager, 1), 1.0);
+		assertEquals(9720, walkingDistanceFor3CarScenario(reservedParkingManager, 1), 5.0);
 	}
 
 	public void testAllAgentsWantToUseFarAwayPreferredParkingShouldIncreaseAverageWalkingDistance() {
@@ -67,7 +67,7 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(24167, walkingDistanceFor3CarScenario(reservedParkingManager, 3), 1.0);
+		assertEquals(24167, walkingDistanceFor3CarScenario(reservedParkingManager, 3), 5.0);
 	}
 	
 	public void testOnlyUsePreferredParkingAtWorkAndNoteHomeShouldDecreaseWalkingDistance() {
@@ -91,7 +91,7 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(22929, walkingDistanceFor3CarScenario(reservedParkingManager, 10), 1.0);
+		assertEquals(22929, walkingDistanceFor3CarScenario(reservedParkingManager, 10), 5.0);
 	}
 
 	private double walkingDistanceFor3CarScenario(PreferredParkingManager preferredParkingManager, int parkingCapacity) {

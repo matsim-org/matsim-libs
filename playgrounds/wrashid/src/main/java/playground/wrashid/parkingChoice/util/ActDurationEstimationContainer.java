@@ -1,8 +1,8 @@
 package playground.wrashid.parkingChoice.util;
 
-public class ActDurEstContainer {
+public class ActDurationEstimationContainer {
 
-	public Double startTimeOfFirstAct;
+	public Double endTimeOfFirstAct;
 	public int indexOfCurrentActivity;
 	public int skipAllPlanElementsTillIndex;
 	
@@ -13,7 +13,7 @@ public class ActDurEstContainer {
 		return false;
 	}
 	
-	public void registerNeuActivity(){
+	public void registerNewActivity(){
 		indexOfCurrentActivity += 2;
 	}
 	

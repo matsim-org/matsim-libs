@@ -17,15 +17,15 @@ import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 public class PrivateParkingTest extends TestCase {
 
 	public void testBaseCase(){
-		assertEquals(2410, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),1.0);
+		assertEquals(2410, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),5.0);
 	}
 	
 	public void testHigherParkingCapacityMakesWalkingDistanceShorter(){
-		assertEquals(998, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(3),1.0);
+		assertEquals(998, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(3),5.0);
 	}
 	
 	public void testMakingTheCapacityHigherThanNumberOfCarsWillNotMakeWalkingDistanceShorter(){
-		assertEquals(998, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(10),1.0);
+		assertEquals(998, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(10),5.0);
 	}
 	
 	private double walkingDistanceFor3CarScenarioWithVariableParkingCapacity(int parkingCapacity) {
@@ -83,7 +83,7 @@ public class PrivateParkingTest extends TestCase {
 		
 		controler.run();
 		
-		assertEquals(3155,parkingModule.getAverageWalkingDistance(),1.0);
+		assertEquals(3155,parkingModule.getAverageWalkingDistance(),5.0);
 	}
 	
 }

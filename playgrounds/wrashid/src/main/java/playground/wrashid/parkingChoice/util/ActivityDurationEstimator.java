@@ -26,7 +26,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	private Id selectedPersonId;
 	//private int indexOfActivity = 0;
 	//private Double startTimeFirstAct = null;
-	private ActDurEstContainer actDurationEstimationContainer=new ActDurEstContainer();
+	private ActDurationEstimationContainer actDurationEstimationContainer=new ActDurationEstimationContainer();
 
 	public ActivityDurationEstimator(Controler controler, Id selectedPersonId) {
 		this.controler = controler;
@@ -49,7 +49,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 
 			GeneralLib.controler=controler;
 			
-			actDurationEstimationContainer.registerNeuActivity();
+			actDurationEstimationContainer.registerNewActivity();
 			if (actDurationEstimationContainer.isCurrentParkingTimeOver()){
 				double estimatedActduration = getEstimatedActDuration(event, controler, actDurationEstimationContainer);
 				activityDurationEstimations.add(estimatedActduration);
@@ -58,17 +58,17 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	}
 
 	public static double getEstimatedActDuration(ActivityStartEvent event, Controler controler,
-			ActDurEstContainer actDurationEstimationContainer) {
+			ActDurationEstimationContainer actDurationEstimationContainer) {
 		
 		Plan selectedPlan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 
 		List<PlanElement> planElement = selectedPlan.getPlanElements();
 
 		int indexOfActivity=actDurationEstimationContainer.indexOfCurrentActivity;
-		double startTimeOfFirstAct=actDurationEstimationContainer.startTimeOfFirstAct;
+		double endTimeOfFirstAct=actDurationEstimationContainer.endTimeOfFirstAct;
 		if (isLastAct(indexOfActivity, planElement)) {
 			
-			return GeneralLib.getIntervalDuration(event.getTime(), startTimeOfFirstAct);
+			return GeneralLib.getIntervalDuration(event.getTime(), endTimeOfFirstAct);
 		}
 
 		int indexOfFirstCarLegAfterCurrentAct = getIndexOfFirstCarLegAfterCurrentAct(indexOfActivity, planElement);
@@ -132,8 +132,8 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getPersonId().equals(selectedPersonId)) {
-			if (actDurationEstimationContainer.startTimeOfFirstAct == null) {
-				actDurationEstimationContainer.startTimeOfFirstAct = event.getTime();
+			if (actDurationEstimationContainer.endTimeOfFirstAct == null) {
+				actDurationEstimationContainer.endTimeOfFirstAct = event.getTime();
 			}
 		}
 	}
