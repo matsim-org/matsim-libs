@@ -194,7 +194,11 @@ public class PhysicalFloor implements Floor {
 		for (; it.hasNext();) {
 			Agent2D agent = it.next();
 			if (moveAgentAndCheckForEndOfLeg(agent, time)){
+
 				it.remove();
+				// (the above removes the Agent2D "wrapper" since endLegAndAssumeControl only moves the wrapped agent, not
+				// the wrapper)
+				
 			}
 		}
 
@@ -220,7 +224,11 @@ public class PhysicalFloor implements Floor {
 
 		boolean endOfLeg = checkForEndOfLinkReached(agent, oldPos, newPos, time);
 		if (endOfLeg) {
+
 			return true;
+			// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves 
+			// the wrapped agent, not the wrapper)
+			
 		}
 
 		double azimuth = getAzimuth(oldPos, newPos);
@@ -267,7 +275,10 @@ public class PhysicalFloor implements Floor {
 			// end of route
 			if (id == null) {
 				agent.endLegAndAssumeControl(time);
+
 				return true;
+				// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves 
+				// the wrapped agent, not the wrapper)
 
 			} else {
 				agent.notifyMoveOverNode(id);
