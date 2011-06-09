@@ -144,7 +144,7 @@ public class ERSAControlerListener implements ShutdownListener{
 				
 				Zone<ZoneObject> startZone = startZoneIterator.next();
 				// get coordinate from origin (start point)
-				Coord coordFromZone = getStartingPointCoordinate(startZone, st, network);
+				Coord coordFromZone = getStartingPointCoordinateAndRunSpanningTree(startZone, st, network);
 				
 				double accessibilityTravelTimes = 0.;
 				double accessibilityTravelCosts = 0.;
@@ -334,7 +334,11 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param network <code>NetworkImpl</code>
 	 * @return coordinate of a given zone
 	 */
-	private Coord getStartingPointCoordinate(Zone<ZoneObject> startZone, SpanningTree st, NetworkImpl network) {
+	private Coord getStartingPointCoordinateAndRunSpanningTree(Zone<ZoneObject> startZone, SpanningTree st, NetworkImpl network) {
+		// Was named "getStartingPointCoordinate".  As such, however, calling the spanning tree run method was a side effect.
+		// Changing the name somewhat improves the situation, but makes clear that this method has more than one function.
+		// Personally, I would prefer to have both `st' commands pushed up and have the `st' argument removed from the 
+		// argument list.  kai, jun'11
 			
 		Point point = startZone.getGeometry().getCentroid();
 		Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
