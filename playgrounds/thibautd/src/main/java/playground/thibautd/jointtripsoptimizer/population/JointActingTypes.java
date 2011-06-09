@@ -24,8 +24,8 @@ package playground.thibautd.jointtripsoptimizer.population;
  * @author thibautd
  */
 public interface JointActingTypes {
-	public static final String PICK_UP = "pick up";
-	public static final String DROP_OFF = "drop off";
+	public static final String PICK_UP = "pick_up";
+	public static final String DROP_OFF = "drop_off";
 
 	public static final String PASSENGER = "car_passenger";
 
