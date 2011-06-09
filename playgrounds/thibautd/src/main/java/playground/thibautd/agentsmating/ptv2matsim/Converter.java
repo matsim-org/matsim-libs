@@ -20,6 +20,7 @@
 package playground.thibautd.agentsmating.ptv2matsim;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -351,6 +352,11 @@ public class Converter {
 		String endName =  sampleRate +"-sample.xml.gz";
 		String cliqueFile = filePath + "/cliques-" + endName;
 		String populationFile = filePath + "/plans-" + endName;
+
+		File outputDir = new File(filePath);
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
 
 		(new CliquesWriter(sampleCliques)).writeFile(cliqueFile);
 		log.debug("writting population of size "+samplePopulation.getPersons().size());

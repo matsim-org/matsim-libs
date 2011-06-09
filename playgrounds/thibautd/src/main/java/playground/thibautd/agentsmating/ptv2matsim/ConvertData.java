@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
@@ -55,7 +56,8 @@ public class ConvertData {
 		Converter ptv2matsim;
 		try {
 			ptv2matsim = new Converter(
-					new BufferedReader(new FileReader(ptvFile)),
+					//new BufferedReader(new FileReader(ptvFile)),
+					IOUtils.getBufferedReader(ptvFile),
 					scenario);
 		} catch (Exception e) {
 			throw new RuntimeException("exception while creating converter, "+
