@@ -17,22 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching.algorithms;
+package playground.droeder.data.graph;
 
-import java.util.List;
-
-import playground.droeder.data.matching.MatchingGraph;
-import playground.droeder.data.matching.MatchingNode;
-
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
  *
  */
-public class NodeDistAlgo implements MatchingAlgorithm{
+public interface GraphElement {
 	
-	public static List<MatchingNode> getNodesInDist(MatchingNode refNode, MatchingGraph candGraph, Double dist) {
-		return candGraph.getNearestNodes(refNode.getCoord().getX(), refNode.getCoord().getY(), dist);
-	}
+	public Id getId();
 
 }

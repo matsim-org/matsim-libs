@@ -17,45 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching;
+package playground.droeder.data.graph.algorithms;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import java.util.List;
+
+import org.jfree.util.Log;
+
+import playground.droeder.data.graph.GraphElement;
+import playground.droeder.data.graph.MatchingGraph;
+import playground.droeder.data.graph.MatchingNode;
+
 
 /**
  * @author droeder
  *
  */
-public class MatchingSegment {
+public class NodeDistAlgo implements MatchingAlgorithm{
 	
-	private Coord start, end;
-	private Id id;
+	private Class<MatchingNode> clazz;
+	private Double deltaDist;
+	private MatchingGraph candGraph;
 
-	public MatchingSegment (Coord start, Coord end, Id id){
-		this.start = start;
-		this.end = end;
-		this.id = id;
+	public NodeDistAlgo(Double deltaDist, MatchingGraph candGraph){
+		this.clazz= MatchingNode.class;
+		this.deltaDist = deltaDist;
+		this.candGraph = candGraph;
 	}
 	
-	
-	/**
-	 * @return the start
-	 */
-	public Coord getStart() {
-		return start;
-	}
 
-	/**
-	 * @return the end
-	 */
-	public Coord getEnd() {
-		return end;
+	@Override
+	public List<? extends GraphElement> run(GraphElement ref, List<? extends GraphElement> candidates) {
+		if(!(ref instanceof MatchingNode)){
+			Log.error("wrong GraphElementType");
+			return null;
+		}
+		return this.candGraph.getNearestNodes(((MatchingNode) ref).getCoord().getX(), ((MatchingNode) ref).getCoord().getY(), deltaDist);
 	}
 
-	/**
-	 * @return the id
-	 */
-	public Id getId() {
-		return id;
+	@Override
+	public Class<? extends GraphElement> getProcessingClass() {
+		return this.clazz;
 	}
+
 }

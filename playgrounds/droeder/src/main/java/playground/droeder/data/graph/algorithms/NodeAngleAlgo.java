@@ -17,15 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching.algorithms;
+package playground.droeder.data.graph.algorithms;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import playground.droeder.data.matching.MatchingEdge;
-import playground.droeder.data.matching.MatchingNode;
+import com.vividsolutions.jts.index.bintree.NodeBase;
+
+import playground.droeder.data.graph.GraphElement;
+import playground.droeder.data.graph.MatchingEdge;
+import playground.droeder.data.graph.MatchingNode;
 
 /**
  * @author droeder
@@ -33,27 +36,36 @@ import playground.droeder.data.matching.MatchingNode;
  */
 public class NodeAngleAlgo implements MatchingAlgorithm{
 	
-	public static List<MatchingNode> getMinAngleNodes(MatchingNode refNode, List<MatchingNode> candidates, Double deltaPhi){
+	private Class<MatchingNode> clazz;
+	private Double deltaPhi;
+
+	public NodeAngleAlgo(Double deltaPhi){
+		this.clazz = MatchingNode.class;
+		this.deltaPhi = deltaPhi;
+	}
+	
+	@Override
+	public List<? extends GraphElement> run(GraphElement ref,	List<? extends GraphElement> candidates) {
 		double phi = Double.MAX_VALUE;
 		double temp;
 		List<MatchingNode> newCandidates = new ArrayList<MatchingNode>();
 
 		//iterate over all candidateNodes
-		for(MatchingNode cand : candidates){
+		for(GraphElement cand : candidates){
 			
 			//iterate over all edges outgoing from referenceNode
-			for(MatchingEdge refEdge : refNode.getOutEdges()){
+			for(MatchingEdge refEdge : ((MatchingNode) ref).getOutEdges()){
 				//iterate over all edges outgoing from the candidateNode
-				for(MatchingEdge candEdge : cand.getOutEdges()){
+				for(MatchingEdge candEdge : ((MatchingNode) cand).getOutEdges()){
 					temp = getPhi(refEdge, candEdge);
 					if(temp < phi){
 						phi = temp;
 					}
 				}
 			}
-			// if the referenceNode and the candidateNode have any pair of links with a phi smaller then deltaPhi, the candidate is still a candidate
+			// if the referenceNode and the candidateNode have any pair of links with a phi smaller than deltaPhi, the candidate is still a candidate
 			if(phi<deltaPhi){
-				newCandidates.add(cand);
+				newCandidates.add((MatchingNode) cand);
 			}
 			phi = Double.MAX_VALUE;
 		}
@@ -62,7 +74,7 @@ public class NodeAngleAlgo implements MatchingAlgorithm{
 		return newCandidates;
 	}
 	
-	private static Double getPhi(MatchingEdge one, MatchingEdge two){
+	private Double getPhi(MatchingEdge one, MatchingEdge two){
 		double absOne, absTwo, scalar;
 		Vector<Double> o = new Vector<Double>();
 		Vector<Double> t = new Vector<Double>();
@@ -79,6 +91,11 @@ public class NodeAngleAlgo implements MatchingAlgorithm{
 		scalar = ((o.get(0)*t.get(0)) + (o.get(1)+ t.get(1)));
 		
 		return Math.acos(scalar/(absOne * absTwo));
+	}
+
+	@Override
+	public Class<? extends GraphElement> getProcessingClass() {
+		return this.clazz;
 	}
 
 }

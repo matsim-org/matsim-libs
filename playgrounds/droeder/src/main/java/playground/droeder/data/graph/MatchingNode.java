@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching;
+package playground.droeder.data.graph;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
  * @param <T>
  *
  */
-public class MatchingNode implements Comparable<MatchingNode>{
+public class MatchingNode implements Comparable<MatchingNode>, GraphElement{
 
 	private Id id;
 	private Coord coord;

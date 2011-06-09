@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching;
+package playground.droeder.data.graph;
 
 import java.util.Collections;
 import java.util.HashMap;

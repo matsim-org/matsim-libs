@@ -17,66 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching;
+package playground.droeder.data.graph.algorithms;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import playground.droeder.data.graph.GraphElement;
 
 /**
  * @author droeder
  *
  */
-public class MatchingEdge {
-
-	private Id id;
-	private MatchingNode toNode;
-	private MatchingNode fromNode;
-	private ArrayList<MatchingSegment> segments;
+public interface MatchingAlgorithm {
 	
-	public MatchingEdge(Id id, MatchingNode to, MatchingNode from){
-		this.id = id;
-		this.toNode = to;
-		this.fromNode = from;
-		this.segments = new ArrayList<MatchingSegment>();
-		this.segments.add(new MatchingSegment(from.getCoord(), to.getCoord(), new IdImpl("base")));
-	}
-
-	/**
-	 * @return the toNode
-	 */
-	public MatchingNode getToNode() {
-		return toNode;
-	}
-
-	/**
-	 * @return the fromNode
-	 */
-	public MatchingNode getFromNode() {
-		return fromNode;
-	}
-
-	/**
-	 * @return
-	 */
-	public Id getId() {
-		return this.id;
-	}
+	public List<? extends GraphElement> run(GraphElement ref, List<? extends GraphElement> candidates);
 	
-	/**
-	 * @return
-	 */
-	public boolean addSegments(ArrayList<MatchingSegment> segments){
-		this.segments = segments;
-		return true;
-	}
+	public Class<? extends GraphElement> getProcessingClass();
 	
-	/**
-	 * @return
-	 */
-	public ArrayList<MatchingSegment> getSegments(){
-		return this.segments;
-	}
-
 }

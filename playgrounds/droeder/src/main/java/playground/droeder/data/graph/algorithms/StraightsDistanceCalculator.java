@@ -17,14 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching.algorithms;
-
-import java.util.Vector;
+package playground.droeder.data.graph.algorithms;
 
 import org.apache.commons.math.geometry.Vector3D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.droeder.DistanceCalculator;
 
@@ -47,12 +44,13 @@ public class StraightsDistanceCalculator {
 	}
 	
 	private void calcInterception(){
-		Vector3D pointA, pointB, pointC, pointD, cd, ab, temp;
+		Vector3D pointA, pointB, pointC, pointD, cd, ab, temp, abOrthNorm, cdOrthNorm;
 		
 		pointA = this.Coord2Vector3D(straightOne.getFirst());
 		pointB = this.Coord2Vector3D(straightOne.getSecond());
 		pointC = this.Coord2Vector3D(straightTwo.getFirst());
 		pointD = this.Coord2Vector3D(straightTwo.getSecond());
+		
 		ab = new Vector3D(1, pointB, -1, pointA);
 		cd = new Vector3D(1, pointD, -1, pointC);
 		
@@ -65,8 +63,6 @@ public class StraightsDistanceCalculator {
 		temp = new Vector3D(1, pointB, -1, pointC);
 		temp = Vector3D.crossProduct(temp, cd);
 		this.dBF = temp.getNorm() / cd.getNorm();
-		
-		
 	}
 	
 	private Vector3D Coord2Vector3D(Coord c){

@@ -17,12 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.matching.algorithms;
+package playground.droeder.data.graph;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
  *
  */
-public interface MatchingAlgorithm {
+public class MatchingSegment implements GraphElement {
+	
+	private Coord start, end;
+	private Id id;
 
+	public MatchingSegment (Coord start, Coord end, Id id){
+		this.start = start;
+		this.end = end;
+		this.id = id;
+	}
+	
+	
+	/**
+	 * @return the start
+	 */
+	public Coord getStart() {
+		return start;
+	}
+
+	/**
+	 * @return the end
+	 */
+	public Coord getEnd() {
+		return end;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Id getId() {
+		return id;
+	}
 }
