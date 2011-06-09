@@ -48,8 +48,8 @@ import playground.droeder.data.matching.algorithms.NodeDistAlgo;
  * @author droeder
  * based on http://www.fsutmsonline.net/images/uploads/reports/FDOT_BC353_21_rpt.pdf
  */
-public class MatchingRunner {
-	private static final Logger log = Logger.getLogger(MatchingRunner.class);
+public class DataMatching {
+	private static final Logger log = Logger.getLogger(DataMatching.class);
 	
 	private MatchingGraph reference;
 	private MatchingGraph matching;
@@ -107,14 +107,14 @@ public class MatchingRunner {
 			}
 		}
 		
-		MatchingRunner r = new MatchingRunner(v, h);
+		DataMatching r = new DataMatching(v, h);
 		r.topDownMatching(300.0, 1.0);
 //		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
 //			System.out.println(e.getKey() + " " + e.getValue());
 //		}
 	}
 	
-	public MatchingRunner(MatchingGraph reference, MatchingGraph matching){
+	public DataMatching(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
 		this.matching = matching;
 	}
@@ -123,7 +123,7 @@ public class MatchingRunner {
 	 * 
 	 */
 	public void topDownMatching(Double deltaDist, Double deltaAngle) {
-		log.info("starting Top-Down-Matching...");
+		log.info("starting top-down-Matching...");
 		this.nodeMatching(deltaDist, deltaAngle);
 //		this.segmentMatching();
 //		this.edgeMatching();
@@ -151,7 +151,7 @@ public class MatchingRunner {
 			}
 		}
 		
-		log.info("matching nodes finished. " + this.nodeReference2match.size() + " of " 
+		log.info("node-matching finished... " + this.nodeReference2match.size() + " of " 
 				+ reference.getNodes().size() + " nodes are matched...");
 	}
 	
@@ -168,7 +168,7 @@ public class MatchingRunner {
 //		
 //	}
 	
-	public Map<Id, Id> getNodeRef2Match(){
+	public Map<Id, Id> getNodeIdRef2Match(){
 		return this.nodeReference2match;
 	}
 
