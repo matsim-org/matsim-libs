@@ -394,18 +394,25 @@ public class Converter {
 	 * gets a sample of the ids of the cliques
 	 */
 	private List<Id> getSampleCliquesIds(final double sampleRate) {
-		List<List<Id>> stratas = getStratas();
+		Map<Integer, List<Id>> stratas = getStratas();
 		List<Id> sample = new ArrayList<Id>((int) Math.ceil(sampleRate * popSize));
 		int strataSize;
+		int toDraw;
 		int index;
+		List<Id> strata;
 
-		for (List<Id> strata : stratas) {
+		for (Map.Entry<Integer, List<Id>> entry : stratas.entrySet()) {
+			strata = entry.getValue();
 			strataSize = strata.size();
+			toDraw = (int) Math.ceil(strataSize * sampleRate);
+
+			log.debug("drawing "+toDraw+" from the "+strataSize+
+					" cliques of size "+entry.getKey());
 
 			// draw a number of elements proportionnal to the strata size,
 			// without replacement.
 			for (int i=0;
-					i < Math.ceil(strata.size() * sampleRate);
+					i < toDraw;
 					i++) {
 				index = this.random.nextInt(strataSize - i);
 				sample.add(strata.remove(index));
@@ -418,7 +425,7 @@ public class Converter {
 	/**
 	 * @return a list of the stratas, under the form of lists of clique's ids.
 	 */
-	private List<List<Id>> getStratas() {
+	private Map<Integer, List<Id>> getStratas() {
 		Map<Integer, List<Id>> tempStratas = new HashMap<Integer, List<Id>>();
 		int size;
 		List<Id> strata;
@@ -438,7 +445,7 @@ public class Converter {
 
 		logStrataInfo(tempStratas);
 
-		return new ArrayList<List<Id>>(tempStratas.values());
+		return tempStratas;
 	}
 
 	private void logStrataInfo(final Map<Integer, List<Id>> stratas) {

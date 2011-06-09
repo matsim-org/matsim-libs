@@ -21,6 +21,7 @@ package playground.thibautd.agentsmating.ptv2matsim;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -48,9 +50,22 @@ public class ConvertData {
 		String ptvFile = args[0];
 		String configFile = args[1];
 
+		CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
+		Logger.getRootLogger().addAppender(appender);
+
+		log.info("######################################################################");
+		log.info("# Starting conversion.");
+		log.info("######################################################################");
 		log.info("loading config file...");
 		Config config = ConfigUtils.loadConfig(configFile);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		try {
+		IOUtils.initOutputDirLogging(
+			config.controler().getOutputDirectory(),
+			appender.getLogEvents());
+		} catch (IOException e) {
+			log.error("could not create log file");
+		}
 
 		log.info("creating converter...");
 		Converter ptv2matsim;
@@ -67,7 +82,10 @@ public class ConvertData {
 		log.info("writing a "+sampleRate+" sample to file...");
 		ptv2matsim.write(config.controler().getOutputDirectory(), sampleRate);
 		
-		log.info("success, exiting.");
+		log.info("######################################################################");
+		log.info("# success, exiting.");
+		log.info("######################################################################");
+		IOUtils.closeOutputDirLogging();
 	}
 }
 
