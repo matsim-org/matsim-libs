@@ -172,6 +172,11 @@ public class PopulationImpl implements Population {
 	public void printPlansCount() {
 		log.info(" person # " + this.counter);
 	}
+	
+	public void resetPlansCount() {
+		this.counter = 0;
+		this.nextMsg = 1;
+	}
 
 	@Override
 	public PopulationFactory getFactory() {
