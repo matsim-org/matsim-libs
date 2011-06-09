@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -38,14 +37,15 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaPaths;
-import playground.droeder.data.graph.GraphElement;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
-import playground.droeder.data.graph.MatchingSegment;
-import playground.droeder.data.graph.algorithms.MatchingAlgorithm;
 import playground.droeder.data.graph.algorithms.NodeAngleAlgo;
 import playground.droeder.data.graph.algorithms.NodeDistAlgo;
+import playground.droeder.data.graph.algorithms.interfaces.EdgeAlgorithm;
+import playground.droeder.data.graph.algorithms.interfaces.MatchingAlgorithm;
+import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
+import playground.droeder.data.graph.algorithms.interfaces.SegmentAlgorithm;
 
 /**
  * @author droeder
@@ -57,24 +57,29 @@ public class GraphMatching {
 	private MatchingGraph reference;
 	private MatchingGraph matching;
 	
-	private List<MatchingAlgorithm>  edgeAlgos;
-	private List<MatchingAlgorithm>  nodeAlgos;
-	private List<MatchingAlgorithm>  segmentAlgos;
+	private List<EdgeAlgorithm>  edgeAlgos;
+	private List<NodeAlgorithm>  nodeAlgos;
+	private List<SegmentAlgorithm>  segmentAlgos;
 	
 	public GraphMatching(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
 		this.matching = matching;
-		
 		this.initDefaultAlgos();
 	}
 	
 	private void initDefaultAlgos() {
-		this.nodeAlgos = new ArrayList<MatchingAlgorithm>();
-		this.nodeAlgos.add(new NodeDistAlgo(300.0, matching));
-		this.nodeAlgos.add(new NodeAngleAlgo(Math.PI / 8));
+		log.info("add default algorithms...");
 		
-		this.edgeAlgos = new ArrayList<MatchingAlgorithm>();
-		this.segmentAlgos = new ArrayList<MatchingAlgorithm>();
+		//node
+		this.nodeAlgos = new ArrayList<NodeAlgorithm>();
+		this.addAlgo(new NodeDistAlgo(300.0, matching));
+		this.addAlgo(new NodeAngleAlgo(Math.PI / 8));
+		
+		//segment
+		this.segmentAlgos = new ArrayList<SegmentAlgorithm>();
+
+		//edge
+		this.edgeAlgos = new ArrayList<EdgeAlgorithm>();
 	}
 
 	/**
@@ -83,9 +88,11 @@ public class GraphMatching {
 	public void topDownMatching() {
 		log.info("starting top-down-Matching...");
 		this.nodeMatching();
-//		this.segmentMatching();
+		this.segmentMatching();
 //		this.edgeMatching();
+		log.info("top-down-matching finished...");
 	}
+
 
 	// ###### NODEMATCHING #######
 	private Map<Id, Id> nodeReference2match;
@@ -97,18 +104,18 @@ public class GraphMatching {
 		this.unmatchedRefNodes = new ArrayList<Id>();
 		
 		// some info
-		log.info("running node-algorithms in following order for every node...");
-		for(MatchingAlgorithm a: this.nodeAlgos){
-			log.info(a.getClass().getSimpleName());
+		log.info("running node-algorithms for every node in the following order:");
+		for(NodeAlgorithm a: this.nodeAlgos){
+			log.info(a.getClass().getName());
 		}
 		
-		List<? extends GraphElement> candidates = new ArrayList<GraphElement>(this.matching.getNodes().values()); 
+		List<MatchingNode> candidates = new ArrayList<MatchingNode>(this.matching.getNodes().values()); 
 
 		// iterate over all nodes
 		for(MatchingNode refNode: this.reference.getNodes().values()){
-			// with every algo
-			for(MatchingAlgorithm a: this.nodeAlgos){
-				candidates = a.run(refNode, (List<? extends GraphElement>) candidates);
+			// with every algorithm
+			for(NodeAlgorithm a: this.nodeAlgos){
+				candidates = a.run(refNode, candidates);
 
 				if(candidates.size() > 0){
 					// if there is one or more candidate-Node take the first
@@ -124,14 +131,52 @@ public class GraphMatching {
 		log.info("node-matching finished... " + this.nodeReference2match.size() + " of " 
 				+ reference.getNodes().size() + " nodes are matched...");
 	}
-	
 
-//	// ##### SEGMENTMATCHING #####
-//	private void segmentMatching() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
+	// ##### SEGMENTMATCHING #####
+	private void segmentMatching() {
+		log.info("start segment matching...");
+		this.computeEdgeCandidatesFromNodes();
+		
+		// TODO Auto-generated method stub
+		log.info("segment matching finished...");
+	}
+	
+	private Map<Id, List<Id>> ref2CandEdgesFromMappedNodes;
+	private void computeEdgeCandidatesFromNodes() {
+		log.info("compute candidate edges from mapped nodes");
+		this.ref2CandEdgesFromMappedNodes = new HashMap<Id, List<Id>>();
+		Id candFrom, candTo, refFrom, refTo;
+		List<Id> tempCandidates;
+		
+		//iterate over all edges
+		for(MatchingEdge ref : this.reference.getEdges().values()){
+			tempCandidates = new ArrayList<Id>();
+			refFrom = ref.getFromNode().getId();
+			refTo = ref.getToNode().getId();
+
+			// if the matched nodes contain the start- and end-node, go on
+			if(this.nodeReference2match.containsKey(refFrom) && 
+					this.nodeReference2match.containsKey(refTo)){
+				// iterate over all edges going out from the candidateStartNode which is mapped to the referenceStartNode 
+				for(MatchingEdge cand : this.matching.getNodes().get(this.nodeReference2match.get(refFrom)).getOutEdges()){
+					candFrom = cand.getFromNode().getId();
+					candTo = cand.getToNode().getId();
+
+					// if the refNodes and candNodes where mapped in NodeMatching, store the candidateEdge  
+					if(this.nodeReference2match.get(refFrom).equals(candFrom) && this.nodeReference2match.get(refTo).equals(candTo)){
+						tempCandidates.add(cand.getId());
+					}
+				}
+			}
+			
+			if(tempCandidates.size() > 0){
+				this.ref2CandEdgesFromMappedNodes.put(ref.getId(), tempCandidates);
+			}
+		}
+		
+		log.info(this.ref2CandEdgesFromMappedNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
+	}
+
 //	// ##### EDGEMATCHING #####
 //	private void edgeMatching() {
 //		// TODO Auto-generated method stub
@@ -142,23 +187,27 @@ public class GraphMatching {
 		return this.nodeReference2match;
 	}
 	
+	/**
+	 * add some own implementations of <code>MatchingAlgorithm</code>. The algorithms are called in the order they are added
+	 * @param algo
+	 */
 	public void addAlgo(MatchingAlgorithm algo){
-		Class<? extends GraphElement> clazz = algo.getProcessingClass();
-		if(clazz == null){
-			log.error("can't register algorithm, because no processing-class is given!");
-		}else if(clazz.equals(MatchingEdge.class)){
-			this.edgeAlgos.add(algo);
+		if(algo instanceof EdgeAlgorithm){
+			this.edgeAlgos.add((EdgeAlgorithm) algo);
 			log.info(algo.getClass().getSimpleName() + " registered...");
-		}else if(clazz.equals(MatchingNode.class)){
-			this.nodeAlgos.add(algo);
+		}else if(algo instanceof NodeAlgorithm){
+			this.nodeAlgos.add((NodeAlgorithm) algo);
 			log.info(algo.getClass().getSimpleName() + " registered...");
-		}else if(clazz.equals(MatchingSegment.class)){
-			this.segmentAlgos.add(algo);
+		}else if(algo instanceof SegmentAlgorithm){
+			this.segmentAlgos.add((SegmentAlgorithm) algo);
 			log.info(algo.getClass().getSimpleName() + " registered...");
 		}
 	}
 	
-	public void clearAlgos(){
+	/**
+	 * removes all registered algorithms
+	 */
+	public void clearAlgorithms(){
 		this.nodeAlgos.clear();
 		this.segmentAlgos.clear();
 		this.edgeAlgos.clear();
@@ -217,11 +266,7 @@ public class GraphMatching {
 			}
 		}
 		
-		Double deltaDist = 300.0;
-		Double deltaPhi = (Math.PI / 4);
 		GraphMatching r = new GraphMatching(v, h);
-//		r.addAlgo(new NodeDistAlgo(deltaDist, h));
-//		r.addAlgo(new NodeAngleAlgo(deltaPhi));
 		r.topDownMatching();
 //		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
 //			System.out.println(e.getKey() + " " + e.getValue());

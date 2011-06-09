@@ -24,39 +24,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import com.vividsolutions.jts.index.bintree.NodeBase;
-
-import playground.droeder.data.graph.GraphElement;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingNode;
+import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
 
 /**
  * @author droeder
  *
  */
-public class NodeAngleAlgo implements MatchingAlgorithm{
+public class NodeAngleAlgo implements NodeAlgorithm{
 	
-	private Class<MatchingNode> clazz;
 	private Double deltaPhi;
 
 	public NodeAngleAlgo(Double deltaPhi){
-		this.clazz = MatchingNode.class;
 		this.deltaPhi = deltaPhi;
 	}
 	
 	@Override
-	public List<? extends GraphElement> run(GraphElement ref,	List<? extends GraphElement> candidates) {
+	public List<MatchingNode> run(MatchingNode ref,	List<MatchingNode> candidates) {
 		double phi = Double.MAX_VALUE;
 		double temp;
 		List<MatchingNode> newCandidates = new ArrayList<MatchingNode>();
 
 		//iterate over all candidateNodes
-		for(GraphElement cand : candidates){
+		for(MatchingNode cand : candidates){
 			
 			//iterate over all edges outgoing from referenceNode
-			for(MatchingEdge refEdge : ((MatchingNode) ref).getOutEdges()){
+			for(MatchingEdge refEdge : ref.getOutEdges()){
 				//iterate over all edges outgoing from the candidateNode
-				for(MatchingEdge candEdge : ((MatchingNode) cand).getOutEdges()){
+				for(MatchingEdge candEdge : cand.getOutEdges()){
 					temp = getPhi(refEdge, candEdge);
 					if(temp < phi){
 						phi = temp;
@@ -91,11 +87,6 @@ public class NodeAngleAlgo implements MatchingAlgorithm{
 		scalar = ((o.get(0)*t.get(0)) + (o.get(1)+ t.get(1)));
 		
 		return Math.acos(scalar/(absOne * absTwo));
-	}
-
-	@Override
-	public Class<? extends GraphElement> getProcessingClass() {
-		return this.clazz;
 	}
 
 }

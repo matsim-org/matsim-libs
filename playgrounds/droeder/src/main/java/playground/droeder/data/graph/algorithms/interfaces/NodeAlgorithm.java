@@ -17,20 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph.algorithms;
+package playground.droeder.data.graph.algorithms.interfaces;
 
 import java.util.List;
 
-import playground.droeder.data.graph.GraphElement;
+import playground.droeder.data.graph.MatchingNode;
 
 /**
  * @author droeder
  *
  */
-public interface MatchingAlgorithm {
+public interface NodeAlgorithm extends MatchingAlgorithm{
 	
-	public List<? extends GraphElement> run(GraphElement ref, List<? extends GraphElement> candidates);
-	
-	public Class<? extends GraphElement> getProcessingClass();
+	public List<MatchingNode> run(MatchingNode ref, List<MatchingNode> candidates);
 	
 }

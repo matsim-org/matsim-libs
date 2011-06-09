@@ -17,34 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph.algorithms;
-
-import java.util.List;
-
-import playground.droeder.data.graph.MatchingGraph;
-import playground.droeder.data.graph.MatchingNode;
-import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
-
+package playground.droeder.data.graph.algorithms.interfaces;
 
 /**
  * @author droeder
  *
  */
-public class NodeDistAlgo implements NodeAlgorithm{
-	
-	private Double deltaDist;
-	private MatchingGraph candGraph;
-
-	public NodeDistAlgo(Double deltaDist, MatchingGraph candGraph){
-		this.deltaDist = deltaDist;
-		this.candGraph = candGraph;
-	}
-	
-
-	@Override
-	public List<MatchingNode> run(MatchingNode ref, List<MatchingNode> candidates) {
-		return this.candGraph.getNearestNodes(ref.getCoord().getX(), ref.getCoord().getY(), deltaDist);
-	}
-
+public interface MatchingAlgorithm {
 
 }
