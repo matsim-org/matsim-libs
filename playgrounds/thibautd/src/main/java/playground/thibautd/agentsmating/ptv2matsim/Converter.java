@@ -454,17 +454,19 @@ public class Converter {
 		int strataSize;
 		int toDraw;
 		int index;
+		int cliqueSize;
 		List<Id> strata;
 		int drawn = 0;
 
 		for (Map.Entry<Integer, List<Id>> entry : stratas.entrySet()) {
 			strata = entry.getValue();
 			strataSize = strata.size();
-			toDraw = (int) Math.ceil(strataSize * sampleRate);
+			cliqueSize = entry.getKey();
+			toDraw = (int) Math.ceil((strataSize * sampleRate)/cliqueSize);
 			drawn += toDraw;
 
 			log.debug("drawing "+toDraw+" from the "+strataSize+
-					" cliques of size "+entry.getKey());
+					" cliques of size "+cliqueSize);
 
 			// draw a number of elements proportionnal to the strata size,
 			// without replacement.
