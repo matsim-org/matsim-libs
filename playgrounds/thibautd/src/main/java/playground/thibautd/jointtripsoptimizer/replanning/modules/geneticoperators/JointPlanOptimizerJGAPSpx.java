@@ -30,17 +30,19 @@ import org.apache.log4j.Logger;
 import org.jgap.Gene;
 import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
-import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPModeGene;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * Multi-parent "Simplex cross-over".
+ *
+ * @deprecated this operator does not lead to better results than simpler ones,
+ * and is more likely to contain bugs due to its complexity.
+ *
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPSpx implements GeneticOperator {

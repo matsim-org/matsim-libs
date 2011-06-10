@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperat
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +32,6 @@ import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
-import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 

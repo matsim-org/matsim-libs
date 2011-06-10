@@ -27,7 +27,6 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
-import org.jgap.Population;
 
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 

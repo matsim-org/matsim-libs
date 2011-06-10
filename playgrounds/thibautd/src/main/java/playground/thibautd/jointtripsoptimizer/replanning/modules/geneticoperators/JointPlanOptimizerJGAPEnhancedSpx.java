@@ -43,6 +43,10 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * Multi-parent "Simplex cross-over", with boolean CO.
  * modified JointPlanOptimizerJGAPSpx: refactoring to do.
+ *
+ * @deprecated this operator does not lead to better results than simpler ones,
+ * and is more likely to contain bugs due to its complexity.
+ *
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPEnhancedSpx implements GeneticOperator {

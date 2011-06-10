@@ -30,7 +30,7 @@ import org.jgap.Population;
 import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.RandomGenerator;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerFitnessFunction;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerPopulationFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;

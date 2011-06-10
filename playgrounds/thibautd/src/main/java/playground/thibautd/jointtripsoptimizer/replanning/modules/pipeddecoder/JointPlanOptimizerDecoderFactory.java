@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
@@ -71,7 +70,6 @@ public class JointPlanOptimizerDecoderFactory {
 			this.partialFactory.createDecoder();
 
 		output.addDecoder(new DurationDecoder(
-		//output.addDecoder(new DurationDecoderAPosterioriSyncing(
 			this.plan,
 			this.configGroup,
 			this.legTravelTimeEstimatorFactory,

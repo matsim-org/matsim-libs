@@ -31,6 +31,8 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JointPlanOptimizerFitnessFunction;
+
 /**
  * Extends org.jgap.Chromosome so that it can take negative fitness values.
  * @author thibautd

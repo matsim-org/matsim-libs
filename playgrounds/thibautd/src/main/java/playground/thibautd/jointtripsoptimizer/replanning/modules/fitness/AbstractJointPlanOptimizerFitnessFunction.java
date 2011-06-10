@@ -17,9 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.modules;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.fitness;
 
 import org.jgap.FitnessFunction;
+
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
 
 /**
  * @author thibautd
