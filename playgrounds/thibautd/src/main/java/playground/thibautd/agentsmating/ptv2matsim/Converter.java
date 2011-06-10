@@ -150,9 +150,17 @@ public class Converter {
 		Id passenger;
 		int passengerLeg;
 
+		int count = 0;
+		int next = 1;
+
 		for (String currentLine = getNextDataLine();
 				currentLine != null;
 				currentLine =  getNextDataLine()) {
+			count++;
+			if (count == next) {
+				log.debug("processing data line # "+count);
+				next *= 2;
+			}
 			data = currentLine.split(SPLIT_EXPR);
 			driver = new IdImpl(data[DRIVER]);
 			driverLeg = getLegIndex(data[DRIVER_LEG]);
@@ -164,6 +172,8 @@ public class Converter {
 			// update cliques
 			updateCliques(driver, passenger);
 		}
+
+		log.debug(count+" lines processed");
 
 		constructCliques();
 	}
