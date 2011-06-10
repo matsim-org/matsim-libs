@@ -20,6 +20,7 @@
 package playground.thibautd.agentsmating.ptv2matsim;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -60,9 +61,11 @@ public class ConvertData {
 		Config config = ConfigUtils.loadConfig(configFile);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		try {
-		IOUtils.initOutputDirLogging(
-			config.controler().getOutputDirectory(),
-			appender.getLogEvents());
+			File outputDir = new File(config.controler().getOutputDirectory());
+			outputDir.mkdirs();
+			IOUtils.initOutputDirLogging(
+				config.controler().getOutputDirectory(),
+				appender.getLogEvents());
 		} catch (IOException e) {
 			log.error("could not create log file");
 		}
