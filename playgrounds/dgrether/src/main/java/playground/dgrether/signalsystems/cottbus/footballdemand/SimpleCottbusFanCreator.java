@@ -39,16 +39,17 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -132,7 +133,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 	}
 
 	@Override
-	public void createAndAddFans(Scenario sc, int numberOfFans) {
+	public Population createAndAddFans(Scenario sc, int numberOfFans) {
 		int numberOfCbFans = (int) (numberOfFans * cottbusFansPercentage);
 		int numberOfSPNFans = numberOfFans - numberOfCbFans;
 		
@@ -141,7 +142,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());
-		
+		Population fanPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Population pop = sc.getPopulation();
 		Person p;
 		Plan plan;
@@ -152,6 +153,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		for (int i = 0; i < numberOfCbFans; i++){
 			p = pop.getFactory().createPerson(sc.createId(Integer.toString(fanId) + "_" + CottbusFootballStrings.CB2FB ));
 			pop.addPerson(p);
+			fanPop.addPerson(p);
 			this.fanId++;
 			homeCoordinate = this.getRandomPointInFeature(this.random, this.cbFeature.getDefaultGeometry(), this.sdfGeometry);
 			homeCoord = MGC.coordinate2Coord(homeCoordinate);
@@ -166,6 +168,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		for (int i = 0; i < numberOfSPNFans; i++){
 			p = pop.getFactory().createPerson(sc.createId(Integer.toString(fanId) + "_" + CottbusFootballStrings.SPN2FB));
 			pop.addPerson(p);
+			fanPop.addPerson(p);
 			this.fanId++;
 			homeCoordinate = this.getRandomPointInFeature(this.random, this.spnFeature.getDefaultGeometry(), this.cbFeature.getDefaultGeometry());
 			homeCoord = MGC.coordinate2Coord(homeCoordinate);
@@ -177,7 +180,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 			this.correctHomeEndTime(p);
 //			sc2.getPopulation().addPerson(p);
 		}
-		
+		return fanPop;
 	}
 	
 	private void correctHomeEndTime(Person p) {

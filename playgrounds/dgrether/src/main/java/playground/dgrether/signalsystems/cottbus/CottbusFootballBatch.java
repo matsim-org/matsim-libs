@@ -31,6 +31,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -73,7 +75,7 @@ public class CottbusFootballBatch {
 		}
 		log.info("using base output directory: " + baseOutputDirectory);
 		createOutputDirectory(baseOutputDirectory);
-		
+		Population fanPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		//initialize variables needed in the loop
 		String runId = baseConfig.controler().getRunId();
 		Map<Integer, Double> percentageOfFans2AverageTTMap = new HashMap<Integer, Double>();
@@ -83,10 +85,16 @@ public class CottbusFootballBatch {
 		//start the runs
 		int increment = 10;
 		for (int numberOfFootballFans = 0; numberOfFootballFans <= 100; numberOfFootballFans = numberOfFootballFans + increment){
-			if (numberOfFootballFans != 0) fanCreator.createAndAddFans(baseScenario, 20 * increment);
+			if (numberOfFootballFans != 0) {
+				Population p = fanCreator.createAndAddFans(baseScenario, 20 * increment);
+				for (Person pers : p.getPersons().values()){
+					fanPop.addPerson(pers);
+				}
+			}
 			baseConfig.controler().setOutputDirectory(baseOutputDirectory + numberOfFootballFans + "_football_fans/");
 			baseConfig.controler().setRunId(runId + "_" + numberOfFootballFans + "_football_fans");
 			Controler controler = new Controler(baseScenario);
+			controler.addControlerListener(new CottbusFansControlerListener(fanPop));
 			//add average tt handler for football fans
 			CottbusFootballAnalysisControllerListener cbfbControllerListener = new CottbusFootballAnalysisControllerListener();
 			controler.addControlerListener(cbfbControllerListener);

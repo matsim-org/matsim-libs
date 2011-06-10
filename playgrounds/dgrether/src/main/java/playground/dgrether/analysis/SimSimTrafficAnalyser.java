@@ -175,7 +175,7 @@ public class SimSimTrafficAnalyser {
 		LineString ls = geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 		
-		Object [] attribs = new Object[35];
+		Object [] attribs = new Object[60];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -197,6 +197,17 @@ public class SimSimTrafficAnalyser {
 			i++;
 		}
 		attribs[34] = sumRelativeError / 24.0;
+		i = 35;
+		double difference = 0;
+		double sumDifference = 0;
+		for (CountSimComparison csc : countSimComparisonList){
+			if (csc.getHour() != i - 34) throw new IllegalStateException("List not sorted correclty");
+			difference = csc.getSimulationValue() - csc.getCountValue();
+			attribs[i] = difference;
+			sumDifference += difference;
+			i++;
+		}
+		attribs[59] = sumDifference;
 		try {
 			return featureType.create(attribs);
 		} catch (IllegalAttributeException e) {
@@ -207,7 +218,7 @@ public class SimSimTrafficAnalyser {
 	
 	private FeatureType createFeatureType(CoordinateReferenceSystem crs) {
 		FeatureType featureType = null;
-		AttributeType [] attribs = new AttributeType[35];
+		AttributeType [] attribs = new AttributeType[60];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -222,6 +233,10 @@ public class SimSimTrafficAnalyser {
 			attribs[10 + i] = AttributeTypeFactory.newAttributeType("re h " + (i + 1), Double.class);
 		}
 		attribs[34] = AttributeTypeFactory.newAttributeType("re 24h", Double.class);
+		for (int i = 0; i < 24; i++){
+			attribs[35 + i] = AttributeTypeFactory.newAttributeType("abdif_h " + (i + 1), Double.class);
+		}
+		attribs[59] = AttributeTypeFactory.newAttributeType("absdif24h", Double.class);
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
 		} catch (FactoryRegistryException e) {
@@ -258,37 +273,15 @@ public class SimSimTrafficAnalyser {
 		String srs = null;
 
 		if (args == null || args.length == 0){
-//			net = DgPaths.IVTCHNET;
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.100/100.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.100/100.linkstats.txt.gz";
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.200/200.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.200/200.linkstats.txt.gz";
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.500/500.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.500/500.linkstats.txt.gz";
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.550/550.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.550/550.linkstats.txt.gz";
-			//		String outfile = DgPaths.VSPCVSBASE + "runs/run612/traffic612vs610.550";
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run612/it.500/500.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run620/it.500/500.linkstats.txt.gz";
-			//		String outfile = DgPaths.VSPCVSBASE + "runs/run620/traffic612vs620.500";
+//			net = "/media/data/work/repos/runs-svn/run1216/1216.output_network.xml.gz";
+//			linkstats1 = "/media/data/work/repos/runs-svn/run1216/ITERS/it.500/1216.500.linkstats.txt.gz";
+//			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
+//			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
 
-			//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run465/it.500/500.linkstats.txt.gz";
-			//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run568/it.500/500.linkstats.txt.gz";
-			//		String outfile = DgPaths.VSPCVSBASE + "runs/run568/traffic465vs568.500";
-//			linkstats1 = DgPaths.RUNBASE + "run709/it.1000/1000.linkstats.txt.gz";
-//			linkstats2 = DgPaths.RUNBASE + "run710/it.1000/1000.linkstats.txt.gz";
-//			outfile = DgPaths.RUNBASE + "run710/traffic709vs710.500";
-//			srs = TransformationFactory.CH1903_LV03;
-
-			net = "/media/data/work/repos/runs-svn/run1216/1216.output_network.xml.gz";
-			linkstats1 = "/media/data/work/repos/runs-svn/run1216/ITERS/it.500/1216.500.linkstats.txt.gz";
-			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
-
-//			net = "/media/data/work/repos/runs-svn/run1217/1217.output_network.xml.gz";
-//			linkstats1 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-//			linkstats2 = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1218.500.linkstats.txt.gz";
-//			outfile = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1217.500vs1218.500";
+			net = "/media/data/work/repos/runs-svn/run1217/1217.output_network.xml.gz";
+			linkstats1 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
+			linkstats2 = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1218.500.linkstats.txt.gz";
+			outfile = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1217.500vs1218.500";
 			
 			srs = TransformationFactory.WGS84_UTM33N;
 			

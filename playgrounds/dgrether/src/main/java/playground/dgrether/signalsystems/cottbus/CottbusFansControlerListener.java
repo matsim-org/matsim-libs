@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusFanCreatorI
+ * CottbusFansControlerListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,13 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.footballdemand;
+package playground.dgrether.signalsystems.cottbus;
 
-import org.matsim.api.core.v01.Scenario;
+import java.util.Random;
+
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public interface CottbusFanCreator {
 
-	public Population createAndAddFans(Scenario sc, int numberOfFans);
+/**
+ * @author dgrether
+ *
+ */
+public class CottbusFansControlerListener implements BeforeMobsimListener{
+
+	private Population pop;
+	private Random random;
+	
+	
+	public CottbusFansControlerListener(Population fanPop) {
+		this.pop = fanPop;
+		random = MatsimRandom.getLocalInstance();
+	}
+
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent e) {
+		Controler c = e.getControler();
+		PlanAlgorithm pcr = c.createRoutingAlgorithm();
+		for (Person p : pop.getPersons().values()){
+			if (random.nextDouble() < 0.1){
+				pcr.run(p.getSelectedPlan());
+			}
+		}
+	}
+	
+	
+	
 
 }

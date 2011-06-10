@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
+import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -34,6 +37,25 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class CottbusUtils {
 
+	
+	public static ScenarioImpl loadCottbusScenrio(boolean fixedTimeSignals){
+		Config c2 = ConfigUtils.createConfig();
+		c2.scenario().setUseLanes(true);
+		c2.scenario().setUseSignalSystems(true);
+		c2.network().setInputFile(DgCottbusScenarioPaths.NETWORK_FILENAME);
+		c2.network().setLaneDefinitionsFile(DgCottbusScenarioPaths.LANES_FILENAME);
+		c2.signalSystems().setSignalSystemFile(DgCottbusScenarioPaths.SIGNALS_FILENAME);
+		c2.signalSystems().setSignalGroupsFile(DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME);
+		if (fixedTimeSignals){
+			c2.signalSystems().setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME);
+		}
+		else {
+			c2.signalSystems().setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_SYLVIA_FILENAME);
+		}
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(c2);
+		return sc;
+	}
+	
 	
 	public static Tuple<CoordinateReferenceSystem, Feature> loadCottbusFeature(String shapeFile) {
 		ShapeFileReader shapeReader = new ShapeFileReader();

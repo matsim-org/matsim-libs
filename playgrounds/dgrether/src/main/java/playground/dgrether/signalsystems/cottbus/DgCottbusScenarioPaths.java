@@ -33,6 +33,7 @@ public interface DgCottbusScenarioPaths {
 	public static final String SIGNALS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
 	public static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
 	public static final String SIGNAL_CONTROL_FIXEDTIME_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+	public static final String SIGNAL_CONTROL_SYLVIA_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_sylvia.xml";
 	
 	
 }
