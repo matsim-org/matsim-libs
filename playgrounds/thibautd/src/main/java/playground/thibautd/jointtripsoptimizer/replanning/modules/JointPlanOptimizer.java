@@ -106,6 +106,9 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 			gaPopulation.evolve(this.configGroup.getMaxIterations());
 		}
 
+		// notify end
+		jgapConfig.finish();
+
 		//get fittest chromosome, and modify the given plan accordingly
 		JointPlan evolvedPlan = jgapConfig.getDecoder().decode(
 				gaPopulation.getFittestChromosome());

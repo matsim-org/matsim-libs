@@ -81,6 +81,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 	private final AbstractJointPlanOptimizerFitnessFunction fitnessFunction;
 	private final IEvolutionMonitor monitor;
+	private final JointPlanOptimizerPopulationAnalysisOperator populationAnalysis;
 
 	private final boolean optimizeToggle;
 
@@ -176,10 +177,15 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 			// genetic operators definitions
 			if (configGroup.getPlotFitness()) {
-				this.addGeneticOperator( new JointPlanOptimizerPopulationAnalysisOperator(
+				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
 							configGroup.getMaxIterations(),
-							outputPath));
+							this.nMembers,
+							outputPath);
+				this.addGeneticOperator(this.populationAnalysis);
+			}
+			else {
+				this.populationAnalysis = null;
 			}
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
@@ -297,6 +303,16 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	public IEvolutionMonitor getEvolutionMonitor() {
 		return this.monitor;
+	}
+
+	/**
+	 * To call at the end, performs all necessary ending procedure
+	 * (as outputing fitness graphs if needed).
+	 */
+	public void finish() {
+		if (this.populationAnalysis != null) {
+			this.populationAnalysis.finish();
+		}
 	}
 }
 

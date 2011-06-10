@@ -27,10 +27,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
@@ -59,8 +62,10 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	private final String fileNameLine;
 	private final int populationSize;
 	private final int chromosomeLength;
-	private int width = 1024;
-	private int height = 768;
+	private final int nMembers;
+	private double scale = 0.75d;
+	private int width = (int) (scale * 1024); 
+	private int height = (int) (scale *  768);
 
 
 
@@ -71,8 +76,10 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	public JointPlanOptimizerPopulationAnalysisOperator(
 			JointPlanOptimizerJGAPConfiguration jgapConfig,
 			int maxIters,
+			int nMembers,
 			String outputPath) {
 		this.jgapConfig = jgapConfig;
+		this.nMembers = nMembers;
 		this.populationSize = jgapConfig.getPopulationSize();
 		this.chromosomeLength = jgapConfig.getChromosomeSize();
 		this.maxIters = maxIters;
@@ -118,15 +125,13 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	 * Allows the output to work with any number of genetic iterations (ie with a
 	 * monitor).
 	 */
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
+	public void finish() {
 		outputFitnessBoxPlots();
 		outputBestFitnessGraph();
 	}
 
 	private void outputBestFitnessGraph() {
-		String title = "best fitness evolution";
+		String title = "best fitness evolution, "+nMembers+" agents";
 		String xLabel = "iteration";
 		String yLabel = "fitness";
 		boolean legend = false;
@@ -135,7 +140,11 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		dataset.addSeries(0, this.maxFitnesses);
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, legend, false, false);
-
+		// set the X axis use integer values.
+		NumberAxis axis = new NumberAxis();
+		axis.setTickUnit((NumberTickUnit) NumberAxis.createIntegerTickUnits().getCeilingTickUnit(1d));
+		axis.setAutoRangeIncludesZero(false);
+		(chart.getXYPlot()).setDomainAxis(axis);
 		try {
 			ChartUtilities.saveChartAsPNG(new File(fileNameLine), chart, width, height);
 		} catch (IOException e) {
@@ -147,7 +156,8 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		//log.info("writing fitness chart to file...");
 
 		String title = "fitness: population="+this.populationSize+
-			", chomosome size="+this.chromosomeLength;
+			", chomosome size="+this.chromosomeLength+", "+
+			this.nMembers+" agents";
 		String xLabel = "iteration";
 		String yLabel = "fitness";
 		boolean legend = false;
