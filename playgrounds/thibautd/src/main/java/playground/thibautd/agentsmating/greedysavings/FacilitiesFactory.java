@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -49,6 +51,9 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  * @author thibautd
  */
 public class FacilitiesFactory {
+	private static final Logger log =
+		Logger.getLogger(FacilitiesFactory.class);
+
 
 	//private static final double EPSILON = 1E-7;
 	private static final double EPSILON = 1;
@@ -61,6 +66,9 @@ public class FacilitiesFactory {
 	//private final Map<Id, Id> pickUpFacilities = new TreeMap<Id, Id>();
 	//private final Map<Id, Id> dropOffFacilities = new TreeMap<Id, Id>();
 	private final Map<Id, Id> puDoFacilities = new TreeMap<Id, Id>();
+
+	private int count = 0;
+	private int next = 1;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor and relatives
@@ -91,6 +99,7 @@ public class FacilitiesFactory {
 	// IO
 	// /////////////////////////////////////////////////////////////////////////
 	public void write(String file) {
+		log.info(count+" pu/do facilities created, writing to file "+file);
 		(new FacilitiesWriter(facilities)).write(file);
 	}
 
@@ -98,18 +107,27 @@ public class FacilitiesFactory {
 	// helper methods
 	// /////////////////////////////////////////////////////////////////////////
 	private Id createFacility(final Id linkId) {
-		Id factoryId = this.idFactory.createId();
+		this.logCount();
+		Id facilityId = this.idFactory.createId();
 
 		ActivityFacilityImpl facility =
 			this.facilities.createFacility(
-					factoryId,
+					facilityId,
 					this.network.getLinks().get(linkId).getCoord());
 
 		createPUOption(facility);
 		createDOOption(facility);
 
-		this.puDoFacilities.put(linkId, factoryId);
-		return factoryId;
+		this.puDoFacilities.put(linkId, facilityId);
+		return facilityId;
+	}
+
+	private void logCount() {
+		count++;
+		if (count == next) {
+			log.info("creating pu/do facility # "+count);
+			next *= 2;
+		}
 	}
 
 	private void createPUOption(final ActivityFacilityImpl facility) {

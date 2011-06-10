@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -36,9 +38,14 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thibautd
  */
 public class CliquesWriter extends MatsimXmlWriter {
+	private static final Logger log =
+		Logger.getLogger(CliquesWriter.class);
+
 
 	private Map<Id, List<Id>> cliques;
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+	private int count = 0;
+	private int nextLog = 1;
 
 	public CliquesWriter(Map<Id, List<Id>> cliques) {
 		this.cliques = cliques;
@@ -53,6 +60,10 @@ public class CliquesWriter extends MatsimXmlWriter {
 			throw new UncheckedIOException("problem while writing cliques", e);
 		}
 		this.close();
+
+		log.info(count+" cliques succesfully dumped to "+fileName);
+		count = 0;
+		nextLog = 1;
 	}
 
 	private void writeCliques() throws IOException {
@@ -68,6 +79,7 @@ public class CliquesWriter extends MatsimXmlWriter {
 	}
 
 	private void writeClique(Id id) throws IOException {
+		this.logCount();
 		this.atts.clear();
 		this.atts.add(this.createTuple(CliquesSchemaNames.CLIQUE_ID, id.toString()));
 		this.writeStartTag(CliquesSchemaNames.CLIQUE, atts);
@@ -75,6 +87,14 @@ public class CliquesWriter extends MatsimXmlWriter {
 		this.writeMembers(this.cliques.get(id));
 
 		this.writeEndTag(CliquesSchemaNames.CLIQUE);
+	}
+
+	private void logCount() {
+		count++;
+		if (count == nextLog) {
+			log.info("dumping clique # "+count);
+			nextLog *= 2;
+		}
 	}
 
 	private void writeMembers(List<Id> clique) throws IOException {
