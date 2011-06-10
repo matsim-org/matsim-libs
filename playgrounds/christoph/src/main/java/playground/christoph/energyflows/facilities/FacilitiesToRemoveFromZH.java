@@ -36,13 +36,13 @@ import org.matsim.core.utils.misc.Counter;
 
 public class FacilitiesToRemoveFromZH {
 
-	private String textFile = "../../matsim/mysimulations/2kw/facilities/Facilities2CutFromMATSim.txt";
+//	private String textFile = "../../matsim/mysimulations/2kw/facilities/Facilities2CutFromMATSim.txt";
 
 	private String separator = ";";
 	private Charset charset = Charset.forName("ISO-8859-1");
 	private Set<Id> facilitiesToRemove;
 	
-	public FacilitiesToRemoveFromZH() throws Exception {
+	public FacilitiesToRemoveFromZH(String textFile) throws Exception {
 		facilitiesToRemove = new TreeSet<Id>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		

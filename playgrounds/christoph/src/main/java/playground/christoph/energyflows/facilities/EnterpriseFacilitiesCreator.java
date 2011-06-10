@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -56,14 +57,14 @@ public class EnterpriseFacilitiesCreator {
 
 final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.class);
 	
-	private String enterpriseToBuildingTextFile = "../../matsim/mysimulations/2kw/gis/EnterpriseToBuilding.txt";
-	private String enterpriseCensusVAETextFile =  "../../matsim/mysimulations/2kw/gis/AST_08_Capacities.csv";
-	private String enterpriseCensusTextFile = "../../matsim/mysimulations/2kw/facilities/AST_08.csv";
-	
-	private String inFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/facilitiesZH.xml.gz";
-	private String existingFacilitiesFile = "../../matsim/mysimulations/2kw/facilities/facilities.xml.gz";
-	private String outFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/output_facilitiesZH.xml.gz";
-	private String outEmptyFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/output_emptyFacilitiesZH.txt";
+//	private String enterpriseToBuildingTextFile = "../../matsim/mysimulations/2kw/gis/EnterpriseToBuilding.txt";
+//	private String enterpriseCensusVAETextFile =  "../../matsim/mysimulations/2kw/gis/AST_08_Capacities.csv";
+//	private String enterpriseCensusTextFile = "../../matsim/mysimulations/2kw/facilities/AST_08.csv";
+//	
+//	private String inFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/facilitiesZH.xml.gz";
+//	private String existingFacilitiesFile = "../../matsim/mysimulations/2kw/facilities/facilities.xml.gz";
+//	private String outFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/output_facilitiesZH.xml.gz";
+//	private String outEmptyFacilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/output_emptyFacilitiesZH.txt";
 	
 	private String muncipalityId = "261";	// Zurich city Id
 		
@@ -74,7 +75,8 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 	
 	private Map<Id, Id> enterpriseToBuildingMapping;	// <EnterpriseId, BuildingId>
 	private Map<Id, Integer> enterpriseVAE;	// <EnterpriseId, Vollzeitaequivalente Arbeitsplaetze>
-//	private Map<Id, EnterpriseData> data;
+
+	private ActivityFacilities zhFacilities;
 	private ActivityFacilities existingFacilities;
 	private Config config;
 	private Scenario scenario;
@@ -103,39 +105,64 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 	private QuadTree<Id> shop_retail_lt100sqmCapacityMapQuadTree;
 	private QuadTree<Id> shop_otherCapacityMapQuadTree;
 	
-	/*
+	/**
 	 * Capacity of third Activities (shopping, leisure, ...) in a Facility is
 	 * calculated as in Meister (2008): cap3 = capacity * (10 + random(0..10))
+	 * EDIT: Adapted formula for education_kindergarten (*2), education_primary (*5), education_higher (/3)
+	 * 
+	 * Expects 7 Strings as input parameters:
+	 * - buildingsTextFile (input)
+	 * - apartmentsTextFile (input)
+	 * - apartmentBuildingsTextFile (output)
+	 * - facilitiesZHFile (output)
 	 */
-	public static void main(String[] args) throws Exception {		
-		new EnterpriseFacilitiesCreator();
+	public static void main(String[] args) throws Exception {
+		if (args.length != 7) return;
+		
+		String enterpriseToBuildingTextFile = args[0];
+		String enterpriseCensusVAETextFile = args[1];
+		String enterpriseCensusTextFile = args[2];
+		String inFacilitiesZHFile = args[3];
+		String existingFacilitiesFile = args[4];
+		String outFacilitiesZHFile = args[5];
+		String outEmptyFacilitiesZHFile = args[6];
+		
+		EnterpriseFacilitiesCreator creator = new EnterpriseFacilitiesCreator(inFacilitiesZHFile, existingFacilitiesFile);
+		creator.createShopQuadTrees();
+		creator.parseEnterpriseToBuildingTextFile(enterpriseToBuildingTextFile);
+		creator.parseEnterpriseCensusVAETextFile(enterpriseCensusVAETextFile);
+		creator.parseEnterpriseTextFile(enterpriseCensusTextFile);
+		creator.setOpeningTimes();
+		creator.analyseFacilites();
+		creator.writeEmptyFacilitiesFile(outEmptyFacilitiesZHFile);
+		creator.writeFacilitiesFile(outFacilitiesZHFile);
 	}
 	
-	public EnterpriseFacilitiesCreator() throws Exception {
+	public EnterpriseFacilitiesCreator(String inFacilitiesZHFile, String existingFacilitiesFile) throws Exception {
 		config = ConfigUtils.createConfig();
 		config.facilities().setInputFile(inFacilitiesZHFile);
 		scenario = ScenarioUtils.loadScenario(config);
+		zhFacilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		
 		Config existingFacilitiesConfig = ConfigUtils.createConfig(); 
 		existingFacilitiesConfig.facilities().setInputFile(existingFacilitiesFile);
 		Scenario existingFacilitiesScenario = ScenarioUtils.loadScenario(existingFacilitiesConfig);
 		existingFacilities = ((ScenarioImpl) existingFacilitiesScenario).getActivityFacilities();
+	}
+	
+	public EnterpriseFacilitiesCreator(ActivityFacilities zhFacilities, ActivityFacilities existingFacilities) throws Exception {
+		config = ConfigUtils.createConfig();
+		scenario = ScenarioUtils.createScenario(config);
 		
-		createShopQuadTrees();
-		parseEnterpriseToBuildingTextFile();
-		parseEnterpriseCensusVAETextFile();
-		parseEnterpriseTextFile();
-		setOpeningTimes();
-		analyseFacilites();
-		writeEmptyFacilitiesFile();
-		writeFacilitiesFile();
+		this.zhFacilities = zhFacilities;
+		this.existingFacilities = existingFacilities;
 	}
 	
 	/*
 	 * Read the existing MATSim Switzerland facilities file. Create quad trees
 	 * for the shopping facilities. We use them to copy their opening times.
 	 */
-	private void createShopQuadTrees() {	
+	public void createShopQuadTrees() {	
 		log.info("building shop quad trees...");
 		
 		shop_retail_gt2500sqmCapacityQuadTree = createQuadTree("shop_retail_gt2500sqm");
@@ -175,7 +202,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				
 		QuadTree<Id> quadTree = new QuadTree<Id>(minx, miny, maxx, maxy);
 		
-		log.info("filling nodes quad tree...");
+		log.info("filling facilities quad tree...");
 		for (ActivityFacility facility : existingFacilities.getFacilities().values()) {
 			if (!((ActivityFacilityImpl) facility).getDesc().contains(shopType)) continue;
 			
@@ -185,7 +212,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		return quadTree;
 	}
 	
-	private void parseEnterpriseToBuildingTextFile() throws Exception {
+	public void parseEnterpriseToBuildingTextFile(String enterpriseToBuildingTextFile) throws Exception {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
@@ -223,7 +250,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		fis.close();
 	}
 	
-	private void parseEnterpriseCensusVAETextFile() throws Exception {
+	public void parseEnterpriseCensusVAETextFile(String enterpriseCensusVAETextFile) throws Exception {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
@@ -256,7 +283,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		fis.close();
 	}
 	
-	private void parseEnterpriseTextFile() throws Exception {
+	public void parseEnterpriseTextFile(String enterpriseCensusTextFile) throws Exception {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
@@ -266,8 +293,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		br = new BufferedReader(isr);
 		
 		Counter counter = new Counter("parsed enterprises in ZH: ");
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		
+				
 		int work_sector2Capacity = 0;
 		int work_sector3Capacity = 0;
 		int leisure_gastroCapacity = 0;
@@ -319,7 +345,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		shop_retail_lt100sqmCapacityMap = new HashMap<Id, Integer>();
 		shop_otherCapacityMap = new HashMap<Id, Integer>();
 		
-		for (Facility facility : facilities.getFacilities().values()) {
+		for (Facility facility : zhFacilities.getFacilities().values()) {
 			work_sector2CapacityMap.put(facility.getId(), 0);
 			work_sector3CapacityMap.put(facility.getId(), 0);
 			leisure_gastroCapacityMap.put(facility.getId(), 0);
@@ -403,14 +429,21 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 					leisure_sportsCapacity += cap;
 					leisure_sportsCapacityMap.put(facilityId, leisure_sportsCapacityMap.get(facilityId) + cap);
 				} else if (NOGATypes.education_higherNOGAs.contains(e.noga)) {
+					// adapt capacity
+					cap = cap / 3;
+					if (cap == 0) cap = 1;
 					education_higherFacilities++;
 					education_higherCapacity += cap;
 					education_higherCapacityMap.put(facilityId, education_higherCapacityMap.get(facilityId) + cap);
 				} else if (NOGATypes.education_kindergartenNOGAs.contains(e.noga)) {
+					// adapt capacity
+					cap = cap * 2;
 					education_kindergartenFacilities++;
 					education_kindergartenCapacity += cap;
 					education_kindergartenCapacityMap.put(facilityId, education_kindergartenCapacityMap.get(facilityId) + cap);
 				} else if (NOGATypes.education_primaryNOGAs.contains(e.noga)) {
+					// adapt capacity
+					cap = cap * 5;
 					education_primaryFacilities++;
 					education_primaryCapacity += cap;
 					education_primaryCapacityMap.put(facilityId, education_primaryCapacityMap.get(facilityId) + cap);
@@ -494,12 +527,10 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		fis.close();
 	}
 	
-	private void setOpeningTimes() {
+	public void setOpeningTimes() {
 		log.info("Setting opening times...");
-		
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		
-		for (Facility facility : facilities.getFacilities().values()) {
+				
+		for (Facility facility : zhFacilities.getFacilities().values()) {
 			
 			int work_sector2Capacity = work_sector2CapacityMap.get(facility.getId());
 			int work_sector3Capacity = work_sector3CapacityMap.get(facility.getId());
@@ -800,12 +831,11 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		log.info("done.");
 	}
 	
-	private void analyseFacilites() {
+	public void analyseFacilites() {
 		log.info("Setting opening times...");
 		
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		Counter counter = new Counter("Facilities without activity option ");
-		for (Facility facility : facilities.getFacilities().values()) {
+		for (Facility facility : zhFacilities.getFacilities().values()) {
 			if (((ActivityFacilityImpl) facility).getActivityOptions().size() == 0) counter.incCounter();
 		}
 		counter.printCounter();
@@ -813,10 +843,10 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		log.info("done.");
 	}
 	
-	private void writeEmptyFacilitiesFile() throws Exception {
+	public void writeEmptyFacilitiesFile(String outEmptyFacilitiesZHFile) throws Exception {
 		log.info("Writing empty facilities to file...");
 		
-		FileOutputStream fos = new FileOutputStream(this.outEmptyFacilitiesZHFile);
+		FileOutputStream fos = new FileOutputStream(outEmptyFacilitiesZHFile);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, charset);
 		BufferedWriter bw = new BufferedWriter(osw);
 		Counter counter = new Counter("Write empty buildings to file ");
@@ -824,8 +854,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		// write Header
 		bw.write("egid" + delimiter + "x" + delimiter + "y" + "\n");
 
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		for (Facility facility : facilities.getFacilities().values()) {
+		for (Facility facility : zhFacilities.getFacilities().values()) {
 			if (((ActivityFacilityImpl) facility).getActivityOptions().size() == 0) {
 				StringBuffer sb = new StringBuffer();
 				sb.append(facility.getId().toString().replace("egid", ""));
@@ -848,9 +877,9 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		log.info("done.");
 	}
 	
-	private void writeFacilitiesFile() {
+	public void writeFacilitiesFile(String outFacilitiesZHFile) {
 		log.info("Setting opening times...");
-		new FacilitiesWriter(((ScenarioImpl) scenario).getActivityFacilities()).write(this.outFacilitiesZHFile);
+		new FacilitiesWriter((ActivityFacilitiesImpl) zhFacilities).write(outFacilitiesZHFile);
 		log.info("done.");
 	}
 	

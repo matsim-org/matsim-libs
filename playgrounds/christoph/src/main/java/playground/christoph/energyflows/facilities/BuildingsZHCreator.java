@@ -56,11 +56,11 @@ public class BuildingsZHCreator {
 	
 	final private static Logger log = Logger.getLogger(BuildingsZHCreator.class);
 	
-	private String buildingsTextFile = "../../matsim/mysimulations/2kw/facilities/Wilke_Gebäude_100709.csv";
-	private String apartmentsTextFile = "../../matsim/mysimulations/2kw/facilities/Wilke_Wohnungen_100709.csv";
+//	private String buildingsTextFile = "../../matsim/mysimulations/2kw/facilities/Wilke_Gebäude_100709.csv";
+//	private String apartmentsTextFile = "../../matsim/mysimulations/2kw/facilities/Wilke_Wohnungen_100709.csv";
 	
-	private String apartmentBuildingsTextFile =  "../../matsim/mysimulations/2kw/gis/apartmentBuildings.csv";
-	private String facilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/facilitiesZH.xml.gz";
+//	private String apartmentBuildingsTextFile =  "../../matsim/mysimulations/2kw/gis/apartmentBuildings.csv";
+//	private String facilitiesZHFile = "../../matsim/mysimulations/2kw/facilities/facilitiesZH.xml.gz";
 	
 	private String delimiter = ",";
 	private Charset charset = Charset.forName("UTF-8");
@@ -70,8 +70,27 @@ public class BuildingsZHCreator {
 	private Config config;
 	private Scenario scenario;
 	
+	/**
+	 * Expects 4 Strings as input parameters:
+	 * - buildingsTextFile (input)
+	 * - apartmentsTextFile (input)
+	 * - apartmentBuildingsTextFile (output)
+	 * - facilitiesZHFile (output)
+	 */
 	public static void main(String[] args) throws Exception {
-		new BuildingsZHCreator();
+		if (args.length != 4) return;
+		
+		String buildingsTextFile = args[0];
+		String apartmentsTextFile = args[1];
+		String apartmentBuildingsTextFile = args[2];
+		String facilitiesZHFile = args[3];
+		
+		BuildingsZHCreator creator = new BuildingsZHCreator();
+		creator.parseBuildingFile(buildingsTextFile);
+		creator.parseApartmentFile(apartmentsTextFile);
+		creator.writeApartmentBuildingsFile(apartmentBuildingsTextFile);
+		creator.createFacilities();
+		creator.writeFacilitiesFile(facilitiesZHFile);
 	}
 	
 	/*
@@ -81,15 +100,9 @@ public class BuildingsZHCreator {
 	public BuildingsZHCreator() throws Exception {
 		config = ConfigUtils.createConfig();	
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		
-		this.parseBuildingFile();
-		this.parseApartmentFile();
-		this.writeApartmentBuildingsFile();
-		this.createFacilities();
-		this.writeFacilitiesFile();
 	}
 	
-	private void parseBuildingFile() throws Exception {
+	public void parseBuildingFile(String buildingsTextFile) throws Exception {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 	    BufferedReader br = null;
@@ -135,7 +148,7 @@ public class BuildingsZHCreator {
 		fis.close();
 	}
 	
-	private void parseApartmentFile() throws Exception {
+	public void parseApartmentFile(String apartmentsTextFile) throws Exception {
 		
 		residentialBuildings = new HashSet<Id>();
 		
@@ -178,7 +191,7 @@ public class BuildingsZHCreator {
 		fis.close();
 	}
 	
-	private void writeApartmentBuildingsFile() throws Exception {
+	public void writeApartmentBuildingsFile(String apartmentBuildingsTextFile) throws Exception {
 		/*
 		 * Write textfile
 		 */
@@ -218,7 +231,7 @@ public class BuildingsZHCreator {
 		fos.close();
 	}
 	
-	private void createFacilities() {
+	public void createFacilities() {
 		for (Entry<Id, BuildingData> entry :data.entrySet()) {
 			Id id = entry.getKey();
 			BuildingData building = entry.getValue();
@@ -234,8 +247,8 @@ public class BuildingsZHCreator {
 		}
 	}
 	
-	private void writeFacilitiesFile() {
-		new FacilitiesWriter(((ScenarioImpl) scenario).getActivityFacilities()).write(this.facilitiesZHFile);
+	public void writeFacilitiesFile(String facilitiesZHFile) {
+		new FacilitiesWriter(((ScenarioImpl) scenario).getActivityFacilities()).write(facilitiesZHFile);
 	}
 	
 //	/*
