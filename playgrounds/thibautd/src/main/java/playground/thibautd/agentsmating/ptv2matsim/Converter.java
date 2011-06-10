@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -46,6 +48,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.thibautd.agentsmating.greedysavings.FacilitiesFactory;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 
@@ -79,6 +82,8 @@ public class Converter {
 	private final Map<Id, List<Id>> associations;
 	private final Map<Id, List<PlanElement>> plansToConstruct;
 	private final List<Id> unaffectedAgents;
+	private final FacilitiesFactory facilitiesFactory;
+	private final boolean useFacilities;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -101,6 +106,20 @@ public class Converter {
 		this.associations = new HashMap<Id, List<Id>>(popSize);
 		this.unaffectedAgents = new ArrayList<Id>(popSize);
 		this.plansToConstruct = new HashMap<Id, List<PlanElement>>(popSize);
+
+		if (scenario.getConfig().facilities().getInputFile() == null) {
+			log.debug("facility creation disabled");
+			this.facilitiesFactory = null;
+			this.useFacilities = false;
+		}
+		else {
+			log.debug("facility creation enabled");
+			this.facilitiesFactory =
+				new FacilitiesFactory(
+						scenario.getActivityFacilities(),
+						scenario.getNetwork());
+			this.useFacilities = true;
+		}
 
 		initInternalStructures();
 		processData();
@@ -204,9 +223,16 @@ public class Converter {
 	private void constructCliques() {
 		List<Id> clique;
 		Id root;
+		int count = 0;
+		int next = 1;
 
 		while (true) {
-			//log.debug("constructing clique");
+			count++;
+			if (count == next) {
+				log.debug("constructing clique # "+count);
+				next *= 2;
+			}
+	
 			try {
 				root = this.unaffectedAgents.remove(0);
 			} catch (IndexOutOfBoundsException e) {
@@ -218,6 +244,7 @@ public class Converter {
 			inDepthSearch(root, clique);
 			addClique(clique);
 		}
+		log.debug(count+" cliques constructed");
 	}
 
 	/**
@@ -262,10 +289,16 @@ public class Converter {
 		Id id;
 		Person person;
 		Plan plan;
+		int count = 0;
+		int next = 1;
 
 		for (Map.Entry<Id, ? extends Person> entry :
 				samplePopulation.getPersons().entrySet()) {
-			//log.debug("constructing individual plan");
+			count++;
+			if (count == next) {
+				log.debug("constructing individual plan # "+count);
+				next *= 2;
+			}
 			id = entry.getKey();
 			person = entry.getValue();
 			// clear person plans and modify the selected plan
@@ -273,6 +306,7 @@ public class Converter {
 			plan = person.getSelectedPlan();
 			constructPlan(id, plan);
 		}
+		log.debug(count+" individuals processed");
 	}
 
 	private void constructPlan(final Id id, final Plan plan) {
@@ -299,7 +333,9 @@ public class Converter {
 		String sharedMode;
 		Activity origin = sharedRide.origin;
 		Activity destination = sharedRide.destination;
+		Activity pickUp, dropOff;
 
+		// mode selection
 		if (sharedRide.isDriver) {
 			accessMode = TransportMode.car;
 			sharedMode = TransportMode.car;
@@ -309,16 +345,29 @@ public class Converter {
 			sharedMode = JointActingTypes.PASSENGER;
 		}
 
-		plan.add(new LegImpl(accessMode));
-		plan.add(new ActivityImpl(
+		// activities construction
+		pickUp = new ActivityImpl(
 					sharedRide.puName,
 					origin.getCoord(),
-					origin.getLinkId()));
-		plan.add(new LegImpl(sharedMode));
-		plan.add(new ActivityImpl(
+					origin.getLinkId());
+		dropOff = new ActivityImpl(
 					JointActingTypes.DROP_OFF,
 					destination.getCoord(),
-					destination.getLinkId()));
+					destination.getLinkId());
+
+		if (useFacilities) {
+			((ActivityImpl) pickUp).setFacilityId(
+					this.facilitiesFactory.getPickUpDropOffFacility(
+						pickUp.getLinkId()));
+			((ActivityImpl) dropOff).setFacilityId(
+					this.facilitiesFactory.getPickUpDropOffFacility(
+						dropOff.getLinkId()));
+		}
+
+		plan.add(new LegImpl(accessMode));
+		plan.add(pickUp);
+		plan.add(new LegImpl(sharedMode));
+		plan.add(dropOff);
 		plan.add(new LegImpl(accessMode));
 	}
 
@@ -352,6 +401,7 @@ public class Converter {
 		String endName =  sampleRate +"-sample.xml.gz";
 		String cliqueFile = filePath + "/cliques-" + endName;
 		String populationFile = filePath + "/plans-" + endName;
+		String facilitiesFile = filePath + "/facilities-" + endName;
 
 		File outputDir = new File(filePath);
 		if (!outputDir.exists()) {
@@ -360,7 +410,12 @@ public class Converter {
 
 		(new CliquesWriter(sampleCliques)).writeFile(cliqueFile);
 		log.debug("writting population of size "+samplePopulation.getPersons().size());
-		(new PopulationWriter(samplePopulation, this.scenario.getNetwork())).write(populationFile);
+		(new PopulationWriter(samplePopulation, this.scenario.getNetwork()))
+			.write(populationFile);
+
+		if (useFacilities) {
+			this.facilitiesFactory.write(facilitiesFile);
+		}
 	}
 
 	/**
@@ -400,11 +455,13 @@ public class Converter {
 		int toDraw;
 		int index;
 		List<Id> strata;
+		int drawn = 0;
 
 		for (Map.Entry<Integer, List<Id>> entry : stratas.entrySet()) {
 			strata = entry.getValue();
 			strataSize = strata.size();
 			toDraw = (int) Math.ceil(strataSize * sampleRate);
+			drawn += toDraw;
 
 			log.debug("drawing "+toDraw+" from the "+strataSize+
 					" cliques of size "+entry.getKey());
@@ -418,6 +475,8 @@ public class Converter {
 				sample.add(strata.remove(index));
 			}
 		}
+
+		log.debug(drawn+" cliques in the sample");
 
 		return sample;
 	}
