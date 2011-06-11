@@ -42,9 +42,13 @@ public class FtConfigGroup extends Module {
 		 */
 		PT_HALTESTELLEN_FILENAME("pt_haltestellen_filename", "", ""),
 		/**
-		 * the path to the world file containing a layer 'municipality'
+		 * the path to the file where carSharing data will be written
 		 */
-		WORLD_INPUT_FILENAME("worldInputFilename", "", ""),
+		CS_SUMMARY_FILENAME("csSummaryFilename", "", ""),
+		/**
+		 * the path to the file where persons data will be written
+		 */
+		PERSONS_SUMMARY_FILENAME("personsSummaryFilename", "", ""),
 		/**
 		 * boolean variable indicating whether the kti router should be used or not
 		 */
@@ -181,12 +185,20 @@ public class FtConfigGroup extends Module {
 		FtConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.setActualValue(ptTraveltimeMatrixFilename);
 	}
 
-	public String getWorldInputFilename() {
-		return FtConfigParameter.WORLD_INPUT_FILENAME.getActualValue();
+	public String getCsSummaryWriterFilename() {
+		return FtConfigParameter.CS_SUMMARY_FILENAME.getActualValue();
 	}
 
-	public void setWorldInputFilename(String worldInputFilename) {
-		FtConfigParameter.WORLD_INPUT_FILENAME.setActualValue(worldInputFilename);
+	public void setCsSummaryWriterFilename(String csSummaryFilename) {
+		FtConfigParameter.CS_SUMMARY_FILENAME.setActualValue(csSummaryFilename);
+	}
+	
+	public String getPersonSummaryWriterFilename() {
+		return FtConfigParameter.PERSONS_SUMMARY_FILENAME.getActualValue();
+	}
+
+	public void setPersonSummaryWriterFilename(String personSummaryFilename) {
+		FtConfigParameter.PERSONS_SUMMARY_FILENAME.setActualValue(personSummaryFilename);
 	}
 
 	public boolean isUsePlansCalcRouteFt() {

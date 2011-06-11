@@ -32,8 +32,8 @@ public class CarSharingListener
   private Controler controler;
   //private CarSharingSummaryWriter csw = new CarSharingSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/CarSharingSummary");
   //private PersonsSummaryWriter psw = new PersonsSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/PersonsSummary");
-  private CarSharingSummaryWriter csw = new CarSharingSummaryWriter("../../matsim/output/triangle/CarSharingSummary");
-  private PersonsSummaryWriter psw = new PersonsSummaryWriter("../../matsim/output/PersonsSummary");
+  private CarSharingSummaryWriter csw;
+  private PersonsSummaryWriter psw;
   private FtConfigGroup configGroup;
   private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
 
@@ -41,6 +41,8 @@ public class CarSharingListener
   {
     this.configGroup = configGroup;
     this.plansCalcRouteFtInfo = new PlansCalcRouteFtInfo(configGroup);
+    this.csw = new CarSharingSummaryWriter(this.configGroup.getCsSummaryWriterFilename());
+    this.psw = new PersonsSummaryWriter(this.configGroup.getPersonSummaryWriterFilename());
   }
 
   public void notifyIterationEnds(IterationEndsEvent event)

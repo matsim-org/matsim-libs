@@ -31,7 +31,7 @@ public class CarSharingControler extends Controler
   protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
   protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
   protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
-  private KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+  //private KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
   private FtConfigGroup ftConfigGroup = new FtConfigGroup();
   private final PlansCalcRouteFtInfo plansCalcRouteFtInfo = new PlansCalcRouteFtInfo(this.ftConfigGroup);
 

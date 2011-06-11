@@ -81,7 +81,6 @@ public class PlansCalcRouteFT extends PlansCalcRoute
       travelTime = handleCarSharingLeg(person,(LegImpl) leg, (ActivityImpl)fromAct, (ActivityImpl)toAct, depTime);
     }
     else {
-    	log.info("mode = " + mode.toString());
       travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
     }
 

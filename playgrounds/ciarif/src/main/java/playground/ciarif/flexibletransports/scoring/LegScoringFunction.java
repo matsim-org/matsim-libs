@@ -67,10 +67,10 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
       if (this.params.marginalUtilityOfDistanceCar_m != 0.0D)
       {
         dist = ((FtCarSharingRoute)leg.getRoute()).calcCarDistance(actNext);
-        tmpScore += this.params.marginalUtilityOfDistanceCar_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
+        tmpScore += 1.2*this.params.marginalUtilityOfDistanceCar_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
       }
       travelTime = arrivalTime - departureTime;
-      tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
+      tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s*1.5;
     }
     else if (TransportMode.pt.equals(leg.getMode()))
     {

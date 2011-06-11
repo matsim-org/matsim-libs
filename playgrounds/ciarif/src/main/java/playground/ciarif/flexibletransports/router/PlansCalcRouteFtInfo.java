@@ -55,23 +55,23 @@ public class PlansCalcRouteFtInfo
     }
     log.info("Reading car stations...done.");
 
-    log.info("Reading traveltime matrix...");
-    Matrices matrices = new Matrices();
-    this.ptTravelTimes = matrices.createMatrix("pt_traveltime", null);
-    VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
-    reader.readFile(this.ftConfigGroup.getPtTraveltimeMatrixFilename());
-    log.info("Reading traveltime matrix...done.");
-
-    log.info("Reading haltestellen...");
-    this.haltestellen = new SwissHaltestellen(network);
-    try {
-      this.haltestellen.readFile(this.ftConfigGroup.getPtHaltestellenFilename());
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    log.info("Reading haltestellen...done.");
+//    log.info("Reading traveltime matrix...");
+//    Matrices matrices = new Matrices();
+//    this.ptTravelTimes = matrices.createMatrix("pt_traveltime", null);
+//    VisumMatrixReader reader = new VisumMatrixReader(this.ptTravelTimes);
+//    reader.readFile(this.ftConfigGroup.getPtTraveltimeMatrixFilename());
+//    log.info("Reading traveltime matrix...done.");
+//
+//    log.info("Reading haltestellen...");
+//    this.haltestellen = new SwissHaltestellen(network);
+//    try {
+//      this.haltestellen.readFile(this.ftConfigGroup.getPtHaltestellenFilename());
+//    } catch (FileNotFoundException e) {
+//      throw new RuntimeException(e);
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//    log.info("Reading haltestellen...done.");
   }
 
   public CarSharingStations getCarStations()
