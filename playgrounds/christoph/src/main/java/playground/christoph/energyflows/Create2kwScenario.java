@@ -138,7 +138,7 @@ public class Create2kwScenario {
 		log.info("...done.");
 		
 		log.info("analyze removed facilities...");
-		AnalyzeRemovedFacilities analyzeRemovedFacilities = new AnalyzeRemovedFacilities(removedFacilities);
+		new AnalyzeRemovedFacilities(removedFacilities);
 		log.info("...done.");
 		
 		log.info("add new facilities...");
@@ -155,7 +155,7 @@ public class Create2kwScenario {
 		log.info("...done.");	
 		
 		log.info("relocate activities from removed facilites...");
-		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities);
+		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities, ((ScenarioImpl)scenario).getKnowledges());
 		relocateActivities.relocateActivities(scenario.getPopulation(), persons, facilitiesToRemove);
 		relocateActivities.checkCapacityUsage();
 		log.info("...done.");

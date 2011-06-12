@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 
@@ -43,6 +45,15 @@ public class EnergyFlowsController extends Controler {
 		StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
+	}
+	
+	/**
+	 * We use a Scoring Function that get the Facility Opening Times from
+	 * the Facilities instead of the Config File.
+	 */
+	@Override
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getFacilities());
 	}
 	
 	public EnergyFlowsController(String[] args) {

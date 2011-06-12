@@ -21,6 +21,7 @@
 package playground.christoph.energyflows.population;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -37,7 +38,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.MatsimRandom;
@@ -46,6 +49,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.knowledges.KnowledgeImpl;
+import org.matsim.knowledges.Knowledges;
 
 /*
  * Relocate Activities that should be performed in Facilities within the
@@ -57,20 +62,23 @@ public class RelocateActivities {
 	
 	private Random random = MatsimRandom.getLocalInstance();
 	private double coordinateFuzzyValue = 25.0;
-	private ActivityFacilities zurichFacilities;
+	
+	private Knowledges knowledges;
+	private ActivityFacilities zurichFacilities;	
 	private String[] activityTypes = {"home", "shop", "education_higher", "education_kindergarten", "education_other", 
 			"education_primary", "education_secondary", "leisure", "work_sector2", "work_sector3"};
 	
 	private Map<String, QuadTree<Id>> quadTrees;
 	private Map<Id, Map<String, Double>> usedCapacities;
 	
-	public RelocateActivities(ActivityFacilities zurichFacilities) {
+	public RelocateActivities(ActivityFacilities zurichFacilities, Knowledges knowledges) {
 		this.zurichFacilities = zurichFacilities;
+		this.knowledges = knowledges;
 		
 		log.info("building quad trees...");
 		quadTrees = new HashMap<String, QuadTree<Id>>();
 		for (String activityType : activityTypes) quadTrees.put(activityType, createQuadTree(activityType));
-//		quadTrees.put("work", mergeWorkQuadTrees());
+
 		log.info("done.");
 		
 		usedCapacities = new HashMap<Id, Map<String, Double>>();
@@ -119,42 +127,7 @@ public class RelocateActivities {
 		
 		return quadTree;
 	}
-	
-//	private QuadTree<Id> mergeWorkQuadTrees() {
-//		
-//		double minx = Double.POSITIVE_INFINITY;
-//		double miny = Double.POSITIVE_INFINITY;
-//		double maxx = Double.NEGATIVE_INFINITY;
-//		double maxy = Double.NEGATIVE_INFINITY;
-//		
-//		for (ActivityFacility facility : zurichFacilities.getFacilities().values()) {
-//			// if the facility does not offer any work activity
-//			if (facility.getActivityOptions().get("work_sector2") == null && facility.getActivityOptions().get("work_sector3") == null) continue;
-//			
-//			if (facility.getCoord().getX() < minx) { minx = facility.getCoord().getX(); }
-//			if (facility.getCoord().getY() < miny) { miny = facility.getCoord().getY(); }
-//			if (facility.getCoord().getX() > maxx) { maxx = facility.getCoord().getX(); }
-//			if (facility.getCoord().getY() > maxy) { maxy = facility.getCoord().getY(); }
-//		}
-//		
-//		minx -= 1.0;
-//		miny -= 1.0;
-//		maxx += 1.0;
-//		maxy += 1.0;
-//		
-//		log.info("work xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-//				
-//		QuadTree<Id> work_quadTree = new QuadTree<Id>(minx, miny, maxx, maxy);
-//		
-//		for (ActivityFacility facility : zurichFacilities.getFacilities().values()) {
-//			if (facility.getActivityOptions().get("work_sector2") == null && facility.getActivityOptions().get("work_sector3") == null) continue;
-//			
-//			work_quadTree.put(facility.getCoord().getX(), facility.getCoord().getY(), facility.getId());
-//		}
-//		
-//		return work_quadTree;
-//	}
-	
+		
 	public void relocateActivities(Population population, Set<Id> personIds, Set<Id> facilitiesToRemove) {
 		
 		log.info("relocating activities...");
@@ -188,6 +161,7 @@ public class RelocateActivities {
 								relocateActivityTo(activity, workFacilityId);
 							} else {
 								relocateActivity(activity);
+								adaptKnowledge(person, activity);
 								counter.incCounter();
 								
 								// check capacity and remove facility from quad tree if the capacity limit is reached
@@ -262,40 +236,7 @@ public class RelocateActivities {
 		((ActivityImpl) activity).setFacilityId(relocatedFacilityId);
 		((ActivityImpl) activity).setLinkId(relocatedFacility.getLinkId());
 		((ActivityImpl) activity).setCoord(relocatedFacility.getCoord());
-		
-//		/*
-//		 * Reselect work sector based on the nearest facility that offers work sector 2 or 3.
-//		 * This is valid because the Census does not contain information on that type.
-//		 */
-//		if (activityType.equals("work")) {
-//			boolean hasSector2 = relocatedFacility.getActivityOptions().get("work_sector2") != null;
-//			boolean hasSector3 = relocatedFacility.getActivityOptions().get("work_sector3") != null;
-//			if (hasSector2 && !hasSector3) activity.setType("work_sector2");
-//			else if (!hasSector2 && hasSector3) activity.setType("work_sector3");
-//			else if (hasSector2 && hasSector3) {
-//				double sector2Capacity = map.get("work_sector2");
-//				double sector3Capacity = map.get("work_sector3");
-//				
-//				/*
-//				 * Check whether both work types offer enough capacity. If one does not, use the other
-//				 * one. If both do not, something seems to be wrong...
-//				 */
-//				if (sector2Capacity < 1.0 && sector3Capacity < 1.0) {
-//					log.warn("Not enough capacity available - this should not happen?!");
-//				} else if (sector2Capacity < 1.0) {
-//					activity.setType("work_sector3");
-//				} else if (sector3Capacity < 1.0) {
-//					activity.setType("work_sector2");
-//				} else {
-//					double sector2Probability = sector2Capacity / (sector2Capacity + sector3Capacity);
-//					double r = random.nextDouble();
-//					if (r < sector2Probability) activity.setType("work_sector2");
-//					else activity.setType("work_sector3");				
-//				}
-//			}
-//			else log.warn("Was looking for work facility but selected facility does not offer work activities?!");			
-//		}
-		
+				
 		/*
 		 *  Increase usage counter
 		 *  Home and Work activities increase the used capacity by one (could this become a problem with part time workers?)
@@ -326,6 +267,27 @@ public class RelocateActivities {
 		((ActivityImpl) activity).setFacilityId(relocatedFacilityId);
 		((ActivityImpl) activity).setLinkId(relocatedFacility.getLinkId());
 		((ActivityImpl) activity).setCoord(relocatedFacility.getCoord());
+	}
+	
+	/*
+	 * The given activity has been relocated. We use its activity type and its new location
+	 * to update the persons knowledge.
+	 */
+	private void adaptKnowledge(Person person, Activity activity) {
+		
+		// adapt the knowledge - ActivityOptions cannot be edited, therefore replace them
+		KnowledgeImpl knowledge = knowledges.getKnowledgesByPersonId().get(person.getId());
+		ActivityFacility facility = zurichFacilities.getFacilities().get(activity.getFacilityId()); 
+		
+		List<ActivityOptionImpl> list = knowledge.getActivities(activity.getType());
+		if (list == null) return;
+		
+		for (ActivityOptionImpl activityOption : list) {
+			ActivityOptionImpl newActivityOption = new ActivityOptionImpl(activity.getType(), (ActivityFacilityImpl) facility);
+			boolean isPrimary = knowledge.isPrimary(activity.getType(), activityOption.getFacilityId());
+			knowledge.removeActivity(activityOption);
+			knowledge.addActivityOption(newActivityOption, isPrimary);
+		}
 	}
 	
 	private void checkCapacity(Id facilityId, String activityType) {
