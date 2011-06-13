@@ -21,7 +21,6 @@
 package playground.christoph.energyflows.population;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -38,19 +37,20 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.population.Desires;
 
 /*
  * Relocate Activities that should be performed in Facilities within the
@@ -64,15 +64,18 @@ public class RelocateActivities {
 	private double coordinateFuzzyValue = 25.0;
 	
 	private Knowledges knowledges;
-	private ActivityFacilities zurichFacilities;	
+	private ActivityFacilities zurichFacilities;
+	private ActivityFacilities switzerlandFacilities;
+	
 	private String[] activityTypes = {"home", "shop", "education_higher", "education_kindergarten", "education_other", 
 			"education_primary", "education_secondary", "leisure", "work_sector2", "work_sector3"};
 	
 	private Map<String, QuadTree<Id>> quadTrees;
 	private Map<Id, Map<String, Double>> usedCapacities;
 	
-	public RelocateActivities(ActivityFacilities zurichFacilities, Knowledges knowledges) {
+	public RelocateActivities(ActivityFacilities zurichFacilities, ActivityFacilities switzerlandFacilities, Knowledges knowledges) {
 		this.zurichFacilities = zurichFacilities;
+		this.switzerlandFacilities = switzerlandFacilities;
 		this.knowledges = knowledges;
 		
 		log.info("building quad trees...");
@@ -134,13 +137,13 @@ public class RelocateActivities {
 		Counter counter = new Counter("relocated activities... ");
 		for (Id personId : personIds) {
 			
-			// If home or work activities are moved, we select a new facility only once and the reuse its Id.
-			Id homeFacilityId = null;
-			Id workFacilityId = null;
-			String workSectorType = null;
-			
 			Person person = population.getPersons().get(personId);
-			
+			/*
+			 * Mapping:
+			 * <activityType in plan, Map<facilityId in plan, Tuple<new facilityId, new activityType>>>
+			 */
+			Map<String, Map<Id, Tuple<Id, String>>> relocationMapping = new HashMap<String, Map<Id, Tuple<Id, String>>>();
+					
 			for (Plan plan : person.getPlans()) {
 				
 				for (int i = 0; i < plan.getPlanElements().size(); i++) {
@@ -149,31 +152,34 @@ public class RelocateActivities {
 					if (planElement instanceof Leg) continue;
 					else {
 						Activity activity = (Activity) planElement;
-						if (facilitiesToRemove.contains(activity.getFacilityId())) {	
-														
-							if (activity.getType().equals("home") && homeFacilityId != null) {
-								relocateActivityTo(activity, homeFacilityId);
-							} else if (activity.getType().equals("work_sector2") && workFacilityId != null) {
-								activity.setType(workSectorType);
-								relocateActivityTo(activity, workFacilityId);
-							} else if (activity.getType().equals("work_sector3") && workFacilityId != null) {
-								activity.setType(workSectorType);
-								relocateActivityTo(activity, workFacilityId);
-							} else {
+						if (facilitiesToRemove.contains(activity.getFacilityId())) {
+							
+							/*
+							 * If already a mapping for the current activity type and facility id exists: reuse it.
+							 */
+							Map<Id, Tuple<Id, String>> relocationMap = relocationMapping.get(activity.getType());
+							if (relocationMap != null && relocationMap.get(activity.getFacilityId()) != null) {
+								Tuple<Id, String> relocationTuple = relocationMap.get(activity.getFacilityId());
+								relocateActivityTo(activity, relocationTuple.getFirst(), relocationTuple.getSecond());
+							}
+							else {
+								Id originalFacilityId = activity.getFacilityId();
+								String originalActivityType = activity.getType();
 								relocateActivity(activity);
-								adaptKnowledge(person, activity);
+								Id newFacilityId = activity.getFacilityId();
+								String newActivityType = activity.getType();
+								
+								// store mapping
+								if (relocationMap == null) {
+									relocationMap = new HashMap<Id, Tuple<Id, String>>(); 
+									relocationMapping.put(originalActivityType, relocationMap);
+								}
+								relocationMap.put(originalFacilityId, new Tuple<Id, String>(newFacilityId, newActivityType));
+								
 								counter.incCounter();
 								
 								// check capacity and remove facility from quad tree if the capacity limit is reached
 								checkCapacity(activity.getFacilityId(), activity.getType());								
-
-								// if it is a home or work activity we store the new facilityId to be able to reuse it
-								if (activity.getType().equals("home")) {
-									homeFacilityId = activity.getFacilityId();
-								} else if (activity.getType().equals("work_sector2") || activity.getType().equals("work_sector3")) {
-									workFacilityId = activity.getFacilityId();
-									workSectorType = activity.getType();
-								}
 							}
 							
 							// Reset routes to and from this Activity
@@ -189,8 +195,24 @@ public class RelocateActivities {
 					}
 				}
 			}
+			
+			/*
+			 * If the person's plan has been adapted, there will be an entry in the map. If we
+			 * find an entry, we have to recreate the person's desires and knowledge. 
+			 */
+//			if (relocationMapping.size() > 0) recreateKnowledgeAndDesires(person);
 		}
 		counter.printCounter();
+		log.info("done.");
+		
+		/*
+		 * We have to recreate the knowledge and desires for every person because sometimes their
+		 * entries seem not to correspond with the person's plan.
+		 */
+		log.info("recreate knowledge and desires for population...");
+		for (Person person : population.getPersons().values()) {
+			recreateKnowledgeAndDesires(person);
+		}
 		log.info("done.");
 	}
 	
@@ -260,35 +282,53 @@ public class RelocateActivities {
 	}
 	
 	// only relocate but do no increase capacity usage
-	private void relocateActivityTo(Activity activity, Id relocatedFacilityId) {
-		
+	private void relocateActivityTo(Activity activity, Id relocatedFacilityId, String activityType) {
+
 		Facility relocatedFacility = zurichFacilities.getFacilities().get(relocatedFacilityId); 
 		
+		activity.setType(activityType);
 		((ActivityImpl) activity).setFacilityId(relocatedFacilityId);
 		((ActivityImpl) activity).setLinkId(relocatedFacility.getLinkId());
 		((ActivityImpl) activity).setCoord(relocatedFacility.getCoord());
 	}
 	
-	/*
-	 * The given activity has been relocated. We use its activity type and its new location
-	 * to update the persons knowledge.
-	 */
-	private void adaptKnowledge(Person person, Activity activity) {
+	private void recreateKnowledgeAndDesires(Person person) {
 		
-		// adapt the knowledge - ActivityOptions cannot be edited, therefore replace them
+		Desires desires = ((PersonImpl) person).getDesires();
 		KnowledgeImpl knowledge = knowledges.getKnowledgesByPersonId().get(person.getId());
-		ActivityFacility facility = zurichFacilities.getFacilities().get(activity.getFacilityId()); 
 		
-		List<ActivityOptionImpl> list = knowledge.getActivities(activity.getType());
-		if (list == null) return;
+		for (String activityType : activityTypes) {
+			if (desires.getActivityDurations() == null) break;
+			else desires.removeActivityDuration(activityType);
+		}
+		Set<String> primaryActivityTypes = knowledge.getActivityTypes(true);
+		knowledge.removeAllActivities();
 		
-		for (ActivityOptionImpl activityOption : list) {
-			ActivityOptionImpl newActivityOption = new ActivityOptionImpl(activity.getType(), (ActivityFacilityImpl) facility);
-			boolean isPrimary = knowledge.isPrimary(activity.getType(), activityOption.getFacilityId());
-			knowledge.removeActivity(activityOption);
-			knowledge.addActivityOption(newActivityOption, isPrimary);
+		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+			if (planElement instanceof Activity) {
+				Activity activity = (Activity) planElement;
+				
+				/*
+				 * Try to find facility in Zurich facilities. It is not contained, try finding it in the
+				 * Switzerland facilities. If we cannot find it there, we prompt an error message.
+				 */
+				ActivityFacility facility = zurichFacilities.getFacilities().get(activity.getFacilityId());
+				if (facility == null) facility = switzerlandFacilities.getFacilities().get(activity.getFacilityId());
+				if (facility == null) log.error("Could not find facility with id: " + activity.getFacilityId());
+				if (facility.getActivityOptions() == null) log.error("Could not find any activity option for facility with id: " + activity.getFacilityId());
+				
+				String activityType = activity.getType();
+				desires.accumulateActivityDuration(activityType, activity.getEndTime() - activity.getStartTime());
+				
+				boolean isPrimary = primaryActivityTypes.contains(activityType);
+				
+				ActivityOption activityOption = facility.getActivityOptions().get(activityType);
+				knowledge.addActivityOption(activityOption, isPrimary);
+			}
 		}
 	}
+	
+
 	
 	private void checkCapacity(Id facilityId, String activityType) {
 		
@@ -309,11 +349,6 @@ public class RelocateActivities {
 		// otherwise remove facility from quad tree 
 		QuadTree<Id> quadTree = quadTrees.get(activityType);
 		quadTree.remove(facility.getCoord().getX(), facility.getCoord().getY(), facility.getId());
-		
-//		// if it is a work facility which is removed from the quad tree: also remove it from the merged work quad tree
-//		if (activityType.equals("work_sector2") || activityType.equals("work_sector3")) {
-//			quadTrees.get("work").remove(facility.getCoord().getX(), facility.getCoord().getY(), facility.getId());
-//		}
 	}
 	
 	public void checkCapacityUsage() {

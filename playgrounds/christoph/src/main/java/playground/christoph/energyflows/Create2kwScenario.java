@@ -155,7 +155,7 @@ public class Create2kwScenario {
 		log.info("...done.");	
 		
 		log.info("relocate activities from removed facilites...");
-		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities, ((ScenarioImpl)scenario).getKnowledges());
+		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities, scenario.getActivityFacilities(), ((ScenarioImpl)scenario).getKnowledges());
 		relocateActivities.relocateActivities(scenario.getPopulation(), persons, facilitiesToRemove);
 		relocateActivities.checkCapacityUsage();
 		log.info("...done.");
