@@ -20,176 +20,101 @@
  * *********************************************************************** */
 
 package playground.fhuelsmann.emission;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.fhuelsmann.emission.objects.HbefaObject;
 
-
 public class EmissionsPerEvent {
+	
+	/** The Order :
+	 * listOfPollutant.add("Benzene");
+		listOfPollutant.add("CH4");
+		listOfPollutant.add("CO");
+		listOfPollutant.add("CO(rep.)");
+		listOfPollutant.add("CO2(total)");
+		listOfPollutant.add("FC");
+		listOfPollutant.add("HC");
+		listOfPollutant.add("N2O");
+		listOfPollutant.add("NH3");
+		listOfPollutant.add("NMHC");
+		listOfPollutant.add("NO2");
+		listOfPollutant.add("NOX");
+		listOfPollutant.add("Pb");
+		listOfPollutant.add("PM");
+		listOfPollutant.add("PN");
+		listOfPollutant.add("SO2");
+		*/
+	
+	public double [] emissionFactorCalculate(Map<String, double[][]> hashOfPollutant,double averageSpeed, double distance){
+			
+		int NumberOfPollutant = hashOfPollutant.size();
+		// the result will be returned after calculating
+		
+		double[] arrayOfEmissions = new double[NumberOfPollutant];
+		// for every Pollutant in the Order of the List in EmissionTool
+		int indexOfPollutant=0;
+		
+		for( Entry<String, double[][]> Pollutant : hashOfPollutant.entrySet() ){
+		
+			double li=distance;
+			double vij = averageSpeed;
+
+			double vf=	Pollutant.getValue()[0][0]; // freeFlow
+			double vh=  Pollutant.getValue()[1][0]; // heavy
+			double vs= 	Pollutant.getValue()[2][0];
+			double vc=  Pollutant.getValue()[3][0];//Stop And Go
+			
+			double EFf = Pollutant.getValue()[0][1];
+			double EFh = Pollutant.getValue()[1][1];
+			double EFs = Pollutant.getValue()[2][1];
+			double EFc = Pollutant.getValue()[3][1];
+		
+			
+			
+			if (vh <= vij && vij<=vf){
+				
+				double a = vf - vij;
+				double b = vij-vh;
+				double tempResult = (a *EFh ) / (a+b) + (b * EFf ) / (a+b);
+				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
+				
+				System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~average speed "+vij+"\n arrayOfEmissions"+arrayOfEmissions[0]+"\n distanz"+li);
+		
+			}else if (vs <= vij && vij<=vh){
+				double a = vh - vij;
+				double b = vij-vs;
+				
+				double tempResult = (a *EFs ) / (a+b) + (b * EFh ) / (a+b);
+				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
+			
+				}
 
 
-	private boolean calculated = false;
-
-
-
-	// Emission calculation based on average speed, EFh=Emission Factor heavy; EFf=Emission Factor freeflow; 
-	// EFs= Emission Factor saturated; EFc=Emission Factor congested/stop&go; 
-	// vh= average speed heavy; vf=average speedfreeflow; 
-	// vs= average speed saturated; vc=average speed congested/stop&go;li = link length; vij= calcuated average speed from event file
-	public static double [] emissionFactorCalculate(double vh,
-			double vij,double vf,double EFh, double li,
-			double EFs,double EFc,double EFf,double vs,double vc, double noxf, double noxh, double noxs, double noxc,
-			double co2rf,double co2rh,double co2rs,double co2rc, double co2tf,double co2th,double co2ts,double co2tc,
-			double no2f,double no2h,double no2s,double no2c,
-			double pmf,double pmh,double pms,double pmc){
-
-		double EF=0.0; //emission factor of mKr
-		double mkr= 0.0; 
-		double nox =0.0;//NOx emission factor
-		double noxEmissions=0.0;
-		double co2r=0.0;//CO2 rep total emission factor - fossiler Anteil
-		double co2rEmissions=0.0;
-		double co2t=0.0;//CO2 total emission factor
-		double co2tEmissions=0.0;
-		double no2=0.0;//NO2 emission factor
-		double no2Emissions=0.0;
-		double pm=0.0;//PM emission factor
-		double pmEmissions=0.0;
-
-
-		if (vh <= vij && vij<=vf){
-			double a = vf - vij;
-			double b = vij-vh;
-			//mKr
-			EF = (a *EFh ) / (a+b) + (b * EFf ) / (a+b);
-			mkr=EF*(li/1000);
-			//Nox
-			nox = (a *noxh ) / (a+b) + (b * noxf ) / (a+b);
-			noxEmissions=nox*(li/1000);
-			//CO2 rep
-			co2r = (a *co2rh ) / (a+b) + (b * co2rf ) / (a+b);
-			co2rEmissions=co2r*(li/1000);
-			//CO2
-			co2t = (a *co2th ) / (a+b) + (b * co2tf ) / (a+b);
-			co2tEmissions=co2t*(li/1000);
-			//NO2
-			no2 = (a *no2h ) / (a+b) + (b * no2f ) / (a+b);
-			no2Emissions=no2*(li/1000);
-			//PM
-			pm= (a *pmh ) / (a+b) + (b * pmf ) / (a+b);
-			pmEmissions=pm*(li/1000);
-
-
-		}
-		else if (vs <= vij && vij<=vh){
-			double a = vh - vij;
-			double b = vij-vs;
-
-			//mKrEF = (a *EFs ) / (a+b) + (b * EFh ) / (a+b);
-			mkr=EF*(li/1000);
-			//Nox
-			nox = (a *noxs ) / (a+b) + (b * noxh ) / (a+b);
-			noxEmissions=nox*(li/1000);
-			//Co2 rep
-			co2r = (a *co2rs ) / (a+b) + (b * co2rh ) / (a+b);
-			co2rEmissions=co2r*(li/1000);
-			//Co2
-			co2t = (a *co2ts ) / (a+b) + (b * co2th ) / (a+b);
-			co2tEmissions=co2t*(li/1000);
-			//No2
-			no2 = (a *no2s ) / (a+b) + (b * no2h ) / (a+b);
-			no2Emissions=no2*(li/1000);
-			//PM
-			pm = (a *pms ) / (a+b) + (b * pmh ) / (a+b);
-			pmEmissions=pm*(li/1000);
-
-		}
-		if (vc <= vij && vij<=vs){
-			double a = vs - vij;
-			double b = vij-vc;
-			//mKr 
-			EF = (a *EFc ) / (a+b) + (b * EFs ) / (a+b);
-			mkr=EF*(li/1000);
-			//Nox
-			nox = (a *noxc ) / (a+b) + (b * noxs ) / (a+b);
-			noxEmissions=nox*(li/1000);
-			//CO2 rep
-			co2r = (a *co2rc ) / (a+b) + (b * co2rs ) / (a+b);
-			co2rEmissions=co2r*(li/1000);
-			//CO2
-			co2t = (a *co2tc ) / (a+b) + (b * co2ts ) / (a+b);
-			co2tEmissions=co2t*(li/1000);
-			//NO2
-			no2 = (a *no2c ) / (a+b) + (b * no2s ) / (a+b);
-			no2Emissions=no2*(li/1000);
-			//PM
-			pm = (a *pmc ) / (a+b) + (b * pms ) / (a+b);
-			pmEmissions=pm*(li/1000);
-
-
-		}
-		if (vij > vf){
-			//mKr
-			EF = EFf;
-			mkr=EF*(li/1000);
-			//Nox
-			nox = noxf;
-			noxEmissions=nox*(li/1000);
-			// CO2 rep
-			co2r =co2rf;
-			co2rEmissions=co2r*(li/1000);
-			// CO2
-			co2t =co2tf;
-			co2tEmissions=co2t*(li/1000);
-			// NO2
-			no2 =no2f;
-			no2Emissions=no2*(li/1000);
-			// PM
-			pm =pmf;
-			pmEmissions=pm*(li/1000);
-
-		}
-		else if(vij<vc){
-			//mKr
-			EF =EFc; 
-			mkr=EF*(li/1000);
-			//Nox
-			nox =noxc;
-			noxEmissions=nox*(li/1000);
-			// CO2 rep
-			co2r =co2rc;
-			co2rEmissions=co2r*(li/1000);
-			// CO2
-			co2t =co2tc;
-			co2tEmissions=co2t*(li/1000);
-			// NO2
-			no2 =no2c;
-			no2Emissions=no2*(li/1000);
-			// PM
-			pm =pmc;
-			pmEmissions=pm*(li/1000);
-		}
-		double [] result = new double[6];
-		//	result[0]=EF;
-		result[0]=mkr;
-		result[1]=noxEmissions;
-		result[2]=co2rEmissions;
-		result[3]=co2tEmissions;
-		result[4]=no2Emissions;
-		result[5]=pmEmissions;
-
-		return  result;
+			if (vc <= vij && vij<=vs){
+				double a = vs - vij;
+				double b = vij-vc;
+			
+				double tempResult = (a *EFc ) / (a+b) + (b * EFs ) / (a+b);
+				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
+				}
+			if (vij > vf){
+				
+				double tempResult = EFf;
+				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
+				}
+			
+			else if(vij<vc){
+				double tempResult =EFc; 
+				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
+				}
+			}// For loop 
+		
+		return  arrayOfEmissions;
+		
 	}
 
-
-	// Emission calculation based on stop&go and free flow fractions
 	public static double [] emissionFreeFlowFractionCalculate(double vij,double li,
 			double EFc,double EFf,double vc, double vf, double noxf, double noxc, 
 			double co2rf,double co2rc,double co2tf, double co2tc,double no2f,double no2c,
@@ -242,11 +167,9 @@ public class EmissionsPerEvent {
 		fraction[3]=co2tFractions;
 		fraction[4]=no2Fractions;
 		fraction[5]=pmFractions;
+		
 		return fraction;
 	}
-
-
-	
 
 	public double[] collectInputForEmission(int Hbefa_road_type, double averageSpeed,double distance,HbefaObject[][] HbefaTable) {
 	
@@ -283,7 +206,6 @@ public class EmissionsPerEvent {
 			
 		} else {	
 			
-			
 
 			double vf =HbefaTable[Hbefa_road_type][0].getVelocity();
 			double EFf = HbefaTable[Hbefa_road_type][0].getMkr(); 
@@ -292,23 +214,6 @@ public class EmissionsPerEvent {
 			double co2tf = HbefaTable[Hbefa_road_type][0].getEmissionFactorCo2Total();
 			double no2f = HbefaTable[Hbefa_road_type][0].getNo2();
 			double pmf = HbefaTable[Hbefa_road_type][0].getPm();
-
-			double vh =HbefaTable[Hbefa_road_type][1].getVelocity();
-			double EFh = HbefaTable[Hbefa_road_type][1].getMkr();
-			double noxh = HbefaTable[Hbefa_road_type][1].getEmissionFactorNox();
-			double co2rh = HbefaTable[Hbefa_road_type][1].getEmissionFactorCo2Rep();
-			double co2th = HbefaTable[Hbefa_road_type][1].getEmissionFactorCo2Total();
-			double no2h = HbefaTable[Hbefa_road_type][1].getNo2();
-			double pmh = HbefaTable[Hbefa_road_type][1].getPm();
-
-			double vs =HbefaTable[Hbefa_road_type][2].getVelocity();
-			double EFs = HbefaTable[Hbefa_road_type][2].getMkr();
-			double noxs = HbefaTable[Hbefa_road_type][2].getEmissionFactorNox();
-			double co2rs = HbefaTable[Hbefa_road_type][2].getEmissionFactorCo2Rep();
-			double co2ts = HbefaTable[Hbefa_road_type][2].getEmissionFactorCo2Total(); 
-			double no2s = HbefaTable[Hbefa_road_type][2].getNo2();
-			double pms = HbefaTable[Hbefa_road_type][2].getPm();
-
 
 			double vc =HbefaTable[Hbefa_road_type][3].getVelocity();
 			double EFc = HbefaTable[Hbefa_road_type][3].getMkr();
@@ -324,26 +229,19 @@ public class EmissionsPerEvent {
 			//      int freeVelocity = obj.getfreeVelocity();
 		
 			//call of function, double output
-			double [] emissionFactorAndEmissions=  emissionFactorCalculate(vh,vij,vf, EFh,li,
-					EFs, EFc, EFf, vs, vc, 
-					noxf, noxh,noxs, noxc,
-					co2rf,co2rh,co2rs,co2rc,
-					co2tf,co2th,co2ts,co2tc,
-					no2f,no2h,no2s,no2c,
-					pmf,pmh,pms,pmc);
-		
+			double [] emissionFactorAndEmissions=  null;
 			//mKr
-			outPut[0] =  emissionFactorAndEmissions[0]; //mKrBasedOnAverageSpeed
+			outPut[0] =  1.1; //mKrBasedOnAverageSpeed
 			//Nox
-			outPut[1] =  emissionFactorAndEmissions[1]; // 	noxEmissionsBasedOnAverageSpeed 
+			outPut[1] =  1.1; // 	noxEmissionsBasedOnAverageSpeed 
 			//CO2 rep -fossiler Anteil
 //			outPut[2] =  emissionFactorAndEmissions[2]; // co2repEmissionsBasedOnAverageSpeed 
 			//CO2 Total
-			outPut[2] =  emissionFactorAndEmissions[3];// co2EmissionsBasedOnAverageSpeed 
+			outPut[2] =  1.1;// co2EmissionsBasedOnAverageSpeed 
 			//NO2
-			outPut[3] =  emissionFactorAndEmissions[4]; //no2EmissionsBasedOnAverageSpeed
+			outPut[3] =  1.1; //no2EmissionsBasedOnAverageSpeed
 			//PM
-			outPut[4] =  emissionFactorAndEmissions[5]; //pmEmissionsBasedOnAverageSpeed
+			outPut[4] =  1.1; //pmEmissionsBasedOnAverageSpeed
 
 			//call of function double output
 			double [] fractions=  emissionFreeFlowFractionCalculate(vij,li,
@@ -367,4 +265,7 @@ public class EmissionsPerEvent {
 		}
 		return outPut;
 	}
+
+
+
 }
