@@ -20,29 +20,37 @@
 
 package org.matsim.core.utils.misc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
 /**
  * @author mrieser
  */
-public class NetworkUtilsTest extends MatsimTestCase {
+public class NetworkUtilsTest {
 
 	private final static Logger log = Logger.getLogger(NetworkUtilsTest.class);
+	private final static double EPSILON = 1e-8;
 
+	@Test
 	public void testGetNodes_Empty() {
 		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "");
@@ -55,12 +63,14 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(0, nodes3.size());
 	}
 
+	@Test
 	public void testGetNodes_Null() {
 		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
+	@Test
 	public void testGetNodes_mixedDelimiters() {
 		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
@@ -72,6 +82,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(network.getNodes().get(new IdImpl(3)), nodes.get(4));
 	}
 
+	@Test
 	public void testGetNodes_NonExistant() {
 		NetworkImpl network = getTestNetwork();
 		try {
@@ -82,6 +93,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		}
 	}
 
+	@Test
 	public void testGetLinks_Empty() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
@@ -94,12 +106,14 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(0, links3.size());
 	}
 
+	@Test
 	public void testGetLinks_StringNull() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 
+	@Test
 	public void testGetLinks_mixedDelimiters() {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
@@ -110,6 +124,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(network.getLinks().get(new IdImpl(3)), links.get(3));
 	}
 
+	@Test
 	public void testGetLinks_NonExistant() {
 		NetworkImpl network = getTestNetwork();
 		try {
@@ -120,16 +135,19 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		}
 	}
 
+	@Test
 	public void testGetLinksID_ListNull() {
 		List<Id> linkIds = NetworkUtils.getLinkIds((List<Link>) null);
 		assertEquals(0, linkIds.size());
 	}
 
+	@Test
 	public void testGetLinksID_StringNull() {
 		List<Id> linkIds = NetworkUtils.getLinkIds((String) null);
 		assertEquals(0, linkIds.size());
 	}
 
+	@Test
 	public void testGetNumberOfLanesAsInt() {
 		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.2)));
 		assertEquals(3, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(3.1)));
@@ -146,6 +164,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(1, NetworkUtils.getNumberOfLanesAsInt(7*3600, new PseudoLink(0.0)));
 	}
 
+	@Test
 	public void testGetBoundingBox() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id id = new IdImpl("dummy");
@@ -161,6 +180,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(300, box[3], EPSILON); // maxY
 	}
 
+	@Test
 	public void testGetBoundingBox_negativeNodesOnly() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id id = new IdImpl("dummy");
@@ -176,6 +196,74 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		assertEquals(-100, box[3], EPSILON); // maxY
 	}
 
+	@Test
+	public void testIsMultimodal_carOnly() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("car"));
+		}
+		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_walkOnly() {
+		// tests that isMultimodal is not somehow hard-coded on "car"
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("walk"));
+		}
+		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_2modesOnSingleLink() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("car"));
+		}
+		f.links[3].setAllowedModes(CollectionUtils.stringToSet("car,bike"));
+		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_2modesOnDifferentLinks() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("car"));
+		}
+		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike"));
+		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_3modes() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("car"));
+		}
+		f.links[2].setAllowedModes(CollectionUtils.stringToSet("bike,walk"));
+		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_onlyNoModes() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet(""));
+		}
+		Assert.assertFalse(NetworkUtils.isMultimodal(f.network));
+	}
+
+	@Test
+	public void testIsMultimodal_sometimesNoModes() {
+		MultimodalFixture f = new MultimodalFixture();
+		for (Link l : f.links) {
+			l.setAllowedModes(CollectionUtils.stringToSet("car"));
+		}
+		f.links[2].setAllowedModes(CollectionUtils.stringToSet(""));
+		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
+	}
+
 	private static class PseudoLink extends FakeLink {
 		private final double nOfLanes;
 		public PseudoLink(final double nOfLanes) {
@@ -184,14 +272,14 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		}
 
 		@Override
-		public double getNumberOfLanes(double time) {
+		public double getNumberOfLanes(final double time) {
 			return this.nOfLanes;
 		}
 	}
 
 	private static class PseudoNode extends FakeNode {
 		private final Coord coord;
-		public PseudoNode(Id id, Coord coord) {
+		public PseudoNode(final Id id, final Coord coord) {
 			super(id);
 			this.coord = coord;
 		}
@@ -213,5 +301,20 @@ public class NetworkUtilsTest extends MatsimTestCase {
 			network.createAndAddLink(new IdImpl(i), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
 		}
 		return network;
+	}
+
+	private static class MultimodalFixture {
+		/*package*/ final NetworkImpl network = NetworkImpl.createNetwork();
+		Node[] nodes = new Node[6];
+		Link[] links = new Link[this.nodes.length - 1];
+
+		public MultimodalFixture() {
+			for (int i = 0; i < this.nodes.length; i++) {
+				this.nodes[i] = this.network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
+			}
+			for (int i = 0; i < this.links.length; i++) {
+				this.links[i] = this.network.createAndAddLink(new IdImpl(i), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+			}
+		}
 	}
 }

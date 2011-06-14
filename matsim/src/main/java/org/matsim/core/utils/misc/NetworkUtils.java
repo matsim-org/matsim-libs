@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -184,6 +185,35 @@ public class NetworkUtils {
 		Map<Id, Link> links = new TreeMap<Id, Link>(n.getInLinks());
 		links.putAll(n.getOutLinks());
 		return links;
+	}
+
+	public static boolean isMultimodal(final Network network) {
+		String mode = null;
+		boolean hasEmptyModes = false;
+		for (Link link : network.getLinks().values()) {
+			Set<String> modes = link.getAllowedModes();
+			if (modes.size() > 1) {
+				return true; // it must be multimodal with more than 1 mode
+			} else if (modes.size() == 1) {
+				String m2 = modes.iterator().next();
+				if (mode == null) {
+					if (hasEmptyModes) {
+						return true;
+					}
+					mode = m2;
+				} else {
+					if (!m2.equals(mode)) {
+						return true;
+					}
+				}
+			} else if (modes.size() == 0) {
+				if (mode != null) {
+					return true;
+				}
+				hasEmptyModes = true;
+			}
+		}
+		return false;
 	}
 
 }
