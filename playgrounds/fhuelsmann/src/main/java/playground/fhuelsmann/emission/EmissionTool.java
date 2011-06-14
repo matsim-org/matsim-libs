@@ -47,18 +47,19 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
-import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
+import playground.fhuelsmann.emission.objects.UrbanSuburbanAnalyzer;
 import playground.fhuelsmann.emission.objects.VisumObject;
+
 
 public class EmissionTool {
 	
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
 	// INPUT
-	private static String runDirectory = "../../runs-svn/run970/";
-	private static String eventsFile = runDirectory + "ITERS/it.1000/970.1000.events.txt.gz";
-	private static String netFile = runDirectory + "970.output_network.xml.gz";
-	private static String plansFile = runDirectory + "970.output_plans.xml.gz";
+	private static String runDirectory = "../../detailedEval/policies/mobilTUM/baseCase/";
+	private static String eventsFile = runDirectory + "ITERS/it.0/0.events.txt.gz";
+	private static String netFile = runDirectory + "output_network.xml.gz";
+	private static String plansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
 
 	//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run22/";
 	//	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
@@ -66,14 +67,14 @@ public class EmissionTool {
 	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
-//	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
+	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
 	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
-//	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-//	private static String vehicleFile="../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
+	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
+	private static String vehicleFile="../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
 
-//	private static final ArrayList<String> listOfPollutant = new ArrayList<String>();
+	private static final ArrayList<String> listOfPollutant = new ArrayList<String>();
 
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
@@ -93,7 +94,7 @@ public class EmissionTool {
 
 	private void run(String[] args) {
 
-		/*		listOfPollutant.add("Benzene");
+		/*	listOfPollutant.add("Benzene");
 		listOfPollutant.add("CH4");
 		listOfPollutant.add("CO");
 		listOfPollutant.add("CO(rep.)");
@@ -102,9 +103,9 @@ public class EmissionTool {
 		listOfPollutant.add("HC");
 		listOfPollutant.add("N2O");
 		listOfPollutant.add("NH3");
-		listOfPollutant.add("NMHC");
+		listOfPollutant.add("NMHC")*/;
 		listOfPollutant.add("NO2");
-		listOfPollutant.add("NOX");
+	/*	listOfPollutant.add("NOX");
 		listOfPollutant.add("Pb");
 		listOfPollutant.add("PM");
 		listOfPollutant.add("PN");
@@ -122,28 +123,26 @@ public class EmissionTool {
 		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
 		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
 		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
-		//		HbefaHot hbefaHot = new HbefaHot();
-		//		hbefaHot.makeHbefaHot(hbefaHotFile);
+		HbefaHot hbefaHot = new HbefaHot();
+		hbefaHot.makeHbefaHot(hbefaHotFile);
 
-//		Vehicles vehicles = new VehiclesImpl();
-//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-//		vehicleReader.readFile(vehicleFile);
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+		vehicleReader.readFile(vehicleFile);
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
-
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent,hbefaHot);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
-		//		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 
 		// create an event object
 		//		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(//vehicles,
-				network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
-		//		warmEmissionHandler.setListOfPollutant(listOfPollutant);
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
+		warmEmissionHandler.setListOfPollutant(listOfPollutant);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
 		eventsManager.addHandler(warmEmissionHandler);
@@ -161,13 +160,13 @@ public class EmissionTool {
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
 
 		// sum up emissions
-		Map<Id, double[]> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
+//		Map<Id, double[]> personId2TotalEmissionsInGrammPerType = getTotalEmissions(personId2WarmEmissionsInGrammPerType, personId2ColdEmissions);
 
 		// print output files
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
 		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
 		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
-		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
+//		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 
 		// =======================================================================================================	
 		//further processing of emissions
@@ -177,14 +176,14 @@ public class EmissionTool {
 		Set<Feature> suburbanShape = usa.readShape(suburbanShapeFile);
 		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);
 		
-		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2TotalEmissionsInGrammPerType);
-		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2TotalEmissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2TotalEmissionsInGrammPerType);
+//		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2TotalEmissionsInGrammPerType);
 		
 //		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2WarmEmissionsInGrammPerType);
 //		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2WarmEmissionsInGrammPerType);
 
-		System.out.println("urbanArea: " + emissionType2AvgEmissionsUrbanArea);
-		System.out.println("suburbanArea: " + emissionType2AvgEmissionsSuburbanArea);
+//		System.out.println("urbanArea: " + emissionType2AvgEmissionsUrbanArea);
+//		System.out.println("suburbanArea: " + emissionType2AvgEmissionsSuburbanArea);
 	}
 
 	private List<Double> calculateAvgEmissionsPerTypeAndArea(Population population, Map<Id, double[]> personId2emissionsInGrammPerType) {
@@ -234,14 +233,18 @@ public class EmissionTool {
 				// average speed based
 				totalEmissions[0] = warmEmissions[0] + personId2ColdEmissions.get(personId).get("FC");
 				totalEmissions[1] = warmEmissions[1] + personId2ColdEmissions.get(personId).get("NOx");
-				totalEmissions[2] = warmEmissions[2]; //TODO: CO2 not directly available for cold emissions; try through fc!
+				totalEmissions[2] = warmEmissions[2] + (personId2ColdEmissions.get(personId).get("FC")*0.865 -
+									personId2ColdEmissions.get(personId).get("CO")*0.429 -
+									personId2ColdEmissions.get(personId).get("HC")*0.866)/0.273; //TODO: not directly //TODO: CO2 not directly available for cold emissions; try through fc!
 				totalEmissions[3] = warmEmissions[3] + personId2ColdEmissions.get(personId).get("NO2");
 				totalEmissions[4] = warmEmissions[4] + personId2ColdEmissions.get(personId).get("PM");
-	
+
 				// fraction based
 				totalEmissions[5] = warmEmissions[5] + personId2ColdEmissions.get(personId).get("FC");
 				totalEmissions[6] = warmEmissions[6] + personId2ColdEmissions.get(personId).get("NOx");
-				totalEmissions[7] = warmEmissions[7]; //TODO: CO2 not directly available for cold emissions; try through fc!
+				totalEmissions[7] = warmEmissions[7] + (personId2ColdEmissions.get(personId).get("FC")*0.865 -
+						personId2ColdEmissions.get(personId).get("CO")*0.429 -
+						personId2ColdEmissions.get(personId).get("HC")*0.866)/0.273; //TODO: CO2 not directly available for cold emissions; try through fc!
 				totalEmissions[8] = warmEmissions[8] + personId2ColdEmissions.get(personId).get("NO2");
 				totalEmissions[9] = warmEmissions[9] + personId2ColdEmissions.get(personId).get("PM");
 			}
