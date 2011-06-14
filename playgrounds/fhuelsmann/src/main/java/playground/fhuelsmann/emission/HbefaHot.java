@@ -1,21 +1,23 @@
 package playground.fhuelsmann.emission;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+
 import playground.fhuelsmann.emission.objects.HotValue;
 
 public class HbefaHot {
 	
+	// HbefaHot<String,String> 
 	Map<String,HotValue> HbefaHot = new HashMap<String,HotValue>() ;
-		
+	
 		public void makeHbefaHot(String filename){
 		
-			// HbefaHot<String,String> 
-			Map<String,HotValue> HbefaHot = new HashMap<String,HotValue>() ;
-			
-			// read all rows
 			File file = new File(filename);
 			BufferedReader reader = null;	
 			
@@ -28,7 +30,7 @@ public class HbefaHot {
 					// split is implemented in this class, see explanation.  
 					String[] row = split(text,";");
 					String key="";
-					String[] value = new String[27];
+					String[] value = new String[2];
 					
 					//create the key, the key is an array , hotKey	
 						for(int i=0;i<13;i++)
@@ -37,32 +39,29 @@ public class HbefaHot {
 						
 					//create the value, the value is an array , hotValue	
 
-						for(int i=0;i<27;i++)
-						value[i] = row[i];
+						value[0] = row[15];
+						value[1] = row[18];
 						
 					
 					// erstllen von HbefaHot
-						
-						HbefaHot.put(key, new HotValue(value));
-						System.out.println(key);
-						
-						
+					HbefaHot.put(key, new HotValue(value));
+	
 				}
 			}catch(Exception e ){
 				System.err.println(e);
 					
 				}
-				
+			System.out.println("Finished writing output to " );
 			}
 		
 		public Map<String, HotValue> getHbefaHot() {
 			return HbefaHot;
 		}
-		
+
 		public void setHbefaHot(Map<String, HotValue> hbefaHot) {
 			HbefaHot = hbefaHot;
 		}
-		
+
 		private String[] split(String hbefa,String symbol) {
 			
 			String[] result = new String[27];
@@ -83,15 +82,5 @@ public class HbefaHot {
 		return result;
 		
 	
-		}
-			
-				
-				
-		
-
-		
-		
+		}		
 }
-
-
-
