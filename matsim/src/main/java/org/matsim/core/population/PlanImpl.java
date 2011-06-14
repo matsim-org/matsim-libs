@@ -38,14 +38,14 @@ import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
-	
+
 	/**Plan(Impl).getType is still there, but now returns a String.  That String can be used in arbitrary, user-defined
 	 * ways; matsim will, however, make sure that the last plan of a given type is not removed.  The constants here are just
 	 * leftovers from the conversion from PlanImpl.Type to String.  They should not be used since they are not useful
 	 * for inter-modal plans; you should rely on Leg.getMode() instead.  kai, mar'11
 	 * <p/>
 	 * yyyy this class presumably should be removed eventually.  kai, mar'11
-	 * 
+	 *
 	 * @author nagel
 	 */
 	@Deprecated
@@ -67,8 +67,6 @@ public class PlanImpl implements Plan {
 
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
-	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
-
 	private Customizable customizableDelegate;
 
 	public PlanImpl(final Person person) {
@@ -79,14 +77,12 @@ public class PlanImpl implements Plan {
 	}
 
 	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
-		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
 	public final ActivityImpl createAndAddActivity(final String type) {
-		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type);
 		getPlanElements().add(a);
 		return a;
@@ -94,7 +90,6 @@ public class PlanImpl implements Plan {
 
 
 	public final ActivityImpl createAndAddActivity(final String type, final Id linkId) {
-		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, linkId);
 		getPlanElements().add(a);
 		return a;
@@ -113,14 +108,8 @@ public class PlanImpl implements Plan {
 	}
 
 	private final void verifyCreateLeg() throws IllegalStateException {
-		if (getPlanElements().size() % 2 == 0) {
+		if (getPlanElements().size() == 0) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
-		}
-	}
-
-	private final void verifyCreateAct() throws IllegalStateException {
-		if (getPlanElements().size() % 2 != 0) {
-			throw new IllegalStateException(ACT_ERROR);
 		}
 	}
 
@@ -222,7 +211,7 @@ public class PlanImpl implements Plan {
 		return this.type;
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 

@@ -20,11 +20,19 @@
 
 package org.matsim.core.population;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -33,16 +41,16 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 
-public class PlanImplTest extends MatsimTestCase {
+public class PlanImplTest {
 
 	static private final Logger log = Logger.getLogger(PlanImplTest.class);
 
 	/**
 	 * @author mrieser
 	 */
-	public void testCreateLeg() {
+	@Test
+	public void testCreateAndAddActAndLeg() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		try {
 			plan.createAndAddLeg(TransportMode.car);
@@ -52,12 +60,6 @@ public class PlanImplTest extends MatsimTestCase {
 		}
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
-		try {
-			plan.createAndAddLeg(TransportMode.bike);
-			fail("expected IllegalStateException.");
-		} catch (IllegalStateException e) {
-			log.debug("catched expected exception.", e);
-		}
 		plan.createAndAddActivity("w", new CoordImpl(100, 200));
 		plan.createAndAddLeg(TransportMode.bike);
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -66,24 +68,7 @@ public class PlanImplTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
-	public void testCreateAct() {
-		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
-		plan.createAndAddActivity("h", new CoordImpl(0, 0));
-		// don't allow a second act directly after the first
-		try {
-			plan.createAndAddActivity("w", new CoordImpl(100, 200));
-			fail("expected IllegalStateException.");
-		} catch (IllegalStateException e) {
-			log.debug("catched expected exception.", e);
-		}
-		plan.createAndAddLeg(TransportMode.car);
-		// but after a leg, it must be possible to add an additional act
-		plan.createAndAddActivity("w", new CoordImpl(100, 200));
-	}
-
-	/**
-	 * @author mrieser
-	 */
+	@Test
 	public void testInsertActLeg_Between() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -110,6 +95,7 @@ public class PlanImplTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testInsertActLeg_AtEnd() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -136,6 +122,7 @@ public class PlanImplTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testInsertActLeg_AtWrongPosition() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -159,6 +146,7 @@ public class PlanImplTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testInsertActLeg_AtStart() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -183,6 +171,7 @@ public class PlanImplTest extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
+	@Test
 	public void testInsertActLeg_BehindEnd() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -211,6 +200,7 @@ public class PlanImplTest extends MatsimTestCase {
 
 	}
 
+	@Test
 	public void testCopyPlan_NetworkRoute() {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
@@ -234,9 +224,10 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof NetworkRoute);
-		assertEquals(98.76, route2.getTravelTime(), EPSILON);
+		assertEquals(98.76, route2.getTravelTime(), 1e-8);
 	}
 
+	@Test
 	public void testCopyPlan_GenericRoute() {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
@@ -260,12 +251,13 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
 		assertTrue(route2 instanceof GenericRoute);
-		assertEquals(98.76, route2.getTravelTime(), EPSILON);
+		assertEquals(98.76, route2.getTravelTime(), 1e-8);
 	}
 
 	/**
 	 * @author meisterk
 	 */
+	@Test
 	public void testRemoveActivity() {
 
 		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
@@ -280,14 +272,13 @@ public class PlanImplTest extends MatsimTestCase {
 
 		testee.removeActivity(4);
 		assertEquals(3, testee.getPlanElements().size());
-
 	}
 
 	/**
 	 * @author meisterk
 	 */
+	@Test
 	public void testRemoveLeg() {
-
 		PlanImpl testee = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		testee.createAndAddActivity("h", new CoordImpl(0, 0));
 		testee.createAndAddLeg(TransportMode.car);
@@ -300,7 +291,70 @@ public class PlanImplTest extends MatsimTestCase {
 
 		testee.removeLeg(3);
 		assertEquals(3, testee.getPlanElements().size());
+	}
 
+	@Test
+	public void addMultipleLegs() {
+		Plan p = new PlanImpl();
+		p.addActivity(new ActivityImpl("h"));
+		p.addLeg(new LegImpl(TransportMode.walk));
+		p.addLeg(new LegImpl(TransportMode.pt));
+		p.addLeg(new LegImpl(TransportMode.walk));
+		p.addActivity(new ActivityImpl("w"));
+
+		Assert.assertEquals(5, p.getPlanElements().size());
+		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(2) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(3) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(4) instanceof Activity);
+	}
+
+	@Test
+	public void addMultipleActs() {
+		Plan p = new PlanImpl();
+		p.addActivity(new ActivityImpl("h"));
+		p.addLeg(new LegImpl(TransportMode.walk));
+		p.addActivity(new ActivityImpl("w"));
+		p.addActivity(new ActivityImpl("l"));
+
+		Assert.assertEquals(4, p.getPlanElements().size());
+		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(2) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(3) instanceof Activity);
+	}
+
+	@Test
+	public void createAndAddMultipleLegs() {
+		PlanImpl p = new PlanImpl();
+		p.createAndAddActivity("h");
+		p.createAndAddLeg(TransportMode.walk);
+		p.createAndAddLeg(TransportMode.pt);
+		p.createAndAddLeg(TransportMode.walk);
+		p.createAndAddActivity("w");
+
+		Assert.assertEquals(5, p.getPlanElements().size());
+		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(2) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(3) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(4) instanceof Activity);
+	}
+
+	@Test
+	public void createAndAddMultipleActs() {
+		PlanImpl p = new PlanImpl();
+		p.createAndAddActivity("h");
+		p.createAndAddLeg(TransportMode.walk);
+		p.createAndAddActivity("w");
+		p.createAndAddActivity("l");
+
+		Assert.assertEquals(4, p.getPlanElements().size());
+		Assert.assertTrue(p.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(p.getPlanElements().get(2) instanceof Activity);
+		Assert.assertTrue(p.getPlanElements().get(3) instanceof Activity);
 	}
 
 }

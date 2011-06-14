@@ -20,6 +20,7 @@
 
 package org.matsim.core.population;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Stack;
 
@@ -36,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -213,19 +215,77 @@ public class PopulationReaderMatsimV4Test {
 		Assert.assertEquals(scenario.createId("2"), ((Activity) plan.getPlanElements().get(2)).getLinkId());
 	}
 
+	@Test
+	public void testRepeatingLegs() {
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		final Population population = scenario.getPopulation();
+
+		String str = "<?xml version=\"1.0\" ?>"+
+		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<plans>"+
+		"<person id=\"1\">"+
+		"	<plan>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
+		"		<leg mode=\"walk\" />"+
+		"		<leg mode=\"pt\" />"+
+		"		<leg mode=\"walk\" />"+
+		"		<act type=\"w\" x=\"10000\" y=\"0\" dur=\"03:30\" />"+
+		"	</plan>"+
+		"</person>"+
+		"</plans>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Assert.assertEquals(5, plan.getPlanElements().size());
+		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
+	}
+
+	@Test
+	public void testRepeatingActs() {
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		final Population population = scenario.getPopulation();
+
+		String str = "<?xml version=\"1.0\" ?>"+
+		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<plans>"+
+		"<person id=\"1\">"+
+		"	<plan>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
+		"		<leg mode=\"walk\" />"+
+		"		<act type=\"w\" x=\"10000\" y=\"0\" dur=\"03:30\" />"+
+		"		<act type=\"l\" x=\"10000\" y=\"0\" dur=\"00:30\" />"+
+		"	</plan>"+
+		"</person>"+
+		"</plans>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Assert.assertEquals(4, plan.getPlanElements().size());
+		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Activity);
+	}
+
 	private static class XmlParserTestHelper {
 		private final MatsimXmlParser parser;
 		private final Stack<String> context = new Stack<String>();
 
-		public XmlParserTestHelper(MatsimXmlParser parser) {
+		public XmlParserTestHelper(final MatsimXmlParser parser) {
 			this.parser = parser;
 		}
 
-		public void startTag(String name) {
+		public void startTag(final String name) {
 			startTag(name, AttributesBuilder.getEmpty());
 		}
 
-		public void startTag(String name, String[][] atts) {
+		public void startTag(final String name, final String[][] atts) {
 			AttributesBuilder builder = new AttributesBuilder();
 			for (String[] attribute : atts) {
 				builder.add(attribute[0], attribute[1]);
@@ -233,8 +293,8 @@ public class PopulationReaderMatsimV4Test {
 			startTag(name, builder.get());
 		}
 
-		private void startTag(String name, Attributes atts) {
-			parser.startTag(name, atts, context);
+		private void startTag(final String name, final Attributes atts) {
+			this.parser.startTag(name, atts, this.context);
 			this.context.push(name);
 		}
 
@@ -242,9 +302,9 @@ public class PopulationReaderMatsimV4Test {
 			endTag(null);
 		}
 
-		public void endTag(String content) {
+		public void endTag(final String content) {
 			String name = this.context.pop();
-			parser.endTag(name, content, this.context);
+			this.parser.endTag(name, content, this.context);
 		}
 	}
 
