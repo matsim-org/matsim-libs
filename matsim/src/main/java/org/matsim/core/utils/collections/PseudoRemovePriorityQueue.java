@@ -22,7 +22,7 @@ package org.matsim.core.utils.collections;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -52,7 +52,7 @@ public class PseudoRemovePriorityQueue<E> {
 
 	public PseudoRemovePriorityQueue(final int initialCapacity) {
 		this.delegate = new PriorityQueue<PseudoEntry<E>>(initialCapacity, new PseudoComparator<E>());
-		this.lastEntry = new HashMap<E, PseudoEntry<E>>(initialCapacity);
+		this.lastEntry = new IdentityHashMap<E, PseudoEntry<E>>(initialCapacity);
 	}
 
 	/**
