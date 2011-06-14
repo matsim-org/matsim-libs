@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType;
 
 import playground.fhuelsmann.emission.objects.HbefaObject;
-import playground.fhuelsmann.emission.objects.HotValue;
+
 
 public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 
@@ -48,7 +48,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private HbefaObject[][] hbefaTable = null;
 	private HbefaObject[][] hbefaHdvTable =null;
 	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
-	private Map<String,HotValue> HbefaHot =null;
 	private ArrayList<String> listOfPollutant = new ArrayList<String>();	
 	
 	public ArrayList<String> getListOfPollutant() {
@@ -59,29 +58,16 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		this.listOfPollutant = listOfPollutant;
 	}
 
-	public Map<String, HotValue> getHbefaHot() {
-		return HbefaHot;
-	}
-
-	public WarmEmissionHandler(//Vehicles vehicles,
-			final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
-//		this.vehicles = vehicles;
+	
+	public WarmEmissionHandler(Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
+		this.vehicles = vehicles;
 		this.network = network;
 		this.hbefaTable = hbefaTable;
 		this.hbefaHdvTable = hbefaHdvTable;
 		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
 		}
 	
-	public WarmEmissionHandler(Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable, 
-			AnalysisModule linkAndAgentAccountAnalysisModule,Map<String,HotValue> HbefaHot) {
-		this.vehicles = vehicles;
-		this.network = network;
-		this.hbefaTable = hbefaTable;
-		this.hbefaHdvTable = hbefaHdvTable;
-		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
-		this.HbefaHot = HbefaHot;
-	}
-
+	
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
@@ -143,13 +129,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			System.err.println("Error: roadtype missing");
 		}
 	
-//		Id vehId = personId;
-//		
-//		Vehicle veh = this.vehicles.getVehicles().get(vehId);
-//		//	System.out.print("*++++++++++++++++++"+veh);
-//			if (veh != null){
-//					VehicleType vehType = veh.getType();
-//					String fuelSizeAge = vehType.getDescription();
+		Id vehId = personId;
+		
+		Vehicle veh = this.vehicles.getVehicles().get(vehId);
+		//	System.out.println("*++++++++++++++++++"+personId+ "~" +veh);
+			if (veh != null){
+					VehicleType vehType = veh.getType();
+					String fuelSizeAge = vehType.getDescription();
 	
 
 		if (this.linkenter.containsKey(event.getPersonId())) {						
@@ -164,8 +150,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 				
 
 				this.agentarrival.remove(personId);
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, /*fuelSizeAge,*/ freeVelocity, distance, hbefaTable,hbefaHdvTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, /*fuelSizeAge,*/ freeVelocity, distance, hbefaTable,hbefaHdvTable, getHbefaHot(),listOfPollutant);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable, listOfPollutant);	
+		//		linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+		//		linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,freeVelocity, distance, hbefaTable,hbefaHdvTable, getHbefaHot(),listOfPollutant);	
+			
 			}
 			// if (this.agentarrival.containsKey(personId)) is not the case (link without activity)
 			else {
@@ -173,10 +162,12 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 				double travelTime = event.getTime() - enterTime;
 				double averageSpeed=(distance/1000)/(travelTime/3600);
 
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, /*fuelSizeAge,*/ freeVelocity, distance, hbefaTable,hbefaHdvTable);	
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType, /*fuelSizeAge,*/ freeVelocity, distance, hbefaTable,hbefaHdvTable, getHbefaHot(),listOfPollutant);
-			}
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);	
+				linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable,listOfPollutant);	
+			}		
 		}
 			}
 	}
-
+	
+	
+}
