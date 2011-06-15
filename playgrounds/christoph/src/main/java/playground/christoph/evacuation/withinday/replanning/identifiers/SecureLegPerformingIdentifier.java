@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
@@ -53,14 +53,14 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Set<WithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
-		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
-		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+		Set<PlanBasedWithinDayAgent> legPerformingAgents =  linkReplanningMap.getLegPerformingAgents();
+		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
 		if (handledAgents == null) return agentsToReplan;	
 				
-		for (PlanAgent personAgent : legPerformingAgents) {
+		for (MobsimAgent personAgent : legPerformingAgents) {
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
@@ -79,7 +79,7 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 			/*
 			 * Add the Agent to the Replanning List
 			 */
-			agentsToReplan.add((WithinDayAgent)personAgent);
+			agentsToReplan.add((PlanBasedWithinDayAgent)personAgent);
 		}
 		
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + agentsToReplan.size() + " Agents performing a Leg in a secure area.");

@@ -20,7 +20,7 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -36,7 +36,7 @@ public class Agent2D  {
 	private final double desiredVelocity;
 	private double vx;
 	private double vy;
-	private final PlanDriverAgent pda;
+	private final MobsimDriverAgent pda;
 
 	public static final double AGENT_WEIGHT = 80;// * 1000;
 	public static final double AGENT_DIAMETER = 0.7;
@@ -45,7 +45,7 @@ public class Agent2D  {
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(PlanDriverAgent pda) {
+	public Agent2D(MobsimDriverAgent pda) {
 		this.pda = pda;
 		// TODO think about this
 		this.desiredVelocity = 1.34; //0.8 + (MatsimRandom.getRandom().nextDouble() - 0.5) / 8;

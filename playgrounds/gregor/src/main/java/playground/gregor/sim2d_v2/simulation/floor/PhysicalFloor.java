@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -39,18 +38,19 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
+
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
 
 /**
  * @author laemmel
@@ -372,7 +372,7 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * @param agent
 	 */
-	public void agentDepart(PlanDriverAgent pda) {
+	public void agentDepart(MobsimDriverAgent pda) {
 		Agent2D agent = new Agent2D(pda);
 		Activity act = (Activity) getPreviousPlanElement(pda);
 		if (act.getCoord() != null) {
@@ -388,8 +388,9 @@ public class PhysicalFloor implements Floor {
 	}
 
 	@Deprecated //add method to PlanAgent
-	private PlanElement getPreviousPlanElement(PlanAgent pda) {
-
+	private PlanElement getPreviousPlanElement(MobsimAgent ma) {
+		
+		PlanAgent pda = (PlanAgent) ma ;
 		Leg leg = (Leg) pda.getCurrentPlanElement();
 		Plan plan = pda.getSelectedPlan();
 		List<PlanElement> l = plan.getPlanElements();

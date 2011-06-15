@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
@@ -63,7 +63,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 	}
 
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		
 		// do Replanning only in the timestep where the Evacuation has started.
 		if (this.time > EvacuationConfig.evacuationTime) return true;
@@ -87,7 +87,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 
 		// Get the current Link
-		Link currentLink = scenario.getNetwork().getLinks().get(((PlanDriverAgent) withinDayAgent).getCurrentLinkId());
+		Link currentLink = scenario.getNetwork().getLinks().get(((MobsimDriverAgent) withinDayAgent).getCurrentLinkId());
 		
 		Activity rescueActivity = null;
 		/*

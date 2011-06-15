@@ -30,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
@@ -44,7 +44,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 	}
 
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		
 		// do Replanning only in the timestep where the Evacuation has started.
 		if (this.time > EvacuationConfig.evacuationTime) return true;

@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -17,9 +17,9 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 	private Netsim queueSim;
 
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time) {
+	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
-		Set<WithinDayAgent> set = new HashSet<WithinDayAgent>();
+		Set<PlanBasedWithinDayAgent> set = new HashSet<PlanBasedWithinDayAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (Math.floor(time) !=  22000.0) {
@@ -32,11 +32,11 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 		for (NetsimLink link:queueSim.getNetsimNetwork().getNetsimLinks().values()){
 //			for (QVehicle vehicle : link.getVehQueue()) {
 				for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
-				PlanDriverAgent agent=vehicle.getDriver();
+				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
 				if (((PersonImpl) ((HasPerson)agent).getPerson()).getAge() == 18) {
 					System.out.println("found agent");
-					set.add((WithinDayAgent)agent);
+					set.add((PlanBasedWithinDayAgent)agent);
 				}
 			}
 		}

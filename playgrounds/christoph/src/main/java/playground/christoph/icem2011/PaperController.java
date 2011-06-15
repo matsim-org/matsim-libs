@@ -49,7 +49,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
@@ -310,10 +310,10 @@ public class PaperController extends WithinDayController implements StartupListe
 		}	
 		
 		@Override
-		public Set<WithinDayAgent> getAgentsToReplan(double time) {
-			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
-			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			for (WithinDayAgent agent : agentsFromDelegate) {
+		public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+			Set<PlanBasedWithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<PlanBasedWithinDayAgent> filteredAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			for (PlanBasedWithinDayAgent agent : agentsFromDelegate) {
 				if (replanningLinks.contains(agent.getCurrentLinkId())) filteredAgents.add(agent);
 			}
 			return filteredAgents;
@@ -336,10 +336,10 @@ public class PaperController extends WithinDayController implements StartupListe
 		}	
 		
 		@Override
-		public Set<WithinDayAgent> getAgentsToReplan(double time) {
-			Set<WithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
-			Set<WithinDayAgent> filteredAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			for (WithinDayAgent agent : agentsFromDelegate) {
+		public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+			Set<PlanBasedWithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<PlanBasedWithinDayAgent> filteredAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			for (PlanBasedWithinDayAgent agent : agentsFromDelegate) {
 				if (replanningAgents.contains(agent.getId())) filteredAgents.add(agent);
 			}
 			return filteredAgents;

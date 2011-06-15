@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -46,7 +46,7 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.mobsim.WithinDayQSim;
@@ -273,7 +273,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 	public static class ReplanningFlagInitializer implements SimulationInitializedListener {
 
 		protected SimpleRouterControler simpleRouterControler;
-		protected Collection<WithinDayAgent> withinDayAgents;
+		protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
 
 		protected int noReplanningCounter = 0;
 		protected int initialReplanningCounter = 0;
@@ -297,13 +297,13 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		 * are assigned based on probabilities from config files.
 		 */
 		protected void setReplanningFlags() {
-			Set<WithinDayAgent> randomAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			Set<WithinDayAgent> tabuAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			Set<WithinDayAgent> compassAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			Set<WithinDayAgent> randomCompassAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
-			Set<WithinDayAgent> dijkstraAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+			Set<PlanBasedWithinDayAgent> randomAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			Set<PlanBasedWithinDayAgent> tabuAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			Set<PlanBasedWithinDayAgent> compassAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			Set<PlanBasedWithinDayAgent> randomCompassAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+			Set<PlanBasedWithinDayAgent> dijkstraAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 			
-			for (WithinDayAgent withinDayAgent : this.withinDayAgents) {
+			for (PlanBasedWithinDayAgent withinDayAgent : this.withinDayAgents) {
 				double probability;
 				Random random = MatsimRandom.getLocalInstance();
 				probability = random.nextDouble();
@@ -390,12 +390,12 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		}
 
 		protected void collectAgents(QSim sim) {
-			this.withinDayAgents = new ArrayList<WithinDayAgent>();
+			this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
 
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
-				if (mobsimAgent instanceof PlanAgent) {
-					PlanAgent personAgent = (PlanAgent) mobsimAgent;
-					withinDayAgents.add((WithinDayAgent) personAgent);
+				if (mobsimAgent instanceof MobsimAgent) {
+					MobsimAgent personAgent = (MobsimAgent) mobsimAgent;
+					withinDayAgents.add((PlanBasedWithinDayAgent) personAgent);
 				} else {
 					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());
 				}

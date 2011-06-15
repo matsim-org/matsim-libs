@@ -29,7 +29,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 /*
@@ -47,7 +47,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 	}
 	
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {		
 		
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;

@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -51,7 +51,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	}
 	
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {		
 		
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;

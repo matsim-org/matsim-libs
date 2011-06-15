@@ -20,8 +20,8 @@
 package playground.gregor.sim2d_v2.simulation;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 /**
@@ -48,9 +48,9 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 * org.matsim.api.core.v01.Id, org.matsim.api.core.v01.population.Leg)
 	 */
 	@Override
-	public boolean handleDeparture(double now, PlanAgent agent, Id linkId) {
-		if (agent instanceof PlanDriverAgent && agent.getMode().equals("walk2d")) {
-			handleAgent2DDeparture((PlanDriverAgent)agent, linkId);
+	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+		if (agent instanceof MobsimDriverAgent && agent.getMode().equals("walk2d")) {
+			handleAgent2DDeparture((MobsimDriverAgent)agent, linkId);
 			return true;
 		}
 		return false;
@@ -62,7 +62,7 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	 * @param linkId
 	 * @param leg
 	 */
-	private void handleAgent2DDeparture(PlanDriverAgent agent, Id linkId) {
+	private void handleAgent2DDeparture(MobsimDriverAgent agent, Id linkId) {
 		this.engine.getFloor(linkId).agentDepart(agent);
 
 	}

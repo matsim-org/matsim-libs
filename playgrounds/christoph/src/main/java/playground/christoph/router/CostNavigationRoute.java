@@ -40,7 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -66,7 +66,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	}
 	
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;

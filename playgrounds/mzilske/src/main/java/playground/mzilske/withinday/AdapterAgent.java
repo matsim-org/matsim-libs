@@ -1,16 +1,13 @@
 package playground.mzilske.withinday;
 
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
@@ -19,7 +16,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.qsim.PlanDriverPassengerAgent;
+import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -27,13 +24,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
-public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeSimStepListener {
+public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBeforeSimStepListener {
 	
 	Id id;
 	
 	RealAgent realAgent;
 
-	protected PlanElement currentPlanElement;
+//	protected PlanElement currentPlanElement;
+	private String mode ;
 
 	protected TeleportationBehavior teleportationBehavior;
 	
@@ -78,7 +76,7 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 			
 			// pushing nextLinkId to the "plan" agent (this should not really be necessary ... although it might make sense
 			// also in the context of getExecutedPlan()) 
-			((NetworkRoute) ((Leg) currentPlanElement).getRoute()).setEndLinkId(nextLinkId);
+//			((NetworkRoute) ((Leg) currentPlanElement).getRoute()).setEndLinkId(nextLinkId);
 		}
 
 		@Override
@@ -102,9 +100,9 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 				public void startDoing(ActivityBehavior activityBehavior) {
 					AdapterAgent.this.activityBehavior = activityBehavior;
 					eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
-					ActivityImpl activityImpl = new ActivityImpl(activityBehavior.getActivityType(), currentLinkId);
-					activityImpl.setEndTime(Double.POSITIVE_INFINITY);
-					AdapterAgent.this.currentPlanElement = activityImpl;
+//					ActivityImpl activityImpl = new ActivityImpl(activityBehavior.getActivityType(), currentLinkId);
+//					activityImpl.setEndTime(Double.POSITIVE_INFINITY);
+//					AdapterAgent.this.currentPlanElement = activityImpl;
 					simulation.scheduleActivityEnd(AdapterAgent.this);
 				}
 				
@@ -121,10 +119,11 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 					if (destination == null) {
 						throw new RuntimeException();
 					}
-					LegImpl legImpl = new LegImpl(teleportTo.getMode());
-					legImpl.setRoute(new GenericRouteImpl(currentLinkId, destination));
-					legImpl.setTravelTime(teleportTo.getTravelTime());
-					AdapterAgent.this.currentPlanElement = legImpl;
+//					LegImpl legImpl = new LegImpl(teleportTo.getMode());
+					AdapterAgent.this.mode = teleportTo.getMode() ;
+//					legImpl.setRoute(new GenericRouteImpl(currentLinkId, destination));
+//					legImpl.setTravelTime(teleportTo.getTravelTime());
+//					AdapterAgent.this.currentPlanElement = legImpl;
 					simulation.arrangeAgentDeparture(AdapterAgent.this);
 					AdapterAgent.this.teleportationBehavior = teleportTo;
 				}
@@ -156,10 +155,11 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 				@Override
 				public void startDriving(DrivingBehavior drivingBehavior) {
 					AdapterAgent.this.drivingBehavior = drivingBehavior;
-					LegImpl legImpl = new LegImpl(TransportMode.car);
-					NetworkRoute route = new LinkNetworkRouteImpl(currentLinkId, currentLinkId);
-					legImpl.setRoute(route);
-					AdapterAgent.this.currentPlanElement = legImpl;
+//					LegImpl legImpl = new LegImpl(TransportMode.car);
+					AdapterAgent.this.mode = TransportMode.car ;
+//					NetworkRoute route = new LinkNetworkRouteImpl(currentLinkId, currentLinkId);
+//					legImpl.setRoute(route);
+//					AdapterAgent.this.currentPlanElement = legImpl;
 					drivingBehavior.doSimStep(drivingWorld);
 					simulation.arrangeAgentDeparture(AdapterAgent.this);
 				}
@@ -183,6 +183,8 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 
 	private ActivityBehavior activityBehavior;
 
+	protected double activityEndTime;
+
 	private ActivityWorld activityWorld = new ActivityWorld() {
 
 		@Override
@@ -194,7 +196,8 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		public void stopActivity() {
 			System.out.println("I want to stop my activity.");
 			eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
-			((Activity) currentPlanElement).setEndTime(now);
+//			((Activity) currentPlanElement).setEndTime(now);
+			AdapterAgent.this.activityEndTime = now ;
 			simulation.rescheduleActivityEnd(AdapterAgent.this, Double.POSITIVE_INFINITY, now);
 
 			simulation.getAgentCounter().decLiving(); 
@@ -298,7 +301,8 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		//
 		// The main reason for this is that the activity end queue is time-sorted, so that not all agents need to be asked
 		// if they want to depart.  If you take care of agent departure yourself, this could just return infinity.
-		return ((Activity) currentPlanElement).getEndTime();
+//		return ((Activity) currentPlanElement).getEndTime();
+		return this.activityEndTime ;
 	}
 
 	@Override
@@ -329,71 +333,78 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		// In part also because the user of the agent arrival event is probably the agent programmer, not the framework
 		// programmer.  Given that this was also the structure that I found, I decided to leave it that way.  kai, jun'11
 
-		currentLinkId = ((Leg) currentPlanElement).getRoute().getEndLinkId();
-		eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id, currentLinkId, ((Leg) currentPlanElement).getMode()));
-		currentPlanElement = null;
+//		currentLinkId = ((Leg) currentPlanElement).getRoute().getEndLinkId();
+		eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id, currentLinkId, this.mode));
+//		currentPlanElement = null;
 		teleportationBehavior = null;
 		drivingBehavior = null;
 	}
 
-	@Override
-	public PlanElement getCurrentPlanElement() {
-		return currentPlanElement;
-	}
+//	@Override
+//	public PlanElement getCurrentPlanElement() {
+//		return currentPlanElement;
+//	}
 
-	@Override
-	public PlanElement getNextPlanElement() {
-		// I am never asked this. mz
-		//
-		// Then why is it in the interface? :-) kai, jun'11
-		throw new RuntimeException();
-	}
+//	@Override
+//	public PlanElement getNextPlanElement() {
+//		// I am never asked this. mz
+//		//
+//		// Then why is it in the interface? :-) kai, jun'11
+//		throw new RuntimeException();
+//	}
 
-	@Override
-	@Deprecated // try to use getCurrentPlanElement()
-	public Leg getCurrentLeg() {
-		// I am getting asked about this as soon as I tell the Simulation I want to depart and on several other
-		// occasions. Most of the time, what they really want to know is only the mode I am choosing,
-		// but sometimes they also want to know the car Route I am taking. This is strange because I am asked at every time
-		// step what link I want to go to. Then I realized that I am only asked this so the Simulation knows if maybe I already
-		// am where I want to go. mz
-		//
-		// I am not fully sure but I seem to remember that the problem is that someone (not me) put the arrival link id into the 
-		// route rather than into the leg.  So you either have to ask the activity or the route if you have arrived.  Out of these
-		// two, I would say that route is the less awkward.  
-		//
-		// There is also getDestinationLinkId(), and it is not clear if "getCurrentLeg()" is even still necessary.  kai, jun'11
-		//
-		// Personally, I also think that getCurrentLeg and getCurrentActivity should simply be removed.
-	    
-        PlanElement currentPlanElement = this.getCurrentPlanElement();
-
-        if (!(currentPlanElement instanceof Leg)) {
-            return null;
-        }
-        
-        return (Leg) currentPlanElement;
-	}
+//	@Override
+//	@Deprecated // try to use getCurrentPlanElement()
+//	public Leg getCurrentLeg() {
+//		// I am getting asked about this as soon as I tell the Simulation I want to depart and on several other
+//		// occasions. Most of the time, what they really want to know is only the mode I am choosing,
+//		// but sometimes they also want to know the car Route I am taking. This is strange because I am asked at every time
+//		// step what link I want to go to. Then I realized that I am only asked this so the Simulation knows if maybe I already
+//		// am where I want to go. mz
+//		//
+//		// I am not fully sure but I seem to remember that the problem is that someone (not me) put the arrival link id into the 
+//		// route rather than into the leg.  So you either have to ask the activity or the route if you have arrived.  Out of these
+//		// two, I would say that route is the less awkward.  
+//		//
+//		// There is also getDestinationLinkId(), and it is not clear if "getCurrentLeg()" is even still necessary.  kai, jun'11
+//		//
+//		// Personally, I also think that getCurrentLeg and getCurrentActivity should simply be removed.
+//	    
+//        PlanElement currentPlanElement = this.getCurrentPlanElement();
+//
+//        if (!(currentPlanElement instanceof Leg)) {
+//            return null;
+//        }
+//        
+//        return (Leg) currentPlanElement;
+//	}
 	
 	@Override
+	public Double getExpectedTravelTime() {
+		return null ; 	// yyyyyy this is not good and should probably be something better.  kai, jun'11
+	}
+    
+	@Override
 	public String getMode() {
-        if (!(this.getCurrentPlanElement() instanceof Leg)) {
-            return null;
-        }
-        return ((Leg)this.getCurrentPlanElement()).getMode() ;
+		return this.mode ;
+//        if (!(this.getCurrentPlanElement() instanceof Leg)) {
+//            return null;
+//        }
+//        return ((Leg)this.getCurrentPlanElement()).getMode() ;
 	}
 	
 	@Override
 	public final Id getPlannedVehicleId() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		Route route = ((Leg) currentPlanElement).getRoute() ;
-		if ( !(route instanceof NetworkRoute) ) {
-			return null ;
-		}
-		return ((NetworkRoute)route).getVehicleId() ;
+		return null ;
+//		PlanElement currentPlanElement = this.getCurrentPlanElement();
+//		if (!(currentPlanElement instanceof Leg)) {
+//			return null;
+//		}
+//		Route route = ((Leg) currentPlanElement).getRoute() ;
+//		if ( !(route instanceof NetworkRoute) ) {
+//			return null ;
+//		}
+//		return ((NetworkRoute)route).getVehicleId() ;
 	}
 
 
@@ -420,6 +431,7 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		// Actually no.  The teleportation arrival is much later than the teleportation departure.  Also, there is no guarantee
 		// that the mobsim delivers to where it should deliver.  The corresponding notification method for network movement 
 		// is "notifyMoveOverNode". kai, jun'11
+		this.currentLinkId = linkId ;
 	}
 
 	@Override
@@ -428,11 +440,11 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		simulation.getAgentCounter().incLiving();
 	}
 
-	@Override
-	public Plan getSelectedPlan() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException();
-	}
+//	@Override
+//	public Plan getSelectedPlan() {
+//		// TODO Auto-generated method stub
+//		throw new RuntimeException();
+//	}
 
 	@Override
 	public Id getCurrentLinkId() {
@@ -462,7 +474,9 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		// immediately notify me that I was teleported to the link which I answer here. mz
 		//
 		// The idea was/is to make the mobsim run without knowing about legs and routes.  kai, jun'11
-		return ((Leg) currentPlanElement).getRoute().getEndLinkId();
+//		return ((Leg) currentPlanElement).getRoute().getEndLinkId();
+		return this.currentLinkId ; // the agent always has the current link as destination link; it actually parks if
+		// simultaneously, chooseNextLinkId returns null.
 	}
 
 	@Override
@@ -507,6 +521,7 @@ public class AdapterAgent implements PlanDriverPassengerAgent, SimulationBeforeS
 		// (It is, however, quite strange that this does not pass on the new link as an argument.)
 		// kai, jun'11
 		this.nextLinkId = null; // this is set to null because it means the "next" linkId, not the "current" linkId.  kai, jun'11
+		this.currentLinkId = newLinkId ;
 	}
 
 	@Override

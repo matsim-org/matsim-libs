@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -72,7 +72,7 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 
 	private void init() {		
 		this.umlaufDriver = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();
-		for (PlanAgent personAgent : this.qSim.getTransitAgents()) {
+		for (MobsimAgent personAgent : this.qSim.getTransitAgents()) {
 			this.umlaufDriver.put(((FixedHeadwayCycleUmlaufDriver) personAgent).getVehicle().getVehicle().getId(), (FixedHeadwayCycleUmlaufDriver) personAgent); 
 		}
 		log.info("initialized with " + this.umlaufDriver.size() + " drivers");		

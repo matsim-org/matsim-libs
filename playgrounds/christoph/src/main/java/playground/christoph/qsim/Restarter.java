@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
@@ -86,7 +86,7 @@ public class Restarter implements SimulationInitializedListener {
 //		sim.getSimTimer().setSimStartTime(startTimeSec)
 		
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			PlanAgent agent = (PlanAgent) mobsimAgent;
+			MobsimAgent agent = (MobsimAgent) mobsimAgent;
 			
 			if (activityPerforming.containsKey(agent.getId())) {
 				int planElementIndex = activityPerforming.get(agent.getId());
@@ -106,7 +106,7 @@ public class Restarter implements SimulationInitializedListener {
 		
 	}
 
-	private void setPlanElementIndex(PlanAgent agent, int index) {
+	private void setPlanElementIndex(MobsimAgent agent, int index) {
 		// TODO
 	}
 	

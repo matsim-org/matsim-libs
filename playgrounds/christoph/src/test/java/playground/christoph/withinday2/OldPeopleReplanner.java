@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -23,7 +23,7 @@ class OldPeopleReplanner extends WithinDayDuringActivityReplanner {
 	/**
 	 * return value (in future it might be true, when successful call)
 	 */
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		
 		// If we don't have a valid Replanner.
 		// (only extra security)

@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -52,14 +52,14 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
-		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+		Set<PlanBasedWithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
+		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
 		if (handledAgents == null) return agentsToReplan;	
 
-		for (PlanAgent personAgent : activityPerformingAgents) {
+		for (PlanBasedWithinDayAgent personAgent : activityPerformingAgents) {
 			/*
 			 * Remove the Agent from the list, if the replanning flag is not set.
 			 */
@@ -83,7 +83,7 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 			}
 			
 			// If we reach this point, the agent can be replanned.
-			agentsToReplan.add((WithinDayAgent)personAgent);
+			agentsToReplan.add((PlanBasedWithinDayAgent)personAgent);
 		}
 		if (time == EvacuationConfig.evacuationTime) log.info("Found " + activityPerformingAgents.size() + " Agents performing an Activity in a secure area.");
 		

@@ -10,7 +10,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
@@ -43,8 +43,8 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	 * really ends. This allows us for example to read the known nodes of a Person
 	 * from a Database before they are needed what should speed up the Simulation.
 	 */
-	protected final PriorityBlockingQueue<PlanAgent> offsetActivityEndsList = 
-		new PriorityBlockingQueue<PlanAgent>(500, new PersonAgentDepartureTimeComparator());
+	protected final PriorityBlockingQueue<MobsimAgent> offsetActivityEndsList = 
+		new PriorityBlockingQueue<MobsimAgent>(500, new PersonAgentDepartureTimeComparator());
 	protected final double timeOffset = 120.0;
 	
 //	private int count = 0;
@@ -168,7 +168,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 		// TODO Auto-generated method stub	
 	}
 	
-	public void scheduleActivityEnd(final PlanAgent agent)
+	public void scheduleActivityEnd(final MobsimAgent agent)
 	{	
 		offsetActivityEndsList.add(agent);
 	}
@@ -182,7 +182,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 	{		
 		while (this.offsetActivityEndsList.peek() != null)
 		{
-			PlanAgent agent = this.offsetActivityEndsList.peek();
+			MobsimAgent agent = this.offsetActivityEndsList.peek();
 			if (agent.getActivityEndTime() <= time + timeOffset)
 			{
 				this.offsetActivityEndsList.poll();

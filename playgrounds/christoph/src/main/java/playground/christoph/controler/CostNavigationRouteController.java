@@ -33,7 +33,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -131,11 +131,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 	}
 
 	private void printStatistics() {
-		Set<WithinDayAgent> handledAgents = duringLegIdentifier.getHandledAgents();
+		Set<PlanBasedWithinDayAgent> handledAgents = duringLegIdentifier.getHandledAgents();
 		log.info("Persons using CostNavigationRoute: " + handledAgents.size());
 		
 		double sumTrust = 0.0;
-		for (WithinDayAgent agent : handledAgents) {
+		for (PlanBasedWithinDayAgent agent : handledAgents) {
 			sumTrust += costNavigationTravelTimeLogger.getTrust(agent.getId());
 		}
 		log.info("Mean trust per person: " + sumTrust / handledAgents.size());
