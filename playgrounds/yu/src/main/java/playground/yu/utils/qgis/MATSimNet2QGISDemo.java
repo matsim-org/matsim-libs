@@ -29,6 +29,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
@@ -42,9 +43,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * This class is a copy of main() from
  * org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape and can convert a
  * MATSim-network to a QGIS .shp-file (link or polygon)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MATSimNet2QGISDemo implements X2QGIS {
 
@@ -64,13 +65,15 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		String netfile, outputFileLs, outputFileP;
 		double width;
 		if (args.length == 0) {
-//			netfile = "../matsim/test/scenarios/chessboard/network.xml";
-//			outputFileLs = "../matsimTests/locationChoice/chessboard/Links.shp";
-//			outputFileP = "../matsimTests/locationChoice/chessboard/Polygon.shp";
-//			width = 10d;
-			netfile = "..//shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
-			outputFileLs = "../shared-svn/studies/countries/de/berlin/counts/iv_counts/Links.shp";
-			outputFileP = "../shared-svn/studies/countries/de/berlin/counts/iv_counts/Polygon.shp";
+			// netfile = "../matsim/test/scenarios/chessboard/network.xml";
+			// outputFileLs =
+			// "../matsimTests/locationChoice/chessboard/Links.shp";
+			// outputFileP =
+			// "../matsimTests/locationChoice/chessboard/Polygon.shp";
+			// width = 10d;
+			netfile = "test/input/network.xml";
+			outputFileLs = "test/output/networkLinks.shp";
+			outputFileP = "test/output/networkPolygon.shp";
 			width = 0.01;
 		} else {
 			netfile = args[0];
@@ -79,9 +82,10 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 			width = Double.parseDouble(args[3]);
 		}
 		// String coordinateSys = ch1903;
-		String coordinateSys = "DHDN_GK4";
-		// String coordinateSys = "Atlantis";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		 String coordinateSys = "DHDN_GK4";
+//		String coordinateSys = TransformationFactory.ATLANTIS;
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem(coordinateSys);
 
 		Logger log = Logger.getLogger(Links2ESRIShape.class);
@@ -92,8 +96,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
 				network, coordinateSys);
-		builder
-				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
+		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		new Links2ESRIShape(network, outputFileLs, builder).write();

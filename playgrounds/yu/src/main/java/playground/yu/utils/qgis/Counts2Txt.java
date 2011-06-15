@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils.qgis;
 
@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
@@ -38,9 +37,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * extracts txt file from countsfile, which could also be insert in QGIS file
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class Counts2Txt {
 
@@ -48,11 +47,11 @@ public class Counts2Txt {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String networkFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/network.xml", //
-		countsFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.xml", //
-		outputFilename = "../integration-demandCalibration1.0.1/test/input/calibration/CalibrationTest/testLogLikelihood/counts1k.txt";
+		String networkFilename = "test/input/network.xml", //
+		countsFilename = "test/input/counts_v4.xml", //
+		outputFilename = "test/output/counts_v4.txt";
 
-		Scenario snr = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario snr = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = snr.getNetwork();
 		new MatsimNetworkReader(snr).readFile(networkFilename);
 
@@ -64,8 +63,9 @@ public class Counts2Txt {
 
 		for (Count count : counts.getCounts().values()) {
 			Coord coord = count.getCoord();
-			if (coord == null)
+			if (coord == null) {
 				coord = net.getLinks().get(count.getLocId()).getCoord();
+			}
 
 			writer.writeln(coord.getX() + "\t" + coord.getY() + "\t"
 					+ count.getLocId());
