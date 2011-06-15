@@ -122,7 +122,7 @@ public class DgCottbusFootballSubPopAnalysis {
 			for (Integer i : itList){
 				double tt = map.get(scale).get(i);
 				if (Double.isNaN(tt)){
-					tt = 0;
+					writer.write("\t");
 				}
 				writer.write("\t " + Double.toString(tt));
 			}
