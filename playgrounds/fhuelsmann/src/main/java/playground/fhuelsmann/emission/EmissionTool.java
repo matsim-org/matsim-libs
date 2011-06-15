@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
@@ -42,12 +41,11 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
-import playground.fhuelsmann.emission.objects.UrbanSuburbanAnalyzer;
+import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 
