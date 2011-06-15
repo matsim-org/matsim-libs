@@ -124,7 +124,9 @@ public class DgCottbusFootballSubPopAnalysis {
 				if (Double.isNaN(tt)){
 					writer.write("\t");
 				}
-				writer.write("\t " + Double.toString(tt));
+				else {
+					writer.write("\t " + Double.toString(tt));
+				}
 			}
 			writer.newLine();
 		}
