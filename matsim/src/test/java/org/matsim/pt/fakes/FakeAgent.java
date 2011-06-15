@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -47,7 +47,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 /**
  * @author mrieser
  */
-public class FakeAgent implements PlanDriverAgent, PassengerAgent {
+public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
@@ -85,9 +85,15 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 		return null ;
 	}
 
+//	@Override
+//	public Leg getCurrentLeg() {
+//		return this.dummyLeg;
+//	}
+	
 	@Override
-	public Leg getCurrentLeg() {
-		return this.dummyLeg;
+	public Double getExpectedTravelTime() {
+		// since the class does not tell what it is supposed to do I do not know what is a reasonable answer here.  kai, jun'11
+		return null ;
 	}
 	
 	@Override
@@ -107,10 +113,10 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 //		return null;
 //	}
 
-	@Override
-	public PlanElement getCurrentPlanElement() {
-		return this.dummyLeg ;
-	}
+//	@Override
+//	public PlanElement getCurrentPlanElement() {
+//		return this.dummyLeg ;
+//	}
 
 	@Override
 	public double getActivityEndTime() {
@@ -163,10 +169,10 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 		return null;
 	}
 
-	@Override
-	public PlanElement getNextPlanElement() {
-		throw new UnsupportedOperationException() ;
-	}
+//	@Override
+//	public PlanElement getNextPlanElement() {
+//		throw new UnsupportedOperationException() ;
+//	}
 
 	@Override
 	public Id getId() {
@@ -178,8 +184,8 @@ public class FakeAgent implements PlanDriverAgent, PassengerAgent {
 		return 1.0;
 	}
 
-	@Override
-	public Plan getSelectedPlan() {
-		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());
-	}
+//	@Override
+//	public Plan getSelectedPlan() {
+//		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());
+//	}
 }

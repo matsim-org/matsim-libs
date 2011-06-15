@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
  * @author nagel
  *
  */
-public interface NetworkAgent extends MobsimAgent {
+public interface NetworkAgent extends MobsimAgentMarkerInterface {
 	
 	public Id getCurrentLinkId();
 

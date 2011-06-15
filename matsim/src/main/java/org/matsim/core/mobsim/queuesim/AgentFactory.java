@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * @author dgrether
@@ -34,8 +34,8 @@ import org.matsim.core.mobsim.framework.PlanDriverAgent;
 		this.simulation = simulation;
 	}
 
-	/*package*/ PlanDriverAgent createPersonAgent(final Person p) {
-		PlanDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(p, this.simulation);
+	/*package*/ MobsimDriverAgent createPersonAgent(final Person p) {
+		MobsimDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(p, this.simulation);
 		return agent;
 	}
 

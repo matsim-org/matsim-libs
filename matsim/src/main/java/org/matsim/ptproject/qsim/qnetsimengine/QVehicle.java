@@ -22,13 +22,13 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vis.snapshots.writers.VisVehicle;
 
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
 public interface QVehicle extends Identifiable, VisVehicle, QItem {
 
-	public void setDriver(final PlanDriverAgent driver);
+	public void setDriver(final MobsimDriverAgent driver);
 	// yy presumably, this should set DriverAgent
 	
 	public Link getCurrentLink();

@@ -22,8 +22,8 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -54,10 +54,10 @@ class CarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public boolean handleDeparture(double now, PlanAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		if (agent.getMode().equals(TransportMode.car)) {
-			if ( agent instanceof PlanDriverAgent ) {
-				handleCarDeparture(now, (PlanDriverAgent)agent, linkId);
+			if ( agent instanceof MobsimDriverAgent ) {
+				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
 				return true ;
 			} else {
 				throw new UnsupportedOperationException("wrong agent type to use a car") ;
@@ -66,7 +66,7 @@ class CarDepartureHandler implements DepartureHandler {
 		return false ;
 	}
 
-	private void handleCarDeparture(double now, PlanDriverAgent agent, Id linkId) {
+	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
 //		NetworkRoute route = (NetworkRoute) leg.getRoute();
 //		Id vehicleId = route.getVehicleId();
 		Id vehicleId = agent.getPlannedVehicleId() ;

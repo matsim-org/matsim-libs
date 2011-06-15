@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
@@ -104,7 +104,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	 */
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
 
-	private final LinkedHashMap<Id, PlanAgent> agents = new LinkedHashMap<Id, PlanAgent>();
+	private final LinkedHashMap<Id, MobsimAgent> agents = new LinkedHashMap<Id, MobsimAgent>();
 
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 
@@ -123,8 +123,8 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
 		log.info("receiving simulationInitializedEvent") ;
 		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
-			if ( mag instanceof PlanAgent ) {
-				PlanAgent pag = (PlanAgent) mag ;
+			if ( mag instanceof MobsimAgent ) {
+				MobsimAgent pag = (MobsimAgent) mag ;
 				agents.put( pag.getId(), pag) ;
 			}
 		}
@@ -220,7 +220,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		}
 		for (Id personId : trackedAgents) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			PlanAgent agent = agents.get(personId);
+			MobsimAgent agent = agents.get(personId);
 			VisLink visLink = queueSimulation.getVisNetwork().getVisLinks().get(agent.getCurrentLinkId());
 			visLink.getVisData().getVehiclePositions(positions);
 			for (AgentSnapshotInfo position : positions) {
@@ -281,7 +281,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	public Person findPersonAgent(Id agentId) {
 		// yy should probably be called findPerson.  kai, jun'11 
 
-		PlanAgent personAgent = agents.get(agentId);
+		MobsimAgent personAgent = agents.get(agentId);
 		if (personAgent != null && personAgent instanceof HasPerson ) {
 			Person person = ((HasPerson)personAgent).getPerson();
 			return person ;

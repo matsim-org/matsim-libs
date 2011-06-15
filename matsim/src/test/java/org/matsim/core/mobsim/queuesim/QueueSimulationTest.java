@@ -57,7 +57,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -670,7 +670,7 @@ public class QueueSimulationTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle2);
 
 		sim.getSimTimer().setTime(100.0);
-		PlanDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
+		MobsimDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
 		agent.initialize();
 		agent.endActivityAndAssumeControl(100.0);
 

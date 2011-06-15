@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
@@ -139,7 +139,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PlanAgent> agentsInActivities = new LinkedHashMap<Id, PlanAgent>();
+	private final Map<Id, MobsimAgent> agentsInActivities = new LinkedHashMap<Id, MobsimAgent>();
 
 	private VisData visdata = this.new VisDataImpl();
 
@@ -540,12 +540,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void registerAgentOnLink(PlanAgent planAgent) {
+	public void registerAgentOnLink(MobsimAgent planAgent) {
 		agentsInActivities.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	public void unregisterAgentOnLink(PlanAgent planAgent) {
+	public void unregisterAgentOnLink(MobsimAgent planAgent) {
 		agentsInActivities.remove(planAgent.getId());
 	}
 
@@ -607,10 +607,13 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 
 	@Override
-	void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now) {
+	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
-		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
+//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
+		if (
+//				(route.getEndLinkId().equals(link.getId()))
+				agent.getPlannedVehicleId().equals(link.getId())
+				&& (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
 
 			agent.endLegAndAssumeControl(now);

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DriverAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.agents;
+package org.matsim.core.mobsim.framework;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-
-public final class ExperimentalBasicWithindayAgentFactory implements AgentFactory {
-
-	private final Netsim simulation;
-
-	public ExperimentalBasicWithindayAgentFactory(final Netsim simulation) {
-		this.simulation = simulation;
-	}
-
-	@Override
-	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverAgent agent = new ExperimentalBasicWithindayAgent(p, this.simulation);
-		return agent;
-	}
+public interface MobsimDriverAgent extends MobsimAgent, DriverAgent {
 
 }

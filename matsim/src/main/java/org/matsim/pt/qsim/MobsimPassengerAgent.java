@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * WithinDayAgent.java
+ * project: matsim
+ * PersonPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.agents;
+package org.matsim.pt.qsim;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
-/**
- * Interface for Agents with within-day functionality. Might get some
- * further methods like resetCaches(). cdobler, Nov'10
+/**Design thoughts:<ul>
+ * <li> Currently, this interface is not used.  Does this mean that Passengers are always also instantiated
+ * as drivers?  kai, jun'11
+ * </ul>
+ * 
+ * @author nagel
  */
-public interface WithinDayAgent extends PlanAgent {
-	// yyyyyy this should be renamed WithinDayPlanAgent!!!! kai, jun'11
-	
-	public void resetCaches();
-
-	public Integer getCurrentPlanElementIndex();
-
-	public Integer getCurrentRouteLinkIdIndex();
-	
-	public Plan getModifiablePlan();
-	
-	public Leg getCurrentLeg() ;
+public interface MobsimPassengerAgent extends MobsimAgent, PassengerAgent {
 
 }

@@ -23,7 +23,7 @@ package org.matsim.withinday.replanning.replanners;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -58,7 +58,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	 * of such a functionality would be a problem due to the structure of MATSim...
 	 */
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 

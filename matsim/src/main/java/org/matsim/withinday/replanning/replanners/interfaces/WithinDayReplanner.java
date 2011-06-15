@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 
@@ -62,7 +62,7 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 		this.random = MatsimRandom.getLocalInstance();
 	}
 	
-	public abstract boolean doReplanning(WithinDayAgent withinDayAgent);
+	public abstract boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent);
 
 	/*
 	 * Based on a random number it is decided whether an agent should

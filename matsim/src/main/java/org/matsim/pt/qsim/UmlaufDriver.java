@@ -157,10 +157,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public Leg getCurrentLeg() {
+	Leg getCurrentLeg() {
 		return (Leg) this.currentPlanElement;
 	}
-	// yyyyyy reduce visibility!
+	
+	@Override
+	public Double getExpectedTravelTime() {
+		return ((Leg) this.currentPlanElement).getTravelTime() ;
+	}
 	
 	@Override
 	public String getMode() {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DriverAgent.java
+ * WithinDayAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,8 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.ptproject.qsim.agents;
 
-public interface PlanDriverAgent extends PlanAgent, DriverAgent {
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+
+/**
+ * Interface for Agents with within-day functionality. Might get some
+ * further methods like resetCaches(). cdobler, Nov'10
+ */
+public interface PlanBasedWithinDayAgent extends MobsimAgent, PlanAgent {
+	// yyyyyy this should be renamed WithinDayPlanAgent!!!! kai, jun'11
+	
+	public void resetCaches();
+
+	public Integer getCurrentPlanElementIndex();
+
+	public Integer getCurrentRouteLinkIdIndex();
+	
+	public Plan getModifiablePlan();
+	
+	public Leg getCurrentLeg() ;
 
 }

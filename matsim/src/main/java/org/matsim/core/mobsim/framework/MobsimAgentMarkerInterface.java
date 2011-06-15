@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: matsim
- * PersonPassengerAgent.java
+ * MobsimAgentMarkerInterface.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,17 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.qsim;
+package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.framework.PlanAgent;
-
-/**Design thoughts:<ul>
- * <li> Currently, this interface is not used.  Does this mean that Passengers are always also instantiated
- * as drivers?  kai, jun'11
- * </ul>
- * 
+/**
  * @author nagel
+ *
  */
-public interface PlanPassengerAgent extends PlanAgent, PassengerAgent {
+public interface MobsimAgentMarkerInterface {
 
 }

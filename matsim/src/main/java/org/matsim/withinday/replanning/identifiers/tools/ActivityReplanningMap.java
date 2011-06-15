@@ -36,13 +36,13 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -73,7 +73,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
-	private Map<Id, WithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
+	private Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 	
 	public ActivityReplanningMap() {
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
@@ -81,7 +81,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	}
 	
 	private void init() {
-		this.personAgentMapping = new TreeMap<Id, WithinDayAgent>();
+		this.personAgentMapping = new TreeMap<Id, PlanBasedWithinDayAgent>();
 		this.replanningSet = new TreeSet<Id>();
 		this.startingAgents = new TreeSet<Id>();
 	}
@@ -99,16 +99,16 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		
 		Netsim sim = (Netsim) e.getQueueSimulation();
 
-		personAgentMapping = new HashMap<Id, WithinDayAgent>();
+		personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				if (mobsimAgent instanceof PlanAgent) {
-					WithinDayAgent withinDayAgent = (WithinDayAgent) mobsimAgent;
+				if (mobsimAgent instanceof MobsimAgent) {
+					PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
 					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
 					
 					// mark the agent as currently performing an Activity
-					replanningSet.add(((PlanAgent) mobsimAgent).getId());
+					replanningSet.add(((MobsimAgent) mobsimAgent).getId());
 				}
 			}
 		}
@@ -124,7 +124,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 
 		for (Id id : startingAgents) {
-			PlanAgent personAgent = personAgentMapping.get(id);
+			MobsimAgent personAgent = personAgentMapping.get(id);
 
 			double now = e.getSimulationTime();
 			double departureTime = personAgent.getActivityEndTime();
@@ -177,8 +177,8 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	/*
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
-	public synchronized Set<WithinDayAgent> getActivityPerformingAgents() {
-		Set<WithinDayAgent> activityPerformingAgents = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+	public synchronized Set<PlanBasedWithinDayAgent> getActivityPerformingAgents() {
+		Set<PlanBasedWithinDayAgent> activityPerformingAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 
 		for (Id id : replanningSet) activityPerformingAgents.add(personAgentMapping.get(id));
 
@@ -189,14 +189,14 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * TODO: find a better name
 	 * Returns a List of all agents that are going to end their activity right now
 	 */
-	public synchronized Set<WithinDayAgent> getReplanningDriverAgents(double time) {
-		Set<WithinDayAgent> personAgentsToReplanActivityEnd = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+	public synchronized Set<PlanBasedWithinDayAgent> getReplanningDriverAgents(double time) {
+		Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEnd = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 				
 		Iterator<Id> ids = replanningSet.iterator();
 		while(ids.hasNext()) {
 			Id id = ids.next();
 
-			WithinDayAgent withinDayAgent = personAgentMapping.get(id);
+			PlanBasedWithinDayAgent withinDayAgent = personAgentMapping.get(id);
 
 			double replanningTime = withinDayAgent.getActivityEndTime();
 

@@ -23,6 +23,7 @@ package org.matsim.pt.qsim;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -36,7 +37,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 /**
  * @author mrieser
  */
-public class TransitAgent extends PersonDriverAgentImpl implements PlanDriverPassengerAgent {
+public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
 
 	public TransitAgent(final Person p, final Netsim simulation) {
 		super(p, simulation);
@@ -71,6 +72,12 @@ public class TransitAgent extends PersonDriverAgentImpl implements PlanDriverPas
 	@Override
 	public double getWeight() {
 		return 1.0;
+	}
+	
+	@Override
+	public Leg getCurrentLeg() {
+		// needed by the passenger agent, since the leg was not removed there.  kai, jun'11
+		return super.getCurrentLeg();
 	}
 
 }

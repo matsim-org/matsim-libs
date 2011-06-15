@@ -53,4 +53,6 @@ public interface DriverAgent extends NetworkAgent {
 	@Deprecated
 	public void notifyMoveOverNode(Id newLinkId);
 	
+	public Id getPlannedVehicleId() ;
+	
 }

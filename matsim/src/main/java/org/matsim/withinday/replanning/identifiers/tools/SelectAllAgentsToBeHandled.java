@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -39,7 +39,7 @@ public class SelectAllAgentsToBeHandled implements SimulationInitializedListener
 
 	private static final Logger log = Logger.getLogger(SelectAllAgentsToBeHandled.class);
 	
-	protected Collection<WithinDayAgent> withinDayAgents;
+	protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
 
 	protected List<AgentsToReplanIdentifier> identifiers;
 	
@@ -75,11 +75,11 @@ public class SelectAllAgentsToBeHandled implements SimulationInitializedListener
 	}
 
 	private void collectAgents(QSim sim) {
-		this.withinDayAgents = new ArrayList<WithinDayAgent>();
+		this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			if (mobsimAgent instanceof WithinDayAgent) {
-				withinDayAgents.add((WithinDayAgent) mobsimAgent);
+			if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
+				withinDayAgents.add((PlanBasedWithinDayAgent) mobsimAgent);
 			} else {
 				log.warn("MobsimAgent was expected to be from type WithinDayAgent, but was from type " + mobsimAgent.getClass().toString());
 			}

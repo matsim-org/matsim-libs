@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
@@ -34,7 +35,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * of matsim. </i>
  * @author nagel
  */
-public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements WithinDayAgent {
+public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements PlanBasedWithinDayAgent {
 
 	private Plan executedPlan;
 	
@@ -96,6 +97,11 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	public final Plan getModifiablePlan() {
 		// yyyy for the time being, this returns the Person's selected plan, but this should be changed. kai, nov'10
 		return this.person.getSelectedPlan();
+	}
+	
+	@Override
+	public final Leg getCurrentLeg() {
+		return super.getCurrentLeg();
 	}
 
 }

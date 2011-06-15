@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -43,7 +43,7 @@ public class SelectHandledAgentsByProbability implements SimulationInitializedLi
 
 	private static final Logger log = Logger.getLogger(SelectHandledAgentsByProbability.class);
 	
-	protected Collection<WithinDayAgent> withinDayAgents;
+	protected Collection<PlanBasedWithinDayAgent> withinDayAgents;
 
 	protected List<Tuple<AgentsToReplanIdentifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
 
@@ -65,12 +65,12 @@ public class SelectHandledAgentsByProbability implements SimulationInitializedLi
 
 		Random random = MatsimRandom.getLocalInstance();
 		double probability;
-		List<WithinDayAgent> agentsToHandle;
+		List<PlanBasedWithinDayAgent> agentsToHandle;
 
 		for (Tuple<AgentsToReplanIdentifier, Double> tuple : identifierProbabilities) {
-			agentsToHandle = new ArrayList<WithinDayAgent>();
+			agentsToHandle = new ArrayList<PlanBasedWithinDayAgent>();
 
-			for (WithinDayAgent withinDayAgent : this.withinDayAgents) {
+			for (PlanBasedWithinDayAgent withinDayAgent : this.withinDayAgents) {
 				probability = random.nextDouble();
 				if (probability <= tuple.getSecond()) {
 					agentsToHandle.add(withinDayAgent);
@@ -91,11 +91,11 @@ public class SelectHandledAgentsByProbability implements SimulationInitializedLi
 	}
 
 	private void collectAgents(QSim sim) {
-		this.withinDayAgents = new ArrayList<WithinDayAgent>();
+		this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			if (mobsimAgent instanceof WithinDayAgent) {
-				withinDayAgents.add((WithinDayAgent) mobsimAgent);
+			if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
+				withinDayAgents.add((PlanBasedWithinDayAgent) mobsimAgent);
 			} else {
 				log.warn("MobsimAgent was expected to be from type WithinDayAgent, but was from type " + mobsimAgent.getClass().toString());
 			}

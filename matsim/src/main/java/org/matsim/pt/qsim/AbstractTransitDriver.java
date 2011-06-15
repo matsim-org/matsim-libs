@@ -25,6 +25,7 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -33,8 +34,9 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -46,7 +48,7 @@ import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
-public abstract class AbstractTransitDriver implements TransitDriverAgent, PassengerAccessEgress {
+public abstract class AbstractTransitDriver implements TransitDriverAgent, PassengerAccessEgress, PlanAgent {
 
 	private static final Logger log = Logger.getLogger(AbstractTransitDriver.class);
 
@@ -247,8 +249,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility().getId());
-			this.getSimulation().unregisterAgentAtPtWaitLocation( (PlanAgent) passenger ) ;
-			PlanDriverAgent agent = (PlanDriverAgent) passenger;
+			this.getSimulation().unregisterAgentAtPtWaitLocation( (MobsimAgent) passenger ) ;
+			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
@@ -260,7 +262,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
-			PlanDriverAgent agent = (PlanDriverAgent) passenger;
+			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
@@ -306,11 +308,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return this.dummyPerson.getId() ;
 	}
 	
-//	/**
-//	 * for junit tests in same package
-//	 */
-//	abstract /*package*/ Leg getCurrentLeg() ;
-	// yyyyyy reduce visibility of derived methods!
+	/**
+	 * for junit tests in same package
+	 */
+	abstract /*package*/ Leg getCurrentLeg() ;
 
 
 	/**

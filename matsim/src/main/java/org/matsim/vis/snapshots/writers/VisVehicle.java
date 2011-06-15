@@ -3,7 +3,7 @@
  */
 package org.matsim.vis.snapshots.writers;
 
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -17,7 +17,7 @@ public interface VisVehicle {
 	 */
 	public Vehicle getVehicle();
 
-	PlanDriverAgent getDriver() ;
+	MobsimDriverAgent getDriver() ;
 	// yy presumably, this should return DriverAgent
 
 }

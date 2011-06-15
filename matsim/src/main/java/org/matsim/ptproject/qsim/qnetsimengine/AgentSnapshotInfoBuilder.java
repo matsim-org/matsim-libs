@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -199,7 +199,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				lane = laneNumber ;
 			}
 
-			List<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink_m, link, lane,
 					speedValueBetweenZeroAndOne, offset);
@@ -301,7 +301,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 			else {
 				lane = laneNumber;
 			}
-			List<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink, link, lane, speedValueBetweenZeroAndOne, offset);
 			lastDistance = distanceOnLink;
 		}
@@ -341,7 +341,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 			}
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speedValueBetweenZeroAndOne = (now > cmp) ? 0.0 : 1.0 ;
-			List<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, queueEnd, link, lane, speedValueBetweenZeroAndOne, offset);
 			queueEnd -= vehSpacing;
 		}
@@ -387,7 +387,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp ? 0.0 : freespeed);
-				List<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed, offset);
 				distFromFromNode -= spacing;
 			}
@@ -397,7 +397,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speedValueBetweenZeroAndOne = (now > cmp ? 0.0 : 1.0);
-				List<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
+				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speedValueBetweenZeroAndOne, offset);
 				distFromFromNode -= spacing;
 			}
@@ -405,14 +405,14 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	}
 
 	private void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
-			List<PlanAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speedValueBetweenZeroAndOne, double offset)
+			List<MobsimAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speedValueBetweenZeroAndOne, double offset)
 	{
 		distanceOnLink += offset;
 		int cnt = peopleInVehicle.size() - 1 ;
 //		for (PersonAgent passenger : peopleInVehicle) {
-		for ( ListIterator<PlanAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+		for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
-			PlanAgent passenger = it.previous();
+			MobsimAgent passenger = it.previous();
 			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane, cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 //			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
@@ -431,9 +431,9 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 
 	 int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
-			Collection<PlanAgent> agentsInActivities,  int cnt2) {
+			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
-		for (PlanAgent pa : agentsInActivities) {
+		for (MobsimAgent pa : agentsInActivities) {
 			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(pa.getId(), link, c) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
@@ -452,9 +452,9 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList, TransitQLaneFeature transitQueueLaneFeature) {
 		for (QVehicle veh : waitingList) {
-			Collection<PlanAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
 			boolean first = true;
-			for (PlanAgent passenger : peopleInVehicle) {
+			for (MobsimAgent passenger : peopleInVehicle) {
 				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -478,17 +478,17 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	private List<PlanAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {
-		List<PlanAgent> passengers = null;
+	private List<MobsimAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {
+		List<MobsimAgent> passengers = null;
 		if (transitQueueLaneFeature != null) {
 			passengers = transitQueueLaneFeature
 			.getPassengers(vehicle); // yy seems to me that "getPassengers" is a vehicle feature???
 		}
 		if (passengers == null || passengers.isEmpty()) {
-			return Collections.singletonList((PlanAgent) vehicle.getDriver());
+			return Collections.singletonList((MobsimAgent) vehicle.getDriver());
 		}
 		else {
-			ArrayList<PlanAgent> people = new ArrayList<PlanAgent>();
+			ArrayList<MobsimAgent> people = new ArrayList<MobsimAgent>();
 			people.add(vehicle.getDriver());
 			people.addAll(passengers);
 			return people;

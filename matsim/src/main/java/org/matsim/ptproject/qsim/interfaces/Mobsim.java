@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 
 /**The logic is as follows:<ul>
@@ -91,7 +91,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  *
  */
 public interface Mobsim extends IOSimulation, ObservableSimulation {
-	void arrangeAgentDeparture(PlanAgent planAgent);
+	void arrangeAgentDeparture(MobsimAgent planAgent);
 
 	EventsManager getEventsManager();
 
@@ -102,7 +102,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * 
 	 * @param planAgent
 	 */
-	void scheduleActivityEnd(PlanAgent planAgent);
+	void scheduleActivityEnd(MobsimAgent planAgent);
 
 	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
 	 * 
@@ -112,7 +112,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * @param newTime - time when the activity end is now scheduled.  This is here so that "oldTime" and "newTime" do not get
 	 * confused.
 	 */
-	void rescheduleActivityEnd(final PlanAgent agent, final double oldTime, final double newTime ) ;
+	void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) ;
 
 	Scenario getScenario();
 
@@ -120,7 +120,7 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 
 	MobsimTimerI getSimTimer();
 
-	Collection<PlanAgent> getActivityEndsList() ;
+	Collection<MobsimAgent> getActivityEndsList() ;
 	
 	/**Registering and unregistering agents on links for visualization.  
 	 * 
@@ -129,8 +129,8 @@ public interface Mobsim extends IOSimulation, ObservableSimulation {
 	 * 
 	 * yyyy not sure if this could not be the more general "registerOnLink" function.  kai, aug'10
 	 * 	 */
-	void registerAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
-	void unregisterAgentAtPtWaitLocation( final PlanAgent planAgent ) ;
+	void registerAgentAtPtWaitLocation( final MobsimAgent planAgent ) ;
+	void unregisterAgentAtPtWaitLocation( final MobsimAgent planAgent ) ;
 
 
 

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
@@ -116,7 +116,7 @@ public abstract class ReplanningThread extends Thread {
 			
 			for (ReplanningTask replanningTask : list) {
 				Id id = replanningTask.getWithinDayReplannerId();
-				WithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
+				PlanBasedWithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
 				
 				if (id == null) {
 					log.error("WithinDayReplanner Id is null!");

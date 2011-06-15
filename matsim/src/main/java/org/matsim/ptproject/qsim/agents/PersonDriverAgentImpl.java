@@ -37,7 +37,8 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -52,7 +53,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  * <p/>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl implements PlanDriverAgent, HasPerson {
+public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10
 
@@ -453,13 +454,23 @@ public class PersonDriverAgentImpl implements PlanDriverAgent, HasPerson {
 		return this.currentLinkId;
 	}
 
-	@Override
-	public final Leg getCurrentLeg() {
+//	@Override
+	protected Leg getCurrentLeg() {
+		// used by TransitAgent.  IMO, should go into same package so we can make this package-private.  kai, jun'11
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
 		return (Leg) currentPlanElement;
+	}
+	
+	@Override
+	public final Double getExpectedTravelTime() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return ((Leg) currentPlanElement).getTravelTime();
 	}
 	
 	@Override

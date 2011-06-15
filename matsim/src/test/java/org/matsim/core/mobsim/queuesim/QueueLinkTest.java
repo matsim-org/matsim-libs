@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -125,7 +125,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		PlanDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, f.qSim);
+		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, f.qSim);
 		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
@@ -182,7 +182,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		PlanDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
+		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
@@ -228,7 +228,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		PlanDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
+		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
@@ -296,13 +296,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		PlanDriverAgent pa1 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
+		MobsimDriverAgent pa1 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.initialize();
 
 		QVehicle v2 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
-		PlanDriverAgent pa2 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
+		MobsimDriverAgent pa2 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
 		pa2.initialize();

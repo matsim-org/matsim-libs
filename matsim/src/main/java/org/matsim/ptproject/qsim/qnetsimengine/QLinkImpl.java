@@ -32,18 +32,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.qsim.TransitQLaneFeature;
@@ -93,7 +92,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
-	private final Map<Id, PlanAgent> additionalAgentsOnLink = new LinkedHashMap<Id, PlanAgent>();
+	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
 
 	/*package*/ VisData visdata = null ;
 
@@ -336,7 +335,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
-			PlanDriverAgent driver = veh.getDriver();
+			MobsimDriverAgent driver = veh.getDriver();
 
 			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 
@@ -402,9 +401,9 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	private void makeVehicleAvailableToNextDriver(QVehicle veh, double now) {
-		Iterator<PlanAgent> i = additionalAgentsOnLink.values().iterator();
+		Iterator<MobsimAgent> i = additionalAgentsOnLink.values().iterator();
 		while (i.hasNext()) {
-			PlanAgent agent = i.next();
+			MobsimAgent agent = i.next();
 //			Leg currentLeg = agent.getCurrentLeg();
 			String mode = agent.getMode() ;
 //			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
@@ -414,13 +413,16 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 				// So our current route must be a NetworkRoute.
 //				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
 //				Id requiredVehicleId = route.getVehicleId();
-				Id requiredVehicleId = agent.getPlannedVehicleId() ;
+				
+				// new: so we are a driver:
+				DriverAgent drAgent = (DriverAgent) agent ;
+				Id requiredVehicleId = drAgent.getPlannedVehicleId() ;
 				if (requiredVehicleId == null) {
 					requiredVehicleId = agent.getId();
 				}
 				if (veh.getId().equals(requiredVehicleId)) {
 					i.remove();
-					this.letAgentDepartWithVehicle((PlanDriverAgent) agent, veh, now);
+					this.letAgentDepartWithVehicle((MobsimDriverAgent) agent, veh, now);
 					return;
 				}
 			}
@@ -428,7 +430,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	void letAgentDepartWithVehicle(PlanDriverAgent agent, QVehicle vehicle, double now) {
+	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 //		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 //		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
@@ -800,12 +802,12 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public void registerAgentOnLink(PlanAgent planAgent) {
+	public void registerAgentOnLink(MobsimAgent planAgent) {
 		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	public void unregisterAgentOnLink(PlanAgent planAgent) {
+	public void unregisterAgentOnLink(MobsimAgent planAgent) {
 		this.additionalAgentsOnLink.remove(planAgent.getId());
 	}
 

@@ -35,7 +35,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -340,7 +340,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			if (veh.getEarliestLinkExitTime() > now) {
 				return;
 			}
-			PlanDriverAgent driver = veh.getDriver();
+			MobsimDriverAgent driver = veh.getDriver();
 			// Check if veh has reached destination:
 			if ((this.getLink().getId().equals(driver.getDestinationLinkId()))
 					&& (driver.chooseNextLinkId() == null)) {

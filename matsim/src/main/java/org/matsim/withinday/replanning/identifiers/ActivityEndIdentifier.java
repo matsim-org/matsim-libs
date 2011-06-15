@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -44,22 +44,22 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	}
 	
 	@Override
-	public Set<WithinDayAgent> getAgentsToReplan(double time) {
-		Set<WithinDayAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
-		Collection<WithinDayAgent> handledAgents = this.getHandledAgents();
-		Set<WithinDayAgent> agentsToReplan = new TreeSet<WithinDayAgent>(new PersonAgentComparator());
+	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+		Set<PlanBasedWithinDayAgent> activityPerformingAgents = activityReplanningMap.getReplanningDriverAgents(time);
+		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
+		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
 		if (this.handleAllAgents()) {
 			agentsToReplan.addAll(activityPerformingAgents);
 		} else {
 			if (activityPerformingAgents.size() > handledAgents.size()) {
-				for (WithinDayAgent agent : handledAgents) {
+				for (PlanBasedWithinDayAgent agent : handledAgents) {
 					if (activityPerformingAgents.contains(agent)) {
 						agentsToReplan.add(agent);
 					}
 				}
 			} else {
-				for (WithinDayAgent agent : activityPerformingAgents) {
+				for (PlanBasedWithinDayAgent agent : activityPerformingAgents) {
 					if (handledAgents.contains(agent)) {
 						agentsToReplan.add(agent);
 					}
@@ -68,9 +68,9 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 		}
 		
 		
-		Iterator<WithinDayAgent> iter = agentsToReplan.iterator();
+		Iterator<PlanBasedWithinDayAgent> iter = agentsToReplan.iterator();
 		while(iter.hasNext()) {
-			WithinDayAgent withinDayAgent = iter.next();	
+			PlanBasedWithinDayAgent withinDayAgent = iter.next();	
 						
 			/*
 			 * Check whether the next Leg has to be replanned.

@@ -22,7 +22,7 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.ptproject.qsim.agents.WithinDayAgent;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 
@@ -38,7 +38,7 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(WithinDayAgent withinDayAgent) {
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		// If we don't have a valid Replanner.
 		if (this.routeAlgo == null) return false;
 

@@ -29,8 +29,8 @@ import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
@@ -96,7 +96,7 @@ public class TransitQLaneFeature {
 	}
 
 	public boolean handleMoveLaneToBuffer(final double now, final QVehicle veh,
-			final PlanDriverAgent driver) {
+			final MobsimDriverAgent driver) {
 		boolean handled = false;
 		// handle transit driver if necessary
 		if (driver instanceof TransitDriverAgent) {
@@ -162,14 +162,14 @@ public class TransitQLaneFeature {
 //				// also add the passengers (so we can track them)? kai, apr'10
 				// This is now done (see below). kai, sep'10
 
-				List<PlanAgent> peopleInVehicle = getPassengers(veh);
+				List<MobsimAgent> peopleInVehicle = getPassengers(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
 //				for (PersonAgent passenger : peopleInVehicle) {
-				for ( ListIterator<PlanAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+				for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 					// this now goes backwards through the list so that the sequence is consistent with that of the moving transit vehicle.
 					// yyyy Not so great that the "plot passenger" functionality is at two different places. kai, sep'10
-					PlanAgent passenger = it.previous();
+					MobsimAgent passenger = it.previous();
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
@@ -190,14 +190,14 @@ public class TransitQLaneFeature {
 		}
 	}
 
-	public List<PlanAgent> getPassengers(final QVehicle queueVehicle) {
+	public List<MobsimAgent> getPassengers(final QVehicle queueVehicle) {
 		// yyyy warum macht diese Methode Sinn?  TransitVehicle.getPassengers() gibt doch
 		// bereits eine Collection<PersonAgent> zurück.  Dann braucht das Umkopieren hier doch
 		// bloss Zeit?  kai, feb'10
 			if (queueVehicle instanceof TransitVehicle) {
-				List<PlanAgent> passengers = new ArrayList<PlanAgent>();
+				List<MobsimAgent> passengers = new ArrayList<MobsimAgent>();
 				for (PassengerAgent passenger : ((TransitVehicle) queueVehicle).getPassengers()) {
-					passengers.add((PlanAgent) passenger);
+					passengers.add((MobsimAgent) passenger);
 				}
 				return passengers;
 			} else {

@@ -21,14 +21,14 @@
 package org.matsim.pt.qsim;
 
 import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * @author nagel
  *
  */
-public interface PlanDriverPassengerAgent extends PlanAgent, DriverAgent, PassengerAgent, PlanDriverAgent, PlanPassengerAgent {
+public interface MobsimDriverPassengerAgent extends MobsimAgent, DriverAgent, PassengerAgent, MobsimDriverAgent, MobsimPassengerAgent {
 	// note: this needs the combined interfaces (currently: PersonDriverAgent) in addition to the atomistic interfaces
 	// because of "instanceof" conditions.  kai, nov'10
 }

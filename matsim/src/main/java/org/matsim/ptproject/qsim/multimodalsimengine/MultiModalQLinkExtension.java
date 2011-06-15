@@ -31,8 +31,8 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
@@ -50,9 +50,9 @@ public class MultiModalQLinkExtension {
 	 */
 	protected boolean isActive = false;
 
-	private final Queue<Tuple<Double, PlanAgent>> agents = new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TravelTimeComparator());
-	private final Queue<PlanAgent> waitingAfterActivityAgents = new LinkedList<PlanAgent>();
-	private final Queue<PlanAgent> waitingToLeaveAgents = new LinkedList<PlanAgent>();
+	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
+	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<MobsimAgent>();
+	private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<MobsimAgent>();
 
 	public MultiModalQLinkExtension(NetsimLink qLink, MultiModalSimEngine simEngine, QNode toNode) {
 		this.qLink = qLink;
@@ -74,12 +74,12 @@ public class MultiModalQLinkExtension {
 
 	/**
 	 * Adds a personAgent to the link (i.e. the "queue"), called by
-	 * {@link MultiModalQNode#moveAgentOverNode(PlanAgent, double)}.
+	 * {@link MultiModalQNode#moveAgentOverNode(MobsimAgent, double)}.
 	 *
 	 * @param personAgent
 	 *          the personAgent
 	 */
-	public void addAgentFromIntersection(PlanAgent personAgent, double now) {
+	public void addAgentFromIntersection(MobsimAgent personAgent, double now) {
 		this.activateLink();
 
 		this.addAgent(personAgent, now);
@@ -88,16 +88,16 @@ public class MultiModalQLinkExtension {
 			new LinkEnterEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
 	}
 
-	private void addAgent(PlanAgent personAgent, double now) {
+	private void addAgent(MobsimAgent personAgent, double now) {
 		double travelTime = simEngine.getMultiModalTravelTime().getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode());
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);
 
-		agents.add(new Tuple<Double, PlanAgent>(departureTime, personAgent));
+		agents.add(new Tuple<Double, MobsimAgent>(departureTime, personAgent));
 	}
 
-	public void addDepartingAgent(PlanAgent personAgent, double now) {
+	public void addDepartingAgent(MobsimAgent personAgent, double now) {
 		this.waitingAfterActivityAgents.add(personAgent);
 		this.activateLink();
 
@@ -127,7 +127,7 @@ public class MultiModalQLinkExtension {
 	 * Returns true, if the Link has to be still active.
 	 */
 	private boolean moveAgents(double now) {
-		Tuple<Double, PlanAgent> tuple = null;
+		Tuple<Double, MobsimAgent> tuple = null;
 
 		while ((tuple = agents.peek()) != null) {
 			/*
@@ -146,7 +146,7 @@ public class MultiModalQLinkExtension {
 			agents.poll();
 
 			// Check if PersonAgent has reached destination:
-			PlanDriverAgent driver = (PlanDriverAgent) tuple.getSecond();
+			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
 			if ((qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 				driver.endLegAndAssumeControl(now);
 			}
@@ -172,8 +172,8 @@ public class MultiModalQLinkExtension {
 		if (waitingToLeaveAgents.size() > 0) toNode.activateNode();
 	}
 
-	public PlanAgent getNextWaitingAgent(double now) {
-		PlanAgent personAgent = waitingToLeaveAgents.poll();
+	public MobsimAgent getNextWaitingAgent(double now) {
+		MobsimAgent personAgent = waitingToLeaveAgents.poll();
 		if (personAgent != null) {
 			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
 		}
@@ -183,8 +183,8 @@ public class MultiModalQLinkExtension {
 	public void clearVehicles() {
 		double now = this.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
-		for (Tuple<Double, PlanAgent> tuple : agents) {
-			PlanAgent personAgent = tuple.getSecond();
+		for (Tuple<Double, MobsimAgent> tuple : agents) {
+			MobsimAgent personAgent = tuple.getSecond();
 			this.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getMode()));
 		}
@@ -193,10 +193,10 @@ public class MultiModalQLinkExtension {
 		this.agents.clear();
 	}
 
-	private static class TravelTimeComparator implements Comparator<Tuple<Double, PlanAgent>>, Serializable {
+	private static class TravelTimeComparator implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
 		@Override
-		public int compare(final Tuple<Double, PlanAgent> o1, final Tuple<Double, PlanAgent> o2) {
+		public int compare(final Tuple<Double, MobsimAgent> o1, final Tuple<Double, MobsimAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
 				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first

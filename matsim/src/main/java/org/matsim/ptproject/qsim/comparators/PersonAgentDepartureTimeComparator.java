@@ -24,23 +24,23 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
- * Compares two {@link PlanDriverAgent}s according to their (planned) departure time. If the 
+ * Compares two {@link MobsimDriverAgent}s according to their (planned) departure time. If the 
  * departure times are the same, the agent with the higher id is considered smaller.
  *
  * @author mrieser
  * 
- * @see PlanDriverAgent#getActivityEndTime()
+ * @see MobsimDriverAgent#getActivityEndTime()
  */
-public class PersonAgentDepartureTimeComparator implements Comparator<PlanAgent>, Serializable, MatsimComparator {
+public class PersonAgentDepartureTimeComparator implements Comparator<MobsimAgent>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public int compare(PlanAgent agent1, PlanAgent agent2) {
+	public int compare(MobsimAgent agent1, MobsimAgent agent2) {
 		int cmp = Double.compare(agent1.getActivityEndTime(), agent2.getActivityEndTime());
 		if (cmp == 0) {
 			// Both depart at the same time -> let the one with the larger id be first (=smaller)

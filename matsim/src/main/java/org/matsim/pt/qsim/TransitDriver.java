@@ -116,10 +116,14 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public Leg getCurrentLeg() {
+	Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
-	// yyyyyy reduce visibility!
+	
+	@Override
+	public Double getExpectedTravelTime() {
+		return this.currentLeg.getTravelTime() ;
+	}
 	
 	@Override 
 	public String getMode() {

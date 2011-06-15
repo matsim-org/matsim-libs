@@ -48,8 +48,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.Initializable;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -126,20 +126,20 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	private MobsimTimerI simTimer;
 
-	private Collection<PlanAgent> transitAgents;
+	private Collection<MobsimAgent> transitAgents;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private final Queue<Tuple<Double, PlanAgent>> teleportationList =
-		new PriorityQueue<Tuple<Double, PlanAgent>>(30, new TeleportationArrivalTimeComparator());
+	private final Queue<Tuple<Double, MobsimAgent>> teleportationList =
+		new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<PlanAgent> activityEndsList =
-		new PriorityBlockingQueue<PlanAgent>(500, new PlanAgentDepartureTimeComparator());
+	private final Queue<MobsimAgent> activityEndsList =
+		new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
 	// can't use the "Tuple" trick from teleportation list, since we need to be able to "find" agents for replanning. kai, oct'10
 	// yy On second thought, this does also not work for the teleportationList since we have the same problem there ... kai, oct'10
 
@@ -360,9 +360,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	private void createVehicles() {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
-			if ( agent instanceof PlanDriverAgent ) {
-				createAndAddDefaultVehicle((PlanAgent) agent, defaultVehicleType);
-				parkVehicleOnInitialLink((PlanAgent) agent);
+			if ( agent instanceof MobsimDriverAgent ) {
+				createAndAddDefaultVehicle((MobsimAgent) agent, defaultVehicleType);
+				parkVehicleOnInitialLink((MobsimAgent) agent);
 			}
 		}
 	}
@@ -387,19 +387,19 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	private void createTransitDrivers() {
 		if (this.transitEngine != null){
-			Collection<PlanAgent> a = this.transitEngine.createAdditionalAgents();
+			Collection<MobsimAgent> a = this.transitEngine.createAdditionalAgents();
 			this.transitAgents = a;
 			agents.addAll(a);
 		}
 	}
 
-	private void parkVehicleOnInitialLink(PlanAgent agent) {
-		QVehicle veh = ((PlanDriverAgent) agent).getVehicle();
-		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(((PlanDriverAgent)agent).getCurrentLinkId());
+	private void parkVehicleOnInitialLink(MobsimAgent agent) {
+		QVehicle veh = ((MobsimDriverAgent) agent).getVehicle();
+		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(((MobsimDriverAgent)agent).getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
 	}
 
-	private void createAndAddDefaultVehicle(PlanAgent agent, VehicleType defaultVehicleType) {
+	private void createAndAddDefaultVehicle(MobsimAgent agent, VehicleType defaultVehicleType) {
 		QVehicleImpl veh = null ;
 		if ( vehWrnCnt < 1 ) {
 			log.warn( "QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10" ) ;
@@ -408,7 +408,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		}
 		VehicleImpl vehicle = new VehicleImpl(agent.getId(), defaultVehicleType);
 		veh = new QVehicleImpl(vehicle);
-		veh.setDriver((PlanDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
+		veh.setDriver((MobsimDriverAgent)agent); // this line is currently only needed for OTFVis to show parked vehicles
 		((DriverAgent)agent).setVehicle(veh);
 		vehicles.put(veh.getId(), veh);
 	}
@@ -435,14 +435,14 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 		double now = this.simTimer.getTimeOfDay();
 
-		for (Tuple<Double, PlanAgent> entry : this.teleportationList) {
-			PlanAgent agent = entry.getSecond();
+		for (Tuple<Double, MobsimAgent> entry : this.teleportationList) {
+			MobsimAgent agent = entry.getSecond();
 			events.processEvent(events.getFactory().
 					createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		this.teleportationList.clear();
 
-		for (PlanAgent agent : this.activityEndsList) {
+		for (MobsimAgent agent : this.activityEndsList) {
 			if ( agent instanceof UmlaufDriver ) {
 				log.error( "this does not terminate correctly for UmlaufDrivers; needs to be " +
 				"fixed but for the time being we skip the next couple of lines.  kai, dec'10") ;
@@ -515,10 +515,10 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	protected final void handleTeleportationArrivals() {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		while (this.teleportationList.peek() != null ) {
-			Tuple<Double, PlanAgent> entry = this.teleportationList.peek();
+			Tuple<Double, MobsimAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
-				PlanAgent personAgent = entry.getSecond();
+				MobsimAgent personAgent = entry.getSecond();
 				personAgent.notifyTeleportToLink(personAgent.getDestinationLinkId());
 				personAgent.endLegAndAssumeControl(now) ;
 			}
@@ -532,16 +532,16 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	 * Registers this agent as performing an activity and makes sure that the agent will be informed once his departure time has come.
 	 * @param agent
 	 *
-	 * @see PlanDriverAgent#getActivityEndTime()
+	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public final void scheduleActivityEnd(final PlanAgent agent) {
+	public final void scheduleActivityEnd(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}
 
 	@Override
-	public final void rescheduleActivityEnd(final PlanAgent agent, final double oldTime, final double newTime ) {
+	public final void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
 		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
 		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
 
@@ -559,52 +559,56 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	}
 
-	private void registerAgentAtActivityLocation(final PlanAgent agent) {
+	private void registerAgentAtActivityLocation(final MobsimAgent agent) {
 		// if the "activities" engine were separate, this would need to be public.  kai, aug'10
 		if (! (agent instanceof AbstractTransitDriver)) {
-			PlanElement pe = agent.getCurrentPlanElement();
-			if (pe instanceof Leg) {
-				throw new RuntimeException();
-			} else {
-				Activity act = (Activity) pe;
-				Id linkId = act.getLinkId();
+//			PlanElement pe = agent.getCurrentPlanElement();
+//			if (pe instanceof Leg) {
+//				throw new RuntimeException();
+//			} else {
+//				Activity act = (Activity) pe;
+//				Id linkId = act.getLinkId();
+				Id linkId = agent.getCurrentLinkId() ;
 				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 				qLink.registerAgentOnLink(agent);
-			}
+//			}
 		}
 	}
 
 	@Override
-	public final void registerAgentAtPtWaitLocation(final PlanAgent planAgent) {
+	public final void registerAgentAtPtWaitLocation(final MobsimAgent planAgent) {
 		// called by TransitEngine
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?  Does the driver get registered?
-			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-			Id linkId = leg.getRoute().getStartLinkId();
+//			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
+//			Id linkId = leg.getRoute().getStartLinkId();
+			Id linkId = planAgent.getCurrentLinkId() ; // yyyyyy it is not fully clear that this is always set correctly.  kai, jun'11
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId) ;
 			qLink.registerAgentOnLink( planAgent ) ;
 		}
 	}
 
-	private void unregisterAgentAtActivityLocation(final PlanAgent agent) {
+	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		if (! (agent instanceof TransitDriver)) {
-			PlanElement pe = agent.getCurrentPlanElement();
-			if (pe instanceof Leg) {
-				throw new RuntimeException();
-			} else {
-				Activity act = (Activity) pe;
-				Id linkId = act.getLinkId();
+//			PlanElement pe = agent.getCurrentPlanElement();
+//			if (pe instanceof Leg) {
+//				throw new RuntimeException();
+//			} else {
+//				Activity act = (Activity) pe;
+//				Id linkId = act.getLinkId();
+			    Id linkId = agent.getCurrentLinkId() ;
 				NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 				qLink.unregisterAgentOnLink(agent);
-			}
+//			}
 		}
 	}
 
 	@Override
-	public final void unregisterAgentAtPtWaitLocation( final PlanAgent planAgent ) {
+	public final void unregisterAgentAtPtWaitLocation( final MobsimAgent planAgent ) {
 		// called by TransitDriver
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is this needed?
-			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-			Id linkId = leg.getRoute().getStartLinkId();
+//			Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
+//			Id linkId = leg.getRoute().getStartLinkId();
+			Id linkId = planAgent.getCurrentLinkId() ;
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId) ;
 			qLink.unregisterAgentOnLink( planAgent ) ;
 		}
@@ -612,7 +616,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {
-			PlanAgent agent = this.activityEndsList.peek();
+			MobsimAgent agent = this.activityEndsList.peek();
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
@@ -637,27 +641,28 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
 	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
 	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
-	public final void arrangeAgentDeparture(final PlanAgent agent) {
+	public final void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
-		Leg leg = agent.getCurrentLeg();
+//		Leg leg = agent.getCurrentLeg();
 		//		Route route = leg.getRoute();
-		String mode = leg.getMode();
+		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now, agent.getId(), linkId, mode ));
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
 		} else {
 			handleUnknownLegMode(now, agent);
-			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getId(), linkId, mode, agent.getDestinationLinkId(), leg.getTravelTime() )) ;
+			events.processEvent(new AdditionalTeleportationDepartureEvent( now, agent.getId(), linkId, mode, 
+					agent.getDestinationLinkId(), agent.getExpectedTravelTime() )) ;
 		}
 	}
 
-	private void handleUnknownLegMode(final double now, final PlanAgent planAgent) {
-		double arrivalTime = now + planAgent.getCurrentLeg().getTravelTime();
-		this.teleportationList.add(new Tuple<Double, PlanAgent>(arrivalTime, planAgent));
+	private void handleUnknownLegMode(final double now, final MobsimAgent planAgent) {
+		double arrivalTime = now + planAgent.getExpectedTravelTime();
+		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime, planAgent));
 	}
 
-	private boolean handleKnownLegModeDeparture(final double now, final PlanAgent planAgent, final Id linkId) {
+	private boolean handleKnownLegModeDeparture(final double now, final MobsimAgent planAgent, final Id linkId) {
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if (departureHandler.handleDeparture(now, planAgent, linkId)) {
 				return true;
@@ -687,7 +692,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 		double simStartTime = 0;
 		if ( QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(
 				qSimConfigGroup.getSimStarttimeInterpretation() ) ) {
-			PlanAgent firstAgent = this.activityEndsList.peek();
+			MobsimAgent firstAgent = this.activityEndsList.peek();
 			if (firstAgent != null) {
 				// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 				simStartTime = Math.floor(Math.max(startTime, firstAgent.getActivityEndTime()));
@@ -846,12 +851,12 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	}
 
 	@Override
-	public final Collection<PlanAgent> getActivityEndsList() {
+	public final Collection<MobsimAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection( activityEndsList ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}
 
-	public final Collection<PlanAgent> getTransitAgents(){
+	public final Collection<MobsimAgent> getTransitAgents(){
 		return Collections.unmodifiableCollection( this.transitAgents ) ;
 		// changed this to unmodifiable in oct'10.  kai
 	}

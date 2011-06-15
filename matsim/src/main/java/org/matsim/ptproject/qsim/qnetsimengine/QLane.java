@@ -38,7 +38,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
 import org.matsim.core.events.LaneLeaveEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
@@ -315,7 +315,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 				return;
 			}
 
-			PlanDriverAgent driver = veh.getDriver();
+			MobsimDriverAgent driver = veh.getDriver();
 
 			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
 

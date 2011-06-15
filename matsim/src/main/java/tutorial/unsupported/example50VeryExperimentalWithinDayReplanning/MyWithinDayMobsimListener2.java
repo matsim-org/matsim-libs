@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.PlanDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -73,19 +73,19 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
-		Collection<PlanAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
+		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
 		
 		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(), 
 				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
 		
-		for ( PlanAgent pa : agentsToReplan ) {
+		for ( MobsimAgent pa : agentsToReplan ) {
 			doReplanning( pa, mobsim ) ;
 		}
 	}
 	
-	private List<PlanAgent> getAgentsToReplan(Netsim mobsim ) {
+	private List<MobsimAgent> getAgentsToReplan(Netsim mobsim ) {
 
-		List<PlanAgent> set = new ArrayList<PlanAgent>();
+		List<MobsimAgent> set = new ArrayList<MobsimAgent>();
 
 		// don't handle the agent, if time != 12 o'clock
 		if (Math.floor(mobsim.getSimTimer().getTimeOfDay()) !=  22000.0) {
@@ -95,7 +95,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		// find agents that are en-route (more interesting case)
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
-				PlanDriverAgent agent=vehicle.getDriver();
+				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
 				if ( true ) { // some condition ...
 					System.out.println("found agent");
@@ -108,7 +108,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 
 	}
 
-	private boolean doReplanning(PlanAgent personAgent, Netsim mobsim ) {
+	private boolean doReplanning(MobsimAgent personAgent, Netsim mobsim ) {
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 		
 		// preconditions:

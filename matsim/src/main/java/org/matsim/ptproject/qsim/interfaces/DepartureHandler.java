@@ -21,10 +21,10 @@
 package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface DepartureHandler {
 	
-	public boolean handleDeparture(double now, PlanAgent agent, Id linkId);
+	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId);
 
 }

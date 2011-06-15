@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
@@ -76,7 +76,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final Map<Person, PlanAgent> agents = new HashMap<Person, PlanAgent>(100);
+	private final Map<Person, MobsimAgent> agents = new HashMap<Person, MobsimAgent>(100);
 
 	private boolean useUmlaeufe = false;
 
@@ -108,8 +108,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	}
 
 
-	public Collection<PlanAgent> createAdditionalAgents() {
-		Collection<PlanAgent> ptDrivers;
+	public Collection<MobsimAgent> createAdditionalAgents() {
+		Collection<MobsimAgent> ptDrivers;
 		if (useUmlaeufe ) {
 			ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
 		} else {
@@ -136,9 +136,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		}
 	}
 
-	private Collection<PlanAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
+	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
-		Collection<PlanAgent> drivers = new ArrayList<PlanAgent>();
+		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = this.qSim.getScenario().getScenarioElement( ReconstructingUmlaufBuilder.class ) ;
 		if (reconstructingUmlaufBuilder != null) {
 			log.warn("found pre-existing ReconstructingUmlaufBuilder in scenario, thus using that one. This should be ok but it is not systematically tested.") ;
@@ -153,7 +153,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		for (Umlauf umlauf : umlaeufe) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				PlanAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
+				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
 				drivers.add(driver);
 			}
 		}
@@ -181,10 +181,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		return driver;
 	}
 
-	private Collection<PlanAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
+	private Collection<MobsimAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
 		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
-		Collection<PlanAgent> drivers = new ArrayList<PlanAgent>();
+		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
@@ -214,9 +214,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 //	}
 	// this method is not used anywhere.  kai, nov'10
 
-	private void handleAgentPTDeparture(final PlanAgent planAgent, Id linkId) {
+	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.
-		Leg leg = planAgent.getCurrentLeg() ;
+		Leg leg = ((TransitAgent)planAgent).getCurrentLeg() ;
 		
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + planAgent.getId().toString());
@@ -251,7 +251,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 
 	@Override
-	public boolean handleDeparture(double now, PlanAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		if (agent.getMode().equals(TransportMode.pt)) {
 			handleAgentPTDeparture(agent, linkId);
 			return true ;

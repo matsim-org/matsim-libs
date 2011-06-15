@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 import org.matsim.vis.snapshots.writers.VisVehicle;
@@ -24,7 +25,12 @@ public class QuerySpinneNOW extends QuerySpinne {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		VisLink link = net.getVisLinks().get(queryLinkId);
 		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
-		for( VisVehicle veh : vehs) actPersons.add(veh.getDriver().getSelectedPlan());
+		for( VisVehicle veh : vehs) {
+			if ( veh.getDriver() instanceof PlanAgent ) {
+				Plan plan = ((PlanAgent)veh.getDriver()).getSelectedPlan() ;
+				actPersons.add( plan );
+			}
+		}
 		
 		return actPersons;
 	}

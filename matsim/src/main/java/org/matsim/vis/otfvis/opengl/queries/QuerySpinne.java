@@ -50,6 +50,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -255,7 +256,12 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		List<Plan> actPersons = new ArrayList<Plan>();
 		VisLink link = net.getVisLinks().get(this.queryLinkId);
 		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
-		for( VisVehicle veh : vehs) actPersons.add(veh.getDriver().getSelectedPlan());
+		for( VisVehicle veh : vehs) {
+			if ( veh.getDriver() instanceof PlanAgent ) {
+				Plan plan = ((PlanAgent)veh.getDriver()).getSelectedPlan() ;
+				actPersons.add( plan );
+			}
+		}
 
 		return actPersons;
 	}
