@@ -42,6 +42,7 @@ import org.jfree.chart.plot.CategoryPlot;
 //TRRE: import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 //TRRE: import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.counts.CountSimComparison;
@@ -102,6 +103,14 @@ public class CountsLoadCurveGraph extends CountsGraph {
 		renderer.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
 		renderer.setSeriesToolTipGenerator(1, new StandardCategoryToolTipGenerator());
 		renderer.setItemMargin(0.0);
+		
+		// configure plot with light colors instead of the default 3D
+		renderer.setShadowVisible(false);  
+		renderer.setBarPainter( new StandardBarPainter() ); 
+		this.chart_.setBackgroundPaint(Color.getHSBColor((float) 0.0, (float) 0.0, (float) 0.93));
+		plot.setBackgroundPaint(Color.white); 	     
+		plot.setRangeGridlinePaint(Color.gray);		
+		plot.setRangeGridlinesVisible(true);      
 
 		plot.setRenderer(0, renderer);
 		plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
