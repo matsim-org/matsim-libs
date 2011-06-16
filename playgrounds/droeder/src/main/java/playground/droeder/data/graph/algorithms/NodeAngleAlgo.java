@@ -24,6 +24,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.collections.Tuple;
+
+import playground.droeder.GeoCalculator;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingNode;
 import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
@@ -53,7 +57,8 @@ public class NodeAngleAlgo implements NodeAlgorithm{
 			for(MatchingEdge refEdge : ref.getOutEdges()){
 				//iterate over all edges outgoing from the candidateNode
 				for(MatchingEdge candEdge : cand.getOutEdges()){
-					temp = this.getPhi(refEdge, candEdge);
+					temp = GeoCalculator.angleBeetween2Straights(new Tuple<Coord, Coord>(refEdge.getFromNode().getCoord(), refEdge.getToNode().getCoord()), 
+							new Tuple<Coord, Coord>(candEdge.getFromNode().getCoord(), candEdge.getToNode().getCoord()));
 					if(temp < phi){
 						phi = temp;
 					}
@@ -68,25 +73,6 @@ public class NodeAngleAlgo implements NodeAlgorithm{
 		Collections.sort(newCandidates);
 
 		return newCandidates;
-	}
-	
-	private Double getPhi(MatchingEdge one, MatchingEdge two){
-		double absOne, absTwo, scalar;
-		Vector<Double> o = new Vector<Double>();
-		Vector<Double> t = new Vector<Double>();
-		
-		o.add(0, one.getToNode().getCoord().getX() - one.getFromNode().getCoord().getX());
-		o.add(1, one.getToNode().getCoord().getY() - one.getFromNode().getCoord().getY());
-		
-		t.add(0, two.getToNode().getCoord().getX() - two.getFromNode().getCoord().getX());
-		t.add(1, two.getToNode().getCoord().getY() - two.getFromNode().getCoord().getY());
-		
-		absOne = Math.sqrt(Math.pow(o.get(0), 2) + Math.pow(o.get(1), 2));
-		absTwo = Math.sqrt(Math.pow(t.get(0), 2) + Math.pow(t.get(1), 2));
-		
-		scalar = ((o.get(0)*t.get(0)) + (o.get(1)+ t.get(1)));
-		
-		return Math.acos(scalar/(absOne * absTwo));
 	}
 
 }

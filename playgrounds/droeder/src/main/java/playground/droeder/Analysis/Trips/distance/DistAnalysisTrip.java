@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.droeder.DistanceCalculator;
+import playground.droeder.GeoCalculator;
 import playground.droeder.Analysis.Trips.AbstractAnalysisTrip;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -152,18 +152,18 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 			if(this.legStartEnd.size() == 2){
 				this.accesWalkCnt++;
 				this.egressWalkCnt++;
-				this.accesWalkDist = DistanceCalculator.between2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
-				this.egressWalkDist = DistanceCalculator.between2Points(this.legStartEnd.get(1).getFirst(), this.legStartEnd.get(1).getSecond());
+				this.accesWalkDist = GeoCalculator.distanceBetween2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
+				this.egressWalkDist = GeoCalculator.distanceBetween2Points(this.legStartEnd.get(1).getFirst(), this.legStartEnd.get(1).getSecond());
 //				System.out.println(this.accesWalkCnt + " " + this.accesWalkDist + "; " + this.egressWalkCnt + " " + this.egressWalkDist);
 			}else if(this.legStartEnd.size() >= 2){
 				this.accesWalkCnt++;
 				this.egressWalkCnt++;
-				this.accesWalkDist = DistanceCalculator.between2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
-				this.egressWalkDist = DistanceCalculator.between2Points(this.legStartEnd.get(this.legStartEnd.size() - 1).getFirst(), this.legStartEnd.get(this.legStartEnd.size() - 1).getSecond());
+				this.accesWalkDist = GeoCalculator.distanceBetween2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
+				this.egressWalkDist = GeoCalculator.distanceBetween2Points(this.legStartEnd.get(this.legStartEnd.size() - 1).getFirst(), this.legStartEnd.get(this.legStartEnd.size() - 1).getSecond());
 				
 				for(int i = 1; i < this.legStartEnd.size() - 1; i++){
 					this.switchWalkCnt++;
-					this.switchWalkDist += DistanceCalculator.between2Points(this.legStartEnd.get(i).getFirst(), this.legStartEnd.get(i).getSecond());
+					this.switchWalkDist += GeoCalculator.distanceBetween2Points(this.legStartEnd.get(i).getFirst(), this.legStartEnd.get(i).getSecond());
 				}
 //				System.out.println(this.accesWalkCnt + " " + this.accesWalkDist + "; " + this.egressWalkCnt + " " + this.egressWalkDist + "; " + this.switchWalkCnt + " " + this.switchWalkDist);
 			}else{
@@ -171,7 +171,7 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 			}
 		this.tripDist = this.accesWalkDist + this.inPtDist + this.switchWalkDist + this.egressWalkDist;	
 		}else if(!super.getMode().equals(TransportMode.car)){
-			this.tripDist = DistanceCalculator.between2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
+			this.tripDist = GeoCalculator.distanceBetween2Points(this.legStartEnd.get(0).getFirst(), this.legStartEnd.get(0).getSecond());
 		}
 		this.finished = true;
 	}

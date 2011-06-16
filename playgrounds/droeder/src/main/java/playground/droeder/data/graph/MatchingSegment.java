@@ -21,20 +21,23 @@ package playground.droeder.data.graph;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
  *
  */
-public class MatchingSegment implements GraphElement {
+public class MatchingSegment implements GraphElement, Cloneable {
 	
 	private Coord start, end;
 	private Id id;
+	private Id parentEdgeId;
 
-	public MatchingSegment (Coord start, Coord end, Id id){
+	public MatchingSegment (Coord start, Coord end, Id parentEdgeId, int segmentCounter){
 		this.start = start;
 		this.end = end;
-		this.id = id;
+		this.id = new IdImpl(parentEdgeId + "_" + segmentCounter);
+		this.parentEdgeId = parentEdgeId;
 	}
 	
 	
@@ -57,5 +60,16 @@ public class MatchingSegment implements GraphElement {
 	 */
 	public Id getId() {
 		return id;
+	}
+	
+	@Override
+	public MatchingSegment clone(){
+		try {
+			return (MatchingSegment) super.clone();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

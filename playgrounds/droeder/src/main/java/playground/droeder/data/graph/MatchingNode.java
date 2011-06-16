@@ -45,7 +45,7 @@ public class MatchingNode implements Comparable<MatchingNode>, GraphElement{
 		this.coord = coord;
 		this.incoming = new HashMap<Id, MatchingEdge>();
 		this.outgoing = new HashMap<Id, MatchingEdge>();
-		this.dist = Math.random();
+		this.dist = Double.MAX_VALUE;
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class MatchingNode implements Comparable<MatchingNode>, GraphElement{
 	
 	
 	/**
-	 * calculates the distance to an arbitrary coordinate, so Collection.sort() can work
+	 * calculates the distance to the given coordinate, so Collection.sort() can work
 	 * @param c
 	 */
 	public void setDist(Coord c){
@@ -93,7 +93,7 @@ public class MatchingNode implements Comparable<MatchingNode>, GraphElement{
 	}
 	
 	/**
-	 * call setDist(Coord c) before, otherwise a random double is returned
+	 * call setDist(Coord c) before, otherwise a Double.MAX_VALUE is returned
 	 * @return
 	 */
 	public Double getDist(){

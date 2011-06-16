@@ -39,10 +39,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaPaths;
 import playground.droeder.data.graph.MatchingEdge;
+import playground.droeder.data.graph.MatchingEdgeCandidate;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
 import playground.droeder.data.graph.algorithms.NodeAngleAlgo;
 import playground.droeder.data.graph.algorithms.NodeDistAlgo;
+import playground.droeder.data.graph.algorithms.SegmentAlgorithmImpl;
 import playground.droeder.data.graph.algorithms.interfaces.EdgeAlgorithm;
 import playground.droeder.data.graph.algorithms.interfaces.MatchingAlgorithm;
 import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
@@ -73,11 +75,12 @@ public class GraphMatching {
 		
 		//node
 		this.nodeAlgos = new ArrayList<NodeAlgorithm>();
-		this.addAlgo(new NodeDistAlgo(300.0, this.matching));
-		this.addAlgo(new NodeAngleAlgo(Math.PI / 4));
+		this.addAlgo(new NodeDistAlgo(500.0, this.matching));
+		this.addAlgo(new NodeAngleAlgo(Math.PI / 2));
 		
 		//segment
 		this.segmentAlgos = new ArrayList<SegmentAlgorithm>();
+		this.addAlgo(new SegmentAlgorithmImpl(0.0)) ;
 
 		//edge
 		this.edgeAlgos = new ArrayList<EdgeAlgorithm>();
@@ -125,40 +128,53 @@ public class GraphMatching {
 				// else, add the refNode to unmatchedList
 				this.unmatchedRefNodes.add(refNode.getId());
 			}
-			
 		}
-		
-		log.info("node-matching finished... " + this.nodeReference2match.size() + " of " 
-				+ reference.getNodes().size() + " nodes are matched...");
+		log.info(this.nodeReference2match.size() + " of " + reference.getNodes().size() + " nodes are matched");
+		log.info("node-matching finished... ");
 	}
 
 	// ##### SEGMENTMATCHING #####
-	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
+	private Map<MatchingEdge, List<MatchingEdgeCandidate>> ref2CandEdgesFromMappedNodes;
+	private Map<MatchingEdge, List<MatchingEdgeCandidate>> ref2CandEdgesFromSegmentMatching;
 
 	private void segmentMatching() {
 		log.info("start segment matching...");
 		this.computeEdgeCandidatesFromNodes();
 		
+		log.info("running segment-algorithms for every node in the following order:");
+		for(SegmentAlgorithm a: this.segmentAlgos){
+			log.info(a.getClass().getName());
+		}
+		List<MatchingEdgeCandidate> tempCand = null;
+		this.ref2CandEdgesFromSegmentMatching = new HashMap<MatchingEdge, List<MatchingEdgeCandidate>>();
 		
-		
-		for(Entry<MatchingEdge, List<MatchingEdge>> edge2cand: this.ref2CandEdgesFromMappedNodes.entrySet()){
+		//iterate over all candidate edges 
+		for(Entry<MatchingEdge, List<MatchingEdgeCandidate>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
+			// with all algorithms
+			for(SegmentAlgorithm a : this.segmentAlgos){
+				tempCand = a.run(e.getKey(), e.getValue());
+			}
 			
-			
+			// if there is at least one candidate, store
+			if(tempCand.size() > 0){
+				this.ref2CandEdgesFromSegmentMatching.put(e.getKey(), tempCand);
+			}
 		}
 		
-		// TODO Auto-generated method stub
+		// clear temporally matched Edges to save memory 
+		this.ref2CandEdgesFromMappedNodes.clear();
 		log.info("segment matching finished...");
 	}
 	
 	private void computeEdgeCandidatesFromNodes() {
 		log.info("compute candidate edges from mapped nodes");
-		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
+		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdgeCandidate>>();
 		Id candFrom, candTo, refFrom, refTo;
-		List<MatchingEdge> tempCandidates;
+		List<MatchingEdgeCandidate> tempCandidates;
 		
 		//iterate over all edges
 		for(MatchingEdge ref : this.reference.getEdges().values()){
-			tempCandidates = new ArrayList<MatchingEdge>();
+			tempCandidates = new ArrayList<MatchingEdgeCandidate>();
 			refFrom = ref.getFromNode().getId();
 			refTo = ref.getToNode().getId();
 
@@ -172,7 +188,7 @@ public class GraphMatching {
 
 					// if the refNodes and candNodes where mapped in NodeMatching, store the candidateEdge  
 					if(this.nodeReference2match.get(refFrom).equals(candFrom) && this.nodeReference2match.get(refTo).equals(candTo)){
-						tempCandidates.add(cand);
+						tempCandidates.add(new MatchingEdgeCandidate(cand));
 					}
 				}
 			}

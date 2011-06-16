@@ -22,25 +22,26 @@ package playground.droeder.data.graph;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
  *
  */
-public class MatchingEdge implements GraphElement {
+public class MatchingEdge implements GraphElement{
+
 
 	private Id id;
 	private MatchingNode toNode;
 	private MatchingNode fromNode;
 	private ArrayList<MatchingSegment> segments;
+	private int segmentCounter = 0;
 	
 	public MatchingEdge(Id id, MatchingNode to, MatchingNode from){
 		this.id = id;
 		this.toNode = to;
 		this.fromNode = from;
 		this.segments = new ArrayList<MatchingSegment>();
-		this.segments.add(new MatchingSegment(from.getCoord(), to.getCoord(), new IdImpl("baseSegment")));
+		this.addSegment(new MatchingSegment(from.getCoord(), to.getCoord(), this.id, this.segmentCounter));
 	}
 
 	/**
@@ -67,9 +68,33 @@ public class MatchingEdge implements GraphElement {
 	/**
 	 * @return
 	 */
-	public boolean addSegments(ArrayList<MatchingSegment> segments){
-		this.segments = segments;
-		return true;
+	public void addSegments(ArrayList<MatchingSegment> segments){
+		for(MatchingSegment s: segments){
+			this.addSegment(s);
+		}
+	}
+	
+	/**
+	 * add's the at last position in the segments-list. 
+	 * call clearSegments() before adding own segments, because a default segment is added at the constructor
+	 * @param s
+	 */
+	public void addSegment(MatchingSegment s){
+		// probably the segment is used anywhere else, so use a clone
+		this.segments.add(s.clone());
+		this.segmentCounter++;
+	}
+	
+	/**
+	 * clears the segment-list and sets the counter to 0
+	 */
+	public void clearSegments(){
+		this.segmentCounter = 0;
+		this.segments.clear();
+	}
+	
+	public int getSegmentCounter(){
+		return this.segmentCounter ;
 	}
 	
 	/**
@@ -78,5 +103,4 @@ public class MatchingEdge implements GraphElement {
 	public ArrayList<MatchingSegment> getSegments(){
 		return this.segments;
 	}
-
 }

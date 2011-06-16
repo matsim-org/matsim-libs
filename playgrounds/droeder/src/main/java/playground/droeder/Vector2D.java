@@ -91,8 +91,8 @@ public class Vector2D {
 	 public boolean equals(final Object o){
 		if(!(o instanceof Vector2D)) return false;
 		Vector2D v = (Vector2D) o;
-		
-		if(v.getX() == this.getX() && v.getY() == this.getY()){
+		double error = 0.0001, x = Math.abs(1-(v.getX() / this.getX())),  y = Math.abs(1 - (v.getY() / this.getY()));
+		if(x < error && y < error){
 			return true;
 		}else{
 			return false;

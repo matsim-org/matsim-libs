@@ -19,24 +19,36 @@
  * *********************************************************************** */
 package playground.droeder.data.graph.algorithms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import playground.droeder.data.graph.MatchingEdge;
+import playground.droeder.data.graph.MatchingEdgeCandidate;
 import playground.droeder.data.graph.algorithms.interfaces.SegmentAlgorithm;
 
 /**
  * @author droeder
  *
  */
-public class SegmentDistanceAlgo implements SegmentAlgorithm{
-
-	@Override
-	public List<MatchingEdge> run(MatchingEdge ref, List<MatchingEdge> cand) {
-		// TODO Auto-generated method stub
-		return null;
+public class SegmentAlgorithmImpl implements SegmentAlgorithm{
+	
+	private Double deltaDistMax;
+	
+	public SegmentAlgorithmImpl(Double deltaDistMax){
+		this.deltaDistMax = deltaDistMax;
 	}
 
 	
+	@Override
+	public List<MatchingEdgeCandidate> run(MatchingEdge ref, List<MatchingEdgeCandidate> cands) {
+		List<MatchingEdgeCandidate> newCands = new ArrayList<MatchingEdgeCandidate>();
+		
+		for(MatchingEdgeCandidate cand :  cands){
+			cand.setRefEdgeId(ref.getId());
+			cand.compareSegments2RefSegments(ref.getSegments());
+		}
+		return newCands;
+	}
 	
 }
 

@@ -25,9 +25,10 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.SingularValueDecompositionImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.droeder.DistanceCalculator;
+import playground.droeder.GeoCalculator;
 import playground.droeder.Vector2D;
 
 /**
@@ -41,10 +42,21 @@ public class StraightComparer{
 	private Straight two;
 	private Coord baseA_CD, baseB_CD, baseC_AB, baseD_AB;
 
-	public StraightComparer(Straight one, Straight two){
+	public StraightComparer(Straight one, Straight two, ResultsOfSegmentComparison results){
 		this.one = one;
 		this.two = two;
 		this.computeBases();
+		results.setAvDist(this.getAverageDistance());
+		results.setMatchedLengthOne(this.getTotalMatchedLengthStraightOne());
+		results.setMatchedLengthTwo(this.getTotalMatchedLengthStraightTwo());
+		results.setAngle(this.getAngle());
+	}
+	
+	public boolean straightOneIsUndershot(){
+		if(one.getEnd().getX() < two.getEnd().getX()){
+			return true;
+		}
+		return false;
 	}
 	
 	private void computeBases() {
@@ -60,11 +72,11 @@ public class StraightComparer{
 	
 	private Double getMinDist(Coord point1, Coord baseOn1, Coord point2, Coord baseOn2){
 		if(baseOn1 == null && baseOn2 == null){
-			return DistanceCalculator.between2Points(point1, point2);
+			return GeoCalculator.distanceBetween2Points(point1, point2);
 		}else if(baseOn1 == null){
-			return Math.min(DistanceCalculator.between2Points(point1, point2), DistanceCalculator.between2Points(point1, baseOn2));
+			return Math.min(GeoCalculator.distanceBetween2Points(point1, point2), GeoCalculator.distanceBetween2Points(point1, baseOn2));
 		}else if(baseOn2 == null){
-			return Math.min(DistanceCalculator.between2Points(point1, point2), DistanceCalculator.between2Points(point2, baseOn1));
+			return Math.min(GeoCalculator.distanceBetween2Points(point1, point2), GeoCalculator.distanceBetween2Points(point2, baseOn1));
 		}else{
 			return Double.MAX_VALUE;
 		}
@@ -73,14 +85,14 @@ public class StraightComparer{
 	public Double getTotalMatchedLengthStraightOne(){
 		if(this.baseA_CD == null && this.baseB_CD == null && this.baseC_AB == null && this.baseD_AB == null){
 			return 0.0;
-		}else if(this.baseC_AB == null && this.baseB_CD == null){
-			return DistanceCalculator.between2Points(one.getStart(), one.getEnd());
+		}else if(this.baseC_AB == null && this.baseD_AB == null){
+			return GeoCalculator.distanceBetween2Points(one.getStart(), one.getEnd());
 		}else if(this.baseC_AB == null){
-			return DistanceCalculator.between2Points(one.getStart(), this.baseD_AB);
+			return GeoCalculator.distanceBetween2Points(one.getStart(), this.baseD_AB);
 		}else if (this.baseD_AB == null){
-			return DistanceCalculator.between2Points(this.baseC_AB, one.getEnd());
+			return GeoCalculator.distanceBetween2Points(this.baseC_AB, one.getEnd());
 		}else{
-			return DistanceCalculator.between2Points(this.baseC_AB, this.baseD_AB);
+			return GeoCalculator.distanceBetween2Points(this.baseC_AB, this.baseD_AB);
 		}
 	}
 
@@ -88,13 +100,13 @@ public class StraightComparer{
 		if(this.baseA_CD == null && this.baseB_CD == null && this.baseC_AB == null && this.baseD_AB == null){
 			return 0.0;
 		}else if(this.baseA_CD == null && this.baseB_CD== null){
-			return DistanceCalculator.between2Points(two.getStart(), two.getEnd());
+			return GeoCalculator.distanceBetween2Points(two.getStart(), two.getEnd());
 		}else if(this.baseA_CD == null){
-			return DistanceCalculator.between2Points(two.getStart(), this.baseB_CD);
+			return GeoCalculator.distanceBetween2Points(two.getStart(), this.baseB_CD);
 		}else if(this.baseB_CD == null){
-			return DistanceCalculator.between2Points(this.baseA_CD, two.getEnd());
+			return GeoCalculator.distanceBetween2Points(this.baseA_CD, two.getEnd());
 		}else{
-			return DistanceCalculator.between2Points(baseA_CD, baseB_CD);
+			return GeoCalculator.distanceBetween2Points(baseA_CD, baseB_CD);
 		}
 		
 	}
@@ -102,7 +114,7 @@ public class StraightComparer{
 	 * computes the base of the perpendicular of the "point" on the straight s
 	 */
 	private Coord getBase(Straight s, Coord point){
-		Vector2D a, b, c, r1, r2, p;
+		Vector2D a, b, c, r1, r2, p, p2;
 		a = new Vector2D(s.getStart().getX(), s.getStart().getY());
 		b = new Vector2D(s.getEnd().getX(), s.getEnd().getY());
 		c = new Vector2D(point.getX(), point.getY());
@@ -123,9 +135,9 @@ public class StraightComparer{
 		
 		// get the base of the perpendicular from c to the straight ab
 		p = a.add(new Vector2D(answers[0], r1));
-		
-		if(!(p.equals(c.add(new Vector2D(answers[1], r2))))){
-			log.error("baseVectors are not equal!");
+		p2 = c.add(new Vector2D(answers[1], r2));
+		if(!(p.equals(p2))){
+			log.error(p.toString() + " " + p2.toString());
 		}
 		
 		// return the point only, if it is beetween the point a && b
@@ -134,6 +146,12 @@ public class StraightComparer{
 		}else{
 			return null;
 		}
+	}
+	
+	public Double getAngle(){
+		return GeoCalculator.angleBeetween2Straights(
+				new Tuple<Coord, Coord>(this.one.getStart(), this.one.getEnd()), 
+				new Tuple<Coord, Coord>(this.two.getStart(), this.two.getEnd()));
 	}
 }
 
@@ -160,3 +178,5 @@ class Straight{
 		return this.end;
 	}
 }
+
+

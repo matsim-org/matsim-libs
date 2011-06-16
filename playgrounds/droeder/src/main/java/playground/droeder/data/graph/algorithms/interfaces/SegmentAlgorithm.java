@@ -22,6 +22,7 @@ package playground.droeder.data.graph.algorithms.interfaces;
 import java.util.List;
 
 import playground.droeder.data.graph.MatchingEdge;
+import playground.droeder.data.graph.MatchingEdgeCandidate;
 
 
 /**
@@ -30,6 +31,6 @@ import playground.droeder.data.graph.MatchingEdge;
  */
 public interface SegmentAlgorithm extends MatchingAlgorithm{
 	
-	public List<MatchingEdge> run(MatchingEdge ref, List<MatchingEdge> cand);
+	public List<MatchingEdgeCandidate> run(MatchingEdge ref, List<MatchingEdgeCandidate> cand);
 
 }
