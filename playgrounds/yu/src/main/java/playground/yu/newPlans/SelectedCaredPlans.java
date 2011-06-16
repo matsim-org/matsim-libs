@@ -89,8 +89,9 @@ public class SelectedCaredPlans extends NewPopulation {
 			outputPopulationFilename = args[2];
 		} else {
 			netFilename = "test/input/network.xml";
-			populationFilename = "test/input/200.plans.xml.gz";
-			outputPopulationFilename = "test/input/it200basePop.xml.gz";
+			// populationFilename = "test/input/200.plans.xml.gz";
+			populationFilename = "test/output/normalOhneJam/ITERS/it.200/200.plans.xml.gz";
+			outputPopulationFilename = "test/input/it200ohneJamBasePop.xml.gz";
 		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils

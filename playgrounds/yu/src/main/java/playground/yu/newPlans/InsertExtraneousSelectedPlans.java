@@ -84,12 +84,12 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 			outputPopulationFilename = args[args.length - 1];
 		} else {
 			netFilename = "test/input/network.xml";
-			populationFilename = "test/input/it200basePop.xml.gz";
+			populationFilename = "test/input/it200ohneJamBasePop.xml.gz";
 			extraneousPopulationFilenames = new String[] {
-					"test/output/normal1/ITERS/it.201/201.plans.xml.gz",
-					"test/output/normal2/ITERS/it.201/201.plans.xml.gz",
-					"test/output/normal3/ITERS/it.201/201.plans.xml.gz" };
-			outputPopulationFilename = "test/input/it201baseTimeDistCombi0_0.5_1plans.xml.gz";
+					"test/output/normal1ohneJam/ITERS/it.201/201.plans.xml.gz",
+					"test/output/normal2ohneJam/ITERS/it.201/201.plans.xml.gz",
+					"test/output/normal3ohneJam/ITERS/it.201/201.plans.xml.gz" };
+			outputPopulationFilename = "test/input/it201baseTimeDistCombi0_0.5_1plansOhneJam.xml.gz";
 			extraneousPopSize = extraneousPopulationFilenames.length;
 		}
 

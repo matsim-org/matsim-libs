@@ -37,6 +37,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
+import playground.yu.counts.CntSimCap4Chart;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.PlansScoring4PC_mnl;
 
 /**
@@ -56,17 +57,19 @@ public class PCCtl extends BseParamCalibrationControler {
 		// config = ConfigUtils.loadConfig(args[0]);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
+		addControlerListener(new CntSimCap4Chart());
 	}
 
 	public PCCtl(Config config) {
 		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
+		addControlerListener(new CntSimCap4Chart());
 	}
 
 	/**
-	 * please check the method in super class, when the super class {@code
-	 * org.matsim.core.controler.Controler} is changed sometimes
+	 * please check the method in super class, when the super class
+	 * {@code org.matsim.core.controler.Controler} is changed sometimes
 	 */
 	@Override
 	protected void loadCoreListeners() {
@@ -93,12 +96,12 @@ public class PCCtl extends BseParamCalibrationControler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new PCStrMn(network, getFirstIteration(),
-				config.planCalcScore().getBrainExpBeta(), Integer
-						.parseInt(config.findParam(
-								PCCtlListener.BSE_CONFIG_MODULE_NAME,
-								"parameterDimension"/*
-													 * 2, traveling , performing
-													 */)));
+				config.planCalcScore().getBrainExpBeta(),
+				Integer.parseInt(config.findParam(
+						PCCtlListener.BSE_CONFIG_MODULE_NAME,
+						"parameterDimension"/*
+											 * 2, traveling , performing
+											 */)));
 		StrategyManagerConfigLoader.load(this, manager);
 
 		// deactivate generating of new Plans by plan innovation
@@ -133,16 +136,16 @@ public class PCCtl extends BseParamCalibrationControler {
 						new ExpBetaPlanChanger(config.planCalcScore()
 								.getBrainExpBeta()));
 				manager.addStrategy(changeExpBeta, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1/* 505 */,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1/* 505 */,
 						changeExpBeta, prob);
 			} else if (module.equals("SelectExpBeta")) {
 				// SelectExpBeta
 				PlanStrategy selectExpBeta = new PlanStrategyImpl(
 						new ExpBetaPlanSelector(config.planCalcScore()));
 				manager.addStrategy(selectExpBeta, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1/* 505 */,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1/* 505 */,
 						selectExpBeta, prob);
 
 			} else if (module.equals("ReRoute")) {
@@ -151,8 +154,9 @@ public class PCCtl extends BseParamCalibrationControler {
 						new RandomPlanSelector());
 				reRoute.addStrategyModule(new ReRoute(this));
 				manager.addStrategy(reRoute, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1, reRoute, prob);
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1,
+						reRoute, prob);
 				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
 						reRoute, 0);
 			} else if (module.equals("TimeAllocationMutator")) {
@@ -162,8 +166,8 @@ public class PCCtl extends BseParamCalibrationControler {
 				timeAllocationMutator
 						.addStrategyModule(new TimeAllocationMutator(config));
 				manager.addStrategy(timeAllocationMutator, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1,
 						timeAllocationMutator, prob);
 				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
 						timeAllocationMutator, 0);

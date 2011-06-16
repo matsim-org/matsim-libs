@@ -28,9 +28,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * a small and simple writer
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class SimpleWriter implements Closeable, Flushable {
 	private BufferedWriter writer = null;
@@ -94,7 +94,7 @@ public class SimpleWriter implements Closeable, Flushable {
 	}
 
 	public void writeln(Object o) {
-		write(o + "\n");
+		write(o.toString() + "\n");
 	}
 
 	public void writeln() {
