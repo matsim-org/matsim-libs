@@ -114,7 +114,7 @@ public class Aggregator {
 			}
 		}
 		if (n == 0) {
-			log.error("Something went wrong (n == 0) for hour the daily volumes"); 
+			log.error("Something went wrong (n == 0) for the daily volumes"); 
 			return 0.0;
 		}
 		variance /= ( n - 1 );

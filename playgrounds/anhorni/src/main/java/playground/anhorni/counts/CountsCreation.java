@@ -1,5 +1,6 @@
 package playground.anhorni.counts;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -18,6 +19,8 @@ public class CountsCreation {
 	public static String outpath;
 	private String pathsFile = inpath + "/datasets.txt";
 	private String networkMappingFile = inpath + "/networkMapping.txt";
+	private String countsCompareFile = inpath + "/countscompare.txt";
+	private String networkNameFile = inpath + "/networkName.txt";
 	
 	private final static String dayFilter = "DIDO";
 	private final static boolean removeOutliers = false;
@@ -42,7 +45,7 @@ public class CountsCreation {
 		for (int month = 0; month <= 12; month++) {
 			Stations stations = readCounts();			
 			this.filtering(stations, month);
-			CountsCompareReader countsCompareReader = new CountsCompareReader(stations);
+			CountsCompareReader countsCompareReader = new CountsCompareReader(stations, countsCompareFile, networkNameFile);
 			countsCompareReader.read();
 			this.writeSummary(stations, month);
 			
@@ -128,10 +131,11 @@ public class CountsCreation {
 		log.info("Writing old files  -------------------");
 		//for comparison with old files
 		Counts countsTele = new Counts();
+		new File(outpath + "/original/").mkdirs();
 		MatsimCountsReader countsReaderTele = new MatsimCountsReader(countsTele);
 		countsReaderTele.readFile(inpath + "/original/countsTeleatlas.xml");
 		CountsWriter countsWriterTele = new CountsWriter(countsTele);
-		countsWriterTele.write(inpath + "/original/countsTeleatlas_original.xml");
+		countsWriterTele.write(outpath + "/original/countsTeleatlas_original.xml");
 		
 		Counts countsIVTCH = new Counts();
 		MatsimCountsReader countsReaderIVTCH = new MatsimCountsReader(countsIVTCH);

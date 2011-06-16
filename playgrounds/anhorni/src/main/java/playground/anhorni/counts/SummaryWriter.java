@@ -249,8 +249,8 @@ public class SummaryWriter {
 	public void writeDailyStdDevBoxPlots(Stations stations, String outpath) {	
 		String header = 	"Station\tLink\tDailyVal\n";
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsAbsolute.txt");
-			BufferedWriter outScaled = IOUtils.getBufferedWriter(outpath + "stdDevsScaled.txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsDailyAbsolute.txt");
+			BufferedWriter outScaled = IOUtils.getBufferedWriter(outpath + "stdDevsDailyScaled.txt");
 			out.write(header);			
 			outScaled.write(header);
 			DecimalFormat formatter = new DecimalFormat("0.0");
@@ -269,23 +269,19 @@ public class SummaryWriter {
 				
 				out.write(station.getId() + "_" + "Link1" ); 
 				outScaled.write(station.getId() + "\t" + "Link1" );
-				for (int hour = 0; hour < 24; hour++) {	
-					double v = station.getLink1().getAggregator().getStandarddev()[hour];
-					out.write("\t" + formatter.format(v));
-					
-					double relV = 100 * v / station.getLink1().getAggregator().getAvg()[hour];
-					outScaled.write("\t" + formatter.format(relV));
-				}
+				double v1 = station.getLink1().getAggregator().getStandarddevDay();
+				out.write("\t" + formatter.format(v1));
+				
+				double relV1 = 100 * v1 / station.getLink1().getAggregator().getAvgDay();
+				outScaled.write("\t" + formatter.format(relV1));
 				out.newLine(); outScaled.newLine();
 				out.write(station.getId() + "_" + "Link2" ); 
 				outScaled.write(station.getId() + "\t" + "Link2" );
-				for (int hour = 0; hour < 24; hour++) {	
-					double v = station.getLink2().getAggregator().getStandarddev()[hour];
-					out.write("\t" + formatter.format(v));
-					
-					double relV = 100 * v / station.getLink2().getAggregator().getAvg()[hour];
-					outScaled.write("\t" + formatter.format(relV));
-				}
+				double v2 = station.getLink2().getAggregator().getStandarddevDay();
+				out.write("\t" + formatter.format(v2));
+				
+				double relV2 = 100 * v2 / station.getLink2().getAggregator().getAvgDay();
+				outScaled.write("\t" + formatter.format(relV2));
 				out.newLine(); outScaled.newLine();
 			}
 			outScaled.flush();

@@ -30,7 +30,7 @@ public class CountStation {
 			
 			int date = rawCount.getDay() + 100 * rawCount.getMonth() + 10000 * rawCount.getYear();
 			link1.addDailyCountVal(date, rawCount.getVol1());
-			link1.addDailyCountVal(date, rawCount.getVol2());
+			link2.addDailyCountVal(date, rawCount.getVol2());
 		}
 	}
 	

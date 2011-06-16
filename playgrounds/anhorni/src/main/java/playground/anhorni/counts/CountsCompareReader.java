@@ -6,19 +6,20 @@ import java.io.IOException;
 import org.matsim.core.gbl.Gbl;
 
 public class CountsCompareReader {
-	
-	private String path = "src/main/java/playground/anhorni/input/counts/";
-	private String countsCompareFile = path + "countscompare.txt";
+	private String countsCompareFile;
+	private String networkNameFile;
 	private Stations stations;
 	
-	public CountsCompareReader(Stations stations) {
+	public CountsCompareReader(Stations stations, String countsCompareFile, String networkNameFile) {
+		this.countsCompareFile = countsCompareFile;
+		this.networkNameFile = networkNameFile;
 		this.stations = stations;
 	}
 	
 	private String readNetworkName() {
 		String networkName = null;
 		try {
-			FileReader fileReader = new FileReader(path + "networkName.txt");
+			FileReader fileReader = new FileReader(this.networkNameFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);	
 			
 			String curr_line;
