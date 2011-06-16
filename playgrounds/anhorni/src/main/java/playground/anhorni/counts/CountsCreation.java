@@ -14,8 +14,8 @@ import org.matsim.counts.MatsimCountsReader;
 public class CountsCreation {
 	
 	private final static Logger log = Logger.getLogger(CountsCreation.class);
-	private String inpath = "src/main/java/playground/anhorni/input/counts/";
-	private String outpath = "src/main/java/playground/anhorni/output/counts/";
+	public static String inpath;
+	public static String outpath;
 	private String pathsFile = inpath + "/datasets.txt";
 	private String networkMappingFile = inpath + "/networkMapping.txt";
 	
@@ -26,7 +26,10 @@ public class CountsCreation {
 	private boolean removeZeroVolumes = true;
 	
 	public static void main(final String[] args) {
-
+		
+		CountsCreation.inpath = args[0];
+		CountsCreation.inpath = args[1];
+		
 		Gbl.startMeasurement();
 		CountsCreation creator = new CountsCreation();
 		creator.run();
