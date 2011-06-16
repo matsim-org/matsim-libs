@@ -29,10 +29,12 @@ import org.apache.log4j.Logger;
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
+	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "vspExperimental";
-	
+
 	// ---
 	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes" ;
 	private boolean removingUnneccessaryPlanAttributes = false ;
@@ -52,46 +54,46 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private String activityDurationInterpretation = MIN_OF_DURATION_AND_END_TIME ;
 
 	// ---
-	
+
 	private static final String INPUT_MZ05_FILE = "inputMZ05File";
 	private String inputMZ05File = "";
 
 	// ---
-	
+
 	private static final String MODES_FOR_SUBTOURMODECHOICE = "modes";
 	private static final String CHAIN_BASED_MODES = "chainBasedModes";
 
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
-	
+
 	// ---
-	
+
 	private static final String COLORING="coloring" ;
-	
+
 	public static final String COLORING_STANDARD = "standard" ;
 	public static final String COLORING_BVG = "bvg" ;
 
 	private String coloring = COLORING_STANDARD ;
-	
+
 	// ---
 	@Deprecated //somewhen should be deleted, Yu 03.2011
 	private static final String OFFSET_WALK = "offsetWalk";
 	// private double offsetWalk = 0d;
 
 	// ---
-	
-	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING = 
+
+	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING =
 		"usingOpportunityCostOfTimeForPtRouting" ;
 	private boolean isUsingOpportunityCostOfTimeInPtRouting = false ;
-	
+
 	// ---
-	
+
 	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
-	
+
 	public static final String IGNORE = "ignore" ;
 	public static final String WARN = "warn" ;
 	public static final String ABORT = "abort" ;
-	
+
 	private String vspDefaultsCheckingLevel = IGNORE ;
 
 
@@ -103,16 +105,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		
+
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n  When violating VSP defaults, this results in " +
 				"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
-		
-		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION 
+
+		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
 				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
-		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION 
+		map.put(ACTIVITY_DURATION_INTERPRETATION, "String: " + MIN_OF_DURATION_AND_END_TIME + "', '" + TRY_END_TIME_THEN_DURATION
 				+ "', '" + END_TIME_ONLY + "'") ;
-		
+
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not yet implemented) will remove plan attributes that are presumably not used, such as " +
 				"activityStartTime. default=false") ;
 
@@ -123,9 +125,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
 				"set offset for mode \"walk\" in leg scoring function");
-		
+
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
-		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING, 
+		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
 				"utilities of time.\n\t\t" +
 				"Default is false although some of us (bk, kn) think this should always be true.\n" +
@@ -146,7 +148,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			if ( Boolean.parseBoolean(value) ) {
 				setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
 			} else {
-				setActivityDurationInterpretation( END_TIME_ONLY ) ; 
+				setActivityDurationInterpretation( END_TIME_ONLY ) ;
 			}
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
 			setActivityDurationInterpretation(value) ;
@@ -179,7 +181,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 //		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
-		
+
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
 
 		map.put(INPUT_MZ05_FILE, getInputMZ05File() ) ;
@@ -188,31 +190,31 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
 
 //		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
-		
-		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING, 
+
+		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
 		map.put(COLORING, getColoring() ) ;
-		
+
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
-		
+
 		return map;
 	}
-	
+
 	@Override
 	protected void checkConsistency() throws RuntimeException {
-		Logger.getLogger(this.getClass()).warn( "entering checkVspDefaults ...") ;
-		
+		log.info( "entering checkVspDefaults ...") ;
+
 		// begin vsp default definitions
 		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
 		// end vsp default definitions
-		
+
 		boolean problem = false ;
 		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
 				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
 
 			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
-				Logger.getLogger(this.getClass()).warn( "violating VSP defaults; usingOpportunityCostOfTimeInPtRouting should be " +
-						"set to: " + usingOpportunityCostOfTimeInPtRoutingDefault ) ;
+				log.warn( "violating VSP defaults; usingOpportunityCostOfTimeInPtRouting should be set to: " +
+						usingOpportunityCostOfTimeInPtRoutingDefault ) ;
 				problem = true ;
 			}
 
@@ -220,11 +222,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
 			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
-			Logger.getLogger(this.getClass()).fatal( str ) ;
+			log.fatal( str ) ;
 			throw new RuntimeException( str ) ;
 		}
 
-		Logger.getLogger(this.getClass()).warn( "leaving checkVspDefaults ...") ;
+		log.info( "leaving checkVspDefaults ...") ;
 	}
 
 
@@ -236,16 +238,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //	public void setUseActivityDurations(final boolean useActivityDurations) {
 //		this.useActivityDurations = useActivityDurations;
 //	}
-	
+
 	public String getColoring() {
-		return coloring ;
+		return this.coloring ;
 	}
-	public void setColoring( String value ) {
-		coloring = value ;
+	public void setColoring( final String value ) {
+		this.coloring = value ;
 	}
 
 	public String getInputMZ05File() {
-		return inputMZ05File;
+		return this.inputMZ05File;
 	}
 
 	public void setInputMZ05File(final String inputMZ05File) {
@@ -253,7 +255,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public String getModesForSubTourModeChoice() {
-		return modesForSubTourModeChoice;
+		return this.modesForSubTourModeChoice;
 	}
 
 	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
@@ -261,7 +263,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public String getChainBasedModes() {
-		return chainBasedModes;
+		return this.chainBasedModes;
 	}
 
 	public void setChainBasedModes(final String chainBasedModes) {
@@ -277,35 +279,35 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //	}
 
 	public String getActivityDurationInterpretation() {
-		return activityDurationInterpretation;
+		return this.activityDurationInterpretation;
 	}
 
-	public void setActivityDurationInterpretation(String activityDurationInterpretation) {
+	public void setActivityDurationInterpretation(final String activityDurationInterpretation) {
 		this.activityDurationInterpretation = activityDurationInterpretation;
 	}
 
 	public boolean isRemovingUnneccessaryPlanAttributes() {
-		return removingUnneccessaryPlanAttributes;
+		return this.removingUnneccessaryPlanAttributes;
 	}
 
-	public void setRemovingUnneccessaryPlanAttributes(boolean removingUnneccessaryPlanAttributes) {
+	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
 	}
 
 	public boolean isUsingOpportunityCostOfTimeInPtRouting() {
-		return isUsingOpportunityCostOfTimeInPtRouting;
+		return this.isUsingOpportunityCostOfTimeInPtRouting;
 	}
 
-	public void setUsingOpportunityCostOfTimeInPtRouting(boolean tmp) {
+	public void setUsingOpportunityCostOfTimeInPtRouting(final boolean tmp) {
 		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
 	}
 
-	public void setVspDefaultsCheckingLevel(String vspDefaultsCheckingLevel) {
+	public void setVspDefaultsCheckingLevel(final String vspDefaultsCheckingLevel) {
 		this.vspDefaultsCheckingLevel = vspDefaultsCheckingLevel;
 	}
 
 	public String getVspDefaultsCheckingLevel() {
-		return vspDefaultsCheckingLevel;
+		return this.vspDefaultsCheckingLevel;
 	}
 
 }
