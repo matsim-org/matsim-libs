@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.possiblesharedrides;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,9 +44,13 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import playground.thibautd.utils.BoxAndWhiskersChart;
 
 /**
  * Computes and outputs statistics about number of possible shared rides.
@@ -52,6 +61,12 @@ public class CountPossibleSharedRides {
 		Logger.getLogger(CountPossibleSharedRides.class);
 
 	private static final double DAY_DUR = 3600d*24d;
+
+	private static final String AGENT_ID_TITLE = "agentId";
+	private static final String TOD_TITLE = "departure time (s)";
+	private static final String DISTANCE_TITLE = "distance (m)";
+	private static final String COUNT_TITLE = "nJoinableTrips";
+	private static final String SEPARATOR = "\t";
 
 	private final double eventInitialSearchWindow = 10*60d;
 	private final double eventSeachWindowIncr = 5*60d;
@@ -97,6 +112,15 @@ public class CountPossibleSharedRides {
 		this.timeWindowRadius = timeWindowRadius;
 	}
 
+	public CountPossibleSharedRides() {
+		this.arrivalsTopology = null;
+		this.departuresTopology = null;
+		this.enterLinksTopology = null;
+		this.leaveLinksTopology = null;
+		this.acceptableDistance = 0d;
+		this.timeWindowRadius = 0d;
+	}
+
 	/*
 	 * =========================================================================
 	 * Analysis functions
@@ -133,6 +157,58 @@ public class CountPossibleSharedRides {
 		log.info("    computing trip data... DONE");
 	}
 
+	/**
+	 * Load from the exported textfile rather than calculating the data.
+	 * 
+	 * CAUTION: the information displayed in the titles may be inexact (radius and
+	 * acceptable distance)!
+	 */
+	public void loadTripData(final String fileName) throws IOException {
+		BufferedReader reader = IOUtils.getBufferedReader(fileName);
+		
+		int agentId=0;
+		int tod=1;
+		int distance=2;
+		int count=3;
+		
+		// inittialize
+		String[] line = nextLine(reader);
+		String value;
+
+		for (int i=0; i < line.length; i++) {
+			value = line[i];
+
+			if (value.equals(AGENT_ID_TITLE)) {
+				agentId = i;
+			}
+			else if (value.equals(TOD_TITLE)) {
+				tod = i;
+			}
+			else if (value.equals(DISTANCE_TITLE)) {
+				distance = i;
+			}
+			else if (value.equals(COUNT_TITLE)) {
+				count = i;
+			}
+		}
+
+		// load data
+		this.results.clear();
+		for (line = nextLine(reader); line != null; line = nextLine(reader)) {
+			this.results.add(new TripData(
+						new IdImpl(line[agentId]),
+						Double.parseDouble(line[tod]),
+						Double.parseDouble(line[distance]),
+						Integer.valueOf(line[count])));
+		}
+	}
+
+	private String[] nextLine(final BufferedReader reader) throws IOException {
+		String line = reader.readLine();
+
+		return (line == null ? null : line.split(SEPARATOR));
+	}
+
 	/*
 	 * =========================================================================
 	 * formated results accessors
@@ -142,7 +218,7 @@ public class CountPossibleSharedRides {
 	 * @return a chart plotting the average number of trips that an agent can
 	 * join per time bin.
 	 */
-	public ChartUtil getAvergePerTimeBinChart(final int nTimeBins) {
+	public ChartUtil getAveragePerTimeBinChart(final int nTimeBins) {
 		this.prepareForAnalysis();
 
 		String title = "Number of possible joint trips per departure time\n"+
@@ -232,9 +308,64 @@ public class CountPossibleSharedRides {
 	 */
 	public ChartUtil getBoxAndWhiskersPerTimeBin(final int nTimeBins) {
 		this.prepareForAnalysis();
-		//TODO: create a ChartUtil that returns a BaW plot.
-		log.warn("using unimplemented method getBoxAndWhiskersPerTimeBin!");
-		return null;
+		String title = "Number of possible joint trips per departure time\n"+
+				"acceptable distance: "+this.acceptableDistance+"m,\n"+
+				"acceptable time: "+(this.timeWindowRadius/60d)+" min.";
+		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
+				title,
+				"time of day (h)",
+				"n joinable trips",
+				24 / nTimeBins);
+
+		for (TripData data : this.results) {
+			chart.add(data.timeOfDay / 3600d, data.numberOfJoinableTrips);
+		}
+
+		return chart;
+	}
+
+	/**
+	 * Writes the collected data in the form of a tab separated textfile.
+	 * The underlying stream isn't closed.
+	 */
+	public void writeRawData(final BufferedWriter writer) {
+		this.writeRawData(new PrintWriter(writer));
+	}
+
+	/**
+	 * Writes the collected data in the form of a tab separated textfile.
+	 * The underlying stream isn't closed.
+	 */
+	public void writeRawData(final PrintWriter writer) {
+		this.prepareForAnalysis();
+		String line = AGENT_ID_TITLE + SEPARATOR
+			+ TOD_TITLE + SEPARATOR
+			+ DISTANCE_TITLE + SEPARATOR
+			+ COUNT_TITLE + SEPARATOR;
+		int count = 0;
+		int next = 1;
+
+		log.info("printing data to text file...");
+		
+		for (TripData data : this.results) {
+			writer.println(line);
+			line = data.id.toString();
+			line += "\t" + data.timeOfDay;
+			line += "\t" + data.distance;
+			line += "\t" + data.numberOfJoinableTrips;
+
+			count++;
+			if (count == next) {
+				log.info("line # "+count+" processed.");
+				next *= 2;
+			}
+		}
+		
+		writer.print(line);
+		writer.flush();
+		// the closing is let to the caller
+		log.info("printing data to text file... DONE");
+		log.info(count+" lines succesfully written.");
 	}
 
 	/*
@@ -256,6 +387,7 @@ public class CountPossibleSharedRides {
 
 		double arrivalTime = departureTime + leg.getTravelTime();
 		//TODO: get distance by a non-deprecated way
+		//problem: implies using Route.calcDistances, which costs a lot!
 		double distance = route.getDistance();
 		int numberOfJoinableTrips = 0;
 		Id departureId = route.getStartLinkId();
@@ -277,7 +409,7 @@ public class CountPossibleSharedRides {
 		numberOfJoinableTrips = countPossibleSharedRides(departure, arrival);
 		//log.debug("counting possible shared rides... DONE");
 
-		return new TripData(departure.getTime(), distance, numberOfJoinableTrips);
+		return new TripData(personId, departure.getTime(), distance, numberOfJoinableTrips);
 	}
 
 	private LinkEvent getDepartureEvent(
@@ -397,11 +529,14 @@ public class CountPossibleSharedRides {
 		public final double timeOfDay;
 		public final double distance;
 		public final int numberOfJoinableTrips;
+		public final Id id;
 
 		public TripData(
+				final Id id,
 				final double tod,
 				final double dist,
 				final int n) {
+			this.id = id;
 			this.timeOfDay = tod;
 			this.distance = dist;
 			this.numberOfJoinableTrips = n;
