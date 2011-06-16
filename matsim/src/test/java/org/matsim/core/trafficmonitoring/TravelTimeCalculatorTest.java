@@ -28,7 +28,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +45,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
@@ -59,7 +64,7 @@ import org.xml.sax.SAXException;
 public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	private final static Logger log = Logger.getLogger(TravelTimeCalculatorTest.class);
-	
+
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile;
 		ScenarioImpl scenario;
@@ -312,6 +317,66 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTime(link10, 6.0 * 3600), EPSILON);
 		assertEquals("wrong link travel time at 06:15.", 359.9712023038157, ttCalc.getLinkTravelTime(link10, 6.25 * 3600), EPSILON);
+	}
+
+	/**
+	 * @author mrieser / senozon
+	 */
+	public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		Id agId2 = new IdImpl("pt2011");
+		Id vehId = new IdImpl(1980);
+
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		ttc.handleEvent(new LinkEnterEventImpl(150, agId2, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+		ttc.handleEvent(new VehicleArrivesAtFacilityEventImpl(240, vehId, new IdImpl("stop"), 0));
+		ttc.handleEvent(new LinkLeaveEventImpl(350, agId2, link1.getId()));
+
+		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 100.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+	}
+
+	/**
+	 * @author mrieser / senozon
+	 */
+	public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		Id agId2 = new IdImpl("pt2011");
+		Id vehId = new IdImpl(1980);
+
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		ttc.handleEvent(new LinkEnterEventImpl(150, agId2, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(300, agId2, link1.getId()));
+
+		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 125.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+
 	}
 
 }
