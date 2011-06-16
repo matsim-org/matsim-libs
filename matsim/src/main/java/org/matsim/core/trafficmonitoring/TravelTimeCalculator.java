@@ -35,6 +35,10 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -58,7 +62,7 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class TravelTimeCalculator
 		implements PersonalizableTravelTime, LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
-		AgentArrivalEventHandler, AgentStuckEventHandler {
+		AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, AgentStuckEventHandler {
 	
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 	"agent is not known the turning move travel time cannot be calculated!";
@@ -75,6 +79,8 @@ public class TravelTimeCalculator
 	
 	private final Map<Id, LinkEnterEvent> linkEnterEvents;
 
+	private final Map<Id, Id> transitVehicleDriverMapping;
+	
 	private final boolean calculateLinkTravelTimes;
 
 	private final boolean calculateLinkToLinkTravelTimes;
@@ -101,6 +107,7 @@ public class TravelTimeCalculator
 			this.linkToLinkData = new ConcurrentHashMap<Tuple<Id, Id>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
 		}
 		this.linkEnterEvents = new ConcurrentHashMap<Id, LinkEnterEvent>();
+		this.transitVehicleDriverMapping = new ConcurrentHashMap<Id, Id>();
 		
 		this.reset(0);
 	}
@@ -137,6 +144,23 @@ public class TravelTimeCalculator
 		this.linkEnterEvents.remove(event.getPersonId());
 	}
 
+	@Override
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+		/* remove EnterEvents from list when a bus stops on a link.
+		 * otherwise, the stop time would counted as travel time, when the
+		 * bus departs again and leaves the link! */
+		Id personId = transitVehicleDriverMapping.get(event.getVehicleId());
+		if (personId != null) this.linkEnterEvents.remove(personId);
+	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		/* we create a mapping between transit vehicles and their drivers. this
+		 * is needed to remove transit vehicles from the linkEnterEvents map if
+		 * they stop on a link (similar to agents who perform an activity at a link. */
+		transitVehicleDriverMapping.put(event.getVehicleId(), event.getDriverId());
+	}
+	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
@@ -218,6 +242,7 @@ public class TravelTimeCalculator
 			}
 		}
 		this.linkEnterEvents.clear();
+		this.transitVehicleDriverMapping.clear();
 	}
 	
 	public void setTravelTimeDataFactory(final TravelTimeDataFactory factory) {
