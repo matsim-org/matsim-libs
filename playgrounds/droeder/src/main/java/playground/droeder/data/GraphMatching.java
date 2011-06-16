@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -72,8 +73,8 @@ public class GraphMatching {
 		
 		//node
 		this.nodeAlgos = new ArrayList<NodeAlgorithm>();
-		this.addAlgo(new NodeDistAlgo(300.0, matching));
-		this.addAlgo(new NodeAngleAlgo(Math.PI / 8));
+		this.addAlgo(new NodeDistAlgo(300.0, this.matching));
+		this.addAlgo(new NodeAngleAlgo(Math.PI / 4));
 		
 		//segment
 		this.segmentAlgos = new ArrayList<SegmentAlgorithm>();
@@ -116,14 +117,13 @@ public class GraphMatching {
 			// with every algorithm
 			for(NodeAlgorithm a: this.nodeAlgos){
 				candidates = a.run(refNode, candidates);
-
-				if(candidates.size() > 0){
-					// if there is one or more candidate-Node take the first
-					this.nodeReference2match.put(refNode.getId(), candidates.get(0).getId());
-				}else{
-					// else, add the refNode to unmatched
-					this.unmatchedRefNodes.add(refNode.getId());
-				}
+			}
+			if(candidates.size() > 0){
+				// if there is one or more candidate-Node take the first
+				this.nodeReference2match.put(refNode.getId(), candidates.get(0).getId());
+			}else{
+				// else, add the refNode to unmatchedList
+				this.unmatchedRefNodes.add(refNode.getId());
 			}
 			
 		}
@@ -133,24 +133,32 @@ public class GraphMatching {
 	}
 
 	// ##### SEGMENTMATCHING #####
+	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
+
 	private void segmentMatching() {
 		log.info("start segment matching...");
 		this.computeEdgeCandidatesFromNodes();
+		
+		
+		
+		for(Entry<MatchingEdge, List<MatchingEdge>> edge2cand: this.ref2CandEdgesFromMappedNodes.entrySet()){
+			
+			
+		}
 		
 		// TODO Auto-generated method stub
 		log.info("segment matching finished...");
 	}
 	
-	private Map<Id, List<Id>> ref2CandEdgesFromMappedNodes;
 	private void computeEdgeCandidatesFromNodes() {
 		log.info("compute candidate edges from mapped nodes");
-		this.ref2CandEdgesFromMappedNodes = new HashMap<Id, List<Id>>();
+		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
 		Id candFrom, candTo, refFrom, refTo;
-		List<Id> tempCandidates;
+		List<MatchingEdge> tempCandidates;
 		
 		//iterate over all edges
 		for(MatchingEdge ref : this.reference.getEdges().values()){
-			tempCandidates = new ArrayList<Id>();
+			tempCandidates = new ArrayList<MatchingEdge>();
 			refFrom = ref.getFromNode().getId();
 			refTo = ref.getToNode().getId();
 
@@ -164,13 +172,13 @@ public class GraphMatching {
 
 					// if the refNodes and candNodes where mapped in NodeMatching, store the candidateEdge  
 					if(this.nodeReference2match.get(refFrom).equals(candFrom) && this.nodeReference2match.get(refTo).equals(candTo)){
-						tempCandidates.add(cand.getId());
+						tempCandidates.add(cand);
 					}
 				}
 			}
 			
 			if(tempCandidates.size() > 0){
-				this.ref2CandEdgesFromMappedNodes.put(ref.getId(), tempCandidates);
+				this.ref2CandEdgesFromMappedNodes.put(ref, tempCandidates);
 			}
 		}
 		

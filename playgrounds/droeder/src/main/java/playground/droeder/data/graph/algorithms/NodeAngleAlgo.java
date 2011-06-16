@@ -53,14 +53,14 @@ public class NodeAngleAlgo implements NodeAlgorithm{
 			for(MatchingEdge refEdge : ref.getOutEdges()){
 				//iterate over all edges outgoing from the candidateNode
 				for(MatchingEdge candEdge : cand.getOutEdges()){
-					temp = getPhi(refEdge, candEdge);
+					temp = this.getPhi(refEdge, candEdge);
 					if(temp < phi){
 						phi = temp;
 					}
 				}
 			}
 			// if the referenceNode and the candidateNode have any pair of links with a phi smaller than deltaPhi, the candidate is still a candidate
-			if(phi<deltaPhi){
+			if(phi<this.deltaPhi){
 				newCandidates.add((MatchingNode) cand);
 			}
 			phi = Double.MAX_VALUE;

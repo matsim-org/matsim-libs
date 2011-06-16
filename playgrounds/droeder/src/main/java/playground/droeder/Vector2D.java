@@ -17,66 +17,85 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph;
-
-import java.util.ArrayList;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+package playground.droeder;
 
 /**
  * @author droeder
  *
  */
-public class MatchingEdge implements GraphElement {
-
-	private Id id;
-	private MatchingNode toNode;
-	private MatchingNode fromNode;
-	private ArrayList<MatchingSegment> segments;
+public class Vector2D {
 	
-	public MatchingEdge(Id id, MatchingNode to, MatchingNode from){
-		this.id = id;
-		this.toNode = to;
-		this.fromNode = from;
-		this.segments = new ArrayList<MatchingSegment>();
-		this.segments.add(new MatchingSegment(from.getCoord(), to.getCoord(), new IdImpl("baseSegment")));
-	}
+	private Double x;
+	private Double y;
 
-	/**
-	 * @return the toNode
-	 */
-	public MatchingNode getToNode() {
-		return toNode;
+	public Vector2D(Double x, Double y){
+		this.x = x;
+		this.y = y;
 	}
-
-	/**
-	 * @return the fromNode
-	 */
-	public MatchingNode getFromNode() {
-		return fromNode;
+	
+	public Vector2D(Double factor, Vector2D v){
+		this.x = v.getX() * factor;
+		this.y = v.getY() * factor;
+	}
+	
+	public Vector2D orthogonal(){
+		if((this.x == 0.0) && (this.y == 0.0)){
+			return new Vector2D(Math.random(), Math.random());
+		}else if(this.x == 0){
+			return new Vector2D(1.0, 0.0);
+		}else if(this.y == 0){
+			return new Vector2D(0.0, 1.0);
+		}else{
+			double y = Math.random();
+			return new Vector2D(this.y*y/this.x, y);
+		}
+	}
+	
+	public Vector2D add(Vector2D v){
+		return new Vector2D(this.x + v.getX(), this.y + v.getY());
+	}
+	
+	public Vector2D subtract(Vector2D v){
+		return new Vector2D(this.x - v.getX(), this.y - v.getY());
 	}
 
 	/**
 	 * @return
 	 */
-	public Id getId() {
-		return this.id;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean addSegments(ArrayList<MatchingSegment> segments){
-		this.segments = segments;
-		return true;
-	}
-	
-	/**
-	 * @return
-	 */
-	public ArrayList<MatchingSegment> getSegments(){
-		return this.segments;
+	public Double getY() {
+		return this.y;
 	}
 
+	/**
+	 * @return
+	 */
+	public Double getX() {
+		return this.x;
+	}
+	
+	public Double scalarProduct(Vector2D v){
+		return ((this.x * v.getX()) + (this.y * v.getY()));
+	}
+	
+	public void addFactor(Double f){
+		this.x = this.x * f;
+		this.y = this.y * f;
+	}
+	
+	@Override
+	public String toString(){
+		return "{" + this.x + "; " + this.y + "}";
+	}
+	
+	@Override
+	 public boolean equals(final Object o){
+		if(!(o instanceof Vector2D)) return false;
+		Vector2D v = (Vector2D) o;
+		
+		if(v.getX() == this.getX() && v.getY() == this.getY()){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }

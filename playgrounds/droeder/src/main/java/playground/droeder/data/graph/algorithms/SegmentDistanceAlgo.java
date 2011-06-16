@@ -17,66 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph;
+package playground.droeder.data.graph.algorithms;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import playground.droeder.data.graph.MatchingEdge;
+import playground.droeder.data.graph.algorithms.interfaces.SegmentAlgorithm;
 
 /**
  * @author droeder
  *
  */
-public class MatchingEdge implements GraphElement {
+public class SegmentDistanceAlgo implements SegmentAlgorithm{
 
-	private Id id;
-	private MatchingNode toNode;
-	private MatchingNode fromNode;
-	private ArrayList<MatchingSegment> segments;
+	@Override
+	public List<MatchingEdge> run(MatchingEdge ref, List<MatchingEdge> cand) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
-	public MatchingEdge(Id id, MatchingNode to, MatchingNode from){
-		this.id = id;
-		this.toNode = to;
-		this.fromNode = from;
-		this.segments = new ArrayList<MatchingSegment>();
-		this.segments.add(new MatchingSegment(from.getCoord(), to.getCoord(), new IdImpl("baseSegment")));
-	}
-
-	/**
-	 * @return the toNode
-	 */
-	public MatchingNode getToNode() {
-		return toNode;
-	}
-
-	/**
-	 * @return the fromNode
-	 */
-	public MatchingNode getFromNode() {
-		return fromNode;
-	}
-
-	/**
-	 * @return
-	 */
-	public Id getId() {
-		return this.id;
-	}
 	
-	/**
-	 * @return
-	 */
-	public boolean addSegments(ArrayList<MatchingSegment> segments){
-		this.segments = segments;
-		return true;
-	}
-	
-	/**
-	 * @return
-	 */
-	public ArrayList<MatchingSegment> getSegments(){
-		return this.segments;
-	}
-
 }
+
+
