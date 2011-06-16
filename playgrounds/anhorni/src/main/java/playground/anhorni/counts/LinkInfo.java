@@ -8,6 +8,8 @@ public class LinkInfo {
 		
 	private TreeMap<String, String> ids = new TreeMap<String, String>();
 	private TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
+	
+	private TreeMap<Integer, List<Double>> dailyCountVals = new TreeMap<Integer, List<Double>>();
 	private TreeMap<Integer, Double> simVals =  new TreeMap<Integer, Double>();
 	
 	private boolean removeZeroVolumes = false;
@@ -60,8 +62,17 @@ public class LinkInfo {
 		}
 	}
 	
+	public void addDailyCountVal(int date, double count) {
+		if (this.dailyCountVals.get(date) == null) {
+			this.dailyCountVals.put(date, new Vector<Double>());
+		}
+		if (!(this.removeZeroVolumes && count < 0.0)) {
+			this.dailyCountVals.get(date).add(count);
+		}
+	}
+	
 	public void aggregate(boolean removeOutliers) {
-		this.aggregator.aggregate(this.yearCountVals, removeOutliers);
+		this.aggregator.aggregate(this.yearCountVals, this.dailyCountVals, removeOutliers);
 	}
 	
 	public String getLinkidTeleatlas() {

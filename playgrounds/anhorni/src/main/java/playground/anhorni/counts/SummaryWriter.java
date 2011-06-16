@@ -28,6 +28,8 @@ public class SummaryWriter {
 		this.writeStats(stations, outpath);
 		this.writeStdDevBoxPlots(stations, outpath);
 		this.writeVolumesBoxPlotsAbsolute(stations, outpath);
+		
+		this.writeDailyStdDevBoxPlots(stations, outpath);
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
@@ -243,6 +245,58 @@ public class SummaryWriter {
 			e.printStackTrace();
 		}
 	}
+
+	public void writeDailyStdDevBoxPlots(Stations stations, String outpath) {	
+		String header = 	"Station\tLink\tDailyVal\n";
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outpath + "stdDevsAbsolute.txt");
+			BufferedWriter outScaled = IOUtils.getBufferedWriter(outpath + "stdDevsScaled.txt");
+			out.write(header);			
+			outScaled.write(header);
+			DecimalFormat formatter = new DecimalFormat("0.0");
+			DecimalFormatSymbols symbol = new DecimalFormatSymbols();
+			symbol.setDecimalSeparator('.');
+			formatter.setDecimalFormatSymbols(symbol);
+																	
+			int numberOfStations = 0;
+			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			while (stations_it.hasNext()) {
+				CountStation station = stations_it.next();
+				
+				// if station is not in region -> no sim vals
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
+				numberOfStations++;
+				
+				out.write(station.getId() + "_" + "Link1" ); 
+				outScaled.write(station.getId() + "\t" + "Link1" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink1().getAggregator().getStandarddev()[hour];
+					out.write("\t" + formatter.format(v));
+					
+					double relV = 100 * v / station.getLink1().getAggregator().getAvg()[hour];
+					outScaled.write("\t" + formatter.format(relV));
+				}
+				out.newLine(); outScaled.newLine();
+				out.write(station.getId() + "_" + "Link2" ); 
+				outScaled.write(station.getId() + "\t" + "Link2" );
+				for (int hour = 0; hour < 24; hour++) {	
+					double v = station.getLink2().getAggregator().getStandarddev()[hour];
+					out.write("\t" + formatter.format(v));
+					
+					double relV = 100 * v / station.getLink2().getAggregator().getAvg()[hour];
+					outScaled.write("\t" + formatter.format(relV));
+				}
+				out.newLine(); outScaled.newLine();
+			}
+			outScaled.flush();
+			out.flush();
+			outScaled.close();
+			out.close(); 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
+	
 	
 	public void writeStdDevBoxPlots(Stations stations, String outpath) {	
 		String header = 	"Station\tLink\tHour0\tHour1\tHour2\tHour3\tHour4\tHour5\t" +

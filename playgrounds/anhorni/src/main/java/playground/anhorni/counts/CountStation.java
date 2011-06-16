@@ -27,6 +27,10 @@ public class CountStation {
 			RawCount rawCount = count_it.next();	
 			link1.addYearCountVal(rawCount.getHour(), rawCount.getVol1());
 			link2.addYearCountVal(rawCount.getHour(), rawCount.getVol2());
+			
+			int date = rawCount.getDay() + 100 * rawCount.getMonth() + 10000 * rawCount.getYear();
+			link1.addDailyCountVal(date, rawCount.getVol1());
+			link1.addDailyCountVal(date, rawCount.getVol2());
 		}
 	}
 	

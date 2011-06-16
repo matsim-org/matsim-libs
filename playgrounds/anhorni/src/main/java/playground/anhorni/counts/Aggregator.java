@@ -10,7 +10,11 @@ import org.apache.log4j.Logger;
 public class Aggregator {
 	private final static Logger log = Logger.getLogger(Aggregator.class);
 	
+	// volumes per hour
 	private TreeMap<Integer, List<Double>> volumes = new TreeMap<Integer, List<Double>>();
+	
+	// volumes per day
+	private TreeMap<Integer, List<Double>> volumesDay = new TreeMap<Integer, List<Double>>();
 		
 	private double [] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -20,22 +24,28 @@ public class Aggregator {
 	
 	private double [] standarddev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 		0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	
+	private double avgDay = 0.0;
+	private double standarddevDay = 0.0;
 		
-	public void aggregate(TreeMap<Integer, List<Double>> volumes, boolean removeOutliers) {
+	public void aggregate(TreeMap<Integer, List<Double>> volumes, TreeMap<Integer, List<Double>> volumesDay, boolean removeOutliers) {
 		this.volumes = volumes;	
+		this.volumesDay = volumesDay;
 		if (removeOutliers) this.removeOutliers();
 		this.avg();
 		this.standarddev_s();
 		this.median();	
+		
+		this.avgDay = this.avgDay();
+		this.standarddevDay = this.standarddevDay_s();
 	}
-	
+		
 	public int getSize(int hour) {
 		return this.volumes.get(hour).size();
 	}
 	
-		
 	private void removeOutliers() {
-				
+		
 		for (int hour = 0; hour < 24; hour++) {		
 			List<Double> filteredVolumes = new Vector<Double>();		
 			List<Double> volumesTemp = volumes.get(hour);
@@ -72,6 +82,45 @@ public class Aggregator {
 		}
 	}
 	
+	private double getDailyVolume(int date) {
+		double dailyVol = 0.0;
+		for (double hourlyVol : this.volumesDay.get(date)) {
+			dailyVol += hourlyVol;
+		}
+		return dailyVol;
+	}
+	
+	private double avgDay() {
+		int n = 0;
+		double avgDayTmp = 0.0;
+		for (Integer date : this.volumesDay.keySet()) {
+			double dailyVol = this.getDailyVolume(date);
+			if (dailyVol > -1.0) { // filter undefined values
+				avgDayTmp += dailyVol;
+				n++;
+			}
+		}
+		return (avgDayTmp / n);
+	}
+	
+	private double standarddevDay_s() {
+		int n = 0;
+		double variance = 0.0;
+		for (Integer date : this.volumesDay.keySet()) {
+			double dailyVol = this.getDailyVolume(date);
+			if (dailyVol > -1.0) { // filter undefined values
+				variance += Math.pow(dailyVol - this.avgDay , 2.0);
+				n++;
+			}
+		}
+		if (n == 0) {
+			log.error("Something went wrong (n == 0) for hour the daily volumes"); 
+			return 0.0;
+		}
+		variance /= ( n - 1 );
+		return Math.sqrt(variance);
+	}
+	
 	private void avg() {	
 		for (int hour = 0; hour < 24; hour++) {
 			int n = 0;
@@ -99,7 +148,7 @@ public class Aggregator {
 				log.error("Something went wrong (n == 0) for hour :" + hour); 
 				return;
 			}
-			variance /= ( n -1 );
+			variance /= ( n - 1 );
 			standarddev[hour] = Math.sqrt(variance);
 		}	
 	}
@@ -141,6 +190,22 @@ public class Aggregator {
 	    	double upper = values.get(values.size()/2);
 	    	return (lower + upper) / 2.0;
 	    }	
+	}
+
+	public double getAvgDay() {
+		return avgDay;
+	}
+
+	public void setAvgDay(double avgDay) {
+		this.avgDay = avgDay;
+	}
+
+	public double getStandarddevDay() {
+		return standarddevDay;
+	}
+
+	public void setStandarddevDay(double standarddevDay) {
+		this.standarddevDay = standarddevDay;
 	}
 
 	public double[] getAvg() {
