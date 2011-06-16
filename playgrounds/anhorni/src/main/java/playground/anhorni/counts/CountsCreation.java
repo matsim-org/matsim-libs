@@ -28,7 +28,7 @@ public class CountsCreation {
 	public static void main(final String[] args) {
 		
 		CountsCreation.inpath = args[0];
-		CountsCreation.inpath = args[1];
+		CountsCreation.outpath = args[1];
 		
 		Gbl.startMeasurement();
 		CountsCreation creator = new CountsCreation();
