@@ -27,6 +27,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,12 +48,8 @@ import playground.mzilske.freight.TransportServiceProviders;
 import freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;
 import freight.CarrierUtils;
-import freight.CommodityFlow;
 import freight.ShipperAgentTracker;
-import freight.ShipperImpl;
-import freight.ShipperPlan;
 import freight.ShipperPlanReader;
-import freight.ShipperUtils;
 import freight.Shippers;
 import freight.TSPPlanReader;
 import freight.TSPUtils;
@@ -102,6 +99,7 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Logger.getRootLogger().setLevel(Level.INFO);
+		MatsimRandom.reset(Long.MAX_VALUE);
 		MobSimRunnnerWithShipper runner = new MobSimRunnnerWithShipper();
 		runner.run();
 	}
@@ -144,9 +142,9 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 		mobsimFactory.setUseOTFVis(liveModus);
 		event.getControler().setMobsimFactory(mobsimFactory);
 
-		agentObserver = new AgentObserver("foo",scenario.getNetwork());
-		agentObserver.setOutFile(outputDirectory + "observedAgents_rrpd.txt");
-		event.getControler().getEvents().addHandler(agentObserver);
+//		agentObserver = new AgentObserver("foo",scenario.getNetwork());
+//		agentObserver.setOutFile(outputDirectory + "observedAgents_rrpd.txt");
+//		event.getControler().getEvents().addHandler(agentObserver);
 		
 	}
 
@@ -260,8 +258,8 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 	public void notifyShutdown(ShutdownEvent event)  {
 		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
 		planWriter.write(outputDirectory + "newCarrierPlans.xml");
-		agentObserver.reset(1);
-		agentObserver.writeStats();
+//		agentObserver.reset(1);
+//		agentObserver.writeStats();
 	}
 
 	private void run(){
