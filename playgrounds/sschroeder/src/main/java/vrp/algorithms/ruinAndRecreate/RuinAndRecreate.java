@@ -1,0 +1,199 @@
+package vrp.algorithms.ruinAndRecreate;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
+import org.apache.log4j.Logger;
+
+import vrp.algorithms.ruinAndRecreate.api.RecreationStrategy;
+import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
+import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
+import vrp.algorithms.ruinAndRecreate.api.ThresholdFunction;
+import vrp.algorithms.ruinAndRecreate.api.TourAgent;
+import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
+import vrp.algorithms.ruinAndRecreate.basics.Solution;
+import vrp.api.VRP;
+import vrp.basics.Tour;
+import vrp.basics.VrpUtils;
+
+
+/**
+ * This algorithm is basically the implementation of 
+ * Schrimpf G., J. Schneider, Hermann Stamm-Wilbrandt and Gunter Dueck (2000): Record Breaking Optimization Results Using 
+ * the Ruin and Recreate Principle, Journal of Computational Physics 159, 139Ð171 (2000).
+ * 
+ * @author stefan schroeder
+ *
+ */
+
+public class RuinAndRecreate {
+	
+	public static class Offer {
+		
+		private TourAgent agent;
+		
+		private double cost;
+
+		public Offer(TourAgent agent, double cost) {
+			super();
+			this.agent = agent;
+			this.cost = cost;
+		}
+
+		public TourAgent getAgent() {
+			return agent;
+		}
+
+		public double getCost() {
+			return cost;
+		}
+		
+		@Override
+		public String toString() {
+			return "currentTour=" + agent + "; marginalInsertionCosts=" + cost;
+		}
+		
+	}
+
+	private static Logger logger = Logger.getLogger(RuinAndRecreate.class);
+	
+	private RuinStrategyManager ruinStrategyManager; 
+
+	private RecreationStrategy recreationStrategy;
+	
+	private VRP vrp;
+	
+	private int nOfMutations = 100;
+	
+	private int warmUpIterations = 10;
+	
+	private int currentMutation = 0;
+	
+	private Solution currentSolution;
+	
+	private ThresholdFunction thresholdFunction;
+	
+	private double currentThreshold;
+	
+	private Double initialThreshold = 0.0;
+	
+	private TourAgentFactory tourAgentFactory;
+
+	private Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
+	
+	public RuinAndRecreate(VRP vrp, Solution iniSolution, int nOfMutations) {
+		this.vrp = vrp;
+		this.currentSolution = iniSolution;
+		this.nOfMutations = nOfMutations;
+	}
+
+	public void setRecreationStrategy(RecreationStrategy recreationStrategy) {
+		this.recreationStrategy = recreationStrategy;
+	}
+
+	public void setTourAgentFactory(TourAgentFactory tourAgentFactory) {
+		this.tourAgentFactory = tourAgentFactory;
+	}
+
+	public void setThresholdFunction(ThresholdFunction thresholdFunction) {
+		this.thresholdFunction = thresholdFunction;
+	}
+
+	public void setWarmUpIterations(int warmUpIterations) {
+		this.warmUpIterations = warmUpIterations;
+	}
+
+	public RuinStrategyManager getRuinStrategyManager() {
+		return ruinStrategyManager;
+	}
+
+	public void setRuinStrategyManager(RuinStrategyManager ruinStrategyManager) {
+		this.ruinStrategyManager = ruinStrategyManager;
+	}
+
+	public void run(){
+		logger.info("run ruin-and-recreate");
+		init();
+		verify();
+		randomWalk(warmUpIterations);
+		logger.info("run mutations");
+		while(currentMutation < nOfMutations){
+			Solution tentativeSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+			ruinAndRecreate(tentativeSolution);
+			double tentativeResult = tentativeSolution.getResult();
+			double currentResult = currentSolution.getResult();
+			boolean isAccepted = false;
+			if(tentativeResult < currentResult + thresholdFunction.getThreshold(currentMutation)){
+				currentSolution = tentativeSolution;
+				isAccepted = true;
+			}
+			informListener(currentMutation,tentativeResult,currentResult, currentThreshold,isAccepted);
+//			print(tentativeSolution);
+			currentMutation++;
+		}
+		informFinish();
+	}
+	
+	private void init() {
+		thresholdFunction.setNofIterations(nOfMutations);
+		thresholdFunction.setInitialThreshold(initialThreshold);
+	}
+
+	private void ruinAndRecreate(Solution solution) {
+		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
+		logger.debug("stratClass=" + ruinStrategy.getClass());
+		ruinStrategy.run(solution);
+		recreationStrategy.run(solution,ruinStrategy.getShipmentsWithoutService());
+	}
+
+	private void randomWalk(int nOfIterations) {
+		logger.info("random walk for threshold determination");
+		Solution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+		double[] results = new double[nOfIterations];
+		for(int i=0;i<nOfIterations;i++){
+			ruinAndRecreate(initialSolution);
+			double result = initialSolution.getResult();
+			results[i]=result;
+		}
+		StandardDeviation dev = new StandardDeviation();
+		double standardDeviation = dev.evaluate(results);
+		initialThreshold = standardDeviation / 2;
+		thresholdFunction.setInitialThreshold(initialThreshold);
+		logger.info("iniThreshold="+initialThreshold);
+	}
+
+	public void informFinish(){
+		for(RuinAndRecreateListener l : listeners){
+			l.finish();
+		}
+	}
+
+	private void informListener(int currentMutation, double tentativeResult,double currentResult, double currentThreshold, boolean isAccepted) {
+		RuinAndRecreateEvent event = new RuinAndRecreateEvent(currentMutation, tentativeResult,currentResult, currentThreshold, isAccepted);
+		for(RuinAndRecreateListener l : listeners){
+			l.inform(event);
+		}
+	}
+
+	public Collection<RuinAndRecreateListener> getListeners() {
+		return listeners;
+	}
+
+	public Solution getTourAgentSolution(){
+		return currentSolution;
+	}
+	
+	public Collection<Tour> getSolution(){
+		Collection<Tour> tours = new ArrayList<Tour>();
+		for(TourAgent tA : currentSolution.getTourAgents()){
+			tours.add(tA.getTour());
+		}
+		return tours;
+	}
+
+	private void verify() {
+		
+		
+	}
+}

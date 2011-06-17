@@ -5,6 +5,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierKnowledge;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.Offer;
@@ -14,7 +15,10 @@ import playground.mzilske.freight.Shipment.TimeWindow;
 public class CarrierUtils {
 	
 	public static CarrierImpl createCarrier(String id, String depotLinkId){
-		return new CarrierImpl(makeId(id), makeId(depotLinkId));
+		CarrierImpl carrier = new CarrierImpl(makeId(id), makeId(depotLinkId));
+		carrier.setCarrierCapabilities(new CarrierCapabilities());
+		carrier.setKnowledge(new CarrierKnowledge());
+		return carrier;
 	}
 
 	public static CarrierVehicle createAndAddVehicle(CarrierImpl carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity){

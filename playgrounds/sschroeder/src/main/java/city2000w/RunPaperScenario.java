@@ -5,7 +5,6 @@ package city2000w;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -35,9 +34,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
+import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.CaseStudyCostObserver;
-import playground.mzilske.city2000w.CaseStudySimulationObserver;
 import playground.mzilske.city2000w.CheapestCarrierChoice;
 import playground.mzilske.city2000w.CheapestCarrierWithVorlaufTSPPlanBuilder;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
@@ -66,23 +64,25 @@ import playground.mzilske.freight.TransportServiceProviders;
  * @author schroeder
  *
  */
-public class CopyOfRunPaperScenario_TrivialPlanner implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener, ShutdownListener {
+public class RunPaperScenario implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener, ShutdownListener {
 
 	private static final int GRID_SIZE = 8;
 	
 	private static int NoITERATION = 1;
 
-	private static Logger logger = Logger.getLogger(CopyOfRunPaperScenario_TrivialPlanner.class);
+	private static Logger logger = Logger.getLogger(RunPaperScenario.class);
 
 	private Carriers carriers;
+	
 	private TransportServiceProviders transportServiceProviders;
 
 	private CarrierAgentTracker carrierAgentTracker;
+	
 	private TSPAgentTracker tspAgentTracker;
 
 	private ScenarioImpl scenario;
 	
-	private CaseStudySimulationObserver simStats;
+	private AgentObserver simStats;
 	
 	private CaseStudyCostObserver costStats;
 	
@@ -94,7 +94,7 @@ public class CopyOfRunPaperScenario_TrivialPlanner implements StartupListener, S
 	 */
 	public static void main(String[] args) {
 		for(int i=0;i<NoITERATION;i++){
-			CopyOfRunPaperScenario_TrivialPlanner runner = new CopyOfRunPaperScenario_TrivialPlanner();
+			RunPaperScenario runner = new RunPaperScenario();
 			runner.run();
 		}
 	}
@@ -129,7 +129,7 @@ public class CopyOfRunPaperScenario_TrivialPlanner implements StartupListener, S
 		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
-		simStats = new CaseStudySimulationObserver("Foo", scenario.getNetwork());
+		simStats = new AgentObserver("Foo", scenario.getNetwork());
 		Date date = new Date();
 		simStats.setOutFile("output/trivialPlanner_noChain_simStats_" + date + ".txt");
 		costStats = new CaseStudyCostObserver();

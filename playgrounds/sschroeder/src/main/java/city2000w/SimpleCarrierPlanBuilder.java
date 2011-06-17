@@ -35,7 +35,7 @@ public class SimpleCarrierPlanBuilder {
 					tourBuilder.scheduleDelivery(c.getShipment());
 				}
 				tourBuilder.scheduleEnd(cV.getLocation());
-				sTours.add(new ScheduledTour(tourBuilder.build(), cV, pickRandomStartTime()));
+				sTours.add(new ScheduledTour(tourBuilder.build(), cV, 0.0));
 			}
 		}
 		return new CarrierPlan(sTours);

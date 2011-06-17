@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="carrier_stefan" linkId="i(4,0)">
+			<vehicles>
+				<vehicle id="vehicle_stefan" linkId="i(4,0)" capacity="30"/>
+			</vehicles>
+		</carrier>
+		<carrier id="carrier_gernot" linkId="i(4,8)">
+			<vehicles>
+				<vehicle id="vehicle_gernot" linkId="i(4,8)" capacity="30"/>
+			</vehicles>
+		</carrier>
+	</carriers>

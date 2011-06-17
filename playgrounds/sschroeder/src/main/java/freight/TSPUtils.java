@@ -8,6 +8,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPKnowledge;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TSPShipment.TimeWindow;
@@ -16,7 +17,10 @@ import playground.mzilske.freight.TransportServiceProviderImpl;
 public class TSPUtils {
 	
 	public static TransportServiceProviderImpl createTSP(String id){
-		return new TransportServiceProviderImpl(makeId(id));
+		TransportServiceProviderImpl tsp = new TransportServiceProviderImpl(makeId(id));
+		tsp.setTspCapabilities(new TSPCapabilities());
+		tsp.setKnowledge(new TSPKnowledge());
+		return tsp;
 	}
 	
 	public static void createAndAddTranshipmentCentre(TransportServiceProviderImpl tsp, String tccLocationId){

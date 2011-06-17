@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<transportServiceProviders>
+		<transportServiceProvider id="logotakt">
+<!-- 			<transhipmentCentres> -->
+<!-- 				<transhipmentCentre linkId="i(8,2)R"/> -->
+<!-- 			</transhipmentCentres> -->
+		</transportServiceProvider>
+		<transportServiceProvider id="dbSchenker">
+<!-- 			<transhipmentCentres> -->
+<!-- 				<transhipmentCentre linkId="i(8,2)R"/> -->
+<!-- 			</transhipmentCentres> -->
+		</transportServiceProvider>
+	</transportServiceProviders>

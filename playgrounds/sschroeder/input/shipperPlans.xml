@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<shippers>
+		<shipper id="shipper_stefan" linkId="j(8,5)">
+			<commodityFlows>
+				<commodityFlow id="1" from="j(8,5)" to="j(0,8)" size="10" value="-1"/>	
+				<commodityFlow id="2" from="j(8,5)" to="j(0,1)" size="10" value="-1"/>	
+				<commodityFlow id="3" from="j(8,5)" to="j(0,2)" size="10" value="-1"/>	
+				<commodityFlow id="4" from="j(8,5)" to="j(0,3)" size="10" value="-1"/>	
+				<commodityFlow id="5" from="j(8,5)" to="j(0,4)" size="10" value="-1"/>	
+				<commodityFlow id="6" from="j(8,5)" to="j(0,5)" size="10" value="-1"/>		
+			</commodityFlows>
+			<scheduledFlows>
+				<scheduledFlow comFlowId="1" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="2" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="3" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="4" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="5" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="6" tspId="logotakt" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+			</scheduledFlows>
+		</shipper>
+		<shipper id="bosch" linkId="j(8,0)">
+			<commodityFlows>
+				<commodityFlow id="1" from="j(8,1)" to="j(0,8)" size="10" value="-1"/>	
+				<commodityFlow id="2" from="j(8,1)" to="j(0,1)" size="10" value="-1"/>	
+				<commodityFlow id="3" from="j(8,1)" to="j(0,2)" size="10" value="-1"/>	
+				<commodityFlow id="4" from="j(8,1)" to="j(0,3)" size="10" value="-1"/>	
+				<commodityFlow id="5" from="j(8,1)" to="j(0,4)" size="10" value="-1"/>	
+				<commodityFlow id="6" from="j(8,1)" to="j(0,5)" size="10" value="-1"/>		
+			</commodityFlows>
+			<scheduledFlows>
+				<scheduledFlow comFlowId="1" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="2" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="3" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="4" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="5" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+				<scheduledFlow comFlowId="6" tspId="dbSchenker" price="0">
+					<shipment size="10" startPickup="0.0" endPickup="0.0" startDelivery="0.0" endDelivery="7200"/>
+				</scheduledFlow>
+			</scheduledFlows>
+		</shipper>
+	</shippers>
+	
