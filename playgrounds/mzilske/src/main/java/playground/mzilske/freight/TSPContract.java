@@ -1,5 +1,6 @@
 package playground.mzilske.freight;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -15,6 +16,7 @@ public class TSPContract {
 		super();
 		this.shipment = shiment;
 		this.offer = offer;
+		shipments = new ArrayList<TSPShipment>();
 		shipments.add(shiment);
 	}
 	

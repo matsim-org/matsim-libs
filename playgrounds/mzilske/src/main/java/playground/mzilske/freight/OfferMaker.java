@@ -1,9 +1,8 @@
 package playground.mzilske.freight;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class OfferMaker {
@@ -28,14 +27,14 @@ public class OfferMaker {
 	
 		if (memorizedPrice != null) {
 			price = memorizedPrice;
-			if (Math.random() < 0.2) {
+			if (MatsimRandom.getRandom().nextDouble() < 0.2) {
 				double tenPercent = price * 0.5;
-				double verrauscht = Math.random() * tenPercent;
-				price = price + verrauscht * ( Math.random() < 0.5 ? -1 : 1);
+				double verrauscht = MatsimRandom.getRandom().nextDouble() * tenPercent;
+				price = price + verrauscht * ( MatsimRandom.getRandom().nextDouble() < 0.5 ? -1 : 1);
 			}
 			System.out.println("Ich bin " + carrier.getId()+". Biete an: " + linkId + " nach " +linkId2 + " fuer " + price);
 		} else {
-			if(Math.random() < 0.5){
+			if(MatsimRandom.getRandom().nextDouble() < 0.5){
 				price = getForwardLookingPrice(linkId, linkId2, shipmentSize);
 			}
 			else{
@@ -51,7 +50,7 @@ public class OfferMaker {
 	}
 
 	private double getRandomPrice() {
-		return Math.random()*300;
+		return MatsimRandom.getRandom().nextDouble()*300;
 	}
 
 	private double getForwardLookingPrice(Id linkId, Id linkId2, int shipmentSize) {
@@ -60,7 +59,7 @@ public class OfferMaker {
 		double crowFlyDist = calcDist(linkId,linkId2) + calcDist(carrier.getDepotLinkId(),linkId) + calcDist(linkId2,carrier.getDepotLinkId());
 		double assumedTravelTime = crowFlyDist/14;
 		//annahme, dass der lkw min. 1/5 wird
-		double assumedLoadFactor = Math.min(0.2, Math.random());
+		double assumedLoadFactor = Math.min(0.2, MatsimRandom.getRandom().nextDouble());
 		double sharedDistance = Math.min(crowFlyDist / ((double)vehicleCapacity*assumedLoadFactor) * shipmentSize, crowFlyDist);
 		double sharedTime = Math.min(assumedTravelTime / ((double)vehicleCapacity*assumedLoadFactor) * shipmentSize, assumedTravelTime);
 		

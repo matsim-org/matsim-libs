@@ -178,9 +178,9 @@ public class CarrierAgent {
 			plan.addLeg(startLeg);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
 				Activity tourElementActivity = new ActivityImpl(tourElement.getActivityType(), tourElement.getLocation());
-				((ActivityImpl) tourElementActivity).setMaximumDuration(tourElement.getDuration());
+//				((ActivityImpl) tourElementActivity).setMaximumDuration(tourElement.getDuration());
 //				((ActivityImpl) tourElementActivity).setEndTime(3600*24);
-//				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
+				((ActivityImpl) tourElementActivity).setEndTime(tourElement.getTimeWindow().getStart());
 				plan.addActivity(tourElementActivity);
 				Leg leg = new LegImpl(TransportMode.car);
 				plan.addLeg(leg);
