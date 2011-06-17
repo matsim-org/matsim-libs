@@ -36,9 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
@@ -610,10 +609,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 //		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		if (
-//				(route.getEndLinkId().equals(link.getId()))
-				agent.getPlannedVehicleId().equals(link.getId())
-				&& (agent.chooseNextLinkId() == null)) {
+		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
 
 			agent.endLegAndAssumeControl(now);
