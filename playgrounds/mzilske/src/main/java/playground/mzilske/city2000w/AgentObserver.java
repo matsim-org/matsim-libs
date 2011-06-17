@@ -22,7 +22,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.mzilske.freight.FreightConstants;
 
-public class CaseStudySimulationObserver implements ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler{
+public class AgentObserver implements ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler{
 
 	public static class CostElements {
 		private Id personId;
@@ -51,7 +51,7 @@ public class CaseStudySimulationObserver implements ActivityEndEventHandler, Lin
 		}
 	}
 	
-	private static Logger logger = Logger.getLogger(CaseStudySimulationObserver.class);
+	private static Logger logger = Logger.getLogger(AgentObserver.class);
 	
 	private List<List<CostElements>> costCollector = new ArrayList<List<CostElements>>();
 	
@@ -71,7 +71,7 @@ public class CaseStudySimulationObserver implements ActivityEndEventHandler, Lin
 		this.outFile = outFile;
 	}
 
-	public CaseStudySimulationObserver(String caseStudyConfDescription, Network network) {
+	public AgentObserver(String caseStudyConfDescription, Network network) {
 		super();
 		this.network = network;
 	}
@@ -80,8 +80,7 @@ public class CaseStudySimulationObserver implements ActivityEndEventHandler, Lin
 	public void reset(int iteration) {
 		List<CostElements> elements = new ArrayList<CostElements>();
 		Set<Id> ids = timeOnTheRoadPerAgent.keySet();
-		for(Id id : ids){
-			
+		for(Id id : ids){		
 			double time = timeOnTheRoadPerAgent.get(id);
 			double distance = 0.0;
 			if(distanceOnTheRoadPerAgent.containsKey(id)){
@@ -135,19 +134,25 @@ public class CaseStudySimulationObserver implements ActivityEndEventHandler, Lin
 		
 	}
 	
-	public void writeStats() throws FileNotFoundException, IOException{
+	public void writeStats(){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 		int iteration = 0;
-		for(List<CostElements> elements : costCollector){
-			for(CostElements e : elements){
-				if(iteration==49){
+		try{
+			for(List<CostElements> elements : costCollector){
+				for(CostElements e : elements){
+
 					writer.write(iteration + ";" + e.personId + ";" + e.getDistance() + ";" + e.getTime());
 					writer.write("\n");
+
+
 				}
+				iteration++;
 			}
-			iteration++;
+			writer.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		writer.close();
 	}
 
 }
