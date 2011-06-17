@@ -131,11 +131,4 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 		ruinAndRecreateAlgo.run();
 		return ruinAndRecreateAlgo.getSolution();
 	}
-
-	private Id findDepotId(Collection<Contract> contracts) {
-		for(Contract c : contracts){
-			return c.getShipment().getFrom();
-		}
-		throw new RuntimeException("no contracts or shipments");
-	}
 }
