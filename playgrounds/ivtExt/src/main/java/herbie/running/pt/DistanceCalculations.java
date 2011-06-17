@@ -11,10 +11,19 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 
 public class DistanceCalculations {
 
@@ -78,6 +87,9 @@ public class DistanceCalculations {
 		if(route instanceof LinkNetworkRouteImpl) {
 			return getLegDistance((LinkNetworkRouteImpl) route, network);
 		}
+		else if(route instanceof ExperimentalTransitRoute){
+			return getLegDistance((ExperimentalTransitRoute) route, network);
+		}
 		else {
 			return getLegDistance((GenericRouteImpl) route, network);
 		}
@@ -89,5 +101,45 @@ public class DistanceCalculations {
 		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
 		return CoordUtils.calcDistance(fromCoord, toCoord);
 	}
-	
+
+	public static double getLegDistance(ExperimentalTransitRoute route, Network network) {
+		
+		Coord startLinkCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
+		Coord endLinkCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
+		
+		return CoordUtils.calcDistance(startLinkCoord, endLinkCoord);
+		
+//		Double routeDist = route.getDistance();
+//		if(!routeDist.isNaN()){
+//			System.out.println();
+//			return route.getDistance();
+//		}
+//		else if(route.getAccessStopId() == route.getEgressStopId() ||
+//			route.getStartLinkId() == route.getEndLinkId()) {
+//			return 0.0;
+//		}
+//		else{
+//			Id linkIDStart = route.getStartLinkId();
+//			Id linkIDEnd = route.getEndLinkId();
+//			Coord startCoord = network.getLinks().get(linkIDStart).getCoord();
+//			Coord endCoord = network.getLinks().get(linkIDEnd).getCoord();
+//			return CoordUtils.calcDistance(startCoord, endCoord);
+			// No solution found so far. See below for details.
+//			return route.getDistance();
+//		}
+//		Here, the problem is that we dont have any departure time. But, so far, everything is running... bv, June 7, 2011
+		
+		
+//		TransitRouterImpl t = (TransitRouterImpl) controler.getTransitRouterFactory();
+//		Coord fromCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
+//		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
+//		route.
+//		List<Leg> legs = t.calcRoute(fromCoord, toCoord, departureTime);
+		
+//		Id linkIDStart = route.getStartLinkId();
+//		Id linkIDEnd = route.getEndLinkId();
+//		Coord startCoord = network.getLinks().get(linkIDStart).getCoord();
+//		Coord endCoord = network.getLinks().get(linkIDEnd).getCoord();
+//		return CoordUtils.calcDistance(startCoord, endCoord);
+	}
 }
