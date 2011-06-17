@@ -158,27 +158,6 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 	}
 
 
-	private void createShippersAndContracts() {
-		ShipperImpl shipper = ShipperUtils.createShipper("stefanShipping", "j(8,8)");
-		CommodityFlow commodityFlow = ShipperUtils.createCommodityFlow("j(8,8)","j(0,8)",20,200.0); 
-		shipper.getContracts().add(ShipperUtils.createShipperContract(commodityFlow));
-		ShipperImpl anotherShipper = ShipperUtils.createShipper("gernotShipping", "j(8,1)");
-		CommodityFlow anotherComFlow = ShipperUtils.createCommodityFlow("j(8,1)", "j(0,1)", 20, 10.0);
-		anotherShipper.getContracts().add(ShipperUtils.createShipperContract(anotherComFlow));
-		shippers.getShippers().add(shipper);
-		shippers.getShippers().add(anotherShipper);
-	}
-
-
-	private void createShipperPlans() {
-		for(ShipperImpl s : shippers.getShippers()){
-			SimpleShipperPlanBuilder planBuilder = new SimpleShipperPlanBuilder(tspAgentTracker);
-			ShipperPlan plan = planBuilder.buildPlan(s);
-			s.setSelectedPlan(plan);
-		}
-	}
-
-
 	private void createTSPContracts() {
 		Collection<TSPContract> tspContracts = shipperAgentTracker.createTSPContracts();
 		for(TSPContract c : tspContracts){
@@ -270,9 +249,7 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-//		Collection<Plan> plans = new ArrayList<Plan>();
-//		String activityShpFilename = outputDirectory + event.getIteration() + ".activities.shp";
-//		String legShpFilename = outputDirectory + event.getIteration() + ".legs.shp";
+
 	}
 
 	public void notifyReplanning(ReplanningEvent event) {
