@@ -56,17 +56,6 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost, Personal
 					"be changed.") ;
 		}
 		
-//		if ( cnScoringGroup.getMonetaryDistanceCostRateCar() < 0. ) {
-//			Logger.getLogger( this.getClass() ).error("you are using a monetary distance cost rate < 0.  If this worked for you " +
-//					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
-//			throw new RuntimeException("aborting, see log file for reason") ;
-//		}
-//		if ( cnScoringGroup.getMarginalUtilityOfMoney() < 0. ) {
-//			Logger.getLogger( this.getClass() ).error("you are using a marginal utility of money < 0.  If this worked for you " +
-//					"in the past, this probably was a bug; it should be positive.  Aborting because you need to fix this ... ") ;
-//			throw new RuntimeException("aborting, see log file for reason") ;
-//		}
-		
 	}
 
 	@Override
