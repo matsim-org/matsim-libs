@@ -21,18 +21,21 @@
 package herbie.running.population.algorithms;
 
 import herbie.running.pt.DistanceCalculations;
-
+import org.apache.log4j.Logger;
 import java.io.PrintStream;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  * Generates a crosstab of the absolute number of legs in a population, by leg mode and route distance.
@@ -46,6 +49,8 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 
 	private Network network;
 
+	private final static Logger log = Logger.getLogger(PopulationLegDistanceDistribution.class);
+
 	public PopulationLegDistanceDistribution(PrintStream out, Network network) {
 		super(out);
 		this.network = network;
@@ -58,12 +63,35 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 
 	@Override
 	public void run(Plan plan) {
-
+		
+		boolean isPtLeg = false;
+		double distForPt = 0.0;
+		String ptMode = "standardPt";
+		String onlyPtWalkMode = "onlyPtWalk";
+		boolean containsPt = false;
+		
 		for (PlanElement pe : plan.getPlanElements()) {
+			
 			if (pe instanceof Leg) {
+				
 				Leg leg = (Leg) pe;
+				
 				String mode = leg.getMode();
-
+				
+				if(mode.equals("transit_walk") || mode.equals("pt")){
+					if(mode.equals("pt")) containsPt = true;
+					
+					mode = ptMode;
+					
+					if(!isPtLeg) distForPt = 0.0;
+					isPtLeg = true;
+					
+				}
+				else{
+					isPtLeg = false;
+				}
+				
+				
 				Frequency frequency = null;
 				ResizableDoubleArray rawData = null;
 				if (!this.frequencies.containsKey(mode)) {
@@ -77,19 +105,63 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 				}
 				
 				double distance = 0.0;
-				if(mode.equals("transit_walk")){
+				if(leg.getMode().equals("transit_walk")){
 					distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl)leg.getRoute(), network);
 				}
-				else if (leg.getRoute() != null) {
-					distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
+				else{
+					if(leg instanceof LegImpl && leg.getRoute() == null && !(leg.getRoute() instanceof LinkNetworkRouteImpl) && !(leg.getRoute() instanceof ExperimentalTransitRoute)){
+						log.warn("Not enough information on leg-object. Distance is set to 0.0 for this leg. Therefore no distance contribution....");
+					}
+					else{						
+						distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
+					}
 				}
-				frequency.addValue(distance);
-				rawData.addElement(distance);
+				
+				if(isPtLeg){
+					distForPt += distance;
+				}
+				else{
+					if(distance >= 0.0){
+						frequency.addValue(distance);
+						rawData.addElement(distance);
+					}
+				}
+				
 //				frequency.addValue(leg.getRoute().getDistance());
 //				rawData.addElement(leg.getRoute().getDistance());
 			}
+			else{
+				if(pe instanceof Activity){
+					Activity act = (Activity) pe;
+					if(isPtLeg && !act.getType().equals("pt interaction")){
+						String mode;
+						if(!containsPt) mode = onlyPtWalkMode;
+						else mode = ptMode;
+						
+						Frequency frequency = null;
+						ResizableDoubleArray rawData = null;
+						if (!this.frequencies.containsKey(mode)) {
+							frequency = new Frequency();
+							this.frequencies.put(mode, frequency);
+							rawData = new ResizableDoubleArray();
+							this.rawData.put(mode, rawData);
+						} else {
+							frequency = this.frequencies.get(mode);
+							rawData = this.rawData.get(mode);
+						}
+						
+						if(distForPt >= 0.0){
+							frequency.addValue(distForPt);
+							rawData.addElement(distForPt);
+						}
+						
+						
+						distForPt = 0.0;
+						isPtLeg = false;
+						containsPt = false;
+					}
+				}
+			}
 		}
-
 	}
-
 }
