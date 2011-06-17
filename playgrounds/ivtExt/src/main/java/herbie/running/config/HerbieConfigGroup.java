@@ -63,6 +63,8 @@ public class HerbieConfigGroup extends Module {
 		 * used in simulation of initial datapuls population where plans have scores with an unknown meaning
 		 * this generates trouble when using a learning rate different to 1.0
 		 */
+		MARGINAL_DISTANCE_COST_RATE_BIKE("monetaryDistanceCostRateBike", "0.0", ""),
+		
 		INVALIDATE_SCORES("invalidateScores", "false", "");
 		
 		private final String parameterName;
@@ -149,5 +151,13 @@ public class HerbieConfigGroup extends Module {
 
 	public boolean isInvalidateScores() {
 		return Boolean.parseBoolean(KtiConfigParameter.INVALIDATE_SCORES.getActualValue());
+	}
+	
+	public double getMarginalDistanceCostRateBike(){
+		return Double.parseDouble(KtiConfigParameter.MARGINAL_DISTANCE_COST_RATE_BIKE.getActualValue());
+	}
+	
+	public void setDistanceCostBike(double newValue){
+		KtiConfigParameter.MARGINAL_DISTANCE_COST_RATE_BIKE.setActualValue(Double.toString(newValue));
 	}
 }
