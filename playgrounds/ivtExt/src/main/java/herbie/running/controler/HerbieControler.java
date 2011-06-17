@@ -44,11 +44,11 @@ public class HerbieControler extends Controler {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
-	private final HerbieConfigGroup ktiConfigGroup = new HerbieConfigGroup();
+	private final HerbieConfigGroup herbieConfigGroup = new HerbieConfigGroup();
 
 	public HerbieControler(String[] args) {
 		super(args);
-		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.herbieConfigGroup);
 		super.setOverwriteFiles(true);
 	}
 
@@ -64,7 +64,7 @@ public class HerbieControler extends Controler {
 	protected void setUp() {
 		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
-				this.ktiConfigGroup,
+				this.herbieConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
@@ -72,7 +72,7 @@ public class HerbieControler extends Controler {
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params);
+		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup);
