@@ -20,6 +20,8 @@
 
 package herbie.running.scoring;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -46,10 +48,11 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelMinCost, Pe
 	public HerbieTravelTimeDistanceCostCalculator(
 			TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup, // NOT delete, will be used for transit parameter...
-			CharyparNagelScoringParameters params) {
+			CharyparNagelScoringParameters params, 
+			HerbieConfigGroup herbieConfigGroup) {
 		super();
 		this.timeCalculator = timeCalculator;
-		this.travelScoring = new TravelScoringFunction(params);
+		this.travelScoring = new TravelScoringFunction(params, herbieConfigGroup);
 		
 		// ?????????? Why getPerforming_utils_hr() ??
 //		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);

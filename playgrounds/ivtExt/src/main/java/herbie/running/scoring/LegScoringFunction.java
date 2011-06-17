@@ -34,7 +34,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -74,7 +76,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			Network network,
 			HerbieConfigGroup ktiConfigGroup) {
 		super(plan, params);
-		travelScoring = new TravelScoringFunction(params);
+		travelScoring = new TravelScoringFunction(params, ktiConfigGroup);
 		this.config = config;
 		this.network = network;
 		this.ktiConfigGroup = ktiConfigGroup;
@@ -84,11 +86,6 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
-		Leg testLeg = leg;
-		String mode = leg.getMode();
-		if(TransportMode.pt.equals(leg.getMode())){			
-			System.out.println();
-		}
 		
 		if (TransportMode.car.equals(leg.getMode())) {
 			double dist = 0.0;
@@ -102,14 +99,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			
-//			Id linkIDStart = leg.getRoute().getStartLinkId();
-//			Id linkIDEnd = leg.getRoute().getEndLinkId();
-//			Coord startCoord = network.getLinks().get(linkIDStart).getCoord();
-//			Coord endCoord = network.getLinks().get(linkIDEnd).getCoord();
-//			double distance = CoordUtils.calcDistance(startCoord, endCoord);
-			
 			double distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
-			
 			
 			double distanceCost = 0.0;
 			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
@@ -128,6 +118,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 			double distance = 0.0;
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
+				
 				distance = leg.getRoute().getDistance();
 			}
 			
@@ -137,22 +128,22 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 			double distance = 0.0;
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
-				distance = leg.getRoute().getDistance();
+				distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl) leg.getRoute(), network);
+//				distance = leg.getRoute().getDistance();
 			}
 			
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			
-			double distance = 0.0;
+			System.out.println();
+			double distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl) leg.getRoute(), network);
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
 		} else {
 			
 			double dist = 0.0;
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = DistanceCalculations.getLegDistance(route, network);				
+				dist = DistanceCalculations.getLegDistance(leg.getRoute(), network);				
 //				carScore += this.params.marginalUtilityOfDistanceCar_m * this.params.monetaryDistanceCostRateCar/1000d * dist;
 			}
 			tmpScore += travelScoring.getAlternativeModeScore(dist, travelTime);

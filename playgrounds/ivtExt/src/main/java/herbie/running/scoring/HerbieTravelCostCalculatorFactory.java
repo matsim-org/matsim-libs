@@ -20,6 +20,8 @@
 
 package herbie.running.scoring;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -30,13 +32,15 @@ public class HerbieTravelCostCalculatorFactory implements
 		TravelCostCalculatorFactory {
 	
 	private CharyparNagelScoringParameters params = null;
+	private HerbieConfigGroup herbieConfigGroup = null;
 
-	public HerbieTravelCostCalculatorFactory(CharyparNagelScoringParameters params) {
+	public HerbieTravelCostCalculatorFactory(CharyparNagelScoringParameters params, HerbieConfigGroup herbieConfigGroup) {
 		super();
 		this.params  = params;
+		this.herbieConfigGroup = herbieConfigGroup;
 	}
 
 	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, params);
+		return new HerbieTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, params, herbieConfigGroup);
 	}
 }

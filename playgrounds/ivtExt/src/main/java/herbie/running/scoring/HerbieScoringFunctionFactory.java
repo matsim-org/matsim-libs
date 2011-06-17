@@ -61,11 +61,14 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyp
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
+//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams()));
+		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				plan, 
 				super.getParams(), 
 				this.facilityPenalties,
-				this.facilities));
+				this.facilities,
+				this.config));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				plan, 
 				super.getParams(),

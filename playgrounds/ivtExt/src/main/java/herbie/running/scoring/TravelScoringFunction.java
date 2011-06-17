@@ -20,6 +20,8 @@
 
 package herbie.running.scoring;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 
@@ -38,9 +40,11 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 public class TravelScoringFunction {
 	
 	private CharyparNagelScoringParameters params;
+	private HerbieConfigGroup herbieConfigGroup;
 
-	public TravelScoringFunction(CharyparNagelScoringParameters params) {
+	public TravelScoringFunction(CharyparNagelScoringParameters params, HerbieConfigGroup ktiConfigGroup) {
 		this.params = params;
+		this.herbieConfigGroup = ktiConfigGroup;
 	}
 	
 	/**
@@ -58,11 +62,19 @@ public class TravelScoringFunction {
 		
 		double bikeScore = 0.0;
 		
+		double timeThreashold = 20.0 * 60.0; // sec
+		
 		bikeScore += this.params.constantBike;
 		
-		bikeScore += travelTime * this.params.marginalUtilityOfTravelingBike_s / 3600d;
+		if(travelTime <= timeThreashold) {
+			bikeScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
+		}
+		else{
+			bikeScore += travelTime * this.params.marginalUtilityOfTravelingBike_s + 
+				3 * (travelTime - timeThreashold) * this.params.marginalUtilityOfTravelingBike_s;
+		}
 		
-//		bikeScore += distance * super.params.marginalUtilityOfDistanceBike_m;
+		bikeScore += distance * this.herbieConfigGroup.getMarginalDistanceCostRateBike() * this.params.marginalUtilityOfMoney;
 		
 		return bikeScore;
 	}
@@ -77,7 +89,7 @@ public class TravelScoringFunction {
 			
 //			carScore += this.params.marginalUtilityOfDistanceCar_m * this.params.monetaryDistanceCostRateCar/1000d * dist;
 			
-		carScore += this.params.marginalUtilityOfDistanceCar_m /1000d * distance;
+		carScore += this.params.marginalUtilityOfDistanceCar_m * distance;
 		
 		return carScore;
 	}
@@ -94,7 +106,13 @@ public class TravelScoringFunction {
 		
 		return walkScore;
 	}
-	
+	/**
+	 * 
+	 * @param distance
+	 * @param travelTime
+	 * @param distanceCost is a factor for transit travel cards
+	 * @return
+	 */
 	protected double getInVehiclePtScore(double distance, double travelTime, double distanceCost) {
 		
 		double ptScore = 0.0;
@@ -103,11 +121,9 @@ public class TravelScoringFunction {
 		
 		double marPt = this.params.marginalUtilityOfTravelingPT_s;
 		
-		System.out.println();
-		
 		ptScore += travelTime * this.params.marginalUtilityOfTravelingPT_s;
 		
-		ptScore += this.params.marginalUtilityOfDistancePt_m * distanceCost / 1000d * distance;
+		ptScore += this.params.marginalUtilityOfDistancePt_m * distanceCost * distance;
 		
 		return ptScore;
 	}

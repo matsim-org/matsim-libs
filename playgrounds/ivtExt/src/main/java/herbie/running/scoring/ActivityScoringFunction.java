@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -73,6 +74,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
+	private Config config;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
@@ -83,10 +85,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
+	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Config config) {
 		super(plan, params);
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
+		this.config = config;
 	}
 
 	/*
@@ -98,6 +101,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private double accumulatedTooShortDuration;
 	private double timeSpentWaiting;
 	private double accumulatedNegativeDuration;
+	private boolean lineSwitchPenalty;
 
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime, Activity act) {
@@ -111,6 +115,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
 			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
+		else if(act.getType().startsWith("pt interaction")){
+			lineSwitchPenalty = true;
+		}
+		
 		///////////////////////////////////////////////////////////////////
 		// the time between arrival and departure is either spent
 		// - performing (when the associated facility is open) or
@@ -118,7 +126,6 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		// - the sum of the share performing and the share waiting equals the difference between arrival and departure
 		///////////////////////////////////////////////////////////////////
 		else {
-
 			SortedSet<OpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
@@ -207,17 +214,6 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			if (timeSpentPerforming < ActivityScoringFunction.MINIMUM_DURATION) {
 				this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - timeSpentPerforming);
 			}
-			
-			if (act.getType().startsWith("pt interaction")){
-				
-				// ###########################################
-				// Ansatz: Hier entweder config reinnehmen oder params anpassen oder config parameter Modul herbie!!!
-				// eg. config.planCalcScore().getUtilityOfLineSwitch()
-				
-				return 0.0;
-			}
-			
-
 		}
 
 		// no actual score is computed here
@@ -240,7 +236,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		this.score += this.getPerformanceScore();
 		this.score += this.getFacilityPenaltiesScore();
 		this.score += this.getNegativeDurationScore();
-
+		this.score += this.getLineSwitchPenaltyScore();
 	}
 
 	@Override
@@ -339,5 +335,12 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	public double getAccumulatedNegativeDuration() {
 		return accumulatedNegativeDuration;
 	}
-
+	
+	public double getLineSwitchPenaltyScore(){
+		double lineSwitchPenalty = 0.0;
+		if (this.lineSwitchPenalty) {			
+			lineSwitchPenalty =  config.planCalcScore().getUtilityOfLineSwitch();
+		}
+		return lineSwitchPenalty;
+	}
 }
