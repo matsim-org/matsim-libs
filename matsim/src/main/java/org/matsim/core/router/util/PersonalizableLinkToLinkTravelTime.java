@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelCostsInvertedNetProxy
+ * PersonalizableLinkToLinkTravelTime
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,33 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 
 /**
- * Proxy for a TravelCost instance to make it work with the 
- * LeastCostPathCalculator working on an inverted network.
- * 
  * @author dgrether
  *
  */
-public class TravelCostsInvertedNetProxy implements TravelCost {
-
-	private Network originalNetwork;
-	private TravelCost travelCosts;
-
-	public TravelCostsInvertedNetProxy(Network originalNetwork,
-			TravelCost travelCosts) {
-		this.originalNetwork = originalNetwork;
-		this.travelCosts = travelCosts;
-	}
-
-	@Override
-	public double getLinkGeneralizedTravelCost(Link link, double time) {
-		//as we have no turning move travel costs defined
-		//the fromLink is sufficient to calculate travelCosts
-		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
-		return this.travelCosts.getLinkGeneralizedTravelCost(fromLink, time);
-	}
+public interface PersonalizableLinkToLinkTravelTime extends LinkToLinkTravelTime,
+		PersonalizableTravelTime {
 
 }

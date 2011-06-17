@@ -21,26 +21,29 @@ package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
  * Proxy for a LinkToLinkTravelTime instance to make it work with the 
  * LeastCostPathCalculator working on an inverted network.
  * @author dgrether
+ * @see org.matsim.core.route.util.NetworkInverter
  *
  */
-public class TravelTimesInvertedNetProxy implements TravelTime {
+public class TravelTimesInvertedNetProxy implements PersonalizableTravelTime {
 
 	private Network originalNetwork;
 	
-	private LinkToLinkTravelTime linkToLinkTravelTime;
+	private PersonalizableLinkToLinkTravelTime linkToLinkTravelTime;
 
-	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
+	public TravelTimesInvertedNetProxy(Network originalNet, PersonalizableLinkToLinkTravelTime l2ltt){
 		this.linkToLinkTravelTime = l2ltt;
 		this.originalNetwork = originalNet;
 	}
 	
 	/**
+	 * In this case the link given as parameter is a link from the inverted network. 
 	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double)
 	 */
 	@Override
@@ -48,6 +51,11 @@ public class TravelTimesInvertedNetProxy implements TravelTime {
 		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
 		Link toLink = this.originalNetwork.getLinks().get(link.getToNode().getId());
 		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
+	}
+
+	@Override
+	public void setPerson(Person person) {
+		this.linkToLinkTravelTime.setPerson(person);
 	}
 
 }

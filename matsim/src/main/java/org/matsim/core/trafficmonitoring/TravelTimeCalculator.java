@@ -39,7 +39,7 @@ import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -61,7 +61,7 @@ import org.matsim.core.utils.collections.Tuple;
  * @author mrieser
  */
 public class TravelTimeCalculator
-		implements PersonalizableTravelTime, LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
+		implements PersonalizableTravelTime, PersonalizableLinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, AgentStuckEventHandler {
 	
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +

@@ -29,17 +29,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.NetworkInverter;
+import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelCostsInvertedNetProxy;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -57,8 +58,6 @@ import org.matsim.core.utils.misc.RouteUtils;
  */
 public class InvertedNetworkLegRouter implements LegRouter{
 
-	private NetworkInverter networkInverter = null;
-	
 	private LeastCostPathCalculator leastCostPathCalculator = null;
 
 	private Network invertedNetwork = null;
@@ -68,30 +67,30 @@ public class InvertedNetworkLegRouter implements LegRouter{
 	private Network network = null;
 
 	public InvertedNetworkLegRouter(Network network, NetworkFactoryImpl routeFactory, 
-			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelCost travelCosts, TravelTime travelTimes) {
+			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelCostCalculatorFactory travelCostCalculatorFactory, 
+			PlanCalcScoreConfigGroup cnScoringGroup, TravelTime travelTimes) {
 		this.network = network;
 		this.routeFactory = routeFactory;
 
-		if (!(travelTimes instanceof LinkToLinkTravelTime)){
-			throw new IllegalStateException("The TravelTime instance must be an instance of LinkToLinkTravelTime" +
-					" but is an instance of " + travelTimes.getClass() + 
-					" if link to link travel times should be used for routing. Set the enableLinkToLinkRouting config parameter in the" +
-					" controler config module!");
+		if (!(travelTimes instanceof PersonalizableLinkToLinkTravelTime)){
+			throw new IllegalStateException("If link to link travel times should be used for routing the TravelTime instance must be an instance of PersonalizableLinkToLinkTravelTime" +
+					" but is an instance of " + travelTimes.getClass() + ". " + 
+					"  Set the enableLinkToLinkRouting config parameter in the" +
+					" controler config module and the calculateLinkToLinkTravelTimes in the travelTimeCalculator module!");
 		}
-
 		
-		this.networkInverter = new NetworkInverter(network);
-		this.invertedNetwork = this.networkInverter.getInvertedNetwork();
+		NetworkInverter networkInverter = new NetworkInverter(network);
+		this.invertedNetwork = networkInverter.getInvertedNetwork();
 		
 		if (leastCostPathCalcFactory instanceof AStarLandmarksFactory){
 			throw new IllegalStateException("Link to link routing is not available for AStarLandmarks routing," +
-					" use the Dijkstra router instead. ");
+					" use the Dijkstra or AStar router instead. ");
 		}
 
-		TravelCostsInvertedNetProxy travelCostsProxy = new TravelCostsInvertedNetProxy(network, travelCosts);
-		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, (LinkToLinkTravelTime) travelTimes);
+		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, (PersonalizableLinkToLinkTravelTime) travelTimes);
+		TravelCost travelCost = travelCostCalculatorFactory.createTravelCostCalculator(travelTimesProxy, cnScoringGroup);
 		
-		this.leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(network, travelCostsProxy, travelTimesProxy);		
+		this.leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(this.invertedNetwork, travelCost, travelTimesProxy);		
 	}
 
 

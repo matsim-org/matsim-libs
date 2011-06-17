@@ -16,6 +16,7 @@ import org.matsim.core.network.NetworkImpl;
  * the end of the real link. Inverted link attributes are copied from toLink
  * of the real network, thus every inverted link actually starts at the
  * location of a real node.
+ * Each link Id of the real network corresponds to a node Id of the inverted network.
  *
  * @author aneumann
  * @author dgrether
@@ -52,7 +53,7 @@ public class NetworkInverter {
 		for (Node node : this.originalNetwork.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
+					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated + 1), // start counting link ids with 1 instead of 0
 							this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
 							outLink.getLength(),
 							outLink.getFreespeed(),
