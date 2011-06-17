@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph;
+package playground.droeder.data.graph.comparison;
 
 import org.apache.commons.math.linear.BlockRealMatrix;
 import org.apache.commons.math.linear.DecompositionSolver;
@@ -42,14 +42,14 @@ public class StraightComparer{
 	private Straight two;
 	private Coord baseA_CD, baseB_CD, baseC_AB, baseD_AB;
 
-	public StraightComparer(Straight one, Straight two, ResultsOfSegmentComparison results){
+	public StraightComparer(Straight one, Straight two){
 		this.one = one;
 		this.two = two;
 		this.computeBases();
-		results.setAvDist(this.getAverageDistance());
-		results.setMatchedLengthOne(this.getTotalMatchedLengthStraightOne());
-		results.setMatchedLengthTwo(this.getTotalMatchedLengthStraightTwo());
-		results.setAngle(this.getAngle());
+//		results.setAvDist(this.getAverageDistance());
+//		results.setMatchedLengthOne(this.getTotalMatchedLengthStraightOne());
+//		results.setMatchedLengthTwo(this.getTotalMatchedLengthStraightTwo());
+//		results.setAngle(this.getAngle());
 	}
 	
 	public boolean straightOneIsUndershot(){

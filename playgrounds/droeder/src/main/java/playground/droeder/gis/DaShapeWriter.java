@@ -294,7 +294,11 @@ public class DaShapeWriter {
 		Feature feature;
 		
 		for(Entry<String, Coord> e: points.entrySet()){
-			feature =  getPointFeature(e.getValue(), e.getKey(), attributes.get(e.getKey()));
+			if(attributes == null){
+				feature =  getPointFeature(e.getValue(), e.getKey(), null);
+			}else{
+				feature =  getPointFeature(e.getValue(), e.getKey(), attributes.get(e.getKey()));
+			}
 			features.add(feature);
 		}
 		

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.droeder.data.graph.MatchingEdge;
-import playground.droeder.data.graph.MatchingEdgeCandidate;
 import playground.droeder.data.graph.algorithms.interfaces.SegmentAlgorithm;
 
 /**
@@ -40,12 +39,12 @@ public class SegmentAlgorithmImpl implements SegmentAlgorithm{
 
 	
 	@Override
-	public List<MatchingEdgeCandidate> run(MatchingEdge ref, List<MatchingEdgeCandidate> cands) {
-		List<MatchingEdgeCandidate> newCands = new ArrayList<MatchingEdgeCandidate>();
+	public List<MatchingEdge> run(MatchingEdge ref, List<MatchingEdge> cands) {
+		List<MatchingEdge> newCands = new ArrayList<MatchingEdge>();
 		
-		for(MatchingEdgeCandidate cand :  cands){
-			cand.setRefEdgeId(ref.getId());
-			cand.compareSegments2RefSegments(ref.getSegments());
+		for(MatchingEdge cand :  cands){
+//			cand.setRefEdgeId(ref.getId());
+//			cand.compareSegments2RefSegments(ref.getSegments());
 		}
 		return newCands;
 	}

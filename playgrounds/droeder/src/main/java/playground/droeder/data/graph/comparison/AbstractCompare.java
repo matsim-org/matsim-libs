@@ -17,18 +17,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph.algorithms.interfaces;
+package playground.droeder.data.graph.comparison;
 
-import java.util.List;
+import org.matsim.api.core.v01.Id;
 
-import playground.droeder.data.graph.MatchingNode;
+import playground.droeder.data.graph.GraphElement;
 
 /**
  * @author droeder
  *
  */
-public interface NodeAlgorithm extends MatchingAlgorithm{
+public abstract class AbstractCompare implements Comparable<AbstractCompare>{
 	
-	public List<MatchingNode> run(MatchingNode ref, List<MatchingNode> candidates);
+	private Id refId;
+	private Id compId;
+	private Double score;
+
+	/**
+	 * calls computeScore() and stores the elementIds
+	 * @param refElement
+	 * @param compareElement
+	 */
+	public AbstractCompare(GraphElement refElement, GraphElement compareElement){
+		this.refId = refElement.getId();
+		this.compId = compareElement.getId();
+		this.score = Double.MAX_VALUE;
+	}
 	
+	public void setScore(Double score){
+		this.score = score;
+	}
+	
+	public Double getScore(){
+		return this.score;
+	}
+	
+	/**
+	 * @return the refId
+	 */
+	public Id getRefId() {
+		return refId;
+	}
+
+	/**
+	 * @return the compId
+	 */
+	public Id getCompId() {
+		return compId;
+	}
+	
+	@Override
+	public int compareTo(AbstractCompare c){
+		return Double.compare(this.getScore(), c.getScore());
+	}
 }

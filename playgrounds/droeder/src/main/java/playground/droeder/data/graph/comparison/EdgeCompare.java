@@ -17,12 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph.algorithms.interfaces;
+package playground.droeder.data.graph.comparison;
+
+import playground.droeder.data.graph.MatchingEdge;
 
 /**
  * @author droeder
  *
  */
-public interface EdgeAlgorithm extends MatchingAlgorithm{
+public class EdgeCompare extends AbstractCompare{
 
+	public EdgeCompare(MatchingEdge refElement, MatchingEdge compareElement) {
+		super(refElement, compareElement);
+	}
+
+	@Override
+	public int compareTo(AbstractCompare o) {
+		return super.compareTo(o);
+	}
 }

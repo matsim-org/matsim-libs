@@ -17,34 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.data.graph.algorithms;
+package playground.droeder.data.graph.comparison;
 
-import java.util.List;
-
-import playground.droeder.data.graph.MatchingGraph;
-import playground.droeder.data.graph.MatchingNode;
-import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
-
+import playground.droeder.data.graph.MatchingSegment;
 
 /**
  * @author droeder
  *
  */
-public class NodeDistAlgo implements NodeAlgorithm{
-	
-	private Double deltaDist;
-	private MatchingGraph candGraph;
+public class SegmentCompare extends AbstractCompare{
 
-	public NodeDistAlgo(Double deltaDist, MatchingGraph candGraph){
-		this.deltaDist = deltaDist;
-		this.candGraph = candGraph;
+	public SegmentCompare(MatchingSegment refElement, MatchingSegment compareElement) {
+		super(refElement, compareElement);
 	}
-	
 
 	@Override
-	public List<MatchingNode> run(MatchingNode ref, List<MatchingNode> candidates) {
-		return this.candGraph.getNearestNodes(ref.getCoord().getX(), ref.getCoord().getY(), deltaDist);
+	public int compareTo(AbstractCompare o) {
+		return super.compareTo(o);
 	}
-
 
 }

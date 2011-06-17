@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.droeder.data.graph;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 
@@ -85,22 +82,22 @@ public class MatchingGraph implements Cloneable{
 	 * @param distance
 	 * @return
 	 */
-	public List<MatchingNode> getNearestNodes(Double x, Double y, Double distance){
+	public Collection<MatchingNode> getNearestNodes(Double x, Double y, Double distance){
 		if(quadtree == null) buildQuadTree();
-		
-		List<MatchingNode> nearest = new LinkedList<MatchingNode>();
-		for(MatchingNode n : quadtree.get(x, y, distance)){
-			n.setDist(new CoordImpl(x, y));
-			nearest.add(n);
-		}
-		Collections.sort(nearest);
-		return nearest;
+		return quadtree.get(x, y, distance);
+//		List<MatchingNode> nearest = new LinkedList<MatchingNode>();
+//		for(MatchingNode n : quadtree.get(x, y, distance)){
+//			n.setDist(new CoordImpl(x, y));
+//			nearest.add(n);
+//		}
+//		Collections.sort(nearest);
+//		return nearest;
 	}
 	
 	public MatchingNode getNearestNode(Double x, Double y){
 		if(quadtree == null) buildQuadTree();
 		MatchingNode n = quadtree.get(x, y);
-		n.setDist(new CoordImpl(x, y));
+//		n.setDist(new CoordImpl(x, y));
 		return n;
 	}
 

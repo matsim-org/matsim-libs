@@ -20,12 +20,16 @@
 package playground.droeder.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -39,16 +43,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaPaths;
 import playground.droeder.data.graph.MatchingEdge;
-import playground.droeder.data.graph.MatchingEdgeCandidate;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
-import playground.droeder.data.graph.algorithms.NodeAngleAlgo;
-import playground.droeder.data.graph.algorithms.NodeDistAlgo;
-import playground.droeder.data.graph.algorithms.SegmentAlgorithmImpl;
-import playground.droeder.data.graph.algorithms.interfaces.EdgeAlgorithm;
-import playground.droeder.data.graph.algorithms.interfaces.MatchingAlgorithm;
-import playground.droeder.data.graph.algorithms.interfaces.NodeAlgorithm;
-import playground.droeder.data.graph.algorithms.interfaces.SegmentAlgorithm;
+import playground.droeder.data.graph.comparison.NodeCompare;
+import playground.droeder.gis.DaShapeWriter;
 
 /**
  * @author droeder
@@ -59,101 +57,93 @@ public class GraphMatching {
 	
 	private MatchingGraph reference;
 	private MatchingGraph matching;
-	
-	private List<EdgeAlgorithm>  edgeAlgos;
-	private List<NodeAlgorithm>  nodeAlgos;
-	private List<SegmentAlgorithm>  segmentAlgos;
+
+	private Double deltaDist;
+	private Double deltaPhi;
 	
 	public GraphMatching(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
 		this.matching = matching;
-		this.initDefaultAlgos();
+		this.deltaDist = Double.MAX_VALUE;
+		this.deltaPhi = Double.MAX_VALUE;
 	}
 	
-	private void initDefaultAlgos() {
-		log.info("add default algorithms...");
-		
-		//node
-		this.nodeAlgos = new ArrayList<NodeAlgorithm>();
-		this.addAlgo(new NodeDistAlgo(500.0, this.matching));
-		this.addAlgo(new NodeAngleAlgo(Math.PI / 2));
-		
-		//segment
-		this.segmentAlgos = new ArrayList<SegmentAlgorithm>();
-		this.addAlgo(new SegmentAlgorithmImpl(0.0)) ;
-
-		//edge
-		this.edgeAlgos = new ArrayList<EdgeAlgorithm>();
+	public void setMaxDist(Double maxDeltaDist){
+		this.deltaDist = maxDeltaDist;
 	}
-
-	/**
-	 * 
-	 */
-	public void topDownMatching() {
-		log.info("starting top-down-Matching...");
+	
+	public void setMaxAngle(Double maxDeltaPhi){
+		this.deltaPhi = maxDeltaPhi;
+	}
+	
+	public void bottomUpMatching() {
+		log.info("starting bottom-up-Matching...");
 		this.nodeMatching();
-		this.segmentMatching();
+//		this.segmentMatching();
 //		this.edgeMatching();
-		log.info("top-down-matching finished...");
+		log.info("bottom-up-matching finished...");
 	}
 
 
 	// ###### NODEMATCHING #######
-	private Map<Id, Id> nodeReference2match;
+	private Map<Id, List<NodeCompare>> nodeReference2match;
 	private List<Id> unmatchedRefNodes;
+
 
 	private void nodeMatching() {
 		log.info("start matching Nodes...");
-		this.nodeReference2match = new HashMap<Id, Id>();
+		this.nodeReference2match = new HashMap<Id, List<NodeCompare>>();
 		this.unmatchedRefNodes = new ArrayList<Id>();
 		
-		// some info
-		log.info("running node-algorithms for every node in the following order:");
-		for(NodeAlgorithm a: this.nodeAlgos){
-			log.info(a.getClass().getName());
-		}
-		
-		List<MatchingNode> candidates = new ArrayList<MatchingNode>(this.matching.getNodes().values()); 
+		List<NodeCompare> candidates;
+		NodeCompare comp;
 
 		// iterate over all nodes
-		for(MatchingNode refNode: this.reference.getNodes().values()){
-			// with every algorithm
-			for(NodeAlgorithm a: this.nodeAlgos){
-				candidates = a.run(refNode, candidates);
+		for(MatchingNode ref: this.reference.getNodes().values()){
+			candidates = new ArrayList<NodeCompare>();
+			//iterate over all possible candidates
+			if(ref.getId().equals(new IdImpl(503013))){
+				System.out.println();
 			}
+			for(MatchingNode match: this.matching.getNearestNodes(ref.getCoord().getX(), ref.getCoord().getY(), this.deltaDist)){
+				comp = new NodeCompare(ref, match);
+				if(ref.getId().equals(new IdImpl(9050301))){
+					System.out.println();
+				}
+				if((comp.getDist() < this.deltaDist) && (comp.getPhi() < this.deltaPhi)){
+					comp.setScore(((comp.getDist() / this.deltaDist) + (comp.getPhi() / this.deltaPhi)) / 2);
+					candidates.add(comp);
+				}
+			}
+			
+			
 			if(candidates.size() > 0){
-				// if there is one or more candidate-Node take the first
-				this.nodeReference2match.put(refNode.getId(), candidates.get(0).getId());
+				Collections.sort(candidates);
+				this.nodeReference2match.put(ref.getId(), candidates);
 			}else{
-				// else, add the refNode to unmatchedList
-				this.unmatchedRefNodes.add(refNode.getId());
+				this.unmatchedRefNodes.add(ref.getId());
 			}
+			
 		}
+		log.info(this.unmatchedRefNodes.size() +" nodes are unmatched!");
 		log.info(this.nodeReference2match.size() + " of " + reference.getNodes().size() + " nodes are matched");
 		log.info("node-matching finished... ");
 	}
 
 	// ##### SEGMENTMATCHING #####
-	private Map<MatchingEdge, List<MatchingEdgeCandidate>> ref2CandEdgesFromMappedNodes;
-	private Map<MatchingEdge, List<MatchingEdgeCandidate>> ref2CandEdgesFromSegmentMatching;
+	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
+	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromSegmentMatching;
 
 	private void segmentMatching() {
 		log.info("start segment matching...");
 		this.computeEdgeCandidatesFromNodes();
 		
-		log.info("running segment-algorithms for every node in the following order:");
-		for(SegmentAlgorithm a: this.segmentAlgos){
-			log.info(a.getClass().getName());
-		}
-		List<MatchingEdgeCandidate> tempCand = null;
-		this.ref2CandEdgesFromSegmentMatching = new HashMap<MatchingEdge, List<MatchingEdgeCandidate>>();
+		List<MatchingEdge> tempCand = null;
+		this.ref2CandEdgesFromSegmentMatching = new HashMap<MatchingEdge, List<MatchingEdge>>();
 		
 		//iterate over all candidate edges 
-		for(Entry<MatchingEdge, List<MatchingEdgeCandidate>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
+		for(Entry<MatchingEdge, List<MatchingEdge>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
 			// with all algorithms
-			for(SegmentAlgorithm a : this.segmentAlgos){
-				tempCand = a.run(e.getKey(), e.getValue());
-			}
 			
 			// if there is at least one candidate, store
 			if(tempCand.size() > 0){
@@ -168,13 +158,13 @@ public class GraphMatching {
 	
 	private void computeEdgeCandidatesFromNodes() {
 		log.info("compute candidate edges from mapped nodes");
-		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdgeCandidate>>();
+		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
 		Id candFrom, candTo, refFrom, refTo;
-		List<MatchingEdgeCandidate> tempCandidates;
+		List<MatchingEdge> tempCandidates;
 		
 		//iterate over all edges
 		for(MatchingEdge ref : this.reference.getEdges().values()){
-			tempCandidates = new ArrayList<MatchingEdgeCandidate>();
+			tempCandidates = new ArrayList<MatchingEdge>();
 			refFrom = ref.getFromNode().getId();
 			refTo = ref.getToNode().getId();
 
@@ -188,7 +178,7 @@ public class GraphMatching {
 
 					// if the refNodes and candNodes where mapped in NodeMatching, store the candidateEdge  
 					if(this.nodeReference2match.get(refFrom).equals(candFrom) && this.nodeReference2match.get(refTo).equals(candTo)){
-						tempCandidates.add(new MatchingEdgeCandidate(cand));
+						tempCandidates.add(cand);
 					}
 				}
 			}
@@ -207,38 +197,70 @@ public class GraphMatching {
 //		
 //	}
 	
-	public Map<Id, Id> getNodeIdRef2Match(){
+	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
 		return this.nodeReference2match;
 	}
 	
-	/**
-	 * add some own implementations of <code>MatchingAlgorithm</code>. The algorithms are called in the order they are added
-	 * @param algo
-	 */
-	public void addAlgo(MatchingAlgorithm algo){
-		if(algo instanceof EdgeAlgorithm){
-			this.edgeAlgos.add((EdgeAlgorithm) algo);
-			log.info(algo.getClass().getSimpleName() + " registered...");
-		}else if(algo instanceof NodeAlgorithm){
-			this.nodeAlgos.add((NodeAlgorithm) algo);
-			log.info(algo.getClass().getSimpleName() + " registered...");
-		}else if(algo instanceof SegmentAlgorithm){
-			this.segmentAlgos.add((SegmentAlgorithm) algo);
-			log.info(algo.getClass().getSimpleName() + " registered...");
+	public void nodes2Shape(String outPath){
+		Map<String, Coord> ref;
+		ref = new HashMap<String, Coord>();
+		
+		Map<String, SortedMap<String, String>> attrib = new HashMap<String, SortedMap<String,String>>();
+		
+		MatchingNode refNode, matchNode;
+		int matched = 0;
+		for(Entry<Id, List<NodeCompare>> e: this.nodeReference2match.entrySet()){
+			refNode = this.reference.getNodes().get(e.getKey());
+			matchNode = this.matching.getNodes().get(e.getValue().get(0).getCompId());
+			
+			ref.put("ref_" + String.valueOf(matched) + "_" + refNode.getId().toString(), refNode.getCoord());
+			ref.put("match_" + String.valueOf(matched) + "_" + matchNode.getId().toString(), matchNode.getCoord());
+			
+			SortedMap<String, String> temp = new TreeMap<String, String>();
+			temp.put("match_nr", String.valueOf(matched));
+			attrib.put("ref_" + String.valueOf(matched) + "_" + refNode.getId().toString(), temp);
+			attrib.put("match_" + String.valueOf(matched) + "_" + matchNode.getId().toString(), temp);
+			matched++;
 		}
+		
+		DaShapeWriter.writeDefaultPoints2Shape(outPath + "matched.shp", "ref", ref, attrib);
+		
+		Map<String, Coord> unmatched = new HashMap<String, Coord>();
+		
+		for(Id id : unmatchedRefNodes){
+			unmatched.put(id.toString(), this.reference.getNodes().get(id).getCoord());
+		}
+		
+		DaShapeWriter.writeDefaultPoints2Shape(outPath + "unmatched.shp", "unmatched", unmatched, null);
 	}
 	
-	/**
-	 * removes all registered algorithms
-	 */
-	public void clearAlgorithms(){
-		this.nodeAlgos.clear();
-		this.segmentAlgos.clear();
-		this.edgeAlgos.clear();
+	public void edges2Shape(String outpath){
+		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
+		SortedMap<Integer, Coord> temp;
+		
+		for(Entry<Id, MatchingEdge> e: this.reference.getEdges().entrySet()){
+			temp = new TreeMap<Integer, Coord>();
+			temp.put(0, e.getValue().getFromNode().getCoord());
+			temp.put(1, e.getValue().getToNode().getCoord());
+			edges.put(e.getKey().toString(), temp);
+		}
+		DaShapeWriter.writeDefaultLineString2Shape(outpath + "refGraph.shp", "refGraph", edges, null);
+
+		edges = new HashMap<String, SortedMap<Integer,Coord>>();
+		for(Entry<Id, MatchingEdge> e: this.matching.getEdges().entrySet()){
+			temp = new TreeMap<Integer, Coord>();
+			temp.put(0, e.getValue().getFromNode().getCoord());
+			temp.put(1, e.getValue().getToNode().getCoord());
+			edges.put(e.getKey().toString(), temp);
+		}
+		DaShapeWriter.writeDefaultLineString2Shape(outpath + "matchingGraph.shp", "matchingGraph", edges, null);
 	}
+	
+	
 
 	public static void main(String[] args){
 		final String PATH = DaPaths.OUTPUT + "bvg09/";
+		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
 		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 		
@@ -290,8 +312,12 @@ public class GraphMatching {
 			}
 		}
 		
-		GraphMatching r = new GraphMatching(v, h);
-		r.topDownMatching();
+		GraphMatching gm = new GraphMatching(v, h);
+		gm.setMaxAngle(Math.PI / 3);
+		gm.setMaxDist(100.0);
+		gm.bottomUpMatching();
+		gm.nodes2Shape(OUT);
+		gm.edges2Shape(OUT);
 //		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
 //			System.out.println(e.getKey() + " " + e.getValue());
 //		}
