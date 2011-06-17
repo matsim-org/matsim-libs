@@ -39,7 +39,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.math.SimpleStatistics;
 
 /**
@@ -183,7 +183,7 @@ public class PathSizeFromPlanChoiceSet {
 					pathSize += legLinearDistChain.get(i) / modeCnt;
 				}
 
-				double legLinearDistChainSum = CollectionSum
+				double legLinearDistChainSum = CollectionMath
 						.getSum(legLinearDistChain);
 				pathSizes[planIdx] = legLinearDistChainSum != 0 ? pathSize
 						/ legLinearDistChainSum : 1/* only 1 stay home Plan */;

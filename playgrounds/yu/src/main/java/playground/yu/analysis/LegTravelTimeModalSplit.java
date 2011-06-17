@@ -49,7 +49,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -218,40 +218,40 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		sw.write("----------------------------------------\n");
 		sw
 				.writeln("the sum of all the traveltimes [s]: "
-						+ CollectionSum.getSum(travelTimes)
+						+ CollectionMath.getSum(travelTimes)
 						+ "\n"
 						+ "the number of all the Trips: "
-						+ CollectionSum.getSum(arrCount)
+						+ CollectionMath.getSum(arrCount)
 						+ "\n"
 						+ "the sum of all the drivers' traveltimes [s]: "
-						+ CollectionSum.getSum(carTravelTimes)
+						+ CollectionMath.getSum(carTravelTimes)
 						+ "\n"
 						+ "the number of all the drivers' Trips: "
-						+ CollectionSum.getSum(carArrCount)
+						+ CollectionMath.getSum(carArrCount)
 						+ "\n"
 						+ "the sum of all the public transit unsers' traveltimes [s]: "
-						+ CollectionSum.getSum(ptTravelTimes)
+						+ CollectionMath.getSum(ptTravelTimes)
 						+ "\n"
 						+ "the number of all the public users' Trips: "
-						+ CollectionSum.getSum(ptArrCount)
+						+ CollectionMath.getSum(ptArrCount)
 						+ "\n"
 						+ "the sum of all the walkers' traveltimes [s]: "
-						+ CollectionSum.getSum(wlkTravelTimes)
+						+ CollectionMath.getSum(wlkTravelTimes)
 						+ "\n"
 						+ "the number of all the walkers' Trips: "
-						+ CollectionSum.getSum(wlkArrCount)
+						+ CollectionMath.getSum(wlkArrCount)
 						+ "\n"
 						+ "the sum of all the cyclists' traveltimes [s]: "
-						+ CollectionSum.getSum(bikeTravelTimes)
+						+ CollectionMath.getSum(bikeTravelTimes)
 						+ "\n"
 						+ "the number of all the cyclists' Trips: "
-						+ CollectionSum.getSum(bikeArrCount)
+						+ CollectionMath.getSum(bikeArrCount)
 						+ "\n"
 						+ "the sum of all the persons with other modes traveltimes [s]: "
-						+ CollectionSum.getSum(othersTravelTimes)
+						+ CollectionMath.getSum(othersTravelTimes)
 						+ "\n"
 						+ "the number of all the persons with other modes Trips: "
-						+ CollectionSum.getSum(othersArrCount));
+						+ CollectionMath.getSum(othersArrCount));
 		sw.close();
 	}
 
@@ -265,20 +265,20 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 				"sum of TravelTimes [s]");
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
 				carTravelTimes);
-		if (CollectionSum.getSum(ptTravelTimes) > 0) {
+		if (CollectionMath.getSum(ptTravelTimes) > 0) {
 			travelTimeSumChart.addSeries(
 					"sum of traveltime of public transit users", xs,
 					ptTravelTimes);
 		}
-		if (CollectionSum.getSum(wlkTravelTimes) > 0) {
+		if (CollectionMath.getSum(wlkTravelTimes) > 0) {
 			travelTimeSumChart.addSeries("sum of traveltime of walkers", xs,
 					wlkTravelTimes);
 		}
-		if (CollectionSum.getSum(bikeTravelTimes) > 0) {
+		if (CollectionMath.getSum(bikeTravelTimes) > 0) {
 			travelTimeSumChart.addSeries("sum of traveltime of cyclists", xs,
 					bikeTravelTimes);
 		}
-		if (CollectionSum.getSum(othersTravelTimes) > 0) {
+		if (CollectionMath.getSum(othersTravelTimes) > 0) {
 			travelTimeSumChart.addSeries(
 					"sum of traveltime of other modes users", xs,
 					othersTravelTimes);
@@ -305,20 +305,20 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 				"average LegTravelTime", "time", "average TravelTimes [s]");
 		avgTravelTimeChart.addSeries("average traveltime of drivers", xs,
 				carTravelTimes);
-		if (CollectionSum.getSum(ptArrCount) > 0) {
+		if (CollectionMath.getSum(ptArrCount) > 0) {
 			avgTravelTimeChart.addSeries(
 					"average traveltime of public transit Users", xs,
 					ptTravelTimes);
 		}
-		if (CollectionSum.getSum(wlkArrCount) > 0) {
+		if (CollectionMath.getSum(wlkArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of walkers", xs,
 					wlkTravelTimes);
 		}
-		if (CollectionSum.getSum(bikeArrCount) > 0) {
+		if (CollectionMath.getSum(bikeArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of cyclists", xs,
 					bikeTravelTimes);
 		}
-		if (CollectionSum.getSum(othersArrCount) > 0) {
+		if (CollectionMath.getSum(othersArrCount) > 0) {
 			avgTravelTimeChart.addSeries("average traveltime of others", xs,
 					othersTravelTimes);
 		}

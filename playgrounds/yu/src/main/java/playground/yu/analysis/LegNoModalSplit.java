@@ -49,7 +49,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.container.Collection2Array;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -155,7 +155,7 @@ public class LegNoModalSplit extends AbstractPersonAlgorithm implements
 		}
 		Collection<Integer> modeCntSet = this.modeCnts.values();
 		writer.writeln("No. of person:\t" + this.personCnt + "\tNo. of Legs:\t"
-				+ CollectionSum.getSum(modeCntSet));
+				+ CollectionMath.getSum(modeCntSet));
 
 		writer.close();
 

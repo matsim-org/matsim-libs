@@ -51,7 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -274,7 +274,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 			for (int i = 0; i < widths.length; i++)
 				widths[i] *= lengths[i];
 
-			return CollectionSum.getSum(widths) / CollectionSum.getSum(lengths);
+			return CollectionMath.getSum(widths) / CollectionMath.getSum(lengths);
 		}
 	}
 

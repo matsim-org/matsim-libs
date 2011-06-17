@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * @author yu
@@ -61,7 +61,7 @@ public class MZ05EtappenReader implements TabularFileHandler {
 	private void append() {
 		personCnt++;
 		eCnt += tmpEtappenDists.size();
-		e_dist_obj += CollectionSum.getSum(tmpEtappenDists);
+		e_dist_obj += CollectionMath.getSum(tmpEtappenDists);
 		eLV += tmpELV;
 		eMIV += tmpEMIV;
 		eOeV += tmpEOeV;
@@ -69,7 +69,7 @@ public class MZ05EtappenReader implements TabularFileHandler {
 		if (belongs2KantonZurich) {
 			personKantonZurichCnt++;
 			eCnt_KantonZurich += tmpEtappenDists.size();
-			e_dist_obj_KantonZurich += CollectionSum.getSum(tmpEtappenDists);
+			e_dist_obj_KantonZurich += CollectionMath.getSum(tmpEtappenDists);
 			eLV_KZ += tmpELV;
 			eMIV_KZ += tmpEMIV;
 			eOeV_KZ += tmpEOeV;

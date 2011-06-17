@@ -40,7 +40,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.analysis.DailyDistance;
 import playground.yu.utils.charts.PieChart;
 import playground.yu.utils.charts.StackedBarChart;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -539,13 +539,13 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
-		if (CollectionSum.getSum(yPt) > 0)
+		if (CollectionMath.getSum(yPt) > 0)
 			chart.addSeries(PT, x, yPt);
-		if (CollectionSum.getSum(yWlk) > 0)
+		if (CollectionMath.getSum(yWlk) > 0)
 			chart.addSeries(WALK, x, yWlk);
-		if (CollectionSum.getSum(yBike) > 0)
+		if (CollectionMath.getSum(yBike) > 0)
 			chart.addSeries(BIKE, x, yBike);
-		if (CollectionSum.getSum(yOthers) > 0)
+		if (CollectionMath.getSum(yOthers) > 0)
 			chart.addSeries(OTHERS, x, yOthers);
 		chart.addSeries(TOTAL, x, yTotal);
 		chart.addMatsimLogo();
@@ -598,13 +598,13 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
-		if (CollectionSum.getSum(yPtFracs) > 0)
+		if (CollectionMath.getSum(yPtFracs) > 0)
 			chart2.addSeries(PT, xs, yPtFracs);
-		if (CollectionSum.getSum(yWlkFracs) > 0)
+		if (CollectionMath.getSum(yWlkFracs) > 0)
 			chart2.addSeries(WALK, xs, yWlkFracs);
-		if (CollectionSum.getSum(yBikeFracs) > 0)
+		if (CollectionMath.getSum(yBikeFracs) > 0)
 			chart2.addSeries(BIKE, xs, yBikeFracs);
-		if (CollectionSum.getSum(yOthersFracs) > 0)
+		if (CollectionMath.getSum(yOthersFracs) > 0)
 			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.addMatsimLogo();
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,

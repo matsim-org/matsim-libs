@@ -23,7 +23,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.analysis.PlanModeJudger;
 import playground.yu.utils.TollTools;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * compute daily En Route/ departures/ arrivals of Zurich and Kanton Zurich
@@ -253,11 +253,11 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		if (CollectionSum.getSum(ptEnRoute) > 0)
+		if (CollectionMath.getSum(ptEnRoute) > 0)
 			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
-		if (CollectionSum.getSum(wlkEnRoute) > 0)
+		if (CollectionMath.getSum(wlkEnRoute) > 0)
 			enRouteChart.addSeries("walkers", xs, wlkEnRoute);
-		if (CollectionSum.getSum(throughEnRoute) > 0)
+		if (CollectionMath.getSum(throughEnRoute) > 0)
 			enRouteChart.addSeries("through", xs, throughEnRoute);
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
@@ -266,11 +266,11 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		if (CollectionSum.getSum(ptDep) > 0)
+		if (CollectionMath.getSum(ptDep) > 0)
 			departChart.addSeries("public transit users", xs, ptDep);
-		if (CollectionSum.getSum(wlkDep) > 0)
+		if (CollectionMath.getSum(wlkDep) > 0)
 			departChart.addSeries("walkers", xs, wlkDep);
-		if (CollectionSum.getSum(throughDep) > 0)
+		if (CollectionMath.getSum(throughDep) > 0)
 			departChart.addSeries("through", xs, throughDep);
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
@@ -278,11 +278,11 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		if (CollectionSum.getSum(ptArr) > 0)
+		if (CollectionMath.getSum(ptArr) > 0)
 			arrChart.addSeries("public transit users", xs, ptArr);
-		if (CollectionSum.getSum(wlkArr) > 0)
+		if (CollectionMath.getSum(wlkArr) > 0)
 			arrChart.addSeries("walkers", xs, wlkArr);
-		if (CollectionSum.getSum(throughArr) > 0)
+		if (CollectionMath.getSum(throughArr) > 0)
 			arrChart.addSeries("through", xs, throughArr);
 		arrChart.addSeries("all agents", xs, arr);
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);

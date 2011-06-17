@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleReader;
 import playground.yu.utils.io.SimpleWriter;
 
@@ -161,19 +161,19 @@ public class ModalSplitLogExtractor {
 
 		XYLineChart chart = new XYLineChart("Mode Choice", "iteration",
 				"leg mode fraction [%]");
-		if (CollectionSum.getSum(carFracs) > 0) {
+		if (CollectionMath.getSum(carFracs) > 0) {
 			chart.addSeries("car", xs, carFracs);
 		}
-		if (CollectionSum.getSum(ptFracs) > 0) {
+		if (CollectionMath.getSum(ptFracs) > 0) {
 			chart.addSeries("pt", xs, ptFracs);
 		}
-		if (CollectionSum.getSum(wlkFracs) > 0) {
+		if (CollectionMath.getSum(wlkFracs) > 0) {
 			chart.addSeries("walk", xs, wlkFracs);
 		}
-		if (CollectionSum.getSum(bikeFracs) > 0) {
+		if (CollectionMath.getSum(bikeFracs) > 0) {
 			chart.addSeries("bike", xs, bikeFracs);
 		}
-		if (CollectionSum.getSum(undefinedFracs) > 0) {
+		if (CollectionMath.getSum(undefinedFracs) > 0) {
 			chart.addSeries("others", xs, undefinedFracs);
 		}
 		chart.saveAsPng(chartFilename, 800, 600);

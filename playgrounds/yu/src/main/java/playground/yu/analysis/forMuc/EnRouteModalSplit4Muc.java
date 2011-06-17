@@ -34,7 +34,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.utils.TollTools;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * compute daily En Route/ departures/ arrivals of Munich Network and Munich
@@ -243,19 +243,19 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		if (CollectionSum.getSum(ptEnRoute) > 0) {
+		if (CollectionMath.getSum(ptEnRoute) > 0) {
 			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
 		}
-		if (CollectionSum.getSum(wlkEnRoute) > 0) {
+		if (CollectionMath.getSum(wlkEnRoute) > 0) {
 			enRouteChart.addSeries("pedestrians", xs, wlkEnRoute);
 		}
-		if (CollectionSum.getSum(bikeEnRoute) > 0) {
+		if (CollectionMath.getSum(bikeEnRoute) > 0) {
 			enRouteChart.addSeries("cyclists", xs, bikeEnRoute);
 		}
-		if (CollectionSum.getSum(rideEnRoute) > 0) {
+		if (CollectionMath.getSum(rideEnRoute) > 0) {
 			enRouteChart.addSeries("ride", xs, rideEnRoute);
 		}
-		if (CollectionSum.getSum(othersEnRoute) > 0) {
+		if (CollectionMath.getSum(othersEnRoute) > 0) {
 			enRouteChart.addSeries("others", xs, othersEnRoute);
 		}
 		enRouteChart.addSeries("all agents", xs, enRoute);
@@ -266,19 +266,19 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		if (CollectionSum.getSum(ptDep) > 0) {
+		if (CollectionMath.getSum(ptDep) > 0) {
 			departChart.addSeries("public transit users", xs, ptDep);
 		}
-		if (CollectionSum.getSum(wlkDep) > 0) {
+		if (CollectionMath.getSum(wlkDep) > 0) {
 			departChart.addSeries("pedestrians", xs, wlkDep);
 		}
-		if (CollectionSum.getSum(bikeDep) > 0) {
+		if (CollectionMath.getSum(bikeDep) > 0) {
 			departChart.addSeries("cyclists", xs, bikeDep);
 		}
-		if (CollectionSum.getSum(rideDep) > 0) {
+		if (CollectionMath.getSum(rideDep) > 0) {
 			departChart.addSeries("ride", xs, rideDep);
 		}
-		if (CollectionSum.getSum(othersDep) > 0) {
+		if (CollectionMath.getSum(othersDep) > 0) {
 			departChart.addSeries("others", xs, othersDep);
 		}
 		departChart.addSeries("all agents", xs, dep);
@@ -288,19 +288,19 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		if (CollectionSum.getSum(ptArr) > 0) {
+		if (CollectionMath.getSum(ptArr) > 0) {
 			arrChart.addSeries("public transit users", xs, ptArr);
 		}
-		if (CollectionSum.getSum(wlkArr) > 0) {
+		if (CollectionMath.getSum(wlkArr) > 0) {
 			arrChart.addSeries("pedestrians", xs, wlkArr);
 		}
-		if (CollectionSum.getSum(bikeArr) > 0) {
+		if (CollectionMath.getSum(bikeArr) > 0) {
 			arrChart.addSeries("cyclists", xs, bikeArr);
 		}
-		if (CollectionSum.getSum(rideArr) > 0) {
+		if (CollectionMath.getSum(rideArr) > 0) {
 			arrChart.addSeries("ride", xs, rideArr);
 		}
-		if (CollectionSum.getSum(othersArr) > 0) {
+		if (CollectionMath.getSum(othersArr) > 0) {
 			arrChart.addSeries("others", xs, othersArr);
 		}
 		arrChart.addSeries("all agents", xs, arr);

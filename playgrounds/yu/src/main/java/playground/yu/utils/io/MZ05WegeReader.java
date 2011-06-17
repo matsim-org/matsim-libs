@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * @author yu
@@ -58,11 +58,11 @@ public class MZ05WegeReader implements TabularFileHandler {
 	private void append() {
 		personCnt++;
 		wCnt += tmpWegeDists.size();
-		w_dist_obj1 += CollectionSum.getSum(tmpWegeDists);
+		w_dist_obj1 += CollectionMath.getSum(tmpWegeDists);
 		if (belongs2KantonZurich) {
 			personKantonZurichCnt++;
 			wKantonZurichCnt += tmpWegeDists.size();
-			w_dist_obj1KantonZurich += CollectionSum.getSum(tmpWegeDists);
+			w_dist_obj1KantonZurich += CollectionMath.getSum(tmpWegeDists);
 			wLV_KZ += tmpWLV;
 			wMIV_KZ += tmpWMIV;
 			wOeV_KZ += tmpWOeV;

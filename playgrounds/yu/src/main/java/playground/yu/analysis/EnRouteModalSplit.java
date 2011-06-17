@@ -53,7 +53,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * @author mrieser
@@ -380,13 +380,13 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		XYLineChart enRouteChart = new XYLineChart("Leg Histogramm - En Route",
 				"time", "agents en route from " + scenario);
 		enRouteChart.addSeries("drivers", xs, carEnRoute);
-		if (CollectionSum.getSum(ptEnRoute) > 0)
+		if (CollectionMath.getSum(ptEnRoute) > 0)
 			enRouteChart.addSeries("public transit users", xs, ptEnRoute);
-		if (CollectionSum.getSum(wlkEnRoute) > 0)
+		if (CollectionMath.getSum(wlkEnRoute) > 0)
 			enRouteChart.addSeries("walkers", xs, wlkEnRoute);
-		if (CollectionSum.getSum(bikeEnRoute) > 0)
+		if (CollectionMath.getSum(bikeEnRoute) > 0)
 			enRouteChart.addSeries("cyclist", xs, bikeEnRoute);
-		if (CollectionSum.getSum(othersEnRoute) > 0)
+		if (CollectionMath.getSum(othersEnRoute) > 0)
 			enRouteChart.addSeries("others", xs, othersEnRoute);
 		enRouteChart.addSeries("all agents", xs, enRoute);
 		enRouteChart.saveAsPng(filename + "enRoute.png", 1024, 768);
@@ -395,13 +395,13 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				"Leg Histogramm - Departures", "time", "departing agents from "
 						+ scenario);
 		departChart.addSeries("drivers", xs, carDep);
-		if (CollectionSum.getSum(ptDep) > 0)
+		if (CollectionMath.getSum(ptDep) > 0)
 			departChart.addSeries("public transit users", xs, ptDep);
-		if (CollectionSum.getSum(wlkDep) > 0)
+		if (CollectionMath.getSum(wlkDep) > 0)
 			departChart.addSeries("walkers", xs, wlkDep);
-		if (CollectionSum.getSum(bikeDep) > 0)
+		if (CollectionMath.getSum(bikeDep) > 0)
 			departChart.addSeries("cyclist", xs, bikeDep);
-		if (CollectionSum.getSum(othersDep) > 0)
+		if (CollectionMath.getSum(othersDep) > 0)
 			departChart.addSeries("others", xs, othersDep);
 		departChart.addSeries("all agents", xs, dep);
 		departChart.saveAsPng(filename + "departures.png", 1024, 768);
@@ -409,13 +409,13 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		XYLineChart arrChart = new XYLineChart("Leg Histogramm - Arrivals",
 				"time", "arriving agents from " + scenario);
 		arrChart.addSeries("drivers", xs, carArr);
-		if (CollectionSum.getSum(ptArr) > 0)
+		if (CollectionMath.getSum(ptArr) > 0)
 			arrChart.addSeries("public transit users", xs, ptArr);
-		if (CollectionSum.getSum(wlkArr) > 0)
+		if (CollectionMath.getSum(wlkArr) > 0)
 			arrChart.addSeries("walkers", xs, wlkArr);
-		if (CollectionSum.getSum(bikeArr) > 0)
+		if (CollectionMath.getSum(bikeArr) > 0)
 			arrChart.addSeries("cyclist", xs, bikeArr);
-		if (CollectionSum.getSum(othersArr) > 0)
+		if (CollectionMath.getSum(othersArr) > 0)
 			arrChart.addSeries("others", xs, othersArr);
 		arrChart.addSeries("all agents", xs, arr);
 		arrChart.saveAsPng(filename + "arrivals.png", 1024, 768);

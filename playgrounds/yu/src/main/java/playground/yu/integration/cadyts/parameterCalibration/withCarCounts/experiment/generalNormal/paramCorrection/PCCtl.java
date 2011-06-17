@@ -21,7 +21,6 @@
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -34,10 +33,8 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.yu.counts.CntSimCap4Chart;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.PlansScoring4PC_mnl;
 
 /**
@@ -57,14 +54,12 @@ public class PCCtl extends BseParamCalibrationControler {
 		// config = ConfigUtils.loadConfig(args[0]);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
-		addControlerListener(new CntSimCap4Chart());
 	}
 
 	public PCCtl(Config config) {
 		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
-		addControlerListener(new CntSimCap4Chart());
 	}
 
 	/**
@@ -175,14 +170,5 @@ public class PCCtl extends BseParamCalibrationControler {
 		}
 
 		return manager;
-	}
-
-	/** @param args */
-	public static void main(final String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0]);
-		Controler ctl = new PCCtl(config);
-		ctl.setCreateGraphs(false);
-		ctl.setOverwriteFiles(true);
-		ctl.run();
 	}
 }

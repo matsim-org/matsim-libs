@@ -41,7 +41,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.analysis.forZrh.Analysis4Zrh.ActTypeZrh;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -386,24 +386,24 @@ public class DailyEnRouteTime extends DailyAnalysis {
 
 		double[] ptDestinationTime = new double[] { ptWorkTime, ptEducTime,
 				ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime };
-		if (CollectionSum.getSum(ptDestinationTime) > 0)
+		if (CollectionMath.getSum(ptDestinationTime) > 0)
 			barChart.addSeries("pt", ptDestinationTime);
 
 		double[] wlkDestinationTime = new double[] { wlkWorkTime, wlkEducTime,
 				wlkShopTime, wlkLeisTime, wlkHomeTime, wlkOtherTime };
-		if (CollectionSum.getSum(wlkDestinationTime) > 0)
+		if (CollectionMath.getSum(wlkDestinationTime) > 0)
 			barChart.addSeries("walk", wlkDestinationTime);
 
 		double[] bikeDestinationTime = new double[] { bikeWorkTime,
 				bikeEducTime, bikeShopTime, bikeLeisTime, bikeHomeTime,
 				bikeOtherTime };
-		if (CollectionSum.getSum(bikeDestinationTime) > 0)
+		if (CollectionMath.getSum(bikeDestinationTime) > 0)
 			barChart.addSeries(BIKE, bikeDestinationTime);
 
 		double[] othersDestinationTime = new double[] { othersWorkTime,
 				othersEducTime, othersShopTime, othersLeisTime, othersHomeTime,
 				othersOtherTime };
-		if (CollectionSum.getSum(othersDestinationTime) > 0)
+		if (CollectionMath.getSum(othersDestinationTime) > 0)
 			barChart.addSeries(OTHERS, othersDestinationTime);
 
 		barChart.addMatsimLogo();
@@ -431,13 +431,13 @@ public class DailyEnRouteTime extends DailyAnalysis {
 				"Daily En Route Time in min",
 				"fraction of persons with daily en route time longer than x... in %");
 		chart.addSeries(CAR, x, yCar);
-		if (CollectionSum.getSum(yPt) > 0)
+		if (CollectionMath.getSum(yPt) > 0)
 			chart.addSeries("pt", x, yPt);
-		if (CollectionSum.getSum(yWlk) > 0)
+		if (CollectionMath.getSum(yWlk) > 0)
 			chart.addSeries("walk", x, yWlk);
-		if (CollectionSum.getSum(yBike) > 0)
+		if (CollectionMath.getSum(yBike) > 0)
 			chart.addSeries(BIKE, x, yBike);
-		if (CollectionSum.getSum(yOthers) > 0)
+		if (CollectionMath.getSum(yOthers) > 0)
 			chart.addSeries(OTHERS, x, yOthers);
 		chart.addSeries("total", x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyEnRouteTimeDistribution.png",
@@ -484,13 +484,13 @@ public class DailyEnRouteTime extends DailyAnalysis {
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
 				"leg Duration [min]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
-		if (CollectionSum.getSum(yPtFracs) > 0)
+		if (CollectionMath.getSum(yPtFracs) > 0)
 			chart2.addSeries("pt", xs, yPtFracs);
-		if (CollectionSum.getSum(yWlkFracs) > 0)
+		if (CollectionMath.getSum(yWlkFracs) > 0)
 			chart2.addSeries("walk", xs, yWlkFracs);
-		if (CollectionSum.getSum(yBikeFracs) > 0)
+		if (CollectionMath.getSum(yBikeFracs) > 0)
 			chart2.addSeries(BIKE, xs, yBikeFracs);
-		if (CollectionSum.getSum(yOthersFracs) > 0)
+		if (CollectionMath.getSum(yOthersFracs) > 0)
 			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();

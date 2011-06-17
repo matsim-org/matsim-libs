@@ -44,7 +44,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import playground.yu.analysis.forZrh.Analysis4Zrh.ActTypeZrh;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -414,25 +414,25 @@ public class DailyDistance extends DailyAnalysis {
 
 		double[] ptDestination = new double[] { ptWorkDist, ptEducDist,
 				ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist };
-		if (CollectionSum.getSum(ptDestination) > 0)
+		if (CollectionMath.getSum(ptDestination) > 0)
 			barChart.addSeries(PT, ptDestination);
 
 		double[] wlkDestination = new double[] { wlkWorkDist, wlkEducDist,
 				wlkShopDist, wlkLeisDist, wlkHomeDist, wlkOtherDist };
-		if (CollectionSum.getSum(wlkDestination) > 0)
+		if (CollectionMath.getSum(wlkDestination) > 0)
 			barChart.addSeries("walk (sum of 1.5 linear distances)",
 					wlkDestination);
 
 		double[] bikeDestination = new double[] { bikeWorkDist, bikeEducDist,
 				bikeShopDist, bikeLeisDist, bikeHomeDist, bikeOtherDist };
-		if (CollectionSum.getSum(bikeDestination) > 0)
+		if (CollectionMath.getSum(bikeDestination) > 0)
 			barChart
 					.addSeries("bike (sum of linear distances", bikeDestination);
 
 		double[] othersDestination = new double[] { othersWorkDist,
 				othersEducDist, othersShopDist, othersLeisDist, othersHomeDist,
 				othersOtherDist };
-		if (CollectionSum.getSum(othersDestination) > 0)
+		if (CollectionMath.getSum(othersDestination) > 0)
 			barChart.addSeries("others (sum of linear distances)",
 					othersDestination);
 
@@ -462,13 +462,13 @@ public class DailyDistance extends DailyAnalysis {
 				"Daily Distance in km",
 				"fraction of persons with daily distance bigger than x... in %");
 		chart.addSeries(CAR, x, yCar);
-		if (CollectionSum.getSum(yPt) > 0)
+		if (CollectionMath.getSum(yPt) > 0)
 			chart.addSeries(PT, x, yPt);
-		if (CollectionSum.getSum(yWlk) > 0)
+		if (CollectionMath.getSum(yWlk) > 0)
 			chart.addSeries(WALK, x, yWlk);
-		if (CollectionSum.getSum(yBike) > 0)
+		if (CollectionMath.getSum(yBike) > 0)
 			chart.addSeries(BIKE, x, yBike);
-		if (CollectionSum.getSum(yOthers) > 0)
+		if (CollectionMath.getSum(yOthers) > 0)
 			chart.addSeries("other", x, yOthers);
 		chart.addSeries(TOTAL, x, yTotal);
 		chart.saveAsPng(outputFilename + "dailyDistanceDistribution.png", 800,
@@ -520,13 +520,13 @@ public class DailyDistance extends DailyAnalysis {
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Distance",
 				"leg Distance [km]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
-		if (CollectionSum.getSum(yPtFracs) > 0)
+		if (CollectionMath.getSum(yPtFracs) > 0)
 			chart2.addSeries(PT, xs, yPtFracs);
-		if (CollectionSum.getSum(yWlkFracs) > 0)
+		if (CollectionMath.getSum(yWlkFracs) > 0)
 			chart2.addSeries(WALK, xs, yWlkFracs);
-		if (CollectionSum.getSum(yBikeFracs) > 0)
+		if (CollectionMath.getSum(yBikeFracs) > 0)
 			chart2.addSeries(BIKE, xs, yBikeFracs);
-		if (CollectionSum.getSum(yOthersFracs) > 0)
+		if (CollectionMath.getSum(yOthersFracs) > 0)
 			chart2.addSeries(OTHERS, xs, yOthersFracs);
 		chart2.saveAsPng(outputFilename + "legDistanceModalSplit2.png", 800,
 				600);

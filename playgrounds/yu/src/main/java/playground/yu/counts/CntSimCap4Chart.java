@@ -109,6 +109,8 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 				.getFirstIteration();
 		Map<Id, Count> countsMap = ctl.getCounts().getCounts();
 		double[] xs = Collection2Array.toDoubleArray(iters);
+		iters.clear();
+
 		Network net = ctl.getNetwork();
 
 		int volIdx = 0;

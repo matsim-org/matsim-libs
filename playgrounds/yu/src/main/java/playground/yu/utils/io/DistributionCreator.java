@@ -37,7 +37,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 
 import playground.yu.utils.charts.TimeScatterChart;
 import playground.yu.utils.container.Collection2Array;
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * a small tool, which is able to create .txt-file or chart for a distribution.
@@ -163,7 +163,7 @@ public class DistributionCreator {
 		double xs[] = Collection2Array.toArrayFromDouble(dataMap.keySet());
 
 		Collection<Integer> values = dataMap.values();
-		double sum = CollectionSum.getSum(values);
+		double sum = CollectionMath.getSum(values);
 		Iterator<Integer> it = values.iterator();
 		double ys[] = new double[xs.length];
 		for (int i = 0; it.hasNext(); i++) {
@@ -191,7 +191,7 @@ public class DistributionCreator {
 			Map<Double, Integer> aDataMap = dataMaps.get(series);
 			double xs[] = Collection2Array.toArrayFromDouble(aDataMap.keySet());
 			Collection<Integer> values = aDataMap.values();
-			double sum = CollectionSum.getSum(values);
+			double sum = CollectionMath.getSum(values);
 			Iterator<Integer> it = values.iterator();
 			double ys[] = new double[xs.length];
 			for (int i = 0; it.hasNext(); i++) {
@@ -305,7 +305,7 @@ public class DistributionCreator {
 	public void writePercent(String filename) {
 		SimpleWriter writer = new SimpleWriter(filename);
 		writer.writeln("value+\tfraction");
-		double sum = CollectionSum.getSum(dataMap.values());
+		double sum = CollectionMath.getSum(dataMap.values());
 		for (Entry<Double, Integer> entry : dataMap.entrySet()) {
 			writer.writeln(entry.getKey() + "\t" + (double) entry.getValue()
 					/ sum * 100d);
@@ -336,7 +336,7 @@ public class DistributionCreator {
 			writer.writeln(key + "\nvalue+\tfraction");
 
 			Map<Double, Integer> localDataMap = dataMaps.get(key);
-			double sum = CollectionSum.getSum(localDataMap.values());
+			double sum = CollectionMath.getSum(localDataMap.values());
 			// TODO sum
 
 			for (Entry<Double, Integer> entry : localDataMap.entrySet()) {

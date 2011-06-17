@@ -42,7 +42,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.utils.container.CollectionSum;
+import playground.yu.utils.container.CollectionMath;
 
 /**
  * @author yu
@@ -150,7 +150,7 @@ public class ScoreVariance extends AbstractPersonAlgorithm implements
 	}
 
 	public static double getAverage(final double[] inputData) {
-		return inputData == null || inputData.length == 0 ? -1 : CollectionSum
+		return inputData == null || inputData.length == 0 ? -1 : CollectionMath
 				.getSum(inputData)
 				/ inputData.length;
 	}
