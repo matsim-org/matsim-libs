@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.cottbus;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
@@ -36,6 +37,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class CottbusFansControlerListener implements BeforeMobsimListener{
 
+	private static final Logger log = Logger.getLogger(CottbusFansControlerListener.class);
+	
 	private Population pop;
 	private Random random;
 	
@@ -52,7 +55,9 @@ public class CottbusFansControlerListener implements BeforeMobsimListener{
 		PlanAlgorithm pcr = c.createRoutingAlgorithm();
 		for (Person p : pop.getPersons().values()){
 			if (random.nextDouble() < 0.1){
+//				log.debug(((LinkNetworkRoute)((Leg)p.getSelectedPlan().getPlanElements().get(1)).getRoute()).getLinkIds());
 				pcr.run(p.getSelectedPlan());
+//				log.debug(((LinkNetworkRoute)((Leg)p.getSelectedPlan().getPlanElements().get(1)).getRoute()).getLinkIds());
 			}
 		}
 	}
