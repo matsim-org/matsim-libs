@@ -159,7 +159,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("startPickup=\"" + s.getPickupTimeWindow().getStart() + "\" ");
 		writer.write("endPickup=\""  + s.getPickupTimeWindow().getEnd() + "\" ");
 		writer.write("startDelivery=\"" + s.getDeliveryTimeWindow().getStart() + "\" ");
-		writer.write("endDelivery=\"" + s.getDeliveryTimeWindow().getEnd() + "\">\n");
+		writer.write("endDelivery=\"" + s.getDeliveryTimeWindow().getEnd() + "\"/>\n");
 	}
 
 	private Id createId() {
