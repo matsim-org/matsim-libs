@@ -21,7 +21,7 @@ import vrp.basics.VrpUtils;
 /**
  * This algorithm is basically the implementation of 
  * Schrimpf G., J. Schneider, Hermann Stamm-Wilbrandt and Gunter Dueck (2000): Record Breaking Optimization Results Using 
- * the Ruin and Recreate Principle, Journal of Computational Physics 159, 139Ð171 (2000).
+ * the Ruin and Recreate Principle, Journal of Computational Physics 159, 139-171 (2000).
  * 
  * @author stefan schroeder
  *
