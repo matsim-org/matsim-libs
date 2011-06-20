@@ -23,12 +23,17 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.thibautd.jointtripsoptimizer.population.CliquesXmlReader;
+import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsReader;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
@@ -40,6 +45,11 @@ import playground.thibautd.jointtripsoptimizer.run.JointControler;
  */
 public class JointControlerUtils {
 	/**
+	 * Creates a {@link JointControler} instance from a configFile.
+	 * Some of the loading methods are workarounds, and may not work with all
+	 * scenarios. Particularly, "special" settings as households, transit, vehicles,
+	 * lanes or signal systems are not handled.
+	 *
 	 * @return a JointControler instance, ready for running.
 	 */
 	public static Controler createControler(final String configFile) {
@@ -62,7 +72,12 @@ public class JointControlerUtils {
 		scenario = new ScenarioWithCliques(config);
 
 		//(new ScenarioLoaderImpl(scenario)).loadScenario();
-		ScenarioUtils.loadScenario(scenario);
+		// ScenarioUtils.loadScenario(scenario);
+		// Cannot load full joint information when using default loader: load manually.
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
+		loader.loadNetwork();
+		loader.loadActivityFacilities();
+		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
 
 		try {
 			new CliquesXmlReader(scenario).parse();

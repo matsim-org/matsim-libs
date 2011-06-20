@@ -47,6 +47,13 @@ public class Clique implements Person {
 	private static final Logger log =
 		Logger.getLogger(Clique.class);
 
+	// import/export package visible fields
+	static final String PLAN_TYPE_SEP = "_";
+	static final String PLAN_TYPE_PREFIX = "linkedPlan";
+	static final String PLAN_TYPE_REGEXP = PLAN_TYPE_PREFIX + PLAN_TYPE_SEP + ".*";
+
+	private int planCount = 0;
+
 	// private fields
 	private final Id id;
 	private final Map<Id,Person> members;
@@ -241,6 +248,9 @@ public class Clique implements Person {
 		}
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// plan import/export
+	// /////////////////////////////////////////////////////////////////////////
 	/**
 	 * Builds a joint plan based on the (presumed unique) plans of the members.
 	 * To call immediately after having added all members.
@@ -250,37 +260,97 @@ public class Clique implements Person {
 	 */
 	public void buildJointPlanFromIndividualPlans() {
 		if (this.plans.isEmpty()) {
-			Map<Id, PlanImpl> individualPlans = new HashMap<Id, PlanImpl>();
+			String defaultType = "a";
+			String selected = defaultType;
+			Map<String, Map<Id, PlanImpl>> individualPlans = new HashMap<String, Map<Id, PlanImpl>>();
 			JointPlan newJointPlan;
 			PlanImpl currentPlan;
+			List<? extends Plan> memberPlans;
+			boolean toSynchronize = true;
 			
 			for (Person member : this.getMembers().values()) {
-				if (member.getPlans().size()>1) {
-					log.warn("only keeping the selected plan for agent "+member.getId()+" with multiple plans");
-					currentPlan = (PlanImpl) member.getSelectedPlan();
-				} else {
-					currentPlan = (PlanImpl) member.getPlans().get(0);
+				memberPlans = member.getPlans();
+
+				if (memberPlans.size()>1) {
+					if ( (((PlanImpl) memberPlans.get(0)).getType() == null) ||
+							(!((PlanImpl) memberPlans.get(0)).getType().matches(PLAN_TYPE_REGEXP)) ) {
+						log.warn("only keeping the selected plan for agent "+
+								member.getId()+" with multiple plans");
+						currentPlan = (PlanImpl) member.getSelectedPlan();
+						getPlanMap(defaultType, individualPlans)
+							.put(member.getId(), currentPlan);
+					}
+					else {
+						// assume that if a plan as a proper type, the others do
+						for (Plan currentMemberPlan : memberPlans) {
+							currentPlan = (PlanImpl) currentMemberPlan;
+							getPlanMap(currentPlan.getType(), individualPlans)
+								.put(member.getId(), currentPlan);
+							if (currentPlan.isSelected()) {
+								selected = currentPlan.getType();
+							}
+						}
+						// assume that if several plans are given, they are synchronized
+						// (TODO pass by the config)
+						toSynchronize = false;
+					}
 				}
-				individualPlans.put(member.getId(), currentPlan);
+				else {
+					currentPlan = (PlanImpl) memberPlans.get(0);
+					getPlanMap(defaultType, individualPlans)
+						.put(member.getId(), currentPlan);
+				}
 			}
 			
 			this.clearIndividualPlans();
 			this.plans.clear();
-			newJointPlan = new JointPlan(this, individualPlans);
-			//TODO: use this.addPlan (when implemented)
-			this.plans.add(newJointPlan);
-			this.setSelectedPlan(newJointPlan);
-		} else {
+
+			for (Map.Entry<String, Map<Id, PlanImpl>> entry : individualPlans.entrySet()) {
+				newJointPlan = new JointPlan(
+						this,
+						entry.getValue(),
+						true, //add at individual level
+						toSynchronize);
+				//TODO: use this.addPlan (when implemented)
+				this.plans.add(newJointPlan);
+				if (entry.getKey().equals(selected)) {
+					this.setSelectedPlan(newJointPlan);
+				}
+			}
+		}
+		else {
 			throw new UnsupportedOperationException(
 					"Clique.buildJointPlanFromIndividualPlans() cannot be ran "+
 					"when the clique already contains joint plans.");
 		}
 	}
 
+	private Map<Id, PlanImpl> getPlanMap(
+			final String type,
+			final Map<String, Map<Id, PlanImpl>> individualPlans) {
+		Map<Id, PlanImpl> out = individualPlans.get(type);
+		
+		if (out == null) {
+			out = new HashMap<Id, PlanImpl>();
+			individualPlans.put(type, out);
+		}
+
+		return out;
+	}
+
 	private void clearIndividualPlans() {
 		for (Person member : this.getMembers().values()) {
 			member.getPlans().clear();
 		}
+	}
+
+	/**
+	 * @return a type, meant to identify individual plans pertaining to the same
+	 * joint plan at import.
+	 */
+	/*package*/ String getNextIndividualPlanType() {
+		planCount++;
+		return PLAN_TYPE_PREFIX + PLAN_TYPE_SEP + planCount;
 	}
 }
 

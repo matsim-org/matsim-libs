@@ -72,6 +72,7 @@ public class JointPlan implements Plan {
 	private final ScoresAggregator aggregator;
 	// for replanning modules to be able to replicate aggregator
 	private final ScoresAggregatorFactory aggregatorFactory;
+	private final String individualPlanType;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -126,7 +127,8 @@ public class JointPlan implements Plan {
 			final boolean toSynchronize,
 			final ScoresAggregatorFactory aggregatorFactory) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
-		Plan currentPlan;
+		PlanImpl currentPlan;
+		Plan currentImportedPlan;
 		this.clique = clique;
 
 		// in the plan file, pu activities are numbered. If two pick ups have
@@ -143,8 +145,9 @@ public class JointPlan implements Plan {
 		//TODO: check for consistency (referenced IDs, etc)
 		for (Id id: plans.keySet()) {
 			currentPlan = new PlanImpl(this.clique.getMembers().get(id));
+			currentImportedPlan = plans.get(id);
 
-			for (PlanElement pe : plans.get(id).getPlanElements()) {
+			for (PlanElement pe : currentImportedPlan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					currentActivity = new JointActivity((Activity) pe, 
 							this.clique.getMembers().get(id));
@@ -178,6 +181,8 @@ public class JointPlan implements Plan {
 			}
 			this.individualPlans.put(id, currentPlan);
 
+			currentPlan.setScore(currentImportedPlan.getScore());
+
 			if (addAtIndividualLevel) {
 				this.clique.getMembers().get(id).addPlan(currentPlan);
 			}
@@ -198,6 +203,7 @@ public class JointPlan implements Plan {
 		}
 
 		this.constructLegsMap();
+		this.individualPlanType = this.setIndividualPlanTypes();
 
 		if (toSynchronize) {
 			this.synchronize();
@@ -206,6 +212,26 @@ public class JointPlan implements Plan {
 		this.aggregatorFactory = aggregatorFactory;
 		this.aggregator =
 			aggregatorFactory.createScoresAggregator(this.individualPlans.values());
+	}
+
+	/**
+	 * If the plan is to be added a the individual level, this method attach
+	 * it a type identifying all individual plans pertaining to the same joint
+	 * plan.
+	 *
+	 * @return the type used
+	 */
+	private String  setIndividualPlanTypes() {
+		if (this.setAtIndividualLevel) {
+			String type = this.clique.getNextIndividualPlanType();
+
+			for (Plan plan :  this.individualPlans.values()) {
+				((PlanImpl) plan).setType(type);
+			}
+
+			return type;
+		}
+		return null;
 	}
 
 	private void synchronize() {
@@ -457,12 +483,15 @@ public class JointPlan implements Plan {
 
 	/**
 	 * Transforms this plan so that it is identical to the argument plan.
-	 * Used in the replanning module.
+	 * Used in the replanning module.<BR>
 	 * Caution: this does NOT make a copy of the plan, but makes the internal
 	 * individual plan references to be equal. This is OK in the case of the
-	 * relanning module (where the argument plan is just a local instance),
+	 * replanning module (where the argument plan is just a local instance),
 	 * but could lead to strange results if the two plan are used in different
-	 * places.
+	 * places.<BR>
+	 * Caution 2: if the plan is set at individual level, the types of the new
+	 * individual plans are set identical to the "old" ones.
+	 *
 	 */
 	public void resetFromPlan(JointPlan plan) {
 		if (plan.getClique() != this.clique) {
@@ -470,12 +499,15 @@ public class JointPlan implements Plan {
 					" a plan of a different clique is unsupported.");
 		}
 		if (this.setAtIndividualLevel) {
+			PlanImpl currentPlan;
 			for (Person currentIndividual : this.clique.getMembers().values()) {
 				// remove the corresponding plan at the individual level
 				currentIndividual.getPlans().remove(
 						this.individualPlans.get(currentIndividual.getId()));
 				// replace it by the new plan
-				currentIndividual.addPlan(plan.getIndividualPlan(currentIndividual));
+				currentPlan = (PlanImpl) plan.getIndividualPlan(currentIndividual);
+				currentPlan.setType(this.individualPlanType);
+				currentIndividual.addPlan(currentPlan);
 				// set it as selected if it was the selected plan
 				if (this.isSelected()) {
 					// no possibility to set the selected plan with the Person interface
