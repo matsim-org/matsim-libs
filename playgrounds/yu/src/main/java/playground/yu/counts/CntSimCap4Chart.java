@@ -94,16 +94,23 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 				.entrySet()) {
 			Id linkId = countEntry.getKey();
 			int[] vols = volsAnalyzer.getVolumesForLink(linkId);
-			for (int i = 0; i < vols.length; i++) {
-				System.out.println("vols[" + i + "] =\t" + vols[i]);
+
+			if (vols == null) {
+				vols = new int[24];
 			}
+
+			// for (int i = 0; i < vols.length; i++) {
+			// System.out.println("vols[" + i + "] =\t" + vols[i]);
+			// }
 			// timeBin is 3600d in Controler
 			for (Integer time : countEntry.getValue().getVolumes().keySet()) {
-				System.out.println("idx =\t" + idx
-						+ "\nthis.volumes(List<<List<Double>>) =\t" + volumes);
+				// System.out.println("idx =\t" + idx
+				// + "\nthis.volumes(List<<List<Double>>) =\t" + volumes);
+
 				volumes.get(idx++).add(vols[time - 1] * cntScaleFac);
-				System.out.println("idx =\t" + idx
-						+ "\nthis.volumes(List<<List<Double>>) =\t" + volumes);
+
+				// System.out.println("idx =\t" + idx
+				// + "\nthis.volumes(List<<List<Double>>) =\t" + volumes);
 			}
 		}
 	}
