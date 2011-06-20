@@ -22,6 +22,7 @@ package playground.thibautd.gaparamoptimizer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -78,16 +79,17 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int P_NON_UNIFORM_GENE = 9;
 
 	// bounds
-	private static final int MAX_POP_SIZE = 200;
+	private static final int MAX_POP_SIZE = 100;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	private static final int MAX_WINDOW_SIZE = 20;
-	private static final double MAX_NON_UNIFORM = 30d;
+	private static final double MAX_NON_UNIFORM = 50d;
 
 	// instance fields
 	private final List<JointPlan> plans;
 	private final int nPlans;
 	private JPOForOptimization jpoAlgo;
 	private final Configuration jgapConfig;
+	private final int[] cliqueSizes;
 
 	public ParameterOptimizerFitness(
 			final Configuration jgapConfig,
@@ -99,11 +101,18 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			final String iterationOutputPath
 			) {
 		this.jgapConfig = jgapConfig;
-		this.plans = plans;
+		this.plans = Collections.unmodifiableList(plans);
 		this.nPlans = plans.size();
 		this.jpoAlgo = new JPOForOptimization(
 				scoringFunctionFactory, legTravelTimeEstimatorFactory, routingAlgorithm,
 				network, iterationOutputPath);
+
+		this.cliqueSizes = new int[this.nPlans];
+
+		for (int i = 0; i < this.nPlans; i++) {
+			this.cliqueSizes[i] = this.plans.get(i).getClique().getMembers().size();
+		}
+
 		log.debug("fitness function initialized");
 		log.debug("max pop size: "+MAX_POP_SIZE);
 		log.debug("max discrete scale: "+MAX_DISCRETE_SCALE);
@@ -132,16 +141,22 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		ThreadMXBean thread = ManagementFactory.getThreadMXBean();
 		long startTime;
 		long endTime;
+		double currentScore;
+		long currentTime;
 
 		for (int i=0; i < nPlans; i++) {
 			scores[i] = 0d;
 			cpuTimesNanoSecs[i] = 0L;
 			for (int j=0; j < N_PLAN_EXEC; j++) {
 				startTime = thread.getCurrentThreadCpuTime();
-				scores[i] += this.jpoAlgo.run(configGroup, this.plans.get(i));
+				currentScore = this.jpoAlgo.run(configGroup, this.plans.get(i));
 				endTime = thread.getCurrentThreadCpuTime();
-				cpuTimesNanoSecs[i] += endTime - startTime;
-				log.debug("plan score: "+scores[i]);
+				currentTime = (endTime - startTime) / this.cliqueSizes[i];
+
+				scores[i] += currentScore;
+				cpuTimesNanoSecs[i] += currentTime;
+				log.debug("plan score per member (CHF): "+currentScore);
+				log.debug("CPU time per member (s): "+(currentTime*1E-9));
 			}
 		}
 

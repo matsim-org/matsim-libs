@@ -64,7 +64,9 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private String outputFileName = "optimizedConf.xml";
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 20;
+	private final static int N_PLANS = 10;
+
+	private final static int MIN_MEMBERS = 3;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -107,8 +109,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			i++;
 
 			// only consider joint plans
-			if (currentPlan.getClique().getMembers().size() > 1) {
-				log.debug("adding test instance of type: "+currentPlan.getType());
+			if (currentPlan.getClique().getMembers().size() >= MIN_MEMBERS) {
+				log.debug("adding test instance with "+currentPlan.getClique().getMembers().size()+" members.");
 				output.add(currentPlan);
 				count++;
 			}
