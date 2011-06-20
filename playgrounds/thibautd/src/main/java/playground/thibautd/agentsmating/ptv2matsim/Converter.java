@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -39,8 +40,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -79,9 +78,14 @@ public class Converter {
 	private final Population population;
 	private final ScenarioImpl scenario;
 	private final Map<Id, List<Id>> cliques;
-	private final Map<Id, List<Id>> associations;
+	//private final Map<Id, List<Id>> associations;
+	// keeps track of the current clique of each agent.
+	// each time to agents are associated, their cliques are merged
+	private final Map<Id, List<Id>> cliqueAgentAssociations;
+	// list of unique cliques
+	private final List<List<Id>> cliquesInCreation = new ArrayList<List<Id>>();
 	private final Map<Id, List<PlanElement>> plansToConstruct;
-	private final List<Id> unaffectedAgents;
+	//private final List<Id> unaffectedAgents;
 	private final FacilitiesFactory facilitiesFactory;
 	private final boolean useFacilities;
 
@@ -102,10 +106,14 @@ public class Converter {
 		this.scenario = scenario;
 		this.population = scenario.getPopulation();
 		this.popSize = population.getPersons().size();
-		this.cliques = new HashMap<Id, List<Id>>(popSize);
-		this.associations = new HashMap<Id, List<Id>>(popSize);
-		this.unaffectedAgents = new ArrayList<Id>(popSize);
-		this.plansToConstruct = new HashMap<Id, List<PlanElement>>(popSize);
+		//this.cliques = new HashMap<Id, List<Id>>(popSize);
+		//this.associations = new HashMap<Id, List<Id>>(popSize);
+		//this.plansToConstruct = new HashMap<Id, List<PlanElement>>(popSize);
+		this.cliques = new HashMap<Id, List<Id>>();
+		//this.associations = new TreeMap<Id, List<Id>>();
+		this.cliqueAgentAssociations = new HashMap<Id, List<Id>>();
+		this.plansToConstruct = new HashMap<Id, List<PlanElement>>();
+		//this.unaffectedAgents = new ArrayList<Id>(popSize);
 
 		if (scenario.getConfig().facilities().getInputFile() == null) {
 			log.debug("facility creation disabled");
@@ -128,11 +136,16 @@ public class Converter {
 	private void initInternalStructures() {
 		Id id;
 		Plan plan;
+		List<Id> clique;
 		for (Map.Entry<Id, ? extends Person> person :
 				this.population.getPersons().entrySet()) {
 			id = person.getKey();
 			plan = person.getValue().getSelectedPlan();
-			this.unaffectedAgents.add(id);
+			//this.unaffectedAgents.add(id);
+			clique = new ArrayList<Id>();
+			clique.add(id);
+			this.cliqueAgentAssociations.put(id, clique);
+			this.cliquesInCreation.add(clique);
 			this.plansToConstruct.put(
 					id,
 					new ArrayList<PlanElement>(plan.getPlanElements()));
@@ -178,11 +191,14 @@ public class Converter {
 		constructCliques();
 	}
 
-	private int getLegIndex(String tripId) {
+	private int getLegIndex(final String tripId) {
 		int i = Integer.valueOf(tripId);
 		return i*2 - 1;
 	}
 
+	/**
+	 * replace the legs to make shared by "marker" SharedRide instances.
+	 */
 	private void markSharedRide(
 			final Id driver,
 			final int driverLeg,
@@ -209,75 +225,113 @@ public class Converter {
 	 * Update the links between agent (do not construct clique yet).
 	 */
 	private void updateCliques(final Id driver, final Id passenger) {
-		getMates(driver).add(passenger);
-		getMates(passenger).add(driver);
+		//getMates(driver).add(passenger);
+		//getMates(passenger).add(driver);
+		List<Id> clique = this.cliqueAgentAssociations.get(driver);
+
+		// merge with passenger clique, without enforcing unicity
+		List<Id> passengerClique = this.cliqueAgentAssociations.put(passenger, clique);
+
+		for (Id member : passengerClique) {
+			// update "status" of all clique members
+			this.cliqueAgentAssociations.put(member, clique);
+		}
+
+		clique.addAll(passengerClique);
+
+		this.cliquesInCreation.remove(passengerClique);
 	}
 
 	/**
 	 * get the agents the agent is currently linked to.
 	 */
-	private List<Id> getMates(final Id agent) {
-		List<Id> mating = this.associations.get(agent);
+	//private List<Id> getMates(final Id agent) {
+	//	List<Id> mating = this.associations.get(agent);
 
-		if (mating == null) {
-			mating = new ArrayList<Id>();
-			this.associations.put(agent, mating);
-		}
+	//	if (mating == null) {
+	//		mating = new ArrayList<Id>();
+	//		this.associations.put(agent, mating);
+	//	}
 
-		return mating;
-	}
+	//	return mating;
+	//}
 
 	/**
 	 * Actually construct cliques from link info.
 	 */
 	private void constructCliques() {
-		List<Id> clique;
-		Id root;
+		//List<Id> clique;
+		//Id root;
+		//int count = 0;
+		//int next = 1;
+
+		//while (true) {
+		//	count++;
+		//	if (count == next) {
+		//		log.debug("constructing clique # "+count);
+		//		next *= 2;
+		//	}
+	
+		//	try {
+		//		root = this.unaffectedAgents.remove(0);
+		//	} catch (IndexOutOfBoundsException e) {
+		//		// there is nobody more: exit
+		//		break;
+		//	}
+
+		//	clique = new ArrayList<Id>();
+		//	inDepthSearch(root, clique);
+		//	addClique(clique);
+		//}
+		//log.debug(count+" cliques constructed");
+
 		int count = 0;
 		int next = 1;
-
-		while (true) {
+		for (List<Id> clique : this.cliquesInCreation) {
 			count++;
 			if (count == next) {
 				log.debug("constructing clique # "+count);
 				next *= 2;
 			}
-	
-			try {
-				root = this.unaffectedAgents.remove(0);
-			} catch (IndexOutOfBoundsException e) {
-				// there is nobody more: exit
-				break;
-			}
-
-			clique = new ArrayList<Id>();
-			inDepthSearch(root, clique);
-			addClique(clique);
+			addClique(removeDoublettes(clique));
 		}
+
 		log.debug(count+" cliques constructed");
+	}
+
+	private List<Id> removeDoublettes(final List<Id> clique) {
+		List<Id> cliqueUnique = new ArrayList<Id>();
+
+		for (Id id : clique) {
+			if (!cliqueUnique.contains(id)) {
+				cliqueUnique.add(id);
+			}
+		}
+
+		return cliqueUnique;
 	}
 
 	/**
 	 * Adds the clique to the clique datastruct
 	 */
 	private void addClique(final List<Id> clique) {
-		this.unaffectedAgents.removeAll(clique);
+		//this.unaffectedAgents.removeAll(clique);
 		this.cliques.put(this.cliqueIdFactory.createId(), clique);
 	}
 
 	/**
 	 * Performs an in depth search to construct cliques.
 	 */
-	private void inDepthSearch(final Id node, final List<Id> marks) {
-		//log.debug("marking node");
-		marks.add(node);
-		
-		for (Id neighboor : getMates(node)) {
-			if (!marks.contains(neighboor)) {
-				inDepthSearch(neighboor, marks);
-			}
-		}
-	}
+	//private void inDepthSearch(final Id node, final List<Id> marks) {
+	//	//log.debug("marking node");
+	//	marks.add(node);
+	//	
+	//	for (Id neighboor : getMates(node)) {
+	//		if (!marks.contains(neighboor)) {
+	//			inDepthSearch(neighboor, marks);
+	//		}
+	//	}
+	//}
 
 	private String getNextDataLine() {
 		try {
@@ -452,7 +506,7 @@ public class Converter {
 			newCliques.put(id, this.cliques.get(id));
 		}
 
-		return newCliques;
+		return new TreeMap<Id, List<Id>>(newCliques);
 	}
 
 	/**
@@ -555,7 +609,7 @@ public class Converter {
 	private class PuNumberFactory {
 		private long current = 0;
 
-		public String createNumber() {
+		public final String createNumber() {
 			current++;
 			return JointActingTypes.PICK_UP_BEGIN +
 				JointActingTypes.PICK_UP_SPLIT_EXPR +
@@ -566,7 +620,7 @@ public class Converter {
 	private class IdFactory {
 		private long current = 0;
 
-		public Id createId() {
+		public final Id createId() {
 			current++;
 			return new IdImpl(current);
 		}
