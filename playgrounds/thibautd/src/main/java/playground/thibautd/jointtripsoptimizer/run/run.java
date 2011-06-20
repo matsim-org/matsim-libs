@@ -40,8 +40,7 @@ public class run {
 
 		Controler controler = JointControlerUtils.createControler(configFile);
 		controler.addControlerListener(new CliqueScoreStats(
-					(PopulationWithCliques) ((JointControler) controler).getPopulation(),
-					controler.getConfig().controler().getOutputDirectory()+"scoresStats",
+					"scoresStats",
 					true));
 		controler.addControlerListener(new ModeAnalysis());
 		controler.setOverwriteFiles(true);

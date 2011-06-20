@@ -95,7 +95,7 @@ public class BoxAndWhiskersChart extends ChartUtil {
 		//}
 
 		//this.chart.setBackgroundPaint(Color.white);
-		//this.chart.getXYPlot().setBackgroundPaint(Color.white);
+		this.chart.getXYPlot().setBackgroundPaint(Color.white);
 		XYBoxAndWhiskerRenderer renderer = (XYBoxAndWhiskerRenderer) this.chart.getXYPlot().getRenderer();
 		//renderer.setFillBox(false);
 		//renderer.setSeriesOutlinePaint(0, Color.black);

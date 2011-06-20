@@ -35,6 +35,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.charts.XYLineChart;
 
+import playground.thibautd.utils.XYChartUtils;
+
 /**
  * Event handler that computes statistics about the evolution of chosen
  * modes across the MATSim iterations.
@@ -53,6 +55,8 @@ public class ModeAnalysis implements
 	private static final Logger log =
 		Logger.getLogger(ModeAnalysis.class);
 
+	private static final String X_TITLE = "iteration";
+	private static final String Y_TITLE = "n legs";
 
 	private final static int NO_VALUE = Integer.MIN_VALUE;
 	private final static String fileName = "modeEvolution";
@@ -93,13 +97,23 @@ public class ModeAnalysis implements
 		double[] xAxis = getXAxis();
 		Map<String, double[]> yAxes = getYAxes(modes);
 		String fileName = event.getControler().getControlerIO().getOutputFilename(this.fileName);
-		XYLineChart globalChart = new XYLineChart(title+", all modes", "iteration", "n legs");
+		XYLineChart globalChart = new XYLineChart(title+", all modes", X_TITLE, Y_TITLE);
+		XYLineChart particularChart;
 
 		for (String mode : modes) {
+			particularChart =  new XYLineChart(title+", "+mode, X_TITLE, Y_TITLE);
 			globalChart.addSeries(mode, xAxis, yAxes.get(mode));
+			particularChart.addSeries(mode, xAxis, yAxes.get(mode));
+			writeChart(particularChart, fileName+"_"+mode+".png");
 		}
 
-		globalChart.saveAsPng(fileName+"_all.png", height, width);
+		writeChart(globalChart, fileName+"_all.png");
+	}
+
+	private void writeChart(final XYLineChart chart, final String fileName) {
+		XYChartUtils.integerXAxis(chart.getChart());
+		chart.addMatsimLogo();
+		chart.saveAsPng(fileName, width, height);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
