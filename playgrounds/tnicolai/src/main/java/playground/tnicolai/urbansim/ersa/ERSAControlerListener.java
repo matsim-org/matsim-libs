@@ -56,6 +56,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -455,6 +456,45 @@ public class ERSAControlerListener implements ShutdownListener{
 	}
 	public SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
 		return travelDistanceAccessibilityGrid;
+	}
+	
+	
+	
+	/**
+	 * cost calculator for travel distances
+	 * @author thomas
+	 *
+	 */
+	public static class TravelDistanceCostCalculator implements TravelCost{
+		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
+
+		@Override
+		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+			if(link != null)
+				return link.getLength();
+			log.warn("Link is null. Reurned 0 as link length.");
+			return 0.;
+		}
+	}
+	
+	/**
+	 * cost calculator for travel times
+	 * @author thomas
+	 *
+	 */
+	public static class TravelTimeCostCalculator implements TravelCost{
+		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
+		
+		protected final TravelTime timeCalculator;
+		
+		public TravelTimeCostCalculator(final TravelTime timeCalculator) {
+			this.timeCalculator = timeCalculator;
+		}
+		
+		@Override
+		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+			return this.timeCalculator.getLinkTravelTime(link, time);
+		}
 	}
 }
 

@@ -110,7 +110,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 			break;
 
 		case 2:
-			log.info("Testing computation of UrbanSim zones");
+			log.info("Testing construction of MATSim agents based on UrbanSim output");
 			// create parcel table
 			testFileName = Constants.URBANSIM_PARCEL_DATASET_TABLE + dummyYear + Constants.FILE_TYPE_TAB;
 			createParcelInputTestFile(testFileDirectory, testFileName);
@@ -120,7 +120,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 			// running ReadFromUrbansimParcelModel generating population
 			result = testRunPopulation( dummyYear, false );
 			Assert.assertTrue(result);
-			log.info("Testing computation of UrbanSim zones finished");
+			log.info("Testing construction of MATSim agents finished");
 			break;
 			
 		case 3:

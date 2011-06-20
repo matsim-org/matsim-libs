@@ -64,7 +64,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		log.info("Starting testMATSimConfig run: Testing if MATSim config is valid.");
 		prepareTest("matsim_config_test_run.xml");
 		// remove temp directories
-		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		// TempDirectoryUtil.cleaningUpOPUSDirectories(); # be careful with cleaning. if regular "OPUS_HOME" is used, this will be deleted, tnicolai: create matsim config that contains the OPUS_HOME directory from TempDirectoryUtil!!!
 		log.info("End of testMATSimConfig.");
 	}
 	
@@ -75,7 +75,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		
 		Assert.assertTrue( postProgressing() );
 		// remove temp directories
-		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		// TempDirectoryUtil.cleaningUpOPUSDirectories(); # be careful with cleaning. if regular "OPUS_HOME" is used, this will be deleted
 		
 		log.info("End of testMATSimRun.");
 	}
@@ -130,7 +130,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	 */
 	private void testRun(String matsimConfigFileLocation){
 		log.info("Starting MATSim4UrbanSim with args = " + matsimConfigFileLocation);
-		String [] args = new String[]{matsimConfigFileLocation}; // create progam arguments for MATSim
+		String [] args = new String[]{matsimConfigFileLocation}; // create program arguments for MATSim
 		
 		MATSim4Urbansim.main(args);
 	}
@@ -145,7 +145,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		// Constants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir")); // moved to TempDirectoryUtil
 		// create temp directories
 		TempDirectoryUtil.createOPUSDirectories();
-		// set outpur directory for UrbanSim data to OPUS_HOME/opus_matsim/tmp
+		// set output directory for UrbanSim data to OPUS_HOME/opus_matsim/tmp
 		destinationDir = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
 
 		// copy UrbanSim data to destination path

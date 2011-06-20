@@ -2,9 +2,7 @@
 <matsim_config>
 	<config>
 		<network>
-			<inputFile>
-				/Users/thomas/Development/opus_home/opus_matsim/data/psrc/network/psrc.xml.gz
-			</inputFile>
+			<inputFile>/Users/thomas/Development/opus_home/data/psrc/network/psrc.xml.gz</inputFile>
 		</network>
 		<controler>
 			<firstIteration>
