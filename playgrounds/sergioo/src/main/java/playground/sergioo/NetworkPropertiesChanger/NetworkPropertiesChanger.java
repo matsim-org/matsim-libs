@@ -24,10 +24,14 @@ public class NetworkPropertiesChanger {
 		while(line!=null) {
 			String[] parts = line.split(CSV_SEPARATOR);
 			LinkImpl link = (LinkImpl) network.getLinks().get(new IdImpl(parts[0]));
-			link.setLength(Double.parseDouble(parts[1]));
-			link.setFreespeed(Double.parseDouble(parts[2]));
-			link.setCapacity(Double.parseDouble(parts[3]));
-			link.setNumberOfLanes(Double.parseDouble(parts[4]));
+			if(!parts[1].equals(""))
+				link.setLength(Double.parseDouble(parts[1]));
+			if(!parts[2].equals(""))
+				link.setFreespeed(Double.parseDouble(parts[2]));
+			if(!parts[3].equals(""))
+				link.setCapacity(Double.parseDouble(parts[3]));
+			if(!parts[4].equals(""))
+				link.setNumberOfLanes(Double.parseDouble(parts[4]));
 			line = reader.readLine();
 		}
 		reader.close();
