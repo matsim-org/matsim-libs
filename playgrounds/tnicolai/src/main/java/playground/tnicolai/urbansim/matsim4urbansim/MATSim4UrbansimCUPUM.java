@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.cupum;
+package playground.tnicolai.urbansim.matsim4urbansim;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -34,7 +34,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
@@ -43,7 +42,7 @@ import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
  * @author thomas
  *
  */
-public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
+class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbansimCUPUM.class);
@@ -54,14 +53,14 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 	 * constructor
 	 * @param args
 	 */
-	public MATSim4UrbansimCUPUM(String args[]){
+	MATSim4UrbansimCUPUM(String args[]){
 		super(args);
 		
 		if(args.length > 1)
 			testParam = args[1];
 	}
 	
-	public void runMATSim(){
+	void runMATSim(){
 		log.info("Starting MATSim from Urbansim");
 
 		// checking for if this is only a test run
@@ -101,7 +100,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 	 * modifies the links in the travel network without changing the file
 	 * @param network
 	 */
-	private void modifyLinks(NetworkImpl network, String testParam){
+	void modifyLinks(NetworkImpl network, String testParam){
 		
 		double capacity = -1; // -1 means, no capacity changes on the network/links
 		try{
@@ -152,7 +151,7 @@ public class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
 	 * 
 	 * @param link
 	 */
-	private void printLinkInfo(LinkImpl link){
+	void printLinkInfo(LinkImpl link){
 		
 		log.info("#########################################");
 		log.info("Link ID:" + link.getId());

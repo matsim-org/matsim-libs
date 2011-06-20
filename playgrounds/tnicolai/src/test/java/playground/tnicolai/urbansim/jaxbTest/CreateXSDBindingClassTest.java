@@ -39,10 +39,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
-import playground.tnicolai.urbansim.UpdateXMLBindingClasses;
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.matsim4urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
+import playground.tnicolai.urbansim.utils.UpdateXMLBindingClasses;
 import playground.tnicolai.urbansim.utils.io.LoadFile;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
 import playground.tnicolai.urbansim.utils.securityManager.NoExitSecurityManager;

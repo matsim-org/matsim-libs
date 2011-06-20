@@ -1,0 +1,33 @@
+âPlanned Testcases:
+
+- Spatial Grid output table testen (Testen ob "dummy" input korrekt ausgegeben wird)
+- Sample Population/Job generation testen (Anzahl der Population / Jobs korrekt?)
+- Warm Start (alle Personen korrekt erkannt? fŸr folgende FŠlle testen:
+												1) Person neu (neue ID)
+												2) Person umgezogen
+												3) Person hat neuen Job (andere Location, ist Arbeitslos, war Arbeitslos)
+												4) Person verzogen (nicht mehr da)
+												5) Keine €nderungen)
+												
+- Accessibility Test 1:
+					  J2--J3--J4
+					   |	   |
+	P1 ---------------J1--P2--J5
+					   |       |
+					  J8--J7--J6
+					  
+	Erwartetes Ergebnis: Accessibility (Time, Cost, Distance) P2 > P1
+	
+
+- Accessibility Test 2:
+
+	-------------------------------------
+	|                                	|
+	|									|
+	|		J2							|
+    |		 |							|	
+	P1		J1-------------------------P2
+			 |
+			J3
+			
+	Erwartetes Ergebnis: Accessibility(Time, Cost, Distance) P2 > P1

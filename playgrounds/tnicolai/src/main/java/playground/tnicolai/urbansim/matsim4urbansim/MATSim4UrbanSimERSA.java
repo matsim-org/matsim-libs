@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.ersa;
+package playground.tnicolai.urbansim.matsim4urbansim;
 
 import gnu.trove.TObjectDoubleHashMap;
 
@@ -46,9 +46,9 @@ import playground.johannes.socialnetworks.gis.SpatialGrid;
 import playground.johannes.socialnetworks.gis.SpatialGridTableWriter;
 import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.gis.MyColorizer;
+import playground.tnicolai.urbansim.matsim4urbansim.ersa.ERSAControlerListener;
 import playground.tnicolai.urbansim.utils.ProgressBar;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author thomas
  *
  */
-public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
+class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	
 	// Logger
 	private static final Logger logger = Logger.getLogger(MATSim4UrbanSimERSA.class);
@@ -107,7 +107,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		}
 		else{
 			shapeFile = "/Users/thomas/Development/opus_home/data/psrc_parcel/shapefiles/boundary.shp";
-			logger.warn("No path for the shape file was given. The path is set to " + shapeFile + " (default setting)!");
+			logger.warn("No path for the shape file was given. The path is set to " + shapeFile + "!!!");
 		}
 		
 		if(!pathExsits(shapeFile))
@@ -195,7 +195,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	 * @throws IOException 
 	 */
 	@Override
-	protected void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl parcels, 
+	void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl parcels, 
 			ReadFromUrbansimParcelModel readFromUrbansim){
 		
 		Controler controler = new Controler(scenario);
@@ -228,7 +228,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	/**
 	 * @param myListener
 	 */
-	private void writeSpatialGridTables(ERSAControlerListener myListener) {
+	void writeSpatialGridTables(ERSAControlerListener myListener) {
 		logger.info("Writing spatial grid tables ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
@@ -256,7 +256,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 	/**
 	 * @param myListener
 	 */
-	private void writeKMZFiles(ERSAControlerListener myListener) {
+	void writeKMZFiles(ERSAControlerListener myListener) {
 		logger.info("Writing Google Erath files ...");
 		
 		ZoneLayer<ZoneObject> startZones = myListener.getStartZones();
@@ -415,7 +415,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); // tnicolai: this should be the correct id for the Washington area
+					polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); 
 					
 					Zone<ZoneObject> zone = new Zone<ZoneObject>(polygon);
 					zone.setAttribute( new ZoneObject( setPoints ) );
@@ -518,7 +518,7 @@ public class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		endTime = System.currentTimeMillis();
 		time = (endTime - startTime) / 60000;
 		
-		logger.info("Computation took " + time + "minutes. Computation done!");
+		logger.info("Computation took " + time + " minutes. Computation done!");
 	}
 
 }

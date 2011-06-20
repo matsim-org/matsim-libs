@@ -35,8 +35,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.tnicolai.urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.matsim4urbansim.MATSim4Urbansim;
 import playground.tnicolai.urbansim.utils.CommonUtilities;
 import playground.tnicolai.urbansim.utils.io.FileCopy;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;

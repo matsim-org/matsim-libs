@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim;
+package playground.tnicolai.urbansim.utils;
 
 import java.io.File;
 import java.io.IOException;

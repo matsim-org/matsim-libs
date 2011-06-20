@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.tnicolai.urbansim.cupum;
+package playground.tnicolai.urbansim.matsim4urbansim.cupum;
 
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -28,7 +28,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 /**
- * This class helps to convert a network file into a schape file in order to 
+ * This class helps to convert a network file into a shape file in order to 
  * determine the link ids.
  * 
  * @author thomas

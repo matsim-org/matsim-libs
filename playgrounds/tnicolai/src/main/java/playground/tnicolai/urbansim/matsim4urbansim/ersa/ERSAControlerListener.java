@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.ersa;
+package playground.tnicolai.urbansim.matsim4urbansim.ersa;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

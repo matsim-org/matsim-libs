@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim;
+package playground.tnicolai.urbansim.matsim4urbansim;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -171,7 +171,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 	
 	
 	/**
-	 * overwrites MyControlerListener in order to measure duration to write traveldata and its size.
+	 * overwrites MyControlerListener in order to measure duration to write travel data and its size.
 	 * @author thomas
 	 *
 	 */
