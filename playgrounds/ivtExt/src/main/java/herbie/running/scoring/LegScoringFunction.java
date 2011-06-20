@@ -135,7 +135,6 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			System.out.println();
 			double distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl) leg.getRoute(), network);
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
