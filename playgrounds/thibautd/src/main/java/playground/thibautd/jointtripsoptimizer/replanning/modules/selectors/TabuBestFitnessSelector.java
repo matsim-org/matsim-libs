@@ -34,6 +34,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * @author thibautd
  */
+@Deprecated
 public class TabuBestFitnessSelector extends NaturalSelectorExt {
 
 	private final static long serialVersionUID = 1L;

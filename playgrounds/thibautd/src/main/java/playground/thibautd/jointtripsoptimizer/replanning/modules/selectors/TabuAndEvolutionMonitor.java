@@ -38,6 +38,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * @author thibautd
  */
+@Deprecated
 public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 	private static final Logger log =
 		Logger.getLogger(TabuAndEvolutionMonitor.class);

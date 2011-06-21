@@ -255,7 +255,10 @@ public class JointPlan implements Plan {
 		return out;
 	}
 
-	public JointPlan(JointPlan plan) {
+	/**
+	 * makes a <u>shallow</u> copy of the plan.
+	 */
+	public JointPlan(final JointPlan plan) {
 		this(	plan.getClique(),
 				plan.getIndividualPlans(),
 				plan.setAtIndividualLevel,
