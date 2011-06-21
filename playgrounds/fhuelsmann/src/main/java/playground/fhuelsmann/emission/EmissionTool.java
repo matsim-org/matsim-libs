@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+//import java.util.Set;
 import java.util.Map.Entry;
 
+
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
+//import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -41,11 +42,12 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
-import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
+//import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 
@@ -54,15 +56,15 @@ public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/policies/mobilTUM/baseCase/";
-	private static String eventsFile = runDirectory + "ITERS/it.0/0.events.txt.gz";
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
+/*	private static String runDirectory = "../../run980/";
+	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.txt.gz";
+	private static String netFile = runDirectory + "980.output_network.xml.gz";
+	private static String plansFile = runDirectory + "ITERS/it.1000/980.1000.plans.xml.gz";*/
 
-	//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run22/";
-	//	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
-	//	private static String netFile = runDirectory + "output_network.xml.gz";
-	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String runDirectory = "../../detailedEval/policies/mobilTUM/policyCase/";
+	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
+	private static String netFile = runDirectory + "output_network.xml.gz";
+	private static String plansFile = runDirectory + "output_plans.xml.gz";
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
@@ -95,15 +97,15 @@ public class EmissionTool {
 		/*	listOfPollutant.add("Benzene");
 		listOfPollutant.add("CH4");
 		listOfPollutant.add("CO");
-		listOfPollutant.add("CO(rep.)");
+		listOfPollutant.add("CO(rep.)");*/
 		listOfPollutant.add("CO2(total)");
-		listOfPollutant.add("FC");
+	/*	listOfPollutant.add("FC");
 		listOfPollutant.add("HC");
 		listOfPollutant.add("N2O");
 		listOfPollutant.add("NH3");
-		listOfPollutant.add("NMHC")*/;
+		listOfPollutant.add("NMHC");
 		listOfPollutant.add("NO2");
-	/*	listOfPollutant.add("NOX");
+		listOfPollutant.add("NOX");
 		listOfPollutant.add("Pb");
 		listOfPollutant.add("PM");
 		listOfPollutant.add("PN");
@@ -130,7 +132,7 @@ public class EmissionTool {
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent,hbefaHot);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(population, visumObject, emissionsPerEvent,hbefaHot);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
 		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
@@ -152,6 +154,8 @@ public class EmissionTool {
 		// =======================================================================================================		
 		// warm emissions
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
+		Map<Id, double[]> commuterHdv2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerCommuterHdv();
+		System.out.println("###########################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+commuterHdv2WarmEmissionsInGrammPerType);
 //		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
 
 		// coldstart emissions
@@ -162,17 +166,19 @@ public class EmissionTool {
 
 		// print output files
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
-		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
+//		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
+		printer.printEmissionTable(commuterHdv2WarmEmissionsInGrammPerType, "EmissionsPerCommuterHdvWarm.txt");
+		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
 //		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 
 		// =======================================================================================================	
 		//further processing of emissions
-		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer(this.scenario);
+/*		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer(this.scenario);
 		Set<Feature> urbanShape = usa.readShape(urbanShapeFile);
 		Population urbanPop = usa.getRelevantPopulation(population, urbanShape);
 		Set<Feature> suburbanShape = usa.readShape(suburbanShapeFile);
-		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);
+		Population suburbanPop = usa.getRelevantPopulation(population, suburbanShape);*/
 		
 //		List<Double> emissionType2AvgEmissionsUrbanArea = calculateAvgEmissionsPerTypeAndArea(urbanPop, personId2TotalEmissionsInGrammPerType);
 //		List<Double> emissionType2AvgEmissionsSuburbanArea = calculateAvgEmissionsPerTypeAndArea(suburbanPop, personId2TotalEmissionsInGrammPerType);

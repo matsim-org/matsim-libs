@@ -21,12 +21,12 @@
 package playground.fhuelsmann.emission;
 
 import java.util.ArrayList;
-import java.util.Map;
+
 
 import org.matsim.api.core.v01.Id;
 
 import playground.fhuelsmann.emission.objects.HbefaObject;
-import playground.fhuelsmann.emission.objects.HotValue;
+
 
 
 public interface AnalysisModule {
@@ -47,5 +47,9 @@ public interface AnalysisModule {
 			final Id personId, final double averageSpeed, final int roadType, 
 			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
+	
+	public void calculateEmissionsPerCommuterAndHdv (final double travelTime, final Id personId, 
+			final double averageSpeed, final int roadType,  
+			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 
 }
