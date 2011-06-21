@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkToLinkTravelTimeCalculator
+ * TravelTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -28,10 +30,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -41,8 +45,8 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
-
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -62,7 +66,8 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class TravelTimeCalculator
 		implements PersonalizableTravelTime, PersonalizableLinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
-		AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, AgentStuckEventHandler {
+		AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
+		AgentStuckEventHandler {
 	
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 	"agent is not known the turning move travel time cannot be calculated!";
@@ -80,6 +85,11 @@ public class TravelTimeCalculator
 	private final Map<Id, LinkEnterEvent> linkEnterEvents;
 
 	private final Map<Id, Id> transitVehicleDriverMapping;
+	
+	private final Set<Id> agentsToFilter;
+	private final Set<String> analyzedModes;
+	
+	private final boolean filterAnalyzedModes;
 	
 	private final boolean calculateLinkTravelTimes;
 
@@ -99,6 +109,7 @@ public class TravelTimeCalculator
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
+		this.filterAnalyzedModes = ttconfigGroup.isFilterModes();
 		if (this.calculateLinkTravelTimes){
 			this.linkData = new ConcurrentHashMap<Id, DataContainer>((int) (network.getLinks().size() * 1.4));
 		}
@@ -108,12 +119,18 @@ public class TravelTimeCalculator
 		}
 		this.linkEnterEvents = new ConcurrentHashMap<Id, LinkEnterEvent>();
 		this.transitVehicleDriverMapping = new ConcurrentHashMap<Id, Id>();
+		this.agentsToFilter = new HashSet<Id>();
+		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
 		
 		this.reset(0);
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent e) {
+		/* if only some modes are analyzed, we check whether the agent
+		 * performs a trip with one of those modes. if not, we skip the event. */
+		if (filterAnalyzedModes && agentsToFilter.contains(e.getPersonId())) return;
+		
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id, Id> fromToLink = new Tuple<Id, Id>(oldEvent.getLinkId(), e.getLinkId());
@@ -128,20 +145,31 @@ public class TravelTimeCalculator
 	public void handleEvent(final LinkLeaveEvent e) {
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
-  		if (oldEvent != null) {
-  			DataContainer data = getTravelTimeData(e.getLinkId(), true);
-  			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
-  			data.needsConsolidation = true;
-  		}
+	  		if (oldEvent != null) {
+	  			DataContainer data = getTravelTimeData(e.getLinkId(), true);
+	  			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+	  			data.needsConsolidation = true;
+	  		}
 		}
 	}
 
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		/* if filtering transport modes is enabled and the agents
+		 * starts a leg on a non analyzed transport mode, add the agent
+		 * to the filtered agents set. */
+		if (filterAnalyzedModes && !analyzedModes.contains(event.getLegMode())) this.agentsToFilter.add(event.getPersonId());
+	}
+	
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		/* remove EnterEvents from list when an agent arrives.
 		 * otherwise, the activity duration would counted as travel time, when the
 		 * agent departs again and leaves the link! */
 		this.linkEnterEvents.remove(event.getPersonId());
+		
+		// try to remove agent from set with filtered agents
+		if (filterAnalyzedModes) this.agentsToFilter.remove(event.getPersonId());
 	}
 
 	@Override
@@ -173,6 +201,9 @@ public class TravelTimeCalculator
 				throw new IllegalStateException(ERROR_STUCK_AND_LINKTOLINK);
 			}
 		}
+		
+		// try to remove agent from set with filtered agents
+		if (filterAnalyzedModes) this.agentsToFilter.remove(event.getPersonId());
 	}
 	
 	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id, Id> fromLinkToLink, final boolean createIfMissing) {
@@ -243,6 +274,7 @@ public class TravelTimeCalculator
 		}
 		this.linkEnterEvents.clear();
 		this.transitVehicleDriverMapping.clear();
+		this.agentsToFilter.clear();
 	}
 	
 	public void setTravelTimeDataFactory(final TravelTimeDataFactory factory) {

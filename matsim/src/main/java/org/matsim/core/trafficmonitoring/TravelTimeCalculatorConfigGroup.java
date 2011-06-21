@@ -22,6 +22,7 @@ package org.matsim.core.trafficmonitoring;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 
@@ -43,7 +44,8 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	private static final String CALCULATE_LINK_TRAVELTIMES = "calculateLinkTravelTimes";
 	private static final String CALCULATE_LINKTOLINK_TRAVELTIMES = "calculateLinkToLinkTravelTimes";
 
-
+	private static final String ANALYZEDMODES = "analyzedModes";
+	private static final String FILTERMODES = "filterModes";
 
 	private String travelTimeCalculator = "TravelTimeCalculatorArray";
 	private String travelTimeAggregator = "optimistic";
@@ -53,6 +55,9 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	private boolean calculateLinkTravelTimes = true;
 	private boolean calculateLinkToLinkTravelTimes = false;
 
+	private String analyzedModes = TransportMode.car;
+	private boolean filterModes = false;
+	
 	public TravelTimeCalculatorConfigGroup() {
 		super(GROUPNAME);
 	}
@@ -71,6 +76,10 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 			return Boolean.toString(isCalculateLinkTravelTimes());
 		} else if (CALCULATE_LINKTOLINK_TRAVELTIMES.equals(key)){
 			return Boolean.toString(isCalculateLinkToLinkTravelTimes());
+		} else if (ANALYZEDMODES.equals(key)){
+			return getAnalyzedModes();
+		} else if (FILTERMODES.equals(key)){
+			return Boolean.toString(isFilterModes());
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -91,6 +100,10 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 			this.setCalculateLinkTravelTimes(Boolean.parseBoolean(value));
 		} else if (CALCULATE_LINKTOLINK_TRAVELTIMES.equals(key)){
 			this.setCalculateLinkToLinkTravelTimes(Boolean.parseBoolean(value));
+		} else if (ANALYZEDMODES.equals(key)){
+			this.setAnalyzedModes(value);
+		} else if (FILTERMODES.equals(key)){
+			this.setFilterModes(Boolean.parseBoolean(value));
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -106,6 +119,8 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));
 		map.put(CALCULATE_LINK_TRAVELTIMES, getValue(CALCULATE_LINK_TRAVELTIMES));
 		map.put(CALCULATE_LINKTOLINK_TRAVELTIMES, getValue(CALCULATE_LINKTOLINK_TRAVELTIMES));
+		map.put(ANALYZEDMODES, getValue(ANALYZEDMODES));
+		map.put(FILTERMODES, getValue(FILTERMODES));
 		return map;
 	}
 
@@ -118,9 +133,11 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 				"supported: average, linearinterpolation");
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
 				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
+		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
+				"includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
+		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
 		return map;
 	}
-
 
 	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
 		this.travelTimeCalculator = travelTimeCalculator;
@@ -165,26 +182,37 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 		return this.traveltimeBinSize;
 	}
 
-
 	public boolean isCalculateLinkTravelTimes() {
 		return this.calculateLinkTravelTimes;
 	}
-
 
 	public void setCalculateLinkTravelTimes(final boolean calculateLinkTravelTimes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 	}
 
-
 	public boolean isCalculateLinkToLinkTravelTimes() {
 		return this.calculateLinkToLinkTravelTimes;
 	}
-
 
 	public void setCalculateLinkToLinkTravelTimes(
 			final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
-
+	
+	public boolean isFilterModes() {
+		return this.filterModes;
+	}
+	
+	public void setFilterModes(final boolean filterModes) {
+		this.filterModes = filterModes;
+	}
+	
+	public String getAnalyzedModes() {
+		return this.analyzedModes;
+	}
+	
+	public void setAnalyzedModes(final String analyzedModes) {
+		this.analyzedModes = analyzedModes.toLowerCase();
+	}
+	
 }
-

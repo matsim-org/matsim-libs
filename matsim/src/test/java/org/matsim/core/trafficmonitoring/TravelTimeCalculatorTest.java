@@ -33,6 +33,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -40,6 +41,7 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -379,4 +381,130 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	}
 
+	/**
+	 * Enable filtering but set an empty string as modes to analyze.
+	 * Expect that all link travel times are ignored.
+	 * @author cdobler
+	 */
+	public void testGetLinkTravelTime_NoAnalyzedModes() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		config.setAnalyzedModes("");
+		config.setFilterModes(true);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		
+		ttc.handleEvent(new AgentDepartureEventImpl(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+
+		Assert.assertEquals("No transport mode has been registered to be analyzed, therefore no vehicle/agent should be counted", 1.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+	}
+	
+	/**
+	 * Enable filtering and analyze only car legs.
+	 * Expect that walk legs are ignored.
+	 * @author cdobler
+	 */
+	public void testGetLinkTravelTime_CarAnalyzedModes() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		config.setAnalyzedModes("car");
+		config.setFilterModes(true);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		Id agId2 = new IdImpl(1511);
+		
+		ttc.handleEvent(new AgentDepartureEventImpl(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new AgentDepartureEventImpl(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new LinkEnterEventImpl(110, agId2, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(410, agId2, link1.getId()));
+
+		Assert.assertEquals("Only transport mode has been registered to be analyzed, therefore no walk agent should be counted", 100.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+	}
+	
+	/**
+	 * Disable filtering but also set analyzed modes to an empty string.
+	 * Expect that still all modes are counted.
+	 * @author cdobler
+	 */
+	public void testGetLinkTravelTime_NoFilterModes() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		config.setAnalyzedModes("");
+		config.setFilterModes(false);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		Id agId2 = new IdImpl(1511);
+		
+		ttc.handleEvent(new AgentDepartureEventImpl(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new AgentDepartureEventImpl(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new LinkEnterEventImpl(110, agId2, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(410, agId2, link1.getId()));
+
+		Assert.assertEquals("Filtering analyzed transport modes is disabled, therefore count all modes", 200.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+	}
+	
+	/**
+	 * Enable filtering but do not set transport modes which should be counted.
+	 * Expect that the default value (=car) will be used for the modes to be counted.
+	 * @author cdobler
+	 */
+	public void testGetLinkTravelTime_FilterDefaultModes() {
+		Network network = NetworkImpl.createNetwork();
+		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
+		config.setTraveltimeBinSize(900);
+		config.setFilterModes(true);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
+
+		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		network.addNode(n1);
+		network.addNode(n2);
+		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		network.addLink(link1);
+
+		Id agId1 = new IdImpl(1510);
+		Id agId2 = new IdImpl(1511);
+		
+		ttc.handleEvent(new AgentDepartureEventImpl(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new LinkEnterEventImpl(100, agId1, link1.getId()));
+		ttc.handleEvent(new AgentDepartureEventImpl(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new LinkEnterEventImpl(110, agId2, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(200, agId1, link1.getId()));
+		ttc.handleEvent(new LinkLeaveEventImpl(410, agId2, link1.getId()));
+
+		Assert.assertEquals("Filtering analyzed transport modes is enabled, but no modes set. Therefore, use default (=car)", 100.0, ttc.getLinkTravelTime(link1, 200), 1e-8);
+	}
 }
