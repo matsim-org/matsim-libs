@@ -82,6 +82,21 @@ public class CountPossibleSharedRides {
 
 	private final List<TripData> results = new ArrayList<TripData>();
 
+	/**
+	 * Used to select whether the joinable trips should be searched in
+	 * the neighborhood of the departure/arrival events or based on the
+	 * plan leg specification.
+	 * <BR>
+	 * The event based search may be badly implemented: it searches for the first
+	 * event of the good type, on the requested link, around the specified hour,
+	 * but nothing allows to check whether this is the event which was searched.
+	 * <BR>
+	 * Moreover, the meaning of an event-based search is not obvious. Joinable trips are
+	 * always searched based on the events.
+	 */
+	public enum TypeOfSearch {PLAN_BASED, EVENT_BASED};
+	private final TypeOfSearch typeOfSearch;
+
 	private boolean toPrepare = false;
 
 	/*
@@ -89,12 +104,27 @@ public class CountPossibleSharedRides {
 	 * constructors
 	 * =========================================================================
 	 */
+	/**
+	 * Base constructor.
+	 *
+	 * @param network
+	 * @param events an {@link EventsAccumulator} corresponding to the output
+	 * to analyse
+	 * @param population the {@link Population} corresponding to the analysed iteration
+	 * @param acceptableDistance the distance an agent is assumed to be willing to
+	 * walk to join a meeting point
+	 * @param timeWindowRadius the time an agent is assumed to be willing to change its
+	 * departure/arrival in the case someone drives him.
+	 * @param typeOfSearch how agents' departure and arrival time are computed:
+	 * based on events or based on plans.
+	 */
 	public CountPossibleSharedRides(
 			final Network network,
 			final EventsAccumulator events,
 			final Population population,
 			final double acceptableDistance,
-			final double timeWindowRadius) {
+			final double timeWindowRadius,
+			final TypeOfSearch typeOfSearch) {
 		TopologyFactory factory = new TopologyFactory(
 				network,
 				acceptableDistance,
@@ -110,8 +140,27 @@ public class CountPossibleSharedRides {
 
 		this.acceptableDistance = acceptableDistance;
 		this.timeWindowRadius = timeWindowRadius;
+		this.typeOfSearch = typeOfSearch;
 	}
 
+	/**
+	 * Initializes an instance using plan information.
+	 */
+	public CountPossibleSharedRides(
+			final Network network,
+			final EventsAccumulator events,
+			final Population population,
+			final double acceptableDistance,
+			final double timeWindowRadius) {
+		this(network, events, population, acceptableDistance, timeWindowRadius,
+				TypeOfSearch.PLAN_BASED);
+	}
+
+	/**
+	 * Construct an instance with all fields initialized to
+	 * null or 0.
+	 * To use to load previously stored datafile.
+	 */
 	public CountPossibleSharedRides() {
 		this.arrivalsTopology = null;
 		this.departuresTopology = null;
@@ -119,6 +168,7 @@ public class CountPossibleSharedRides {
 		this.leaveLinksTopology = null;
 		this.acceptableDistance = 0d;
 		this.timeWindowRadius = 0d;
+		this.typeOfSearch = null;
 	}
 
 	/*
@@ -315,7 +365,7 @@ public class CountPossibleSharedRides {
 				title,
 				"time of day (h)",
 				"n joinable trips",
-				24 / nTimeBins);
+				24d / nTimeBins);
 
 		for (TripData data : this.results) {
 			chart.add(data.timeOfDay / 3600d, data.numberOfJoinableTrips);
@@ -394,22 +444,40 @@ public class CountPossibleSharedRides {
 		Id arrivalId = route.getEndLinkId();
 
 		// correct leg info based on events
-		//log.debug("getting departure events...");
-		LinkEvent departure = getDepartureEvent(personId, departureTime, departureId);
-		//log.debug("getting departure events... DONE");
-		//log.debug("getting arrival events...");
-		LinkEvent arrival = getArrivalEvent(personId, arrivalTime, arrivalId);
-		if (arrival == null) {
-			log.debug("arrival unfound: agent may have been stucked and removed.");
-			return null;
+		switch (this.typeOfSearch) {
+			case EVENT_BASED:
+				//log.debug("getting departure events...");
+				LinkEvent departure = getDepartureEvent(
+						personId,
+						departureTime,
+						departureId);
+				//log.debug("getting departure events... DONE");
+				//log.debug("getting arrival events...");
+				LinkEvent arrival = getArrivalEvent(
+						personId,
+						arrivalTime,
+						arrivalId);
+				if (arrival == null) {
+					log.debug("arrival unfound: agent may have been stucked and removed.");
+					return null;
+				}
+				//log.debug("getting arrival events... DONE");
+
+				//log.debug("counting possible shared rides...");
+				numberOfJoinableTrips = countPossibleSharedRides(departure, arrival);
+				//log.debug("counting possible shared rides... DONE");
+				departureTime = departure.getTime();
+				break;
+			case PLAN_BASED:
+				numberOfJoinableTrips = countPossibleSharedRides(
+						departureTime,
+						departureId,
+						arrivalTime,
+						arrivalId);
+				break;
 		}
-		//log.debug("getting arrival events... DONE");
 
-		//log.debug("counting possible shared rides...");
-		numberOfJoinableTrips = countPossibleSharedRides(departure, arrival);
-		//log.debug("counting possible shared rides... DONE");
-
-		return new TripData(personId, departure.getTime(), distance, numberOfJoinableTrips);
+		return new TripData(personId, departureTime, distance, numberOfJoinableTrips);
 	}
 
 	private LinkEvent getDepartureEvent(
@@ -475,6 +543,31 @@ public class CountPossibleSharedRides {
 			this.leaveLinksTopology.getNeighbors(departure);
 		List<LinkEvent> arrivalNeighbors =
 			this.enterLinksTopology.getNeighbors(arrival);
+	
+		return countPossibleSharedRides(departureNeighbors, arrivalNeighbors);
+	}
+
+	private int countPossibleSharedRides(
+			final double departureTime,
+			final Id departureLink,
+			final double arrivalTime,
+			final Id arrivalLink
+			) {
+		List<LinkEvent> departureNeighbors =
+			this.leaveLinksTopology.getNeighbors(
+					departureTime,
+					departureLink);
+		List<LinkEvent> arrivalNeighbors =
+			this.enterLinksTopology.getNeighbors(
+					arrivalTime,
+					arrivalLink);
+	
+		return countPossibleSharedRides(departureNeighbors, arrivalNeighbors);
+	}
+
+	private int countPossibleSharedRides(
+			final List<LinkEvent> departureNeighbors,
+			final List<LinkEvent> arrivalNeighbors) {
 		List<Id> alreadyChecked = new ArrayList<Id>(1000);
 		Id currentId;
 		int count = 0;

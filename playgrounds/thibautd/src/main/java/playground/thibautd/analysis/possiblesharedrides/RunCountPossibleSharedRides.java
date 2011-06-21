@@ -47,7 +47,7 @@ public class RunCountPossibleSharedRides {
 		Logger.getLogger(RunCountPossibleSharedRides.class);
 
 	private static final int NUM_TIME_BINS = 100;
-	private static final int NUM_BOXES_PER_DAY = 24;
+	private static final int NUM_BOXES_PER_DAY = 24*4;
 	private static final double ACCEPTABLE_DISTANCE = 500d;
 	private static final double TIME_WINDOW = 15*60d;
 

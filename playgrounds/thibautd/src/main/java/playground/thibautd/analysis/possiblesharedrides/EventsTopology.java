@@ -73,9 +73,13 @@ public class EventsTopology {
 	 * window
 	 */
 	public List<LinkEvent> getNeighbors(final LinkEvent event) {
-		List<? extends LinkEvent> temporalNeighbors = getTemporalNeighbors(event);
+		return getNeighbors(event.getTime(), event.getLinkId());
+	}
+
+	public List<LinkEvent> getNeighbors(final double time, final Id link) {
+		List<? extends LinkEvent> temporalNeighbors = getTemporalNeighbors(time, this.timeWindowRadius);
 		List<Id> spatialNeighborhood = 
-			this.linkTopology.getNeighbors(event.getLinkId());
+			this.linkTopology.getNeighbors(link);
 		List<LinkEvent> output = new ArrayList<LinkEvent>();
 
 		for (LinkEvent currentEvent : temporalNeighbors) {
