@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "/mnt/sda3/matsim-sources/trunk/dtd/plans_v4.dtd">
+<plans>
+ <person id="1">
+ 	<plan type="car">
+ 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" />
+ 		<leg mode="car">
+ 			<route>2 7 12</route>
+ 		</leg>
+ 		<act type="w" x="10000" y="0" link="20" dur="1:59" />
+
+		<!-- joint trip -->
+		<leg mode="car">
+		</leg>
+		<act type="pu_1045" x="10000" y="0" link="20"/><!-- dur="0:00" />-->
+ 		<leg mode="car"> 
+ 		</leg>
+ 		<act type="drop_off" x="-25000" y="0" link="1" dur="0:00" /> 
+		<leg mode="car">
+		</leg>
+		<!-- end of joint trip -->
+
+ 		<act type="h" x="-25000" y="0" link="1" /> 
+ 	</plan>
+ </person>
+
+ <person id="2" car_avail="never">
+ 	<plan type="pt">
+ 		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" /> 
+ 		<leg mode="pt" trav_time="1800"> 
+ 		</leg>
+ 		<act type="w" x="10000" y="0" link="20" dur="02:01" />
+
+		<!-- joint trip -->
+		<leg mode="walk">
+		</leg>
+ 		<act type="pu_1045" x="10000" y="0" link="20" dur="0:00" />
+ 		<leg mode="car_passenger" trav_time="00:38:59">  
+		</leg>
+ 		<act type="drop_off" x="-25000" y="0" link="1" dur="0:00" /> 
+		<leg mode="walk">
+		</leg>
+		<!-- end of joint trip -->
+
+ 		<act type="h" x="-25000" y="0" link="1" />
+ 	</plan>
+ </person>
+ 
+<person id="5" car_avail="always">
+	<plan type="pt">
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" /> -->
+		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
+		<leg mode="pt">
+			<route>2 7 12</route>
+		</leg>
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
+
+		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+
+		<!-- joint trip -->
+		<leg mode="pt">
+		</leg>
+		<act type="pu_1045" x="0" y="0" link="20" dur="0:00" />
+ 		<leg mode="car_passenger" trav_time="00:38:59">  
+ 		</leg>
+ 		<act type="drop_off" x="-25000" y="0" link="1" dur="0:00" /> 
+		<leg mode="pt">
+		</leg>
+		<!-- end of joint trip -->
+
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+
+
+
+<person id="3">
+	<plan type="pt">
+		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" />
+		<leg mode="pt">
+		</leg>
+		<act type="w" x="10000" y="0" link="20" dur="09:02:22" />
+		<leg mode="pt">
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+
+<person id="4">
+	<plan type="car">
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" /> -->
+		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
+		<leg mode="car">
+			<route>2 7 12</route>
+		</leg>
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+		<leg mode="car">
+			<route>13 14 15 1</route>
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+
+<person id="6">
+	<plan type="car">
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" /> -->
+		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
+		<leg mode="car">
+			<route>2 7 12</route>
+		</leg>
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+		<leg mode="car">
+			<route>13 14 15 1</route>
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+
+<person id="7">
+	<plan type="car">
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" /> -->
+		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
+		<leg mode="car">
+			<route>2 7 12</route>
+		</leg>
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+		<leg mode="car">
+			<route>13 14 15 1</route>
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+</plans>

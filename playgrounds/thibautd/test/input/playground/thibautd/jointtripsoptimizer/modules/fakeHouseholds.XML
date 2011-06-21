@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cliques>
+	<clique id="2593677">
+		<person id="3"/>
+		<person id="4"/>
+	</clique>
+	<clique id="2593674">
+		<person id="1"/>
+		<person id="2"/>
+		<!--	</clique>
+		  <clique id="1">-->
+		<person id="5"/>
+	</clique>
+	<clique id="5674">
+		<person id="6"/>
+	</clique>
+	<clique id="2567">
+		<person id="7"/>
+	</clique>
+</cliques>
