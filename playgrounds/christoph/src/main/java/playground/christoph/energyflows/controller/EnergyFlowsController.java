@@ -42,6 +42,7 @@ public class EnergyFlowsController extends Controler {
 	 */
 	@Override
 	protected StrategyManager loadStrategyManager() {
+		log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
 		StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
@@ -59,6 +60,7 @@ public class EnergyFlowsController extends Controler {
 	public EnergyFlowsController(String[] args) {
 		super(args[0]);
 		this.reroutingShare = Double.parseDouble(args[1]);
+		log.info("Use transit agent rerouting share of " + Double.parseDouble(args[1]));
 		
 		if (args.length != 2) {
 			log.error("Unexpected number of input arguments!");

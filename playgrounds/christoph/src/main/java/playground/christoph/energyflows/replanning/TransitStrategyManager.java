@@ -27,7 +27,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
@@ -45,11 +45,14 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public class TransitStrategyManager extends StrategyManager {
 
 	private PlanStrategy reroutingStrategy;
+	private PlanStrategy expBetaSelectorStrategy;
 	private double reroutingShare;
 	
 	public TransitStrategyManager(Controler controler, double replanningShare) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
 		reroutingStrategy.addStrategyModule(new ReRoute(controler));
+		
+		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
 		
 		this.reroutingShare = replanningShare;
 	}
@@ -64,7 +67,7 @@ public class TransitStrategyManager extends StrategyManager {
 		if (id > 1000000000) {
 			double rnd = MatsimRandom.getRandom().nextDouble();
 			if (rnd <= reroutingShare) return reroutingStrategy;
-			else return new PlanStrategyImpl(new KeepSelected());
+			else return expBetaSelectorStrategy;
 		} else return super.chooseStrategy(person);
 	}
 }
