@@ -53,10 +53,10 @@ public class Simulation_12{
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
 		final double ev=0.75; 
-		double kWHEV =24;
-		double kWHPHEV =24;
+		double kWHEV =16;
+		double kWHPHEV =16;
 		//boolean gasHigh =true; // high gas price
-		boolean gasHigh =false;// low gas price
+		boolean gasHigh =true;// low gas price
 		final double xPercentDownUp=1.00;
 		final double xPercentDown=1.0-xPercentDownUp;
 		

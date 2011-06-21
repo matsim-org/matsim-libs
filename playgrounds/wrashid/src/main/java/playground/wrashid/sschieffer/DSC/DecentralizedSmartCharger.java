@@ -134,6 +134,7 @@ public class DecentralizedSmartCharger {
 	private HashMap<Id, Schedule> agentParkingAndDrivingSchedules; 
 	private HashMap<Id, Schedule> agentChargingSchedules;
 	private double averageChargingCostsAgent, averageChargingCostsAgentEV, averageChargingCostsAgentPHEV;	
+	private double averageChargingTimeAgent, averageChargingTimeAgentEV, averageChargingTimeAgentPHEV;	
 	
 	public double minChargingLength;	
 	public double emissionCounter=0.0;	
@@ -351,15 +352,25 @@ public class DecentralizedSmartCharger {
 		updateDeterministicLoad(); // bottle neck of wrap up
 		
 		System.out.println("\n Update costs ");
-		calculateChargingCostsAllAgents();
+		calculateAverageChargingCostsAllAgents();
+		
+		calculateAverageChargingTimesAllAgents();
+		
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
-		
 		writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		
+		deleteEVsWithFailureForV2G();
 	}
-
-
-
+	
+	
+	
+	public void deleteEVsWithFailureForV2G(){
+		deleteAgentInList(getIdsOfEVAgentsWithFailedOptimization());
+		for(Id id: getIdsOfEVAgentsWithFailedOptimization()){
+			agentsWithEV.remove(id);
+		}
+	}
 	
 	
 	/**
@@ -389,21 +400,23 @@ public class DecentralizedSmartCharger {
 				
 			}
 		}
-		deleteAgentEverywhere();
+		deleteAgentInList(deletedAgents);
+		
 		
 	}
 
 	
-	public void deleteAgentEverywhere(){
-		for(int i=0; i< deletedAgents.size(); i++){
-			Id id= deletedAgents.get(i);
-			System.out.println("agent "+id.toString()+
-			" had to be deleted - no parking times were found for him -- schedule == empty");
+		
+	
+	public void deleteAgentInList(LinkedList <Id> list){
+		for(int i=0; i< list.size(); i++){
+			Id id= list.get(i);
 			agentParkingAndDrivingSchedules.remove(id);
 			vehicles.getKeySet().remove(id);// referenced in agentContracts - so automatically deleted... later used for stochastic load		
 			
 		}
 	}
+	
 	
 	/**
 	 * finds the required charging times for all parking intervals based on the daily plan of the agent
@@ -618,40 +631,75 @@ public class DecentralizedSmartCharger {
 	
 	
 	/**
-	 * calculates and stores the final charging costs for all agent schedules and their associated charging times
+	 * calculates and stores the final average charging costs for all agent schedules and their associated charging times
 	 * </br> </br>
 	 * the results are stored in agentChargingCosts
 	 * @throws MaxIterationsExceededException
 	 * @throws FunctionEvaluationException
 	 * @throws IllegalArgumentException
 	 */
-	public void calculateChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+	public void calculateAverageChargingCostsAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
 		
 		for(Id id : vehicles.getKeySet()){			
 			Schedule s= agentParkingAndDrivingSchedules.get(id);
 			double thisChargingCost=calculateChargingCostForAgentSchedule(id, s) ;
 			agentChargingCosts.put(id,thisChargingCost );
 			
-			averageChargingCostsAgent+=thisChargingCost;
-			if(hasAgentEV(id)){
-				averageChargingCostsAgentEV+=thisChargingCost;
-			}else{
-				averageChargingCostsAgentPHEV+=thisChargingCost;	
+			if(!chargingFailureEV.contains(id)){
+				averageChargingCostsAgent+=thisChargingCost;
+				
+				if(hasAgentEV(id) ){				
+					averageChargingCostsAgentEV+=thisChargingCost;				
+				}else{
+					averageChargingCostsAgentPHEV+=thisChargingCost;	
+				}
 			}
+			
 		}
-		
-		averageChargingCostsAgent=averageChargingCostsAgent/(agentsWithEV.size()+agentsWithPHEV.size());
+		int numEVsNotfail=agentsWithEV.size()-chargingFailureEV.size();
+		int numPHEVs= agentsWithPHEV.size();
+		averageChargingCostsAgent=averageChargingCostsAgent/(numEVsNotfail+numPHEVs);
 		if(agentsWithEV.size()==0){
 			averageChargingCostsAgentEV=0;
-		}else{averageChargingCostsAgentEV=averageChargingCostsAgentEV/(agentsWithEV.size());}
+		}else{averageChargingCostsAgentEV=averageChargingCostsAgentEV/(numEVsNotfail);}
 		
 		if(agentsWithPHEV.size()==0){
 			averageChargingCostsAgentPHEV=0;
-		}else{averageChargingCostsAgentPHEV=averageChargingCostsAgentPHEV/(agentsWithPHEV.size());}
+		}else{averageChargingCostsAgentPHEV=averageChargingCostsAgentPHEV/(numPHEVs);}
 		
 	}
 
-
+	
+	public void calculateAverageChargingTimesAllAgents() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
+		for(Id id : vehicles.getKeySet()){			
+			if(!chargingFailureEV.contains(id)){
+				double time= agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule();
+				averageChargingTimeAgent+=time;
+				
+				if(hasAgentEV(id) ){
+						averageChargingTimeAgentEV+=time;
+					
+				}else{
+					averageChargingTimeAgentPHEV+=time;
+				}
+			}
+			
+		}
+		int numEVsNotfail=agentsWithEV.size()-chargingFailureEV.size();
+		int numPHEVs= agentsWithPHEV.size();
+		
+		averageChargingTimeAgent=averageChargingTimeAgent/(numEVsNotfail+numPHEVs);
+		//EVs
+		if(agentsWithEV.size()==0){
+			averageChargingTimeAgentEV=0;
+		}else{averageChargingTimeAgentEV=averageChargingTimeAgentEV/(numEVsNotfail);}
+		//PHEVs
+		if(agentsWithPHEV.size()==0){
+			averageChargingTimeAgentPHEV=0;
+		}else{averageChargingTimeAgentPHEV=averageChargingTimeAgentPHEV/(numPHEVs);}
+		
+	}
 
 	/**
 	 * calculates the costs of charging for a schedule
@@ -787,7 +835,7 @@ public class DecentralizedSmartCharger {
 		myV2G.calcV2GVehicleStats();
 		System.out.println("DONE V2G");
 		writeSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
-		
+		writeSummaryV2GTXT("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 	}
 	
 	
@@ -1334,15 +1382,15 @@ public class DecentralizedSmartCharger {
 	 * @return
 	 */
 	public double getAverageChargingTimeAgents(){
-		return getAverageChargingTimeAgents();
+		return averageChargingTimeAgent;
 	}
 	
 	public double getAverageChargingTimePHEV(){
-		return getAverageChargingTimePHEV();
+		return  averageChargingTimeAgentPHEV;
 	}
 	
 	public double getAverageChargingTimeEV(){
-		return getAverageChargingTimeEV();
+		return averageChargingTimeAgentEV;
 	}
 	
 	
@@ -2039,17 +2087,17 @@ public class DecentralizedSmartCharger {
 		    
 		    out.write("</br>");
 		    out.write("CHARGING COSTS </br>");
-		    out.write("Average charging cost of agents: "+getAverageChargingCostAgents()+"</br>");
-		    out.write("Average charging cost of EV agents: "+getAverageChargingCostEV()+"</br>");			   
-		    out.write("Average charging cost of PHEV agents: "+getAverageChargingCostPHEV()+"</br>");
+		    out.write("DSC Average charging cost of agents: "+getAverageChargingCostAgents()+"</br>");
+		    out.write("DSC Average charging cost of EV agents: "+getAverageChargingCostEV()+"</br>");			   
+		    out.write("DSC Average charging cost of PHEV agents: "+getAverageChargingCostPHEV()+"</br>");
 		    out.write("</br>");
 		    
 		   
 		    out.write("</br>");
 		    out.write("CHARGING TIME </br>");
-		    out.write("Average charging time of agents: "+averageChargingCostsAgent+"</br>");
-		    out.write("Average charging time of EV agents: "+ averageChargingCostsAgentEV+"</br>");			   
-		    out.write("Average charging time of PHEV agents: "+averageChargingCostsAgentPHEV+"</br>");
+		    out.write("Average charging time of agents: "+getAverageChargingTimeAgents()+"</br>");
+		    out.write("Average charging time of EV agents: "+ getAverageChargingTimeEV()+"</br>");			   
+		    out.write("Average charging time of PHEV agents: "+getAverageChargingTimePHEV()+"</br>");
 		    out.write("</br>");
 		    
 		    out.write("TOTAL EMISSIONS: "+ getTotalEmissions() +"</br>");
@@ -2088,7 +2136,50 @@ public class DecentralizedSmartCharger {
 	
 	
 	
-	
+	public void writeSummaryTXT(String configName){
+		try{
+		    // Create file 
+			String title=(outputPath + configName+ "_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    out.write("Number of PHEVs: \t");
+		    out.write("Number of EVs: \t");
+		    out.write(" EV with failure \t");
+		    out.write("Number of deleted agents \t");
+		    
+		    out.write("DSC Average charging cost of agents: \t");
+		    out.write("DSC Average charging cost of EV agents: \t");			   
+		    out.write("DSC Average charging cost of PHEV agents: "+getAverageChargingCostPHEV()+"\t");
+		  
+		    out.write("DSC Average charging time of agents: \t");
+		    out.write("DSC Average charging time of EV agents: \t");			   
+		    out.write("DSC Average charging time of PHEV agents: \t");
+		    out.write("DSC TOTAL EMISSIONS: \t \n");
+		    
+		    //*********************
+		    
+		    out.write(getAllAgentsWithPHEV().size() +"\t");
+		    out.write(getAllAgentsWithEV().size()+"\t");
+		    out.write(chargingFailureEV.size()+"\t");
+		    out.write(deletedAgents.size()+"\t");
+		    //cost
+		    out.write(getAverageChargingCostAgents()+"\t");
+		    out.write(getAverageChargingCostEV()+"\t");			   
+		    out.write(getAverageChargingCostPHEV()+"\t");
+		    //time
+		    out.write(getAverageChargingTimeAgents()+"\t");
+		    out.write(getAverageChargingTimeEV()+"\t");			   
+		    out.write(getAverageChargingTimePHEV()+"\t");
+		    
+		    out.write(getTotalEmissions() +"\t");
+		  		    
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
+	}
 	
 	
 	
@@ -2178,7 +2269,86 @@ public class DecentralizedSmartCharger {
 	}
 
 
-	
+	public void writeSummaryV2GTXT(String configName){
+		try{
+		    // Create file 
+			String title=(outputPath + configName+ "_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    
+		    out.write("Number of PHEVs: \t");
+		    out.write("Number of EVs: \t");
+		    out.write(" EV with failure \t");
+		    out.write("Number of deleted agents \t");
+		    
+		    out.write("DSC Average charging cost of agents: \t");
+		    out.write("DSC Average charging cost of EV agents: \t");			   
+		    out.write("DSC Average charging cost of PHEV agents: \t");
+		  
+		    out.write("DSC Average charging time of agents: \t");
+		    out.write("DSC Average charging time of EV agents: \t");			   
+		    out.write("DSC Average charging time of PHEV agents: \t");
+		    
+		    out.write("DSC TOTAL EMISSIONS: \t ");
+		    
+		    out.write("% of agents with contract 'regulation down': \t");
+		    out.write("% of agents with contract 'regulation up and down': \t");
+		    
+		    out.write("Average revenue per agent: \t");
+		    out.write("Average revenue per EV agent: \t");
+		    out.write("Average revenue per PHEV agent: \t");
+		   
+		    out.write("Total V2G Up provided by all Agents: \t");
+		    out.write("      of which EV: \t");
+		    out.write("      of which PHEV: \t");
+		    
+		    out.write("Total V2G Down provided by all Agents: \t");
+		    out.write("      of which EV: \t");
+		    out.write("      of which PHEV: \t \n");
+		    //*********************
+		    
+		    out.write(getAllAgentsWithPHEV().size() +"\t");
+		    out.write(getAllAgentsWithEV().size()+"\t");
+		    out.write(chargingFailureEV.size()+"\t");
+		    out.write(deletedAgents.size()+"\t");
+		    
+		    //cost
+		    out.write(getAverageChargingCostAgents()+"\t");
+		    out.write(getAverageChargingCostEV()+"\t");			   
+		    out.write(getAverageChargingCostPHEV()+"\t");
+		    //time
+		    out.write(getAverageChargingTimeAgents()+"\t");
+		    out.write(getAverageChargingTimeEV()+"\t");			   
+		    out.write(getAverageChargingTimePHEV()+"\t");
+		    
+		    out.write(getTotalEmissions() +"\t");
+		    
+		    out.write(getPercentDown() +"\t");
+		    out.write(getPercentDownUp() +"\t");
+		    
+		    out.write(myV2G.getAverageV2GRevenueAgent() +"\t");
+		    out.write(myV2G.getAverageV2GRevenueEV() +"\t");
+		    out.write(myV2G.getAverageV2GRevenuePHEV() +"\t");
+		   
+		    out.write(myV2G.getTotalRegulationUp() +"\t");
+		    out.write(myV2G.getTotalRegulationUpEV() +"\t");
+		    out.write(myV2G.getTotalRegulationUpPHEV() +"\t");
+		    
+		    out.write(myV2G.getTotalRegulationDown() +"\t");
+		    out.write(myV2G.getTotalRegulationDownEV() +"\t");
+		    out.write(myV2G.getTotalRegulationDownPHEV() +"\t");
+		    //*********************
+		    
+		    
+		  
+		   
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
+	}
 	
 
 	public void setV2G(V2G setV2G){

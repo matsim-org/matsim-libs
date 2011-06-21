@@ -96,7 +96,7 @@ public class Main_V2G {
 		
 		//final String outputPath="/cluster/home/baug/stellas/Runs/24hrV2G20000Plans15Min/Results";
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+		final String outputPath="D:/ETH/MasterThesis/TestOutput/";
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		double kWHEV =24;
