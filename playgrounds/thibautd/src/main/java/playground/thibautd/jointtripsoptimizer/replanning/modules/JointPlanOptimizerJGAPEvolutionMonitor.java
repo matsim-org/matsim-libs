@@ -30,6 +30,8 @@ import org.jgap.Population;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * Monitors the evolution and stops them if stagnation is observed.
+ *
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor {

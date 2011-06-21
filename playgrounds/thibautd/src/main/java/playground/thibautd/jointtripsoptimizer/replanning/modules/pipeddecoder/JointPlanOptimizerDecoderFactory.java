@@ -28,6 +28,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * Creates {@link JointPlanOptimizerPipedDecoder} instances.
  * @author thibautd
  */
 public class JointPlanOptimizerDecoderFactory {

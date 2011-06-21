@@ -49,13 +49,17 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 /**
  * Decoder for the engagement/desengagement of individuals in a shared ride.
  * The resulting plan has the following flaws, to be corrected in the following
- * decoders (say, the duration decoder):
- * -no synchronisation
- * -inconsistent origin/destination in legs
+ * decoders (say, the duration and mode decoders):
+ * <ul>
+ * <li> no synchronisation
+ * <li> inconsistent origin/destination in legs
+ *  </ul>
  *
  *  the correct parameters are:
- *  -the affectation of activities and legs
- *  -the links between legs (ie legs of unengaged individuals are not referenced)
+ *  <ul>
+ *  <li>the affectation of activities and legs
+ *  <li>the links between legs (ie legs of unengaged individuals are not referenced)
+ *  </ul>
  * @author thibautd
  */
 public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {

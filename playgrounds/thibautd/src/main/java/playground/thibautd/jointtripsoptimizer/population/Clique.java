@@ -66,12 +66,18 @@ public class Clique implements Person {
 	 * =========================================================================
 	 */
 	/**
-	 * @deprecated
+	 * @deprecated should be removed soon.
 	 */
 	public Clique(final Id id) {
 		this(id, new HashMap<Id, Person>());
 	}
 
+	/**
+	 * constructs a clique.
+	 *
+	 * @param id the {@link Id} of the clique
+	 * @param members a map listing members and their {@link Id}s
+	 */
 	public Clique(final Id id, final Map<Id, Person> members) {
 		this.members = members;
 		this.plans = new ArrayList<JointPlan>();
@@ -88,7 +94,7 @@ public class Clique implements Person {
 	 * @return the <i>joint</i> plans of the clique.
 	 */
 	@Override
-	public List<? extends Plan> getPlans() {
+	public List<JointPlan> getPlans() {
 		//log.debug("clique.getPlans() returns "+this.plans.size()+" plans");
 		//log.debug("first individual has "+
 		//		((Person) members.values().toArray()[0]).getPlans().size()+" plans");
@@ -108,7 +114,13 @@ public class Clique implements Person {
 	}
 
 	/**
-	 * Currently unimplemented.
+	 * Currently unimplemented. The only way to create a new plan is currently by
+	 * copying the selected plan.
+	 * <BR>
+	 * The idea behind this restriction is to avoid inconsistencies, as, contrary
+	 * to an individual plan like {@link PlanImpl}, a {@link JointPlan} is tied to
+	 * a specific clique.
+	 *
 	 * @deprecated
 	 * @throws UnsupportedOperationException
 	 */
@@ -119,16 +131,25 @@ public class Clique implements Person {
 		throw new UnsupportedOperationException("using yet unimplemented clique.addPlan method:");
 	}
 
+	/**
+	 * @return the selected plan of the clique.
+	 */
 	@Override
 	public Plan getSelectedPlan() {
 		return this.selectedPlan;
 	}
 
+	/**
+	 * @return the id of the clique
+	 */
 	@Override
 	public Id getId() {
 		return this.id;
 	}
 
+	/**
+	 * @return null
+	 */
 	@Override
 	public Map<String,Object> getCustomAttributes() {
 		return null;
@@ -138,6 +159,12 @@ public class Clique implements Person {
 	 * ========================================================================
 	 * methods existing for PersonImpl but not in the interface
 	 * ========================================================================
+	 */
+	/**
+	 * Sets the selected plan of the clique to the given plan. The plan must
+	 * already be a plan of the clique, and will not be added.
+	 *
+	 * @param selectedPlan the plan to mark as selected.
 	 */
 	public final void setSelectedPlan(final JointPlan selectedPlan) {
 		if (this.getPlans().contains(selectedPlan)) {
@@ -152,8 +179,22 @@ public class Clique implements Person {
 		}
 	}
 
+	/**
+	 * sets the seleted plan if it is a {@link JointPlan}
+	 * 
+	 * @throws IllegalArgumentException if the plan cannot be cast to a
+	 * {@link JointPlan}
+	 */
 	public final void setSelectedPlan(final Plan selectedPlan) {
-		this.setSelectedPlan((JointPlan) selectedPlan);
+		JointPlan plan; 
+
+		try {
+			plan = (JointPlan) selectedPlan;
+		}
+		catch (ClassCastException e) {
+			throw new IllegalArgumentException("cannot select a non joint plan for a clique", e);
+		}
+		this.setSelectedPlan(plan);
 	}
 
 	public Plan getRandomUnscoredPlan() {
@@ -202,6 +243,9 @@ public class Clique implements Person {
 	 * Clique specific methods
 	 * =========================================================================
 	 */
+	/**
+	 * @return the internal members map.
+	 */
 	public Map<Id, ? extends Person> getMembers() {
 		return this.members;
 	}
@@ -228,6 +272,14 @@ public class Clique implements Person {
 				" a member from a clique");
 	}
 
+	/**
+	 * Removes the plan from the clique database, and removes the corresponding
+	 * individual plans at the individual level.
+	 *
+	 * @return true if the plan was removed, false otherwise.
+	 * @throws RuntimeException if the plan was properly removed at the global level
+	 * but not at the individual one.
+	 */
 	public boolean removePlan(final Plan plan) {
 		if ((plan instanceof JointPlan)&&(this.plans.remove(plan))) {
 			// delete the corresponding individual plans
@@ -252,11 +304,20 @@ public class Clique implements Person {
 	// plan import/export
 	// /////////////////////////////////////////////////////////////////////////
 	/**
-	 * Builds a joint plan based on the (presumed unique) plans of the members.
+	 * Builds a joint plan based on the plans of the members.
 	 * To call immediately after having added all members.
-	 * TODO: buil it from extra information from the plans file.
-	 * TODO: initialize at construction? (possibility of choosing between dataset
-	 * extraction, joint trips insertion heuristics, choice model...)
+	 * <BR>
+	 * If the individual plan types allow it, all individual plans are kept.
+	 * Otherwise, the selected plans of the individuals are grouped in a joint plan,
+	 * the other plans are discarded.
+	 * <BR>
+	 * If the plan type identify joint plans, the plans are assumed synchronized.
+	 * Otherwise, the plans are synchronised at construction.
+	 * <BR><BR>
+	 * CAUTION: importing from the plan dump will produce valid plans, but not a strict
+	 * copy of the imported plans: the leg ids, that are used to resolve linked legs,
+	 * are not dumped. This does not currently pose problems, but could if the
+	 * cliques where to maintain several "father" plans.
 	 */
 	public void buildJointPlanFromIndividualPlans() {
 		if (this.plans.isEmpty()) {

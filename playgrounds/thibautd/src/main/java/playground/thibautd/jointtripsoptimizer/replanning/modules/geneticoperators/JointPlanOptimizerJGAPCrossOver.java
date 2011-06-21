@@ -42,10 +42,12 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * Cross breeds joint plans.
  * It does the following:
- * - on discrete variables: uniform cross-over.
- * - on continuous variables: GENOCOP-like "arithmetical" cross overs.
+ * <ul>
+ * <li> on discrete variables: uniform cross-over.
+ * <li> on continuous variables: GENOCOP-like "arithmetical" cross overs.
+ * </ul>
  *
- * assumes the following structure for the chromosome: [boolean genes]-[Double genes]
+ * assumes the following structure for the chromosome: [boolean genes]-[Double genes]-[mode genes]
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {

@@ -50,6 +50,9 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * Decodes plan durations, assuming that all other dimensions (toggle, mode) are
+ * set correctly.
+ *
  * @author thibautd
  */
 public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {

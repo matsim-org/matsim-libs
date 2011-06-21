@@ -129,19 +129,22 @@ public class JointEventsToScore implements
 		this.learningRate = learningRate;
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	@Override
+	public void handleEvent(final AgentDepartureEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		this.getAgentTimesList(event.getPersonId()).add(
 				new Tuple<String, Double>(DEPARTURE, event.getTime()));
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	@Override
+	public void handleEvent(final AgentArrivalEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		this.getAgentTimesList(event.getPersonId()).add(
 				new Tuple<String, Double>(ARRIVAL, event.getTime()));
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	@Override
+	public void handleEvent(final AgentStuckEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		ScoringFunction scoringFunction =
 			this.getScoringFunctionForAgent(event.getPersonId());
@@ -150,7 +153,8 @@ public class JointEventsToScore implements
 		}
 	}
 
-	public void handleEvent(AgentMoneyEvent event) {
+	@Override
+	public void handleEvent(final AgentMoneyEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		ScoringFunction scoringFunction =
 			this.getScoringFunctionForAgent(event.getPersonId());
@@ -159,29 +163,32 @@ public class JointEventsToScore implements
 		}
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	@Override
+	public void handleEvent(final ActivityStartEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		this.getAgentTimesList(event.getPersonId()).add(
 				new Tuple<String, Double>(ACT_START, event.getTime()));
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	@Override
+	public void handleEvent(final ActivityEndEvent event) {
 		//eventsToScoreDelegate.handleEvent(event);
 		this.getAgentTimesList(event.getPersonId()).add(
 				new Tuple<String, Double>(ACT_END, event.getTime()));
 	}
 
-	public double getAveragePlanPerformance() {
-		//return eventsToScoreDelegate.getAveragePlanPerformance();
-		return 0d;
-	}
+	//public double getAveragePlanPerformance() {
+	//	//return eventsToScoreDelegate.getAveragePlanPerformance();
+	//	return 0d;
+	//}
 
-	public double getAgentScore(Id agentId) {
+	public double getAgentScore(final Id agentId) {
 		//return eventsToScoreDelegate.getAgentScore(agentId);
 		return this.getScoringFunctionForAgent(agentId).getScore();
 	}
 
-	public void reset(int iteration) {
+	@Override
+	public void reset(final int iteration) {
 		//eventsToScoreDelegate.reset(iteration);
 		this.agentScorers.clear();
 		this.agentTimes.clear();
@@ -238,11 +245,9 @@ public class JointEventsToScore implements
 		return agentTimeList;
 	}
 
-	/*
-	 * =========================================================================
-	 * Scoring relative functions
-	 * =========================================================================
-	 */
+	// /////////////////////////////////////////////////////////////////////////
+	// Scoring relative functions
+	// /////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Iterates over cliques and scores the corresponding individual plans.
@@ -291,9 +296,9 @@ public class JointEventsToScore implements
 	}
 
 	private boolean scoreNextEvent(
-			Id individualId,
-			List<Id> individualsToScore,
-			Map<Id, List<PlanElement>> individualPlans) {
+			final Id individualId,
+			final List<Id> individualsToScore,
+			final Map<Id, List<PlanElement>> individualPlans) {
 		Tuple<String, Double> currentEvent = null;
 
 		try {
@@ -322,8 +327,8 @@ public class JointEventsToScore implements
 	}
 
 	private void scoreDeparture(
-			Id individualId,
-			double time) {
+			final Id individualId,
+			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
 		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan); 
@@ -359,8 +364,8 @@ public class JointEventsToScore implements
 	}
 
 	private void scoreArrival(
-			Id individualId,
-			double time) {
+			final Id individualId,
+			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
 		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan); 
@@ -388,7 +393,7 @@ public class JointEventsToScore implements
 	/**
 	 * TODO: improve (currently returns the max start time)
 	 */
-	private double getArrivalTime(JointLeg leg) {
+	private double getArrivalTime(final JointLeg leg) {
 		double maxTime = Double.NEGATIVE_INFINITY;
 		double currentTime;
 
@@ -401,8 +406,8 @@ public class JointEventsToScore implements
 	}
 
 	private void scoreActivityStart(
-			Id individualId,
-			double time) {
+			final Id individualId,
+			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
 		Activity activity = (Activity) individualPlan.getPlanElements().get(indexInPlan);
@@ -414,8 +419,8 @@ public class JointEventsToScore implements
 	}
 
 	private void scoreActivityEnd(
-			Id individualId,
-			double time) {
+			final Id individualId,
+			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
 		Activity activity = (Activity) individualPlan.getPlanElements().get(indexInPlan);
@@ -427,7 +432,7 @@ public class JointEventsToScore implements
 		//}
 	}
 
-	private void initialiseIndices(List<Id> individualsToScore) {
+	private void initialiseIndices(final List<Id> individualsToScore) {
 		this.indicesInPlan.clear();
 		this.indicesInEvents.clear();
 
@@ -440,19 +445,19 @@ public class JointEventsToScore implements
 		this.examinedLegsForArrival.clear();
 	}
 
-	private int getIndexInPlan(Id id) {
+	private int getIndexInPlan(final Id id) {
 		return this.indicesInPlan.get(id);
 	}
 
-	private void incrIndexInPlan(Id id) {
+	private void incrIndexInPlan(final Id id) {
 		this.indicesInPlan.put(id, this.indicesInPlan.get(id) + 1);
 	}
 
-	private int getIndexInEvents(Id id) {
+	private int getIndexInEvents(final Id id) {
 		return this.indicesInEvents.get(id);
 	}
 
-	private void incrIndexInEvents(Id id) {
+	private void incrIndexInEvents(final Id id) {
 		this.indicesInEvents.put(id, this.indicesInEvents.get(id) + 1);
 	}
 

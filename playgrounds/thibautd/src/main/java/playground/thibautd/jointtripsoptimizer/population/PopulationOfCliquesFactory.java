@@ -33,11 +33,11 @@ import org.matsim.api.core.v01.population.PopulationFactory;
  */
 public class PopulationOfCliquesFactory implements PopulationFactory {
 	//not used
-	private final ScenarioWithCliques scenario;
+	//private final ScenarioWithCliques scenario;
 	private final PopulationWithCliquesFactory factoryDelegate;
 
 	public PopulationOfCliquesFactory(ScenarioWithCliques sc) {
-		this.scenario = sc;
+		//this.scenario = sc;
 		this.factoryDelegate = new PopulationWithCliquesFactory(sc);
 	}
 

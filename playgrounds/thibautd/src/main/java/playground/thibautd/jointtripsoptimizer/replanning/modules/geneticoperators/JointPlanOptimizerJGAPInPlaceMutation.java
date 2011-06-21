@@ -45,13 +45,19 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * The genes of the <u>candidate</u> chromosomes are mutated according to some 
  * probability, and the resulting offspring reimplaces the original chromosome
  * if it is fittest.
- *
+ * <BR>
  * Using this mutation operator can be seen as the usage of a local optimizer
  * for toggle gene, thus making useless the modification of those genes in genetic
  * operators.
+ * <BR>
+ * This DOES NOT correspond to the operator used when "in place" mutation os selected
+ * in the config.
+ *
+ * @deprecated
  *
  * @author thibautd
  */
+@Deprecated
 public class JointPlanOptimizerJGAPInPlaceMutation implements GeneticOperator {
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPMutation.class);

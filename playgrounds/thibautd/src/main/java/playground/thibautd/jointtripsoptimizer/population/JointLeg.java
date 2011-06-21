@@ -37,6 +37,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.AbstractRoute;
 
 /**
+ * Defines a {@link Leg} type, which can be linked to other individual legs
+ * to identify shared rides.
+ *
  * @author thibautd
  */
 public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable {
@@ -58,7 +61,6 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * to indicate when it is safe to copy the route of the driver leg from
 	 * passenger legs.
 	 */
-	//TODO: find a more parcimonious way of achieving this.
 	private boolean routeToCopy = false;
 	
 	private final List<IdLeg> linkedLegsIds = new ArrayList<IdLeg>();
@@ -74,14 +76,23 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * =========================================================================
 	 */
 
-	//LegImpl compatible
+	/**
+	 * Instanciate a ne JointLeg, with a newly generated Id.
+	 */
 	public JointLeg(final String transportMode, final Person person) {
 		super(transportMode);
 		this.person = person;
 		this.legId = createId();
 	}
 
-	//JointLeg specific
+	/**
+	 * Copy constructor.
+	 * <ul>
+	 * <li> uses the copy {@link LegImpl} constructor to copy the internal leg.
+	 * <li> copies the leg id
+	 * <li> copies the linked leg information.
+	 * </ul>
+	 */
 	public JointLeg(final JointLeg leg) {
 		super((LegImpl) leg);
 		this.legId = leg.getId();
@@ -178,6 +189,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		return super.getRoute();
 	}
 
+	/**
+	 * If the leg is a passenger leg, this will make the route to be
+	 * set to a copy of the driver's route at the next call of {@link JointLeg#getRoute()}.
+	 */
 	public void routeToCopy() {
 		this.routeToCopy = true;
 	}
@@ -210,6 +225,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		return (this.linkedLegsIds.size() > 0);
 	}
 
+	/**
+	 * @deprecated use the equivalent by Id instead
+	 */
+	@Deprecated
 	@Override
 	public void setLinkedElements(
 			final Map<Id, ? extends JointActing> linkedElements) {
@@ -224,6 +243,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		}
 	}
 
+	/**
+	 * @deprecated use the equivalent by Id instead
+	 */
+	@Deprecated
 	@Override
 	public void addLinkedElement(final Id id, final JointActing act) {
 		try {
@@ -234,6 +257,10 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		}
 	}
 
+	/**
+	 * @deprecated use the equivalent by Id instead
+	 */
+	@Deprecated
 	@Override
 	public Map<Id, JointLeg> getLinkedElements() {
 		Map<Id, JointLeg> output = new HashMap<Id, JointLeg>();
@@ -316,6 +343,9 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * =========================================================================
 	 */
 
+	/**
+	 * @return true if the leg is joint and its mode is car.
+	 */
 	public boolean getIsDriver() {
 		//return this.isDriver;
 		return this.getJoint() && this.getMode().equals(TransportMode.car);

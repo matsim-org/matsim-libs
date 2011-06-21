@@ -32,12 +32,19 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 
 /**
- * Interface aimed at handling the population of cliques from within the default
+ * Container aimed at handling the population of cliques from within the default
  * classes of MATSim (as the StrategyManager) with few modifications.
+ * <BR>
  * It thus consists of two types of methods:
- * -methods with meaningful names
- * -methods inherited from the population interface, which redirect toward the
+ * <ul>
+ * <li>methods with meaningful names
+ * <li>methods inherited from the population interface, which redirect toward the
  *  "real" ones.
+ *  </ul>
+ *
+ * Instances of this class are created together with the individual population
+ * while constructing a {@link PopulationWithCliques}.
+ *
  * @author thibautd
  */
 public class PopulationOfCliques implements Population {
@@ -54,7 +61,13 @@ public class PopulationOfCliques implements Population {
 	 * constructors
 	 * =========================================================================
 	 */
-	public PopulationOfCliques(ScenarioWithCliques sc) {
+	/**
+	 * Constructs an instance.
+	 *
+	 * Do not call: use {@link PopulationWithCliques} to constuct simultaneously
+	 * population and cliques.
+	 */
+	PopulationOfCliques(ScenarioWithCliques sc) {
 		this.factory = new PopulationOfCliquesFactory(sc);
 		//this.cliques = this.extractCliques(sc.getConfig());
 	}
@@ -101,19 +114,29 @@ public class PopulationOfCliques implements Population {
 		this.name = name;
 	}
 
+	/**
+	 * binds to {@link PopulationOfCliques#getCliques()}
+	 */
 	@Override
 	public Map<Id,? extends Person> getPersons() {
 		//log.debug("method getPersons() used to retrieve cliques from PopulationOfCliques");
 		return this.getCliques();
 	}
 
+	/**
+	 * binds to {@link PopulationOfCliques#addClique(Clique)}
+	 *
+	 * @throws IllegalArgumentException if the argument is not a
+	 * {@link Clique}
+	 */
 	@Override
-	public void addPerson(Person p) {
+	public void addPerson(final Person p) {
 		try {
 			this.addClique((Clique) p);
-		} catch(java.lang.ClassCastException e) {
-			//TODO: treat exception
-			log.error("Failed to add agent "+p+": is not a Clique!");
+		} catch(ClassCastException e) {
+			throw new IllegalArgumentException(
+					"Failed to add agent "+p+": is not a Clique!",
+					e);
 		}
 	}
 }

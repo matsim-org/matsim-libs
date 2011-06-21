@@ -24,8 +24,12 @@ import org.jgap.Population;
 
 /**
  * monitors the population and "corrects" tabu chromosomes.
+ *
+ * @deprecated this method is computationnally inefficient, and premature
+ * convergence can be avoided much more efficiently.
  * @author thibautd
  */
+@Deprecated
 public interface TabuMonitor {
 	/**
 	 * To call at each generation to update tabu list.

@@ -43,9 +43,13 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * Class mutating random members from the previous generation.
  * The type of mutation differs depending on the gene:
- * -"toggle" gene: the value is changed with probability 1.
- * -duration gene: GENOCOP (Michalewicz and Janikow, 1996) like "non-uniform
- *  mutation" (preserves the inequality constraints).
+ * <ul>
+ * <li> "toggle" gene: the value is changed
+ * <li> duration gene: GENOCOP (Michalewicz and Janikow, 1996) like "non-uniform
+ *  mutation" (preserves the inequality constraints) or "uniform" (the probability
+ *  of choosing one or the other is set in the config file).
+ *  <li> mode gene: the list is shuffled
+ * </ul>
  *
  * @author thibautd
  */
@@ -115,7 +119,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	/**
 	 * Randomly mutates the offsprings of the previously applied operators
-	 * (classical mutation)
+	 * (classical mutation).
 	 */
 	public void operateInPlace(
 			final Population a_population,

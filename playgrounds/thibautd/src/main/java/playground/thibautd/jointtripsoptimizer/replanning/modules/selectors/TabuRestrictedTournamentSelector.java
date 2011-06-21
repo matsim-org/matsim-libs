@@ -30,6 +30,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * Quick implementation of a RTS with tabu capabilities on toggle genes.
  * @author thibautd
  */
+@Deprecated
 public class TabuRestrictedTournamentSelector extends RestrictedTournamentSelector {
 	//cannot use delegation:  add protected
 	private static final long serialVersionUID = 1L;

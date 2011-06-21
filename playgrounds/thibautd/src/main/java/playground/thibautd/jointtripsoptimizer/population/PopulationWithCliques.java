@@ -33,6 +33,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 /**
+ * Encapsulate a {@link Population} Object and a {@link PopulationWithCliques}
  * @author thibautd
  */
 public class PopulationWithCliques implements Population {
@@ -49,14 +50,17 @@ public class PopulationWithCliques implements Population {
 	 * Constructors
 	 * =========================================================================
 	 */
-	public PopulationWithCliques(ScenarioImpl sc) {
+	public PopulationWithCliques(final ScenarioImpl sc) {
 		this((ScenarioWithCliques) sc);
 		log.debug("PopulationWithCliques initialized by passing it a scenario");
 	}
 
-	public PopulationWithCliques(ScenarioWithCliques sc) {
+	/**
+	 * Construct the internal {@link Population} and {@link PopulationOfCliques}.
+	 */
+	public PopulationWithCliques(final ScenarioWithCliques sc) {
 		log.debug("PopulationWithCliques initialized by passing it a scenarioWithCliques");
-		this.populationDelegate = new PopulationImpl((ScenarioImpl) sc);
+		this.populationDelegate = new PopulationImpl(sc);
 		this.factory = new PopulationWithCliquesFactory(sc);
 		this.cliques = new PopulationOfCliques(sc);
 	}
@@ -66,26 +70,31 @@ public class PopulationWithCliques implements Population {
 	 * Delegate methods calls
 	 * =========================================================================
 	 */
+	@Override
 	public PopulationFactory getFactory() {
 		//log.debug("population factory from populationWithCliques accessed");
 		return populationDelegate.getFactory();
 	}
 
+	@Override
 	public String getName() {
 		return populationDelegate.getName();
 	}
 
-	public void setName(String name) {
+	@Override
+	public void setName(final String name) {
 		populationDelegate.setName(name);
 	}
 
+	@Override
 	public Map<Id, ? extends Person> getPersons() {
 		//log.debug("Persons of the PopulationWithCliques accessed");
 		//log.debug(populationDelegate.getPersons().size()+" persons returned");
 		return populationDelegate.getPersons();
 	}
 
-	public void addPerson(Person p) {
+	@Override
+	public void addPerson(final Person p) {
 		populationDelegate.addPerson(p);
 	}
 

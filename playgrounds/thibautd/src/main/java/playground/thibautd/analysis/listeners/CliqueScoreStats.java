@@ -88,9 +88,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 	/**
 	 * Creates a new CliqueScoreStats instance.
 	 *
-	 * @param population the population, which cliques must remain unchanged during the
-	 * iterations
-	 * @param filename
+	 * @param fileName the output "base" name, without the path nor the extension
 	 * @param createPNG true if in every iteration, the scorestats should be
 	 * visualized in a graph and written to disk.
 	 * @throws UncheckedIOException

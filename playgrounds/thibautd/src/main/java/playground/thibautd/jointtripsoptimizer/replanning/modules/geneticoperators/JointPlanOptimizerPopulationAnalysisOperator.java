@@ -33,7 +33,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
@@ -45,7 +44,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 
 /**
  * "fake" genetic operator for displaying information about the population.
- * CAUTION: generates large amounts of files at the root of the project
+ * CAUTION: generates large amounts of files. Use with little scenarios only
  * @author thibautd
  */
 public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOperator {

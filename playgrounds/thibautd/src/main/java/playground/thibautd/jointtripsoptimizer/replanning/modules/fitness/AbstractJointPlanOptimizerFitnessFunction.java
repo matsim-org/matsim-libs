@@ -24,6 +24,9 @@ import org.jgap.FitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
 
 /**
+ * Extend this class to provide a fitness function for the joint replanning algorithm.
+ *
+ *
  * @author thibautd
  */
 abstract public class AbstractJointPlanOptimizerFitnessFunction extends FitnessFunction {

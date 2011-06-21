@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 /**
+ * Defines the file used to import clique information.
  * @author thibautd
  */
 public class CliquesConfigGroup extends Module {

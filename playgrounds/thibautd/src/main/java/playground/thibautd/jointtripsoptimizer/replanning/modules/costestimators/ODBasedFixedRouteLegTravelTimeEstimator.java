@@ -81,6 +81,12 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	private final Map<Tuple<Id, Id>, Map<String, LegImpl>> fixedRoutes = 
 		new HashMap<Tuple<Id, Id>, Map<String, LegImpl>>();
 
+	/**
+	 * Constructs an instance.
+	 *
+	 * Do not call directly: use {@link JointPlanOptimizerLegTravelTimeEstimatorFactory}
+	 * instead.
+	 */
 	protected ODBasedFixedRouteLegTravelTimeEstimator(
 			final Plan plan,
 			final TravelTime linkTravelTimeEstimator,

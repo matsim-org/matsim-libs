@@ -35,6 +35,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
+ * {@link PlanAlgorithm} aimed at optimizing joint plans with a genetic algorithm.
  * @author thibautd
  */
 public class JointPlanOptimizer implements PlanAlgorithm {

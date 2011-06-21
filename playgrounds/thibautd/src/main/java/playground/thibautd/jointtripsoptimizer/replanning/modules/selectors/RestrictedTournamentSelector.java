@@ -22,7 +22,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.selectors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import org.jgap.Configuration;
 import org.jgap.IChromosome;
@@ -37,12 +36,14 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * Selector using a "restricted tournament" (cf Harik 1995) to generate the new 
  * population.
  * The idea is the following:
- *  -for each "new born", <i>w</i> chromosomes from the population are selected
+ * <ul>
+ *  <li>for each "new born", <i>w</i> chromosomes from the population are selected
  *   randomly.
- *  -the "closest" chromosome of this set is selected for competition
- *  -if the new born is fittest than the chromosome competitor, it replaces it
+ *  <li>the "closest" chromosome of this set is selected for competition
+ *  <li>if the new born is fittest than the chromosome competitor, it replaces it
  *   (and becomes thus part of the possible competitors for not yet added new
  *   born)
+ * </ul>
  *
  * @author thibautd
  */
