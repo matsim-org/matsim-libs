@@ -45,6 +45,7 @@ import playground.droeder.DaPaths;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
+import playground.droeder.data.graph.MatchingSegment;
 import playground.droeder.data.graph.comparison.NodeCompare;
 import playground.droeder.gis.DaShapeWriter;
 
@@ -201,6 +202,8 @@ public class GraphMatching {
 		return this.nodeReference2match;
 	}
 	
+	
+	//####### results 2 shape ########
 	public void nodes2Shape(String outPath){
 		Map<String, Coord> ref;
 		ref = new HashMap<String, Coord>();
@@ -237,54 +240,84 @@ public class GraphMatching {
 	public void edges2Shape(String outpath){
 		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer, Coord> temp;
-		
+		int i;
 		for(Entry<Id, MatchingEdge> e: this.reference.getEdges().entrySet()){
 			temp = new TreeMap<Integer, Coord>();
-			temp.put(0, e.getValue().getFromNode().getCoord());
-			temp.put(1, e.getValue().getToNode().getCoord());
+			i = 0;
+			for(MatchingSegment s: e.getValue().getSegments()){
+				temp.put(i, s.getStart());
+				temp.put(i++, s.getEnd());
+			}
 			edges.put(e.getKey().toString(), temp);
 		}
-		DaShapeWriter.writeDefaultLineString2Shape(outpath + "refGraph.shp", "refGraph", edges, null);
+		DaShapeWriter.writeDefaultLineString2Shape(outpath + "refGraphSegments.shp", "refGraphSegments", edges, null);
 
 		edges = new HashMap<String, SortedMap<Integer,Coord>>();
 		for(Entry<Id, MatchingEdge> e: this.matching.getEdges().entrySet()){
 			temp = new TreeMap<Integer, Coord>();
-			temp.put(0, e.getValue().getFromNode().getCoord());
-			temp.put(1, e.getValue().getToNode().getCoord());
+			i = 0;
+			for(MatchingSegment s: e.getValue().getSegments()){
+				temp.put(i, s.getStart());
+				temp.put(i++, s.getEnd());
+			}
 			edges.put(e.getKey().toString(), temp);
 		}
-		DaShapeWriter.writeDefaultLineString2Shape(outpath + "matchingGraph.shp", "matchingGraph", edges, null);
+		DaShapeWriter.writeDefaultLineString2Shape(outpath + "matchingGraphSegments.shp", "matchingGraphSegments", edges, null);
 	}
 	
 	
 
 	public static void main(String[] args){
 		final String PATH = DaPaths.OUTPUT + "bvg09/";
-		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
-		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
+		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
+		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+		
+
+		TransitStopFacility fac = null;
+		MatchingEdge e;
+		MatchingNode start, end;
 		
 		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		visumSc.getConfig().scenario().setUseTransit(true);
 		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
 		reader.readFile(VISUMTRANSITFILE);
 		MatchingGraph v = new MatchingGraph();
+		List<TransitStopFacility> facs;
+		ArrayList<Coord> shape;
 		
-		for(TransitStopFacility stop : visumSc.getTransitSchedule().getFacilities().values()){
-			v.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
-		}
-		
-		TransitStopFacility fac = null;
-		int i = 0;
+		String temp;
 		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
+			temp = line.getId().toString().substring(0, 1);
+			
+			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V")) continue;
+			
 			for(TransitRoute route: line.getRoutes().values()){
+				facs = new ArrayList<TransitStopFacility>();
+				shape = new ArrayList<Coord>();
 				for(TransitRouteStop stop : route.getStops()){
-					if(!(fac == null)){
-						v.addEdge(new MatchingEdge(new IdImpl(i), v.getNodes().get(fac.getId()), v.getNodes().get(stop.getStopFacility().getId())));
-					}
-					fac = stop.getStopFacility();
-					i++;
+					facs.add(stop.getStopFacility());
+					shape.add(stop.getStopFacility().getCoord());
 				}
+				if(facs.size() < 2) continue;
+				
+				if(v.getNodes().containsKey(facs.get(0).getId())){
+					start = v.getNodes().get(facs.get(0).getId());
+				}else{
+					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+					v.addNode(start);
+				}
+				
+				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+					end = v.getNodes().get(facs.get(facs.size()-1).getId());
+				}else{
+					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+					v.addNode(end);
+				}
+				
+				e = new MatchingEdge(route.getId(), start, end);
+				e.addShapePointsAndCreateSegments(shape);
+				v.addEdge(e);
 			}
 		}
 		
@@ -294,27 +327,41 @@ public class GraphMatching {
 		reader2.readFile(HAFASTRANSITFILE);
 		MatchingGraph h = new MatchingGraph();
 		
-		for(TransitStopFacility stop : hafasSc.getTransitSchedule().getFacilities().values()){
-			h.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
-		}
 		
 		fac = null;
-		i = 0;
 		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
 			for(TransitRoute route: line.getRoutes().values()){
+				facs = new ArrayList<TransitStopFacility>();
+				shape = new ArrayList<Coord>();
 				for(TransitRouteStop stop : route.getStops()){
-					if(!(fac == null)){
-						h.addEdge(new MatchingEdge(new IdImpl(i), h.getNodes().get(fac.getId()), h.getNodes().get(stop.getStopFacility().getId())));
-					}
-					fac = stop.getStopFacility();
-					i++;
+					facs.add(stop.getStopFacility());
+					shape.add(stop.getStopFacility().getCoord());
 				}
+				if(facs.size() < 2) continue;
+				
+				if(h.getNodes().containsKey(facs.get(0).getId())){
+					start = h.getNodes().get(facs.get(0).getId());
+				}else{
+					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+					h.addNode(start);
+				}
+				
+				if(h.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+					end = h.getNodes().get(facs.get(facs.size()-1).getId());
+				}else{
+					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+					h.addNode(end);
+				}
+				
+				e = new MatchingEdge(route.getId(), h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
+				e.addShapePointsAndCreateSegments(shape);
+				h.addEdge(e);
 			}
 		}
 		
 		GraphMatching gm = new GraphMatching(v, h);
-		gm.setMaxAngle(Math.PI / 3);
-		gm.setMaxDist(100.0);
+		gm.setMaxAngle(Math.PI / 4);
+		gm.setMaxDist(500.0);
 		gm.bottomUpMatching();
 		gm.nodes2Shape(OUT);
 		gm.edges2Shape(OUT);

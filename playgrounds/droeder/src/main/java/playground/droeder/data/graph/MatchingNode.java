@@ -38,14 +38,12 @@ public class MatchingNode implements GraphElement{
 	private Coord coord;
 	private Map<Id, MatchingEdge> incoming;
 	private Map<Id, MatchingEdge> outgoing;
-	private double dist;
 	
 	public MatchingNode(Id id, Coord coord){
 		this.id = id;
 		this.coord = coord;
 		this.incoming = new HashMap<Id, MatchingEdge>();
 		this.outgoing = new HashMap<Id, MatchingEdge>();
-		this.dist = Double.MAX_VALUE;
 	}
 
 	/**
@@ -80,35 +78,4 @@ public class MatchingNode implements GraphElement{
 	public Collection<MatchingEdge> getOutEdges(){
 		return this.outgoing.values();
 	}
-	
-	
-//	/**
-//	 * calculates the distance to the given coordinate, so Collection.sort() can work
-//	 * @param c
-//	 */
-//	public void setDist(Coord c){
-//		Double a = c.getX() - this.coord.getX();
-//		Double b = c.getY() - this.coord.getY();
-//		this.dist = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-//	}
-//	
-//	/**
-//	 * call setDist(Coord c) before, otherwise a Double.MAX_VALUE is returned
-//	 * @return
-//	 */
-//	public Double getDist(){
-//		return this.dist;
-//	}
-//
-//	@Override
-//	public int compareTo(MatchingNode o) {
-//		if(this.dist < o.getDist()){
-//			return -1;
-//		}else if(this.dist == o.getDist()){
-//			return 0;
-//		}else{
-//			return 1;
-//		}
-//	}
-
 }

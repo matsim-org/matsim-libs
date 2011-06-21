@@ -312,7 +312,7 @@ public class DaShapeWriter {
 		
 		for(Entry<String, SortedMap<Integer, Coord>> points : lineStrings.entrySet()){
 			if (points.getValue().size()<2){
-				log.error("not enough points for a lineString. Need at least 2 points!");
+				log.error(points.getKey() + ": not enough points for a lineString. Need at least 2 points!");
 			}else{
 				int i = 0;
 				coord = new Coordinate[points.getValue().size()];
