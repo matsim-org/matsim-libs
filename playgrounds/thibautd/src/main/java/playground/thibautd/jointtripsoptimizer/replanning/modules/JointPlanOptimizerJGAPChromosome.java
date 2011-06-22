@@ -266,12 +266,80 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		// genes values and return it.
 		// ---------------------------------------------------------
 		return new JointPlanOptimizerJGAPChromosome(getConfiguration(), newGenes);
+	}
 
+	/**
+	 * Creates a "full" random chromosome, that is, a chromosome which sum
+	 * of durations for each individual equals the upper bound.
+	 * <BR>
+	 * For use in tests.
+	 */
+	protected IChromosome randomFullChromosome()
+			throws InvalidConfigurationException {
+		// Sanity check: make sure the given configuration isn't null.
+		// -----------------------------------------------------------
+		if (getConfiguration() == null) {
+			throw new IllegalArgumentException(
+			"Configuration instance must not be null");
+		}
+		// Lock the configuration settings so that they can't be changed
+		// from now on.
+		// -------------------------------------------------------------
+		getConfiguration().lockSettings();
+		Gene[] newGenes = new Gene[this.nBooleanGenes + this.nDoubleGenes + this.nModeGenes];
+		DoubleGene newDoubleGene;
+		JointPlanOptimizerJGAPModeGene newModeGene;
+		Double[] randomDurations = new Double[this.nDoubleGenes];
+		RandomGenerator generator = getConfiguration().getRandomGenerator();
+		double scalingFactor = 0d;
+		int countDoubleGenes = 0;
+
+		// create a random chromosome, taking into account the structure of a
+		// JointPlan chromosome and the time constraints
+		for (int j=0; j < this.nBooleanGenes; j++) {
+			newGenes[j] = new BooleanGene(this.getConfiguration(),
+					generator.nextBoolean());
+		}
+		
+		for (int planLength : this.nDurationGenes) {
+			scalingFactor = 0d;
+			for (int j=0; j < planLength; j++) {
+				randomDurations[j] = generator.nextDouble();
+				scalingFactor += randomDurations[j];
+			}
+
+			scalingFactor = this.dayDuration / scalingFactor;
+
+			for (int j=0; j < planLength; j++) {
+				newDoubleGene =  new DoubleGene(this.getConfiguration(), 0d, this.dayDuration);
+				newDoubleGene.setAllele(scalingFactor * randomDurations[j]);
+
+				newGenes[this.nBooleanGenes + countDoubleGenes] = newDoubleGene;
+				countDoubleGenes++;
+			}
+		}
+
+		if (this.nModeGenes > 0) {
+			List<String> possibleModes = ((JointPlanOptimizerJGAPModeGene) 
+					this.getGene(this.nBooleanGenes + this.nDoubleGenes)).getListValue();
+			for (int j=0; j < this.nModeGenes; j++) {
+				//TODO create and initialize to a random value
+				newModeGene = new JointPlanOptimizerJGAPModeGene(
+						this.getConfiguration(),
+						possibleModes);
+				newModeGene.setToRandomValue(generator);
+				newGenes[this.nBooleanGenes + this.nDoubleGenes + j] =
+					newModeGene;
+			}
+		}
+
+		return new JointPlanOptimizerJGAPChromosome(getConfiguration(), newGenes);
 	}
 
 	public static IChromosome randomInitialChromosome() 
 			throws InvalidConfigurationException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("cannot create a random chromosome"
+				+" in a static way, as the constraints depend on the corresponding plan.");
 	}
 
 	@Override

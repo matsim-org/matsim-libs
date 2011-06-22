@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" [
 <!ENTITY replanningPackage "playground.thibautd.jointtripsoptimizer.replanning">
-<!ENTITY dir "test/input/playground/thibautd/jointtripsoptimizer/modules">
+<!ENTITY dir "test/input/playground/thibautd/jointtripsoptimizer">
 ]>
 <config>
 
