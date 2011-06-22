@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations;
+package playground.wrashid.sschieffer.simulations.batSPriceS;
 
 import java.io.IOException;
 
@@ -39,22 +39,21 @@ import java.util.*;
 
 
 /**
- * 0.75	1.00	2.00	0.67
+ *a	0	1	0.1	0
 
- *EV penetration 75%
- *price of gas US prices : low
- *battery size : large
- *regulation up percentage 67%
+ *price of gas US prices : S
+ *battery size : S
+ *
  * @author Stella
  *
  */
-public class Simulation_1{
+public class SimA{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
 		final double electrification= 1.0; 
-		final double ev=0.75; 
-		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation1/Results/";
+		
+		final String outputPath="/cluster/home/baug/stellas/Runs/SimSSA/Results/";
 		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
@@ -68,11 +67,12 @@ public class Simulation_1{
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
-		double kWHEV =24;
-		double kWHPHEV =24;
+		final double ev=0.1; 
+		double kWHEV =16;
+		double kWHPHEV =16;
 		boolean gasHigh = false;
 		
-		final double xPercentDownUp=0.67;
+		final double xPercentDownUp=0.0;
 		final double xPercentDown=1.0-xPercentDownUp;
 		
 		int numberOfHubsInX=1;

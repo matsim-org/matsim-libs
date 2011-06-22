@@ -113,7 +113,7 @@ public class Schedule {
 	
 	
 	
-	public double getTotalConsumptionFromEngine(){
+	public double getExtraConsumptionFromEngine(){
 		
 		double total=0;
 		for(int i=0; i<getNumberOfEntries();i++){

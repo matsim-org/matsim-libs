@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations;
+package playground.wrashid.sschieffer.simulations.orthogonal;
 
 import java.io.IOException;
 
@@ -39,32 +39,22 @@ import java.util.*;
 
 
 /**
- * 0.10	1.00	1.00	0.00
+ * 0.75	2.00	2.00	0.33
 
- *EV penetration 10%
- *price of gas US prices : low
- *battery size : low
- *regulation up percentage 0%
+ *EV penetration 75%
+ *price of gas US prices : high
+ *battery size : large
+ *regulation up percentage 33%
  * @author Stella
  *
  */
-public class Simulation_11{
+public class Simulation_3{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
-		final double ev=0.10; 
-		double kWHEV =16;
-		double kWHPHEV =16;
-		//boolean gasHigh =true; // high gas price
-		boolean gasHigh =false;// low gas price
-		final double xPercentDownUp=0.00;
-		final double xPercentDown=1.0-xPercentDownUp;
-		
 		final double electrification= 1.0; 
-		final double bufferBatteryCharge=0.0;
-		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
-		
-		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation11/Results/";
+		final double ev=0.75; 
+		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation3/Results/";
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
 		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
@@ -74,6 +64,15 @@ public class Simulation_11{
 		
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double bufferBatteryCharge=0.0;
+		double kWHEV =24;
+		double kWHPHEV =24;
+		boolean gasHigh = true;
+		
+		final double xPercentDownUp=0.33;
+		final double xPercentDown=1.0-xPercentDownUp;
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;

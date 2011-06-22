@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations;
+package playground.wrashid.sschieffer.simulations.orthogonal;
 
 import java.io.IOException;
 
@@ -39,32 +39,32 @@ import java.util.*;
 
 
 /**
- * 0.25	2.00	1.00	0.67
+ * 0.75	2.00	1.00	1.00
 
-
- *EV penetration 25%
+ *EV penetration 75%
  *price of gas US prices : high
  *battery size : low
- *regulation up percentage 67%
+ *regulation up percentage 100%
  * @author Stella
  *
  */
-public class Simulation_8{
+public class Simulation_12{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
-		final double ev=0.25; 
+		final double ev=0.75; 
 		double kWHEV =16;
 		double kWHPHEV =16;
-		boolean gasHigh =true;
-		final double xPercentDownUp=0.67;
+		//boolean gasHigh =true; // high gas price
+		boolean gasHigh =true;// low gas price
+		final double xPercentDownUp=1.00;
 		final double xPercentDown=1.0-xPercentDownUp;
 		
 		final double electrification= 1.0; 
 		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
-		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation8/Results/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation12/Results/";
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
 		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";

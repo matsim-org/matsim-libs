@@ -359,6 +359,7 @@ public class DecentralizedSmartCharger {
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
 		writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		writeSummaryDSCPerAgent("DSCPerAgent");
 		
 		deleteEVsWithFailureForV2G();
 	}
@@ -1315,7 +1316,7 @@ public class DecentralizedSmartCharger {
 	public double getTotalDrivingConsumptionOfAgent(Id id){
 		
 		return agentParkingAndDrivingSchedules.get(id).getTotalBatteryConsumption()
-		+agentParkingAndDrivingSchedules.get(id).getTotalConsumptionFromEngine();
+		+agentParkingAndDrivingSchedules.get(id).getExtraConsumptionFromEngine();
 	}
 	
 	
@@ -1339,7 +1340,7 @@ public class DecentralizedSmartCharger {
 	 */
 	public double getTotalDrivingConsumptionOfAgentFromOtherSources(Id id){
 		
-		return agentParkingAndDrivingSchedules.get(id).getTotalConsumptionFromEngine();
+		return agentParkingAndDrivingSchedules.get(id).getExtraConsumptionFromEngine();
 	}
 	
 	/**
@@ -2136,6 +2137,11 @@ public class DecentralizedSmartCharger {
 	
 	
 	
+	/**
+	 * wrutes .txt summary with results from Decentralized Smart Charging algorithm
+	 * statistics
+	 * @param configName
+	 */
 	public void writeSummaryTXT(String configName){
 		try{
 		    // Create file 
@@ -2182,7 +2188,10 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	
+	/**
+	 * writes out html summary of results from V2G
+	 * @param configName
+	 */
 	public void writeSummaryV2G(String configName){
 		try{
 		    // Create file 
@@ -2269,6 +2278,10 @@ public class DecentralizedSmartCharger {
 	}
 
 
+	/**
+	 * writes out text file with statistics from V2G 
+	 * @param configName
+	 */
 	public void writeSummaryV2GTXT(String configName){
 		try{
 		    // Create file 
@@ -2351,6 +2364,55 @@ public class DecentralizedSmartCharger {
 	}
 	
 
+	/**
+	 * writes out txt file with basic results for every agent
+	 * id, EV, charging cost, charging total time, joules from engine, joules from other source
+	 * @param configName
+	 */
+	public void writeSummaryDSCPerAgent(String configName){
+		try{
+		    // Create file 
+			String title=(outputPath + configName+ "_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    out.write("Agent Id: \t");
+		    out.write("EV?: \t");
+		    
+		    out.write("charging cost:\t");
+		    out.write("charging time: \t");
+		    
+		    out.write("EV failure?: \t");
+		    out.write("Joules from engine: \t");			   
+		    out.write("Joules not from engine: \n");		    
+		   
+		    //*********************
+		    for(Id id: vehicles.getKeySet()){
+		    	out.write(id.toString()+ "\t");
+		    	out.write(hasAgentEV(id)+ "\t");
+		    	
+		    	out.write(agentChargingCosts.get(id)+ "\t");
+		    	out.write(agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule()+ "\t");
+		    	
+		    	out.write(chargingFailureEV.contains(id)+ "\t");
+		    	out.write(getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\t");
+		    	out.write(getTotalDrivingConsumptionOfAgent(id)-getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\n");
+		    }
+		    
+		   
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
+	}
+	
+	
+	
+	
+	
+	
+	
 	public void setV2G(V2G setV2G){
 		myV2G=setV2G;
 	}

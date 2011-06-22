@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations;
+package playground.wrashid.sschieffer.simulations.orthogonal;
 
 import java.io.IOException;
 
@@ -39,42 +39,41 @@ import java.util.*;
 
 
 /**
- * 0.25	2.00	2.00	0.00
+ * 0.90	1.00	2.00	1.00
 
- *EV penetration 25%
- *price of gas US prices : high
- *battery size : large
- *regulation up percentage 0%
+ *EV penetration 90%
+ *price of gas US prices : low
+ *battery size : high
+ *regulation up percentage 100%
  * @author Stella
  *
  */
-public class Simulation_9{
+public class Simulation_13{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
-		final double ev=0.25; 
+		final double ev=0.90; 
 		double kWHEV =24;
 		double kWHPHEV =24;
-		boolean gasHigh =true;
-		final double xPercentDownUp=0.0;
+		//boolean gasHigh =true; // high gas price
+		boolean gasHigh =false;// low gas price
+		final double xPercentDownUp=1.00;
 		final double xPercentDown=1.0-xPercentDownUp;
 		
 		final double electrification= 1.0; 
 		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		
-		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation9/Results/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/Simulation13/Results/";
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
 		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
-		
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
 		
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
-		
 		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
