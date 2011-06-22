@@ -28,11 +28,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
@@ -52,6 +56,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			.getLogger(Events2Score4PC_mnl.class);
 
 	protected MultinomialLogit mnl;
+	private boolean outputCalcDetail = false;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
@@ -370,14 +375,42 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				}
 			}
 
-			double util = mnl
-					.getCoeff()
-					/* s. the attributes order in Events2Score4PC2.attrNameList */.innerProd(
-							attrVector)
-					+ (Double) plan.getCustomAttributes().get(
-							BseStrategyManager.UTILITY_CORRECTION)
+			double utilCorrection = (Double) plan.getCustomAttributes().get(
+					BseStrategyManager.UTILITY_CORRECTION);
+			Vector coeff = mnl.getCoeff();
+			double util = coeff/*
+								 * s. the attributes order in
+								 * Events2Score4PC2.attrNameList
+								 */
+			.innerProd(attrVector) + utilCorrection
 			/* utilityCorrection is also an important ASC */;
 			plan.setScore(util);
+			if (outputCalcDetail) {
+				System.out.println("/////CALC-DETAILS of PERSON\t"
+						+ person.getId() + "\t////////////////\ncoeff\tattr");
+				for (int i = 0; i < coeff.size(); i++) {
+					System.out.println("/////\t" + coeff.get(i) + "\t"
+							+ attrVector.get(i) + "\t/////");
+				}
+				System.out.println("/////\tUtiliy Correction\t=\t"
+						+ utilCorrection
+						+ "\t/////\n/////\tscore before replanning\t=\t" + util
+						+ "\t/////");
+				System.out.println();
+				for (PlanElement pe : person.getSelectedPlan()
+						.getPlanElements()) {
+					if (pe instanceof Leg) {
+						Route route = ((Leg) pe).getRoute();
+						if (route instanceof NetworkRoute) {
+							System.out.println("/////\tRoute :\t"
+									+ ((NetworkRoute) route).getLinkIds()
+									+ "\t/////");
+						}
+						break;
+					}
+				}
+				System.out.println("///////////////////////////////////////");
+			}
 		}
 	}
 
@@ -460,4 +493,13 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 		return mnl;
 	}
+
+	@Override
+	public void reset(int iteration) {
+		super.reset(iteration);
+		if (iteration == config.controler().getLastIteration()) {
+			outputCalcDetail = true;
+		}
+	}
+
 }

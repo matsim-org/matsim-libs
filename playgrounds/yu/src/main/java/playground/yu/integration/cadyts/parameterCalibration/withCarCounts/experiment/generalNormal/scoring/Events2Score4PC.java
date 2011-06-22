@@ -58,7 +58,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	private static final String PARAM_SCALE_FACTOR_INDEX = "paramScaleFactor_";
 
-	private final Config config;
+	protected final Config config;
 	/** Map<personId,Map<Plan,attr>> */
 	protected Map<Id/* agent */, Map<Plan, Double>> legDursCar = new HashMap<Id, Map<Plan, Double>>(),
 			legDursPt = new HashMap<Id, Map<Plan, Double>>(),
