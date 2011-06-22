@@ -19,16 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.run;
 
-import java.io.File;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,10 +39,12 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
+import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
 
 /**
@@ -138,6 +136,67 @@ public class TestTeleportationBehaviour {
 		return Double.NaN;
 	}
 
+	/**
+	 * tests the "relationships" between the driver and the passenger routes:
+	 * <ul>
+	 * <li> they must reference the same instance
+	 * <li> they must be identical
+	 * </ul>
+	 */
+	@Test
+	public void testPassengerDriverRouteRelationship() {
+		jdeqsimControler.getConfig().controler().setFirstIteration(0);
+		jdeqsimControler.getConfig().controler().setLastIteration(0);
+		jdeqsimControler.run();
+
+		NetworkRoute driverRoute;
+		NetworkRoute passengerRoute;
+
+		for (Person person : jdeqsimControler.getPopulation().getPersons().values()) {
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if ((pe instanceof Leg) && (((JointLeg) pe).getIsDriver())) {
+					driverRoute = (NetworkRoute) ((JointLeg) pe).getRoute();
+
+					for (JointLeg passengerLeg : ((JointLeg) pe).getLinkedElements().values()) {
+						passengerRoute = (NetworkRoute) passengerLeg.getRoute();
+						assertRoutesAreCorrect(passengerRoute, driverRoute);
+					}
+				}
+			}
+		}
+	}
+
+	private void assertRoutesAreCorrect(
+			final NetworkRoute passengerRoute,
+			final NetworkRoute driverRoute) {
+		Assert.assertNotSame(
+				"the driver and passenger route point toward the same instance!",
+				passengerRoute,
+				driverRoute);
+
+		Assert.assertEquals(
+				"the driver and passenger route do not have the same durations",
+				passengerRoute.getTravelTime(),
+				driverRoute.getTravelTime(),
+				MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals(
+				"the driver and the passenger rout do not have the same origin",
+				passengerRoute.getStartLinkId(),
+				driverRoute.getStartLinkId());
+
+		// is it necessary?
+		Assert.assertEquals(
+				"the driver and the passenger rout do not have the same path",
+				passengerRoute.getLinkIds(),
+				driverRoute.getLinkIds());
+
+		Assert.assertEquals(
+				"the driver and the passenger rout do not have the same destination",
+				passengerRoute.getEndLinkId(),
+				driverRoute.getEndLinkId());
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// ////////////////////////////////////////////////////////////////////////
@@ -156,10 +215,7 @@ public class TestTeleportationBehaviour {
 		}
 
 		@Override
-		public void reset(final int iteration) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void reset(final int iteration) {}
 
 		@Override
 		public void handleEvent(final AgentDepartureEvent event) {
