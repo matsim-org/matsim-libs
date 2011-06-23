@@ -22,6 +22,7 @@ package org.matsim.core.controler;
 
 import javax.swing.event.EventListenerList;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -43,12 +44,14 @@ import org.matsim.core.controler.listener.StartupListener;
 
 /**
  * Class encapsulating all behavior concerning the ControlerEvents/Listeners
- * 
+ *
  * @author dgrether
  */
 public final class ControlerListenerManager implements MatsimManager {
 
-	private Controler controler;
+	private final static Logger log = Logger.getLogger(ControlerListenerManager.class);
+
+	private final Controler controler;
 	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners
 	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
 	 * always running in a predefined order to ensure correctness.
@@ -57,11 +60,11 @@ public final class ControlerListenerManager implements MatsimManager {
 	 */
 	private final EventListenerList coreListenerList = new EventListenerList();
 	private final EventListenerList listenerList = new EventListenerList();
-	
-	ControlerListenerManager(Controler c){
+
+	ControlerListenerManager(final Controler c){
 		this.controler = c;
 	}
-	
+
 	/**
 	 * Add a core ControlerListener to the Controler instance
 	 *
@@ -106,20 +109,23 @@ public final class ControlerListenerManager implements MatsimManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Notifies all ControlerListeners
 	 */
 	protected void fireControlerStartupEvent() {
-		StartupEvent event = new StartupEvent(controler);
+		StartupEvent event = new StartupEvent(this.controler);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
     for (int i = 0; i < listener.length; i++) {
+    	log.info("calling notifyStartup on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyStartup(event);
     }
     listener = this.listenerList.getListeners(StartupListener.class);
     for (int i = 0; i < listener.length; i++) {
+    	log.info("calling notifyStartup on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyStartup(event);
     }
+    log.info("all ControlerStartupListeners called.");
 	}
 
 	/**
@@ -127,15 +133,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
 	protected void fireControlerShutdownEvent(final boolean unexpected) {
-		ShutdownEvent event = new ShutdownEvent(controler, unexpected);
+		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected);
     ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
     for (int i = 0; i < listener.length; i++) {
+    	log.info("calling notifyShutdown on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyShutdown(event);
     }
     listener = this.listenerList.getListeners(ShutdownListener.class);
     for (int i = 0; i < listener.length; i++) {
+    	log.info("calling notifyShutdown on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyShutdown(event);
     }
+    log.info("all ControlerShutdownListeners called.");
 	}
 
 	/**
@@ -143,15 +152,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerIterationStartsEvent(final int iteration) {
-		IterationStartsEvent event = new IterationStartsEvent(controler, iteration);
+		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyIterationStarts on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyIterationStarts(event);
     }
 		listener = this.listenerList.getListeners(IterationStartsListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyIterationStarts on " + listener[i].getClass().getCanonicalName());
     	listener[i].notifyIterationStarts(event);
     }
+		log.info("all ControlerIterationStartsListeners called.");
 	}
 
 	/**
@@ -160,15 +172,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerIterationEndsEvent(final int iteration) {
-		IterationEndsEvent event = new IterationEndsEvent(controler, iteration);
+		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration);
 		IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyIterationEnds on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyIterationEnds(event);
 		}
 		listener = this.listenerList.getListeners(IterationEndsListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyIterationEnds on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyIterationEnds(event);
 		}
+		log.info("all ControlerIterationEndsListeners called.");
 	}
 
 	/**
@@ -177,15 +192,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerScoringEvent(final int iteration) {
-		ScoringEvent event = new ScoringEvent(controler, iteration);
+		ScoringEvent event = new ScoringEvent(this.controler, iteration);
 		ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyScoring on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyScoring(event);
 		}
 		listener = this.listenerList.getListeners(ScoringListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyScoring on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyScoring(event);
 		}
+		log.info("all ControlerScoringListeners called.");
 	}
 
 	/**
@@ -194,15 +212,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerReplanningEvent(final int iteration) {
-		ReplanningEvent event = new ReplanningEvent(controler, iteration);
+		ReplanningEvent event = new ReplanningEvent(this.controler, iteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyReplanning on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyReplanning(event);
 		}
 		listener = this.listenerList.getListeners(ReplanningListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyReplanning on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyReplanning(event);
 		}
+		log.info("all ControlerReplanningListeners called.");
 	}
 
 	/**
@@ -211,15 +232,18 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerBeforeMobsimEvent(final int iteration) {
-		BeforeMobsimEvent event = new BeforeMobsimEvent(controler, iteration);
+		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyBeforeMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyBeforeMobsim(event);
 		}
 		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyBeforeMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyBeforeMobsim(event);
 		}
+		log.info("all ControlerBeforeMobsimListeners called.");
 	}
 
 	/**
@@ -228,16 +252,19 @@ public final class ControlerListenerManager implements MatsimManager {
 	 * @param iteration
 	 */
 	protected void fireControlerAfterMobsimEvent(final int iteration) {
-		
-		AfterMobsimEvent event = new AfterMobsimEvent(controler, iteration);
+
+		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyAfterMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyAfterMobsim(event);
 		}
 		listener = this.listenerList.getListeners(AfterMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
+			log.info("calling notifyAfterMobsim on " + listener[i].getClass().getCanonicalName());
 			listener[i].notifyAfterMobsim(event);
 		}
+		log.info("all ControlerAfterMobsimListeners called.");
 	}
 
 }
