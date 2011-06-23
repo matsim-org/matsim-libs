@@ -230,11 +230,11 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		double oldValue1;
 		double oldValue2;
 		int crossingPoint = this.randomGenerator.nextInt(this.N_DOUBLE);
-		double crossingCoef1 = SimpleCoCrossingCoef(
+		double crossingCoef1 = simpleCoCrossingCoef(
 				mate1.getGenes(),
 				mate2.getGenes(),
 				crossingPoint);
-		double crossingCoef2 = SimpleCoCrossingCoef(
+		double crossingCoef2 = simpleCoCrossingCoef(
 				mate2.getGenes(),
 				mate1.getGenes(),
 				crossingPoint);
@@ -271,7 +271,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * respects the constraints. A value of one corresponds to a classical single
 	 * point cross-over.
 	 */
-	private double SimpleCoCrossingCoef(
+	private double simpleCoCrossingCoef(
 			final Gene[] mate1Genes,
 			final Gene[] mate2Genes,
 			final int crossingPoint) {
@@ -378,11 +378,11 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				continue;
 			}
 
-			crossingCoef1 = SingleCoCrossingCoef(
+			crossingCoef1 = singleCoCrossingCoef(
 					mate1.getGenes(),
 					mate2.getGenes(),
 					crossingPoint);
-			crossingCoef2 = SingleCoCrossingCoef(
+			crossingCoef2 = singleCoCrossingCoef(
 					mate2.getGenes(),
 					mate1.getGenes(),
 					crossingPoint);
@@ -413,7 +413,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * (y_1, y_2, ..., y_(i-1), (1 - a)y_i + a*x_i, y_(i+1), ..., y_n)
 	 * respect the constraints.
 	 */
-	private double SingleCoCrossingCoef(
+	private double singleCoCrossingCoef(
 			final Gene[] mate1Genes,
 			final Gene[] mate2Genes,
 			final int crossingPoint) {
