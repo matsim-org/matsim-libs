@@ -21,29 +21,56 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
+import playground.wrashid.parkingChoice.api.PreferredParkingManager;
+import playground.wrashid.parkingChoice.api.ReservedParkingManager;
+import playground.wrashid.parkingChoice.apiDefImpl.DefaultParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
-import playground.wrashid.parkingChoice.infrastructure.PreferredParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 
 public class ParkingManager implements StartupListener {
 
-	QuadTree<Parking> parkings;
-	private ReservedParkingManager reservedParkingManager = null;
-	private PreferredParkingManager preferredParkingManager = null;
-	private final Controler controler;
-
-	public Controler getControler() {
-		return controler;
+	private QuadTree<Parking> parkings;
+	public QuadTree<Parking> getParkings() {
+		return parkings;
 	}
 
+	private ReservedParkingManager reservedParkingManager = null;
+	public ReservedParkingManager getReservedParkingManager() {
+		return reservedParkingManager;
+	}
+
+	public PreferredParkingManager getPreferredParkingManager() {
+		return preferredParkingManager;
+	}
+
+	private PreferredParkingManager preferredParkingManager = null;
+	private ParkingSelectionManager parkingSelectionManager = new DefaultParkingSelectionManager(this);
+	
+
+	public void setParkingSelectionManager(ParkingSelectionManager parkingSelectionManager) {
+		this.parkingSelectionManager = parkingSelectionManager;
+	}
+
+	private final Controler controler;
+
+	
 	private Collection<Parking> parkingCollection;
 	// key: personId
 	private HashMap<Id, Parking> currentParkingLocation;
 
+	public ParkingSelectionManager getParkingSelectionManager() {
+		return parkingSelectionManager;
+	}
+	
+	public Controler getControler() {
+		return controler;
+	}
+
+	
 	public void resetAllParkingOccupancies() {
 		for (Parking parking : parkings.values()) {
 			parking.resetParkingOccupancy();
@@ -68,120 +95,11 @@ public class ParkingManager implements StartupListener {
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 	}
 
-	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo, Id personId) {
-		double minDistanceOfSearchSpaceInMeters = 1000; // TODO: needs also be
-														// set from
-														// configuration file
-														// (we can't narrow too
-														// much our search).
 
-		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord,
-				ParkingConfigModule.getStartParkingSearchDistanceInMeters(), personId, 0, targetActInfo);
 
-		return getParkingWithShortestWalkingDistance(destCoord, parkingsInSurroundings);
-	}
 
-	private Parking getParkingWithShortestWalkingDistance(Coord destCoord, Collection<Parking> parkingsInSurroundings) {
-		Parking bestParking = null;
-		double currentBestDistance = Double.MAX_VALUE;
 
-		for (Parking parking : parkingsInSurroundings) {
-			double distance = GeneralLib.getDistance(destCoord, parking.getCoord());
-			if (distance < currentBestDistance) {
-				bestParking = parking;
-				currentBestDistance = distance;
-			}
-		}
 
-		return bestParking;
-	}
-
-	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Id personId,
-			double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo) {
-		double maxWalkingDistanceSearchSpaceInMeters = 1000000; // TODO: add this
-																// parameter in
-																// the
-																// configuration
-																// file
-		
-		//+ TO solve problem above the user of this module should provide appropriate parkings
-		// Far away with appropriate capacity.
-		// In this case this parameter could even be left out (although, 1000km is really a long way to walk...)
-		// aber dies factor is wichtig, weil parking far away could still be relevant due to the price
-		// so this parameter needs to be chosen in a way keeping this in mind.
-		
-		Collection<Parking> collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
-
-		Collection<Parking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
-				collection);
-
-		// widen search space, if no parking found
-		while (resultCollection.size() == 0) {
-			minSearchDistance *= 2;
-			collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
-			resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo, collection);
-
-			if (minSearchDistance > maxWalkingDistanceSearchSpaceInMeters) {
-				DebugLib.stopSystemAndReportInconsistency("Simulation Stopped, because no parking found (for given 'maxWalkingDistanceSearchSpaceInMeters')!");
-			}
-		}
-
-		return resultCollection;
-	}
-
-	private Collection<Parking> filterReservedAndFullParkings(Id personId, double OPTIONALtimeOfDayInSeconds,
-			ActInfo targetActInfo, Collection<Parking> collection) {
-		Collection<Parking> resultCollection = new LinkedList<Parking>();
-
-		boolean isPersonLookingForCertainTypeOfParking = false;
-
-		if (preferredParkingManager != null) {
-			isPersonLookingForCertainTypeOfParking = preferredParkingManager.isPersonLookingForCertainTypeOfParking(personId, OPTIONALtimeOfDayInSeconds, targetActInfo);
-		}
-
-		for (Parking parking : collection) {
-
-			if (!parking.hasFreeCapacity()) {
-				continue;
-			}
-
-			if (isPersonLookingForCertainTypeOfParking) {
-				if (parking instanceof PreferredParking) {
-
-					PreferredParking preferredParking = (PreferredParking) parking;
-
-					if (preferredParkingManager.considerForChoiceSet(preferredParking, personId, OPTIONALtimeOfDayInSeconds,
-							targetActInfo)) {
-						resultCollection.add(parking);
-					}
-				}
-
-				continue;
-			}
-
-			if (parking instanceof ReservedParking) {
-				if (reservedParkingManager == null) {
-					DebugLib.stopSystemAndReportInconsistency("The reservedParkingManager must be set!");
-				}
-
-				ReservedParking reservedParking = (ReservedParking) parking;
-
-				if (reservedParkingManager.considerForChoiceSet(reservedParking, personId, OPTIONALtimeOfDayInSeconds,
-						targetActInfo)) {
-					resultCollection.add(parking);
-				}
-			} else if (parking instanceof PrivateParking) {
-				PrivateParking privateParking = (PrivateParking) parking;
-				if (privateParking.getCorrespondingActInfo().getFacilityId().equals(targetActInfo.getFacilityId())
-						&& privateParking.getCorrespondingActInfo().getActType().equals(targetActInfo.getActType())) {
-					resultCollection.add(parking);
-				}
-			} else {
-				resultCollection.add(parking);
-			}
-		}
-		return resultCollection;
-	}
 
 	public ParkingManager(Controler controler, Collection<Parking> parkingCollection) {
 		this.controler = controler;
@@ -235,23 +153,27 @@ public class ParkingManager implements StartupListener {
 			// TODO: carve this out, so that the same code is invoked here and from
 			// Simulation handler + use it in the tests...
 			
+			
+			
 			// park car
-			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord,
-					ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person.getId(), 0, lastActivityInfo);
-
-			// score parkings (only according to distance)
-			for (Parking parking : parkingsInSurroundings) {
-				parking.setScore(-parking.getWalkingDistance(activityCoord) / 10);
-			}
-
-			// rank parkings
-			PriorityQueue<Parking> rankedParkings = new PriorityQueue<Parking>();
-			for (Parking parking : parkingsInSurroundings) {
-				rankedParkings.add(parking);
-			}
+//			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord,
+//					ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person.getId(), 0, lastActivityInfo);
+//
+//			// score parkings (only according to distance)
+//			for (Parking parking : parkingsInSurroundings) {
+//				parking.setScore(-parking.getWalkingDistance(activityCoord) / 10);
+//			}
+//
+//			// rank parkings
+//			PriorityQueue<Parking> rankedParkings = new PriorityQueue<Parking>();
+//			for (Parking parking : parkingsInSurroundings) {
+//				rankedParkings.add(parking);
+//			}
 
 			// park vehicle
-			Parking bestParking = rankedParkings.poll();
+		//	Parking bestParking = rankedParkings.poll();
+			Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), null, null);
+		//	Parking bestParking = getParkingWithShortestWalkingDistance(activityCoord,lastActivityInfo,person.getId());
 			parkVehicle(person.getId(), bestParking);
 		}
 	}

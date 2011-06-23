@@ -102,9 +102,6 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			
 			// TODO: this selection should happen according to best parking available for the
 			// given activity location (not only according to the best walking distance).
-			Parking selectedParking=parkingManager.getParkingWithShortestWalkingDistance(getTargetFacility(event).getCoord(),new ActInfo(event.getFacilityId(),event.getActType()), event.getPersonId());
-			parkingManager.parkVehicle(personId, selectedParking);
-			lastParkingUsed.put(personId, selectedParking);
 			
 			Person person = controler.getPopulation().getPersons().get(personId);
 			
@@ -116,6 +113,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			} else {
 				DebugLib.stopSystemAndReportInconsistency("there might be some inconsitency???");
 			}
+			
+			Parking selectedParking=parkingManager.getParkingSelectionManager().selectParking(getTargetFacility(event).getCoord(), new ActInfo(event.getFacilityId(),event.getActType()), event.getPersonId(), event.getTime(), estimatedActduration); 
+			parkingManager.parkVehicle(personId, selectedParking);
+			lastParkingUsed.put(personId, selectedParking);
+			
 			
 			//TODO: get the best possible parking at the moment for the given estimated act duration and walking dist. etc.
 			// 

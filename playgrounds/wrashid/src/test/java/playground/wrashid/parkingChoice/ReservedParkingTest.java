@@ -12,10 +12,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+
+import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 
 public class ReservedParkingTest extends TestCase {
 

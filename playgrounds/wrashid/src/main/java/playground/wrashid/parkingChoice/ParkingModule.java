@@ -7,9 +7,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
+import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
+import playground.wrashid.parkingChoice.api.PreferredParkingManager;
+import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
-import playground.wrashid.parkingChoice.infrastructure.PreferredParkingManager;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreCollector;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -53,6 +54,11 @@ public class ParkingModule {
 	 */
 	public void setReservedParkingManager(ReservedParkingManager reservedParkingManager){
 		parkingManager.setReservedParkingManager(reservedParkingManager);
+	}
+	
+
+	public void setParkingSelectionManager(ParkingSelectionManager parkingSelectionManager){
+		parkingManager.setParkingSelectionManager(parkingSelectionManager);
 	}
 	
 	

@@ -11,12 +11,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.wrashid.parkingChoice.api.PreferredParkingManager;
+import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.Parking;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
-import playground.wrashid.parkingChoice.infrastructure.PreferredParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParkingManager;
 
 public class PreferredParkingTest extends TestCase {
 
@@ -46,7 +46,7 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(9720, walkingDistanceFor3CarScenario(reservedParkingManager, 1), 5.0);
+		assertEquals(9594, walkingDistanceFor3CarScenario(reservedParkingManager, 1), 5.0);
 	}
 
 	public void testAllAgentsWantToUseFarAwayPreferredParkingShouldIncreaseAverageWalkingDistance() {
