@@ -40,12 +40,12 @@ public class VehicleTypeChanger {
 		VehicleReaderV1 readerVehicles = new VehicleReaderV1(vehicles);
 		readerVehicles.readFile(args[1]);
 		TransitSchedule transitSchedule = ((ScenarioImpl)scenario).getTransitSchedule();
-		for (TransitLine line : transitSchedule.getTransitLines().values())
+		/*for (TransitLine line : transitSchedule.getTransitLines().values())
 			for (TransitRoute route : line.getRoutes().values())
 				for(MODES_VEHICLES mode_vehicles:MODES_VEHICLES.values())
 					if(route.getTransportMode().trim().equals(mode_vehicles.name().toLowerCase()))
 						for (Departure departure : route.getDepartures().values())
-							((VehicleImpl)vehicles.getVehicles().get(departure.getVehicleId())).setType(vehicles.getVehicleTypes().get(new IdImpl(mode_vehicles.vehicleTypes[(int) (mode_vehicles.vehicleTypes.length*Math.random())])));
+							((VehicleImpl)vehicles.getVehicles().get(departure.getVehicleId())).setType(vehicles.getVehicleTypes().get(new IdImpl(mode_vehicles.vehicleTypes[(int) (mode_vehicles.vehicleTypes.length*Math.random())])));*/
 		VehicleWriterV1 writer2 = new VehicleWriterV1(vehicles);
 		writer2.writeFile(args[2]);
 	}

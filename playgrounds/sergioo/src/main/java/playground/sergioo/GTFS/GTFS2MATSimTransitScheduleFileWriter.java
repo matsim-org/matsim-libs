@@ -1146,7 +1146,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
 		g2m.write(args[0]);
-		//NetworkPropertiesChanger.changePropertiesCSVFile(network, "./data/gtfs/changes.csv");
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);
