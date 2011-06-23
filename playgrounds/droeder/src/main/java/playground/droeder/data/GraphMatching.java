@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -46,7 +47,9 @@ import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
 import playground.droeder.data.graph.MatchingSegment;
+import playground.droeder.data.graph.comparison.EdgeCompare;
 import playground.droeder.data.graph.comparison.NodeCompare;
+import playground.droeder.data.graph.comparison.SegmentCompare;
 import playground.droeder.gis.DaShapeWriter;
 
 /**
@@ -61,12 +64,14 @@ public class GraphMatching {
 
 	private Double deltaDist;
 	private Double deltaPhi;
+	private double maxLengthDiff;
 	
 	public GraphMatching(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
 		this.matching = matching;
 		this.deltaDist = Double.MAX_VALUE;
 		this.deltaPhi = Double.MAX_VALUE;
+		this.maxLengthDiff = 1.0;
 	}
 	
 	public void setMaxDist(Double maxDeltaDist){
@@ -77,11 +82,15 @@ public class GraphMatching {
 		this.deltaPhi = maxDeltaPhi;
 	}
 	
+	public void setMaxLengthTolerancePerc(double lengthDiffPerc) {
+		this.maxLengthDiff = lengthDiffPerc;
+	}
+
 	public void bottomUpMatching() {
 		log.info("starting bottom-up-Matching...");
 		this.nodeMatching();
-//		this.segmentMatching();
-//		this.edgeMatching();
+		this.segmentMatching();
+		this.edgeMatching();
 		log.info("bottom-up-matching finished...");
 	}
 
@@ -133,23 +142,42 @@ public class GraphMatching {
 
 	// ##### SEGMENTMATCHING #####
 	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
-	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromSegmentMatching;
+	private HashMap<Id, Map<Id, List<SegmentCompare>>> ref2CandEdgesFromSegmentMatching;
 
 	private void segmentMatching() {
 		log.info("start segment matching...");
 		this.computeEdgeCandidatesFromNodes();
 		
-		List<MatchingEdge> tempCand = null;
-		this.ref2CandEdgesFromSegmentMatching = new HashMap<MatchingEdge, List<MatchingEdge>>();
+		this.ref2CandEdgesFromSegmentMatching = new HashMap<Id, Map<Id,List<SegmentCompare>>>();
+		Map<Id, List<SegmentCompare>> candEdge2Segments = new HashMap<Id, List<SegmentCompare>>();
+		List<SegmentCompare> segComp;
+		SegmentCompare sc = null;
+		MatchingSegment rs = null, cs = null;
+		ListIterator<MatchingSegment> candIt, refIt;
 		
 		//iterate over all candidate edges 
 		for(Entry<MatchingEdge, List<MatchingEdge>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
-			// with all algorithms
-			
-			// if there is at least one candidate, store
-			if(tempCand.size() > 0){
-				this.ref2CandEdgesFromSegmentMatching.put(e.getKey(), tempCand);
+			for(MatchingEdge cand : e.getValue()){
+				segComp = new ArrayList<SegmentCompare>();
+				
+				candIt = cand.getSegments().listIterator();
+				refIt = e.getKey().getSegments().listIterator();
+				
+				while(candIt.hasNext() && refIt.hasNext()){
+					if((rs == null) && (cs == null)){
+						rs = refIt.next();
+						cs = candIt.next();
+					}else if(sc.refIsUndershot()){
+						rs = refIt.next();
+					}else if(!sc.refIsUndershot()){
+						cs = candIt.next();
+					}
+					sc = new SegmentCompare(rs, cs);
+					segComp.add(sc);
+				}
+				candEdge2Segments.put(cand.getId(), segComp);
 			}
+			ref2CandEdgesFromSegmentMatching.put(e.getKey().getId(), candEdge2Segments);
 		}
 		
 		// clear temporally matched Edges to save memory 
@@ -173,7 +201,7 @@ public class GraphMatching {
 			if(this.nodeReference2match.containsKey(refFrom) && 
 					this.nodeReference2match.containsKey(refTo)){
 				// iterate over all edges going out from the candidateStartNode which is mapped to the referenceStartNode 
-				for(MatchingEdge cand : this.matching.getNodes().get(this.nodeReference2match.get(refFrom)).getOutEdges()){
+				for(MatchingEdge cand : this.matching.getNodes().get(this.nodeReference2match.get(refFrom).get(0).getCompId()).getOutEdges()){
 					candFrom = cand.getFromNode().getId();
 					candTo = cand.getToNode().getId();
 
@@ -192,11 +220,37 @@ public class GraphMatching {
 		log.info(this.ref2CandEdgesFromMappedNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
 	}
 
-//	// ##### EDGEMATCHING #####
-//	private void edgeMatching() {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	// ##### EDGEMATCHING #####
+	private Map<Id, List<EdgeCompare>> edgeComp;
+	private void edgeMatching() {
+		log.info("start edge-matching...");
+		int cnt = 1,
+			msg = 1;
+		
+		edgeComp = new HashMap<Id, List<EdgeCompare>>();
+		List<EdgeCompare> tempComp;
+		EdgeCompare comp;
+		
+		for(MatchingEdge ref: this.reference.getEdges().values()){
+			tempComp = new ArrayList<EdgeCompare>();
+			for(MatchingEdge cand: this.matching.getEdges().values()){
+				comp = new EdgeCompare(ref, cand);
+				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
+					tempComp.add(comp);
+				}
+				if(cnt%msg == 0){
+					log.info("edges compared: " + cnt + ", matched: " + edgeComp.size());
+					msg *= 2;
+				}
+				cnt++;
+			}
+			if(tempComp.size() > 0){
+				Collections.sort(tempComp);
+				edgeComp.put(ref.getId(), tempComp);
+			}
+		}
+		log.info("edge matching finished...");
+	}
 	
 	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
 		return this.nodeReference2match;
@@ -205,8 +259,7 @@ public class GraphMatching {
 	
 	//####### results 2 shape ########
 	public void nodes2Shape(String outPath){
-		Map<String, Coord> ref;
-		ref = new HashMap<String, Coord>();
+		Map<String, Coord> ref = new HashMap<String, Coord>();
 		
 		Map<String, SortedMap<String, String>> attrib = new HashMap<String, SortedMap<String,String>>();
 		
@@ -226,7 +279,7 @@ public class GraphMatching {
 			matched++;
 		}
 		
-		DaShapeWriter.writeDefaultPoints2Shape(outPath + "matched.shp", "ref", ref, attrib);
+		DaShapeWriter.writeDefaultPoints2Shape(outPath + "matched_Nodes.shp", "matched_Nodes", ref, attrib);
 		
 		Map<String, Coord> unmatched = new HashMap<String, Coord>();
 		
@@ -234,10 +287,10 @@ public class GraphMatching {
 			unmatched.put(id.toString(), this.reference.getNodes().get(id).getCoord());
 		}
 		
-		DaShapeWriter.writeDefaultPoints2Shape(outPath + "unmatched.shp", "unmatched", unmatched, null);
+		DaShapeWriter.writeDefaultPoints2Shape(outPath + "unmatched_Nodes.shp", "unmatched_Nodes", unmatched, null);
 	}
 	
-	public void edges2Shape(String outpath){
+	public void baseSegments2Shape(String outpath){
 		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer, Coord> temp;
 		int i;
@@ -246,7 +299,9 @@ public class GraphMatching {
 			i = 0;
 			for(MatchingSegment s: e.getValue().getSegments()){
 				temp.put(i, s.getStart());
-				temp.put(i++, s.getEnd());
+				i++;
+				temp.put(i, s.getEnd());
+				i++;
 			}
 			edges.put(e.getKey().toString(), temp);
 		}
@@ -258,23 +313,77 @@ public class GraphMatching {
 			i = 0;
 			for(MatchingSegment s: e.getValue().getSegments()){
 				temp.put(i, s.getStart());
-				temp.put(i++, s.getEnd());
+				i++;
+				temp.put(i, s.getEnd());
+				i++;
 			}
 			edges.put(e.getKey().toString(), temp);
 		}
 		DaShapeWriter.writeDefaultLineString2Shape(outpath + "matchingGraphSegments.shp", "matchingGraphSegments", edges, null);
 	}
 	
+	public void matchedSegments2Shape(String outPath){
+		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
+		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
+		
+		SortedMap<Integer, Coord> coords;
+		SortedMap<String, String> attribValues;
+		
+		EdgeCompare e;
+		MatchingEdge ref, cand;
+		String refId, candId;
+		int cnt;
+		int matchNr = 0;
+		
+		for(List<EdgeCompare> el: this.edgeComp.values()){
+			attribValues = new TreeMap<String, String>();
+			attribValues.put("matchNr", String.valueOf(matchNr));
+
+			coords = new TreeMap<Integer, Coord>();
+			
+			e = el.get(0);
+
+			ref = reference.getEdges().get(e.getRefId());
+			refId = "ref_" + String.valueOf(matchNr) + "_" + ref.getId().toString();
+			cnt = 0;
+			for(MatchingSegment s: ref.getSegments()){
+				coords.put(cnt, s.getStart());
+				cnt++;
+				coords.put(cnt, s.getEnd());
+				cnt++;
+			}
+			edges.put(refId, coords);
+			attribs.put(refId, attribValues);
+			
+			cand = matching.getEdges().get(e.getCompId());
+			candId = "cand_"  + String.valueOf(matchNr) + "_" + cand.getId().toString();
+			cnt = 0;
+			coords =  new TreeMap<Integer, Coord>();
+			for(MatchingSegment s: cand.getSegments()){
+				coords.put(cnt, s.getStart());
+				cnt++;
+				coords.put(cnt, s.getEnd());
+				cnt++;
+			}
+			edges.put(candId, coords);
+			attribs.put(candId, attribValues);
+			
+			matchNr++;
+		}
+		
+		DaShapeWriter.writeDefaultLineString2Shape(outPath + "matchedSegments.shp", "matchedSegments", edges, attribs);
+	}
+	
+	
 	
 
 	public static void main(String[] args){
-		final String PATH = DaPaths.OUTPUT + "bvg09/";
-		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
-		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
+		final String PATH = DaPaths.OUTPUT + "geoAlgorithm/";
+		final String VISUMTRANSITFILE = PATH + "visum_cutted.xml";
+		final String HAFASTRANSITFILE = PATH + "hafas_cutted.xml";
 		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
 		
 
-		TransitStopFacility fac = null;
 		MatchingEdge e;
 		MatchingNode start, end;
 		
@@ -299,15 +408,21 @@ public class GraphMatching {
 					facs.add(stop.getStopFacility());
 					shape.add(stop.getStopFacility().getCoord());
 				}
-				if(facs.size() < 2) continue;
+				if(facs.size() < 2){
+					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+							line.getId() + " beacause it have less than 2 stops!");
+					continue;
+				}
 				
+				// create or get start-node
 				if(v.getNodes().containsKey(facs.get(0).getId())){
 					start = v.getNodes().get(facs.get(0).getId());
 				}else{
 					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
 					v.addNode(start);
 				}
-				
+
+				// create or get end-node
 				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
 					end = v.getNodes().get(facs.get(facs.size()-1).getId());
 				}else{
@@ -328,7 +443,6 @@ public class GraphMatching {
 		MatchingGraph h = new MatchingGraph();
 		
 		
-		fac = null;
 		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
 			for(TransitRoute route: line.getRoutes().values()){
 				facs = new ArrayList<TransitStopFacility>();
@@ -337,7 +451,11 @@ public class GraphMatching {
 					facs.add(stop.getStopFacility());
 					shape.add(stop.getStopFacility().getCoord());
 				}
-				if(facs.size() < 2) continue;
+				if(facs.size() < 2){
+					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+							line.getId() + " beacause it have less than 2 stops!");
+					continue;
+				}
 				
 				if(h.getNodes().containsKey(facs.get(0).getId())){
 					start = h.getNodes().get(facs.get(0).getId());
@@ -353,7 +471,8 @@ public class GraphMatching {
 					h.addNode(end);
 				}
 				
-				e = new MatchingEdge(route.getId(), h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
+				e = new MatchingEdge(new IdImpl(line.getId() + "_" + route.getId()), 
+						h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
 				e.addShapePointsAndCreateSegments(shape);
 				h.addEdge(e);
 			}
@@ -362,12 +481,15 @@ public class GraphMatching {
 		GraphMatching gm = new GraphMatching(v, h);
 		gm.setMaxAngle(Math.PI / 4);
 		gm.setMaxDist(500.0);
+		gm.setMaxLengthTolerancePerc(0.25);
 		gm.bottomUpMatching();
 		gm.nodes2Shape(OUT);
-		gm.edges2Shape(OUT);
+		gm.baseSegments2Shape(OUT);
+		gm.matchedSegments2Shape(OUT);
 //		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
 //			System.out.println(e.getKey() + " " + e.getValue());
 //		}
 	}
+
 }
 

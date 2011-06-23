@@ -23,21 +23,25 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.droeder.GeoCalculator;
+
 /**
  * @author droeder
  *
  */
-public class MatchingSegment implements GraphElement, Cloneable {
+public class MatchingSegment implements GraphElement {
 	
 	private Coord start, end;
 	private Id id;
 	private Id parentEdgeId;
+	private Double length;
 
 	public MatchingSegment (Coord start, Coord end, Id parentEdgeId, int segmentCounter){
 		this.start = start;
 		this.end = end;
 		this.id = new IdImpl(parentEdgeId + "_" + segmentCounter);
 		this.parentEdgeId = parentEdgeId;
+		this.length = GeoCalculator.distanceBetween2Points(start, end);
 	}
 	
 	
@@ -62,14 +66,11 @@ public class MatchingSegment implements GraphElement, Cloneable {
 		return id;
 	}
 	
-	@Override
-	public MatchingSegment clone(){
-		try {
-			return (MatchingSegment) super.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	public Id getParentEdgeId(){
+		return parentEdgeId;
+	}
+	
+	public Double getLength(){
+		return this.length;
 	}
 }

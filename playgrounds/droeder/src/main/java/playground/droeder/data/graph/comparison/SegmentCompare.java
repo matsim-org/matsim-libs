@@ -26,9 +26,23 @@ import playground.droeder.data.graph.MatchingSegment;
  *
  */
 public class SegmentCompare extends AbstractCompare{
+	
+	private Double deltaAngle, avDist, matchedLengthRef, MatchedLengthComp; 
+	private boolean sOneIsUndershot;
 
 	public SegmentCompare(MatchingSegment refElement, MatchingSegment compareElement) {
 		super(refElement, compareElement);
+		this.computeValues(refElement, compareElement);
+	}
+
+	private void computeValues(MatchingSegment ref, MatchingSegment comp) {
+		StraightComparer c = new StraightComparer(new Straight(ref.getStart(), ref.getEnd()), 
+				new Straight(comp.getStart(), comp.getEnd()));
+		this.deltaAngle = c.getAngle();
+		this.avDist = c.getAverageDistance();
+		this.matchedLengthRef = c.getTotalMatchedLengthStraightOne();
+		this.MatchedLengthComp = c.getTotalMatchedLengthStraightTwo();
+		this.sOneIsUndershot = c.straightOneIsUndershot();
 	}
 
 	@Override
@@ -36,4 +50,38 @@ public class SegmentCompare extends AbstractCompare{
 		return super.compareTo(o);
 	}
 
+	/**
+	 * @return the sOneIsUndershot
+	 */
+	public boolean refIsUndershot() {
+		return sOneIsUndershot;
+	}
+
+	/**
+	 * @return the deltaAngle
+	 */
+	public Double getDeltaAngle() {
+		return deltaAngle;
+	}
+
+	/**
+	 * @return the avDist
+	 */
+	public Double getAvDist() {
+		return avDist;
+	}
+
+	/**
+	 * @return the matchedLengthRef
+	 */
+	public Double getMatchedLengthRef() {
+		return matchedLengthRef;
+	}
+
+	/**
+	 * @return the matchedLengthComp
+	 */
+	public Double getMatchedLengthComp() {
+		return MatchedLengthComp;
+	}
 }

@@ -46,10 +46,6 @@ public class StraightComparer{
 		this.one = one;
 		this.two = two;
 		this.computeBases();
-//		results.setAvDist(this.getAverageDistance());
-//		results.setMatchedLengthOne(this.getTotalMatchedLengthStraightOne());
-//		results.setMatchedLengthTwo(this.getTotalMatchedLengthStraightTwo());
-//		results.setAngle(this.getAngle());
 	}
 	
 	public boolean straightOneIsUndershot(){
@@ -136,9 +132,9 @@ public class StraightComparer{
 		// get the base of the perpendicular from c to the straight ab
 		p = a.add(new Vector2D(answers[0], r1));
 		p2 = c.add(new Vector2D(answers[1], r2));
-		if(!(p.equals(p2))){
-			log.error(p.toString() + " " + p2.toString());
-		}
+//		if(!(p.equals(p2))){
+//			log.error(p.toString() + " " + p2.toString());
+//		}
 		
 		// return the point only, if it is beetween the point a && b
 		if(a.getX() < p.getX() && p.getX() < b.getX()){

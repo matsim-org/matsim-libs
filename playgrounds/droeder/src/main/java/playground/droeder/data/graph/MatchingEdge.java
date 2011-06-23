@@ -38,8 +38,9 @@ public class MatchingEdge implements GraphElement{
 	private MatchingNode fromNode;
 	private ArrayList<MatchingSegment> segments;
 	private int segmentCounter = 0;
+	private Double lengthOfSegments = 0.0;
 	
-	public MatchingEdge(Id id, MatchingNode to, MatchingNode from){
+	public MatchingEdge(Id id, MatchingNode from, MatchingNode to){
 		this.id = id;
 		this.toNode = to;
 		this.fromNode = from;
@@ -74,8 +75,6 @@ public class MatchingEdge implements GraphElement{
 	 * @return
 	 */
 	public void addShapePointsAndCreateSegments(ArrayList<Coord> shapeCoords){
-		
-		//TODO doesn't work
 		if(shapeCoords.size()< 2){
 			log.error("can not create segments for edge " + this.id + ", because at least two points are needed!");
 		}else if(shapeCoords.get(0).equals(this.fromNode.getCoord()) && shapeCoords.get(shapeCoords.size() - 1).equals(this.toNode.getCoord())){
@@ -87,7 +86,7 @@ public class MatchingEdge implements GraphElement{
 					start = it.next();
 				}else{
 					end = it.next();
-					this.segments.add(new MatchingSegment(start, end, this.id, this.segmentCounter));
+					this.addSegment(new MatchingSegment(start, end, this.id, this.segmentCounter));
 					start = end;
 				}
 			}
@@ -97,13 +96,18 @@ public class MatchingEdge implements GraphElement{
 	}
 	
 	private void addSegment(MatchingSegment s){
-		// probably the segment is used anywhere else, so use a clone
 		this.segments.add(s);
+		this.lengthOfSegments += s.getLength();
 		this.segmentCounter++;
+	}
+	
+	public Double getSegmentLength(){
+		return lengthOfSegments;
 	}
 	
 	private void clearSegments(){
 		this.segmentCounter = 0;
+		this.lengthOfSegments = 0.0;
 		this.segments.clear();
 	}
 	

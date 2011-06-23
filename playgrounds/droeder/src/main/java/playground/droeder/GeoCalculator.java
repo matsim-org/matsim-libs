@@ -58,6 +58,7 @@ public class GeoCalculator {
 		return Math.acos(scalar/(absOne * absTwo));
 	}
 	
+	@Deprecated
 	public static double averageStraightDistance(Tuple<Coord, Coord> straightOne, Tuple<Coord, Coord> straightTwo){
 		double dAC, dCE, dBF, dBD;
 		//get dist between start/start and end/end
