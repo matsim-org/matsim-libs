@@ -33,6 +33,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -106,7 +107,12 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		updateNetwork();
 		this.serviceIds = serviceIds;
 	}
-
+	/**
+	 * @return the network
+	 */
+	public Network getNetwork() {
+		return network;
+	}
 	private void updateNetwork() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE));
@@ -124,8 +130,8 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				double distance = CoordUtils.calcDistance(network.getNodes().get(new IdImpl(fromNode)).getCoord(),network.getNodes().get(new IdImpl(toNode)).getCoord());
 				Link link = new LinkFactoryImpl().createLink(new IdImpl(line), network.getNodes().get(new IdImpl(fromNode)), network.getNodes().get(new IdImpl(toNode)), network, distance, DEFAULT_FREE_SPEED, DEFAULT_CAPCITY, 1);
 				Set<String> modes = new HashSet<String>();
-				modes.add("Car");
-				modes.add("Bus");
+				modes.add("car");
+				modes.add(Route.RouteTypes.BUS.name);
 				link.setAllowedModes(modes);
 				network.addLink(link);
 				line = reader.readLine();
@@ -638,11 +644,13 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N");
 		for(Node node:network.getNodes().values())
 			((NodeImpl)node).setCoord(ct.transform(node.getCoord()));
-		for(Link link:network.getLinks().values())
+		for(Link link:network.getLinks().values()) {
 			if(((LinkImpl)link).getOrigId()!=null)
 				((LinkImpl)link).setLength(((LinkImpl)link).getLength()*1000);
 			else
 				((LinkImpl)link).setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(),link.getToNode().getCoord()));
+			link.setFreespeed(link.getFreespeed()/3.6);
+		}
 	}
 	private void generateRepeatedMRTStops() {
 		for(Entry<String,Route> routeE:routes[1].entrySet()) {
@@ -693,7 +701,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	private void addNewLinksSequence(Trip trip, RouteTypes routeType, String routeKey, int r) {
 		double length;
 		double freeSpeed=50;
-		double capacity=20;
+		double capacity=1000;
 		double nOfLanes=1;
 		StopTime stopTime = trip.getStopTimes().get(1);
 		String id = stopTime.getStopId();
@@ -1023,9 +1031,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		try {
 			loadGTFSFiles();
 			calculateUnknownInformation();
-			//Write modified network
-			NetworkWriter networkWriter =  new NetworkWriter(network);
-			networkWriter.write("./data/networks/singapore2.xml");
 			//Public Transport Schedule
 			//Stops
 			this.openFile(filename);
@@ -1033,7 +1038,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			this.writeDoctype("transitSchedule", "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd");
 			this.writeStartTag("transitSchedule", new ArrayList<Tuple<String,String>>());
 			this.writeStartTag("transitStops", new ArrayList<Tuple<String,String>>());
-			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N");
+			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 			for(int r=0; r<roots.length; r++)
 				for(Entry<String, Stop> stop: stops[r].entrySet())
 					if(stop.getValue().getLinkId()!=null) {
@@ -1137,10 +1142,15 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
-		matsimNetworkReader.readFile("./data/networks/singapore_initial.xml");
+		matsimNetworkReader.readFile(args[1]);
 		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
-		g2m.write("./data/gtfs/test.xml");
+		g2m.write(args[0]);
+		//NetworkPropertiesChanger.changePropertiesCSVFile(network, "./data/gtfs/changes.csv");
+		//Write modified network
+		((NetworkImpl)network).setName(args[3]);
+		NetworkWriter networkWriter =  new NetworkWriter(network);
+		networkWriter.write(args[2]);
 	}
 
 }

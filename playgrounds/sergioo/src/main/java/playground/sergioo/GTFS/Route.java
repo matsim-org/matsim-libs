@@ -14,12 +14,12 @@ public class Route {
 	}
 	public enum RouteTypes {
 		//Values
-		TRAM("Tram",WayTypes.RAIL),
-		SUBWAY("Subway",WayTypes.RAIL),
-		RAIL("Rail",WayTypes.RAIL),
-		BUS("Bus",WayTypes.ROAD),
-		FERRY("Ferry",WayTypes.WATER),
-		CABLE_CAR("Cable car",WayTypes.CABLE);
+		TRAM("tram",WayTypes.RAIL),
+		SUBWAY("subway",WayTypes.RAIL),
+		RAIL("rail",WayTypes.RAIL),
+		BUS("bus",WayTypes.ROAD),
+		FERRY("ferry",WayTypes.WATER),
+		CABLE_CAR("cable car",WayTypes.CABLE);
 		//Attributes
 		public String name;
 		public WayTypes wayType;

@@ -26,8 +26,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -35,9 +36,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class Window extends JFrame implements ActionListener {
 	/**
@@ -47,8 +54,9 @@ public class Window extends JFrame implements ActionListener {
 	//Enumerations
 	public enum Option {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_STOP("<html>S<br/>T<br/>O<br/>P</html>"),
 		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
+		SELECT_LINE("<html>P<br/>O<br/>I<br/>N<br/>T</html>"),
+		SELECT_POINT("<html>L<br/>I<br/>N<br/>E</html>"),
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		public String caption;
 		private Option(String caption) {
@@ -57,7 +65,9 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public enum Label {
 		LINK("LinkText"),
-		STOP("StopText");
+		NODE("NodeText"),
+		LINE("LineText"),
+		POINT("PointText");
 		String text;
 		private Label(String text) {
 			this.text = text;
@@ -75,25 +85,30 @@ public class Window extends JFrame implements ActionListener {
 	//Attributes
 	public static int width;
 	public static int height;
-	private PanelPathEditor panel;
+	private PanelNetwork panel;
 	private Network network;
+	private Collection<Tuple<Coord,Coord>> lines;
+	private Collection<Coord> points;
 	private Option option;
-	private String selectedLinkId = "";
-	private String selectedStopId = "";
-	private Node selectedNode = null;
-	public List<Link> links;
+	private Id selectedLinkId;
+	private Id selectedNodeId;
+	private Tuple<Coord,Coord> selectedLine;
+	private Coord selectedPoint;
 	private JButton saveButton;
 	private JLabel[] labels;
 	private JLabel[] lblCoords = {new JLabel(),new JLabel()};
+	private boolean save = false;
 	//Methods
 	public Window(String title, Network network) {
 		setTitle(title);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.network = network;
+		lines = new ArrayList<Tuple<Coord,Coord>>();
+		points = new ArrayList<Coord>();
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		option = Option.ZOOM;
-		panel = new PanelPathEditor(this);
+		option = Option.SELECT_LINK;
+		panel = new PanelNetwork(this);
 		this.setSize(width+GAPX, height+GAPY);
 		this.add(panel, BorderLayout.CENTER);
 		JPanel buttonsPanel = new JPanel();
@@ -107,9 +122,9 @@ public class Window extends JFrame implements ActionListener {
 		this.add(buttonsPanel, BorderLayout.EAST);
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
-		saveButton = new JButton("Exit");
+		saveButton = new JButton("Save");
 		saveButton.addActionListener(this);
-		saveButton.setActionCommand("Exit");
+		saveButton.setActionCommand("Save");
 		infoPanel.add(saveButton, BorderLayout.WEST);
 		JPanel labelsPanel = new JPanel();
 		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
@@ -130,47 +145,157 @@ public class Window extends JFrame implements ActionListener {
 	public Option getOption() {
 		return option;
 	}
-	public String refreshLink() {
-		return selectedLinkId;
-	}
-	public String refreshStop() {
-		return selectedStopId;
-	}
-	public void selectLink(double x, double y) {
-		selectedLinkId = getIndexNearestLink(x, y);
-		labels[Label.LINK.ordinal()].setText(refreshLink());
-	}
-	private String getIndexNearestLink(double x, double y) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public void unselectLink() {
-		selectedLinkId = "";
-		labels[Label.LINK.ordinal()].setText("");
-	}
-	public void selectNode(double x, double y) {
-		selectedNode = getNearestNode(x, y);
-	}
-	private Node getNearestNode(double x, double y) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public void unselectNode() {
-		selectedNode = null;
+	public boolean isSave() {
+		return save;
 	}
 	public Link getSelectedLink() {
-		return selectedLinkId==""?null:getLink(selectedLinkId);
-	}
-	private Link getLink(String selectedLinkId2) {
-		// TODO Auto-generated method stub
+		if(selectedLinkId != null)
+			return network.getLinks().get(selectedLinkId);
 		return null;
 	}
 	public Node getSelectedNode() {
-		return selectedNode;
+		if(selectedNodeId != null)
+			return network.getNodes().get(selectedNodeId);
+		return null;
+	}
+	public Tuple<Coord,Coord> getSelectedLine() {
+		return selectedLine;
+	}
+	public Coord getSelectedPoint() {
+		return selectedPoint;
+	}
+	public Collection<? extends Link> getNetworkLinks() {
+		return network.getLinks().values();
 	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
-		//TODO
+		Collection<Link> links =  new HashSet<Link>();
+		for(Link link:network.getLinks().values()) {
+			Coord from = link.getFromNode().getCoord();
+			Coord to = link.getToNode().getCoord();
+			if((xMin<from.getX()&&yMin<from.getY()&&xMax>from.getX()&&yMax>from.getY())||
+					(xMin<to.getX()&&yMin<to.getY()&&xMax>to.getX()&&yMax>to.getY()))
+				links.add(link);
+		}
+		return links;
+	}
+	public Collection<Tuple<Coord, Coord>> getLines() {
+		return lines;
+	}
+	public Collection<Coord> getPoints() {
+		return points;
+	}
+	private Id getIdNearestLink(double x, double y) {
+		Coord coord = new CoordImpl(x, y);
+		Link nearest = null;
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		for(Link link: network.getLinks().values()) {
+			double distance = ((LinkImpl) link).calcDistance(coord); 
+			if(distance<nearestDistance) {
+				nearest = link;
+				nearestDistance = distance;
+			}
+		}
+		return nearest.getId();
+	}
+	public Id getIdOppositeLink(Link link) {
+		for(Link nLink: network.getLinks().values()) {
+			if(nLink.getFromNode().equals(link.getToNode()) && nLink.getToNode().equals(link.getFromNode()))
+				return nLink.getId();
+		}
 		return null;
+	}
+	private Id getIdNearestNode(double x, double y) {
+		Coord coord = new CoordImpl(x, y);
+		Node nearest = null;
+		double nearestDistance = Double.MAX_VALUE;
+		for(Node node:network.getNodes().values()) {
+			double distance = CoordUtils.calcDistance(coord, node.getCoord());
+			if(distance<nearestDistance) {
+				nearestDistance = distance;
+				nearest = node;
+			}
+		}
+		return nearest.getId();
+	}
+	private Tuple<Coord,Coord> getCoordsNearestLine(double x, double y) {
+		Coord coord = new CoordImpl(x, y);
+		Tuple<Coord,Coord> nearest = null;
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		for(Tuple<Coord,Coord> line:lines) {
+			double distance = CoordUtils.distancePointLinesegment(line.getFirst(), line.getSecond(), coord); 
+			if(distance<nearestDistance) {
+				nearest = line;
+				nearestDistance = distance;
+			}
+		}
+		return nearest;
+	}
+	private Coord getCoordNearestPoint(double x, double y) {
+		Coord coord = new CoordImpl(x, y);
+		Coord nearest = null;
+		double nearestDistance = Double.MAX_VALUE;
+		for(Coord point:points) {
+			double distance = CoordUtils.calcDistance(coord, point);
+			if(distance<nearestDistance) {
+				nearestDistance = distance;
+				nearest = point;
+			}
+		}
+		return nearest;
+	}
+	public void selectLink(double x, double y) {
+		selectedLinkId = getIdNearestLink(x, y);
+		labels[Label.LINK.ordinal()].setText(refreshLink());
+	}
+	public void selectOppositeLink() {
+		selectedLinkId = getIdOppositeLink(network.getLinks().get(selectedLinkId));
+		labels[Label.LINK.ordinal()].setText(selectedLinkId==null?"":refreshLink());
+	}
+	public void unselectLink() {
+		selectedLinkId = null;
+		labels[Label.LINK.ordinal()].setText("");
+	}
+	public void selectNode(double x, double y) {
+		selectedNodeId = getIdNearestNode(x, y);
+		labels[Label.LINK.ordinal()].setText(refreshNode());
+	}
+	public void unselectNode() {
+		selectedNodeId = null;
+		labels[Label.LINK.ordinal()].setText("");
+	}
+	public void selectLine(double x, double y) {
+		selectedLine = getCoordsNearestLine(x, y);
+		labels[Label.LINK.ordinal()].setText(refreshLine());
+	}
+	public void unselectLine() {
+		selectedPoint = null;
+		labels[Label.LINK.ordinal()].setText("");
+	}
+	public void selectPoint(double x, double y) {
+		selectedPoint = getCoordNearestPoint(x, y);
+		labels[Label.LINK.ordinal()].setText(refreshPoint());
+	}
+	public void unselectPoint() {
+		selectedPoint = null;
+		labels[Label.LINK.ordinal()].setText("");
+	}
+	private String refreshLink() {
+		return selectedLinkId.toString();
+	}
+	private String refreshNode() {
+		return selectedNodeId.toString();
+	}
+	private String refreshLine() {
+		return selectedLine.getFirst().getX()+","+selectedLine.getFirst().getY()+" "+selectedLine.getSecond().getX()+","+selectedLine.getSecond().getY();
+	}
+	private String refreshPoint() {
+		return selectedPoint.getX()+","+selectedPoint.getY();
+	}
+	public void addPoint(Coord point) {
+		points.add(point);
+	}
+	public void addLine(Tuple<Coord,Coord> line) {
+		lines.add(line);
 	}
 	public void setCoords(double x, double y) {
 		NumberFormat nF = NumberFormat.getInstance();
@@ -179,13 +304,24 @@ public class Window extends JFrame implements ActionListener {
 		lblCoords[0].setText(nF.format(x)+" ");
 		lblCoords[1].setText(" "+nF.format(y));
 	}
+	public void zoomIn(Coord coord) {
+		panel.zoomIn(coord.getX(), coord.getY());
+	}
+	public void zoomOut(Coord coord) {
+		panel.zoomOut(coord.getX(), coord.getY());
+	}
+	public void centerCamera(Coord coord) {
+		panel.centerCamera(coord.getX(), coord.getY());
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for(Option option:Option.values())
 			if(e.getActionCommand().equals(option.name()))
 				this.option = option;
-		if(e.getActionCommand().equals("Exit"))
+		if(e.getActionCommand().equals("Save")) {
 			setVisible(false);
+			save = true;
+		}
 	}
 	
 }

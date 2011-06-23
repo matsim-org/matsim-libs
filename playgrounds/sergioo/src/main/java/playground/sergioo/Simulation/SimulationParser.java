@@ -1,4 +1,4 @@
-package playground.sergioo.ezLinkDataSimulation;
+package playground.sergioo.Simulation;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;

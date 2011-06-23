@@ -22,15 +22,15 @@ public class Camera {
 	public Vector2D getSize() {
 		return size;
 	}
-	public void zoomIn(int x, int y) {
-		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(getDoubleX(x), getDoubleY(y)));
+	public void zoomIn(double x, double y) {
+		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(x, y));
 		Vector2D difCorners = new Vector2D(size.getX()*(1-1/ZOOM_RATE)/2,size.getY()*(1-1/ZOOM_RATE)/2);
 		upLeftCorner.translate(difCenters);
 		upLeftCorner.translate(difCorners);
 		size.scale(1/ZOOM_RATE);
 	}
-	public void zoomOut(int x, int y) {
-		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(getDoubleX(x), getDoubleY(y)));
+	public void zoomOut(double x, double y) {
+		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(x, y));
 		Vector2D difCorners = new Vector2D(size.getX()*(1-ZOOM_RATE)/2,size.getY()*(1-ZOOM_RATE)/2);
 		upLeftCorner.translate(difCenters);
 		upLeftCorner.translate(difCorners);

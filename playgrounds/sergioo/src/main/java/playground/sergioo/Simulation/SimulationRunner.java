@@ -1,4 +1,4 @@
-package playground.sergioo.ezLinkDataSimulation;
+package playground.sergioo.Simulation;
 
 import org.matsim.core.controler.Controler;
 
@@ -13,7 +13,7 @@ public class SimulationRunner {
 		TransitSchedule tS = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader =  new TransitScheduleReaderV1(tS, scenario.getNetwork(), scenario);
 		reader.parse("transitScheduleFile");*/
-		Controler controler = new Controler("./data/ezLinkDataSimulation/config.xml");
+		Controler controler = new Controler(args[0]);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

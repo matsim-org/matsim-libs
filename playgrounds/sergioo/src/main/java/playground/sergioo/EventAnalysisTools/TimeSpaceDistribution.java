@@ -17,11 +17,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -36,11 +38,12 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.SAXException;
 
-public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentArrivalEventHandler {
+public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 	
 	public static double TIME_INTERVAL;
 	public final static long millisSingapore = 27000000;
-	private static final String SEPARATOR = ";";
+	private static final String SEPARATOR_CSV = ",";
+	private static final String SEPARATOR_TXT = "\t";
 	
 	private int numIntervals;
 	private Map<Id,LinkData> linksData;
@@ -56,127 +59,47 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		MatsimXmlParser matsimXmlParser = new EventsReaderXMLv1(events);
 		matsimXmlParser.parse(args[1]);
 		tSD.printCSVFiles(args[2]);
-		if(args[4].equals("-link")) {
-			tSD.showFlowLinkGraph(args[5]);
-			tSD.showDensityLinkGraph(args[5]);
-			tSD.showTTLinkGraph(args[5]);
-			tSD.showSpeedLinkGraph(args[5]);
-			tSD.showKLinkGraph(args[5]);
-			tSD.showFlowSpeedGraph(args[5]);
-			tSD.showDensityFlowGraph(args[5]);
-			tSD.showDensitySpeedGraph(args[5]);
-		}
-		else if(args[4].equals("-avg")) {
-			tSD.showFlowAvgGraph();
-			tSD.showDensityAvgGraph();
-			tSD.showSpeedAvgGraph();
-			tSD.showTTAvgGraph();
-			tSD.showKAvgGraph();
-		}
-		else if(args[4].equals("-avgint")) {
-			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-			tSD.showFlowAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
-			tSD.showDensityAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
-			tSD.showSpeedAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
-			tSD.showTTAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
-			tSD.showKAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
-		}
-		else {
-			Id moreCongested = null;
-			for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet())
-				if(moreCongested==null || (!Double.isNaN(linkData.getValue().getConcentration()) && linkData.getValue().getConcentration()>tSD.getLinksData().get(moreCongested).getConcentration()))
-					moreCongested = linkData.getKey();
-			System.out.println(moreCongested+" "+tSD.getLinksData().get(moreCongested).getConcentration());
-			moreCongested = null;
-			for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet()) {
-				if(moreCongested==null || linkData.getValue().getDensity()>tSD.getLinksData().get(moreCongested).getDensity())
-					moreCongested = linkData.getKey();
+		//tSD.printTXTFiles(args[2]);
+		if(args.length>4) {
+			if(args[4].equals("-link")) {
+				tSD.showFlowLinkGraph(args[5]);
+				tSD.showDensityLinkGraph(args[5]);
+				tSD.showTTLinkGraph(args[5]);
+				tSD.showSpeedLinkGraph(args[5]);
+				tSD.showKLinkGraph(args[5]);
+				tSD.showFlowSpeedGraph(args[5]);
+				tSD.showDensityFlowGraph(args[5]);
+				tSD.showDensitySpeedGraph(args[5]);
 			}
-			System.out.println(moreCongested+" "+tSD.getLinksData().get(moreCongested).getDensity());
-		}
-	}
-	
-	private void printCSVFiles(String folder) throws FileNotFoundException {
-		PrintWriter printWriter = new PrintWriter(new File(folder+"/flows.csv"));
-		printWriter.print("link"+SEPARATOR+"average\\time"+SEPARATOR);
-		for(int t=0;t<numIntervals;t++) {
-			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			printWriter.print(time+SEPARATOR);
-		}
-		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
-			printWriter.print(linkDataE.getKey().toString()+SEPARATOR+linkDataE.getValue().getFlow()*3600+SEPARATOR);
-			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
-				double value=linkDataE.getValue().getFlow(t)*3600;
-				printWriter.print(value+SEPARATOR);
+			else if(args[4].equals("-avg")) {
+				tSD.showFlowAvgGraph();
+				tSD.showDensityAvgGraph();
+				tSD.showSpeedAvgGraph();
+				tSD.showTTAvgGraph();
+				tSD.showKAvgGraph();
 			}
-			printWriter.println();
-		}
-		printWriter.close();
-		printWriter = new PrintWriter(new File(folder+"/densities.csv"));
-		printWriter.print("link"+SEPARATOR+"average\\time"+SEPARATOR);
-		for(int t=0;t<numIntervals;t++) {
-			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			printWriter.print(time+SEPARATOR);
-		}
-		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
-			printWriter.print(linkDataE.getKey().toString()+SEPARATOR+linkDataE.getValue().getDensity()*1000+SEPARATOR);
-			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
-				double value=linkDataE.getValue().getDensity(t)*1000;
-				printWriter.print(value+SEPARATOR);
+			else if(args[4].equals("-avgint")) {
+				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+				tSD.showFlowAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
+				tSD.showDensityAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
+				tSD.showSpeedAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
+				tSD.showTTAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
+				tSD.showKAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
 			}
-			printWriter.println();
-		}
-		printWriter.close();
-		printWriter = new PrintWriter(new File(folder+"/travelTimes.csv"));
-		printWriter.print("link\\time"+SEPARATOR);
-		for(int t=0;t<numIntervals;t++) {
-			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			printWriter.print(time+SEPARATOR);
-		}
-		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
-			printWriter.print(linkDataE.getKey().toString()+SEPARATOR);
-			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
-				double value=linkDataE.getValue().getAvgTravelTimes(t);
-				printWriter.print(value+SEPARATOR);
+			else {
+				Id moreCongested = null;
+				for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet())
+					if(moreCongested==null || (linkData.getValue().getConcentration()>tSD.getLinksData().get(moreCongested).getConcentration()))
+						moreCongested = linkData.getKey();
+				System.out.println(moreCongested+" "+tSD.getLinksData().get(moreCongested).getConcentration());
+				moreCongested = null;
+				for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet()) {
+					if(moreCongested==null || linkData.getValue().getDensity()>tSD.getLinksData().get(moreCongested).getDensity())
+						moreCongested = linkData.getKey();
+				}
+				System.out.println(moreCongested+" "+tSD.getLinksData().get(moreCongested).getDensity());
 			}
-			printWriter.println();
 		}
-		printWriter.close();
-		printWriter = new PrintWriter(new File(folder+"/avgSpeeds.csv"));
-		printWriter.print("link\\time"+SEPARATOR);
-		for(int t=0;t<numIntervals;t++) {
-			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			printWriter.print(time+SEPARATOR);
-		}
-		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
-			printWriter.print(linkDataE.getKey().toString()+SEPARATOR);
-			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
-				double value=linkDataE.getValue().getAvgSpeeds(t)*3600/1000;
-				printWriter.print(value+SEPARATOR);
-			}
-			printWriter.println();
-		}
-		printWriter.close();
-		printWriter = new PrintWriter(new File(folder+"/concentrations.csv"));
-		printWriter.print("link"+SEPARATOR+"average\\time"+SEPARATOR);
-		for(int t=0;t<numIntervals;t++) {
-			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			printWriter.print(time+SEPARATOR);
-		}
-		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
-			printWriter.print(linkDataE.getKey().toString()+SEPARATOR+linkDataE.getValue().getConcentration()+SEPARATOR);
-			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
-				double value=linkDataE.getValue().getConcentration(t)*1000;
-				printWriter.print(value+SEPARATOR);
-			}
-			printWriter.println();
-		}
-		printWriter.close();
 	}
 
 	public TimeSpaceDistribution(Network network) {
@@ -186,7 +109,171 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		this.network = network;
 		for(Link link:network.getLinks().values())
 			if(link.getLength()>0)
-				linksData.put(link.getId(), new LinkData(link.getLength(), (int) link.getNumberOfLanes()));
+				linksData.put(link.getId(), new LinkData(link));
+	}
+	public void printCSVFiles(String folder) throws FileNotFoundException {
+		PrintWriter printWriter = new PrintWriter(new File(folder+"/flows.csv"));
+		printWriter.print("link"+SEPARATOR_CSV+"average\\time"+SEPARATOR_CSV);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_CSV);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getFlow()*3600+SEPARATOR_CSV);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getFlow(t)*3600;
+				printWriter.print(value+SEPARATOR_CSV);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/densities.csv"));
+		printWriter.print("link"+SEPARATOR_CSV+"average\\time"+SEPARATOR_CSV);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_CSV);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getDensity()*1000+SEPARATOR_CSV);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getDensity(t)*1000;
+				printWriter.print(value+SEPARATOR_CSV);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/travelTimes.csv"));
+		printWriter.print("link\\time"+SEPARATOR_CSV);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_CSV);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getAvgTravelTimes(t);
+				printWriter.print((Double.isNaN(value)?"":value)+SEPARATOR_CSV);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/avgSpeeds.csv"));
+		printWriter.print("link\\time"+SEPARATOR_CSV);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_CSV);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getAvgSpeeds(t)*3600/1000;
+				printWriter.print((Double.isNaN(value)?"":value)+SEPARATOR_CSV);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/concentrations.csv"));
+		printWriter.print("link"+SEPARATOR_CSV+"average\\time"+SEPARATOR_CSV);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_CSV);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getConcentration()+SEPARATOR_CSV);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getConcentration(t)*1000;
+				printWriter.print(value+SEPARATOR_CSV);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+	}
+	public void printTXTFiles(String folder) throws FileNotFoundException {
+		PrintWriter printWriter = new PrintWriter(new File(folder+"/flows.txt"));
+		printWriter.print("link"+SEPARATOR_TXT+"average\\time"+SEPARATOR_TXT);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_TXT);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getFlow()*3600+SEPARATOR_TXT);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getFlow(t)*3600;
+				printWriter.print(value+SEPARATOR_TXT);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/densities.txt"));
+		printWriter.print("link"+SEPARATOR_TXT+"average\\time"+SEPARATOR_TXT);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_TXT);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getDensity()*1000+SEPARATOR_TXT);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getDensity(t)*1000;
+				printWriter.print(value+SEPARATOR_TXT);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/travelTimes.txt"));
+		printWriter.print("link\\time"+SEPARATOR_TXT);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_TXT);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getAvgTravelTimes(t);
+				printWriter.print((Double.isNaN(value)?"":value)+SEPARATOR_TXT);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/avgSpeeds.txt"));
+		printWriter.print("link\\time"+SEPARATOR_TXT);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_TXT);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getAvgSpeeds(t)*3600/1000;
+				printWriter.print((Double.isNaN(value)?"":value)+SEPARATOR_TXT);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
+		printWriter = new PrintWriter(new File(folder+"/concentrations.txt"));
+		printWriter.print("link"+SEPARATOR_TXT+"average\\time"+SEPARATOR_TXT);
+		for(int t=0;t<numIntervals;t++) {
+			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
+			printWriter.print(time+SEPARATOR_TXT);
+		}
+		printWriter.println();
+		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getConcentration()+SEPARATOR_TXT);
+			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
+				double value=linkDataE.getValue().getConcentration(t)*1000;
+				printWriter.print(value+SEPARATOR_TXT);
+			}
+			printWriter.println();
+		}
+		printWriter.close();
 	}
 	public Map<Id, LinkData> getLinksData() {
 		return linksData;
@@ -241,8 +328,8 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData!=null && linkData.isUsed() && !Double.isNaN(linkData.getAvgSpeeds(t))) {
-					value+=linkData.getAvgSpeeds(t);
+				if(linkData!=null && linkData.isUsed()) {
+					value+=linkData.getAvgSpeedsGraphs(t);
 					numLinks++;
 				}
 			}
@@ -261,8 +348,8 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData!=null && linkData.isUsed() && !Double.isNaN(linkData.getAvgTravelTimes(t))) {
-					value+=linkData.getAvgTravelTimes(t);
+				if(linkData!=null && linkData.isUsed()) {
+					value+=linkData.getAvgTravelTimesGraphs(t);
 					numLinks++;
 				}
 			}
@@ -281,7 +368,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData!=null && linkData.isUsed() && !Double.isNaN(linkData.getConcentration(t))) {
+				if(linkData!=null && linkData.isUsed()) {
 					value+=linkData.getConcentration(t);
 					numLinks++;
 				}
@@ -341,8 +428,8 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData.isUsed() && !Double.isNaN(linkData.getAvgSpeeds(t))) {
-					value+=linkData.getAvgSpeeds(t);
+				if(linkData.isUsed()) {
+					value+=linkData.getAvgSpeedsGraphs(t);
 					numLinks++;
 				}
 			}
@@ -361,8 +448,8 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData.isUsed() && !Double.isNaN(linkData.getAvgTravelTimes(t))) {
-					value+=linkData.getAvgTravelTimes(t);
+				if(linkData.isUsed()) {
+					value+=linkData.getAvgTravelTimesGraphs(t);
 					numLinks++;
 				}
 			}
@@ -381,7 +468,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			int numLinks = 0;
 			for(Link link:network.getLinks().values()) {
 				LinkData linkData = linksData.get(link.getId());
-				if(linkData!=null && linkData.isUsed() && !Double.isNaN(linkData.getConcentration(t))) {
+				if(linkData!=null && linkData.isUsed()) {
 					value+=linkData.getConcentration(t);
 					numLinks++;
 				}
@@ -425,7 +512,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		double[] ys = new double[linkData.getTimeSize()];
 		for(int t=0;t<linkData.getTimeSize();t++) {
 			xs[t]=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			ys[t]=linkData.getAvgTravelTimes(t);
+			ys[t]=linkData.getAvgTravelTimesGraphs(t);
 		}
 		chart.addSeries("Travel time", xs, ys);
 		chart.saveAsPng("./data/youssef/ttLink_"+linkId.toString()+".png", 800, 600);
@@ -438,7 +525,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		double[] ys = new double[linkData.getTimeSize()];
 		for(int t=0;t<linkData.getTimeSize();t++) {
 			xs[t]=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
-			ys[t]=linkData.getAvgSpeeds(t)*3600/1000;
+			ys[t]=linkData.getAvgSpeedsGraphs(t)*3600/1000;
 		}
 		chart.addSeries("Avg. Speed", xs, ys);
 		chart.saveAsPng("./data/youssef/speedLink_"+linkId.toString()+".png", 800, 600);
@@ -464,7 +551,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		double[] ys = new double[linkData.getTimeSize()];
 		for(int t=0;t<linkData.getTimeSize();t++) {
 			xs[t]=linkData.getFlow(t);
-			ys[t]=linkData.getAvgSpeeds(t);
+			ys[t]=linkData.getAvgSpeedsGraphs(t);
 		}
 		chart.addSeries("FlowSpeed", xs, ys);
 		chart.saveAsPng("./data/youssef/fSLink_"+linkId.toString()+".png", 800, 600);
@@ -490,7 +577,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		double[] ys = new double[linkData.getTimeSize()];
 		for(int t=0;t<linkData.getTimeSize();t++) {
 			xs[t]=linkData.getDensity(t);
-			ys[t]=linkData.getAvgSpeeds(t);
+			ys[t]=linkData.getAvgSpeedsGraphs(t);
 		}
 		chart.addSeries("DensitySpeed", xs, ys);
 		chart.saveAsPng("./data/youssef/dSLink_"+linkId.toString()+".png", 800, 600);
@@ -505,11 +592,15 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	}
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		exitLink(event.getTime(), event.getLinkId(), event.getPersonId());
+		beginActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
-		enterLink(event.getTime(), event.getLinkId(), event.getPersonId());
+		finishActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
+	}
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		System.out.println("stuck");
 	}
 	public void enterLink(double time, Id linkId, Id personId) {
 		verifyNewInterval(time, linkId);
@@ -523,16 +614,26 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		if(linkData!=null)
 			linkData.addExitVehicle(personId, time);
 	}
+	public void finishActivityLink(double time, Id linkId, Id personId) {
+		verifyNewInterval(time, linkId);
+		LinkData linkData = linksData.get(linkId);
+		if(linkData!=null)
+			linkData.addEndActivity(personId, time);
+	}
+	public void beginActivityLink(double time, Id linkId, Id personId) {
+		verifyNewInterval(time, linkId);
+		LinkData linkData = linksData.get(linkId);
+		if(linkData!=null)
+			linkData.addStartActivity(personId, time);
+	}
 	public void verifyNewInterval(double time, Id linkId) {
 		LinkData linkData = linksData.get(linkId);
 		while(linkData!=null && time-linkData.getTimeSize()*TIME_INTERVAL>TIME_INTERVAL) {
+			linkData.addTimeInterval();
 			linkData = linksData.get(linkId);
-			if(linkData!=null) {
-				linkData.addTimeInterval();
-				if(linkData.getTimeSize()>numIntervals)
-					numIntervals=linkData.getTimeSize();
-			}
 		}
+		if(linkData!=null && linkData.getTimeSize()>numIntervals)
+			numIntervals=linkData.getTimeSize();
 	}
 	@Override
 	public void reset(int iteration) {

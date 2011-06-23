@@ -57,7 +57,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Camera camera;
 	private Window window;
 	private Color backgroundColor = Color.WHITE;
-	private Color pointsColor = new Color(127,127,255);
+	private Color pointsColor = Color.BLUE;
 	private Color pointsColor2 = Color.RED;
 	private Color linesColor = Color.BLACK;
 	private Color linesColor2 = Color.ORANGE;
@@ -65,10 +65,10 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Color nodeSelectedColor = Color.MAGENTA;
 	private Color networkColor = Color.LIGHT_GRAY;
 	private int pointsSize = 2;
-	private Stroke pointsStroke = new BasicStroke(2.5f);
-	private Stroke linesStroke = new BasicStroke(1.5f);
-	private Stroke selectedStroke = new BasicStroke(2);
-	private Stroke networkStroke = new BasicStroke(1f);
+	private Stroke pointsStroke = new BasicStroke(2f);
+	private Stroke linesStroke = new BasicStroke(1f);
+	private Stroke selectedStroke = new BasicStroke(2f);
+	private Stroke networkStroke = new BasicStroke(0.5f);
 	private boolean wait;
 	private int iniX;
 	private int iniY;
@@ -80,8 +80,8 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	public boolean paintAll = false;
 	private boolean withStops = true;
 	private boolean withNetwork = true;
-	private boolean withLinksStops = false;
-	private boolean withLines = false;
+	private boolean withLinksStops = true;
+	private boolean withLines = true;
 	
 	//Methods
 	public PanelPathEditor(Window window) {

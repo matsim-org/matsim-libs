@@ -27,14 +27,13 @@ public class VehiclesGenerator {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		TransitScheduleReader reader = new TransitScheduleReader(scenario);
-		reader.readFile("./data/gtfs/test.xml");
+		reader.readFile("./data/gtfs/test1.xml");
 		CreateVehiclesForSchedule cvfs = new CreateVehiclesForSchedule(((ScenarioImpl)scenario).getTransitSchedule(), ((ScenarioImpl)scenario).getVehicles());
 		cvfs.run();
 		TransitScheduleWriter writer= new TransitScheduleWriter(((ScenarioImpl)scenario).getTransitSchedule());
-		writer.writeFile("./data/ezLinkDataSimulation/transitScheduleWV.xml");
+		writer.writeFile("./data/currentSimulation/transitScheduleWV.xml");
 		VehicleWriterV1 writer2 = new VehicleWriterV1(((ScenarioImpl)scenario).getVehicles());
-		writer2.writeFile("./data/ezLinkDataSimulation/vehicles.xml");
-		
+		writer2.writeFile("./data/currentSimulation/vehicles.xml");
 	}
 
 }

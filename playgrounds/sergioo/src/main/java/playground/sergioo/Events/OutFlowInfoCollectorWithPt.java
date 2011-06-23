@@ -12,12 +12,13 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 //the program is currently calculating the destination flows
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler
-public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, AgentArrivalEventHandler
+//public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, AgentArrivalEventHandler
 //public class OutFlowInfoCollectorWithPt implements AgentArrivalEventHandler
-//public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler,AgentArrivalEventHandler 
+public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler,AgentArrivalEventHandler 
 {
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define

@@ -56,7 +56,7 @@ public class MainFlowAnalysisWithPt {
 		//double radiusInMeters=2500;
 		//Coord center=new CoordImpl(683400.75,247500.0687); //(4-21)
 		Coord center=new CoordImpl(683139.3125,247387.9531);// high density center
-		double radiusInMeters=4500;
+		double radiusInMeters=1500;
 		
 		
 		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius

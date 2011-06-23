@@ -32,13 +32,12 @@ public class MainDensityAnalysisWithPt {
 //		Coord center=new CoordImpl(0,0);
 		//boolean isOldEventFile=false;
 		
-		Coord center=new CoordImpl(683400.75,247500.0687);
+		Coord center=new CoordImpl(4090,5702);
 		//Coord center=new CoordImpl(683139.3125,247387.9531);// high density center
-		double radiusInMeters=4500;
+		double radiusInMeters=10000;
 		
-		String networkFile="./data/youssef/network.xml";
-		String eventsFile="./data/youssef/NE/100.events.xml.gz";
-		
+		String networkFile="./data/youssef/siouxfalls_net1.xml";
+		String eventsFile="./data/youssef/SC/SC.50.events.xml.gz";
 		
 				
 		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
@@ -163,7 +162,7 @@ public static void printDensity(HashMap<Id, double[]> density, Map<Id, Link> lin
 }
 
 public static void printDensityFile(HashMap<Id, double[]> density, Map<Id, Link> links) throws FileNotFoundException { // print
-	PrintWriter writer = new PrintWriter(new File("./data/youssef/res.txt"));
+	PrintWriter writer = new PrintWriter(new File("./data/youssef/SC2.txt"));
 	for (Id linkId : density.keySet()) {
 		double[] bins = density.get(linkId);
 		Link link = links.get(linkId);
