@@ -61,12 +61,22 @@ public class EnergyFlowsController extends Controler {
 		super(args[0]);
 		this.reroutingShare = Double.parseDouble(args[1]);
 		log.info("Use transit agent rerouting share of " + Double.parseDouble(args[1]));
-		
-		if (args.length != 2) {
+	}
+
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: EnergyFlowsController config-file rerouting-share");
+			System.out.println();
+		} else if (args.length != 2) {
 			log.error("Unexpected number of input arguments!");
 			log.error("Expected path to a config file (String) and rerouting share (double, 0.0 ... 1.0) for transit agents.");
 			System.exit(0);
+		} else {
+			final EnergyFlowsController controler = new EnergyFlowsController(args);
+			controler.run();
 		}
+		
+		System.exit(0);
 	}
-
 }
