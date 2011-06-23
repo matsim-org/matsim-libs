@@ -131,8 +131,8 @@ public class DecentralizedSmartCharger {
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
 
-	private HashMap<Id, Schedule> agentParkingAndDrivingSchedules; 
-	private HashMap<Id, Schedule> agentChargingSchedules;
+	private static HashMap<Id, Schedule> agentParkingAndDrivingSchedules; 
+	public HashMap<Id, Schedule> agentChargingSchedules;
 	private double averageChargingCostsAgent, averageChargingCostsAgentEV, averageChargingCostsAgentPHEV;	
 	private double averageChargingTimeAgent, averageChargingTimeAgentEV, averageChargingTimeAgentPHEV;	
 	
@@ -146,7 +146,7 @@ public class DecentralizedSmartCharger {
 	
 	public LinkedList<Id> deletedAgents;// agents where ParkingTimes were not found
 	
-	private HashMap<Id, Double> agentChargingCosts;
+	public HashMap<Id, Double> agentChargingCosts;
 	
 	//***********************************************************************
 	public static V2G myV2G;
@@ -389,7 +389,7 @@ public class DecentralizedSmartCharger {
 			if(DecentralizedSmartCharger.debug){
 				System.out.println("getAgentSchedule: "+ id.toString());
 			}
-			// in 10000 id 8797 had error with schedulesize=0
+			
 			agentParkingAndDrivingSchedules.put(id,myAgentTimeReader.readParkingAndDrivingTimes(id));
 						
 			if(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()==0 
@@ -402,7 +402,6 @@ public class DecentralizedSmartCharger {
 			}
 		}
 		deleteAgentInList(deletedAgents);
-		
 		
 	}
 
@@ -430,7 +429,7 @@ public class DecentralizedSmartCharger {
 		
 		for (Id id : vehicles.getKeySet()){			
 			if (debug){
-				System.out.println("Find required charging times - LP - agent"+id.toString() );
+				System.out.println("Find required charging times - LP - agent" + id.toString() );
 			}
 			String type="";			
 				/*
@@ -1231,6 +1230,23 @@ public class DecentralizedSmartCharger {
 		}else{return false;}
 	}
 	
+	
+	
+	public boolean isAgentAtHub(Id id, Integer hubNumber){
+		boolean isAtHub=false;
+		
+		Schedule s= agentParkingAndDrivingSchedules.get(id);
+		for(int i=0; i<s.getNumberOfEntries(); i++){
+			if (s.timesInSchedule.get(i).isParking()){
+				ParkingInterval p= (ParkingInterval)s.timesInSchedule.get(i);
+				if(myHubLoadReader.getHubForLinkId(p.getLocation())==hubNumber){
+					isAtHub=true;
+					return isAtHub;
+				}
+			}
+		}
+		return isAtHub;
+	}
 	
 	/**
 	 * checks if agent has a EV

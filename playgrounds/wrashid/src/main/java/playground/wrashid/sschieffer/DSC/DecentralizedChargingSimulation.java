@@ -60,7 +60,7 @@ public class DecentralizedChargingSimulation {
 	
 	public static double kWHEV;
 	public static  double kWHPHEV;
-	public static boolean gasHigh;
+	public static Object gasHigh;
 	
 	/**
 	 * Setup for only decentralized smart charging optimization
@@ -88,7 +88,7 @@ public class DecentralizedChargingSimulation {
 			MappingClass myMappingClass,
 			ArrayList<HubInfoDeterministic> myHubInfo,
 			boolean LPoutput,
-			double kWHEV, double kWHPHEV, boolean gasHigh
+			double kWHEV, double kWHPHEV, Object gasHigh
 			) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.outputPath=outputPath;

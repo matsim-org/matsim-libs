@@ -18,58 +18,102 @@ public class SetUpVehicleCollector {
 
 	
 	private VehicleTypeCollector myVehicleTypes;
+	private double gasPricePerLiter;
+	
+	private Battery EVBattery ;
+	private Battery PHEVBattery ;
+	private VehicleType EVTypeStandard, PHEVTypeStandard;
+	private GasType normalGas;
 	
 	public SetUpVehicleCollector(){
 		
 	}
 	
+	
+	
 	/**
-	 * defines and sets up the gas types for the simulation
+	 * defines and sets up the gas types for the simulation indicating only between high or low gas price
+	 * using the default gas price values
 	 * @return
 	 */
-	public VehicleTypeCollector setUp(double kWHEV, double kWHPHEV, boolean gasHigh){
-		
-		/*
-		 * GAS TYPES
-		 * - Specify gas types and their characteristics
-		 * 
-		 * - Gas Price [currency]
-		 * - Joules per liter in gas [J]
-		 * - emissions of Co2 per liter gas [kg]
-		 
-		 */
+	public VehicleTypeCollector setUp(double kWHEV, double kWHPHEV, Object gasHigh){
 		
 		/**
 		 * NORMAL GAS
 		 */
+		if (gasHigh.getClass()==Double.class){
+			setUpGasPrice((Double)gasHigh);
+		}else{
+			setUpGasPrice((Boolean)gasHigh);
+		}
 		
+		setNormalGas();
 		
-		double gasPricePerLiter;
+		setBatteryTypes(kWHEV, kWHPHEV);		
+		
+		setVehicleTypes();
+		/*
+		 * The vehicle types are saved within the VehicleTypeCollector
+		 * which is then passed into the Decentralized Smart Charger
+		 */
+		myVehicleTypes= new VehicleTypeCollector();
+		myVehicleTypes.addVehicleType(EVTypeStandard);
+		myVehicleTypes.addVehicleType(PHEVTypeStandard);		
+	
+		return myVehicleTypes;
+	}
+
+	
+	/**
+	 * defines and sets up the gas types for the simulation
+	 * with passed value of gasPrice </br>
+	 * IMPORTANT: The gas price is given in: = CHF/l * l/J * J/s </br>
+	 * CHF per second charging = price per liter *1/(joules/liter) * engineWatt
+	 * @return
+	 */
+	public VehicleTypeCollector setUp(double kWHEV, double kWHPHEV, double gasPrice){
+		
+		/**
+		 * NORMAL GAS
+		 */
+		setUpGasPrice(gasPrice);
+		
+		setNormalGas();
+		
+		setBatteryTypes(kWHEV, kWHPHEV);		
+		
+		setVehicleTypes();
+		/*
+		 * The vehicle types are saved within the VehicleTypeCollector
+		 * which is then passed into the Decentralized Smart Charger
+		 */
+		myVehicleTypes= new VehicleTypeCollector();
+		myVehicleTypes.addVehicleType(EVTypeStandard);
+		myVehicleTypes.addVehicleType(PHEVTypeStandard);		
+	
+		return myVehicleTypes;
+	}
+
+
+	private void setUpGasPrice(boolean gasHigh){
 		if(gasHigh){
 			// GAS PRICE CH //http://www.tanktipp.ch/
 			gasPricePerLiter= 1.70; 
 		}else{
 			// GAS PRICE USA //	http://gasbuddy.com/ //3.75 (U.S. dollars / US gallon) = 0.849974428 Swiss francs / l
-			//gasPricePerLiter= 0.85;
-			//calc of gas price per second = gasPricePerLiter * 1/ 43*10^6 * 80000 < 0.00007 - 0.00011
-			gasPricePerLiter=0.043; // --> 0.00008
+			gasPricePerLiter= 0.85;
+			
 		}
+	}
 	
+	private void setUpGasPrice(double gasHigh){
 		
-		//JoulesPerLiter = theoretisch moegliche Energie * Wirkungsgrad; 
-		//http://de.wikipedia.org/wiki/Wirkungsgrad
-		//http://de.wikipedia.org/wiki/Motorenbenzin
-		double massPerLiter=0.75;// kg/l
-		double gasJoulesPerLiter = 43.0*Math.pow(10,6)*massPerLiter;// Benzin 42,7–44,2 MJ/kg  * 0.3
+			gasPricePerLiter= gasHigh; 
 		
-		double emissionPerLiter = 2.36; // 2,36 kg/L
-		
-		GasType normalGas=new GasType("normal gas", 
-				gasJoulesPerLiter, 
-				gasPricePerLiter, 
-				emissionPerLiter);
-		
-		
+	}
+	
+	
+	private void setBatteryTypes(double kWHEV, double kWHPHEV){
 		/*
 		 * Define battery types (e.g. EV mode, PHEV model)
 		 * 
@@ -90,9 +134,37 @@ public class SetUpVehicleCollector {
 		double batteryMaxEV= 0.9; 
 		double batteryMaxPHEV= 0.9; 		
 		
-		Battery EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
-		Battery PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+		EVBattery = new Battery(batterySizeEV, batteryMinEV, batteryMaxEV);
+		PHEVBattery = new Battery(batterySizePHEV, batteryMinPHEV, batteryMaxPHEV);
+	}
+	
+	
+	public void setNormalGas(){
+		/*
+		 * GAS TYPES
+		 * - Specify gas types and their characteristics
+		 * 
+		 * - Gas Price [currency]
+		 * - Joules per liter in gas [J]
+		 * - emissions of Co2 per liter gas [kg]
+		 
+		 */
+		//JoulesPerLiter = theoretisch moegliche Energie * Wirkungsgrad; 
+		//http://de.wikipedia.org/wiki/Wirkungsgrad
+		//http://de.wikipedia.org/wiki/Motorenbenzin
+		double massPerLiter=0.75;// kg/l
+		double gasJoulesPerLiter = 43.0*Math.pow(10,6)*massPerLiter;// Benzin 42,7–44,2 MJ/kg  * 0.3
 		
+		double emissionPerLiter = 2.36; // 2,36 kg/L
+		
+		normalGas=new GasType("normal gas", 
+				gasJoulesPerLiter, 
+				gasPricePerLiter, 
+				emissionPerLiter);
+	}
+	
+	
+	public void setVehicleTypes(){
 		/*
 		 * Specify vehicle types </br>
 		 * 
@@ -105,30 +177,20 @@ public class SetUpVehicleCollector {
 		 * <li> energy burn rate of the engine [W] 
 		 * </ul>
 		 */
-		VehicleType EVTypeStandard= new VehicleType("standard EV", 
+		EVTypeStandard= new VehicleType("standard EV", 
 				EVBattery, 
 				null, 
 				ElectricVehicle.class,
 				80000,// Nissan leaf 80kW Engine
 				1.0);
 		
-		VehicleType PHEVTypeStandard= new VehicleType("standard PHEV", 
+		PHEVTypeStandard= new VehicleType("standard PHEV", 
 				PHEVBattery, 
 				normalGas, 
 				PlugInHybridElectricVehicle.class,
 				80000,
 				0.3);
 		
-		/*
-		 * The vehicle types are saved within the VehicleTypeCollector
-		 * which is then passed into the Decentralized Smart Charger
-		 */
-		myVehicleTypes= new VehicleTypeCollector();
-		myVehicleTypes.addVehicleType(EVTypeStandard);
-		myVehicleTypes.addVehicleType(PHEVTypeStandard);		
-	
-		
-		return myVehicleTypes;
 	}
 	
 }

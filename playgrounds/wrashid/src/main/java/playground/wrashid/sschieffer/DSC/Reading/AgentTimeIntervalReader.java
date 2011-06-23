@@ -160,11 +160,8 @@ public class AgentTimeIntervalReader {
 			
 			Id idLink= thisParkingInterval.getLocation();
 			
-			Schedule loadDistributionSchedule;
-		
-			loadDistributionSchedule= DecentralizedSmartCharger.myHubLoadReader.getLoadDistributionScheduleForHubId(id, idLink);
-		
-			
+			Schedule loadDistributionSchedule = DecentralizedSmartCharger.myHubLoadReader.getLoadDistributionScheduleForHubId(id, idLink);
+					
 			for(int i=0; i<loadDistributionSchedule.getNumberOfEntries(); i++){
 				
 				LoadDistributionInterval lHub= ((LoadDistributionInterval)loadDistributionSchedule.timesInSchedule.get(i));

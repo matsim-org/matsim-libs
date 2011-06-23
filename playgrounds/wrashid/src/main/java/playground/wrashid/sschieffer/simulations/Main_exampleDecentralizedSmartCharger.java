@@ -106,10 +106,13 @@ public class Main_exampleDecentralizedSmartCharger {
 		final double ev=1.0; 
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";		
+		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		
 		double kWHEV =24;
 		double kWHPHEV =24;
-		boolean gasHigh = false;
+		
+		double gasHigh = 1.70;
 		
 		/**
 		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo

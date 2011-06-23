@@ -196,13 +196,17 @@ public class HubLoadDistributionReader {
 		if (myVehicleTypeCollector.containsVehicleTypeForThisVehicle(p)){			
 			
 			GasType phevGasType= myVehicleTypeCollector.getGasType(p);
-			double engineWatt =  myVehicleTypeCollector.getWattOfEngine(p);
-			double engineEfficiency = myVehicleTypeCollector.getEfficiencyOfEngine(p);
-			
-			// gasPriceInCostPerSecond;= cost/second = cost/liter * liter/joules * joules/second    could still take into account * 1/efficiency			
-			double  gasPriceInCostPerSecond=phevGasType.getPricePerLiter() * 1/(phevGasType.getJoulesPerLiter()) 
-											 * engineWatt;// *(1/engineEfficiency)
+			double jpl= phevGasType.getJoulesPerLiter();
+			double ppl= phevGasType.getPricePerLiter();
 						
+			/*
+			 * to compare the cost of charging per second to using a combustion engine instead: we
+			 * - see how much gas costs one second of charging would incur
+			 * standard connection *1s* 1/(JoulesPeriter) * pricePerLiter
+			 * [W=J/s] * s * l/J * CHF/l  = CHF
+			 */
+			double  gasPriceInCostPerSecond=DecentralizedSmartCharger.STANDARDCONNECTIONSWATT * 1/jpl*ppl;
+			
 			deterministicHubLoadDistributionPHEVAdjusted=getPHEVDeterministicHubLoad(gasPriceInCostPerSecond);
 			visualizePricingAndGas(gasPriceInCostPerSecond);
 			

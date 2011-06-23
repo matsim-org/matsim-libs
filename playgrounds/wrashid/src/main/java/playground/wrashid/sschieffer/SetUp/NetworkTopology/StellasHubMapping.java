@@ -69,8 +69,8 @@ public class StellasHubMapping extends MappingClass{
 			double coordY=link.getCoord().getY();
 			coordY=coordY-minY; // relative position
 			
-			int hubNoX=(int)Math.ceil(coordX/xDiv);
-			int hubNoY=(int)Math.ceil(coordY/yDiv);
+			int hubNoX=Math.max(1,(int)Math.ceil(coordX/xDiv));
+			int hubNoY=Math.max(1,(int)Math.ceil(coordY/yDiv));
 			
 			int hubNumber= hubNoX + (hubNoY-1)*hubNoX;
 			/*
@@ -89,7 +89,7 @@ public class StellasHubMapping extends MappingClass{
 			
 			
 			hubLinkMapping.addMapping(link.getId().toString(), hubNumber);
-						
+			//System.out.println("assigned link "+link.getId().toString()+ "to hub "+ hubNumber);			
 		}
 		return hubLinkMapping;
 	}	
@@ -97,14 +97,30 @@ public class StellasHubMapping extends MappingClass{
 	
 	
 	public void findMinMaxXYNetwork(Controler controler){
-		
+		System.out.println("find Max and Min XY in Network in Stellas Hub Mapping");
 		for (Link link:controler.getNetwork().getLinks().values()){
-			minX= Math.min(minX, link.getCoord().getX()); 
-			maxX= Math.max(maxX,link.getCoord().getX());
 			
-			minY= Math.min(minY, link.getCoord().getY()); 
-			maxY= Math.max(maxY,link.getCoord().getY());
+			double startNodeX=link.getFromNode().getCoord().getX();
+			double startNodeY=link.getFromNode().getCoord().getY();
+			double endNodeX=link.getToNode().getCoord().getX();
+			double endNodeY=link.getToNode().getCoord().getY();
+			
+			//System.out.println("From ("+startNodeX+", "+startNodeY+") to ("+ endNodeX+", "+endNodeY+")");
+			
+			minX= Math.min(minX, startNodeX); 
+			minX= Math.min(minX, endNodeX);
+			
+			maxX= Math.max(maxX, startNodeX); 
+			maxX= Math.max(maxX, endNodeX);
+			
+			minY= Math.min(minY, startNodeY); 
+			minY= Math.min(minY, startNodeY);
+			
+			maxY= Math.max(maxY,startNodeY);
+			maxY= Math.max(maxY,endNodeY);
 		}
+		//System.out.println("final X: "+ minX + ", " + maxX);
+		//System.out.println("final Y: "+ minY + ", " + maxY);
 	}
 	
 	
