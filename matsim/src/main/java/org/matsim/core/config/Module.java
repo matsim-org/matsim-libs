@@ -91,6 +91,10 @@ public class Module  implements Serializable{
 	}
 
 	public String getValue(final String param_name) {
+		// yyyy my intuition is that this should be made final.  This would leave the prototypical "getParameterFromHashKey"
+		// still intact.  But it would force normal config groups to use direct getters and setters ... allowing later to
+		// find out where the parameters are actually used in the code.  So far, this seems feasible (few actual
+		// occurences in the code).  kai, jun'11
 		return this.params.get(param_name);
 	}
 
