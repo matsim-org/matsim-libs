@@ -54,6 +54,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperato
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.DefaultChromosomeDistanceComparator;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.HammingChromosomeDistanceComparator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.RestrictedTournamentSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -123,8 +124,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 				new RestrictedTournamentSelector(
 						this,
 						configGroup,
-						new DefaultChromosomeDistanceComparator(
-							configGroup.getDiscreteDistanceScale()));
+						(configGroup.getUseOnlyHammingDistanceInRTS() ?
+							 new HammingChromosomeDistanceComparator() :
+							 new DefaultChromosomeDistanceComparator(
+								configGroup.getDiscreteDistanceScale())));
 			this.addNaturalSelector(selector, false);
 
 			// do not try to reintroduce fittest: RTS never eliminates it

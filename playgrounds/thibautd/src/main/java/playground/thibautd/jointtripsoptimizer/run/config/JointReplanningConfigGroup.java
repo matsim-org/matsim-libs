@@ -143,6 +143,10 @@ public class JointReplanningConfigGroup extends Module {
 	 * to be non uniform.
 	 */
 	public static final String P_NON_UNIFORM = "probNonUniform";
+	/**
+	 * true if only the hamming distance have to be considered in RTS
+	 */
+	public static final String HAMMING_DISTANCE = "useHammingDistanceOnlyInRTS";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -178,6 +182,7 @@ public class JointReplanningConfigGroup extends Module {
 	private int rtsWindowSize = 15;
 	private boolean inPlaceMutation = true;
 	private double pNonUniform = 0.5d;
+	private boolean useOnlyHammingDistance = true;
 	//deprecated fields:
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
@@ -769,6 +774,14 @@ public class JointReplanningConfigGroup extends Module {
 		return this.pNonUniform;
 	}
 
+	public void setUseOnlyHammingDistanceInRTS(final String value) {
+		this.useOnlyHammingDistance = Boolean.parseBoolean(value);
+	}
+
+	public boolean getUseOnlyHammingDistanceInRTS() {
+		return this.useOnlyHammingDistance;
+	}
+
 	// allow setting of GA params "directly"
 	public void setPopulationSize(final int populationSize) {
 		this.populationSize = (populationSize);
@@ -849,6 +862,10 @@ public class JointReplanningConfigGroup extends Module {
 
 	public void setNonUniformMutationProbability(final double value) {
 		this.pNonUniform = (value);
+	}
+
+	public void setUseOnlyHammingDistanceInRTS(final boolean value) {
+		this.useOnlyHammingDistance = value;
 	}
 }
 
