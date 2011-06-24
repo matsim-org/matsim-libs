@@ -22,6 +22,9 @@ package playground.yu.run;
 
 import org.matsim.core.controler.Controler;
 
+import playground.yu.analysis.RouteTravelTimeSummary;
+import playground.yu.counts.CntSimCap4Chart;
+
 public class Run {
 
 	/**
@@ -29,9 +32,15 @@ public class Run {
 	 *            args[0] - configfile;
 	 *            <P>
 	 *            args[1] - writeGraphs (boolean)
+	 *            <p>
+	 *            args[2] - output counts-simuated traffic volume-capacity plots
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler(args[0]);
+		if (args.length >= 3 && Boolean.parseBoolean(args[2])) {
+			controler.addControlerListener(new CntSimCap4Chart());
+		}
+		controler.addControlerListener(new RouteTravelTimeSummary());
 		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
 		controler.setOverwriteFiles(true);
 		controler.run();

@@ -26,6 +26,8 @@ package playground.yu.analysis;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
@@ -122,8 +124,8 @@ public class RouteTravelTimeMeasure implements AgentDepartureEventHandler,
 		agentDepartTimes.put(agentId, event.getTime());
 	}
 
-	public Map<String/* route Id */, Double/* avg travel ime */> getAvgTravelTimes() {
-		Map<String, Double> avgTravTimes = new HashMap<String, Double>();
+	public SortedMap<String/* route Id */, Double/* avg travel ime */> getAvgTravelTimes() {
+		SortedMap<String, Double> avgTravTimes = new TreeMap<String, Double>();
 		for (String routeId : routeTimes.keySet()) {
 			List<Double> routeTravTimes = routeTimes.get(routeId);
 			double avgTravTime = CollectionMath.getAvg(routeTravTimes);
@@ -132,8 +134,11 @@ public class RouteTravelTimeMeasure implements AgentDepartureEventHandler,
 		return avgTravTimes;
 	}
 
-	public Map<String/* routeId */, Integer/* nb. of agents taking one route */> getNbTakingRoute() {
-		Map<String, Integer> routeUserNbs = new HashMap<String, Integer>();
+	public SortedMap<String/* routeId */, Integer/*
+												 * nb. of agents taking one
+												 * route
+												 */> getNbTakingRoute() {
+		SortedMap<String, Integer> routeUserNbs = new TreeMap<String, Integer>();
 		for (String routeId : routeTimes.keySet()) {
 			routeUserNbs.put(routeId, routeTimes.get(routeId).size());
 		}

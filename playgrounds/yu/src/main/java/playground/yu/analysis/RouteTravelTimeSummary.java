@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.Vector;
 
 import org.matsim.core.controler.ControlerIO;
@@ -67,8 +68,8 @@ public class RouteTravelTimeSummary implements AfterMobsimListener,
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		event.getControler().getEvents().removeHandler(rttm);
 		// output of this iteration
-		Map<String, Double> routeTravTimes = rttm.getAvgTravelTimes();
-		Map<String, Integer> routeUserNbs = rttm.getNbTakingRoute();
+		SortedMap<String, Double> routeTravTimes = rttm.getAvgTravelTimes();
+		SortedMap<String, Integer> routeUserNbs = rttm.getNbTakingRoute();
 
 		int iter = event.getIteration();
 		// route travel times

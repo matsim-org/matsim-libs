@@ -34,9 +34,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
  * agents in the file and change only the Ids.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class DoublePop extends NewPopulation {
 	// private String newPersonId;
@@ -45,7 +45,7 @@ public class DoublePop extends NewPopulation {
 
 	/**
 	 * Construcktor
-	 * 
+	 *
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
@@ -62,8 +62,8 @@ public class DoublePop extends NewPopulation {
 		pw.writePerson(person);
 		// n++;
 		tmpPerson = person;
-		String oldId = person.getId().toString();
-		// long oldId = Integer.parseInt(person.getId().toString());
+		// String oldId = person.getId().toString();
+		long oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
 		// if (n == 1) {
 
@@ -75,12 +75,12 @@ public class DoublePop extends NewPopulation {
 
 		// } else if (n == 2) {
 
-		// for (int i = 1; i <= 99; i++) {
-		// createNewPerson(oldId + i);
-		// }
+		for (int i = 1; i <= 99; i++) {
+			createAndWriteNewPerson(oldId + i);
+		}
 
 		// createNewPerson(oldId + "A");
-		createAndWriteNewPerson(oldId + "B");
+		// createAndWriteNewPerson(oldId + "B");
 		// createNewPerson(oldId + "C");
 		// createNewPerson(oldId + "D");
 	}
@@ -89,7 +89,7 @@ public class DoublePop extends NewPopulation {
 		createAndWriteNewPerson(new IdImpl(newId));
 	}
 
-	private void createNewPerson(long newId) {
+	private void createAndWriteNewPerson(long newId) {
 		createAndWriteNewPerson(new IdImpl(newId));
 	}
 
@@ -103,9 +103,9 @@ public class DoublePop extends NewPopulation {
 		String networkFilename, plansFilename, outputPlansFilename;
 
 		if (args.length != 3) {
-			networkFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptNet.xml";
-			plansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/ptPop.xml";
-			outputPlansFilename = "../playgrounds/yu/test/input/playground/yu/ptCounts/pt100Pop.xml";
+			networkFilename = "test/input/2routes/network.xml";
+			plansFilename = "test/input/2routes/plan.xml";
+			outputPlansFilename = "test/input/2routes/pop100.xml";
 		} else {
 			networkFilename = args[0];
 			plansFilename = args[1];
