@@ -21,6 +21,7 @@
 package playground.christoph.energyflows.replanning;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
@@ -55,6 +56,18 @@ public class TransitStrategyManager extends StrategyManager {
 		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
 		
 		this.reroutingShare = replanningShare;
+	}
+
+	@Override
+	public void beforePopulationRunHook(Population population) {
+		this.reroutingStrategy.init();
+		this.expBetaSelectorStrategy.init();
+	}
+	
+	@Override
+	public void afterRunHook(Population population) {
+		this.reroutingStrategy.finish();
+		this.expBetaSelectorStrategy.finish();
 	}
 	
 	@Override
