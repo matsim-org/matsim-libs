@@ -1,0 +1,22 @@
+The folders batXPriceX differ by the values chosen for battery and gas price		
+"(1)Battery can take two values (S= small= 16kWh, L=large =24kWh)"		
+"(2)Gas Price (S= small= US price, L=large =CH price)"		
+		
+"Then, within each folder the simulations A-P follow the scheme below."		
+SIM	EV penetration	RegulationUpPercentage
+a	0.1	0
+b	0.25	0
+c	0.75	0
+d	0.9	0
+e	0.1	0.33
+f	0.25	0.33
+g	0.75	0.33
+h	0.9	0.33
+i	0.1	0.67
+j	0.25	0.67
+k	0.75	0.67
+l	0.9	0.67
+m	0.1	1
+n	0.25	1
+o	0.75	1
+p	0.9	1

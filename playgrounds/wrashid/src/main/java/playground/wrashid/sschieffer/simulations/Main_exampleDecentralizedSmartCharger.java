@@ -105,29 +105,30 @@ public class Main_exampleDecentralizedSmartCharger {
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=1.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\Output\\Testing\\";		
-		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		final String outputPath="D:/ETH/MasterThesis/Output/Testing/";		
+		
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
+		// battery size of EV and PHEV vehicle
 		double kWHEV =24;
 		double kWHPHEV =24;
 		
+		// gas price, i.e. 1.70 CHF/liter
 		double gasHigh = 1.70;
 		
 		/**
-		 * define the hubs and their input, for each hub create a HubInfo Object and add it to the ArrayList<HubInfo> myHubInfo
-		 * for multiple hubs, you can add multiple entries to myHubInfo
+		 * define the hubs and their input, for each hub create a HubInfo Object 
+		 * and add it to the ArrayList<HubInfo> myHubInfo
+		 * --> for multiple hubs, you can add multiple entries to myHubInfo
 		 */
-		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
-		double priceMinPerkWh=0.07;
+		double priceMaxPerkWh=0.11;double priceMinPerkWh=0.07;
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
 		/**
 		 * define mapping class that shall be used to map the 
-		 * linkdId to the hubs in the DecentralizedSmartCharger
-		 * 
+		 * linkdId to the hubs in the DecentralizedSmartCharger		
 		 */
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
