@@ -47,7 +47,8 @@ public class Vector2D {
 			return new Vector2D(0.0, 1.0);
 		}else{
 			double y = Math.random();
-			return new Vector2D(this.y*y/this.x, y);
+			return new Vector2D(this.y, -this.x);
+//			return new Vector2D(this.y*y/this.x, y);
 		}
 	}
 	

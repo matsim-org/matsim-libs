@@ -104,7 +104,6 @@ public class StraightComparer{
 		}else{
 			return GeoCalculator.distanceBetween2Points(baseA_CD, baseB_CD);
 		}
-		
 	}
 	/*
 	 * computes the base of the perpendicular of the "point" on the straight s
@@ -131,17 +130,22 @@ public class StraightComparer{
 		
 		// get the base of the perpendicular from c to the straight ab
 		p = a.add(new Vector2D(answers[0], r1));
-		p2 = c.add(new Vector2D(answers[1], r2));
-//		if(!(p.equals(p2))){
-//			log.error(p.toString() + " " + p2.toString());
-//		}
 		
 		// return the point only, if it is beetween the point a && b
-		if(a.getX() < p.getX() && p.getX() < b.getX()){
-			return new CoordImpl(p.getX(), p.getY());
-		}else{
-			return null;
+		if(a.getX() < b.getX()){
+			if(a.getX() < p.getX() && p.getX() < b.getX()){
+				return new CoordImpl(p.getX(), p.getY());
+			}else{
+				return null;
+			}	
+		}else if(b.getX() < a.getX()){
+			if(a.getX() > p.getX() && p.getX() > b.getX()){
+				return new CoordImpl(p.getX(), p.getY());
+			}else{
+				return null;
+			}
 		}
+		return null;
 	}
 	
 	public Double getAngle(){
@@ -157,13 +161,8 @@ class Straight{
 	private Coord end;
 
 	public Straight(Coord one, Coord two){
-		if(one.getX() < two.getX()){
-			this.start = one;
-			this.end = two;
-		}else{
-			this.start = two;
-			this.end = one;
-		}
+		this.start = one;
+		this.end = two;
 	}
 	
 	public Coord getStart(){

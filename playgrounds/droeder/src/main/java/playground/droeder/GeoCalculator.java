@@ -53,8 +53,7 @@ public class GeoCalculator {
 		absOne = Math.sqrt(Math.pow(o.get(0), 2) + Math.pow(o.get(1), 2));
 		absTwo = Math.sqrt(Math.pow(t.get(0), 2) + Math.pow(t.get(1), 2));
 		
-		scalar = ((o.get(0)*t.get(0)) + (o.get(1)+ t.get(1)));
-		
+		scalar = ((o.get(0)*t.get(0)) + (o.get(1)* t.get(1)));
 		return Math.acos(scalar/(absOne * absTwo));
 	}
 	

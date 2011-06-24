@@ -88,9 +88,9 @@ public class GraphMatching {
 
 	public void bottomUpMatching() {
 		log.info("starting bottom-up-Matching...");
-		this.nodeMatching();
-		this.segmentMatching();
-		this.edgeMatching();
+		this.nodeMatchingBottomUp();
+		this.computeEdgeCandidatesFromMappedNodes();
+		this.edgeMatchingBottomUp();
 		log.info("bottom-up-matching finished...");
 	}
 
@@ -99,8 +99,7 @@ public class GraphMatching {
 	private Map<Id, List<NodeCompare>> nodeReference2match;
 	private List<Id> unmatchedRefNodes;
 
-
-	private void nodeMatching() {
+	private void nodeMatchingBottomUp() {
 		log.info("start matching Nodes...");
 		this.nodeReference2match = new HashMap<Id, List<NodeCompare>>();
 		this.unmatchedRefNodes = new ArrayList<Id>();
@@ -111,21 +110,15 @@ public class GraphMatching {
 		// iterate over all nodes
 		for(MatchingNode ref: this.reference.getNodes().values()){
 			candidates = new ArrayList<NodeCompare>();
+			
 			//iterate over all possible candidates
-			if(ref.getId().equals(new IdImpl(503013))){
-				System.out.println();
-			}
 			for(MatchingNode match: this.matching.getNearestNodes(ref.getCoord().getX(), ref.getCoord().getY(), this.deltaDist)){
 				comp = new NodeCompare(ref, match);
-				if(ref.getId().equals(new IdImpl(9050301))){
-					System.out.println();
-				}
 				if((comp.getDist() < this.deltaDist) && (comp.getPhi() < this.deltaPhi)){
 					comp.setScore(((comp.getDist() / this.deltaDist) + (comp.getPhi() / this.deltaPhi)) / 2);
 					candidates.add(comp);
 				}
 			}
-			
 			
 			if(candidates.size() > 0){
 				Collections.sort(candidates);
@@ -133,61 +126,63 @@ public class GraphMatching {
 			}else{
 				this.unmatchedRefNodes.add(ref.getId());
 			}
-			
 		}
 		log.info(this.unmatchedRefNodes.size() +" nodes are unmatched!");
-		log.info(this.nodeReference2match.size() + " of " + reference.getNodes().size() + " nodes are matched");
+		log.info(this.nodeReference2match.size() + " of " + reference.getNodes().size() + " have one or more matches after bottom-up node-matching!");
 		log.info("node-matching finished... ");
 	}
 
 	// ##### SEGMENTMATCHING #####
-	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
-	private HashMap<Id, Map<Id, List<SegmentCompare>>> ref2CandEdgesFromSegmentMatching;
-
-	private void segmentMatching() {
-		log.info("start segment matching...");
-		this.computeEdgeCandidatesFromNodes();
-		
-		this.ref2CandEdgesFromSegmentMatching = new HashMap<Id, Map<Id,List<SegmentCompare>>>();
-		Map<Id, List<SegmentCompare>> candEdge2Segments = new HashMap<Id, List<SegmentCompare>>();
-		List<SegmentCompare> segComp;
-		SegmentCompare sc = null;
-		MatchingSegment rs = null, cs = null;
-		ListIterator<MatchingSegment> candIt, refIt;
-		
-		//iterate over all candidate edges 
-		for(Entry<MatchingEdge, List<MatchingEdge>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
-			for(MatchingEdge cand : e.getValue()){
-				segComp = new ArrayList<SegmentCompare>();
-				
-				candIt = cand.getSegments().listIterator();
-				refIt = e.getKey().getSegments().listIterator();
-				
-				while(candIt.hasNext() && refIt.hasNext()){
-					if((rs == null) && (cs == null)){
-						rs = refIt.next();
-						cs = candIt.next();
-					}else if(sc.refIsUndershot()){
-						rs = refIt.next();
-					}else if(!sc.refIsUndershot()){
-						cs = candIt.next();
-					}
-					sc = new SegmentCompare(rs, cs);
-					segComp.add(sc);
-				}
-				candEdge2Segments.put(cand.getId(), segComp);
-			}
-			ref2CandEdgesFromSegmentMatching.put(e.getKey().getId(), candEdge2Segments);
-		}
-		
-		// clear temporally matched Edges to save memory 
-		this.ref2CandEdgesFromMappedNodes.clear();
-		log.info("segment matching finished...");
-	}
+	//doesn't make sense, because segments will be compared in edge matching
+//	private void segmentMatching() {
+//		log.info("start segment matching...");
+//		this.computeEdgeCandidatesFromNodes();
+//		
+//		this.ref2CandEdgesFromSegmentMatching = new HashMap<Id, Map<Id,List<SegmentCompare>>>();
+//		Map<Id, List<SegmentCompare>> candEdge2Segments = new HashMap<Id, List<SegmentCompare>>();
+//		List<SegmentCompare> segComp;
+//		SegmentCompare sc = null;
+//		MatchingSegment rs = null, cs = null;
+//		ListIterator<MatchingSegment> candIt, refIt;
+//		
+//		//iterate over all candidate edges 
+//		for(Entry<MatchingEdge, List<MatchingEdge>> e: this.ref2CandEdgesFromMappedNodes.entrySet()){
+//			for(MatchingEdge cand : e.getValue()){
+//				segComp = new ArrayList<SegmentCompare>();
+//				
+//				candIt = cand.getSegments().listIterator();
+//				refIt = e.getKey().getSegments().listIterator();
+//				
+//				while(candIt.hasNext() && refIt.hasNext()){
+//					if((rs == null) && (cs == null)){
+//						rs = refIt.next();
+//						cs = candIt.next();
+//					}else if(sc.refIsUndershot()){
+//						rs = refIt.next();
+//					}else if(!sc.refIsUndershot()){
+//						cs = candIt.next();
+//					}
+//					sc = new SegmentCompare(rs, cs);
+//					segComp.add(sc);
+//				}
+//				candEdge2Segments.put(cand.getId(), segComp);
+//			}
+//			ref2CandEdgesFromSegmentMatching.put(e.getKey().getId(), candEdge2Segments);
+//		}
+//		
+//		// clear temporally matched Edges to save memory 
+//		this.ref2CandEdgesFromMappedNodes.clear();
+//		log.info("segment matching finished...");
+//	}
 	
-	private void computeEdgeCandidatesFromNodes() {
-		log.info("compute candidate edges from mapped nodes");
+	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
+
+	private ArrayList<Id> refEdgesUnmatched;
+	private void computeEdgeCandidatesFromMappedNodes() {
+		log.info("compute candidate edges from mapped nodes...");
 		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
+		this.refEdgesUnmatched = new ArrayList<Id>();
+		
 		Id candFrom, candTo, refFrom, refTo;
 		List<MatchingEdge> tempCandidates;
 		
@@ -211,18 +206,18 @@ public class GraphMatching {
 					}
 				}
 			}
-			
 			if(tempCandidates.size() > 0){
 				this.ref2CandEdgesFromMappedNodes.put(ref, tempCandidates);
+			}else{
+				this.refEdgesUnmatched.add(ref.getId());
 			}
 		}
-		
-		log.info(this.ref2CandEdgesFromMappedNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
+//		log.info(this.ref2CandEdgesFromMappedNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
 	}
 
 	// ##### EDGEMATCHING #####
 	private Map<Id, List<EdgeCompare>> edgeComp;
-	private void edgeMatching() {
+	private void edgeMatchingBottomUp() {
 		log.info("start edge-matching...");
 		int cnt = 1,
 			msg = 1;
@@ -238,17 +233,19 @@ public class GraphMatching {
 				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
 					tempComp.add(comp);
 				}
-				if(cnt%msg == 0){
-					log.info("edges compared: " + cnt + ", matched: " + edgeComp.size());
-					msg *= 2;
-				}
-				cnt++;
 			}
 			if(tempComp.size() > 0){
 				Collections.sort(tempComp);
 				edgeComp.put(ref.getId(), tempComp);
 			}
+
+			if(cnt%msg == 0){
+				log.info("processed " + cnt + " of " + reference.getEdges().size() + " edges from reference-graph. Matched: " + edgeComp.size());
+				msg *= 2;
+			}
+			cnt++;
 		}
+		log.info(edgeComp.size() + " of " + reference.getEdges().size() + " have one or more matches after bottom-up edge-matching...");
 		log.info("edge matching finished...");
 	}
 	
@@ -283,11 +280,15 @@ public class GraphMatching {
 		
 		Map<String, Coord> unmatched = new HashMap<String, Coord>();
 		
-		for(Id id : unmatchedRefNodes){
-			unmatched.put(id.toString(), this.reference.getNodes().get(id).getCoord());
+		if(unmatchedRefNodes.size()>0){
+			for(Id id : unmatchedRefNodes){
+				unmatched.put(id.toString(), this.reference.getNodes().get(id).getCoord());
+			}
+			
+			DaShapeWriter.writeDefaultPoints2Shape(outPath + "unmatched_Nodes.shp", "unmatched_Nodes", unmatched, null);
+		}else{
+			log.info("can not write " +outPath + "unmatched_Nodes.shp, because no nodes in the ref network are unmatched...");
 		}
-		
-		DaShapeWriter.writeDefaultPoints2Shape(outPath + "unmatched_Nodes.shp", "unmatched_Nodes", unmatched, null);
 	}
 	
 	public void baseSegments2Shape(String outpath){
@@ -323,6 +324,9 @@ public class GraphMatching {
 	}
 	
 	public void matchedSegments2Shape(String outPath){
+		if(edgeComp.size() < 1){
+			return;
+		}
 		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
 		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
 		
@@ -375,13 +379,64 @@ public class GraphMatching {
 	}
 	
 	
+//	public static void main(String[] args){
+//		MatchingGraph ref = new MatchingGraph();
+//		MatchingNode r1, r2, r3;
+//		
+//		r1 = new MatchingNode(new IdImpl("r1"), new CoordImpl(0, 0));
+//		r2 = new MatchingNode(new IdImpl("r2"), new CoordImpl(100,0));
+//		r3 = new MatchingNode(new IdImpl("r3"), new CoordImpl(200,0));
+//		ref.addNode(r1);
+//		ref.addNode(r2);
+//		ref.addNode(r3);
+//		
+//		ref.addEdge(new MatchingEdge(new IdImpl("re12"), r1, r2));
+//		ref.addEdge(new MatchingEdge(new IdImpl("re23"), r2, r3));
+//		ref.addEdge(new MatchingEdge(new IdImpl("re32"), r3, r2));
+//		ref.addEdge(new MatchingEdge(new IdImpl("re21"), r2, r1));
+//		
+//		MatchingGraph match = new MatchingGraph();
+//		MatchingNode m1, m2, m3, m4, m5, m6;
+//		m1 = new MatchingNode(new IdImpl("m1"), new CoordImpl(-1,1));
+//		m2 = new MatchingNode(new IdImpl("m2"), new CoordImpl(100,100));
+//		m3 = new MatchingNode(new IdImpl("m3"), new CoordImpl(201,1));
+//		m4 = new MatchingNode(new IdImpl("m4"), new CoordImpl(-1,-10));
+//		m5 = new MatchingNode(new IdImpl("m5"), new CoordImpl(100,-11));
+//		m6 = new MatchingNode(new IdImpl("m6"), new CoordImpl(202,-10));
+//		match.addNode(m1);
+//		match.addNode(m2);
+//		match.addNode(m3);
+//		match.addNode(m4);
+//		match.addNode(m5);
+//		match.addNode(m6);
+//		
+//		match.addEdge(new MatchingEdge(new IdImpl("me12"), m1, m2));
+//		match.addEdge(new MatchingEdge(new IdImpl("me23"), m2, m3));
+//		match.addEdge(new MatchingEdge(new IdImpl("me32"), m3, m2));
+//		match.addEdge(new MatchingEdge(new IdImpl("me21"), m2, m1));
+//		
+//		match.addEdge(new MatchingEdge(new IdImpl("me45"), m4, m5));
+//		match.addEdge(new MatchingEdge(new IdImpl("me56"), m5, m6));
+//		match.addEdge(new MatchingEdge(new IdImpl("me65"), m6, m5));
+//		match.addEdge(new MatchingEdge(new IdImpl("me54"), m5, m4));
+//		
+//		
+//		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+//		GraphMatching gm = new GraphMatching(ref, match);
+//		gm.setMaxAngle(Math.PI/8);
+//		gm.setMaxDist(25.0);
+//		gm.setMaxLengthTolerancePerc(0.1);
+//		gm.bottomUpMatching();
+//		gm.nodes2Shape(OUT);
+//		gm.baseSegments2Shape(OUT);
+//		gm.matchedSegments2Shape(OUT);
+//	}
 	
-
 	public static void main(String[] args){
-		final String PATH = DaPaths.OUTPUT + "geoAlgorithm/";
-		final String VISUMTRANSITFILE = PATH + "visum_cutted.xml";
-		final String HAFASTRANSITFILE = PATH + "hafas_cutted.xml";
+		final String PATH = DaPaths.OUTPUT + "bvg09/";
 		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.oxml";
+		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 		
 
 		MatchingEdge e;
@@ -399,7 +454,7 @@ public class GraphMatching {
 		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
 			temp = line.getId().toString().substring(0, 1);
 			
-			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V")) continue;
+			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V") || temp.equals("N")) continue;
 			
 			for(TransitRoute route: line.getRoutes().values()){
 				facs = new ArrayList<TransitStopFacility>();
@@ -486,9 +541,6 @@ public class GraphMatching {
 		gm.nodes2Shape(OUT);
 		gm.baseSegments2Shape(OUT);
 		gm.matchedSegments2Shape(OUT);
-//		for(Entry<Id, Id> e : r.getNodeRef2Match().entrySet()){
-//			System.out.println(e.getKey() + " " + e.getValue());
-//		}
 	}
 
 }

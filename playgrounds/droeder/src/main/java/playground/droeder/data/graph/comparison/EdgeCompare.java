@@ -40,30 +40,12 @@ public class EdgeCompare extends AbstractCompare{
 			matchedLengthRef = 0.0, 
 			matchedLengthComp = 0.0;
 	
-	private Coord startRef, startComp, endRef, endComp;
 
 	public EdgeCompare(MatchingEdge refElement, MatchingEdge compareElement) {
 		super(refElement, compareElement);
 		this.computeValues(refElement, compareElement);
 		this.refTotalLength = refElement.getSegmentLength();
 		this.compTotalLength = compareElement.getSegmentLength();
-		this.startRef = refElement.getFromNode().getCoord();
-		this.startComp = compareElement.getFromNode().getCoord();
-		this.endRef = refElement.getToNode().getCoord();
-		this.endComp = compareElement.getToNode().getCoord();
-		
-		if(super.getRefId().equals(new IdImpl("U-2.001.001.H")) && super.getCompId().equals(new IdImpl("U2   _00619"))){
-			ListIterator<MatchingSegment> candIt = refElement.getSegments().listIterator();
-			ListIterator<MatchingSegment> refIt = compareElement.getSegments().listIterator();
-			MatchingSegment r = null, c= null;
-			while(candIt.hasNext() && refIt.hasNext()){
-				r = refIt.next();
-				c = candIt.next();
-				System.out.println(r.getStart().getX() + "\t" + r.getStart().getY() + "\t" + c.getStart().getX() + "\t" + c.getStart().getY());
-			}
-			System.out.println(r.getEnd().getX() + "\t" + r.getEnd().getY() + "\t" + c.getEnd().getX() + "\t" + c.getEnd().getY());
-			
-		}
 	}
 
 	/**
@@ -99,9 +81,6 @@ public class EdgeCompare extends AbstractCompare{
 	}
 	
 	public boolean isMatched(Double dDistMax, Double dPhiMax, Double lengthTolerancePercentage){
-		if(super.getRefId().equals(new IdImpl("U-2.001.001.H")) && super.getCompId().equals(new IdImpl("U2   _00619"))){
-			Log.info("aha");
-		}
 		if((avDist < dDistMax) && 
 				(avAngle < dPhiMax) && 
 				(Math.abs(1 - (matchedLengthRef / refTotalLength)) < lengthTolerancePercentage ) && 
