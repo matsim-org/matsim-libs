@@ -123,7 +123,16 @@ public class LPPHEV extends LP{
 				
 		setEnergyFromCombustionEngine(calcEnergyUsageFromCombustionEngine(getSolver().getPtrVariables()));
 		
-		if(isOutput()|| id.toString().equals(Integer.toString(1)) ){
+		if(isOutput()|| id.toString().equals(Integer.toString(1)) 
+				|| id.toString().equals(Integer.toString(2))
+				|| id.toString().equals(Integer.toString(3))
+				|| id.toString().equals(Integer.toString(4))
+				|| id.toString().equals(Integer.toString(5))
+				|| id.toString().equals(Integer.toString(6))
+				|| id.toString().equals(Integer.toString(7))
+				|| id.toString().equals(Integer.toString(8))
+				|| id.toString().equals(Integer.toString(9))
+				|| id.toString().equals(Integer.toString(10))){
 			String filename= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger/SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+".png";
 			visualizeSOCAgent(getSolver().getPtrVariables(),filename, id);
 			

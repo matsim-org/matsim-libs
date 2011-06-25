@@ -508,6 +508,7 @@ public class DecentralizedSmartCharger {
 			}
 		}
 		
+		printGraphChargingTimesEVAndPHEVAgents();
 		if(debug || vehicles.getKeySet().size()<1000){
 			printGraphChargingTimesAllAgents();
 		}
@@ -1584,18 +1585,8 @@ public class DecentralizedSmartCharger {
         		plot.getRenderer().setSeriesPaint(j, Color.black);
         	}        	
         	
-        	plot.getRenderer().setSeriesStroke(
-    	            j, 
-    	          
-    	            new BasicStroke(
-    	                1.0f,  //float width
-    	                BasicStroke.CAP_ROUND, //int cap
-    	                BasicStroke.JOIN_ROUND, //int join
-    	                1.0f, //float miterlimit
-    	                new float[] {1.0f, 0.0f}, //float[] dash
-    	                0.0f //float dash_phase
-    	            )
-    	        );
+        	setSeriesStroke(plot, j, 1.0f, 1.0f, 0.0f);
+        	
             
         }
         ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
@@ -1745,31 +1736,10 @@ public class DecentralizedSmartCharger {
 	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
 	        plot.getRenderer().setSeriesPaint(1, Color.black);//before
 	        
-        	plot.getRenderer().setSeriesStroke(
-	            0, 
-	          
-	            new BasicStroke(
-	                1.0f,  //float width
-	                BasicStroke.CAP_ROUND, //int cap
-	                BasicStroke.JOIN_ROUND, //int join
-	                1.0f, //float miterlimit
-	                new float[] {1.0f, 0.0f}, //float[] dash
-	                0.0f //float dash_phase
-	            )
-	        );
+	        setSeriesStroke(plot, 0, 1.0f, 1.0f, 0.0f);
+	        setSeriesStroke(plot, 1, 5.0f, 1.0f, 0.0f);
         	
-        	plot.getRenderer().setSeriesStroke(
-    	            1, 
-    	          
-    	            new BasicStroke(
-    	                5.0f,  //float width
-    	                BasicStroke.CAP_ROUND, //int cap
-    	                BasicStroke.JOIN_ROUND, //int join
-    	                1.0f, //float miterlimit
-    	                new float[] {1.0f, 0.0f}, //float[] dash
-    	                0.0f //float dash_phase
-    	            )
-    	        );
+        	
         	ChartUtilities.saveChartAsPNG(new File(outputFile) , chart, 1000, 1000);
            
         	
@@ -1822,31 +1792,10 @@ public class DecentralizedSmartCharger {
 	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
 	        plot.getRenderer().setSeriesPaint(1, Color.black);//before
 	        
-        	plot.getRenderer().setSeriesStroke(
-	            0, 
-	          
-	            new BasicStroke(
-	                1.0f,  //float width
-	                BasicStroke.CAP_ROUND, //int cap
-	                BasicStroke.JOIN_ROUND, //int join
-	                1.0f, //float miterlimit
-	                new float[] {3.0f, 3.0f}, //float[] dash
-	                0.0f //float dash_phase
-	            )
-	        );
+	        setSeriesStroke(plot, 0, 1.0f, 3.0f, 3.0f);
+	        
+	        setSeriesStroke(plot, 1, 5.0f, 1.0f, 0.0f);
         	
-        	plot.getRenderer().setSeriesStroke(
-    	            1, 
-    	          
-    	            new BasicStroke(
-    	                5.0f,  //float width
-    	                BasicStroke.CAP_ROUND, //int cap
-    	                BasicStroke.JOIN_ROUND, //int join
-    	                1.0f, //float miterlimit
-    	                new float[] {1.0f, 0.0f}, //float[] dash
-    	                0.0f //float dash_phase
-    	            )
-    	        );
         	ChartUtilities.saveChartAsPNG(new File(outputFile) , chart, 1000, 1000);
         	
         	//Close the output stream
@@ -1855,6 +1804,10 @@ public class DecentralizedSmartCharger {
 		    	//Catch exception if any
 		}		
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -1892,32 +1845,13 @@ public class DecentralizedSmartCharger {
 				false, true, false);
 		
 		final XYPlot plot = chart.getXYPlot();
-        plot.setDrawingSupplier(supplier);
-        plot.setBackgroundPaint(Color.white);
-        plot.setDomainGridlinePaint(Color.gray); 
-        plot.setRangeGridlinePaint(Color.gray);
-        
-        NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
-        xAxis.setTickUnit(new NumberTickUnit(3600));
-        xAxis.setRange(0, SECONDSPERDAY);
-       
-        NumberAxis yaxis = (NumberAxis) plot.getRangeAxis();
-        yaxis.setRange(0, vehicles.getKeySet().size()); // y axis size dependent on number of agents
-        
+		setPlotWhite(plot, 0, vehicles.getKeySet().size(), 0, SECONDSPERDAY);
+		
         for(int j=0; j<seriesCount; j++){
         	plot.getRenderer().setSeriesPaint(j, Color.black);
         	
-        	plot.getRenderer().setSeriesStroke(
-    	            j, 
-    	            new BasicStroke(
-    	                1.0f, 
-    	                BasicStroke.CAP_ROUND, 
-    	                BasicStroke.JOIN_ROUND, 
-    	                1.0f,
-    	                new float[] {1.0f, 0.0f}, 
-    	                1.0f
-    	            )
-    	        );
+        	setSeriesStroke(plot, j, 1.0f, 1.0f, 0.0f);
+        	
         }
         
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
@@ -1928,8 +1862,157 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
+	/**
+	 * makes two graphs 
+	 * <li> graph of all EVs in system and their charging times
+	 * <li> graph of all PHEVs in system and their charging times
+	 * 
+	 * @throws IOException
+	 */
+	private void printGraphChargingTimesEVAndPHEVAgents() throws IOException{
+		
+		XYSeriesCollection allEVAgentsOverview= new XYSeriesCollection();
+		XYSeriesCollection allPHEVAgentsOverview= new XYSeriesCollection();
+		
+		int seriesCountEV=0;
+		int seriesCountPHEV=0;
+		int vehicleEV=1;
+		int vehiclePHEV=1;
+		Schedule s1;
+		
+		for(Id id : vehicles.getKeySet()){
+			if(hasAgentEV(id)){
+				s1= agentChargingSchedules.get(id);
+				
+				for(int i=0; i<s1.getNumberOfEntries(); i++){
+					
+					String strId= id.toString();
+					int intId= Integer.parseInt(strId);
+				    
+					XYSeries chargingTimesSet= new XYSeries("charging time");
+									
+					chargingTimesSet.add(s1.timesInSchedule.get(i).getStartTime(),vehicleEV); 
+					chargingTimesSet.add(s1.timesInSchedule.get(i).getEndTime(), vehicleEV);
+					
+					allEVAgentsOverview.addSeries(chargingTimesSet);
+					seriesCountEV++;
+				}
+				vehicleEV++;
+			
+			}
+			
+			
+			if (hasAgentPHEV(id)){
+				s1= agentChargingSchedules.get(id);
+				
+				for(int i=0; i<s1.getNumberOfEntries(); i++){
+					
+					String strId= id.toString();
+					int intId= Integer.parseInt(strId);
+				    
+					XYSeries chargingTimesSet= new XYSeries("charging time");
+									
+					chargingTimesSet.add(s1.timesInSchedule.get(i).getStartTime(),vehiclePHEV); 
+					chargingTimesSet.add(s1.timesInSchedule.get(i).getEndTime(), vehiclePHEV);
+					
+					allPHEVAgentsOverview.addSeries(chargingTimesSet);
+					seriesCountPHEV++;
+				}
+				vehiclePHEV++;
+			}
+		}
+		
+		//////////////////////////////
+		
+		if(seriesCountEV>0){
+			JFreeChart chartEV = ChartFactory.createXYLineChart("Distribution of charging times for all EV agents by agent Id number", 
+					"time [s]", 
+					"", 
+					allEVAgentsOverview, 
+					PlotOrientation.VERTICAL, 
+					false, true, false);
+			final XYPlot plotEV = chartEV.getXYPlot();
+			
+			setPlotWhite(plotEV, 0, seriesCountEV+1, 0, SECONDSPERDAY);
+			
+			for(int j=0; j<seriesCountEV; j++){
+	        	plotEV.getRenderer().setSeriesPaint(j, Color.black);
+	        	setSeriesStroke(plotEV, j, 1, 1.0f, 0.0f);
+	        }
+			chartEV.setTitle(new TextTitle("Charging times for EV agents", 
+		    		   new Font("Arial", Font.BOLD, 20)));
+			
+			ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/EVAgentsChargingTimes.png"), chartEV, 2000, (int)(20.0*(vehicleEV)));//width, height	
+	        
+		}
+		
+		
+		if(seriesCountPHEV>0){
+			JFreeChart chartPHEV = ChartFactory.createXYLineChart("Distribution of charging times for all PHEV agents by agent Id number", 
+					"time [s]", 
+					"", 
+					allPHEVAgentsOverview, 
+					PlotOrientation.VERTICAL, 
+					false, true, false);
+			
+			final XYPlot plotPHEV = chartPHEV.getXYPlot();
+			
+			setPlotWhite(plotPHEV, 0, seriesCountPHEV+1, 0, SECONDSPERDAY);
+			
+			for(int j=0; j<seriesCountPHEV; j++){
+	        	plotPHEV.getRenderer().setSeriesPaint(j, Color.black);
+	        	setSeriesStroke(plotPHEV, j, 1, 1.0f, 0.0f);
+	        }
+			 chartPHEV.setTitle(new TextTitle("Charging times for PHEV agents", 
+		     		   new Font("Arial", Font.BOLD, 20)));
+			 ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/PHEVAgentsChargingTimes.png"), chartPHEV, 2000, (int)(20.0*(vehiclePHEV)));//width, height	
+		    	
+		}
+		        
+	}
 	
-	
+
+	/**
+	 * convenience class to set stroke of Series in plot
+	 * @param plot
+	 * @param seriesNumber
+	 * @param width
+	 * @param dash1
+	 * @param dash2
+	 */
+	public static void setSeriesStroke(XYPlot plot, int seriesNumber, float width, float dash1, float dash2){
+		plot.getRenderer().setSeriesStroke(
+				seriesNumber, 
+				
+	            new BasicStroke(
+	            	width*1.0f, //float width
+	                BasicStroke.CAP_ROUND, 
+	                BasicStroke.JOIN_ROUND, 
+	                1.0f,//float miterlimit
+	                new float[] {dash1*1.0f, dash2*1.0f}, //float[] dash 
+	                1.0f //float dash_phase
+	            )
+	        );
+	}
+
+
+	public void setPlotWhite(XYPlot plot, double yAxisMin, double yAxisMax, double XAxisMin, double XAxisMax){
+		plot.setDrawingSupplier(supplier);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.gray); 
+        plot.setRangeGridlinePaint(Color.gray);
+        
+        NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+        xAxis.setTickUnit(new NumberTickUnit(3600));
+        xAxis.setRange(XAxisMin,XAxisMax);
+        //xAxis.setRange(0, SECONDSPERDAY);
+       
+        NumberAxis yaxis = (NumberAxis) plot.getRangeAxis();
+        yaxis.setRange(yAxisMin, yAxisMax); // y axis size dependent on number of agents
+        
+	}
+
+
 	/**
 	 * transforms joules to emissions according to the vehicle and gas type data stored in the vehicleCollector
 	 * <p>When converting the joules needed for driving into liters of gas, the engine efficiency stored in the vehicle type

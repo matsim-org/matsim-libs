@@ -106,10 +106,11 @@ public class SetUpVehicleCollector {
 		}
 	}
 	
+	
+	
 	private void setUpGasPrice(double gasHigh){
 		
 			gasPricePerLiter= gasHigh; 
-		
 	}
 	
 	
