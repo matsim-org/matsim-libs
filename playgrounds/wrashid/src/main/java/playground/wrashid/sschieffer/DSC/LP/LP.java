@@ -49,6 +49,9 @@ public abstract class LP {
 		return schedule;
 	}
 	
+	protected Id getPersonId(){
+		return personId;
+	}
 	
 	protected boolean isOutput(){
 		return output;
@@ -100,12 +103,15 @@ public abstract class LP {
 		}
 	}
 	
-	public void setInequalityContraintsForBatteryUpper() throws LpSolveException{
+	public void setInequalityContraintsForBatteryUpper(double reducedBy, int startingAtIntervalI) throws LpSolveException{
 		// at all points should be within battery limit
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			String inequality=setInEqualityBatteryConstraint(i);
-			solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
-			//solver.strAddConstraint(inequality, LpSolve.GE, batterySize*batteryMin);
+			if(i<startingAtIntervalI){
+				solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax);
+			}else{
+				solver.strAddConstraint(inequality, LpSolve.LE, batterySize*batteryMax-reducedBy);
+			}
 			
 		}
 	}
@@ -221,7 +227,7 @@ public abstract class LP {
 					}
 				if(schedule.timesInSchedule.get(i).isDriving() ){
 					DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
-					String s= Double.toString(thisDrivingInterval.getBatteryConsumption()*(-1));
+					String s= Double.toString((thisDrivingInterval.getTotalConsumption())*(-1));
 					s= s.concat(" ");
 					objectiveStr=objectiveStr.concat(s);
 					
@@ -330,9 +336,7 @@ public abstract class LP {
 		this.energyFromCombustionEngine=energyFromCombustionEngine;
 	}
 
-	/**
-	 * ONLY FOR DEBUGGING PURPOSES
-	 */
+	
 	public void setSchedule(Schedule s){
 		schedule=s;
 	}
@@ -365,7 +369,7 @@ public abstract class LP {
 				}
 				
 				if(schedule.timesInSchedule.get(i).isDriving()){
-					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getBatteryConsumption();
+					objective[1+i]+= ((DrivingInterval)schedule.timesInSchedule.get(i)).getTotalConsumption();
 					
 				}
 				
@@ -418,33 +422,87 @@ public abstract class LP {
 	
 	
 	
-public void visualizeSOCAgent(double [] solution, String filename, Id id) throws LpSolveException, IOException{
+public void visualizeSOCAgentWithAndWithoutNonBattery(double [] solution, String filename1,String filename2, Id id) throws LpSolveException, IOException{
 		
 		XYSeriesCollection SOCAgent= new XYSeriesCollection();
+		XYSeriesCollection SOCAgentBat= new XYSeriesCollection();
 		
-		XYSeries SOCAgentSeries= new XYSeries("SOC agent"+ id.toString());
+		XYSeries SOCAgentSeries= new XYSeries("SOC agent total consumption"+ id.toString());
+		XYSeries SOCAgentSeriesBat= new XYSeries("SOC agent battery"+ id.toString());
 		
-		double [] SOC= solution.clone();	
+		
+		double [] SOC= solution.clone();
+		double [] SOCBat= solution.clone();	
+		
 		SOCAgentSeries.add(schedule.timesInSchedule.get(0).getStartTime(),SOC[0]);
-		
+		SOCAgentSeriesBat.add(schedule.timesInSchedule.get(0).getStartTime(),SOC[0]);
 		for(int i=0; i<schedule.getNumberOfEntries(); i++){
 			if(schedule.timesInSchedule.get(i).isParking()){
 				ParkingInterval thisP= (ParkingInterval)schedule.timesInSchedule.get(i);
 				SOC[i+1]= SOC[i]+thisP.getChargingSpeed()	*solution[1+i];
+				SOCBat[i+1]= SOCBat[i]+thisP.getChargingSpeed()	*solution[1+i];
 				// add
 				SOCAgentSeries.add(thisP.getEndTime(),SOC[i+1]);
+				SOCAgentSeriesBat.add(thisP.getEndTime(),SOCBat[i+1]);
 			}else{
 				//subtract
 				DrivingInterval thisD = (DrivingInterval)schedule.timesInSchedule.get(i);
 				
-				SOC[i+1]=SOC[i] - (thisD).getBatteryConsumption();
+				SOC[i+1]=SOC[i] - (thisD).getTotalConsumption();
+				SOCBat[i+1]=SOCBat[i] - (thisD).getBatteryConsumption();
+				
 				SOCAgentSeries.add(thisD.getEndTime(),SOC[i+1]);
+				SOCAgentSeriesBat.add(thisD.getEndTime(),SOCBat[i+1]);
 			}
 		}
 		
 		SOCAgent.addSeries(SOCAgentSeries);
+		SOCAgentBat.addSeries(SOCAgentSeriesBat);
 		
+		plotSeries(SOCAgent, filename1,  id);
+		plotSeries(SOCAgentBat, filename2,  id);
 		
+	  	
+	}
+	
+	
+public void visualizeSOCAgent(double [] solution, String filename1, Id id) throws LpSolveException, IOException{
+	
+	XYSeriesCollection SOCAgent= new XYSeriesCollection();
+	
+	XYSeries SOCAgentSeries= new XYSeries("SOC agent total consumption"+ id.toString());
+	
+	
+	double [] SOC= solution.clone();
+	
+	SOCAgentSeries.add(schedule.timesInSchedule.get(0).getStartTime(),SOC[0]);
+	for(int i=0; i<schedule.getNumberOfEntries(); i++){
+		if(schedule.timesInSchedule.get(i).isParking()){
+			ParkingInterval thisP= (ParkingInterval)schedule.timesInSchedule.get(i);
+			SOC[i+1]= SOC[i]+thisP.getChargingSpeed()	*solution[1+i];
+			// add
+			SOCAgentSeries.add(thisP.getEndTime(),SOC[i+1]);
+		}
+		if(schedule.timesInSchedule.get(i).isDriving()){
+			//subtract
+			DrivingInterval thisD = (DrivingInterval)schedule.timesInSchedule.get(i);
+			
+			SOC[i+1]=SOC[i] - (thisD).getTotalConsumption();
+			
+			SOCAgentSeries.add(thisD.getEndTime(),SOC[i+1]);
+			
+		}
+	}
+	
+	SOCAgent.addSeries(SOCAgentSeries);
+	
+	
+	plotSeries(SOCAgent, filename1,  id);	
+  	
+}
+
+
+	public void plotSeries(XYSeriesCollection SOCAgent, String filename, Id id) throws IOException{
 		//********************************
 		XYSeries SOCMax= new XYSeries("SOC Max");
 		SOCMax.add(0, batterySize);
@@ -551,10 +609,6 @@ public void visualizeSOCAgent(double [] solution, String filename, Id id) throws
  	        );
      	
      	ChartUtilities.saveChartAsPNG(new File(filename) , chart, 800, 600);
-	  	
 	}
-	
-			
-		
 	
 }

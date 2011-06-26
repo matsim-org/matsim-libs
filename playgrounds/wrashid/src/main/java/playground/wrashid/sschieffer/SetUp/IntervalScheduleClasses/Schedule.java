@@ -126,17 +126,6 @@ public class Schedule {
 	
 	
 	
-	public double getTotalDrivingTimeWithoutEnginePower(){
-		
-		double total=0;
-		for(int i=0; i<getNumberOfEntries();i++){
-			if(timesInSchedule.get(i).isDriving()){
-				total+=((DrivingInterval) timesInSchedule.get(i)).getEngineTime();
-			}
-		}
-		return total;
-	}
-	
 	
 	
 	
@@ -572,6 +561,9 @@ public class Schedule {
 			TimeInterval l= timesInSchedule.get(i);
 			copy.addTimeInterval(l.clone());
 		}
+		copy.setStartingSOC(startingSOC);
+		copy.totalJoulesInOptimalParkingTimes=totalJoulesInOptimalParkingTimes;
+		copy.totalJoulesInSubOptimalParkingTimes=totalJoulesInSubOptimalParkingTimes;
 		return copy;
 	}
 	
@@ -881,24 +873,27 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 	 * @param extraTime
 	 * @param extraC
 	 */
-	public void addExtraConsumptionDriving( int pos, double extraTime, double extraC){
+	public void addExtraConsumptionDriving( int pos, double extraC){
+		printSchedule();
 		for(int i=pos;i>0; i--){
 			
 			if(timesInSchedule.get(i).isDriving()){
 				
 				DrivingInterval thisD = (DrivingInterval) timesInSchedule.get(i);
-				if(thisD.getIntervalLength()>=extraTime ){
+				//thisD.printInterval();
+				if(thisD.getTotalConsumption()>extraC ){
 					
-					thisD.setExtraConsumption(extraC, extraTime);
-					i=0;
+					thisD.setExtraConsumption(extraC);
+					
+					//thisD.printInterval();
+					return;
 					
 				}else{
 					double consLeft= extraC- thisD.getBatteryConsumption();
-					double timeLeft= extraTime-thisD.getIntervalLength();
 					
-					addExtraConsumptionDriving( i, timeLeft, consLeft);
-					thisD.setExtraConsumption(thisD.getBatteryConsumption(), thisD.getIntervalLength());
-					i=0;
+					addExtraConsumptionDriving( i-1, consLeft);
+					
+					return;
 				}
 			}
 		}
@@ -913,9 +908,9 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 	 * @param pos
 	 * @param deduct
 	 */
-	public void reducePrecedingParkingBy( int pos, double deduct){
-			
-		for(int i=pos-1;i>0; i--){
+	public void reduceFollowingParkingBy( int pos, double deduct){
+		//pos = driving
+		for(int i=pos+1;i<getNumberOfEntries(); i++){
 			
 			if(timesInSchedule.get(i).isParking()){
 				
@@ -924,13 +919,13 @@ public void getJoulesForEachParkingInterval(Id id) throws MaxIterationsExceededE
 				if(thisP.getRequiredChargingDuration()>=deduct ){
 					
 					thisP.setRequiredChargingDuration(thisP.getRequiredChargingDuration()-deduct);
-					i=0;
+					return;
 				}else{
 					
 					double stillLeft= deduct-thisP.getRequiredChargingDuration();
 					thisP.setRequiredChargingDuration(0);
-					reducePrecedingParkingBy( i, stillLeft);
-					i=0;
+					reduceFollowingParkingBy( i, stillLeft);
+					return;
 				}
 				
 			}

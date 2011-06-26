@@ -126,7 +126,7 @@ public class DecentralizedSmartCharger {
 	private LPEV lpev;
 	private LPPHEV lpphev;
 	
-	private VehicleTypeCollector myVehicleTypes;
+	private static VehicleTypeCollector myVehicleTypes;
 	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
 	public ParkingTimesPlugin parkingTimesPlugin;
 	public EnergyConsumptionPlugin energyConsumptionPlugin;
@@ -1447,9 +1447,6 @@ public class DecentralizedSmartCharger {
 		XYSeriesCollection agentOverview= new XYSeriesCollection();
 		
 		//************************************
-		//GET EXTRA CONSUMPTION TIMES - MAKE RED LATER
-		
-		int extraConsumptionCount=0;
 		
 		
 		if(vehicles.getValue(id).getClass().equals(PlugInHybridElectricVehicle.class)){
@@ -1461,15 +1458,6 @@ public class DecentralizedSmartCharger {
 					
 					DrivingInterval thisD= (DrivingInterval) dailySchedule.timesInSchedule.get(i);
 					
-					if(thisD.hasExtraConsumption()){
-						
-						
-						XYSeries drivingTimesSet= new XYSeries("extra consumption");
-						drivingTimesSet.add(thisD.getStartTime(), 3.75);
-						drivingTimesSet.add(thisD.getStartTime()+thisD.getEngineTime(), 3.75);
-						agentOverview.addSeries(drivingTimesSet);
-						extraConsumptionCount++;
-					}
 					
 				}
 			}
@@ -1572,23 +1560,16 @@ public class DecentralizedSmartCharger {
         yAxis.setTickUnit(new NumberTickUnit(1));
         yAxis.setVisible(false);
         
-        int numSeries=dailySchedule.getNumberOfEntries()+chargingSchedule.getNumberOfEntries()+extraConsumptionCount;
+        int numSeries=dailySchedule.getNumberOfEntries()+chargingSchedule.getNumberOfEntries();
         
         for(int j=0; j<numSeries; j++){
         	
-        	// IF FROM ENGINE MAKE RED
-        	if (j<extraConsumptionCount){
-        		plot.getRenderer().setSeriesPaint(j, Color.red);
-        		
-        	}else{
         		// ALL OTHERS MAKE BLACK
         		plot.getRenderer().setSeriesPaint(j, Color.black);
+        		setSeriesStroke(plot, j, 1.0f, 1.0f, 0.0f);
         	}        	
         	
-        	setSeriesStroke(plot, j, 1.0f, 1.0f, 0.0f);
-        	
-            
-        }
+        
         ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
@@ -1897,7 +1878,10 @@ public class DecentralizedSmartCharger {
 					allEVAgentsOverview.addSeries(chargingTimesSet);
 					seriesCountEV++;
 				}
-				vehicleEV++;
+				
+				if(vehicleEV>100){
+					break;
+				}else{vehicleEV++;}
 			
 			}
 			
@@ -1918,13 +1902,16 @@ public class DecentralizedSmartCharger {
 					allPHEVAgentsOverview.addSeries(chargingTimesSet);
 					seriesCountPHEV++;
 				}
-				vehiclePHEV++;
+				if(vehiclePHEV>100){
+					break;
+				}else{vehiclePHEV++;}
+				
 			}
 		}
 		
 		//////////////////////////////
 		
-		if(seriesCountEV>0){
+		if(vehicleEV>0){
 			JFreeChart chartEV = ChartFactory.createXYLineChart("Distribution of charging times for all EV agents by agent Id number", 
 					"time [s]", 
 					"", 
@@ -1933,7 +1920,7 @@ public class DecentralizedSmartCharger {
 					false, true, false);
 			final XYPlot plotEV = chartEV.getXYPlot();
 			
-			setPlotWhite(plotEV, 0, seriesCountEV+1, 0, SECONDSPERDAY);
+			setPlotWhite(plotEV, 0, vehicleEV+1, 0, SECONDSPERDAY);
 			
 			for(int j=0; j<seriesCountEV; j++){
 	        	plotEV.getRenderer().setSeriesPaint(j, Color.black);
@@ -1947,7 +1934,7 @@ public class DecentralizedSmartCharger {
 		}
 		
 		
-		if(seriesCountPHEV>0){
+		if(vehiclePHEV>0){
 			JFreeChart chartPHEV = ChartFactory.createXYLineChart("Distribution of charging times for all PHEV agents by agent Id number", 
 					"time [s]", 
 					"", 
@@ -1957,7 +1944,7 @@ public class DecentralizedSmartCharger {
 			
 			final XYPlot plotPHEV = chartPHEV.getXYPlot();
 			
-			setPlotWhite(plotPHEV, 0, seriesCountPHEV+1, 0, SECONDSPERDAY);
+			setPlotWhite(plotPHEV, 0, vehiclePHEV+1, 0, SECONDSPERDAY);
 			
 			for(int j=0; j<seriesCountPHEV; j++){
 	        	plotPHEV.getRenderer().setSeriesPaint(j, Color.black);
@@ -2037,6 +2024,13 @@ public class DecentralizedSmartCharger {
 		return emission;
 	}
 	
+	
+	public static double getWattOfVehicleOfAgent(Id id){
+		Vehicle v= vehicles.getValue(id);
+		
+		return myVehicleTypes.getWattOfEngine(v);
+		
+	}
 	
 	/**
 	 * converts the extra joules into costs

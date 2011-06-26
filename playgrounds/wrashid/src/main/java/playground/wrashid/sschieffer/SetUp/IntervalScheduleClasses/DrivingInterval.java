@@ -38,8 +38,7 @@ public class DrivingInterval extends TimeInterval {
 	double consumptionFromBattery; // consumption from battery
 	
 	double extraConsumption=0; // consumption from engine
-	double timeEngine=0;
-	
+		
 	boolean extra=false;
 	
 	
@@ -58,8 +57,7 @@ public class DrivingInterval extends TimeInterval {
 	@Override
 	public DrivingInterval clone(){
 		DrivingInterval d = new DrivingInterval(getStartTime(), getEndTime(), getBatteryConsumption());
-		d.setValueForExtraConsumption(extraConsumption);
-		d.setValueForExtraTime(timeEngine);
+		d.setValueForExtraConsumption(extraConsumption);		
 		return d;
 	}
 	
@@ -68,16 +66,16 @@ public class DrivingInterval extends TimeInterval {
 		this.extraConsumption=extra;
 	}
 	
-	private void setValueForExtraTime(double extra){
-		this.timeEngine=extra;
-	}
+	
 	
 	public double getBatteryConsumption(){
 		return consumptionFromBattery;
 	}
 	
 	
-	
+	public double getTotalConsumption(){
+		return(consumptionFromBattery + extraConsumption);
+	}
 	/**
 	 * reduces current consumption by extraC
 	 * and sets extraConsumption equal extraC
@@ -85,11 +83,10 @@ public class DrivingInterval extends TimeInterval {
 	 * @param extraC extra consumption not from electric battery
 	 * @param extraTime extra time required prior to this driving interval to charge the necessary missing consumption
 	 */
-	public void setExtraConsumption(double extraC, double extraTime){
+	public void setExtraConsumption(double extraC){
 		consumptionFromBattery=consumptionFromBattery-extraC;
 		extraConsumption+=extraC;
-		timeEngine=extraTime;
-		
+				
 		extra=true;
 	}
 	
@@ -104,13 +101,11 @@ public class DrivingInterval extends TimeInterval {
 	}
 	
 	
-	public double getEngineTime(){
-		return timeEngine;
-	}
+	
 	
 	 @Override
 	public void printInterval(){
-		System.out.println("Driving Interval \t  start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  consumption: " + getBatteryConsumption());
+		System.out.println("Driving Interval \t  start: "+ this.getStartTime()+ "\t  end: "+ this.getEndTime()+ "\t  battery consumption: " + getBatteryConsumption()+ "\t extra consumption: " + getExtraConsumption());
 	}
 	
 }

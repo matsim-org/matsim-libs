@@ -57,6 +57,7 @@ import lpsolve.LpSolveException;
  */
 public class LPEV extends LP{
 	
+	private int printCount=0;
 	private double buffer;	
 		
 	public LPEV(double buffer, boolean output){
@@ -121,19 +122,10 @@ public class LPEV extends LP{
 		
 		schedule= update();
 	
-		if(isOutput()|| id.toString().equals(Integer.toString(1)) 
-				|| id.toString().equals(Integer.toString(2))
-				|| id.toString().equals(Integer.toString(3))
-				|| id.toString().equals(Integer.toString(4))
-				|| id.toString().equals(Integer.toString(5))
-				|| id.toString().equals(Integer.toString(6))
-				|| id.toString().equals(Integer.toString(7))
-				|| id.toString().equals(Integer.toString(8))
-				|| id.toString().equals(Integer.toString(9))
-				|| id.toString().equals(Integer.toString(10))){
+		if(isOutput()|| printCount<10){
 			String filename= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger/SOC_of_"+vehicleType+"afterLPEV_Agent" + id.toString()+".png";
 			visualizeSOCAgent(getSolver().getPtrVariables(),filename, id);
-			
+			printCount++;
 		}
 		
 		getSolver().deleteLp();
@@ -331,7 +323,7 @@ public class LPEV extends LP{
 				
 				if(getSchedule().timesInSchedule.get(i).isDriving()){
 					objectiveStr=objectiveStr.concat(Double.toString(
-							((DrivingInterval)getSchedule().timesInSchedule.get(i)).getBatteryConsumption()*(-1))+ " ");
+							((DrivingInterval)getSchedule().timesInSchedule.get(i)).getTotalConsumption()*(-1))+ " ");
 				}
 				
 			}else{
@@ -342,7 +334,7 @@ public class LPEV extends LP{
 		DrivingInterval d= (DrivingInterval)getSchedule().timesInSchedule.get(pos);
 		getSolver().strAddConstraint(objectiveStr, 
 				LpSolve.GE, 
-				(1+buffer)*d.getBatteryConsumption());
+				(1+buffer)*d.getTotalConsumption());
 	}
 	
 	

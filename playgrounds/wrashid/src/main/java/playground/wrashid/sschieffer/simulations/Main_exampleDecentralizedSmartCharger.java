@@ -103,15 +103,15 @@ public class Main_exampleDecentralizedSmartCharger {
 		//electrification 1.0=100% of cars are evs or phevs
 		final double electrification= 1.0; 
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
-		final double ev=1.0; 
+		final double ev=0.0; 
 		
 		final String outputPath="D:/ETH/MasterThesis/Output/Testing/";		
-		
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		String configPath="test/scenarios/berlin/config.xml";
+		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
 		// battery size of EV and PHEV vehicle
-		double kWHEV =24;
-		double kWHPHEV =24;
+		double kWHEV =16;
+		double kWHPHEV =16;
 		
 		// gas price, i.e. 1.70 CHF/liter
 		double gasHigh = 1.70;
