@@ -459,11 +459,11 @@ public class LPPHEVTest extends TestCase{
 	 * calcEnergyUsageFromCombustionEngine
 	 * check energy use from engine/battery for one case
 	 */
-	public void testLPPHEVEnergyUsageFromCombustionEngine() throws LpSolveException{
+	public void testLPPHEVEnergyUsageFromCombustionEngine() throws LpSolveException, IOException{
 		LPPHEV lp= new LPPHEV(false);
 		double [] solution = setUpEnergyUsageFromCombustionEngine();
 		lp.setSchedule(sTestEnergyCalc);
-		double eEngine= lp.calcEnergyUsageFromCombustionEngine(solution);
+		double eEngine= lp.calcEnergyUsageFromCombustionEngine(solution,  0);
 		assertEquals(eEngine, 15000.0);
 		// * parking times-->  the required charging times is adjusted;
 		// dependent on charing speed.. currently 3500 but should be flexible in future..

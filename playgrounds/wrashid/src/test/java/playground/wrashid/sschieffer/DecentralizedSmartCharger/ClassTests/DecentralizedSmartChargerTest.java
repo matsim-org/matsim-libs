@@ -172,7 +172,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 						assertEquals(calcCost, expectedCost);
 						if(myDecentralizedSmartCharger.hasAgentEV(id)){
 							// extra consumption very expensive
-							((DrivingInterval)testSchedule.timesInSchedule.get(2)).setExtraConsumption(10, 10);
+							((DrivingInterval)testSchedule.timesInSchedule.get(2)).setExtraConsumption(10);
 							expectedCost=30*optimalPrice+ Double.MAX_VALUE;
 							calcCost= myDecentralizedSmartCharger.calculateChargingCostForAgentSchedule(id, testSchedule);
 							assertEquals(calcCost, expectedCost);
@@ -186,7 +186,7 @@ public class DecentralizedSmartChargerTest extends MatsimTestCase {
 							double gasJoulesPerLiter = 43.0*1000000.0;
 							double emissionPerLiter = 23.2/10; 
 							
-							((DrivingInterval)testSchedule.timesInSchedule.get(2)).setExtraConsumption(gasJoulesPerLiter,0);
+							((DrivingInterval)testSchedule.timesInSchedule.get(2)).setExtraConsumption(gasJoulesPerLiter);
 							expectedCost=30*optimalPrice+ gasPricePerLiter/0.3;
 							calcCost= myDecentralizedSmartCharger.calculateChargingCostForAgentSchedule(id, testSchedule);
 							assertEquals(calcCost, expectedCost);
