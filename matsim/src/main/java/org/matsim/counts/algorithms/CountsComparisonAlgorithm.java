@@ -51,9 +51,9 @@ public class CountsComparisonAlgorithm {
 	 * The LinkAttributes of the simulation
 	 */
 	private final CalcLinkStats linkStats;
-	
+
 	private final VolumesAnalyzer volumes;
-	
+
 	private final Map<Id, double[]> volumesPerLinkPerHour;
 	/**
 	 * The counts object
@@ -74,6 +74,7 @@ public class CountsComparisonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
+	@Deprecated
 	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.linkStats = linkStats;
 		this.counts = counts;
@@ -83,8 +84,8 @@ public class CountsComparisonAlgorithm {
 		this.volumes = null;
 		this.volumesPerLinkPerHour = null;
 	}
-	
-	public CountsComparisonAlgorithm(VolumesAnalyzer volumes, final Counts counts, final Network network, final double countsScaleFactor) {
+
+	public CountsComparisonAlgorithm(final VolumesAnalyzer volumes, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.volumes = volumes;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
@@ -123,7 +124,7 @@ public class CountsComparisonAlgorithm {
 			} else {
 				volumes = this.volumesPerLinkPerHour.get(count.getLocId());
 			}
-			if (volumes.length == 0) {
+			if (volumes == null || volumes.length == 0) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
 			}
@@ -141,7 +142,7 @@ public class CountsComparisonAlgorithm {
 			}
 		}
 	}
-	
+
 	/**
 	 *
 	 * @param linkid
