@@ -1,4 +1,4 @@
-/* **********************************************4************************ *
+/* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
@@ -268,6 +268,8 @@ public class CountControlerListenerTest {
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig(null);
+		config.network().setInputFile("test/scenarios/triangle/network.xml");	// network file which is used by the counts file
+		
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
@@ -275,7 +277,7 @@ public class CountControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
 		
-		Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.addMobsimFactory("dummy", new DummyMobsimFactory());
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
