@@ -67,6 +67,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 	private final static int N_PLANS = 10;
 
 	private final static int MIN_MEMBERS = 3;
+	private final static int MAX_MEMBERS = 10;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -96,21 +97,21 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		List<JointPlan> output = new ArrayList<JointPlan>(N_PLANS);
 		JointPlan currentPlan;
 
-		//for (int i=0; i < N_PLANS; i++) {
-		//	currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
-		//	log.debug("adding test instance of type: "+currentPlan.getType());
-		//	output.add(currentPlan);
-		//}
+		log.debug("drawing "+N_PLANS+" test instances.");
+		log.debug("minimum members of clique: "+MIN_MEMBERS);
+		log.debug("maximum members of clique: "+MAX_MEMBERS);
 
 		int count = 0;
 		int i = 0;
+		int size;
 		while (count < N_PLANS) {
 			currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
+			size = currentPlan.getClique().getMembers().size();;
 			i++;
 
 			// only consider joint plans
-			if (currentPlan.getClique().getMembers().size() >= MIN_MEMBERS) {
-				log.debug("adding test instance with "+currentPlan.getClique().getMembers().size()+" members.");
+			if (size >= MIN_MEMBERS && size <= MAX_MEMBERS) {
+				log.debug("adding test instance with "+size+" members.");
 				output.add(currentPlan);
 				count++;
 			}

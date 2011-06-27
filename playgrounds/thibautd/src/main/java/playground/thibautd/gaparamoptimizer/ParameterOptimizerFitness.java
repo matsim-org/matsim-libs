@@ -144,6 +144,11 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		double currentScore;
 		long currentTime;
 
+		if (!thread.isThreadCpuTimeEnabled()) {
+			log.warn("CPU time monitoring had to be enabled by hand");
+			thread.setThreadCpuTimeEnabled(true);
+		}
+
 		for (int i=0; i < nPlans; i++) {
 			scores[i] = 0d;
 			cpuTimesNanoSecs[i] = 0L;
