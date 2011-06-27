@@ -124,7 +124,11 @@ public class CountsComparisonAlgorithm {
 			} else {
 				volumes = this.volumesPerLinkPerHour.get(count.getLocId());
 			}
-			if (volumes == null || volumes.length == 0) {
+			
+			if (!this.network.getLinks().containsKey(count.getLocId())) {
+				log.warn("No link for count station found: " + count.getLocId().toString());
+				continue;				
+			} else if (volumes == null || volumes.length == 0) {
 				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
 			}
