@@ -79,6 +79,8 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		new HashMap<Id, List<Integer>>();
 	private final PlanAnalyzeSubtours analyseSubtours =
 		new PlanAnalyzeSubtours();
+	// for log pupose
+	private final Id cliqueId;
 	
 	private int[] orderedSubtourIndices = null;
 
@@ -94,6 +96,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 			final int nDurGenes) {
 		//this.firstModeGene = nToggleGenes + nDurGenes;
 		// initialize the indices of the genes relative to individuals
+		this.cliqueId = plan.getClique().getId();
 		int currentIndex = nToggleGenes + nDurGenes;
 		int lastIndividualIndex = currentIndex;
 		List<Integer> individualIndices;
@@ -346,7 +349,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 			driver = false;
 			passenger = false;
 
-			// iterate over subtour legs and its children
+			// iterate over subtour legs and its children's
 			for (int j = originActs.get(i) + 1;
 					j < destinationActs.get(i) + 1;
 					j += 2) {
@@ -361,7 +364,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 			// check consistency
 			if (driver && passenger) {
 				throw new IllegalArgumentException("the optimized plan has an "+
-						"inconsistent joint structure");
+						"inconsistent joint structure for clique "+this.cliqueId);
 			}
 			else if (driver) {
 				//output.put(i, DRIVER_LABEL);
