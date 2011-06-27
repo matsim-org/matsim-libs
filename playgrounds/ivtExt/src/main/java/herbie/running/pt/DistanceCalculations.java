@@ -96,7 +96,7 @@ public class DistanceCalculations {
 	}
 	
 
-	public static double getTransitWalkDistance(GenericRouteImpl route, Network network) {
+	public static double getWalkDistance(GenericRouteImpl route, Network network) {
 		Coord fromCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
 		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
 		return CoordUtils.calcDistance(fromCoord, toCoord);
