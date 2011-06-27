@@ -55,7 +55,7 @@ import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 public class MATSim4Urbansim {
 
 	// logger
-	static final Logger log = Logger.getLogger(MATSim4Urbansim.class);
+	private static final Logger log = Logger.getLogger(MATSim4Urbansim.class);
 
 	// MATSim scenario
 	ScenarioImpl scenario = null;
