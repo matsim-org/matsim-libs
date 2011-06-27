@@ -359,6 +359,7 @@ public class ControlerTest {
 	public void testSetWriteEventsInterval() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
+		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
@@ -390,6 +391,7 @@ public class ControlerTest {
 	public void testSetWriteEventsIntervalConfig() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(10);
+		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
@@ -420,6 +422,7 @@ public class ControlerTest {
 	public void testSetWriteEventsNever() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
+		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
@@ -444,6 +447,7 @@ public class ControlerTest {
 	public void testSetWriteEventsAlways() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
+		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
@@ -464,6 +468,7 @@ public class ControlerTest {
 	public void testSetWriteEventsTxt() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		final Controler controler = new Controler(config);
@@ -485,6 +490,7 @@ public class ControlerTest {
 	public void testSetWriteEventsXml() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
@@ -506,6 +512,7 @@ public class ControlerTest {
 	public void testSetWriteEventsTxtXml() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
@@ -567,6 +574,7 @@ public class ControlerTest {
 	public void testSetMobsimFactory() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(1);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
@@ -580,10 +588,45 @@ public class ControlerTest {
 		assertEquals(2, testFactory.counter);
 	}
 
+	/**
+	 * @author mrieser
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void testShutdown_UncaughtException() throws InterruptedException {
+		ControlerRunnable r = new ControlerRunnable();
+
+		// we have to start the Controler in it's own thread, as JUnit interferes with the UncaughtExceptionHandler
+		Thread t = new Thread(r);
+		t.start();
+		t.join();
+
+		assertNotNull(r.controler);
+		assertNotNull(r.controler.uncaughtException);
+		assertTrue(r.controler.uncaughtException instanceof NullPointerException);
+		assertEquals("Just for testing...", ((NullPointerException) r.controler.uncaughtException).getMessage());
+	}
+
+	private class ControlerRunnable implements Runnable {
+		/*package*/ Controler controler = null;
+		public void run() {
+			final Config config = ControlerTest.this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+			config.controler().setLastIteration(1);
+
+			controler = new Controler(config);
+			CrashingMobsimFactory testFactory = new CrashingMobsimFactory();
+			controler.setMobsimFactory(testFactory);
+			controler.setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
+			controler.run();
+		}
+	}
+
 	@Test
 	public void test_ExceptionOnMissingPopulationFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.plans().setInputFile("dummy/non-existing/population.xml");
 
 		final Controler controler = new Controler(config);
@@ -602,6 +645,7 @@ public class ControlerTest {
 	public void test_ExceptionOnMissingNetworkFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.network().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
@@ -620,6 +664,7 @@ public class ControlerTest {
 	public void test_ExceptionOnMissingFacilitiesFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWritePlansInterval(0);
 		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
@@ -647,6 +692,15 @@ public class ControlerTest {
 		public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.counter++;
 			return new FakeMobsim();
+		}
+	}
+
+	/*package*/ static class CrashingMobsimFactory implements MobsimFactory {
+		/*package*/ int counter = 0;
+		@Override
+		public Simulation createMobsim(final Scenario sc, final EventsManager eventsManager) {
+			this.counter++;
+			throw new NullPointerException("Just for testing...");
 		}
 	}
 

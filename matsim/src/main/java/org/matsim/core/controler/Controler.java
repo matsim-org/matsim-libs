@@ -256,7 +256,7 @@ public class Controler {
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
-	private volatile Throwable uncaughtException = null;
+	/*package*/ volatile Throwable uncaughtException = null; // package-private for tests
 
 	/** initializes Log4J */
 	static {
