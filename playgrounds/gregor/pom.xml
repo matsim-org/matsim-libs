@@ -37,5 +37,10 @@
 			<artifactId>Jama</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.11</version>
+		</dependency>
 	</dependencies>
 </project>
