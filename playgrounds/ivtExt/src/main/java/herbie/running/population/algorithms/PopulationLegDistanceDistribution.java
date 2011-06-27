@@ -106,7 +106,7 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 				
 				double distance = 0.0;
 				if(leg.getMode().equals("transit_walk")){
-					distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl)leg.getRoute(), network);
+					distance = DistanceCalculations.getWalkDistance((GenericRouteImpl)leg.getRoute(), network);
 				}
 				else{
 					if(leg instanceof LegImpl && leg.getRoute() == null && !(leg.getRoute() instanceof LinkNetworkRouteImpl) && !(leg.getRoute() instanceof ExperimentalTransitRoute)){
