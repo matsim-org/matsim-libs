@@ -100,7 +100,15 @@ public class TravelScoringFunction {
 		
 //		walkScore += super.params.constantWalk;
 		
-		walkScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
+		double timeThreashold = 20.0 * 60.0; // sec
+		
+		if(travelTime <= timeThreashold) {
+			walkScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
+		}
+		else{
+			walkScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s+ 
+				6 * (travelTime - timeThreashold) * this.params.marginalUtilityOfTravelingWalk_s;
+		}
 		
 		walkScore += this.params.marginalUtilityOfDistanceWalk_m * distance;
 		

@@ -116,26 +116,37 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 			
-			double distance = 0.0;
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
-				
-				distance = leg.getRoute().getDistance();
-			}
+			double distance =  DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
+								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
+			travelTime = distance / this.config.plansCalcRoute().getWalkSpeed();
+			
+//			double tt = travelTime;
+//			double beelinefact = this.config.plansCalcRoute().getBeelineDistanceFactor();
+//			double timeParam = this.params.marginalUtilityOfTravelingWalk_s;
+//			double distParam = this.params.marginalUtilityOfDistanceWalk_m;
+//			double score = travelScoring.getWalkScore(distance, travelTime);
+//			double dist_transitwalk = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network);
+//			double scoreOfWalk = travelScoring.getWalkScore(distance, travelTime);
+//			
+//			if(distance > 20000){
+//				System.out.println();
+//			}
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		}else if (TransportMode.transit_walk.equals(leg.getMode())){
 			
 			double distance = 0.0;
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
-				distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl) leg.getRoute(), network);
-//				distance = leg.getRoute().getDistance();
+				distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
+					* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			}
 			
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			double distance = DistanceCalculations.getTransitWalkDistance((GenericRouteImpl) leg.getRoute(), network);
+			double distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
+				* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
 		} else {
