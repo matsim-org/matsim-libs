@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -255,6 +256,8 @@ public class Controler {
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
+	private volatile Throwable uncaughtException = null;
+
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -311,6 +314,17 @@ public class Controler {
 		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
+
+		// make sure we know about any exceptions that lead to abortion of the program
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				log.warn("Getting uncaught Exception in Thread " + t.getName(), e);
+				Controler.this.uncaughtException = e;
+			}
+
+		});
 
 		// now do other stuff
 		if (scenario != null) {
@@ -486,6 +500,9 @@ public class Controler {
 				log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
 			} else {
 				log.info("S H U T D O W N   ---   start regular shutdown.");
+			}
+			if (this.uncaughtException != null) {
+				log.warn("Shutdown probably caused by the following Exception.", this.uncaughtException);
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			if (this.dumpDataAtEnd) {
@@ -757,7 +774,7 @@ public class Controler {
 		 * and write to common variables, the order is important. Example: The
 		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
 		 * turn is used by the PlansScoring-Listener.
-		 * 
+		 *
 		 * IMPORTANT:
 		 * The execution order is reverse to the order the listeners are added to the list.
 		 */
@@ -810,7 +827,7 @@ public class Controler {
 		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
 			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
 		}
-		
+
 		if (this.config.scenario().isUseTransit()) {
 			addControlerListener(new TransitControlerListener());
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
@@ -1117,7 +1134,7 @@ public class Controler {
 	 */
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
-		
+
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
@@ -1143,14 +1160,14 @@ public class Controler {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
 					.getLeastCostPathCalculatorFactory());
 		}
-		
+
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()){
-			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, network.getFactory(), 
+			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, network.getFactory(),
 					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), this.getConfig().planCalcScore(), travelTimes);
 			plansCalcRoute.addLegHandler(TransportMode.car, invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
-		
+
 		return plansCalcRoute;
 	}
 
