@@ -22,6 +22,10 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -76,6 +80,11 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	private double[][] history = null;
 	private int minIteration = 0;
 
+	private Thread[] threads = null;
+	private StatsCalculator[] statsCalculators = null;
+	private final AtomicBoolean hadException = new AtomicBoolean(false);
+	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
+	
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	/**
@@ -103,7 +112,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			this.minIteration = controler.getFirstIteration();
 			int maxIter = controler.getLastIteration();
 			int iterations = maxIter - this.minIteration;
-			if (iterations > 10000) {
+			if (iterations > 1000) {
 				iterations = 1000; // limit the history size
 			}
 			this.history = new double[4][iterations+1];
@@ -112,6 +121,35 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		
+		int numOfThreads = event.getControler().getConfig().global().getNumberOfThreads();
+		if (numOfThreads < 1) numOfThreads = 1;
+		
+		initThreads(numOfThreads);
+		
+		int roundRobin = 0;
+		for (Person person : this.population.getPersons().values()) {
+			this.statsCalculators[roundRobin++ % numOfThreads].addPerson(person);
+		}
+		
+		log.info("[" + this.getClass().getSimpleName() + "] using " + numOfThreads + " thread(s).");
+		// start threads
+		for (Thread thread : this.threads) {
+			thread.start();
+		}
+		// wait until each thread is finished
+		try {
+			for (Thread thread : this.threads) {
+				thread.join();
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		log.info("[" + this.getClass().getSimpleName() + "] all threads finished.");
+		if (this.hadException.get()) {
+			throw new RuntimeException("Some threads crashed, thus not all persons may have been handled.");
+		}
+		
 		double sumAvgPlanLegTravelDistanceWorst = 0.0;
 		double sumAvgPlanLegTravelDistanceBest = 0.0;
 		double sumAvgPlanLegTravelDistanceAll = 0.0;
@@ -121,62 +159,21 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
 
-		for (Person person : this.population.getPersons().values()) {
-			Plan worstPlan = null;
-			Plan bestPlan = null;
-			double worstScore = Double.POSITIVE_INFINITY;
-			double bestScore = Double.NEGATIVE_INFINITY;
-			double sumAvgLegTravelDistance = 0.0;
-			double cntAvgLegTravelDistance = 0;
-			for (Plan plan : person.getPlans()) {
-
-				if (plan.getScore() == null) {
-					continue;
-				}
-				double score = plan.getScore().doubleValue();
-
-				// worst plan -----------------------------------------------------
-				if (worstPlan == null) {
-					worstPlan = plan;
-					worstScore = score;
-				} else if (score < worstScore) {
-					worstPlan = plan;
-					worstScore = score;
-				}
-
-				// best plan -------------------------------------------------------
-				if (bestPlan == null) {
-					bestPlan = plan;
-					bestScore = score;
-				} else if (score > bestScore) {
-					bestPlan = plan;
-					bestScore = score;
-				}
-
-				// avg. leg travel distance
-				sumAvgLegTravelDistance += getAvgLegTravelDistance(plan);
-				cntAvgLegTravelDistance++;
-
-				// executed plan? --------------------------------------------------
-				if (plan.isSelected()) {
-					sumAvgPlanLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
-					nofLegTravelDistanceExecuted++;
-				}
-			}
-
-			if (worstPlan != null) {
-				nofLegTravelDistanceWorst++;
-				sumAvgPlanLegTravelDistanceWorst += getAvgLegTravelDistance(worstPlan);
-			}
-			if (bestPlan != null) {
-				nofLegTravelDistanceBest++;
-				sumAvgPlanLegTravelDistanceBest += getAvgLegTravelDistance(bestPlan);
-			}
-			if (cntAvgLegTravelDistance > 0) {
-				sumAvgPlanLegTravelDistanceAll += (sumAvgLegTravelDistance / cntAvgLegTravelDistance);
-				nofLegTravelDistanceAvg++;
-			}
+		for (StatsCalculator statsCalculator : statsCalculators) {
+			sumAvgPlanLegTravelDistanceWorst += statsCalculator.sumAvgPlanLegTravelDistanceWorst;
+			sumAvgPlanLegTravelDistanceBest += statsCalculator.sumAvgPlanLegTravelDistanceBest;
+			sumAvgPlanLegTravelDistanceAll += statsCalculator.sumAvgPlanLegTravelDistanceAll;
+			sumAvgPlanLegTravelDistanceExecuted += statsCalculator.sumAvgPlanLegTravelDistanceExecuted;
+			nofLegTravelDistanceWorst += statsCalculator.nofLegTravelDistanceWorst;
+			nofLegTravelDistanceBest += statsCalculator.nofLegTravelDistanceBest;
+			nofLegTravelDistanceAvg += statsCalculator.nofLegTravelDistanceAvg;
+			nofLegTravelDistanceExecuted += statsCalculator.nofLegTravelDistanceExecuted;
 		}
+
+		// reset
+		this.statsCalculators = null;
+		this.threads = null;
+		
 		log.info("-- average of the average leg distance per plan (executed plans only): " + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
 		log.info("-- average of the average leg distance per plan (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst));
 		log.info("-- average of the average leg distance per plan (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg));
@@ -240,26 +237,144 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		return this.history.clone();
 	}
 
-	private double getAvgLegTravelDistance(final Plan plan){
+	private void initThreads(int numOfThreads) {
+		if (this.threads != null) {
+			throw new RuntimeException("threads are already initialized");
+		}
 
-		double planTravelDistance=0.0;
-		int numberOfLegs=0;
+		this.hadException.set(false);
+		this.threads = new Thread[numOfThreads];
+		this.statsCalculators = new StatsCalculator[numOfThreads];
 
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				final Leg leg = (Leg) pe;
-				if (leg.getRoute() instanceof NetworkRoute) {
-					planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
-					numberOfLegs++;
+		// setup threads
+		for (int i = 0; i < numOfThreads; i++) {
+			StatsCalculator statsCalculatorThread = new StatsCalculator(this.network);
+			Thread thread = new Thread(statsCalculatorThread, this.getClass().getSimpleName() + "." + StatsCalculator.class.getSimpleName() + "." + i);
+			thread.setUncaughtExceptionHandler(this.exceptionHandler);
+			this.threads[i] = thread;
+			this.statsCalculators[i] = statsCalculatorThread;
+		}
+	}
+	
+	private static class StatsCalculator implements Runnable {
+
+		double sumAvgPlanLegTravelDistanceWorst = 0.0;
+		double sumAvgPlanLegTravelDistanceBest = 0.0;
+		double sumAvgPlanLegTravelDistanceAll = 0.0;
+		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
+		int nofLegTravelDistanceWorst = 0;
+		int nofLegTravelDistanceBest = 0;
+		int nofLegTravelDistanceAvg = 0;
+		int nofLegTravelDistanceExecuted = 0;
+		
+		private Collection<Person> persons;
+		private Network network;
+		
+		public StatsCalculator(Network network) {
+			this.network = network;
+			persons = new ArrayList<Person>();
+		}
+		
+		public void addPerson(Person person) {
+			persons.add(person);
+		}
+		
+		@Override
+		public void run() {
+			for (Person person : persons) {
+				Plan worstPlan = null;
+				Plan bestPlan = null;
+				double worstScore = Double.POSITIVE_INFINITY;
+				double bestScore = Double.NEGATIVE_INFINITY;
+				double sumAvgLegTravelDistance = 0.0;
+				double cntAvgLegTravelDistance = 0;
+				for (Plan plan : person.getPlans()) {
+
+					if (plan.getScore() == null) {
+						continue;
+					}
+					double score = plan.getScore().doubleValue();
+
+					// worst plan -----------------------------------------------------
+					if (worstPlan == null) {
+						worstPlan = plan;
+						worstScore = score;
+					} else if (score < worstScore) {
+						worstPlan = plan;
+						worstScore = score;
+					}
+
+					// best plan -------------------------------------------------------
+					if (bestPlan == null) {
+						bestPlan = plan;
+						bestScore = score;
+					} else if (score > bestScore) {
+						bestPlan = plan;
+						bestScore = score;
+					}
+
+					// avg. leg travel distance
+					sumAvgLegTravelDistance += getAvgLegTravelDistance(plan);
+					cntAvgLegTravelDistance++;
+
+					// executed plan? --------------------------------------------------
+					if (plan.isSelected()) {
+						sumAvgPlanLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
+						nofLegTravelDistanceExecuted++;
+					}
 				}
-				// yyyyyy Seems that this averages only over routes of type NetworkRoute.  This is, minimally, not consistent with what we had before
-				// (average over ALL modes).  kai/benjamin, apr'10
+
+				if (worstPlan != null) {
+					nofLegTravelDistanceWorst++;
+					sumAvgPlanLegTravelDistanceWorst += getAvgLegTravelDistance(worstPlan);
+				}
+				if (bestPlan != null) {
+					nofLegTravelDistanceBest++;
+					sumAvgPlanLegTravelDistanceBest += getAvgLegTravelDistance(bestPlan);
+				}
+				if (cntAvgLegTravelDistance > 0) {
+					sumAvgPlanLegTravelDistanceAll += (sumAvgLegTravelDistance / cntAvgLegTravelDistance);
+					nofLegTravelDistanceAvg++;
+				}
 			}
 		}
-		if (numberOfLegs>0) {
-			return planTravelDistance/numberOfLegs;
-		}
-		return 0.0;
-	}
+		
+		private double getAvgLegTravelDistance(final Plan plan) {
 
+			double planTravelDistance=0.0;
+			int numberOfLegs=0;
+
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					final Leg leg = (Leg) pe;
+					if (leg.getRoute() instanceof NetworkRoute) {
+						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+						numberOfLegs++;
+					}
+					// yyyyyy Seems that this averages only over routes of type NetworkRoute.  This is, minimally, not consistent with what we had before
+					// (average over ALL modes).  kai/benjamin, apr'10
+				}
+			}
+			if (numberOfLegs>0) {
+				return planTravelDistance/numberOfLegs;
+			}
+			return 0.0;
+		}
+	}
+	
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+
+		public ExceptionHandler(final AtomicBoolean hadException) {
+			this.hadException = hadException;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			log.error("Thread " + t.getName() + " died with exception. Will stop after all threads finished.", e);
+			this.hadException.set(true);
+		}
+
+	}
 }
