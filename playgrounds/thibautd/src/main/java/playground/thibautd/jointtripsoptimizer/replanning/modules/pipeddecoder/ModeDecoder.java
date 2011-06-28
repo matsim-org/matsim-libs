@@ -45,9 +45,14 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
- * For decoding the mode.
+ * For decoding the mode, taking into account feasibility constraints.
+ * Currently, only plans with start and end activity on the same link are
+ * possible to optimize (otherwise, there is a problem with subtour analysis).
+ *
  * @author thibautd
  */
+// FIXME: if the departure is not on the same link as the location, the number
+// of subtours is considered to be 0, and this results in an error.
 public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	private static final Logger log =
 		Logger.getLogger(ModeDecoder.class);
