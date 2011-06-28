@@ -11,9 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -39,13 +37,13 @@ public class EvacuationNetworkGenerator {
 
 	private final Id safeLinkId;
 
-	public EvacuationNetworkGenerator(Scenario sc, Geometry evavcuationArea){
+	public EvacuationNetworkGenerator(Scenario sc, Geometry evavcuationArea, Id safeLinkId){
 		this.sc = sc;
 		this.evacuationArea = evavcuationArea;
 		this.network = sc.getNetwork();
 		this.safeNodeAId = this.sc.createId("en1");
 		this.safeNodeBId = this.sc.createId("en2");
-		this.safeLinkId = this.sc.createId("el1");
+		this.safeLinkId = safeLinkId;
 	}
 
 	public void run() {

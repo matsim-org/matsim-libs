@@ -22,6 +22,10 @@ public class GripsConfigModule extends Module {
 
 	public static final String OUTPUT_DIR = "outputDir";
 
+	//Do we really want to define it in the GripsConfigModule?
+	@Deprecated
+	public static final String SAMPLE_SIZE = "sampleSize";
+
 	private String networkFileName;
 
 	private String evacuationAreaFileName;
@@ -29,6 +33,11 @@ public class GripsConfigModule extends Module {
 	private String populationFileName;
 
 	private String outputDir;
+
+	//Do we really want to define it in the GripsConfigModule?
+	@Deprecated
+	private double sampleSize = 1;
+
 
 
 	public GripsConfigModule(String name) {
@@ -52,6 +61,8 @@ public class GripsConfigModule extends Module {
 			setPopulationFileName(value);
 		} else if (param_name.equals(OUTPUT_DIR)){
 			setOutputDir(value);
+		} else if (param_name.equals(SAMPLE_SIZE)){
+			setSampleSize(value);
 		}else {
 			throw new IllegalArgumentException(param_name);
 		}
@@ -75,6 +86,8 @@ public class GripsConfigModule extends Module {
 			return getPopulationFileName();
 		} else if (param_name.equals(OUTPUT_DIR)){
 			return getOutputDir();
+		}else if (param_name.equals(SAMPLE_SIZE)){
+			return Double.toString(getSampleSize());
 		}else {
 			throw new IllegalArgumentException(param_name);
 		}
@@ -87,6 +100,7 @@ public class GripsConfigModule extends Module {
 		map.put(EVACUATION_AREA_FILE_NAME, getValue(EVACUATION_AREA_FILE_NAME));
 		map.put(POPULATION_FILE_NAME, getValue(POPULATION_FILE_NAME));
 		map.put(OUTPUT_DIR, getValue(OUTPUT_DIR));
+		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
 		return map;
 	}
 
@@ -112,5 +126,17 @@ public class GripsConfigModule extends Module {
 
 	public void setPopulationFileName(String populationFileName) {
 		this.populationFileName = populationFileName;
+	}
+
+	//Do we really want to define it in the GripsConfigModule?
+	@Deprecated
+	public double getSampleSize() {
+		return this.sampleSize;
+	}
+
+	//Do we really want to define it in the GripsConfigModule?
+	@Deprecated
+	public void setSampleSize(String sampleSize) {
+		this.sampleSize = Double.parseDouble(sampleSize);
 	}
 }

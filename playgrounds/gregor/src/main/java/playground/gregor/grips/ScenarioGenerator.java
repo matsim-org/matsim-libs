@@ -6,10 +6,16 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -36,22 +42,31 @@ public class ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	private final String configFile;
+	private Id safeLinkId;
 
 	public ScenarioGenerator(String config) {
 		this.configFile = config;
 	}
 
 	private void run() {
+		log.info("loading config file");
 		Config c = ConfigUtils.loadConfig(this.configFile);
+		c.addSimulationConfigGroup(new SimulationConfigGroup());
 		Scenario sc = ScenarioUtils.createScenario(c);
+		this.safeLinkId = sc.createId("el1");
 
+		log.info("generating network file");
 		generateAndSaveNetwork(sc);
 
+		log.info("generating population file");
 		generateAndSavePopulation(sc);
 
+		log.info("saving simulation config file");
+		c.controler().setLastIteration(0);
+		c.controler().setOutputDirectory(getGripsConfig(c).getOutputDir()+"/output");
+		new ConfigWriter(c).write(getGripsConfig(c).getOutputDir() + "/config.xml");
+
 	}
-
-
 
 
 	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
@@ -60,7 +75,26 @@ public class ScenarioGenerator {
 	}
 
 	private void generateAndSavePopulation(Scenario sc) {
-		// TODO Auto-generated method stub
+		// for now a simple ESRI shape file format is used to emulated the a more sophisticated not yet defined population meta format
+		GripsConfigModule gcm = getGripsConfig(sc.getConfig());
+		String gripsPopulationFile = gcm.getPopulationFileName();
+		new PopulationFromESRIShapeFileGenerator(sc, gripsPopulationFile, this.safeLinkId).run();
+
+		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
+		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
+		sc.getConfig().plans().setInputFile(outputPopulationFile);
+
+		sc.getConfig().simulation().setStorageCapFactor(gcm.getSampleSize());
+		sc.getConfig().simulation().setFlowCapFactor(gcm.getSampleSize());
+
+		ActivityParams pre = new ActivityParams("pre-evac");
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision? (gl)
+		ActivityParams post = new ActivityParams("post-evac");
+		post.setTypicalDuration(49); // dito
+		sc.getConfig().planCalcScore().addActivityParams(pre);
+		sc.getConfig().planCalcScore().addActivityParams(post);
+
 
 	}
 
@@ -71,13 +105,27 @@ public class ScenarioGenerator {
 
 		// Step 1 raw network input
 		// for now grips network meta format is osm
-
-		String wgs84 = MGC.getCRS("EPSG: 4326").toWKT();
-		String wgs84utm32n = MGC.getCRS("EPSG: 32632").toWKT();
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(wgs84, wgs84utm32n);
-		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
+		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG: 4326", "EPSG: 32632");
+		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
+		//		reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
+		//		reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
+		reader.setHighwayDefaults(2, "trunk",         4,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(2, "trunk_link",    4,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(3, "primary",       4,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(3, "primary_link",  4,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(4, "secondary",     4,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(5, "tertiary",      4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6, "minor",         4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6, "unclassified",  4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6, "residential",   4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6, "living_street", 4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6,"path",           4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6,"cycleay",           4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6,"footway",           4,  5.0/3.6, 1.0,  10000);
 		reader.setKeepPaths(true);
 		reader.parse(gripsNetworkFile);
+
 
 
 		// Step 2 evacuation network generator
@@ -95,14 +143,14 @@ public class ScenarioGenerator {
 		}
 		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
 		Polygon p = (Polygon) mp.getGeometryN(0);
-		new EvacuationNetworkGenerator(sc, p).run();
+		new EvacuationNetworkGenerator(sc, p,this.safeLinkId).run();
 
-		new NetworkWriter(sc.getNetwork()).write(gcm.getOutputDir()+"/network.xml.gz");
-
-
+		String networkOutputFile = gcm.getOutputDir()+"/network.xml.gz";
+		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
+		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
 
-	private GripsConfigModule getGripsConfig(Config c) {
+	public GripsConfigModule getGripsConfig(Config c) {
 
 		Module m = c.getModule("grips");
 		if (m instanceof GripsConfigModule) {
@@ -121,8 +169,6 @@ public class ScenarioGenerator {
 		new ScenarioGenerator(args[0]).run();
 
 	}
-
-
 
 	private static void printUsage() {
 		System.out.println();
