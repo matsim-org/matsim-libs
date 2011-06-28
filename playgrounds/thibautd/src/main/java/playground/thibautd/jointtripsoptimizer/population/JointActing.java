@@ -43,14 +43,10 @@ public interface JointActing {
 	// first API. Linking with objects can lead to wrong references when creating
 	// a plan copy, and using co-participants Id is less useful than expected.
 	// Modified so as to work, but prefer the "Id" API.
-	// TODO: refactor the code using this API and suppress it.
-	@Deprecated
 	public void setLinkedElements(Map<Id, ? extends JointActing> linkedElements);
-	@Deprecated
 	public void addLinkedElement(Id id, JointActing act);
 	// confusing when act/legs are also identified
 	//public void removeLinkedElement(Id id);
-	@Deprecated
 	public Map<Id, ? extends JointActing> getLinkedElements();
 
 	public void setLinkedElementsById(List<? extends Id> linkedElements);

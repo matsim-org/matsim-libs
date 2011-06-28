@@ -244,13 +244,13 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	/**
-	 * @deprecated use the equivalent by Id instead
+	 * @param id the id of the mate (unused, as it can be extracted from the jointleg)
+	 * @param leg a JointLeg to remember as linked.
 	 */
-	@Deprecated
 	@Override
-	public void addLinkedElement(final Id id, final JointActing act) {
+	public void addLinkedElement(final Id id, final JointActing leg) {
 		try {
-			this.addLinkedElementById(((JointLeg) act).getId());
+			this.addLinkedElementById(((JointLeg) leg).getId());
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException("Elements linked to a JointLeg must"+
 					" be of type JointLeg!");
@@ -258,9 +258,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	/**
-	 * @deprecated use the equivalent by Id instead
+	 * @return a map which links mate Ids with their individual leg
 	 */
-	@Deprecated
 	@Override
 	public Map<Id, JointLeg> getLinkedElements() {
 		Map<Id, JointLeg> output = new HashMap<Id, JointLeg>();
