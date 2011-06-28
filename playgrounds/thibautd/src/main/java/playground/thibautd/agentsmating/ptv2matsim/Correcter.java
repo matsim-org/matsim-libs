@@ -266,7 +266,9 @@ public class Correcter {
 			correctedCliques = getConnexComponents(this.cliques.remove(id));
 
 			for (List<Id> clique : correctedCliques) {
-				this.cliques.put(idFactory.createId(), clique);
+				if (this.cliques.put(idFactory.createId(), clique) != null) {
+					throw new RuntimeException("created clique with already existing id");
+				}
 			}
 		}
 	}
@@ -287,14 +289,14 @@ public class Correcter {
 	private List<Id> inDepthSearch(final Id member, final List<Id> clique) {
 		List<Id> out = new ArrayList<Id>();
 		clique.remove(member);
+		out.add(member);
 		
 		for (Id neighboor : getMates(member)) {
 			if (clique.contains(neighboor)) {
-				out = inDepthSearch(neighboor, clique);
+				out.addAll(inDepthSearch(neighboor, clique));
 			}
 		}
 		
-		out.add(member);
 		return out;
 	}
 

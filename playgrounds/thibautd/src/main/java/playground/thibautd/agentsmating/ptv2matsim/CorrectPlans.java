@@ -32,6 +32,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
+import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
 
 /**
@@ -77,7 +78,14 @@ public class CorrectPlans {
 		(new CliquesWriter(correcter.getCliques())).writeFile(cliqueFile);
 
 		log.info("writing corrected plans to "+planFile);
-		(new PopulationWriter(population, controler.getScenario().getNetwork())).write(planFile);
+		PopulationWriter writer = (new PopulationWriter(
+					population,
+					controler.getScenario().getNetwork(),
+					controler.getScenario().getKnowledges()));
+		writer.setWriterHandler(new PopulationWithJointTripsWriterHandler(
+					controler.getScenario().getNetwork(),
+					controler.getScenario().getKnowledges()));
+		writer.write(planFile);
 		
 		log.info("######################################################################");
 		log.info("# success, exiting.");
