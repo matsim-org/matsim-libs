@@ -89,7 +89,7 @@ public class ScenarioGenerator {
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
-		// the reason is the double precision? (gl)
+		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
 		ActivityParams post = new ActivityParams("post-evac");
 		post.setTypicalDuration(49); // dito
 		sc.getConfig().planCalcScore().addActivityParams(pre);
