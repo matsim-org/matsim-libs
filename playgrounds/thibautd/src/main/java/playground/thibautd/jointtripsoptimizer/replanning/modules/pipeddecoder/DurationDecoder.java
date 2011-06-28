@@ -119,7 +119,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		//construction
 		//Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
-		List<Activity> lastActivities = plan.getLastActivities();
+		// List<Activity> lastActivities = plan.getLastActivities();
 		//TODO: less hard-coded chromosome structure
 		int currentDurationGene = numJointEpisodes;
 		Integer indexToAdd;
@@ -130,25 +130,29 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		}
 
 		// construction of the list of relative genes.
-		for (PlanElement pe : plan.getPlanElements()) {
-			//do not consider legs
-			if (pe instanceof JointLeg) {
-				continue;
-			}
+		Id currentId;
+		List<PlanElement> planElements;
+		for (Map.Entry<Id, Plan> planEntry : plan.getIndividualPlans().entrySet()) {
+			currentId = planEntry.getKey();
+			planElements = planEntry.getValue().getPlanElements();
 
-			// associate to duration genes (only for non-joint-trip related activities)
-			if ( !isPickUp(pe) && !isDropOff(pe) ) {
-				if (!lastActivities.contains(pe)) {
+			for (PlanElement pe : planElements.subList(0, planElements.size() -1)) {
+				//do not consider legs
+				if (pe instanceof JointLeg) {
+					continue;
+				}
+
+				// associate to duration genes (only for non-joint-trip related activities)
+				if ( !isPickUp(pe) && !isDropOff(pe) ) {
 					indexToAdd = currentDurationGene;
 					currentDurationGene++;
+					// remember the association
+					this.genesIndices.get(currentId).add(
+							indexToAdd);
 				}
-				else {
-					indexToAdd = null;
-				}
-				// remember the association
-				this.genesIndices.get( ((JointActing) pe).getPerson().getId() ).add(
-						indexToAdd);
 			}
+			// "mark" the last activity as not being related to a gene
+			this.genesIndices.get(currentId).add(null);
 		}
 
 		this.initializeLegEstimators(plan, configGroup.getSimLegInterpretation());
