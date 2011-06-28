@@ -41,13 +41,15 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	private double earliestEndTime = -1;
 
 	public ActivityUtilityParameters(final String type, final double priority, final double typicalDuration) {
+		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
+		// to have activities with a typical duration <=48 seconds (GL/June2011)
 		super();
 		this.type = type;
 		this.priority = priority;
 		this.typicalDuration = typicalDuration;
 
 		this.zeroUtilityDuration = (typicalDuration / 3600.0)
-				* Math.exp( -10.0 / (typicalDuration / 3600.0) / priority );
+		* Math.exp( -10.0 / (typicalDuration / 3600.0) / priority );
 		if (this.zeroUtilityDuration <= 0.0) {
 			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
