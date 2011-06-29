@@ -107,7 +107,7 @@ public class TestSimulationSetUp {
 				getParkingTimesPlugIn(),
 				getEnergyConsumptionInit().getEnergyConsumptionPlugin(),
 				outputPath,
-				getVehicleTypeCollector()
+				getVehicleTypeCollector(), 3500
 				);
 		
 		myDecentralizedSmartCharger.initializeLP(bufferBatteryCharge, false);

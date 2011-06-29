@@ -128,7 +128,8 @@ public class TestHubFunctionBerlin extends TestCase{
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh,
+				3500
 				);
 		
 		mySimulation.addControlerListenerDecentralizedCharging();		

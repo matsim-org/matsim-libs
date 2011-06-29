@@ -93,6 +93,8 @@ public class Main_exampleDSCTest extends TestCase{
 		double kWHPHEV =24;
 		boolean gasHigh = true;
 		
+		double standardConnectionWatt=3500;
+		
 		mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -102,7 +104,8 @@ public class Main_exampleDSCTest extends TestCase{
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh, 
+				standardConnectionWatt
 				);
 		
 		mySimulation.addControlerListenerDecentralizedCharging();		

@@ -106,7 +106,8 @@ public class Main_exampleV2GTest_NoReg extends TestCase{
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh,
+				3500
 				);
 		
 		double xPercentDown=0.0;
