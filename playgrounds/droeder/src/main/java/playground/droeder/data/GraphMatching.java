@@ -238,8 +238,8 @@ public class GraphMatching {
 			tempUnmatched = new ArrayList<EdgeCompare>();
 			for(MatchingEdge cand : e.getValue()){
 				comp = new EdgeCompare(e.getKey(), cand);
+				tempComp.add(comp);
 				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
-					tempComp.add(comp);
 					//TODO to many prematchings are deleted here... why?
 				}else{
 					tempUnmatched.add(comp);
@@ -297,8 +297,8 @@ public class GraphMatching {
 				newMatched.add(ref);
 			}
 			if(cnt%msg == 0){
-			log.info("processed " + cnt + " of " + edgesUnmatchedRef.size() + " of unmatched Edges. New matched: " + newMatched.size());
-			msg *= 2;
+				log.info("processed " + cnt + " of " + edgesUnmatchedRef.size() + " of unmatched Edges. New matched: " + newMatched.size());
+				msg *= 2;
 			}
 			cnt++;
 		}
@@ -313,10 +313,10 @@ public class GraphMatching {
 	}
 	
 
-	private void nodeMatchingTopDown(){
-		
-		
-	}
+//	private void nodeMatchingTopDown(){
+//		
+//		
+//	}
 	
 	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
 		return this.nodesReference2match;
@@ -520,7 +520,6 @@ public class GraphMatching {
 			w.flush();
 			w.close();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}

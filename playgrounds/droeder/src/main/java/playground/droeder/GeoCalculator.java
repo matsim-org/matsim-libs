@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.droeder;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.math.geometry.Vector3D;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -31,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
  *
  */
 public class GeoCalculator {
-	private static final Logger log = Logger.getLogger(GeoCalculator.class);
+//	private static final Logger log = Logger.getLogger(GeoCalculator.class);
 	
 	public static double distanceBetween2Points(Coord one, Coord two){
 		double a = one.getX() - two.getX();

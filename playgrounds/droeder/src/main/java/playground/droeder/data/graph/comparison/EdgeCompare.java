@@ -56,6 +56,7 @@ public class EdgeCompare extends AbstractCompare{
 		SegmentCompare sc = null;
 		int cnt = 0;
 		
+		// TODO weighted by length
 		while(candIt.hasNext() && refIt.hasNext()){
 			if((rs == null) && (cs == null)){
 				rs = refIt.next();

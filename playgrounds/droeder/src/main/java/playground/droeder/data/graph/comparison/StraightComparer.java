@@ -129,7 +129,10 @@ public class StraightComparer{
 		// get the base of the perpendicular from c to the straight ab
 		p = a.add(new Vector2D(answers[0], r1));
 		
-		// return the point only, if it is beetween the point a && b
+		/*
+		 * return the point only, if it is beetween the point a && b, because otherwise it is not interesting
+		 * for the distance-calculation
+		 */
 		if(a.getX() < b.getX()){
 			if(a.getX() < p.getX() && p.getX() < b.getX()){
 				return new CoordImpl(p.getX(), p.getY());
