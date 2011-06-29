@@ -32,6 +32,7 @@ import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
 import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
@@ -47,7 +48,7 @@ import java.util.*;
  * @author Stella
  *
  */
-public class SSP{
+public class SSPPlus50000{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
@@ -57,7 +58,8 @@ public class SSP{
 		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
-		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochastic random+-50000.txt";
+		ArrayList<LoadDistributionInterval> stochasticGeneral= new ArrayList<LoadDistributionInterval>(0);
+		stochasticGeneral.add(new LoadDistributionInterval(0, 24*3600.0, 50000));		
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -80,6 +82,8 @@ public class SSP{
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 	
+		double standardConnectionWatt=3500;
+		
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -89,7 +93,8 @@ public class SSP{
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh,
+				standardConnectionWatt
 				);
 		
 		

@@ -105,8 +105,11 @@ public class LPPHEV extends LP{
 			if(DecentralizedSmartCharger.debug){
 				System.out.println("LP PHEV for Agent: "+ id.toString()); 
 			}
-						
-			setUpLP();
+			
+			
+			// set default starting SOC to 50% of battery size
+			//setUpLP();
+			setUpLP(batterySize*0.5);
 			getSolver().setTimeout(100); 
 		
 			int status = getSolver().solve();

@@ -108,8 +108,7 @@ public class ParkingInterval extends TimeInterval {
 	
 	
 	public double getChargingSpeed(){
-		// TODO
-		// TODO
+		
 		//location--> facility-- charging speed
 		return DecentralizedSmartCharger.STANDARDCONNECTIONSWATT;
 		

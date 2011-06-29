@@ -49,6 +49,7 @@ public class DecentralizedChargingSimulation {
 	
 	public static StochasticLoadCollector slc;
 	
+	public static double standardConnectionsWatt;
 	public static double  compensationPerKWHRegulationUp;
 	public static double compensationPerKWHRegulationDown;
 	public static double compensationPERKWHFeedInVehicle;
@@ -88,7 +89,8 @@ public class DecentralizedChargingSimulation {
 			MappingClass myMappingClass,
 			ArrayList<HubInfoDeterministic> myHubInfo,
 			boolean LPoutput,
-			double kWHEV, double kWHPHEV, Object gasHigh
+			double kWHEV, double kWHPHEV, Object gasHigh,
+			double standardConnectionsWatt
 			) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 		
 		this.outputPath=outputPath;
@@ -99,6 +101,7 @@ public class DecentralizedChargingSimulation {
 		this.kWHEV=kWHEV;
 		this.kWHPHEV=kWHPHEV;
 		this.gasHigh=gasHigh;
+		this.standardConnectionsWatt=standardConnectionsWatt;
 		loadPricingCollector= new DetermisticLoadPricingCollector(myHubInfo);
 		
 		controler=new Controler(configPath);

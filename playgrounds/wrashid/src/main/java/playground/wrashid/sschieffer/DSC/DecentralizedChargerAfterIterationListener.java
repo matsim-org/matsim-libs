@@ -55,8 +55,8 @@ public class DecentralizedChargerAfterIterationListener implements IterationEnds
 					DecentralizedChargingSimulation.parkingTimesPlugin, //ParkingTimesPlugIn
 					DecentralizedChargingSimulation.energyInit.getEnergyConsumptionPlugin(), // EnergyConsumptionPlugIn
 					DecentralizedChargingSimulation.outputPath, // where to save the data
-					myVehicleTypes // the defined vehicle types(gas, battery)
-					);
+					myVehicleTypes, // the defined vehicle types(gas, battery)
+					DecentralizedChargingSimulation.standardConnectionsWatt);
 			
 			
 			

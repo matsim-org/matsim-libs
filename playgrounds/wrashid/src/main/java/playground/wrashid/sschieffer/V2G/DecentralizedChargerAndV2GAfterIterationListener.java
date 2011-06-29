@@ -56,8 +56,8 @@ public class DecentralizedChargerAndV2GAfterIterationListener implements Iterati
 					DecentralizedChargingSimulation.parkingTimesPlugin, //ParkingTimesPlugIn
 					DecentralizedChargingSimulation.energyInit.getEnergyConsumptionPlugin(), // EnergyConsumptionPlugIn
 					DecentralizedChargingSimulation.outputPath, // where to save the data
-					myVehicleTypes // the defined vehicle types(gas, battery)
-					);
+					myVehicleTypes, // the defined vehicle types(gas, battery)
+					DecentralizedChargingSimulation.standardConnectionsWatt);
 			
 			//set battery reserve
 			myDecentralizedSmartCharger.initializeLP(

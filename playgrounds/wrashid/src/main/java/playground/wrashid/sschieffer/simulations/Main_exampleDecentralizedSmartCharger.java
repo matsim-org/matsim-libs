@@ -122,7 +122,10 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * --> for multiple hubs, you can add multiple entries to myHubInfo
 		 */
 		double priceMaxPerkWh=0.11;double priceMinPerkWh=0.07;
+		
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
+		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/newFreeLoadForSSPHighSpeed.txt";
+		
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
@@ -134,7 +137,7 @@ public class Main_exampleDecentralizedSmartCharger {
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		
-		
+		double standardConnectionWatt=3500;
 		/**
 		 * LP Optimization parameters
 		 * - battery buffer for charging (e.g. 0.2=20%, agent will have charged 20% more 
@@ -158,13 +161,12 @@ public class Main_exampleDecentralizedSmartCharger {
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh,
+				standardConnectionWatt
 				);
 		
 		mySimulation.addControlerListenerDecentralizedCharging();		
 		mySimulation.controler.run();
-		
-		
 		
 		/***********************
 		 * Examples how to use
@@ -172,6 +174,9 @@ public class Main_exampleDecentralizedSmartCharger {
 		 * after the run, the results can be obtained as demonstrated in the example below
 		 * **********************
 		 */
+		System.out.println("Total emissions [kg]" +
+				mySimulation.getTotalEmissions());
+		
 		for(Id id: mySimulation.mySmartCharger.vehicles.getKeySet()){
 			
 			//CHRONOLOGICAL SCHEDULES OF AGENTS where each schedule has parking and driving intervals
@@ -237,6 +242,7 @@ public class Main_exampleDecentralizedSmartCharger {
 			System.out.println("Total emissions [kg]" +
 					mySimulation.getTotalEmissions());
 			
+			break;
 		}
 	}
 	

@@ -93,7 +93,8 @@ public class LPEV extends LP{
 			System.out.println("LP EV for Agent: "+ id.toString()); 
 		}
 		
-		setUpLP();
+		//setUpLP();
+		setUpLP(batterySize*0.5);
 		getSolver().setTimeout(100); 
 		
 		int status = getSolver().solve();

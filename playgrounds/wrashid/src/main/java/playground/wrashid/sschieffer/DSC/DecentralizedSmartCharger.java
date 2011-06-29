@@ -115,7 +115,7 @@ public class DecentralizedSmartCharger {
 	
 	final public static double KWHPERJOULE=1.0/(3600.0*1000.0);
 	
-	final public static double STANDARDCONNECTIONSWATT= 3500.0;
+	public static double STANDARDCONNECTIONSWATT;
 	//***********************************************************************	
 	public static String outputPath;
 	final Controler controler;
@@ -137,7 +137,7 @@ public class DecentralizedSmartCharger {
 	private double averageChargingTimeAgent, averageChargingTimeAgentEV, averageChargingTimeAgentPHEV;	
 	
 	public double minChargingLength;	
-	public double emissionCounter=0.0;	
+	public double emissionCounter;	
 	
 	public LinkedList<Id> chargingFailureEV;
 	public LinkedList<Id> agentsWithEV;
@@ -180,21 +180,32 @@ public class DecentralizedSmartCharger {
 			ParkingTimesPlugin parkingTimesPlugin,
 			EnergyConsumptionPlugin energyConsumptionPlugin,
 			String outputPath,
-			VehicleTypeCollector myVehicleTypes) throws IOException, OptimizationException{
+			VehicleTypeCollector myVehicleTypes,
+			double STANDARDCONNECTIONSWATT
+			) throws IOException, OptimizationException{
 		
 		this.controler=controler;						
 		this.outputPath=outputPath;	
-		
-		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
-		optimizer.setMaxIterations(10000);		
-		optimizer.setConvergenceChecker(checker);		
-		polyFit= new PolynomialFitter(20, optimizer);
+		this.STANDARDCONNECTIONSWATT= STANDARDCONNECTIONSWATT;
 		
 		myAgentTimeReader= new AgentTimeIntervalReader(
 				parkingTimesPlugin, 
 				energyConsumptionPlugin);
 		
 		this.myVehicleTypes=myVehicleTypes;
+		
+		initialize();
+	}
+	
+	
+	
+	private void initialize(){
+		emissionCounter=0.0;
+		
+		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
+		optimizer.setMaxIterations(10000);		
+		optimizer.setConvergenceChecker(checker);		
+		polyFit= new PolynomialFitter(20, optimizer);
 		
 		chargingFailureEV=new LinkedList<Id>();
 		agentsWithEV=new LinkedList<Id>();
@@ -345,11 +356,8 @@ public class DecentralizedSmartCharger {
 		
 		distributeTime = System.currentTimeMillis();
 		
-		System.out.println("\n Find Charging distribution");
-		findChargingDistribution();
-		
 		System.out.println("\n Update loads ");
-		updateDeterministicLoad(); // bottle neck of wrap up
+		updateDeterministicLoad(); 
 		
 		System.out.println("\n Update costs ");
 		calculateAverageChargingCostsAllAgents();
@@ -362,6 +370,11 @@ public class DecentralizedSmartCharger {
 		writeSummaryDSCPerAgent("DSCPerAgent");
 		
 		deleteEVsWithFailureForV2G();
+		
+		
+		
+		
+		
 	}
 	
 	
@@ -457,13 +470,8 @@ public class DecentralizedSmartCharger {
 						type);
 				if (scheduleAfterLP !=null){
 					// if successful --> save
-					
 					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
-					if(hasAgentPHEV(id)){
-						// only if agent has PHEV change joules to emissions
-						emissionCounter= joulesToEmissionInKg(id,joulesFromEngine); // still 0
-												
-					}
+					
 				}else{					
 					//if fails, try PHEV
 										
@@ -473,7 +481,6 @@ public class DecentralizedSmartCharger {
 					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
 					if(hasAgentEV(id)){						
 						chargingFailureEV.add(id);
-						
 					}else{						
 						emissionCounter+= joulesToEmissionInKg(id, joulesFromEngine);
 					}
@@ -552,7 +559,7 @@ public class DecentralizedSmartCharger {
 	 * records the parking times of all agents at hubs and visualizes the distribition for each hub over the day
 	 * @throws Exception 
 	 */
-	private void findChargingDistribution() throws Exception{
+	private void findConnectivityDistribution() throws Exception{
 		
 		for(int i=0; i<MINUTESPERDAY; i++){
 			double thisSecond= i*SECONDSPERMIN;
@@ -811,6 +818,9 @@ public class DecentralizedSmartCharger {
 			double xPercentDown,
 			double xPercentDownUp
 			) throws Exception{
+		
+		System.out.println("\n Find Connectivty Curve for V2G");
+		findConnectivityDistribution();
 		
 		myV2G.initializeAgentStats();
 		setV2GRegUpAndDownStats(xPercentDown,xPercentDownUp);
@@ -1412,21 +1422,7 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	/**
-	 * clears agentParkingAndDrivingSchedules, agentChargingSchedules, emissions and lists of EV/PHEV/conventional car owners
-	 */
-	public void clearResults(){
-		agentParkingAndDrivingSchedules = new HashMap<Id, Schedule>(); 
-		agentChargingSchedules = new HashMap<Id, Schedule>();
-		
-		emissionCounter=0.0;
-		
-		chargingFailureEV=new LinkedList<Id>();
-		agentsWithEV=new LinkedList<Id>();
-		agentsWithPHEV=new LinkedList<Id>();
-		agentsWithCombustion=new LinkedList<Id>();
-		
-	}
+	
 
 
 
@@ -1754,7 +1750,10 @@ public class DecentralizedSmartCharger {
 			
 			load.addSeries(after);
 			load.addSeries(beforeXY);
-					
+			for(int i=0; i<after.getItemCount(); i++){
+				  out.write( after.getX(i)+" \t "+ after.getY(i)+" \n");
+			}
+			
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart(graphTitle, 
 					"time [s]", 
@@ -2185,7 +2184,6 @@ public class DecentralizedSmartCharger {
 		    out.write("DSC Average charging cost of EV agents: "+getAverageChargingCostEV()+"</br>");			   
 		    out.write("DSC Average charging cost of PHEV agents: "+getAverageChargingCostPHEV()+"</br>");
 		    out.write("</br>");
-		    
 		   
 		    out.write("</br>");
 		    out.write("CHARGING TIME </br>");
@@ -2474,10 +2472,12 @@ public class DecentralizedSmartCharger {
 		    
 		    out.write("charging cost:\t");
 		    out.write("charging time: \t");
+		    out.write("number of charging slots: \t");
 		    
 		    out.write("EV failure?: \t");
 		    out.write("Joules from engine: \t");			   
-		    out.write("Joules not from engine: \n");		    
+		    out.write("Joules not from engine: \t");
+		    out.write("emission: \n");
 		   
 		    //*********************
 		    for(Id id: vehicles.getKeySet()){
@@ -2486,10 +2486,13 @@ public class DecentralizedSmartCharger {
 		    	
 		    	out.write(agentChargingCosts.get(id)+ "\t");
 		    	out.write(agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule()+ "\t");
+		    	 out.write(agentChargingSchedules.get(id).getNumberOfEntries() + " \t");
 		    	
 		    	out.write(chargingFailureEV.contains(id)+ "\t");
 		    	out.write(getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\t");
-		    	out.write(getTotalDrivingConsumptionOfAgent(id)-getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\n");
+		    	double joulesNotEngine=getTotalDrivingConsumptionOfAgent(id)-getTotalDrivingConsumptionOfAgentFromBattery(id);
+		    	out.write(joulesNotEngine+ "\t");
+		    	out.write(joulesExtraConsumptionToGasCosts(id, joulesNotEngine)+ "\n");
 		    }
 		    
 		   

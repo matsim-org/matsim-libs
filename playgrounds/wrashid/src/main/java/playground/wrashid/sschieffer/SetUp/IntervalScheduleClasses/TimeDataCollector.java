@@ -61,7 +61,7 @@ public class TimeDataCollector {
 		optimizer= new GaussNewtonOptimizer(true); //useLU - true, faster  else QR more robust
 		optimizer.setMaxIterations(10000);		
 		optimizer.setConvergenceChecker(checker);		
-		fitter= new PolynomialFitter(20, optimizer);
+		fitter= new PolynomialFitter(21, optimizer);
 	}
 	
 	

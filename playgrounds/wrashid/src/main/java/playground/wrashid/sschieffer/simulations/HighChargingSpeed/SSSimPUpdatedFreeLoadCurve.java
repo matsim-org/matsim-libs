@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations.V2GPlusMinus50000;
+package playground.wrashid.sschieffer.simulations.HighChargingSpeed;
 
 import java.io.IOException;
 
@@ -39,8 +39,7 @@ import java.util.*;
 
 
 /**
- *m	0	0	0.1	1
-
+ *p	0	0	0.9	1
 
  *price of gas US prices : S
  *battery size : S
@@ -48,17 +47,17 @@ import java.util.*;
  * @author Stella
  *
  */
-public class SSM{
+public class SSSimPUpdatedFreeLoadCurve{
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
 		final double electrification= 1.0; 
 		
-		final String outputPath="/cluster/home/baug/stellas/Runs/SimSSM/Results/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/HighCharging/SSP/Results/";
 		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
-		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
-		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochastic random+-50000.txt";
+		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/newFreeLoadForSSPHighSpeed.txt";
+		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
 		
 		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
 		double priceMinPerkWh=0.07;
@@ -68,11 +67,12 @@ public class SSM{
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
-		final double ev=0.1; 
+		
 		double kWHEV =16;
 		double kWHPHEV =16;
 		boolean gasHigh = false;
 		
+		final double ev=0.9; 
 		final double xPercentDownUp=1.0;
 		final double xPercentDown=1.0-xPercentDownUp;
 		
@@ -80,6 +80,8 @@ public class SSM{
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 	
+		double standardConnectionWatt=50000;
+		
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -89,7 +91,8 @@ public class SSM{
 				myMappingClass,
 				myHubInfo,
 				false, // indicate if you want graph output for every agent to visualize the SOC over the day
-				kWHEV,kWHPHEV, gasHigh
+				kWHEV,kWHPHEV, gasHigh,
+				standardConnectionWatt
 				);
 		
 		

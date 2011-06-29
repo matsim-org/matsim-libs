@@ -154,7 +154,7 @@ public class SetUpVehicleCollector {
 		//http://de.wikipedia.org/wiki/Wirkungsgrad
 		//http://de.wikipedia.org/wiki/Motorenbenzin
 		double massPerLiter=0.75;// kg/l
-		double gasJoulesPerLiter = 43.0*Math.pow(10,6)*massPerLiter;// Benzin 42,7–44,2 MJ/kg  * 0.3
+		double gasJoulesPerLiter = 43.0*Math.pow(10,6)*massPerLiter;// Benzin 42,7–44,2 MJ/kg  * 0.75
 		
 		double emissionPerLiter = 2.36; // 2,36 kg/L
 		
