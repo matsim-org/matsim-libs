@@ -31,24 +31,21 @@ import playground.fhuelsmann.emission.objects.HbefaObject;
 
 public interface AnalysisModule {
 	
-//	public void calculateEmissionsPerPerson(final double travelTime, final Id personId, 
-//			final double averageSpeed, final int roadType,   
-//			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable, Map<String,HotValue> HbefaHot,ArrayList<String> listOfPollutant);
 	
-//	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, 
-//			final Id personId, final double averageSpeed, final int roadType, 
-//		    final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
+	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, 
+			final Id personId, final double averageSpeed, final int roadType, 
+			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable,ArrayList<String> listOfPollutant);
 	
 	public void calculateEmissionsPerPerson(final double travelTime, final Id personId, 
 			final double averageSpeed, final int roadType, final String fuelSizeAge,  
 			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable,ArrayList<String> listOfPollutant);
 	
-	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, 
+	
+	public void calculateEmissionsPerLinkForComHdvPecWithoutVeh (final double travelTime, final Id linkId, 
 			final Id personId, final double averageSpeed, final int roadType, 
-			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
+			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
-	
-	public void calculateEmissionsPerCommuterAndHdv (final double travelTime, final Id personId, 
+	public void calculateEmissionsPerCommuterHdvPcWithoutVeh (final double travelTime, final Id personId, 
 			final double averageSpeed, final int roadType,  
 			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 

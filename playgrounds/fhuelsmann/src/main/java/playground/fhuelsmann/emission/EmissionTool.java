@@ -132,7 +132,7 @@ public class EmissionTool {
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(population, visumObject, emissionsPerEvent,hbefaHot);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent,hbefaHot);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
 		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
@@ -141,7 +141,7 @@ public class EmissionTool {
 		//		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		// create the handler 
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(population, vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
 		warmEmissionHandler.setListOfPollutant(listOfPollutant);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
 		// add the handler
@@ -154,9 +154,8 @@ public class EmissionTool {
 		// =======================================================================================================		
 		// warm emissions
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
-		Map<Id, double[]> commuterHdv2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerCommuterHdv();
-		System.out.println("###########################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+commuterHdv2WarmEmissionsInGrammPerType);
-//		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
+	//	System.out.println("###########################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+commuterHdv2WarmEmissionsInGrammPerType);
+		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
 
 		// coldstart emissions
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
@@ -167,8 +166,8 @@ public class EmissionTool {
 		// print output files
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
 //		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
-		printer.printEmissionTable(commuterHdv2WarmEmissionsInGrammPerType, "EmissionsPerCommuterHdvWarm.txt");
 		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
+		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
 		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
 //		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 

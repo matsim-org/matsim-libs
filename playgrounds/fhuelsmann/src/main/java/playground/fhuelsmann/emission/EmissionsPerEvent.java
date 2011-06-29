@@ -47,7 +47,7 @@ public class EmissionsPerEvent {
 		listOfPollutant.add("SO2");
 		*/
 	
-	public double [] emissionAvSpeedCalculate(Map<String, double[][]> hashOfPollutant,double averageSpeed, double distance){
+	public double [] emissionAvSpeedCalculateDetailed(Map<String, double[][]> hashOfPollutant,double averageSpeed, double distance){
 			
 		int NumberOfPollutant = hashOfPollutant.size();
 		// the result will be returned after calculating
@@ -71,105 +71,75 @@ public class EmissionsPerEvent {
 			double EFs = Pollutant.getValue()[2][1];
 			double EFc = Pollutant.getValue()[3][1];
 		
-			
-			
 			if (vh <= vij && vij<=vf){
-				
 				double a = vf - vij;
 				double b = vij-vh;
 				double tempResult = (a *EFh ) / (a+b) + (b * EFf ) / (a+b);
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
-				
 			//	System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~average speed "+vij+"\n arrayOfEmissions"+arrayOfEmissions[0]+"\n distanz"+li);
-		
-			}else if (vs <= vij && vij<=vh){
+			}
+			else if (vs <= vij && vij<=vh){
 				double a = vh - vij;
 				double b = vij-vs;
-				
 				double tempResult = (a *EFs ) / (a+b) + (b * EFh ) / (a+b);
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
-			
 				}
-
-
 			if (vc <= vij && vij<=vs){
 				double a = vs - vij;
 				double b = vij-vc;
-			
 				double tempResult = (a *EFc ) / (a+b) + (b * EFs ) / (a+b);
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
 				}
 			if (vij > vf){
-				
 				double tempResult = EFf;
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
 				}
-			
 			else if(vij<vc){
 				double tempResult =EFc; 
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
 				}
 			}// For loop 
-		
 		return  arrayOfEmissions;
+}
+
+	public double [] emissionFractionCalculateDetailed(Map<String, double[][]> hashOfPollutant,double averageSpeed, double distance){
+
+		int NumberOfPollutant = hashOfPollutant.size();
+		// the result will be returned after calculating
 		
-	}
-
-	public static double [] emissionFractionCalculate(double vij,double li,
-			double EFc,double EFf,double vc, double vf, double noxf, double noxc, 
-			double co2rf,double co2rc,double co2tf, double co2tc,double no2f,double no2c,
-			double pmf,double pmc /*,int freeVelocity*/){
-
+		double[] arrayOfEmissions = new double[NumberOfPollutant];
+		// for every Pollutant in the Order of the List in EmissionTool
+		int indexOfPollutant=0;
 		
+		for( Entry<String, double[][]> Pollutant : hashOfPollutant.entrySet() ){
 		
-		double stopGoVel = vc;
-		//	in visumnetzlink1.txt the freeVelocity is 60.00 km/h;  average free flow speed in HBEFA = 57.1577 km/h which is taken here
+			double li=distance;
+			double vij = averageSpeed;
 
-		double freeFlowFraction =0.0;
-		double stopGoFraction =0.0;
-		double stopGoTime =0.0;
-		double mKrFraction =0.0;
-		double noxFractions=0.0;
-		double co2rFractions=0.0;
-		double co2tFractions=0.0;
-		double no2Fractions=0.0;
-		double pmFractions=0.0;
+			double vf=	Pollutant.getValue()[0][0]; // freeFlow
+			double vc=  Pollutant.getValue()[3][0];//Stop And Go
+			
+			double EFf = Pollutant.getValue()[0][1];
+			double EFc = Pollutant.getValue()[3][1];
+			
+			double freeFlowFraction =0.0;
+			double stopGoFraction =0.0;
+			double stopGoTime =0.0;
 
-
-		if (vij<stopGoVel){
-			mKrFraction = li/1000*EFc;
-			noxFractions=  li/1000*	noxc;
-			co2rFractions=  li/1000*co2rc;
-			co2tFractions=  li/1000*co2tc;
-			no2Fractions=  li/1000*no2c;
-			pmFractions=  li/1000*pmc;
-
+		if (vij<vc){
+			arrayOfEmissions[indexOfPollutant]=li/1000*EFc;
 		}
-
 		else {
 			stopGoTime= (li/1000)/vij -(li/1000)/vf;  //li/vij -li/freeVelocity;
 
-			stopGoFraction = stopGoVel *stopGoTime;
+			stopGoFraction = vc *stopGoTime;
 			freeFlowFraction= (li/1000) - stopGoFraction;
-
-			mKrFraction = stopGoFraction*	EFc + freeFlowFraction*	EFf;
-			noxFractions=  stopGoFraction*	noxc + freeFlowFraction*noxf;
-			co2rFractions=  stopGoFraction*	co2rc + freeFlowFraction*co2rf;
-			co2tFractions=  stopGoFraction*	co2tc + freeFlowFraction*co2tf;
-			no2Fractions=  stopGoFraction*	no2c + freeFlowFraction*no2f;
-			pmFractions=  stopGoFraction*	pmc + freeFlowFraction*pmf;
+			arrayOfEmissions[indexOfPollutant]=stopGoFraction*	EFc + freeFlowFraction*	EFf;
 		}
-
-		double [] fraction = new double[6];
-		fraction[0] =mKrFraction;
-		fraction[1] =noxFractions;
-		fraction[2]=co2rFractions;
-		fraction[3]=co2tFractions;
-		fraction[4]=no2Fractions;
-		fraction[5]=pmFractions;
-		
-		return fraction;
+		}
+		return arrayOfEmissions;
 	}
+
 
 	// Emission calculation based on average speed, EFh=Emission Factor heavy; EFf=Emission Factor freeflow; 
 	// EFs= Emission Factor saturated; EFc=Emission Factor congested/stop&go; 
@@ -378,7 +348,6 @@ public class EmissionsPerEvent {
 	}
 
 
-	
 
 	public double[] collectInputForEmission(int Hbefa_road_type, double averageSpeed,double distance,HbefaObject[][] HbefaTable) {
 	
@@ -499,4 +468,20 @@ public class EmissionsPerEvent {
 		}
 		return outPut;
 	}
+	
+	/**Public transport emissions**/
+/*	public double [] ptEmissionCalculate(double distance){
+		
+		
+		double [] ptEmissions = new double [10];
+		double co2Emissions = 123620.638;
+	
+		double li=distance;
+			
+		ptEmissions [2] = co2Emissions/1000*li/1000; //Bahn-mix Source=GEMIS
+		ptEmissions [7] = co2Emissions/1000*li/1000; //Bahn-mix Source=GEMIS
+
+		return  ptEmissions;
+		
+	}*/
 }
