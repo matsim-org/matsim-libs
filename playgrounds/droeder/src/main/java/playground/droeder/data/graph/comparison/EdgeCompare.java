@@ -21,10 +21,6 @@ package playground.droeder.data.graph.comparison;
 
 import java.util.ListIterator;
 
-import org.jfree.util.Log;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingSegment;
 
@@ -98,4 +94,48 @@ public class EdgeCompare extends AbstractCompare{
 	public int compareTo(AbstractCompare o) {
 		return super.compareTo(o);
 	}
+
+	/**
+	 * @return the refTotalLength
+	 */
+	public Double getRefTotalLength() {
+		return refTotalLength;
+	}
+
+	/**
+	 * @return the compTotalLength
+	 */
+	public Double getCompTotalLength() {
+		return compTotalLength;
+	}
+
+	/**
+	 * @return the avDist
+	 */
+	public Double getAvDist() {
+		return avDist;
+	}
+
+	/**
+	 * @return the avAngle
+	 */
+	public Double getAvAngle() {
+		return avAngle;
+	}
+
+	/**
+	 * @return the matchedLengthRef
+	 */
+	public Double getMatchedLengthRef() {
+		return matchedLengthRef;
+	}
+
+	/**
+	 * @return the matchedLengthComp
+	 */
+	public Double getMatchedLengthComp() {
+		return matchedLengthComp;
+	}
+	
+	
 }

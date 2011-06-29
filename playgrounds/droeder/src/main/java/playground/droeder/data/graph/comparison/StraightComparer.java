@@ -23,7 +23,6 @@ import org.apache.commons.math.linear.BlockRealMatrix;
 import org.apache.commons.math.linear.DecompositionSolver;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.SingularValueDecompositionImpl;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -36,7 +35,6 @@ import playground.droeder.Vector2D;
  *
  */
 public class StraightComparer{
-	private static final Logger log = Logger.getLogger(StraightComparer.class);
 	
 	private Straight one;
 	private Straight two;
@@ -109,7 +107,7 @@ public class StraightComparer{
 	 * computes the base of the perpendicular of the "point" on the straight s
 	 */
 	private Coord getBase(Straight s, Coord point){
-		Vector2D a, b, c, r1, r2, p, p2;
+		Vector2D a, b, c, r1, r2, p;
 		a = new Vector2D(s.getStart().getX(), s.getStart().getY());
 		b = new Vector2D(s.getEnd().getX(), s.getEnd().getY());
 		c = new Vector2D(point.getX(), point.getY());

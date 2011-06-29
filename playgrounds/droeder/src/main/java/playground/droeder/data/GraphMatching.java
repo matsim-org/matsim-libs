@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.droeder.data;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -90,20 +93,20 @@ public class GraphMatching {
 		this.computeEdgeCandidatesFromMappedNodes();
 		this.edgeMatchingBottomUp();
 		log.info("bottom-up-matching finished...");
-//		log.info("starting top-down-Matching...");
-//		this.edgeMatchingTopDown();
-//		log.info("top-down-matching finished...");
+		log.info("starting top-down-Matching...");
+		this.edgeMatchingTopDown();
+		log.info("top-down-matching finished...");
 	}
 
 
 	// ###### NODEMATCHING #######
-	private Map<Id, List<NodeCompare>> nodeReference2match;
-	private List<Id> unmatchedRefNodes;
+	private Map<Id, List<NodeCompare>> nodesReference2match;
+	private List<Id> nodesUnmatchedRef;
 
 	private void nodeMatchingBottomUp() {
 		log.info("start matching Nodes...");
-		this.nodeReference2match = new HashMap<Id, List<NodeCompare>>();
-		this.unmatchedRefNodes = new ArrayList<Id>();
+		this.nodesReference2match = new HashMap<Id, List<NodeCompare>>();
+		this.nodesUnmatchedRef = new ArrayList<Id>();
 		
 		List<NodeCompare> candidates;
 		NodeCompare comp;
@@ -123,13 +126,13 @@ public class GraphMatching {
 			
 			if(candidates.size() > 0){
 				Collections.sort(candidates);
-				this.nodeReference2match.put(ref.getId(), candidates);
+				this.nodesReference2match.put(ref.getId(), candidates);
 			}else{
-				this.unmatchedRefNodes.add(ref.getId());
+				this.nodesUnmatchedRef.add(ref.getId());
 			}
 		}
-		log.info(this.unmatchedRefNodes.size() +" nodes are unmatched!");
-		log.info(this.nodeReference2match.size() + " of " + reference.getNodes().size() + " nodes have one or more match after bottom-up node-matching!");
+		log.info(this.nodesUnmatchedRef.size() +" nodes are unmatched!");
+		log.info(this.nodesReference2match.size() + " of " + reference.getNodes().size() + " nodes have one or more match after bottom-up node-matching!");
 		log.info("node-matching finished... ");
 	}
 
@@ -176,13 +179,13 @@ public class GraphMatching {
 //		log.info("segment matching finished...");
 //	}
 	
-	private Map<MatchingEdge, List<MatchingEdge>> ref2CandEdgesFromMappedNodes;
+	private Map<MatchingEdge, List<MatchingEdge>> edgeCandidatesRef2matchFromNodes;
 
-	private ArrayList<Id> refEdgesUnmatched;
+	private ArrayList<Id> edgesUnmatchedRef;
 	private void computeEdgeCandidatesFromMappedNodes() {
 		log.info("compute candidate edges from mapped nodes...");
-		this.ref2CandEdgesFromMappedNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
-		this.refEdgesUnmatched = new ArrayList<Id>();
+		this.edgeCandidatesRef2matchFromNodes = new HashMap<MatchingEdge, List<MatchingEdge>>();
+		this.edgesUnmatchedRef = new ArrayList<Id>();
 		
 		Id candFrom, candTo, refFrom, refTo;
 		List<MatchingEdge> tempCandidates;
@@ -194,58 +197,69 @@ public class GraphMatching {
 			refTo = ref.getToNode().getId();
 
 			// if the matched nodes contain the start- and end-node, go on
-			if(this.nodeReference2match.containsKey(refFrom) && 
-					this.nodeReference2match.containsKey(refTo)){
+			if(this.nodesReference2match.containsKey(refFrom) && 
+					this.nodesReference2match.containsKey(refTo)){
 				// iterate over all edges going out from the candidateStartNode which is mapped to the referenceStartNode 
-				for(MatchingEdge cand : this.matching.getNodes().get(this.nodeReference2match.get(refFrom).get(0).getCompId()).getOutEdges()){
+				for(MatchingEdge cand : this.matching.getNodes().get(this.nodesReference2match.get(refFrom).get(0).getCompId()).getOutEdges()){
 					candFrom = cand.getFromNode().getId();
 					candTo = cand.getToNode().getId();
 
 					// if the refNodes and candNodes where mapped in NodeMatching, store the candidateEdge  
-					if(this.nodeReference2match.get(refFrom).get(0).getCompId().equals(candFrom) 
-							&& this.nodeReference2match.get(refTo).get(0).getCompId().equals(candTo)){
+					if(this.nodesReference2match.get(refFrom).get(0).getCompId().equals(candFrom) 
+							&& this.nodesReference2match.get(refTo).get(0).getCompId().equals(candTo)){
 						tempCandidates.add(cand);
 					}
 				}
 			}
 			if(tempCandidates.size() > 0){
-				this.ref2CandEdgesFromMappedNodes.put(ref, tempCandidates);
+				this.edgeCandidatesRef2matchFromNodes.put(ref, tempCandidates);
 			}else{
-				this.refEdgesUnmatched.add(ref.getId());
+				this.edgesUnmatchedRef.add(ref.getId());
 			}
 		}
-		log.info(this.ref2CandEdgesFromMappedNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
+		log.info(this.edgeCandidatesRef2matchFromNodes.size() + " of " + reference.getEdges().size() + " edges from the reference-Graph are preMapped");
 	}
 
 	// ##### EDGEMATCHING #####
-	private Map<Id, List<EdgeCompare>> edgeComp;
+	private Map<Id, List<EdgeCompare>> edgesRef2Match;
+	private Map<Id, List<EdgeCompare>> edgesRef2MatchUnmatchedAgain;
 	private void edgeMatchingBottomUp() {
 		log.info("start bottom-up edge-matching...");
 
 		
-		edgeComp = new HashMap<Id, List<EdgeCompare>>();
+		edgesRef2Match = new HashMap<Id, List<EdgeCompare>>();
+		edgesRef2MatchUnmatchedAgain = new HashMap<Id, List<EdgeCompare>>();
 		List<EdgeCompare> tempComp;
+		List<EdgeCompare>  tempUnmatched;
 		EdgeCompare comp;
 		
-		for(Entry<MatchingEdge, List<MatchingEdge>> e: ref2CandEdgesFromMappedNodes.entrySet()){
+		for(Entry<MatchingEdge, List<MatchingEdge>> e: edgeCandidatesRef2matchFromNodes.entrySet()){
 			tempComp = new ArrayList<EdgeCompare>();
+			tempUnmatched = new ArrayList<EdgeCompare>();
 			for(MatchingEdge cand : e.getValue()){
 				comp = new EdgeCompare(e.getKey(), cand);
 				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
 					tempComp.add(comp);
-					//TODO to many prematchings are deleted here
+					//TODO to many prematchings are deleted here... why?
+				}else{
+					tempUnmatched.add(comp);
 				}
 			}
 			if(tempComp.size() > 0){
 				Collections.sort(tempComp);
-				edgeComp.put(e.getKey().getId(), tempComp);
+				edgesRef2Match.put(e.getKey().getId(), tempComp);
 			}else{
-				refEdgesUnmatched.add(e.getKey().getId());
+				edgesUnmatchedRef.add(e.getKey().getId());
+				if(tempUnmatched.size() > 0){
+					edgesRef2MatchUnmatchedAgain.put(e.getKey().getId(), tempUnmatched);
+				}
 			}
 		}
-		log.info(edgeComp.size() + " of " + reference.getEdges().size() + " edges have one or more match after bottom-up edge-matching...");
+		log.info(edgesRef2Match.size() + " of " + reference.getEdges().size() + " edges have one or more match after bottom-up edge-matching...");
 		log.info("edge matching finished...");
 	}
+	
+	
 	
 	// ################## top-down-matching ###################
 	
@@ -254,23 +268,36 @@ public class GraphMatching {
 		List<Id> newMatched = new ArrayList<Id>();
 		List<EdgeCompare> tempComp;
 		EdgeCompare comp;
-		
+		Coord refCoord;
+		MatchingEdge refEdge;
 		int cnt = 1,
 		msg = 1;
-		for(Id ref: refEdgesUnmatched){
+		for(Id ref: edgesUnmatchedRef){
+			refEdge = this.reference.getEdges().get(ref);
+			refCoord = refEdge.getFromNode().getCoord();
 			tempComp = new ArrayList<EdgeCompare>();
-			for(MatchingEdge cand: matching.getEdges().values()){
-				comp = new EdgeCompare(reference.getEdges().get(ref), cand);
-				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
-					tempComp.add(comp);
+			/*
+			 *  here it would be correct (according to the given algorithm) to use ALL Edges
+			 *  but this would cause a very large computation time
+			 *  so my decision is to use only the nearest edges. Assuming that the coordinate-system is correct,
+			 *  it wouldn't make sense to compare edges which are not in an acceptable distance.
+			 *  TODO probably it would make sense to use some factor for the distance
+			 */
+			for(MatchingNode n: this.matching.getNearestNodes(refCoord.getX(), refCoord.getY(), deltaDist)){
+				for(MatchingEdge e : n.getOutEdges()){
+					comp = new EdgeCompare(refEdge, e);
+					if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
+						tempComp.add(comp);
+					}
 				}
 			}
+			// store only, if there is at least one match
 			if(tempComp.size() > 0 ){
-				edgeComp.put(ref, tempComp);
+				edgesRef2Match.put(ref, tempComp);
 				newMatched.add(ref);
 			}
 			if(cnt%msg == 0){
-			log.info("processed " + cnt + " of " + refEdgesUnmatched.size() + " of unmatched Edges. New matched: " + newMatched.size());
+			log.info("processed " + cnt + " of " + edgesUnmatchedRef.size() + " of unmatched Edges. New matched: " + newMatched.size());
 			msg *= 2;
 			}
 			cnt++;
@@ -278,15 +305,21 @@ public class GraphMatching {
 		
 		//remove newMatched from unmatched
 		for(Id id: newMatched){
-			this.refEdgesUnmatched.remove(id);
+			this.edgesUnmatchedRef.remove(id);
 		}
-		
-		log.info(edgeComp.size() + " edges are matched after top-down edge-matching!");
+		log.info(newMatched.size() + " edges are new matched after top-down edge matching!");
+		log.info(edgesRef2Match.size() + " edges are matched after top-down edge-matching!");
 		log.info("finished top-down edge-matching...");
 	}
 	
+
+	private void nodeMatchingTopDown(){
+		
+		
+	}
+	
 	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
-		return this.nodeReference2match;
+		return this.nodesReference2match;
 	}
 	
 	
@@ -298,7 +331,7 @@ public class GraphMatching {
 		
 		MatchingNode refNode, matchNode;
 		int matched = 0;
-		for(Entry<Id, List<NodeCompare>> e: this.nodeReference2match.entrySet()){
+		for(Entry<Id, List<NodeCompare>> e: this.nodesReference2match.entrySet()){
 			refNode = this.reference.getNodes().get(e.getKey());
 			matchNode = this.matching.getNodes().get(e.getValue().get(0).getCompId());
 			
@@ -316,8 +349,8 @@ public class GraphMatching {
 		
 		Map<String, Coord> unmatched = new HashMap<String, Coord>();
 		
-		if(unmatchedRefNodes.size()>0){
-			for(Id id : unmatchedRefNodes){
+		if(nodesUnmatchedRef.size()>0){
+			for(Id id : nodesUnmatchedRef){
 				unmatched.put(id.toString(), this.reference.getNodes().get(id).getCoord());
 			}
 			
@@ -360,7 +393,7 @@ public class GraphMatching {
 	}
 	
 	public void matchedSegments2Shape(String outPath){
-		if(edgeComp.size() < 1){
+		if(edgesRef2Match.size() < 1){
 			return;
 		}
 		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
@@ -375,7 +408,7 @@ public class GraphMatching {
 		int cnt;
 		int matchNr = 0;
 		
-		for(List<EdgeCompare> el: this.edgeComp.values()){
+		for(List<EdgeCompare> el: this.edgesRef2Match.values()){
 			attribValues = new TreeMap<String, String>();
 			attribValues.put("matchNr", String.valueOf(matchNr));
 
@@ -384,7 +417,7 @@ public class GraphMatching {
 			e = el.get(0);
 
 			ref = reference.getEdges().get(e.getRefId());
-			refId = "ref_" + String.valueOf(matchNr) + "_" + ref.getId().toString();
+			refId = String.valueOf(matchNr) + "_" + "ref_" + ref.getId().toString();
 			cnt = 0;
 			for(MatchingSegment s: ref.getSegments()){
 				coords.put(cnt, s.getStart());
@@ -396,7 +429,7 @@ public class GraphMatching {
 			attribs.put(refId, attribValues);
 			
 			cand = matching.getEdges().get(e.getCompId());
-			candId = "cand_"  + String.valueOf(matchNr) + "_" + cand.getId().toString();
+			candId = String.valueOf(matchNr) + "_" + "cand_" + cand.getId().toString();
 			cnt = 0;
 			coords =  new TreeMap<Integer, Coord>();
 			for(MatchingSegment s: cand.getSegments()){
@@ -412,6 +445,84 @@ public class GraphMatching {
 		}
 		
 		DaShapeWriter.writeDefaultLineString2Shape(outPath + "matchedSegments.shp", "matchedSegments", edges, attribs);
+	}
+	
+	// just for debugging
+	public void unmatchedAfterPrematchingOut(String outPath){
+		if(edgesRef2Match.size() < 1){
+			return;
+		}
+		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
+		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
+		
+		SortedMap<Integer, Coord> coords;
+		SortedMap<String, String> attribValues;
+		
+		EdgeCompare e;
+		MatchingEdge ref, cand;
+		String refId, candId;
+		int cnt;
+		int matchNr = 0;
+		
+		for(List<EdgeCompare> el: this.edgesRef2MatchUnmatchedAgain.values()){
+			attribValues = new TreeMap<String, String>();
+			attribValues.put("matchNr", String.valueOf(matchNr));
+
+			coords = new TreeMap<Integer, Coord>();
+			
+			e = el.get(0);
+
+			ref = reference.getEdges().get(e.getRefId());
+			refId = String.valueOf(matchNr) + "_" + "ref_" + ref.getId().toString();
+			cnt = 0;
+			for(MatchingSegment s: ref.getSegments()){
+				coords.put(cnt, s.getStart());
+				cnt++;
+				coords.put(cnt, s.getEnd());
+				cnt++;
+			}
+			edges.put(refId, coords);
+			attribs.put(refId, attribValues);
+			
+			for(EdgeCompare ee : el){
+				cand = matching.getEdges().get(ee.getCompId());
+				candId = String.valueOf(matchNr) + "_" + "cand_" + cand.getId().toString();
+				cnt = 0;
+				coords =  new TreeMap<Integer, Coord>();
+				for(MatchingSegment s: cand.getSegments()){
+					coords.put(cnt, s.getStart());
+					cnt++;
+					coords.put(cnt, s.getEnd());
+					cnt++;
+				}
+				edges.put(candId, coords);
+				attribs.put(candId, attribValues);
+			}
+			
+			matchNr++;
+		}
+		
+		DaShapeWriter.writeDefaultLineString2Shape(outPath + "edgesUnmatchedAfterPreMatching.shp", "edgesUnmatchedAfterPreMatching", edges, attribs);
+		
+		// to string
+		BufferedWriter w = IOUtils.getBufferedWriter(outPath + "edgesUnmatchedAfterPreMatching.csv");
+		try {
+			w.write("refID; matchID; avDist; avAngle; refTotalLength; refMatchedLength; matchTotalLength; matchMatchedLength;");
+			w.newLine();
+			
+			for(List<EdgeCompare> el : this.edgesRef2MatchUnmatchedAgain.values()){
+				for(EdgeCompare ec: el){
+					w.write(ec.getRefId() + ";" + ec.getCompId() + ";" + ec.getAvDist() + ";" + ec.getAvAngle() + ";" +
+							ec.getRefTotalLength() + ";" + ec.getMatchedLengthRef() + ";" + ec.getCompTotalLength() + ";" + ec.getMatchedLengthComp() + ";");
+					w.newLine();
+				}
+			}
+			w.flush();
+			w.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
 	
@@ -577,7 +688,9 @@ public class GraphMatching {
 		gm.nodes2Shape(OUT);
 		gm.baseSegments2Shape(OUT);
 		gm.matchedSegments2Shape(OUT);
+		gm.unmatchedAfterPrematchingOut(OUT);
 	}
+	
 
 }
 

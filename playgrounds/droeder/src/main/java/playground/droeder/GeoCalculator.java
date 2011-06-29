@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package playground.droeder;
 
-import java.util.Vector;
+import javax.management.RuntimeErrorException;
 
 import org.apache.commons.math.geometry.Vector3D;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.droeder.data.graph.MatchingEdge;
 
 /**
  * @author droeder
  *
  */
 public class GeoCalculator {
+	private static final Logger log = Logger.getLogger(GeoCalculator.class);
 	
 	public static double distanceBetween2Points(Coord one, Coord two){
 		double a = one.getX() - two.getX();
@@ -40,21 +40,27 @@ public class GeoCalculator {
 	}
 	
 	public static double angleBeetween2Straights(Tuple<Coord, Coord> one, Tuple<Coord, Coord> two) {
-		double absOne, absTwo, scalar;
-		Vector<Double> o = new Vector<Double>();
-		Vector<Double> t = new Vector<Double>();
-		
-		o.add(0, one.getSecond().getX() - one.getFirst().getX());
-		o.add(1, one.getSecond().getY() - one.getFirst().getY());
-		
-		t.add(0, two.getSecond().getX() - two.getFirst().getX());
-		t.add(1, two.getSecond().getY() - two.getFirst().getY());
-		
-		absOne = Math.sqrt(Math.pow(o.get(0), 2) + Math.pow(o.get(1), 2));
-		absTwo = Math.sqrt(Math.pow(t.get(0), 2) + Math.pow(t.get(1), 2));
-		
-		scalar = ((o.get(0)*t.get(0)) + (o.get(1)* t.get(1)));
-		return Math.acos(scalar/(absOne * absTwo));
+		double value;
+		Vector2D o = new Vector2D(one.getSecond().getX() - one.getFirst().getX(),  
+								one.getSecond().getY() - one.getFirst().getY());
+		Vector2D t = new Vector2D(two.getSecond().getX() - two.getFirst().getX(),
+						two.getSecond().getY() - two.getFirst().getY());
+		value = (o.scalarProduct(t)/(o.absolut() * t.absolut()));
+		if(value > 1){
+			if((value - 1.0) < (1.0/1000.0)){
+				return Math.acos(1);
+			}else{
+				throw new RuntimeException("acos not defined for: " + value);
+			}
+		}else if(value < -1){
+			if((value + 1.0) > -(1.0/1000.0) ){
+				return Math.acos(-1);
+			}else{
+				throw new RuntimeException("acos not defined for: " + value);
+			}
+		}else{
+			return Math.acos(value);
+		}
 	}
 	
 	@Deprecated

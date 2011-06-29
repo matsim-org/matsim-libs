@@ -46,9 +46,7 @@ public class Vector2D {
 		}else if(this.y == 0){
 			return new Vector2D(0.0, 1.0);
 		}else{
-			double y = Math.random();
 			return new Vector2D(this.y, -this.x);
-//			return new Vector2D(this.y*y/this.x, y);
 		}
 	}
 	
@@ -58,6 +56,10 @@ public class Vector2D {
 	
 	public Vector2D subtract(Vector2D v){
 		return new Vector2D(this.x - v.getX(), this.y - v.getY());
+	}
+	
+	public Double absolut(){
+		return Math.sqrt(Math.pow(x,2) + Math.pow(y, 2));
 	}
 
 	/**
