@@ -58,8 +58,11 @@ import cadyts.utilities.math.Vector;
 
 public class PCCtlListener extends BseParamCalibrationControlerListener
 		implements StartupListener, ShutdownListener, IterationEndsListener {
+	private int caliStartTime, caliEndTime;
+	private int avgLlhOverIters = 0, writeLlhInterval = 0;
 	// private Config config;
 	private int cycleIdx = 0, cycle;
+
 	private SimpleWriter writer = null, writerCV = null;
 	// private static List<Link> links = new ArrayList<Link>();
 	// private static Set<Id> linkIds = new HashSet<Id>();
@@ -72,6 +75,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	static String[] paramNames/* in configfile */;
 
 	private double[][] paramArrays/* performing, traveling and so on */;
+
+	private double llhSum = 0d;
 
 	// private ChoiceParameterCalibrator2<Link> calibrator = null;
 	private void setMatsimParameters(Controler ctl) {
@@ -201,10 +206,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			throw new RuntimeException("BSE requires counts-data.");
 		}
 
-		int caliStartTime = Integer.parseInt(config.findParam(
+		caliStartTime = Integer.parseInt(config.findParam(
 				BSE_CONFIG_MODULE_NAME, "startTime"));
-		int caliEndTime = Integer.parseInt(config.findParam(
-				BSE_CONFIG_MODULE_NAME, "endTime"));
+		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
+				"endTime"));
 
 		for (Map.Entry<Id, Count> entry : counts.getCounts().entrySet()) {
 			Link link = network.getLinks().get(entry.getKey());
@@ -217,10 +222,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				// linkIds.add(entry.getKey());
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : entry.getValue().getVolumes().values()) {
-					if (volume.getHour() >= caliStartTime
-							&& volume.getHour() <= caliEndTime) {
-						int start_s = (volume.getHour() - 1) * 3600;
-						int end_s = volume.getHour() * 3600 - 1;
+					int hour = volume.getHour();
+					if (hour >= caliStartTime && hour <= caliEndTime) {
+						int start_s = (hour - 1) * 3600;
+						int end_s = hour * 3600 - 1;
 						double val_veh_h = volume.getValue();
 						calibrator.addMeasurement(link, start_s, end_s,
 								val_veh_h, TYPE.FLOW_VEH_H);
@@ -417,6 +422,20 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 	}
 
+	private void setWriteLlh(Config config) {
+		String avgLlhOverItersStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"averageLogLikelihoodOverIterations");
+		if (avgLlhOverItersStr != null) {
+			avgLlhOverIters = Integer.parseInt(avgLlhOverItersStr);
+		}
+
+		String writeLlhItervalStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"writeLogLikelihoodInterval");
+		if (writeLlhItervalStr != null) {
+			writeLlhInterval = Integer.parseInt(writeLlhItervalStr);
+		}
+	}
+
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final PCCtl ctl = (PCCtl) event.getControler();
@@ -457,6 +476,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// INITIALIZING OUTPUT
 		initializeOutput(ctl);
+
+		// set interval of writing log-likelihood, and avg log-likelihood over
+		// Iterations
+		setWriteLlh(config);
 	}
 
 	@Override
@@ -615,6 +638,59 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			}
 		}
 
+		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
+		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
+			int nextWriteLlhInterval = writeLlhInterval
+					* (iter / writeLlhInterval + 1);
+			if (iter <= nextWriteLlhInterval
+					&& iter > nextWriteLlhInterval - avgLlhOverIters
+					|| iter % writeLlhInterval == 0) {
+				Network network = ctl.getNetwork();
+
+				for (Map.Entry<Id, Count> entry : ctl.getCounts().getCounts()
+						.entrySet()) {
+					Link link = network.getLinks().get(entry.getKey());
+					if (link == null) {
+						System.err.println("could not find link "
+								+ entry.getKey().toString());
+					} else if (isInRange(entry.getKey(), network)) {
+						// for ...2QGIS
+						// links.add(network.getLinks().get(entry.getKey()));
+						// linkIds.add(entry.getKey());
+						// ---------GUNNAR'S CODES---------------------
+						for (Volume volume : entry.getValue().getVolumes()
+								.values()) {
+							int hour = volume.getHour();
+							if (hour >= caliStartTime && hour <= caliEndTime) {
+								// int start_s = (hour - 1) * 3600;
+								// int end_s = hour * 3600 - 1;
+								double cntVal = volume.getValue();
+								double simVal = volumes.getVolumesForLink(link
+										.getId())[hour - 1] * countsScaleFactor;
+								double minstddev = calibrator
+										.getMinStddev(TYPE.FLOW_VEH_H);
+								double var = Math.max(minstddev * minstddev,
+										calibrator.getVarianceScale() * cntVal);
+								double absLlh = (simVal - cntVal)
+										* (simVal - cntVal) / 2d / var;
+								llhSum -= absLlh;
+								System.out.println("Accumulated Llh over "
+										+ avgLlhOverIters
+										+ " iterations at it." + iter + " =\t"
+										+ llhSum + "\tadded llh =\t-" + absLlh);
+							}
+						}
+					}
+				}
+			}
+			if (iter % writeLlhInterval == 0) {
+				// TODO calculate avg. value of llh
+				double avgLlh = llhSum / avgLlhOverIters;
+				System.out.println("avgLlh over " + avgLlhOverIters
+						+ " iterations at it." + iter + " =\t" + avgLlh);
+				llhSum = 0d;// refresh
+			}
+		}
 		// output - chart etc.
 		outputHalfway(ctl, 50);
 	}
