@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.urbansim.matsim4urbansim.ersa;
+package playground.tnicolai.urbansim.matsim4urbansim;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -100,7 +100,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * constructor
 	 * @param jobObjectMap
 	 */
-	public ERSAControlerListener(ZoneLayer<ZoneObject> startZones, Map<Id, JobsObject> jobObjectMap, 
+	ERSAControlerListener(ZoneLayer<ZoneObject> startZones, Map<Id, JobsObject> jobObjectMap, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
 			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
@@ -442,19 +442,19 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	// getter methods
 	
-	public ZoneLayer<ZoneObject> getStartZones(){
+	ZoneLayer<ZoneObject> getStartZones(){
 		return startZones;
 	}
-	public Map<Id, JobsObject> getJobObjectMap(){
+	Map<Id, JobsObject> getJobObjectMap(){
 		return jobObjectMap;
 	}
-	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
+	SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
 		return travelTimeAccessibilityGrid;
 	}
-	public SpatialGrid<Double> getTravelCostAccessibilityGrid(){
+	SpatialGrid<Double> getTravelCostAccessibilityGrid(){
 		return travelCostAccessibilityGrid;
 	}
-	public SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
+	SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
 		return travelDistanceAccessibilityGrid;
 	}
 	
@@ -465,7 +465,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @author thomas
 	 *
 	 */
-	public static class TravelDistanceCostCalculator implements TravelCost{
+	static class TravelDistanceCostCalculator implements TravelCost{
 		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 
 		@Override
@@ -482,7 +482,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @author thomas
 	 *
 	 */
-	public static class TravelTimeCostCalculator implements TravelCost{
+	static class TravelTimeCostCalculator implements TravelCost{
 		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
 		
 		protected final TravelTime timeCalculator;

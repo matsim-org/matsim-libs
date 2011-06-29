@@ -48,7 +48,6 @@ import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.gis.MyColorizer;
-import playground.tnicolai.urbansim.matsim4urbansim.ersa.ERSAControlerListener;
 import playground.tnicolai.urbansim.utils.ProgressBar;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
@@ -62,6 +61,66 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+
+/**
+ * Manual:
+ * 
+ * Download "opus_home.zip" file from svn repository:
+ * https://svn.vsp.tu-berlin.de/repos/shared-svn/projects/SustainCity/MATSim_Data/accessibility_measure_input_files/opus_home.zip
+ * 
+ * Extract opus_home.zip at a convenient place. The extracted file contains the following folder hierarchy:
+ * 				- matsim_config folder contains the MATSim config
+ * 				- opus_matsim/tmp folder contains UrbanSim input data
+ * 				- data/network folder contains store network file 
+ * 				- data/shapefile folder contains boundary shape file of the UrbanSim scenario
+ * 
+ * Relevant parts of MATSim config:
+ * 				- set network file path in:
+ *					<network>
+ *						<inputFile>
+ *						enter full path to network file here
+ *						</inputFile>
+ *					</network>
+ *
+ * 				- set number of MATSim iterations in:
+ * 					<firstIteration>
+ *					0
+ *					</firstIteration>
+ *					<lastIteration>
+ *					9
+ *					</lastIteration>
+ *  
+ *  			in this example MATSim performs 10 iterations
+ *  
+ * 				- set sampling rate for MATSim travelers in: 
+ * 					<samplingRate>
+ *					0.1
+ *					</samplingRate>
+ *
+ *				- set full path to your extracted oupus_home folder in:
+ *					<opusHOME>
+ *					enter full path here
+ *					</opusHOME>
+ *
+ * 				- set "tmp" directory path in:
+ * 					<tempDirectory>
+ *					relative path to "tmp" directory (should be "opus_matsim/tmp", see folder hierarchy above)
+ *					</tempDirectory>
+ * 
+ * MATSim4Urbansim description: This class calculates the "workplace" accessibility for different spatial resolutions. 
+ * 								The study area is divided into squares (grid cells). For each square the accessibility computation is performed.
+ * 								To speed up computation time small samples of travelers and jobs can be taken can be taken. 
+ * 								Use the <samplingRate> in the config file to sample travelers, the job sample size must be passed when calling the class (see below).
+ * 
+ * MATSim4UrbanSimERSA usage: Call MATSim4UrbanSimERSA with the following parameters
+ * 
+ * 							 path to MATSim configuration, path to shape file, edge length in meter (lower values lead to higher resolution), job sample size
+ * 
+ * 							 Example:
+ * 							 /path/to/config.xml /path/to/shapefile.shp 1000 0.01
+ * 							 
+ * 							In this example the squares have a edge length of 1000x1000 meter, and MATSim considers only 1% of a workplaces
+ */
 
 /**
  * @author thomas
