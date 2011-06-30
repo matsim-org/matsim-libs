@@ -596,62 +596,150 @@ public class GraphMatching {
 //		gm.matchedSegments2Shape(OUT);
 //	}
 	
+//	public static void main(String[] args){
+//		final String PATH = DaPaths.OUTPUT + "bvg09/";
+//		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+//		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
+//		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
+//		
+//
+//		MatchingEdge e;
+//		MatchingNode start, end;
+//		
+//		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		visumSc.getConfig().scenario().setUseTransit(true);
+//		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
+//		reader.readFile(VISUMTRANSITFILE);
+//		MatchingGraph v = new MatchingGraph();
+//		List<TransitStopFacility> facs;
+//		ArrayList<Coord> shape;
+//		
+//		String temp;
+//		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
+//			temp = line.getId().toString().substring(0, 1);
+//			
+//			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V") || temp.equals("N")) continue;
+//			
+//			for(TransitRoute route: line.getRoutes().values()){
+//				facs = new ArrayList<TransitStopFacility>();
+//				shape = new ArrayList<Coord>();
+//				for(TransitRouteStop stop : route.getStops()){
+//					facs.add(stop.getStopFacility());
+//					shape.add(stop.getStopFacility().getCoord());
+//				}
+//				if(facs.size() < 2){
+//					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+//							line.getId() + " beacause it have less than 2 stops!");
+//					continue;
+//				}
+//				
+//				// create or get start-node
+//				if(v.getNodes().containsKey(facs.get(0).getId())){
+//					start = v.getNodes().get(facs.get(0).getId());
+//				}else{
+//					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+//					v.addNode(start);
+//				}
+//
+//				// create or get end-node
+//				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+//					end = v.getNodes().get(facs.get(facs.size()-1).getId());
+//				}else{
+//					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+//					v.addNode(end);
+//				}
+//				
+//				e = new MatchingEdge(route.getId(), start, end);
+//				e.addShapePointsAndCreateSegments(shape);
+//				v.addEdge(e);
+//			}
+//		}
+//		
+//		ScenarioImpl hafasSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		hafasSc.getConfig().scenario().setUseTransit(true);
+//		TransitScheduleReader reader2 = new TransitScheduleReader(hafasSc);
+//		reader2.readFile(HAFASTRANSITFILE);
+//		MatchingGraph h = new MatchingGraph();
+//		
+//		
+//		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
+//			for(TransitRoute route: line.getRoutes().values()){
+//				facs = new ArrayList<TransitStopFacility>();
+//				shape = new ArrayList<Coord>();
+//				for(TransitRouteStop stop : route.getStops()){
+//					facs.add(stop.getStopFacility());
+//					shape.add(stop.getStopFacility().getCoord());
+//				}
+//				if(facs.size() < 2){
+//					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+//							line.getId() + " beacause it have less than 2 stops!");
+//					continue;
+//				}
+//				
+//				if(h.getNodes().containsKey(facs.get(0).getId())){
+//					start = h.getNodes().get(facs.get(0).getId());
+//				}else{
+//					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+//					h.addNode(start);
+//				}
+//				
+//				if(h.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+//					end = h.getNodes().get(facs.get(facs.size()-1).getId());
+//				}else{
+//					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+//					h.addNode(end);
+//				}
+//				
+//				e = new MatchingEdge(new IdImpl(line.getId() + "_" + route.getId()), 
+//						h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
+//				e.addShapePointsAndCreateSegments(shape);
+//				h.addEdge(e);
+//			}
+//		}
+//		
+//		GraphMatching gm = new GraphMatching(v, h);
+//		gm.setMaxAngle(Math.PI / 6);
+//		gm.setMaxDist(250.0);
+//		gm.setMaxLengthTolerancePerc(0.1);
+//		gm.run();
+//		gm.nodes2Shape(OUT);
+//		gm.baseSegments2Shape(OUT);
+//		gm.matchedSegments2Shape(OUT);
+//		gm.unmatchedAfterPrematchingOut(OUT);
+//	}
+	
 	public static void main(String[] args){
 		final String PATH = DaPaths.OUTPUT + "bvg09/";
 		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
-		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
-		
-
-		MatchingEdge e;
-		MatchingNode start, end;
+		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 		
 		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		visumSc.getConfig().scenario().setUseTransit(true);
 		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
 		reader.readFile(VISUMTRANSITFILE);
 		MatchingGraph v = new MatchingGraph();
-		List<TransitStopFacility> facs;
-		ArrayList<Coord> shape;
 		
+		for(TransitStopFacility stop : visumSc.getTransitSchedule().getFacilities().values()){
+			v.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
+		}
+		
+		TransitStopFacility fac = null;
+		int i = 0;
 		String temp;
 		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
 			temp = line.getId().toString().substring(0, 1);
 			
 			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V") || temp.equals("N")) continue;
-			
 			for(TransitRoute route: line.getRoutes().values()){
-				facs = new ArrayList<TransitStopFacility>();
-				shape = new ArrayList<Coord>();
 				for(TransitRouteStop stop : route.getStops()){
-					facs.add(stop.getStopFacility());
-					shape.add(stop.getStopFacility().getCoord());
+					if(!(fac == null)){
+						v.addEdge(new MatchingEdge(new IdImpl(i), v.getNodes().get(fac.getId()), v.getNodes().get(stop.getStopFacility().getId())));
+					}
+					fac = stop.getStopFacility();
+					i++;
 				}
-				if(facs.size() < 2){
-					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
-							line.getId() + " beacause it have less than 2 stops!");
-					continue;
-				}
-				
-				// create or get start-node
-				if(v.getNodes().containsKey(facs.get(0).getId())){
-					start = v.getNodes().get(facs.get(0).getId());
-				}else{
-					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
-					v.addNode(start);
-				}
-
-				// create or get end-node
-				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
-					end = v.getNodes().get(facs.get(facs.size()-1).getId());
-				}else{
-					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
-					v.addNode(end);
-				}
-				
-				e = new MatchingEdge(route.getId(), start, end);
-				e.addShapePointsAndCreateSegments(shape);
-				v.addEdge(e);
+				fac = null;
 			}
 		}
 		
@@ -661,39 +749,22 @@ public class GraphMatching {
 		reader2.readFile(HAFASTRANSITFILE);
 		MatchingGraph h = new MatchingGraph();
 		
+		for(TransitStopFacility stop : hafasSc.getTransitSchedule().getFacilities().values()){
+			h.addNode(new MatchingNode(stop.getId(), stop.getCoord()));
+		}
 		
+		fac = null;
+		i = 0;
 		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
 			for(TransitRoute route: line.getRoutes().values()){
-				facs = new ArrayList<TransitStopFacility>();
-				shape = new ArrayList<Coord>();
 				for(TransitRouteStop stop : route.getStops()){
-					facs.add(stop.getStopFacility());
-					shape.add(stop.getStopFacility().getCoord());
+					if(!(fac == null)){
+						h.addEdge(new MatchingEdge(new IdImpl(i), h.getNodes().get(fac.getId()), h.getNodes().get(stop.getStopFacility().getId())));
+					}
+					fac = stop.getStopFacility();
+					i++;
 				}
-				if(facs.size() < 2){
-					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
-							line.getId() + " beacause it have less than 2 stops!");
-					continue;
-				}
-				
-				if(h.getNodes().containsKey(facs.get(0).getId())){
-					start = h.getNodes().get(facs.get(0).getId());
-				}else{
-					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
-					h.addNode(start);
-				}
-				
-				if(h.getNodes().containsKey(facs.get(facs.size()-1).getId())){
-					end = h.getNodes().get(facs.get(facs.size()-1).getId());
-				}else{
-					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
-					h.addNode(end);
-				}
-				
-				e = new MatchingEdge(new IdImpl(line.getId() + "_" + route.getId()), 
-						h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
-				e.addShapePointsAndCreateSegments(shape);
-				h.addEdge(e);
+				fac =null;
 			}
 		}
 		
