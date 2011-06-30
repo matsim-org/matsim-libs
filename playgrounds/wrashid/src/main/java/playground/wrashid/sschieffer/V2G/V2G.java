@@ -1,5 +1,7 @@
 package playground.wrashid.sschieffer.V2G;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -234,8 +236,51 @@ public class V2G {
 		return totalRegulationDownPHEV;
 	}
 	
+	
+	private void writeV2GPerAgentTxt(){
+		try{
+		    // Create file 
+			String title=(mySmartCharger.outputPath + "V2GPerAgent_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    out.write("Agent Id \t");
+		    out.write("EV? \t");
+		    out.write("Total V2Gup \t");
+		    out.write("Total V2Gdown \t");
+		    out.write("Total revenue \n");		    
+		    
+		    //*********************
+		    int totalEV=mySmartCharger.getAllAgentsWithEV().size();
+			for(int i=0; i<totalEV; i++){
+				Id agentId= mySmartCharger.getAllAgentsWithEV().get(i);
+				out.write(agentId.toString() +"\t");
+			    out.write(mySmartCharger.hasAgentEV(agentId)+"\t");
+			    out.write(getAgentTotalJouleV2GUp(agentId)+"\t");
+			    out.write(getAgentTotalJouleV2GDown(agentId)+"\t");
+			    out.write(getAgentV2GRevenues(agentId)+"\n");
+			}
+			
+			int totalPHEV=mySmartCharger.getAllAgentsWithPHEV().size();
+			for(int i=0; i<totalPHEV; i++){
+				Id agentId= mySmartCharger.getAllAgentsWithPHEV().get(i);
+				out.write(agentId.toString() +"\t");
+			    out.write(mySmartCharger.hasAgentEV(agentId)+"\t");
+			    out.write(getAgentTotalJouleV2GUp(agentId)+"\t");
+			    out.write(getAgentTotalJouleV2GDown(agentId)+"\t");
+			    out.write(getAgentV2GRevenues(agentId)+"\n");
+			}
+			
+		    		   
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
+	}
+	
 	public void calcV2GVehicleStats(){
-		
+		writeV2GPerAgentTxt();
 		//EV
 		int totalEV=mySmartCharger.getAllAgentsWithEV().size();
 		for(int i=0; i<totalEV; i++){
@@ -492,6 +537,7 @@ public class V2G {
 					double joules= mySmartCharger.functionSimpsonIntegrator.integrate(electricSourceInterval.getPolynomialFunction(), 
 							electricSourceInterval.getStartTime(),
 							electricSourceInterval.getEndTime());
+					//System.out.println("joules agent ="+ joules );
 					
 					/*
 					 * IN CASE JOULES IS HIGHER THAN WHAT IS FEASIBLE AT THE CONNECTION
@@ -593,10 +639,7 @@ public class V2G {
 			
 		// reschedule if equal - hopefully the load can be balanced elsewhere in the grid
 		if(costKeeping>=costReschedule && answerScheduleAfterElectricSourceInterval!=null){
-			if(answerScheduleAfterElectricSourceInterval==null){
-				System.out.println("Something fishy" + costKeeping +  ", "+ costReschedule);
-				secondHalf.printSchedule();
-			}
+			
 			
 			//reschedule
 			reschedule(agentId, 
@@ -668,10 +711,8 @@ public class V2G {
 		}else{
 			costReschedule=Double.MAX_VALUE;
 		}
-		if(DecentralizedSmartCharger.debug){
-			System.out.println("CostKeeping"+ costKeeping + "Cost Rescheduling"+ costReschedule);	
-		}
-		
+		//System.out.println("\n CostKeeping "+ costKeeping + "  Cost Rescheduling "+ costReschedule);	
+				
 		// if costs are equal = also reschedule, because its good for the system
 		// if EV failure then costKeeping can be Infinity > DOuble.Max=costReschedule
 		// with answerScheduleAfterElectricSourceInterval=null
@@ -695,7 +736,6 @@ public class V2G {
 			// thus car discharges 3500 to balance the net
 			// thus -3500 will be reduced by (-3500)= 0
 			reduceHubLoadByGivenLoadInterval(hub, electricSourceInterval);
-			
 		}
 		
 	}
@@ -905,15 +945,13 @@ public class V2G {
 	public void reduceAgentVehicleLoadsByGivenLoadInterval(
 			Id agentId, 
 			LoadDistributionInterval electricSourceInterval) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		// -3500-(-3500)=0
-		
+		// -3500-(-3500)=0		
 		
 		//Schedule agentVehicleSource= mySmartCharger.myHubLoadReader.agentVehicleSourceMappingAfterContinuous.get(agentId);
 		
 		PolynomialFunction negativePolynomialFunc= 
 			new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone());
-		negativePolynomialFunc=negativePolynomialFunc.negate();
-		
+		negativePolynomialFunc=negativePolynomialFunc.negate();		
 		
 		// aggregated 96 bins
 		mySmartCharger.myHubLoadReader.agentVehicleSourceAfter15MinBins.get(agentId).increaseYEntryOf96EntryBinCollectorBetweenSecStartEndByFunction(
@@ -1066,7 +1104,7 @@ public class V2G {
 					
 					/*
 					 * REDUCE HUB LOAD
-					 * loadInterval is negative so negat it first
+					 * loadInterval is negative so negate it first
 					 */
 					int hubId=mySmartCharger.myHubLoadReader.getHubForLinkId(
 							((ParkingInterval)agentIntervalInAgentDuringLoad).getLocation());
@@ -1076,7 +1114,7 @@ public class V2G {
 							overlapAgentAndElectricSource);
 					
 				}
-			}							
+			}		
 				
 		}
 	}
@@ -1166,7 +1204,7 @@ public class V2G {
 					if(DecentralizedSmartCharger.debug){
 						System.out.println("Reschedule was not possible!");
 					}
-					costReschedule= 100000000.0;
+					costReschedule= Double.MAX_VALUE;
 				}else{
 					costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
 				}

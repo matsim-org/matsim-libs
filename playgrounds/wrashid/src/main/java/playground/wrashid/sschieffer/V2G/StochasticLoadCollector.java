@@ -146,34 +146,49 @@ public class StochasticLoadCollector {
 			int hubId= myHubInfo.get(hub).getId();
 			
 			ArrayList<GeneralSource> stochasticGeneralSources= myHubInfo.get(hub).getStochasticGeneralSources();
+						
 			if (stochasticGeneralSources!= null){
 				for(int i=0; i<stochasticGeneralSources.size(); i++){
-					
-					String file= stochasticGeneralSources.get(i).getInputLoad96Bins();
-					
 					Id linkId= stochasticGeneralSources.get(i).getlinkId();
 					hubId = mySimulation.mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
-					String name= stochasticGeneralSources.get(i).getName();
 					
-					LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
-							97, 
-							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
-							"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
-					
-					stochasticGeneralSources.get(i).setLoadSchedule
-						(LoadFileReader.makeSchedule(stochasticHubSourceLoad.getFittedFunction()));
-					
-					stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
-					
-					LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+".png",
-							"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
-							stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
+					if (stochasticGeneralSources.get(i).isTxtLoad()){
+						String file= stochasticGeneralSources.get(i).getInputLoad96Bins();
+						
+						String name= stochasticGeneralSources.get(i).getName();
+						
+						LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
+								97, 
+								"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" from file", 
+								"stochastic load '"+name+"' at link "+ linkId.toString() +"at hub "+ hubId +" fitted");
+						
+						stochasticGeneralSources.get(i).setLoadSchedule
+							(LoadFileReader.makeSchedule(stochasticHubSourceLoad.getFittedFunction()));
+						
+						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
+						
+						LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+".png",
+								"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
+								stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
+						
+					}else{
+						
+						stochasticGeneralSources.get(i).setLoadSchedule(
+							Schedule.makeScheduleFromArrayListLoadIntervals(stochasticGeneralSources.get(i).getInputHubSourceIntervals()));
+						
+						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
+						
+						stochasticGeneralSources.get(i).getLoadSchedule().visualizeLoadDistribution("stochastic hubsource "+ linkId.toString(), 
+								mySimulation.outputPath+"V2G/stochastic hubsource "+ linkId.toString() +".png");
+							
+						}
+					}
 					
 				}
 			}
 		}
 		
-	}
+	
 	
 	
 	

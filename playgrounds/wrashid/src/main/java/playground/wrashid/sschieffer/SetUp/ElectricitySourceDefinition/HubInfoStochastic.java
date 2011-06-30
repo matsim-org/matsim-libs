@@ -112,7 +112,6 @@ public class HubInfoStochastic {
 	
 	
 	
-	
 	public String geStochasticGeneralLoadTxt(){
 		return stochasticGeneralLoadTxt;
 	}
@@ -145,7 +144,7 @@ public class HubInfoStochastic {
 	
 	
 	public boolean hasVehicleStochasticLoad(){
-		if(stochasticVehicleLoadTxt!=null && stochasticVehicleLoadIntervals!=null){
+		if(stochasticVehicleLoadTxt!=null || stochasticVehicleLoadIntervals!=null){
 			return true;
 		}else{return false;}
 	}

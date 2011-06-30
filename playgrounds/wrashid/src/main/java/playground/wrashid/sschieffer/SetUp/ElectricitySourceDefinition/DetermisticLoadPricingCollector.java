@@ -48,6 +48,7 @@ public class DetermisticLoadPricingCollector {
 	
 	public DetermisticLoadPricingCollector(	ArrayList<HubInfoDeterministic> myHubInfo) throws ConvergenceException, FunctionEvaluationException, IllegalArgumentException, IOException{
 			this.myHubInfo=myHubInfo;
+			findHighestAndLowestPricesInAllHubs();
 	}
 	
 	

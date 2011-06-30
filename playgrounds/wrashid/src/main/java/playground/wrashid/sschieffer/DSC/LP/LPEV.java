@@ -84,17 +84,14 @@ public class LPEV extends LP{
 			String vehicleType) throws LpSolveException, IOException{
 		
 		super.solveLP(schedule, 
-				id, 
-				batterySize, 
-				batteryMin, 
-				batteryMax);
+				id, batterySize, batteryMin, batteryMax);
 		
 		if(DecentralizedSmartCharger.debug){
 			System.out.println("LP EV for Agent: "+ id.toString()); 
 		}
 		
-		//setUpLP();
-		setUpLP(batterySize*0.5);
+		setUpLP();
+		//setUpLP(batterySize*0.5);
 		getSolver().setTimeout(100); 
 		
 		int status = getSolver().solve();
@@ -109,15 +106,12 @@ public class LPEV extends LP{
         	return null; 
         }
         
-      
 		
 		try {
 			if(DecentralizedSmartCharger.debug){
 				getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"DecentralizedCharger/LP/EV/LP_agent"+ id.toString()+"printLp.txt");
 				getSolver().printLp();
 			}
-			
-			
 			} catch (Exception e) {	    
 		}
 		
@@ -132,7 +126,6 @@ public class LPEV extends LP{
 		getSolver().deleteLp();
 		
 		return schedule;
-		
 		
 	}
 	
@@ -215,8 +208,9 @@ public class LPEV extends LP{
 		// setDrivingConsumption < SOC +buffer
 		for(int i=0; i<getSchedule().numberOfDrivingTimes();i++){
 			setDrivingConsumptionSmallerSOC(i,  buffer);
-			
 		}
+		// total consumption<=total Charge<=total consumption*(1+limit)
+		setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
 		
 		//upper & lower bounds
 		setLowerAndUpperBounds();

@@ -266,8 +266,9 @@ public class TimeDataCollector {
 	}
 	
 	public void increaseYEntryAtEntryByDouble(int entry, double increase){
+		//System.out.println("before"+getYAtEntry(entry));
 		addDataPoint(entry, getXAtEntry(entry), getYAtEntry(entry)+increase);
-		
+		//System.out.println("after"+getYAtEntry(entry));
 	}
 	
 	
@@ -307,13 +308,14 @@ public class TimeDataCollector {
 		if(last<=first){
 			// do at least for the firstEntry
 			int firstEntry= (int) (first);
-			double increase= func.value(firstEntry);
+			double increase= func.value(first*secBin);
 			increaseYEntryAtEntryByDouble(firstEntry, increase);
+			return;
 		}
 		
 		int firstEntry= (int) (first);
-		for( int i=0; i< (int)(last-first); i++){
-			double increase= func.value(firstEntry+i*(secBin));
+		for( int i=0; i<= (int)(last-first); i++){
+			double increase= func.value(first*secBin+i*(secBin));
 			increaseYEntryAtEntryByDouble(firstEntry+i, increase);
 		}
 	}

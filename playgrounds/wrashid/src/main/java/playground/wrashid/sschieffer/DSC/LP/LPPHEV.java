@@ -108,8 +108,8 @@ public class LPPHEV extends LP{
 			
 			
 			// set default starting SOC to 50% of battery size
-			//setUpLP();
-			setUpLP(batterySize*0.5);
+			setUpLP();
+			//setUpLP(batterySize*0.5);
 			getSolver().setTimeout(100); 
 		
 			int status = getSolver().solve();
@@ -253,6 +253,9 @@ public class LPPHEV extends LP{
 		setObjectiveFunction();
 		
 		setInequalityContraintsForBatteryUpper(reductionOfSOC, reductionOfSOCStartingAtIntervalI);
+		
+		// total consumption<=total Charge<=total consumption*(1+limit)
+		setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
 		
 		//upper & lower bounds
 		setLowerAndUpperBounds();		

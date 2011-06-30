@@ -145,6 +145,7 @@ public class DecentralizedSmartCharger {
 	public LinkedList<Id> agentsWithCombustion;
 	
 	public LinkedList<Id> deletedAgents;// agents where ParkingTimes were not found
+	public LinkedList<Id> deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge= new LinkedList<Id>();
 	
 	public HashMap<Id, Double> agentChargingCosts;
 	
@@ -356,6 +357,7 @@ public class DecentralizedSmartCharger {
 		
 		distributeTime = System.currentTimeMillis();
 		
+				
 		System.out.println("\n Update loads ");
 		updateDeterministicLoad(); 
 		
@@ -369,11 +371,7 @@ public class DecentralizedSmartCharger {
 		writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		writeSummaryDSCPerAgent("DSCPerAgent");
 		
-		deleteEVsWithFailureForV2G();
-		
-		
-		
-		
+		deleteEVsWithFailureForV2G();		
 		
 	}
 	
@@ -477,16 +475,29 @@ public class DecentralizedSmartCharger {
 										
 					scheduleAfterLP= lpphev.solveLP(agentParkingAndDrivingSchedules.get(id),id, batterySize, batteryMin, batteryMax, type);
 					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
-					
-					joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
-					if(hasAgentEV(id)){						
-						chargingFailureEV.add(id);
-					}else{						
-						emissionCounter+= joulesToEmissionInKg(id, joulesFromEngine);
+					if(scheduleAfterLP==null){
+						System.out.println("too restrictive even for PHEV - happens if imposing how muhc to charge boundaries");
+						deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.add(id);
+					}else{
+						joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
+						if(hasAgentEV(id)){						
+							chargingFailureEV.add(id);
+						}else{						
+							emissionCounter+= joulesToEmissionInKg(id, joulesFromEngine);
+						}
 					}
-				
+					
 			}
 		}
+		//delete the PHEVs that failed
+		System.out.println("total phevs deleted: "+ deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.size());
+		for(Id id: deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge){
+			agentParkingAndDrivingSchedules.remove(id);
+			vehicles.getKeySet().remove(id);// referenced in agentContracts - so automatically deleted... later used for stochastic load		
+			
+		}
+		
+		
 	}
 
 
@@ -768,6 +779,7 @@ public class DecentralizedSmartCharger {
 					totalCost +=  joulesExtraConsumptionToGasCosts(id,((DrivingInterval)t).getExtraConsumption());
 				}
 			}
+			
 			if(hasAgentEV(id)){
 				if(t.isDriving() && ((DrivingInterval)t).getExtraConsumption()>0){
 					if(DecentralizedSmartCharger.debug){
@@ -775,7 +787,7 @@ public class DecentralizedSmartCharger {
 						System.out.println("assigned "+Double.MAX_VALUE+" for agent "+ id.toString());
 					}
 				
-					totalCost += Double.MAX_VALUE;
+					totalCost = Double.MAX_VALUE;
 				}
 			}
 			
@@ -971,7 +983,7 @@ public class DecentralizedSmartCharger {
 				}
 					
 					Schedule electricSource= myHubLoadReader.locationSourceMapping.get(linkId).getLoadSchedule();
-					
+					electricSource.printSchedule();
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
 						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
@@ -1069,6 +1081,7 @@ public class DecentralizedSmartCharger {
 							//*********************************													
 							
 							double joulesFromSource= functionSimpsonIntegrator.integrate(func, start, end);
+							System.out.println("joules from source ="+ joulesFromSource +" is:  "+(Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT) );
 							
 							
 							if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
@@ -1772,7 +1785,7 @@ public class DecentralizedSmartCharger {
 	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
 	        plot.getRenderer().setSeriesPaint(1, Color.black);//before
 	        
-	        setSeriesStroke(plot, 0, 1.0f, 3.0f, 3.0f);
+	        setSeriesStroke(plot, 0, 5.0f, 3.0f, 3.0f);
 	        
 	        setSeriesStroke(plot, 1, 5.0f, 1.0f, 0.0f);
         	
@@ -2243,7 +2256,8 @@ public class DecentralizedSmartCharger {
 		    out.write("Number of PHEVs: \t");
 		    out.write("Number of EVs: \t");
 		    out.write(" EV with failure \t");
-		    out.write("Number of deleted agents \t");
+		    out.write("Number of deleted EV agents \t");
+		    out.write("Number of deleted PHEV agents \t");
 		    
 		    out.write("DSC Average charging cost of agents: \t");
 		    out.write("DSC Average charging cost of EV agents: \t");			   
@@ -2252,7 +2266,7 @@ public class DecentralizedSmartCharger {
 		    out.write("DSC Average charging time of agents: \t");
 		    out.write("DSC Average charging time of EV agents: \t");			   
 		    out.write("DSC Average charging time of PHEV agents: \t");
-		    out.write("DSC TOTAL EMISSIONS: \t \n");
+		    out.write("DSC TOTAL EMISSIONS: \n");
 		    
 		    //*********************
 		    
@@ -2260,6 +2274,8 @@ public class DecentralizedSmartCharger {
 		    out.write(getAllAgentsWithEV().size()+"\t");
 		    out.write(chargingFailureEV.size()+"\t");
 		    out.write(deletedAgents.size()+"\t");
+		    out.write(deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.size()+"\t");
+		    
 		    //cost
 		    out.write(getAverageChargingCostAgents()+"\t");
 		    out.write(getAverageChargingCostEV()+"\t");			   
@@ -2384,7 +2400,8 @@ public class DecentralizedSmartCharger {
 		    out.write("Number of PHEVs: \t");
 		    out.write("Number of EVs: \t");
 		    out.write(" EV with failure \t");
-		    out.write("Number of deleted agents \t");
+		    out.write("Number of deleted EV agents \t");
+		    out.write("Number of deleted PHEV agents \t");
 		    
 		    out.write("DSC Average charging cost of agents: \t");
 		    out.write("DSC Average charging cost of EV agents: \t");			   
@@ -2416,6 +2433,7 @@ public class DecentralizedSmartCharger {
 		    out.write(getAllAgentsWithEV().size()+"\t");
 		    out.write(chargingFailureEV.size()+"\t");
 		    out.write(deletedAgents.size()+"\t");
+		    out.write(deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.size()+"\t");
 		    
 		    //cost
 		    out.write(getAverageChargingCostAgents()+"\t");

@@ -43,6 +43,7 @@ import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
@@ -97,14 +98,28 @@ public class Main_V2G {
 		//final String outputPath="/cluster/home/baug/stellas/Runs/24hrV2G20000Plans15Min/Results";
 		
 		final String outputPath="D:/ETH/MasterThesis/TestOutput/";
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
-		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
+		//String configPath="test/scenarios/berlin/config.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
+		
 		double kWHEV =24;
 		double kWHPHEV =24;
 		boolean gasHigh = false;
 		
-		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
+		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
+		final double bufferBatteryCharge=0.0;
+		
+		int numberOfHubsInX=1;
+		int numberOfHubsInY=1;
+		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
+		
+		double standardConnectionWatt=3500;
+		
+		/*
+		 * CHARGING PRICES
+		 */
+		double priceMaxPerkWh=0.11;
 		double priceMinPerkWh=0.07;
+		
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
@@ -140,17 +155,35 @@ public class Main_V2G {
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
 		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
 		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
+		
+		/*
+		 * ADDING A HUB LOAD
+		 * - by generating a general hub source 
+		 */
+		ArrayList<GeneralSource> generalHubSource= new ArrayList<GeneralSource>(0);
+		ArrayList<LoadDistributionInterval> generalHubLoad= new ArrayList<LoadDistributionInterval>(0);
+		generalHubLoad.add(new LoadDistributionInterval(3500, 7000, 5000));
+		generalHubSource.add(new GeneralSource(
+				generalHubLoad,
+				new IdImpl(1),				
+				"random load", 
+				0.005) );
+		hubInfo1.setStochasticGeneralSources(generalHubSource);
+		
+		/*
+		 * ADDING A VEHICLE LOAD
+		 */
+		HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoadHashMap = new HashMap<Id, ArrayList<LoadDistributionInterval>>();
+		ArrayList<LoadDistributionInterval> vehicleLoad= new ArrayList<LoadDistributionInterval>(0);
+		vehicleLoad.add(new LoadDistributionInterval(3500, 7000, 3500));
+		vehicleLoadHashMap.put(new IdImpl(1), vehicleLoad);
+		hubInfo1.setStochasticVehicleSourcesIntervals(vehicleLoadHashMap);
+		
+		// add hubInfo to stochastic load
 		myStochasticHubInfo.add(hubInfo1);
 		
-		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
-		final double bufferBatteryCharge=0.0;
-		
-		int numberOfHubsInX=1;
-		int numberOfHubsInY=1;
-		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
-		
-		double standardConnectionWatt=3500;
-		
+				
+		//SETUP UP VARIABLES
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 

@@ -118,6 +118,40 @@ public abstract class LP {
 	
 	
 	/**
+	 * sets
+	 * totalConsumption<=totalCharged<=totalConsumption*(1+buffer)
+	 * where totalConsumption
+	 * =chargingSpeed* (1 1 0 1)*(parkingTime parkingTime DrivingTime parkingTime)'
+	 * @param buffer
+	 * @throws LpSolveException 
+	 */
+	public void setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(double limit) throws LpSolveException{
+		String inequality="0 ";
+		double totalConsumption=0;
+		//schedule.printSchedule();
+		for(int i=0; i<schedule.getNumberOfEntries(); i++){
+			if(schedule.timesInSchedule.get(i).isParking()){
+				ParkingInterval thisParkingInterval= (ParkingInterval)schedule.timesInSchedule.get(i);
+				String s= Double.toString(thisParkingInterval.getChargingSpeed());
+				s= s.concat(" ");
+				inequality=inequality.concat(s);
+				
+			}else{
+				if(schedule.timesInSchedule.get(i).isDriving()){
+					DrivingInterval thisDrivingInterval= (DrivingInterval)schedule.timesInSchedule.get(i);
+					totalConsumption+=thisDrivingInterval.getTotalConsumption();
+					inequality=inequality.concat("0 ");
+				}
+				
+			}
+		}
+		
+		solver.strAddConstraint(inequality, LpSolve.GE, totalConsumption);
+		solver.strAddConstraint(inequality, LpSolve.LE, totalConsumption*(1+limit));
+	}
+	
+	
+	/**
 	 * sets objective function
 	 * 
 	 * minimizing time in peak hours
