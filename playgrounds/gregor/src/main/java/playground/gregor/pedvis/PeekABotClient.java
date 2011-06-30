@@ -86,6 +86,9 @@ public class PeekABotClient {
 	 */
 	public native void drawArrowII(int arrowId, int agentId, float r, float g, float b, float fromX, float fromY, float fromZ, float toX, float toY, float toZ);
 
+
+	public native void drawColoredSquare(int id, float locX, float locY, float r, float g, float b, float length);
+
 	static {
 		System.loadLibrary("peekabotclient");
 	}
@@ -124,5 +127,7 @@ public class PeekABotClient {
 		pc.removeAllBotsII();
 
 	}
+
+
 
 }

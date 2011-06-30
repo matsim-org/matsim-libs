@@ -6,6 +6,8 @@ import org.matsim.core.network.NetworkImpl;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
+import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
@@ -27,6 +29,9 @@ public class PeekabotVisController extends Controller2D{
 		this.vis.setFloorShapeFile(this.getSim2dConfig().getFloorShapeFile());
 		this.vis.drawNetwork(this.network);
 		this.events.addHandler(this.vis);
+
+		NNGaussianKernelEstimator est = new DensityEstimatorFactory(this.events).createDensityEstimator();
+		this.events.addHandler(est);
 	}
 
 	public static void main(String[] args) {

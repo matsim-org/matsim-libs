@@ -50,6 +50,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEvent;
+import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEventHandler;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
@@ -67,7 +69,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author laemmel
  * 
  */
-public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler {
+public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, ColoredSquareAtCoordinateEventHandler {
 
 	private final PeekABotClient pc;
 	private String file;
@@ -245,7 +247,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
 
-		this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
+		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
 	}
@@ -260,7 +262,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		double x = l.getFromNode().getCoord().getX();
 		double y = l.getFromNode().getCoord().getY();
 		double az = getAzimuth(l.getFromNode().getCoord(), l.getToNode().getCoord());
-		this.pc.setBotPositionII(Integer.parseInt(event.getPersonId().toString()), (float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0, (float) az,(float)(this.scale));
+		this.pc.setBotPositionII(event.getPersonId().toString().hashCode(), (float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0, (float) az,(float)(this.scale));
 		this.locations.put(event.getPersonId(), new Coordinate((float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0));
 	}
 
@@ -344,7 +346,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 		if (this.inSim.contains(e.getPersonId())) {
 			Coordinate c = this.locations.get(e.getPersonId());
-			this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()),(float) c.x, (float)c.y,0,0,(float)this.scale);
+			this.pc.setBotPositionII(e.getPersonId().toString().hashCode(),(float) c.x, (float)c.y,0,0,(float)this.scale);
 		} else {
 
 
@@ -352,7 +354,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			Coord cc = l.getToNode().getCoord();
 			float x = (float)((cc.getX()-this.ofX)*this.scale);
 			float y = (float)((cc.getY()-this.ofY)*this.scale);
-			this.pc.addBotII(Integer.parseInt(e.getPersonId().toString()), x, y, 0, (float)this.scale);
+			this.pc.addBotII(e.getPersonId().toString().hashCode(), x, y, 0, (float)this.scale);
 			this.inSim.add(e.getPersonId());
 
 		}
@@ -368,30 +370,30 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float b = 0;
 
 		// experimental id dependent colorization
-		MatsimRandom.reset(Integer.parseInt(e.getPersonId().toString()));
+		MatsimRandom.reset(e.getPersonId().toString().hashCode());
 		MatsimRandom.getRandom().nextDouble();
 		MatsimRandom.getRandom().nextDouble();
 		b = MatsimRandom.getRandom().nextFloat();
-		if (Integer.parseInt(e.getPersonId().toString()) < 240) {
+		if (e.getPersonId().toString().contains("r")) {
 			r = 1.f;
 		} else {
 			g = 1.f;
 		}
+		//
+		//		if (Integer.parseInt(e.getPersonId().toString()) == 1) {
+		//			b = 1.f;
+		//			r=0;
+		//			g=0;
+		//		}
+		//		if (Integer.parseInt(e.getPersonId().toString()) == 500) {
+		//			b = 1.f;
+		//			r=0.5f;
+		//			g=0.5f;
+		//		}
 
-		if (Integer.parseInt(e.getPersonId().toString()) == 1) {
-			b = 1.f;
-			r=0;
-			g=0;
-		}
-		if (Integer.parseInt(e.getPersonId().toString()) == 500) {
-			b = 1.f;
-			r=0.5f;
-			g=0.5f;
-		}
 
 
-
-		this.pc.setBotColorII(Integer.parseInt(e.getPersonId().toString()), r, g, b);
+		this.pc.setBotColorII(e.getPersonId().toString().hashCode(), r, g, b);
 	}
 
 	/*
@@ -434,6 +436,18 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		float toZ = 0; //event.getTo().z;
 
 		this.pc.drawArrowII(arrowId, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
+	}
+
+	@Override
+	public void handleEvent(ColoredSquareAtCoordinateEvent e) {
+		float locX = (float) ((e.getCoordinate().x - this.ofX)*this.scale);
+		float locY = (float) ((e.getCoordinate().y - this.ofY)*this.scale);
+		float r = (float) (e.getR()/255.);
+		float g = (float) (e.getG()/255.);
+		float b = (float) (e.getB()/255.);
+		float length = (float)(e.getSideLength()*this.scale);
+		int id = new String(locX + " " + locY).hashCode();
+		this.pc.drawColoredSquare(id,locX,locY,r,g,b,length);
 	}
 
 

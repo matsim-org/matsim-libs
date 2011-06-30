@@ -8,11 +8,14 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
+import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
@@ -22,6 +25,7 @@ import playground.gregor.sim2d_v2.events.XYZEventsHandler;
  *
  */
 public class NNGaussianKernelEstimator implements XYZEventsHandler{
+
 
 	Stack<XYZAzimuthEvent> events = new Stack<XYZAzimuthEvent>();
 	List<String> groupIDs = new ArrayList<String>();
@@ -38,6 +42,9 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	private final double searchRangeIncrement = 1;
 
+	double maxRho = 0;
+	private EventsManager eventsManger = null;
+
 	/*package*/ NNGaussianKernelEstimator() {
 
 	}
@@ -53,11 +60,15 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		double eventTime = event.getTime();
 		if (eventTime > this.time) {
 			processFrame();
+			this.time = eventTime;
 		}
 		this.events.push(event);
 	}
 
 	private void processFrame() {
+		if (this.events.size() == 0) {
+			return;
+		}
 		initDensityArrays();
 		Map<String, List<Coordinate>> groups = new HashMap<String,List<Coordinate>>();
 		Map<String, List<PersonInfo>> groupsDists = new HashMap<String,List<PersonInfo>>();
@@ -74,33 +85,58 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		}
 		initQuadTree(all);
 		for (String key : this.groupIDs) {
-			List<PersonInfo> groupDists = getGroupDists(groups.get(key));
+			List<Coordinate> l = groups.get(key);
+			if (l == null) {
+				continue;
+			}
+			List<PersonInfo> groupDists = getGroupDists(l);
 			groupsDists.put(key, groupDists);
 		}
 
 		double x = this.envelope.getMinX() + this.res/2;
-		double y = this.envelope.getMinY() + this.res/2;
+
 
 		int xpos = 0;
 		for (; x < this.envelope.getMaxX(); x += this.res){
 			int ypos = 0;
+			double y = this.envelope.getMinY() + this.res/2;
 			for (; y < this.envelope.getMaxY(); y+=this.res) {
 				Coordinate here = new Coordinate(x,y);
 				for (String key : this.groupIDs) {
 					double rho = 0;
-					for (PersonInfo pi : groupsDists.get(key)) {
+					List<PersonInfo> l = groupsDists.get(key);
+					if (l == null) {
+						continue;
+					}
+					for (PersonInfo pi : l) {
 						rho += 1/Math.pow(this.lambda * pi.dist,2) * Math.exp(-Math.pow(pi.c.distance(here), 2)/(2*Math.pow(this.lambda*pi.dist, 2)));
 					}
 					rho *= 1/(2*Math.PI);
+					if (rho > this.maxRho) {
+						this.maxRho = rho;
+					}
 					this.densityArrays.get(key)[xpos][ypos] = rho;
+				}
+				if (this.eventsManger != null) {
+					double r = this.densityArrays.get("r")[xpos][ypos];
+					double g = this.densityArrays.get("g")[xpos][ypos];
+					//					double b = this.densityArrays.get("b")[xpos][ypos];
+					generateEvent(here,r,g,0 );
 				}
 				ypos++;
 			}
 			xpos++;
 		}
 
+	}
 
-
+	private void generateEvent(Coordinate here, double r, double g, double b) {
+		double maxDens = 3;
+		int red = Math.min(255, (int) (r/maxDens *255.+0.5));
+		int green = Math.min(255, (int) (g/maxDens *255.+0.5));
+		int blue = Math.min(255, (int) (b/maxDens *255.+0.5));
+		Event e = new ColoredSquareAtCoordinateEvent(here, red, green, blue, this.res, this.time);
+		this.eventsManger.processEvent(e);
 	}
 
 	private List<PersonInfo> getGroupDists(List<Coordinate> list) {
@@ -110,7 +146,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 			info.c = c;
 			double distance = 1;
 			Collection<Coordinate> neighbors = this.particleQuadTree.get(c.x, c.y, distance);
-			while (neighbors.size() <= 1) {
+			while (neighbors.size() <= 1 && distance <= 100) {
 				distance += this.searchRangeIncrement;
 				neighbors = this.particleQuadTree.get(c.x, c.y, distance);
 			}
@@ -178,5 +214,9 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	/*package*/ void setMinDist(double minDist) {
 		this.minDist = minDist;
+	}
+
+	/*package*/ void setEventsManager(EventsManager events) {
+		this.eventsManger  = events;
 	}
 }
