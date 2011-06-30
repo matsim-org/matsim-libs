@@ -55,6 +55,7 @@ public class EdgeCompare extends AbstractCompare{
 		MatchingSegment rs = null, cs = null;
 		SegmentCompare sc = null;
 		int cnt = 0;
+		double weighting = 0.0;
 		
 		// TODO weighted by length
 		while(candIt.hasNext() && refIt.hasNext()){
@@ -68,13 +69,14 @@ public class EdgeCompare extends AbstractCompare{
 			}
 			sc = new SegmentCompare(rs, cs);
 			cnt++;
-			avDist += sc.getAvDist();
-			avAngle += sc.getDeltaAngle();
 			matchedLengthRef += sc.getMatchedLengthRef();
 			matchedLengthComp += sc.getMatchedLengthComp();
+			weighting += (0.5 * (matchedLengthComp + matchedLengthRef));
+			avDist += sc.getAvDist()* (0.5 * (matchedLengthComp + matchedLengthRef));
+			avAngle += sc.getDeltaAngle() * (0.5 * (matchedLengthComp + matchedLengthRef));
 		}
-		avDist = avDist / cnt;
-		avAngle = avAngle / cnt;
+		avDist = avDist / weighting;
+		avAngle = avAngle / weighting;
 	}
 	
 	public boolean isMatched(Double dDistMax, Double dPhiMax, Double lengthTolerancePercentage){

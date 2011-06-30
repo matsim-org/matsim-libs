@@ -21,6 +21,7 @@ package playground.droeder.gis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -100,9 +101,11 @@ public class DaShapeWriter {
 	 * @param lines2write
 	 */
 	public static void writeTransitLines2Shape(String fileName, TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, String>> attributes){
-		for(SortedMap<String, String> m : attributes.values()){
-			initLineFeatureType("transitLines", m);
-			break;
+		if(!(attributes == null) && (attributes.size() > 0)){
+			for(SortedMap<String, String> m : attributes.values()){
+				initLineFeatureType("transitLines", m);
+				break;
+			}
 		}
 		write(createRouteFeatures(schedule, lines2write, attributes), fileName);
 	}
@@ -222,7 +225,11 @@ public class DaShapeWriter {
 						coord[i] = MGC.coord2Coordinate(stop.getStopFacility().getCoord());
 						i++;
 					}
-					feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), attributes.get(line.getId()));
+					if(attributes == null){
+						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), null);
+					}else{
+						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), attributes.get(line.getId()));
+					}
 					features.add(feature);
 				}
 			}
