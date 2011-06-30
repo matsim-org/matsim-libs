@@ -58,8 +58,9 @@ public class PPlan {
 
 	@Override
 	public String toString() {
-		return "Plan " + this.id + " score: " + this.score + " - Operation time " + Time.writeTime(this.startTime) + " - " + Time.writeTime(this.endTime)
-		+ this.vehicleIds.size() + " vehicles ply the route from " + this.startStop + " to " + this.endStop;
+		return "Plan from iteration " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime) + ", "
+		+ this.vehicleIds.size() + " vehicles ply the route from " + this.startStop.getId() + " to " + this.endStop.getId();
 	}
 
 	public void setLine(TransitLine line) {

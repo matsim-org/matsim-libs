@@ -77,7 +77,7 @@ public class CreateStopsForAllCarLinks {
 			}
 		}
 		
-		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(new IdImpl("p_" + link.getId()), link.getCoord(), false);
+		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(new IdImpl("p_" + link.getId()), link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		

@@ -152,7 +152,7 @@ public class PBox {
 			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
 		}
 		
-		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleArchivScored.xml"));		
+		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
 	}
 
 	/**
@@ -168,6 +168,8 @@ public class PBox {
 		capacity.setSeats(Integer.valueOf(10));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
+		vehType.setAccessTime(3.0);
+		vehType.setEgressTime(3.0);
 		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
 	
 		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {

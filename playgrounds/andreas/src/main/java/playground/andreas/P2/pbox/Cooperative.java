@@ -68,11 +68,11 @@ public class Cooperative {
 			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}
 		
-		for (TransitRoute route : this.currentPlan.getLine().getRoutes().values()) {
-			route.setDescription("line score: " + totalLineScore + ", trips: " + totalTripsServed + ", score per trip: " + (totalLineScore / totalTripsServed));
-		}
-		
 		this.currentPlan.setScore(totalLineScore);
+		
+		for (TransitRoute route : this.currentPlan.getLine().getRoutes().values()) {
+			route.setDescription(this.currentPlan.toString());
+		}		
 		
 		if(this.bestPlan == null){
 			this.bestPlan = this.currentPlan;
@@ -101,7 +101,7 @@ public class Cooperative {
 				PPlan plan = new PPlan(new IdImpl(simpleScheduleProvider.getIteration()));
 				plan.setStartStop(this.bestPlan.getStartStop());
 				plan.setEndStop(this.bestPlan.getEndStop());
-				plan.setStartTime(Math.max(0.0, this.bestPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 3600));
+				plan.setStartTime(Math.max(0.0, this.bestPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
 				plan.setEndTime(this.bestPlan.getEndTime());
 				plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
 				this.currentPlan = plan;
@@ -111,7 +111,7 @@ public class Cooperative {
 				plan.setStartStop(this.bestPlan.getStartStop());
 				plan.setEndStop(this.bestPlan.getEndStop());
 				plan.setStartTime(this.bestPlan.getStartTime());
-				plan.setEndTime(Math.min(24 * 3600.0, this.bestPlan.getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 3600));
+				plan.setEndTime(Math.min(24 * 3600.0, this.bestPlan.getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
 				plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
 				this.currentPlan = plan;
 			}			

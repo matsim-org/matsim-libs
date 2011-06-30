@@ -38,9 +38,11 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.P2.helper.PScenarioImpl;
@@ -116,7 +118,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 					return new PersonPrepareForSim(controler.createRoutingAlgorithm(), controler.getNetwork());
 				}
 			});
-			
+
+			dumpTransitScheduleAndVehicles(event.getIteration());
 		}
 	}
 	
@@ -156,6 +159,14 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		Vehicles pVeh = pBox.getVehicles();
 		controler.getScenario().getVehicles().getVehicleTypes().putAll(pVeh.getVehicleTypes());
 		controler.getScenario().getVehicles().getVehicles().putAll(pVeh.getVehicles());
+	}
+	
+	private void dumpTransitScheduleAndVehicles(int iteration){
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
+		writer.write(this.controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		
+		VehicleWriterV1 writer2 = new VehicleWriterV1(this.controler.getScenario().getVehicles());
+		writer2.writeFile(this.controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}
 
 }
