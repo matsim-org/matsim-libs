@@ -698,9 +698,9 @@ public class GraphMatching {
 		}
 		
 		GraphMatching gm = new GraphMatching(v, h);
-		gm.setMaxAngle(Math.PI / 4);
-		gm.setMaxDist(1000.0);
-		gm.setMaxLengthTolerancePerc(0.33);
+		gm.setMaxAngle(Math.PI / 6);
+		gm.setMaxDist(250.0);
+		gm.setMaxLengthTolerancePerc(0.1);
 		gm.run();
 		gm.nodes2Shape(OUT);
 		gm.baseSegments2Shape(OUT);
