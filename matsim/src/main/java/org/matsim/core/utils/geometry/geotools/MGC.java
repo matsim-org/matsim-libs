@@ -146,7 +146,7 @@ public class MGC {
 			log.info("seems to be no WKT: " + wkt_CRS, e);
 		}
 		try {
-			log.warn("Assuming that coordinates are in longitude first notation, i.e. (longitude, lantitude).");
+			log.warn("Assuming that coordinates are in longitude first notation, i.e. (longitude, latitude).");
 			return CRS.decode(crsString,true);
 		} catch (NoSuchAuthorityCodeException e) {
 			throw new IllegalArgumentException(e);
