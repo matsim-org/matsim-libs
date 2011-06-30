@@ -71,9 +71,9 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 			// outputFileP =
 			// "../matsimTests/locationChoice/chessboard/Polygon.shp";
 			// width = 10d;
-			netfile = "test/input/network.xml";
-			outputFileLs = "test/output/networkLinks.shp";
-			outputFileP = "test/output/networkPolygon.shp";
+			netfile = "test/input/2routesCntsVorEngpass/network.xml";
+			outputFileLs = "test/output/2routesCntsVorEngpass/networkLinks.shp";
+			outputFileP = "test/output/2routesCntsVorEngpass/networkPolygon.shp";
 			width = 0.01;
 		} else {
 			netfile = args[0];

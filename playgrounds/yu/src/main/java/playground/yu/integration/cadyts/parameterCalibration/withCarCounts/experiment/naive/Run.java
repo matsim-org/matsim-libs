@@ -75,6 +75,9 @@ public class Run {
 			}
 		} else if (args[1].equals("real")) { // real senarios
 			double travVal = -Double.parseDouble(args[2]) / 10d;
+			if (args.length == 4 && args[3].equals("positive")) {
+				travVal = -travVal;
+			}
 			run(config, outputPath, travVal);
 		}
 
