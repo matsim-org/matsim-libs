@@ -63,66 +63,83 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Manual:
+ * Manual:<ol>
  * 
- * Download "opus_home.zip" file from svn repository:
+ * <li>Download "opus_home.zip" file from svn repository:
  * https://svn.vsp.tu-berlin.de/repos/shared-svn/projects/SustainCity/MATSim_Data/accessibility_measure_input_files/opus_home.zip
+ * <ul></ul>
  * 
- * Extract opus_home.zip at a convenient place. The extracted file contains the following folder hierarchy:
- * 				- matsim_config folder contains the MATSim config
- * 				- opus_matsim/tmp folder contains UrbanSim input data
- * 				- data/network folder contains store network file 
- * 				- data/shapefile folder contains boundary shape file of the UrbanSim scenario
+ * <li>Extract opus_home.zip at a convenient place. The extracted file contains the following folder hierarchy:<ul>
+ * 				<li> matsim_config folder contains the MATSim config
+ * 				<li> opus_matsim/tmp folder contains UrbanSim input data
+ * 				<li> data/network folder contains store network file 
+ * 				<li> data/shapefile folder contains boundary shape file of the UrbanSim scenario
+ * </ul>
  * 
- * Relevant parts of MATSim config:
- * 				- set network file path in:
- *					<network>
- *						<inputFile>
- *						enter full path to network file here
- *						</inputFile>
- *					</network>
+ * <li>Relevant parts of MATSim config:<ul>
+ * 				<li> set network file path in:<pre>
+ *&lt;network&gt;
+ *	&lt;inputFile&gt;
+ *		enter full path to network file here
+ *	&lt;/inputFile&gt;
+ *&lt;/network&gt;
+ *</pre>
  *
- * 				- set number of MATSim iterations in:
- * 					<firstIteration>
+ * 				<li> set number of MATSim iterations in:<pre>
+ * 					&lt;firstIteration&gt;
  *					0
- *					</firstIteration>
- *					<lastIteration>
+ *					&lt;/firstIteration&gt;
+ *					&lt;lastIteration&gt;
  *					9
- *					</lastIteration>
+ *					&lt;/lastIteration&gt;
+ *</pre>
  *  
  *  			in this example MATSim performs 10 iterations
  *  
- * 				- set sampling rate for MATSim travelers in: 
- * 					<samplingRate>
+ * 				<li> set sampling rate for MATSim travelers in:<pre> 
+ * 					&lt;samplingRate&gt;
  *					0.1
- *					</samplingRate>
+ *					&lt;/samplingRate&gt;
+ *</pre>
  *
- *				- set full path to your extracted oupus_home folder in:
- *					<opusHOME>
+ *				<li> set full path to your extracted oupus_home folder in:<pre>
+ *					&lt;opusHOME&gt;
  *					enter full path here
- *					</opusHOME>
+ *					&lt;/opusHOME&gt;
+ *</pre>
  *
- * 				- set "tmp" directory path in:
- * 					<tempDirectory>
+ * 				<li> set "tmp" directory path in:<pre>
+ * 					&lt;tempDirectory&gt;
  *					relative path to "tmp" directory (should be "opus_matsim/tmp", see folder hierarchy above)
- *					</tempDirectory>
+ *					&lt;/tempDirectory&gt;
+ *</pre>
+ *
+ *</ul>
  * 
- * MATSim4Urbansim description: This class calculates the "workplace" accessibility for different spatial resolutions. 
+ * <li>MATSim4Urbansim description: This class calculates the "workplace" accessibility for different spatial resolutions. 
  * 								The study area is divided into squares (grid cells). For each square the accessibility computation is performed.
  * 								To speed up computation time small samples of travelers and jobs can be taken can be taken. 
  * 								Use the <samplingRate> in the config file to sample travelers, the job sample size must be passed when calling the class (see below).
- * 
- * MATSim4UrbanSimERSA usage: Call MATSim4UrbanSimERSA with the following parameters
+ * <ul></ul>
+ * <li>MATSim4UrbanSimERSA usage: Call MATSim4UrbanSimERSA with the following parameters
  * 
  * 							 path to MATSim configuration, path to shape file, edge length in meter (lower values lead to higher resolution), job sample size
  * 
  * 							 Example:
  * 							 /path/to/config.xml /path/to/shapefile.shp 1000 0.01
  * 							 
- * 							In this example the squares have a edge length of 1000x1000 meter, and MATSim considers only 1% of a workplaces
- */
-
-/**
+ * 							In this example the squares have a edge length of 1000x1000 meter, and MATSim considers only 1% of the workplaces
+ * </ol>
+ * 
+ * Design comments:<ul>
+ * 
+ * <li> The shp file is currently necessary, but is not necessary in general.  Might make sense to write a version that functions
+ * without.  kai, jun'11
+ * <li> The accessibility computation is not optimally fast since it first computes the matrix and then sums up the results
+ * into the accessibility.  This will/should be improved in future versions.  kai, jun'11
+ * 
+ * </ul>
+ *
  * @author thomas
  *
  */
