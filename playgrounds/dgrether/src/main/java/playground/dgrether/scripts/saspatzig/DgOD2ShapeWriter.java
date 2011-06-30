@@ -70,20 +70,32 @@ public class DgOD2ShapeWriter {
 	 * @throws IllegalAttributeException 
 	 */
 	public static void main(String[] args) throws FactoryConfigurationError, SchemaException, FactoryException, TransformException, IllegalAttributeException {
+		//### bvg project demand 
 		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/plans.times.xml.gz";
+		CoordinateReferenceSystem popCrs = MGC.getCRS(TransformationFactory.DHDN_GK4);
 //		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-1.0sample/scenario/plans.times.xml.gz";
 		String lkwIdPart = "lkw";
 		String wvIdPart = "wv";
+		boolean acceptAll = false;
 		String outFeatureFilename = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/rev554-bvg00-0.1sample_od_shape/plans.times.";
 //		String outFeatureFilename = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-1.0sample/scenario/rev554-bvg00-0.1sample_od_shape/plans.times."+ idPart +".shp";
+		//### end bvg project demand 
+		
+		//### satellic project demand 
+		popFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_10pct.xml.gz";
+		popCrs = MGC.getCRS(TransformationFactory.WGS84);
+		acceptAll = true;
+		outFeatureFilename = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb.gv.10pct.xml.";
+	//### end satellic project demand 
+		
+		
 		Config config = ConfigUtils.createConfig();
 //		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(popFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.DHDN_GK4);
 		CoordinateReferenceSystem targetCrs = MGC.getCRS(TransformationFactory.WGS84);
-		MathTransform transformation = CRS.findMathTransform(crs, targetCrs, true);
+		MathTransform transformation = CRS.findMathTransform(popCrs, targetCrs, true);
 		FeatureType mulitPointFt = createMultiPointActFeatureType(targetCrs);
 		List<Feature> multiPointFeatures = new ArrayList<Feature>();
 		FeatureType pointFt = createPointActFeatureType(targetCrs);
@@ -91,7 +103,7 @@ public class DgOD2ShapeWriter {
 
 		Population pop = scenario.getPopulation();
 		for (Person person : pop.getPersons().values()){
-			if (person.getId().toString().contains(lkwIdPart) || person.getId().toString().contains(wvIdPart)){
+			if (acceptAll || person.getId().toString().contains(lkwIdPart) || person.getId().toString().contains(wvIdPart)){
 				Activity act1 = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 				Activity act2 = (Activity) person.getSelectedPlan().getPlanElements().get(2);
 				Coordinate a1c = MGC.coord2Coordinate(act1.getCoord());

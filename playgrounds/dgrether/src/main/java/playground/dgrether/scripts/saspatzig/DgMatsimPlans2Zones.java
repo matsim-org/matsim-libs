@@ -62,22 +62,35 @@ public class DgMatsimPlans2Zones {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		//### bvg project demand 
 		String baseDir = DgPaths.REPOS + "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/";
-		String zonesFile = "/media/data/work/research/gis/nuts_10m_2006_sh/data/NUTS_RG_10M_2006.shp";
+		String zonesFile = DgPaths.REPOS + "shared-svn/studies/countries/eu/nuts_10m_2006/data/NUTS_RG_10M_2006.shp";
 		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/plans.times.xml.gz";
+		CoordinateReferenceSystem popCrs = MGC.getCRS(TransformationFactory.DHDN_GK4);
 //		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-1.0sample/scenario/plans.times.xml.gz";
 		String lkwIdPart = "lkw";
 		String wvIdPart = "wv";
+		boolean acceptAll = false;
 //		String outFile = baseDir +  "plans.times.0.1sample.lkw.od.nuts.rg.10m.2006.txt";
 		String outFile = baseDir +  "plans.times.0.1sample.wv.od.nuts.rg.10m.2006.txt";
 //		String outFile = baseDir +  "plans.times.0.1sample.lkw.wv.od.nuts.rg.10m.2006.txt";
+		//### end bvg project demand 
 			
+		//### satellic project demand 
+		popFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_10pct.xml.gz";
+		popCrs = MGC.getCRS(TransformationFactory.WGS84);
+		acceptAll = true;
+		outFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb.gv.10pct.od.nuts.rg.10m.2006.txt";
+	//### end satellic project demand 
+
+		
+		
+		
 		Config config = ConfigUtils.createConfig();
 //		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(popFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		CoordinateReferenceSystem popCrs = MGC.getCRS(TransformationFactory.DHDN_GK4);
 
 		ShapeFileReader shpReader = new ShapeFileReader();
 		Set<Feature> zones = shpReader.readFileAndInitialize(zonesFile);
@@ -89,7 +102,8 @@ public class DgMatsimPlans2Zones {
 		int numberOfTrips = 0;
 		Population pop = scenario.getPopulation();
 		for (Person person : pop.getPersons().values()){
-			if (//person.getId().toString().contains(lkwIdPart) ) {
+			if (acceptAll || 
+					//person.getId().toString().contains(lkwIdPart) ) {
 //|| 
 					person.getId().toString().contains(wvIdPart)){
 				Activity act1 = (Activity) person.getSelectedPlan().getPlanElements().get(0);
@@ -100,6 +114,10 @@ public class DgMatsimPlans2Zones {
 				a2c = JTS.transform(a2c, a2c, transformation);
 				Feature featureFrom = findFeature(zones, a1c);
 				Feature featureTo = findFeature(zones, a2c);
+				if (featureFrom == null || featureTo == null){
+					log.warn("At least one of the features is not in nuts area!");
+					continue;
+				}
 				//NUTS_ID
 				String  fromId = (String) featureFrom.getAttribute("NUTS_ID");
 				String toId = (String) featureTo.getAttribute("NUTS_ID");
@@ -142,6 +160,20 @@ public class DgMatsimPlans2Zones {
 				return f;
 			}
 		}
+		//if we haven't found something for nuts level 3 we look for nuts level 2
+		for (Feature f : zones){
+			Integer level =  (Integer) f.getAttribute("STAT_LEVL_");
+			if (level.equals(2) &&  f.getDefaultGeometry().contains(point)) {
+				return f;
+			}
+		}
+		for (Feature f : zones){
+			Integer level =  (Integer) f.getAttribute("STAT_LEVL_");
+			if (level.equals(1) &&  f.getDefaultGeometry().contains(point)) {
+				return f;
+			}
+		}
+		log.warn("Cannot find feature for coordinate: " + coordinate);
 		return null;
 	}
 
