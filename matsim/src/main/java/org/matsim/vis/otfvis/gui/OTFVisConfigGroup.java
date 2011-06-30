@@ -96,7 +96,15 @@ public class OTFVisConfigGroup extends Module {
 	private String coloring = COLORING_STANDARD ;
 
 	// ---
-
+	
+	private static final String LINK_WIDTH_IS_PROPORTIONAL_TO="linkwidthIsProportionalTo" ;
+	
+	public static final String NUMBER_OF_LANES = "numberOfLanes" ;
+	public static final String CAPACITY = "capacity" ;
+	
+	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
+	
+	// ---
 
 	public OTFVisConfigGroup() {
 		super(GROUP_NAME);
@@ -166,23 +174,23 @@ public class OTFVisConfigGroup extends Module {
 	@Override
 	public String getValue(final String key) {
 		// for variables that have getters, this is not needed (and should probably be avoided).  kai, jan'11
-		if (AGENT_SIZE.equals(key)) {
-			return Float.toString(getAgentSize());
-		} else if (MIDDLE_MOUSE_FUNC.equals(key)) {
+		if (MIDDLE_MOUSE_FUNC.equals(key)) {
 			return this.middleMouseFunc;
 		} else if (LEFT_MOUSE_FUNC.equals(key)) {
 			return this.leftMouseFunc;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			return this.rightMouseFunc;
 		}
-		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
-			return Boolean.toString(this.showTeleportedAgents);
-		}
-		else if (LINK_WIDTH.equalsIgnoreCase(key)){
-			return Float.toString(this.getLinkWidth());
-		}
-		else if ( COLORING.equalsIgnoreCase(key) )
-			return this.coloring ;
+//		else if (AGENT_SIZE.equals(key)) {
+//			return Float.toString(getAgentSize());
+//		} else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
+//			return Boolean.toString(this.showTeleportedAgents);
+//		}
+//		else if (LINK_WIDTH.equalsIgnoreCase(key)){
+//			return Float.toString(this.getLinkWidth());
+//		}
+//		else if ( COLORING.equalsIgnoreCase(key) )
+//			return this.coloring ;
 		else {
 			throw new IllegalArgumentException(key + ".  There may exist a direct getter.");
 		}
@@ -203,6 +211,9 @@ public class OTFVisConfigGroup extends Module {
 		} 
 		else if ( COLORING.equalsIgnoreCase(key) ) {
 			this.setColoringScheme( value ) ;
+		}  
+		else if ( LINK_WIDTH_IS_PROPORTIONAL_TO.equalsIgnoreCase(key) ) {
+			this.setLinkWidthIsProportionalTo( value ) ;
 		}  
 		else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
@@ -227,13 +238,14 @@ public class OTFVisConfigGroup extends Module {
 		// this is needed for everything since the config dump is based on this.
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(AGENT_SIZE, getValue(AGENT_SIZE));
+		map.put(AGENT_SIZE, Float.toString(this.getAgentSize()) );
 		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
 		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents() ) ) ;
-		map.put(LINK_WIDTH, this.getValue(LINK_WIDTH));
-		map.put(COLORING, getValue(COLORING)) ;
+		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, this.getLinkWidthIsProportionalTo() );
+		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()) );
+		map.put(COLORING, this.getColoringScheme() ) ;
 //		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
@@ -246,6 +258,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
 				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
+		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." ) ;
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 //		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 //				"May affect all non-moving items.") ;
@@ -506,6 +519,14 @@ public class OTFVisConfigGroup extends Module {
 	}
 	public Double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth ;
+	}
+
+	public String getLinkWidthIsProportionalTo() {
+		return linkWidthIsProportionalTo;
+	}
+
+	public void setLinkWidthIsProportionalTo(String linkWidthIsProportionalTo) {
+		this.linkWidthIsProportionalTo = linkWidthIsProportionalTo;
 	}
 
 

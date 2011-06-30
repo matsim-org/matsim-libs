@@ -26,12 +26,14 @@ import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.VisLink;
 
@@ -49,7 +51,7 @@ import org.matsim.vis.snapshots.writers.VisLink;
 public class OTFDefaultLinkHandler extends OTFDataReader {
 
 	protected OTFDataQuadReceiver quadReceiver = null;
-
+	
 	public OTFDataQuadReceiver getQuadReceiver() {
 		return quadReceiver;
 	}
@@ -57,9 +59,23 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 	static public class Writer extends  OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 
 		private static final long serialVersionUID = 2827811927720044709L;
+		
+		private static OTFVisConfigGroup otfVisConfig = null ;
+		private static boolean first = true ;
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
+			if ( first ) {
+				// there is sometimes a null pointer exception (e.g. in testConvert in OTFVisTest), and I don't know
+				// when and where this is set and when not.  Thus this hack ...  Please do better if you know better. 
+				// kai, jun'11
+				first = false ;
+				if ( OTFClientControl.getInstance()!=null ) {
+					if ( OTFClientControl.getInstance().getOTFVisConfig()!=null ) {
+						otfVisConfig = OTFClientControl.getInstance().getOTFVisConfig() ;
+					}
+				}
+			}
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
@@ -72,7 +88,21 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 			out.putFloat((float) linkStart.y);
 			out.putFloat((float) linkEnd.x); 
 			out.putFloat((float) linkEnd.y);
-			out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
+			if ( otfVisConfig != null ) {
+				if ( OTFVisConfigGroup.NUMBER_OF_LANES.equals(otfVisConfig.getLinkWidthIsProportionalTo()) ) {
+					out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
+				} else if ( OTFVisConfigGroup.CAPACITY.equals(otfVisConfig.getLinkWidthIsProportionalTo()) ) {
+					out.putInt( 1 + (int)(2.*this.src.getLink().getCapacity()/3600.) ) ;
+					// yyyyyy 3600. is a magic number but I cannot get to the network (where "capacityPeriod" resides).  
+					// Please do better if you know better.  kai, jun'11
+				} else {
+					throw new RuntimeException("I do not understand.  Aborting ..." ) ;
+				}
+			} else {
+				out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
+			}
+ 
+
 		}
 
 		@Override
