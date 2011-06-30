@@ -149,7 +149,7 @@ class MATSim4UrbanSimERSA extends MATSim4Urbansim{
 		checkAndSetShapeFile(args);
 		checkAndSetGridSize(args);
 		checkAndSetJobSample(args);
-		checkAndSetCUPUMNetworkModification(args); // testing impact of an accessibility improvement (see cupum). this is just for testing ...
+		// checkAndSetCUPUMNetworkModification(args); // this is for testing effects of network changes ..., Don't use, experimental
 	}
 
 	/**
