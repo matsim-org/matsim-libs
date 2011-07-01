@@ -12,7 +12,7 @@ import org.matsim.core.utils.gis.*;
 import org.opengis.referencing.crs.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 
@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.*;
 
 public class Routes2QGIS
 {
-    private Route[] routes;
+    private Schedule[] schedules;
     private String filename;
     private FeatureType featureType;
     private GeometryFactory geofac;
@@ -29,9 +29,9 @@ public class Routes2QGIS
     private Collection<Feature> features;
 
 
-    public Routes2QGIS(Route[] routes, MATSimVRPData data, String filename)
+    public Routes2QGIS(Schedule[] schedules, MATSimVRPData data, String filename)
     {
-        this.routes = routes;
+        this.schedules = schedules;
         this.data = data;
         this.filename = filename;
 
@@ -42,64 +42,40 @@ public class Routes2QGIS
 
     public void write()
     {
-        for (Route route : routes) {
-            List<Request> reqs = route.getRequests();
+        for (Schedule s : schedules) {
+            Iterator<DriveTask> driveIter = Schedules.createDriveTaskIter(s);
 
-            if (reqs.size() == 0) {
+            if (!driveIter.hasNext()) {
                 continue;
             }
 
             features = new ArrayList<Feature>();
 
-            // starting from the depot
-            Vertex depotVertex = route.vehicle.depot.vertex;
-            Vertex prevVertex = depotVertex;
-            int departTime = route.beginTime;
+            while (driveIter.hasNext()) {
+                DriveTask drive = driveIter.next();
+                LineString ls = createLineString(drive);
 
-            for (int i = 0; i < reqs.size(); i++) {
-                Request req = reqs.get(i);
-                Vertex currVertex = req.fromVertex;
-
-                addLineString(route, i, prevVertex, currVertex, departTime);
-
-                if (req.fromVertex != req.toVertex) { // i.e. taxi service
-                    currVertex = req.toVertex;
-                    addLineString(route, i, req.fromVertex, currVertex, req.startTime);
+                if (ls != null) {
+                    try {
+                        Vehicle veh = s.getVehicle();
+                        features.add(featureType.create(new Object[] { ls, veh.id, veh.name,
+                                s.getId(), drive.getScheduleIdx() }));
+                    }
+                    catch (IllegalAttributeException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-                prevVertex = currVertex;
-                departTime = req.departureTime;
             }
 
-            addLineString(route, reqs.size(), prevVertex, depotVertex, departTime);
-
-            ShapeFileWriter.writeGeometries(features, filename + route.id + ".shp");
+            ShapeFileWriter.writeGeometries(features, filename + s.getId() + ".shp");
         }
     }
 
 
-    private void addLineString(Route route, int arcIdx, Vertex fromVertex, Vertex toVertex,
-            int departTime)
+    private LineString createLineString(DriveTask driveTask)
     {
-        LineString ls = createLineString(fromVertex, toVertex, departTime);
-
-        if (ls != null) {
-            try {
-                Vehicle veh = route.vehicle;
-                features.add(featureType.create(new Object[] { ls, veh.id, veh.name, route.id,
-                        arcIdx }));
-            }
-            catch (IllegalAttributeException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    private LineString createLineString(Vertex fromVertex, Vertex toVertex, int departTime)
-    {
-        Path path = data.getShortestPaths()[fromVertex.getId()][toVertex.getId()]
-                .getPath(departTime);
+        Path path = data.getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
+                .getToVertex().getId()].getPath(driveTask.getBeginTime());
 
         if (path == ShortestPath.ZERO_PATH) {
             return null;
@@ -108,7 +84,7 @@ public class Routes2QGIS
         List<Coordinate> coordList = new ArrayList<Coordinate>();
 
         // starting coordinate
-        Link link = ((MATSimVertex)fromVertex).getLink();
+        Link link = ((MATSimVertex)driveTask.getFromVertex()).getLink();
         Coord c = link.getFromNode().getCoord();
         coordList.add(new Coordinate(c.getX(), c.getY()));
 

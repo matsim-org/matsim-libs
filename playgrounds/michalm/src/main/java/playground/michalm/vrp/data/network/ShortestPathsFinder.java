@@ -312,9 +312,9 @@ public class ShortestPathsFinder
                     costsOnDeparture[k] = paths[k].travelCost;
                 }
 
-                graph.setTime(vA, vB, new InterpolatedArcTime(timesOnDeparture, travelTimeBinSize,
+                graph.setArcTime(vA, vB, new InterpolatedArcTime(timesOnDeparture, travelTimeBinSize,
                         true));
-                graph.setCost(vA, vB, new InterpolatedArcCost(costsOnDeparture, travelTimeBinSize,
+                graph.setArcCost(vA, vB, new InterpolatedArcCost(costsOnDeparture, travelTimeBinSize,
                         true));
             }
         }

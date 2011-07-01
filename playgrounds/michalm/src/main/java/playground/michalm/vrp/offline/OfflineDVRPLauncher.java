@@ -8,12 +8,10 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
 import org.matsim.core.network.*;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.utils.misc.*;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -22,8 +20,8 @@ import pl.poznan.put.vrp.dynamic.customer.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Route;
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.vrp.*;
 import playground.michalm.vrp.data.*;
@@ -150,11 +148,11 @@ public class OfflineDVRPLauncher
         InterpolatedArcTime[][] simulatedArcTimes = null;
 
         if (AVG_TRAFFIC_MODE) {
-            simulatedArcCosts = (InterpolatedArcCost[][])graph.getCosts();
-            simulatedArcTimes = (InterpolatedArcTime[][])graph.getTimes();
+            simulatedArcCosts = (InterpolatedArcCost[][])graph.getArcCosts();
+            simulatedArcTimes = (InterpolatedArcTime[][])graph.getArcTimes();
 
-            graph.setCosts(ConstantArcCost.averageInterpolatedArcCosts(simulatedArcCosts));
-            graph.setTimes(ConstantArcTime.averageInterpolatedArcTimes(simulatedArcTimes));
+            graph.setArcCosts(ConstantArcCost.averageInterpolatedArcCosts(simulatedArcCosts));
+            graph.setArcTimes(ConstantArcTime.averageInterpolatedArcTimes(simulatedArcTimes));
 
             System.err.println("RUNNING WITH AVERAGED ArcTimes/Costs");
         }
@@ -189,17 +187,17 @@ public class OfflineDVRPLauncher
         simulator.simulate();
 
         if (VRP_OUT_FILES) {
-            new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
+            new Routes2QGIS(data.getVrpData().schedules, data, vrpOutDirName + "\\route_").write();
 
             Population popul = scenario.getPopulation();
             PopulationFactory pf = popul.getFactory();
 
             // generate output plans (plans.xml)
-            for (Route rt : data.getVrpData().routes) {
-                Person person = pf.createPerson(scenario.createId("vrpDriver_" + rt.id));
+            for (Schedule s : data.getVrpData().schedules) {
+                Person person = pf.createPerson(scenario.createId("vrpDriver_" + s.getId()));
 
                 VRPRoutePlan plan = new VRPRoutePlan(new PersonImpl(scenario.createId(Integer
-                        .toString(rt.id))), rt, data);
+                        .toString(s.getId()))), s, data);
 
                 person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);
@@ -215,8 +213,8 @@ public class OfflineDVRPLauncher
         // ================================================== BELOW: only for comparison reasons...
 
         if (AVG_TRAFFIC_MODE) {
-            graph.setCosts(simulatedArcCosts);
-            graph.setTimes(simulatedArcTimes);
+            graph.setArcCosts(simulatedArcCosts);
+            graph.setArcTimes(simulatedArcTimes);
 
             new ScheduleUpdater(vrpData).updateSchedule();
             vrpData.evaluateVRP();

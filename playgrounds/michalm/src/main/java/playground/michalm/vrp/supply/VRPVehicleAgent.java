@@ -14,17 +14,15 @@ public class VRPVehicleAgent
 {
     private Vehicle vrpVehicle;
     private VRPRoutePlan vrpRoutePlan;
-    private MATSimVRPData data;
 
 
     private VRPVehicleAgent(Person driver, Netsim simulation, Vehicle vrpVehicle, MATSimVRPData data)
     {
         super(driver, simulation);
 
-        this.data = data;
         this.vrpVehicle = vrpVehicle;
 
-        vrpRoutePlan = new VRPRoutePlan(driver, vrpVehicle.route, data);
+        vrpRoutePlan = new VRPRoutePlan(driver, vrpVehicle.schedule, data);
         driver.addPlan(vrpRoutePlan);
     }
 
@@ -37,12 +35,12 @@ public class VRPVehicleAgent
         return super.chooseNextLinkId();
     }
 
-    
+
     public Vehicle getVrpVehicle()
     {
         return vrpVehicle;
     }
-    
+
 
     public VRPRoutePlan getVrpRoutePlan()
     {
