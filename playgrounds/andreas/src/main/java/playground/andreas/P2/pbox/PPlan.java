@@ -43,6 +43,7 @@ public class PPlan {
 
 	private TransitLine line;
 	private double score = Double.NaN;
+	private int tripsServed = 0;
 
 	private double startTime;
 	private double endTime;
@@ -58,9 +59,14 @@ public class PPlan {
 
 	@Override
 	public String toString() {
-		return "Plan from iteration " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
-		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime) + ", "
-		+ this.vehicleIds.size() + " vehicles ply the route from " + this.startStop.getId() + " to " + this.endStop.getId();
+		return "Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+		+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
+		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
+		+ ", corridor from " + this.startStop.getId() + " to " + this.endStop.getId();
+	}
+
+	public Id getId() {
+		return id;
 	}
 
 	public void setLine(TransitLine line) {
@@ -114,10 +120,42 @@ public class PPlan {
 	}
 
 	public double getScore() {
-		return score;
+		return this.score;
+	}
+	
+	public double getScorePerVehicle() {
+		return (this.score / this.vehicleIds.size());
 	}
 
 	public Set<Id> getVehicleIds() {
 		return vehicleIds;
+	}
+
+	public void setTripsServed(int tripsServed) {
+		this.tripsServed = tripsServed;
+	}
+
+	public int getTripsServed() {
+		return tripsServed;
+	}
+
+	public boolean isSameButVehSize(PPlan testPlan) {
+		if(!this.startStop.getId().toString().equalsIgnoreCase(testPlan.getStartStop().getId().toString())){
+			return false;
+		}
+		
+		if(!this.endStop.getId().toString().equalsIgnoreCase(testPlan.getEndStop().getId().toString())){
+			return false;
+		}
+		
+		if(this.startTime != testPlan.getStartTime()){
+			return false;
+		}
+		
+		if(this.endTime != testPlan.getEndTime()){
+			return false;
+		}
+		
+		return true;
 	}	
 }
