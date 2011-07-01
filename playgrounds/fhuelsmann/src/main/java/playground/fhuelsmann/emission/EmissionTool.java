@@ -94,22 +94,24 @@ public class EmissionTool {
 
 	private void run(String[] args) {
 
-		/*	listOfPollutant.add("Benzene");
+		listOfPollutant.add("FC");
+		listOfPollutant.add("NOx");
+		listOfPollutant.add("CO2(total)");
+		listOfPollutant.add("NO2");
+		listOfPollutant.add("PM");
+	/*	listOfPollutant.add("Benzene");
 		listOfPollutant.add("CH4");
 		listOfPollutant.add("CO");
-		listOfPollutant.add("CO(rep.)");*/
-		listOfPollutant.add("CO2(total)");
-	/*	listOfPollutant.add("FC");
+		listOfPollutant.add("CO(rep.)");
 		listOfPollutant.add("HC");
-		listOfPollutant.add("N2O");
 		listOfPollutant.add("NH3");
 		listOfPollutant.add("NMHC");
-		listOfPollutant.add("NO2");
-		listOfPollutant.add("NOX");
 		listOfPollutant.add("Pb");
-		listOfPollutant.add("PM");
+		listOfPollutant.add("N20");
 		listOfPollutant.add("PN");
 		listOfPollutant.add("SO2");*/
+		
+	
 
 		// load the scenario
 		loadScenario();
@@ -132,7 +134,7 @@ public class EmissionTool {
 
 		VisumObject[] visumObject = new VisumObject[100];
 		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(visumObject, emissionsPerEvent,hbefaHot);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutant,visumObject, emissionsPerEvent,hbefaHot);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
 		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();

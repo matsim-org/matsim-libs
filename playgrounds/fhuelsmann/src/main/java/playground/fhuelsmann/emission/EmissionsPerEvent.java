@@ -21,6 +21,7 @@
 
 package playground.fhuelsmann.emission;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -76,7 +77,6 @@ public class EmissionsPerEvent {
 				double b = vij-vh;
 				double tempResult = (a *EFh ) / (a+b) + (b * EFf ) / (a+b);
 				arrayOfEmissions[indexOfPollutant]=tempResult*(li/1000);
-			//	System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~average speed "+vij+"\n arrayOfEmissions"+arrayOfEmissions[0]+"\n distanz"+li);
 			}
 			else if (vs <= vij && vij<=vh){
 				double a = vh - vij;
@@ -104,15 +104,11 @@ public class EmissionsPerEvent {
 
 	public double [] emissionFractionCalculateDetailed(Map<String, double[][]> hashOfPollutant,double averageSpeed, double distance){
 
-		int NumberOfPollutant = hashOfPollutant.size();
-		// the result will be returned after calculating
-		
-		double[] arrayOfEmissions = new double[NumberOfPollutant];
+		double[] arrayOfEmissions = new double[hashOfPollutant.size()];
 		// for every Pollutant in the Order of the List in EmissionTool
-		int indexOfPollutant=0;
-		
+
 		for( Entry<String, double[][]> Pollutant : hashOfPollutant.entrySet() ){
-		
+			
 			double li=distance;
 			double vij = averageSpeed;
 
@@ -127,14 +123,16 @@ public class EmissionsPerEvent {
 			double stopGoTime =0.0;
 
 		if (vij<vc){
-			arrayOfEmissions[indexOfPollutant]=li/1000*EFc;
+			double result = li/1000*EFc;;
+			arrayOfEmissions[getIndexOfPollutant(Pollutant.getKey().toString())]=result;
 		}
 		else {
 			stopGoTime= (li/1000)/vij -(li/1000)/vf;  //li/vij -li/freeVelocity;
 
 			stopGoFraction = vc *stopGoTime;
 			freeFlowFraction= (li/1000) - stopGoFraction;
-			arrayOfEmissions[indexOfPollutant]=stopGoFraction*	EFc + freeFlowFraction*	EFf;
+			double result =stopGoFraction*	EFc + freeFlowFraction*	EFf;
+			arrayOfEmissions[getIndexOfPollutant(Pollutant.getKey().toString())]=result;
 		}
 		}
 		return arrayOfEmissions;
@@ -349,43 +347,21 @@ public class EmissionsPerEvent {
 
 
 
-	public double[] collectInputForEmission(int Hbefa_road_type, double averageSpeed,double distance,HbefaObject[][] HbefaTable) {
-	
+	public double[] collectInputForEmissionAverageSpeed(int Hbefa_road_type, double averageSpeed,double distance,HbefaObject[][] HbefaTable) {
+			
+		double[] outPut = new double[5];
 		
-		double[] outPut = new double[12];
-	
 		if (Hbefa_road_type ==0){
 		
 			outPut[0] =  0; //mKrBasedOnAverageSpeed
-			//Nox
 			outPut[1] = 0; // 	noxEmissionsBasedOnAverageSpeed 
-			//CO2 rep -fossiler Anteil
 //			outPut[2] =  0; // co2repEmissionsBasedOnAverageSpeed 
-			//CO2 Total
 			outPut[2] = 0;// co2EmissionsBasedOnAverageSpeed 
-			//NO2
 			outPut[3] =  0; //no2EmissionsBasedOnAverageSpeed
-			//PM
 			outPut[4] = 0; //pmEmissionsBasedOnAverageSpeed
-
-			//mKr
-			outPut[5] = 0; //  mKrBasedOnFractions
-			//NOx
-			outPut[6]  =0; //noxEmissionsBasedOnFractions
-			//CO2 rep -fossiler Anteil
-//			outPut[7]  =0; //co2repEmissionsBasedOnFractions
-			//CO2 total
-			outPut[7] = 0; //co2EmissionsBasedOnFractions
-			//NO2
-			outPut[8] = 0; //no2EmissionsBasedOnFractions
-			//PM
-			outPut[9] = 0; //pmEmissionsBasedOnFractions
-			
 			
 		} else {	
 			
-			
-
 			double vf =HbefaTable[Hbefa_road_type][0].getVelocity();
 			double EFf = HbefaTable[Hbefa_road_type][0].getMkr(); 
 			double noxf = HbefaTable[Hbefa_road_type][0].getEmissionFactorNox();
@@ -410,6 +386,60 @@ public class EmissionsPerEvent {
 			double no2s = HbefaTable[Hbefa_road_type][2].getNo2();
 			double pms = HbefaTable[Hbefa_road_type][2].getPm();
 
+			double vc =HbefaTable[Hbefa_road_type][3].getVelocity();
+			double EFc = HbefaTable[Hbefa_road_type][3].getMkr();
+			double noxc = HbefaTable[Hbefa_road_type][3].getEmissionFactorNox();
+			double co2rc = HbefaTable[Hbefa_road_type][3].getEmissionFactorCo2Rep();
+			double co2tc = HbefaTable[Hbefa_road_type][3].getEmissionFactorCo2Total(); 
+			double no2c = HbefaTable[Hbefa_road_type][3].getNo2();
+			double pmc = HbefaTable[Hbefa_road_type][3].getPm();
+
+			double vij = averageSpeed;
+			double li = distance;
+			//      int freeVelocity = obj.getfreeVelocity();
+			//call of function, double output
+			double [] emissionFactorAndEmissions=  emissionFactorCalculate(vh,vij,vf, EFh,li,
+					EFs, EFc, EFf, vs, vc, 
+					noxf, noxh,noxs, noxc,
+					co2rf,co2rh,co2rs,co2rc,
+					co2tf,co2th,co2ts,co2tc,
+					no2f,no2h,no2s,no2c,
+					pmf,pmh,pms,pmc);
+		
+			outPut[0] =  emissionFactorAndEmissions[0]; //mKrBasedOnAverageSpeed
+			outPut[1] =  emissionFactorAndEmissions[1]; // 	noxEmissionsBasedOnAverageSpeed 
+//			outPut[] =  emissionFactorAndEmissions[2]; // co2repEmissionsBasedOnAverageSpeed 
+			outPut[2] =  emissionFactorAndEmissions[3];// co2EmissionsBasedOnAverageSpeed 
+			outPut[3] =  emissionFactorAndEmissions[4]; //no2EmissionsBasedOnAverageSpeed
+			outPut[4] =  emissionFactorAndEmissions[5]; //pmEmissionsBasedOnAverageSpeed
+		}
+		return outPut;
+	}
+	
+public double[] collectInputForEmissionFraction( ArrayList<String> listOfPollutant,int Hbefa_road_type, double averageSpeed,double distance,HbefaObject[][] HbefaTable) {
+	
+		int NumberOfPollutant = listOfPollutant.size();
+		
+		double[] outPutFraction= new double[NumberOfPollutant];
+	
+		if (Hbefa_road_type ==0){
+			
+			outPutFraction[0] = 0; //  mKrBasedOnFractions
+			outPutFraction[1]  =0; //noxEmissionsBasedOnFractions
+		//	outPutFraction[7]  =0; //co2repEmissionsBasedOnFractions
+			outPutFraction[2] = 0; //co2EmissionsBasedOnFractions
+			outPutFraction[3] = 0; //no2EmissionsBasedOnFractions
+			outPutFraction[4] = 0; //pmEmissionsBasedOnFractions
+	
+		} else {	
+			
+			double vf =HbefaTable[Hbefa_road_type][0].getVelocity();
+			double EFf = HbefaTable[Hbefa_road_type][0].getMkr(); 
+			double noxf = HbefaTable[Hbefa_road_type][0].getEmissionFactorNox();
+			double co2rf = HbefaTable[Hbefa_road_type][0].getEmissionFactorCo2Rep();
+			double co2tf = HbefaTable[Hbefa_road_type][0].getEmissionFactorCo2Total();
+			double no2f = HbefaTable[Hbefa_road_type][0].getNo2();
+			double pmf = HbefaTable[Hbefa_road_type][0].getPm();
 
 			double vc =HbefaTable[Hbefa_road_type][3].getVelocity();
 			double EFc = HbefaTable[Hbefa_road_type][3].getMkr();
@@ -420,54 +450,32 @@ public class EmissionsPerEvent {
 			double pmc = HbefaTable[Hbefa_road_type][3].getPm();
 
 			double vij = averageSpeed;
-
 			double li = distance;
-			//      int freeVelocity = obj.getfreeVelocity();
-		
-			//call of function, double output
-			double [] emissionFactorAndEmissions=  emissionFactorCalculate(vh,vij,vf, EFh,li,
-					EFs, EFc, EFf, vs, vc, 
-					noxf, noxh,noxs, noxc,
-					co2rf,co2rh,co2rs,co2rc,
-					co2tf,co2th,co2ts,co2tc,
-					no2f,no2h,no2s,no2c,
-					pmf,pmh,pms,pmc);
-		
-			//mKr
-			outPut[0] =  emissionFactorAndEmissions[0]; //mKrBasedOnAverageSpeed
-			//Nox
-			outPut[1] =  emissionFactorAndEmissions[1]; // 	noxEmissionsBasedOnAverageSpeed 
-			//CO2 rep -fossiler Anteil
-//			outPut[2] =  emissionFactorAndEmissions[2]; // co2repEmissionsBasedOnAverageSpeed 
-			//CO2 Total
-			outPut[2] =  emissionFactorAndEmissions[3];// co2EmissionsBasedOnAverageSpeed 
-			//NO2
-			outPut[3] =  emissionFactorAndEmissions[4]; //no2EmissionsBasedOnAverageSpeed
-			//PM
-			outPut[4] =  emissionFactorAndEmissions[5]; //pmEmissionsBasedOnAverageSpeed
 
+			
 			//call of function double output
 			double [] fractions=  emissionFreeFlowFractionCalculate(vij,li,
 					EFc, EFf,vc,/*freeVelocity,*/vf, noxf, noxc,co2rf,co2rc,co2tf,co2tc,no2f,no2c,pmf,pmc);
-			//mKr
-			outPut[5] =fractions[0]; //  mKrBasedOnFractions
-			//NOx
-			outPut[6]  =fractions [1]; //noxEmissionsBasedOnFractions
-			//CO2 rep -fossiler Anteil
-//			outPut[8]  =fractions [2]; //co2repEmissionsBasedOnFractions
-			//CO2 total
-			outPut[7] = fractions [3]; //co2EmissionsBasedOnFractions
-			//NO2
-			outPut[8] = fractions [4]; //no2EmissionsBasedOnFractions
-			//PM
-			outPut[9] = fractions [5]; //pmEmissionsBasedOnFractions
-			
-			
-			
-
+	
+			outPutFraction[0] =fractions[0]; // fcBasedOnFractions
+			outPutFraction[1]  =fractions [1]; //noxEmissionsBasedOnFractions
+//			outPut2[]  =fractions [2]; //co2repEmissionsBasedOnFractions
+			outPutFraction[2] = fractions [3]; //co2EmissionsBasedOnFractions
+			outPutFraction[3] = fractions [4]; //no2EmissionsBasedOnFractions
+			outPutFraction[4] = fractions [5]; //pmEmissionsBasedOnFractions
 		}
-		return outPut;
+		return outPutFraction;
 	}
+
+
+	private int getIndexOfPollutant(String pollutant){
+		
+			if (pollutant.equals("FC")) return 0;
+			else  if (pollutant.equals("NOx")) return 1;
+			else if (pollutant.equals("CO2(total)")) return 2;
+			else   if (pollutant.equals("NO2")) return 3;
+			else return 4;
+	} 
 	
 	/**Public transport emissions**/
 /*	public double [] ptEmissionCalculate(double distance){

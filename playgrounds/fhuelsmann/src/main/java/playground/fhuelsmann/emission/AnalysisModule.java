@@ -34,19 +34,25 @@ public interface AnalysisModule {
 	
 	public void calculateEmissionsPerLink(final double travelTime, final Id linkId, 
 			final Id personId, final double averageSpeed, final int roadType, 
-			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable,ArrayList<String> listOfPollutant);
+			final String fuelSizeAge, final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
 	public void calculateEmissionsPerPerson(final double travelTime, final Id personId, 
 			final double averageSpeed, final int roadType, final String fuelSizeAge,  
-			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable,ArrayList<String> listOfPollutant);
+			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
 	
 	public void calculateEmissionsPerLinkForComHdvPecWithoutVeh (final double travelTime, final Id linkId, 
 			final Id personId, final double averageSpeed, final int roadType, 
-			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
+			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable );
 	
 	public void calculateEmissionsPerCommuterHdvPcWithoutVeh (final double travelTime, final Id personId, 
 			final double averageSpeed, final int roadType,  
 			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
+	
+	//public void calculatePerLinkPtBikeWalk(final Id linkId);
+	
+	//public void calculatePerPersonPtBikeWalk(final Id personId);
+	
+	
 
 }
