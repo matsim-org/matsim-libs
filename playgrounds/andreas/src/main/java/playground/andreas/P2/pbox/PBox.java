@@ -87,7 +87,7 @@ public class PBox {
 		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork());
 		
 		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.init(new SimpleScheduleProvider(this.pStopsOnly, controler.getNetwork(), 0));
+			cooperative.init(new SimpleBackAndForthScheduleProvider(this.pStopsOnly, controler.getNetwork(), 0));
 		}
 	}	
 	
@@ -116,7 +116,7 @@ public class PBox {
 			// any other iteration
 			
 			for (Cooperative cooperative : this.cooperatives) {
-				cooperative.replan(new SimpleScheduleProvider(this.pStopsOnly, controler.getNetwork(), iteration));
+				cooperative.replan(new SimpleBackAndForthScheduleProvider(this.pStopsOnly, controler.getNetwork(), iteration));
 			}
 			
 			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());

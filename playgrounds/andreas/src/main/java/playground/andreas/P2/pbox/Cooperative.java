@@ -48,13 +48,13 @@ public class Cooperative {
 		this.id = id;
 	}
 
-	public void init(SimpleScheduleProvider simpleScheduleProvider) {
+	public void init(SimpleBackAndForthScheduleProvider simpleScheduleProvider) {
 		PPlan plan = new PPlan(new IdImpl("0"));
 		plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
 		plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
 		plan.setStartTime(0.0);
 		plan.setEndTime(24.0 * 3600);
-		plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop()));
+		plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop()));
 		this.bestPlan = null;
 		this.currentPlan = plan;
 	}
@@ -83,7 +83,7 @@ public class Cooperative {
 		}		
 	}
 
-	public void replan(SimpleScheduleProvider simpleScheduleProvider) {
+	public void replan(SimpleBackAndForthScheduleProvider simpleScheduleProvider) {
 		// dumb simple replanning
 		if(bestPlan.getScore() > 0){
 			double rnd = MatsimRandom.getRandom().nextDouble();
@@ -94,7 +94,7 @@ public class Cooperative {
 				plan.setEndStop(this.bestPlan.getEndStop());
 				plan.setStartTime(this.bestPlan.getStartTime());
 				plan.setEndTime(this.bestPlan.getEndTime());
-				plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop()));
+				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop()));
 				this.currentPlan = plan;
 			} else if(rnd < 0.66){
 				// profitable route, increase vehicle fleet
@@ -103,7 +103,7 @@ public class Cooperative {
 				plan.setEndStop(this.bestPlan.getEndStop());
 				plan.setStartTime(Math.max(0.0, this.bestPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
 				plan.setEndTime(this.bestPlan.getEndTime());
-				plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
+				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
 				this.currentPlan = plan;
 			} else {
 				// profitable route, increase vehicle fleet
@@ -112,7 +112,7 @@ public class Cooperative {
 				plan.setEndStop(this.bestPlan.getEndStop());
 				plan.setStartTime(this.bestPlan.getStartTime());
 				plan.setEndTime(Math.min(24 * 3600.0, this.bestPlan.getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
-				plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
+				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop()));
 				this.currentPlan = plan;
 			}			
 			
@@ -123,7 +123,7 @@ public class Cooperative {
 			plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
 			plan.setStartTime(0.0);
 			plan.setEndTime(24.0 * 3600);
-			plan.setLine(simpleScheduleProvider.createInitialRandomTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop()));
+			plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop()));
 			this.currentPlan = plan;
 		}
 	}

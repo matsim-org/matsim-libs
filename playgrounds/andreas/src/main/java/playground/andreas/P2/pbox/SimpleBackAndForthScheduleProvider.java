@@ -48,9 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author aneumann
  *
  */
-public class SimpleScheduleProvider {
+public class SimpleBackAndForthScheduleProvider {
 	
-	private final static Logger log = Logger.getLogger(SimpleScheduleProvider.class);
+	private final static Logger log = Logger.getLogger(SimpleBackAndForthScheduleProvider.class);
 	
 	private NetworkImpl net;
 	private TransitSchedule scheduleWithStopsOnly;
@@ -60,13 +60,13 @@ public class SimpleScheduleProvider {
 		return iteration;
 	}
 
-	public SimpleScheduleProvider(TransitSchedule scheduleWithStopsOnly, NetworkImpl network, int iteration) {
+	public SimpleBackAndForthScheduleProvider(TransitSchedule scheduleWithStopsOnly, NetworkImpl network, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		this.iteration = iteration;
 	}
 
-	public TransitLine createInitialRandomTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop){
+	public TransitLine createBackAndForthTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop){
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
 		
