@@ -109,6 +109,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 				for (Plan plan : person.getPlans()) {
 					transitActsRemover.run(plan);
 				}
+				// TODO AN Add BeforeMobsimListener and only reroute the selected plan - speedup
+//				transitActsRemover.run(person.getSelectedPlan());
 			}
 
 			ParallelPersonAlgorithmRunner.run(this.controler.getPopulation(), this.controler.getConfig().global().getNumberOfThreads(),
