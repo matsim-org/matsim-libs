@@ -106,6 +106,8 @@ public class DaShapeWriter {
 				initLineFeatureType("transitLines", m);
 				break;
 			}
+		}else{
+			initLineFeatureType("transitLines", null);
 		}
 		write(createRouteFeatures(schedule, lines2write, attributes), fileName);
 	}
