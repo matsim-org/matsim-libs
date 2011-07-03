@@ -20,12 +20,13 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.Population;
 import org.jgap.Population;
 
 import org.junit.Assert;
@@ -35,7 +36,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -54,6 +59,9 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPChromosome;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationDecoder;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationDecoderPartial;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDimensionDecoder;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
@@ -108,7 +116,7 @@ public class TestJPO {
 		PersonalizableTravelCost travelCost = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTime = controler.getTravelTimeCalculator();
 		this.configGroup = (JointReplanningConfigGroup)
-					this.controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);
+			this.controler.getConfig().getModule(JointReplanningConfigGroup.GROUP_NAME);
 		this.legTTEstFactory = new JointPlanOptimizerLegTravelTimeEstimatorFactory(
 					 travelTime,
 					 new DepartureDelayAverageCalculator(
@@ -144,6 +152,7 @@ public class TestJPO {
 	// /////////////////////////////////////////////////////////////////////////
 	// test methods
 	// /////////////////////////////////////////////////////////////////////////
+	/////////////////////////// fitness and decoder ////////////////////////////
 	/**
 	 * Tests whether the fitness "on the fly" and the fitness with the
 	 * "full decoder" give the same result.
@@ -191,6 +200,199 @@ public class TestJPO {
 				MatsimTestUtils.EPSILON);
 	}
 
+	/**
+	 * Tests the consistency of the partial decoder. More precisely,
+	 * the test fails if the partial decoder launched on a whole clique
+	 * does not produce the same output at the standard decoder.
+	 */
+	@Test
+	@Ignore
+	public void testPartialDecoder() {
+		int nTrys = 3;
+
+		DurationDecoderPartial partial = new DurationDecoderPartial(
+					this.samplePlan,
+					new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		DurationDecoder classical = new DurationDecoder(
+					this.samplePlan,
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		IChromosome sampleChrom;
+
+		for (int tryCount=0; tryCount < nTrys; tryCount++) {
+			try {
+				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
+					.randomInitialJointPlanOptimizerJGAPChromosome();
+			} catch (InvalidConfigurationException e) {
+				throw new RuntimeException(e);
+			}
+
+			List<PlanElement> planPartial = partial.decode(sampleChrom, /*new JointPlan*/(this.samplePlan)).getPlanElements();
+			List<PlanElement> planClassical = classical.decode(sampleChrom, /*new JointPlan*/(this.samplePlan)).getPlanElements();
+			double endTimeClassical;
+			double endTimePartial;
+
+			Assert.assertEquals(
+					"plans decoded with classical and partial decoder do not have the same length",
+					planClassical.size(),
+					planPartial.size());
+
+			for (int i=0; i < planClassical.size(); i++) {
+				if (planClassical.get(i) instanceof Activity) {
+					endTimeClassical = ((Activity) planClassical.get(i)).getEndTime();
+					endTimePartial = ((Activity) planPartial.get(i)).getEndTime();
+
+					Assert.assertEquals(
+							"activities were found with different ending times in"+
+							" classical and partial decoder.",
+							endTimeClassical,
+							endTimePartial,
+							MatsimTestUtils.EPSILON);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Tests whether a plan decoded with the duration decoder ends at midnight.
+	 */
+	@Test
+	public void testDurationDecoderClassicalEndTime() {
+		DurationDecoder classical = new DurationDecoder(
+					this.samplePlan,
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		testDurationDecoderEndTime(classical);
+	}
+
+	@Test
+	public void testDurationDecoderPartialEndTime() {
+		DurationDecoderPartial partial = new DurationDecoderPartial(
+					this.samplePlan,
+					new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		testDurationDecoderEndTime(partial);
+	}
+
+	private void testDurationDecoderEndTime(final JointPlanOptimizerDimensionDecoder decoder) {
+		int nTrys = 3;
+		double expectedEndTime = 3600d*24;
+
+		IChromosome sampleChrom;
+
+		for (int tryCount=0; tryCount < nTrys; tryCount++) {
+			try {
+				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
+					.randomInitialJointPlanOptimizerJGAPChromosome();
+			} catch (InvalidConfigurationException e) {
+				throw new RuntimeException(e);
+			}
+
+			Collection<Plan> individualPlans = decoder.decode(sampleChrom, this.samplePlan).getIndividualPlans().values();
+
+			for (Plan indivPlan : individualPlans) {
+				Assert.assertEquals(
+						"plan of incorrect duration created by "+decoder.getClass().getSimpleName(),
+						expectedEndTime,
+						((PlanImpl) indivPlan).getLastActivity().getEndTime(),
+						MatsimTestUtils.EPSILON);
+			}
+		}
+	}
+
+	@Test
+	public void testTimeLineClassical() {
+		DurationDecoder classical = new DurationDecoder(
+					this.samplePlan,
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		testTimeLine(classical);
+	}
+
+	@Test
+	public void testTimeLinePartial() {
+		DurationDecoderPartial partial = new DurationDecoderPartial(
+					this.samplePlan,
+					new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size());
+
+		testTimeLine(partial);
+	}
+
+	private void testTimeLine(final JointPlanOptimizerDimensionDecoder decoder) {
+		int nTrys = 3;
+
+		IChromosome sampleChrom;
+		double oldNow=0;
+		double now =0;
+
+		for (int tryCount=0; tryCount < nTrys; tryCount++) {
+			try {
+				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
+					.randomInitialJointPlanOptimizerJGAPChromosome();
+			} catch (InvalidConfigurationException e) {
+				throw new RuntimeException(e);
+			}
+
+			Collection<Plan> indivPlans = decoder.decode(sampleChrom, (this.samplePlan)).getIndividualPlans().values();
+
+			for (Plan indivPlan : indivPlans) {
+				oldNow = 0d;
+				for (PlanElement pe : indivPlan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						now = ((Activity) pe).getEndTime();
+						
+						Assert.assertTrue(
+								"inconsistency in the timeline in "+decoder.getClass().getSimpleName()
+								+": time goes from "+oldNow+" to "+now+".",
+								now >= oldNow);
+						oldNow = now;
+					}
+				}
+			}
+		}
+	}
+
+	/////////////////////////////////// operators //////////////////////////////
 	/**
 	 * Checks whether the offspring of the cross-overs respect the constraints.
 	 */
