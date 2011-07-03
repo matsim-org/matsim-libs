@@ -420,17 +420,6 @@ public class JointPlan implements Plan {
 		return this.clique;
 	}
 
-	///**
-	// * Sets the clique associated to the joint plan and sets the current
-	// * individual to the first member of the clique.
-	// * May be moved to a constructor in the future (final clique field).
-	// * XXX do not use, breaks the link individual plans/clique!
-	// */
-	//public void setClique(Clique clique) {
-	//	this.clique = clique;
-	//	this.resetCurrentIndividual();
-	//}
-	
 	public Map<Id, List<PlanElement>> getIndividualPlanElements() {
 		Map<Id, List<PlanElement>> output = new TreeMap<Id, List<PlanElement>>();
 
@@ -452,37 +441,6 @@ public class JointPlan implements Plan {
 	public Map<Id,Plan> getIndividualPlans() {
 		return this.individualPlans;
 	}
-
-	// public void setCurrentIndividual(Id id) {
-	// 	if (this.individualPlans.containsKey(id)) {
-	// 		this.currentIndividual = id;
-	// 	} else {
-	// 		throw new IllegalArgumentException("Trying to set current individual"+
-	// 				"to a non-existing individual in JointPlan.");
-	// 	}
-	// }
-
-	//public void resetCurrentIndividual() {
-	//	this.individualsIterator = this.clique.getMembers().keySet().iterator();
-	//	this.currentIndividual = this.individualsIterator.next();
-	//}
-
-	///**
-	// * Jumps to the next individual.
-	// * If current individual is the last individual, returns false.
-	// */
-	//public boolean nextIndividual() {
-	//	//TODO
-	//	if (this.individualsIterator.hasNext()) {
-	//		this.currentIndividual = this.individualsIterator.next();
-	//		return true;
-	//	}
-	//	return false;
-	//}
-
-	//public Id getCurrentIndividual() {
-	//	return this.currentIndividual;
-	//}
 
 	/**
 	 * Transforms this plan so that it is identical to the argument plan.

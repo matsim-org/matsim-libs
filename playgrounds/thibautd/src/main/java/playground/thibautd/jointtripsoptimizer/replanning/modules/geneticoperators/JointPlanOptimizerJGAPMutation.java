@@ -223,7 +223,12 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		}
 	}
 
-	private final double getFreeSpace(
+	/**
+	 * @param indexToMute index of the DoubleGene to mute in the Chromosome.
+	 * @param chromosome the chromosome to mute.
+	 * @return the upper bound on the gene value.
+	 */
+	protected final double getFreeSpace(
 			final int indexToMute,
 			final IChromosome chromosome) {
 		double freeSpace = DAY_DURATION;
@@ -232,36 +237,6 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes = nGenesIterator.next();
 		boolean inGoodPlan = false;
-
-		//for (Gene gene : chromosome.getGenes()) {
-		//	if ( !(gene instanceof DoubleGene) ) {
-		//		totalCount++;
-		//		continue;
-		//	}
-
-		//	if (geneCount == currentNGenes) {
-		//		// end of an individual plan reached
-		//		if (inGoodPlan) {
-		//			// we were in the plan of the mutated chromosome:
-		//			// we are done.
-		//			break;
-		//		}
-		//		// else, we begin a new initial plan
-		//		freeSpace = DAY_DURATION;
-		//		geneCount = 0;
-		//		currentNGenes = nGenesIterator.next();
-		//	}
-
-		//	if ((totalCount != indexToMute)) {
-		//		freeSpace -= ((DoubleGene) gene).doubleValue();
-		//	}
-		//	else {
-		//		inGoodPlan = true;
-		//	}
-
-		//	geneCount++;
-		//	totalCount++;
-		//}
 
 		Gene[] genes = chromosome.getGenes();
 		Gene gene;
