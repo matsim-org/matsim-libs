@@ -13,7 +13,7 @@ public class VRPVehicleAgent
     extends ExperimentalBasicWithindayAgent
 {
     private Vehicle vrpVehicle;
-    private VRPRoutePlan vrpRoutePlan;
+    private VRPSchedulePlan vrpSchedulePlan;
 
 
     private VRPVehicleAgent(Person driver, Netsim simulation, Vehicle vrpVehicle, MATSimVRPData data)
@@ -22,15 +22,15 @@ public class VRPVehicleAgent
 
         this.vrpVehicle = vrpVehicle;
 
-        vrpRoutePlan = new VRPRoutePlan(driver, vrpVehicle.schedule, data);
-        driver.addPlan(vrpRoutePlan);
+        vrpSchedulePlan = new VRPSchedulePlan(driver, vrpVehicle.schedule, data);
+        driver.addPlan(vrpSchedulePlan);
     }
 
 
     @Override
     public Id chooseNextLinkId()
     {
-        // should depend on the vrpRoutePlan:
+        // should depend on the vrpSchedulePlan:
 
         return super.chooseNextLinkId();
     }
@@ -42,15 +42,15 @@ public class VRPVehicleAgent
     }
 
 
-    public VRPRoutePlan getVrpRoutePlan()
+    public VRPSchedulePlan getVrpSchedulePlan()
     {
-        return vrpRoutePlan;
+        return vrpSchedulePlan;
     }
 
 
     @Override
-    public VRPRoutePlan getSelectedPlan()
+    public VRPSchedulePlan getSelectedPlan()
     {
-        return vrpRoutePlan;
+        return vrpSchedulePlan;
     }
 }

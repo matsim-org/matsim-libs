@@ -1,24 +1,32 @@
 package playground.michalm.vrp.data.network;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.api.core.v01.*;
 
 
 public class ShortestPath
 {
-    public static final Path ZERO_PATH = new Path(new ArrayList<Node>(0), new ArrayList<Link>(0),
-            0, 0);
+    public static class SPEntry
+    {
+        public final int travelTime;
+        public final double travelCost;
+        public final Id[] linkIds;
 
-    public static final ShortestPath NO_SHORTEST_PATH = new ShortestPath(0, 0, false);
+
+        public SPEntry(int travelTime, double travelCost, Id[] linkIds)
+        {
+            this.travelTime = travelTime;
+            this.travelCost = travelCost;
+            this.linkIds = linkIds;
+        }
+    }
+
+//    public static final ShortestPath NO_SHORTEST_PATH = new ShortestPath(0, 0, false);
 
     private int timeInterval;
     private int intervalCoutn;
     private boolean cyclic;
 
-    Path[] paths;// this contains travel times in-between "fromLink" and "toLink".
-    int[] travelTimes;// in QSim a vehicle traverses also "toLink"
+    SPEntry entries[];
 
 
     public ShortestPath(int numIntervals, int timeInterval, boolean cyclic)
@@ -27,8 +35,7 @@ public class ShortestPath
         this.intervalCoutn = numIntervals;
         this.cyclic = cyclic;
 
-        paths = new Path[numIntervals];
-        travelTimes = new int[numIntervals];
+        entries = new SPEntry[numIntervals];
     }
 
 
@@ -47,15 +54,9 @@ public class ShortestPath
     }
 
 
-    public Path getPath(int departTime)
+    public SPEntry getSPEntry(int departTime)
     {
-        return paths[getIdx(departTime)];
-    }
-
-
-    public int getTravelTime(int departTime)
-    {
-        return travelTimes[getIdx(departTime)];
+        return entries[getIdx(departTime)];
     }
 
 

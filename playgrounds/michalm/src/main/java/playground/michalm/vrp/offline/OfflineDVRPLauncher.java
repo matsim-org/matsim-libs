@@ -196,7 +196,7 @@ public class OfflineDVRPLauncher
             for (Schedule s : data.getVrpData().schedules) {
                 Person person = pf.createPerson(scenario.createId("vrpDriver_" + s.getId()));
 
-                VRPRoutePlan plan = new VRPRoutePlan(new PersonImpl(scenario.createId(Integer
+                VRPSchedulePlan plan = new VRPSchedulePlan(new PersonImpl(scenario.createId(Integer
                         .toString(s.getId()))), s, data);
 
                 person.addPlan(plan);
@@ -209,6 +209,7 @@ public class OfflineDVRPLauncher
 
         ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        System.out.println("X");
 
         // ================================================== BELOW: only for comparison reasons...
 

@@ -1,20 +1,22 @@
 package playground.michalm.vrp.supply;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.*;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.*;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.*;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 
 
-public class VRPRoutePlan
+public class VRPSchedulePlan
     extends PlanImpl
 {
     private PopulationFactory populFactory;
@@ -25,7 +27,7 @@ public class VRPRoutePlan
     private Schedule schedule;
 
 
-    public VRPRoutePlan(Person driver, Schedule schedule, MATSimVRPData data)
+    public VRPSchedulePlan(Person driver, Schedule schedule, MATSimVRPData data)
     {
         super(driver);
         this.schedule = schedule;
@@ -91,11 +93,6 @@ public class VRPRoutePlan
     {
         ShortestPath sp = shortestPaths[fromVertex.getId()][toVertex.getId()];
 
-        if (sp == ShortestPath.NO_SHORTEST_PATH) {
-            throw new RuntimeException("No route found from vertex " + fromVertex + " to vertex "
-                    + toVertex);
-        }
-
         Leg leg = populFactory.createLeg(TransportMode.car);
 
         leg.setDepartureTime(departTime);
@@ -103,15 +100,22 @@ public class VRPRoutePlan
         Link fromLink = fromVertex.getLink();
         Link toLink = toVertex.getLink();
 
-        Path path = sp.getPath(departTime);
+        SPEntry entry = sp.getSPEntry(departTime);
+        Id[] linkIds = entry.linkIds;
 
         NetworkRoute netRoute = (NetworkRoute)networkFactory.createRoute(TransportMode.car,
                 fromLink.getId(), toLink.getId());
 
-        if (path != ShortestPath.ZERO_PATH) {// means: fromLink != toLink
-            netRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links),
-                    toLink.getId());
+        if (linkIds.length > 0) {// means: fromLink != toLink
 
+            // all except the last one (it's the toLink)
+            ArrayList<Id> linkIdList = new ArrayList<Id>(linkIds.length - 1);
+
+            for (int i = 0; i < linkIds.length - 1; i++) {
+                linkIdList.add(linkIds[i]);
+            }
+
+            netRoute.setLinkIds(fromLink.getId(), Arrays.asList(entry.linkIds), toLink.getId());
             netRoute.setDistance(RouteUtils.calcDistance(netRoute, network));
         }
         else {
@@ -121,7 +125,7 @@ public class VRPRoutePlan
         int travelTime = arrivalTime - departTime;// According to the route
 
         netRoute.setTravelTime(travelTime);
-        netRoute.setTravelCost(path.travelCost);
+        netRoute.setTravelCost(entry.travelCost);
 
         leg.setRoute(netRoute);
         leg.setDepartureTime(departTime);

@@ -6,7 +6,6 @@ import org.geotools.factory.*;
 import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.geotools.*;
 import org.matsim.core.utils.gis.*;
 import org.opengis.referencing.crs.*;
@@ -14,7 +13,7 @@ import org.opengis.referencing.crs.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 
 import com.vividsolutions.jts.geom.*;
 
@@ -74,23 +73,25 @@ public class Routes2QGIS
 
     private LineString createLineString(DriveTask driveTask)
     {
-        Path path = data.getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
-                .getToVertex().getId()].getPath(driveTask.getBeginTime());
+        SPEntry entry = data.getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
+                .getToVertex().getId()].getSPEntry(driveTask.getBeginTime());
 
-        if (path == ShortestPath.ZERO_PATH) {
+        Id[] ids = entry.linkIds;
+
+        if (ids.length == 0) {
             return null;
         }
 
         List<Coordinate> coordList = new ArrayList<Coordinate>();
+        Map<Id, ? extends Link> linksMap = data.getScenario().getNetwork().getLinks();
 
-        // starting coordinate
-        Link link = ((MATSimVertex)driveTask.getFromVertex()).getLink();
+        Link link = linksMap.get(entry.linkIds[0]);
         Coord c = link.getFromNode().getCoord();
         coordList.add(new Coordinate(c.getX(), c.getY()));
 
-        // path coordinates
-        for (org.matsim.api.core.v01.network.Node node : path.nodes) {
-            c = node.getCoord();
+        for (Id l : entry.linkIds) {
+            link = linksMap.get(l);
+            c = link.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }
 

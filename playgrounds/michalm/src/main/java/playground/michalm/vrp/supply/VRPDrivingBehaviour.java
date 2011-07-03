@@ -3,12 +3,13 @@ package playground.michalm.vrp.supply;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 import playground.mzilske.withinday.*;
+
+import com.google.common.collect.*;
 
 
 class VRPDrivingBehaviour
@@ -18,21 +19,10 @@ class VRPDrivingBehaviour
     private Iterator<Id> linkIdIter;
 
 
-    private VRPDrivingBehaviour(DriveTask driveTask, Path path)
+    private VRPDrivingBehaviour(DriveTask driveTask, SPEntry entry)
     {
         this.driveTask = driveTask;
-
-        List<Id> linkIds = new ArrayList<Id>(path.links.size() + 1);
-
-        if (path != ShortestPath.ZERO_PATH) {
-            for (Link l : path.links) {
-                linkIds.add(l.getId());
-            }
-
-            linkIds.add( ((MATSimVertex)driveTask.getToVertex()).getLink().getId());
-        }
-
-        this.linkIdIter = linkIds.iterator();
+        this.linkIdIter = Iterators.forArray(entry.linkIds);
     }
 
 
@@ -77,8 +67,8 @@ class VRPDrivingBehaviour
     static VRPDrivingBehaviour createDrivingAlongArc(DriveTask driveTask,
             ShortestPath[][] shortestPaths, double realDepartTime)
     {
-        Path path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
-                .getId()].getPath((int)realDepartTime);
+        SPEntry path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
+                .getId()].getSPEntry((int)realDepartTime);
 
         return new VRPDrivingBehaviour(driveTask, path);
     }
