@@ -336,6 +336,16 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		return this.legId;
 	}
 
+	/**
+	 * JointLegs are considered equals if they have the same id.
+	 */
+	@Override
+	public boolean equals(final Object leg) {
+		return leg instanceof JointLeg &&
+			leg != null &&
+			this.legId.equals(((JointLeg) leg).legId);
+	}
+
 	/*
 	 * =========================================================================
 	 * miscelaneous
