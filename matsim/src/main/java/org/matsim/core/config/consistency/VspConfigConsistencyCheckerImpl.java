@@ -57,6 +57,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			throw new RuntimeException( str ) ;
 		}
 		
+		// xml events
+		
 	}
 
 }
