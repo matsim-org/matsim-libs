@@ -137,7 +137,6 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 
 	@Override
 	public void handleEvent(DoubleValueStringKeyAtCoordinateEvent e) {
-		System.out.println(e);
 		int idxX = (int) (e.getCoordinate().x+this.offsetX);
 		int idxY = (int) (e.getCoordinate().y+this.offsetY);
 		if (e.getKey().equals("r")) {
