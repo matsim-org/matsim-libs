@@ -91,8 +91,10 @@ public class PaperController extends WithinDayController implements StartupListe
 	 * will replan their plans.
 	 */
 	/*package*/ String noEventEventsFile = "";
+	/*package*/ String affectedAgentsFile = "";
 	/*package*/ String replanningAgentsFile = "";
 	/*package*/ String replanningLinksFile = "";
+	private Set<Id> affectedAgents;
 	private Set<Id> replanningAgents;
 	private Set<Id> replanningLinks;
 	private Charset charset = Charset.forName("UTF-8");
@@ -170,6 +172,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		 * Use the AgentFilteredDuringLegIdentifier to remove those agents who do not cross a
 		 * certain area when no event occurs and they do not replan their plans.
 		 */
+		getAffectedAgents(this.noEventEventsFile);
 		getReplanningAgents(this.noEventEventsFile);
 		parseReplanningLinks(this.replanningLinksFile);
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
@@ -212,7 +215,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		initReplanners((QSim)e.getQueueSimulation());
 		
 		// Module to analyze the travel times
-		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile, replanningAgents);
+		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile, affectedAgents, replanningAgents);
 		super.addControlerListener(analyzeTravelTimes);
 		super.getEvents().addHandler(analyzeTravelTimes);
 	}
@@ -280,6 +283,17 @@ public class PaperController extends WithinDayController implements StartupListe
 	    } catch (IOException e) {
 	    	log.error("Error when trying to parse the replanning links file. No replanning links identified!");
 	    }
+	}
+	
+	private void getAffectedAgents(String eventsFile) {
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, affectedAgentsFile);
+		
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(iaa);
+		
+		new MatsimEventsReader(eventsManager).readFile(eventsFile);
+		
+		this.affectedAgents = iaa.getAffectedAgents();
 	}
 	
 	private void getReplanningAgents(String eventsFile) {
@@ -354,6 +368,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	private final static String NUMOFTHREADS = "-numofthreads";
 	private final static String LEGREPLANNINGSHARE = "-legreplanningshare";
 	private final static String NOEVENTEVENTSFILE = "-noeventeventsfile";
+	private final static String AFFECTEDAGENTSFILE = "-affectedagentsfile";
 	private final static String REPLANNINGAGENTSFILE = "-replanningagentsfile";
 	private final static String REPLANNINGLINKSFILE = "-replanninglinksfile";
 	private final static String STARTEVENT = "-startevent";
@@ -388,6 +403,10 @@ public class PaperController extends WithinDayController implements StartupListe
 					i++;
 					controller.noEventEventsFile = args[i];
 					log.info("no event occuring events file: " + args[i]);
+				} else if (args[i].equalsIgnoreCase(AFFECTEDAGENTSFILE)) {
+					i++;
+					controller.affectedAgentsFile = args[i];
+					log.info("affected agents file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGAGENTSFILE)) {
 					i++;
 					controller.replanningAgentsFile = args[i];

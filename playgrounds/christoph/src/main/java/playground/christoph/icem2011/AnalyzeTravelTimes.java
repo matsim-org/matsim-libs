@@ -66,6 +66,7 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 	private MultiPolygon cityPolygon;
 	private MultiPolygon cantonPolygon;
 	private Collection<Id> affectedAgents;
+	private Collection<Id> replanningAgents;
 	
 	private Collection<Id> activityInCityZurich;
 	private Collection<Id> activityInCantonZurich;
@@ -73,21 +74,24 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 	private Collection<Id> tripThroughCantonZurich;
 	private Map<Id, Double> activeTrips;
 	private double affectedAgentsTravelTimes;
+	private double replanningAgentsTravelTimes;
 	private double activityInCityZurichTravelTimes;
 	private double activityInCantonZurichTravelTimes;
 	private double tripThroughCityZurichTravelTimes;
 	private double tripThroughCantonZurichTravelTimes;
 	private int affectedAgentsCount;
+	private int replanningAgentsCount;
 	private int activityInCityZurichCount;
 	private int activityInCantonZurichCount;
 	private int tripThroughCityZurichCount;
 	private int tripThroughCantonZurichCount;
 	
-	public AnalyzeTravelTimes(Scenario scenario, String citySHPFile, String cantonSHPFile, Collection<Id> affectedAgents) {
+	public AnalyzeTravelTimes(Scenario scenario, String citySHPFile, String cantonSHPFile, Collection<Id> affectedAgents, Collection<Id> replanningAgents) {
 		this.scenario = scenario;
 		this.citySHPFile = citySHPFile;
 		this.cantonSHPFile = cantonSHPFile;
 		this.affectedAgents = affectedAgents;
+		this.replanningAgents = replanningAgents;
 		
 		activityInCityZurich = new HashSet<Id>();
 		activityInCantonZurich = new HashSet<Id>();
@@ -324,6 +328,11 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 				affectedAgentsCount++;
 			}
 			
+			if (replanningAgents.contains(event.getPersonId())) {
+				replanningAgentsTravelTimes += time;
+				replanningAgentsCount++;
+			}
+			
 			if (activityInCityZurich.contains(event.getPersonId())) {
 				activityInCityZurichTravelTimes += time;
 				activityInCityZurichCount++;
@@ -360,11 +369,13 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 	public void reset(int iteration) {
 		activeTrips = new HashMap<Id, Double>();
 		affectedAgentsTravelTimes = 0.0;
+		replanningAgentsTravelTimes = 0.0;
 		activityInCityZurichTravelTimes = 0.0;
 		activityInCantonZurichTravelTimes = 0.0;
 		tripThroughCityZurichTravelTimes = 0.0;
 		tripThroughCantonZurichTravelTimes = 0.0;
 		affectedAgentsCount = 0;
+		replanningAgentsCount = 0;
 		activityInCityZurichCount = 0;
 		activityInCantonZurichCount = 0;
 		tripThroughCityZurichCount = 0;
@@ -374,12 +385,14 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		log.info("Number of Agents with Trips planned over affected Links: " + affectedAgents.size());
-		log.info("Number of Agents with Trips through in the City of Zurich: " + tripThroughCityZurich.size());
-		log.info("Number of Agents with Trips through in the Canton of Zurich: " + tripThroughCantonZurich.size());
+		log.info("Number of Agents with Trips through the replanning area: " + replanningAgents.size());
+		log.info("Number of Agents with Trips through the City of Zurich: " + tripThroughCityZurich.size());
+		log.info("Number of Agents with Trips through the Canton of Zurich: " + tripThroughCantonZurich.size());
 		log.info("Number of Agents with Activity in the City of Zurich: " + activityInCityZurich.size());
 		log.info("Number of Agents with Activity in the Canton of Zurich: " + activityInCantonZurich.size());
 
 		log.info("Mean Travel Time per Agent with Trip planned over affected Links: " + Time.writeTime(affectedAgentsTravelTimes / affectedAgentsCount));
+		log.info("Mean Travel Time per Agent with Trip through the replanning area: " + Time.writeTime(replanningAgentsTravelTimes / replanningAgentsCount));
 		log.info("Mean Travel Time per Agent with Trip through the City of Zurich: " + Time.writeTime(tripThroughCityZurichTravelTimes / tripThroughCityZurichCount));
 		log.info("Mean Travel Time per Agent with Trip through the Canton of Zurich: " + Time.writeTime(tripThroughCantonZurichTravelTimes / tripThroughCantonZurichCount));
 		log.info("Mean Travel Time per Agent with Activity in the City of Zurich: " + Time.writeTime(activityInCityZurichTravelTimes / activityInCityZurichCount));
