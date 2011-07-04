@@ -76,7 +76,8 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		Map<String, List<Coordinate>> groups = new HashMap<String,List<Coordinate>>();
 		Map<String, List<PersonInfo>> groupsDists = new HashMap<String,List<PersonInfo>>();
 		List<Coordinate> all = new ArrayList<Coordinate>();
-		for (XYZAzimuthEvent e = this.events.pop();!this.events.isEmpty(); e = this.events.pop()) {
+		while (!this.events.isEmpty()) {
+			XYZAzimuthEvent e = this.events.pop();
 			String key = getKeyFromPersonId(e.getPersonId());
 			all.add(e.getCoordinate());
 			List<Coordinate> l = groups.get(key);
@@ -112,9 +113,13 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 						continue;
 					}
 					for (PersonInfo pi : l) {
-						rho += 1/Math.pow(this.lambda * pi.dist,2) * Math.exp(-Math.pow(pi.c.distance(here), 2)/(2*Math.pow(this.lambda*pi.dist, 2)));
+						double k = kernel((here.x-pi.c.x)/this.lambda/(pi.dist),(here.y-pi.c.y)/this.lambda/(pi.dist));
+						rho += 1./Math.pow(this.lambda,2)/Math.pow(pi.dist, 2)*k;
+
+
+						//							1/Math.pow(this.lambda * pi.dist,2) * Math.exp(-Math.pow(pi.c.distance(here), 2)/(2*Math.pow(this.lambda*pi.dist, 2)));
 					}
-					rho *= 1/(2*Math.PI);
+					//					rho *= 1/(2*Math.PI);
 					if (rho > this.maxRho) {
 						this.maxRho = rho;
 					}
@@ -132,6 +137,11 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 			xpos++;
 		}
 
+	}
+
+	private double kernel(double x,double y) {
+		double tmp = -1./2.*(Math.pow(x, 2)+Math.pow(y, 2));
+		return 1./2./Math.PI * Math.exp(tmp);
 	}
 
 	private void generateEvent(Coordinate here, double value, String key) {

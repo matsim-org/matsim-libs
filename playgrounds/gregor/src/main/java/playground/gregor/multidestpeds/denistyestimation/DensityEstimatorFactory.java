@@ -24,17 +24,25 @@ public class DensityEstimatorFactory {
 		NNGaussianKernelEstimator ret = new NNGaussianKernelEstimator();
 		ret.addGroupId("r");
 		ret.addGroupId("g");
-		ret.setResolution(.5);
+		ret.setResolution(1);
 
-		Coordinate c1 = new Coordinate(386407,5819493);
-		Coordinate c2 = new Coordinate(386430,5819513);
-		ret.setEnvelope(new Envelope(c1,c2));
 
 		ret.setLambda(1);
-		ret.setMinDist(0.3);
+		ret.setMinDist(.300);
 		ret.setEventsManager(this.events);
 
-		ret.setStaticEnvironmentDistancesField(this.sc.getScenarioElement(StaticEnvironmentDistancesField.class));
+		StaticEnvironmentDistancesField sedf = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
+		ret.setStaticEnvironmentDistancesField(sedf);
+		double maxX = sedf.getEnvironmentDistancesQuadTree().getMaxEasting();
+		double minX = sedf.getEnvironmentDistancesQuadTree().getMinEasting();
+		double maxY = sedf.getEnvironmentDistancesQuadTree().getMaxNorthing();
+		double minY = sedf.getEnvironmentDistancesQuadTree().getMinNorthing();
+
+		Coordinate c1 = new Coordinate(minX,minY);
+		Coordinate c2 = new Coordinate(maxX,maxY);
+		ret.setEnvelope(new Envelope(c1,c2));
+
+
 		return ret;
 	}
 }
