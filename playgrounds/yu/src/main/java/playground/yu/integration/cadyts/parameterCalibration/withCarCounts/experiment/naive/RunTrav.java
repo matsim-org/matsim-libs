@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
  * @author yu
  *
  */
-public class Run {
+public class RunTrav {
 
 	private static void run(Config config, String outputPath, double val) {
 		config.planCalcScore().setTraveling_utils_hr(val);
