@@ -18,6 +18,8 @@ import com.vividsolutions.jts.geom.Envelope;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
+import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 /**
  * 
@@ -44,6 +46,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	double maxRho = 0;
 	private EventsManager eventsManger = null;
+	private StaticEnvironmentDistancesField sedf;
 
 	/*package*/ NNGaussianKernelEstimator() {
 
@@ -153,6 +156,14 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 					minDist = tmp.distance(c);
 				}
 			}
+
+			EnvironmentDistances dists = this.sedf.getEnvironmentDistances(c);
+			for (Coordinate tmp : dists.getObjects()) {
+				if (tmp.distance(c) < minDist) {
+					minDist = tmp.distance(c);
+				}
+			}
+
 			info.dist = Math.max(minDist, this.minDist);
 			ret.add(info);
 		}
@@ -215,5 +226,9 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	/*package*/ void setEventsManager(EventsManager events) {
 		this.eventsManger  = events;
+	}
+
+	/*package*/ void setStaticEnvironmentDistancesField(StaticEnvironmentDistancesField sedf) {
+		this.sedf = sedf;
 	}
 }
