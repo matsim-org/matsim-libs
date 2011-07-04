@@ -31,23 +31,14 @@ public class ScenarioWithCliques extends ScenarioImpl {
 	private static final Logger log =
 		Logger.getLogger(ScenarioWithCliques.class);
 
-	private PopulationOfCliques cliques=null;
-
 	/*
 	 * =========================================================================
 	 * Constructors
 	 * =========================================================================
 	 */
-	//public ScenarioWithCliques() {
-	//	super();
-	//	super.setPopulation(new PopulationWithCliques(this));
-	//	this.cliques = new PopulationOfCliques(this);
-	//}
-
 	public ScenarioWithCliques(Config config) {
 		super(config);
 		super.setPopulation(new PopulationWithCliques(this));
-		this.cliques =  new PopulationOfCliques(this);
 		log.debug("populations initialized");
 	}
 
@@ -57,7 +48,7 @@ public class ScenarioWithCliques extends ScenarioImpl {
 	 * =========================================================================
 	 */
 	public PopulationOfCliques getCliques() {
-		return this.cliques;
+		return ((PopulationWithCliques) this.getPopulation()).getCliques();
 	}
 }
 
