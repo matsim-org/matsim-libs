@@ -140,6 +140,7 @@ public class ScenarioGenerator {
 		}
 		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
 		Polygon p = (Polygon) mp.getGeometryN(0);
+		// 2b) generate network
 		new EvacuationNetworkGenerator(sc, p,this.safeLinkId).run();
 
 		String networkOutputFile = gcm.getOutputDir()+"/network.xml.gz";
