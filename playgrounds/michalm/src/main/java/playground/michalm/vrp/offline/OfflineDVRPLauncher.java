@@ -189,6 +189,8 @@ public class OfflineDVRPLauncher
         if (VRP_OUT_FILES) {
             new Routes2QGIS(data.getVrpData().schedules, data, vrpOutDirName + "\\route_").write();
 
+            //PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName + );
+
             Population popul = scenario.getPopulation();
             PopulationFactory pf = popul.getFactory();
 
@@ -230,6 +232,10 @@ public class OfflineDVRPLauncher
         // ================================================== ABOVE: only for comparison reasons...
 
         // TODO fix bug in Link Time Estimations ??
+        
+        // ======combine population with vrpDrivers...
+        
+        
 
     }
 }

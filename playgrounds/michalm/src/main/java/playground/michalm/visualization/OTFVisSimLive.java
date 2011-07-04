@@ -7,7 +7,6 @@ import org.matsim.run.*;
 
 public class OTFVisSimLive
 {
-
     public static void main(String[] args)
     {
         String dirName;
@@ -19,10 +18,7 @@ public class OTFVisSimLive
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
 
-            cfgFileName = "config-verB_and_vrpDriverPlans.xml";
-            
-            dirName = "d:\\PP-dyplomy\\2010_11-mgr\\test_network\\";
-            cfgFileName = "config-verB2.xml"; 
+            cfgFileName = "config-verB_with_vrp.xml";
         }
         else if (args.length == 2) {
             dirName = args[0];
@@ -34,6 +30,5 @@ public class OTFVisSimLive
         }
 
         OTFVis.playConfig(dirName + cfgFileName);
-
     }
 }
