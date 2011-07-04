@@ -69,6 +69,10 @@ public class PeekABotClient {
 
 	public native void drawLink(int id, int fromId, int toId, float fromX, float fromY, float toX, float toY);
 
+	public native void shutdown();
+
+	public native void endFrame();
+
 	//	public native void setBotShapeII(int id, int shape);
 
 	/**
@@ -87,7 +91,7 @@ public class PeekABotClient {
 	public native void drawArrowII(int arrowId, int agentId, float r, float g, float b, float fromX, float fromY, float fromZ, float toX, float toY, float toZ);
 
 
-	public native void drawColoredSquare(int id, float locX, float locY, float r, float g, float b, float length);
+	public native void updateOccupancyCell(int id, float locX, float locY, float occupancy);
 
 	static {
 		System.loadLibrary("peekabotclient");
@@ -127,6 +131,8 @@ public class PeekABotClient {
 		pc.removeAllBotsII();
 
 	}
+
+
 
 
 

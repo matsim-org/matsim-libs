@@ -23,7 +23,7 @@ public class PeekabotVisController extends Controller2D{
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.vis = new PedVisPeekABot(1,this.scenarioData);
+		this.vis = new PedVisPeekABot(10,this.scenarioData);
 		//		this.vis.setOffsets(386128,5820182);
 		this.vis.setOffsets(getNetwork());
 		this.vis.setFloorShapeFile(this.getSim2dConfig().getFloorShapeFile());
@@ -32,6 +32,7 @@ public class PeekabotVisController extends Controller2D{
 
 		NNGaussianKernelEstimator est = new DensityEstimatorFactory(this.events).createDensityEstimator();
 		this.events.addHandler(est);
+		this.addControlerListener(this.vis);
 	}
 
 	public static void main(String[] args) {

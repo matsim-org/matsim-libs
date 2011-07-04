@@ -15,7 +15,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
-import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEvent;
+import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
@@ -30,7 +30,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 	Stack<XYZAzimuthEvent> events = new Stack<XYZAzimuthEvent>();
 	List<String> groupIDs = new ArrayList<String>();
 
-	Map<String,double[][]> densityArrays;
+	//	Map<String,double[][]> densityArrays;
 
 	private double time = -1;
 	private Envelope envelope;
@@ -69,7 +69,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		if (this.events.size() == 0) {
 			return;
 		}
-		initDensityArrays();
+		//		initDensityArrays();
 		Map<String, List<Coordinate>> groups = new HashMap<String,List<Coordinate>>();
 		Map<String, List<PersonInfo>> groupsDists = new HashMap<String,List<PersonInfo>>();
 		List<Coordinate> all = new ArrayList<Coordinate>();
@@ -115,14 +115,15 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 					if (rho > this.maxRho) {
 						this.maxRho = rho;
 					}
-					this.densityArrays.get(key)[xpos][ypos] = rho;
+					generateEvent(here,rho,key);
+					//					this.densityArrays.get(key)[xpos][ypos] = rho;
 				}
-				if (this.eventsManger != null) {
-					double r = this.densityArrays.get("r")[xpos][ypos];
-					double g = this.densityArrays.get("g")[xpos][ypos];
-					//					double b = this.densityArrays.get("b")[xpos][ypos];
-					generateEvent(here,r,g,0 );
-				}
+				//				if (this.eventsManger != null) {
+				//					double r = this.densityArrays.get("r")[xpos][ypos];
+				//					double g = this.densityArrays.get("g")[xpos][ypos];
+				//					//					double b = this.densityArrays.get("b")[xpos][ypos];
+				//					generateEvent(here,r,g,0 );
+				//				}
 				ypos++;
 			}
 			xpos++;
@@ -130,12 +131,8 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	}
 
-	private void generateEvent(Coordinate here, double r, double g, double b) {
-		double maxDens = 3;
-		int red = Math.min(255, (int) (r/maxDens *255.+0.5));
-		int green = Math.min(255, (int) (g/maxDens *255.+0.5));
-		int blue = Math.min(255, (int) (b/maxDens *255.+0.5));
-		Event e = new ColoredSquareAtCoordinateEvent(here, red, green, blue, this.res, this.time);
+	private void generateEvent(Coordinate here, double value, String key) {
+		Event e = new DoubleValueStringKeyAtCoordinateEvent(here, value, key, this.time);
 		this.eventsManger.processEvent(e);
 	}
 
@@ -170,15 +167,15 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	}
 
-	private void initDensityArrays() {
-		this.densityArrays = new HashMap<String,double[][]>();
-		int xsize = (int) ((this.envelope.getMaxX() - this.envelope.getMinX())/this.res);
-		int ysize = (int) ((this.envelope.getMaxY() - this.envelope.getMinY())/this.res);
-		for (String key : this.groupIDs) {
-			double[][] array = new double[xsize][ysize];
-			this.densityArrays.put(key, array);
-		}
-	}
+	//	private void initDensityArrays() {
+	//		this.densityArrays = new HashMap<String,double[][]>();
+	//		int xsize = (int) ((this.envelope.getMaxX() - this.envelope.getMinX())/this.res);
+	//		int ysize = (int) ((this.envelope.getMaxY() - this.envelope.getMinY())/this.res);
+	//		for (String key : this.groupIDs) {
+	//			double[][] array = new double[xsize][ysize];
+	//			this.densityArrays.put(key, array);
+	//		}
+	//	}
 
 	private String getKeyFromPersonId(Id personId) {
 		String tmp = personId.toString();

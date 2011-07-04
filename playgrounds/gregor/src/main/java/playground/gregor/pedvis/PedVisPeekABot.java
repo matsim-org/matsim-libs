@@ -43,6 +43,8 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,8 +52,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEvent;
-import playground.gregor.sim2d_v2.events.ColoredSquareAtCoordinateEventHandler;
+import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
+import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
@@ -69,7 +71,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author laemmel
  * 
  */
-public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, ColoredSquareAtCoordinateEventHandler {
+public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, DoubleValueStringKeyAtCoordinateEventHandler, IterationEndsListener {
 
 	private final PeekABotClient pc;
 	private String file;
@@ -93,7 +95,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private final Set<Id> inSim = new HashSet<Id>();
 
 	private final Set<Id> carAgents = new HashSet<Id>();
-	private Scenario sc;
+	private final Scenario sc;
 
 	public PedVisPeekABot(double speedUp, Scenario sc) {
 		this.speedUp = speedUp;
@@ -190,6 +192,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		Sim2DConfigGroup sc = new Sim2DConfigGroup(m);
 		this.floorShape = sc.getFloorShapeFile();
 		Scenario s = ScenarioUtils.loadScenario(c);
+		this.sc = s;
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
 		this.file = events;
@@ -299,6 +302,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		if (d == this.lastEventsTime) {
 			return;
 		}
+		this.pc.endFrame();
 		double step = ((d - this.lastEventsTime) * 1000) / this.speedUp;
 		long currentTime = System.currentTimeMillis();
 		long diff = (long) (step - (currentTime - this.lastTime));
@@ -318,7 +322,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/output/ITERS/it.0/0.events.xml.gz", true, .5);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}
@@ -439,15 +443,29 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	@Override
-	public void handleEvent(ColoredSquareAtCoordinateEvent e) {
+	public void handleEvent(DoubleValueStringKeyAtCoordinateEvent e) {
+		if (e.getValue() < .01) {
+			return;
+		}
 		float locX = (float) ((e.getCoordinate().x - this.ofX)*this.scale);
 		float locY = (float) ((e.getCoordinate().y - this.ofY)*this.scale);
-		float r = (float) (e.getR()/255.);
-		float g = (float) (e.getG()/255.);
-		float b = (float) (e.getB()/255.);
-		float length = (float)(e.getSideLength()*this.scale);
-		int id = new String(locX + " " + locY).hashCode();
-		this.pc.drawColoredSquare(id,locX,locY,r,g,b,length);
+		float value = Math.min(1.f, (float) (e.getValue()));
+		if (value <= 0.02) {
+			value = 0.f;
+		}
+		String key = e.getKey();
+		if (key.contains("r")) {
+			this.pc.updateOccupancyCell(0,locX,locY,value);
+		}
+		if (key.contains("g"))  {
+			this.pc.updateOccupancyCell(1,locX,locY,value);
+		}
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		this.pc.shutdown();
+
 	}
 
 

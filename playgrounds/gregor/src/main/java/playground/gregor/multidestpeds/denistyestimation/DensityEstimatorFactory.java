@@ -17,7 +17,7 @@ public class DensityEstimatorFactory {
 		NNGaussianKernelEstimator ret = new NNGaussianKernelEstimator();
 		ret.addGroupId("r");
 		ret.addGroupId("g");
-		ret.setResolution(0.5);
+		ret.setResolution(0.1);
 
 		Coordinate c1 = new Coordinate(386407,5819493);
 		Coordinate c2 = new Coordinate(386430,5819513);

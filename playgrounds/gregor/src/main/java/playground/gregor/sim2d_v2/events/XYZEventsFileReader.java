@@ -35,6 +35,8 @@ import org.matsim.core.events.PersonEventImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * Events file reader that handles xyzAzimuth, link leave, link enter, departure
  * and arrival events its a lot of copy and paste code from EventsReaderXMLv1
@@ -93,6 +95,14 @@ public class XYZEventsFileReader extends MatsimXmlParser {
 			String id = atts.getValue(PersonEventImpl.ATTRIBUTE_PERSON);
 			Event e = this.builder.createXYZAzimuthEvent(x, y, z, azimuth, id, time);
 			this.events.processEvent(e);
+		} else if (DoubleValueStringKeyAtCoordinateEvent.EVENT_TYPE.equals(eventType)) {
+			String x = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_CENTER_X);
+			String y = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_CENTER_Y);
+			String key = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_KEY);
+			String val = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_VALUE);
+			Event e = new DoubleValueStringKeyAtCoordinateEvent(new Coordinate(Double.parseDouble(x),Double.parseDouble(y)), Double.parseDouble(val), key, time);
+			this.events.processEvent(e);
+
 		}
 
 	}
