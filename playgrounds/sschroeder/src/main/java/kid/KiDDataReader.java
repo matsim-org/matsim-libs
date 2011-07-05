@@ -81,11 +81,23 @@ public class KiDDataReader {
 		this.legAttributeFilter = legAttributeFilter;
 	}
 
-	public void run() throws FileNotFoundException, IOException{
+	public void run() {
 		verify();
-		readVehicles();
-		readTransportLegs();
-		readTransportChains();
+		try {
+			readVehicles();
+			readTransportLegs();
+			readTransportChains();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			logger.error(e);
+			System.exit(1);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error(e);
+			System.exit(1);
+		}
+		
 		buildScheduledVehicles();
 	}
 

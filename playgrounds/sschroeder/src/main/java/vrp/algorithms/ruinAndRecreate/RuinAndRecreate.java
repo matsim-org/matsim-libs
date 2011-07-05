@@ -148,6 +148,9 @@ public class RuinAndRecreate {
 	}
 
 	private void randomWalk(int nOfIterations) {
+		if(nOfIterations == 0){
+			return;
+		}
 		logger.info("random walk for threshold determination");
 		Solution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
 		double[] results = new double[nOfIterations];

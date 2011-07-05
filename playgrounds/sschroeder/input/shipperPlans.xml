@@ -2,12 +2,12 @@
 	<shippers>
 		<shipper id="shipper_stefan" linkId="j(8,5)">
 			<commodityFlows>
-				<commodityFlow id="1" from="j(8,5)" to="j(0,8)" size="10" value="-1"/>	
-				<commodityFlow id="2" from="j(8,5)" to="j(0,1)" size="10" value="-1"/>	
-				<commodityFlow id="3" from="j(8,5)" to="j(0,2)" size="10" value="-1"/>	
-				<commodityFlow id="4" from="j(8,5)" to="j(0,3)" size="10" value="-1"/>	
-				<commodityFlow id="5" from="j(8,5)" to="j(0,4)" size="10" value="-1"/>	
-				<commodityFlow id="6" from="j(8,5)" to="j(0,5)" size="10" value="-1"/>		
+				<commodityFlow id="1" from="j(8,5)" to="j(0,8)" size="15" value="-1"/>	
+				<commodityFlow id="2" from="j(8,5)" to="j(0,1)" size="15" value="-1"/>	
+				<commodityFlow id="3" from="j(8,5)" to="j(0,2)" size="15" value="-1"/>	
+				<commodityFlow id="4" from="j(8,5)" to="j(0,3)" size="15" value="-1"/>	
+				<commodityFlow id="5" from="j(8,5)" to="j(0,4)" size="15" value="-1"/>	
+				<commodityFlow id="6" from="j(8,5)" to="j(0,5)" size="15" value="-1"/>		
 			</commodityFlows>
 			<scheduledFlows>
 				<scheduledFlow comFlowId="1" tspId="logotakt" price="0">

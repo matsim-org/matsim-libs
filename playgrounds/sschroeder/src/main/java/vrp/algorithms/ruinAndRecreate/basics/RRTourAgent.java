@@ -39,6 +39,8 @@ class RRTourAgent implements TourAgent {
 	
 	private Offer openOffer = null;
 	
+	private Shipment newShipment = null;
+	
 	private Double costOfOfferedTour = null; 
 	
 	private Tour tourOfLastOffer = null;
@@ -104,11 +106,21 @@ class RRTourAgent implements TourAgent {
 		else{
 			return null;
 		}
-		
 	}
 	
-	
-	 /* (non-Javadoc)
+	 @Override
+	public void run() {
+		 TourInformation tourInformation = tourBuilder.buildTour(tour, newShipment);
+		 if(tourInformation != null){
+			 Offer offer = new Offer(this, tourInformation.marginalCosts);
+			 openOffer = offer;
+			 tourOfLastOffer = tourInformation.tour;
+			 costOfOfferedTour = tourInformation.totalCosts;
+			 logger.debug("lastOffer: " + offer);
+		 }
+	}
+
+	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTourSize()
 	 */
 	public int getTourSize(){
@@ -137,7 +149,9 @@ class RRTourAgent implements TourAgent {
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
 	 */
 	public void offerRejected(Offer offer){
-		
+		openOffer = null;
+		tourOfLastOffer = null;
+		costOfOfferedTour = null;
 	}
 
 	/* (non-Javadoc)
@@ -192,6 +206,16 @@ class RRTourAgent implements TourAgent {
 
 	public Tour getTour() {
 		return tour;
+	}
+
+	@Override
+	public Offer getOpenOffer() {
+		return openOffer;
+	}
+
+	@Override
+	public void setNewShipment(Shipment shipment) {
+		newShipment = shipment;
 	}
 
 }

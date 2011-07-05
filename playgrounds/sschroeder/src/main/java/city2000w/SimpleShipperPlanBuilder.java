@@ -1,8 +1,10 @@
-package city2000w;
+ package city2000w;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import playground.mzilske.freight.TSPAgentTracker;
+import playground.mzilske.freight.TSPOffer;
 import freight.CommodityFlow;
 import freight.ScheduledCommodityFlow;
 import freight.ShipperContract;
@@ -10,17 +12,16 @@ import freight.ShipperImpl;
 import freight.ShipperPlan;
 import freight.ShipperShipment;
 import freight.ShipperUtils;
-import freight.TSPUtils;
-
-import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPOffer;
-import playground.mzilske.freight.TSPShipment;
 
 public class SimpleShipperPlanBuilder {
 
 	private TSPAgentTracker tspAgentTracker;
 	
 	private TLCostFunction tlcFunction;
+	
+	private int[] sizes = { 5, 10, 15 };
+	
+	double timePeriod = 3600*24;
 	
 	public SimpleShipperPlanBuilder(TSPAgentTracker tspAgentTracker) {
 		this.tspAgentTracker = tspAgentTracker;
@@ -29,35 +30,28 @@ public class SimpleShipperPlanBuilder {
 	public ShipperPlan buildPlan(ShipperImpl s) {
 		Collection<ScheduledCommodityFlow> scheduledCommodityFlows = new ArrayList<ScheduledCommodityFlow>();
 		for(ShipperContract sC : s.getContracts()){
-			ScheduledCommodityFlow scheduledCommodityFlow = null;
-			CommodityFlow comFlow = sC.getCommodityFlow();
-			Collection<TSPShipment> tspShipments_Freq1 = new ArrayList<TSPShipment>(); 
-			int lotsizeFor1 = makeTSPShipmentsAndGetLotsize(comFlow, 1, tspShipments_Freq1);
-			Collection<TSPOffer> offersFor1 = tspAgentTracker.requestServices(tspShipments_Freq1);
-			TSPOffer cheapestOfferFor1 = getCheapestOffer(offersFor1);
-			double tlcFor1 = tlcFunction.getTLC(comFlow.getValue(),lotsizeFor1,cheapestOfferFor1.getPrice());
-			
-			Collection<TSPShipment> tspShipments_Freq5 = new ArrayList<TSPShipment>(); 
-			int lotsizeFor5 = makeTSPShipmentsAndGetLotsize(comFlow, 5, tspShipments_Freq5);
-			Collection<TSPOffer> offersFor5 = tspAgentTracker.requestServices(tspShipments_Freq5);
-			TSPOffer cheapestOfferFor5 = getCheapestOffer(offersFor5);
-			double tlcFor5 = tlcFunction.getTLC(comFlow.getValue(),lotsizeFor5,cheapestOfferFor5.getPrice());
-			
-			if(tlcFor1 < tlcFor5){
-				scheduledCommodityFlow = ShipperUtils.createScheduledCommodityFlow(comFlow,makeShippersShipments(tspShipments_Freq1), cheapestOfferFor1);
+			CommodityFlow comFlow = sC.getCommodityFlow(); 
+			double minCost = Double.MAX_VALUE;
+			ScheduledCommodityFlow bestScheduledCommodityFlow = null;
+			for(int shipmentSize : sizes){
+				Collection<TSPOffer> offers = tspAgentTracker.requestService(comFlow.getFrom(), comFlow.getTo(), shipmentSize);
+				TSPOffer cheapestOffer = getCheapestOffer(offers);
+				double cost = tlcFunction.getTLC(comFlow.getValue(), shipmentSize, cheapestOffer.getPrice());
+				if(cost < minCost){
+					minCost = cost;
+					bestScheduledCommodityFlow = ShipperUtils.createScheduledCommodityFlow(comFlow,makeShipments(comFlow,comFlow.getSize()/shipmentSize,shipmentSize,timePeriod), cheapestOffer);
+				}
 			}
-			else{
-				scheduledCommodityFlow = ShipperUtils.createScheduledCommodityFlow(comFlow,makeShippersShipments(tspShipments_Freq5), cheapestOfferFor5);
-			}
-			scheduledCommodityFlows.add(scheduledCommodityFlow);
+			scheduledCommodityFlows.add(bestScheduledCommodityFlow);
 		}
 		return ShipperUtils.createPlan(scheduledCommodityFlows);
 	}
-
-	private Collection<ShipperShipment> makeShippersShipments(Collection<TSPShipment> tspShipments) {
+	
+	private Collection<ShipperShipment> makeShipments(CommodityFlow comFlow, int frequency, int shipmentSize, double timePeriod){
 		Collection<ShipperShipment> shipments = new ArrayList<ShipperShipment>();
-		for(TSPShipment tspShipment : tspShipments){
-			shipments.add(ShipperUtils.createShipment(tspShipment));
+		for(int i=0;i<frequency;i++){
+			shipments.add(ShipperUtils.createShipment(comFlow.getFrom(), comFlow.getTo(), shipmentSize,
+					i*timePeriod, (i+1)*timePeriod, i*timePeriod, (i+1)*timePeriod));
 		}
 		return shipments;
 	}
@@ -75,15 +69,6 @@ public class SimpleShipperPlanBuilder {
 			}
 		}
 		return bestOffer;
-	}
-
-	private int makeTSPShipmentsAndGetLotsize(CommodityFlow comFlow, int frequency, Collection<TSPShipment> tspShipments) {
-		int lotSize = comFlow.getSize() / frequency;
-		for(int i=0;i<frequency;i++){
-			tspShipments.add(TSPUtils.createTSPShipment(comFlow.getFrom(), comFlow.getTo(), lotSize, 
-					i*24*3600, (i+1)*24*3600, i*24*3600, (i+1)*24*3600));
-		}
-		return lotSize;
 	}
 
 }

@@ -2,13 +2,15 @@ package city2000w;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.TreeBidiMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+
+import freight.VRPTransformation;
 
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierPlan;
@@ -21,8 +23,6 @@ import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 import playground.mzilske.freight.TourBuilder;
-import vrp.algorithms.clarkeAndWright.ClarkeAndWright;
-import vrp.algorithms.clarkeAndWright.ClarkeWrightCapacityConstraint;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
@@ -36,7 +36,7 @@ private static Logger logger = Logger.getLogger(RuinAndRecreateCarrierPlanBuilde
 	
 	private Network network;
 	
-	private Map<Id,Shipment> customerIdToShipmentMap = new HashMap<Id,Shipment>();
+	private BidiMap customerIdToShipmentMap = new TreeBidiMap();
 	
 	public RuinAndRecreateCarrierPlanBuilder(Network network){
 		this.network = network;
@@ -96,7 +96,7 @@ private static Logger logger = Logger.getLogger(RuinAndRecreateCarrierPlanBuilde
 		
 
 	private Shipment getShipment(Id customerId) {
-		return customerIdToShipmentMap.get(customerId);
+		return (Shipment) customerIdToShipmentMap.get(customerId);
 	}
 
 	private CarrierPlan getEmptyPlan(CarrierCapabilities carrierCapabilities) {
@@ -118,12 +118,14 @@ private static Logger logger = Logger.getLogger(RuinAndRecreateCarrierPlanBuilde
 
 	private Collection<vrp.basics.Tour> solveVRP(Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
 		Id depotId = findDepotId(contracts);
-		VrpBuilder vrpBuilder = new VrpBuilder(depotId, network, customerIdToShipmentMap);
+		VrpBuilder vrpBuilder = new VrpBuilder(depotId, network);
 		vrpBuilder.setConstraints(new CapacityConstraint(carrierVehicle.getCapacity()));
+		VRPTransformation vrpTrafo = new VRPTransformation(network);
 		for(Contract c : contracts){
 			Shipment s = c.getShipment();
-			vrpBuilder.addShipment(s);
+			vrpTrafo.addShipment(s);
 		}
+		vrpBuilder.setVrpTrafo(vrpTrafo);
 		VRP vrp = vrpBuilder.buildVrp();
 		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
 		Collection<vrp.basics.Tour> initialSolution = VrpUtils.createTrivialSolution(vrp);

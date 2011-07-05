@@ -1,5 +1,8 @@
 package facilities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -12,6 +15,12 @@ public abstract class Facility {
 	
 	private Coordinate coordinate;
 	
+	private Map<String,String> attributes = new HashMap<String, String>();
+	
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
 	public Facility(Id id) {
 		super();
 		this.id = id;

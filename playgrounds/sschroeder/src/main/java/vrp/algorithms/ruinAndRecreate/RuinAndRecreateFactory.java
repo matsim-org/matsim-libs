@@ -3,12 +3,14 @@ package vrp.algorithms.ruinAndRecreate;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentWithTimeWindowFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.algorithms.ruinAndRecreate.recreation.BestInsertion;
+import vrp.algorithms.ruinAndRecreate.recreation.RecreationListener;
 import vrp.algorithms.ruinAndRecreate.ruin.RadialRuin;
 import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
@@ -27,6 +29,17 @@ import vrp.basics.VrpUtils;
 
 public class RuinAndRecreateFactory {
 	
+	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
+	
+	private Collection<RuinAndRecreateListener> ruinAndRecreationListeners = new ArrayList<RuinAndRecreateListener>();
+	
+	public void addRecreationListener(RecreationListener l){
+		recreationListeners.add(l);
+	}
+	
+	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
+		ruinAndRecreationListeners.add(l);
+	}
 	
 	/**
 	 * Standard ruin and recreate without time windows. This algo is configured according to Schrimpf et. al (2000).
@@ -57,6 +70,14 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
 		ruinAndRecreateAlgo.setThresholdFunction(new SchrimpfsRRThresholdFunction(0.1));
+		
+		for(RuinAndRecreateListener l : ruinAndRecreationListeners){
+			ruinAndRecreateAlgo.getListeners().add(l);
+		}
+		
+		for(RecreationListener l : recreationListeners){
+			recreationStrategy.addListener(l);
+		}
 		
 		return ruinAndRecreateAlgo;
 	}

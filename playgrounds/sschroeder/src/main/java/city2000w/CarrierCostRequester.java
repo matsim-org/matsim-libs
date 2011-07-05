@@ -2,6 +2,8 @@ package city2000w;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
+
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.TSPOffer;
@@ -11,6 +13,8 @@ import playground.mzilske.freight.TransportServiceProviderImpl;
 
 public class CarrierCostRequester implements TSPOfferMaker{
 
+	private TransportServiceProviderImpl tsp;
+	
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	public CarrierCostRequester(CarrierAgentTracker carrierAgentTracker) {
@@ -18,7 +22,12 @@ public class CarrierCostRequester implements TSPOfferMaker{
 		this.carrierAgentTracker = carrierAgentTracker;
 	}
 
-	public TSPOffer makeOffer(TransportServiceProviderImpl tsp, Collection<TSPShipment> shipments) {
+	@Override
+	public void setTSP(TransportServiceProviderImpl tsp) {
+		this.tsp = tsp;
+	}
+
+	public TSPOffer getOffer(TransportServiceProviderImpl tsp, Collection<TSPShipment> shipments) {
 		TSPShipment shipment = shipments.iterator().next();
 		Collection<Offer> offers = carrierAgentTracker.getOffers(shipment.getFrom(), shipment.getTo(), shipment.getSize());
 		Offer bestOffer = pickBest(offers);
@@ -42,6 +51,16 @@ public class CarrierCostRequester implements TSPOfferMaker{
 			}
 		}
 		return bestOffer;
+	}
+
+	@Override
+	public TSPOffer getOffer(Id from, Id to, int size, double memorizedPrice) {
+		Collection<Offer> offers = carrierAgentTracker.getOffers(from, to, size);
+		Offer bestOffer = pickBest(offers);
+		TSPOffer tspOffer = new TSPOffer();
+		tspOffer.setPrice(bestOffer.getPrice());
+		tspOffer.setTspId(tsp.getId());
+		return tspOffer;
 	}
 
 }

@@ -27,5 +27,10 @@ public class Shipment {
 	public Customer getTo() {
 		return to;
 	}
+	
+	@Override
+	public String toString() {
+		return "fromNode=" + from.getLocation().getId() + " toNode=" + to.getLocation().getId() + " size=" + from.getDemand();
+	}
 
 }

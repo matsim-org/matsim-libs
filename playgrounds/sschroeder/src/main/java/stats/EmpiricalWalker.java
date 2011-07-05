@@ -28,6 +28,10 @@ public class EmpiricalWalker {
 	public Frequency getFrequency() {
 		return frequency;
 	}
+	
+	public void addEntry(Comparable<?> entry, int weight){
+		
+	}
 
 	public Comparable<?> nextValue(){
 		double randomValue = MatsimRandom.getRandom().nextDouble();

@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.TreeBidiMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+
+import freight.VRPTransformation;
 
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierPlan;
@@ -32,7 +35,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 	
 	private Network network;
 	
-	private Map<Id,Shipment> customerIdToShipmentMap = new HashMap<Id,Shipment>();
+	private BidiMap customerIdToShipmentMap = new TreeBidiMap();
 	
 	public ClarkeAndWrightCarrierPlanBuilder(Network network){
 		this.network = network;
@@ -86,7 +89,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 		
 
 	private Shipment getShipment(Id customerId) {
-		return customerIdToShipmentMap.get(customerId);
+		return (Shipment)customerIdToShipmentMap.get(customerId);
 	}
 
 	private CarrierPlan getEmptyPlan(CarrierCapabilities carrierCapabilities) {
@@ -108,12 +111,14 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 
 	private Collection<vrp.basics.Tour> solveVRP(Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
 		Id depotId = findDepotId(contracts);
-		VrpBuilder vrpBuilder = new VrpBuilder(depotId, network, customerIdToShipmentMap);
+		VrpBuilder vrpBuilder = new VrpBuilder(depotId, network);
 		vrpBuilder.setConstraints(new ClarkeWrightCapacityConstraint(carrierVehicle.getCapacity()));
+		VRPTransformation vrpTrafo = new VRPTransformation(network);
 		for(Contract c : contracts){
 			Shipment s = c.getShipment();
-			vrpBuilder.addShipment(s);
+			vrpTrafo.addShipment(s);
 		}
+		vrpBuilder.setVrpTrafo(vrpTrafo);
 		VRP vrp = vrpBuilder.buildVrp();
 		ClarkeAndWright clarkAndWright = new ClarkeAndWright(vrp);
 		clarkAndWright.run();

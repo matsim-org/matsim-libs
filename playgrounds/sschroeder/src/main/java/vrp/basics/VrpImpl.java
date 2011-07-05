@@ -50,7 +50,7 @@ public class VrpImpl implements VRP{
 		return constraints;
 	}
 
-	public Costs getCosts() {
+	public synchronized Costs getCosts() {
 		return costs;
 	}
 

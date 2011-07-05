@@ -45,13 +45,13 @@ public class CarrierUtils {
 		return offer;
 	}
 	
-	public static Shipment createShipment(Id from, Id to, int size, long startPickup, long endPickup, long startDelivery, long endDelivery){
+	public static Shipment createShipment(Id from, Id to, int size, double startPickup, double endPickup, double startDelivery, double endDelivery){
 		TimeWindow startTW = makeTW(startPickup, endPickup);
 		TimeWindow endTW = makeTW(startDelivery, endDelivery);
 		return new Shipment(from,to,size,startTW,endTW);
 	}
 	
-	private static TimeWindow makeTW(long start, long end) {
+	private static TimeWindow makeTW(double start, double end) {
 		return new TimeWindow(start, end);
 	}
 

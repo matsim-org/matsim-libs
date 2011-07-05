@@ -21,6 +21,8 @@ public class ScheduledVehicleAgent {
 	private PlanAlgorithm router;
 	
 	private NetworkImpl network;
+	
+	GeotoolsTransformation transformation;
 
 	public ScheduledVehicleAgent(ScheduledVehicle scheduledVehicle) {
 		super();
@@ -34,9 +36,19 @@ public class ScheduledVehicleAgent {
 	public void setRouter(PlanAlgorithm router) {
 		this.router = router;
 	}
+	
+	/**
+	 * activity coordinates from kid-activities are assigned to network-links. thus, coordinate-system of network must be equal
+	 * to coordinate-system of kid-activities. this transformation transforms kid-coordinate system to network-coordinate system.
+	 * by default, kid-coordinates are in WGS84.
+	 * 
+	 * @param transformation
+	 */
+	public void setTransformation(GeotoolsTransformation transformation) {
+		this.transformation = transformation;
+	}
 
 	public Plan createPlan(){
-		logger.info("create plan");
 		AgentPlanBuilder planBuilder = new AgentPlanBuilder(router);
 		planBuilder.setDriverId(scheduledVehicle.getVehicle().getId());
 		TransportLeg lastLeg = null;
@@ -69,15 +81,12 @@ public class ScheduledVehicleAgent {
 		planBuilder.scheduleActivity(KiDUtils.getActivity(lastLeg), finalDestinationLink, null);
 		logger.debug("finalDest=" + finalDestinationLink + "; depTime=null");
 		Plan plan = planBuilder.build();
-		logger.info(plan);
 		return plan;
 	}
 	
 	
 
 	private Id getLinkId(Coordinate coordinate){
-		//does only make sense if network is in dhdn_gk4 also
-		GeotoolsTransformation transformation = KiDUtils.createTransformation_WGS84ToWGS8432N();
 		Coordinate transformedCoord = transformation.transform(coordinate);
 		Coord coord = new CoordImpl(transformedCoord.x, transformedCoord.y);
 		Link link = network.getNearestLink(coord);

@@ -17,6 +17,7 @@ import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
 import vrp.api.VRP;
 import vrp.basics.Tour;
+import vrp.basics.TourActivity;
 import vrp.basics.VrpUtils;
 
 
@@ -28,9 +29,9 @@ import vrp.basics.VrpUtils;
  *
  */
 
-public class BestInsertion implements RecreationStrategy{
+public class ParallelBestInsertion implements RecreationStrategy{
 
-	private Logger logger = Logger.getLogger(BestInsertion.class);
+	private Logger logger = Logger.getLogger(ParallelBestInsertion.class);
 	
 	private VRP vrp;
 	
@@ -46,7 +47,7 @@ public class BestInsertion implements RecreationStrategy{
 		return recreationListeners;
 	}
 
-	public BestInsertion(VRP vrp) {
+	public ParallelBestInsertion(VRP vrp) {
 		super();
 		this.vrp = vrp;
 		this.depot = vrp.getDepot();
@@ -56,27 +57,57 @@ public class BestInsertion implements RecreationStrategy{
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
-	public void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
-//		List<Customer> customersWithoutService = getCustomers(shipmentsWithoutService);
+	public synchronized void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
 		Collections.shuffle(shipmentsWithoutService, MatsimRandom.getRandom());
 		for(Shipment shipmentWithoutService : shipmentsWithoutService){
+			doCalculation();
+			List<Offer> rejectedOffers = new ArrayList<Offer>();
 			Offer bestOffer = null;
+			TourAgent bestAgent = null;
+			Collection<Thread> threads = new ArrayList<Thread>();
 			for(TourAgent agent : tentativeSolution.getTourAgents()){
-				Offer offer = agent.requestService(shipmentWithoutService);
-//				logger.debug(offer);
+				assertAgentDoesNotHaveThisShipment(agent,shipmentWithoutService);
+				agent.setNewShipment(VrpUtils.createShipment(shipmentWithoutService.getFrom(), shipmentWithoutService.getTo()));
+			}
+			for(TourAgent agent : tentativeSolution.getTourAgents()){
+				Thread agentThread = new Thread(agent);
+				threads.add(agentThread);
+				agentThread.start();
+			}
+			for(Thread agentThread : threads){
+				try {
+					agentThread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					logger.error(e);
+					System.exit(1);
+				}
+			}
+			for(TourAgent agent : tentativeSolution.getTourAgents()){
+				Offer offer = agent.getOpenOffer();
 				if(offer == null){
 					continue;
 				}
 				if(bestOffer == null){
 					bestOffer = offer;
+					bestAgent = agent;
 				}
 				else if(offer.getCost() < bestOffer.getCost()){
+					rejectedOffers.add(bestOffer);
 					bestOffer = offer;
+					bestAgent = agent;
 				}
+				else{
+					rejectedOffers.add(offer);
+				}
+				
+			}
+			for(Offer o : rejectedOffers){
+				o.getAgent().offerRejected(o);
 			}
 			if(bestOffer != null){
 				logger.debug("offer granted " + bestOffer.getAgent() + " " + bestOffer + " " + shipmentWithoutService);
-				bestOffer.getAgent().offerGranted(shipmentWithoutService);
+				bestAgent.offerGranted(shipmentWithoutService);
 				informListeners(shipmentWithoutService,bestOffer.getCost());
 			}
 			else{
@@ -88,6 +119,24 @@ public class BestInsertion implements RecreationStrategy{
 					throw new IllegalStateException("could not create a valid round-tour" + newTourAgent);
 				}
 				
+			}
+		}
+	}
+
+	private synchronized void doCalculation() {
+		
+		
+	}
+
+	private void assertAgentDoesNotHaveThisShipment(TourAgent agent, Shipment shipmentWithoutService) {
+		Customer from = shipmentWithoutService.getFrom();
+		Customer to = shipmentWithoutService.getTo();
+		for(TourActivity tA : agent.getTourActivities()){
+			if(tA.getCustomer().getId().equals(from.getId()) && !isDepot(from)){
+				throw new IllegalStateException("this cannot happen. " + agent.getTour() + "; " + shipmentWithoutService);
+			}
+			if(tA.getCustomer().getId().equals(to.getId()) && !isDepot(to)){
+				throw new IllegalStateException("this cannot happen. " + agent.getTour() + "; " + shipmentWithoutService);
 			}
 		}
 	}

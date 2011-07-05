@@ -38,8 +38,22 @@ public class KiDUtils {
 		return geoTransformation.transform(coord);
 	}
 	
+	public static GeotoolsTransformation createTransformation_WGS84ToWGS84UTM33N(){
+		GeotoolsTransformation geoTransformation;
+		try {
+			geoTransformation = new GeotoolsTransformation(DefaultGeographicCRS.WGS84, CRS.decode("EPSG:32633"));
+		} catch (NoSuchAuthorityCodeException e) {
+			e.printStackTrace();
+			throw new IllegalStateException("cannot transform coordinate. error: " + e);
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new IllegalStateException("cannot transform coordinate. error: " + e);
+		}
+		return geoTransformation;
+	}
 	
-	public static GeotoolsTransformation createTransformation_WGS84ToWGS8432N(){
+	public static GeotoolsTransformation createTransformation_WGS84ToWGS84UTM32N(){
 		GeotoolsTransformation geoTransformation;
 		try {
 			geoTransformation = new GeotoolsTransformation(DefaultGeographicCRS.WGS84, CRS.decode("EPSG:32632"));

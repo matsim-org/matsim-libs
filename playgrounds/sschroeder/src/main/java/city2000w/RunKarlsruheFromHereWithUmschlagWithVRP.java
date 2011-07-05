@@ -3,16 +3,11 @@
  */
 package city2000w;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -38,7 +33,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
-import playground.mzilske.city2000w.SelectedPlanReplicator;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
@@ -63,13 +57,9 @@ import playground.mzilske.freight.TransportServiceProviders;
  */
 public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener, ShutdownListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private static final int GRID_SIZE = 8;
-
 	private static final int NUMBEROFCARRIERS = 100;
 	
 	private static final int NUMBEROFTSPSHIPMENTS = 500;
-	
-	private static final Long SEED = Long.MAX_VALUE;
 	
 	private static Logger logger = Logger.getLogger(RunKarlsruheFromHereWithUmschlagWithVRP.class);
 	
@@ -83,7 +73,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 	
 	private AgentObserver simStats;
 	
-	private static final String NETWORK_FILENAME = "../FreightModel/input/karlsruheNetwork.xml";
+	private static final String NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
 	
 	
 	/**
@@ -125,7 +115,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		freightAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
-		mobsimFactory.setUseOTFVis(false);
+		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
 		simStats = new AgentObserver("Karlsruhe with umschlag", scenario.getNetwork());
@@ -164,8 +154,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		replanTSP();
-		// replanCarriers();
+		
 	}
 
 	@Override
@@ -173,34 +162,6 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		simStats.reset(1);
 		simStats.writeStats();
 	}
-
-	private void replanTSP() {
-//		// TODO Auto-generated method stub
-//		for (TransportServiceProviderImpl tsp : transportServiceProviders.getTransportServiceProviders()) {
-//			List<TSPPlan> plans = (List) tsp.getPlans();
-//			TSPPlan selectedPlan = tsp.getSelectedPlan();
-//			logger.info("The plan we just used got us "+selectedPlan.getScore()+" points. Now trying the other one.");
-//			tsp.setSelectedPlan(plans.get(1 - plans.indexOf(selectedPlan)));
-//		}
-	}
-
-	private void replanCarriers() {
-		for(CarrierImpl carrier : carriers.getCarriers().values()){
-			replan(carrier);
-		}
-	}
-
-	private void replan(CarrierImpl carrier) {
-		SelectedPlanReplicator replanner = new SelectedPlanReplicator();
-		CarrierPlan newPlan = replanner.replan(carrier.getCarrierCapabilities(),carrier.getContracts(),carrier.getSelectedPlan());
-		carrier.getPlans().add(newPlan);
-		carrier.setSelectedPlan(newPlan);
-	}
-
-	private void scoreLogisticServiceProvider() {
-		// do something
-	}	
-	
 
 	private void run(){
 		Config config = new Config();
@@ -230,9 +191,9 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 
 	private void createCarrierPlans() {
 		for(CarrierImpl carrier : carriers.getCarriers().values()){
-//			RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder planBuilder = new RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(scenario.getNetwork());
+			RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder planBuilder = new RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(scenario.getNetwork());
 //			RuinAndRecreateCarrierPlanBuilder planBuilder = new RuinAndRecreateCarrierPlanBuilder(scenario.getNetwork());
-			ClarkeAndWrightCarrierPlanBuilder planBuilder = new ClarkeAndWrightCarrierPlanBuilder(scenario.getNetwork());
+//			ClarkeAndWrightCarrierPlanBuilder planBuilder = new ClarkeAndWrightCarrierPlanBuilder(scenario.getNetwork());
 			CarrierPlan plan = planBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
@@ -276,16 +237,6 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 
 	private IdImpl makeId(String idString) {
 		return new IdImpl(idString);
-	}
-
-	private CarrierImpl createCarrier(int linkPosInNetwork) {
-		Id linkId = pickLinkIdFromNetwork(linkPosInNetwork);
-		CarrierImpl carrier = new CarrierImpl(new IdImpl("carrier-"+linkPosInNetwork), linkId);
-		CarrierCapabilities cc = new CarrierCapabilities();
-		carrier.setCarrierCapabilities(cc);
-		CarrierVehicle carrierVehicle = new CarrierVehicle(new IdImpl("carrier-"+linkPosInNetwork+"-vehicle"), linkId);
-		cc.getCarrierVehicles().add(carrierVehicle);
-		return carrier;
 	}
 
 	private void createTransportServiceProviderWithContracts(int nOfShipments) {
@@ -349,26 +300,6 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		tsp.setSelectedPlan(directPlan);
 	}
 
-	private void createContracts(TransportServiceProviderImpl tsp, int nOfShipments) {
-		Random random = new Random(SEED);
-		Id sourceLinkId = new IdImpl("160038764_160038765"); //bruchsal
-		for(int i=0; i<nOfShipments; i++){
-			Id destinationLinkId = pickLinkIdFromNetwork(random.nextInt(scenario.getNetwork().getLinks().values().size()));
-			tsp.getContracts().add(createContract(sourceLinkId, destinationLinkId));
-		}
-	}
-
-	private Id pickLinkIdFromNetwork(int i) {
-		int count=0;
-		for(Link link : scenario.getNetwork().getLinks().values()){
-			if(i==count){
-				return link.getId();
-			}
-			count++;
-		}
-		throw new RuntimeException("no linkId found");
-	}
-
 	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
 		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
 		TSPOffer offer = new TSPOffer();
@@ -388,17 +319,6 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		logger.debug("TransshipmentCentres:");
 		for(Id id : cap.getTransshipmentCentres()){
 			logger.debug(id);
-		}
-		
-	}
-
-	private void printContracts(Collection<TSPContract> contracts) {
-		int count = 1;
-		for(TSPContract c : contracts){
-			for(TSPShipment s : c.getShipments()){
-				logger.debug("shipment " + count + ": " + s);
-				count++;
-			}
 		}
 		
 	}

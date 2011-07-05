@@ -1,5 +1,8 @@
 package vrp.algorithms.ruinAndRecreate.basics;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -16,6 +19,8 @@ import vrp.basics.VrpUtils;
  */
 
 public class BestTourBuilder implements TourBuilder {
+	
+	private static Logger logger = Logger.getLogger(BestTourBuilder.class);
 	
 	public static class TourInformation {
 		public Tour tour;
@@ -65,6 +70,7 @@ public class BestTourBuilder implements TourBuilder {
 						newTour.getActivities().add(VrpUtils.createTourActivity(tA.getCustomer()));
 					}
 					newTour.getActivities().add(i,VrpUtils.createTourActivity(customer));
+					assertCustomerIsOnlyOnceInTour(newTour,customer);
 					tourActivityUpdater.update(newTour);
 					double totalCosts = tourActivityUpdater.getTourCost();
 					if(this.constraints.judge(newTour)){
@@ -80,6 +86,24 @@ public class BestTourBuilder implements TourBuilder {
 		return null;
 	}
 	
+	private void assertCustomerIsOnlyOnceInTour(Tour newTour, Customer customer) {
+		if(isDepot(newTour, customer)){
+			return;
+		}
+		Id customerId = customer.getId();
+		int count = 0;
+		for(TourActivity tA : newTour.getActivities()){
+			if(tA.getCustomer().getId().equals(customerId)){
+				count++;
+			}
+		}
+		if(count<1 || count>1){
+			logger.error(newTour + " this cannot happen");
+			System.exit(1);
+		}
+		
+	}
+
 	public TourInformation buildTour(Tour tour, Shipment shipment){
 		TourInformation tourTrippel = null;
 		if(isDepot(tour,shipment.getFrom())){

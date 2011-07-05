@@ -65,6 +65,14 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 
 	private void startCarrier(CarrierImpl carrier, BufferedWriter writer) throws IOException {
 		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\" linkId=\"" + carrier.getDepotLinkId() + "\">\n");
+		startVehicles(writer);
+		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
+			startAndEndVehicle(v);
+		}
+		endVehicles(writer);
+		if(carrier.getSelectedPlan() == null){
+			return;
+		}
 		for(ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()){
 			registeredShipments(tour.getTour().getShipments());
 		}
@@ -73,11 +81,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 			startShipment(registeredShipments.get(shipment), shipment, writer);
 		}
 		endShipments(writer);
-		startVehicles(writer);
-		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
-			startAndEndVehicle(v);
-		}
-		endVehicles(writer);
+		
 		startScheduledTours(writer);
 		for(ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()){
 			startScheduledTour(tour,writer);

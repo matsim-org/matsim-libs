@@ -39,6 +39,13 @@ public class FacilityShapeFileWriter {
 		this.network = network;
 	}
 	
+	public FacilityShapeFileWriter(Collection<? extends Facility> facilities) {
+		super();
+		setDefaultReferenceSystem();
+		this.facilities = facilities;
+	}
+	
+	
 	private void setDefaultReferenceSystem() {
 		try {
 			referenceSystem = CRS.decode("EPSG:32633");
@@ -69,12 +76,23 @@ public class FacilityShapeFileWriter {
 	}
 
 	private void createFeatures() {
-		
 		SimpleFeatureType featureType = createFeatureType();
 		for(Facility f : facilities){
 			SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-			Coord faciltiyCoord = network.getLinks().get(f.getLocationId()).getCoord();
-			featureBuilder.add(new GeometryFactory().createPoint(makeCoordinate(faciltiyCoord)));
+			Coordinate facilityCoord = null;
+			if(network == null){
+				facilityCoord = f.getCoordinate();
+				if(facilityCoord == null){
+					throw new IllegalStateException("network is null and facilityCoord is null. this should not happen.");
+				}
+			}
+			else{
+				if(f.getLocationId() == null){
+					throw new IllegalStateException("locationId/linkId must be set.");
+				}
+				facilityCoord = makeCoordinate(network.getLinks().get(f.getLocationId()).getCoord());
+			}
+			featureBuilder.add(new GeometryFactory().createPoint(facilityCoord));
 			featureBuilder.add(f.getId());
 			featureBuilder.add(f.getLocationId());
 			featureBuilder.add(f.getType());
