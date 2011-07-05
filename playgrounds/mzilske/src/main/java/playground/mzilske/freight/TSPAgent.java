@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -59,6 +60,7 @@ public class TSPAgent {
 	}
 	
 	public void setOfferMaker(TSPOfferMaker offerMaker) {
+		offerMaker.setTSP(tsp);
 		this.offerMaker = offerMaker;
 	}
 
@@ -123,8 +125,12 @@ public class TSPAgent {
 		return cost;
 	}
 
-	public TSPOffer requestService(Collection<TSPShipment> shipments) {
-		return offerMaker.makeOffer(tsp,shipments);
+	public TSPOffer requestService(Id from, Id to, int size) {
+		return offerMaker.getOffer(from,to,size,getMemorizedPrice(from,to,size));
+	}
+
+	private double getMemorizedPrice(Id from, Id to, int size) {
+		return 0.0;
 	}
 	
 }

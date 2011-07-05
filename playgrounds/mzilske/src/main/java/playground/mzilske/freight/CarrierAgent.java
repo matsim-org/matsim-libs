@@ -23,11 +23,38 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.mzilske.freight.Tour.Delivery;
-import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 
 public class CarrierAgent {
+	
+	public interface CostCalculator {
+		
+		public Double getCost(Id from, Id to, int size);
+		
+		public void memorizeCost(Id from, Id to, int size, double cost);
+		
+	}
+	
+	public class CostTable implements CostCalculator {
+
+		private Map<CostTableKey,Double> costMap = new HashMap<CarrierAgent.CostTableKey, Double>();
+		
+		@Override
+		public Double getCost(Id from, Id to, int size) {
+			Double cost = costMap.get(makeKey(from,to,size));
+			return cost;
+		}
+
+		private CostTableKey makeKey(Id from, Id to, int size) {
+			CostTableKey key = new CostTableKey(from, to, size);
+			return key;
+		}
+
+		@Override
+		public void memorizeCost(Id from, Id to, int size, double cost) {
+			costMap.put(makeKey(from,to,size), cost);
+		}
+	}
 	
 	public class CostTableKey {
 
@@ -66,13 +93,13 @@ public class CarrierAgent {
 	
 	private Map<Id, CarrierDriverAgent> carrierDriverAgents = new HashMap<Id, CarrierDriverAgent>();
 	
-	private CostAllocator costAllocator = null;
+	private CostAllocatorImpl costAllocator = null;
 
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
 
 	private CarrierAgentTracker tracker;
 
-	private Map<CostTableKey, Double> costTable = new HashMap<CostTableKey, Double>();
+	private CostCalculator costTable;
 	
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 
@@ -207,7 +234,7 @@ public class CarrierAgent {
 		
 	}
 
-	public void setCostAllocator(CostAllocator costAllocator) {
+	public void setCostAllocator(CostAllocatorImpl costAllocator) {
 		this.costAllocator = costAllocator;
 	}
 
@@ -270,18 +297,13 @@ public class CarrierAgent {
 	}
 
 	private void memorizeCost(Id from, Id to, int size, Double cost) {
-		CostTableKey key = new CostTableKey(from, to, size);
-		if(!costTable.containsKey(key)){
-			costTable.put(key, cost);
+		if(costTable.getCost(from, to, size) == null){
+			costTable.memorizeCost(from, to, size, cost);
 		}
 		else{
-			if(costTable.get(key) > cost){
-				costTable.put(key, cost);
+			if(costTable.getCost(from,to,size) > cost){
+				costTable.memorizeCost(from, to, size, cost);
 			}
-//			double oldCost = costTable.get(key);
-//			double learningRate = 0.5;
-//			double newCost = learningRate*cost + (1-learningRate)*oldCost;
-//			costTable.put(key, newCost);
 		}
 	}
 
@@ -311,14 +333,14 @@ public class CarrierAgent {
 		return id;
 	}
 
-	public Offer makeOffer(Id linkId, Id linkId2, int shipmentSize) {
+	public Offer requestOffer(Id linkId, Id linkId2, int shipmentSize) {
 		if(requestIsNoGo(linkId,linkId2)){
 			return new NoOffer();
 		}
 		Offer offer = new Offer();
 		offer.setCarrierId(carrier.getId());
-		Double memorizedPrice = costTable.get(new CostTableKey(linkId, linkId2, shipmentSize));
-		return offerMaker.getOffer(linkId,linkId2,shipmentSize,memorizedPrice);
+		Double memorizedPrice = costTable.getCost(linkId, linkId2, shipmentSize);
+		return offerMaker.requestOffer(linkId,linkId2,shipmentSize,memorizedPrice);
 	}
 
 	private boolean requestIsNoGo(Id linkId, Id linkId2) {

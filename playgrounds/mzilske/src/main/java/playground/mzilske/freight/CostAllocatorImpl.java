@@ -9,15 +9,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class CostAllocator {
+public class CostAllocatorImpl {
 	
-	private Logger logger = Logger.getLogger(CostAllocator.class);
+	private Logger logger = Logger.getLogger(CostAllocatorImpl.class);
 	
 	private Network network;
 
 	private CarrierImpl carrier;
 	
-	public CostAllocator(CarrierImpl carrier, Network network) {
+	public CostAllocatorImpl(CarrierImpl carrier, Network network) {
 		this.carrier = carrier;
 		this.network = network;
 	}

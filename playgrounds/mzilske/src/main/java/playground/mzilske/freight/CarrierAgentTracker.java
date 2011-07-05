@@ -140,8 +140,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		for (CarrierImpl carrier : carriers) {
 			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
 			carrierAgent.setCostFunction(new CarrierTimeDistanceCostFunction());
-			carrierAgent.setCostAllocator(new CostAllocator(carrier, network));
-			carrierAgent.setOfferMaker(new OfferMaker(carrier, network, new CarrierTimeDistanceCostFunction()));
+			carrierAgent.setCostAllocator(new CostAllocatorImpl(carrier, network));
+			carrierAgent.setOfferMaker(new BeeLineOfferMaker(carrier, network, new CarrierTimeDistanceCostFunction()));
 			carrierAgent.setNetwork(network);
 			carrierAgents.add(carrierAgent);
 		}
@@ -162,7 +162,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	public Collection<Offer> getOffers(Id linkId, Id linkId2, int shipmentSize) {
 		Collection<Offer> offers = new ArrayList<Offer>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
-			Offer offer = carrierAgent.makeOffer(linkId, linkId2, shipmentSize);
+			Offer offer = carrierAgent.requestOffer(linkId, linkId2, shipmentSize);
 			if(offer instanceof NoOffer){
 				continue;
 			}

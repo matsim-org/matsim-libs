@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -24,8 +25,6 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	private Collection<TSPAgent> tspAgents = new ArrayList<TSPAgent>();
 	
 	private Collection<TSPCostListener> costListeners = new ArrayList<TSPCostListener>();
-	
-	private TSPOfferMaker offerMaker;
 	
 	public void setOfferMaker(TSPOfferMaker offerMaker) {
 		for(TSPAgent a : tspAgents){
@@ -102,7 +101,6 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	private void createTSPAgents() {
 		for(TransportServiceProviderImpl tsp : transportServiceProviders){
 			TSPAgent tspAgent = new TSPAgent(tsp);
-//			tspAgent.setOfferMaker(new Carrie);
 			tspAgents.add(tspAgent);
 		}
 	}
@@ -114,10 +112,10 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		}
 	}
 	
-	public Collection<TSPOffer> requestServices(Collection<TSPShipment> shipments){
+	public Collection<TSPOffer> requestService(Id from, Id to, int size){
 		Collection<TSPOffer> offers = new ArrayList<TSPOffer>();
 		for(TSPAgent tspAgent : tspAgents){
-			TSPOffer offer = tspAgent.requestService(shipments);
+			TSPOffer offer = tspAgent.requestService(from,to,size);
 			offers.add(offer);
 		}
 		return offers;
