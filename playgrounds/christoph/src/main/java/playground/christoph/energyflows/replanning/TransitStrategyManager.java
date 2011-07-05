@@ -20,6 +20,8 @@
 
 package playground.christoph.energyflows.replanning;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
@@ -48,6 +50,7 @@ public class TransitStrategyManager extends StrategyManager {
 	private PlanStrategy reroutingStrategy;
 	private PlanStrategy expBetaSelectorStrategy;
 	private double reroutingShare;
+	private Random random;
 	
 	public TransitStrategyManager(Controler controler, double replanningShare) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
@@ -56,6 +59,7 @@ public class TransitStrategyManager extends StrategyManager {
 		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
 		
 		this.reroutingShare = replanningShare;
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
@@ -78,7 +82,7 @@ public class TransitStrategyManager extends StrategyManager {
 		 */
 		int id = Integer.valueOf(person.getId().toString());
 		if (id > 1000000000) {
-			double rnd = MatsimRandom.getRandom().nextDouble();
+			double rnd = random.nextDouble();
 			if (rnd <= reroutingShare) return reroutingStrategy;
 			else return expBetaSelectorStrategy;
 		} else return super.chooseStrategy(person);
