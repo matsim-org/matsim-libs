@@ -53,23 +53,32 @@ public class JointControlerUtils {
 	 * @return a JointControler instance, ready for running.
 	 */
 	public static Controler createControler(final String configFile) {
-		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
-		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
+		Config config = createConfig(configFile);
 
-		Config config = ConfigUtils.createConfig();
-		ScenarioWithCliques scenario = null;
-		Controler controler = null;
+		ScenarioWithCliques scenario = createScenario(config);
 
-		// /////////////////////////////////////////////////////////////////////
-		// initialize the config before passing it to the controler
-		config.addCoreModules();
-		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
-		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
+		Controler controler = new JointControler(scenario);
+		setScoringFunction(controler);
 
-		//read the config file
-		ConfigUtils.loadConfig(config, configFile);
+		return controler;
+	}
 
-		scenario = new ScenarioWithCliques(config);
+	/**
+	 * binds to createScenario(createConfig(configFile));
+	 *
+	 * @param configFile the path to the configFile
+	 * @return a ready to use scenario
+	 */
+	public static ScenarioWithCliques createScenario(final String configFile) {
+		return createScenario(createConfig(configFile));
+	}
+
+	/**
+	 * @param config a loaded config
+	 * @return a ready to use scenario
+	 */
+	public static ScenarioWithCliques createScenario(final Config config) {
+		ScenarioWithCliques scenario = new ScenarioWithCliques(config);
 
 		//(new ScenarioLoaderImpl(scenario)).loadScenario();
 		// ScenarioUtils.loadScenario(scenario);
@@ -85,10 +94,29 @@ public class JointControlerUtils {
 			throw new RuntimeException("Problem while importing clique information", e);
 		}
 
-		controler = new JointControler(scenario);
-		setScoringFunction(controler);
+		return scenario;
+	}
 
-		return controler;
+	/**
+	 * @param configFile the path to the config file
+	 * @return a loaded config, including proper setting of joint trips specific groups
+	 */
+	public static Config createConfig(final String configFile) {
+		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
+		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
+
+		Config config = ConfigUtils.createConfig();
+
+		// /////////////////////////////////////////////////////////////////////
+		// initialize the config before passing it to the controler
+		config.addCoreModules();
+		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
+		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
+
+		//read the config file
+		ConfigUtils.loadConfig(config, configFile);
+
+		return config;
 	}
 
 	/**
