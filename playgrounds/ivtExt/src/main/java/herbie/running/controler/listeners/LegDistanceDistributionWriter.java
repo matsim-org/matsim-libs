@@ -42,7 +42,7 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		1000, 2000, 5000, 
 		10000, 20000, 50000, 
 		100000, 200000, 500000,
-		1000000};
+		1000000, Double.MAX_VALUE};
 
 	private final String filename;
 

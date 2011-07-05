@@ -104,17 +104,68 @@ public class RunControlers extends Thread {
 //		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110614/configCalibration9.xml");
 //		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110614/configCalibration10.xml");
 		
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibrationStandard.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration1.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration2.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration3.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration4.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration5.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration6.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration7.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration8.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration9.xml");
-		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration10.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibrationStandard.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration1.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration2.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration3.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration4.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration5.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration6.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration7.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration8.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration9.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110617/configCalibration10.xml");
+		
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibrationStandard.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration1.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration2.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration3.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration4.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration5.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration6.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration7.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration8.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration9.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibration10.xml");
+		
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110620/configCalibrationStandard.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration1.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration2.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration3.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration4.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration5.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration6.xml");
+		
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration7.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration8.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration9.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110621/configCalibration10.xml");
+//		
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibrationStandard.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration1.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration2.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration3.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration4.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration5.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration6.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration7.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration8.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration9.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration10.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration11.xml");
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110624/configCalibration12.xml");
+		
+//		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibrationStandard.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration1.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration2.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration3.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration4.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration5.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration6.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration7.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration8.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration9.xml");
+		configs.add("/Network/Servers/pingelap/Volumes/ivt-shared/Groups/ivt/vpl/Projekte/herbie/configs/20110705/configCalibration10.xml");
 		
 		for (int i = 0; i < configs.size(); i++) {
 			

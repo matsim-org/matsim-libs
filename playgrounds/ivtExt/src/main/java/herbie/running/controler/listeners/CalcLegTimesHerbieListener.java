@@ -55,6 +55,7 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 		240.0 * 60.0,
 		480.0 * 60.0,
 		960.0 * 60.0,
+		Double.MAX_VALUE,
 	};
 
 	final private String averagesSummaryFilename;
