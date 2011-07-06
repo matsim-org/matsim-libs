@@ -102,18 +102,18 @@ public class PaperController extends WithinDayController implements StartupListe
 	/*
 	 * Define when the affected agents start and end being collected.
 	 */
-	/*package*/ int tBeginEvent = 7*3600;	// 07:00
-	/*package*/ int tEndEvent = 9*3600;		// 09:00
+	/*package*/ int tBeginEvent = -1;
+	/*package*/ int tEndEvent = -1;
 	
 	/*
 	 * Define when the Replanning is en- and disabled.
 	 */
-	/*package*/ int tWithinDayEnabled = 7*3600;		// 07:00
-	/*package*/ int tWithinDayDisabled = 12*3600;	// 12:00
+	/*package*/ int tWithinDayEnabled = -1;
+	/*package*/ int tWithinDayDisabled = -1;
 	/*package*/ boolean enabled = false;
 	
-	/*package*/ String cityZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_City.shp";
-	/*package*/ String cantonZurichSHPFile = "../../matsim/mysimulations/ICEM2011/input/GIS/Zurich_Canton.shp";
+	/*package*/ String cityZurichSHPFile = "";
+	/*package*/ String cantonZurichSHPFile = "";
 	
 //	protected InitialIdentifier initialIdentifier;
 //	protected DuringActivityIdentifier duringActivityIdentifier;
@@ -123,7 +123,6 @@ public class PaperController extends WithinDayController implements StartupListe
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
 	protected SelectHandledAgentsByProbability selector;
-
 
 	public PaperController(String[] args) {
 		super(args);
@@ -286,7 +285,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	}
 	
 	private void getAffectedAgents(String eventsFile) {
-		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, affectedAgentsFile);
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tBeginEvent, tEndEvent, affectedAgentsFile);
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(iaa);
@@ -298,7 +297,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	
 	private void getReplanningAgents(String eventsFile) {
 		
-		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tWithinDayEnabled, tWithinDayDisabled, replanningAgentsFile);
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tBeginEvent, tEndEvent, replanningAgentsFile);
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(iaa);
@@ -385,6 +384,9 @@ public class PaperController extends WithinDayController implements StartupListe
 			System.out.println();
 		} else {		
 			final PaperController controller = new PaperController(new String[]{args[0]});
+			
+			// do not dump plans, network and facilities and the end
+//			controller.setDumpDataAtEnd(false);
 			
 			// set parameter from command line
 			for (int i = 1; i < args.length; i++) {
