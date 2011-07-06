@@ -23,11 +23,8 @@
  */
 package playground.mmoyo.cadyts_integration;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 public class Z_Launcher {
@@ -38,6 +35,9 @@ public class Z_Launcher {
 			configFile = args[0];
 		}else{
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			// the launch root needs to be at a place from where this path is found.  Changing it here by itself will not be enough
+			// since the input files mentioned in the config file also rely on "../".  With materialized maven modules, the
+			// correct root seems to be ${workspace_loc:playgrounds}, which is not the default.  kai, jul'11
 		}
 
 		Config config = null;
