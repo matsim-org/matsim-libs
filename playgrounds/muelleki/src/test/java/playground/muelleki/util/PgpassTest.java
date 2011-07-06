@@ -37,4 +37,9 @@ public class PgpassTest extends TestCase {
 		assertEquals(p.getPgpass("myhost", "1234", "mydb", "myuser"), "pwd2");
 		assertEquals(p.getPgpass("unknownhost", "7890", "unknowndb", "unknownuser"), null);
 	}
+	
+	public void testPgpassFile() {
+		assertEquals(PgpassFile._getWindowsName("%APPDATA%"), "%APPDATA%\\postgresql\\pgpass.conf");
+		assertEquals(PgpassFile._getUnixName("$HOME"), "$HOME/.pgpass");
+	}
 }

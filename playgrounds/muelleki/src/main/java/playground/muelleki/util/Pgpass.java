@@ -9,15 +9,37 @@ import  java.io.*;
 import org.apache.log4j.Logger;
 
 /**
- * @author  Vladimir Podstavkov
+ * @author  Vladimir Podstavkov, Kirill Müller
  */
-public class Pgpass {
+class PgpassFile {
+	static String getDefaultName() {
+		return _getName(System.getProperty("os.name").startsWith("Windows"));
+	}
 
+    static String _getName(boolean isWindows) {
+		if (isWindows) {
+			return _getWindowsName(System.getenv("APPDATA"));
+		}
+		else {
+			return _getUnixName(System.getenv("HOME"));
+		}
+	}
+
+	static String _getUnixName(String homeDirectory) {
+		return String.format("%s/.pgpass", homeDirectory);
+	}
+
+	static String _getWindowsName(String appDataDirectory) {
+		return String.format("%s\\postgresql\\pgpass.conf", appDataDirectory);
+	}
+};
+
+public class Pgpass {
     private String _pwdfile;
 	private Logger _log = Logger.getLogger(Pgpass.class);
-
-    public Pgpass() {
-        this("~/.pgpass");
+	
+	public Pgpass() {
+        this(PgpassFile.getDefaultName());
     }
 
     public Pgpass(String pwdfile) {
@@ -64,3 +86,4 @@ public class Pgpass {
         return getPgpass(up.getHost(), up.getPort(), up.getDbName(), username);
     }
 }
+
