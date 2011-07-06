@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -48,6 +49,7 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 
 	private final double travelCostFactor;
 	private final double marginalUtlOfDistance;
+	private static int wrnCnt = 0 ;
 	/**
 	 *
 	 * @param scaledMarginalUtilityOfTraveling. Must be scaled, i.e. per second.  Usually negative.
@@ -60,13 +62,17 @@ public class FreespeedTravelTimeCost implements PersonalizableTravelCost, Travel
 		// but for the cost, the cost should be positive.
 		this.travelCostFactor = -scaledMarginalUtilityOfTraveling + scaledMarginalUtilityOfPerforming;
 
-		if (this.travelCostFactor <= 0) {
-			log.warn("The travel cost in " + this.getClass().getName() + " under normal circumstances should be >= 0. " +
-					"Currently, it is " + this.travelCostFactor + "." +
-					"That is the sum of the costs for traveling and the opportunity costs." +
-							" Please adjust the parameters" +
-							"'traveling' and 'performing' in the module 'planCalcScore' in your config file to be" +
-							" lower or equal than 0 when added.");
+		if ( wrnCnt < 1 ) {
+			wrnCnt++ ;
+			if (this.travelCostFactor <= 0) {
+				log.warn("The travel cost in " + this.getClass().getName() + " under normal circumstances should be > 0. " +
+						"Currently, it is " + this.travelCostFactor + "." +
+						"That is the sum of the costs for traveling and the opportunity costs." +
+						" Please adjust the parameters" +
+						"'traveling' and 'performing' in the module 'planCalcScore' in your config file to be" +
+				" lower or equal than 0 when added.");
+				log.warn(Gbl.ONLYONCE) ;
+			}
 		}
 
 		this.marginalUtlOfDistance = scaledMarginalUtilityOfDistance;
