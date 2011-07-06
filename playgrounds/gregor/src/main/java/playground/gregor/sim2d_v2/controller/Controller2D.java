@@ -22,14 +22,12 @@ package playground.gregor.sim2d_v2.controller;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
@@ -38,9 +36,7 @@ import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 @Deprecated // should not be derived from Controler
 public class Controller2D extends Controler {
 
-	private PedVisPeekABot vis;
 	protected Sim2DConfigGroup sim2dConfig;
-	private ScenarioLoader2DImpl loader;
 
 	public Controller2D(String[] args) {
 		super(args[0]);
@@ -53,17 +49,10 @@ public class Controller2D extends Controler {
 
 	@Override
 	protected void loadData() {
-		//TODO remove this method!!
-		if (!this.scenarioLoaded) {
-			initSim2DConfigGroup();
-			this.loader = new ScenarioLoader2DImpl(this.scenarioData);
-			this.loader.loadScenario();
-			this.network = (NetworkImpl) this.loader.getScenario().getNetwork();
-			this.population = this.loader.getScenario().getPopulation();
-			this.scenarioLoaded = true;
-
-		}
-
+		super.loadData();
+		initSim2DConfigGroup();
+		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenarioData);
+		loader.load2DScenario();
 	}
 
 

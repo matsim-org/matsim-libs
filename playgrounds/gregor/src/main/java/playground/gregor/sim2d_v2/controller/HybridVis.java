@@ -36,7 +36,6 @@ public class HybridVis {
 	private static final Logger log = Logger.getLogger(HybridVis.class);
 
 	public static void main (String [] args) {
-		Scenario scenario1;
 		Config config = ConfigUtils.loadConfig(args[0]);
 
 
@@ -50,25 +49,25 @@ public class HybridVis {
 		config.getModules().put("sim2d", s);
 
 		MatsimRandom.reset(config.global().getRandomSeed());
-		scenario1 = ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		((NetworkImpl)scenario1.getNetwork()).getFactory().setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		((NetworkImpl)scenario.getNetwork()).getFactory().setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 
-		ScenarioLoaderImpl loader = new ScenarioLoader2DImpl(scenario1);
+		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);
+		loader.load2DScenario();
+
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
-		new ConfigWriter(loader.getScenario().getConfig()).writeStream(new PrintWriter(writer));
+		new ConfigWriter(config).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
-		if (loader.getScenario().getConfig().getQSimConfigGroup() == null){
+		if (config.getQSimConfigGroup() == null){
 			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
 					"Fixing this by adding default config module for QSim. " +
 					"Please check if default values fit your needs, otherwise correct them in " +
 			"the config given as parameter to get a valid visualization!");
-			loader.getScenario().getConfig().addQSimConfigGroup(new QSimConfigGroup());
+			config.addQSimConfigGroup(new QSimConfigGroup());
 		}
-		loader.loadScenario();
-		ScenarioImpl scenario = (ScenarioImpl) loader.getScenario();
 
 		//		ScenarioLoader2DImpl loader2 = new ScenarioLoader2DImpl(this.s/cenarioData);
 		//		loader2.loadScenario();
@@ -76,13 +75,13 @@ public class HybridVis {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		PedVisPeekABot vis = new PedVisPeekABot(1,scenario1);
+		PedVisPeekABot vis = new PedVisPeekABot(1,scenario);
 		vis.setOffsets(386128,5820182);
 		vis.setFloorShapeFile(s.getFloorShapeFile());
 		vis.drawNetwork(scenario.getNetwork());
 		events.addHandler(vis);
 
-		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
+		ControlerIO controlerIO = new ControlerIO(config.controler().getOutputDirectory());
 		QSim qSim = (QSim) new HybridQ2DMobsimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());

@@ -47,9 +47,9 @@ public class CalibrationController2D  {
 		String configFile = args[0];
 		this.config = ConfigUtils.loadConfig(configFile);
 		initSim2DConfigGroup();
-		this.scenario = ScenarioUtils.createScenario(this.config);
+		this.scenario = ScenarioUtils.loadScenario(this.config);
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
-		loader.loadScenario();
+		loader.load2DScenario();
 		this.sim2dConfig.setPhantomPopulationEventsFile("/Users/laemmel/devel/dfg/phantomEvents.xml.gz");
 		this.phantomEvents = new PhantomPopulationLoader(this.sim2dConfig.getPhantomPopulationEventsFile()).getPhantomPopulation();
 

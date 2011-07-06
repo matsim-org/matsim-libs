@@ -43,60 +43,50 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-@Deprecated //should be a stand-alone class and not inherited from ScenarioLoaderImpl
-public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
+public class ScenarioLoader2DImpl  {
 
-	//
-	//
 	private StaticEnvironmentDistancesField sff;
-	//
-	//	private HashMap<Id, LineString> lsmp;
 
 	private final Scenario scenarioData;
 
 
 	private final Sim2DConfigGroup sim2DConfig;
 
-	public ScenarioLoader2DImpl(Scenario scenarioData) {
-		super(scenarioData);
-		this.scenarioData = scenarioData;
+	public ScenarioLoader2DImpl(Scenario scenario) {
+		this.scenarioData = scenario;
 		MyDataContainer c = new MyDataContainer();
 		this.scenarioData.addScenarioElement(c);
-		this.sim2DConfig = (Sim2DConfigGroup) scenarioData.getConfig().getModule("sim2d");
+		this.sim2DConfig = (Sim2DConfigGroup) this.scenarioData.getConfig().getModule("sim2d");
 	}
 
-	@Override
-	public void loadNetwork() {
-		//		if (Sim2DConfig.NETWORK_LOADER_LS) {
-		//		loadLsMp();
-		//		NetworkFromLsFile loader = new NetworkFromLsFile(getScenario(), this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap());
-		//		loader.loadNetwork();
-		super.loadNetwork();
+	public void load2DScenario() {
+
 		loadMps();
 		loadStaticEnvironmentDistancesField();
 	}
 
-	private void loadLsMp() {
-		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
 
-		@SuppressWarnings("rawtypes")
-		Iterator it = null;
-		try {
-			it = fs.getFeatures().iterator();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-
-		int idd = 0;
-		while (it.hasNext()) {
-			Feature ft = (Feature) it.next();
-			Id id = new IdImpl(idd++);
-			this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap().put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
-
-		}
-
-	}
+	//	private void loadLsMp() {
+	//		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
+	//
+	//		@SuppressWarnings("rawtypes")
+	//		Iterator it = null;
+	//		try {
+	//			it = fs.getFeatures().iterator();
+	//		} catch (IOException e) {
+	//			throw new RuntimeException(e);
+	//		}
+	//
+	//
+	//		int idd = 0;
+	//		while (it.hasNext()) {
+	//			Feature ft = (Feature) it.next();
+	//			Id id = new IdImpl(idd++);
+	//			this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap().put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
+	//
+	//		}
+	//
+	//	}
 
 	private void loadMps() {
 		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
@@ -116,7 +106,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 		if (!(geo instanceof MultiPolygon)) {
 			throw new RuntimeException("MultiPolygon expected but got:" + geo);
 		}
-		List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
+		List<Link> links = new ArrayList<Link>(this.scenarioData.getNetwork().getLinks().values());
 		this.scenarioData.getScenarioElement(MyDataContainer.class).getMps().put((MultiPolygon) geo, links);
 	}
 
