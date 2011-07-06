@@ -24,11 +24,15 @@ import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
+import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -46,6 +50,8 @@ public class HerbieControler extends Controler {
 
 	private final HerbieConfigGroup herbieConfigGroup = new HerbieConfigGroup();
 
+	private static final Logger log = Logger.getLogger(Controler.class);
+	
 	public HerbieControler(String[] args) {
 		super(args);
 		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.herbieConfigGroup);
@@ -83,7 +89,19 @@ public class HerbieControler extends Controler {
 	}
 	
 	
-
+	private double reroutingShare = 0.05;
+	 /**
+	  * Create and return a TransitStrategyManager which filters transit agents
+	  * during the replanning phase. They either keep their selected plan or
+	  * replan it.
+	  */
+	 @Override
+	 protected StrategyManager loadStrategyManager() {
+	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
+	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
+	  StrategyManagerConfigLoader.load(this, manager);
+	  return manager;
+	 }
 
 	@Override
 	protected void loadControlerListeners() {
