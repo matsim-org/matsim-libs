@@ -49,7 +49,7 @@ public class LinkVolumesComparator {
 		
 		this.ensembles.clear();
 		
-		this.readVolumes("intra");
+		this.readVolumes("intraAWTV");
 		this.write("stdDevIntraAWTV");	
 	}
 		
@@ -72,9 +72,9 @@ public class LinkVolumesComparator {
 			}
 			else if (type.equals("intraAWTV")) {
 				int cnt = 191 + i;
-				if (cnt >= 200) return;
+				if (cnt > 200) return;
 				p = this.path + "/intrarun/zh10PctEps." + cnt + ".countscompareAWTV.txt";
-				this.readCountsCompare(p);
+				this.readAWTV(p);
 			}
 			log.info("reading " + p);
 		}
@@ -124,7 +124,7 @@ public class LinkVolumesComparator {
 		try {
 			new File(this.outpath).mkdirs();
 			BufferedWriter out = IOUtils.getBufferedWriter(this.outpath + "/" + name + ".txt");
-			log.info("files written to: " + this.outpath);
+			log.info("files written to: " + this.outpath + "/" + name + ".txt");
 			String header = "Station\tLinkId";
 			for (int hour = 0; hour < 24; hour++) {
 				header += "\tHour" + hour;
