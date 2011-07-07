@@ -314,27 +314,27 @@ public class GraphMatching {
 	
 	Map<Id, Id> nodeFinalRef2Match;
 	Map<Id, Id> edgeFinalRef2Match;
-	private void nodeMatchingTopDown(){
-		nodeFinalRef2Match = new HashMap<Id, Id>();
-		edgeFinalRef2Match = new HashMap<Id, Id>();
-		
-		MatchingEdge ref, match;
-		for(Entry<Id, List<EdgeCompare>> e: edgesRef2Match.entrySet()){
-			for(EdgeCompare ee: e.getValue()){
-				ref = this.reference.getEdges().get(ee.getRefId());
-				match = this.matching.getEdges().get(ee.getCompId());
-				
-				if(this.nodesReference2match.containsKey(ref.getFromNode().getId()) && this.nodesReference2match.containsKey(ref.getToNode().getId())){
-					if(!this.nodesReference2match.get(ref.getFromNode().getId()).equals(match.getFromNode().getId())
-							&& !this.nodesReference2match.get(ref.getToNode().getId()).equals(match.getToNode().getId())){
-						
-					}
-				}
-			}
-		}
-		
-		
-	}
+//	private void nodeMatchingTopDown(){
+//		nodeFinalRef2Match = new HashMap<Id, Id>();
+//		edgeFinalRef2Match = new HashMap<Id, Id>();
+//		
+//		MatchingEdge ref, match;
+//		for(Entry<Id, List<EdgeCompare>> e: edgesRef2Match.entrySet()){
+//			for(EdgeCompare ee: e.getValue()){
+//				ref = this.reference.getEdges().get(ee.getRefId());
+//				match = this.matching.getEdges().get(ee.getCompId());
+//				
+//				if(this.nodesReference2match.containsKey(ref.getFromNode().getId()) && this.nodesReference2match.containsKey(ref.getToNode().getId())){
+//					if(!this.nodesReference2match.get(ref.getFromNode().getId()).equals(match.getFromNode().getId())
+//							&& !this.nodesReference2match.get(ref.getToNode().getId()).equals(match.getToNode().getId())){
+//						
+//					}
+//				}
+//			}
+//		}
+//		
+//		
+//	}
 	
 	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
 		return this.nodesReference2match;

@@ -21,24 +21,19 @@ package playground.droeder.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -52,6 +47,8 @@ public class TransitScheduleMatching {
 	
 	private static final Logger log = Logger
 			.getLogger(TransitScheduleMatching.class);
+	
+	private final String SEPARATOR = "_|_";
 
 	private Double maxDeltaPhi;
 	private Double maxDeltaDist;
@@ -130,10 +127,10 @@ public class TransitScheduleMatching {
 		Id osmLine, hafasLine;
 		
 		for(Entry<Id, Id> e: edges.entrySet()){
-			osmLine = new IdImpl(e.getKey().toString().split("__")[0]);
+			osmLine = new IdImpl(e.getKey().toString().split(this.SEPARATOR)[0]);
 			osm = osmSc.getTransitSchedule().getTransitLines().get(osmLine).getRoutes().get(e.getKey());
 			
-			hafasLine = new IdImpl(e.getValue().toString().split("__")[0]);
+			hafasLine = new IdImpl(e.getValue().toString().split(this.SEPARATOR)[0]);
 			hafas = hafasSched.getTransitLines().get(hafasLine).getRoutes().get(e.getValue());
 			
 			this.addStopsAndCreateRoute(osmLine, osm, hafas, sc);
@@ -149,78 +146,83 @@ public class TransitScheduleMatching {
 	 * @param hafas
 	 */
 	private void addStopsAndCreateRoute(Id osmLine, TransitRoute osm, TransitRoute hafas, ScenarioImpl newSc) {
+		//prepare for handling
 		TransitSchedule sched = newSc.getTransitSchedule();
-		TransitScheduleFactory fac = sched.getFactory();
-		
-		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		
-		List<Id> linkIds = osm.getRoute().getLinkIds();
-		String mode = osm.getTransportMode();
-
-		TransitLine line;
-		TransitRoute newRoute;
-		NetworkRoute netRoute;
-		
-		TransitStopFacility hafasFac, newFac;
-		TransitRouteStop hafasStop, newStop;
-		
-		if(!sched.getTransitLines().containsKey(osmLine)){
-			line = fac.createTransitLine(osmLine);
-		}else{
-			line = sched.getTransitLines().get(osmLine);
+		if(!newSc.getTransitSchedule().getTransitLines().containsKey(osmLine)){
+			sched.addTransitLine(sched.getFactory().createTransitLine(osmLine));
 		}
 		
-		ListIterator<TransitRouteStop> hafasIt = hafas.getStops().listIterator();
-		// make StopFacility for the first stop
-		if(hafasIt.hasNext()){
-			hafasStop = hafasIt.next();
-			hafasFac = hafasStop.getStopFacility();
-		}else{
-			log.error("route has no stops...");
+		// create new route
+		if(osm.getStops().size() == hafas.getStops().size()){
+			this.mergeStops(osmLine, osm, hafas, sched);
+		}else if((osm.getRoute().getLinkIds().size() + 2) < hafas.getStops().size()){
+		// +2 because start- and endLink are not in the LinkIdList
+			log.error("can not create new Route for osmLine " + osmLine.toString() + "/ osmRoute " + osm.getId().toString() + 
+					"with HafasRoute " + hafas.getId() + ", because number osmLinks is smaller than number of hafasStops" +
+							" and every stop should be located on an separat link...");
 			return;
+		}else {
+			this.mergeStopsAndLinks(osmLine, osm, hafas, sched);
 		}
-		if(sched.getFacilities().containsKey(hafasFac.getId())){
-			newFac = sched.getFacilities().get(hafasFac.getId());
-		}else{
-			newFac = fac.createTransitStopFacility(hafasFac.getId(), hafasFac.getCoord(), hafasFac.getIsBlockingLane());
-			newFac.setLinkId(osm.getRoute().getStartLinkId());
-			sched.addStopFacility(newFac);
+	}
+
+	/**
+	 * @param osmLine 
+	 * @param osm
+	 * @param hafas
+	 * @param sched
+	 */
+	private void mergeStops(Id osmLine, TransitRoute osm, TransitRoute hafas, TransitSchedule sched) {
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		for(int i = 0; i < osm.getStops().size(); i++){
+			stops.add(this.createStopFacility(osm.getStops().get(i).getStopFacility().getLinkId(), hafas.getStops().get(i), sched));
 		}
-		newStop = fac.createTransitRouteStop(newFac, hafasStop.getArrivalOffset(), hafasStop.getDepartureOffset());
-		stops.add(newStop);
-		
-		int pointer = 0, size = osm.getRoute().getLinkIds().size();
-		
-		// process other stops
-		while(hafasIt.hasNext()){
-			hafasStop = hafasIt.next();
-			hafasFac = hafasStop.getStopFacility();
-			
-			if(sched.getFacilities().containsKey(hafasFac.getId())){
-				newFac = sched.getFacilities().get(hafasFac.getId());
-			}else{
-				newFac = fac.createTransitStopFacility(hafasFac.getId(), hafasFac.getCoord(), hafasFac.getIsBlockingLane());
-				newFac.setLinkId(findNextLink(osm.getRoute().getLinkIds().subList(pointer, size), newFac.getCoord()));
-				pointer = osm.getRoute().getLinkIds().indexOf(newFac.getLinkId());
-				sched.addStopFacility(newFac);
-			}
-			newStop = fac.createTransitRouteStop(newFac, hafasStop.getArrivalOffset(), hafasStop.getDepartureOffset());
-			stops.add(newStop);
-		}
-		
-		
-		
-		
-		netRoute = new LinkNetworkRouteImpl(osm.getRoute().getStartLinkId(), osm.getRoute().getEndLinkId());
-		netRoute.setLinkIds(osm.getRoute().getStartLinkId(), linkIds, osm.getRoute().getEndLinkId());
-		
-		newRoute = fac.createTransitRoute(osm.getId(), netRoute, stops, mode);
-		
+		LinkNetworkRouteImpl netRoute = new LinkNetworkRouteImpl(osm.getRoute().getStartLinkId(), osm.getRoute().getEndLinkId());
+		netRoute.setLinkIds(osm.getRoute().getStartLinkId(), osm.getRoute().getLinkIds(), osm.getRoute().getEndLinkId());
+		TransitRoute route = sched.getFactory().createTransitRoute(hafas.getId(), netRoute, stops, hafas.getTransportMode());
+		sched.getTransitLines().get(osmLine).addRoute(route);
 	}
 	
-	private Id findNextLink(List<Id> osmLinkIds, Coord hafasCoord){
-		
-		return null;
+	/**
+	 * @param osmLine
+	 * @param osm
+	 * @param hafas
+	 * @param sched
+	 */
+	private void mergeStopsAndLinks(Id osmLine, TransitRoute osm, TransitRoute hafas, TransitSchedule sched) {
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		//handle first stop
+		stops.add(this.createStopFacility(osm.getRoute().getStartLinkId(), hafas.getStops().get(0), sched));
+		//handle other stops - first and last stop are handled separately
+		if(hafas.getStops().size() > 2){
+//			ListIterator<TransitRouteStop> hafasIt = hafas.getStops().subList(1, hafas.getStops().size()-1).listIterator();
+//			ListIterator<Id> osmIter = osm.getRoute().getLinkIds().listIterator();
+			
+			
+			//TODO not finished yet
+		}
+		//handle last stop
+		stops.add(this.createStopFacility(osm.getRoute().getEndLinkId(), hafas.getStops().get(osm.getStops().size()-1), sched));
+		//create Route
+		LinkNetworkRouteImpl netRoute = new LinkNetworkRouteImpl(osm.getRoute().getStartLinkId(), osm.getRoute().getEndLinkId());
+		netRoute.setLinkIds(osm.getRoute().getStartLinkId(), osm.getRoute().getLinkIds(), osm.getRoute().getEndLinkId());
+		TransitRoute route = sched.getFactory().createTransitRoute(hafas.getId(), netRoute, stops, hafas.getTransportMode());
+		sched.getTransitLines().get(osmLine).addRoute(route);
+	}
+
+	private TransitRouteStop createStopFacility(Id osmLinkId, TransitRouteStop hafasStop, TransitSchedule sched){
+		TransitStopFacility hafasFacility, newFacility;
+		hafasFacility = hafasStop.getStopFacility();
+		if(!sched.getFacilities().containsKey(hafasFacility.getId())){
+			// osm-> linkId, hafas -> rest
+			newFacility = sched.getFactory().createTransitStopFacility(hafasFacility.getId(), hafasFacility.getCoord(), hafasFacility.getIsBlockingLane());
+			newFacility.setLinkId(osmLinkId);
+			sched.addStopFacility(newFacility);
+		}else{
+			newFacility = sched.getFacilities().get(hafasFacility.getId());
+		}
+		// offsets from hafas
+		return sched.getFactory().createTransitRouteStop(newFacility, hafasStop.getArrivalOffset(),hafasStop.getDepartureOffset());
 	}
 
 
