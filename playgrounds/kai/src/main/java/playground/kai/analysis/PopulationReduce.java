@@ -37,7 +37,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
  * @author nagel
  *
  */
-public class PopulationReduce {
+class PopulationReduce {
 
 	private void run() throws IOException {
 		Population popIn = null ;
@@ -47,7 +47,7 @@ public class PopulationReduce {
 			Config config1 = ConfigUtils.createConfig() ;
 			config1.network().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_network.xml.gz") ;
 //			config1.plans().setInputFile("/Users/nagel/kairuns/18jun-base/kairun3-incl-ba16.reduced_plans.xml.gz") ;
-			config1.plans().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_plans.xml.gz") ;
+			config1.plans().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/output_plans.xml.gz") ;
 			Scenario sc1 = ScenarioUtils.loadScenario(config1) ;
 			popIn = sc1.getPopulation() ;
 		}
@@ -70,7 +70,7 @@ public class PopulationReduce {
 			
 		}
 		MatsimWriter popWriter = new PopulationWriter(popOut,null) ;
-		popWriter.write("/Users/nagel/kairuns/pop.xml.gz") ;
+		popWriter.write("/Users/nagel/kw/pop.xml.gz") ;
 		
 		
 	}

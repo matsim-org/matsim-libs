@@ -40,7 +40,7 @@ import com.vividsolutions.jts.util.Assert;
  * @author nagel
  *
  */
-public class PopulationComparison {
+class PopulationComparison {
 	// yyyyyy ConfigUtils should go to org.matsim.core.config
 
 	// yyyy Config should go into api
@@ -50,8 +50,8 @@ public class PopulationComparison {
 	static final double ymin = 5783028. ;
 	static final double ymax = 5848081. ;
 	
-	static int LL = 30 ;
-	static int MM = 30 ;
+	static int LL = 40 ;
+	static int MM = 25 ;
 
 	private static Integer xxToBin(double xx) {
 		if ( xx<=xmin || xx>=xmax ) return null ;
@@ -78,7 +78,7 @@ public class PopulationComparison {
 	private static double weight( double x1, double y1, double x2, double y2 ) {
 		double rr = Math.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ) ;
 //		return Math.pow(rr, -0.5);
-		return Math.exp(-rr*rr/50000./5000.) ;
+		return Math.exp(-rr*rr/5000./5000.) ;
 	}
 	
 	private void run() throws IOException {
@@ -98,7 +98,7 @@ public class PopulationComparison {
 			Config config1 = ConfigUtils.createConfig() ;
 			config1.network().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_network.xml.gz") ;
 //			config1.plans().setInputFile("/Users/nagel/kairuns/18jun-base/kairun3-incl-ba16.reduced_plans.xml.gz") ;
-			config1.plans().setInputFile("/Users/nagel/kairuns/18jun-base/pop.xml.gz") ;
+			config1.plans().setInputFile("/Users/nagel/kairuns/base-01jul/pop.xml.gz") ;
 			sc1 = ScenarioUtils.loadScenario(config1) ;
 		}
 
@@ -106,7 +106,7 @@ public class PopulationComparison {
 			Config config2 = ConfigUtils.createConfig() ;
 			config2.network().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_network.xml.gz") ;
 //			config2.plans().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.reduced_plans.xml.gz") ;
-			config2.plans().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/pop.xml.gz") ;
+			config2.plans().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/pop.xml.gz") ;
 			sc2 = ScenarioUtils.loadScenario(config2) ;
 		}
 		
@@ -182,7 +182,7 @@ public class PopulationComparison {
 		for ( int ii=0 ; ii<LL ; ii++ ) {
 			for ( int jj=0 ; jj<MM ; jj++ ) {
 				double xx = binToXx(ii) ; double yy = binToYy(jj) ;
-				if ( cnt[ii][jj] > 20. ) {
+				if ( cnt[ii][jj] > 10. ) {
 					//				if ( weight[ii][jj] > 0. ) {
 					//					double xx = xsum[ii][jj]/cnt[ii][jj] ; double yy = ysum[ii][jj]/cnt[ii][jj] ;
 					double val = sum[ii][jj]/weight[ii][jj] ;
@@ -192,10 +192,10 @@ public class PopulationComparison {
 						gridCnt++ ;
 						System.out.print( str ) ;
 					}
-				} else {
-					double val = simpleSum / simpleCnt ;
-					String str = xx + "," + yy + "," + val + "\n" ;
-					out2.append( str ) ;
+//				} else {
+//					double val = simpleSum / simpleCnt ;
+//					String str = xx + "," + yy + "," + val + "\n" ;
+//					out2.append( str ) ;
 				}
 			}
 		}
@@ -211,7 +211,7 @@ public class PopulationComparison {
 		for ( Plan plan : person.getPlans() ) {
 			sum += Math.exp( beta*(plan.getScore()-bestScore) ) ;
 		}
-		return Math.log( sum/beta + bestScore ) ;
+		return bestScore + (1./beta) * Math.log( sum ) ;
 	}
 	
 	private static double bestScore(Person person) {
