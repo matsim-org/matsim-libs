@@ -7,6 +7,12 @@ import java.util.List;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPShipment;
 
+/**
+ * 
+ * @author stefan
+ *
+ */
+
 public class ShipperAgent {
 	
 	private ShipperImpl shipper;
@@ -25,9 +31,9 @@ public class ShipperAgent {
 						s.getPickTimeWindow().getStart(), s.getPickTimeWindow().getEnd(), s.getDeliveryTimeWindow().getStart(), 
 						s.getDeliveryTimeWindow().getEnd());
 				tspShipments.add(shipment);
+				TSPContract tspContract = TSPUtils.createTSPContract(shipment,sComFlow.getTspOffer());
+				contracts.add(tspContract);
 			}
-			TSPContract tspContract = TSPUtils.createTSPContract(tspShipments,sComFlow.getTspOffer());
-			contracts.add(tspContract);
 		}
 		return contracts;
 	}
