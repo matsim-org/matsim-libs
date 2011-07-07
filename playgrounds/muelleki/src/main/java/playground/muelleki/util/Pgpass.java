@@ -13,6 +13,10 @@ import org.apache.log4j.Logger;
  */
 class PgpassFile {
 	static String getDefaultName() {
+		String passFile = System.getenv("PGPASSFILE");
+		if (!passFile.equals(""))
+			return passFile;
+		
 		return _getName(System.getProperty("os.name").startsWith("Windows"));
 	}
 
