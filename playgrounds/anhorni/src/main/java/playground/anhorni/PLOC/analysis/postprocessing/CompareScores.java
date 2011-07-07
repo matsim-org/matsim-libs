@@ -52,7 +52,11 @@ public class CompareScores {
 		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
 		for (int i = 0; i < bestScoresPerAgent.size(); i++) {
 			try {
-				this.bufferedWriterScores.write(agentIds.get(i).toString() + "\t" 
+				
+				String identical ="";
+				if (Math.abs(bestScoresPerAgent.get(i) - executedScoresPerAgent.get(i)) > 0.00001) identical="*"; 
+				
+				this.bufferedWriterScores.write(agentIds.get(i).toString() + identical + "\t" 
 						+ formatter.format(bestScoresPerAgent.get(i)) +  "\t" 
 						+ formatter.format(executedScoresPerAgent.get(i)) + "\t");
 			} catch (IOException e) {
@@ -127,7 +131,7 @@ public class CompareScores {
 				double executedScoreRelativeStandardDeviationinPercent = 
 					100.0 * agentsExecutedScores.get(bestScores.getAgentId()).getStandardDeviationScore_S() / 
 					Math.abs(agentsExecutedScores.get(bestScores.getAgentId()).getAverageScore());
-				
+								
 				bufferedWriter.write(bestScores.getAgentId() + "\t" + 
 						bestScoreRelativeStandardDeviationinPercent + "\t" +  
 						executedScoreRelativeStandardDeviationinPercent +

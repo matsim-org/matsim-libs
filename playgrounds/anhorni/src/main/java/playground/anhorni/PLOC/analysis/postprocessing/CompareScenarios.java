@@ -64,7 +64,7 @@ public class CompareScenarios {
 		scoreComparator.openScoresFile(this.outpath + "/scores.txt");
 		
 		for (int i = 0; i < this.numberOfAnalyses; i++) {
-			String p = this.path + "/interrun/" + i + "/" + this.plansFileName;
+			String p = this.path + "/" + i + "/" + this.plansFileName;
 			log.info("reading: " + p);
 			this.readPopulation(p);
 			scoreComparator.handleScenario(this.baseScenario);
@@ -75,17 +75,17 @@ public class CompareScenarios {
 		scoreComparator.compareScores(this.outpath + "/scores.txt", 
 				this.outpath + "/scoresStandardDeviationsInPercent.txt");
 		
-		CompareDestinations destinationComparator = new CompareDestinations();
-		for (int i = 0; i < this.numberOfAnalyses; i++) {
-			String p = this.path + "/interrun/" + i + "/" + this.plansFileName;
-			log.info("reading: " + p);
-			this.readPopulation(p);
-			destinationComparator.handleScenario(this.baseScenario);
-		}
-		DecimalFormat formatter = new DecimalFormat("0.0000000");
-		log.info("Distances from center point: " + formatter.format(destinationComparator.evaluateScenarios()) + "[m]");
+//		CompareDestinations destinationComparator = new CompareDestinations();
+//		for (int i = 0; i < this.numberOfAnalyses; i++) {
+//			String p = this.path + "/interrun/" + i + "/" + this.plansFileName;
+//			log.info("reading: " + p);
+//			this.readPopulation(p);
+//			destinationComparator.handleScenario(this.baseScenario);
+//		}
+//		DecimalFormat formatter = new DecimalFormat("0.0000000");
+//		log.info("Distances from center point: " + formatter.format(destinationComparator.evaluateScenarios()) + "[m]");
 		
-		SimulatedLinkVolumesAndCounts volumesAnalyzer = new SimulatedLinkVolumesAndCounts(numberOfAnalyses, this.path, this.outpath, 
+		LinkVolumesComparator volumesAnalyzer = new LinkVolumesComparator(numberOfAnalyses, this.path, this.outpath, 
 				this.baseScenario.getNetwork());
 		volumesAnalyzer.run();		
 	}
