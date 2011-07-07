@@ -55,8 +55,6 @@ public class Controller2D extends Controler {
 		loader.load2DScenario();
 	}
 
-
-
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
 			PersonalizableTravelCost travelCosts,
@@ -80,8 +78,6 @@ public class Controller2D extends Controler {
 		this.sim2dConfig = s;
 		this.config.getModules().put("sim2d", s);
 	}
-
-
 
 	public static void main(String[] args) {
 		Controler controller = new Controller2D(args);
