@@ -80,8 +80,8 @@ public class TSPUtils {
 		return new IdImpl(id);
 	}
 
-	public static TSPContract createTSPContract(Collection<TSPShipment> shipments, TSPOffer tspOffer) {
-		TSPContract contract = new TSPContract(shipments, tspOffer);
+	public static TSPContract createTSPContract(TSPShipment shipment, TSPOffer tspOffer) {
+		TSPContract contract = new TSPContract(shipment, tspOffer);
 		return contract;
 	}
 
