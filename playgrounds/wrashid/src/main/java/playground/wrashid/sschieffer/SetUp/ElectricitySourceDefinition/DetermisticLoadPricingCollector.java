@@ -88,6 +88,7 @@ public class DetermisticLoadPricingCollector {
 		return hubPricingDistribution;
 	}
 	
+	
 	public void setUp() throws Exception{
 		
 		for(int hub=0;hub< myHubInfo.size();hub++){

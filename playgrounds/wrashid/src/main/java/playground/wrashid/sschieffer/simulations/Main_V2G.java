@@ -91,12 +91,12 @@ public class Main_V2G {
 		 * SET UP STANDARD Decentralized Smart Charging simulation 
 		 * *************/
 		
+		//percent of population with electric vehicles
 		final double electrification= 1.0; 
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=0.0; 
 		
 		//final String outputPath="/cluster/home/baug/stellas/Runs/24hrV2G20000Plans15Min/Results";
-		
 		final String outputPath="D:/ETH/MasterThesis/TestOutput/";
 		//String configPath="test/scenarios/berlin/config.xml";
 		String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
@@ -121,7 +121,7 @@ public class Main_V2G {
 		double priceMinPerkWh=0.07;
 		
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
-		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_1000.txt";
+		
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
@@ -214,15 +214,8 @@ public class Main_V2G {
 		final double xPercentDown=0.0;
 		final double xPercentDownUp=1.0;
 		
-		
-		/*
-		 * if you also want to include information about vehicle and other hub sources 
-		 * <li> create the objects (ArrayList<GeneralSource>  stochasticHubLoadTxt=null; HashMap <Id, String> stochasticVehicleLoad= new HashMap <Id, String> ();)
-		 * <li>use the following constructor: 
-		 * myStochasticHubInfo.add(new HubInfo(1, stochasticGeneral, stochasticHubLoadTxt, stochasticVehicleLoad));
-		 */
-		
-				
+			
+		// compensation for V2Gs for regulation up, down or feed in
 		double compensationPerKWHRegulationUp=0.1;
 		double compensationPerKWHRegulationDown=0.005;
 		double compensationPERKWHFeedInVehicle=0.005;
@@ -277,16 +270,23 @@ public class Main_V2G {
 		
 		//ENERGY EXTRA COSTS From extra charging
 		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllVehicles());
-		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllEVs());
-		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllPHEVs());
+		System.out.println("average extra costs for extra vehicle charging EV: "+mySimulation.getAverageExtraChargingAllEVs());
+		System.out.println("average extra costs for extra vehicle charging PHEV: "+mySimulation.getAverageExtraChargingAllPHEVs());
 		
+		//Extra joules charged from battery for additional stochastic consumption 
 		
+		System.out.println("average joules taken from battery for extra stochastic consumption: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionAllAgents());
+		System.out.println("average joules taken from battery for extra stochastic consumption EV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionEV());
+		System.out.println("average joules taken from battery for extra stochastic consumption PHEV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionPHEV());
 		
+		//joules saved by local production
+		System.out.println("average joules saved by local stochastic production all agents: "+mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents());
+		System.out.println("average joules saved by local stochastic production EV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionEV());
+		System.out.println("average joules saved by local stochastic production PHEV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV());
 		
 		/*
 		 * HUBSOURCES
 		 */
-		
 		System.out.println("average revenue from feed in for hub sources: "+mySimulation.getAverageFeedInRevenueHubSources());
 		System.out.println("average extra charging cost for hub sources: "+mySimulation.getAverageExtraChargingHubSources());
 		System.out.println("total energy for hub sources: "+mySimulation.getTotalJoulesFeedInHubSources());

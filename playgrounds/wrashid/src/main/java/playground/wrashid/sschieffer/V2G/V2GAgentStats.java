@@ -8,6 +8,9 @@ public class V2GAgentStats {
 	private double revenueFeedIn;
 	private double totalJouleFeedIn;
 	
+	private double joulesSavedWithLocalProduction;
+	private double joulesTakenFromBatteryForExtraConsumption;
+	
 	private double totalJouleUp;
 	private double totalJouleDown;
 	
@@ -17,8 +20,20 @@ public class V2GAgentStats {
 		totalJouleDown=0;
 		revenueFeedIn=0;
 		totalJouleFeedIn=0;
+		joulesSavedWithLocalProduction=0;
+		joulesTakenFromBatteryForExtraConsumption=0;
 	}
 	
+	
+
+
+	public void addJoulesSavedWithLocalProduction(double joules){
+		joulesSavedWithLocalProduction+=joules;
+	}
+	
+	public void addJoulesTakenFromBatteryForExtraConsumption(double joules){
+		joulesTakenFromBatteryForExtraConsumption+=joules;
+	}
 	
 	public void addExtraChargingCosts(double money){
 		costChargingExtra-=money;
@@ -43,6 +58,16 @@ public class V2GAgentStats {
 	
 	public void addJoulesDown(double joules){
 		totalJouleDown+=joules;
+	}
+	
+	
+	
+	public double getJoulesSavedWithLocalProduction(){
+		return joulesSavedWithLocalProduction;
+	}
+	
+	public double getJoulesTakenFromBatteryForExtraConsumption(){
+		return joulesTakenFromBatteryForExtraConsumption;
 	}
 	
 	public double getRevenueV2G(){

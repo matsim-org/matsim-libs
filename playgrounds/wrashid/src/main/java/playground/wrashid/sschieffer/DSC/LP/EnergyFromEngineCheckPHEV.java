@@ -104,9 +104,9 @@ public class EnergyFromEngineCheckPHEV {
 		double chargingTime=energyFromEngine/
 		( precedingP).getChargingSpeed();
 		
-		
+		//s.printSchedule();
 		s.reduceFollowingParkingBy( pos, chargingTime);
-		
+		//s.printSchedule();
 		s.addExtraConsumptionDriving( pos, energyFromEngine);
 		
 	}

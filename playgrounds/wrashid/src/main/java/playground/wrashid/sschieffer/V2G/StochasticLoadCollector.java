@@ -151,11 +151,11 @@ public class StochasticLoadCollector {
 				for(int i=0; i<stochasticGeneralSources.size(); i++){
 					Id linkId= stochasticGeneralSources.get(i).getlinkId();
 					hubId = mySimulation.mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
-					
+					String name= stochasticGeneralSources.get(i).getName();
 					if (stochasticGeneralSources.get(i).isTxtLoad()){
 						String file= stochasticGeneralSources.get(i).getInputLoad96Bins();
 						
-						String name= stochasticGeneralSources.get(i).getName();
+						
 						
 						LoadFileReader stochasticHubSourceLoad = new LoadFileReader(file,  
 								97, 
@@ -167,7 +167,7 @@ public class StochasticLoadCollector {
 						
 						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
 						
-						LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+".png",
+						LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+name+".png",
 								"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
 								stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
 						
@@ -178,8 +178,8 @@ public class StochasticLoadCollector {
 						
 						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
 						
-						stochasticGeneralSources.get(i).getLoadSchedule().visualizeLoadDistribution("stochastic hubsource "+ linkId.toString(), 
-								mySimulation.outputPath+"V2G/stochastic hubsource "+ linkId.toString() +".png");
+						stochasticGeneralSources.get(i).getLoadSchedule().visualizeLoadDistribution("stochastic hubsource "+ linkId.toString()+name, 
+								mySimulation.outputPath+"V2G/stochastic hubsource "+ linkId.toString() +name+".png");
 							
 						}
 					}
@@ -284,8 +284,11 @@ public class StochasticLoadCollector {
 	
 	
 	
+	/**
+	 * test scenario with 4 times 1 hour stochastic load
+	 */
 	public void makeStochasticHubLoad(){
-		// 4 * 15 minutes = 1 hour
+		// 4 * 1hour = 4 hour
 		// 
 		double secs= 60*60.0;								
 		double startSec= 0.0;

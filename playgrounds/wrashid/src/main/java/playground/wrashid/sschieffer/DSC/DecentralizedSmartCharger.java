@@ -171,7 +171,7 @@ public class DecentralizedSmartCharger {
 	private double startTime, agentReadTime, LPTime, distributeTime, wrapUpTime;
 	private double startV2G, timeCheckVehicles,timeCheckHubSources,timeCheckRemainingSources;
 	
-			
+	private static double cutoff=0.00001;
 	//***********************************************************************
 	
 	/**
@@ -186,8 +186,8 @@ public class DecentralizedSmartCharger {
 			) throws IOException, OptimizationException{
 		
 		this.controler=controler;						
-		this.outputPath=outputPath;	
-		this.STANDARDCONNECTIONSWATT= STANDARDCONNECTIONSWATT;
+		DecentralizedSmartCharger.outputPath=outputPath;	
+		DecentralizedSmartCharger.STANDARDCONNECTIONSWATT= STANDARDCONNECTIONSWATT;
 		
 		myAgentTimeReader= new AgentTimeIntervalReader(
 				parkingTimesPlugin, 
@@ -350,14 +350,13 @@ public class DecentralizedSmartCharger {
 		agentReadTime = System.currentTimeMillis();
 		System.out.println("\n Starting LP");
 		findRequiredChargingTimes();
-		
+						
 		LPTime = System.currentTimeMillis();
 		System.out.println("\n Assigning charging times");
 		assignChargingTimes();
 		
 		distributeTime = System.currentTimeMillis();
-		
-				
+						
 		System.out.println("\n Update loads ");
 		updateDeterministicLoad(); 
 		
@@ -371,18 +370,11 @@ public class DecentralizedSmartCharger {
 		writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		writeSummaryDSCPerAgent("DSCPerAgent");
 		
-		deleteEVsWithFailureForV2G();		
+		deleteAgentsInList(chargingFailureEV);
 		
 	}
 	
 	
-	
-	public void deleteEVsWithFailureForV2G(){
-		deleteAgentInList(getIdsOfEVAgentsWithFailedOptimization());
-		for(Id id: getIdsOfEVAgentsWithFailedOptimization()){
-			agentsWithEV.remove(id);
-		}
-	}
 	
 	
 	/**
@@ -408,22 +400,58 @@ public class DecentralizedSmartCharger {
 					||agentParkingAndDrivingSchedules.get(id).timesInSchedule.get(agentParkingAndDrivingSchedules.get(id).getNumberOfEntries()-1).getEndTime()!=SECONDSPERDAY){
 				deletedAgents.add(id);
 				System.out.println("deleted agent : "+ id.toString());
-				agentParkingAndDrivingSchedules.get(id).printSchedule();
+				//agentParkingAndDrivingSchedules.get(id).printSchedule();
 				
 			}
 		}
-		deleteAgentInList(deletedAgents);
+		deleteAgentsInList(deletedAgents);
 		
 	}
 
 	
 		
-	
-	public void deleteAgentInList(LinkedList <Id> list){
+	/**
+	 * deletes all agent Ids in list 
+	 * from 
+	 * <li>agentParkingAndDrivingSchedules
+	 * <li>vehicles
+	 * 
+	 * @param list
+	 */
+	public void deleteAgentsInList(LinkedList<Id> list){
 		for(int i=0; i< list.size(); i++){
 			Id id= list.get(i);
 			agentParkingAndDrivingSchedules.remove(id);
 			vehicles.getKeySet().remove(id);// referenced in agentContracts - so automatically deleted... later used for stochastic load		
+			if(agentsWithEV.contains(id)){
+				agentsWithEV.remove(id);
+			}
+			if(agentsWithPHEV.contains(id)){
+				agentsWithPHEV.remove(id);
+			}
+		}
+	}
+	
+	/**
+	 * deletes all agent Ids in list 
+	 * from 
+	 * <li>agentParkingAndDrivingSchedules,
+	 * <li>vehicles,
+	 * <li>agentsWithEV,
+	 * <li>myHubLoadReader.agentVehicleSourceMapping
+	 * @param list
+	 */
+	public void deleteFailedEVAgentsForV2G(LinkedList<Id> list){
+		for(int i=0; i< list.size(); i++){
+			Id id= list.get(i);
+			agentParkingAndDrivingSchedules.remove(id);
+			vehicles.getKeySet().remove(id);// referenced in agentContracts - so automatically deleted... later used for stochastic load		
+			if(agentsWithEV.contains(id)){
+				agentsWithEV.remove(id);
+			}
+			if(agentsWithPHEV.contains(id)){
+				agentsWithPHEV.remove(id);
+			}			
 			
 		}
 	}
@@ -476,7 +504,7 @@ public class DecentralizedSmartCharger {
 					scheduleAfterLP= lpphev.solveLP(agentParkingAndDrivingSchedules.get(id),id, batterySize, batteryMin, batteryMax, type);
 					agentParkingAndDrivingSchedules.put(id, scheduleAfterLP);
 					if(scheduleAfterLP==null){
-						System.out.println("too restrictive even for PHEV - happens if imposing how muhc to charge boundaries");
+						System.out.println("too restrictive even for PHEV - can happen if imposing how muhc to charge boundaries");
 						deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.add(id);
 					}else{
 						joulesFromEngine= lpphev.getEnergyFromCombustionEngine();
@@ -491,13 +519,8 @@ public class DecentralizedSmartCharger {
 		}
 		//delete the PHEVs that failed
 		System.out.println("total phevs deleted: "+ deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge.size());
-		for(Id id: deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge){
-			agentParkingAndDrivingSchedules.remove(id);
-			vehicles.getKeySet().remove(id);// referenced in agentContracts - so automatically deleted... later used for stochastic load		
-			
-		}
-		
-		
+		deleteAgentsInList(deleterestrictedPHEVAgentsFromLimitBatteryTotalCharge);
+				
 	}
 
 
@@ -577,11 +600,7 @@ public class DecentralizedSmartCharger {
 			for(Id id : vehicles.getKeySet()){
 				
 				Schedule thisAgentParkAndDrive = agentParkingAndDrivingSchedules.get(id);
-				if (debug){
-					System.out.println("Finding Charging distribution Agent "+ id.toString());
-					thisAgentParkAndDrive.printSchedule();
-					//Finding Charging distribution Agent 183148
-				}
+				
 				
 				int interval= thisAgentParkAndDrive.timeIsInWhichInterval(thisSecond);
 				
@@ -640,9 +659,7 @@ public class DecentralizedSmartCharger {
 		}
 		
 		visualizeDeterministicLoadXYSeriesBeforeAfterDecentralizedSmartCharger();
-		if(controler.getPopulation().getPersons().size()<=1000.0){
-			visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger();
-		}
+		
 		
 	}
 
@@ -831,6 +848,7 @@ public class DecentralizedSmartCharger {
 			double xPercentDownUp
 			) throws Exception{
 		
+		
 		System.out.println("\n Find Connectivty Curve for V2G");
 		findConnectivityDistribution();
 		
@@ -851,11 +869,12 @@ public class DecentralizedSmartCharger {
 		System.out.println("START CHECKING STOCHASTIC HUB LOADS");
 		//the remaining generalstochasticHubLoad needs to be recalculated 
 		myHubLoadReader.recalculateStochasticHubLoadCurveAfterVehicleAndHubSources();
-		checkHubStochasticLoads();
+		checkRemainingStochasticHubLoads();
 		
 		timeCheckRemainingSources=System.currentTimeMillis();
 		
 		myV2G.calcV2GVehicleStats();
+		myV2G.calcHubSourceStats();
 		System.out.println("DONE V2G");
 		writeSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		writeSummaryV2GTXT("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
@@ -873,11 +892,8 @@ public class DecentralizedSmartCharger {
 		if(myHubLoadReader.agentVehicleSourceMapping!=null){
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
 				
-				if(DecentralizedSmartCharger.debug){
-					System.out.println("check VehicleSource for"+ id.toString());
-				}
-					
-					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
+				if(vehicles.containsKey(id)){
+Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
 					
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
@@ -925,7 +941,7 @@ public class DecentralizedSmartCharger {
 								 */
 								
 								double compensation;
-								if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+								if (Math.abs(joulesFromSource)>cutoff*STANDARDCONNECTIONSWATT){
 									if (joulesFromSource>0){//regulation down = local production
 										/*
 										 * compensation for providing your own energy
@@ -962,9 +978,12 @@ public class DecentralizedSmartCharger {
 						}	
 					}
 					// check V2G effect
-					if(debug|| id.toString().equals(Integer.toString(1))  ){
-						visualizeStochasticLoadVehicleBeforeAfterV2G(id);												
-					}	
+					//if(debug|| id.toString().equals(Integer.toString(1))  ){
+						visualizeStochasticLoadVehicleBeforeAfterV2G(id);											
+					//}	
+				}
+					
+					
 			}
 		}
 		
@@ -983,7 +1002,7 @@ public class DecentralizedSmartCharger {
 				}
 					
 					Schedule electricSource= myHubLoadReader.locationSourceMapping.get(linkId).getLoadSchedule();
-					electricSource.printSchedule();
+					//electricSource.printSchedule();
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
 						LoadDistributionInterval electricSourceInterval= (LoadDistributionInterval)electricSource.timesInSchedule.get(i);
@@ -995,7 +1014,7 @@ public class DecentralizedSmartCharger {
 						
 						///////////////////////////
 						double compensation;
-						if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+						if (Math.abs(joulesFromSource)>cutoff*STANDARDCONNECTIONSWATT){
 							if (joulesFromSource>0){//regulation down = local production
 								/*
 								 * feed in 
@@ -1041,7 +1060,7 @@ public class DecentralizedSmartCharger {
 	 * visualizeStochasticLoadBeforeAfterV2G();
 	 * @throws Exception 
 	 */
-	public void checkHubStochasticLoads() throws Exception{
+	public void checkRemainingStochasticHubLoads() throws Exception{
 		
 		if(myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources !=null){
 			for(Integer h : myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.keySet()){
@@ -1081,10 +1100,10 @@ public class DecentralizedSmartCharger {
 							//*********************************													
 							
 							double joulesFromSource= functionSimpsonIntegrator.integrate(func, start, end);
-							System.out.println("joules from source ="+ joulesFromSource +" is:  "+(Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT) );
+							System.out.println("joules from source ="+ joulesFromSource +" is big enough to be considered for V2G:  "+(Math.abs(joulesFromSource)>cutoff*STANDARDCONNECTIONSWATT) );
 							
 							
-							if (Math.abs(joulesFromSource)>0.05*STANDARDCONNECTIONSWATT){
+							if (Math.abs(joulesFromSource)>cutoff*STANDARDCONNECTIONSWATT){
 								if(joulesFromSource<0 ){
 									// regulation UP
 									double expectedNumberOfParkingAgents=getPercentDownUp()*
@@ -1194,7 +1213,7 @@ public class DecentralizedSmartCharger {
 		realFuncIntegrator.setMaximalIterationCount(64);
 		/*System.out.println(realFuncIntegrator.getRelativeAccuracy());
 		System.out.println(realFuncIntegrator.getAbsoluteAccuracy());*/
-		realFuncIntegrator.setRelativeAccuracy(STANDARDCONNECTIONSWATT*0.05);
+		realFuncIntegrator.setRelativeAccuracy(STANDARDCONNECTIONSWATT*cutoff);
 		double test= realFuncIntegrator.integrate( start, end);
 		return test;
 		
@@ -1206,7 +1225,7 @@ public class DecentralizedSmartCharger {
 		realFuncIntegrator.setMaximalIterationCount(32);
 		/*System.out.println(realFuncIntegrator.getRelativeAccuracy());
 		System.out.println(realFuncIntegrator.getAbsoluteAccuracy());*/
-		realFuncIntegrator.setRelativeAccuracy(STANDARDCONNECTIONSWATT*0.05);
+		realFuncIntegrator.setRelativeAccuracy(STANDARDCONNECTIONSWATT*cutoff);
 		double test= realFuncIntegrator.integrate( start, end);
 		return test;
 		
@@ -1584,47 +1603,30 @@ public class DecentralizedSmartCharger {
 	}
 	
 	
-	
+	/**
+	 * Deterministic free load before and after
+	 * @throws IOException
+	 */
 	private void visualizeDeterministicLoadXYSeriesBeforeAfterDecentralizedSmartCharger()throws IOException{
 		
-		  //************************************
+		  	//************************************
 			//READ IN VALUES FOR EVERY HUB
 			// and make chart before-after
 			//************************************
+		System.out.println();
 			for( Integer i : myHubLoadReader.deterministicHubLoadAfter15MinBins.keySet()){
 				visualizeTwoXYLoadSeriesBeforeAfter(
 						myHubLoadReader.deterministicHubLoadDistribution.get(i),//before 
 						myHubLoadReader.deterministicHubLoadAfter15MinBins.get(i).getXYSeries("Free Load at Hub "+ i.toString()+ " after"),//after
 						"Free Load at Hub "+ i.toString()+ " before",
 						outputPath+"Hub/deterministicLoadBeforeAfter_hub"+i.toString()+".png", 
-						"DeterministicLoadBeforeAfter_hub"+i.toString());
+						"DeterministicLoadBeforeAfter_hub"+i.toString(), true);
 				
 			}   		    		
      
 	}
 	
-	/**
-	 * 
-	 * @throws IOException
-	 */
-	private void visualizeDeterministicLoadBeforeAfterDecentralizedSmartCharger() throws IOException{
-		
-		  //************************************
-			//READ IN VALUES FOR EVERY HUB
-			// and make chart before-after
-			//************************************
-			for( Integer i : myHubLoadReader.deterministicHubLoadDistributionAfterContinuous.keySet()){
-				visualizeTwoLoadSchedulesBeforeAfter(
-						myHubLoadReader.deterministicHubLoadDistribution.get(i),//before 
-						myHubLoadReader.deterministicHubLoadDistributionAfterContinuous.get(i),//after
-						"Free Load at Hub "+ i.toString()+ " before",
-						"Free Load at Hub "+ i.toString()+ " after",
-						outputPath+"Hub/deterministicLoadBeforeAfterContinuous_hub"+i.toString()+".png", 
-						"DeterministicLoadBeforeAfter_hub"+i.toString());
-				
-			}   		    		
-       
-	}
+	
 	
 	
 	
@@ -1635,20 +1637,23 @@ public class DecentralizedSmartCharger {
 			// and make chart before-after
 			//************************************
 			for( Integer i : myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.keySet()){
-				Schedule sBefore= myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.get(i);
-				//Schedule sAfter=myHubLoadReader.stochasticHubLoadDistributionAfterContinuous.get(i);
+				XYSeries sBefore = myHubLoadReader.getXYSeriesForHubXFromStochasticLoadAfterVehicleAndHubSources15MinBins(i);
+				// Fitted Schedule sBefore= myHubLoadReader.stochasticHubLoadAfterVehicleAndHubSources.get(i);
 				XYSeries sAfter = myHubLoadReader.stochasticHubLoadAfter15MinBins.get(i).getXYSeries("Stochastic free load at hub "+ i.toString()+ " after V2G");
 				
-				visualizeTwoXYLoadSeriesBeforeAfter(sBefore, sAfter, 
-						"Stochastic free load at hub "+ i.toString()+ " before V2G",
-						outputPath+"V2G/stochasticLoadBeforeAfter_hub"+i.toString()+".png", 
+				visualizeTwoXYLoadSeriesBeforeAfter(sBefore, sAfter, 						
+						outputPath+"V2G/stochasticLoadBeforeAfterV2G_hub"+i.toString()+".png", 
 						"StochasticLoadBeforeAfter_hub"+i.toString());
 			}   		    		
      
 	}
 	
 	
-	
+	/**
+	 * visualize vehicle load 15min bin after and original 
+	 * @param id
+	 * @throws IOException
+	 */
 	private void visualizeStochasticLoadVehicleBeforeAfterV2G(Id id) throws IOException{
 		
 		Schedule sBefore= myHubLoadReader.agentVehicleSourceMapping.get(id);
@@ -1658,26 +1663,31 @@ public class DecentralizedSmartCharger {
 				sAfter,
 				"Stochastic free load Agent "+ id.toString()+ " before V2G",						
 				outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle"+id.toString()+".png", 
-				"StochasticLoadBeforeAfter_agentVehicle"+id.toString());     
+				"StochasticLoadBeforeAfter_agentVehicle"+id.toString(), false);     
 	}
 	
 	
 	
-	
+	/**
+	 * original hub source load and 15 bin hub source load
+	 * @param linkId
+	 */
 	private void  visualizeStochasticLoadHubSourceBeforeAfterV2G(Id linkId){
 		Schedule sBefore= myHubLoadReader.locationSourceMapping.get(linkId).getLoadSchedule();
 		
 		String name=myHubLoadReader.locationSourceMapping.get(linkId).getName();
 		XYSeries sAfter=myHubLoadReader.locationSourceMappingAfter15MinBins.get(linkId).getXYSeries(
 				"Hub Source '"+name +"' at Link "+ linkId.toString()+ " after V2G");
+		
 		visualizeTwoXYLoadSeriesBeforeAfter(sBefore,
 				sAfter,
 				"Hub Source '"+name +"' at Link "+ linkId.toString()+ "before V2G",						
-				outputPath+"V2G/stochasticHubSourceBeforeAfter_"+name+".png", 
-				"StochasticHubSourceBeforeAfter_"+name); 
+				outputPath+"V2G/stochasticHubSourceBeforeAfter15MinBin_"+name+".png", 
+				"StochasticHubSourceBeforeAfter15MinBin_"+name, false); 
 	}
 	
 	/**
+	 * visualizes two load schedules before and after and writes out a txt file with data values in 15 min bins
 	 * 
 	 * @param before
 	 * @param after
@@ -1696,18 +1706,20 @@ public class DecentralizedSmartCharger {
 		    FileWriter fstream = new FileWriter(outputPath+graphTitle+".txt");
 		    BufferedWriter out = new BufferedWriter(fstream);
 		   
-		    out.write("time \t after \n");
+		    out.write("time \t before \t after \n");
 		    
 			XYSeriesCollection load= new XYSeriesCollection();
-			XYSeries beforeXY= before.makeXYSeriesFromLoadSchedule(XYBefore);
-			XYSeries afterXY= after.makeXYSeriesFromLoadSchedule(XYAfter);
+			XYSeries beforeXY= before.makeXYSeries1MinBinFromLoadSchedule(XYBefore);
+			XYSeries afterXY= after.makeXYSeries1MinBinFromLoadSchedule(XYAfter);
 			//************************************
-			//AFTER//BEFORE
-			
+			//AFTER//BEFORE		
 			//************************************
 			load.addSeries(afterXY);
 			load.addSeries(beforeXY);
-					
+			for(int i=0; i<afterXY.getItemCount(); i++){	
+				// sec // load before // load after
+				  out.write( afterXY.getX(i)+" \t "+ beforeXY.getY(i)+" \t "+ afterXY.getY(i)+" \n");
+			}	
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart(graphTitle, 
 					"time [s]", 
@@ -1745,26 +1757,33 @@ public class DecentralizedSmartCharger {
 	public static void visualizeTwoXYLoadSeriesBeforeAfter(
 			Schedule beforeSchedule, XYSeries after, 
 			String XYBefore,
-			String outputFile, String graphTitle){
+			String outputFile, String graphTitle, boolean txt){
 		
 		try{
 		    // Create file 
-		    FileWriter fstream = new FileWriter(outputPath+graphTitle+".txt");
-		    BufferedWriter out = new BufferedWriter(fstream);
-		   
-		    out.write("time \t after \n");
+			String filename=outputPath+graphTitle+".txt";
+			FileWriter fstream = new FileWriter(filename);
+		    BufferedWriter out= new BufferedWriter(fstream);
+		    
+			if(txt){				
+		    	out.write("time \t before \t after \n");
+		    }
+			
 		    
 			XYSeriesCollection load= new XYSeriesCollection();
 		
 			//************************************
 			//AFTER//BEFORE
 			//************************************
-			XYSeries beforeXY= beforeSchedule.makeXYSeriesFromLoadSchedule(XYBefore);
+			
+			XYSeries beforeXY= beforeSchedule.makeXYSeriesXSecBinBinFromLoadSchedule(XYBefore,SECONDSPER15MIN);
 			
 			load.addSeries(after);
 			load.addSeries(beforeXY);
-			for(int i=0; i<after.getItemCount(); i++){
-				  out.write( after.getX(i)+" \t "+ after.getY(i)+" \n");
+			for(int i=0; i<after.getItemCount(); i++){	
+				if(txt){
+					out.write( after.getX(i)+" \t "+ beforeXY.getY(i)+" \t "+ after.getY(i)+" \n");
+				}
 			}
 			
 			//************************************
@@ -1778,6 +1797,67 @@ public class DecentralizedSmartCharger {
 			chart.setBackgroundPaint(Color.white);
 			
 			final XYPlot plot = chart.getXYPlot();
+			
+	        plot.setBackgroundPaint(Color.white);
+	        plot.setDomainGridlinePaint(Color.gray); 
+	        plot.setRangeGridlinePaint(Color.gray);
+			
+	        plot.getRenderer().setSeriesPaint(0, Color.red);//after
+	        plot.getRenderer().setSeriesPaint(1, Color.black);//before
+	        
+	        setSeriesStroke(plot, 0, 5.0f, 3.0f, 3.0f);
+	        
+	        setSeriesStroke(plot, 1, 5.0f, 1.0f, 0.0f);
+        	
+        	ChartUtilities.saveChartAsPNG(new File(outputFile) , chart, 1000, 1000);
+        	
+        	//Close the output stream
+        	if(txt){out.close();}
+        	 File f = new File(filename); 
+        	f.delete();
+		    }catch (Exception e){
+		    	e.printStackTrace();
+		}		
+	}
+	
+	
+	
+	public static void visualizeTwoXYLoadSeriesBeforeAfter(
+			XYSeries before, XYSeries after, 			
+			String outputFile, String graphTitle){
+		
+		try{
+		    // Create file 
+		    FileWriter fstream = new FileWriter(outputPath+graphTitle+".txt");
+		    BufferedWriter out = new BufferedWriter(fstream);
+		   
+		    out.write("time \t before \t after \n");
+		    
+			XYSeriesCollection load= new XYSeriesCollection();
+		
+			//************************************
+			//AFTER//BEFORE
+			//************************************
+			
+			load.addSeries(after);
+			load.addSeries(before);
+			for(int i=0; i<after.getItemCount(); i++){	
+				// sec // load before // load after
+				  out.write( after.getX(i)+" \t "+ before.getY(i)+" \t "+ after.getY(i)+" \n");
+			}
+			
+			//************************************
+			JFreeChart chart = ChartFactory.createXYLineChart(graphTitle, 
+					"time [s]", 
+					"available load [W]", 
+					load, 
+					PlotOrientation.VERTICAL, 
+					true, true, false);
+			
+			chart.setBackgroundPaint(Color.white);
+			
+			final XYPlot plot = chart.getXYPlot();
+			
 	        plot.setBackgroundPaint(Color.white);
 	        plot.setDomainGridlinePaint(Color.gray); 
 	        plot.setRangeGridlinePaint(Color.gray);
@@ -1794,13 +1874,9 @@ public class DecentralizedSmartCharger {
         	//Close the output stream
 		    out.close();
 		    }catch (Exception e){
-		    	//Catch exception if any
+		    	e.printStackTrace();
 		}		
 	}
-	
-	
-	
-	
 	
 	
 	
@@ -2426,7 +2502,14 @@ public class DecentralizedSmartCharger {
 		    
 		    out.write("Total V2G Down provided by all Agents: \t");
 		    out.write("      of which EV: \t");
-		    out.write("      of which PHEV: \t \n");
+		    out.write("      of which PHEV: \t ");
+		    
+		    out.write("Total direct compensation V2G EV: \t ");
+		    out.write("Total direct compensation V2G PHEV: \t ");
+		    
+		    out.write("Total indirect saving rescheduling V2G EV: \t ");
+		    out.write("Total indirect saving rescheduling V2G PHEV: \t \n");
+		 
 		    //*********************
 		    
 		    out.write(getAllAgentsWithPHEV().size() +"\t");
@@ -2460,10 +2543,15 @@ public class DecentralizedSmartCharger {
 		    out.write(myV2G.getTotalRegulationDown() +"\t");
 		    out.write(myV2G.getTotalRegulationDownEV() +"\t");
 		    out.write(myV2G.getTotalRegulationDownPHEV() +"\t");
-		    //*********************
 		    
+		    out.write(myV2G.getTotalDirectCompensationEV()+"\t");
+		    out.write(myV2G.getTotalDirectCompensationPHEV()+"\t");
 		    
+		    out.write(myV2G.getIndirectSavingReschedulingEV()+"\t");
+		    out.write(myV2G.getIndirectSavingReschedulingPHEV()+"\n");
 		  
+		    //*********************
+		    		  
 		   
 		    //Close the output stream
 		    out.close();
@@ -2490,12 +2578,11 @@ public class DecentralizedSmartCharger {
 		    
 		    out.write("charging cost:\t");
 		    out.write("charging time: \t");
-		    out.write("number of charging slots: \t");
+		    out.write("number of charging slots: \t");		        	    
 		    
-		    out.write("EV failure?: \t");
-		    out.write("Joules from engine: \t");			   
-		    out.write("Joules not from engine: \t");
-		    out.write("emission: \n");
+		    out.write("Joules from battery [J]: \t");			   
+		    out.write("Joules not from engine [J]: \t");
+		    out.write("Emissions [kg]: \n");
 		   
 		    //*********************
 		    for(Id id: vehicles.getKeySet()){
@@ -2504,20 +2591,19 @@ public class DecentralizedSmartCharger {
 		    	
 		    	out.write(agentChargingCosts.get(id)+ "\t");
 		    	out.write(agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule()+ "\t");
-		    	 out.write(agentChargingSchedules.get(id).getNumberOfEntries() + " \t");
+		    	out.write(agentChargingSchedules.get(id).getNumberOfEntries() + " \t");		    			    	
 		    	
-		    	out.write(chargingFailureEV.contains(id)+ "\t");
 		    	out.write(getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\t");
-		    	double joulesNotEngine=getTotalDrivingConsumptionOfAgent(id)-getTotalDrivingConsumptionOfAgentFromBattery(id);
-		    	out.write(joulesNotEngine+ "\t");
-		    	out.write(joulesExtraConsumptionToGasCosts(id, joulesNotEngine)+ "\n");
+		    	double joulesNotEngine=getTotalDrivingConsumptionOfAgentFromOtherSources(id);
+		    	out.write(joulesNotEngine+ "\t");		
+		    	
+		    	out.write(joulesToEmissionInKg(id, joulesNotEngine)+ "\n");
 		    }
-		    
-		   
+		    		   
 		    //Close the output stream
 		    out.close();
 		    }catch (Exception e){
-		    	//Catch exception if any
+		    	e.printStackTrace();
 		    }
 	}
 	

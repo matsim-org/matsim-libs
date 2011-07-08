@@ -84,6 +84,7 @@ public class HubLoadDistributionReader {
 	public HashMap<Integer, Schedule> stochasticHubLoadDistribution;
 	//public HashMap<Integer, Schedule> stochasticHubLoadDistributionAfterContinuous;
 	public HashMap<Integer, Schedule> stochasticHubLoadAfterVehicleAndHubSources;
+	public HashMap<Integer, XYSeries> stochasticHubLoadAfterVehicleAndHubSources15MinBins;
 	public HashMap<Integer, TimeDataCollector> stochasticHubLoadAfter15MinBins;
 	
 	public HashMap<Id, GeneralSource> locationSourceMapping;
@@ -176,7 +177,6 @@ public class HubLoadDistributionReader {
 					make96BinCollectorFromDayLoadSchedule(deterministicHubLoadDistribution.get(hub)));
 					
 		}
-		
 	}
 	
 	
@@ -246,7 +246,6 @@ public class HubLoadDistributionReader {
 	
 	/**
 	 * initialize the stochastic hub loads after
-	 * 
 	 */
 	public void initializeStochasticHubLoadDistributionAfter(){
 		if (stochasticHubLoadDistribution!=null){
@@ -276,7 +275,6 @@ public class HubLoadDistributionReader {
 			for(Id i: locationSourceMapping.keySet()){				
 				locationSourceMappingAfter15MinBins.put(i, 
 						make96BinCollectorFromDayLoadSchedule(locationSourceMapping.get(i).getLoadSchedule()));
-				
 			}
 		}
 	}
@@ -311,10 +309,22 @@ public class HubLoadDistributionReader {
 	}
 	
 	
+	
+	public XYSeries getXYSeriesForHubXFromStochasticLoadAfterVehicleAndHubSources15MinBins(int hub){
+		return stochasticHubLoadAfterVehicleAndHubSources15MinBins.get(hub);
+	}
+	
+	
 	public void recalculateStochasticHubLoadCurveAfterVehicleAndHubSources() throws Exception{
 		stochasticHubLoadAfterVehicleAndHubSources= new HashMap<Integer, Schedule>();
-				
+		stochasticHubLoadAfterVehicleAndHubSources15MinBins = new HashMap<Integer, XYSeries>();
+		
+		
 		for (Integer hub: stochasticHubLoadAfter15MinBins.keySet()){
+			
+			stochasticHubLoadAfterVehicleAndHubSources15MinBins.put(hub, stochasticHubLoadAfter15MinBins.get(hub).
+					getXYSeries("stochastic hub load after vehicle and hub sources"));
+			
 			/*
 			 * NO VEHICLE OR GENERAL HUB LOADS SPECIFIED
 			 * if no vehicle or hub loads are in the system
@@ -326,56 +336,77 @@ public class HubLoadDistributionReader {
 								
 				DecentralizedSmartCharger.visualizeTwoXYLoadSeriesBeforeAfter(
 						stochasticHubLoadDistribution.get(hub), 					
-						stochasticHubLoadAfterVehicleAndHubSources.get(hub).makeXYSeriesFromLoadSchedule("stochastic hub load after vehicle and hub sources"),
+						stochasticHubLoadAfterVehicleAndHubSources.get(hub).makeXYSeriesXSecBinBinFromLoadSchedule("stochastic hub load after vehicle and hub sources", 
+								DecentralizedSmartCharger.SECONDSPER15MIN),
 						"stochastic hub load original",
 						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSource_"+hub+".png", 
-						"StochasticHubSourceBeforeAfterVehicleHubSource_"+hub); 
+						"StochasticHubSourceBeforeAfterVehicleHubSource_"+hub, false); 
+										
 			}
 			else{
 				/*
 				 * VEHICLE OR GENERAL HUB LOADS SPECIFIED
 				 * if stochastic loads were passed as discrete load intervals then its likely, that there are significant steps in the function
 				 this cannot be accurately displayed with a Polynomial Function
-				 Thus, the initial intervals in the schedule will be used to fit the updated stochastic load
-				 
-				 - refit vehicle loads
-				 - refit hub sources
-				 - add them to original stochastic load
+				 Thus, the initial intervals of the aggregated hub sources will be used to fit the updated stochastic load
+				
 				 */
 				
-				Schedule agentRefit=new Schedule();
-				for (Id agentId : agentVehicleSourceMapping.keySet()){
-					Schedule agentRefit1= agentVehicleSourceAfter15MinBins.get(hub).
-					reFitFunctionInIntervalsOfSchedule96Bin(agentVehicleSourceMapping.get(agentId));
-					
-					for(int agentInt=0; agentInt<agentRefit1.getNumberOfEntries(); agentInt++){
-						agentRefit.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
-								(LoadDistributionInterval)agentRefit1.timesInSchedule.get(agentInt));
+				// aggregate all locationSources (at linkIds) over the hub
+				Schedule totalLocationSourcesAtHub=new Schedule(new LoadDistributionInterval(0, DecentralizedSmartCharger.SECONDSPERDAY, 0));
+				for(Id linkId: locationSourceMapping.keySet()){
+					if(getHubForLinkId(linkId)==hub){
+						//locationSourceMapping.get(linkId).getLoadSchedule().printSchedule();
+						for(int source=0; source<locationSourceMapping.get(linkId).getLoadSchedule().getNumberOfEntries(); source++){
+							LoadDistributionInterval loadToAdd= (LoadDistributionInterval)locationSourceMapping.get(linkId).getLoadSchedule().timesInSchedule.get(source);
+							
+							totalLocationSourcesAtHub.addLoadDistributionIntervalToExistingLoadDistributionSchedule(loadToAdd);
+							
+						}
 					}
 				}
 				
 				
-				Schedule locationRefit= locationSourceMappingAfter15MinBins.get(hub).
-					reFitFunctionInIntervalsOfSchedule96Bin(locationSourceMapping.get(hub).getLoadSchedule());
-		
-				Schedule originalPlusUpdatedAgentAndLocation= stochasticHubLoadDistribution.get(hub).cloneSchedule();
-				
-				// HERE STILL TO CHANGE
-				
-				for(int locationInt=0; locationInt<agentRefit.getNumberOfEntries(); locationInt++){
-					originalPlusUpdatedAgentAndLocation.addLoadDistributionIntervalToExistingLoadDistributionSchedule(
-							(LoadDistributionInterval)locationRefit.timesInSchedule.get(locationInt));
+				// refit the aggregated hubsource data according to Hub source schedule , linkId
+				if(totalLocationSourcesAtHub.getNumberOfEntries()>0){
+					stochasticHubLoadAfterVehicleAndHubSources.put(hub, stochasticHubLoadAfter15MinBins.get(hub).
+								reFitFunctionInIntervalsOfSchedule96Bin(totalLocationSourcesAtHub));
+				}else{
+					// if no hubsource schedule, 'better guess' to reschedule over the whole day assuming that vehicles overall small
+					stochasticHubLoadAfterVehicleAndHubSources.put(hub, stochasticHubLoadAfter15MinBins.get(hub).
+							reFitFunctionInIntervalsOfSchedule96Bin(
+									new Schedule(new LoadDistributionInterval(
+											0, DecentralizedSmartCharger.SECONDSPERDAY, 0)))
+					);
 				}
 				
-				stochasticHubLoadAfterVehicleAndHubSources.put(hub, originalPlusUpdatedAgentAndLocation);
 				
-				// from schedule XYSeries
+				
+				// plot original stochastic load and updated fitted stochastic load
 				DecentralizedSmartCharger.visualizeTwoXYLoadSeriesBeforeAfter(
 						stochasticHubLoadDistribution.get(hub), 					
-						stochasticHubLoadAfterVehicleAndHubSources.get(hub).makeXYSeriesFromLoadSchedule("stochastic hub load after vehicle and hub sources"),
+						stochasticHubLoadAfterVehicleAndHubSources.get(hub).makeXYSeriesXSecBinBinFromLoadSchedule(
+								"fitted stochastic hub load after vehicle and hub sources",
+								DecentralizedSmartCharger.SECONDSPER15MIN),
 						"stochastic hub load original",
-						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSource_"+hub+".png", 
-						"StochasticHubSourceBeforeAfterVehicleHubSource_"+hub); 
+						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceFITTED_"+hub+".png", 
+						"StochasticHubSourceBeforeAfterVehicleHubSourceFITTED_"+hub, true); 
+				
+				// plot original stochastic load with updated actual 15min stochastic load
+				DecentralizedSmartCharger.visualizeTwoXYLoadSeriesBeforeAfter(
+						stochasticHubLoadDistribution.get(hub), 					
+						stochasticHubLoadAfter15MinBins.get(hub).getXYSeries("15min bin stochastic hub load after vehicle and hub sources"),
+						"stochastic hub load original",
+						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceACTUAL_"+hub+".png", 
+						"StochasticHubSourceBeforeAfterVehicleHubSourceACTUAL_"+hub, true);
+				
+				// plot fitted stochastic load and actual 15 min bin stochastic load for comparison
+				DecentralizedSmartCharger.visualizeTwoXYLoadSeriesBeforeAfter(
+						stochasticHubLoadAfterVehicleAndHubSources.get(hub),
+						stochasticHubLoadAfter15MinBins.get(hub).getXYSeries("15min bin stochastic hub load after vehicle and hub sources"), 					
+						"fitted stochastic hub load after vehicle and hub sources",								
+						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceFittedActual15Min_"+hub+".png", 
+						"StochasticHubSourceBeforeAfterVehicleHubSourceFittedActual15Min_"+hub, false); 
 			}
 		}
 	}	
@@ -773,7 +804,7 @@ public class HubLoadDistributionReader {
 			DomainFinder minMaxLoad= new DomainFinder();
 			minMaxLoad.setLoadSchedule(deterministicHubLoadDistribution.get(i));
 			Schedule pricingS= pricingHubDistribution.get(i);
-			
+			//pricingS.printSchedule();
 			Schedule deterministicSchedule=deterministicHubLoadDistribution.get(i);
 			
 			Schedule sPHEV= new Schedule();
@@ -875,6 +906,7 @@ public class HubLoadDistributionReader {
 			
 			sPHEV.sort();		
 			hubLoadDistributionPHEVAdjusted.put(i, sPHEV);
+			//sPHEV.printSchedule();
 		}
 		
 		return hubLoadDistributionPHEVAdjusted;

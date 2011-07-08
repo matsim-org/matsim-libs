@@ -78,6 +78,7 @@ public class AgentContractCollector {
 					list.put(id, contractRegUpRegDown);
 				}
 			}
+			count++;
 		}
 		return list;
 	}

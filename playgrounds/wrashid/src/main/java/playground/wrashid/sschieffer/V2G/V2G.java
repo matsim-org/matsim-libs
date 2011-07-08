@@ -3,6 +3,7 @@ package playground.wrashid.sschieffer.V2G;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import lpsolve.LpSolveException;
@@ -43,7 +44,9 @@ public class V2G {
 	private DecentralizedSmartCharger mySmartCharger;
 	//private LinkedListValueHashMap<Id, Double> agentV2GRevenue = new LinkedListValueHashMap<Id, Double>(); 
 	private HashMap<Id, V2GAgentStats> agentV2GStatistic; 
-	private HashMap<Id, V2GAgentStats> hubSourceStatistic; 
+	private HashMap<Id, V2GAgentStats> hubSourceStatistic;
+	
+	private ArrayList<V2GDecisionMonitor> V2GdecisionsList;
 	
 	public Schedule answerScheduleAfterElectricSourceInterval;
 	private double averageV2GRevenueEV ;
@@ -52,7 +55,15 @@ public class V2G {
 	
 	private double averageExtraChargingCostEV ;
 	private double averageExtraChargingCostPHEV ;
-	private double averageExtraChargingCostAllAgents=0;
+	private double averageExtraChargingCostAllAgents;
+	
+	private double averageJoulesSavedByLocalProductionEV ;
+	private double averageJoulesSavedByLocalProductionPHEV ;
+	private double averageJoulesSavedByLocalProductionAllAgents;
+	
+	private double averageJoulesTakenFromBatteryForExtraConsumptionEV ;
+	private double averageJoulesTakenFromBatteryForExtraConsumptionPHEV ;
+	private double averageJoulesTakenFromBatteryForExtraConsumptionAllAgents;
 	
 	private double totalRegulationUp ;
 	private double totalRegulationUpEV ;
@@ -61,6 +72,12 @@ public class V2G {
 	private double totalRegulationDown ;
 	private double totalRegulationDownEV ;
 	private double totalRegulationDownPHEV ;
+	
+	private double totalCompensationEV ;
+	private double totalCompensationPHEV ;
+	
+	private double totalMoneySavedReschedulingEV ;
+	private double totalMoneySavedReschedulingPHEV ;
 	
 	private double averageRevenueFeedInEV ;
 	private double averageRevenueFeedInPHEV ;
@@ -76,14 +93,30 @@ public class V2G {
 	
 	public V2G(DecentralizedSmartCharger mySmartCharger){
 		this.mySmartCharger=mySmartCharger;
-		 averageV2GRevenueEV=0;
+		 
+		V2GdecisionsList= new ArrayList<V2GDecisionMonitor>();
+		
+		averageV2GRevenueEV=0;
 		 averageV2GRevenuePHEV=0;
 		 averageV2GRevenueAllAgents=0;
 		
 		 averageExtraChargingCostEV=0;
 		 averageExtraChargingCostPHEV=0;
 		 averageExtraChargingCostAllAgents=0;
+		 
+		averageJoulesSavedByLocalProductionEV=0 ;
+		averageJoulesSavedByLocalProductionPHEV =0;
+		averageJoulesSavedByLocalProductionAllAgents=0;
+			
+		averageJoulesTakenFromBatteryForExtraConsumptionEV =0;
+		averageJoulesTakenFromBatteryForExtraConsumptionPHEV =0;
+		averageJoulesTakenFromBatteryForExtraConsumptionAllAgents=0;
 		
+		totalCompensationEV=0;
+		totalCompensationPHEV=0;
+		
+		totalMoneySavedReschedulingEV=0;
+		totalMoneySavedReschedulingPHEV=0;
 		 totalRegulationUp=0;
 		 totalRegulationUpEV=0;
 		 totalRegulationUpPHEV=0;
@@ -149,6 +182,21 @@ public class V2G {
 		return agentV2GStatistic.get(id).getRevenueFeedIn();
 	}
 	
+	
+	public double getAgentJoulesSavedByLocalProduction(Id id){
+		return agentV2GStatistic.get(id).getJoulesSavedWithLocalProduction();
+	}
+	
+	public double getAgentJoulesTakenFromBatteryForExtraConsumption(Id id){
+		return agentV2GStatistic.get(id).getJoulesTakenFromBatteryForExtraConsumption();
+	}
+	
+	public double getAgentExtraChargingCost(Id id){
+		return agentV2GStatistic.get(id).getExtraChargingCosts();
+	}
+	
+	
+	
 	public double getAverageV2GRevenueAgent(){
 		return averageV2GRevenueAllAgents;
 	}
@@ -173,9 +221,37 @@ public class V2G {
 		return averageExtraChargingCostPHEV;
 	}
 	
+	
+	public double getAverageJoulesSavedByLocalProductionEV(){
+		return averageJoulesSavedByLocalProductionEV;
+	}
+	
+	public double getAverageJoulesSavedByLocalProductionPHEV(){
+		return averageJoulesSavedByLocalProductionPHEV;
+	}
+	
+	public double getAverageJoulesSavedByLocalProductionAllAgents(){
+		return averageJoulesSavedByLocalProductionAllAgents;
+	}
+	
+	public double getAverageJoulesTakenFromBatteryForExtraConsumptionEV(){
+		return averageJoulesTakenFromBatteryForExtraConsumptionEV;
+	}
+	
+	public double getAverageJoulesTakenFromBatteryForExtraConsumptionPHEV(){
+		return averageJoulesTakenFromBatteryForExtraConsumptionPHEV;
+	}
+	
+	public double getAverageJoulesTakenFromBatteryForExtraConsumptionAllAgents(){
+		return averageJoulesTakenFromBatteryForExtraConsumptionAllAgents;
+	}
+		
+	
+	
 	public double getAverageFeedInRevenueHubSources(){
 		return averageRevenueFeedInHubSources;
 	}
+	
 	
 	public double getAverageExtraChargingHubSources(){
 		return averageExtraChargingHubSources;
@@ -237,6 +313,23 @@ public class V2G {
 	}
 	
 	
+	public double getTotalDirectCompensationEV(){
+		return totalCompensationEV;
+	}
+	
+	public double getTotalDirectCompensationPHEV(){
+		return totalCompensationPHEV;
+	}
+	
+	public double getIndirectSavingReschedulingEV(){
+		return totalMoneySavedReschedulingEV;
+	}
+	
+	public double getIndirectSavingReschedulingPHEV(){
+		return totalMoneySavedReschedulingPHEV;
+	}
+	
+	
 	private void writeV2GPerAgentTxt(){
 		try{
 		    // Create file 
@@ -246,9 +339,14 @@ public class V2G {
 		    
 		    out.write("Agent Id \t");
 		    out.write("EV? \t");
-		    out.write("Total V2Gup \t");
-		    out.write("Total V2Gdown \t");
-		    out.write("Total revenue \n");		    
+		    out.write("V2G: Total up \t");
+		    out.write("V2G: Total down \t");
+		    out.write("V2G: Total revenue \t");
+		    out.write("StochasticVehicle: Feed in revenue \t");
+		    out.write("StochasticVehicle: Joules Feed in \t");
+		    out.write("StochasticVehicle: JoulesSaved by local Production \t");
+		    out.write("StochasticVehicle: Joules Taken from battery for extra consumption \t");		    
+		    out.write("StochasticVehicle:Extra charging costs \n");
 		    
 		    //*********************
 		    int totalEV=mySmartCharger.getAllAgentsWithEV().size();
@@ -258,7 +356,12 @@ public class V2G {
 			    out.write(mySmartCharger.hasAgentEV(agentId)+"\t");
 			    out.write(getAgentTotalJouleV2GUp(agentId)+"\t");
 			    out.write(getAgentTotalJouleV2GDown(agentId)+"\t");
-			    out.write(getAgentV2GRevenues(agentId)+"\n");
+			    out.write(getAgentV2GRevenues(agentId)+"\t");
+			    out.write(getAgentRevenueFeedIn(agentId)+"\t");
+			    out.write(getAgentTotalJouleFeedIn(agentId)+"\t");
+			    out.write(getAgentJoulesSavedByLocalProduction(agentId)+"\t");
+			    out.write(getAgentJoulesTakenFromBatteryForExtraConsumption(agentId)+"\t");			   
+			    out.write(getAgentExtraChargingCost(agentId)+"\n");
 			}
 			
 			int totalPHEV=mySmartCharger.getAllAgentsWithPHEV().size();
@@ -268,7 +371,12 @@ public class V2G {
 			    out.write(mySmartCharger.hasAgentEV(agentId)+"\t");
 			    out.write(getAgentTotalJouleV2GUp(agentId)+"\t");
 			    out.write(getAgentTotalJouleV2GDown(agentId)+"\t");
-			    out.write(getAgentV2GRevenues(agentId)+"\n");
+			    out.write(getAgentV2GRevenues(agentId)+"\t");
+			    out.write(getAgentRevenueFeedIn(agentId)+"\t");
+			    out.write(getAgentTotalJouleFeedIn(agentId)+"\t");
+			    out.write(getAgentJoulesSavedByLocalProduction(agentId)+"\t");
+			    out.write(getAgentJoulesTakenFromBatteryForExtraConsumption(agentId)+"\t");			   
+			    out.write(getAgentExtraChargingCost(agentId)+"\n");
 			}
 			
 		    		   
@@ -279,11 +387,45 @@ public class V2G {
 		    }
 	}
 	
+	private void writeV2GDecisionMonitor(){
+		try{
+		    // Create file 
+			String title=(mySmartCharger.outputPath + "V2GDecisions_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    out.write("Agent Id \t");
+		    out.write("From: \t");
+		    out.write("To: \t");
+		    out.write("costKeeping: \t");
+		    out.write("costReschedule: \t");
+		    out.write("compensation:  \t");
+		    out.write("reschedule?: \t");
+		    out.write("additional Revenue?: \n");
+		    //*********************
+		    int totalDecisions=V2GdecisionsList.size();
+			for(int i=0; i<totalDecisions; i++){
+				//System.out.println("item"+ i);
+				V2GDecisionMonitor v= V2GdecisionsList.get(i);
+				out.write(v.writeString());
+			}
+		    		   
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	e.printStackTrace();
+		    	}
+	}
+	
+	
+	
 	public void calcV2GVehicleStats(){
+		writeV2GDecisionMonitor();
 		writeV2GPerAgentTxt();
 		//EV
 		int totalEV=mySmartCharger.getAllAgentsWithEV().size();
 		for(int i=0; i<totalEV; i++){
+			
 			Id agentId= mySmartCharger.getAllAgentsWithEV().get(i);
 			
 			averageV2GRevenueEV+=getAgentV2GRevenues(agentId);
@@ -298,17 +440,28 @@ public class V2G {
 			averageRevenueFeedInEV+= getAgentRevenueFeedIn(agentId);
 			totalJoulesFeedInEV+= getAgentTotalJouleFeedIn(agentId);
 			
-			averageExtraChargingCostEV+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
-			averageExtraChargingCostAllAgents+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
+			averageExtraChargingCostEV+= getAgentExtraChargingCost(agentId);
+			averageExtraChargingCostAllAgents+= getAgentExtraChargingCost(agentId);
+			
+			averageJoulesSavedByLocalProductionAllAgents+=getAgentJoulesSavedByLocalProduction(agentId);
+			averageJoulesSavedByLocalProductionEV+=getAgentJoulesSavedByLocalProduction(agentId);
+			
+			averageJoulesTakenFromBatteryForExtraConsumptionEV+=getAgentJoulesTakenFromBatteryForExtraConsumption(agentId);
+			averageJoulesTakenFromBatteryForExtraConsumptionAllAgents+=getAgentJoulesTakenFromBatteryForExtraConsumption(agentId);
+			
 		}
 		if (totalEV==0){
 			averageV2GRevenueEV=0;
 			averageRevenueFeedInEV=0;
 			averageExtraChargingCostEV=0;
+			averageJoulesSavedByLocalProductionEV=0;
+			averageJoulesTakenFromBatteryForExtraConsumptionEV=0;
 		}else{
 			averageV2GRevenueEV=averageV2GRevenueEV/totalEV;
 			averageRevenueFeedInEV=averageRevenueFeedInEV/totalEV;
 			averageExtraChargingCostEV=averageExtraChargingCostEV/totalEV;
+			averageJoulesSavedByLocalProductionEV=averageJoulesSavedByLocalProductionEV/totalEV;
+			averageJoulesTakenFromBatteryForExtraConsumptionEV=averageJoulesTakenFromBatteryForExtraConsumptionEV/totalEV;
 		}
 	
 		
@@ -328,33 +481,85 @@ public class V2G {
 			averageRevenueFeedInPHEV+= getAgentRevenueFeedIn(agentId);
 			totalJoulesFeedInPHEV+= getAgentTotalJouleFeedIn(agentId);
 			
-			averageExtraChargingCostPHEV+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
-			averageExtraChargingCostAllAgents+= agentV2GStatistic.get(agentId).getExtraChargingCosts();
+			averageExtraChargingCostPHEV+= getAgentExtraChargingCost(agentId);
+			averageExtraChargingCostAllAgents+= getAgentExtraChargingCost(agentId);
+			
+			averageJoulesSavedByLocalProductionAllAgents+=getAgentJoulesSavedByLocalProduction(agentId);
+			averageJoulesSavedByLocalProductionPHEV+=getAgentJoulesSavedByLocalProduction(agentId);
+			
+			averageJoulesTakenFromBatteryForExtraConsumptionPHEV+=getAgentJoulesTakenFromBatteryForExtraConsumption(agentId);
+			averageJoulesTakenFromBatteryForExtraConsumptionAllAgents+=getAgentJoulesTakenFromBatteryForExtraConsumption(agentId);
+			
 		}
 	
 		if(totalPHEV==0){
 			averageV2GRevenuePHEV=0.0;
 			averageRevenueFeedInPHEV=0.0;
 			averageExtraChargingCostPHEV=0.0;
+			averageJoulesSavedByLocalProductionPHEV=0;
+			averageJoulesTakenFromBatteryForExtraConsumptionPHEV=0;
 		}else{
 			averageV2GRevenuePHEV=averageV2GRevenuePHEV/totalPHEV;
 			averageRevenueFeedInPHEV=averageRevenueFeedInPHEV/totalPHEV;
 			averageExtraChargingCostPHEV=averageExtraChargingCostPHEV/totalPHEV;
+			averageJoulesSavedByLocalProductionPHEV=averageJoulesSavedByLocalProductionPHEV/totalPHEV;
+			averageJoulesTakenFromBatteryForExtraConsumptionPHEV=averageJoulesTakenFromBatteryForExtraConsumptionPHEV/totalPHEV;
 		}
 		//TOTAL
 		averageV2GRevenueAllAgents=averageV2GRevenueAllAgents/(totalPHEV+totalEV);
 		averageRevenueFeedInAllAgents=averageRevenueFeedInPHEV/(totalPHEV+totalEV);
 		averageExtraChargingCostAllAgents=averageExtraChargingCostAllAgents/(totalPHEV+totalEV);
+		
+		averageJoulesTakenFromBatteryForExtraConsumptionAllAgents=
+			averageJoulesTakenFromBatteryForExtraConsumptionAllAgents/(totalPHEV+totalEV);
+		averageJoulesSavedByLocalProductionAllAgents=averageJoulesSavedByLocalProductionAllAgents/(totalPHEV+totalEV);
 	}
 	
 	
+	
+	private void writePerHubSourceTxt(){
+		try{
+		    // Create file 
+			String title=(mySmartCharger.outputPath + "HubSource_summary.txt");
+		    FileWriter fstream = new FileWriter(title);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    
+		    out.write("Link Id \t");
+		    out.write("Name \t");
+		    out.write("Total Joules Feed in \t");
+		    out.write("Total Feed in revenue \t");
+		    out.write("Total Extra charging cost\n");
+		    
+		   
+		    //*********************
+			int numLinks= mySmartCharger.myHubLoadReader.locationSourceMapping.keySet().size();
+			for(Id linkId: mySmartCharger.myHubLoadReader.locationSourceMapping.keySet()){
+			
+				out.write(linkId.toString() +"\t");
+			    out.write(mySmartCharger.myHubLoadReader.locationSourceMapping.get(linkId).getName()+"\t");
+			    out.write(hubSourceStatistic.get(linkId).getTotalJoulesFeedIn()+"\t");
+			    out.write(hubSourceStatistic.get(linkId).getRevenueFeedIn()+"\t");			   
+			    out.write(hubSourceStatistic.get(linkId).getExtraChargingCosts()+"\n");
+			}
+			
+		    		   
+		    //Close the output stream
+		    out.close();
+		    }catch (Exception e){
+		    	//Catch exception if any
+		    }
+	}
+	
+	
+	
 	public void calcHubSourceStats(){
+		writePerHubSourceTxt();
 		if(mySmartCharger.myHubLoadReader.locationSourceMapping!=null){
 			int numLinks= mySmartCharger.myHubLoadReader.locationSourceMapping.keySet().size();
 			for(Id linkId: mySmartCharger.myHubLoadReader.locationSourceMapping.keySet()){
 				averageRevenueFeedInHubSources+=hubSourceStatistic.get(linkId).getRevenueFeedIn();
 				totalJoulesFeedInHubSources+=hubSourceStatistic.get(linkId).getTotalJoulesFeedIn();
-				averageExtraChargingHubSources=hubSourceStatistic.get(linkId).getExtraChargingCosts();
+				averageExtraChargingHubSources+=hubSourceStatistic.get(linkId).getExtraChargingCosts();
 			}
 			averageRevenueFeedInHubSources=averageRevenueFeedInHubSources/numLinks;
 			averageExtraChargingHubSources=averageExtraChargingHubSources/numLinks;
@@ -421,19 +626,53 @@ public class V2G {
 			String type			
 			) throws Exception{
 		
-	
-		double currentSOC=getSOCAtTime(agentId, electricSourceInterval.getEndTime());
-		/*
-		 * joules>0 defined as reg down = local energy generation = currentSOC+ joules
-		 * joules<0 = reg up = local energy demand  = currentSOC + (- joules)
-		 */
-		currentSOC=currentSOC+joules;
+		double currentSOCBefore= getSOCAtTime(agentId, electricSourceInterval.getEndTime());
+		double currentSOC=currentSOCBefore+joules;
 		
-		costComparisonVehicle(agentId, 
-				electricSourceInterval, 				
-				compensation,				
-				type,				
-				currentSOC, joules);
+		double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
+		double batteryMin=mySmartCharger.getBatteryOfAgent(agentId).getMinSOC();
+		double batteryMax=mySmartCharger.getBatteryOfAgent(agentId).getMaxSOC(); 
+		//*****************************
+		if (currentSOC>batterySize*batteryMax && (batterySize*batteryMax>currentSOCBefore)){
+			// IF too much V2G
+			double newJoules=batterySize*batteryMax-currentSOCBefore;			
+			if (joules<0){newJoules=newJoules*(-1);}
+			compensation=newJoules*compensation/joules;
+			// adjust electricSurceIntercal
+			// W*s=J
+			double wattInterval= newJoules/electricSourceInterval.getIntervalLength();
+			LoadDistributionInterval adjusted= new LoadDistributionInterval(electricSourceInterval.getStartTime(), 
+					electricSourceInterval.getEndTime(), wattInterval);
+			costComparisonVehicle(agentId, 
+					adjusted, 				
+					compensation,				
+					type,				
+					batterySize*batteryMax, newJoules);
+		}else {
+			// IF too much V2G
+			if(currentSOC<batterySize*batteryMin && (batterySize*batteryMin<currentSOCBefore)){
+				double newJoules=currentSOCBefore-batterySize*batteryMin;
+				if (joules<0){newJoules=newJoules*(-1);}
+				compensation=newJoules*compensation/joules;
+				// adjust electricSurceIntercal
+				double wattInterval= newJoules/electricSourceInterval.getIntervalLength();
+				LoadDistributionInterval adjusted= new LoadDistributionInterval(electricSourceInterval.getStartTime(), 
+						electricSourceInterval.getEndTime(), wattInterval);
+				costComparisonVehicle(agentId, 
+						adjusted, 				
+						compensation,				
+						type,				
+						batterySize*batteryMin, newJoules);
+			}else{
+				// IF GOOD
+				
+				costComparisonVehicle(agentId, 
+						electricSourceInterval, 				
+						compensation,				
+						type,				
+						currentSOC, joules);
+			}
+		}		
 		
 	}
 	
@@ -444,8 +683,9 @@ public class V2G {
 	public void feedInHubSource(Id linkId,
 			LoadDistributionInterval electricSourceInterval,											
 			double compensation,
-			double joulesFromSource													
+			double joulesFromSource												
 			) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
 		
 		// REDUCE HUBSOURCE LOAD
 		reduceHubSourceLoadsByGivenLoadInterval(
@@ -456,14 +696,20 @@ public class V2G {
 		addRevenueToHubSourceFromFeedIn(compensation, linkId);
 		
 		// ADD joules
-		addJouleFeedInToHubSourceStats(joulesFromSource, linkId);		
+		addJouleFeedInToHubSourceStats(joulesFromSource, linkId);	
 		
-		// INCREASE HUBLOAD GENREAL
+		// REDUCE 15min stochastic general load
+		// increase hubLoadfromCharge
+		// hubload +(- ((-posCurrent)  )  )		
 		int hubId= mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
-		// I want to increase the hubLoad - - = +
-		electricSourceInterval.negatePolynomialFunc();
-		reduceHubLoadByGivenLoadInterval(hubId, electricSourceInterval);
+			
 		
+		LoadDistributionInterval negatedElectricSourceInterval= new LoadDistributionInterval(
+				electricSourceInterval.getStartTime(), 
+				electricSourceInterval.getEndTime(), 
+				new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone()).negate());
+		
+		reduceHubLoadByGivenLoadInterval(hubId, negatedElectricSourceInterval);
 	}
 	
 	
@@ -472,6 +718,7 @@ public class V2G {
 	public void hubSourceChargeExtra(Id linkId,
 			LoadDistributionInterval electricSourceInterval,
 			double joulesFromSource	) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
+		
 		
 		// REDUCE HUBSOURCE LOAD
 		// interval < 0   (-negVal) - (-negVal)=0
@@ -486,10 +733,15 @@ public class V2G {
 		hubSourceStatistic.get(linkId).addExtraChargingCosts(extraCost);
 		
 		// reduce hubLoadfromCharge
-		//(posVal) - (-(-negVal))=0
+		// hubload +(- (-(negCurrent)  )  )
+		
 		int hubId= mySmartCharger.myHubLoadReader.getHubForLinkId(linkId);
-		electricSourceInterval.negatePolynomialFunc();
-		reduceHubLoadByGivenLoadInterval(hubId, electricSourceInterval);
+		LoadDistributionInterval negatedElectricSourceInterval= new LoadDistributionInterval(
+				electricSourceInterval.getStartTime(), 
+				electricSourceInterval.getEndTime(), 
+				new PolynomialFunction(electricSourceInterval.getPolynomialFunction().getCoefficients().clone()).negate());
+		
+		reduceHubLoadByGivenLoadInterval(hubId, negatedElectricSourceInterval);
 		
 	}
 	
@@ -521,7 +773,7 @@ public class V2G {
 			Schedule relevantAgentParkingAndDrivingScheduleAtHub= 
 				findAndReturnAgentScheduleWithinLoadIntervalWhichIsAtSpecificHub(agentId, hub,				
 				currentStochasticLoadInterval);
-		
+			
 			if(relevantAgentParkingAndDrivingScheduleAtHub.getNumberOfEntries()>0){
 				
 				for(int i=0; i<relevantAgentParkingAndDrivingScheduleAtHub.getNumberOfEntries();i++){
@@ -560,24 +812,67 @@ public class V2G {
 						}
 					}
 					//*****************************
-					//agentParkingDrivingSchedule.printSchedule();
-					double currentSOC=getSOCAtTime(agentId, electricSourceInterval.getEndTime() );
+					//LIMIT JOULES TO VALID SOC VALUES
 					
+					double currentSOCBefore=getSOCAtTime(agentId, electricSourceInterval.getEndTime() );
 					/*
 					 * if regulation up   joules<0    currentSOC+(-joules)
 					 * if regulation down  joules>0   currentSOC+(+joules)
 					 */
-					currentSOC=currentSOC+joules;
-					//*****************************
-					double compensation=calculateCompensationUpDown(joules,agentId);
 					
-					costComparisonHubload(agentId, 
-							electricSourceInterval, 							
-							compensation,
-							joules,							
-							type,							
-							hub,
-							currentSOC);
+					double currentSOC=currentSOCBefore+joules;
+					double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
+					double batteryMin=mySmartCharger.getBatteryOfAgent(agentId).getMinSOC();
+					double batteryMax=mySmartCharger.getBatteryOfAgent(agentId).getMaxSOC(); 
+					//*****************************
+					if (currentSOC>batterySize*batteryMax && (batterySize*batteryMax>currentSOCBefore)){
+						// IF too much V2G
+						double newJoules=batterySize*batteryMax-currentSOCBefore;
+						if (joules<0){newJoules=newJoules*(-1);}
+						double compensation=calculateCompensationUpDown(newJoules,agentId);
+						// adjust electricSurceIntercal
+						// W*s=J
+						double wattInterval= newJoules/electricSourceInterval.getIntervalLength();
+						LoadDistributionInterval adjusted= new LoadDistributionInterval(electricSourceInterval.getStartTime(), 
+								electricSourceInterval.getEndTime(), wattInterval);
+						costComparisonHubload(agentId, 
+								adjusted, 							
+								compensation,
+								newJoules,							
+								type,							
+								hub,
+								batterySize*batteryMax);
+					}else {
+						// IF too much V2G
+						if(currentSOC<batterySize*batteryMin && (batterySize*batteryMin<currentSOCBefore)){
+							double newJoules=currentSOCBefore-batterySize*batteryMin;
+							if (joules<0){newJoules=newJoules*(-1);}
+							double compensation=calculateCompensationUpDown(newJoules,agentId);
+							// adjust electricSurceIntercal
+							double wattInterval= newJoules/electricSourceInterval.getIntervalLength();
+							LoadDistributionInterval adjusted= new LoadDistributionInterval(electricSourceInterval.getStartTime(), 
+									electricSourceInterval.getEndTime(), wattInterval);
+							costComparisonHubload(agentId, 
+									adjusted, 							
+									compensation,
+									newJoules,							
+									type,							
+									hub,
+									batterySize*batteryMin);
+						}else{
+							// IF GOOD
+							
+							double compensation=calculateCompensationUpDown(joules,agentId);
+							costComparisonHubload(agentId, 
+									electricSourceInterval, 							
+									compensation,
+									joules,							
+									type,							
+									hub,
+									currentSOC);
+						}
+					}
+					
 					
 				}
 	
@@ -613,6 +908,7 @@ public class V2G {
 		double batterySize= mySmartCharger.getBatteryOfAgent(agentId).getBatterySize();
 		double batteryMin=mySmartCharger.getBatteryOfAgent(agentId).getMinSOC();
 		double batteryMax=mySmartCharger.getBatteryOfAgent(agentId).getMaxSOC(); 
+		//getSOCAtTime(agentId, electricSourceInterval.getEndTime())
 		
 		Schedule secondHalf= cutScheduleAtTimeSecondHalfAndReassignJoules(agentId, 
 				mySmartCharger.getAllAgentParkingAndDrivingSchedules().get(agentId), 
@@ -624,8 +920,8 @@ public class V2G {
 		double costKeeping=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, secondHalf);
 		
 		double costReschedule;
-		if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
-			costReschedule= calcCostForRescheduling(
+		//if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
+		costReschedule= calcCostForRescheduling(
 					secondHalf, 
 					agentId, 
 					batterySize, batteryMin, batteryMax, 
@@ -633,13 +929,12 @@ public class V2G {
 					currentSOC,					
 					compensation
 					);
-		}else{
-			costReschedule=Double.MAX_VALUE;
-		}
+		//}else{
+		//	costReschedule=Double.MAX_VALUE;
+		//}
 			
 		// reschedule if equal - hopefully the load can be balanced elsewhere in the grid
 		if(costKeeping>=costReschedule && answerScheduleAfterElectricSourceInterval!=null){
-			
 			
 			//reschedule
 			reschedule(agentId, 
@@ -654,7 +949,11 @@ public class V2G {
 					agentId, 
 					electricSourceInterval);
 			
-			
+			if(joules>0){
+				agentV2GStatistic.get(agentId).addJoulesSavedWithLocalProduction(joules);
+			}else{
+				agentV2GStatistic.get(agentId).addJoulesTakenFromBatteryForExtraConsumption(joules);
+			}
 		
 		}else{
 			
@@ -669,9 +968,7 @@ public class V2G {
 				// increase charging need here
 				chargeMoreToAccomodateExtraVehicleLoad(agentId, 					 
 						electricSourceInterval);
-			}
-					
-			
+			}	
 		}
 	}
 	
@@ -699,8 +996,9 @@ public class V2G {
 		double batteryMax=mySmartCharger.getBatteryOfAgent(agentId).getMaxSOC(); 
 		
 		double costReschedule=0;
-		if (currentSOC>=batterySize*batteryMin && currentSOC<=batterySize*batteryMax){
-			costReschedule= calcCostForRescheduling(
+		
+		
+		costReschedule= calcCostForRescheduling(
 					secondHalf, 
 					agentId, 
 					batterySize, batteryMin, batteryMax, 
@@ -708,16 +1006,17 @@ public class V2G {
 					currentSOC,					
 					compensation					
 					);
-		}else{
-			costReschedule=Double.MAX_VALUE;
-		}
-		//System.out.println("\n CostKeeping "+ costKeeping + "  Cost Rescheduling "+ costReschedule);	
+				
 				
 		// if costs are equal = also reschedule, because its good for the system
-		// if EV failure then costKeeping can be Infinity > DOuble.Max=costReschedule
+		// if EV failure then costKeeping can be Infinity > Double.Max=costReschedule
 		// with answerScheduleAfterElectricSourceInterval=null
+		V2GDecisionMonitor v = new V2GDecisionMonitor(agentId, costKeeping, costReschedule, compensation, electricSourceInterval);
+		v.writeOut();
+		V2GdecisionsList.add(v);
 		if(costKeeping>=costReschedule && answerScheduleAfterElectricSourceInterval!=null){
 			
+			addCompensationAndSavedMoneyByRescheduling(agentId, costKeeping, costReschedule, compensation);
 			//UPDATE CHARGING COSTS 
 			addRevenueToAgentFromV2G(costKeeping-costReschedule, agentId);
 			
@@ -725,7 +1024,7 @@ public class V2G {
 			addJoulesUpDownToAgentStats(joules, agentId);
 			
 			//reschedule
-			reschedule(agentId, 
+			reschedule(agentId,
 					answerScheduleAfterElectricSourceInterval,
 					electricSourceInterval,
 					costKeeping,
@@ -737,8 +1036,8 @@ public class V2G {
 			// thus -3500 will be reduced by (-3500)= 0
 			reduceHubLoadByGivenLoadInterval(hub, electricSourceInterval);
 		}
-		
 	}
+	
 	
 	/**
 	 * goes through the part of agents schedule which is during  currentStochasticLoadInterval,
@@ -856,13 +1155,17 @@ public class V2G {
 		}
 		
 		mySmartCharger.getAllAgentChargingSchedules().put(agentId, newChargingSchedule);
-				
-				
+			
 	}
 	
 	
 	
 	/**
+	 * builds new agent parking and driving schedule from
+	 * <li> first half of agent schedule up to loadInterval
+	 * <li> schedule during loadInterval +/- additional energy = charging time
+	 * <li> the answer schedule
+	 * 
 	 * 
 	 * @param agentId
 	 * @param answerScheduleAfterElectricSourceInterval
@@ -913,7 +1216,6 @@ public class V2G {
 		
 		try{
 		
-			
 			rescheduledFirstHalf.mergeSchedules(rescheduledElectricLoadPart);
 			rescheduledFirstHalf.mergeSchedules(answerScheduleAfterElectricSourceInterval);
 					
@@ -1148,18 +1450,16 @@ public class V2G {
 	
 	
 	
-	/*public void setLoadAsLost(PolynomialFunction func, 
-			double start,
-			double end,
-			Id agentId) throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException{
-		double lost= mySmartCharger.functionIntegrator.integrate(
-				func,
-				start,
-				end);
+	public void addCompensationAndSavedMoneyByRescheduling(Id id, double costKeeping, double costReschedule, double compensation){
+		if(mySmartCharger.hasAgentEV(id)){
+			totalCompensationEV += compensation;
+			totalMoneySavedReschedulingEV += costKeeping-(costReschedule+compensation);
+		}else{
+			totalCompensationPHEV += compensation;		
+			totalMoneySavedReschedulingPHEV += costKeeping-(costReschedule+compensation);
+		}
 		
-		agentElectricSourcesFailureinJoules.put(agentId, Math.abs(lost));
-		
-	}*/
+	}
 	
 	
 	public double calcCostForRescheduling(
@@ -1215,6 +1515,10 @@ public class V2G {
 			
 		}
 		this.answerScheduleAfterElectricSourceInterval=answerScheduleAfterElectricSourceInterval;
+		
+		if (costReschedule<0){
+			costReschedule= Double.MAX_VALUE;
+		}
 		return costReschedule;
 		
 	}
@@ -1281,17 +1585,16 @@ public class V2G {
 		 * if regulation down  joules>0
 		 */
 		if (contributionInJoulesAgent>0){//down
-			double compensationPerJouleRegulationDown= 
-				mySmartCharger.getAgentContracts().get(agentId).compensationDown()*mySmartCharger.KWHPERJOULE;
-				
+			double compensationPerkWh=mySmartCharger.getAgentContracts().get(agentId).compensationDown();
+			double compensationPerJouleRegulationDown= compensationPerkWh*mySmartCharger.KWHPERJOULE;
+			
 			return  Math.abs(contributionInJoulesAgent*compensationPerJouleRegulationDown);
 		}else{
-			double compensationPerJouleRegulationUp= 
-				mySmartCharger.getAgentContracts().get(agentId).compensationUp()*mySmartCharger.KWHPERJOULE;
+			double compensationPerkWh=mySmartCharger.getAgentContracts().get(agentId).compensationUp();
+			double compensationPerJouleRegulationUp= compensationPerkWh	*mySmartCharger.KWHPERJOULE;
 				
 			return  Math.abs(contributionInJoulesAgent*compensationPerJouleRegulationUp);
 		}
-		
 	}
 	
 	

@@ -181,6 +181,7 @@ public class TimeDataCollector {
 			double startTime= timeSchedule.timesInSchedule.get(i).getStartTime();
 			double endTime= timeSchedule.timesInSchedule.get(i).getEndTime();
 			
+			// if interval large enough meaning >= 3 secBin
 			if(endTime-startTime>=3*secBin){
 				int minAbove= (int)Math.ceil(startTime/(secBin));
 				int maxBelow= (int)Math.floor(endTime/(secBin));
@@ -195,7 +196,8 @@ public class TimeDataCollector {
 				}
 				fittedFunc= fitCurve(refit);
 			}else{
-				int numBins=4;
+				//if small - divide in alternative bins to get enough points to fit
+				int numBins=10;
 				double alternativeBin= (endTime-startTime)/numBins;
 				
 				refit= new double[numBins+1][2];

@@ -210,7 +210,7 @@ public class LPEV extends LP{
 			setDrivingConsumptionSmallerSOC(i,  buffer);
 		}
 		// total consumption<=total Charge<=total consumption*(1+limit)
-		setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
+		//setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
 		
 		//upper & lower bounds
 		setLowerAndUpperBounds();

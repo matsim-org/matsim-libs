@@ -106,8 +106,8 @@ public class Main_exampleDecentralizedSmartCharger {
 		final double ev=0.0; 
 		
 		final String outputPath="D:/ETH/MasterThesis/Output/Testing/";		
-		String configPath="test/scenarios/berlin/config.xml";
-		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";
+		//String configPath="test/scenarios/berlin/config.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 		
 		// battery size of EV and PHEV vehicle
 		double kWHEV =16;

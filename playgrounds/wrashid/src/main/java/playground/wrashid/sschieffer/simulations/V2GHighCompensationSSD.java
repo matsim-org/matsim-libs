@@ -1,7 +1,7 @@
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation_1.java
+ * Main_exampleV2G.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,33 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations.HighChargingSpeed;
+package playground.wrashid.sschieffer.simulations;
 
 import java.io.IOException;
 
 
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.polynomials.PolynomialFunction;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import playground.wrashid.PSF.data.HubLinkMapping;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
+import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
+import playground.wrashid.lib.EventHandlerAtStartupAdder;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
 import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
@@ -39,49 +54,70 @@ import java.util.*;
 
 
 /**
- *p	0	0	0.9	1
-
- *price of gas US prices : S
- *battery size : S
- *
+ * This V2G simulation tests the V2G behavior for extremely high 
+ * V2G regulation compensaion of 1CHF/kWh
+ * for simulation SSA
+ * 
  * @author Stella
  *
  */
-public class LSSimP{
+public class V2GHighCompensationSSD {
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
+		/*************
+		 * SET UP STANDARD Decentralized Smart Charging simulation 
+		 * *************/
+		
 		final double electrification= 1.0; 
+		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+		final double ev=0.9; 
 		
-		final String outputPath="/cluster/home/baug/stellas/Runs/HighCharging/LSP/Results/";
-		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
+		
+		//final String outputPath="D:/ETH/MasterThesis/TestOutput/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/HighCompensationSSD/";
+		
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
-		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
-		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
+		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		
-		double priceMaxPerkWh=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
-		double priceMinPerkWh=0.07;
-		
-		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
-		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		double kWHEV =16;
+		double kWHPHEV =16;
+		boolean gasHigh = false;
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
 		final double bufferBatteryCharge=0.0;
 		
-		double kWHEV =24;
-		double kWHPHEV =24;
-		boolean gasHigh = false;
-		
-		final double ev=0.9; 
-		final double xPercentDownUp=1.0;
-		final double xPercentDown=1.0-xPercentDownUp;
-		
 		int numberOfHubsInX=1;
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
-	
-		double standardConnectionWatt=50000;
 		
+		double standardConnectionWatt=3500;
+		
+		/*
+		 * CHARGING PRICES
+		 */
+		double priceMaxPerkWh=0.11;
+		double priceMinPerkWh=0.07;
+		
+		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
+		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
+		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
+		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
+		
+							
+		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
+		//String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
+		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
+		
+		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
+		
+		
+		
+		// add hubInfo to stochastic load
+		myStochasticHubInfo.add(hubInfo1);
+		
+				
+		//SETUP UP VARIABLES
 		DecentralizedChargingSimulation mySimulation= new DecentralizedChargingSimulation(
 				configPath, 
 				outputPath, 
@@ -95,13 +131,35 @@ public class LSSimP{
 				standardConnectionWatt
 				);
 		
+		/******************************************
+		 * SETUP V2G
+		 * *****************************************
 		
-		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
-		myStochasticHubInfo.add(new HubInfoStochastic(1, stochasticGeneral));
-						
-		double compensationPerKWHRegulationUp=0.1;
-		double compensationPerKWHRegulationDown=0.005;
-		double compensationPERKWHFeedInVehicle=0.005;
+		/**
+		 * SPECIFY WHAT PERCENTAGE OF THE POPULATION PROVIDES V2G
+		 * <li> no V2G
+		 * <li> only down (only charging)
+		 * <li> up and down (charging and discharging)
+		 * 
+		 * i.e. 0/0.5/0.5
+		 * 50% do only down, 50% do up and down
+		 */
+		
+		final double xPercentDownUp=1.0;
+		final double xPercentDown=1.0-xPercentDownUp;
+		
+		
+		/*
+		 * if you also want to include information about vehicle and other hub sources 
+		 * <li> create the objects (ArrayList<GeneralSource>  stochasticHubLoadTxt=null; HashMap <Id, String> stochasticVehicleLoad= new HashMap <Id, String> ();)
+		 * <li>use the following constructor: 
+		 * myStochasticHubInfo.add(new HubInfo(1, stochasticGeneral, stochasticHubLoadTxt, stochasticVehicleLoad));
+		 */
+		
+				
+		double compensationPerKWHRegulationUp=1.0;
+		double compensationPerKWHRegulationDown=1.0;
+		double compensationPERKWHFeedInVehicle=1.0;
 		
 		mySimulation.setUpV2G(				
 				xPercentDown,
@@ -113,7 +171,9 @@ public class LSSimP{
 	
 		mySimulation.controler.run();
 		
-		
+		/*********************
+		 * Example how to Use V2G
+		 *********************/
 		/*
 		 * V2G Of VEHICLES
 		 */
@@ -151,8 +211,21 @@ public class LSSimP{
 		
 		//ENERGY EXTRA COSTS From extra charging
 		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllVehicles());
-		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllEVs());
-		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllPHEVs());
+		System.out.println("average extra costs for extra vehicle charging EV: "+mySimulation.getAverageExtraChargingAllEVs());
+		System.out.println("average extra costs for extra vehicle charging PHEV: "+mySimulation.getAverageExtraChargingAllPHEVs());
+		
+		//Extra joules charged from battery for additional stochastic consumption 
+		
+		System.out.println("average joules taken from battery for extra stochastic consumption: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionAllAgents());
+		System.out.println("average joules taken from battery for extra stochastic consumption EV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionEV());
+		System.out.println("average joules taken from battery for extra stochastic consumption PHEV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionPHEV());
+		
+		//joules saved by local production
+		System.out.println("average joules saved by local stochastic production all agents: "+mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents());
+		System.out.println("average joules saved by local stochastic production EV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionEV());
+		System.out.println("average joules saved by local stochastic production PHEV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV());
+		
+		
 		
 		
 		/*

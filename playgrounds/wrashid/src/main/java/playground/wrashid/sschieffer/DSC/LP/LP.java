@@ -45,7 +45,7 @@ public abstract class LP {
 		
 	}
 	
-	protected Schedule getSchedule(){
+	public Schedule getSchedule(){
 		return schedule;
 	}
 	

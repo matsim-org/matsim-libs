@@ -173,7 +173,7 @@ public class Schedule {
 	
 	
 	
-	public XYSeries makeXYSeriesFromLoadSchedule(String name){
+	public XYSeries makeXYSeries1MinBinFromLoadSchedule(String name){
 		XYSeries xy = new XYSeries(name);
 		for(int entry=0; entry<getNumberOfEntries();entry++){
 			TimeInterval t= timesInSchedule.get(entry);
@@ -191,6 +191,31 @@ public class Schedule {
 	
 	
 	/**
+	 * makes XY Series from first second of first Interval to last second of last interval
+	 * for every secBin seconds
+	 * 
+	 * @param name
+	 * @param secBin
+	 * @return
+	 */
+	public XYSeries makeXYSeriesXSecBinBinFromLoadSchedule(String name, double secBin){
+		XYSeries xy = new XYSeries(name);
+		
+		for(double sec=timesInSchedule.get(0).getStartTime(); 
+			sec<=timesInSchedule.get(getNumberOfEntries()-1).getEndTime();){
+			int interval= timeIsInWhichInterval(sec);
+			TimeInterval t= timesInSchedule.get(interval);
+			
+			if(t.isLoadDistributionInterval()){
+				LoadDistributionInterval t2=(LoadDistributionInterval) t;
+				xy.add(sec, t2.getPolynomialFunction().value(sec));
+				sec+=secBin;//in one minute bins
+			}
+		}
+		return xy;
+	}
+	
+	/**
 	 * only meant for schedules with loaddistributionIntervals,
 	 * 
 	 * passed String is title String of diagram
@@ -201,7 +226,7 @@ public class Schedule {
 	public void visualizeLoadDistribution(String titleGraph, String saveAs) throws IOException{
 		XYSeriesCollection loadDistributionIntervals = new XYSeriesCollection();
 			
-		loadDistributionIntervals.addSeries(makeXYSeriesFromLoadSchedule(""));
+		loadDistributionIntervals.addSeries(makeXYSeries1MinBinFromLoadSchedule(""));
 			
         
         JFreeChart chart = ChartFactory.createXYLineChart(

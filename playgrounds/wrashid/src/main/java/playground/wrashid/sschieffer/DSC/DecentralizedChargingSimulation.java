@@ -367,8 +367,7 @@ public class DecentralizedChargingSimulation {
 		return mySmartCharger.myV2G.getAverageFeedInRevenuePHEV();
 	}
 	
-	
-	
+		
 	public double getAverageExtraChargingAllVehicles(){
 		return mySmartCharger.myV2G.getAverageExtraChargingAllVehicles();
 	}
@@ -385,6 +384,29 @@ public class DecentralizedChargingSimulation {
 		return mySmartCharger.myV2G.getTotalRegulationDownPHEV();
 	}
 	
+	public double getAverageJouleSavedByLocalV2GProductionAllAgents(){
+		return mySmartCharger.myV2G.getAverageJoulesSavedByLocalProductionAllAgents();
+	}
+	
+	public double getAverageJouleSavedByLocalV2GProductionEV(){
+		return mySmartCharger.myV2G.getAverageJoulesSavedByLocalProductionEV();
+	}
+	
+	public double getAverageJouleSavedByLocalV2GProductionPHEV(){
+		return mySmartCharger.myV2G.getAverageJoulesSavedByLocalProductionPHEV();
+	}
+	
+	public double getAverageJouleV2GTakenFromBatteryForExtraConsumptionAllAgents(){
+		return mySmartCharger.myV2G.getAverageJoulesTakenFromBatteryForExtraConsumptionAllAgents();
+	}
+	
+	public double getAverageJouleV2GTakenFromBatteryForExtraConsumptionEV(){
+		return mySmartCharger.myV2G.getAverageJoulesTakenFromBatteryForExtraConsumptionEV();
+	}
+	
+	public double getAverageJouleV2GTakenFromBatteryForExtraConsumptionPHEV(){
+		return mySmartCharger.myV2G.getAverageJoulesTakenFromBatteryForExtraConsumptionPHEV();
+	}
 	
 	//HUBSOURCES
 	public double getAverageFeedInRevenueHubSources(){

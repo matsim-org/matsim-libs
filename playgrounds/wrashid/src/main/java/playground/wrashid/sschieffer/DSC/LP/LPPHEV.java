@@ -72,6 +72,7 @@ public class LPPHEV extends LP{
 	}
 	
 	
+		
 	/**
 	 * sets up the LP for EVs and solves the LP-Problem
 	 * 
@@ -255,7 +256,7 @@ public class LPPHEV extends LP{
 		setInequalityContraintsForBatteryUpper(reductionOfSOC, reductionOfSOCStartingAtIntervalI);
 		
 		// total consumption<=total Charge<=total consumption*(1+limit)
-		setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
+		//setTotalChargedGreaterEqualTotalConsumptionAndSmallerThanBuffer(0.1);
 		
 		//upper & lower bounds
 		setLowerAndUpperBounds();		
@@ -265,8 +266,6 @@ public class LPPHEV extends LP{
 	
 	
 	private void setUpLP(double startingSOC) throws LpSolveException{
-		
-		
 		setObjectiveFunction();
 		
 		setInequalityContraintsForBatteryUpper(reductionOfSOC, reductionOfSOCStartingAtIntervalI);
@@ -304,8 +303,8 @@ public class LPPHEV extends LP{
 				
 		EnergyFromEngineCheckPHEV eCalc=new EnergyFromEngineCheckPHEV();
 		
-		eCalc.run(getSchedule(), 
-				solution, 
+		eCalc.run(getSchedule(),
+				solution,
 				reductionOfSOCStartingAtIntervalI);
 		
 		iterate=eCalc.isIterate();
@@ -315,7 +314,6 @@ public class LPPHEV extends LP{
 			setSchedule(eCalc.getWorkingSchedule());
 			iterate=false;
 		}
-		
 		return eCalc.getTotalEnergyFromEngine();
 		
 	}

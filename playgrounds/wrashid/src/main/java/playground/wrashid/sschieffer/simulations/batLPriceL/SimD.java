@@ -53,7 +53,7 @@ public class SimD{
 		
 		final double electrification= 1.0; 
 		
-		final String outputPath="/cluster/home/baug/stellas/Runs/SimSSD/Results/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/LL/SimLLD/";
 		//final String outputPath="D:\\ETH\\MasterThesis\\Output\\Runs\\Simulation1\\";		
 		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
 		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
