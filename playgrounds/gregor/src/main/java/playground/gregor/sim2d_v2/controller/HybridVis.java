@@ -15,8 +15,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;

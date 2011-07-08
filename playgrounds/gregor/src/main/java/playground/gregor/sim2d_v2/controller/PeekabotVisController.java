@@ -1,10 +1,7 @@
 package playground.gregor.sim2d_v2.controller;
 
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 
-import com.vividsolutions.jts.geom.Envelope;
 
 import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
 import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
