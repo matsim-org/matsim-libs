@@ -49,9 +49,10 @@ public class HybridVis {
 		config.getModules().put("sim2d", s);
 
 		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		((NetworkImpl)scenario.getNetwork()).getFactory().setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		ScenarioUtils.loadScenario(scenario);
 
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);
 		loader.load2DScenario();
@@ -75,7 +76,7 @@ public class HybridVis {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		PedVisPeekABot vis = new PedVisPeekABot(1,scenario);
+		PedVisPeekABot vis = new PedVisPeekABot(5,scenario);
 		vis.setOffsets(386128,5820182);
 		vis.setFloorShapeFile(s.getFloorShapeFile());
 		vis.drawNetwork(scenario.getNetwork());
