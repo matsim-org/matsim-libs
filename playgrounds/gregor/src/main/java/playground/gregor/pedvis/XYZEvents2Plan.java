@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -34,7 +35,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,13 +132,17 @@ public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandle
 	}
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
-		String eventsFile = "/home/laemmel/devel/dfg/events.xml";
-		EventsManager mgr = (EventsManager) EventsUtils.createEventsManager();
+		String eventsFile = "/Users/laemmel/devel/dfg/events.xml";
+		String configFile = "/Users/laemmel/devel/dfg/config2d.xml";
+		Config c = ConfigUtils.loadConfig(configFile);
+		Scenario sc = ScenarioUtils.createScenario(c);
+		new MatsimNetworkReader(sc).readFile(c.network().getInputFile());
+		EventsManager mgr = EventsUtils.createEventsManager();
 		XYZEvents2Plan planGen = new XYZEvents2Plan();
 		mgr.addHandler(planGen);
 		XYZEventsFileReader reader = new XYZEventsFileReader(mgr);
 		reader.parse(eventsFile);
-		planGen.write("/home/laemmel/devel/dfg/data/90gradPlans.xml");
+		planGen.write("/Users/laemmel/devel/dfg/data/90gradPlans.xml");
 	}
 
 	/**

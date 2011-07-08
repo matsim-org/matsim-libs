@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.pedvis;
+package playground.gregor.multidestpeds.io;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,5 +37,6 @@ public class Ped {
 	double depart;
 	double arrived;
 	Map<Double, Coordinate> coords = new LinkedHashMap<Double, Coordinate>();
+	Map<Double, Coordinate> velocities = new LinkedHashMap<Double, Coordinate>();
 
 }

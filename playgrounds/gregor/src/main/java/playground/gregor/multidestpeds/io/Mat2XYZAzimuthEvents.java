@@ -17,17 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.pedvis;
+package playground.gregor.multidestpeds.io;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
@@ -39,6 +47,8 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
+//TODO rewrite
+@Deprecated
 public class Mat2XYZAzimuthEvents {
 
 	private static final double PI_HALF = Math.PI / 2;
@@ -51,9 +61,10 @@ public class Mat2XYZAzimuthEvents {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		EventWriterXML writer = new EventWriterXML("/home/laemmel/devel/dfg/events.xml");
-		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
+		Config conf = ConfigUtils.loadConfig("/Users/laemmel/devel/dfg/config2d.xml");
+		Scenario sc = ScenarioUtils.loadScenario(conf);
+		EventWriterXML writer = new EventWriterXML("/Users/laemmel/devel/dfg/events.xml");
+		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(writer);
 		EventsFactory fac = manager.getFactory();
 
@@ -67,33 +78,49 @@ public class Mat2XYZAzimuthEvents {
 					continue;
 				}
 				if (time == ped.depart) {
-					if (ped.color.equals("red")) {
-						manager.processEvent(fac.createAgentDepartureEvent(time, ped.id, new IdImpl(1), "walk2d"));
-					} else {
-						manager.processEvent(fac.createAgentDepartureEvent(time, ped.id, new IdImpl(2), "walk2d"));
-					}
+					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
+					manager.processEvent(fac.createAgentDepartureEvent(time, ped.id, linkId, "walk2d"));
 				}
 				Id id = ped.id;
 				Coordinate c = ped.coords.get(time);
-				float a = 0;
-				if (i > 0) {
-					double preTime = timeSteps.get(i - 1);
-					Coordinate preC = ped.coords.get(preTime);
-					if (preC != null) {
-						a = (float) getPhaseAngle(c.x - preC.x, c.y - preC.y);
-					}
-				}
+				Coordinate v = ped.velocities.get(time);
+				float a = (float) getPhaseAngle(v.x, v.y);
+
 
 				XYZAzimuthEvent ev = new XYZAzimuthEventImpl(id, c, a, time);
 				manager.processEvent(ev);
 
 				if (time == ped.arrived) {
-					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, new IdImpl(-2), "walk2d"));
+					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
+					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
 				}
+				break;
 			}
 
 		}
 		writer.closeFile();
+
+	}
+
+	private static Id getLinkId(Coordinate loc, Coordinate vel,
+			Scenario sc) {
+
+		LinkImpl l1 = ((NetworkImpl)sc.getNetwork()).getNearestLink(MGC.coordinate2Coord(loc));
+		LinkImpl l2 = null;
+		for (Link l : l1.getToNode().getOutLinks().values()) {
+			if (l.getToNode() == l1.getFromNode()) {
+				l2 = (LinkImpl) l;
+			}
+		}
+
+		Coordinate next = new Coordinate(loc.x+vel.x,loc.y+vel.y);
+		double distNow = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(loc);
+		double distNext = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(next);
+		if (distNow > distNext) {
+			return l1.getId();
+		} else {
+			return l2.getId();
+		}
 
 	}
 

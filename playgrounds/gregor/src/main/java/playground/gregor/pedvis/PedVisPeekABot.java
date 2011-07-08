@@ -249,7 +249,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-
+		System.out.println(e.getPersonId().toString().hashCode());
 		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
@@ -322,7 +322,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/events.xml", true, 1.);
 		vis.play(true);
 
 	}
