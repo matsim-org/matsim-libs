@@ -48,6 +48,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
+import playground.wrashid.sschieffer.DSC.LP.EnergyFromEngineCheckPHEV;
 import playground.wrashid.sschieffer.DSC.LP.LPPHEV;
 import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSetUp;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.DrivingInterval;
@@ -119,8 +120,6 @@ public class LPPHEVTest extends TestCase{
 		
 		controler= mySimulation.getControler();
 		
-		
-		
 		controler.addControlerListener(new IterationEndsListener() {
 			
 			@Override
@@ -128,16 +127,17 @@ public class LPPHEVTest extends TestCase{
 				
 				try {
 					
-					DecentralizedSmartCharger myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
+					myDecentralizedSmartCharger = mySimulation.setUpSmartCharger(
 							outputPath,
 							bufferBatteryCharge,
 							standardChargingSlotLength);
+					
+					
 					
 					/***********************************
 					 * LP TEST
 					 * *********************************
 					 */
-					
 					
 					for(Id id : myDecentralizedSmartCharger.vehicles.getKeySet()){
 						
@@ -266,10 +266,7 @@ public class LPPHEVTest extends TestCase{
 							       assertEquals(Integer.toString(1), st.nextToken());
 							       assertEquals(Integer.toString(0), st.nextToken());
 							      
-							       
 							       bro.close( );  
-							       
-							       
 							    }
 							 
 							    catch( FileNotFoundException filenotfoundexxption )
@@ -282,6 +279,9 @@ public class LPPHEVTest extends TestCase{
 							      ioexception.printStackTrace( );
 							    }
 						}
+					
+					
+					
 					
 					/*
 					 * RESOLVE
@@ -441,43 +441,33 @@ public class LPPHEVTest extends TestCase{
 					
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
-				
-							
+				}							
 			}
 		});
 		controler.run();
-		
-	
 		
 	}
 	
 	
 	
-		
+	
+
+	
 	/*
 	 * calcEnergyUsageFromCombustionEngine
 	 * check energy use from engine/battery for one case
 	 */
 	public void testLPPHEVEnergyUsageFromCombustionEngine() throws LpSolveException, IOException{
 		LPPHEV lp= new LPPHEV(false);
-		double [] solution = setUpEnergyUsageFromCombustionEngine();
+		double [] solution = setUpEnergyUsageFromCombustionEngine();// 0 10 1 0 0 
 		lp.setSchedule(sTestEnergyCalc);
+		sTestEnergyCalc.printSchedule();
+		
 		double eEngine= lp.calcEnergyUsageFromCombustionEngine(solution,  0);
 		assertEquals(eEngine, 15000.0);
-		// * parking times-->  the required charging times is adjusted;
-		// dependent on charing speed.. currently 3500 but should be flexible in future..
-		// so not implemented right now test for this
 		
-		
-		// * driving times --> consumption from engine for an interval is reduced 
-		DrivingInterval d= (DrivingInterval) sTestEnergyCalc.timesInSchedule.get(1);
-		
-		assertEquals(15000.0, d.getExtraConsumption());
-		assertEquals(35000.0, d.getBatteryConsumption());
 		
 	}
-	
 	
 	
 	

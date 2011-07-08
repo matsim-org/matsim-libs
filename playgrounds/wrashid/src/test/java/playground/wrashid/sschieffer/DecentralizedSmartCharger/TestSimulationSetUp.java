@@ -61,7 +61,6 @@ public class TestSimulationSetUp {
 		
 		controler=new Controler(configPath);
 		
-		
 		parkingTimesPlugin = new ParkingTimesPlugin(controler);
 		
 		energyConsumptionInit= new EnergyConsumptionInit(
@@ -102,6 +101,7 @@ public class TestSimulationSetUp {
 			String outputPath,
 			double bufferBatteryCharge,
 			double standardChargingSlotLength) throws OptimizationException, IOException, InterruptedException{
+		
 		DecentralizedSmartCharger myDecentralizedSmartCharger = new DecentralizedSmartCharger(
 				controler, 
 				getParkingTimesPlugIn(),
@@ -308,7 +308,7 @@ public class TestSimulationSetUp {
 		);
 	
 		bullShitSchedule.addTimeInterval(l2);
-		//bullShitSchedule.printSchedule();
+		bullShitSchedule.printSchedule();
 		
 		return bullShitSchedule;
 	}

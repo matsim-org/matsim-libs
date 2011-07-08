@@ -17,7 +17,11 @@ public class TestVehicleCollectorSetUp {
 	}
 	
 	/**
-	 * defines and sets up the gas types for the simulation
+	 * defines set up the gas types for the simulation
+	 * <li> normalGas
+	 * <li> EV and PHEV Battery
+	 * <li> EV and PHEV Vehicle Type
+	 * 
 	 * @return
 	 */
 	public VehicleTypeCollector setUp(){

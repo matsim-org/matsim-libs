@@ -49,7 +49,7 @@ import lpsolve.LpSolveException;
 
 /**
  * tests methods:
- * <li> checks if adding revenue from V2G works and statistik calc function works
+ * <li> checks if adding revenue from V2G works and statistics calc function works
  * <li> checks the most important V2G function reschedule at the example of one agent
  * 
  * @author Stella

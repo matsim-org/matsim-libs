@@ -53,9 +53,12 @@ import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
 /**
+ * 
+ * SCENARIO equil - 1 agents
+ * 
  * tests if
  *  <li>parking times are read in correctly for first agent 
- *  in readParkingTimes method
+ *  in readParkingTimes method 
 	<li>driving times are read in correctly from addDrivingTimes method
 	<li>intervals in schedule are correctly distinguished into optimal and suboptimal time intervals according to the determistic hubload
 	in checkTimesWithHubSubAndOptimalTimes method
@@ -75,11 +78,11 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 	
 	final double electrification= 1.0; 
 	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
-	final double ev=0.0;
+	final double ev=1.0;
 
 	final double bufferBatteryCharge=0.0;
 	
-	final double standardChargingSlotLength=5*60;
+	final double standardChargingSlotLength=5*DecentralizedSmartCharger.SECONDSPERMIN;
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
@@ -159,9 +162,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 						Parking Interval 	 start: 22500.0	  end: 35700.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
 						Driving Interval 	  start: 35700.0	  end: 38040.0	  consumption: 4.879471387207076E7
 						Parking Interval 	 start: 38040.0	  end: 86400.0	  ChargingTime:  -1.0	  Optimal:  false	  Joules per Interval:  0.0	  ChargingSchedule:  0
-
 						 */
-						
 						
 						   /*
 						    * 0.0 -- 62490.0    10
@@ -197,6 +198,7 @@ public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 						
 						// lowest Deterministic value = -10.0  
 						assertEquals(pLast.getJoulesInInterval(), -10.0*pLast.getIntervalLength());
+						break;
 					}
 					
 					

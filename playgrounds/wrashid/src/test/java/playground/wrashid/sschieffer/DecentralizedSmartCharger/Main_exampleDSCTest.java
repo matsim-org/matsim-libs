@@ -53,7 +53,9 @@ import java.util.*;
 import junit.framework.TestCase;
 
 /**
- * tests results of Decentralized Smart Charger
+ * tests results of Decentralized Smart Charger on highest level
+ * using the equil scenario with 2 agents
+ * 
  * @author Stella
  *
  */
@@ -115,21 +117,21 @@ public class Main_exampleDSCTest extends TestCase{
 	}
 	
 	
-	
-	
 	public static void resultsCheck(){
 		/***********************
 		 * CHECK
 		 * **********************
-		 */
-	
+		 */		
 		assertEquals(mySimulation.getListOfAllEVAgents().size(), 1);
 		assertEquals(mySimulation.getListOfAllPHEVAgents().size(), 1);
 		// all LPs should be successful
 		assertEquals(mySimulation.getListOfIdsOfEVAgentsWithFailedOptimization().size(), 0);
 		
-		// all evs - no emissions
-		assertEquals(mySimulation.getTotalEmissions(), 0.0);
+		// Emissions
+		double emissions=mySimulation.getTotalEmissions();
+		assertEquals(emissions, 0.0);
+		
+		
 		for(Id id: mySimulation.mySmartCharger.vehicles.getKeySet()){
 			// check parkingDrivingSchedule
 			if(id.toString().equals(Integer.toString(2))){
@@ -140,7 +142,7 @@ public class Main_exampleDSCTest extends TestCase{
 				System.out.println("charging Schedule agent "+id.toString());
 				mySimulation.getAllAgentChargingSchedules().get(id).printSchedule();
 				System.out.println("total charging time "+mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
-				assertEquals(36023.4833074387, mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
+				assertEquals(36060.76862282351, mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
 				
 				
 				System.out.println("Total consumption from battery [joules]" 
@@ -157,26 +159,27 @@ public class Main_exampleDSCTest extends TestCase{
 				System.out.println("parking and driving schedule agent "+id.toString());
 				System.out.println("has EV: "+mySimulation.mySmartCharger.hasAgentEV(id));
 				mySimulation.getAllAgentParkingAndDrivingSchedules().get(id).printSchedule();
-				assertEquals(mySimulation.getAllAgentParkingAndDrivingSchedules().get(id).getNumberOfEntries(), 8);
-				assertEquals(((ParkingInterval)mySimulation.getAllAgentParkingAndDrivingSchedules().get(id).timesInSchedule.get(6)).getRequiredChargingDuration(), 10907.407343063918);
+				assertEquals(mySimulation.getAllAgentParkingAndDrivingSchedules().get(id).getNumberOfEntries(), 9);
+				assertEquals(((ParkingInterval)mySimulation.getAllAgentParkingAndDrivingSchedules().get(id).timesInSchedule.get(7)).getRequiredChargingDuration(), 10866.919649567433);
 				
-				/**************************
-				Starting SOC: 8640000.0
-				Parking Interval 	 start: 0.0	  end: 161.55730502686816	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -4.2226729519050616E8	  ChargingSchedule of size:  0
-				Parking Interval 	 start: 161.55730502686816	  end: 21600.0	  ChargingTime:  19748.571428571428	  Optimal:  true	  Joules per Interval:  8.953702132438436E11	  ChargingSchedule of size:  1
-				Driving Interval 	  start: 21600.0	  end: 22500.0	  consumption: 1.8786265875308476E7
-				Parking Interval 	 start: 22500.0	  end: 35700.0	  ChargingTime:  5367.504535803357	  Optimal:  true	  Joules per Interval:  9.254393720925945E10	  ChargingSchedule of size:  6
-				Driving Interval 	  start: 35700.0	  end: 38040.0	  consumption: 4.879471387207076E7
-				Parking Interval 	 start: 38040.0	  end: 50430.91150817324	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -5.1881640204678894E10	  ChargingSchedule of size:  0
-				Parking Interval 	 start: 50430.91150817324	  end: 61338.318851237156	  ChargingTime:  10907.407343063918	  Optimal:  true	  Joules per Interval:  1.0478917594542213E11	  ChargingSchedule of size:  1
-				Parking Interval 	 start: 61338.318851237156	  end: 86400.0	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -9.27857545438167E11	  ChargingSchedule of size:  0
-				**************************/
-
+				/*
+				 * Starting SOC: 8640000.0
+				Parking Interval 	 start: 0.0	  end: 165.78956623095112	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -4.502199259229531E8	  ChargingSchedule of size:  0
+				Parking Interval 	 start: 165.78956623095112	  end: 21600.0	  ChargingTime:  19748.571428571424	  Optimal:  true	  Joules per Interval:  8.960859713694156E11	  ChargingSchedule of size:  1
+				Driving Interval 	  start: 21600.0	  end: 22500.0	  battery consumption: 1.8786265875308476E7	 extra consumption: 0.0
+				Parking Interval 	 start: 22500.0	  end: 35700.0	  ChargingTime:  5367.504535803352	  Optimal:  true	  Joules per Interval:  9.23969625786535E10	  ChargingSchedule of size:  6
+				Driving Interval 	  start: 35700.0	  end: 38040.0	  battery consumption: 4.879471387207076E7	 extra consumption: 0.0
+				Parking Interval 	 start: 38040.0	  end: 38117.7730088813	  ChargingTime:  77.77300888129685	  Optimal:  true	  Joules per Interval:  2256009.94700933	  ChargingSchedule of size:  1
+				Parking Interval 	 start: 38117.7730088813	  end: 50357.16020410957	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -5.433030943174914E10	  ChargingSchedule of size:  0
+				Parking Interval 	 start: 50357.16020410957	  end: 61224.079853677	  ChargingTime:  10866.919649567433	  Optimal:  true	  Joules per Interval:  1.0676896051476192E11	  ChargingSchedule of size:  1
+				Parking Interval 	 start: 61224.079853677	  end: 86400.0	  ChargingTime:  0.0	  Optimal:  false	  Joules per Interval:  -9.249470386024418E11	  ChargingSchedule of size:  0
+				*************************
+				 */
 								
 				System.out.println("charging Schedule agent "+id.toString());
 				mySimulation.getAllAgentChargingSchedules().get(id).printSchedule();
 				System.out.println("total charging time "+mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
-				assertEquals(36023.4833074387, mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
+				assertEquals(36060.76862282351, mySimulation.getAllAgentChargingSchedules().get(id).getTotalTimeOfIntervalsInSchedule());
 				
 				
 				System.out.println("Total consumption from battery [joules]" 

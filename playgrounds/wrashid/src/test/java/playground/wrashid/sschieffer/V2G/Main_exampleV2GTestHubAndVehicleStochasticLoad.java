@@ -44,7 +44,10 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.sschieffer.DSC.DecentralizedChargingSimulation;
 import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.DetermisticLoadPricingCollector;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.GeneralSource;
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoDeterministic;
+import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubInfoStochastic;
+import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
 import playground.wrashid.sschieffer.SetUp.NetworkTopology.StellasHubMapping;
 import playground.wrashid.sschieffer.V2G.StochasticLoadCollector;
 
@@ -54,14 +57,20 @@ import junit.framework.TestCase;
 
 
 /**
- * checks on highest level if results of simulation make sense
- * unfortunately it is not possible to check exact values -> because of the distribution of charging slots 
- * with random numbers and probability density functions the exact charging times and thus V2G are different every time
+ * checks on highest level the values for 
+ * <li> VEHICLE STOCHATIC LOAD: feed in, revenue, joules saved by local production,...
+ * <li> HUB STOCHASTIC SOURCE: feed in, revenue
+ * 
+ * </br>
+ * 
+ * In the system we have 
+ * <li> one hub source with 5000W between 3500-7000s 
+ * <li> one vehicle load with 3500W between 3500-7000s 
  * 
  * @author Stella
  *
  */
-public class Main_exampleV2GTest extends TestCase{
+public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 	
 	private static DecentralizedChargingSimulation mySimulation;
 	
@@ -112,8 +121,39 @@ public class Main_exampleV2GTest extends TestCase{
 				3500
 				);
 		
+		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
+		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
+		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
+		
+		/*
+		 * ADDING A HUB LOAD
+		 * - by generating a general hub source 
+		 */
+		ArrayList<GeneralSource> generalHubSource= new ArrayList<GeneralSource>(0);
+		ArrayList<LoadDistributionInterval> generalHubLoad= new ArrayList<LoadDistributionInterval>(0);
+		generalHubLoad.add(new LoadDistributionInterval(3500, 7000, 5000));
+		generalHubSource.add(new GeneralSource(
+				generalHubLoad,
+				new IdImpl(1),				
+				"random load", 
+				0.005) );
+		hubInfo1.setStochasticGeneralSources(generalHubSource);
+		
+		/*
+		 * ADDING A VEHICLE LOAD
+		 */
+		HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoadHashMap = new HashMap<Id, ArrayList<LoadDistributionInterval>>();
+		ArrayList<LoadDistributionInterval> vehicleLoad= new ArrayList<LoadDistributionInterval>(0);
+		vehicleLoad.add(new LoadDistributionInterval(3500, 7000, 3500));
+		vehicleLoadHashMap.put(new IdImpl(1), vehicleLoad);
+		hubInfo1.setStochasticVehicleSourcesIntervals(vehicleLoadHashMap);
+		
+		// add hubInfo to stochastic load
+		myStochasticHubInfo.add(hubInfo1);
+		
+		
 		double xPercentDown=0.0;
-		double xPercentDownUp=1.0;
+		double xPercentDownUp=0.0;
 		
 		double compensationPerKWHRegulationUp=0.1;
 		double compensationPerKWHRegulationDown=0.005;
@@ -122,48 +162,24 @@ public class Main_exampleV2GTest extends TestCase{
 		mySimulation.setUpV2G(				
 				xPercentDown,
 				xPercentDownUp,
-				new StochasticLoadCollector(mySimulation),//test scenario with 4 times 1 hour stochastic load
+				new StochasticLoadCollector(mySimulation, myStochasticHubInfo ),
 				compensationPerKWHRegulationUp,
 				compensationPerKWHRegulationDown,
 				compensationPERKWHFeedInVehicle);
 	
 		mySimulation.controler.run();
 		
-		resultsCheckUpDown();
+		resultsCheckNoReg();
+	
 	}
 	
 	
-	public static void resultsCheckUpDown(){
+	
+	
+	public static void resultsCheckNoReg(){
 		/*********************
 		 * Check V2G
 		 *********************/
-		//AVERAGE REVENUE - only EVs, thus average revenue per agent= AR of EV
-		System.out.println("average revenue from V2G for agents: "+mySimulation.getAverageRevenueV2GPerAgent());		
-		System.out.println("average revenue from V2G for EV agents: "+mySimulation.getAverageRevenueV2GPerEV());				
-		System.out.println("average revenue from V2G for PHEV agents: "+mySimulation.getAverageRevenueV2GPerPHEV());
-		//assertEquals(mySimulation.getAverageRevenueV2GPerAgent(),0.10062500000000006); CANT assert - always stochastic influence
-		assertEquals(mySimulation.getAverageRevenueV2GPerAgent(), mySimulation.getAverageRevenueV2GPerEV());
-		assertEquals(0.0, mySimulation.getAverageRevenueV2GPerPHEV());
-		
-		assertEquals(0.235, mySimulation.getAverageRevenueV2GPerEV(), 0.002);
-		
-		//JOULES PROVIDED IN REGULATION UP OR DOWN
-		System.out.println("total joules from V2G for regulation up: "+mySimulation.getTotalJoulesV2GRegulationUp());		
-		System.out.println("total joules from V2G for regulation up from EVs: "+mySimulation.getTotalJoulesV2GRegulationUpEV());		
-		System.out.println("total joules from V2G for regulation up from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationUpPHEV());
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV(), mySimulation.getTotalJoulesV2GRegulationUp());
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpPHEV(), 0.0);
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV()!=0.0, true);
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationUpEV(), -1.5378304378040342E7, -0.5E7);
-		
-		
-		System.out.println("total joules from V2G for regulation down: "+mySimulation.getTotalJoulesV2GRegulationDown());		
-		System.out.println("total joules from V2G for regulation down from EVs: "+mySimulation.getTotalJoulesV2GRegulationDownEV());		
-		System.out.println("total joules from V2G for regulation down from PHEVs: "+mySimulation.getTotalJoulesV2GRegulationDownPHEV());
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationDownEV(), mySimulation.getTotalJoulesV2GRegulationDown());
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationDownPHEV(), 0.0);
-		assertEquals(mySimulation.getTotalJoulesV2GRegulationDown()!=0.0, true);
-		
 		/*
 		 * VEHICLES AS SOURCES
 		 */
@@ -172,32 +188,41 @@ public class Main_exampleV2GTest extends TestCase{
 		System.out.println("average revenue from feed in for EV agents: "+mySimulation.getAverageRevenueFeedInForEVs());
 		System.out.println("average revenue from feed in for PHEV agents: "+mySimulation.getAverageRevenueFeedInForPHEVs());
 		assertEquals(mySimulation.getAverageRevenueFeedInAllAgents(), 0.0);
-		
+		assertEquals(mySimulation.getAverageRevenueFeedInForEVs(), 0.0);
+		assertEquals(mySimulation.getAverageRevenueFeedInForPHEVs(), 0.0);
 		
 		//ENERGY FEEDIN VEHICLES
 		System.out.println("total energy feed in for all agents: "+mySimulation.getTotalJoulesFromFeedIn());
 		System.out.println("total energy feed in for EV agents: "+mySimulation.getTotalJoulesFromFeedInfromEVs());
 		System.out.println("total energy feed in for PHEV agents: "+mySimulation.getTotalJoulesFromFeedInFromPHEVs());
 		assertEquals(mySimulation.getTotalJoulesFromFeedIn(), 0.0);
+		assertEquals(mySimulation.getTotalJoulesFromFeedInfromEVs(), 0.0);
+		assertEquals(mySimulation.getTotalJoulesFromFeedInFromPHEVs(), 0.0);
 		
 		//ENERGY EXTRA COSTS From extra charging
 		System.out.println("average extra costs for extra vehicle charging all agents: "+mySimulation.getAverageExtraChargingAllVehicles());
 		System.out.println("average extra costs for extra vehicle charging EV: "+mySimulation.getAverageExtraChargingAllEVs());
 		System.out.println("average extra costs for extra vehicle charging PHEV: "+mySimulation.getAverageExtraChargingAllPHEVs());
 		assertEquals(mySimulation.getAverageExtraChargingAllVehicles(), 0.0);
+		assertEquals(mySimulation.getAverageExtraChargingAllEVs(), 0.0);
+		assertEquals(mySimulation.getAverageExtraChargingAllPHEVs(), 0.0);
 		
 		//Extra joules charged from battery for additional stochastic consumption 
-		
 		System.out.println("average joules taken from battery for extra stochastic consumption: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionAllAgents());
 		System.out.println("average joules taken from battery for extra stochastic consumption EV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionEV());
 		System.out.println("average joules taken from battery for extra stochastic consumption PHEV: "+mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionPHEV());
 		assertEquals(mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionAllAgents(), 0.0);
+		assertEquals(mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionEV(), 0.0);
+		assertEquals(mySimulation.getAverageJouleV2GTakenFromBatteryForExtraConsumptionPHEV(), 0.0);
+		
 		
 		//joules saved by local production
 		System.out.println("average joules saved by local stochastic production all agents: "+mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents());
 		System.out.println("average joules saved by local stochastic production EV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionEV());
 		System.out.println("average joules saved by local stochastic production PHEV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV());
-		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents(), 0.0);
+		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents(), 6125000.0);
+		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionEV(), 6125000.0);
+		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV(), 0.0);
 		
 		/*
 		 * HUBSOURCES
@@ -205,12 +230,9 @@ public class Main_exampleV2GTest extends TestCase{
 		System.out.println("average revenue from feed in for hub sources: "+mySimulation.getAverageFeedInRevenueHubSources());
 		System.out.println("average extra charging cost for hub sources: "+mySimulation.getAverageExtraChargingHubSources());
 		System.out.println("total energy for hub sources: "+mySimulation.getTotalJoulesFeedInHubSources());
-		assertEquals(mySimulation.getAverageFeedInRevenueHubSources(), 0.0);
-				
-		
-		assertEquals(mySimulation.getListOfAllEVAgents().size(), 2);
+		assertEquals(mySimulation.getAverageFeedInRevenueHubSources(), 0.024305555555555552);
+		assertEquals(mySimulation.getAverageExtraChargingHubSources(), 0.0);
+		assertEquals(mySimulation.getTotalJoulesFeedInHubSources(),1.75E7);
 	}
 
-	
-	
 }

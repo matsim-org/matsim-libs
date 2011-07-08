@@ -35,26 +35,26 @@ import playground.wrashid.sschieffer.DecentralizedSmartCharger.TestSimulationSet
 import playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition.HubLoadDistributionReader;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.Schedule;
+import playground.wrashid.sschieffer.SetUp.VehicleDefinition.GasType;
 import junit.framework.TestCase;
 import lpsolve.LpSolveException;
 
 /**
  * HubLoadDistributionReader
  * checks if PHEV deterministic load is calculated correctly
- * for constant, linear and parabolic price functions
+ * for constant, linear electricity price functions
  * 
  * @author Stella
  *
  */
 public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 
-	
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
 		
 	final double electrification= 1.0; 
 	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
-	final double ev=0.0;
+	final double ev=1.0;
 	
 	
 	private TestSimulationSetUp mySimulation;
@@ -66,28 +66,34 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
-	final static double optimalPrice=0.25*1/1000*1/3600*3500;//0.25 CHF per kWh		
-	final static double suboptimalPrice=optimalPrice*3; // cost/second  
+	// gas Price is 0.000203...
+	final static double optimalPrice=0.00001;// below gas price
+	final static double suboptimalPrice=optimalPrice*3; // above gas price
 	
 	public static void testMain(String[] args) throws MaxIterationsExceededException, OptimizationException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, IOException {
 	
 	}
 	
-	
-	public Controler setControler() throws IOException{
+	public Controler setControler() throws IOException, OptimizationException, InterruptedException{
 		mySimulation = new TestSimulationSetUp(
 				configPath, 
 				electrification, 
 				ev 
 				);
+		// set up smart charger needed to initialize standard connection of 3500
+		mySimulation.setUpSmartCharger(
+				outputPath,
+				bufferBatteryCharge,
+				15*60);
 		
 		return mySimulation.getControler();
 	}
 	
 	/**
-	*  Schedule:part 1/part 2
-	*  deterministic load 10/-10
-	*  pricing belowGas/aboveGas
+	*  Schedule:  part 1  / part 2 </br>
+	*  deterministic load: 10  /  -10 </br>
+	*  deterministic pricing 2.4*E-4/ 
+	*  pricing   belowGas / aboveGas  </br>
 	*  
 	 * @throws MaxIterationsExceededException
 	 * @throws FunctionEvaluationException
@@ -99,14 +105,12 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	 */
 	public void testHubLoadDistributionReaderConstant() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
 		
-		
 		controler= setControler();
-		
 		
 		//*****************************************
 		// EV and PHEV 
-		//determistic 10/-10
-		//pricing optimal/suboptimal
+		//determistic -10/-10
+		//pricing suboptimal/suboptimal
 		//*****************************************
 		
 		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
@@ -128,7 +132,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		assertEquals(deterministicLoad.getNumberOfEntries(),
 				2);			
 					
-		
 		LoadDistributionInterval t1= 
 			(LoadDistributionInterval) deterministicLoad.timesInSchedule.get(0);
 		LoadDistributionInterval t2= 
@@ -155,8 +158,8 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		LoadDistributionInterval tPHEV2= 
 			(LoadDistributionInterval)deterministicLoadPHEV.timesInSchedule.get(1);
 		
-		//determistic 10/-10
-		//pricing optimal/suboptimal			
+		
+		//pricing suboptimal/suboptimal			
 		coeffs=tPHEV1.getPolynomialFunction().getCoefficients();
 		assertEquals(coeffs[0],10.0
 				);
@@ -213,8 +216,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		deterministicLoad.printSchedule();
 		
 		assertEquals(deterministicLoad.getNumberOfEntries(),
-				2);			
-					
+				2);		
 		
 		LoadDistributionInterval t1= 
 			(LoadDistributionInterval) deterministicLoad.timesInSchedule.get(0);
@@ -229,21 +231,16 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		
 		
 		/**
-		 * PHEV 
-		 * double[] bullshitCoeffs = new double[]{0, 6*Math.pow(10, -4)/62490.0};// 
-		double[] bullshitCoeffs2 = new double[]{suboptimalPrice};
-		gas Price = 4.6511627906976747E-4
-	
+		 * PRICING FUNCTION CUTS GAS PRICE FUCNTION AT 62490.0/2
 		 */
 		System.out.println("Deterministic PHEV load");
 		Schedule deterministicLoadPHEV= 
 			hubReader.getDeterministicHubLoadDistributionPHEVAdjusted(1);
 		deterministicLoadPHEV.printSchedule();
 		
-		double gasPricePerSec = 4.6511627906976747E-4;
+		double  gasPriceInCostPerSecond=DecentralizedSmartCharger.STANDARDCONNECTIONSWATT * 1/43.0*1000000.0*0.25;
 		
-		assertEquals(deterministicLoadPHEV.getNumberOfEntries(),
-				3);		
+		assertEquals(deterministicLoadPHEV.getNumberOfEntries(),3);		
 		
 		LoadDistributionInterval tPHEV1= 
 			(LoadDistributionInterval) deterministicLoadPHEV.timesInSchedule.get(0);
@@ -253,20 +250,18 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 			(LoadDistributionInterval)deterministicLoadPHEV.timesInSchedule.get(2);
 		
 		
-		
-		 //* Interval 1 from 0-intersectAtX
+		/*
+		 * rise over run of charging price is = 2*gasPriceInCostPerSecond/62490.0
+		 * 
+		 * thus intersect is at 62490.0/2
+		 */
 		 
-		double intersectAtX= gasPricePerSec/(6*Math.pow(10, -4)/62490.0);
+		double intersectAtX= 62490.0/2;
 		
 		coeffs=tPHEV1.getPolynomialFunction().getCoefficients();
-		
 		assertEquals(tPHEV1.getEndTime(), intersectAtX);
-		
-		assertEquals(coeffs[0],10.0
-				);
-		assertEquals(tPHEV1.getStartTime(),0.0
-		);
-		
+		assertEquals(coeffs[0],10.0);
+		assertEquals(tPHEV1.getStartTime(),0.0);
 		
 		
 		// * Interval 2 from 0-intersectAtX
@@ -277,119 +272,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		
 		// * Interval 3 from 0-intersectAtX
 		 
-		coeffs=tPHEV3.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-10.0);
-		
-	}
-
-
-	/**
-	*  Schedule:part 1/part 2
-	*  deterministic load 10/-10
-	*  pricing linearCuttingGasPrice/aboveGas
-	*  
-	 * @throws MaxIterationsExceededException
-	 * @throws FunctionEvaluationException
-	 * @throws IllegalArgumentException
-	 * @throws LpSolveException
-	 * @throws OptimizationException
-	 * @throws IOException
-	 * @throws InterruptedException 
-	 */
-	public void testHubLoadDistributionReaderParabolic() throws MaxIterationsExceededException, FunctionEvaluationException, IllegalArgumentException, LpSolveException, OptimizationException, IOException, InterruptedException{
-		
-		controler= setControler();
-		
-		
-		//*****************************************
-		// EV and PHEV 
-		//determistic 10/-10
-		//pricing optimal/suboptimal
-		//*****************************************
-		
-		HubLoadDistributionReader hubReader= new HubLoadDistributionReader(controler, 
-				mapHubsTest(),//HubLinkMapping hubLinkMapping
-				readHubsTest(),				
-				readHubsPricingTestParabolic(),
-				mySimulation.getVehicleTypeCollector(),
-				outputPath, 0,0);
-		
-		
-			
-		/**
-		 * determistic load
-		 */	
-		System.out.println("Deterministic load");
-		Schedule deterministicLoad= 
-			hubReader.getDeterministicHubLoadDistribution(1);
-		
-		deterministicLoad.printSchedule();
-		
-		assertEquals(deterministicLoad.getNumberOfEntries(),
-				2);			
-					
-		
-		LoadDistributionInterval t1= 
-			(LoadDistributionInterval) deterministicLoad.timesInSchedule.get(0);
-		LoadDistributionInterval t2= 
-			(LoadDistributionInterval)deterministicLoad.timesInSchedule.get(1);
-		double [] coeffs=t1.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],10.0
-				);
-		coeffs=t2.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-10.0);			
-		
-		
-		
-		/**
-		 * PHEV 
-		 * double[] bullshitCoeffs = new double[]{0, 6*Math.pow(10, -4)/62490.0};// 
-		double[] bullshitCoeffs2 = new double[]{suboptimalPrice};
-		gas Price = 4.6511627906976747E-4
-	
-		 */
-		System.out.println("Deterministic PHEV load");
-		Schedule deterministicLoadPHEV= 
-			hubReader.getDeterministicHubLoadDistributionPHEVAdjusted(1);
-		deterministicLoadPHEV.printSchedule();
-		
-		double gasPricePerSec = 4.6511627906976747E-4;
-		
-		assertEquals(deterministicLoadPHEV.getNumberOfEntries(),
-				3);		
-		
-		LoadDistributionInterval tPHEV1= 
-			(LoadDistributionInterval) deterministicLoadPHEV.timesInSchedule.get(0);
-		LoadDistributionInterval tPHEV2= 
-			(LoadDistributionInterval)deterministicLoadPHEV.timesInSchedule.get(1);
-		LoadDistributionInterval tPHEV3= 
-			(LoadDistributionInterval)deterministicLoadPHEV.timesInSchedule.get(2);
-		
-		
-		/*
-		 * Interval 1 from 0-intersectAtX
-		 */
-		double intersectAtX= 1000.0;
-		
-		coeffs=tPHEV1.getPolynomialFunction().getCoefficients();
-		
-		assertEquals(tPHEV1.getEndTime(), intersectAtX);
-		
-		assertEquals(coeffs[0],10.0
-				);
-		assertEquals(tPHEV1.getStartTime(),0.0
-		);
-		
-		
-		/*
-		 * Interval 2 from 0-intersectAtX
-		 */
-		coeffs=tPHEV2.getPolynomialFunction().getCoefficients();
-		assertEquals(coeffs[0],-10.0);
-		
-		/*
-		 * Interval 3 from 0-intersectAtX
-		 */
 		coeffs=tPHEV3.getPolynomialFunction().getCoefficients();
 		assertEquals(coeffs[0],-10.0);
 		
@@ -408,6 +290,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	public static HashMap<Integer, Schedule> readHubsPricingTest(double optimal, double suboptimal) throws IOException{
 		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
 		hubLoadDistribution1.put(1, makeBullshitPricingScheduleTest(optimal, suboptimal));
+		//hubLoadDistribution1.get(1).printSchedule();
 	return hubLoadDistribution1;
 		
 	}
@@ -419,13 +302,6 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 		
 	}
 	
-	
-	public static HashMap<Integer, Schedule> readHubsPricingTestParabolic() throws IOException{
-		HashMap<Integer, Schedule> hubLoadDistribution1= new  HashMap<Integer, Schedule>();
-		hubLoadDistribution1.put(1, makeBullshitScheduleTestParabolic());
-	return hubLoadDistribution1;
-		
-	}
 	
 	public static Schedule makeBullshitScheduleTest() throws IOException{
 		
@@ -543,7 +419,10 @@ public static Schedule makeBullshitScheduleTestLinear() throws IOException{
 	
 	Schedule bullShitSchedule= new Schedule();
 	
-	double[] bullshitCoeffs = new double[]{0, 6*Math.pow(10, -4)/62490.0};// 
+	double  gasPriceInCostPerSecond=DecentralizedSmartCharger.STANDARDCONNECTIONSWATT * 1/(43.0*1000000.0)*0.25;
+	
+	
+	double[] bullshitCoeffs = new double[]{0, 2*gasPriceInCostPerSecond/62490.0};// 
 	double[] bullshitCoeffs2 = new double[]{suboptimalPrice};
 	
 	PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
@@ -553,43 +432,6 @@ public static Schedule makeBullshitScheduleTestLinear() throws IOException{
 			62490.0,
 			bullShitFunc,//p
 			false//boolean
-	);
-	//l1.makeXYSeries();
-	bullShitSchedule.addTimeInterval(l1);
-	
-	
-	LoadDistributionInterval l2= new LoadDistributionInterval(					
-			62490.0,
-			DecentralizedSmartCharger.SECONDSPERDAY,
-			bullShitFunc2,//p
-			false//boolean
-	);
-	//l2.makeXYSeries();
-	bullShitSchedule.addTimeInterval(l2);
-	
-	//bullShitSchedule.visualizeLoadDistribution("BullshitSchedule");	
-	return bullShitSchedule;
-}
-
-
-
-
-
-public static Schedule makeBullshitScheduleTestParabolic() throws IOException{
-	
-	Schedule bullShitSchedule= new Schedule();
-	double gasPricePerSec = 4.6511627906976747E-4;
-	
-	double[] bullshitCoeffs = new double[]{0, 0, 4.6511627906976747E-4/(1000*1000)};// 
-	double[] bullshitCoeffs2 = new double[]{suboptimalPrice};
-	
-	PolynomialFunction bullShitFunc= new PolynomialFunction(bullshitCoeffs);
-	PolynomialFunction bullShitFunc2= new PolynomialFunction(bullshitCoeffs2);
-	LoadDistributionInterval l1= new LoadDistributionInterval(
-			0.0,
-			62490.0,
-			bullShitFunc,//p
-			true//boolean
 	);
 	//l1.makeXYSeries();
 	bullShitSchedule.addTimeInterval(l1);
