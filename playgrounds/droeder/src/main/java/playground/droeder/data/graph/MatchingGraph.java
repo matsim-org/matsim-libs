@@ -62,7 +62,7 @@ public class MatchingGraph implements Cloneable{
 			return false;
 		}
 		this.nodes.get(e.getFromNode().getId()).addIncidentEdge(e);
-		this.nodes.get(e.getToNode().getId()).addIncidentEdge(e);
+		this.nodes.get		(e.getToNode().getId()).addIncidentEdge(e);
 		this.edges.put(e.getId(), e);
 		return true;
 	}

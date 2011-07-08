@@ -227,9 +227,9 @@ public class DaShapeWriter {
 						i++;
 					}
 					if(attributes == null){
-						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), null);
+						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString() + "_" + route.getId().toString(), null);
 					}else{
-						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString(), attributes.get(line.getId()));
+						feature = getLineStringFeature(new CoordinateArraySequence(coord), line.getId().toString() + "_" + route.getId().toString(), attributes.get(line.getId()));
 					}
 					features.add(feature);
 				}

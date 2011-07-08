@@ -95,6 +95,7 @@ public class GraphMatching {
 		log.info("bottom-up-matching finished...");
 		log.info("starting top-down-Matching...");
 		this.edgeMatchingTopDown();
+		this.nodeMatchingTopDown();
 		log.info("top-down-matching finished...");
 	}
 
@@ -314,10 +315,17 @@ public class GraphMatching {
 	
 	Map<Id, Id> nodeFinalRef2Match;
 	Map<Id, Id> edgeFinalRef2Match;
-//	private void nodeMatchingTopDown(){
-//		nodeFinalRef2Match = new HashMap<Id, Id>();
-//		edgeFinalRef2Match = new HashMap<Id, Id>();
-//		
+	private void nodeMatchingTopDown(){
+		nodeFinalRef2Match = new HashMap<Id, Id>();
+		edgeFinalRef2Match = new HashMap<Id, Id>();
+		
+		EdgeCompare c;
+		for(Entry<Id, List<EdgeCompare>> e: edgesRef2Match.entrySet()){
+			c = e.getValue().get(0);
+			this.edgeFinalRef2Match.put(c.getRefId(), c.getCompId());
+		}
+		
+		// TODO implement nodeMatching Top-down
 //		MatchingEdge ref, match;
 //		for(Entry<Id, List<EdgeCompare>> e: edgesRef2Match.entrySet()){
 //			for(EdgeCompare ee: e.getValue()){
@@ -332,9 +340,7 @@ public class GraphMatching {
 //				}
 //			}
 //		}
-//		
-//		
-//	}
+	}
 	
 	public Map<Id, List<NodeCompare>> getNodeIdRef2Match(){
 		return this.nodesReference2match;
@@ -779,20 +785,19 @@ public class GraphMatching {
 		gm.unmatchedAfterPrematchingOut(OUT);
 	}
 
-	/**
-	 * @return
-	 */
-	public Map<Id, Id> getNodes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	/**
+//	 * @return
+//	 */
+//	public Map<Id, Id> getNodes() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	/**
 	 * @return
 	 */
 	public Map<Id, Id> getEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.edgeFinalRef2Match;
 	}
 	
 
