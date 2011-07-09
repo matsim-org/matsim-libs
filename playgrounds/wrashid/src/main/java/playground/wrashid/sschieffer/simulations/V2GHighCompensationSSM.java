@@ -61,7 +61,7 @@ import java.util.*;
  * @author Stella
  *
  */
-public class V2GHighCompensationSSA {
+public class V2GHighCompensationSSM {
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		

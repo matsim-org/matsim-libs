@@ -395,6 +395,7 @@ public class V2G {
 		    BufferedWriter out = new BufferedWriter(fstream);
 		    
 		    out.write("Agent Id \t");
+		    out.write("EV? \t");
 		    out.write("From: \t");
 		    out.write("To: \t");
 		    out.write("costKeeping: \t");
@@ -1007,7 +1008,7 @@ public class V2G {
 					compensation					
 					);
 				
-				
+		
 		// if costs are equal = also reschedule, because its good for the system
 		// if EV failure then costKeeping can be Infinity > Double.Max=costReschedule
 		// with answerScheduleAfterElectricSourceInterval=null
@@ -1453,10 +1454,14 @@ public class V2G {
 	public void addCompensationAndSavedMoneyByRescheduling(Id id, double costKeeping, double costReschedule, double compensation){
 		if(mySmartCharger.hasAgentEV(id)){
 			totalCompensationEV += compensation;
-			totalMoneySavedReschedulingEV += costKeeping-(costReschedule+compensation);
-		}else{
+			if(costKeeping-(costReschedule+compensation)>0){
+				totalMoneySavedReschedulingEV += costKeeping-(costReschedule+compensation);// costReschedule already subtracted compensation
+			}
+			}else{
 			totalCompensationPHEV += compensation;		
-			totalMoneySavedReschedulingPHEV += costKeeping-(costReschedule+compensation);
+			if(costKeeping-(costReschedule+compensation)>0){
+				totalMoneySavedReschedulingPHEV += costKeeping-(costReschedule+compensation);// costReschedule already subtracted compensation
+			}
 		}
 		
 	}
@@ -1483,7 +1488,12 @@ public class V2G {
 				costReschedule= Double.MAX_VALUE;
 			}else{
 				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)
-								-compensation;
+								;
+				if(costReschedule<0){
+					costReschedule= Double.MAX_VALUE;
+				}else{
+					costReschedule=costReschedule-compensation;
+				}
 			}
 			
 			
@@ -1506,19 +1516,28 @@ public class V2G {
 					}
 					costReschedule= Double.MAX_VALUE;
 				}else{
-					costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
+					costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval);
+					
+					if(costReschedule<0){
+						costReschedule= Double.MAX_VALUE;
+					}else{
+						costReschedule=costReschedule-compensation;
+					}
 				}
 			}else{
-				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval)-compensation;
+				costReschedule=mySmartCharger.calculateChargingCostForAgentSchedule(agentId, answerScheduleAfterElectricSourceInterval);
+				if(costReschedule<0){
+					costReschedule= Double.MAX_VALUE;
+				}else{
+					costReschedule=costReschedule-compensation;
+				}
 			}
 			
 			
 		}
 		this.answerScheduleAfterElectricSourceInterval=answerScheduleAfterElectricSourceInterval;
 		
-		if (costReschedule<0){
-			costReschedule= Double.MAX_VALUE;
-		}
+		
 		return costReschedule;
 		
 	}

@@ -2,6 +2,7 @@ package playground.wrashid.sschieffer.V2G;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.wrashid.sschieffer.DSC.DecentralizedSmartCharger;
 import playground.wrashid.sschieffer.SetUp.IntervalScheduleClasses.LoadDistributionInterval;
 
 public class V2GDecisionMonitor {
@@ -32,6 +33,7 @@ public class V2GDecisionMonitor {
 	
 	public String writeString(){
 		String s=agentId.toString()+ "\t"
+				+ DecentralizedSmartCharger.hasAgentEV(agentId)+ "\t"
 				+l.getStartTime()+ "\t"
 				+l.getEndTime()+ "\t"
 				+costKeeping+ "\t"
