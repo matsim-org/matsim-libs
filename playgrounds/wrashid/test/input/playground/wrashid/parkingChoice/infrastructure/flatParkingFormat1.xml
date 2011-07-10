@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE flatParkings SYSTEM "./test/input/playground/wrashid/parkingChoice/infrastructure/flatParkingFormat_v1.dtd">
+<!-- missing: variable price over the day. -->
+
+	<flatParkings>
+		<parking type="public" id="1"  x="400.0" y="399.0" capacity="15" generalAttributs="street;blueParking"/>
+		<parking type="public" id="2"  x="400.0" y="399.0" capacity="10" costPerHour="3" generalAttributs="garage"/>
+		<parking type="private" id="3"  x="400.0" y="399.0" capacity="1" facilityId="dfasdfsd" actType="home"/>
+		<parking type="reserved" id="4" x="400.0" y="399.0" capacity="1" generalAttributs="Disabled"/>
+		<parking type="preferred" id="5" x="400.0" y="399.0" capacity="1" generalAttributs="EV"/>
+	</flatParkings>
+	

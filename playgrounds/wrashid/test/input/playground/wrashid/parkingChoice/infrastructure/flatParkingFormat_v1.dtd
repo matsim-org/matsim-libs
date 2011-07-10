@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT flatParkings  (parking)*>
+
+<!ELEMENT parking     EMPTY>
+
+<!ATTLIST parking
+          type               CDATA   #REQUIRED
+          id               CDATA   #REQUIRED
+          x                CDATA   #REQUIRED
+          y                CDATA   #REQUIRED
+          capacity        CDATA   #REQUIRED
+          generalAttributs             CDATA   #IMPLIED
+          costPerHour             CDATA   #IMPLIED
+          facilityId             CDATA   #IMPLIED
+          actType             CDATA   #IMPLIED>

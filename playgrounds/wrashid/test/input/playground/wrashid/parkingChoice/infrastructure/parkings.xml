@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE parkingInfrastructure SYSTEM "http://www.matsim.org/files/dtd/parkingInfrastructure_v1.dtd">
+
+<parkingInfrastructure>
+
+	<parkings>
+		<publicParking id="1" type="streetParking" x="400.0" y="399.0" capacity="1" priceSchemeId="3"/>
+		<reservedParking id="2" x="400.0" y="399.0" capacity="1" priceSchemeId="3" reservationAttributes=""/>
+		<privateParking id="3" x="400.0" y="399.0" capacity="1" priceSchemeId="3" facilityId="555s232" belongsToAct=""/>
+		<preferredParking id="4" x="400.0" y="399.0" capacity="1" priceSchemeId="3" preferredAttributes=""/>
+	</parkings>
+	
+	<parkingPriceSchemes>
+		<priceScheme id="1" type="free" customTag="blueCard"/>
+		
+<!--  		<priceScheme id="2" type="blueCard"/> -->
+<!-- blaue parkplätze können modelliert werden als preferredParking (only when target activity is home) mit fixedDailyCost  -->
+		
+		<priceScheme id="3" type="fixedHourlyCost" hourlyCost="1.5" maxParkingDurationInSeconds="7200" freeTimesId="1"/>
+		
+		<priceScheme id="4" type="dynamicCost"/>
+			<defaultCost hourlyCost="1.5"/>
+			<alternativeCost startTimeInSeconds="68400" endTimeInSeconds="25200" hourlyCost="0.5"/>
+		</priceScheme/>
+		
+		<priceScheme id="5" type="fixedDailyCost" dailyCost="2" freeTimesId="1"/>
+		
+	</parkingPriceSchemes>
+	
+	<freeTimes>
+		<freeTime id="1" startTimeInSeconds="68400" endTimeInSeconds="25200"/>
+	</freeTimes>
+	
+	<accessibilitiesScore>
+		<accessibilityScore id="1" accessTimeInSeconds="" score="-0.05"/>
+		<accessibilityScore id="2" accessTimeInSeconds="" score="-0.05"/>
+		<!-- TODO: natürlich braucht es auch da einen faktor um dies zu kalibieren -->
+		<!-- das beinhaltet auch score für schwer zugänglich/dauert länger um dorthin zu kommen, etc. -->
+	</accessibilities>
+	
+<parkingInfrastructure>
