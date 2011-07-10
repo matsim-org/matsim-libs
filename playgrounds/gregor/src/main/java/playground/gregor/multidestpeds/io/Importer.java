@@ -117,7 +117,7 @@ public class Importer {
 				}
 
 				if (departed) {
-					Coordinate c = new Coordinate(xPos,yPos);
+					Coordinate c = new Coordinate(xPos,yPos,0);
 					p.coords.put(time, c);
 					Coordinate v = new Coordinate(currVX,currVY);
 					p.velocities.put(time, v);

@@ -38,7 +38,7 @@ public class NetworkFromESRIShape {
 	private final GeometryFactory geofac = new GeometryFactory();
 
 
-	private final double oneUnitInSIUnit = 0.001;
+	private final double oneUnitInSIUnit = 1;
 	private final double fetchRadius = .25;
 
 	public NetworkFromESRIShape(Scenario sc) {
@@ -204,7 +204,7 @@ public class NetworkFromESRIShape {
 	}
 
 	public static void main(String [] args) {
-		String networkShape = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/links_transformed.shp";
+		String networkShape = "/Users/laemmel/devel/dfg/data/links.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		new NetworkFromESRIShape(sc).processShapeFile(networkShape);

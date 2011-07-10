@@ -51,6 +51,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
+import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
@@ -59,6 +61,7 @@ import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
+import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -190,14 +193,17 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			throw new RuntimeException("Module \"sim2d\" is missing in config");
 		}
 		Sim2DConfigGroup sc = new Sim2DConfigGroup(m);
+		c.getModules().put("sim2d", sc);
 		this.floorShape = sc.getFloorShapeFile();
 		Scenario s = ScenarioUtils.loadScenario(c);
+		new ScenarioLoader2DImpl(s).load2DScenario();
 		this.sc = s;
 		this.speedUp = speedUp;
 		this.pc = new PeekABotClient();
 		this.file = events;
 		setOffsets(s.getNetwork());
 		init();
+		drawNetwork(s.getNetwork());
 	}
 
 	public void setOffsets(Network network) {
@@ -230,6 +236,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		} else {
 			while (true) {
 				play();
+				reset(1);
 			}
 		}
 
@@ -238,6 +245,8 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private void play(){
 		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
+		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc).createDensityEstimator();
+		ev.addHandler(est);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {
 			reader.parse(this.file);
@@ -249,7 +258,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
-		System.out.println(e.getPersonId().toString().hashCode());
+		//		System.out.println(e.getPersonId().toString().hashCode());
 		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
@@ -410,6 +419,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
 		this.carAgents.remove(e.getPersonId());
+		this.pc.removeBotII(e.getPersonId().toString().hashCode());
 		// this.pc.setBotPositionII(Integer.parseInt(e.getPersonId().toString()),
 		// -100, -100, -10, -10);
 		//		this.pc.removeBotII(Integer.parseInt(e.getPersonId().toString()));
@@ -444,15 +454,15 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	@Override
 	public void handleEvent(DoubleValueStringKeyAtCoordinateEvent e) {
-		if (e.getValue() < .01) {
-			return;
-		}
+		//		if (e.getValue() < .01) {
+		//			return;
+		//		}
 		float locX = (float) ((e.getCoordinate().x - this.ofX)*this.scale);
 		float locY = (float) ((e.getCoordinate().y - this.ofY)*this.scale);
 		float value = Math.min(1.f, (float) (e.getValue()));
-		if (value <= 0.02) {
-			value = 0.f;
-		}
+		//		if (value <= 0.02) {
+		//			value = 0.f;
+		//		}
 		String key = e.getKey();
 		if (key.contains("r")) {
 			this.pc.updateOccupancyCell(0,locX,locY,value);
