@@ -15,8 +15,9 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ReservedParkingTest extends TestCase {
 
@@ -68,7 +69,7 @@ public class ReservedParkingTest extends TestCase {
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				Parking parking = new Parking(new CoordImpl(i * 1000 + 500, j * 1000 + 500));
+				ParkingImpl parking = new ParkingImpl(new CoordImpl(i * 1000 + 500, j * 1000 + 500));
 				parking.setMaxCapacity(parkingCapacity);
 				parkingCollection.add(parking);
 			}

@@ -4,8 +4,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PriceScheme;
 
-public class Parking implements Comparable<Parking> {
+// TODO: make it also mandatory in the constructor to set the capacity
+public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	public void setParkingId(Id parkingId) {
 		this.parkingId = parkingId;
 	}
@@ -55,11 +58,7 @@ public class Parking implements Comparable<Parking> {
 		this.score = score;
 	}
 
-	public Id getParkingId() {
-		return parkingId;
-	}
-
-	public Integer getMaxCapacity() {
+	public int getCapacity() {
 		return maxCapacity;
 	}
 
@@ -95,7 +94,7 @@ public class Parking implements Comparable<Parking> {
 		return coord;
 	}
 
-	public Parking(Coord coord) {
+	public ParkingImpl(Coord coord) {
 		super();
 		this.coord = coord;
 	}
@@ -105,7 +104,7 @@ public class Parking implements Comparable<Parking> {
 	}
 
 	@Override
-	public int compareTo(Parking otherParking) {
+	public int compareTo(ParkingImpl otherParking) {
 		if (score > otherParking.getScore()) {
 			return 1;
 		} else if (getScore() < otherParking.getScore()) {
@@ -113,5 +112,25 @@ public class Parking implements Comparable<Parking> {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public Id getId() {
+		// TODO Auto-generated method stub
+		return this.parkingId;
+	}
+
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+
+	@Override
+	public PriceScheme getPriceScheme() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

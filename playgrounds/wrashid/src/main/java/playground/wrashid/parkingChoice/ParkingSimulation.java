@@ -27,7 +27,8 @@ import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.util.ActDurationEstimationContainer;
 import playground.wrashid.parkingChoice.util.ActivityDurationEstimator;
 
@@ -69,7 +70,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		// where it parked at the evening
 		parkingManager.resetAllParkingOccupancies();
 		for (Parking parking:lastParkingUsed.values()){
-			parking.parkVehicle();
+			((ParkingImpl)parking).parkVehicle();
 		}
 		
 		lastParkingUsed=new HashMap<Id, Parking>();
@@ -93,6 +94,9 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		GeneralLib.controler=controler;
 		
 		ActDurationEstimationContainer actDurEstContainer= actDurEstimationContainer.get(event.getPersonId());
+		if (neverDepartedWithCar(actDurEstContainer)){
+			return;
+		}
 		actDurEstContainer.registerNewActivity();
 		
 		
@@ -110,7 +114,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			
 			if (actDurEstContainer.isCurrentParkingTimeOver()){
 				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, controler, actDurEstContainer);
-			} else {
+			} else {			 
 				DebugLib.stopSystemAndReportInconsistency("there might be some inconsitency???");
 			}
 			
@@ -138,13 +142,22 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 
 	}
 
+	private boolean neverDepartedWithCar(ActDurationEstimationContainer actDurEstContainer) {
+		return actDurEstContainer==null;
+	}
+
 	private ActivityFacility getTargetFacility(ActivityStartEvent event) {
 		return parkingManager.getControler().getFacilities().getFacilities().get(event.getFacilityId());
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {	
-		if (TransportMode.car.equalsIgnoreCase(event.getLegMode())){
+		if (!actDurEstimationContainer.containsKey(event.getPersonId())){
+			actDurEstimationContainer.put(event.getPersonId(), new ActDurationEstimationContainer());
+		}
+		
+		
+		if (considerForParking(event)){
 			detectAndRegisterEndTimeOfFirstAct(event);
 			
 			
@@ -162,10 +175,12 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		}
 	}
 
+	private boolean considerForParking(AgentDepartureEvent event) {
+		return TransportMode.car.equalsIgnoreCase(event.getLegMode()) && !event.getPersonId().toString().contains("pt");
+	}
+
 	private void detectAndRegisterEndTimeOfFirstAct(AgentDepartureEvent event) {
-		if (!actDurEstimationContainer.containsKey(event.getPersonId())){
-			actDurEstimationContainer.put(event.getPersonId(), new ActDurationEstimationContainer());
-		}
+		
 		
 		ActDurationEstimationContainer actDurEstContainer= actDurEstimationContainer.get(event.getPersonId());
 		

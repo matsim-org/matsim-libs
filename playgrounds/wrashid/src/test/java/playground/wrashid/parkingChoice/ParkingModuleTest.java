@@ -7,7 +7,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 import junit.framework.TestCase;
 
@@ -34,7 +35,7 @@ public class ParkingModuleTest extends TestCase {
 
 		for (int i=0;i<10;i++){
 			for (int j=0;j<10;j++){
-				Parking parking = new Parking(new CoordImpl(i*1000+500,j*1000+500));
+				ParkingImpl parking = new ParkingImpl(new CoordImpl(i*1000+500,j*1000+500));
 				parking.setMaxCapacity(parkingCapacity);
 				parkingCollection.add(parking);
 			}

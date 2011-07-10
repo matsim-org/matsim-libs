@@ -13,16 +13,17 @@ import playground.wrashid.parkingChoice.ParkingConfigModule;
 import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
-public class DefaultParkingSelectionManager implements ParkingSelectionManager {
+public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSelectionManager {
 
 	private final ParkingManager parkingManager;
 
-	public DefaultParkingSelectionManager(ParkingManager parkingManager){
+	public ShortestWalkingDistanceParkingSelectionManager(ParkingManager parkingManager){
 		this.parkingManager = parkingManager;
 		
 	}
@@ -33,13 +34,9 @@ public class DefaultParkingSelectionManager implements ParkingSelectionManager {
 		// TODO Auto-generated method stub
 		return getParkingWithShortestWalkingDistance(targtLocationCoord,targetActInfo,personId);
 	}
+	
 
 	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo, Id personId) {
-		double minDistanceOfSearchSpaceInMeters = 1000; // TODO: needs also be
-														// set from
-														// configuration file
-														// (we can't narrow too
-														// much our search).
 
 		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord,
 				ParkingConfigModule.getStartParkingSearchDistanceInMeters(), personId, 0, targetActInfo,parkingManager.getParkings());
@@ -90,7 +87,8 @@ public class DefaultParkingSelectionManager implements ParkingSelectionManager {
 			resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo, collection);
 
 			if (minSearchDistance > maxWalkingDistanceSearchSpaceInMeters) {
-				DebugLib.stopSystemAndReportInconsistency("Simulation Stopped, because no parking found (for given 'maxWalkingDistanceSearchSpaceInMeters')!");
+				// TODO: enable this again, when can be set from outside
+				//DebugLib.stopSystemAndReportInconsistency("Simulation Stopped, because no parking found (for given 'maxWalkingDistanceSearchSpaceInMeters')!");
 			}
 		}
 
@@ -109,7 +107,7 @@ public class DefaultParkingSelectionManager implements ParkingSelectionManager {
 
 		for (Parking parking : collection) {
 
-			if (!parking.hasFreeCapacity()) {
+			if (!((ParkingImpl)parking).hasFreeCapacity()) {
 				continue;
 			}
 

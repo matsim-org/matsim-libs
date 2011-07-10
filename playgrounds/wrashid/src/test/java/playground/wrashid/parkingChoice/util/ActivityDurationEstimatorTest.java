@@ -47,6 +47,18 @@ public class ActivityDurationEstimatorTest extends TestCase {
 		assertEquals(51600, activityDurationEstimator.getActivityDurationEstimations().get(0),1);
 		assertEquals(29976, activityDurationEstimator.getActivityDurationEstimations().get(1),1);
 	}
+	
+	//TODO: go through the numbers of this test...
+	public void testConfig5(){
+		Config config=ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
+		
+		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
+	
+		assertEquals(118933, activityDurationEstimator.getActivityDurationEstimations().get(0),1);
+		assertEquals(3600, activityDurationEstimator.getActivityDurationEstimations().get(1),1);
+		assertEquals(3600, activityDurationEstimator.getActivityDurationEstimations().get(2),1);
+		assertEquals(3803, activityDurationEstimator.getActivityDurationEstimations().get(3),1);
+	}
 
 	private ActivityDurationEstimator getActivityDurationEstimations(Config config) {
 		Controler controler=new Controler(config);

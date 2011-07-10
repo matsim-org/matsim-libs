@@ -94,7 +94,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 				ActivityImpl nextAct = (ActivityImpl) planElement.get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
 				PlansCalcRouteConfigGroup plansCalcRoute = controler.getConfig().plansCalcRoute();
-				if (leg.getMode().equalsIgnoreCase("walk")) {
+				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
 					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance);
 				} else if (leg.getMode().equalsIgnoreCase("bike")) {
 					estimatedActduration += GeneralLib.getBikeTravelDuration(distance);
@@ -103,6 +103,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 				} else {
 					// estimatedActduration +=
 					// distance/plansCalcRoute.getUndefinedModeSpeed();
+					// TODO: define speed for unknown mode here?
 					DebugLib.stopSystemAndReportInconsistency("handle mode:" + leg.getMode());
 				}
 			}

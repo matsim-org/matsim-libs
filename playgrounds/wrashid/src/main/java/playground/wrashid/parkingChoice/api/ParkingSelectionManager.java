@@ -4,7 +4,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public interface ParkingSelectionManager {
 

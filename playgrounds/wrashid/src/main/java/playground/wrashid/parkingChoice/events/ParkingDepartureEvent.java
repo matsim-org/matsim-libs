@@ -3,7 +3,8 @@ package playground.wrashid.parkingChoice.events;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ParkingDepartureEvent {
 

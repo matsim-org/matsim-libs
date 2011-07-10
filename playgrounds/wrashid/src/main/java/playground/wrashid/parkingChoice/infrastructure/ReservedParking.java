@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Coord;
  * @author wrashid
  *
  */
-public class ReservedParking extends Parking {
+public class ReservedParking extends ParkingImpl {
 	public ReservedParking(Coord coord, String attributes) {
 		super(coord);
 		this.attributes=attributes;

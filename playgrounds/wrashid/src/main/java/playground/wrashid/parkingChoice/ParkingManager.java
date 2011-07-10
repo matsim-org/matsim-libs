@@ -24,12 +24,13 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;
-import playground.wrashid.parkingChoice.apiDefImpl.DefaultParkingSelectionManager;
+import playground.wrashid.parkingChoice.apiDefImpl.ShortestWalkingDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.Parking;
+import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ParkingManager implements StartupListener {
 
@@ -48,7 +49,7 @@ public class ParkingManager implements StartupListener {
 	}
 
 	private PreferredParkingManager preferredParkingManager = null;
-	private ParkingSelectionManager parkingSelectionManager = new DefaultParkingSelectionManager(this);
+	private ParkingSelectionManager parkingSelectionManager = new ShortestWalkingDistanceParkingSelectionManager(this);
 	
 
 	public void setParkingSelectionManager(ParkingSelectionManager parkingSelectionManager) {
@@ -73,7 +74,8 @@ public class ParkingManager implements StartupListener {
 	
 	public void resetAllParkingOccupancies() {
 		for (Parking parking : parkings.values()) {
-			parking.resetParkingOccupancy();
+			ParkingImpl parkingImpl=(ParkingImpl) parking;
+			parkingImpl.resetParkingOccupancy();
 		}
 	}
 
@@ -182,12 +184,15 @@ public class ParkingManager implements StartupListener {
 	
 	
 	public void parkVehicle(Id personId, Parking parking) {
-		parking.parkVehicle();
+		((ParkingImpl) parking).parkVehicle();
 		currentParkingLocation.put(personId, parking);
 	}
 
 	public void unParkVehicle(Id personId, Parking parking) {
-		parking.removeVehicle();
+		if (parking==null){
+			System.out.println();
+		}
+		((ParkingImpl) parking).removeVehicle();
 		currentParkingLocation.put(personId, null);
 	}
 

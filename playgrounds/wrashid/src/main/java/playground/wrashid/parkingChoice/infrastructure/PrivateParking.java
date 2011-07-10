@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
-public class PrivateParking extends Parking {
+public class PrivateParking extends ParkingImpl {
 
 	public PrivateParking(Coord coord, ActInfo actInfo) {
 		super(coord);
