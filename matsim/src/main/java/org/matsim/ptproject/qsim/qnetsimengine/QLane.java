@@ -27,7 +27,9 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
@@ -43,7 +45,9 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
-import org.matsim.pt.qsim.TransitQLaneFeature;
+import org.matsim.pt.qsim.TransitDriverAgent;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
@@ -70,6 +74,8 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	private static final Logger log = Logger.getLogger(QLane.class);
 
 	private static int spaceCapWarningCount = 0;
+
+	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
@@ -153,19 +159,22 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	 */
 	private boolean fireLaneEvents = false;
 
-	/*package*/ final TransitQLaneFeature transitQueueLaneFeature;
-
 	private DefaultSignalizeableItem qSignalizedItem;
-	
+
 	private Map<Id, List<QLane>> toLinkToQLanesMap = null;
+
+	/**
+	 * A list containing all transit vehicles that are at a stop but not
+	 * blocking other traffic on the lane.
+	 */
+	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
 		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
-		this.transitQueueLaneFeature = new TransitQLaneFeature(this.getQLink());
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
 	}
-	
+
 	/*package*/ void finishInitialization() {
 		//do some indexing
 		if (this.toLanes != null){
@@ -240,7 +249,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
-					log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				log.warn("Lane " + this.getId() + " on Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
@@ -290,7 +299,26 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		this.thisTimeStepGreen = b;
 	}
 
-
+	public boolean addTransitToBuffer(final double now, final QVehicle veh) {
+		if (veh.getDriver() instanceof TransitDriverAgent) {
+			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
+			while (true) {
+				TransitStopFacility stop = driver.getNextTransitStop();
+				if ((stop != null) && (stop.getLinkId().equals(queueLink.getLink().getId()))) {
+					double delay = driver.handleTransitStop(stop, now);
+					if (delay > 0.0) {
+						veh.setEarliestLinkExitTime(now + delay);
+						// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
+						transitVehicleStopQueue.add(veh);
+						return true;
+					}
+				} else {
+					return false;
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
@@ -303,7 +331,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	private void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
-		this.transitQueueLaneFeature.beforeMoveLaneToBuffer(now);
+		this.moveTransitToQueue(now);
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
@@ -317,7 +345,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 
 			MobsimDriverAgent driver = veh.getDriver();
 
-			boolean handled = this.transitQueueLaneFeature.handleMoveLaneToBuffer(now, veh, driver);
+			boolean handled = this.handleTransitStop(now, veh, driver);
 
 			if (!handled) {
 				// Check if veh has reached destination:
@@ -344,10 +372,67 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		} // end while
 	}
 
+	private boolean handleTransitStop(final double now, final QVehicle veh,
+			final MobsimDriverAgent driver) {
+		boolean handled = false;
+		// handle transit driver if necessary
+		if (driver instanceof TransitDriverAgent) {
+			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
+			TransitStopFacility stop = transitDriver.getNextTransitStop();
+			if ((stop != null) && (stop.getLinkId().equals(queueLink.getLink().getId()))) {
+				double delay = transitDriver.handleTransitStop(stop, now);
+				if (delay > 0.0) {
+
+					veh.setEarliestLinkExitTime(now + delay);
+					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
+
+					if (!stop.getIsBlockingLane()) {
+						getVehQueue().poll(); // remove the bus from the queue
+						transitVehicleStopQueue.add(veh); // and add it to the stop queue
+					}
+				}
+				/* start over: either this veh is still first in line,
+				 * but has another stop on this link, or on another link, then it is moved on
+				 */
+				handled = true;
+			}
+		}
+		return handled;
+	}
+
+	/**
+	 * This method
+	 * moves transit vehicles from the stop queue directly to the front of the
+	 * "queue" of the QLink. An advantage is that this will observe flow
+	 * capacity restrictions. 
+	 */
+	private void moveTransitToQueue(final double now) {
+		QVehicle veh;
+		// handle transit traffic in stop queue
+		List<QVehicle> departingTransitVehicles = null;
+		while ((veh = transitVehicleStopQueue.peek()) != null) {
+			// there is a transit vehicle.
+			if (veh.getEarliestLinkExitTime() > now) {
+				break;
+			}
+			if (departingTransitVehicles == null) {
+				departingTransitVehicles = new LinkedList<QVehicle>();
+			}
+			departingTransitVehicles.add(transitVehicleStopQueue.poll());
+		}
+		if (departingTransitVehicles != null) {
+			// add all departing transit vehicles at the front of the vehQueue
+			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
+			while (iter.hasPrevious()) {
+				getVehQueue().addFirst(iter.previous());
+			}
+		}
+	}
+
 
 	boolean isActive() {
 		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		|| (!this.bufferIsEmpty()) || this.transitQueueLaneFeature.isFeatureActive();
+		|| (!this.bufferIsEmpty()) || (!this.transitVehicleStopQueue.isEmpty());
 		return active;
 	}
 
@@ -373,7 +458,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
 		return moveBufferToNextLane(now);
 	}
-	
+
 	private QLane chooseNextLane(Id toLinkId){
 		List<QLane> nextLanes = this.toLinkToQLanesMap.get(toLinkId);
 		if (nextLanes.size() == 1){
@@ -388,7 +473,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		}
 		return retLane;
 	}
-	
+
 
 	private boolean moveBufferToNextLane(final double now) {
 		// because of the "this.toLanes != null", this method in my does something only when there are downstream
@@ -500,7 +585,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	}
 
 	@Override
-	 QVehicle popFirstFromBuffer() {
+	QVehicle popFirstFromBuffer() {
 		double now = this.getQLink().getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -523,16 +608,16 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	 double getSimulatedFlowCapacity() {
+	double getSimulatedFlowCapacity() {
 		return this.simulatedFlowCapacity;
 	}
 
 	@Override
-	 QVehicle getFirstFromBuffer() {
+	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
-	 Queue<QVehicle> getVehiclesInBuffer() {
+	Queue<QVehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
 
@@ -599,7 +684,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	 */
 	Collection<QVehicle> getAllVehicles() {
 		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
-		vehicles.addAll(this.transitQueueLaneFeature.getFeatureVehicles());
+		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);
 		return vehicles;
@@ -649,7 +734,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	}
 
 	@Override
-	 double getBufferLastMovedTime() {
+	double getBufferLastMovedTime() {
 		return this.bufferLastMovedTime;
 	}
 
@@ -660,7 +745,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		}
 		return true; //the lane is not signalized and thus always green
 	}
-	
+
 	protected Lane getLaneData() {
 		return this.laneData;
 	}
@@ -684,7 +769,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 	public void setSignalized(boolean isSignalized) {
 		this.qSignalizedItem = new DefaultSignalizeableItem(this.queueLink.getLink().getToNode().getOutLinks().keySet());
 	}
-	
+
 	/**
 	 * Inner class to capsulate visualization methods
 	 *
@@ -699,12 +784,12 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
 			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
 					QLane.this.length, offset,
-					QLane.this.visualizerLane*3, QLane.this.transitQueueLaneFeature);
+					QLane.this.visualizerLane*3);
 
 			return positions;
 		}
 	}
-	
+
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -718,7 +803,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 			}
 		}
 	}
-	
+
 	@Override
 	double getInverseSimulatedFlowCapacity() {
 		return this.inverseSimulatedFlowCapacity ;

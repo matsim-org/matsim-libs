@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,21 +33,21 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.TransitQLaneFeature;
+import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
  * @author dgrether
  */
- final class AgentSnapshotInfoBuilder {
+final class AgentSnapshotInfoBuilder {
 
 	private static final Logger log = Logger.getLogger(AgentSnapshotInfoBuilder.class);
 
@@ -59,11 +58,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	private final String snapshotStyle;
 
 
-	 AgentSnapshotInfoBuilder( Scenario sc ){
+	AgentSnapshotInfoBuilder( Scenario sc ){
 		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotStyle = sc.getConfig().getQSimConfigGroup().getSnapshotStyle() ;
-		
+
 		double effLaneWidth = sc.getNetwork().getEffectiveLaneWidth() ;
 		if ( Double.isNaN( effLaneWidth ) ) {
 			AgentSnapshotInfoFactory.setLaneWidth( 3.75 ) ; // yyyyyy magic number
@@ -76,12 +75,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * See overloaded method for parameter description.
 	 * @param visLane TODO
 	 */
-	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
-			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
-			TransitQLaneFeature transitQueueLaneFeature){
+	void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength){
 
 		this.addVehiclePositions(visLane, positions, buffer, vehQueue, holes, linkLength, 0.0,
-				null, transitQueueLaneFeature);
+				null);
 	}
 
 	/**
@@ -96,21 +94,20 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param laneNumber
 	 * @param transitQueueLaneFeature
 	 */
-	 void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+	void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
-			double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature){
+			double offset, Integer laneNumber){
 
 		if ("queue".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsAsQueue(positions, buffer, vehQueue, linkLength, offset, laneNumber,
-					transitQueueLaneFeature, visLane);
+			this.addVehiclePositionsAsQueue(positions, buffer, vehQueue, linkLength, offset, laneNumber, visLane);
 		}
 		else  if ("equiDist".equalsIgnoreCase(this.snapshotStyle)){
-			this.addVehiclePositionsEquil(positions, buffer, vehQueue, offset, laneNumber, transitQueueLaneFeature, linkLength,
+			this.addVehiclePositionsEquil(positions, buffer, vehQueue, offset, laneNumber, linkLength,
 					visLane);
 		}
 		else if ("withHolesExperimental".equalsIgnoreCase(this.snapshotStyle)){
 			this.addVehiclePositionsWithHoles(positions, buffer, vehQueue, holes, linkLength, offset,
-					laneNumber, transitQueueLaneFeature, visLane);
+					laneNumber, visLane);
 		}
 		else {
 			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
@@ -119,7 +116,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 	private void addVehiclePositionsWithHoles(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength, double offset,
-			Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature, VisLane visLane)
+			Integer laneNumber, VisLane visLane)
 	{
 		double storageCapacity = visLane.getStorageCapacity() ;
 		double bufferStorageCapacity = visLane.getBufferStorage() ;
@@ -128,16 +125,16 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 		// for holes: using the "queue" method, but with different vehSpacing:
 		float vehSpacing = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
-//		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity,
-//				congestedDensity);
+		//		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity,
+		//				congestedDensity);
 
 		// treat vehicles from buffer:
 		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacing, buffer, offset,
-				laneNumber, transitQueueLaneFeature, visLane);
+				laneNumber, visLane);
 
 		// treat other driving vehicles:
 		positionOtherDrivingVehiclesWithHoles(positions, currentQueueEnd, vehSpacing, vehQueue, holes,
-				offset, laneNumber, transitQueueLaneFeature, visLane);
+				offset, laneNumber, visLane);
 
 	}
 
@@ -157,7 +154,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 
 	private void positionOtherDrivingVehiclesWithHoles(final Collection<AgentSnapshotInfo> positions, double queueEnd,
 			double vehSpacing, Collection<QVehicle> vehQueue, Collection<QItem> holes, double offset, Integer laneNumber,
-			TransitQLaneFeature transitQueueLaneFeature, VisLane visLane)
+			VisLane visLane)
 	{
 		if ( visLane instanceof QLane ) {
 			throw new RuntimeException("holes visualization is not implemented for lanes since I don't understand which "
@@ -199,7 +196,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				lane = laneNumber ;
 			}
 
-			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink_m, link, lane,
 					speedValueBetweenZeroAndOne, offset);
@@ -207,11 +204,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		throw new RuntimeException("this is not (yet) finished; aborting ...") ;
 
 	}
-//	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
-//			double congestedDensity_veh_m ) {
-//		// yyyyyy abusing congDens as nHolesMax!
-//		return 1.*(linkLength / (storageCapacity + bufferStorageCapacity - congestedDensity_veh_m )) ;
-//	}
+	//	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
+	//			double congestedDensity_veh_m ) {
+	//		// yyyyyy abusing congDens as nHolesMax!
+	//		return 1.*(linkLength / (storageCapacity + bufferStorageCapacity - congestedDensity_veh_m )) ;
+	//	}
 
 	/**
 	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
@@ -221,7 +218,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 */
 	private void addVehiclePositionsAsQueue(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, double linkLength, double offset, Integer laneNumber,
-			TransitQLaneFeature transitQueueLaneFeature, VisLane visLane)
+			VisLane visLane)
 	{
 		double storageCapacity = visLane.getStorageCapacity() ;
 		double bufferStorageCapacity = visLane.getBufferStorage() ;
@@ -230,11 +227,11 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 		float vehSpacingAsQueueCache = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
 		// treat vehicles from buffer:
 		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacingAsQueueCache, buffer, offset,
-				laneNumber, transitQueueLaneFeature, visLane);
+				laneNumber, visLane);
 
 		// treat other driving vehicles:
 		positionOtherDrivingVehiclesAsQueue(positions, currentQueueEnd, vehSpacingAsQueueCache, vehQueue, offset,
-				laneNumber, transitQueueLaneFeature, linkLength, visLane);
+				laneNumber, linkLength, visLane);
 
 		// yyyy waiting list, transit stops, persons at activity, etc. all do not depend on "queue" vs "equil"
 		// and should thus not be treated in this method. kai, apr'10
@@ -254,7 +251,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * with free speed at that place
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
-			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber,
 			double linkLength, VisLane qBufferItem)
 	{
 		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
@@ -301,7 +298,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 			else {
 				lane = laneNumber;
 			}
-			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink, link, lane, speedValueBetweenZeroAndOne, offset);
 			lastDistance = distanceOnLink;
 		}
@@ -324,7 +321,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param qBufferItem TODO
 	 */
 	private double positionVehiclesFromBufferAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
-			double vehSpacing, Collection<QVehicle> buffer, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			double vehSpacing, Collection<QVehicle> buffer, double offset, Integer laneNumber, 
 			VisLane qBufferItem)
 	{
 		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
@@ -341,7 +338,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 			}
 			int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 			double speedValueBetweenZeroAndOne = (now > cmp) ? 0.0 : 1.0 ;
-			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, queueEnd, link, lane, speedValueBetweenZeroAndOne, offset);
 			queueEnd -= vehSpacing;
 		}
@@ -363,7 +360,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param qBufferItem TODO
 	 */
 	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
-			Collection<QVehicle> vehQueue, double offset, Integer laneNumber, TransitQLaneFeature transitQueueLaneFeature,
+			Collection<QVehicle> vehQueue, double offset, Integer laneNumber, 
 			double linkLength, VisLane qBufferItem)
 	{
 		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
@@ -387,7 +384,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp ? 0.0 : freespeed);
-				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speed, offset);
 				distFromFromNode -= spacing;
 			}
@@ -397,7 +394,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 				int lane = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 				int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 				double speedValueBetweenZeroAndOne = (now > cmp ? 0.0 : 1.0);
-				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, null);
+				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 				createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distFromFromNode, link, lane, speedValueBetweenZeroAndOne, offset);
 				distFromFromNode -= spacing;
 			}
@@ -409,14 +406,14 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	{
 		distanceOnLink += offset;
 		int cnt = peopleInVehicle.size() - 1 ;
-//		for (PersonAgent passenger : peopleInVehicle) {
+		//		for (PersonAgent passenger : peopleInVehicle) {
 		for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
 			MobsimAgent passenger = it.previous();
 			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane, cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
-//			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
-//			passengerPosition.setColorValueBetweenZeroAndOne(tmp);
+			//			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
+			//			passengerPosition.setColorValueBetweenZeroAndOne(tmp);
 			if (passenger.getId().toString().startsWith("pt")) {
 				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 			} else if (cnt==0) {
@@ -430,7 +427,7 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	}
 
 
-	 int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
+	int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
 		for (MobsimAgent pa : agentsInActivities) {
@@ -449,10 +446,10 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	 * @param waitingList
 	 * @param transitQueueLaneFeature
 	 */
-	 void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
-			final Link link, int cnt2, final Queue<QVehicle> waitingList, TransitQLaneFeature transitQueueLaneFeature) {
+	void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
+			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh, transitQueueLaneFeature);
+			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
 			for (MobsimAgent passenger : peopleInVehicle) {
 				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
@@ -472,27 +469,53 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 	}
 
 	/**
+	 * Put the transit vehicles from the transit stop list in positions.
+	 * @param transitVehicleStopQueue 
+	 */
+	void positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
+		if (transitVehicleStopQueue.size() > 0) {
+			for (QVehicle veh : transitVehicleStopQueue) {
+				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
+				boolean last = false ;
+				cnt2 += peopleInVehicle.size() ;
+				for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+					MobsimAgent passenger = it.previous();
+					if ( !it.hasPrevious() ) {
+						last = true ;
+					}
+					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
+					if ( passenger.getId().toString().startsWith("pt")) {
+						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
+					} else if (last) {
+						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
+					} else {
+						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
+					}
+					positions.add(passengerPosition);
+					cnt2-- ;
+				}
+
+			}
+
+		}
+	}
+
+	/**
 	 * Returns all the people sitting in this vehicle.
 	 *
 	 * @param vehicle
 	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	private List<MobsimAgent> getPeopleInVehicle(QVehicle vehicle, TransitQLaneFeature transitQueueLaneFeature) {
-		List<MobsimAgent> passengers = null;
-		if (transitQueueLaneFeature != null) {
-			passengers = transitQueueLaneFeature
-			.getPassengers(vehicle); // yy seems to me that "getPassengers" is a vehicle feature???
+	private List<MobsimAgent> getPeopleInVehicle(QVehicle vehicle) {
+		ArrayList<MobsimAgent> people = new ArrayList<MobsimAgent>();
+		people.add(vehicle.getDriver());
+		if (vehicle instanceof TransitVehicle) {
+			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
+				people.add((MobsimAgent) passenger);
+			}
 		}
-		if (passengers == null || passengers.isEmpty()) {
-			return Collections.singletonList((MobsimAgent) vehicle.getDriver());
-		}
-		else {
-			ArrayList<MobsimAgent> people = new ArrayList<MobsimAgent>();
-			people.add(vehicle.getDriver());
-			people.addAll(passengers);
-			return people;
-		}
+		return people;
 	}
 
 }

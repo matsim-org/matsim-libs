@@ -158,7 +158,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	 QLinkLanesImpl(final Link link2, NetsimEngine engine,
+	QLinkLanesImpl(final Link link2, NetsimEngine engine,
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		this.link = link2;
 		this.toQueueNode = toNode;
@@ -347,14 +347,13 @@ public class QLinkLanesImpl extends QLinkInternalI {
 			movedAtLeastOne = true;
 			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
-			boolean handled = this.originalLane.transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
+			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);
 			}
 		}
 		return movedAtLeastOne;
 	}
-
 
 	@Override
 	boolean bufferIsEmpty() {
@@ -529,7 +528,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 			int cnt2 = 0;
 			// treat vehicles from waiting list:
 			agentSnapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkLanesImpl.this.link, cnt2,
-					QLinkLanesImpl.this.waitingList, null);
+					QLinkLanesImpl.this.waitingList);
 			cnt2 = QLinkLanesImpl.this.waitingList.size();
 			agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
 					QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
@@ -608,7 +607,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	@Override
 	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
-//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
+		//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
 		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
 
