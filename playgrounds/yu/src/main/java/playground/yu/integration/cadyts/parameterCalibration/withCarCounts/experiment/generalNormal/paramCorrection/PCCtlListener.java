@@ -83,12 +83,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		final Network network = ctl.getNetwork();
 		Config config = ctl.getConfig();
 
-		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = network.getNodes()
-				.get(new IdImpl(config.counts().getDistanceFilterCenterNode()))
-				.getCoord();
-		distanceFilter = config.counts().getDistanceFilter();
-
+		String distFilterCenterNodeStr = config.counts()
+				.getDistanceFilterCenterNode();
+		if (distFilterCenterNodeStr != null) {
+			// set up center and radius of counts stations locations
+			distanceFilterCenterNodeCoord = network.getNodes()
+					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
+			distanceFilter = config.counts().getDistanceFilter();
+		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
 		/*

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
@@ -38,14 +38,14 @@ import cadyts.supply.SimResults;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class BseParamCalibrationControlerListener implements
 		ControlerListener {
 	protected boolean watching = false;
 	protected VolumesAnalyzer volumes = null;
-	protected double countsScaleFactor = 1.0, distanceFilter;
-	protected Coord distanceFilterCenterNodeCoord;
+	protected double countsScaleFactor = 1.0, distanceFilter = 0d;
+	protected Coord distanceFilterCenterNodeCoord = null;
 	protected AnalyticalCalibrator<Link> calibrator = null;
 	protected SimResults<Link> resultsContainer = null;
 	protected CadytsChoice chooser;
@@ -60,6 +60,7 @@ public abstract class BseParamCalibrationControlerListener implements
 		public SimResultsContainerImpl() {
 		}
 
+		@Override
 		public double getSimValue(final Link link, final int startTime_s,
 				final int endTime_s, final TYPE type) {
 			int hour = startTime_s / 3600;
@@ -72,6 +73,10 @@ public abstract class BseParamCalibrationControlerListener implements
 	}
 
 	protected boolean isInRange(final Id linkid, final Network net) {
+		if (distanceFilterCenterNodeCoord == null) {
+			return true;
+		}
+
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
