@@ -38,7 +38,7 @@ public class PeekabotVisController extends Controller2D{
 		this.vis.drawNetwork(this.network);
 		this.events.addHandler(this.vis);
 
-		NNGaussianKernelEstimator est = new DensityEstimatorFactory(this.events,this.scenarioData).createDensityEstimator();
+		NNGaussianKernelEstimator est = new DensityEstimatorFactory(this.events,this.scenarioData,0.25).createDensityEstimator();
 		this.events.addHandler(est);
 		this.addControlerListener(this.vis);
 
