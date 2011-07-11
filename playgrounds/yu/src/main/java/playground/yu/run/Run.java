@@ -39,8 +39,8 @@ public class Run {
 		Controler controler = new Controler(args[0]);
 		if (args.length >= 3 && Boolean.parseBoolean(args[2])) {
 			controler.addControlerListener(new CntSimCap4Chart());
+			controler.addControlerListener(new RouteTravelTimeSummary());
 		}
-		controler.addControlerListener(new RouteTravelTimeSummary());
 		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
 		controler.setOverwriteFiles(true);
 		controler.run();
