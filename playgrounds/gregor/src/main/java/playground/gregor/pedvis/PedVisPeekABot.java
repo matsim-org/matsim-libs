@@ -245,7 +245,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	private void play(){
 		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
-		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc).createDensityEstimator();
+		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc,0.25).createDensityEstimator();
 		ev.addHandler(est);
 		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
 		try {
