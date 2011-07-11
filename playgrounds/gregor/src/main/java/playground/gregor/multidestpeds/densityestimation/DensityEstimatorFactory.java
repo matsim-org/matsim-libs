@@ -1,6 +1,7 @@
 package playground.gregor.multidestpeds.densityestimation;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
@@ -33,10 +34,30 @@ public class DensityEstimatorFactory {
 
 		StaticEnvironmentDistancesField sedf = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
 		ret.setStaticEnvironmentDistancesField(sedf);
-		double maxX = sedf.getEnvironmentDistancesQuadTree().getMaxEasting();
-		double minX = sedf.getEnvironmentDistancesQuadTree().getMinEasting();
-		double maxY = sedf.getEnvironmentDistancesQuadTree().getMaxNorthing();
-		double minY = sedf.getEnvironmentDistancesQuadTree().getMinNorthing();
+		double maxX = Double.NEGATIVE_INFINITY;
+		double minX = Double.POSITIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		for (Node node : this.sc.getNetwork().getNodes().values()) {
+			double x = node.getCoord().getX();
+			double y = node.getCoord().getY();
+			if (x > maxX) {
+				maxX = x;
+			}
+			if (x < minX) {
+				minX = x;
+			}
+
+			if (y > maxY) {
+				maxY = y;
+			}
+
+			if (y < minY) {
+				minY = y;
+			}
+
+
+		}
 
 		Coordinate c1 = new Coordinate(minX,minY);
 		Coordinate c2 = new Coordinate(maxX,maxY);

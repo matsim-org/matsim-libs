@@ -5,6 +5,8 @@ import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
@@ -67,7 +69,7 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
-		QuadTree<EnvironmentDistances> tree = createQuadTree();
+		QuadTree<EnvironmentDistances> tree = createQuadTreeAndNetwork(sc);
 		StaticEnvironmentDistancesField sedf = new StaticEnvironmentDistancesField(tree, -1, -1);
 		sc.addScenarioElement(sedf);
 
@@ -116,8 +118,20 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		events.processEvent(dummy);
 	}
 
-	private QuadTree<EnvironmentDistances> createQuadTree() {
-		QuadTree<EnvironmentDistances> ret = new QuadTree<EnvironmentDistances>(-3.500,-6.500,7.500,3.500);
+	private QuadTree<EnvironmentDistances> createQuadTreeAndNetwork(Scenario sc) {
+		double minX = -3.5;
+		double minY = -6.5;
+		double maxX = 7.5;
+		double maxY = 3.5;
+
+		NetworkFactory fac = sc.getNetwork().getFactory();
+		Node n1 = fac.createNode(sc.createId("0"), sc.createCoord(minX, minY));
+		sc.getNetwork().addNode(n1);
+		Node n2 = fac.createNode(sc.createId("1"), sc.createCoord(maxX, maxY));
+		sc.getNetwork().addNode(n2);
+
+
+		QuadTree<EnvironmentDistances> ret = new QuadTree<EnvironmentDistances>(minX,minY,maxX,maxY);
 		double [] x = {0., .650, .650, 0., 3.620, 4.230, 4.230, 3.620, .900, 1.200, 3.000, 3.300, .900, 1.200, 3.000, 3.300};
 		double [] y = {0., 0., .660, .660, 0., 0., .600, .600, -4.110, -4.110, -4.110, -4.110, -5.000, -5.000, -5.000, -5.000};
 		for (int i = 0; i < x.length; i++) {
