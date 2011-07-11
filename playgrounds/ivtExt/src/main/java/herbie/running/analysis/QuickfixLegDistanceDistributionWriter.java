@@ -50,7 +50,7 @@ public class QuickfixLegDistanceDistributionWriter {
 
 		PrintStream out = null;
 		try {
-			out = new PrintStream("C:/Documents and Settings/scnadine/My Documents/Projekte/VW Verkehrsmittelwahl/output/newDistanceDistribution.txt");
+			out = new PrintStream("D:/Arbeit/Projekte/herbie/output/newDistanceDistribution.txt");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

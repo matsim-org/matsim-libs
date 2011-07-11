@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 
 import org.matsim.api.core.v01.Scenario;
@@ -42,8 +43,10 @@ public class ReanalyseMZ2005Plans {
 				1000, 0.0};
 
 		
-		HashMap<Double, Integer> walkDC = new HashMap<Double, Integer>();	
-		HashMap<Double, Integer> bikeDC = new HashMap<Double, Integer>();	
+		TreeMap<Double, Integer> walkDC = new TreeMap<Double, Integer>();	
+		TreeMap<Double, Integer> bikeDC = new TreeMap<Double, Integer>();
+		TreeMap<Double, Integer> carDC = new TreeMap<Double, Integer>();
+		TreeMap<Double, Integer> ptDC = new TreeMap<Double, Integer>();
 
 		System.out.println("Number of persons: "+pop.getPersons().size());
 
@@ -111,6 +114,60 @@ public class ReanalyseMZ2005Plans {
 						}
 						
 					}
+					else if (leg.getMode().equals("car")) {
+						double lastDistClass = 0;
+						boolean placed = false;
+						
+						for (double distClass : distanceClasses) {							
+							if (leg.getRoute().getDistance() > distClass) {
+								if (carDC.containsKey(lastDistClass)) {
+									int newFreq = carDC.get(lastDistClass) + 1;
+									carDC.put(lastDistClass, newFreq);
+								} else  {
+									carDC.put(lastDistClass, 1);
+								}
+								placed = true;
+								break;
+							}
+							lastDistClass = distClass;
+						}
+						if (!placed) {
+							if (carDC.containsKey(lastDistClass)) {
+								int newFreq = carDC.get(lastDistClass) + 1;
+								carDC.put(lastDistClass, newFreq);
+							} else  {
+								carDC.put(lastDistClass, 1);
+							}
+						}
+						
+					}
+					else if (leg.getMode().equals("pt")) {
+						double lastDistClass = 0;
+						boolean placed = false;
+						
+						for (double distClass : distanceClasses) {							
+							if (leg.getRoute().getDistance() > distClass) {
+								if (ptDC.containsKey(lastDistClass)) {
+									int newFreq = ptDC.get(lastDistClass) + 1;
+									ptDC.put(lastDistClass, newFreq);
+								} else  {
+									ptDC.put(lastDistClass, 1);
+								}
+								placed = true;
+								break;
+							}
+							lastDistClass = distClass;
+						}
+						if (!placed) {
+							if (ptDC.containsKey(lastDistClass)) {
+								int newFreq = ptDC.get(lastDistClass) + 1;
+								ptDC.put(lastDistClass, newFreq);
+							} else  {
+								ptDC.put(lastDistClass, 1);
+							}
+						}
+						
+					}
 														
 				}
 			}
@@ -124,15 +181,67 @@ public class ReanalyseMZ2005Plans {
 		for (double i : bikeDC.keySet()) {
 			System.out.println(i+" = "+bikeDC.get(i));
 		}
+		System.out.println("car distr");
+		for (double i : carDC.keySet()) {
+			System.out.println(i+" = "+carDC.get(i));
+		}
+		System.out.println("pt distr");
+		for (double i : ptDC.keySet()) {
+			System.out.println(i+" = "+ptDC.get(i));
+		}
 		
 
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(new File ("C:/Documents and Settings/scnadine/My Documents/Projekte/VW Verkehrsmittelwahl/output/newDistanceDistributionMZ2005.txt")));
-			out.write("Mode\t0\t1000\t2000\t3000\t4000\t5000\t10000\t20000\t30000\t40000\t50000\t100000\tMax\n");
-			
-
-
-
+			BufferedWriter out = new BufferedWriter(new FileWriter(new File ("D:/Arbeit/Projekte/herbie/output/newDistanceDistributionMZ2005.txt")));
+			out.write("Mode\tcar\tbike\tpt\twalk\tsum\n");
+			double carSum = 0;
+			double bikeSum = 0;
+			double ptSum = 0;
+			double walkSum = 0;
+			for (int i=12; i>=0; i--) {
+				double className =  distanceClasses[i];
+				int rowSum = 0;
+				
+				out.write(className+"\t");
+				if (carDC.containsKey(className)) {
+					out.write(carDC.get(className)+"\t");
+					carSum += carDC.get(className);
+					rowSum += carDC.get(className);
+				}
+				else {
+					out.write("0\t");
+				}
+				if (bikeDC.containsKey(className)) {
+					out.write(bikeDC.get(className)+"\t");
+					bikeSum += bikeDC.get(className);
+					rowSum += bikeDC.get(className);
+				}
+				else {
+					out.write("0\t");
+				}
+				if (ptDC.containsKey(className)) {
+					out.write(ptDC.get(className)+"\t");
+					ptSum += ptDC.get(className);
+					rowSum += ptDC.get(className);
+				}
+				else {
+					out.write("0\t");
+				}
+				if (walkDC.containsKey(className)) {
+					out.write(walkDC.get(className)+"\t");
+					walkSum += walkDC.get(className);
+					rowSum += walkDC.get(className);
+				}
+				else {
+					out.write("0\t");
+				}
+				out.write(rowSum+"");
+				out.newLine();
+				out.flush();
+			}
+			out.write("Sum\t"+carSum+"\t"+bikeSum+"\t"+ptSum+"\t"+walkSum);
+			out.newLine();
+			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -143,7 +252,7 @@ public class ReanalyseMZ2005Plans {
 
 
 
-
+		System.out.println("Done reanalysing MZ 2005 plans.");
 
 	}
 
