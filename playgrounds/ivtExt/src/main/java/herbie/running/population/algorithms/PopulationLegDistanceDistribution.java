@@ -63,7 +63,7 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 
 	@Override
 	public void run(Plan plan) {
-		
+				
 		boolean isPtLeg = false;
 		double distForPt = 0.0;
 		String ptMode = "standardPt";

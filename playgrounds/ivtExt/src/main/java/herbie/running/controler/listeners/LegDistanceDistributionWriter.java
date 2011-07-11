@@ -38,10 +38,9 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 
 	public static final double[] distanceClasses = new double[]{
 		0.0, 
-		100, 200, 500, 
-		1000, 2000, 5000, 
-		10000, 20000, 50000, 
-		100000, 200000, 500000,
+		1000, 2000, 3000, 4000, 5000, 
+		10000, 20000, 30000, 40000, 50000, 
+		100000, 200000, 300000, 400000, 500000,
 		1000000, Double.MAX_VALUE};
 
 	private final String filename;

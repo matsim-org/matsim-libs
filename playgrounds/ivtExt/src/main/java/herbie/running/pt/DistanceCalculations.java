@@ -61,6 +61,12 @@ public class DistanceCalculations {
 			
 			Node node1 = network.getNodes().get(new IdImpl(nodeIDs[i]));
 			Node node2 = network.getNodes().get(new IdImpl(nodeIDs[i+1]));
+			if (node1 == null) {
+				System.out.println("could not find node with id " + nodeIDs[i]);
+			}
+			if (node2 == null) {
+				System.out.println("could not find node with id " + nodeIDs[i+1]);
+			}
 			
 			distance += (CoordUtils.calcDistance(node1.getCoord(), node2.getCoord()));
 		}
