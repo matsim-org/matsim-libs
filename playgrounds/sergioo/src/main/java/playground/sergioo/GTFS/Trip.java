@@ -10,10 +10,10 @@ import org.matsim.api.core.v01.network.Link;
 public class Trip {
 	
 	//Attributes
-	private Service service;
-	private Shape shape;
-	private SortedMap<Integer,StopTime> stopTimes; 
-	private List<Frequency> frequencies;
+	private final Service service;
+	private final Shape shape;
+	private final SortedMap<Integer,StopTime> stopTimes; 
+	private final List<Frequency> frequencies;
 	private List<Link> links;
 	private Route route;
 	//Methods

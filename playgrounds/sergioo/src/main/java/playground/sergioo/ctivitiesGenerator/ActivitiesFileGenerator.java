@@ -1,4 +1,4 @@
-package playground.sergioo.activitiesGenerator;
+package playground.sergioo.ctivitiesGenerator;
 
 import java.io.File;
 import java.io.IOException;

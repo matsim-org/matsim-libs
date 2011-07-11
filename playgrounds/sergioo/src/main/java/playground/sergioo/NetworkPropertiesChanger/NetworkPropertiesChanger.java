@@ -59,7 +59,7 @@ public class NetworkPropertiesChanger {
 	}
 	
 	private static boolean isLinkOfType(Link link, double freeSpeed, double capacity, double numLanes) {
-		return link.getFreespeed()==freeSpeed && link.getCapacity()==capacity && link.getNumberOfLanes()==numLanes;
+		return Math.abs(link.getFreespeed()-freeSpeed)<0.01 && Math.abs(link.getCapacity()-capacity)<0.01 && link.getNumberOfLanes()==numLanes;
 	}
 
 	/**
@@ -73,6 +73,7 @@ public class NetworkPropertiesChanger {
 			MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 			matsimNetworkReader.readFile(args[0]);
 			Network network = scenario.getNetwork();
+			
 			if(args[1].equals("-l"))
 				changePropertiesPerLinkCSVFile(network, args[2]);
 			else if(args[1].equals("-g"))

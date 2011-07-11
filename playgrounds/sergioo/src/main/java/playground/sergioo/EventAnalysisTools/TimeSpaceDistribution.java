@@ -112,7 +112,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 				linksData.put(link.getId(), new LinkData(link));
 	}
 	public void printCSVFiles(String folder) throws FileNotFoundException {
-		PrintWriter printWriter = new PrintWriter(new File(folder+"/flows.csv"));
+		PrintWriter printWriter = new PrintWriter(folder+"/flows.csv");
 		printWriter.print("link"+SEPARATOR_CSV+"average\\time"+SEPARATOR_CSV);
 		for(int t=0;t<numIntervals;t++) {
 			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);
@@ -194,7 +194,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		printWriter.close();
 	}
 	public void printTXTFiles(String folder) throws FileNotFoundException {
-		PrintWriter printWriter = new PrintWriter(new File(folder+"/flows.txt"));
+		PrintWriter printWriter = new PrintWriter(folder+"/flows.txt");
 		printWriter.print("link"+SEPARATOR_TXT+"average\\time"+SEPARATOR_TXT);
 		for(int t=0;t<numIntervals;t++) {
 			double time=(t*TIME_INTERVAL+TIME_INTERVAL/2)/(60*60);

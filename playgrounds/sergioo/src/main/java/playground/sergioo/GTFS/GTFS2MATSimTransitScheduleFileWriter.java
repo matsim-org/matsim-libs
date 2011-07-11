@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +23,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -33,9 +32,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,6 +45,16 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.sergioo.GTFS.Route.RouteTypes;
 import playground.sergioo.GTFS.auxiliar.LinkStops;
@@ -52,7 +63,7 @@ import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 
-public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implements MatsimWriter {
+public class GTFS2MATSimTransitScheduleFileWriter {
 	
 	//Constants
 	/**
@@ -143,322 +154,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * Changes the calendar references in the trips file
-	 * @throws IOException
-	 */
-	public static void fixGTFSBusSingapore() throws IOException {
-		File oldFile=new File("C:/Users/sergioo/Desktop/Desktop/buses/trips2.txt");
-		File newFile=new File("C:/Users/sergioo/Desktop/Desktop/buses/trips.txt");
-		BufferedReader reader = new BufferedReader(new FileReader(oldFile));
-		PrintWriter writer = new PrintWriter(newFile);
-		String line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(parts[1].endsWith("saturday"))
-				parts[1]="saturday";
-			else if(parts[1].endsWith("sunday"))
-				parts[1]="sunday";
-			else if(parts[1].endsWith("weekday"))
-				parts[1]="weekday";
-			writer.print(parts[0]);
-			int i=1;
-			for(;i<parts.length;i++)
-				writer.print(","+parts[i]);
-			for(;i<5;i++)
-				writer.print(",");
-			writer.println();
-			line=reader.readLine();
-		}
-		writer.close();
-		reader.close();
-	}
-	/**
-	 * Erases the E and S routes
-	 * @throws IOException
-	 */
-	public static void fixGTFSBusSingapore2() throws IOException {
-		Collection<String> trips = new HashSet<String>();
-		File oldFile=new File("./data/gtfs/buses/trips2.txt");
-		File newFile=new File("./data/gtfs/buses/trips.txt");
-		BufferedReader reader = new BufferedReader(new FileReader(oldFile));
-		PrintWriter writer = new PrintWriter(newFile);
-		String line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(!parts[2].endsWith("-S") && !parts[2].endsWith("-E")) {
-				trips.add(parts[2]);
-				writer.println(line);
-			}
-			else if(parts[2].endsWith("-E") && !trips.contains(parts[2].substring(0, parts[2].lastIndexOf('-')))) {
-				String tripId = parts[2].substring(0, parts[2].lastIndexOf('-'));
-				trips.add(tripId);
-				writer.print(parts[0]+","+parts[1]+","+tripId);
-				int i=3;
-				for(;i<parts.length;i++)
-					writer.print(","+parts[i]);
-				for(;i<5;i++)
-					writer.print(",");
-				writer.println();
-			}
-			line=reader.readLine();
-		}
-		writer.close();
-		reader.close();
-		Map<String,String> startDepartures = new HashMap<String,String>();
-		Map<String,String> endDepartures = new HashMap<String,String>();
-		oldFile=new File("./data/gtfs/buses/stop_times2.txt");
-		newFile=new File("./data/gtfs/buses/stop_times.txt");
-		reader = new BufferedReader(new FileReader(oldFile));
-		writer = new PrintWriter(newFile);
-		line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(parts[0].endsWith("-S")) {
-				String tripId = parts[0].substring(0, parts[0].lastIndexOf('-'));
-				if(startDepartures.get(tripId)==null)
-					startDepartures.put(tripId, parts[2]);
-				writer.print(tripId);
-				for(int i=1;i<parts.length;i++)
-					writer.print(","+parts[i]);
-				writer.println();
-			}
-			if(parts[0].endsWith("-E")) {
-				String tripId = parts[0].substring(0, parts[0].lastIndexOf('-'));
-				if(endDepartures.get(tripId)==null) {
-					String[] parts3 = parts[2].split(":");
-					int hour = Integer.parseInt(parts3[0]);
-					if(hour<12) {
-						hour+=24;
-						endDepartures.put(tripId, Integer.toString(hour)+":"+parts3[1]+":"+parts3[2]);
-					}
-					else
-						endDepartures.put(tripId, parts[2]);
-				}
-			}
-			line=reader.readLine();
-		}
-		writer.close();
-		reader.close();
-		oldFile=new File("./data/gtfs/buses/frequencies2.txt");
-		newFile=new File("./data/gtfs/buses/frequencies.txt");
-		reader = new BufferedReader(new FileReader(oldFile));
-		writer = new PrintWriter(newFile);
-		line = reader.readLine();
-		writer.println(line);
-		String previous = line;
-		line = reader.readLine();
-		String[] parts = line.split(",");
-		String tripId = parts[0];
-		previous = parts[0]+","+startDepartures.get(parts[0]);
-		for(int i=2;i<parts.length;i++)
-			previous += ","+parts[i];
-		line=reader.readLine();
-		while(line!=null) {
-			parts = line.split(",");
-			if(!parts[0].equals(tripId)) {
-				String[] parts2 = previous.split(",");
-				for(int i=0;i<2;i++)
-					writer.print(parts2[i]+",");
-				writer.println(endDepartures.get(parts2[0])+","+parts2[3]);
-				tripId = parts[0];
-				previous = parts[0]+","+startDepartures.get(parts[0]);
-				for(int i=2;i<parts.length;i++)
-					previous += ","+parts[i];
-			}
-			else {
-				writer.println(previous);
-				previous = line;
-			}
-			line=reader.readLine();
-		}
-		String[] parts2 = previous.split(",");
-		for(int i=0;i<2;i++)
-			writer.print(parts2[i]+",");
-		writer.println(endDepartures.get(parts2[0])+","+parts2[3]);
-		writer.close();
-		reader.close();
-	}
-	/**
-	 * Changes the calendar references in the trips file
-	 * @throws IOException
-	 */
-	public static void fixGTFSTrainSingapore() throws IOException {
-		File oldFile=new File("C:/Users/sergioo/Documents/2011/Work/FCL/Operations/Data/GoogleTransitFeed/ProcessedData/Trains/trips2.txt");
-		File newFile=new File("C:/Users/sergioo/Documents/2011/Work/FCL/Operations/Data/GoogleTransitFeed/ProcessedData/Trains/trips.txt");
-		BufferedReader reader = new BufferedReader(new FileReader(oldFile));
-		PrintWriter writer = new PrintWriter(newFile);
-		String line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(parts[1].endsWith("weeksatday"))
-				parts[1]="weeksatday";
-			else if(parts[1].endsWith("sunday"))
-				parts[1]="sunday";
-			else if(parts[1].endsWith("weekday"))
-				parts[1]="weekday";
-			else if(parts[1].contains("daily"))
-				parts[1]="daily";
-			else
-				System.out.println("Error");
-			writer.print(parts[0]);
-			int i=1;
-			for(;i<parts.length;i++)
-				writer.print(","+parts[i]);
-			for(;i<5;i++)
-				writer.print(",");
-			writer.println();
-			line=reader.readLine();
-		}
-		writer.close();
-		reader.close();
-	}
-	/**
-	 * Erases the E and S routes
-	 * @throws IOException
-	 */
-	public static void fixGTFSTrainSingapore2() throws IOException {
-		SortedMap<String,TripAux> trips = new TreeMap<String,TripAux>();
-		File oldFile=new File("./data/gtfs/trains/trips2.txt");
-		File newFile=new File("./data/gtfs/trains/trips.txt");
-		BufferedReader reader = new BufferedReader(new FileReader(oldFile));
-		PrintWriter writer = new PrintWriter(newFile);
-		String line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(!parts[2].contains("_first") && !parts[2].contains("_last")) {
-				TripAux tripAux = trips.get(parts[2]);
-				if(tripAux==null) {
-					trips.put(parts[2],new TripAux());
-					tripAux = trips.get(parts[2]);
-				}
-				tripAux.setLine(line);
-			}
-			else if(parts[2].contains("_first")) {
-				String tripId=parts[2].replaceAll("_first", "");
-				TripAux tripAux = trips.get(tripId);
-				if(tripAux==null) {
-					tripAux = trips.put(parts[2],new TripAux());
-					tripAux = trips.get(parts[2]);
-					tripAux.setLine(line);
-				}
-				tripAux.addFirst(parts[2]);
-			}
-			else {
-				String tripId=parts[2].replaceAll("_last", "");
-				TripAux tripAux = trips.get(tripId);
-				if(tripAux==null) {
-					tripAux = trips.put(parts[2],new TripAux());
-					tripAux = trips.get(parts[2]);
-					tripAux.setLine(line);
-				}
-				tripAux.addLast(parts[2]);
-			}
-			line=reader.readLine();
-		}
-		for(Entry<String, TripAux> trip:trips.entrySet()) {
-			writer.println(trip.getValue().getLine());
-			System.out.println(trip.getKey()+" "+trip.getValue().getFirsts().size()+" "+trip.getValue().getLasts().size());
-		}
-		writer.close();
-		reader.close();
-		Map<String,String> startDepartures = new HashMap<String,String>();
-		Map<String,String> endDepartures = new HashMap<String,String>();
-		oldFile=new File("./data/gtfs/trains/stop_times2.txt");
-		newFile=new File("./data/gtfs/trains/stop_times.txt");
-		reader = new BufferedReader(new FileReader(oldFile));
-		writer = new PrintWriter(newFile);
-		line = reader.readLine();
-		writer.println(line);
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			if(parts[0].contains("_first")) {
-				String tripId = parts[0].replaceAll("_first", "");
-				if(trips.containsKey(tripId)) {
-					if(startDepartures.get(tripId)==null)
-						startDepartures.put(tripId, parts[2]);
-					writer.print(tripId);
-					for(int i=1;i<parts.length;i++)
-						writer.print(","+parts[i]);
-					writer.println();
-				}
-			}
-			else if(parts[0].contains("_last")) {
-				String tripId = parts[0].replaceAll("_last", "");;
-				if(trips.containsKey(tripId)) {
-					if(endDepartures.get(tripId)==null)
-						endDepartures.put(tripId, parts[2]);
-				}
-				else if(trips.containsKey(parts[0]))
-					writer.println(line);
-			}
-			else {
-				if(trips.get(parts[0]).getFirsts().size()==0)
-					writer.println(line);
-			}
-			line=reader.readLine();
-		}
-		writer.close();
-		reader.close();
-		oldFile=new File("./data/gtfs/trains/frequencies2.txt");
-		newFile=new File("./data/gtfs/trains/frequencies.txt");
-		reader = new BufferedReader(new FileReader(oldFile));
-		writer = new PrintWriter(newFile);
-		line = reader.readLine();
-		writer.println(line);
-		String previous = line;
-		line = reader.readLine();
-		String[] parts = line.split(",");
-		String tripId = parts[0];
-		previous = parts[0]+","+startDepartures.get(parts[0]);
-		for(int i=2;i<parts.length;i++)
-			previous += ","+parts[i];
-		line=reader.readLine();
-		while(line!=null) {
-			parts = line.split(",");
-			if(!parts[0].equals(tripId)) {
-				String[] parts2 = previous.split(",");
-				if(endDepartures.get(parts2[0])!=null) {
-					for(int i=0;i<2;i++)
-						writer.print(parts2[i]+",");
-					writer.println(endDepartures.get(parts2[0])+","+parts2[3]);
-				}
-				else
-					writer.println(previous);
-				tripId = parts[0];
-				previous = parts[0]+","+startDepartures.get(parts[0]);
-				for(int i=2;i<parts.length;i++)
-					previous += ","+parts[i];
-			}
-			else {
-				writer.println(previous);
-				previous = line;
-			}
-			line=reader.readLine();
-		}
-		String[] parts2 = previous.split(",");
-		if(endDepartures.get(parts2[0])!=null) {
-			for(int i=0;i<2;i++)
-				writer.print(parts2[i]+",");
-			writer.println(endDepartures.get(parts2[0])+","+parts2[3]);
-		}
-		else
-			writer.println(previous);
-		writer.close();
-		reader.close();
-	}
 	/**
 	 * Loads all the GTFS information form the roots field
 	 */
@@ -514,7 +209,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		}*/
 	}
 	/*private void calculateShapePoints() throws FileNotFoundException {
-		PrintWriter pw = new PrintWriter(new File("./data/shapesDistance"));
+		PrintWriter pw = new PrintWriter("./data/shapesDistance");
 		for(Route route:routes[0].values())
 			for(Entry<String,Trip> tripE:route.getTrips().entrySet()) {
 				Shape shape = tripE.getValue().getShape();
@@ -1022,16 +717,90 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 	}
 
 	
-	@Override
 	/**
 	 * Writes the MATSim public transport file
 	 * @param filename
 	 */
-	public void write(String filename) {
-		try {
+	public void write(String filename, CoordinateTransformation ct) {
 			loadGTFSFiles();
-			calculateUnknownInformation();
+			try {
+				calculateUnknownInformation();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			//Public Transport Schedule
+			//writeXML(filename+"t");
+			TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();
+			TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();
+			for(int r=0; r<roots.length; r++)
+				for(Entry<String, Stop> stop: stops[r].entrySet())
+					if(stop.getValue().getLinkId()!=null) {
+						Coord result = ct.transform(stop.getValue().getPoint());
+						TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(new IdImpl(stop.getKey()), result, stop.getValue().isBlocks());
+						transitStopFacility.setLinkId(new IdImpl(stop.getValue().getLinkId()));
+						transitStopFacility.setName(stop.getValue().getName());
+						transitSchedule.addStopFacility(transitStopFacility);
+					}
+			for(int r=0; r<roots.length; r++)
+				for(Entry<String,Route> route:routes[r].entrySet()) {
+					TransitLine transitLine = transitScheduleFactory.createTransitLine(new IdImpl(route.getKey()));
+					transitSchedule.addTransitLine(transitLine);
+					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet()) {
+						boolean isService=false;
+						for(String serviceId:serviceIds)
+							if(trip.getValue().getService().equals(services[r].get(serviceId)))
+								isService = true;
+						if(isService) {
+							NetworkRoute networkRoute = (NetworkRoute) ((NetworkFactoryImpl)network.getFactory()).createRoute(/*TODO*/TransportMode.car, trip.getValue().getLinks().get(0).getId(), trip.getValue().getLinks().get(trip.getValue().getLinks().size()-1).getId());
+							List<Id> intermediate = new ArrayList<Id>();
+							for(Link link:trip.getValue().getLinks())
+								intermediate.add(link.getId());
+							intermediate.remove(0);
+							intermediate.remove(intermediate.size()-1);
+							networkRoute.setLinkIds(networkRoute.getStartLinkId(), intermediate, networkRoute.getEndLinkId());
+							List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
+							Date startTime = trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getArrivalTime();
+							for(Integer stopTimeKey:trip.getValue().getStopTimes().keySet()) {
+								StopTime stopTime = trip.getValue().getStopTimes().get(stopTimeKey);
+								double arrival = Time.UNDEFINED_TIME, departure = Time.UNDEFINED_TIME;
+								if(!stopTimeKey.equals(trip.getValue().getStopTimes().firstKey())) {
+									long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
+									try {
+										arrival = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference)));
+									} catch (ParseException e) {
+										e.printStackTrace();
+									}
+								}
+								if(!stopTimeKey.equals(trip.getValue().getStopTimes().lastKey())) {
+									long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
+									try {
+										departure = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference)));
+									} catch (ParseException e) {
+										e.printStackTrace();
+									}
+								}
+								transitRouteStops.add(transitScheduleFactory.createTransitRouteStop(transitSchedule.getFacilities().get(new IdImpl(stopTime.getStopId())),arrival,departure));
+							}
+							TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(new IdImpl(trip.getKey()), networkRoute, transitRouteStops, route.getValue().getRouteType().name);
+							transitLine.addRoute(transitRoute);
+							int id = 1;
+							for(Frequency frequency:trip.getValue().getFrequencies())
+								for(Date actualTime = (Date) frequency.getStartTime().clone(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
+									transitRoute.addDeparture(transitScheduleFactory.createDeparture(new IdImpl(id), Time.parseTime(timeFormat.format(actualTime))));
+									id++;
+								}
+							if(id==1)
+								transitRoute.addDeparture(transitScheduleFactory.createDeparture(new IdImpl(id), Time.parseTime(timeFormat.format(trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getDepartureTime()))));
+						}
+					}
+				}
+			(new TransitScheduleWriter(transitSchedule)).writeFile(filename);
+	}
+	/**
+	 * Writes the Transit Schedule file
+	 */
+	/*private void writeXML(String filename) {
+		try {
 			//Stops
 			this.openFile(filename);
 			this.writeXmlHead();
@@ -1101,15 +870,14 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 							//Departures
 							int id = 1;
 							this.writeStartTag("departures", new ArrayList<Tuple<String,String>>());
-							for(Frequency frequency:trip.getValue().getFrequencies()) {
-								for(Date actualTime = frequency.getStartTime(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
+							for(Frequency frequency:trip.getValue().getFrequencies())
+								for(Date actualTime = (Date) frequency.getStartTime().clone(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
 									List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
 									departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
 									departureAtts.add(new Tuple<String, String>("departureTime", timeFormat.format(actualTime)));
 									this.writeStartTag("departure", departureAtts, true);
 									id++;
 								}
-							}
 							if(id==1) {
 								List<Tuple<String,String>> departureAtts = new ArrayList<Tuple<String,String>>();
 								departureAtts.add(new Tuple<String, String>("id", Integer.toString(id)));
@@ -1124,8 +892,6 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 				}
 			this.writeEndTag("transitSchedule");
 			this.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -1133,7 +899,7 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	//Main method
 	/**
 	 * @param args
@@ -1145,7 +911,9 @@ public class GTFS2MATSimTransitScheduleFileWriter extends MatsimXmlWriter implem
 		matsimNetworkReader.readFile(args[1]);
 		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
-		g2m.write(args[0]);
+		//Transformation for Singapore
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+		g2m.write(args[0],ct);
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);

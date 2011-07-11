@@ -5,9 +5,9 @@ import java.util.Date;
 public class Frequency {
 	
 	//Attributes
-	private Date startTime;
-	private Date endTime;
-	private int secondsPerDeparture;
+	private final Date startTime;
+	private final Date endTime;
+	private final int secondsPerDeparture;
 	
 	//Methods
 	/**
