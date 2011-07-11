@@ -474,8 +474,9 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		this.pc.shutdown();
-
+		//			this.pc.shutdown();
+		//			init();
+		//
 	}
 
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -24,7 +25,7 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 public class CalibrationController2D  {
 
 
-	private static final int THREADS = 4;
+	private static final int THREADS = 1;
 
 	private final Mutator mut = new Mutator();
 
@@ -35,7 +36,7 @@ public class CalibrationController2D  {
 
 	private double[] params;
 
-	double c = 1000;
+	double c = 1;
 	int it = 0;
 	private final Tuple<Double,Double>[] ranges;
 
@@ -50,14 +51,14 @@ public class CalibrationController2D  {
 		this.scenario = ScenarioUtils.loadScenario(this.config);
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
 		loader.load2DScenario();
-		this.sim2dConfig.setPhantomPopulationEventsFile("/Users/laemmel/devel/dfg/phantomEvents.xml.gz");
+		this.sim2dConfig.setPhantomPopulationEventsFile("/Users/laemmel/devel/dfg/events.xml");
 		this.phantomEvents = new PhantomPopulationLoader(this.sim2dConfig.getPhantomPopulationEventsFile()).getPhantomPopulation();
 
 		this.params = new double[3];
 		this.ranges = new Tuple[3];
-		this.params[0] = 0.5; //MatsimRandom.getRandom().nextDouble();
-		this.params[1] = 1.2; //MatsimRandom.getRandom().nextDouble()*5;
-		this.params[2] = 12; //MatsimRandom.getRandom().nextDouble()*2000;;
+		this.params[0] =  this.sim2dConfig.getLambda();
+		this.params[1] = this.sim2dConfig.getBi();
+		this.params[2] = this.sim2dConfig.getAi();
 		this.ranges[0] = new Tuple<Double, Double>(0.01, 1.);
 		this.ranges[1] = new Tuple<Double, Double>(0.01, 5.);
 		this.ranges[2] = new Tuple<Double, Double>(1., 200.);
@@ -66,10 +67,7 @@ public class CalibrationController2D  {
 
 
 	private void run() {
-		List<Id> ids = new ArrayList<Id>();
-		for (int i = 0; i < 480; i++) {
-			ids.add(new IdImpl(i));
-		}
+		List<Id> ids = new ArrayList<Id>(this.scenario.getPopulation().getPersons().keySet());
 		Collections.shuffle(ids);
 
 		this.target = new double[3];

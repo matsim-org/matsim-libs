@@ -15,6 +15,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
 import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.pedvis.PedVisPeekABot;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.UTurnRemover;
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
@@ -30,7 +31,7 @@ public class PeekabotVisController extends Controller2D{
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.vis = new PedVisPeekABot(10,this.scenarioData);
+		this.vis = new PedVisPeekABot(1,this.scenarioData);
 		//		this.vis.setOffsets(386128,5820182);
 		this.vis.setOffsets(getNetwork());
 		this.vis.setFloorShapeFile(this.getSim2dConfig().getFloorShapeFile());
@@ -42,6 +43,11 @@ public class PeekabotVisController extends Controller2D{
 		this.addControlerListener(this.vis);
 
 		this.addControlerListener(new UTurnRemover(this.scenarioData));
+
+		Sim2DConfigGroup s2dConf = (Sim2DConfigGroup) this.config.getModule("sim2d");
+		//		s2dConf.setAi(11.381916655);
+		//		s2dConf.setBi(1.84136188);
+		//		s2dConf.setLambda(0.01);
 
 	}
 
