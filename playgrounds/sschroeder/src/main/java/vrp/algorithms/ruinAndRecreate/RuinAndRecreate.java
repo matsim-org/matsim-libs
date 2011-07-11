@@ -9,12 +9,14 @@ import org.apache.log4j.Logger;
 import vrp.algorithms.ruinAndRecreate.api.RecreationStrategy;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
+import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
 import vrp.algorithms.ruinAndRecreate.api.ThresholdFunction;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.VRP;
 import vrp.basics.Tour;
+import vrp.basics.VrpSolution;
 import vrp.basics.VrpUtils;
 
 
@@ -31,21 +33,21 @@ public class RuinAndRecreate {
 	
 	public static class Offer {
 		
-		private TourAgent agent;
+		private ServiceProvider agent;
 		
 		private double cost;
 
-		public Offer(TourAgent agent, double cost) {
+		public Offer(ServiceProvider agent, double cost) {
 			super();
 			this.agent = agent;
 			this.cost = cost;
 		}
 
-		public TourAgent getAgent() {
+		public ServiceProvider getServiceProvider() {
 			return agent;
 		}
 
-		public double getCost() {
+		public double getPrice() {
 			return cost;
 		}
 		
@@ -82,6 +84,8 @@ public class RuinAndRecreate {
 
 	private Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 	
+	private VrpSolution vrpSolution;
+	
 	public RuinAndRecreate(VRP vrp, Solution iniSolution, int nOfMutations) {
 		this.vrp = vrp;
 		this.currentSolution = iniSolution;
@@ -115,7 +119,6 @@ public class RuinAndRecreate {
 	public void run(){
 		logger.info("run ruin-and-recreate");
 		init();
-		verify();
 		randomWalk(warmUpIterations);
 		logger.info("run mutations");
 		while(currentMutation < nOfMutations){
@@ -132,9 +135,15 @@ public class RuinAndRecreate {
 //			print(tentativeSolution);
 			currentMutation++;
 		}
+		vrpSolution = new VrpSolution(getSolution());
+		vrpSolution.setTransportCosts(currentSolution.getResult());
 		informFinish();
 	}
 	
+	public VrpSolution getVrpSolution() {
+		return vrpSolution;
+	}
+
 	private void init() {
 		thresholdFunction.setNofIterations(nOfMutations);
 		thresholdFunction.setInitialThreshold(initialThreshold);
@@ -193,10 +202,5 @@ public class RuinAndRecreate {
 			tours.add(tA.getTour());
 		}
 		return tours;
-	}
-
-	private void verify() {
-		
-		
 	}
 }

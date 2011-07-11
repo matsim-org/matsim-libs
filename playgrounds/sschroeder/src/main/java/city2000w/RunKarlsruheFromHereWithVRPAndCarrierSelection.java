@@ -3,9 +3,11 @@
  */
 package city2000w;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -16,14 +18,12 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -37,10 +37,12 @@ import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierKnowledge;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
@@ -48,47 +50,55 @@ import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.TransportChainBuilder;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
 import freight.AnotherCarrierAgentFactory;
+import freight.CarrierUtils;
+import freight.TSPUtils;
 
 /**
  * @author schroeder
  *
  */
-public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener, ShutdownListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+public class RunKarlsruheFromHereWithVRPAndCarrierSelection implements ScoringListener, ReplanningListener, StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private static final int NUMBEROFCARRIERS = 100;
+	private static final int NUMBEROFCARRIERS = 5;
 	
-	private static final int NUMBEROFTSPSHIPMENTS = 500;
+	private static final int NUMBEROFTSPSHIPMENTS = 20;
 	
-	private static Logger logger = Logger.getLogger(RunKarlsruheFromHereWithUmschlagWithVRP.class);
+	private static Logger logger = Logger.getLogger(RunKarlsruheFromHereWithVRPAndCarrierSelection.class);
 	
 	private Carriers carriers;
+	
 	private TransportServiceProviders transportServiceProviders;
 	
 	private CarrierAgentTracker carrierAgentTracker;
+	
 	private TSPAgentTracker tspAgentTracker;
 
 	private ScenarioImpl scenario;
 	
-	private AgentObserver simStats;
+	private AgentObserver agentObserver;
 	
 	private static final String NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
+	
+	MarginalCostCalculator marginalCostCalculator;
+
+	private boolean liveModus = false;
 	
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Logger.getRootLogger().setLevel(Level.INFO);
-		RunKarlsruheFromHereWithUmschlagWithVRP runner = new RunKarlsruheFromHereWithUmschlagWithVRP();
+		Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
+		RunKarlsruheFromHereWithVRPAndCarrierSelection runner = new RunKarlsruheFromHereWithVRPAndCarrierSelection();
 		runner.run();
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
 		
 		Controler controler = event.getControler();
 		
@@ -110,15 +120,16 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
-		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		mobsimFactory.setUseOTFVis(liveModus );
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
-		simStats = new AgentObserver("Karlsruhe with umschlag", scenario.getNetwork());
-		simStats.setOutFile("../FreightModel/output/ka_umschlag_cw.txt");
-		event.getControler().getEvents().addHandler(simStats);
+		agentObserver = new AgentObserver("foo",scenario.getNetwork());
+		agentObserver.setOutFile("../playgrounds/sschroeder/output/karlsruhe.txt");
+		event.getControler().getEvents().addHandler(agentObserver);
+	
 		
 	}
 
@@ -135,37 +146,108 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		controler.getEvents().removeHandler(carrierAgentTracker);
 	}
 
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-//		logger.info("carrierAgents are calculating costs ...");
-//		freightAgentTracker.calculateCostsScoreCarriersAndInform();
-//		logger.info("transportServiceProvider are calculating costs ...");
-//		tspAgentTracker.calculateCostsScoreTSPAndInform();
-//		
-	}
+
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		logger.info("Reset costs/score of tspAgents");
+		carrierAgentTracker.reset(event.getIteration());
 		tspAgentTracker.reset();
+		agentObserver.reset(0);
+		agentObserver.writeStats();
 	}
+
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
+		replanTsp();
+		clearCarrierContracts();
+		createCarrierContracts(tspAgentTracker.createCarrierContracts());
+		replanCarriers();
+		
+//		Collection<CarrierImpl> carriersToReplan = replanOneTspAndGetCarriers2BeReplanned();
+//		replanSelectedCarriers(carriersToReplan);
+		
+		
+	}
+
+	private Collection<CarrierImpl> replanOneTspAndGetCarriers2BeReplanned() {
+		Collection<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+		
+		return null;
+	}
+
+	private void clearCarrierContracts() {
+		for(CarrierImpl c : carriers.getCarriers().values()){
+			c.getContracts().clear();
+		}
+	}
+
+	private void replanCarriers() {
+		for(CarrierImpl carrier : carriers.getCarriers().values()){
+			RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder planBuilder = new RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(scenario.getNetwork());
+			CarrierPlan plan = planBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
+			carrier.getPlans().add(plan);
+			carrier.setSelectedPlan(plan);
+		}
 		
 	}
 
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		simStats.reset(1);
-		simStats.writeStats();
+	public void notifyScoring(ScoringEvent event) {
+		for(CarrierImpl c : carriers.getCarriers().values()){
+			logger.info("carrierId=" + c.getId() + " planScore=" + c.getSelectedPlan().getScore());
+		}
+		
+	}
+
+	private void replanTsp() {
+		logger.info("offerTime");
+		Collection<Id> carriersToReplan = new ArrayList<Id>();
+		Id from = makeId("160038764_160038765");
+		Id to_stefantje = makeId("160324487_160089302");
+		Id to_10 = makeId("160420669_160086968");
+		int size = 10;
+		Collection<Offer>  offers = carrierAgentTracker.getOffers(from, to_10, size, 0.0, 0.0, 0.0, 0.0);
+		Offer bestOffer = null;
+		for(Offer o : offers){
+			if(o == null){
+				continue;
+			}
+			logger.info("carrierId=" + o.getCarrierId() + " offer=" + o.getPrice());
+			if(bestOffer == null){
+				bestOffer = o;
+			}
+			else if(o.getPrice() < bestOffer.getPrice()){
+				bestOffer = o;
+			}
+		}
+		TransportServiceProviderImpl tsp = transportServiceProviders.getTransportServiceProviders().iterator().next();
+		TSPShipment tspShipment = TSPUtils.createTSPShipment(from, to_stefantje, size, 0.0, 0.0, 0.0, 0.0);
+		TSPUtils.createAndAddTSPContract(tsp, tspShipment);
+		TransportChainBuilder chainBuilder = new TransportChainBuilder(tspShipment);
+		chainBuilder.schedulePickup(tspShipment.getFrom(), tspShipment.getPickUpTimeWindow());
+		chainBuilder.scheduleLeg(bestOffer);
+		chainBuilder.scheduleDelivery(tspShipment.getTo(), tspShipment.getDeliveryTimeWindow());
+		TransportChain chain = chainBuilder.build();
+//		Collection<Contract> carrierContracts = tspAgentTracker.registerChainAndGetCarrierContracts(tsp,chain);
+		tsp.getSelectedPlan().getChains().add(chain);
+		carriersToReplan.add(bestOffer.getCarrierId());
+		
+//		Collection<Offer>  otherOffers = carrierAgentTracker.getOffers(from, to_stefantje, size, 0.0, 0.0, 0.0, 0.0);
+//		for(Offer o : otherOffers){
+//			if(o == null){
+//				continue;
+//			}
+//			logger.info("carrierId=" + o.getCarrierId() + " offer=" + o.getPrice());
+//		}
 	}
 
 	private void run(){
 		Config config = new Config();
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1);
 		scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		NetworkCleaner networkCleaner = new NetworkCleaner();
@@ -193,6 +275,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 //			RuinAndRecreateCarrierPlanBuilder planBuilder = new RuinAndRecreateCarrierPlanBuilder(scenario.getNetwork());
 //			ClarkeAndWrightCarrierPlanBuilder planBuilder = new ClarkeAndWrightCarrierPlanBuilder(scenario.getNetwork());
 			CarrierPlan plan = planBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
+			
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
 		}
@@ -202,7 +285,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		for(Contract contract : contracts){
 			Id carrierId = contract.getOffer().getCarrierId();
 			carriers.getCarriers().get(carrierId).getContracts().add(contract);
-		}	
+		}
 	}
 
 	private void createCarriers(int nOfCarriers) {
@@ -230,6 +313,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 			CarrierVehicle carrierVehicle = new CarrierVehicle(makeId(c.getId().toString() + "-vehicle"), c.getDepotLinkId());
 			cc.getCarrierVehicles().add(carrierVehicle);
 			carrierVehicle.setCapacity(15);
+			c.setKnowledge(new CarrierKnowledge());
 		}
 	}
 
@@ -245,7 +329,6 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 		tsp.setTspCapabilities(cap);
 		printCap(cap);
 		makeKarlsruheContracts(tsp);
-		//createContracts(tsp,nOfShipments);
 		createInitialPlans(tsp);
 		transportServiceProviders = new TransportServiceProviders();
 		transportServiceProviders.getTransportServiceProviders().add(tsp);
@@ -291,7 +374,7 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 	private void createInitialPlans(TransportServiceProviderImpl tsp) {
 		SimpleTSPPlanBuilder tspPlanBuilder = new SimpleTSPPlanBuilder(scenario.getNetwork());
 		tspPlanBuilder.setCarriers(carriers.getCarriers().values());
-		tspPlanBuilder.setTransshipmentCentres(tsp.getTspCapabilities().getTransshipmentCentres());
+		tspPlanBuilder.setTransshipmentCentres(Collections.EMPTY_LIST);
 		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
 		printTSPPlan(directPlan);
 		tsp.getPlans().add(directPlan);
@@ -299,8 +382,8 @@ public class RunKarlsruheFromHereWithUmschlagWithVRP implements StartupListener,
 	}
 
 	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
-		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
 		TSPOffer offer = new TSPOffer();
+		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
 		TSPContract tspContract = new TSPContract(tspShipment,offer);
 		return tspContract;
 	}

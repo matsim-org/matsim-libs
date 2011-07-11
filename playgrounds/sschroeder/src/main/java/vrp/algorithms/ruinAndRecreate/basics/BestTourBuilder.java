@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
+import vrp.algorithms.ruinAndRecreate.api.TourBuilder;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
@@ -22,11 +23,11 @@ public class BestTourBuilder implements TourBuilder {
 	
 	private static Logger logger = Logger.getLogger(BestTourBuilder.class);
 	
-	public static class TourInformation {
+	public static class TourResult {
 		public Tour tour;
 		public double totalCosts;
 		public double marginalCosts;
-		public TourInformation(Tour tour, double totalCosts, double marginalCosts) {
+		public TourResult(Tour tour, double totalCosts, double marginalCosts) {
 			this.tour = tour;
 			this.totalCosts = totalCosts;
 			this.marginalCosts = marginalCosts;
@@ -57,7 +58,7 @@ public class BestTourBuilder implements TourBuilder {
 		this.constraints = constraints;
 	}
 	
-	private TourInformation buildTour(Tour tour, Customer customer){
+	private TourResult buildTour(Tour tour, Customer customer){
 		double bestMarginalCost = Double.MAX_VALUE;
 		Tour bestTour = null;
 		double bestTotalCosts = Double.MAX_VALUE;
@@ -81,7 +82,7 @@ public class BestTourBuilder implements TourBuilder {
 				}
 		}
 		if(bestTour != null){
-			return new TourInformation(bestTour,bestTotalCosts,bestMarginalCost);
+			return new TourResult(bestTour,bestTotalCosts,bestMarginalCost);
 		}
 		return null;
 	}
@@ -104,8 +105,8 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	public TourInformation buildTour(Tour tour, Shipment shipment){
-		TourInformation tourTrippel = null;
+	public TourResult buildTour(Tour tour, Shipment shipment){
+		TourResult tourTrippel = null;
 		if(isDepot(tour,shipment.getFrom())){
 			tourTrippel = buildTour(tour, shipment.getTo());
 		}
@@ -118,7 +119,7 @@ public class BestTourBuilder implements TourBuilder {
 		return tourTrippel;
 	}
 	
-	private TourInformation buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
+	private TourResult buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
 		Node fromLocation = shipment.getFrom().getLocation();
 		Node toLocation = shipment.getTo().getLocation();
 		Double bestMarginalCost = Double.MAX_VALUE;
@@ -149,7 +150,7 @@ public class BestTourBuilder implements TourBuilder {
 			}
 		}
 		if(bestTour != null){
-			return new TourInformation(bestTour,bestTotalCosts,bestMarginalCost);
+			return new TourResult(bestTour,bestTotalCosts,bestMarginalCost);
 		}
 		return null;
 	

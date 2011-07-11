@@ -8,7 +8,8 @@ import org.apache.log4j.Logger;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
-import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder.TourInformation;
+import vrp.algorithms.ruinAndRecreate.api.TourBuilder;
+import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder.TourResult;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
@@ -94,7 +95,7 @@ class RRTourAgent implements TourAgent {
 	 */
 	
 	public Offer requestService(Shipment shipment){
-		TourInformation tourTrippel = tourBuilder.buildTour(tour, shipment);
+		TourResult tourTrippel = tourBuilder.buildTour(tour, shipment);
 		if(tourTrippel != null){
 			Offer offer = new Offer(this, tourTrippel.marginalCosts);
 			openOffer = offer;
@@ -110,7 +111,7 @@ class RRTourAgent implements TourAgent {
 	
 	 @Override
 	public void run() {
-		 TourInformation tourInformation = tourBuilder.buildTour(tour, newShipment);
+		 TourResult tourInformation = tourBuilder.buildTour(tour, newShipment);
 		 if(tourInformation != null){
 			 Offer offer = new Offer(this, tourInformation.marginalCosts);
 			 openOffer = offer;

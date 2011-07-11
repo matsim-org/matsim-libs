@@ -35,8 +35,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.CheapestCarrierTSPPlanBuilder;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
@@ -45,6 +45,7 @@ import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
+import freight.AnotherCarrierAgentFactory;
 import freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;
 import freight.CarrierUtils;
@@ -121,12 +122,10 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 		
 //		createShipperPlans();
 
-		CarrierAgentTrackerBuilder carrierAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		carrierAgentTrackerBuilder.setCarriers(carriers.getCarriers().values());
-		carrierAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
-		carrierAgentTrackerBuilder.setNetwork(controler.getNetwork());
-		carrierAgentTrackerBuilder.setEventsManager(controler.getEvents());
-		carrierAgentTracker = carrierAgentTrackerBuilder.build();
+		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
 			
 		tspAgentTracker.setOfferMaker(new CarrierCostRequester(carrierAgentTracker));
 		
@@ -164,7 +163,7 @@ public class MobSimRunnnerWithShipper implements StartupListener, ScoringListene
 			if(tsp == null){
 				throw new NullPointerException("tsp " + tspId.toString() + " does not exist in tspList");
 			}
-			TSPContract contract = TSPUtils.createTSPContract(c.getShipments(), c.getOffer());
+			TSPContract contract = TSPUtils.createTSPContract(c.getShipment(), c.getOffer());
 			tsp.getContracts().add(contract);
 		}
 	}

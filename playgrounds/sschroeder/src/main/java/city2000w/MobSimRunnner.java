@@ -33,19 +33,19 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import freight.CarrierPlanReader;
-import freight.CarrierPlanWriter;
-import freight.CarrierUtils;
-import freight.TSPPlanReader;
-
 import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TransportServiceProviders;
+import freight.AnotherCarrierAgentFactory;
+import freight.CarrierPlanReader;
+import freight.CarrierPlanWriter;
+import freight.CarrierUtils;
+import freight.TSPPlanReader;
 
 /**
  * @author schroeder
@@ -164,12 +164,10 @@ public class MobSimRunnner implements StartupListener, ScoringListener, Replanni
 			
 		}
 		
-		CarrierAgentTrackerBuilder carrierAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		carrierAgentTrackerBuilder.setCarriers(carriers.getCarriers().values());
-		carrierAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
-		carrierAgentTrackerBuilder.setNetwork(controler.getNetwork());
-		carrierAgentTrackerBuilder.setEventsManager(controler.getEvents());
-		carrierAgentTracker = carrierAgentTrackerBuilder.build();
+		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
 
 			
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);

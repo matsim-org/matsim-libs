@@ -70,14 +70,14 @@ public class BestInsertion implements RecreationStrategy{
 				if(bestOffer == null){
 					bestOffer = offer;
 				}
-				else if(offer.getCost() < bestOffer.getCost()){
+				else if(offer.getPrice() < bestOffer.getPrice()){
 					bestOffer = offer;
 				}
 			}
 			if(bestOffer != null){
-				logger.debug("offer granted " + bestOffer.getAgent() + " " + bestOffer + " " + shipmentWithoutService);
-				bestOffer.getAgent().offerGranted(shipmentWithoutService);
-				informListeners(shipmentWithoutService,bestOffer.getCost());
+				logger.debug("offer granted " + bestOffer.getServiceProvider() + " " + bestOffer + " " + shipmentWithoutService);
+				bestOffer.getServiceProvider().offerGranted(shipmentWithoutService);
+				informListeners(shipmentWithoutService,bestOffer.getPrice());
 			}
 			else{
 				TourAgent newTourAgent = createTourAgent(shipmentWithoutService);

@@ -1,16 +1,14 @@
 package city2000w;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-
-import freight.VRPTransformation;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.VrpImpl;
+import freight.VRPTransformation;
 
 public class VrpBuilder {
 	
@@ -22,7 +20,7 @@ public class VrpBuilder {
 	
 	private Costs costs = new CrowFlyDistance();
 	
-	public VrpBuilder(Id depotId, Network network) {
+	public VrpBuilder(Id depotId) {
 		super();
 		this.depotLocationId = depotId;
 	}
@@ -46,7 +44,7 @@ public class VrpBuilder {
 		return new IdImpl(depotId);
 	}
 
-	public void setVrpTrafo(VRPTransformation vrpTrafo) {
+	public void setVrpTransformation(VRPTransformation vrpTrafo) {
 		this.vrpTrafo = vrpTrafo;
 	}
 

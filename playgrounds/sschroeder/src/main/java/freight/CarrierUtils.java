@@ -56,8 +56,12 @@ public class CarrierUtils {
 	}
 
 	public static void createAndAddContract(CarrierImpl carrier, Shipment shipment, Offer offer){
-		Contract contract = new Contract(shipment, offer);
+		Contract contract = createContract(shipment, offer);
 		carrier.getContracts().add(contract);
+	}
+	
+	public static Contract createContract(Shipment shipment, Offer offer){
+		return new Contract(shipment,offer);
 	}
 	
 	private static Id makeId(String depotLinkId) {

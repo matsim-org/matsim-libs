@@ -33,13 +33,13 @@ public class VRPTransformation {
 	
 	private HashMap<Id, Node> nodes = new HashMap<Id, Node>();
 	
-	private Network network;
-	
 	private Integer customerCounter = 0;
+
+	private Locations locations;
 	
-	public VRPTransformation(Network network) {
+	public VRPTransformation(Locations locations) {
 		super();
-		this.network = network;
+		this.locations = locations;
 	}
 	
 	public void addAndCreateCustomer(String customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
@@ -101,6 +101,10 @@ public class VRPTransformation {
 	public Collection<Customer> getCustomers() {
 		return Collections.unmodifiableCollection(customers.values());
 	}
+	
+	public Customer getCustomer(Id customerId){
+		return customers.get(customerId);
+	}
 
 	public void clear(){
 		fromCustomers.clear();
@@ -136,7 +140,7 @@ public class VRPTransformation {
 		}
 		else{
 			node = VrpUtils.createNode(id.toString());
-			node.setCoord(network.getLinks().get(id).getCoord());
+			node.setCoord(locations.getCoord(id));
 			nodes.put(node.getId(), node);
 		}
 		return node;
@@ -155,7 +159,7 @@ public class VRPTransformation {
 		}
 		else{
 			node = VrpUtils.createNode(id.toString());
-			node.setCoord(network.getLinks().get(id).getCoord());
+			node.setCoord(locations.getCoord(id));
 			nodes.put(node.getId(), node);
 		}
 		Customer customer = VrpUtils.createCustomer(makeId(customerCounter.toString()), node, shipment.getSize(), 

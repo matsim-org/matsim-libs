@@ -40,14 +40,7 @@ public class NutsRegionShapeReader {
 	public void read(String fileName){
 		logger.info("read regions");
 		ShapeFileReader reader = new ShapeFileReader();
-		try {
-			reader.readFileAndInitialize(fileName);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			logger.error(e);
-			System.exit(1);
-		}
+		reader.readFileAndInitialize(fileName);
 		FeatureCollection<SimpleFeatureType,SimpleFeature> featureCollection = reader.getFeatureCollection();
 		FeatureIterator<SimpleFeature> featureIter = featureCollection.features();
 		while(featureIter.hasNext()){

@@ -57,6 +57,7 @@ public class MarginalCostCalculator implements RecreationListener {
 	@Override
 	public void inform(RecreationEvent event) {
 		CostTableKey key = new CostTableKey(getFrom(event),getTo(event),getSize(event));
+		
 		logger.info(key + " mc=" + event.getCost());
 		if(marginalCostTable.containsKey(key)){
 			marginalCostTable.get(key).number++;

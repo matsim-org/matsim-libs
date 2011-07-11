@@ -39,24 +39,24 @@ public class SimpleTSPPlanBuilder {
 	public TSPPlan buildPlan(Collection<TSPContract> contracts, TSPCapabilities tspCapabilities) {
 		Collection<TransportChain> chains = new ArrayList<TransportChain>();
 		for(TSPContract c : contracts){
-			for(TSPShipment s : c.getShipments()){
-				TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
-				chainBuilder.schedulePickup(s.getFrom(), s.getPickUpTimeWindow());
-				for (Id transshipmentCentre : transshipmentCentres) {
-					CarrierImpl carrier = pickCarrier(s.getFrom());
-					Offer offer = new Offer();
-					offer.setCarrierId(carrier.getId());
-					chainBuilder.scheduleLeg(offer);
-					chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
-					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(3600,24*3600));
-				}
-				CarrierImpl carrier = pickCarrier(s.getTo());
+			TSPShipment s = c.getShipment();
+			TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
+			chainBuilder.schedulePickup(s.getFrom(), s.getPickUpTimeWindow());
+			for (Id transshipmentCentre : transshipmentCentres) {
+				CarrierImpl carrier = pickCarrier(s.getFrom());
 				Offer offer = new Offer();
 				offer.setCarrierId(carrier.getId());
 				chainBuilder.scheduleLeg(offer);
-				chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
-				chains.add(chainBuilder.build());
+				chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
+				chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(3600,24*3600));
 			}
+			CarrierImpl carrier = pickCarrier(s.getTo());
+			Offer offer = new Offer();
+			offer.setCarrierId(carrier.getId());
+			chainBuilder.scheduleLeg(offer);
+			chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
+			chains.add(chainBuilder.build());
+
 		}
 		TSPPlan plan = new TSPPlan(chains);
 		return plan;

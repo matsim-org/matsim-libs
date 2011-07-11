@@ -5,6 +5,7 @@ import java.io.IOException;
 import kid.GeotoolsTransformation;
 import kid.filter.SimpleFeatureFilter;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -12,6 +13,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.LinkImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -23,6 +25,8 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class NetworkShapeFileWriter {
+	
+	private static Logger logger = Logger.getLogger(NetworkShapeFileWriter.class);
 	
 	private Network network;
 	
@@ -76,16 +80,11 @@ public class NetworkShapeFileWriter {
 			fBuilder.add(link.getLength());
 			fBuilder.add(link.getFreespeed());
 			fBuilder.add(link.getCapacity());
+			fBuilder.add(((LinkImpl)link).getType());
+			logger.debug(((LinkImpl)link).getType());
 			SimpleFeature feature = fBuilder.buildFeature(null);
-			SimpleFeature newFeature = null;
-			if(transformation != null){
-				newFeature = transformation.transformFeature(feature);
-			}
-			else {
-				newFeature = feature;
-			}
-			if(featureFilter.judge(newFeature)){
-				links.add(newFeature);
+			if(featureFilter.judge(feature)){
+				links.add(feature);
 			}
 		}
 	}
@@ -132,6 +131,7 @@ public class NetworkShapeFileWriter {
 		builder.add("Length", Double.class);
 		builder.add("FreeSpeed", Double.class);
 		builder.add("Capacity", Double.class);
+		builder.add("Type", String.class);
 		
 		final SimpleFeatureType featureType = builder.buildFeatureType();
 

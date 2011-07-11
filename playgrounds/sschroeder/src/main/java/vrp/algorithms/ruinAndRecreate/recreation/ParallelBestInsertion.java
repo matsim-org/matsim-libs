@@ -57,7 +57,7 @@ public class ParallelBestInsertion implements RecreationStrategy{
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
-	public synchronized void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
+	public void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
 		Collections.shuffle(shipmentsWithoutService, MatsimRandom.getRandom());
 		for(Shipment shipmentWithoutService : shipmentsWithoutService){
 			doCalculation();
@@ -66,13 +66,12 @@ public class ParallelBestInsertion implements RecreationStrategy{
 			TourAgent bestAgent = null;
 			Collection<Thread> threads = new ArrayList<Thread>();
 			for(TourAgent agent : tentativeSolution.getTourAgents()){
-				assertAgentDoesNotHaveThisShipment(agent,shipmentWithoutService);
+//				assertAgentDoesNotHaveThisShipment(agent,shipmentWithoutService);
 				agent.setNewShipment(VrpUtils.createShipment(shipmentWithoutService.getFrom(), shipmentWithoutService.getTo()));
-			}
-			for(TourAgent agent : tentativeSolution.getTourAgents()){
 				Thread agentThread = new Thread(agent);
 				threads.add(agentThread);
 				agentThread.start();
+//				logger.info("thread started");
 			}
 			for(Thread agentThread : threads){
 				try {
@@ -92,7 +91,7 @@ public class ParallelBestInsertion implements RecreationStrategy{
 					bestOffer = offer;
 					bestAgent = agent;
 				}
-				else if(offer.getCost() < bestOffer.getCost()){
+				else if(offer.getPrice() < bestOffer.getPrice()){
 					rejectedOffers.add(bestOffer);
 					bestOffer = offer;
 					bestAgent = agent;
@@ -103,12 +102,13 @@ public class ParallelBestInsertion implements RecreationStrategy{
 				
 			}
 			for(Offer o : rejectedOffers){
-				o.getAgent().offerRejected(o);
+				o.getServiceProvider().offerRejected(o);
+				
 			}
 			if(bestOffer != null){
-				logger.debug("offer granted " + bestOffer.getAgent() + " " + bestOffer + " " + shipmentWithoutService);
+				logger.debug("offer granted " + bestOffer.getServiceProvider() + " " + bestOffer + " " + shipmentWithoutService);
 				bestAgent.offerGranted(shipmentWithoutService);
-				informListeners(shipmentWithoutService,bestOffer.getCost());
+				informListeners(shipmentWithoutService,bestOffer.getPrice());
 			}
 			else{
 				TourAgent newTourAgent = createTourAgent(shipmentWithoutService);

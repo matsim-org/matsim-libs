@@ -3,7 +3,6 @@
  */
 package city2000w;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,14 +14,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -32,8 +27,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
+import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
@@ -49,12 +44,13 @@ import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
+import freight.AnotherCarrierAgentFactory;
 
 /**
  * @author schroeder
  *
  */
-public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringListener, ReplanningListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
 	private static final int NUMBEROFCARRIERS = 5;
 	
@@ -66,7 +62,7 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 	
 	private TransportServiceProviders transportServiceProviders;
 	
-	private CarrierAgentTracker freightAgentTracker;
+	private CarrierAgentTracker carrierAgentTracker;
 	
 	private TSPAgentTracker tspAgentTracker;
 
@@ -107,16 +103,13 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 		
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
-		CarrierAgentTrackerBuilder freightAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers().values());
-		freightAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
-		freightAgentTrackerBuilder.setNetwork(controler.getNetwork());
-		freightAgentTrackerBuilder.setEventsManager(controler.getEvents());
-		freightAgentTrackerBuilder.addCarrierCostListener(tspAgentTracker);
-		freightAgentTracker = freightAgentTrackerBuilder.build();
-		freightAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		
-		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
+		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
@@ -130,24 +123,17 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
-		controler.getEvents().addHandler(freightAgentTracker);
-		freightAgentTracker.createPlanAgents();
+		controler.getEvents().addHandler(carrierAgentTracker);
+		carrierAgentTracker.createPlanAgents();
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		Controler controler = event.getControler();
-		controler.getEvents().removeHandler(freightAgentTracker);
+		controler.getEvents().removeHandler(carrierAgentTracker);
 	}
 
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-//		logger.info("carrierAgents are calculating costs ...");
-//		freightAgentTracker.calculateCostsScoreCarriersAndInform();
-//		logger.info("transportServiceProvider are calculating costs ...");
-//		tspAgentTracker.calculateCostsScoreTSPAndInform();
-//		
-	}
+
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -157,11 +143,6 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 		agentObserver.writeStats();
 	}
 
-	@Override
-	public void notifyReplanning(ReplanningEvent event) {
-//		replanTSP();
-		// replanCarriers();
-	}
 
 	private void run(){
 		Config config = new Config();
@@ -210,11 +191,6 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 	private void createCarriers(int nOfCarriers) {
 		carriers = new Carriers();
 		createKarlsurheCarriers();
-//		Random random = new Random();
-//		for(int i=0; i<nOfCarriers; i++){
-//			CarrierImpl carrier = createCarrier(random.nextInt(scenario.getNetwork().getLinks().values().size()));
-//			carriers.getCarriers().add(carrier);
-//		}
 	}
 
 	private void createKarlsurheCarriers() {
@@ -236,7 +212,7 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 			c.setCarrierCapabilities(cc);
 			CarrierVehicle carrierVehicle = new CarrierVehicle(makeId(c.getId().toString() + "-vehicle"), c.getDepotLinkId());
 			cc.getCarrierVehicles().add(carrierVehicle);
-			carrierVehicle.setCapacity(10);
+			carrierVehicle.setCapacity(15);
 		}
 	}
 
@@ -252,7 +228,6 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 		tsp.setTspCapabilities(cap);
 		printCap(cap);
 		makeKarlsruheContracts(tsp);
-		//createContracts(tsp,nOfShipments);
 		createInitialPlans(tsp);
 		transportServiceProviders = new TransportServiceProviders();
 		transportServiceProviders.getTransportServiceProviders().add(tsp);
@@ -307,7 +282,8 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, ScoringList
 
 	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
 		TSPOffer offer = new TSPOffer();
-		TSPContract tspContract = new TSPContract(Arrays.asList(new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600))),offer);
+		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
+		TSPContract tspContract = new TSPContract(tspShipment,offer);
 		return tspContract;
 	}
 

@@ -51,7 +51,7 @@ public class RuinAndRecreateFactory {
 	public RuinAndRecreate createStandardAlgo(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory();
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
-		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, 500);
+		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, 50);
 		ruinAndRecreateAlgo.setWarmUpIterations(10);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());

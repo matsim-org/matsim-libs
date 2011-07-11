@@ -28,8 +28,7 @@ public class ShapeFileWriter {
 	
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> features;
 	
-	public ShapeFileWriter(
-			FeatureCollection<SimpleFeatureType, SimpleFeature> simpleFeatureCollection) {
+	public ShapeFileWriter(FeatureCollection<SimpleFeatureType, SimpleFeature> simpleFeatureCollection) {
 		super();
 		this.features = simpleFeatureCollection;
 	}

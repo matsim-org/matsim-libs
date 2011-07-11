@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.mzilske.freight.CarrierCapabilities;
@@ -19,13 +20,10 @@ import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 import playground.mzilske.freight.TourBuilder;
-import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
-import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
-import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
 import vrp.api.Customer;
-import vrp.api.VRP;
 import vrp.basics.TourActivity;
-import vrp.basics.VrpUtils;
+import freight.LocationsImpl;
+import freight.RuinAndRecreateSolver;
 import freight.VRPTransformation;
 
 public class RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder {
@@ -45,6 +43,18 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 
 	public RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(Network network){
 		this.network = network;
+		iniTrafo();
+	}
+
+	private void iniTrafo() {
+		LocationsImpl locations = new LocationsImpl();
+		makeLocations(locations);
+		vrpTrafo = new VRPTransformation(locations);
+		
+	}
+
+	private void makeLocations(LocationsImpl locations) {
+		locations.addAllLinks((Collection<Link>) network.getLinks().values());
 	}
 
 	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<Contract> contracts) {
@@ -53,7 +63,9 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 		}
 		Collection<Tour> tours = new ArrayList<Tour>();
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		Collection<vrp.basics.Tour> vrpSolution = solveVRP(contracts,carrierCapabilities.getCarrierVehicles().iterator().next());
+		Collection<vrp.basics.Tour> vrpSolution = new ArrayList<vrp.basics.Tour>();
+		RuinAndRecreateSolver ruinAndRecreateSolver = new RuinAndRecreateSolver(vrpSolution, vrpTrafo);
+		ruinAndRecreateSolver.solve(contracts, carrierCapabilities.getCarrierVehicles().iterator().next());
 		for(CarrierVehicle carrierVehicle : carrierCapabilities.getCarrierVehicles()){
 			TourBuilder tourBuilder = new TourBuilder();
 			Id vehicleStartLocation = carrierVehicle.getLocation();
@@ -82,6 +94,7 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 			scheduledTours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(scheduledTours);
+		carrierPlan.setScore(ruinAndRecreateSolver.getVrpSolution().getTransportCosts());
 		return carrierPlan;
 	}
 		
@@ -105,26 +118,5 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(scheduledTours);
 		return carrierPlan;
-	}
-
-	private Collection<vrp.basics.Tour> solveVRP(Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
-		Id depotId = carrierVehicle.getLocation();
-		VrpBuilder vrpBuilder = new VrpBuilder(depotId, network);
-		vrpBuilder.setConstraints(new CapacityConstraint(carrierVehicle.getCapacity()));
-		vrpTrafo = new VRPTransformation(network);
-		for(Contract c : contracts){
-			Shipment s = c.getShipment();
-			vrpTrafo.addShipment(s);
-		}
-		vrpBuilder.setVrpTrafo(vrpTrafo);
-		VRP vrp = vrpBuilder.buildVrp();
-		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
-		rrFactory.addRecreationListener(marginalCostCalculator);
-		Collection<vrp.basics.Tour> initialSolution = VrpUtils.createTrivialSolution(vrp);
-		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, carrierVehicle.getCapacity());
-		ruinAndRecreateAlgo.run();
-		logger.info(carrierVehicle.getVehicleId().toString());
-		marginalCostCalculator.finish();
-		return ruinAndRecreateAlgo.getSolution();
 	}
 }
