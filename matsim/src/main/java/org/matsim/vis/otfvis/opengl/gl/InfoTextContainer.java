@@ -64,7 +64,6 @@ public class InfoTextContainer {
 			drawInfoTextIfNecessary(drawable, visibleLinkIds, text);
 		}
 		elements.clear();
-		
 		for (InfoText text : elementsPermanent) {
 			drawInfoTextIfNecessary(drawable, visibleLinkIds, text);
 		}

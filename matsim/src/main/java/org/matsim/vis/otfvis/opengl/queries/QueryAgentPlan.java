@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -132,10 +131,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		this.net = queueSimulation.getVisMobsim().getVisNetwork();
 		result = new Result();
 		result.agentId = this.agentId.toString();
-		Person person = queueSimulation.findPersonAgent(this.agentId);
-		if (person != null) {
+		Plan plan = queueSimulation.findPlan(this.agentId);
+		if (plan != null) {
 			queueSimulation.addTrackedAgent(this.agentId);
-			Plan plan = person.getSelectedPlan();
 			for (PlanElement e : plan.getPlanElements()) {
 				if (e instanceof Activity) {
 					Activity act = (Activity) e;

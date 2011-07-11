@@ -112,7 +112,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
 	private boolean glInited = false;
-	
+
 	private int nRedrawn = 0;
 
 	private GL gl = null;
@@ -358,13 +358,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			this.queryHandler.drawQueries(this);
 		}
 
+		Map<Coord, String> coordStringPairs = findVisibleLinks();
 		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
-			Map<Coord, String> coordStringPairs = findVisibleLinks();
 			displayLinkIds(coordStringPairs);
-			Collection<String> visibleLinkIds = coordStringPairs.values();
-			InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
 		}
-		this.gl.glDisable(GL.GL_BLEND);
 
 		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
 			this.statusDrawer.displayStatusText(this.lastTime);
@@ -398,6 +395,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		if (this.current == null) {
 			this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
 		}
+		Collection<String> visibleLinkIds = coordStringPairs.values();
+		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
+		this.gl.glDisable(GL.GL_BLEND);
 	}
 
 	@Override

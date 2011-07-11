@@ -30,12 +30,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
@@ -278,13 +279,10 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		return queueSimulation;
 	}
 
-	public Person findPersonAgent(Id agentId) {
-		// yy should probably be called findPerson.  kai, jun'11 
-
-		MobsimAgent personAgent = agents.get(agentId);
-		if (personAgent != null && personAgent instanceof HasPerson ) {
-			Person person = ((HasPerson)personAgent).getPerson();
-			return person ;
+	public Plan findPlan(Id agentId) {
+		MobsimAgent agent = agents.get(agentId);
+		if (agent != null && agent instanceof PlanAgent ) {
+			return ((PlanAgent) agent).getSelectedPlan();
 		}
 		return null;
 	}
