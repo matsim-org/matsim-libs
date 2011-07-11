@@ -43,10 +43,13 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	
 	private double sumOfTotalDistance = 0.0;
 	
-	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router, Network network) {
+	private CarrierAgentFactory carrierAgentFactory;
+	
+	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
 		this.carriers = carriers;
 		this.router = router;
 		this.network = network;
+		this.carrierAgentFactory = carrierAgentFactory;
 		createCarrierAgents();
 	}
 
@@ -138,11 +141,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
-			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, router);
-			carrierAgent.setCostFunction(new CarrierTimeDistanceCostFunction());
-			carrierAgent.setCostAllocator(new CostAllocatorImpl(carrier, network));
-			carrierAgent.setOfferMaker(new BeeLineOfferMaker(carrier, network, new CarrierTimeDistanceCostFunction()));
-			carrierAgent.setNetwork(network);
+			CarrierAgent carrierAgent = carrierAgentFactory.createAgent(this,carrier);
 			carrierAgents.add(carrierAgent);
 		}
 	}
@@ -163,6 +162,20 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		Collection<Offer> offers = new ArrayList<Offer>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			Offer offer = carrierAgent.requestOffer(linkId, linkId2, shipmentSize);
+			if(offer instanceof NoOffer){
+				continue;
+			}
+			else {
+				offers.add(offer);
+			}
+		}
+		return offers;
+	}
+	
+	public Collection<Offer> getOffers(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {
+		Collection<Offer> offers = new ArrayList<Offer>();
+		for (CarrierAgent carrierAgent : carrierAgents) {
+			Offer offer = carrierAgent.requestOffer(linkId, linkId2, shipmentSize, startPickup, endPickup, startDelivery, endDelivery);
 			if(offer instanceof NoOffer){
 				continue;
 			}

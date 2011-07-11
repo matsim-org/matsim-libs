@@ -109,7 +109,7 @@ public class CarrierAgent {
 
 	private OfferMaker offerMaker;
 	
-	void setOfferMaker(OfferMaker offerMaker) {
+	public void setOfferMaker(OfferMaker offerMaker) {
 		this.offerMaker = offerMaker;
 	}
 
@@ -333,6 +333,14 @@ public class CarrierAgent {
 		return id;
 	}
 
+	public Offer requestOffer(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {
+		if(requestIsNoGo(linkId,linkId2)){
+			return new NoOffer();
+		}
+//		Double memorizedPrice = costTable.getCost(linkId, linkId2, shipmentSize);
+		return offerMaker.requestOffer(linkId,linkId2,shipmentSize,startPickup,endPickup,startDelivery,endDelivery,null);
+	}
+	
 	public Offer requestOffer(Id linkId, Id linkId2, int shipmentSize) {
 		if(requestIsNoGo(linkId,linkId2)){
 			return new NoOffer();
@@ -344,14 +352,13 @@ public class CarrierAgent {
 	}
 
 	private boolean requestIsNoGo(Id linkId, Id linkId2) {
-		
 		if(carrier.getKnowledge().getNoGoLocations().contains(linkId2) || carrier.getKnowledge().getNoGoLocations().contains(linkId)){
 			return true;
 		}
 		return false;
 	}
 
-	void setCostFunction(CarrierCostFunction costFunction) {
+	public void setCostFunction(CarrierCostFunction costFunction) {
 		this.costFunction = costFunction;
 	}
 

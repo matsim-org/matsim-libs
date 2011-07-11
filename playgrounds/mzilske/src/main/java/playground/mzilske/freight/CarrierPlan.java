@@ -20,11 +20,11 @@ public class CarrierPlan {
 		this.scheduledTours = scheduledTours;
 	}
 
-	Double getScore() {
+	public Double getScore() {
 		return score;
 	}
 
-	void setScore(Double score) {
+	public void setScore(Double score) {
 		this.score = score;
 	}
 

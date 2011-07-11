@@ -133,4 +133,34 @@ public class TSPAgent {
 		return 0.0;
 	}
 	
+	public Collection<Contract> registerChainAndGetCarrierContracts(TransportChain chain){
+		Collection<Contract> carrierContracts = new ArrayList<Contract>();
+		TransportChainAgent chainAgent = new TransportChainAgent(chain);
+		transportChainAgents.add(chainAgent);
+		List<Contract> chainShipments = chainAgent.createCarrierShipments();
+		for(Contract c : chainShipments){
+			carrierContracts.add(c);
+			shipmentChainMap.put(c.getShipment(), chainAgent);				
+		}
+		return carrierContracts;
+	}
+	
+	public void removeChain(TransportChain chain){
+		TransportChainAgent chainAgent = findChainAgent(chain);
+		if(chainAgent != null){
+			transportChainAgents.remove(chainAgent);
+			for(Shipment s : chainAgent.getShipments()){
+				shipmentChainMap.remove(s);
+			}
+		}
+	}
+
+	private TransportChainAgent findChainAgent(TransportChain chain) {
+		for(TransportChainAgent a : transportChainAgents){
+			if(a.getTpChain() == chain){
+				return a;
+			}
+		}
+		return null;
+	}
 }

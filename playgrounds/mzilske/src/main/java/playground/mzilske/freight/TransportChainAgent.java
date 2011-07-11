@@ -4,12 +4,11 @@
 package playground.mzilske.freight;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.mzilske.freight.Shipment.TimeWindow;
 import playground.mzilske.freight.TransportChain.ChainElement;
@@ -92,6 +91,7 @@ public class TransportChainAgent {
 	
 	void reset(){
 		cost = 0.0;
+		initIterator();
 	}
 
 	private Shipment createAndRegisterShipment(Id from, Id to, Integer size,
@@ -163,6 +163,10 @@ public class TransportChainAgent {
 			}
 		}
 		return costs;
+	}
+	
+	Collection<Shipment> getShipments(){
+		return shipments;
 	}
 	
 }

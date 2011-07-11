@@ -74,10 +74,11 @@ public class BeeLineOfferMaker implements OfferMaker {
 		return CoordUtils.calcDistance(network.getLinks().get(link1).getCoord(), network.getLinks().get(link2).getCoord());
 	}
 
+
 	@Override
 	public Offer requestOffer(Id from, Id to, int shimpentSize,
 			Double startPickup, Double endPickup, Double startDelivery,
-			Double endDelivery, double memorizedPrice) {
+			Double endDelivery, Double memorizedPrice) {
 		// TODO Auto-generated method stub
 		return null;
 	}

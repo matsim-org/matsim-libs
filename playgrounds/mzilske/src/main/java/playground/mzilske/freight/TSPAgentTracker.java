@@ -120,5 +120,17 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		}
 		return offers;
 	}
+
+	public void register(TransportServiceProviderImpl tsp, TransportChain chain) {
+		TSPAgent agent = findAgentForTSP(tsp);
+		agent.registerChainAndGetCarrierContracts(chain);
+	}
+
+	private TSPAgent findAgentForTSP(TransportServiceProviderImpl tsp) {
+		for(TSPAgent a : tspAgents){
+			
+		}
+		return null;
+	}
 	
 }
