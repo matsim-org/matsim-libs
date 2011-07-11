@@ -15,17 +15,23 @@ public class DensityEstimatorFactory {
 
 	private final EventsManager events;
 	private final Scenario sc;
+	private final double res;
 
 	public DensityEstimatorFactory(EventsManager events, Scenario sc) {
+		this(events,sc,1);
+	}
+
+	public DensityEstimatorFactory(EventsManager events, Scenario sc, double res) {
 		this.events = events;
 		this.sc = sc;
+		this.res = res;
 	}
 
 	public NNGaussianKernelEstimator createDensityEstimator() {
 		NNGaussianKernelEstimator ret = new NNGaussianKernelEstimator();
 		ret.addGroupId("r");
 		ret.addGroupId("g");
-		ret.setResolution(1);
+		ret.setResolution(this.res);
 
 
 		ret.setLambda(1);
