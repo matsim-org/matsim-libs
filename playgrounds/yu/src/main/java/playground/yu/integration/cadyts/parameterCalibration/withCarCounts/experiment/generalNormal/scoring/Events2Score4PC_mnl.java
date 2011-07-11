@@ -183,6 +183,12 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				attrNameIndex = attrNameList.indexOf("travelingPt");
 				mnl.setAttribute(choiceIdx, attrNameIndex, legDurPt
 						/ paramScaleFactorList.get(attrNameIndex));
+				if (statistics != null) {
+					for (int i = 0; i < statistics.length; i++) {
+						statistics[i].add(legDurPt
+								/ paramScaleFactorList.get(attrNameIndex));
+					}
+				}
 
 				attrNameIndex = attrNameList.indexOf("travelingWalk");
 				mnl.setAttribute(choiceIdx, attrNameIndex, legDurWalk
@@ -202,10 +208,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 						.indexOf("monetaryDistanceCostRateCar");
 				mnl.setAttribute(choiceIdx, attrNameIndex, distanceCar
 						/ paramScaleFactorList.get(attrNameIndex));
-				for (int i = 0; i < statistics.length; i++) {
-					statistics[i].add(distanceCar
-							/ paramScaleFactorList.get(attrNameIndex));
-				}
 
 				attrNameIndex = attrNameList
 						.indexOf("monetaryDistanceCostRatePt");

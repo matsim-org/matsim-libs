@@ -57,7 +57,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private final int paramDimension;
 	private Plan oldSelected = null;
-	private BasicStatistics monetaryDistanceCostRateCarStats = null;
+	private BasicStatistics betaTravelingPtStats = null;
 
 	public PCStrMn(NetworkImpl net, int firstIteration, double brainExpBeta,
 			int paramDimension) {
@@ -85,7 +85,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// the most things before "removePlans"
 		super.beforePopulationRunHook(population);// iter++
 		// cadyts class - create new BasicStatistics Objects
-		monetaryDistanceCostRateCarStats = new BasicStatistics();
+		betaTravelingPtStats = new BasicStatistics();
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
@@ -126,9 +126,8 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					// only with planSelector/-Changer, no new plan will be
 					// created
 					// **************WRITE ATTR.S INTO MNL******************
-					chooser.setPersonAttrs(
-							person,
-							new BasicStatistics[] { monetaryDistanceCostRateCarStats });
+					chooser.setPersonAttrs(person,
+							new BasicStatistics[] { betaTravelingPtStats });
 					// now there are only #maxPlansPerAgent# Plans in choice set
 
 					/* ***********************************************************
@@ -153,9 +152,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				}
 				// ENSURE THAT EVERY PLANS IN CHOICE SET WILL BE EXECUTED ONE
 				// TIME
-				((PersonImpl) person).setSelectedPlan(person.getPlans().get(
-						iter % maxPlansPerAgent));
-				// ****************************************************
+				if (iter % maxPlansPerAgent < person.getPlans().size()) {
+					((PersonImpl) person).setSelectedPlan(person.getPlans()
+							.get(iter % maxPlansPerAgent));
+					// ****************************************************
+				}
 			}
 		} else { // strategy==null
 			Gbl.errorMsg("No strategy found!");
@@ -434,11 +435,13 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		// output stats and variabilities
-		statistics = new double[] { monetaryDistanceCostRateCarStats.getAvg(),
-				monetaryDistanceCostRateCarStats.getVar() };
-		System.out
-				.println("BSE_Statistics\tavg.\t" + statistics[0]/* monetaryDistanceCostRateCarAvg */
-						+ "\tvar.\t" + statistics[1]/* monetaryDistanceCostRateCarVar */);
+		statistics = new double[] { betaTravelingPtStats.getAvg(),
+				betaTravelingPtStats.getVar() };
+		System.out.println("BSE_Statistics\tavg.\t" + statistics[0]/*
+																	 * betaTravelingPtAttr
+																	 * .
+																	 */
+				+ "\tvar.\t" + statistics[1]/* betaTravelingPtAttr. */);
 	}
 
 	private void generateScoreCorrections(Person person) {
