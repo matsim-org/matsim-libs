@@ -19,10 +19,9 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +42,13 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.scoring.ScoringFunctionAccumulator4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.ScoringFunctionAccumulator4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import cadyts.utilities.math.BasicStatistics;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class Events2Score4TravPerf extends EventsToScore implements
 		CadytsChoice {
@@ -75,10 +75,12 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 		sfFactory = factory;
 	}
 
+	@Override
 	public PlanCalcScoreConfigGroup getScoring() {
 		return scoring;
 	}
 
+	@Override
 	public Double getAgentScore(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
 		if (data == null) {
@@ -95,14 +97,15 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 			if (person == null) {
 				return null;
 			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(),
-					sfFactory.createNewScoringFunction(person
-							.getSelectedPlan()));
+			data = new Tuple<Plan, ScoringFunction>(
+					person.getSelectedPlan(),
+					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
 			agentScorers.put(agentId, data);
 		}
 		return data;
 	}
 
+	@Override
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(agentId);
 		if (data == null) {
@@ -119,15 +122,18 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param performStats
 	 * @param travelingCarStats
 	 */
-	public abstract void setPersonAttrs(Person person);
+	@Override
+	public abstract void setPersonAttrs(Person person, BasicStatistics[] stats);
 
+	@Override
 	public abstract void setPersonScore(Person person);
 
+	@Override
 	public void reset(List<Tuple<Id, Plan>> toRemoves) {
 		for (Tuple<Id, Plan> agentIdPlanPair : toRemoves) {
 			Id agentId = agentIdPlanPair.getFirst();
@@ -148,6 +154,7 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 		}
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		agentScorers.clear();
 		agentPlanElementIndex.clear();
@@ -155,8 +162,8 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 	}
 
 	/**
-	 * this method will be called in {@code
-	 * DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
+	 * this method will be called in
+	 * {@code DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
 	 */
 	@Override
 	public void finish() {
@@ -215,6 +222,7 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 		}
 	}
 
+	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
 				.getPersonId());
@@ -231,11 +239,12 @@ public abstract class Events2Score4TravPerf extends EventsToScore implements
 			agentPlanElementIndex.put(personId, Integer.valueOf(1));
 			return 1;
 		}
-		agentPlanElementIndex.put(personId, Integer.valueOf(1 + index
-				.intValue()));
+		agentPlanElementIndex.put(personId,
+				Integer.valueOf(1 + index.intValue()));
 		return 1 + index.intValue();
 	}
 
+	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
 				.getPersonId());

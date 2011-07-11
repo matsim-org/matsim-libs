@@ -516,6 +516,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void outputHalfway(Controler ctl, int outputIterInterval) {
 		int iter = ctl.getIterationNumber();
+		if (outputIterInterval == 0) {
+			return;
+		}
 		if (iter % outputIterInterval == 0) {
 			ControlerIO ctlIO = ctl.getControlerIO();
 			int firstIter = ctl.getFirstIteration();
@@ -692,6 +695,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			}
 		}
 		// output - chart etc.
-		outputHalfway(ctl, 50);
+		String halfwayOutputIntervalStr = config.findParam(
+				BSE_CONFIG_MODULE_NAME, "halfwayOutputInterval");
+		int halfwayOutputInterval = 0;
+		if (halfwayOutputIntervalStr != null) {
+			halfwayOutputInterval = Integer.parseInt(halfwayOutputIntervalStr);
+		}
+		outputHalfway(ctl, halfwayOutputInterval);
 	}
 }

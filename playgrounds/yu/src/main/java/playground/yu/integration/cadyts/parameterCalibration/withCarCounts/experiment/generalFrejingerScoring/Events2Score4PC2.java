@@ -46,6 +46,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import cadyts.utilities.math.BasicStatistics;
 
 /**
  * @author yu
@@ -141,9 +142,9 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 			if (person == null) {
 				return null;
 			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(),
-					sfFactory
-							.createNewScoringFunction(person.getSelectedPlan()));
+			data = new Tuple<Plan, ScoringFunction>(
+					person.getSelectedPlan(),
+					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
 			agentScorers.put(agentId, data);
 		}
 		return data;
@@ -170,7 +171,7 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 	 * @param person
 	 */
 	@Override
-	public abstract void setPersonAttrs(Person person);
+	public abstract void setPersonAttrs(Person person, BasicStatistics[] stats);
 
 	@Override
 	public abstract void setPersonScore(Person person);
@@ -212,8 +213,8 @@ public abstract class Events2Score4PC2 extends EventsToScore implements
 	}
 
 	/**
-	 * this method will be called in {@code
-	 * ???PlansScoring4PC.notifyScoring(ScoringEvent)}
+	 * this method will be called in
+	 * {@code ???PlansScoring4PC.notifyScoring(ScoringEvent)}
 	 */
 	@Override
 	public void finish() {

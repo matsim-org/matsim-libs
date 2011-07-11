@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring;
 
@@ -36,12 +36,13 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.utils.DebugTools;
+import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 		MultinomialLogitChoice {
@@ -55,6 +56,7 @@ public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 		this.mnl = mnl;
 	}
 
+	@Override
 	public MultinomialLogit getMultinomialLogit() {
 		return mnl;
 	}
@@ -67,12 +69,13 @@ public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param travelingCarStats
 	 * @param travelingPtStats
 	 */
-	public void setPersonAttrs(Person person) {
+	@Override
+	public void setPersonAttrs(Person person, BasicStatistics[] stats) {
 		Id pId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(pId), legDurMapPt = legDursPt
 				.get(pId), actAttrMap = actAttrs.get(pId);
@@ -110,18 +113,20 @@ public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 				// /////////////////////////////////////////////////////////////
 				if (Double.isNaN(legDurCar) || Double.isNaN(legDurPt)
 						|| Double.isNaN(actDur)) {
-					throw new RuntimeException(Events2Score4TravPerf_mnl.class
-							.getName()
-							+ "\tline:\t"
-							+ DebugTools.getLineNumber(new Exception())
-							+ "\tattr NaN:\nlegDurCar\tlegDurPt\tactDur\n"
-							+ legDurCar + "\t" + legDurPt + "\t" + actDur);
+					throw new RuntimeException(
+							Events2Score4TravPerf_mnl.class.getName()
+									+ "\tline:\t"
+									+ DebugTools.getLineNumber(new Exception())
+									+ "\tattr NaN:\nlegDurCar\tlegDurPt\tactDur\n"
+									+ legDurCar + "\t" + legDurPt + "\t"
+									+ actDur);
 				}
 				// ///////////////////////////////////////////////////////////////
 			}
 		}
 	}
 
+	@Override
 	public void setPersonScore(Person person) {
 		Id psId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(psId), legDurMapPt = legDursPt
@@ -151,16 +156,13 @@ public class Events2Score4TravPerf_mnl extends Events2Score4TravPerf implements
 					+ stuckScore;
 
 			if (Double.isNaN(util)) {
-				throw new RuntimeException(Events2Score4TravPerf_mnl.class
-						.getName()
-						+ "\t"
-						+ DebugTools.getLineNumber(new Exception())
-						+ "\tutil/score is a NaN. legDurCar\t=\t"
-						+ legDurCar
-						+ "\tlegDurPt\t=\t"
-						+ legDurPt
-						+ "\tactDur\t=\t"
-						+ actAttr + "\nmnl_coeff\t" + mnl.getCoeff());
+				throw new RuntimeException(
+						Events2Score4TravPerf_mnl.class.getName() + "\t"
+								+ DebugTools.getLineNumber(new Exception())
+								+ "\tutil/score is a NaN. legDurCar\t=\t"
+								+ legDurCar + "\tlegDurPt\t=\t" + legDurPt
+								+ "\tactDur\t=\t" + actAttr + "\nmnl_coeff\t"
+								+ mnl.getCoeff());
 			}
 			pl.setScore(util);
 		}

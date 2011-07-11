@@ -35,13 +35,17 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import playground.yu.utils.io.SimpleWriter;
+import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
@@ -56,7 +60,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			.getLogger(Events2Score4PC_mnl.class);
 
 	protected MultinomialLogit mnl;
-	private boolean outputCalcDetail = false;
+	// private boolean outputCalcDetail = false;
+	private SimpleWriter writer = null;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
@@ -81,7 +86,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * @param person
 	 */
 	@Override
-	public void setPersonAttrs(Person person) {
+	public void setPersonAttrs(Person person, BasicStatistics[] statistics) {
 		Id agentId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
 				.get(agentId), legDurMapWalk = legDursWalk.get(agentId), perfAttrMap = actAttrs
@@ -197,6 +202,10 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 						.indexOf("monetaryDistanceCostRateCar");
 				mnl.setAttribute(choiceIdx, attrNameIndex, distanceCar
 						/ paramScaleFactorList.get(attrNameIndex));
+				for (int i = 0; i < statistics.length; i++) {
+					statistics[i].add(distanceCar
+							/ paramScaleFactorList.get(attrNameIndex));
+				}
 
 				attrNameIndex = attrNameList
 						.indexOf("monetaryDistanceCostRatePt");
@@ -385,31 +394,32 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			.innerProd(attrVector) + utilCorrection
 			/* utilityCorrection is also an important ASC */;
 			plan.setScore(util);
-			if (outputCalcDetail) {
-				System.out.println("/////CALC-DETAILS of PERSON\t"
-						+ person.getId() + "\t////////////////\ncoeff\tattr");
+			if (writer != null) {
+				writer.writeln("/////CALC-DETAILS of PERSON\t" + person.getId()
+						+ "\t////////////////\n/////coeff\tattr");
 				for (int i = 0; i < coeff.size(); i++) {
-					System.out.println("/////\t" + coeff.get(i) + "\t"
+					writer.writeln("/////\t" + coeff.get(i) + "\t"
 							+ attrVector.get(i) + "\t/////");
 				}
-				System.out.println("/////\tUtiliy Correction\t=\t"
-						+ utilCorrection
+				writer.writeln("/////\tUtiliy Correction\t=\t" + utilCorrection
 						+ "\t/////\n/////\tscore before replanning\t=\t" + util
 						+ "\t/////");
-				System.out.println();
-				for (PlanElement pe : person.getSelectedPlan()
-						.getPlanElements()) {
+				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						Route route = ((Leg) pe).getRoute();
 						if (route instanceof NetworkRoute) {
-							System.out.println("/////\tRoute :\t"
+							writer.write("/////\tRoute :\t"
 									+ ((NetworkRoute) route).getLinkIds()
-									+ "\t/////");
+									+ "\t");
+							if (plan.isSelected()) {
+								writer.write("selected");
+							}
+							writer.writeln("/////\n");
 						}
 						break;
 					}
 				}
-				System.out.println("///////////////////////////////////////");
+				writer.writeln("///////////////////////////////////////");
 			}
 		}
 	}
@@ -497,9 +507,20 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		if (iteration == config.controler().getLastIteration()) {
-			outputCalcDetail = true;
+		ControlerConfigGroup ctlCfg = config.controler();
+		if (iteration <= ctlCfg.getLastIteration()
+				&& iteration > ctlCfg.getLastIteration() - 100) {
+			// outputCalcDetail = true;
+			ControlerIO ctlIO = new ControlerIO(ctlCfg.getOutputDirectory());
+			writer = new SimpleWriter(ctlIO.getIterationFilename(iteration,
+					"scoreCalcDetails.log"));
+
+			StringBuilder head = new StringBuilder("AgentID");
+			for (String attrName : attrNameList) {
+				head.append("\t");
+				head.append(attrName);
+			}
+
 		}
 	}
-
 }

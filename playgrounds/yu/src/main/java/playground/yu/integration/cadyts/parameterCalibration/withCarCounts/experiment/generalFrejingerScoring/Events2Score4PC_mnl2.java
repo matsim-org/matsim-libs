@@ -37,6 +37,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
@@ -75,7 +76,7 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 	 * @param person
 	 */
 	@Override
-	public void setPersonAttrs(Person person) {
+	public void setPersonAttrs(Person person, BasicStatistics[] stats) {
 		Id agentId = person.getId();
 
 		Map<Plan, Double> travTimeAttrCar = travTimeAttrCars.get(agentId), perfAttr = perfAttrs
@@ -162,7 +163,9 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 
 				attrNameIndex = attrNameList
 						.indexOf(ScoringParameters.BETA_INTERSECTION_NB);
-				mnl.setAttribute(choiceIdx, attrNameIndex,
+				mnl.setAttribute(
+						choiceIdx,
+						attrNameIndex,
 						(double) intersectionNb
 								/ paramScaleFactorList.get(attrNameIndex));
 			}
@@ -228,8 +231,8 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 				} else if (attrName.equals(ScoringParameters.PERFORMING)) {
 					attrNameIndex = attrNameList
 							.indexOf(ScoringParameters.PERFORMING);
-					attrVector.set(attrNameIndex, perf
-							/ paramScaleFactorList.get(attrNameIndex));
+					attrVector.set(attrNameIndex,
+							perf / paramScaleFactorList.get(attrNameIndex));
 				} else if (attrName.equals(ScoringParameters.BETA_LN_PATH_SIZE)) {
 					attrNameIndex = attrNameList
 							.indexOf(ScoringParameters.BETA_LN_PATH_SIZE);
@@ -268,7 +271,8 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 	private MultinomialLogit createMultinomialLogit(Config config) {
 		int choiceSetSize = config.strategy().getMaxAgentPlanMemorySize(), // =4
 		attributeCount = Integer.parseInt(config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
+				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				"attributeCount"));
 
 		PlanCalcScoreConfigGroup scoring = config.planCalcScore();// TODO {@code
 		// ScoringParameters.java}
@@ -297,8 +301,8 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 				ScoringParameters.BETA_LN_PATH_SIZE);
 		double betaLnPathSize = betaLnPathSizeStr != null ? Double
 				.parseDouble(betaLnPathSizeStr) : 0d;
-		mnl.setCoefficient(attrNameIndex, betaLnPathSize
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex,
+				betaLnPathSize * paramScaleFactorList.get(attrNameIndex));
 
 		attrNameIndex = attrNameList
 				.indexOf(ScoringParameters.BETA_SPEED_BUMP_NB);
@@ -317,8 +321,8 @@ public class Events2Score4PC_mnl2 extends Events2Score4PC2 implements
 				ScoringParameters.BETA_LEFT_TURN_NB);
 		double betaLeftTurnNb = betaLeftTurnNbStr != null ? Double
 				.parseDouble(betaLeftTurnNbStr) : 0d;
-		mnl.setCoefficient(attrNameIndex, betaLeftTurnNb
-				* paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex,
+				betaLeftTurnNb * paramScaleFactorList.get(attrNameIndex));
 
 		attrNameIndex = attrNameList
 				.indexOf(ScoringParameters.BETA_INTERSECTION_NB);

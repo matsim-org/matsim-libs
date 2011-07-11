@@ -20,7 +20,6 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.tests;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,14 +40,12 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.DeprecatedConstants;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerfStuck_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerf_mnl;
-
 import cadyts.utilities.math.MultinomialLogit;
 
 public class MNLUtilsTest {
@@ -60,18 +57,20 @@ public class MNLUtilsTest {
 
 		double travelingPt = -3d;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 
 		Config config = scenario.getConfig();
 		new MatsimConfigReader(config).readFile(configFilename);
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(1/* choiceSetSize */, 4/*
-																		 * attributeCount[
+																		 * attributeCount
+																		 * [
 																		 * travCar
 																		 * ,
 																		 * travPt
@@ -81,16 +80,16 @@ public class MNLUtilsTest {
 																		 * ]
 																		 */);
 		mnl.setUtilityScale(2d);
-		for (int i = 0; i < 1/* choiceSetSize, only 1 element in choiceSet */; i++)
+		for (int i = 0; i < 1/* choiceSetSize, only 1 element in choiceSet */; i++) {
 			mnl.setASC(i, 0);
+		}
 		mnl.setCoefficient(0, -6d/* traveling */);
 		mnl.setCoefficient(1, travelingPt);
 		mnl.setCoefficient(2, 6d/* performing */);
 		mnl.setCoefficient(3, -18d/* lateArrival */);
 
 		// initialize scoringConfigGroup
-		PlanCalcScoreConfigGroup scoringConfigGroup = config
-				.planCalcScore();
+		PlanCalcScoreConfigGroup scoringConfigGroup = config.planCalcScore();
 		scoringConfigGroup.setTravelingPt_utils_hr(travelingPt);
 
 		// pop?
@@ -101,8 +100,9 @@ public class MNLUtilsTest {
 			List<Plan> plans = new ArrayList<Plan>();
 			plans.addAll(person.getPlans());
 			for (Plan plan : plans) {
-				if (!plan.isSelected())
+				if (!plan.isSelected()) {
 					person.getPlans().remove(plan);
+				}
 			}
 		}
 		Map<Id, Double> selectedScores = new HashMap<Id, Double>();
@@ -123,14 +123,15 @@ public class MNLUtilsTest {
 		int n = 0;
 		for (Person person : pop.getPersons().values()) {
 			Plan selectedPlan = person.getSelectedPlan();
-			if (((PlanImpl) selectedPlan).getType().equals(DeprecatedConstants.CAR)) {
+			if (((PlanImpl) selectedPlan).getType().equals(
+					DeprecatedConstants.CAR)) {
 				n++;
 				double matsimScore = selectedScores.get(person.getId());
 
 				events2score.setPersonScore(person);
 				double yuScore = events2score.getAgentScore(person.getId());
 
-				events2score.setPersonAttrs(person);
+				events2score.setPersonAttrs(person, null);
 				double mnlScore = events2score.getMultinomialLogit().getUtils()
 						.get(0);
 				if (matsimScore != yuScore || matsimScore != mnlScore) {

@@ -40,6 +40,7 @@ import playground.yu.demandModifications.StayHomePlanASC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
 
@@ -79,7 +80,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * @param person
 	 */
 	@Override
-	public void setPersonAttrs(Person person) {
+	public void setPersonAttrs(Person person, BasicStatistics[] stats) {
 		Id agentId = person.getId();
 		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
 				.get(agentId), legDurMapWalk = legDursWalk.get(agentId), perfAttrMap = actAttrs

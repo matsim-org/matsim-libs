@@ -57,7 +57,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private final int paramDimension;
 	private Plan oldSelected = null;
-	private BasicStatistics travelingCarStats = null, performingStats = null;
+	private BasicStatistics monetaryDistanceCostRateCarStats = null;
 
 	public PCStrMn(NetworkImpl net, int firstIteration, double brainExpBeta,
 			int paramDimension) {
@@ -85,8 +85,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// the most things before "removePlans"
 		super.beforePopulationRunHook(population);// iter++
 		// cadyts class - create new BasicStatistics Objects
-		travelingCarStats = new BasicStatistics();
-		performingStats = new BasicStatistics();
+		monetaryDistanceCostRateCarStats = new BasicStatistics();
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
@@ -127,7 +126,9 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					// only with planSelector/-Changer, no new plan will be
 					// created
 					// **************WRITE ATTR.S INTO MNL******************
-					chooser.setPersonAttrs(person);
+					chooser.setPersonAttrs(
+							person,
+							new BasicStatistics[] { monetaryDistanceCostRateCarStats });
 					// now there are only #maxPlansPerAgent# Plans in choice set
 
 					/* ***********************************************************
@@ -433,12 +434,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		// output stats and variabilities
-		statistics = new double[] { travelingCarStats.getAvg(),
-				travelingCarStats.getVar(), performingStats.getAvg(),
-				performingStats.getVar() };
-		System.out.println("Statistics\t" + statistics[0]/* travCarAvg */
-				+ "\t" + statistics[1]/* travCarVar */+ "\t" + statistics[2]/* perfAttrAvg */
-				+ "\t" + statistics[3]/* perfAttrVar */);
+		statistics = new double[] { monetaryDistanceCostRateCarStats.getAvg(),
+				monetaryDistanceCostRateCarStats.getVar() };
+		System.out
+				.println("BSE_Statistics\tavg.\t" + statistics[0]/* monetaryDistanceCostRateCarAvg */
+						+ "\tvar.\t" + statistics[1]/* monetaryDistanceCostRateCarVar */);
 	}
 
 	private void generateScoreCorrections(Person person) {

@@ -46,6 +46,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import cadyts.utilities.math.BasicStatistics;
 
 /**
  * @author yu
@@ -173,11 +174,11 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * only choiceSetSize plans in the memory of an agent.
 	 *
 	 * @param person
-	 * @param performStats
-	 * @param travelingCarStats
+	 * @param monetaryDistanceCostRateCarStats
 	 */
+
 	@Override
-	public abstract void setPersonAttrs(Person person);
+	public abstract void setPersonAttrs(Person person, BasicStatistics[] stats/* monetaryDistanceCostRateCarStats */);
 
 	@Override
 	public abstract void setPersonScore(Person person);

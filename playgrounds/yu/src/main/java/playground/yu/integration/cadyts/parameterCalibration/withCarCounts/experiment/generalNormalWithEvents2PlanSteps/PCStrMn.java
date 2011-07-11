@@ -126,7 +126,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager {
 					// only with planSelector/-Changer, no new plan will be
 					// created
 					// **************WRITE ATTR.S INTO MNL******************
-					chooser.setPersonAttrs(person);
+					chooser.setPersonAttrs(person, null);
 					// now there are only #maxPlansPerAgent# Plans in choice set
 
 					/* ***********************************************************

@@ -46,6 +46,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalStayHomePlan.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import cadyts.utilities.math.BasicStatistics;
 
 /**
  * @author yu
@@ -76,18 +77,15 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	protected PlanCalcScoreConfigGroup scoring;
 	// protected boolean setPersonScore = true;
 	protected int maxPlansPerAgent
-//	, firstIteration, iteration
+	// , firstIteration, iteration
 	/*
-															 * not updated till
-															 * EventsHandling .
-															 * notifyBeforeMobsim
-															 * (...)
-															 */;
-//	private boolean isFirstIteration;
+	 * not updated till EventsHandling . notifyBeforeMobsim (...)
+	 */;
+	// private boolean isFirstIteration;
 	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
 	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
 
-//	protected double betaBrain;
+	// protected double betaBrain;
 
 	public Events2Score4PC(Config config, ScoringFunctionFactory factory,
 			Population population) {
@@ -123,11 +121,11 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		pop = population;
 		maxPlansPerAgent = config.strategy().getMaxAgentPlanMemorySize();
 		sfFactory = factory;
-//		betaBrain = scoring.getBrainExpBeta();
-//		f = Double.parseDouble(this.config.findParam(
-//				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-//				"notStayHomeProb"));
-//		isFirstIteration = true;
+		// betaBrain = scoring.getBrainExpBeta();
+		// f = Double.parseDouble(this.config.findParam(
+		// BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+		// "notStayHomeProb"));
+		// isFirstIteration = true;
 	}
 
 	private void initialAttrNameScaleFactor(String attributeName) {
@@ -192,7 +190,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * @param travelingCarStats
 	 */
 	@Override
-	public abstract void setPersonAttrs(Person person);
+	public abstract void setPersonAttrs(Person person, BasicStatistics[] stats);
 
 	@Override
 	public abstract void setPersonScore(Person person);
@@ -240,12 +238,12 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	@Override
 	public void reset(final int iteration) {
-//		this.iteration = iteration;
-//
-//		if (isFirstIteration && iteration >= 0) {
-//			firstIteration = iteration;
-//			isFirstIteration = false;
-//		}
+		// this.iteration = iteration;
+		//
+		// if (isFirstIteration && iteration >= 0) {
+		// firstIteration = iteration;
+		// isFirstIteration = false;
+		// }
 
 		agentScorers.clear();
 		agentPlanElementIndex.clear();

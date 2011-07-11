@@ -28,6 +28,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -166,6 +167,20 @@ public class PCCtl extends BseParamCalibrationControler {
 						timeAllocationMutator, prob);
 				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
 						timeAllocationMutator, 0);
+			} else if (module.equals("ChangeSingleLegMode")) {
+				// TimeAllocationMutator
+				PlanStrategy changeSingleLegMode = new PlanStrategyImpl(
+						new RandomPlanSelector());
+				changeSingleLegMode.addStrategyModule(new ChangeSingleLegMode(
+						config));
+				changeSingleLegMode.addStrategyModule(new ReRoute(this));
+
+				manager.addStrategy(changeSingleLegMode, 0.0);
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1,
+						changeSingleLegMode, prob);
+				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
+						changeSingleLegMode, 0);
 			}
 		}
 

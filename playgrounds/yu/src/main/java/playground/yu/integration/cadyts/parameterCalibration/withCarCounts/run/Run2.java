@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.run;
 
@@ -27,11 +27,11 @@ import java.io.IOException;
 
 import org.matsim.core.controler.Controler;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.general.paramCorrection.PCCtl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormalWithEvents2PlanSteps.PCCtl;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Run2 {
 
@@ -42,13 +42,6 @@ public class Run2 {
 	public static void main(String[] args) throws IOException {
 		final Controler ctl;
 		if (args.length == 0) {
-			// ctl = new
-			// playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.experiment.onlyTraveling.newStrMn.PCCtl(
-			// new String[] { "test/cali3/cfgC3onlyTravStep0newStrMn.xml" });
-			// ctl = new
-			// playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.experiment.dummyParam.MATSimChoiceCalibrator.PCCtl(
-			// new String[] {
-			// "test/cali3/newIntegrationCodeTestLocal_MatsimCalibrator.xml" });
 			ctl = new PCCtl(
 					new String[] { "test/cali3/newIntegrationCodeTestLocalC1p3.xml" });
 
