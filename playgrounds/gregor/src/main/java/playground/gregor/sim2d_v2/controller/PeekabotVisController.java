@@ -3,8 +3,8 @@ package playground.gregor.sim2d_v2.controller;
 import org.matsim.core.controler.Controler;
 
 
-import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
+import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
+import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 

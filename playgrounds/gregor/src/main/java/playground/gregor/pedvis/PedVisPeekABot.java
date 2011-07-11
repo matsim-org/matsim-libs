@@ -51,8 +51,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
+import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
+import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;

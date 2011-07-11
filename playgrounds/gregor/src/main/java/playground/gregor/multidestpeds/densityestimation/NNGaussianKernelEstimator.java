@@ -1,4 +1,4 @@
-package playground.gregor.multidestpeds.denistyestimation;
+package playground.gregor.multidestpeds.densityestimation;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -15,8 +15,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.multidestpeds.denistyestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.denistyestimation.NNGaussianKernelEstimator;
+import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
+import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
