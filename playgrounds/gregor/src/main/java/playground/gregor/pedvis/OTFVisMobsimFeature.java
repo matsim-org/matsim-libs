@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -100,7 +100,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 	}
 
 	@Override
-	public Person findPersonAgent(Id agentId) {
+	public Plan findPlan(Id agentId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
