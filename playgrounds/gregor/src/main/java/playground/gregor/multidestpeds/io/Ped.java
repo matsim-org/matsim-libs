@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -38,5 +39,9 @@ public class Ped {
 	double arrived;
 	Map<Double, Coordinate> coords = new LinkedHashMap<Double, Coordinate>();
 	Map<Double, Coordinate> velocities = new LinkedHashMap<Double, Coordinate>();
+
+	Coordinate lastPos;
+	Path path;
+	int currLink = 0;
 
 }
