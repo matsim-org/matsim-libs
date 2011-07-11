@@ -19,13 +19,19 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.controller;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
@@ -43,6 +49,13 @@ public class Controller2D extends Controler {
 		setOverwriteFiles(true);
 		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 20* 60);
+		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
+	}
+
+	public Controller2D(Scenario sc) {
+		super(sc);
+		setOverwriteFiles(true);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
 	}
@@ -80,7 +93,17 @@ public class Controller2D extends Controler {
 	}
 
 	public static void main(String[] args) {
-		Controler controller = new Controller2D(args);
+
+		String configFile = args[0];
+		Config c = ConfigUtils.loadConfig(configFile);
+		c.addQSimConfigGroup(new QSimConfigGroup());
+		c.getQSimConfigGroup().setEndTime( 9*3600 + 20* 60);
+
+		Scenario sc = ScenarioUtils.createScenario(c);
+		((NetworkFactoryImpl)sc.getNetwork().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		ScenarioUtils.loadScenario(sc);
+
+		Controler controller = new Controller2D(sc);
 		controller.run();
 
 	}

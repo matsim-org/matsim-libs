@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.pedvis;
+package playground.gregor.multidestpeds.io;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -115,7 +115,7 @@ public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandle
 		Plan plan = this.fac.createPlan();
 		Activity actS = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.orig));
 		actS.setEndTime(p.dep);
-		Leg leg = this.fac.createLeg("car");
+		Leg leg = this.fac.createLeg("walk2d");
 		Activity actE = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.dest));
 		plan.addActivity(actS);
 		plan.addLeg(leg);
