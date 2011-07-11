@@ -34,11 +34,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * of possible modes.
  *
  * By default, the module chooses between "car" and "pt". If other modes should
- * be used, it can be done so in the configuration:
+ * be used, it can be done so in the configuration. Also, this module is able to (optionally)
+ * respect car-availability:
  * <pre>
  * &lt;module name="changeLegMode">
  *   &lt!-- provide a comma-separated list of leg modes -->
  *   &lt;param name="modes" value="car,walk,bike" />
+ *   %lt;param name="ignoreCarAvailability" value="false" />
  * &lt;/module>
  * </pre>
  *
