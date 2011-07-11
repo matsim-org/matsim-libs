@@ -36,11 +36,16 @@ import playground.yu.counts.CntSimCap4Chart;
  */
 public class PC_Run {
 	/** @param args */
+	/**
+	 * @param args
+	 */
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Controler ctl = new PCCtl(config);
-		ctl.addControlerListener(new CntSimCap4Chart());
-		ctl.addControlerListener(new RouteTravelTimeSummary());
+		if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+			ctl.addControlerListener(new CntSimCap4Chart());
+			ctl.addControlerListener(new RouteTravelTimeSummary());
+		}
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
 		ctl.run();
