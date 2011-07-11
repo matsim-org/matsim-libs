@@ -20,30 +20,24 @@
 package playground.gregor.multidestpeds.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImplTest;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLArray;
-import com.jmatio.types.MLCell;
 import com.jmatio.types.MLDouble;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
- * 
+ *
  */
 public class Importer {
 
@@ -86,8 +80,8 @@ public class Importer {
 	}
 
 
-	private void extractPeds(MLDouble timeStamps, MLDouble aX, MLDouble aY,
-			MLDouble aVX, MLDouble aVY, String color) {
+	private void extractPeds(final MLDouble timeStamps, final MLDouble aX, final MLDouble aY,
+			final MLDouble aVX, final MLDouble aVY, final String color) {
 		double[][] times = timeStamps.getArray();
 		int numTimeStamps = times[0].length;
 		double[][] x = aX.getArray();
