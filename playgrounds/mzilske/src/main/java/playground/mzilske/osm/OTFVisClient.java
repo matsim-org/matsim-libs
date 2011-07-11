@@ -31,6 +31,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
@@ -52,7 +53,7 @@ public final class OTFVisClient implements Runnable {
 	public OTFVisClient() {
 		super();
 	}
-	
+
 	double log2 (float scale) {
 		return Math.log(scale) / Math.log(2);
 	}
@@ -92,7 +93,7 @@ public final class OTFVisClient implements Runnable {
 			mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), otfClient.getHostControlBar());
 		}
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(masterHostControl.getAddress()));
-		
+
 		final JPanel compositePanel = otfClient.getCompositePanel();
 		final JMapViewer jMapViewer = new MyJMapViewer(compositePanel);
 
@@ -105,13 +106,15 @@ public final class OTFVisClient implements Runnable {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
-				double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
-				Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
-				float scale = mainDrawer.getScale();
-				int zoomDiff = (int) log2(scale);
-				jMapViewer.setDisplayPositionByLatLon(center.getY(), center.getX(), WGS84ToOSMMercator.SCALE - zoomDiff);
-				compositePanel.repaint();
+				if (((OTFOGLDrawer) mainDrawer).getViewBounds() != null) {
+					double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
+					double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
+					Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+					float scale = mainDrawer.getScale();
+					int zoomDiff = (int) log2(scale);
+					jMapViewer.setDisplayPositionByLatLon(center.getY(), center.getX(), WGS84ToOSMMercator.SCALE - zoomDiff);
+					compositePanel.repaint();
+				}
 			}
 
 		});
@@ -142,6 +145,8 @@ public final class OTFVisClient implements Runnable {
 	}
 
 	public static final void playNetwork(final String filename) {
+		VisGUIMouseHandler.ORTHO = true;
+		OTFOGLDrawer.USE_GLJPANEL = true;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
@@ -153,9 +158,9 @@ public final class OTFVisClient implements Runnable {
 		client.run();
 		server.getSnapshotReceiver().finish();
 	}
-	
+
 	public static void main(String[] args) {
 		playNetwork("input/network.xml");
 	}
-	
+
 }
