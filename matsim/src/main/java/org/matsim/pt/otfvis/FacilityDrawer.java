@@ -135,7 +135,6 @@ public class FacilityDrawer {
 					this.drawer.stops.add(stop);
 				}
 			}
-			drawer.initTexts();
 		}
 
 		@Override
@@ -153,7 +152,7 @@ public class FacilityDrawer {
 
 		@Override
 		public void onDraw(GL gl) {
-			if (OTFClientControl.getInstance().getOTFVisConfig().drawTransitFacilities()) {
+			if (OTFClientControl.getInstance().getOTFVisConfig().isDrawTransitFacilities()) {
 				for (VisBusStop stop : this.stops) {
 					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
 				}

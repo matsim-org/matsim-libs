@@ -486,7 +486,7 @@ public class OTFVisConfigGroup extends Module {
 		this.drawTransitFacilities = drawTransitFacilities;
 	}
 
-	public boolean drawTransitFacilities() {
+	public boolean isDrawTransitFacilities() {
 		return this.drawTransitFacilities;
 	}
 

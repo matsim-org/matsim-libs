@@ -69,7 +69,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  */
 public class VisGUIMouseHandler extends MouseInputAdapter {
 
-	public final boolean ORTHO = false;
+	public static boolean ORTHO = false;
 
 	private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
 	private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);

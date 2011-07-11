@@ -180,7 +180,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			panel.add(synchBox);
 			if (host.getOTFHostConnectionManager().getOTFServer().isLive()) {
 				synchBox = new JCheckBox("show transit facilities");
-				synchBox.setSelected(visConfig.drawTransitFacilities());
+				synchBox.setSelected(visConfig.isDrawTransitFacilities());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 160, 200, 31);
 				synchBox.setVisible(true);
@@ -350,7 +350,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			visConfig.setDrawScaleBar(!visConfig.drawScaleBar());
 		} else if (source.getText().equals("show transit facilities")) {
 			// toggle draw Overlays
-			visConfig.setDrawTransitFacilities(!visConfig.drawTransitFacilities());
+			visConfig.setDrawTransitFacilities(!visConfig.isDrawTransitFacilities());
 		} 
 		}
 
