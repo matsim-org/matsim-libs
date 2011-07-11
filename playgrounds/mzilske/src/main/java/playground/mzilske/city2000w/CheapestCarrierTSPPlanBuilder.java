@@ -36,23 +36,24 @@ public class CheapestCarrierTSPPlanBuilder {
 	public TSPPlan buildPlan(Collection<TSPContract> contracts, TSPCapabilities tspCapabilities) {
 		Collection<TransportChain> chains = new ArrayList<TransportChain>();
 		for(TSPContract c : contracts){
-			for(TSPShipment s : c.getShipments()){
-				Id fromLocation = s.getFrom();
-				TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
-				chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
-				for (Id transshipmentCentre : transshipmentCentres) { 
-					Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
-					chainBuilder.scheduleLeg(acceptedOffer);
-					chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
-					chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1400,24*3600)); // works
-					// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
-					fromLocation = transshipmentCentre;
-				}
-				Offer acceptedOffer = pickOffer(fromLocation, s.getTo(), s.getSize());
+
+			TSPShipment s = c.getShipment();
+			Id fromLocation = s.getFrom();
+			TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
+			chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
+			for (Id transshipmentCentre : transshipmentCentres) { 
+				Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
 				chainBuilder.scheduleLeg(acceptedOffer);
-				chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
-				chains.add(chainBuilder.build());
+				chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
+				chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1400,24*3600)); // works
+				// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
+				fromLocation = transshipmentCentre;
 			}
+			Offer acceptedOffer = pickOffer(fromLocation, s.getTo(), s.getSize());
+			chainBuilder.scheduleLeg(acceptedOffer);
+			chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
+			chains.add(chainBuilder.build());
+
 		}
 		TSPPlan plan = new TSPPlan(chains);
 		return plan;

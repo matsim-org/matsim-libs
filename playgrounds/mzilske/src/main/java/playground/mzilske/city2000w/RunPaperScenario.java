@@ -3,7 +3,6 @@
  */
 package playground.mzilske.city2000w;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +29,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.mzilske.freight.CarrierAgentFactory;
+import playground.mzilske.freight.CarrierAgentFactoryImpl;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierAgentTrackerBuilder;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierVehicle;
@@ -61,7 +61,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 	private Carriers carriers;
 	private TransportServiceProviders transportServiceProviders;
 
-	private CarrierAgentTracker freightAgentTracker;
+	private CarrierAgentTracker carrierAgentTracker;
 	private TSPAgentTracker tspAgentTracker;
 
 	private ScenarioImpl scenario;
@@ -90,14 +90,11 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders());
 		tspAgentTracker.getCostListeners().add(new DefaultLSPShipmentTracker());
 
-		CarrierAgentTrackerBuilder freightAgentTrackerBuilder = new CarrierAgentTrackerBuilder();
-		freightAgentTrackerBuilder.setCarriers(controler.getScenario().getScenarioElement(Carriers.class).getCarriers().values());
-		freightAgentTrackerBuilder.setRouter(controler.createRoutingAlgorithm());
-		freightAgentTrackerBuilder.setNetwork(controler.getNetwork());
-		freightAgentTrackerBuilder.setEventsManager(controler.getEvents());
-		freightAgentTrackerBuilder.addCarrierCostListener(tspAgentTracker);
-		freightAgentTracker = freightAgentTrackerBuilder.build();
-		freightAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		CarrierAgentFactory carrierAgentFactory = new CarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
+		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 
 
 		createTSPPlans();
@@ -106,7 +103,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 
 		createCarrierPlans();
 
-		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, freightAgentTracker);
+		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);
 
@@ -121,21 +118,21 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		freightAgentTracker.createPlanAgents();
+		carrierAgentTracker.createPlanAgents();
 		Controler controler = event.getControler();
-		controler.getEvents().addHandler(freightAgentTracker);
+		controler.getEvents().addHandler(carrierAgentTracker);
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		Controler controler = event.getControler();
-		controler.getEvents().removeHandler(freightAgentTracker);
+		controler.getEvents().removeHandler(carrierAgentTracker);
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
 		logger.info("carrierAgents are calculating costs ...");
-		freightAgentTracker.calculateCostsScoreCarriersAndInform();
+		carrierAgentTracker.calculateCostsScoreCarriersAndInform();
 		logger.info("transportServiceProvider are calculating costs ...");
 		tspAgentTracker.calculateCostsScoreTSPAndInform();
 
@@ -144,7 +141,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		logger.info("Reset costs/score of tspAgents");
-		freightAgentTracker.reset(event.getIteration());
+		carrierAgentTracker.reset(event.getIteration());
 		tspAgentTracker.reset();
 	}
 
@@ -269,7 +266,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 
 	private void createAndSelectAPlan(TransportServiceProviderImpl tsp) {
 		CheapestCarrierWithVorlaufTSPPlanBuilder tspPlanBuilder = new CheapestCarrierWithVorlaufTSPPlanBuilder();
-		tspPlanBuilder.setCarrierAgentTracker(freightAgentTracker);
+		tspPlanBuilder.setCarrierAgentTracker(carrierAgentTracker);
 		List<Id> emptyList = Collections.emptyList();
 		tspPlanBuilder.setTransshipmentCentres(emptyList);
 		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities(),tsp.getKnowledge());
@@ -278,7 +275,7 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 		tsp.setSelectedPlan(directPlan);
 		
 		CheapestCarrierWithVorlaufTSPPlanBuilder logisticCentrePlanBuilder = new CheapestCarrierWithVorlaufTSPPlanBuilder();
-		logisticCentrePlanBuilder.setCarrierAgentTracker(freightAgentTracker);
+		logisticCentrePlanBuilder.setCarrierAgentTracker(carrierAgentTracker);
 		logisticCentrePlanBuilder.setTransshipmentCentres(tsp.getTspCapabilities().getTransshipmentCentres());
 		TSPPlan logCentrePlan = logisticCentrePlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities(), tsp.getKnowledge());
 		tsp.getPlans().add(logCentrePlan);
@@ -334,10 +331,11 @@ public class RunPaperScenario implements StartupListener, ScoringListener, Repla
 	private void printContracts(Collection<TSPContract> contracts) {
 		int count = 1;
 		for(TSPContract c : contracts){
-			for(TSPShipment s : c.getShipments()){
-				logger.debug("shipment " + count + ": " + s);
-				count++;
-			}
+
+			TSPShipment s = c.getShipment();
+			logger.debug("shipment " + count + ": " + s);
+			count++;
+
 		}
 
 	}
