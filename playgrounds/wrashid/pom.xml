@@ -36,5 +36,10 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/lpsolve55j.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>ivtExt</artifactId>
+			<version>0.4.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
