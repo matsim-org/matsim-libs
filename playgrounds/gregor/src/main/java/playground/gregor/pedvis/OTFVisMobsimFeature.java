@@ -22,7 +22,6 @@ import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
-import playground.gregor.snapshots.writers.XYZAzimuthPositionInfo;
 
 public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 

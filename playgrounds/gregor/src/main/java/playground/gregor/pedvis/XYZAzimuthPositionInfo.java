@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.snapshots.writers;
+package playground.gregor.pedvis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
