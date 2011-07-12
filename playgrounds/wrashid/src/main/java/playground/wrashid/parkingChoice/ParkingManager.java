@@ -184,11 +184,19 @@ public class ParkingManager implements StartupListener {
 	
 	
 	public void parkVehicle(Id personId, Parking parking) {
+		DebugLib.traceAgent(personId);
+		
+		if (parking==null){
+			System.out.println();
+		}
+		
 		((ParkingImpl) parking).parkVehicle();
 		currentParkingLocation.put(personId, parking);
 	}
 
 	public void unParkVehicle(Id personId, Parking parking) {
+		DebugLib.traceAgent(personId);
+		
 		if (parking==null){
 			System.out.println();
 		}

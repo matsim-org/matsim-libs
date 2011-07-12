@@ -13,10 +13,12 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 
@@ -32,7 +34,7 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.util.ActDurationEstimationContainer;
 import playground.wrashid.parkingChoice.util.ActivityDurationEstimator;
 
-public class ParkingSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler {
+public class ParkingSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler, AgentStuckEventHandler {
 	// key: personId, value: parking
 	HashMap<Id, Parking> lastParkingUsed;
 	// key: personId
@@ -94,10 +96,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 		GeneralLib.controler=controler;
 		
 		ActDurationEstimationContainer actDurEstContainer= actDurEstimationContainer.get(event.getPersonId());
-		if (neverDepartedWithCar(actDurEstContainer)){
-			return;
-		}
+//		if (neverDepartedWithCar(actDurEstContainer)){
+//			return;
+//		}
 		actDurEstContainer.registerNewActivity();
+		
 		
 		
 		if (lastTransportModeWasCar.contains(personId)){
@@ -138,6 +141,8 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			for (ParkingArrivalEventHandler parkingArrivalEH: parkingArrivalEventHandlers){
 				parkingArrivalEH.handleEvent(new ParkingArrivalEvent(event, selectedParking));
 			}
+		} else {
+			DebugLib.traceAgent(personId);
 		}
 
 	}
@@ -151,7 +156,9 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {	
+	public void handleEvent(AgentDepartureEvent event) {
+		
+		
 		if (!actDurEstimationContainer.containsKey(event.getPersonId())){
 			actDurEstimationContainer.put(event.getPersonId(), new ActDurationEstimationContainer());
 		}
@@ -176,7 +183,7 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	}
 
 	private boolean considerForParking(AgentDepartureEvent event) {
-		return TransportMode.car.equalsIgnoreCase(event.getLegMode()) && !event.getPersonId().toString().contains("pt");
+		return TransportMode.car.equalsIgnoreCase(event.getLegMode()) && !event.getPersonId().toString().startsWith("pt");
 	}
 
 	private void detectAndRegisterEndTimeOfFirstAct(AgentDepartureEvent event) {
@@ -188,5 +195,11 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 			actDurEstContainer.endTimeOfFirstAct = event.getTime();
 		}
 		
+	}
+
+	@Override
+	// TODO: remove method after debugging is over.
+	public void handleEvent(AgentStuckEvent event) {
+		DebugLib.traceAgent(event.getPersonId());
 	}
 }
