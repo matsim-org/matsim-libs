@@ -42,7 +42,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	
@@ -87,117 +86,133 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		/*
 		 * If the person trusts the navigation system replan its leg
 		 */
-		double randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
-		if (randomNumber <= costNavigationTravelTimeLogger.getTrust(personId)) {
-			costNavigationTravelTimeLogger.setFollowed(personId, true);
-			
-			int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
-			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		double gamma = costNavigationTravelTimeLogger.getTrust(personId);
+		double phi = 1 - gamma;
+		
+		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		Id currentLinkId = withinDayAgent.getCurrentLinkId();
+		Link currentLink = scenario.getNetwork().getLinks().get(currentLinkId);
+		Node nextNode = currentLink.getToNode();
+		Link endLink = scenario.getNetwork().getLinks().get(withinDayAgent.getCurrentLeg().getRoute().getEndLinkId());
+		Node endNode = endLink.getFromNode();
+		
+		Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
+		Map<Id, Path> paths = new TreeMap<Id, Path>();	// outLinkId
+		Map<Id, Double> costs = new TreeMap<Id, Double>();	// outLinkId
+		Map<Id, Double> probabilities = new TreeMap<Id, Double>();	// outLinkId
 
-			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
-		} 
+		// If we have reached the endLink, we need no further replanning.
+		if (currentLink.getId().equals(endLink.getId())) {
+			return true;
+		}
+		
+		// If one of the next links is the endLink, we also do no further replanning.
+		if (currentLink.getToNode().getId().equals(endNode.getId())) {
+			return true;
+		}	
+		
+		// If one of the next links leads directly to the endLink, we also do no further replanning.
+		for (Link outLink : outLinksMap.values()) {
+			if (outLink.getToNode().getId().equals(endNode.getId())) {
+				return true;
+			}
+		}	
+		
 		/*
-		 * The person does not trust the navigation system. Therefore select the next link.
+		 * Calculate path costs for each outgoing link
 		 */
+		double leastCosts = Double.MAX_VALUE;
+		Id leastCostLinkId = null;
+		for (Link outLink : outLinksMap.values()) {
+			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time);
+			paths.put(outLink.getId(), path);
+			costs.put(outLink.getId(), path.travelCost);
+			if (path.travelCost < leastCosts) {
+				leastCosts = path.travelCost;
+				leastCostLinkId = outLink.getId();
+			}
+		}
+			
+		/*
+		 * Calculate the probabilities for each path. We use inverse values to
+		 * give short travel times a higher probability.
+		 */
+		double inverseSumLeastCosts = 0.0;
+		for (Entry<Id, Double> entry : costs.entrySet()) {
+			// if it is the least cost link
+			if (entry.getKey().equals(leastCostLinkId)) inverseSumLeastCosts += 1 / (phi*entry.getValue());
+
+			// else
+			else inverseSumLeastCosts += 1 / entry.getValue();
+		}
+		for (Entry<Id, Double> entry : costs.entrySet()) {
+			// if it is the least cost link
+			if (entry.getKey().equals(leastCostLinkId)) probabilities.put(entry.getKey(), (1 / (phi*entry.getValue())) / inverseSumLeastCosts);
+
+			// else
+			else probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
+		}
+		
+		double randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
+				
+		double sumProb = 0.0;
+		Id nextLinkId = null;
+		Path nextPath = null;
+		for (Entry<Id, Double> entry : probabilities.entrySet()) {
+			if (entry.getValue() + sumProb > randomNumber) {
+				nextLinkId = entry.getKey();
+				nextPath = paths.get(entry.getKey());
+				break;
+			} else {
+				sumProb += entry.getValue();
+			}
+		}
+				
+		if (nextLinkId.equals(leastCostLinkId)) costNavigationTravelTimeLogger.setFollowed(personId, true);
 		else {
 			costNavigationTravelTimeLogger.setFollowed(personId, false);
-			
-			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-			Id currentLinkId = withinDayAgent.getCurrentLinkId();
-			Link currentLink = scenario.getNetwork().getLinks().get(currentLinkId);
-			Node nextNode = currentLink.getToNode();
-			
-			Link endLink = scenario.getNetwork().getLinks().get(withinDayAgent.getCurrentLeg().getRoute().getEndLinkId());
-			Node endNode = endLink.getFromNode();
-			
-			// If we have reached the endLink, we need no further replanning.
-			if (currentLink.equals(endLink)) return true;
-						
-			Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
-			Map<Id, Path> paths = new TreeMap<Id, Path>();	// outLinkId
-			Map<Id, Double> costs = new TreeMap<Id, Double>();	// outLinkId
-			Map<Id, Double> probabilities = new TreeMap<Id, Double>();	// outLinkId
-
-			// If one of the next links is the endLink, we also do no further replanning.
-			if (outLinksMap.containsKey(endLink.getId())) return true;
-			
-			// If one of the next links leads directly to the endLink, we also do no further replanning.
-			for (Link outLink : outLinksMap.values()) {
-				if (outLink.getToNode().equals(endNode)) return true;
-			}
-			
-			double inverseSumLeastCosts = 0.0;
-			for (Link outLink : outLinksMap.values()) {
-				Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time);
-				paths.put(outLink.getId(), path);
-				costs.put(outLink.getId(), path.travelCost);
-				inverseSumLeastCosts += 1 / path.travelCost;
-			}
-			
-			/*
-			 * Calculate the probabilities for each path. We use inverse values to
-			 * give short travel times a higher probability.
-			 */
-			for (Entry<Id, Double> entry : costs.entrySet()) {
-				probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
-			}
-			
-			/*
-			 * Choose next path weighted by its probability.
-			 */
-			randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
-			
-			double sumProb = 0.0;
-			Id nextLinkId = null;
-			Path nextPath = null;
-			for (Entry<Id, Double> entry : probabilities.entrySet()) {
-				if (entry.getValue() + sumProb > randomNumber) {
-					nextLinkId = entry.getKey();
-					nextPath = paths.get(entry.getKey());
-				} else {
-					sumProb += entry.getValue();
-				}
-			}
-			
-			Leg leg = withinDayAgent.getCurrentLeg();
-			Route route = leg.getRoute();
-
-			// if the route type is not supported (e.g. because it is a walking agent)
-			if (!(route instanceof NetworkRoute)) return false;
-			NetworkRoute oldRoute = (NetworkRoute) route;
-
-			// The linkIds of the new Route
-			List<Id> linkIds = new ArrayList<Id>();
-			
-			/*
-			 *  Get the Id of the current Link.
-			 *  Create a List that contains all links of a route, including the Start- and EndLinks.
-			 */
-			List<Id> allLinkIds = getRouteLinkIds(oldRoute);
-
-			/*
-			 * Get those Links which have already been passed.
-			 * allLinkIds contains also the startLinkId, which should not
-			 * be part of the List - it is set separately. Therefore we start
-			 * at index 1.
-			 */
-			if (currentLinkIndex > 0) {
-				linkIds.addAll(allLinkIds.subList(1, currentLinkIndex + 1));
-			}
-			
-			// add the next link
-			linkIds.add(nextLinkId);
-			
-			// add the path from the next link to the destination
-			for (Link link : nextPath.links) {
-				linkIds.add(link.getId());				
-			}
-
-			// Overwrite old Route
-			oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, oldRoute.getEndLinkId());
+			double c = travelCost.getLinkGeneralizedTravelCost(this.scenario.getNetwork().getLinks().get(nextLinkId), time);
+			double expectedAlternativeCosts = c * leastCosts/nextPath.travelCost;
+			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}
-	
+			
+		Leg leg = withinDayAgent.getCurrentLeg();
+		Route route = leg.getRoute();
+
+		// if the route type is not supported (e.g. because it is a walking agent)
+		if (!(route instanceof NetworkRoute)) return false;
+		NetworkRoute oldRoute = (NetworkRoute) route;
+
+		// The linkIds of the new Route
+		List<Id> linkIds = new ArrayList<Id>();
+		
+		/*
+		 *  Get the Id of the current Link.
+		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
+		 */
+		List<Id> allLinkIds = getRouteLinkIds(oldRoute);
+
+		/*
+		 * Get those Links which have already been passed.
+		 * allLinkIds contains also the startLinkId, which should not
+		 * be part of the List - it is set separately. Therefore we start
+		 * at index 1.
+		 */
+		if (currentLinkIndex > 0) {
+			linkIds.addAll(allLinkIds.subList(1, currentLinkIndex + 1));
+		}
+		
+		// add the next link
+		linkIds.add(nextLinkId);
+		
+		// add the path from the next link to the destination
+		for (Link link : nextPath.links) {
+			linkIds.add(link.getId());
+		}
+
+		// Overwrite old Route
+		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, oldRoute.getEndLinkId());
+			
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
 

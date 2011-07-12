@@ -47,11 +47,11 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	private Map<Id, Boolean> followed;
 	private Map<Id, Double> enterTimes;
 	private Map<Id, Double> expectedTravelTimes;
+	private Map<Id, Double> expectedAlternativeTravelTimes;
 	
 	protected double toleranceSlower = 1.25;
 	protected double toleranceFaster = 0.75;
-//	protected double toleranceSlower = 4.00;
-//	protected double toleranceFaster = 0.25;
+	protected double toleranceAlternativeRoute = 1.10;
 	
 //	protected double initialGamma = 0.5;
 		
@@ -63,6 +63,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		followed = new HashMap<Id, Boolean>();
 		enterTimes = new HashMap<Id, Double>();
 		expectedTravelTimes = new HashMap<Id, Double>();
+		expectedAlternativeTravelTimes = new HashMap<Id, Double>();
 		
 		init();
 	}
@@ -129,13 +130,12 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 				personInfo.followedAndAccepted++;
 			}
 		} else {
-			if (estimation > toleranceSlower) {
-				personInfo.notFollowedAndNotAccepted++;
-			} else if (estimation < toleranceFaster) {
-				personInfo.notFollowedAndNotAccepted++;
-			} else {
+			double expectedAlternativeTravelTime = this.expectedAlternativeTravelTimes.get(personId);
+			if (expectedAlternativeTravelTime * toleranceAlternativeRoute <= travelTime) {
 				personInfo.notFollowedAndAccepted++;
-			}			
+			} else {
+				personInfo.notFollowedAndNotAccepted++;
+			}	
 		}		
 	}
 
@@ -166,14 +166,26 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		this.followed.put(personId, followed);
 	}
 	
-//	public double getTrustFollowedAndAccepted(Id personId) {
-//		return personInfos.get(personId).getTrustFollowedAndAccepted();
-//	}
+	public void setExpectedAlternativeTravelTime(Id personId, double costs) {
+		this.expectedAlternativeTravelTimes.put(personId, costs);
+	}
 	
-//	public double getTrustNotFollowedAndNotAccepted(Id personId) {
-//		return personInfos.get(personId).getTrustNotFollowedAndNotAccepted();
-//	}
+	public int getFollowedAndAccepted(Id personId) {
+		return personInfos.get(personId).followedAndAccepted;
+	}
 	
+	public int getFollowedAndNotAccepted(Id personId) {
+		return personInfos.get(personId).followedAndNotAccepted;
+	}
+	
+	public int getNotFollowedAndAccepted(Id personId) {
+		return personInfos.get(personId).notFollowedAndAccepted;
+	}
+	
+	public int getNotFollowedAndNotAccepted(Id personId) {
+		return personInfos.get(personId).notFollowedAndNotAccepted;
+	}
+		
 	public double getRandomNumber(Id personId) {
 		return personInfos.get(personId).getRandomNumber();
 	}
@@ -195,15 +207,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 //			return ((double)(followedAndAccepted + notFollowedAndNotAccepted)) / observations;
 			return ((double)(followedAndAccepted + notFollowedAndAccepted)) / observations;
 		}
-		
-//		public double getTrustFollowedAndAccepted() {
-//			return ((double)followedAndAccepted) / ((double)(followedAndAccepted + followedAndNotAccepted));
-//		}
-		
-//		public double getTrustNotFollowedAndNotAccepted() {
-//			return ((double)notFollowedAndNotAccepted) / /(double)(notFollowedAndAccepted + notFollowedAndNotAccepted));
-//		}
-		
+				
 		public double getRandomNumber() {
 			return random.nextDouble();
 		}
