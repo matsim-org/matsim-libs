@@ -46,7 +46,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
-import playground.christoph.energyflows.controller.EnergyFlowsController;
 import playground.christoph.router.CostNavigationRouteFactory;
 import playground.christoph.router.CostNavigationTravelTimeLogger;
 
@@ -61,7 +60,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 7;
+	/*package*/ int numReplanningThreads = 1;
 
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
@@ -177,15 +176,16 @@ public class CostNavigationRouteController extends WithinDayController implement
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: CostNavigationRouteController config-file rerouting-share");
+			System.out.println("Usage: CostNavigationRouteController config-file rerouting-share rerouting-threads");
 			System.out.println();
-		} else if (args.length != 2) {
+		} else if (args.length != 3) {
 			log.error("Unexpected number of input arguments!");
-			log.error("Expected path to a config file (String) and rerouting share (double, 0.0 ... 1.0).");
+			log.error("Expected path to a config file (String), rerouting share (double, 0.0 ... 1.0) and number of rerouting threads (1..n).");
 			System.exit(0);
 		} else {
 			final CostNavigationRouteController controller = new CostNavigationRouteController(args);
 			controller.pDuringLegReplanning = Double.valueOf(args[1]);
+			controller.numReplanningThreads = Integer.valueOf(args[2]);
 			controller.run();
 		}
 		System.exit(0);
