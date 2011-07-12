@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.MatsimRandom;
@@ -25,7 +23,7 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 public class CalibrationController2D  {
 
 
-	private static final int THREADS = 1;
+	private static final int THREADS = 4;
 
 	private final Mutator mut = new Mutator();
 
@@ -36,7 +34,7 @@ public class CalibrationController2D  {
 
 	private double[] params;
 
-	double c = 1;
+	double c = 1000;
 	int it = 0;
 	private final Tuple<Double,Double>[] ranges;
 
@@ -81,7 +79,7 @@ public class CalibrationController2D  {
 		this.sim2dConfig.setAi(this.params[2]);
 		double actualLL = run(ids);
 
-		for (; this.it < 2000; this.it++) {
+		for (; this.it < 20000; this.it++) {
 			this.c = this.c*0.99;
 			double[] proposed = Arrays.copyOf(this.params, 3);
 			this.mut.mutate(proposed, this.ranges);
@@ -151,7 +149,7 @@ public class CalibrationController2D  {
 		LLCalculator llCalc = new LLCalculator();
 		List<Thread> ts = new ArrayList<Thread>();
 
-		int size = 20/ THREADS;
+		int size = 40/ THREADS;
 		for (int i = 0; i < THREADS; i++) {
 
 			int lb = i*size;

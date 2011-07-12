@@ -367,7 +367,12 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 			Coord cc = l.getToNode().getCoord();
 			float x = (float)((cc.getX()-this.ofX)*this.scale);
 			float y = (float)((cc.getY()-this.ofY)*this.scale);
-			this.pc.addBotII(e.getPersonId().toString().hashCode(), x, y, 0, (float)this.scale);
+
+			int layer =1;
+			if (e.getPersonId().toString().contains("ghost")){
+				layer = 8;
+			}
+			this.pc.addBotII(e.getPersonId().toString().hashCode(), x, y, 0, (float)this.scale,layer);
 			this.inSim.add(e.getPersonId());
 
 		}

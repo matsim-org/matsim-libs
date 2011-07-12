@@ -5,17 +5,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 
 import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
 import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.pedvis.PedVisPeekABot;
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.ghostpopulation.GhostPopulationEngine;
 import playground.gregor.sim2d_v2.helper.UTurnRemover;
 import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
@@ -44,11 +41,13 @@ public class PeekabotVisController extends Controller2D{
 
 		this.addControlerListener(new UTurnRemover(this.scenarioData));
 
-		Sim2DConfigGroup s2dConf = (Sim2DConfigGroup) this.config.getModule("sim2d");
+		//		Sim2DConfigGroup s2dConf = (Sim2DConfigGroup) this.config.getModule("sim2d");
 		//		s2dConf.setAi(11.381916655);
 		//		s2dConf.setBi(1.84136188);
 		//		s2dConf.setLambda(0.01);
 
+		GhostPopulationEngine ghostPopEngine = new GhostPopulationEngine("/Users/laemmel/devel/dfg/events.xml", this.events);
+		this.events.addHandler(ghostPopEngine);
 	}
 
 	public static void main(String[] args) {

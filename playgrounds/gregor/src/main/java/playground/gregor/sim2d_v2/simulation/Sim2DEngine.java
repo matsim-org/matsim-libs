@@ -35,6 +35,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.events.TickEvent;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
@@ -78,6 +79,7 @@ public class Sim2DEngine implements MobsimEngine {
 	public void doSimStep(double time) {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
+			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
 			for (Floor floor : this.floors) {
 				floor.move(sim2DTime);
 			}

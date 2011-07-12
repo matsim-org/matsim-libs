@@ -53,7 +53,7 @@ public class PeekABotClient {
 
 	public native void initII();
 
-	public native void addBotII(int id, float x, float y, float z, float scale);
+	public native void addBotII(int id, float x, float y, float z, float scale, int layer);
 
 	public native void setBotPositionII(int id, float x, float y, float z, float az, float scale);
 
@@ -104,7 +104,7 @@ public class PeekABotClient {
 		for (int i = 0; i < 2500; i++) {
 			float x = MatsimRandom.getRandom().nextFloat() * 50;
 			float y = MatsimRandom.getRandom().nextFloat() * 50;
-			pc.addBotII(i, x, y, 0,1);
+			pc.addBotII(i, x, y, 0,1,1);
 		}
 
 		for (int i = 0; i < 50; i++) {
