@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 class PgpassFile {
 	static String getDefaultName() {
 		String passFile = System.getenv("PGPASSFILE");
-		if (!passFile.equals(""))
+		if (passFile != null)
 			return passFile;
 		
 		return _getName(System.getProperty("os.name").startsWith("Windows"));
@@ -67,7 +67,7 @@ public class Pgpass {
 		try {
 			in = new BufferedReader(new FileReader(_pwdfile));
 		} catch (FileNotFoundException e) {
-			_log.info(String.format("File %s not found", _pwdfile), e);
+			_log.info(String.format("File %s not found", _pwdfile));
 			return null;
 		}
         String line, r = null;
