@@ -52,6 +52,8 @@ public class Clique implements Person {
 	static final String PLAN_TYPE_PREFIX = "linkedPlan";
 	static final String PLAN_TYPE_REGEXP = PLAN_TYPE_PREFIX + PLAN_TYPE_SEP + ".*";
 
+	private static boolean warnKeepOnlySelected = true;
+
 	private int planCount = 0;
 
 	// private fields
@@ -335,8 +337,11 @@ public class Clique implements Person {
 				if (memberPlans.size()>1) {
 					if ( (((PlanImpl) memberPlans.get(0)).getType() == null) ||
 							(!((PlanImpl) memberPlans.get(0)).getType().matches(PLAN_TYPE_REGEXP)) ) {
-						log.warn("only keeping the selected plan for agent "+
-								member.getId()+" with multiple plans");
+						if (warnKeepOnlySelected) {
+							log.warn("only keeping the selected plan for agent"+
+									" with multiple plans. Message given only once.");
+							warnKeepOnlySelected = false;
+						}
 						currentPlan = (PlanImpl) member.getSelectedPlan();
 						getPlanMap(defaultType, individualPlans)
 							.put(member.getId(), currentPlan);
@@ -348,7 +353,12 @@ public class Clique implements Person {
 							getPlanMap(currentPlan.getType(), individualPlans)
 								.put(member.getId(), currentPlan);
 							if (currentPlan.isSelected()) {
-								selected = currentPlan.getType();
+								if (selected.equals(defaultType)) {
+									selected = currentPlan.getType();
+								}
+								else if (!selected.equals(currentPlan.getType())) {
+									throw new RuntimeException("different plans are selected at the individual level.");
+								}
 							}
 						}
 						// assume that if several plans are given, they are synchronized
