@@ -90,6 +90,9 @@ public class ShipperPlanWriter extends MatsimXmlWriter{
 	}
 
 	private void startAndEndScheduledCommodityFlows(ShipperPlan selectedPlan, BufferedWriter writer) throws IOException {
+		if(selectedPlan == null){
+			return;
+		}
 		startScheduledCommodityFlows(writer);
 		for(ScheduledCommodityFlow sCF : selectedPlan.getScheduledFlows()){
 			startScheduledFlow(sCF, writer);
