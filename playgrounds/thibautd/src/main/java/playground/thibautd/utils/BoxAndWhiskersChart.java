@@ -86,7 +86,7 @@ public class BoxAndWhiskersChart extends ChartUtil {
 		this.chart.getXYPlot().setDomainAxis(new NumberAxis(this.xAxisLabel));
 		this.chart.getXYPlot().getDomainAxis().configure();
 
-		this.addMatsimLogo();
+		//this.addMatsimLogo();
 
 		//try {
 		//	this.addDefaultFormatting();

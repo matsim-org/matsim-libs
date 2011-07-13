@@ -40,9 +40,9 @@ import org.matsim.core.utils.collections.Tuple;
 public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements BoxAndWhiskerXYDataset {
 	static final long serialVersionUID = 1L;
 
-	private boolean isSorted = true;
-	private final List<Tuple<Number, BoxAndWhiskerItem>> items =
-		new ArrayList<Tuple<Number, BoxAndWhiskerItem>>();
+	private final List<List<Tuple<Number, BoxAndWhiskerItem>>> items =
+		new ArrayList<List<Tuple<Number, BoxAndWhiskerItem>>>();
+	private final List<String> seriesKeys = new ArrayList<String>();
 
 	// those are the (hard-coded) values of the BoxAndWhiskerCalculator
 	private final double faroutCoefficient = 2d;
@@ -51,16 +51,60 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	// /////////////////////////////////////////////////////////////////////////
 	// add methods
 	// /////////////////////////////////////////////////////////////////////////
-	public void add(final Number xValue, final BoxAndWhiskerItem item) {
-		this.items.add(new Tuple<Number, BoxAndWhiskerItem>(xValue, item));
-		this.isSorted = false;
+	public void setSeriesKey(final int series, final String key) {
+		getItems(series);
+		this.seriesKeys.set(series, key);
 	}
 
-	public void add(final Number xValue, final List<? extends Number> item) {
-		this.items.add(new Tuple<Number, BoxAndWhiskerItem>(
+	public void add(
+			final int series,
+			final Number xValue,
+			final BoxAndWhiskerItem item) {
+		List<Tuple<Number, BoxAndWhiskerItem>> seriesItems =
+			getItems(series);
+		seriesItems.add(new Tuple<Number, BoxAndWhiskerItem>(xValue, item));
+	}
+
+	public void add(
+			final int series,
+			final Number xValue,
+			final List<? extends Number> item) {
+		List<Tuple<Number, BoxAndWhiskerItem>> seriesItems =
+			getItems(series);
+		seriesItems.add(new Tuple<Number, BoxAndWhiskerItem>(
 					xValue,
 					BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(item)));
-		this.isSorted = false;
+	}
+
+	private List<Tuple<Number, BoxAndWhiskerItem>> getItems(final int series) {
+		if (items.size() > series) {
+		  return items.get(series);
+		}
+		else {
+			List<Tuple<Number, BoxAndWhiskerItem>> list = null;
+
+			for (int i=items.size(); i <= series; i++) {
+				list = new ArrayList<Tuple<Number, BoxAndWhiskerItem>>();
+				items.add(list);
+				seriesKeys.add("series "+i);
+			}
+
+			return list;
+		}
+	}
+
+	/**
+	 * to use when only one series (adds to the series 0)
+	 */
+	public void add(final Number xValue, final BoxAndWhiskerItem item) {
+		add(0, xValue, item);
+	}
+
+	/**
+	 * to use when only one series (adds to the series 0)
+	 */
+	public void add(final Number xValue, final List<? extends Number> item) {
+		add(0, xValue, item);
 	}
 
 
@@ -73,7 +117,13 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	 */
 	@Override
 	public int getItemCount(final int series) {
-		return this.items.size();
+		try {
+			return this.items.get(series).size();
+		}
+		catch (IndexOutOfBoundsException e) {
+			// the series does not exist
+			return 0;
+		}
 	}
 
 	/**
@@ -82,7 +132,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	 */
 	@Override
 	public Number getX(final int series, final int item) {
-		return this.items.get(item).getFirst();
+		return this.items.get(series).get(item).getFirst();
 	}
 
 	/**
@@ -106,7 +156,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	 */
 	@Override
 	public Number getMaxOutlier(final int series, final int item) {
-		return this.items.get(item).getSecond().getMaxOutlier();
+		return this.items.get(series).get(item).getSecond().getMaxOutlier();
 	}
 
 	/**
@@ -114,27 +164,27 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	 */
 	@Override
 	public Number getMaxRegularValue(final int series, final int item) {
-		return this.items.get(item).getSecond().getMaxRegularValue();
+		return this.items.get(series).get(item).getSecond().getMaxRegularValue();
 	}
 
 	@Override
 	public Number getMeanValue(final int series, final int item) {
-		return this.items.get(item).getSecond().getMean();
+		return this.items.get(series).get(item).getSecond().getMean();
 	}
 
 	@Override
 	public Number getMedianValue(final int series, final int item) {
-		return this.items.get(item).getSecond().getMedian();
+		return this.items.get(series).get(item).getSecond().getMedian();
 	}
 
 	@Override
 	public Number getMinOutlier(final int series, final int item) {
-		return this.items.get(item).getSecond().getMinOutlier();
+		return this.items.get(series).get(item).getSecond().getMinOutlier();
 	}
 
 	@Override
 	public Number getMinRegularValue(final int series, final int item) {
-		return this.items.get(item).getSecond().getMinRegularValue();
+		return this.items.get(series).get(item).getSecond().getMinRegularValue();
 	}
 
 	@Override
@@ -144,22 +194,22 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 
 	@Override
 	public List getOutliers(final int series, final int item) {
-		return this.items.get(item).getSecond().getOutliers();
+		return this.items.get(series).get(item).getSecond().getOutliers();
 	}
 
 	@Override
 	public Number getQ1Value(final int series, final int item) {
-		return this.items.get(item).getSecond().getQ1();
+		return this.items.get(series).get(item).getSecond().getQ1();
 	}
 
 	@Override
 	public Number getQ3Value(final int series, final int item) {
-		return this.items.get(item).getSecond().getQ3();
+		return this.items.get(series).get(item).getSecond().getQ3();
 	}
 
 	@Override
 	public int getSeriesCount() {
-		return 1;
+		return this.items.size();
 	}
 
 	/**
