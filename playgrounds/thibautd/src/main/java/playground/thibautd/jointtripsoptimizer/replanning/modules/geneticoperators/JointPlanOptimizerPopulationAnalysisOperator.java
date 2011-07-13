@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators;
 
+import java.awt.Color;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -92,8 +94,8 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 			this.maxFitnesses[1][i] = Double.NaN;
 		}
 
-		fileNameBox = outputPath+"/fitnessBoxPlot-"+currentCount+".png";
-		fileNameLine = outputPath+"/maxFitnessPlot-"+currentCount+".png";
+		fileNameBox = outputPath+"/fitnessBoxPlot-"+nMembers+"-members-size-"+chromosomeLength+"-"+currentCount+".png";
+		fileNameLine = outputPath+"/maxFitnessPlot-"+nMembers+"-members-size-"+chromosomeLength+"-"+currentCount+".png";
 	}
 
 	@Override
@@ -144,6 +146,7 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		axis.setTickUnit((NumberTickUnit) NumberAxis.createIntegerTickUnits().getCeilingTickUnit(1d));
 		axis.setAutoRangeIncludesZero(false);
 		(chart.getXYPlot()).setDomainAxis(axis);
+		chart.getPlot().setBackgroundPaint(Color.white);
 		try {
 			ChartUtilities.saveChartAsPNG(new File(fileNameLine), chart, width, height);
 		} catch (IOException e) {
@@ -164,6 +167,7 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
 				title, xLabel, yLabel, this.boxes, legend);
 
+		chart.getPlot().setBackgroundPaint(Color.white);
 		try {
 			ChartUtilities.saveChartAsPNG(new File(fileNameBox), chart, width, height);
 		} catch (IOException e) {
