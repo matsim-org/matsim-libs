@@ -241,13 +241,15 @@ public class RouterPerformanceTest {
 			router.run(population);
 		} catch (RuntimeException e) {
 		}
+		long part1 = System.currentTimeMillis() - start;
 		measureMemory("### before Routing 2");
+		start = System.currentTimeMillis();
 		try {
 			router2.run(population);
 		} catch (RuntimeException e) {
 		}
 		end = System.currentTimeMillis();
-		log.info("### Routing took " + (end - start) + " ms");
+		log.info("### Routing took " + (part1 + end - start) + " ms");
 		measureMemory("### after Routing");
 		System.out.println(router.hashCode()); // just some code to ensure that the router is not gc'ed before the end
 		System.out.println(router2.hashCode());
@@ -271,7 +273,7 @@ public class RouterPerformanceTest {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
 		long usedMem = totalMem - freeMem;
-		log.info(message + " | used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
+		log.info(message + " | used RAM: " + usedMem + " B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
 				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
 
