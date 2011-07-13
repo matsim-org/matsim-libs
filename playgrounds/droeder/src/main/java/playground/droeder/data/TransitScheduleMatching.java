@@ -86,7 +86,7 @@ public class TransitScheduleMatching {
 		hafas.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(hafas).readFile(HAFASSCHED);
 		
-		new TransitScheduleMatching(Math.PI/4, 350.0, 0.2).run(osm, hafas.getTransitSchedule(), OSM);
+		new TransitScheduleMatching(Math.PI/4, 750.0, 0.2).run(osm, hafas.getTransitSchedule(), OSM);
 	}
 	
 	/**
@@ -138,7 +138,6 @@ public class TransitScheduleMatching {
 			if(!l.getId().toString().startsWith("U")) continue;
 			for(TransitRoute r: l.getRoutes().values()){
 				edgeId = new IdImpl(l.getId() + this.SEPARATOR + r.getId());
-				System.out.println("|" + edgeId.toString() + "|");
 				startNode = new IdImpl(r.getStops().get(0).getStopFacility().getId().toString());
 				endNode = new IdImpl(r.getStops().get(r.getStops().size()-1).getStopFacility().getId().toString());
 				if(!g.getNodes().containsKey(startNode)){
@@ -178,10 +177,11 @@ public class TransitScheduleMatching {
 		ArrayList<Coord> shape;
 		
 		for(TransitLine l: osmSc.getTransitSchedule().getTransitLines().values()){
-			if(!l.getId().toString().contains("U7")) continue;
+//			if(!l.getId().toString().contains("U1")) continue;
 			for(TransitRoute r: l.getRoutes().values()){
+//				System.out.println(r.getId());
 				edgeId = new IdImpl(l.getId().toString() + this.SEPARATOR + r.getId().toString());
-				startNode = this.osmSc.getNetwork().getLinks().get(r.getRoute().getStartLinkId()).getToNode();
+				startNode = this.osmSc.getNetwork().getLinks().get(r.getRoute().getStartLinkId()).getFromNode();
 				endNode = this.osmSc.getNetwork().getLinks().get(r.getRoute().getEndLinkId()).getToNode();
 				if(g.getNodes().containsKey(startNode.getId())){
 					start = g.getNodes().get(startNode.getId());
@@ -200,7 +200,9 @@ public class TransitScheduleMatching {
 				shape.add(startNode.getCoord());
 				for(Id linkId: r.getRoute().getLinkIds()){
 					shape.add(this.osmSc.getNetwork().getLinks().get(linkId).getToNode().getCoord());
+//					System.out.print(linkId + "\t");
 				}
+//				System.out.println();
 				shape.add(endNode.getCoord());
 				e.addShapePointsAndCreateSegments(shape);
 				g.addEdge(e);
@@ -276,7 +278,7 @@ public class TransitScheduleMatching {
 	private void mergeStops(Id osmLine, TransitRoute osm, TransitRoute hafas, TransitSchedule sched) {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		for(int i = 0; i < osm.getStops().size(); i++){
-			stops.add(this.createStopFacility(osm.getStops().get(i).getStopFacility().getLinkId(), hafas.getStops().get(i), sched));
+			stops.add(this.createRouteStop(osm.getStops().get(i).getStopFacility().getLinkId(), hafas.getStops().get(i), sched));
 		}
 		LinkNetworkRouteImpl netRoute = new LinkNetworkRouteImpl(osm.getRoute().getStartLinkId(), osm.getRoute().getEndLinkId());
 		netRoute.setLinkIds(osm.getRoute().getStartLinkId(), osm.getRoute().getLinkIds(), osm.getRoute().getEndLinkId());
@@ -293,51 +295,67 @@ public class TransitScheduleMatching {
 	private void mergeStopsAndLinks(Id osmLine, TransitRoute osm, TransitRoute hafas, TransitSchedule sched) {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		//handle first stop
-		stops.add(this.createStopFacility(osm.getRoute().getStartLinkId(), hafas.getStops().get(0), sched));
+		stops.add(this.createRouteStop(osm.getRoute().getStartLinkId(), hafas.getStops().get(0), sched));
 		//handle other stops - first and last stop are handled separately
 		if(hafas.getStops().size() > 2){
 			ListIterator<TransitRouteStop> hafasIt = hafas.getStops().subList(1, hafas.getStops().size()-1).listIterator();
 			ListIterator<Id> osmIter = osm.getRoute().getLinkIds().listIterator();
-			TransitRouteStop hafasStop;
+			TransitRouteStop hafasStop, newStop;
 			Id osmLinkId;
 			Double minDistance = Double.MAX_VALUE, distance;
+			
+			log.error(osmLine + " " + osm.getId() + "... " + (osm.getRoute().getLinkIds().size() + 2) + " links, " + hafas.getStops().size() +" stops...");
 			
 			while(hafasIt.hasNext()){
 				hafasStop = hafasIt.next();
 				if(!osmIter.hasNext()){
-					log.error("can not distribute stops 2 links, not enough links...");
+//					log.error("can not distribute stops 2 links, not enough links for Line " + osmLine + "... " +
+//							(osm.getRoute().getLinkIds().size() + 2) + " links, " + hafas.getStops().size() +" stops...");
 					return;
 				}
-				while(osmIter.hasNext()){
+				while(osmIter.hasNext() && hafasIt.hasNext()){
 					osmLinkId = osmIter.next();
 					distance = this.calcDist(osmLinkId, hafasStop);
+//					log.info("omsLink: " + osmLinkId + " distance " + distance);
 					if(distance < minDistance){
 						if(osmIter.hasNext()){
 							minDistance = distance;
 						}else{
-							stops.add(createStopFacility(osmLinkId, hafasStop, sched));
+							newStop = createRouteStop(osmLinkId, hafasStop, sched);
+//							log.info("newStop: " + newStop.getStopFacility().getId() + " at Link: " + newStop.getStopFacility().getLinkId());
+							stops.add(newStop);
 						}
 					}else if(distance >= minDistance){
-						stops.add(createStopFacility(osmIter.previous(), hafasIt.previous(), sched));
+						// TODO ????
+						osmIter.previous();
+						osmLinkId = osmIter.previous();
+						newStop = createRouteStop(osmLinkId, hafasStop, sched);
+//						log.info("newStop: " + newStop.getStopFacility().getId() + " at Link: " + newStop.getStopFacility().getLinkId());
+						stops.add(newStop);
+						osmIter.next();
 						minDistance = Double.MAX_VALUE;
 					}
 				}
 			}
 		}
 		//handle last stop
-		stops.add(this.createStopFacility(osm.getRoute().getEndLinkId(), hafas.getStops().get(osm.getStops().size()-1), sched));
+		stops.add(this.createRouteStop(osm.getRoute().getEndLinkId(), hafas.getStops().get(osm.getStops().size()-1), sched));
 		//create Route
 		LinkNetworkRouteImpl netRoute = new LinkNetworkRouteImpl(osm.getRoute().getStartLinkId(), osm.getRoute().getEndLinkId());
 		netRoute.setLinkIds(osm.getRoute().getStartLinkId(), osm.getRoute().getLinkIds(), osm.getRoute().getEndLinkId());
 		TransitRoute route = sched.getFactory().createTransitRoute(hafas.getId(), netRoute, stops, hafas.getTransportMode());
-		sched.getTransitLines().get(osmLine).addRoute(route);
+		if(!sched.getTransitLines().get(osmLine).getRoutes().containsKey(route.getId())){
+			sched.getTransitLines().get(osmLine).addRoute(route);
+		}else{
+			log.error("there is already a route: " + route.getId() + " for TransitLine: " + osmLine);
+		}
 	}
 
 	private Double calcDist(Id linkId, TransitRouteStop hafasStop){
 		return GeoCalculator.distanceBetween2Points(this.osmSc.getNetwork().getLinks().get(linkId).getToNode().getCoord(), 
 				hafasStop.getStopFacility().getCoord());
 	}
-	private TransitRouteStop createStopFacility(Id osmLinkId, TransitRouteStop hafasStop, TransitSchedule sched){
+	private TransitRouteStop createRouteStop(Id osmLinkId, TransitRouteStop hafasStop, TransitSchedule sched){
 		TransitStopFacility hafasFacility, newFacility;
 		hafasFacility = hafasStop.getStopFacility();
 		if(!sched.getFacilities().containsKey(hafasFacility.getId())){
