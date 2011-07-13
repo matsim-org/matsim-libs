@@ -11,5 +11,7 @@ public interface Parking  extends Identifiable {
 	
 	public abstract int getCapacity();
 	
+	public abstract void setCapacity(int capacity);
+	
 	public abstract PriceScheme getPriceScheme();
 }

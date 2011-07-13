@@ -8,6 +8,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class PrintStatisticsAboutFacilities {
 
@@ -16,22 +17,22 @@ public class PrintStatisticsAboutFacilities {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String facilitiesPath = "H:/data/experiments/ARTEMIS/output/run10/output_facilities.xml.gz";
+		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 
-		HashSet<String> activityTypes = new HashSet<String>();
+		IntegerValueHashMap<String> actTypes=new IntegerValueHashMap<String>();
 
 		for (Id facilityId : facilities.getFacilities().keySet()) {
 			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
 
 			for (String activityOption : facility.getActivityOptions().keySet()) {
-				if (!activityTypes.contains(activityOption)) {
-					System.out.println(activityOption);
-					activityTypes.add(activityOption);
-				}
-
+				actTypes.increment(activityOption);
 			}
 
+		}
+		
+		for (String activityType:actTypes.getKeySet()){
+			System.out.println(activityType + " => " + actTypes.get(activityType));
 		}
 
 	}

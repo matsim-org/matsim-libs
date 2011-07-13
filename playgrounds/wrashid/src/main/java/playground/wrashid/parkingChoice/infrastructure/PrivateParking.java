@@ -13,7 +13,7 @@ public class PrivateParking extends ParkingImpl {
 
 	ActInfo belongsToAct=null;
 	
-	public ActInfo getCorrespondingActInfo(){
+	public ActInfo getActInfo(){
 		return belongsToAct;
 	}
 	

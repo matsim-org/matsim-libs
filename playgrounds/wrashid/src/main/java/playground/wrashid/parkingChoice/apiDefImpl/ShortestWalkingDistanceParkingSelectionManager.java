@@ -138,8 +138,8 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 				}
 			} else if (parking instanceof PrivateParking) {
 				PrivateParking privateParking = (PrivateParking) parking;
-				if (privateParking.getCorrespondingActInfo().getFacilityId().equals(targetActInfo.getFacilityId())
-						&& privateParking.getCorrespondingActInfo().getActType().equals(targetActInfo.getActType())) {
+				if (privateParking.getActInfo().getFacilityId().equals(targetActInfo.getFacilityId())
+						&& privateParking.getActInfo().getActType().equals(targetActInfo.getActType())) {
 					resultCollection.add(parking);
 				}
 			} else {

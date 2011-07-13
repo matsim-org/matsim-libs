@@ -133,4 +133,9 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setCapacity(int capacity) {
+		maxCapacity=capacity;
+	}
 }

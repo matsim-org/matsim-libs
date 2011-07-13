@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class PrintAllActTypesInPlan {
 
@@ -17,9 +18,9 @@ public class PrintAllActTypesInPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String inputPlansFile="V:/data/cvs/ivt/studies/switzerland/plans/ivtch/census2000v2_dilZh30km_10pct/plans.xml.gz";
-		String inputNetworkFile="V:/data/cvs/ivt/studies/switzerland/networks/ivtch/network.xml";
-		String inputFacilities="V:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		String inputPlansFile="K:/Projekte/herbie/output/demandCreation/plans.xml.gz";
+		String inputNetworkFile="K:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
+		String inputFacilities="K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 		
@@ -32,23 +33,20 @@ public class PrintAllActTypesInPlan {
 	 * @param population
 	 */
 	public static void printAllActTypes(Population population){
-		LinkedList<String> actTypes=new LinkedList<String>();
+		IntegerValueHashMap<String> actTypes=new IntegerValueHashMap<String>();
 		for (Person person:population.getPersons().values()){
 			for (Plan plan:person.getPlans()){
 				for (PlanElement pe:plan.getPlanElements()){
 					if (pe instanceof Activity){
 						Activity activity=(Activity) pe;
-						if (!actTypes.contains(activity.getType())){
-							actTypes.add(activity.getType());
-						}
+						actTypes.increment(activity.getType());
 					}
-					
 				}
 			}
 		}
 		
-		for (String acitivityType:actTypes){
-			System.out.println(acitivityType);
+		for (String activityType:actTypes.getKeySet()){
+			System.out.println(activityType + " => " + actTypes.get(activityType));
 		}
 	}
 	

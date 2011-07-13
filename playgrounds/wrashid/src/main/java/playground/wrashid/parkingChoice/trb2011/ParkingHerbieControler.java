@@ -16,10 +16,7 @@ public class ParkingHerbieControler {
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
-		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml");
-		
-		LinkedList<Parking> parkingCollection= flatParkingFormatReaderV1.getParkings();
+		LinkedList<Parking> parkingCollection = getParkingCollection();
 		
 		/*
 		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();
@@ -32,11 +29,42 @@ public class ParkingHerbieControler {
 			}
 		}*/
 		
+		
 		ParkingModule parkingModule=new ParkingModule(hControler, parkingCollection);
 		
 //		hControler.setOverwriteFiles(true);
 
 		hControler.run();
+		
+	}
+
+	private static LinkedList<Parking> getParkingCollection() {
+		double streetParkingCalibrationFactor=1.0;
+		double garageParkingCalibrationFactor=1.0;
+		
+		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
+		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml");
+		
+		LinkedList<Parking> streetParkings= flatParkingFormatReaderV1.getParkings();
+		calibarteParkings(streetParkings,streetParkingCalibrationFactor);
+		
+		
+		flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
+		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkings.xml");
+		
+		LinkedList<Parking> garageParkings= flatParkingFormatReaderV1.getParkings();
+		calibarteParkings(garageParkings,garageParkingCalibrationFactor);
+		
+		LinkedList<Parking> parkingCollection = streetParkings;
+		parkingCollection.addAll(garageParkings);
+		return parkingCollection;
+	}
+	
+	private static void calibarteParkings(LinkedList<Parking> parkingCollection, double calibrationFactor){
+		for (Parking parking:parkingCollection){
+			int capacity = parking.getCapacity();
+			parking.setCapacity((int) Math.round(capacity*calibrationFactor));
+		}
 		
 	}
 	
