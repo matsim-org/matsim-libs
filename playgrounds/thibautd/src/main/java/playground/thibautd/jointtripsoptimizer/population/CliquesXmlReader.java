@@ -77,20 +77,24 @@ public class CliquesXmlReader extends MatsimXmlParser {
 	private void constructCliques() {
 		Clique currentClique;
 		Map<Id, ? extends Person> populationMembers = population.getPersons();
+		int count = 0;
+		int next = 1;
 
 		// iterate over cliques ids
 		log.debug("begin cliques construction");
 		for (String id : cliques.keySet()) {
-			//log.debug("constructs clique "+id);
+			count++;
+			if (count == next) {
+				log.info("constructing clique # "+count);
+				next *= 2;
+			}
+
 			// search corresponding members in the population and put them in a clique
 			currentClique = this.factory.createClique(new IdImpl(id));
 			currentMembers = cliques.get(id);
-			//log.debug("clique members: "+currentMembers);
 
 			for (String memberId: currentMembers) {
 				try {
-					//log.debug("adding an individual to a clique");
-					//log.debug("population: "+populationMembers);
 					currentClique.addMember(populationMembers.get(new IdImpl(memberId)));
 				} catch (NullPointerException e) {
 					throw new RuntimeException("clique members and population members do not match");
