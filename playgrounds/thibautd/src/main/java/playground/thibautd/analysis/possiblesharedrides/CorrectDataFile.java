@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlotDataFile.java
+ * CorrectDataFile.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,31 +19,24 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.possiblesharedrides;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+
 /**
+ * Corrects a data file for which distances were got from route
  * @author thibautd
  */
-public class PlotDataFile {
-	private static final double DIST=500d;
-	private static final double TIME=15*60d;
+public class CorrectDataFile {
+	public static void main(final String[] args) {
+		String configFile = args[0];
+		String dataFile = args[1];
+		String outputFile = args[2];
 
-	public static final void main(String[] args) {
-		String fileName = args[0];
-		String outputFile = args[1];
-		int width = 1024;
-		int height = 800;
+		CountPossibleSharedRideNew counter = new CountPossibleSharedRideNew(0,0);
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 
-		CountPossibleSharedRideNew counter = new CountPossibleSharedRideNew(DIST,TIME);
-		
-		counter.loadTripData(fileName);
-
-		counter.getBoxAndWhiskersPerTimeBin(24).saveAsPng(outputFile+"-per-time-bin.png", width, height);
-		counter.getBoxAndWhiskersPerTimeBin(24,1).saveAsPng(outputFile+"-per-time-bin-1km.png", width, height);
-		counter.getBoxAndWhiskersPerTimeBin(24,2).saveAsPng(outputFile+"-per-time-bin-2km.png", width, height);
-		counter.getBoxAndWhiskersPerTimeBin(24,3).saveAsPng(outputFile+"-per-time-bin-3km.png", width, height);
-
-		counter.getBoxAndWhiskersPerDistanceBin(1,Double.POSITIVE_INFINITY).saveAsPng(outputFile+"-per-dist-bin.png", width, height);
-		counter.getBoxAndWhiskersPerDistanceBin(1,10).saveAsPng(outputFile+"-per-dist-bin-10km.png", width, height);
-		counter.getBoxAndWhiskersPerDistanceBin(1,25).saveAsPng(outputFile+"-per-dist-bin-25km.png", width, height);
+		counter.correctFileFromPlans(dataFile, scenario.getPopulation(), scenario.getNetwork(), outputFile);
 	}
 }
 
