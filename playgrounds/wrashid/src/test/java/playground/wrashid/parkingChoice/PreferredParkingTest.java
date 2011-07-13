@@ -22,7 +22,7 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 public class PreferredParkingTest extends TestCase {
 
 	public void testBaseTestCase() {
-		PreferredParkingManager reservedParkingManager = new PreferredParkingManager() {
+		PreferredParkingManager preferredParkingManager = new PreferredParkingManager() {
 
 			@Override
 			public boolean considerForChoiceSet(PreferredParking preferredParking, Id personId,
@@ -47,11 +47,11 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(9594, walkingDistanceFor3CarScenario(reservedParkingManager, 1), 5.0);
+		assertEquals(9800, walkingDistanceFor3CarScenario(preferredParkingManager, 1), 5.0);
 	}
 
 	public void testAllAgentsWantToUseFarAwayPreferredParkingShouldIncreaseAverageWalkingDistance() {
-		PreferredParkingManager reservedParkingManager = new PreferredParkingManager() {
+		PreferredParkingManager preferredParkingManager = new PreferredParkingManager() {
 
 			@Override
 			public boolean considerForChoiceSet(PreferredParking preferredParking, Id personId,
@@ -68,11 +68,11 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(24167, walkingDistanceFor3CarScenario(reservedParkingManager, 3), 5.0);
+		assertEquals(24167, walkingDistanceFor3CarScenario(preferredParkingManager, 3), 5.0);
 	}
 	
 	public void testOnlyUsePreferredParkingAtWorkAndNoteHomeShouldDecreaseWalkingDistance() {
-		PreferredParkingManager reservedParkingManager = new PreferredParkingManager() {
+		PreferredParkingManager preferredParkingManager = new PreferredParkingManager() {
 
 			@Override
 			public boolean considerForChoiceSet(PreferredParking preferredParking, Id personId,
@@ -92,7 +92,7 @@ public class PreferredParkingTest extends TestCase {
 			
 		};
 
-		assertEquals(22929, walkingDistanceFor3CarScenario(reservedParkingManager, 10), 5.0);
+		assertEquals(22929, walkingDistanceFor3CarScenario(preferredParkingManager, 10), 5.0);
 	}
 
 	private double walkingDistanceFor3CarScenario(PreferredParkingManager preferredParkingManager, int parkingCapacity) {

@@ -2,6 +2,7 @@ package playground.wrashid.parkingChoice.infrastructure;
 
 import org.matsim.testcases.MatsimTestCase;
 
+
 import junit.framework.TestCase;
 
 public class FlatParkingFormatReader extends MatsimTestCase {

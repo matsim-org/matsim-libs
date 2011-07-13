@@ -18,7 +18,7 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 public class PrivateParkingTest extends TestCase {
 
 	public void testBaseCase(){
-		assertEquals(2410, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),5.0);
+		assertEquals(2744, walkingDistanceFor3CarScenarioWithVariableParkingCapacity(1),5.0);
 	}
 	
 	public void testHigherParkingCapacityMakesWalkingDistanceShorter(){
@@ -84,7 +84,7 @@ public class PrivateParkingTest extends TestCase {
 		
 		controler.run();
 		
-		assertEquals(3155,parkingModule.getAverageWalkingDistance(),5.0);
+		assertEquals(3489,parkingModule.getAverageWalkingDistance(),5.0);
 	}
 	
 }

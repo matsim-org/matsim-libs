@@ -16,11 +16,12 @@ public class ParkingHerbieControler {
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
-		//FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		//flatParkingFormatReaderV1.parse("");
+		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
+		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml");
 		
-//		LinkedList<Parking> parkingCollection= flatParkingFormatReaderV1.getParkings();
+		LinkedList<Parking> parkingCollection= flatParkingFormatReaderV1.getParkings();
 		
+		/*
 		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();
 		
 		for (int i = 0; i < 10; i++) {
@@ -29,7 +30,7 @@ public class ParkingHerbieControler {
 				parking.setMaxCapacity(30000);
 				parkingCollection.add(parking);
 			}
-		}
+		}*/
 		
 		ParkingModule parkingModule=new ParkingModule(hControler, parkingCollection);
 		

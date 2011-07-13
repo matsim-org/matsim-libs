@@ -34,7 +34,7 @@ public class ReservedParkingTest extends TestCase {
 			}
 		};
 		
-		assertEquals(2410, walkingDistanceFor3CarScenario(reservedParkingManager,1),5.0);
+		assertEquals(2744, walkingDistanceFor3CarScenario(reservedParkingManager,1),5.0);
 	}
 	
 	public void testCaseWithHigherParkingCapacityAllAgentsAllowedToUseReservedParking(){

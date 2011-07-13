@@ -34,6 +34,8 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ParkingManager implements StartupListener {
 
+	private HashMap<Id, Plan> planUsedInPreviousIteration=new HashMap<Id, Plan>(); 
+	
 	private QuadTree<Parking> parkings;
 	public QuadTree<Parking> getParkings() {
 		return parkings;
@@ -76,6 +78,7 @@ public class ParkingManager implements StartupListener {
 		for (Parking parking : parkings.values()) {
 			ParkingImpl parkingImpl=(ParkingImpl) parking;
 			parkingImpl.resetParkingOccupancy();
+		//	currentParkingLocation.clear();
 		}
 	}
 
@@ -96,12 +99,6 @@ public class ParkingManager implements StartupListener {
 	private void addParking(Parking parking) {
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 	}
-
-
-
-
-
-
 
 	public ParkingManager(Controler controler, Collection<Parking> parkingCollection) {
 		this.controler = controler;
@@ -144,68 +141,61 @@ public class ParkingManager implements StartupListener {
 
 		// initialize parking occupations
 		for (Person person : controler.getPopulation().getPersons().values()) {
-			Plan selectedPlan = person.getSelectedPlan();
-
-			ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfo(selectedPlan);
-
-			ActivityFacility activityFacility = controler.getFacilities().getFacilities().get(lastActivityInfo.getFacilityId());
-
-			Coord activityCoord = activityFacility.getCoord();
-
-			// TODO: carve this out, so that the same code is invoked here and from
-			// Simulation handler + use it in the tests...
-			
-			
-			
-			// park car
-//			Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(activityCoord,
-//					ParkingConfigModule.getStartParkingSearchDistanceInMeters(), person.getId(), 0, lastActivityInfo);
-//
-//			// score parkings (only according to distance)
-//			for (Parking parking : parkingsInSurroundings) {
-//				parking.setScore(-parking.getWalkingDistance(activityCoord) / 10);
-//			}
-//
-//			// rank parkings
-//			PriorityQueue<Parking> rankedParkings = new PriorityQueue<Parking>();
-//			for (Parking parking : parkingsInSurroundings) {
-//				rankedParkings.add(parking);
-//			}
-
-			// park vehicle
-		//	Parking bestParking = rankedParkings.poll();
-			Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), null, null);
-		//	Parking bestParking = getParkingWithShortestWalkingDistance(activityCoord,lastActivityInfo,person.getId());
-			parkVehicle(person.getId(), bestParking);
+			initializePersonForParking(person);
 		}
 	}
+	
+	public void initializePersonForParking(Person person){
+		Plan selectedPlan = person.getSelectedPlan();
 
+		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(selectedPlan);
+
+		if (agentHasNoCarLeg(lastActivityInfo)){
+			return;
+		}
+		
+		ActivityFacility activityFacility = controler.getFacilities().getFacilities().get(lastActivityInfo.getFacilityId());
+
+		Coord activityCoord = activityFacility.getCoord();
+
+		Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), null, null);
+		parkVehicle(person.getId(), bestParking);
+	}
 	
-	
+
+	private boolean agentHasNoCarLeg(ActInfo lastActivityInfo) {
+		return lastActivityInfo==null;
+	}
 	
 	public void parkVehicle(Id personId, Parking parking) {
-		DebugLib.traceAgent(personId);
-		
-		if (parking==null){
-			System.out.println();
-		}
 		
 		((ParkingImpl) parking).parkVehicle();
 		currentParkingLocation.put(personId, parking);
 	}
 
 	public void unParkVehicle(Id personId, Parking parking) {
-		DebugLib.traceAgent(personId);
 		
-		if (parking==null){
-			System.out.println();
-		}
 		((ParkingImpl) parking).removeVehicle();
-		currentParkingLocation.put(personId, null);
+		currentParkingLocation.remove(personId);
+	}
+	
+	public void unparkVehicleIfParkedInPreviousIteration(Id personId) {
+		if (currentParkingLocation.containsKey(personId)){
+			((ParkingImpl) currentParkingLocation.get(personId)).removeVehicle();
+			currentParkingLocation.remove(personId);
+		}
+	}
+	
+	public int getNumberOfParkedVehicles(){
+		return currentParkingLocation.size();
 	}
 
 	public void setPreferredParkingManager(PreferredParkingManager preferredParkingManager) {
 		this.preferredParkingManager = preferredParkingManager;
+	}
+
+	public HashMap<Id, Plan> getPlanUsedInPreviousIteration() {
+		return planUsedInPreviousIteration;
 	}
 
 }

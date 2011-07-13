@@ -50,6 +50,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		
+		
 		HashMap<Id, Double> walkingDistances = new HashMap<Id, Double>();
 		parkingScoreCollector.finishHandling();
 
@@ -101,6 +103,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	private void printWalkingDistanceHistogramm(Controler controler, HashMap<Id, Double> walkingDistance){
 		double[] values=Collections.convertDoubleCollectionToArray(walkingDistance.values());
+		
+		if (values.length==0){
+			values=new double[1];
+			values[0]=-1.0;
+		}
 		
 		averageWalkingDistance=new Mean().evaluate(values);
 		

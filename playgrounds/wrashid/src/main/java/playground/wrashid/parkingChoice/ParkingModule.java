@@ -2,9 +2,13 @@ package playground.wrashid.parkingChoice;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.EventHandlerAtStartupAdder;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
@@ -23,6 +27,10 @@ public class ParkingModule {
 	private ParkingScoreAccumulator parkingScoreAccumulator;
 	private ParkingManager parkingManager;
 
+	public ParkingManager getParkingManager(){
+		return parkingManager;
+	}
+	
 	public ParkingModule(Controler controler, LinkedList<Parking> parkingCollection){
 		this.controler = controler;
 		
@@ -41,6 +49,8 @@ public class ParkingModule {
 		controler.addControlerListener(parkingManager);
 		parkingScoreAccumulator = new ParkingScoreAccumulator(parkingScoreCollector);
 		controler.addControlerListener(parkingScoreAccumulator);
+		PlanUpdater planUpdater=new PlanUpdater(parkingManager);
+		controler.addControlerListener(planUpdater);
 		
 		eventHandlerAtStartupAdder.addEventHandler(parkingSimulation);
 	}
@@ -69,6 +79,27 @@ public class ParkingModule {
 	 */
 	public void setPreferredParkingManager(PreferredParkingManager preferredParkingManager){
 		parkingManager.setPreferredParkingManager(preferredParkingManager);
+	}
+	
+	class PlanUpdater implements AfterMobsimListener{
+
+		private final ParkingManager parkingManager;
+
+		public PlanUpdater(ParkingManager parkingManager){
+			this.parkingManager = parkingManager;
+			
+		}
+		
+		@Override
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
+			for (Person person : event.getControler().getPopulation().getPersons().values()) {
+				
+				
+				parkingManager.getPlanUsedInPreviousIteration().put(person.getId(), person.getSelectedPlan());
+			}
+		}
+		
+		
 	}
 	
 }

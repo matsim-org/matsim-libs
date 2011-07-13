@@ -1,15 +1,16 @@
-package playground.wrashid.parkingChoice.trb2011;
+package playground.wrashid.parkingChoice;
 
 import java.util.LinkedList;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
-public class ParkingDefControler {
+//TODO: class only used in tests -> remove this class and incorporate code directly in tests...
+
+public class ParkingControlerMain {
 public static void main(String[] args) {
 		
 		Controler controler=new Controler(args);
