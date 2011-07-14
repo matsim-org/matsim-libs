@@ -159,13 +159,13 @@ public class JointReplanningConfigGroup extends Module {
 
 	//parameter values, initialized to defaults.
 
-	private int populationSize = 70;
-	private double mutationProb = 0.1;
-	private double wholeCrossOverProb = 0.3;
-	private double simpleCrossOverProb = 0.5;
-	private double singleCrossOverProb = 0.3;
-	private int numberOfIterations = 30;
-	private double betaNonUniformity = 1;
+	private int populationSize = 28;
+	private double mutationProb = 0.05929328513354826;
+	private double wholeCrossOverProb = 0.3542456557133803;
+	private double simpleCrossOverProb = 0.8429808963287465;
+	private double singleCrossOverProb = 0.39668794760225035;
+	private int numberOfIterations = 50;
+	private double betaNonUniformity = 34.59690684427823;
 	private boolean optimizeToggle = true;
 	private boolean plotFitness = false;
 	private boolean optimizeMode = true;
@@ -177,11 +177,11 @@ public class JointReplanningConfigGroup extends Module {
 	private double minImprovement = 0.075d;
 	private TripStructureAnalysisLayerOption
 		tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.link;
-	private double discreteDistScale = 17000d;
+	private double discreteDistScale = 1407971.908714476;
 	private SimLegInterpretation simLegInt = SimLegInterpretation.CharyparEtAlCompatible;
-	private int rtsWindowSize = 15;
-	private boolean inPlaceMutation = true;
-	private double pNonUniform = 0.5d;
+	private int rtsWindowSize = 6;
+	private boolean inPlaceMutation = false;
+	private double pNonUniform = 0.04032756452861985;
 	private boolean useOnlyHammingDistance = true;
 	//deprecated fields:
 	private int numTimeIntervals;
