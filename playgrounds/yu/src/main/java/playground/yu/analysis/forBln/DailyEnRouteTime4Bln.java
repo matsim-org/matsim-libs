@@ -84,28 +84,32 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		double wlkDayTime = 0.0;
 		double bikeDayTime = 0.0;
 		double othersDayTime = 0.0;
-		for (PlanElement pe : plan.getPlanElements())
+		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 
 				Leg bl = (Leg) pe;
 
 				ActTypeBln at = null;
-				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
-				for (ActTypeBln a : ActTypeBln.values())
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl)
+						.getType();
+				for (ActTypeBln a : ActTypeBln.values()) {
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;
 						break;
 					}
-				if (at == null)
+				}
+				if (at == null) {
 					at = ActTypeBln.other;
+				}
 
 				double time = bl.getTravelTime() / 60.0;
-				if (time < 0)
+				if (time < 0) {
 					time = 0;
+				}
 				// if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
 				String mode = bl.getMode();
-				if (TransportMode.car.equals("mode")) {
+				if (TransportMode.car.equals(mode)) {
 					carTime += time;
 					carDayTime += time;
 					switch (at) {
@@ -332,18 +336,25 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 					othersLegTimeCounts[Math.min(100, (int) time / 2)]++;
 				}
 			}
-		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) dayTime); i++) {
 			totalDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) othersDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) othersDayTime); i++) {
 			othersDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++) {
 			carDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++) {
 			ptDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) wlkDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) wlkDayTime); i++) {
 			wlkDayEnRouteTimeCounts[i]++;
-		for (int i = 0; i <= Math.min(100, (int) bikeDayTime); i++)
+		}
+		for (int i = 0; i <= Math.min(100, (int) bikeDayTime); i++) {
 			bikeDayEnRouteTimeCounts[i]++;
+		}
 	}
 
 	@Override
@@ -415,49 +426,40 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				+ othersFreizeitSonstSportTime + "\t" + othersSeeADoctorTime
 				+ "\t" + othersHolidayJourneyTime + "\t" + othersMultipleTime);
 
-		sw
-				.writeln("total\t"
-						+ (carHomeTime + ptHomeTime + wlkHomeTime
-								+ bikeHomeTime + othersHomeTime)
-						+ "\t"
-						+ (carWorkTime + ptWorkTime + wlkWorkTime
-								+ bikeWorkTime + othersWorkTime)
-						+ "\t"
-						+ (carShopTime + ptShopTime + wlkShopTime
-								+ bikeShopTime + othersEducTime)
-						+ "\t"
-						+ (carEducTime + ptEducTime + wlkEducTime
-								+ bikeEducTime + othersEducTime)
-						+ "\t"
-						+ (carLeisTime + ptLeisTime + wlkLeisTime
-								+ bikeLeisTime + othersLeisTime)
-						+ "\t"
-						+ (carOtherTime + ptOtherTime + wlkOtherTime
-								+ bikeOtherTime + othersOtherTime)
-						+ "\t"
-						+ (carNotSpecifiedTime + ptNotSpecifiedTime
-								+ wlkNotSpecifiedTime + bikeNotSpecifiedTime + othersNotSpecifiedTime)
-						+ "\t"
-						+ (carBusinessTime + ptBusinessTime + wlkBusinessTime
-								+ bikeBusinessTime + othersBusinessTime)
-						+ "\t"
-						+ (carEinkaufSonstigesTime + ptEinkaufSonstigesTime
-								+ wlkEinkaufSonstigesTime
-								+ bikeEinkaufSonstigesTime + othersEinkaufSonstigesTime)
-						+ "\t"
-						+ (carFreizeitSonstSportTime + ptFreizeitSonstSportTime
-								+ wlkFreizeitSonstSportTime
-								+ bikeFreizeitSonstSportTime + othersFreizeitSonstSportTime)
-						+ "\t"
-						+ (carSeeADoctorTime + ptSeeADoctorTime
-								+ wlkSeeADoctorTime + bikeSeeADoctorTime + othersSeeADoctorTime)
-						+ "\t"
-						+ (carHolidayJourneyTime + ptHolidayJourneyTime
-								+ wlkHolidayJourneyTime
-								+ bikeHolidayJourneyTime + othersHolidayJourneyTime)
-						+ "\t"
-						+ (carMultipleTime + ptMultipleTime + wlkMultipleTime
-								+ bikeMultipleTime + othersMultipleTime));
+		sw.writeln("total\t"
+				+ (carHomeTime + ptHomeTime + wlkHomeTime + bikeHomeTime + othersHomeTime)
+				+ "\t"
+				+ (carWorkTime + ptWorkTime + wlkWorkTime + bikeWorkTime + othersWorkTime)
+				+ "\t"
+				+ (carShopTime + ptShopTime + wlkShopTime + bikeShopTime + othersEducTime)
+				+ "\t"
+				+ (carEducTime + ptEducTime + wlkEducTime + bikeEducTime + othersEducTime)
+				+ "\t"
+				+ (carLeisTime + ptLeisTime + wlkLeisTime + bikeLeisTime + othersLeisTime)
+				+ "\t"
+				+ (carOtherTime + ptOtherTime + wlkOtherTime + bikeOtherTime + othersOtherTime)
+				+ "\t"
+				+ (carNotSpecifiedTime + ptNotSpecifiedTime
+						+ wlkNotSpecifiedTime + bikeNotSpecifiedTime + othersNotSpecifiedTime)
+				+ "\t"
+				+ (carBusinessTime + ptBusinessTime + wlkBusinessTime
+						+ bikeBusinessTime + othersBusinessTime)
+				+ "\t"
+				+ (carEinkaufSonstigesTime + ptEinkaufSonstigesTime
+						+ wlkEinkaufSonstigesTime + bikeEinkaufSonstigesTime + othersEinkaufSonstigesTime)
+				+ "\t"
+				+ (carFreizeitSonstSportTime + ptFreizeitSonstSportTime
+						+ wlkFreizeitSonstSportTime
+						+ bikeFreizeitSonstSportTime + othersFreizeitSonstSportTime)
+				+ "\t"
+				+ (carSeeADoctorTime + ptSeeADoctorTime + wlkSeeADoctorTime
+						+ bikeSeeADoctorTime + othersSeeADoctorTime)
+				+ "\t"
+				+ (carHolidayJourneyTime + ptHolidayJourneyTime
+						+ wlkHolidayJourneyTime + bikeHolidayJourneyTime + othersHolidayJourneyTime)
+				+ "\t"
+				+ (carMultipleTime + ptMultipleTime + wlkMultipleTime
+						+ bikeMultipleTime + othersMultipleTime));
 
 		StackedBarChart stackedBarChart = new StackedBarChart(
 				"travel destination and modal split--daily En Route Time",
@@ -503,8 +505,9 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				+ "dailyEnRouteTimeTravelDistination.png", 1280, 1024);
 
 		double x[] = new double[101];
-		for (int i = 0; i < 101; i++)
+		for (int i = 0; i < 101; i++) {
 			x[i] = i;
+		}
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
@@ -523,23 +526,26 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				"Daily En Route Time in min",
 				"fraction of persons with daily en route time longer than x... in %");
 		chart.addSeries(CAR, x, yCar);
-		if (CollectionMath.getSum(yPt) > 0)
+		if (CollectionMath.getSum(yPt) > 0) {
 			chart.addSeries("pt", x, yPt);
-		if (CollectionMath.getSum(yWlk) > 0)
+		}
+		if (CollectionMath.getSum(yWlk) > 0) {
 			chart.addSeries(WALK, x, yWlk);
-		if (CollectionMath.getSum(yBike) > 0)
+		}
+		if (CollectionMath.getSum(yBike) > 0) {
 			chart.addSeries(BIKE, x, yBike);
-		if (CollectionMath.getSum(yOthers) > 0)
+		}
+		if (CollectionMath.getSum(yOthers) > 0) {
 			chart.addSeries(OTHERS, x, yOthers);
+		}
 		chart.addSeries("total", x, yTotal);
 		chart.addMatsimLogo();
 		chart.saveAsPng(outputFilename + "dailyEnRouteTimeDistribution.png",
 				800, 600);
 
 		sw.writeln("\n--Modal split -- leg duration--");
-		sw
-				.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\twalk legs no.\tbike legs no.\tothers legs no.\t"
-						+ "car fraction [%]\tpt fraction [%]\twalk fraction [%]\tbike fraction [%]\tothers fraction [%]");
+		sw.writeln("leg Duration [min]\tcar legs no.\tpt legs no.\twalk legs no.\tbike legs no.\tothers legs no.\t"
+				+ "car fraction [%]\tpt fraction [%]\twalk fraction [%]\tbike fraction [%]\tothers fraction [%]");
 
 		double xs[] = new double[101];
 		double yCarFracs[] = new double[101];
@@ -577,14 +583,18 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		XYLineChart chart2 = new XYLineChart("Modal Split -- leg Duration",
 				"leg Duration [min]", "mode fraction [%]");
 		chart2.addSeries(CAR, xs, yCarFracs);
-		if (CollectionMath.getSum(yPtFracs) > 0)
+		if (CollectionMath.getSum(yPtFracs) > 0) {
 			chart2.addSeries("pt", xs, yPtFracs);
-		if (CollectionMath.getSum(yWlkFracs) > 0)
+		}
+		if (CollectionMath.getSum(yWlkFracs) > 0) {
 			chart2.addSeries(WALK, xs, yWlkFracs);
-		if (CollectionMath.getSum(yBikeFracs) > 0)
+		}
+		if (CollectionMath.getSum(yBikeFracs) > 0) {
 			chart2.addSeries(BIKE, xs, yBikeFracs);
-		if (CollectionMath.getSum(yOthersFracs) > 0)
+		}
+		if (CollectionMath.getSum(yOthersFracs) > 0) {
 			chart2.addSeries(OTHERS, xs, yOthersFracs);
+		}
 		chart2.addMatsimLogo();
 		chart2.saveAsPng(outputFilename + "legTimeModalSplit2.png", 800, 600);
 		sw.close();
@@ -598,18 +608,21 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		String outputFilename = "../matsimTests/run756/dailyEnRouteTime/";
 		String tollFilename = "../berlin data/Hundekopf/osm/tollBerlinHundekopf.xml";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+				scenario.getRoadPricingScheme());
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(scenario.getRoadPricingScheme());
+		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(
+				scenario.getRoadPricingScheme());
 		ert.run(population);
 		ert.write(outputFilename);
 
