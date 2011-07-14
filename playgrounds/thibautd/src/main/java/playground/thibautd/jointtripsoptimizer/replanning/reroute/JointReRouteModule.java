@@ -24,6 +24,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
+ * Module returning instances of {@link JointReRouteAlgo}
  * @author thibautd
  */
 public class JointReRouteModule extends AbstractMultithreadedModule {

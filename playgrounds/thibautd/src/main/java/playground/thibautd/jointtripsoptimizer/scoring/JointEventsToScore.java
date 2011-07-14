@@ -41,14 +41,12 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.IdLeg;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
@@ -57,11 +55,13 @@ import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 /**
  * Same role as {@link org.matsim.core.scoring.EventsToScore}, but takes into account
  * the driver events to score the passengers plan.
- * That is, the score is "as if" the joint trips were "really" simulated.
- *
+ * That is, the score is "as if" the joint trips were "really" simulated (at least,
+ * this should be the case in an ideal implementation. Here, the effect is more
+ * to penalize the passenger too in case of traffic jam).
+ * <br>
  * Do not score "on the fly", but accumulates information used to compute scores
  * "off line".
- *
+ * <br>
  * method of calculus: departure and end times for shared rides correspond to the
  * lattest observed.
  * Activity start and end time not modified yet.

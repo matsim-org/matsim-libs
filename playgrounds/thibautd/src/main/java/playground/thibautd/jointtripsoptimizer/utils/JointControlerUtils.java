@@ -23,14 +23,10 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.thibautd.jointtripsoptimizer.population.CliquesXmlReader;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsReader;
@@ -40,10 +36,14 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
 
 /**
- * Helper class to create a fully configured jointcontroler from a config file
+ * Helper class to create a fully configured {@link JointControler} from a config file,
+ * or to only load the {@link Config} or the {@link ScenarioWithCliques}
+ *
  * @author thibautd
  */
 public class JointControlerUtils {
+	private JointControlerUtils() {}
+
 	/**
 	 * Creates a {@link JointControler} instance from a configFile.
 	 * Some of the loading methods are workarounds, and may not work with all

@@ -30,11 +30,13 @@ import playground.thibautd.jointtripsoptimizer.population.JointLeg;
  * {@link LegRouter} designed to set the route of a "passenger" leg, such that
  * it is consistent with the driver's route.
  *
- * More precisely, it just sets the route to null, which makes JointLeg copy the
- * driver's route at the first call of getRoute. In that way, the driver's route
+ * More precisely, it just sets the route to null and calls {@link JointLeg#routeToCopy()},
+ * which makes JointLeg copy the
+ * driver's route at the first call of {@link JointLeg#getRoute()}. In that way,
+ * the driver's route
  * is well defined at the time of the copy.
  *
- * This also allows to use the ReRoute module on a JointPlan, with the insurance
+ * This also allows to use the ReRoute strategy on a JointPlan, with the insurance
  * that routes will be consistent.
  *
  * @author thibautd
