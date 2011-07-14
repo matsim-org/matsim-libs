@@ -41,23 +41,36 @@ public class ParkingHerbieControler {
 	private static LinkedList<Parking> getParkingCollection() {
 		double streetParkingCalibrationFactor=1.0;
 		double garageParkingCalibrationFactor=1.0;
+		double privateParkingsIndoorCalibrationFactor=1.0;
+		double privateParkingsOutdoorCalibrationFactor=1.0;
 		
-		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml");
+		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
 		
-		LinkedList<Parking> streetParkings= flatParkingFormatReaderV1.getParkings();
-		calibarteParkings(streetParkings,streetParkingCalibrationFactor);
+		String streetParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml";
+		readParkings(streetParkingCalibrationFactor, streetParkingsFile,parkingCollection);
+		
+		String garageParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkings.xml";
+		readParkings(garageParkingCalibrationFactor, garageParkingsFile,parkingCollection);
+		
+		String privateIndoorParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsIndoor.xml";
+		readParkings(privateParkingsIndoorCalibrationFactor, privateIndoorParkingsFile,parkingCollection);
+		
+		String privateOutdoorParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsOutdoor.xml";
+		readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
 		
 		
-		flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		flatParkingFormatReaderV1.parse("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkings.xml");
 		
-		LinkedList<Parking> garageParkings= flatParkingFormatReaderV1.getParkings();
-		calibarteParkings(garageParkings,garageParkingCalibrationFactor);
-		
-		LinkedList<Parking> parkingCollection = streetParkings;
-		parkingCollection.addAll(garageParkings);
 		return parkingCollection;
+	}
+
+	private static void readParkings(double streetParkingCalibrationFactor, String streetParkingsFile, LinkedList<Parking> parkingCollection) {
+		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
+		flatParkingFormatReaderV1.parse(streetParkingsFile);
+		
+		LinkedList<Parking> parkings= flatParkingFormatReaderV1.getParkings();
+		calibarteParkings(parkings,streetParkingCalibrationFactor);
+		
+		parkingCollection.addAll(parkings);
 	}
 	
 	private static void calibarteParkings(LinkedList<Parking> parkingCollection, double calibrationFactor){

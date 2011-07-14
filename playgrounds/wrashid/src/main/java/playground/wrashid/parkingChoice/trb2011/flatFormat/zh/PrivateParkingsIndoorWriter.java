@@ -37,10 +37,9 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 		
 		StringMatrix privateParkingIndoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsIndoor);
 
-		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
-		facilitiesQuadTree = getFacilitiesQuadTree(facilities);
+		
+		facilitiesQuadTree = getFacilitiesQuadTree();
 		
 		HashMap<Integer, String> mainUsagePurposeOfBuilding = getMainBuildingUsagePurpose();
 		
@@ -226,6 +225,10 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 
 	private static void assignParkingCapacityToClosestFacility(Coord coord,
 			int parkingCapacity) {
+		assignParkingCapacityToClosestFacility(coord,parkingCapacity,facilitiesQuadTree,privateParkings);
+	}
+	
+	public static void assignParkingCapacityToClosestFacility(Coord coord, int parkingCapacity, QuadTree<ActivityFacilityImpl> facilitiesQuadTree, LinkedList<PrivateParking> privateParkings){
 		ActivityFacilityImpl closestFacility=facilitiesQuadTree.get(coord.getX(), coord.getY());
 		int activityCapacities[]=new int[closestFacility.getActivityOptions().size()];
 		int sumOfFacilityActivityCapacities=0;
@@ -252,6 +255,7 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 			i++;
 		}
 	}
+	
 
 	private static ActivityFacilityImpl getClosestFacilityWithin300MeterForActivity(Coord coord,
 			 String activityType) {
@@ -275,12 +279,15 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 		return bestActivityFacility;
 	}
 
-	private static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(ActivityFacilitiesImpl facilities) {
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree() {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
 		double maxY = Double.MIN_VALUE;
 
+		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
+		
 		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
 			if (activityFacility.getCoord().getX() < minX) {
 				minX = activityFacility.getCoord().getX();
