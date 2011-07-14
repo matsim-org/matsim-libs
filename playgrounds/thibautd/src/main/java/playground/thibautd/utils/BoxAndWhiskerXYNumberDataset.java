@@ -33,7 +33,8 @@ import org.matsim.core.utils.collections.Tuple;
  * Implementation of a {@link BoxAndWhiskerXYDataset} which allows for any
  * numerical X value.
  *
- * There is only one series.
+ * Multiple series are supported, but JFreeChart renderers are unable to 
+ * display a multi-series box and whiskers XY plot properly.
  *
  * @author thibautd
  */
@@ -56,6 +57,13 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 		this.seriesKeys.set(series, key);
 	}
 
+	/**
+	 * adds a box to the specified x value
+	 *
+	 * @param series the index of the series to modify
+	 * @param xValue the xValue of the box
+	 * @param item the item to add
+	 */
 	public void add(
 			final int series,
 			final Number xValue,
@@ -65,6 +73,13 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 		seriesItems.add(new Tuple<Number, BoxAndWhiskerItem>(xValue, item));
 	}
 
+	/**
+	 * adds a box to the specified x value
+	 *
+	 * @param series the index of the series to modify
+	 * @param xValue the xValue of the box
+	 * @param item the raw data from which getting the statistics
+	 */
 	public void add(
 			final int series,
 			final Number xValue,
@@ -112,9 +127,6 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	// interface methods
 	// /////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @param series unused (only one series).
-	 */
 	@Override
 	public int getItemCount(final int series) {
 		try {
@@ -126,42 +138,26 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 		}
 	}
 
-	/**
-	 * @param series unused
-	 * @param item the index of the item to get
-	 */
 	@Override
 	public Number getX(final int series, final int item) {
 		return this.items.get(series).get(item).getFirst();
 	}
 
-	/**
-	 * @return the mean value
-	 */
 	@Override
 	public Number getY(final int series, final int item) {
 		return this.getMeanValue(series, item);
 	}
 
-	/**
-	 * @return the value used to check if an outlier is farout
-	 */
 	@Override
 	public double getFaroutCoefficient() {
 		return this.faroutCoefficient;
 	}
 
-	/**
-	 * @return normally, the max non farout value. here, no farout exclusion (yet)
-	 */
 	@Override
 	public Number getMaxOutlier(final int series, final int item) {
 		return this.items.get(series).get(item).getSecond().getMaxOutlier();
 	}
 
-	/**
-	 * @return the maximum outlier of the item
-	 */
 	@Override
 	public Number getMaxRegularValue(final int series, final int item) {
 		return this.items.get(series).get(item).getSecond().getMaxRegularValue();
@@ -213,11 +209,11 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	}
 
 	/**
-	 * @return null
+	 * @return the index of the series
 	 */
 	@Override
 	public Comparable getSeriesKey(final int series) {
-		return 1;
+		return series;
 	}
 }
 

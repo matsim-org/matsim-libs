@@ -25,10 +25,13 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.JFreeChart;
 
 /**
- * provides static function to perform usual XYPlot manipulation.
+ * provides static functions to perform usual XYPlot manipulation.
  * @author thibautd
  */
 public class XYChartUtils {
+
+	private XYChartUtils() {}
+
 	/**
 	 * Sets the X axis of an XYPlot chart to a {@link NumberAxis}
 	 * with integer values.

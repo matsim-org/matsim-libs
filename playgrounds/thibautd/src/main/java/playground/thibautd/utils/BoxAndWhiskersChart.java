@@ -24,19 +24,17 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.renderer.xy.XYBoxAndWhiskerRenderer;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
+ * Allows to plot easily box and whishers charts against an X axis
  * @author thibautd
  */
 public class BoxAndWhiskersChart extends ChartUtil {
@@ -59,12 +57,23 @@ public class BoxAndWhiskersChart extends ChartUtil {
 		this.binWidth = binWidth;
 	}
 
+	/**
+	 * Creates the chart if it does not exits, and returns it. Once called,
+	 * no modifications can be made to the dataset.
+	 * @return the chart
+	 */
 	@Override
 	public JFreeChart getChart() {
 		if (this.chart == null) createChart();
 		return this.chart;
 	}
 
+	/**
+	 * adds a value to the dataset.
+	 *
+	 * During chart creation, y values of all point of x values belonging to a
+	 * given bin will be used to compute the statistics
+	 */
 	public void add(final double x, final double y) {
 		maxX = Math.max(maxX, x);
 		minX = Math.min(minX, x);
