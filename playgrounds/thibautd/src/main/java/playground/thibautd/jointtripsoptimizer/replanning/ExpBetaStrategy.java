@@ -23,6 +23,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 /**
+ * {@link JointPlanStrategy} which simply selects a joint plan using an {@link ExpBetaPlanSelector}
  * @author thibautd
  */
 public class ExpBetaStrategy extends JointPlanStrategy {

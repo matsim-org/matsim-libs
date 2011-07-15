@@ -23,7 +23,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 /**
- * Wraps a BestPlanSelector into a JointPlanStrategy.
+ * Wraps a {@link BestPlanSelector} into a {@link JointPlanStrategy}.
  * @author thibautd
  */
 public class BestScoreStrategy extends JointPlanStrategy {

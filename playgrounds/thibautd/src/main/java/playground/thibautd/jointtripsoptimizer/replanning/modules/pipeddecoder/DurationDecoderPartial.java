@@ -42,7 +42,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
-import playground.thibautd.jointtripsoptimizer.population.JointActing;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.JointActivity;
 import playground.thibautd.jointtripsoptimizer.population.JointLeg;
@@ -53,6 +52,11 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 /**
  * Decodes plan durations, assuming that all other dimensions (toggle, mode) are
  * set correctly.
+ * <br>
+ * This version is meant to be used for "partial" decoding (only part of a clique
+ * optimised)
+ * <br><br>
+ * XXX DO NOT WORK
  *
  * @author thibautd
  */

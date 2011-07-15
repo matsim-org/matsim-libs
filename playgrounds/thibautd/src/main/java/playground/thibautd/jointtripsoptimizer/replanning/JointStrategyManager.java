@@ -29,7 +29,7 @@ import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.selectors.WorstJointPlanForRemovalSelector;
 
 /**
- * Custom StrategyManager allowing to select and optimize joint schedules
+ * Custom {@link StrategyManager} allowing to select and optimize joint plans
  * rather than individual ones.
  * Implements the hooks provided by StrategyManager.
  *

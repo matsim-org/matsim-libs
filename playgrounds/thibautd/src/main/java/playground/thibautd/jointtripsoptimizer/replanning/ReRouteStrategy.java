@@ -25,11 +25,14 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import playground.thibautd.jointtripsoptimizer.replanning.reroute.JointReRouteModule;
 
 /**
+ * {@link JointPlanStrategy} using an {@link ExpBetaPlanSelector} to select a plan
+ * and uses {@link JointReRouteModule} on it.
+ *
  * @author thibautd
  */
 public class ReRouteStrategy extends JointPlanStrategy {
 
-	public ReRouteStrategy(Controler controler) {
+	public ReRouteStrategy(final Controler controler) {
 		// TODO: use a JointPlan specific selector?
 		// + pass it from the config file
 		// this.planSelector = new BestPlanSelector();

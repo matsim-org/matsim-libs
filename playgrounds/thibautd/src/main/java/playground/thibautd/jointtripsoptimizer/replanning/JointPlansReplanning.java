@@ -29,6 +29,7 @@ import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 
 /**
+ * {@link ReplanningListener} allowing to pass the cliques to the {@link JointStrategyManager}
  * @author thibautd
  */
 public class JointPlansReplanning implements ReplanningListener {
