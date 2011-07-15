@@ -71,7 +71,6 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 				DebugLib.stopSystemAndReportInconsistency();
 			}
 			
-			
 			writer.write("\t<parking type=\"private\"");
 			writer.write(" id=\"ppOutdoor-" + i +"\"");
 			writer.write(" x=\""+ privateParkings.get(i).getCoord().getX() +"\"");

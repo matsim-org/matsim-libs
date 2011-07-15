@@ -12,7 +12,15 @@ import herbie.running.controler.HerbieControler;
 
 public class ParkingHerbieControler {
 
+	static Boolean isRunningOnServer=true;
+	static String parkingDataBase=null;
+	
 	public static void main(String[] args) {
+		if (isRunningOnServer){
+			parkingDataBase="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/";
+		} else {
+			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
+		}
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
@@ -30,6 +38,8 @@ public class ParkingHerbieControler {
 		}*/
 		
 		
+		
+		
 		ParkingModule parkingModule=new ParkingModule(hControler, parkingCollection);
 		
 //		hControler.setOverwriteFiles(true);
@@ -43,7 +53,7 @@ public class ParkingHerbieControler {
 		
 		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity();
 		
-		String streetParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkingsOutsideZHCity.xml";
+		String streetParkingsFile=parkingDataBase + "garageParkingsOutsideZHCity.xml";
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
 		
 		return parkingCollection;
@@ -57,19 +67,17 @@ public class ParkingHerbieControler {
 		
 		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
 		
-		String streetParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/streetParkings.xml";
+		String streetParkingsFile=parkingDataBase + "streetParkings.xml";
 		readParkings(streetParkingCalibrationFactor, streetParkingsFile,parkingCollection);
 		
-		String garageParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkings.xml";
+		String garageParkingsFile=parkingDataBase + "garageParkings.xml";
 		readParkings(garageParkingCalibrationFactor, garageParkingsFile,parkingCollection);
 		
-		String privateIndoorParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsIndoor.xml";
+		String privateIndoorParkingsFile=parkingDataBase + "privateParkingsIndoor.xml";
 		readParkings(privateParkingsIndoorCalibrationFactor, privateIndoorParkingsFile,parkingCollection);
 		
-		String privateOutdoorParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsOutdoor.xml";
+		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
 		readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
-		
-		
 		
 		return parkingCollection;
 	}
@@ -89,7 +97,6 @@ public class ParkingHerbieControler {
 			int capacity = parking.getCapacity();
 			parking.setCapacity((int) Math.round(capacity*calibrationFactor));
 		}
-		
 	}
 	
 }
