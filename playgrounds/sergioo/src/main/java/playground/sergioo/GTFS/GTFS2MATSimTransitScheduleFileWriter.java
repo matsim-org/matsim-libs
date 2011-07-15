@@ -721,7 +721,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * Writes the MATSim public transport file
 	 * @param filename
 	 */
-	public void write(String filename, CoordinateTransformation ct) {
+	public void write(String filename, CoordinateTransformation coordinateTransformation) {
 			loadGTFSFiles();
 			try {
 				calculateUnknownInformation();
@@ -735,7 +735,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			for(int r=0; r<roots.length; r++)
 				for(Entry<String, Stop> stop: stops[r].entrySet())
 					if(stop.getValue().getLinkId()!=null) {
-						Coord result = ct.transform(stop.getValue().getPoint());
+						Coord result = coordinateTransformation.transform(stop.getValue().getPoint());
 						TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(new IdImpl(stop.getKey()), result, stop.getValue().isBlocks());
 						transitStopFacility.setLinkId(new IdImpl(stop.getValue().getLinkId()));
 						transitStopFacility.setName(stop.getValue().getName());
@@ -912,8 +912,8 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
 		//Transformation for Singapore
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		g2m.write(args[0],ct);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+		g2m.write(args[0],coordinateTransformation);
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);
