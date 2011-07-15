@@ -35,7 +35,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 	
 	private Integer shipmentCounter = 0;
 	
-	private Map<String,TSPShipment> tspShipments;
+	private Map<TSPShipment, String> tspShipments;
 	
 
 	public TSPPlanWriter(
@@ -51,27 +51,9 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 			startTSPs(writer);
 			for(TransportServiceProviderImpl tsp : transportServiceProviders){
 				startTSP(tsp,writer);
-				if(!tsp.getTspCapabilities().getTransshipmentCentres().isEmpty()){
-					startTranshipmentCentres(writer);
-					for(Id id : tsp.getTspCapabilities().getTransshipmentCentres()){
-						startAndEndTranshipmentCentre(id, writer);
-					}
-					endTranshipmentCentres(writer);
-				}
-				if(!tsp.getContracts().isEmpty()){
-					startShipments(writer);
-					for(TSPContract contract : tsp.getContracts()){
-						startAndEndShipment(contract.getShipment(), writer);
-					}
-					endShipments(writer);
-				}
-				if(tsp.getSelectedPlan() != null){
-					startTransportChains(writer);
-					for(TransportChain chain : tsp.getSelectedPlan().getChains()){
-						startAndEndChain(chain, writer);
-					}
-					endTransportChains(writer);
-				}
+				writeCapabilities(tsp);
+				writeContracts(tsp);
+				writeTransportChains(tsp);
 				endTSP(writer);
 			}
 			endTSPs(writer);
@@ -81,6 +63,40 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 			e.printStackTrace();
 			log.error(e);
 			System.exit(1);
+		}
+	}
+
+	private void writeTransportChains(TransportServiceProviderImpl tsp)
+			throws IOException {
+		if(tsp.getSelectedPlan() != null){
+			startTransportChains(writer);
+			for(TransportChain chain : tsp.getSelectedPlan().getChains()){
+				startAndEndChain(chain, writer);
+			}
+			endTransportChains(writer);
+		}
+	}
+
+	private void writeCapabilities(TransportServiceProviderImpl tsp)
+			throws IOException {
+		if(!tsp.getTspCapabilities().getTransshipmentCentres().isEmpty()){
+			startTranshipmentCentres(writer);
+			for(Id id : tsp.getTspCapabilities().getTransshipmentCentres()){
+				startAndEndTranshipmentCentre(id, writer);
+			}
+			endTranshipmentCentres(writer);
+		}
+	}
+
+	private void writeContracts(TransportServiceProviderImpl tsp)
+			throws IOException {
+		if(!tsp.getContracts().isEmpty()){
+			startShipments(writer);
+			tspShipments = new HashMap<TSPShipment, String>();
+			for(TSPContract contract : tsp.getContracts()){
+				startAndEndShipment(contract.getShipment(), writer);
+			}
+			endShipments(writer);
 		}
 	}
 	
@@ -107,6 +123,9 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 
 	
 	private void startAndEndChain(TransportChain chain, BufferedWriter writer) throws IOException {
+		writer.write(tab(4) + "<transportChain ");
+		writer.write("shipmentId=" + quotation() + tspShipments.get(chain.getShipment()) + quotation());
+		writer.write(">" + newLine());
 		for(ChainElement element : chain.getChainElements()){
 			if(element instanceof ChainActivity){
 				writer.write(tab(5) + "<act type=" + quotation());
@@ -124,10 +143,10 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 			}
 			if(element instanceof ChainLeg){
 				ChainLeg leg = (ChainLeg)element;
-//				leg.
+				writer.write(tab(5) + "<leg carrierId=" + quotation() + leg.getAcceptedOffer().getCarrierId().toString() + quotation() + "/>" + newLine()); 
 			}
 		}
-		
+		writer.write(tab(4) + "</transportChain>" + newLine());
 	}
 
 	private void startTransportChains(BufferedWriter writer) throws IOException {
@@ -154,8 +173,10 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 	}
 
 	private void startAndEndShipment(TSPShipment shipment, BufferedWriter writer) throws IOException {
+		String id = makeShipmentId();
+		tspShipments.put(shipment,id);
 		writer.write(tab(4)+"<shipment ");
-		writer.write("id=" + quotation() + tspShipments.get(shipment) + quotation() + " ");
+		writer.write("id=" + quotation() + id + quotation() + " ");
 		writer.write("from=" + quotation() + shipment.getFrom().toString() + quotation() + " ");
 		writer.write("to=" + quotation() + shipment.getTo().toString() + quotation() + " ");
 		writer.write("size=" + quotation() + shipment.getSize() + quotation() + "/>" + newLine());
