@@ -69,15 +69,13 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	@Override
 	public void shipmentPickedUp(Shipment shipment, double time) {
 		TSPAgent agent = findTSPAgentForShipment(shipment);
-		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment);
-		chainAgent.informPickup(shipment, time);
+		agent.shipmentPickedUp(shipment,time);
 	}
 
 	@Override
 	public void shipmentDelivered(Shipment shipment, double time) {
 		TSPAgent agent = findTSPAgentForShipment(shipment);
-		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment);
-		chainAgent.informDelivery(shipment, time);
+		agent.shiopmentDelivered(shipment,time);
 	}
 
 	public void calculateCostsScoreTSPAndInform(){

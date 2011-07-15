@@ -163,4 +163,13 @@ public class TSPAgent {
 		}
 		return null;
 	}
+
+	public void shipmentPickedUp(Shipment shipment, double time) {
+		shipmentChainMap.get(shipment).informPickup(shipment, time);
+	}
+
+	public void shiopmentDelivered(Shipment shipment, double time) {
+		shipmentChainMap.get(shipment).informDelivery(shipment, time);
+		
+	}
 }
