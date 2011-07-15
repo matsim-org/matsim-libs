@@ -3,12 +3,12 @@
  */
 package city2000w;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -29,34 +29,23 @@ import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
 import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPCapabilities;
-import playground.mzilske.freight.TSPContract;
-import playground.mzilske.freight.TSPOffer;
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
 import freight.AnotherCarrierAgentFactory;
+import freight.CarrierPlanReader;
+import freight.TSPPlanReader;
 
 /**
  * @author schroeder
  *
  */
-public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
-	private static final int NUMBEROFCARRIERS = 5;
-	
-	private static final int NUMBEROFTSPSHIPMENTS = 20;
-	
-	private static Logger logger = Logger.getLogger(RunKarlsruheFromHereWithVRP.class);
+	private static Logger logger = Logger.getLogger(RunKarlsruheScenario.class);
 	
 	private Carriers carriers;
 	
@@ -72,15 +61,16 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsi
 	
 	private static final String NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
 	
-	MarginalCostCalculator marginalCostCalculator;
+	private static final String TSPPLAN_FILENAME = "../playgrounds/sschroeder/anotherInput/karlsruheMitUmschlagTspPlans.xml";
 	
+	private static final String CARRIERNPLAN_FILENAME = "../playgrounds/sschroeder/anotherInput/karlsruheMitUmschlagCarrierPlans.xml";
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
-		RunKarlsruheFromHereWithVRP runner = new RunKarlsruheFromHereWithVRP();
+		RunKarlsruheScenario runner = new RunKarlsruheScenario();
 		runner.run();
 	}
 	
@@ -89,9 +79,9 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsi
 		
 		Controler controler = event.getControler();
 		
-		createCarriers(NUMBEROFCARRIERS);
+		readCarriers();
 		
-		createTransportServiceProviderWithContracts(NUMBEROFTSPSHIPMENTS);
+		readTransportServiceProviders();
 		
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders());
 		
@@ -107,7 +97,6 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsi
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
-		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(true);
@@ -132,7 +121,6 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsi
 		Controler controler = event.getControler();
 		controler.getEvents().removeHandler(carrierAgentTracker);
 	}
-
 
 
 	@Override
@@ -188,119 +176,15 @@ public class RunKarlsruheFromHereWithVRP implements StartupListener, BeforeMobsi
 		}
 	}
 
-	private void createCarriers(int nOfCarriers) {
-		carriers = new Carriers();
-		createKarlsurheCarriers();
+	private void readCarriers() {
+		Collection<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+		new CarrierPlanReader(carriers).read(CARRIERNPLAN_FILENAME);
+		this.carriers = new Carriers(carriers);
 	}
 
-	private void createKarlsurheCarriers() {
-		CarrierImpl c_durlacherTor = new CarrierImpl(makeId("durlacherTor-carrier"), makeId("160093860_160093861"));
-		carriers.getCarriers().put(c_durlacherTor.getId(), c_durlacherTor);
-		CarrierImpl c_ettlingerTor = new CarrierImpl(makeId("ettlingerTor-carrier"), makeId("160622804_160606750"));
-		carriers.getCarriers().put(c_ettlingerTor.getId(),c_ettlingerTor);
-		CarrierImpl c_muehlburgerTor = new CarrierImpl(makeId("muehlburgerTor-carrier"), makeId("160057858_160057859"));
-		carriers.getCarriers().put(c_muehlburgerTor.getId(), c_muehlburgerTor);
-		CarrierImpl c_neureut = new CarrierImpl(makeId("neureut-carrier"), makeId("160499832_160207664"));
-		carriers.getCarriers().put(c_neureut.getId(), c_neureut);
-		CarrierImpl c_daxlanden = new CarrierImpl(makeId("daxlanden-carrier"), makeId("160260604_160168056"));
-		carriers.getCarriers().put(c_daxlanden.getId(), c_daxlanden);
-		CarrierImpl c_blankenloch = new CarrierImpl(makeId("blankenloch-carrier"), makeId("160200856_160095443"));
-		carriers.getCarriers().put(c_blankenloch.getId(), c_blankenloch);	
-		
-		for(CarrierImpl c : carriers.getCarriers().values()){
-			CarrierCapabilities cc = new CarrierCapabilities();
-			c.setCarrierCapabilities(cc);
-			CarrierVehicle carrierVehicle = new CarrierVehicle(makeId(c.getId().toString() + "-vehicle"), c.getDepotLinkId());
-			cc.getCarrierVehicles().add(carrierVehicle);
-			carrierVehicle.setCapacity(15);
-		}
-	}
-
-	private IdImpl makeId(String idString) {
-		return new IdImpl(idString);
-	}
-
-	private void createTransportServiceProviderWithContracts(int nOfShipments) {
-		TransportServiceProviderImpl tsp = new TransportServiceProviderImpl(new IdImpl("guenter"));
-		TSPCapabilities cap = new TSPCapabilities();
-		IdImpl tscEttlingen = makeId("160356161_160281801");
-		cap.getTransshipmentCentres().add(tscEttlingen);
-		tsp.setTspCapabilities(cap);
-		printCap(cap);
-		makeKarlsruheContracts(tsp);
-		createInitialPlans(tsp);
+	private void readTransportServiceProviders() {
 		transportServiceProviders = new TransportServiceProviders();
-		transportServiceProviders.getTransportServiceProviders().add(tsp);
-	}
-
-	private void makeKarlsruheContracts(TransportServiceProviderImpl tsp) {
-		Id from = makeId("160038764_160038765");
-		
-		Id to_stefantje = makeId("160324487_160089302");
-		tsp.getContracts().add(createContract(from, to_stefantje));
-		
-		Id to_lars = makeId("160685639_160099410");
-		tsp.getContracts().add(createContract(from, to_lars));
-		
-		Id to_aaron = makeId("160096359_160609343");
-		tsp.getContracts().add(createContract(from, to_aaron));
-		
-		Id to_4 = makeId("160425761_160339189");
-		tsp.getContracts().add(createContract(from, to_4));
-		
-		Id to_5 = makeId("160087060_160018372");
-		tsp.getContracts().add(createContract(from, to_5));
-		
-		Id to_6 = makeId("160337225_160337224");
-		tsp.getContracts().add(createContract(from, to_6));
-		
-		Id to_7 = makeId("160161936_160271340");
-		tsp.getContracts().add(createContract(from, to_7));
-		
-		Id to_8 = makeId("160117522_160337532");
-		tsp.getContracts().add(createContract(from, to_8));
-		
-		Id to_9 = makeId("160175985_160236797");
-		tsp.getContracts().add(createContract(from, to_9));
-		
-		Id to_10 = makeId("160420669_160086968");
-		tsp.getContracts().add(createContract(from, to_10));
-		
-		Id to_11 = makeId("160535693_160112497");
-		tsp.getContracts().add(createContract(from, to_11));
-	}
-	
-	private void createInitialPlans(TransportServiceProviderImpl tsp) {
-		SimpleTSPPlanBuilder tspPlanBuilder = new SimpleTSPPlanBuilder(scenario.getNetwork());
-		tspPlanBuilder.setCarriers(carriers.getCarriers().values());
-		tspPlanBuilder.setTransshipmentCentres(Collections.EMPTY_LIST);
-		TSPPlan directPlan = tspPlanBuilder.buildPlan(tsp.getContracts(),tsp.getTspCapabilities());
-		printTSPPlan(directPlan);
-		tsp.getPlans().add(directPlan);
-		tsp.setSelectedPlan(directPlan);
-	}
-
-	private TSPContract createContract(Id sourceLinkId, Id destinationLinkId) {
-		TSPOffer offer = new TSPOffer();
-		TSPShipment tspShipment = new TSPShipment(sourceLinkId, destinationLinkId, 5, new TSPShipment.TimeWindow(0.0, 24*3600), new TSPShipment.TimeWindow(0.0,24*3600));
-		TSPContract tspContract = new TSPContract(tspShipment,offer);
-		return tspContract;
-	}
-
-	private void printTSPPlan(TSPPlan plan) {
-		logger.debug("transportChains:");
-		for(TransportChain chain : plan.getChains()){
-			logger.debug(chain);
-		}
-		
-	}
-
-	private void printCap(TSPCapabilities cap) {
-		logger.debug("TransshipmentCentres:");
-		for(Id id : cap.getTransshipmentCentres()){
-			logger.debug(id);
-		}
-		
+		new TSPPlanReader(transportServiceProviders.getTransportServiceProviders()).read(TSPPLAN_FILENAME);
 	}
 
 }

@@ -54,7 +54,10 @@ import playground.mzilske.freight.TransportChainBuilder;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
 import freight.AnotherCarrierAgentFactory;
-import freight.CarrierUtils;
+import freight.ShipperAgentTracker;
+import freight.ShipperImpl;
+import freight.ShipperUtils;
+import freight.Shippers;
 import freight.TSPUtils;
 
 /**
@@ -76,6 +79,10 @@ public class RunKarlsruheFromHereWithVRPAndCarrierSelection implements ScoringLi
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	private TSPAgentTracker tspAgentTracker;
+	
+	private ShipperAgentTracker shipperAgentTracker;
+	
+	private Shippers shippers;
 
 	private ScenarioImpl scenario;
 	
@@ -114,6 +121,11 @@ public class RunKarlsruheFromHereWithVRPAndCarrierSelection implements ScoringLi
 		
 		createCarrierPlans();
 		
+		createShippers();
+		
+		shipperAgentTracker = new ShipperAgentTracker(shippers.getShippers());
+		
+		
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
 		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
@@ -130,6 +142,13 @@ public class RunKarlsruheFromHereWithVRPAndCarrierSelection implements ScoringLi
 		agentObserver.setOutFile("../playgrounds/sschroeder/output/karlsruhe.txt");
 		event.getControler().getEvents().addHandler(agentObserver);
 	
+		
+	}
+
+	private void createShippers() {
+//		shippers = new Shippers();
+//		ShipperImpl shipper = ShipperUtils.createShipper("shipper_stefan", locationId);
+//		shippers.getShippers().add(arg0);
 		
 	}
 
