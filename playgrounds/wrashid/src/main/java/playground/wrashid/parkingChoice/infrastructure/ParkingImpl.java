@@ -45,6 +45,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	Double searchTime = null;
 	Coord coord = null;
 	double score = 0;
+	private String parkingType;
 
 	public void resetParkingOccupancy(){
 		currentOccupancy=0;
@@ -123,7 +124,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return parkingType;
 	}
 
 	
@@ -138,4 +139,11 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	public void setCapacity(int capacity) {
 		maxCapacity=capacity;
 	}
+
+	@Override
+	public void setType(String parkingType) {
+		this.parkingType=parkingType;		
+	}
+
+	
 }

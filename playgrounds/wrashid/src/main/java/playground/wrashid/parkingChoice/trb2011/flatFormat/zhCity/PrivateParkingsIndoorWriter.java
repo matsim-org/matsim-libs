@@ -1,4 +1,4 @@
-package playground.wrashid.parkingChoice.trb2011.flatFormat.zh;
+package playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -280,13 +280,17 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 	}
 
 	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree() {
+		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
+		
+		return getFacilitiesQuadTree(facilities);
+	}
+	
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(ActivityFacilitiesImpl facilities) {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
 		double maxY = Double.MIN_VALUE;
-
-		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
 			if (activityFacility.getCoord().getX() < minX) {

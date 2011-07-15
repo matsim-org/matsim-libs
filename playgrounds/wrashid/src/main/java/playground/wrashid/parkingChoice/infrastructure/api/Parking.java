@@ -7,6 +7,8 @@ public interface Parking  extends Identifiable {
 
 	public abstract String getType();
 	
+	public abstract void setType(String parkingType);
+	
 	public abstract Coord getCoord();
 	
 	public abstract int getCapacity();

@@ -1,4 +1,4 @@
-package playground.wrashid.parkingChoice.trb2011.flatFormat.zh;
+package playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -40,8 +40,6 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 		
 		PrivateParkingsOutdoorWriter privateParkingsWriter=new PrivateParkingsOutdoorWriter();
 		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsOutdoor.xml", sourcePathPrivateParkingsOutdoor);
-
-		
 	}
 	
 	public void writeFile(final String filename, String source) {
@@ -75,7 +73,7 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 			
 			
 			writer.write("\t<parking type=\"private\"");
-			writer.write(" id=\"ppIndoor-" + i +"\"");
+			writer.write(" id=\"ppOutdoor-" + i +"\"");
 			writer.write(" x=\""+ privateParkings.get(i).getCoord().getX() +"\"");
 			writer.write(" y=\""+ privateParkings.get(i).getCoord().getY() +"\"");
 			writer.write(" capacity=\""+ privateParkings.get(i).getCapacity() +"\"");
@@ -85,6 +83,4 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 		}
 		
 	}
-	
-	
 }

@@ -191,6 +191,19 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	}
 
 	private boolean considerForParking(AgentDepartureEvent event) {
+		int freightAgentIdStart=2000000000;
+		Integer agentId=null;
+		
+		try{
+			agentId=Integer.parseInt(event.getPersonId().toString());
+		} catch (Exception e) {
+			
+		}
+		
+		if (agentId!=null && agentId>freightAgentIdStart){
+			return false;
+		}
+		
 		return TransportMode.car.equalsIgnoreCase(event.getLegMode()) && !event.getPersonId().toString().startsWith("pt");
 	}
 

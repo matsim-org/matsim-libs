@@ -40,30 +40,35 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 		
 		if (parkingType.equalsIgnoreCase("public")){
 			PublicParking publicParking=new PublicParking(coord);
+			publicParking.setType(parkingType);
 			publicParking.setGeneralAttributes(atts.getValue("generalAttributs"));
 			publicParking.setMaxCapacity(capacity);
 			return publicParking;
 		}
 		
 		if (parkingType.equalsIgnoreCase("private")){
+			
 			Id facilityId=new IdImpl(atts.getValue("facilityId"));
 			String actType=atts.getValue("actType");
 			ActInfo actInfo=new ActInfo(facilityId, actType);
 			PrivateParking privateParking=new PrivateParking(coord,actInfo);
+			privateParking.setType(parkingType);
 			privateParking.setMaxCapacity(capacity);
 			return privateParking;
 		}
 		
 		if (parkingType.equalsIgnoreCase("reserved")){
 			ReservedParking reservedParking=new ReservedParking(coord, atts.getValue("generalAttributs"));
+			reservedParking.setType(parkingType);
 			reservedParking.setMaxCapacity(capacity);
 			return reservedParking;
 		}
 		
 		if (parkingType.equalsIgnoreCase("preferred")){
-			PreferredParking reservedParking=new PreferredParking(coord, atts.getValue("generalAttributs"));
-			reservedParking.setMaxCapacity(capacity);
-			return reservedParking;
+			PreferredParking preferredParking=new PreferredParking(coord, atts.getValue("generalAttributs"));
+			preferredParking.setType(parkingType);
+			preferredParking.setMaxCapacity(capacity);
+			return preferredParking;
 		}
 		
 		DebugLib.stopSystemAndReportInconsistency("parkingType: '" + parkingType + "' unknown.");

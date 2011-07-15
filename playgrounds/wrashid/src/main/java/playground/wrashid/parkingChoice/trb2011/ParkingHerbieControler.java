@@ -16,7 +16,7 @@ public class ParkingHerbieControler {
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
-		LinkedList<Parking> parkingCollection = getParkingCollection();
+		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity();
 		
 		/*
 		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();
@@ -37,8 +37,19 @@ public class ParkingHerbieControler {
 		hControler.run();
 		
 	}
+	
+	public static LinkedList<Parking> getParkingsForScenario() {
+		double parkingsOutsideZHCityScaling=1.0;
+		
+		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity();
+		
+		String streetParkingsFile="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkingsOutsideZHCity.xml";
+		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
+		
+		return parkingCollection;
+	}
 
-	private static LinkedList<Parking> getParkingCollection() {
+	public static LinkedList<Parking> getParkingCollectionZHCity() {
 		double streetParkingCalibrationFactor=1.0;
 		double garageParkingCalibrationFactor=1.0;
 		double privateParkingsIndoorCalibrationFactor=1.0;

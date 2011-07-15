@@ -21,6 +21,7 @@
 package playground.wrashid.lib.tools.facility;
 
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 
 public class FacilityLib {
 
@@ -60,6 +61,14 @@ public class FacilityLib {
 	public static String getActivityFacilityImplStringForKml(ActivityFacilityImpl facility){
 	
 		return getActivityFacilityImplString(facility);
+	}
+	
+	public static double getTotalCapacityOfFacility(ActivityFacilityImpl activityFacility){
+		double totalFacilityCapacity=0;
+		for (ActivityOption actOption:activityFacility.getActivityOptions().values()){
+			totalFacilityCapacity+=actOption.getCapacity();
+		}
+		return totalFacilityCapacity;
 	}
 	
 }

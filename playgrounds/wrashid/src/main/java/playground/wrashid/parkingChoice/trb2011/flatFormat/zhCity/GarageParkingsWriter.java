@@ -1,4 +1,4 @@
-package playground.wrashid.parkingChoice.trb2011.flatFormat.zh;
+package playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
