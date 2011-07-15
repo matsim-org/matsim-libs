@@ -33,6 +33,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import org.jfree.chart.renderer.xy.XYBoxAndWhiskerRenderer;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -72,6 +74,8 @@ public class CountPossibleSharedRideNew {
 	private static final String DEP_TITLE = "departureLinkId";
 	private static final String ARR_TITLE = "arrivalLinkId";
 	private static final String SEPARATOR = "\t";
+
+	private static final double UPPER_X_BOUND = 30;
 
 	private final double eventInitialSearchWindow = 10*60d;
 	private final double eventSeachWindowIncr = 5*60d;
@@ -297,6 +301,7 @@ public class CountPossibleSharedRideNew {
 		Plan plan;
 		double minTimeDist;
 		double timeDist;
+		double depTime;
 		Leg leg;
 
 		for (TripData data : this.results) {
@@ -307,24 +312,28 @@ public class CountPossibleSharedRideNew {
 
 			// go through the plan to find the leg with the good departure time
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					timeDist = Math.abs(((Leg) pe).getDepartureTime() - data.timeOfDay);
+				if (pe instanceof Leg && ((Leg) pe).getMode().equals(TransportMode.car)) {
+					depTime = ((Leg) pe).getDepartureTime();
 
-					if (timeDist < minTimeDist) {
-						minTimeDist = timeDist;
+					timeDist = Math.abs(depTime - data.timeOfDay);
+
+					//if (timeDist < minTimeDist) {
+					//	minTimeDist = timeDist;
+					//	leg = (Leg) pe;
+					//}
+					//else {
+					//	//we go away "again" from the planed dep time: we found the one
+					//	if (minTimeDist > 1E-7) {
+					//		log.debug("leg found at dist "+minTimeDist);
+					//	}
+					//	break;
+					//}
+
+					if (timeDist < 1E-7) {
 						leg = (Leg) pe;
-					}
-					else {
-						//we go away "again" from the planed dep time: we found the one
-						//log.debug("leg found at dist "+minTimeDist);
 						break;
 					}
 				}
-			}
-
-			if (!leg.getMode().equals(TransportMode.car)) {
-				log.warn("non car leg found, forgetting it");
-				continue;
 			}
 
 			newResults.add(new TripData(
@@ -446,6 +455,7 @@ public class CountPossibleSharedRideNew {
 	public ChartUtil getBoxAndWhiskersPerTimeBin(final int nTimeBins) {
 		return getBoxAndWhiskersPerTimeBin(nTimeBins, -10);
 	}
+
 	/**
 	 * @return a  "box and whiskers" representation of the distribution of the number
 	 * of trips joinable per time bin.
@@ -463,10 +473,12 @@ public class CountPossibleSharedRideNew {
 				24d / nTimeBins);
 
 		double kmDist;
+		double tod;
 		for (TripData data : this.results) {
 			kmDist = data.distance / 1000d;
-			if (kmDist > minDist) {
-				chart.add(data.timeOfDay / 3600d, data.numberOfJoinableTrips);
+			tod = data.timeOfDay / 3600d;
+			if (kmDist > minDist && tod < UPPER_X_BOUND) {
+				chart.add(tod, data.numberOfJoinableTrips);
 			}
 		}
 
@@ -475,7 +487,7 @@ public class CountPossibleSharedRideNew {
 
 	/**
 	 * @param binWidth the width of a bin (km)
-	 * @param maxTripLenth the maximum trip length (km)
+	 * @param maxTripLength the maximum trip length (km)
 	 * @return a box and whiskers representation of the number of joinable joint trips,
 	 * depending on the leg distance
 	 */
@@ -577,9 +589,6 @@ public class CountPossibleSharedRideNew {
 		}
 
 		double arrivalTime = departureTime + leg.getTravelTime();
-		//TODO: get distance by a non-deprecated way
-		//problem: implies using Route.calcDistances, which costs a lot!
-		//double distance = route.getDistance();
 		double distance = RouteUtils.calcDistance((NetworkRoute) route, this.network);
 		int numberOfJoinableTrips = 0;
 		Id departureId = route.getStartLinkId();
