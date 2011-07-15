@@ -39,7 +39,10 @@ import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 
+import org.jgap.Gene;
 import org.jgap.GeneticOperator;
+import org.jgap.IChromosome;
+import org.jgap.impl.BooleanGene;
 import org.jgap.Population;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
@@ -61,6 +64,7 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	private final JointPlanOptimizerJGAPConfiguration jgapConfig;
 	private final String fileNameBox;
 	private final String fileNameLine;
+	private final String fileNameNiche;
 	private final int populationSize;
 	private final int chromosomeLength;
 	private final int nMembers;
@@ -73,6 +77,7 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	//private final List<BoxAndWhiskerItem> boxes;
 	private final DefaultBoxAndWhiskerCategoryDataset boxes;
 	private final double[][] maxFitnesses;
+	private final double[][] nNiches;
 
 	public JointPlanOptimizerPopulationAnalysisOperator(
 			JointPlanOptimizerJGAPConfiguration jgapConfig,
@@ -88,14 +93,19 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 		int currentCount = count++;
 		this.boxes = new DefaultBoxAndWhiskerCategoryDataset();
 		this.maxFitnesses = new double[2][maxIters];
+		this.nNiches = new double[2][maxIters];
 
 		for (int i=0; i<maxIters; i++) {
 			this.maxFitnesses[0][i] = Double.NaN;
 			this.maxFitnesses[1][i] = Double.NaN;
+			this.nNiches[0][i] = Double.NaN;
+			this.nNiches[1][i] = Double.NaN;
+
 		}
 
 		fileNameBox = outputPath+"/fitnessBoxPlot-"+nMembers+"-members-size-"+chromosomeLength+"-"+currentCount+".png";
 		fileNameLine = outputPath+"/maxFitnessPlot-"+nMembers+"-members-size-"+chromosomeLength+"-"+currentCount+".png";
+		fileNameNiche = outputPath+"/nichePlot-"+nMembers+"-members-size-"+chromosomeLength+"-"+currentCount+".png";
 	}
 
 	@Override
@@ -119,6 +129,31 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 
 		this.maxFitnesses[0][iterNumber - 1] = iterNumber;
 		this.maxFitnesses[1][iterNumber - 1] = a_population.determineFittestChromosome().getFitnessValue();
+
+		this.nNiches[0][iterNumber - 1] = iterNumber;
+		this.nNiches[1][iterNumber - 1] = countNiches(a_population);
+	}
+
+	private int countNiches(final Population population) {
+		int count = 0;
+		List<Boolean> scheme;
+		List<List<Boolean>> knownSchemes = new ArrayList<List<Boolean>>();
+
+		for (Object chrom : population.getChromosomes()) {
+			scheme = new ArrayList<Boolean>();
+			for (Gene gene : ((IChromosome) chrom).getGenes()) {
+				if (gene instanceof BooleanGene) {
+					scheme.add(((BooleanGene) gene).booleanValue());
+				}
+			}
+
+			if (!knownSchemes.contains(scheme)) {
+				knownSchemes.add(scheme);
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	/**
@@ -129,6 +164,7 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 	public void finish() {
 		outputFitnessBoxPlots();
 		outputBestFitnessGraph();
+		outputNichesGraph();
 	}
 
 	private void outputBestFitnessGraph() {
@@ -174,6 +210,31 @@ public class JointPlanOptimizerPopulationAnalysisOperator implements GeneticOper
 			log.warn("problem while writing output graph");
 		}
 		//log.info("writing fitness chart to file... DONE");
+	}
+
+	private void outputNichesGraph() {
+		String title = "number of collaboration schemes: population="+this.populationSize+
+			", chomosome size="+this.chromosomeLength+", "+
+			this.nMembers+" agents";
+		String xLabel = "iteration";
+		String yLabel = "n";
+		boolean legend = false;
+
+		DefaultXYDataset dataset = new DefaultXYDataset();
+		dataset.addSeries(0, this.nNiches);
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, legend, false, false);
+		// set the X axis use integer values.
+		NumberAxis axis = new NumberAxis();
+		axis.setTickUnit((NumberTickUnit) NumberAxis.createIntegerTickUnits().getCeilingTickUnit(1d));
+		axis.setAutoRangeIncludesZero(false);
+		(chart.getXYPlot()).setDomainAxis(axis);
+		chart.getPlot().setBackgroundPaint(Color.white);
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileNameNiche), chart, width, height);
+		} catch (IOException e) {
+			log.warn("problem while writing output graph");
+		}
 	}
 }
 
