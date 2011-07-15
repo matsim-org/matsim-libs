@@ -84,7 +84,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	private StatsCalculator[] statsCalculators = null;
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
-	
+
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	/**
@@ -112,8 +112,8 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			this.minIteration = controler.getFirstIteration();
 			int maxIter = controler.getLastIteration();
 			int iterations = maxIter - this.minIteration;
-			if (iterations > 1000) {
-				iterations = 1000; // limit the history size
+			if (iterations > 5000) {
+				iterations = 5000; // limit the history size
 			}
 			this.history = new double[4][iterations+1];
 		}
@@ -121,17 +121,17 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		
+
 		int numOfThreads = event.getControler().getConfig().global().getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;
-		
+
 		initThreads(numOfThreads);
-		
+
 		int roundRobin = 0;
 		for (Person person : this.population.getPersons().values()) {
 			this.statsCalculators[roundRobin++ % numOfThreads].addPerson(person);
 		}
-		
+
 		log.info("[" + this.getClass().getSimpleName() + "] using " + numOfThreads + " thread(s).");
 		// start threads
 		for (Thread thread : this.threads) {
@@ -149,7 +149,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		if (this.hadException.get()) {
 			throw new RuntimeException("Some threads crashed, thus not all persons may have been handled.");
 		}
-		
+
 		double sumAvgPlanLegTravelDistanceWorst = 0.0;
 		double sumAvgPlanLegTravelDistanceBest = 0.0;
 		double sumAvgPlanLegTravelDistanceAll = 0.0;
@@ -173,7 +173,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		// reset
 		this.statsCalculators = null;
 		this.threads = null;
-		
+
 		log.info("-- average of the average leg distance per plan (executed plans only): " + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
 		log.info("-- average of the average leg distance per plan (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst));
 		log.info("-- average of the average leg distance per plan (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg));
@@ -213,7 +213,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				chart.addMatsimLogo();
 				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("traveldistancestats.png"), 800, 600);
 			}
-			if (index == this.history[0].length) {
+			if (index == (this.history[0].length - 1)) {
 				// we cannot store more information, so disable the graph feature.
 				this.history = null;
 			}
@@ -255,7 +255,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			this.statsCalculators[i] = statsCalculatorThread;
 		}
 	}
-	
+
 	private static class StatsCalculator implements Runnable {
 
 		double sumAvgPlanLegTravelDistanceWorst = 0.0;
@@ -266,19 +266,19 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int nofLegTravelDistanceBest = 0;
 		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
-		
+
 		private Collection<Person> persons;
 		private Network network;
-		
+
 		public StatsCalculator(Network network) {
 			this.network = network;
 			persons = new ArrayList<Person>();
 		}
-		
+
 		public void addPerson(Person person) {
 			persons.add(person);
 		}
-		
+
 		@Override
 		public void run() {
 			for (Person person : persons) {
@@ -338,7 +338,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				}
 			}
 		}
-		
+
 		private double getAvgLegTravelDistance(final Plan plan) {
 
 			double planTravelDistance=0.0;
@@ -361,7 +361,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			return 0.0;
 		}
 	}
-	
+
 	private static class ExceptionHandler implements UncaughtExceptionHandler {
 
 		private final AtomicBoolean hadException;

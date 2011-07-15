@@ -93,7 +93,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		this.minIteration = controler.getFirstIteration();
 		int maxIter = controler.getLastIteration();
 		int iterations = maxIter - this.minIteration;
-		if (iterations > 10000) iterations = 1000; // limit the history size
+		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations+1];
 	}
 
@@ -216,7 +216,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 				chart.addMatsimLogo();
 				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("scorestats.png"), 800, 600);
 			}
-			if (index == this.history[0].length) {
+			if (index == (this.history[0].length - 1)) {
 				// we cannot store more information, so disable the graph feature.
 				this.history = null;
 			}
