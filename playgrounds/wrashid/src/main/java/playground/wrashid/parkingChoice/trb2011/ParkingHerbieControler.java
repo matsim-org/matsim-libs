@@ -12,17 +12,20 @@ import herbie.running.controler.HerbieControler;
 
 public class ParkingHerbieControler {
 
-	static Boolean isRunningOnServer=true;
 	static String parkingDataBase=null;
 	
 	public static void main(String[] args) {
-		if (!isRunningOnServer){
-			parkingDataBase="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/";
-		} else {
-			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
-		}
+		
 		
 		HerbieControler hControler=new HerbieControler(args);
+		
+		String isRunningOnServer = hControler.getConfig().findParam("parking", "isRunningOnServer");
+		if (Boolean.parseBoolean(isRunningOnServer)){
+			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
+		} else {
+			parkingDataBase="H:/data/experiments/TRBAug2011/parkings/flat/";
+		}
+		
 		
 		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity();
 		
