@@ -16,7 +16,7 @@ public class ParkingHerbieControler {
 	static String parkingDataBase=null;
 	
 	public static void main(String[] args) {
-		if (isRunningOnServer){
+		if (!isRunningOnServer){
 			parkingDataBase="C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/";
 		} else {
 			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
