@@ -166,11 +166,11 @@ public class PBox {
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(10));
+		capacity.setSeats(Integer.valueOf(11)); // july 2011 the driver takes one seat
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
-		vehType.setAccessTime(3.0);
-		vehType.setEgressTime(3.0);
+		vehType.setAccessTime(2.0);
+		vehType.setEgressTime(1.0);
 		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
 	
 		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
