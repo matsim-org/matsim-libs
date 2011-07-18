@@ -100,6 +100,10 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 					estimatedActduration += GeneralLib.getBikeTravelDuration(distance);
 				} else if (leg.getMode().equalsIgnoreCase("pt")) {
 					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+				} else if (leg.getMode().equalsIgnoreCase("ride")) {
+					//as ride should disappear anyway, this the closest simple estimation,
+					// which must not be correct for the algorithm to work.
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
 				} else {
 					// estimatedActduration +=
 					// distance/plansCalcRoute.getUndefinedModeSpeed();

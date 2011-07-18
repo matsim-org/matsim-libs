@@ -4,6 +4,10 @@ import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
 
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+
 import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.infrastructure.FlatParkingFormatReaderV1;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -11,26 +15,17 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 public class ParkingHerbieControler {
 
 	static String parkingDataBase=null;
+	static ParkingModule parkingModule;
 	
 	public static void main(String[] args) {
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
-		String isRunningOnServer = args[1];
-		if (Boolean.parseBoolean(isRunningOnServer)){
-			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
-		} else {
-			parkingDataBase="H:/data/experiments/TRBAug2011/parkings/flat/";
-		}
 		
 		
-		LinkedList<Parking> parkingCollection = getParkingsForScenario();
+		parkingModule=new ParkingModule(hControler, null);
 		
-		
-		
-		
-		
-		ParkingModule parkingModule=new ParkingModule(hControler, parkingCollection);
+		prepareParkingsForScenario(hControler);
 		
 //		hControler.setOverwriteFiles(true);
 
@@ -38,10 +33,33 @@ public class ParkingHerbieControler {
 		
 	}
 	
-	public static LinkedList<Parking> getParkingsForScenario() {
-		double parkingsOutsideZHCityScaling=1.0;
+	
+	
+	private static void prepareParkingsForScenario(HerbieControler hControler) {
+		hControler.addControlerListener(new StartupListener() {
+			
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				String isRunningOnServer = event.getControler().getConfig().findParam("parking", "isRunningOnServer");
+				if (Boolean.parseBoolean(isRunningOnServer)){
+					parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
+				} else {
+					parkingDataBase="H:/data/experiments/TRBAug2011/parkings/flat/";
+				}
+				
+				LinkedList<Parking> parkingCollection = getParkingsForScenario(event.getControler());
+				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
+			}
+		});
 		
-		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity();
+	}
+
+
+
+	public static LinkedList<Parking> getParkingsForScenario(Controler controler) {
+		double parkingsOutsideZHCityScaling=Double.parseDouble(controler.getConfig().findParam("parking", "publicParkingsCalibrationFactorOutsideZHCity"));
+		
+		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity(controler);
 		
 		String streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity.xml";
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
@@ -49,11 +67,11 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	public static LinkedList<Parking> getParkingCollectionZHCity() {
-		double streetParkingCalibrationFactor=1.0;
-		double garageParkingCalibrationFactor=1.0;
-		double privateParkingsIndoorCalibrationFactor=1.0;
-		double privateParkingsOutdoorCalibrationFactor=1.0;
+	public static LinkedList<Parking> getParkingCollectionZHCity(Controler controler) {
+		double streetParkingCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "streetParkingCalibrationFactorZHCity"));
+		double garageParkingCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "garageParkingCalibrationFactorZHCity"));
+		double privateParkingsIndoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingsIndoorCalibrationFactorZHCity"));
+		double privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingsOutdoorCalibrationFactorZHCity"));
 		
 		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
 		
@@ -68,6 +86,24 @@ public class ParkingHerbieControler {
 		
 		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
 		readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
+		
+		return parkingCollection;
+	}
+	
+	public static LinkedList<Parking> getParkingCollectionZHCity(){
+		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
+		
+		String streetParkingsFile=parkingDataBase + "streetParkings.xml";
+		readParkings(1.0, streetParkingsFile,parkingCollection);
+		
+		String garageParkingsFile=parkingDataBase + "garageParkings.xml";
+		readParkings(1.0, garageParkingsFile,parkingCollection);
+		
+		String privateIndoorParkingsFile=parkingDataBase + "privateParkingsIndoor.xml";
+		readParkings(1.0, privateIndoorParkingsFile,parkingCollection);
+		
+		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
+		readParkings(1.0, privateOutdoorParkingsFile,parkingCollection);
 		
 		return parkingCollection;
 	}

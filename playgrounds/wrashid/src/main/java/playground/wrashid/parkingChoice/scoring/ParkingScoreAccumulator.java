@@ -50,8 +50,6 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
-		
 		HashMap<Id, Double> walkingDistances = new HashMap<Id, Double>();
 		parkingScoreCollector.finishHandling();
 
@@ -80,16 +78,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
 				walkingDistances.put(personId, sumOfWalkingTimes * event.getControler().getConfig().plansCalcRoute().getWalkSpeed());
 
+				// this is only the implicit disutility (not an explicit one)
 				disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
-
-				// System.out.println("sum of act score:" + sumOfActTotalScore);
-				// System.out.println("sum of parking duration: "+
-				// sumOfParkingDurations);
-				// System.out.println("sum of walking durations: "+
-				// sumOfWalkingTimes);
-				// System.out.println("disutilityOfWalking:" +
-				// disutilityOfWalking);
-				// System.out.println("================");
 
 				scoringFuncAccumulator.addMoney(disutilityOfWalking);
 			}

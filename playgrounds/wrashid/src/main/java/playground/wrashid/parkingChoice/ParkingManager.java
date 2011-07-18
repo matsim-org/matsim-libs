@@ -35,6 +35,10 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 public class ParkingManager implements StartupListener {
 
 	private HashMap<Id, Plan> planUsedInPreviousIteration=new HashMap<Id, Plan>(); 
+
+	private HashMap<Parking,int[]> parkingOccupancy=new HashMap<Parking, int[]>();
+	// TODO: cont' here.
+	
 	
 	private QuadTree<Parking> parkings;
 	public QuadTree<Parking> getParkings() {
@@ -94,6 +98,10 @@ public class ParkingManager implements StartupListener {
 		for (Parking parking : parkingCollection) {
 			addParking(parking);
 		}
+	}
+
+	public void setParkingCollection(Collection<Parking> parkingCollection) {
+		this.parkingCollection = parkingCollection;
 	}
 
 	private void addParking(Parking parking) {
