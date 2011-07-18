@@ -67,23 +67,23 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		if (PT_SPEED_MODE.equals(key)) {
-			return getPtSpeedMode().toString();
-		} else if (PT_SPEED_FACTOR.equals(key)) {
-			return Double.toString(getPtSpeedFactor());
-		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
-			return Double.toString(getBeelineDistanceFactor());
-		} else if (PT_SPEED.equals(key)) {
-			return Double.toString(getPtSpeed());
-		} else if (WALK_SPEED.equals(key)) {
-			return Double.toString(getWalkSpeed());
-		} else if (BIKE_SPEED.equals(key)) {
-			return Double.toString(getBikeSpeed());
-		} else if (UNDEFINED_MODE_SPEED.equals(key)) {
-			return Double.toString(getUndefinedModeSpeed());
-		} else {
-			throw new IllegalArgumentException(key);
-		}
+//		if (PT_SPEED_MODE.equals(key)) {
+//			return getPtSpeedMode().toString();
+//		} else if (PT_SPEED_FACTOR.equals(key)) {
+//			return Double.toString(getPtSpeedFactor());
+//		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
+//			return Double.toString(getBeelineDistanceFactor());
+//		} else if (PT_SPEED.equals(key)) {
+//			return Double.toString(getPtSpeed());
+//		} else if (WALK_SPEED.equals(key)) {
+//			return Double.toString(getWalkSpeed());
+//		} else if (BIKE_SPEED.equals(key)) {
+//			return Double.toString(getBikeSpeed());
+//		} else if (UNDEFINED_MODE_SPEED.equals(key)) {
+//			return Double.toString(getUndefinedModeSpeed());
+//		} else {
+			throw new IllegalArgumentException(key + ": getValue access disabled; use direct getter");
+//		}
 	}
 
 	@Override
@@ -110,13 +110,24 @@ public class PlansCalcRouteConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
-		super.addParameterToMap(map, PT_SPEED_MODE);
-		super.addParameterToMap(map, PT_SPEED_FACTOR);
-		super.addParameterToMap(map, BEELINE_DISTANCE_FACTOR);
-		super.addParameterToMap(map, PT_SPEED);
-		super.addParameterToMap(map, WALK_SPEED);
-		super.addParameterToMap(map, BIKE_SPEED);
-		super.addParameterToMap(map, UNDEFINED_MODE_SPEED);
+
+//		super.addParameterToMap(map, PT_SPEED_MODE);
+//		super.addParameterToMap(map, PT_SPEED_FACTOR);
+//		super.addParameterToMap(map, BEELINE_DISTANCE_FACTOR);
+//		super.addParameterToMap(map, PT_SPEED);
+//		super.addParameterToMap(map, WALK_SPEED);
+//		super.addParameterToMap(map, BIKE_SPEED);
+//		super.addParameterToMap(map, UNDEFINED_MODE_SPEED);
+		// (disabling the above is a collateral damage of disabling the getValue(...) access.  kai, jul'11
+		
+		map.put( PT_SPEED_MODE, this.getPtSpeedMode().toString() );
+		map.put( PT_SPEED_FACTOR, Double.toString(this.getPtSpeedFactor()) );
+		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
+		map.put( PT_SPEED, Double.toString(this.getPtSpeed()) );
+		map.put( WALK_SPEED, Double.toString(this.getWalkSpeed()) );
+		map.put( BIKE_SPEED, Double.toString(this.getBikeSpeed()) );
+		map.put( UNDEFINED_MODE_SPEED, Double.toString(this.getUndefinedModeSpeed()) );
+
 		return map;
 	}
 
