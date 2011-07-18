@@ -893,7 +893,7 @@ public class DecentralizedSmartCharger {
 			for(Id id : myHubLoadReader.agentVehicleSourceMapping.keySet()){				
 				
 				if(vehicles.containsKey(id)){
-Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
+					Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
 					
 					for(int i=0; i<electricSource.getNumberOfEntries(); i++){
 						
@@ -2102,14 +2102,19 @@ Schedule electricSource= myHubLoadReader.agentVehicleSourceMapping.get(id);
 	 */
 	public double joulesToEmissionInKg(Id agentId, double joules){
 		Vehicle v= vehicles.getValue(agentId);
-		GasType vGT= myVehicleTypes.getGasType(v);
+		if(v.getClass().equals(ElectricVehicle.class)){
+			return 0;
+		}else{
+			GasType vGT= myVehicleTypes.getGasType(v);
+			
+			// joules used = numLiter * possiblejoulesPer liter/efficiecy
+			// numLiter= joulesUsed/(possiblejoulesPer liter/efficiecy)
+			double liter=1/(vGT.getJoulesPerLiter())*1/myVehicleTypes.getEfficiencyOfEngine(v)*joules; 		
+			double emission= vGT.getEmissionsPerLiter()*liter; 
+					
+			return emission;
+		}
 		
-		// joules used = numLiter * possiblejoulesPer liter/efficiecy
-		// numLiter= joulesUsed/(possiblejoulesPer liter/efficiecy)
-		double liter=1/(vGT.getJoulesPerLiter())*1/myVehicleTypes.getEfficiencyOfEngine(v)*joules; 		
-		double emission= vGT.getEmissionsPerLiter()*liter; 
-				
-		return emission;
 	}
 	
 	
