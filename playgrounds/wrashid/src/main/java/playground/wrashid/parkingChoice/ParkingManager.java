@@ -202,6 +202,10 @@ public class ParkingManager implements StartupListener {
 	}
 
 	public void unParkVehicle(Id personId, Parking parking) {
+		if (parking==null){
+			System.out.println();
+		}
+		
 		
 		((ParkingImpl) parking).removeVehicle();
 		currentParkingLocation.remove(personId);

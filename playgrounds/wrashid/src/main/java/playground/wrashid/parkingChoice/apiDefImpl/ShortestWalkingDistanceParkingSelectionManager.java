@@ -90,6 +90,10 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 				// TODO: enable this again, when can be set from outside
 				//DebugLib.stopSystemAndReportInconsistency("Simulation Stopped, because no parking found (for given 'maxWalkingDistanceSearchSpaceInMeters')!");
 			}
+			
+			if (Double.isInfinite(minSearchDistance)){
+				DebugLib.stopSystemAndReportInconsistency("Simulation Stopped, because no free parking available in whole scenario!");
+			}
 		}
 
 		return resultCollection;
