@@ -76,7 +76,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter extends MatsimXmlWriter
 		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
 		
 		ProvideEnoughParkingsForAllActivitiesWriter garageParkingsOutsideZHCityWriter=new ProvideEnoughParkingsForAllActivitiesWriter();
-		garageParkingsOutsideZHCityWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/garageParkingsOutsideZHCity.xml", sourcePath,garageParkingData);
+		garageParkingsOutsideZHCityWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/publicParkingsOutsideZHCity.xml", sourcePath,garageParkingData);
 
 	}
 

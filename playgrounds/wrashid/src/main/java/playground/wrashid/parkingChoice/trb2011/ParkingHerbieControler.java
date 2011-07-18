@@ -56,7 +56,7 @@ public class ParkingHerbieControler {
 		
 		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity();
 		
-		String streetParkingsFile=parkingDataBase + "garageParkingsOutsideZHCity.xml";
+		String streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity.xml";
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
 		
 		return parkingCollection;
