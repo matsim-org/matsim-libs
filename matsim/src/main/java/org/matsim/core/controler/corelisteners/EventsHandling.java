@@ -100,8 +100,12 @@ public class EventsHandling implements BeforeMobsimListener,
 		if (controler.getLegTimes() != null) {
 			controler.getLegTimes().writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "tripdurations.txt"));
 			// - print averages in log
-			log.info("[" + iteration + "] average trip duration is: " + (int) controler.getLegTimes().getAverageTripDuration()
+			log.info("[" + iteration + "] average trip (probably: leg) duration is: " + (int) controler.getLegTimes().getAverageTripDuration()
 					+ " seconds = " + Time.writeTime(controler.getLegTimes().getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+			// trips are from "true" activity to "true" activity.  legs may also go
+			// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
+			// kai, jul'11
+
 		}
 	}
 
