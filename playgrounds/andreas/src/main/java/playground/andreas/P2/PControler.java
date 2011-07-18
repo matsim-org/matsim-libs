@@ -19,13 +19,17 @@
 package playground.andreas.P2;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.pt.PtConstants;
 
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
+import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
+import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 
 
 /**
@@ -39,16 +43,29 @@ public class PControler{
 
 	public static void main(final String[] args) {
 		
-		PBox pBox = new PBox(10);
+		if(args.length == 0){
+			log.info("Arg 1: config.xml");
+			log.info("Arg 2: Number of cooperatives");
+			System.exit(1);
+		}
 		
-		PScenarioImpl scenario = new PScenarioImpl(ConfigUtils.loadConfig("F:/p/config.xml"));
+		PBox pBox = new PBox(Integer.parseInt(args[1]));
+		
+		PScenarioImpl scenario = new PScenarioImpl(ConfigUtils.loadConfig(args[0]));
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 		
+		// manipulate config
+		// add "pt interaction" cause controler.init() is called too late and in a protected way
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
+		
 		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(pBox, controler);
 		controler.addControlerListener(pFact);		
 		controler.setTransitRouterFactory(pFact);
+		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
 
 		controler.run();
 	}		
