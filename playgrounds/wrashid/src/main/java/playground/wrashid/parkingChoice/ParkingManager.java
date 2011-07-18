@@ -148,11 +148,13 @@ public class ParkingManager implements StartupListener {
 	public void initializePersonForParking(Person person){
 		Plan selectedPlan = person.getSelectedPlan();
 
-		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(selectedPlan);
+		
 
 		if (!considerForParking(person.getId())){
 			return;
 		}
+		
+		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(selectedPlan);
 		
 		if (agentHasNoCarLeg(lastActivityInfo)){
 			return;
