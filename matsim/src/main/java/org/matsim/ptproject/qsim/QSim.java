@@ -639,8 +639,9 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	// depending on this, it is a "PersonAgent" or "DriverAgent".  kai, may'10
 	// I think it is departure, but still a person agent.  kai, aug'10
 	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
-	// yy Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
+	// Since this is now by force a PlanAgent, one could replace arrangeAgentDeparture and
 	// scheduleActivityEnd by joint startPlanElement.  kai, nov'10
+	// It is no longer a PlanAgent. :-)  kai, jul'11
 	public final void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 //		Leg leg = agent.getCurrentLeg();
