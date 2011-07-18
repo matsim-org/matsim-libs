@@ -59,6 +59,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// xml events
 		
+		// pseudo-pt über Distanz, nicht ptSpeedFactor
+		
 	}
 
 }
