@@ -179,7 +179,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		return this.occupancies.keySet();
 	}
 
-	public void write(final String filename, final Counts occupCounts, final List<Id> m44StopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final List<Id> m44StopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 		
 		// write header

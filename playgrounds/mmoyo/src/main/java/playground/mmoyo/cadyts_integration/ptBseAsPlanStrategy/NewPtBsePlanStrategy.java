@@ -61,7 +61,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.CadytsErrorPlot;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
@@ -96,27 +95,25 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		// IMPORTANT: Do not change this constructor.  It needs to be like this in order to be callable as a "Module"
 		// from the config file.  kai/manuel, dec'10
 
-		// under normal circumstances, this is called relatively late in the initialization sequence, since otherwise the
-		// strategyManager to which this needs to be added is not yet there. Thus, everything that was in notifyStartup can go
-		// here. kai, oct'10
-
-		// remember the controler:
-		this.controler = controler ;
+		// remember the controler:  (yyyy I don't think this is necessary.  kai, jul'11)
+		this.controler = controler ; 
 
 		// add "this" to the events channel so that reset is called between iterations
+		// (yyyy I think this should now be better done by the controler listener mechanics.  kai, jul'11)
 		this.controler.getEvents().addHandler( this ) ;
 		this.controler.addControlerListener(this) ;
 
-		// set up the bus occupancy analyzer  
+		// set up the bus occupancy analyzer ...  
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
 		this.controler.getEvents().addHandler(ptBseOccupAnalyzer);
+		// ... and connect it to the simResults container:
+		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 
 		// this collects events and generates cadyts plans from it
 		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() /*,  ptBseOccupAnalyzer 18.jul.2011*/ ) ;
+		// yyyyyy passing ptBseOccupAnalyzer into PtPlanToPlanStepBasedOnEvents is, I think, unnecessary and should be avoided.
+		// See there.  kai, jul'11
 		this.controler.getEvents().addHandler( ptStep ) ;
-
-		// prepare resultsContainer.
-		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 
 		// build the calibrator.  This is a static method, and in consequence has no side effects
 		this.calibrator = buildCalibrator( this.controler.getScenario() );
@@ -125,6 +122,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		this.delegate = new PlanStrategyImpl( new NewPtBsePlanChanger( ptStep, this.calibrator ) ) ;
 
 		// NOTE: The coupling between calibrator and simResults is done in "reset".
+		
+		// ===========================
+		// everything beyond this line is, I think, analysis code.  kai, jul'11
 
 		//read occup counts from file
 		//String occupancyCountsFilename = this.controler.getConfig().findParam("ptCounts", "inputOccupancyCountsFile"); //better read it from config object like below
@@ -132,6 +132,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		if (occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 		}
+		// yyyyyy the counts data is read in "buildCalibrator", and here again.  This is not necessary,
+		// and confuses the reader of the program.  kai, jul'11
+		
 		//countsScaleFactor = Double.parseDouble(this.controler.getConfig().ptCounts().getCountsScaleFactor() //better read it from config object like below
 		countsScaleFactor = this.controler.getConfig().ptCounts().getCountsScaleFactor();
 
@@ -142,6 +145,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	final String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
 	@Override
 	public void reset(int iteration) {
+		// yyyy since this is now also a controler listener, material in here should be moved to "notifyIterationEnds".  kai, jul'11
+		
 		String filename = this.controler.getControlerIO().getIterationFilename(iteration, STR_LINKOFFSETFILE) ;
 
 		//show in log the results of sim volumes
@@ -169,6 +174,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
+	// yyyyyy this statement is no longer correct since someone added other public methods below.  kai, jul'11
 
 	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
@@ -415,16 +421,16 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
 
 			//Get all M44 stations and invoke the method write to get all information of them
-			TransitLine lineM44 = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
-			List<Id> m44StopIds = new ArrayList<Id>();
-			for (TransitRoute route :lineM44.getRoutes().values()){
+			TransitLine specificLine = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
+			List<Id> stopIds = new ArrayList<Id>();
+			for (TransitRoute route :specificLine.getRoutes().values()){
 				for (TransitRouteStop stop: route.getStops()){
-					m44StopIds.add( stop.getStopFacility().getId());
+					stopIds.add( stop.getStopFacility().getId());
 				}
 
 			}
 			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
-			ptBseOccupAnalyzer.write(outFile, this.occupCounts , m44StopIds );
+			ptBseOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts , stopIds );
 		}
 	}
 
@@ -502,6 +508,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	
 
 	public final String getCalibratorSettings() {
+		// yyyyyy this can be changed to package-private once the test is in the same package
 		StringBuffer sBuff = new StringBuffer();
 		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]" ); 
 		sBuff.append("[CenterRegression=" + this.calibrator.getCenterRegression() + "]" );
