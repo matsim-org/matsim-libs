@@ -124,7 +124,12 @@ public class Cooperative {
 				PPlan plan = new PPlan(new IdImpl(simpleScheduleProvider.getIteration()));
 				plan.setStartStop(this.bestPlan.getStartStop());
 				plan.setEndStop(this.bestPlan.getEndStop());
-				plan.setStartTime(Math.max(0.0, this.bestPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
+				
+				// get a valid new start time
+				double newStartTime = Math.max(0.0, this.bestPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600);
+				newStartTime = Math.min(newStartTime, this.bestPlan.getEndTime() - 1 * 3600);
+				plan.setStartTime(newStartTime);
+				
 				plan.setEndTime(this.bestPlan.getEndTime());
 				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
 				this.testPlan = plan;
@@ -134,7 +139,12 @@ public class Cooperative {
 				plan.setStartStop(this.bestPlan.getStartStop());
 				plan.setEndStop(this.bestPlan.getEndStop());
 				plan.setStartTime(this.bestPlan.getStartTime());
-				plan.setEndTime(Math.min(24 * 3600.0, this.bestPlan.getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600));
+				
+				// get a valid new end time
+				double newEndTime = Math.min(24 * 3600.0, this.bestPlan.getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * 6 * 3600);
+				newEndTime = Math.max(newEndTime, this.bestPlan.getStartTime() + 1 * 3600);
+				plan.setEndTime(newEndTime);
+				
 				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
 				this.testPlan = plan;
 			}			
