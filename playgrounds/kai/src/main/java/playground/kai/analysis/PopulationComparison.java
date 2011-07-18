@@ -96,7 +96,7 @@ class PopulationComparison {
 		
 		{
 			Config config1 = ConfigUtils.createConfig() ;
-			config1.network().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_network.xml.gz") ;
+			config1.network().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/output_network.xml.gz") ;
 //			config1.plans().setInputFile("/Users/nagel/kairuns/18jun-base/kairun3-incl-ba16.reduced_plans.xml.gz") ;
 			config1.plans().setInputFile("/Users/nagel/kairuns/base-01jul/pop.xml.gz") ;
 			sc1 = ScenarioUtils.loadScenario(config1) ;
@@ -104,7 +104,7 @@ class PopulationComparison {
 
 		{
 			Config config2 = ConfigUtils.createConfig() ;
-			config2.network().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.output_network.xml.gz") ;
+			config2.network().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/output_network.xml.gz") ;
 //			config2.plans().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.reduced_plans.xml.gz") ;
 			config2.plans().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/pop.xml.gz") ;
 			sc2 = ScenarioUtils.loadScenario(config2) ;
@@ -182,7 +182,7 @@ class PopulationComparison {
 		for ( int ii=0 ; ii<LL ; ii++ ) {
 			for ( int jj=0 ; jj<MM ; jj++ ) {
 				double xx = binToXx(ii) ; double yy = binToYy(jj) ;
-				if ( cnt[ii][jj] > 10. ) {
+				if ( cnt[ii][jj] > 20. ) {
 					//				if ( weight[ii][jj] > 0. ) {
 					//					double xx = xsum[ii][jj]/cnt[ii][jj] ; double yy = ysum[ii][jj]/cnt[ii][jj] ;
 					double val = sum[ii][jj]/weight[ii][jj] ;
