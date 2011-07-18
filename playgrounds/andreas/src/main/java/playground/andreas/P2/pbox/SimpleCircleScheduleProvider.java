@@ -123,24 +123,26 @@ public class SimpleCircleScheduleProvider {
 		
 		// get stops at Route
 		List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
-							
+		
+		double runningTime = 0.0;
+		
 		// first stop
-		TransitRouteStop routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, startTime, startTime);
+		TransitRouteStop routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, runningTime, runningTime);
 		stops.add(routeStop);
 		
 		// additional stops
 		for (Link link : completeLinkList) {
-			startTime += link.getLength() / link.getFreespeed();
+			runningTime += link.getLength() / link.getFreespeed();
 			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl("p_" + link.getId())) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl("p_" + link.getId())), startTime, startTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl("p_" + link.getId())), runningTime, runningTime);
 			stops.add(routeStop);
 		}
 		
 		// last stop
-		startTime += this.net.getLinks().get(startStop.getLinkId()).getLength() / this.net.getLinks().get(startStop.getLinkId()).getFreespeed();
-		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, startTime, startTime);
+		runningTime += this.net.getLinks().get(startStop.getLinkId()).getLength() / this.net.getLinks().get(startStop.getLinkId()).getFreespeed();
+		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, runningTime, runningTime);
 		stops.add(routeStop);
 		
 		// register departure
