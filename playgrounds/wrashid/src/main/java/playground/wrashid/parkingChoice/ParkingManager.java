@@ -150,6 +150,10 @@ public class ParkingManager implements StartupListener {
 
 		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(selectedPlan);
 
+		if (!considerForParking(person.getId())){
+			return;
+		}
+		
 		if (agentHasNoCarLeg(lastActivityInfo)){
 			return;
 		}
@@ -160,6 +164,23 @@ public class ParkingManager implements StartupListener {
 
 		Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), null, null);
 		parkVehicle(person.getId(), bestParking);
+	}
+	
+	public boolean considerForParking(Id agentId){
+		int freightAgentIdStart=2000000000;
+		Integer currentAgentId=null;
+		
+		try{
+			currentAgentId=Integer.parseInt(agentId.toString());
+		} catch (Exception e) {
+			
+		}
+		
+		if (currentAgentId!=null && currentAgentId>freightAgentIdStart){
+			return false;
+		}
+		
+		return !agentId.toString().startsWith("pt");
 	}
 	
 
