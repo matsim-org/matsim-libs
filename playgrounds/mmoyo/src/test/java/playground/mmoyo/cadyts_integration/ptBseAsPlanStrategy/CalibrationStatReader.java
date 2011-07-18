@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.io.IOException;
 import java.util.Map;

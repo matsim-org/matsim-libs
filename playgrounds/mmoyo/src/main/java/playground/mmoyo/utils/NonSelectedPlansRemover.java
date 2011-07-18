@@ -20,7 +20,6 @@
 
 package playground.mmoyo.utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,40 +28,49 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkImpl;
- /**
-  *filters all plans leaving only the selected ones
+import org.matsim.population.algorithms.PersonAlgorithm;
+ 
+/**
+  *filters all plans out leaving only the selected ones
   * @author manuel
   */
-public class NonSelectedPlansRemover {
+public class NonSelectedPlansRemover implements PersonAlgorithm {
+
+	@Override
+	public void run(Person person){
+		Collection <Plan> selectedPlanList = new ArrayList<Plan>();
+		selectedPlanList.add(person.getSelectedPlan());
+		person.getPlans().retainAll(selectedPlanList);
+	}
 
 	public void run(Population population){
 		for (Person person : population.getPersons().values()){
-			Collection <Plan> selectedPlanList = new ArrayList<Plan>();
-			selectedPlanList.add(person.getSelectedPlan());
-			person.getPlans().retainAll(selectedPlanList);
+			this.run(person);
 		}
 	}
-
+	
 	public static void main(String[] args) {
-		String PopFilePath;
-		String NetFilePath;
+		String popFilePath;
+		String netFilePath;
+		String outputFilePath;
 		
-		if (args.length==2){
-			PopFilePath = args[0];
-			NetFilePath = args[1];
+		if (args.length==3){
+			popFilePath = args[0];
+			netFilePath = args[1];
+			outputFilePath = args[2];
 		}else{
-			PopFilePath = "../path";
-			NetFilePath = "../path";
+			popFilePath = "../../input/6_0_1200_2clons.xml.gz";
+			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			outputFilePath = "../../input/6_0_1200_2clonsNoSelPlans.xml.gz";
 		}
 
 		DataLoader dLoader = new DataLoader();
 		
-		Population population = dLoader.readPopulation(PopFilePath);
+		Population population = dLoader.readPopulation(popFilePath);
 		new NonSelectedPlansRemover().run(population);
-		NetworkImpl net = dLoader.readNetwork(NetFilePath);
+		NetworkImpl net = dLoader.readNetwork(netFilePath);
 		
-		String outputFile = new File(PopFilePath).getParent() + File.separatorChar + "PopulationOnlySelectedPlans.xml"; 
-		System.out.println("writing output plan file..." + outputFile);
-		new PopulationWriter(population, net).write(outputFile);
+		System.out.println("writing output plan file..." + outputFilePath);
+		new PopulationWriter(population, net).write(outputFilePath);
 	}
 }

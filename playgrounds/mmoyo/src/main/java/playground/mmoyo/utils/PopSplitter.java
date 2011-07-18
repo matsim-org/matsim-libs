@@ -17,7 +17,7 @@ public class PopSplitter {
 	public void run(Scenario sc, int fileNum){
 		final String procesing = "processing ";
 		final String writting = "writting until agent: ";
-		final String xml = ".xml";
+		final String xmlgz = ".xml.gz";
 		Population inputPop = sc.getPopulation();
 		
 		int i=1;
@@ -29,7 +29,7 @@ public class PopSplitter {
 			newPopulation.addPerson(person);
 			if (i%(size/fileNum)==0 || i==size ){
 				PopulationWriter writer = new PopulationWriter(newPopulation, sc.getNetwork());
-				String outFileName = sc.getConfig().controler().getOutputDirectory()  +  i + xml; 
+				String outFileName = sc.getConfig().controler().getOutputDirectory()  +  i + xmlgz; 
 				writer.write(outFileName);
 				new FileCompressor().run(outFileName);
 				

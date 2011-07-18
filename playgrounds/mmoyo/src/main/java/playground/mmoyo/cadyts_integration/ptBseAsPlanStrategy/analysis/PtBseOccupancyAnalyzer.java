@@ -33,7 +33,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -60,6 +62,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();  //Map< vehId,stopFacilityId> 
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();  //Map<vehId,passengersNo. in Veh> 
 	private StringBuffer occupancyRecord;
+	private final static String STR_M44 = "M44";
 	
 	public PtBseOccupancyAnalyzer() {
 		this.timeBinSize = 3600;
@@ -77,6 +80,12 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		//only line m44
+		Id transitLineId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
+		if ( !transitLineId.toString().contains(STR_M44)) {
+			return ;
+		}
+		
 		// ------------------veh_passenger- (for occupancy)-----------------
 		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
 		double time = event.getTime();
@@ -87,6 +96,11 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		//only line m44
+		Id transitLineId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
+		if ( !transitLineId.toString().contains(STR_M44)) {
+			return ;
+		}
 		// ----------------veh_passenger-(for occupancy)--------------------------
 		Id vehId = event.getVehicleId();
 		double time = event.getTime();

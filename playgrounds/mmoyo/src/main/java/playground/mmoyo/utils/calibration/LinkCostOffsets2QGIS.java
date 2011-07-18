@@ -20,6 +20,7 @@
 
 package playground.mmoyo.utils.calibration;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,9 +44,7 @@ import playground.yu.utils.qgis.X2QGIS;
 
 import cadyts.utilities.misc.DynamicData;
 
-/**
- * @author Manuel
- */
+ /**produces gis polygons from cost offset values*/
 public class LinkCostOffsets2QGIS {
 	final String netFilePath;
 	final NetworkImpl net;

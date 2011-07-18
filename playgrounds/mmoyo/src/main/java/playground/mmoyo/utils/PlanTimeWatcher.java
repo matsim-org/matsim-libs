@@ -20,6 +20,7 @@
 
 package playground.mmoyo.utils;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -51,7 +52,7 @@ public class PlanTimeWatcher {
 		String populationFile = "../playgrounds/mmoyo/output/test/doubleMinTransfersRoutes_plan2.xml.gz";
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 	
-		ScenarioImpl scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
+		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		
 		new PlanTimeWatcher().run(scenario.getPopulation());
 

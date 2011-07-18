@@ -2,6 +2,7 @@ package playground.mmoyo.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -103,7 +104,7 @@ public class PlanFragmenter {
 		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		String outputFile = "../playgrounds/mmoyo/output/alltest/fragmentedPlan.xml";
 		
-		ScenarioImpl scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
+		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		
 		Population fragmPopulation = new PlanFragmenter().run(scenario.getPopulation());
 		System.out.println("writing output plan file..." + outputFile);

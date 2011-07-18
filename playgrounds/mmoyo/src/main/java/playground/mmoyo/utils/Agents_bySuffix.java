@@ -17,7 +17,6 @@ public class Agents_bySuffix {
 		this.population= population;
 	}
 	
-	
 	public void ListPersons(final String criterion){
 		Map <String, Integer> idMap = new TreeMap <String, Integer>();
 		for(Person person: this.population.getPersons().values()){

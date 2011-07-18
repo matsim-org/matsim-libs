@@ -1,4 +1,4 @@
-package playground.mmoyo.utils;
+package playground.mmoyo.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,11 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-/**Creates a plan with an agent repeated many times*/
-public class PlanRepeater {
+/**Creates a population with only one agent repeated many times*/
+public class PersonRepeater {
 
 	
-	public PlanRepeater(final String config, final int repetitions, final Id selectedId) {
+	public PersonRepeater(final String config, final int repetitions, final Id selectedId) {
 		
 		final String SEPARATOR = "_";
 		
@@ -57,7 +57,7 @@ public class PlanRepeater {
 		String config = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/equil_config.xml";
 		int repetitions= 10;
 		Id selectedId= new IdImpl("1");
-		new PlanRepeater(config, repetitions, selectedId);
+		new PersonRepeater(config, repetitions, selectedId);
 	}
 	
 }

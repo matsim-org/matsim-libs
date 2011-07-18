@@ -13,9 +13,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 
+import playground.mmoyo.algorithms.PlanScoreNullifier;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PlanFragmenter;
-import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
 /**routes scenario with configurable travel parameter values**/
 public class AdaptedLauncher {
@@ -24,7 +24,6 @@ public class AdaptedLauncher {
 	
 	private boolean noCarPlans = false;
 	private boolean fragmentPlans = false;
-	private boolean compressPlan = true;
 	
 	double betaWalk;
 	double betaDistance;
@@ -77,13 +76,14 @@ public class AdaptedLauncher {
 		this.betaTransfer= 	Math.round(this.betaTransfer*100)/100.0;
 
 		//set margin utility values
+		myTransitRouterConfig.setMarginalUtilityOfTravelTimePt_utl_s( -this.betaTime / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-this.betaDistance / 1000.0);
 //		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
 		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * myTransitRouterConfig.getMarginalUtilityOfTravelTimePt_utl_s());
 
 		myTransitRouterConfig.scenarioName = strWalk + this.betaWalk + sep+ strDist + this.betaDistance + sep +  strTr + this.betaTransfer ;
-		System.out.println (routing  + myTransitRouterConfig.scenarioName);
+		System.out.println("routing: " + myTransitRouterConfig.scenarioName);
 		
 		Population pop = scenario.getPopulation();
 		if (this.noCarPlans){
@@ -104,7 +104,7 @@ public class AdaptedLauncher {
 				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenario.getTransitSchedule(), transitConfig, myTransitRouterConfig);
 
 		
-		new PlanScoreRemover().run(pop);
+		new PlanScoreNullifier().run(pop);
 		adaptedPlansCalcTransitRoute.run(pop);
 
 		if (this.fragmentPlans){
@@ -112,10 +112,7 @@ public class AdaptedLauncher {
 		}
 
 		//write routed plan
-		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory()+ "routedPlan_" + myTransitRouterConfig.scenarioName + ".xml";
-		if (this.compressPlan){
-			routedPlansFile += ".gz";
-		}
+		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory()+ "routedPlan_" + myTransitRouterConfig.scenarioName + ".xml.gz";
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(pop, scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
@@ -168,18 +165,13 @@ public class AdaptedLauncher {
 	public static void main(String[] args) throws FileNotFoundException{
 		String configFilePath = null;
 		if (args.length ==0){
-			configFilePath = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFilePath = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}else{
 			configFilePath = args[0];
 		}
 		AdaptedLauncher adaptedLauncher	= new AdaptedLauncher(configFilePath);
 		adaptedLauncher.setFragmentPlans(false);
-		adaptedLauncher.setNoCarPlans(false);
-		
-		//route once, setting own parameter values 
-		adaptedLauncher.set_betaDistance(0.7);
-		adaptedLauncher.set_betaTransfer(240);
-		adaptedLauncher.set_betaWalk(6.0);
+		adaptedLauncher.setNoCarPlans(true);
 		adaptedLauncher.route();
 		
 		// for many times with combination of values

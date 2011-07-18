@@ -26,43 +26,37 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.mmoyo.cadyts_integration.Z_Launcher;
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
-import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
 import playground.mmoyo.utils.DataLoader;
-import playground.mmoyo.utils.FileCompressor;
 import playground.mmoyo.utils.PlansMerger;
 
 /**
  *  -reads a base plan 
  *  -routes it with a given number of parameter combinations
  *  -creates it over-estimated version (agent add stay-home plan and the agent is cloned) 
- *  -calibrates it if wanted
+ *  -calibrates it if wanted(using cadyts as strategy in config file)
  */
 public class OverDemandPlan_router {
 	private ScenarioImpl scenario;
 	private Config config;
-	private MyTransitRouterConfig myTransitRouterConfig;
 	private PopulationWriter popwriter;
 	
 	public OverDemandPlan_router(final ScenarioImpl scenario){
 		this.scenario = scenario;
 		this.config = this.scenario.getConfig();
-		
-		myTransitRouterConfig = new MyTransitRouterConfig(this.scenario.getConfig().planCalcScore(),
-				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
-				this.scenario.getConfig().vspExperimental());
 	}
 	
 	/**
 	 * returns the config file of the over-demand plan 
 	 */
-	public String run(String[] valuesArray){
+	public String run(String[] paramValuesArray, int numHomePlans, int numClons){
 		String splitter= "_";
-		String[] routedPlanArray = new String[valuesArray.length];
+		String[] routedPlanArray = new String[paramValuesArray.length];
 
-		for (int i=0; i<valuesArray.length; i++){
+		for (int i=0; i<paramValuesArray.length; i++){
 			//read parameter combination
-			String strComb =  valuesArray[i];
+			String strComb =  paramValuesArray[i];
 			String[] strComb2 = strComb.split(splitter);
 			
 			System.out.println("beta walk: " + strComb2[0] );
@@ -79,24 +73,23 @@ public class OverDemandPlan_router {
 		}
 		
 		//merge plans
-		Population mergedPop= new PlansMerger().plansAggregator(routedPlanArray);     
+		PlansMerger plansMerger = new PlansMerger();
+		plansMerger.setNetFilePath(this.scenario.getConfig().network().getInputFile());
+		Population mergedPop= plansMerger.plansAggregator(routedPlanArray);
 		
 		//clone plans and add stay home plans
-		Population clonedPop = new OverDemandPlanCreator(mergedPop).run(3, 2);
+		Population clonedPop = new OverDemandPlanCreator(mergedPop).run(numHomePlans, numClons);
 		mergedPop= null;
 		
 		//write plan in config-output directory
-		String overEstimDemPlansFile = scenario.getConfig().controler().getOutputDirectory() + "overEstimatedDemandPlans.xml";		
+		String overEstimDemPlansFile = scenario.getConfig().controler().getOutputDirectory() + "overEstimatedDemandPlans.xml.gz";		
 		System.out.println("writing output cloned plan file..." +  overEstimDemPlansFile);
 		popwriter = new PopulationWriter(clonedPop, scenario.getNetwork());
 		popwriter.write(overEstimDemPlansFile);
-		FileCompressor fileCompressor = new FileCompressor();
-		fileCompressor.run(overEstimDemPlansFile);
-		overEstimDemPlansFile += ".gz";
 		
 		//create the new config file
 		String oldOutdir= this.config.controler().getOutputDirectory();
-		String newOuputdirPath = this.config.controler().getOutputDirectory() + "output/";
+		String newOuputdirPath = this.config.controler().getOutputDirectory() + "outputCal/";
 		this.config.setParam("plans", "inputPlansFile", overEstimDemPlansFile );
 		this.config.setParam("controler", "outputDirectory", newOuputdirPath);
 
@@ -112,31 +105,36 @@ public class OverDemandPlan_router {
 		configWriter= null;
 		newOuputdirPath = null;
 		
-		return configClonedFile;
-		
-	}		
+		return configClonedFile; 
+	}
 
 	public static void main(String[] args) {
 		String configFile= null;
 		String[] valuesArray = null;
+		int numHomePlans;
+		int numClons;
 		
 		if (args.length>0){
-			configFile = args[0];	
-			valuesArray = new String[args.length-1];
-			for (int i=0; i<args.length;i++){
-				valuesArray[i]=args[i+1];
-			}
-		
-		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = args[0];	  //config comb1 comb2 comb3 clones homPlans
 			valuesArray = new String[3];
-			valuesArray[0] = "10_0.0_1020";
-			valuesArray[1] = "10_0.6_1020";
-			valuesArray[2] = "10_0.0_00";
+			valuesArray[0]=args[1];
+			valuesArray[1]=args[2];
+			valuesArray[2]=args[3];
+			numClons = Integer.valueOf(args[4]);
+			numHomePlans = Integer.valueOf(args[5]);
+		}else{
+			configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			valuesArray = new String[3];
+			valuesArray[0] = "6_0.0_1200";
+			valuesArray[1] = "10_0.0_240";
+			valuesArray[2] = "8_0.5_720";
+		
+			numClons = 0;
+			numHomePlans = 1;
 		}
 		
-		ScenarioImpl scn = new DataLoader().loadScenarioWithTrSchedule(configFile);
-		new OverDemandPlan_router(scn).run(valuesArray);
+		ScenarioImpl scn = new DataLoader().loadScenario(configFile);
+		new OverDemandPlan_router(scn).run(valuesArray, numHomePlans,numClons);
 	}
 
 }

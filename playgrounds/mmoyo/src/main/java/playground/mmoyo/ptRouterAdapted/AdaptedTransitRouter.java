@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -42,8 +41,6 @@ import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCost;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -65,7 +62,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
-
+		
 		// progressive stop search*
 		Collection<TransitRouterNetworkNode> fromNodes;
 		double searchRadius = this.getConfig().searchRadius;
@@ -99,7 +96,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 			double initialCost = -initialTime * this.getConfig().getMarginalUtilityOfTravelTimeWalk_utl_s(); // yyyy check sign!!! kai, apr'10
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
-
+		
 		// find routes between start and end stops
 		Path p = this.getDijkstra().calcLeastCostPath(wrappedFromNodes, wrappedToNodes);
 

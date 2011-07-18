@@ -20,8 +20,11 @@
 
 package playground.mmoyo.utils.calibration;
 
+import java.io.File;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,9 +42,10 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.utils.DataLoader;
-import playground.mmoyo.utils.FirstPlansExtractor;
+import playground.mmoyo.utils.FirstPersonsExtractor;
 import playground.mmoyo.utils.PlansMerger;
 
+/**creates clones and stay home plans for each person*/
 public class OverDemandPlanCreator {
 	private Population population;
 	
@@ -99,7 +103,7 @@ public class OverDemandPlanCreator {
 	/**
 	 * Creates a plan whereby the agents stay at home the whole day
 	 */
-	private void createHomePlan(Person person){
+	public void createHomePlan(Person person){
 		Plan homePlan = new PlanImpl();
 		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		ActivityImpl homeAct = new ActivityImpl(home, homeCoord);
@@ -115,44 +119,40 @@ public class OverDemandPlanCreator {
 	}
 	
 	public static void main(String[] args) {
-		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-
-		Population multPop = null;
-		String[] arraPopPaths = new String[6];
+		String networkFile;
+		Population pop = null;
+		String popFilePath = null;
 		
-		//cad1   w6d0.0t1200_w10d0.0t240_w8d0.5t720
-		/*
-		arraPopPaths[0]= "I:/z_alltest5/output/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
-		arraPopPaths[1]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
-		arraPopPaths[2]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.5_tran720.0.xml.gz";
-		*/
-		//cad2     w10d0.0t1020_w10d0.4t60_w8d0.0t900
+		if (args.length>0){
+			popFilePath= args[0];
+			networkFile = args[1];
+		}else{
+			networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			/*
+			String[] popFilePathArray = new String[0];
+			popFilePathArray[0]= "../../input/ro/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
+			popFilePathArray[1]= "../../input/ro/routedPlan_walk8.0_dist0.5_tran720.0.xml.gz";
+			popFilePathArray[2]= "../../input/ro/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
+			*/
+			popFilePath = "../../input/juli/addhome/routedTrackedAndMerged.xml.gz";
+		}
 		
-		arraPopPaths[0]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.0_tran1020.0.xml.gz";
-		arraPopPaths[1]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.4_tran60.0.xml.gz";
-		arraPopPaths[2]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.0_tran900.0.xml.gz";
+		DataLoader dataLoader = new DataLoader();
+		Scenario scn = dataLoader.readNetwork_Population(networkFile, popFilePath); 
 		
-		
-		//cad3    w10d0.2t780_w6d0.7t540_w8d0.4t60
-		
-		arraPopPaths[3]= "I:/z_alltest5/output/routedPlan_walk10.0_dist0.2_tran780.0.xml.gz";
-		arraPopPaths[4]= "I:/z_alltest5/output/routedPlan_walk6.0_dist0.7_tran540.0.xml.gz";
-		arraPopPaths[5]= "I:/z_alltest5/output/routedPlan_walk8.0_dist0.4_tran60.0.xml.gz";
-		
-		multPop =  new OverDemandPlanCreator(multPop).MergingPops(arraPopPaths, 1, 0);
-
-		final NetworkImpl net = new DataLoader().readNetwork(networkFile);
-		PopulationWriter popWriter;
+		pop = scn.getPopulation();
+		pop =  new OverDemandPlanCreator(pop).run(1, 0);
 
 		//write the plan with over demand
-		popWriter= new PopulationWriter(multPop, net);
-		//popWriter.write("../playgrounds/mmoyo/output/tmp/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0_ver2_NoCLONES.xml.gz");
-		//popWriter.write("../playgrounds/mmoyo/output/cadyts/w10d0.0t1020_w10d0.4t60_w8d0.0t900_NOCLONS.xml.gz");
-		popWriter.write("../playgrounds/mmoyo/output/tmp/w10d0.0t1020_w10d0.4t60_w8d0.0t900_w10d0.2t780_w6d0.7t540_w8d0.4t60_NoClons.xml.gz");
+		Network net = scn.getNetwork();
+		File file = new File(popFilePath);
+		String outputFile = file.getParent() + File.separatorChar + file.getName() + "overDemandPlan.xml.gz";		
+		PopulationWriter popWriter= new PopulationWriter(pop, net);
+		popWriter.write(outputFile);	
 		
 		//write a sample
-		popWriter = new PopulationWriter(new FirstPlansExtractor().run(multPop), net);
-		popWriter.write("../playgrounds/mmoyo/output/cadyts/samplePlans.xml") ;
+		popWriter = new PopulationWriter(new FirstPersonsExtractor().run(pop, 5), net);
+		popWriter.write(file.getParent() + File.separatorChar + file.getName() + "overDemandPlanSample.xml") ;
 	}
 
 }

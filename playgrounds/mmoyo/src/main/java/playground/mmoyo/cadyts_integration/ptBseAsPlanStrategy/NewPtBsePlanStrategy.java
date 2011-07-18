@@ -61,15 +61,13 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-//import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
-//import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
+import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.CadytsErrorPlot;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
 import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
-import cadyts.utilities.misc.DynamicData;
 
 public class NewPtBsePlanStrategy implements PlanStrategy, 
 											AdditionalTeleportationDepartureEventHandler,  
@@ -114,7 +112,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		this.controler.getEvents().addHandler(ptBseOccupAnalyzer);
 
 		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() , ptBseOccupAnalyzer ) ;
+		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents( this.controler.getScenario() /*,  ptBseOccupAnalyzer 18.jul.2011*/ ) ;
 		this.controler.getEvents().addHandler( ptStep ) ;
 
 		// prepare resultsContainer.
@@ -406,6 +404,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
 			ptBseOccupAnalyzer.reset(iter);
+			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
 		}
 	}
 
@@ -495,20 +494,23 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simBseCountCompareOccupancy.txt"));
 					}
 				}
-
+			
 				controler.stopwatch.endOperation("compare with pt counts");
 			}
 		}
 	}
 	
+
 	public final String getCalibratorSettings() {
-		return	"[BruteForce=" + this.calibrator.getBruteForce() + "]" +
-				"[CenterRegression=" + this.calibrator.getCenterRegression() + "]" +
-				"[FreezeIteration=" + this.calibrator.getFreezeIteration() + "]" +
-				"[MinStddev=" + this.calibrator.getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H) + "]" +
-				"[PreparatoryIterations=" + this.calibrator.getPreparatoryIterations() + "]" +
-				"[RegressionInertia=" + this.calibrator.getRegressionInertia() + "]" +
-				"[VarianceScale=" + this.calibrator.getVarianceScale() + "]";
+		StringBuffer sBuff = new StringBuffer();
+		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]" ); 
+		sBuff.append("[CenterRegression=" + this.calibrator.getCenterRegression() + "]" );
+		sBuff.append("[FreezeIteration=" + this.calibrator.getFreezeIteration() + "]" );
+		sBuff.append("[MinStddev=" + this.calibrator.getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H) + "]" );
+		sBuff.append("[PreparatoryIterations=" + this.calibrator.getPreparatoryIterations() + "]" );
+		sBuff.append("[RegressionInertia=" + this.calibrator.getRegressionInertia() + "]" );
+		sBuff.append("[VarianceScale=" + this.calibrator.getVarianceScale() + "]" );
+		return sBuff.toString();
 	}
 	
 }

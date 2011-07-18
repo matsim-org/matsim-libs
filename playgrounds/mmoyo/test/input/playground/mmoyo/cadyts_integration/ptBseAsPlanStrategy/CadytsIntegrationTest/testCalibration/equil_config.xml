@@ -1,19 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
   [
-   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK		"test/scenarios/equil/network.xml">
+   <!ENTITY INPUTBASE   "test/input/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/">
+   <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/cadyts_integration/ptBseAsPlanStrategy/CadytsIntegrationTest/testCalibration/">
   ]
 >
   <!-- 
    <!ENTITY INPUTBASE   "test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
    <!ENTITY OUTPUTBASE	"test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK		"./matsim/examples/equil/network.xml">
   
    <!ENTITY INPUTBASE   "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
    <!ENTITY OUTPUTBASE	"../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/">
-   <!ENTITY NETWORK	"../matsim/examples/equil/network.xml">
    -->
    
 <config>
@@ -23,7 +20,7 @@
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="&NETWORK;" />
+		<param name="inputNetworkFile" value="&INPUTBASE;network.xml" />
 	</module>
 	
 	<module name="plans">

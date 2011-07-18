@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo;
+package playground.mmoyo.utils;
 
 import org.junit.Assert;
 import org.junit.Rule;

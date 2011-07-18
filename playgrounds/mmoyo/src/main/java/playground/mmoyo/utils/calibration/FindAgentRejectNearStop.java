@@ -62,7 +62,7 @@ public class FindAgentRejectNearStop {
 		Coord stopCoord = scn.getTransitSchedule().getFacilities().get(stopId).getCoord();
 
 		//Create a new population where persons will be stored 
-		ScenarioImpl tempScenario =(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl tempScenario =(ScenarioImpl) new DataLoader().createScenario();
 		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
 		
 		//create set of nodes coordinates around the station

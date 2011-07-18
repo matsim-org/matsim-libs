@@ -21,14 +21,16 @@ package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
@@ -43,8 +45,10 @@ public class DataLoader {
 
 	//this is to be used when one need to work with a scenario outside a controler. v.gr. at util classes
 	public ScenarioImpl loadScenarioWithTrSchedule(final String configFile) {
-		ScenarioImpl scenario = (ScenarioImpl) this.loadTransitScenario(configFile);
-
+		ScenarioImpl scenario = (ScenarioImpl) this.loadScenario(configFile);
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
+		
 		//load transit schedule by config
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, scenario.getNetwork(), scenario).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
@@ -53,19 +57,11 @@ public class DataLoader {
 		return scenario;
 	}
 
-	//Use this with the controler. The transit schedule will be loaded by controler, but the config object is needed as parameter
-	public Scenario loadTransitScenario(final String configFile) {
-		Scenario scenario = this.loadScenario(configFile);
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
-		return scenario;
-	}
-
 	public TransitSchedule readTransitSchedule(final String networkFile, final String transitScheduleFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl)this.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		TransitSchedule schedule = readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
+		TransitSchedule schedule = this.readTransitSchedule(scenario.getNetwork(), transitScheduleFile);
 		scenario = null;
 		matsimNetReader = null;
 		return schedule;
@@ -74,25 +70,27 @@ public class DataLoader {
 	public TransitSchedule readTransitSchedule(final NetworkImpl network, final String transitScheduleFile) {
 		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
-		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network);
+		Scenario scn = this.createScenario();
+		TransitScheduleReaderV1 transitScheduleReaderV1 = new TransitScheduleReaderV1(transitSchedule, network, scn);
 		transitScheduleReaderV1.readFile(transitScheduleFile);
 		transitScheduleFactoryImpl = null;
 		transitScheduleReaderV1 = null;
+		scn = null;
 		return transitSchedule;
 	}
 
 	public NetworkImpl readNetwork (final String networkFile){
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = this.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		NetworkImpl network = scenario.getNetwork(); 
+		NetworkImpl network = ((ScenarioImpl)scenario).getNetwork(); 
 		scenario = null;
 		matsimNetReader = null;
 		return network;
 	}
 
 	public Population readPopulation(final String populationFile){
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = this.createScenario();
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(populationFile);
 		Population population = scenario.getPopulation();
@@ -101,22 +99,43 @@ public class DataLoader {
 		return population;
 	}
 
-	public ScenarioImpl readNetwork_Population(String networkFile, String populationFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	// Caution: all previous references to scn.getPopulation will point to the new Population
+	public void setNewPopulation(Scenario scenario, final String populationFile){
+		scenario.getPopulation().getPersons().clear();
+		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		popReader.readFile(populationFile);
+		popReader = null;
+	}
+	
+	public Scenario readNetwork_Population(String networkFile, String populationFile) {
+		Scenario scenario = this.createScenario();
+		
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		matsimNetReader.readFile(networkFile);
+		
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(populationFile);
 
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
-		matsimNetReader.readFile(networkFile);
 		return scenario;
 	}
 
-	public Scenario loadScenario (final String configFile){
-		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		scenarioLoader.loadScenario();
-		return scenarioLoader.getScenario();
+	public Scenario createScenario(){
+		return ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	}
+	
+	public ScenarioImpl loadScenario (final String configFile){
+		Config config = this.readConfig(configFile); 
+		return (ScenarioImpl)ScenarioUtils.loadScenario(config);
 	}
 
+	public Config readConfig(final String configFile){
+		Config config = ConfigUtils.createConfig();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		configReader = null;
+		return config;
+	}
+	
 	//returns a transitRoute object of the schedule
 	public TransitRoute getTransitRoute(final String strRouteId, final TransitSchedule schedule){
 		Id lineId = new IdImpl(strRouteId.split("\\.")[0]);

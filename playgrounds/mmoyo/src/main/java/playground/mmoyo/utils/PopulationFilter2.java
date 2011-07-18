@@ -1,19 +1,18 @@
 package playground.mmoyo.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.basic.v01.IdImpl;
-import org.apache.log4j.Logger;
+
+import playground.mmoyo.io.TXT_IdReader;
 
 public class PopulationFilter2 {
 	private final static Logger log = Logger.getLogger(PopulationFilter2.class);
@@ -36,23 +35,7 @@ public class PopulationFilter2 {
 		delebPersonList = null;
 	}
 
-	/**reads id's from a text file*/
-	public List<Id> readAgentFromTxtFile(final String idsFilePath  ){
-		//reads idFilePaths
-		List<Id> idList = new ArrayList<Id>();
-		try {
-		    BufferedReader in = new BufferedReader(new FileReader(idsFilePath));
-		    String str_row;
-		    while ((str_row = in.readLine()) != null) {
-		    	idList.add(new IdImpl(str_row));
-		    }
-		    in.close();
-		} catch (IOException e) {
-		}
-		
-		return idList;
-	}
-	
+
 	public List<Id> getRandomAgents(final Population pop, final int agentNum){
 		List<Id> idList = new ArrayList<Id>();
 	
@@ -76,22 +59,19 @@ public class PopulationFilter2 {
 	}
 	
 	public static void main(String[] args) {
-		List<Id> persIds;
+		List<Id> persIds = new ArrayList<Id>();
 		String popFile;
 		String netFile;
 		String txtFile;
-		String outFile; 
 		
-		if (args.length==4){
+		if (args.length>0){
 			popFile = args[0];
 			netFile = args[1];
 			txtFile = args[2];
-			outFile = args[3];
 		}else{
-			popFile = "../playgrounds/mmoyo/output/tmp/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0.xml.gz";//"../playgrounds/mmoyo/output/tmp/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0.xml.gz";//"I:/alltest5/output/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
-			netFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-			txtFile = "../playgrounds/mmoyo/output/cadyts/persAvoid_812550.1.txt";
-			outFile = "../playgrounds/mmoyo/output/cadyts/agentsSample.xml.gz";
+			popFile = "../../input/basePlan5x/clonMutatedPlan.xml.gz";//"../playgrounds/mmoyo/output/tmp/w6.0d0.0t1200.0_w10.0d0.0t240.0_w8.0d0.5t720.0.xml.gz";//"I:/alltest5/output/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
+			netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			txtFile = "../../input/basePlan5x/clonMutatedPlanIDS.txt";
 		}
 		
 		DataLoader dataLoader = new DataLoader();
@@ -102,19 +82,21 @@ public class PopulationFilter2 {
 		//persIds = popFileter2.getRandomAgents(pop, 4);
 		
 		//get persons from text File
-		persIds = popFileter2.readAgentFromTxtFile(txtFile);
-
+		persIds = new TXT_IdReader().readAgentFromTxtFile(txtFile);
+		
 		//get persons directly with code
 		/*
-		persIds = new ArrayList<Id>()
+		
 		persIds.add(new IdImpl("11100482X1"));
-		persIds.add(new IdImpl(""));
-		persIds.add(new IdImpl(""));
+		persIds.add(new IdImpl("11100482X1_2"));
+		persIds.add(new IdImpl("11100482X1_3"));
+		persIds.add(new IdImpl("11100482X1_4"));
+		persIds.add(new IdImpl("11100482X1_5"));
 		*/
 
 		popFileter2.run(pop, persIds);
 		NetworkImpl net = dataLoader.readNetwork(netFile);		
-		new PopulationWriter(pop, net).write(outFile);
+		new PopulationWriter(pop, net).write(new File(txtFile).getParent()+ "/agents.xml.gz");
 
 		
 	}

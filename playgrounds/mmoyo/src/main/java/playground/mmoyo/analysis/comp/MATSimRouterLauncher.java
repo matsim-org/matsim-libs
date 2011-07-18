@@ -20,9 +20,8 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.xml.sax.SAXException;
 
+import playground.mmoyo.algorithms.PlanScoreNullifier;
 import playground.mmoyo.utils.DataLoader;
-import playground.mmoyo.utils.FileCompressor;
-import playground.mmoyo.utils.calibration.PlanScoreRemover;
 
 /**routes a population specified in a config file with MATSim standard router*/
 public class MATSimRouterLauncher {
@@ -54,7 +53,7 @@ public class MATSimRouterLauncher {
 		Population population = scenario.getPopulation();
 		
 		//remove scores
-		new PlanScoreRemover().run(population);
+		new PlanScoreNullifier().run(population);
 		
 		router.run(scenario.getPopulation());
 
@@ -62,12 +61,10 @@ public class MATSimRouterLauncher {
 		//new PlanFragmenter().run(population);
 		
 		//write plan
-		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory() + "rieserRoutedPlan.xml";
+		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory() + "rieserRoutedPlan.xml.gz";
 		System.out.println("writing output plan file..." + routedPlansFile);
 		PopulationWriter popwriter = new PopulationWriter(population, scenario.getNetwork()) ;
 		popwriter.write(routedPlansFile) ;
-
-		new FileCompressor().run(routedPlansFile);
 		System.out.println("done");
 	}
 

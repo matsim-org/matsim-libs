@@ -76,13 +76,13 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	private static Network NET ;
 	private static TransitSchedule SCHEDULE ;
 
-	private PtBseOccupancyAnalyzer delegOcupAnalizer;
+	//private PtBseOccupancyAnalyzer delegOcupAnalizer;  //it is not needed 18.jul.2011
 
 	private final static String STR_M44 = "M44";
 	private final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private final String STR_ITERATION = "iteration";
 	
-	PtPlanToPlanStepBasedOnEvents(Scenario sc, PtBseOccupancyAnalyzer delOcupAnalizer) {
+	PtPlanToPlanStepBasedOnEvents(Scenario sc/*, PtBseOccupancyAnalyzer delOcupAnalizer 18.jul.2011*/) {
 		this.sc = sc ;
 		this.net = sc.getNetwork();
 		
@@ -90,7 +90,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		
 		NET = this.net ;
 		SCHEDULE = this.schedule ;
-		this.delegOcupAnalizer = delOcupAnalizer;
+		//this.delegOcupAnalizer = delOcupAnalizer;   //it is not needed 18.jul.2011
 	}
 
 	private long plansFound = 0 ;
@@ -116,7 +116,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)") ;
 
 		personsFromVehId.clear();
-		this.delegOcupAnalizer.reset(iteration);
+		//this.delegOcupAnalizer.reset(iteration);    //it is not needed 18.jul.2011
 	}
 
 	@Override
@@ -126,7 +126,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			return ;
 		}
 		addPersonToVehicleContainer(event.getPersonId(), event.getVehicleId());
-		this.delegOcupAnalizer.handleEvent(event);
+		//this.delegOcupAnalizer.handleEvent(event);     //it is not needed 18.jul.2011
 	}
 
 	@Override
@@ -136,12 +136,12 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 			return ;
 		}
 		removePersonFromVehicleContainer(event.getPersonId(), event.getVehicleId());
-		this.delegOcupAnalizer.handleEvent(event);
+		//this.delegOcupAnalizer.handleEvent(event);      //it is not needed 18.jul.2011
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.delegOcupAnalizer.handleEvent(event);
+		//this.delegOcupAnalizer.handleEvent(event);      //it is not needed 18.jul.2011
 	}
 
 	@Override
@@ -173,7 +173,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 				tmpPlanStepFactory.addTurn( fac, (int) time ) ;
 			}
 		}
-		this.delegOcupAnalizer.handleEvent(event);
+		//this.delegOcupAnalizer.handleEvent(event);       //it is not needed 18.jul.2011
 	}
 
 
