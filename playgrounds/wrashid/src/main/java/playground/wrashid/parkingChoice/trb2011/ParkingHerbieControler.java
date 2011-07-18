@@ -19,7 +19,7 @@ public class ParkingHerbieControler {
 		
 		HerbieControler hControler=new HerbieControler(args);
 		
-		String isRunningOnServer = hControler.getConfig().findParam("parking", "isRunningOnServer");
+		String isRunningOnServer = "true";//hControler.getConfig().findParam("parking", "isRunningOnServer");
 		if (Boolean.parseBoolean(isRunningOnServer)){
 			parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
 		} else {
