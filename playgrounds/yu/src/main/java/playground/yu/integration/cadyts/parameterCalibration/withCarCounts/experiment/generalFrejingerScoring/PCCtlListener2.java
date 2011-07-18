@@ -44,8 +44,8 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.calibrators.Calibrator;
@@ -78,8 +78,8 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 
 		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = network.getNodes().get(
-				new IdImpl(config.counts().getDistanceFilterCenterNode()))
+		distanceFilterCenterNodeCoord = network.getNodes()
+				.get(new IdImpl(config.counts().getDistanceFilterCenterNode()))
 				.getCoord();
 		distanceFilter = config.counts().getDistanceFilter();
 
@@ -129,9 +129,9 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 		}
 
 		// INITIALIZING "Calibrator"
-		calibrator = new MATSimChoiceParameterCalibrator<Link>(ctlIO
-				.getOutputFilename("calibration.log"), MatsimRandom
-				.getLocalInstance(), regressionInertia, paramDim);
+		calibrator = new MATSimChoiceParameterCalibrator<Link>(
+				ctlIO.getOutputFilename("calibration.log"),
+				MatsimRandom.getLocalInstance(), regressionInertia, paramDim);
 
 		// SETTING staticsFile
 		calibrator.setStatisticsFile(ctlIO
@@ -149,14 +149,17 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
 
-				initialParams.set(i, Double.parseDouble(ScoringConfigGetValue
-						.getValue(paramNames[i]))
-						* paramScaleFactor);
+				initialParams.set(
+						i,
+						Double.parseDouble(ScoringConfigGetValue
+								.getValue(paramNames[i])) * paramScaleFactor);
 
 			} else/* bse */{
-				initialParams.set(i, Double.parseDouble(config.findParam(
-						BSE_CONFIG_MODULE_NAME, paramNames[i]))
-						* paramScaleFactor);
+				initialParams.set(
+						i,
+						Double.parseDouble(config.findParam(
+								BSE_CONFIG_MODULE_NAME, paramNames[i]))
+								* paramScaleFactor);
 			}
 		}
 
@@ -181,8 +184,7 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 						.setInitialParameterVariances(initialParamVars);
 			}
 		} else {
-			Logger
-					.getLogger("BSE:\tNo setting of setInitialParameterVariances, so it is accepted as FALSE");
+			Logger.getLogger("BSE:\tNo setting of setInitialParameterVariances, so it is accepted as FALSE");
 		}
 	}
 
@@ -366,8 +368,8 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
 		((PCStrMn2) ctl.getStrategyManager()).init(
-				(ChoiceParameterCalibrator<Link>) calibrator, ctl
-						.getTravelTimeCalculator(),
+				(ChoiceParameterCalibrator<Link>) calibrator,
+				ctl.getTravelTimeCalculator(),
 				(MultinomialLogitChoice) chooser, delta);
 	}
 
@@ -384,8 +386,8 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 			writer.writeln(sb);
 		}
 		{
-			writerCV = new SimpleWriter(ctlIO
-					.getOutputFilename("parameterCovariance.log"));
+			writerCV = new SimpleWriter(
+					ctlIO.getOutputFilename("parameterCovariance.log"));
 			StringBuffer sb = new StringBuffer("iter\tmatrix/Covariance ["
 					+ paramNames[0]);
 			for (int i = 1; i < paramNames.length; i++) {
@@ -512,8 +514,9 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 				chartFilename += paramNames[i] + ".";
 			}
 
-			chart.saveAsPng(ctlIO.getIterationFilename(iter, chartFilename
-					+ "png"), 1024, 768);
+			chart.saveAsPng(
+					ctlIO.getIterationFilename(iter, chartFilename + "png"),
+					1024, 768);
 
 			// travPerf.saveAsPng(ctlIO.getIterationFilename(iter,
 			// "travTravPt.png"), 1024, 768);
@@ -569,12 +572,12 @@ public class PCCtlListener2 extends BseParamCalibrationControlerListener
 
 						double value = params.get(i);
 						if (scoringCfg.getParams().containsKey(paramNames[i])) {
-							scoringCfg.addParam(paramNames[i], Double
-									.toString(value / paramScaleFactor));
+							scoringCfg.addParam(paramNames[i],
+									Double.toString(value / paramScaleFactor));
 						} else/* bse */{
 							config.setParam(BSE_CONFIG_MODULE_NAME,
-									paramNames[i], Double.toString(value
-											/ paramScaleFactor));
+									paramNames[i],
+									Double.toString(value / paramScaleFactor));
 						}
 
 						mnl.setParameter(paramNameIndex, value);

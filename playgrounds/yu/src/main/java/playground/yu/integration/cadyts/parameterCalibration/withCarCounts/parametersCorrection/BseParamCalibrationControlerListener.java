@@ -19,10 +19,9 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection;
-
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
@@ -33,26 +32,26 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.network.LinkImpl;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
-
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class BseParamCalibrationControlerListener implements
 		ControlerListener {
 	protected boolean watching = false;
 	protected VolumesAnalyzer volumes = null;
-	protected double countsScaleFactor = 1.0, distanceFilter;
-	protected Coord distanceFilterCenterNodeCoord;
+	protected double countsScaleFactor = 1d, distanceFilter = 0d;
+	protected Coord distanceFilterCenterNodeCoord = null;
 	protected AnalyticalCalibrator<Link> calibrator = null;
 	protected SimResults<Link> resultsContainer = null;
 	protected CadytsChoice chooser;
 	protected final static int DEFAULT_CALIBRATION_START_TIME = 1,
 			DEFAULT_CALIBRATION_END_TIME = 24;
+	public static final String BSE_CONFIG_MODULE_NAME = "bse";
 
 	protected class SimResultsContainerImpl implements SimResults<Link> {
 		/***/
@@ -61,6 +60,7 @@ public abstract class BseParamCalibrationControlerListener implements
 		public SimResultsContainerImpl() {
 		}
 
+		@Override
 		public double getSimValue(final Link link, final int startTime_s,
 				final int endTime_s, final TYPE type) {
 			int hour = startTime_s / 3600;
@@ -72,7 +72,11 @@ public abstract class BseParamCalibrationControlerListener implements
 		}
 	}
 
-	protected boolean isInRange(final Id linkid, final Network net) {
+	public boolean isInRange(final Id linkid, final Network net) {
+		if (distanceFilterCenterNodeCoord == null) {
+			return true;
+		}
+
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "

@@ -37,7 +37,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.BseParamCalibrationControlerListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
@@ -65,8 +65,8 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 	}
 
 	/**
-	 * please check the method in super class, when the super class {@code
-	 * org.matsim.core.controler.Controler} is changed sometimes
+	 * please check the method in super class, when the super class
+	 * {@code org.matsim.core.controler.Controler} is changed sometimes
 	 */
 	@Override
 	protected void loadCoreListeners() {
@@ -96,14 +96,12 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 				network,
 				getFirstIteration(),
 				config.planCalcScore().getBrainExpBeta(),
-				Integer
-						.parseInt(config
-								.findParam(
-										BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-										"parameterDimension"/*
-															 * 2, traveling ,
-															 * performing
-															 */)));
+				Integer.parseInt(config
+						.findParam(
+								BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+								"parameterDimension"/*
+													 * 2, traveling , performing
+													 */)));
 		StrategyManagerConfigLoader.load(this, manager);
 
 		// deactivate generating of new Plans by plan innovation
@@ -139,16 +137,16 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 						new ExpBetaPlanChanger(config.planCalcScore()
 								.getBrainExpBeta()));
 				manager.addStrategy(changeExpBeta, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1/* 505 */,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1/* 505 */,
 						changeExpBeta, prob);
 			} else if (module.equals("SelectExpBeta")) {
 				// SelectExpBeta
 				PlanStrategy selectExpBeta = new PlanStrategyImpl(
 						new ExpBetaPlanSelector(config.planCalcScore()));
 				manager.addStrategy(selectExpBeta, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1/* 505 */,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1/* 505 */,
 						selectExpBeta, prob);
 
 			} else if (module.equals("ReRoute")) {
@@ -157,8 +155,9 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 						new RandomPlanSelector());
 				reRoute.addStrategyModule(new ReRoute(this));
 				manager.addStrategy(reRoute, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1, reRoute, prob);
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1,
+						reRoute, prob);
 				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
 						reRoute, 0);
 			} else if (module.equals("TimeAllocationMutator")) {
@@ -168,8 +167,8 @@ public class PCCtl2 extends BseParamCalibrationControler2 {
 				timeAllocationMutator
 						.addStrategyModule(new TimeAllocationMutator(config));
 				manager.addStrategy(timeAllocationMutator, 0.0);
-				manager.addChangeRequest(getFirstIteration()
-						+ manager.getMaxPlansPerAgent() + 1,
+				manager.addChangeRequest(
+						getFirstIteration() + manager.getMaxPlansPerAgent() + 1,
 						timeAllocationMutator, prob);
 				manager.addChangeRequest(disablePlanGeneratingAfterIter + 1,
 						timeAllocationMutator, 0);
