@@ -221,5 +221,10 @@ public class ParkingSimulation implements AgentDepartureEventHandler, ActivitySt
 	// TODO: remove method after debugging is over.
 	public void handleEvent(AgentStuckEvent event) {
 		DebugLib.traceAgent(event.getPersonId());
+		Person person = controler.getPopulation().getPersons().get(event.getPersonId());
+		if (parkingManager.considerForParking(event.getPersonId())){
+			parkingManager.initializePersonForParking(person);
+		}
+		
 	}
 }

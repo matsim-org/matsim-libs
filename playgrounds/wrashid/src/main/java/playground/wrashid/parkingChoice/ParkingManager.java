@@ -140,13 +140,8 @@ public class ParkingManager implements StartupListener {
 		parkingCollection = null;
 
 		// initialize parking occupations
-		int i=0;
 		for (Person person : controler.getPopulation().getPersons().values()) {
-			if (i%1000==0){
-				System.out.println(i);
-			}
 			initializePersonForParking(person);
-			i++;
 		}
 	}
 	
