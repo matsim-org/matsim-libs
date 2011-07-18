@@ -27,7 +27,7 @@ public class ParkingHerbieControler {
 		}
 		
 		
-		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity();
+		LinkedList<Parking> parkingCollection = getParkingsForScenario();
 		
 		/*
 		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();
