@@ -128,7 +128,7 @@ public class Main_exampleDSCTest extends TestCase{
 		assertEquals(mySimulation.getListOfIdsOfEVAgentsWithFailedOptimization().size(), 0);
 		
 		// Emissions
-		double emissions=mySimulation.getTotalEmissions();
+		double emissions=mySimulation.getTotalEmissions();// no battery used in this case
 		assertEquals(emissions, 0.0);
 		
 		

@@ -89,7 +89,7 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		
 		final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
-		String configPath="test/input/playground/wrashid/sschieffer/config_plans2.xml";
+		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 		
 		final double bufferBatteryCharge=0.0;
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
@@ -131,7 +131,7 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		 */
 		ArrayList<GeneralSource> generalHubSource= new ArrayList<GeneralSource>(0);
 		ArrayList<LoadDistributionInterval> generalHubLoad= new ArrayList<LoadDistributionInterval>(0);
-		generalHubLoad.add(new LoadDistributionInterval(3500, 7000, 5000));
+		generalHubLoad.add(new LoadDistributionInterval(3500, 7000, 5000));//17.5 million Joules
 		generalHubSource.add(new GeneralSource(
 				generalHubLoad,
 				new IdImpl(1),				
@@ -144,7 +144,7 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		 */
 		HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoadHashMap = new HashMap<Id, ArrayList<LoadDistributionInterval>>();
 		ArrayList<LoadDistributionInterval> vehicleLoad= new ArrayList<LoadDistributionInterval>(0);
-		vehicleLoad.add(new LoadDistributionInterval(3500, 7000, 3500));
+		vehicleLoad.add(new LoadDistributionInterval(3500, 4400, 1000));//1000W for 900 seconds - expect 900.000 Joules saved energy
 		vehicleLoadHashMap.put(new IdImpl(1), vehicleLoad);
 		hubInfo1.setStochasticVehicleSourcesIntervals(vehicleLoadHashMap);
 		
@@ -220,8 +220,8 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		System.out.println("average joules saved by local stochastic production all agents: "+mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents());
 		System.out.println("average joules saved by local stochastic production EV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionEV());
 		System.out.println("average joules saved by local stochastic production PHEV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV());
-		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents(), 6125000.0);
-		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionEV(), 6125000.0);
+		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionAllAgents(), 900000.0);
+		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionEV(), 900000.0);
 		assertEquals(mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV(), 0.0);
 		
 		/*
