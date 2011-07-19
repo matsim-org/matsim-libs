@@ -45,9 +45,6 @@ import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.naive.Events2Score4PC_mnl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.naive.PCCtl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.naive.PCStrMn;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
@@ -671,8 +668,13 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 								// int start_s = (hour - 1) * 3600;
 								// int end_s = hour * 3600 - 1;
 								double cntVal = volume.getValue();
-								double simVal = volumes.getVolumesForLink(link
-										.getId())[hour - 1] * countsScaleFactor;
+								int[] linkVols = volumes.getVolumesForLink(link
+										.getId());
+								double simVal = 0d;
+								if (linkVols != null) {
+									simVal = linkVols[hour - 1]
+											* countsScaleFactor;
+								}
 								double minstddev = calibrator
 										.getMinStddev(TYPE.FLOW_VEH_H);
 								double var = Math.max(minstddev * minstddev,
