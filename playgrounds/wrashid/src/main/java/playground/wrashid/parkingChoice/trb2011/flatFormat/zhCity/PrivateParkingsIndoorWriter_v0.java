@@ -22,7 +22,7 @@ import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 
-public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
+public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 
 	
 
@@ -76,7 +76,7 @@ public class PrivateParkingsIndoorWriter extends MatsimXmlWriter {
 			
 		}
 		
-		PrivateParkingsIndoorWriter privateParkingsWriter=new PrivateParkingsIndoorWriter();
+		PrivateParkingsIndoorWriter_v0 privateParkingsWriter=new PrivateParkingsIndoorWriter_v0();
 		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsIndoor.xml", sourcePathPrivateParkingsIndoor);
 
 	}

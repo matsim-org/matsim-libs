@@ -30,6 +30,7 @@ public class PrivateParkingTest extends TestCase {
 	}
 	
 	private double walkingDistanceFor3CarScenarioWithVariableParkingCapacity(int parkingCapacity) {
+		ParkingChoiceLib.isTestCaseRun=true;
 		Config config=ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
 		Controler controler=new Controler(config);
 		

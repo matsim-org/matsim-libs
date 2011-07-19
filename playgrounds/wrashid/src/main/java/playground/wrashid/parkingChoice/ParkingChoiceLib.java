@@ -9,6 +9,8 @@ import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 
 public class ParkingChoiceLib {
 
+	public static boolean isTestCaseRun=false;
+	
 	// TODO: use parameter from org.matsim.core.config.groups.PlansCalcRouteConfigGroup for this
 	static public double getWalkingSpeed(){
 		return 3.0 / 3.6 * 1.3;

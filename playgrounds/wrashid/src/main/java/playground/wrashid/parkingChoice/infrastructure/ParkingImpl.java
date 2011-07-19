@@ -38,7 +38,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	}
 
 	Id parkingId = null;
-	Integer maxCapacity = null;
+	double maxCapacity =0;
 	int currentOccupancy = 0;
 	Double Price = null;
 	Double accessTime = null;
@@ -59,7 +59,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.score = score;
 	}
 
-	public int getCapacity() {
+	public double getCapacity() {
 		return maxCapacity;
 	}
 
@@ -136,7 +136,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	}
 
 	@Override
-	public void setCapacity(int capacity) {
+	public void setCapacity(double capacity) {
 		maxCapacity=capacity;
 	}
 

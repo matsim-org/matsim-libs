@@ -17,6 +17,7 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
+import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
@@ -75,8 +76,10 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		}
 		writeWalkingDistanceStatisticsGraph(controler, walkingDistances);
 		printWalkingDistanceHistogramm(controler, walkingDistances);
-		writeOutParkingOccupancies(controler);
-		writeOutGraphParkingTypeOccupancies(controler);
+		if (!ParkingChoiceLib.isTestCaseRun){
+			writeOutParkingOccupancies(controler);
+			writeOutGraphParkingTypeOccupancies(controler);
+		}
 		
 		//eventsToScore.finish();
 	}

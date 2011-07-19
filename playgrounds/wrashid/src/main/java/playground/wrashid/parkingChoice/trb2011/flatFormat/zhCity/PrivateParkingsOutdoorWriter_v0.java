@@ -16,7 +16,7 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 
-public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
+public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 
 	private static QuadTree<ActivityFacilityImpl> facilitiesQuadTree;
 	private static LinkedList<PrivateParking> privateParkings;
@@ -25,7 +25,7 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 		String sourcePathPrivateParkingsOutdoor = "ETH/static data/parking/zürich city/Private Parkplätze/PrivateParkingIndoor.txt";
 		StringMatrix privateParkingOutdoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsOutdoor);
 
-		facilitiesQuadTree = PrivateParkingsIndoorWriter.getFacilitiesQuadTree();
+		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree();
 		
 		privateParkings = new LinkedList<PrivateParking>();
 		
@@ -34,11 +34,11 @@ public class PrivateParkingsOutdoorWriter extends MatsimXmlWriter {
 			Coord coord=new CoordImpl(privateParkingOutdoorFile.getDouble(i, 1),privateParkingOutdoorFile.getDouble(i, 2));
 		
 			if (parkingCapacity>0){
-				PrivateParkingsIndoorWriter.assignParkingCapacityToClosestFacility(coord, parkingCapacity, facilitiesQuadTree, privateParkings);
+				PrivateParkingsIndoorWriter_v0.assignParkingCapacityToClosestFacility(coord, parkingCapacity, facilitiesQuadTree, privateParkings);
 			}
 		}
 		
-		PrivateParkingsOutdoorWriter privateParkingsWriter=new PrivateParkingsOutdoorWriter();
+		PrivateParkingsOutdoorWriter_v0 privateParkingsWriter=new PrivateParkingsOutdoorWriter_v0();
 		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsOutdoor.xml", sourcePathPrivateParkingsOutdoor);
 	}
 	

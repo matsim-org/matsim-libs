@@ -120,8 +120,8 @@ public class ParkingHerbieControler {
 	
 	private static void calibarteParkings(LinkedList<Parking> parkingCollection, double calibrationFactor){
 		for (Parking parking:parkingCollection){
-			int capacity = parking.getCapacity();
-			parking.setCapacity((int) Math.round(capacity*calibrationFactor));
+			double capacity = parking.getCapacity();
+			parking.setCapacity(capacity*calibrationFactor);
 		}
 	}
 	

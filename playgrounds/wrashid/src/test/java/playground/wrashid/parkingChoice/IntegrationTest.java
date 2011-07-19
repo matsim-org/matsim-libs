@@ -25,6 +25,7 @@ public class IntegrationTest  extends TestCase {
 	public static ParkingModule parkingModule;
 		
 	public void testModeChange(){
+		ParkingChoiceLib.isTestCaseRun=true;
 		Controler controler=new Controler("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
 		
 		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();

@@ -22,7 +22,7 @@ import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.DrawAllActivitiesWithParkingsCloseBy;
-import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParkingsIndoorWriter;
+import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParkingsIndoorWriter_v0;
 
 /*
  * 
