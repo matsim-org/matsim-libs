@@ -202,6 +202,14 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		generateAndWriteCountsComparisons(event);
+	}
+
+	// ===========================================================================================================================
+	// private methods & pure delegate methods only below this line
+	// yyyyyy this statement is no longer correct since someone added other public methods below.  kai, jul'11
+
+	private void generateAndWriteCountsComparisons(final IterationEndsEvent event) {
 		Config config = event.getControler().getConfig();
 		PtCountsConfigGroup ptCounts = config.ptCounts() ;
 		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
@@ -267,10 +275,6 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		}
 	}
 	
-	// ===========================================================================================================================
-	// private methods & pure delegate methods only below this line
-	// yyyyyy this statement is no longer correct since someone added other public methods below.  kai, jul'11
-
 	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		this.delegate.addStrategyModule(module);
