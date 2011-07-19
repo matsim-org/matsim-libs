@@ -119,7 +119,7 @@ public class TransitScheduleMatching {
 		gm.matchedSegments2Shape(outDir);
 		gm.baseSegments2Shape(outDir);
 		
-		createAndWriteNewSchedule(gm.getEdges(), outDir + "schedule_osm_hafas_merged.xml");
+		createAndWriteNewSchedule(gm.getCompleteMatchedEdges(), outDir + "schedule_osm_hafas_merged.xml");
 	}
 
 	

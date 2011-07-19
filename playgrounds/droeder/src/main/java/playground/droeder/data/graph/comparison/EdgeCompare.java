@@ -92,6 +92,19 @@ public class EdgeCompare extends AbstractCompare{
 		}
 		return false;
 	}
+	
+	public boolean isPartlyMatched(Double dDistMax, Double dPhiMax, Double lengthTolerancePercentage) {
+		if((avDist < dDistMax) && 
+				(avAngle < dPhiMax) && 
+				(Math.abs(1 - (matchedLengthComp / compTotalLength)) < lengthTolerancePercentage )){
+			super.setScore((avDist / dDistMax) + 
+					(avAngle / dPhiMax) + 
+					(Math.abs(1 - (matchedLengthRef / refTotalLength)) / lengthTolerancePercentage ) + 
+					(Math.abs(1 - (matchedLengthComp / compTotalLength)) / lengthTolerancePercentage ));
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	public int compareTo(AbstractCompare o) {
@@ -139,6 +152,4 @@ public class EdgeCompare extends AbstractCompare{
 	public Double getMatchedLengthComp() {
 		return matchedLengthComp;
 	}
-	
-	
 }

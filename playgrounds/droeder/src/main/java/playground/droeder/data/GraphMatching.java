@@ -67,6 +67,10 @@ public class GraphMatching {
 	private Double deltaPhi;
 	private double maxLengthDiff;
 	
+	/*
+	 * a LinkMatch is generated, if a Link is of the matchingGraph equal or a subpart 
+	 * of a Link in the ReferenceGraph
+	 */
 	public GraphMatching(MatchingGraph reference, MatchingGraph matching){
 		this.reference = reference;
 		this.matching = matching;
@@ -224,24 +228,29 @@ public class GraphMatching {
 	// ##### EDGEMATCHING #####
 	private Map<Id, List<EdgeCompare>> edgesRef2Match;
 	private Map<Id, List<EdgeCompare>> edgesRef2MatchUnmatchedAgain;
+
+	private Map<Id, List<EdgeCompare>> edgesRef2MatchPart;
 	private void edgeMatchingBottomUp() {
 		log.info("start bottom-up edge-matching...");
-
 		
 		edgesRef2Match = new HashMap<Id, List<EdgeCompare>>();
+		edgesRef2MatchPart = new HashMap<Id, List<EdgeCompare>>();
 		edgesRef2MatchUnmatchedAgain = new HashMap<Id, List<EdgeCompare>>();
 		List<EdgeCompare> tempComp;
+		List<EdgeCompare> tempCompPart;
 		List<EdgeCompare>  tempUnmatched;
 		EdgeCompare comp;
 		
 		for(Entry<MatchingEdge, List<MatchingEdge>> e: edgeCandidatesRef2matchFromNodes.entrySet()){
 			tempComp = new ArrayList<EdgeCompare>();
+			tempCompPart = new ArrayList<EdgeCompare>();
 			tempUnmatched = new ArrayList<EdgeCompare>();
 			for(MatchingEdge cand : e.getValue()){
 				comp = new EdgeCompare(e.getKey(), cand);
-				tempComp.add(comp);
 				if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
-					//TODO to many prematchings are deleted here... why?
+					tempComp.add(comp);
+				}else if(comp.isPartlyMatched(deltaDist, deltaPhi, maxLengthDiff)){
+					tempCompPart.add(comp);
 				}else{
 					tempUnmatched.add(comp);
 				}
@@ -249,6 +258,9 @@ public class GraphMatching {
 			if(tempComp.size() > 0){
 				Collections.sort(tempComp);
 				edgesRef2Match.put(e.getKey().getId(), tempComp);
+			}else if(tempCompPart.size() > 0){
+				Collections.sort(tempComp);
+				edgesRef2MatchPart.put(e.getKey().getId(), tempCompPart);
 			}else{
 				edgesUnmatchedRef.add(e.getKey().getId());
 				if(tempUnmatched.size() > 0){
@@ -268,6 +280,7 @@ public class GraphMatching {
 		log.info("starting top-down edge matching...");
 		List<Id> newMatched = new ArrayList<Id>();
 		List<EdgeCompare> tempComp;
+		List<EdgeCompare> tempCompPart;
 		EdgeCompare comp;
 		Coord refCoord;
 		MatchingEdge refEdge;
@@ -277,24 +290,31 @@ public class GraphMatching {
 			refEdge = this.reference.getEdges().get(ref);
 			refCoord = refEdge.getFromNode().getCoord();
 			tempComp = new ArrayList<EdgeCompare>();
+			tempCompPart = new ArrayList<EdgeCompare>();
 			/*
 			 *  here it would be correct (according to the given algorithm) to use ALL Edges
 			 *  but this would cause a very large computation time
 			 *  so my decision is to use only the nearest edges. Assuming that the coordinate-system is correct,
 			 *  it wouldn't make sense to compare edges which are not in an acceptable distance.
-			 *  TODO probably it would make sense to use some factor for the distance
 			 */
 			for(MatchingNode n: this.matching.getNearestNodes(refCoord.getX(), refCoord.getY(), deltaDist)){
 				for(MatchingEdge e : n.getOutEdges()){
 					comp = new EdgeCompare(refEdge, e);
 					if(comp.isMatched(deltaDist, deltaPhi, maxLengthDiff)){
 						tempComp.add(comp);
+					}else if(comp.isPartlyMatched(deltaDist, deltaPhi, maxLengthDiff)){
+						tempCompPart.add(comp);
 					}
 				}
 			}
 			// store only, if there is at least one match
 			if(tempComp.size() > 0 ){
+				Collections.sort(tempComp);
 				edgesRef2Match.put(ref, tempComp);
+				newMatched.add(ref);
+			}else if(tempCompPart.size() > 0){
+				Collections.sort(tempCompPart);
+				edgesRef2MatchPart.put(ref, tempCompPart);
 				newMatched.add(ref);
 			}
 			if(cnt%msg == 0){
@@ -315,14 +335,21 @@ public class GraphMatching {
 	
 	Map<Id, Id> nodeFinalRef2Match;
 	Map<Id, Id> edgeFinalRef2Match;
+	Map<Id, Id> edgeFinalRef2MatchPart;
 	private void nodeMatchingTopDown(){
 		nodeFinalRef2Match = new HashMap<Id, Id>();
 		edgeFinalRef2Match = new HashMap<Id, Id>();
+		edgeFinalRef2MatchPart = new HashMap<Id, Id>();
 		
 		EdgeCompare c;
 		for(Entry<Id, List<EdgeCompare>> e: edgesRef2Match.entrySet()){
 			c = e.getValue().get(0);
 			this.edgeFinalRef2Match.put(c.getRefId(), c.getCompId());
+		}
+		
+		for(Entry<Id, List<EdgeCompare>> e : edgesRef2MatchPart.entrySet()){
+			c = e.getValue().get(0);
+			this.edgeFinalRef2MatchPart.put(c.getRefId(), c.getCompId());
 		}
 		
 		// TODO implement nodeMatching Top-down
@@ -785,19 +812,15 @@ public class GraphMatching {
 		gm.unmatchedAfterPrematchingOut(OUT);
 	}
 
-//	/**
-//	 * @return
-//	 */
-//	public Map<Id, Id> getNodes() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
 	/**
 	 * @return
 	 */
-	public Map<Id, Id> getEdges() {
+	public Map<Id, Id> getCompleteMatchedEdges() {
 		return this.edgeFinalRef2Match;
+	}
+	
+	public Map<Id, Id> getPartlyMatchedEdges(){
+		return this.edgeFinalRef2MatchPart;
 	}
 	
 

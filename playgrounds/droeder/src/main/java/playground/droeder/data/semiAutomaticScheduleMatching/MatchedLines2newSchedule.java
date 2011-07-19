@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -34,6 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -51,6 +53,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
+import playground.droeder.GeoCalculator;
+import playground.droeder.gis.DaShapeWriter;
 
 /**
  * @author droeder
@@ -62,6 +66,7 @@ public class MatchedLines2newSchedule {
 	
 	private ScenarioImpl osm;
 	private TransitSchedule hafas;
+	private static String PATH;
 	
 	/**
 	 * @param osm
@@ -80,6 +85,7 @@ public class MatchedLines2newSchedule {
 		final String OSMSCHED = DIR + "osm_berlin_subway_sched.xml";
 		final String HAFASSCHED = DaPaths.OUTPUT + "bvg09/transitSchedule-HAFAS-Coord.xml";
 		final String OUTSCHED = DIR + "manuallyMatchedSched.xml";
+		PATH = DIR;
 		
 		final Set<String[]> matchedLines = DaFileReader.readFileContent(MATCHEDLINES, ";", true);
 		
@@ -135,8 +141,9 @@ public class MatchedLines2newSchedule {
 		for(TransitRoute r : osm.getRoutes().values()){
 			createNetworkForThisLine(networkForThisLine, r);
 		}
+		new NetworkCleaner().run(networkForThisLine);
 		
-		// create the routes from the hafassSchedule
+		// create the routes from the hafasSchedule
 		TransitLine newLine = newSchedule.getFactory().createTransitLine(hafas.getId());
 		for(TransitRoute r : hafas.getRoutes().values()){
 			newLine.addRoute(createNewRoute(r, networkForThisLine, newSchedule));
@@ -169,7 +176,8 @@ public class MatchedLines2newSchedule {
 				links.addAll(routeMe(networkForThisRoute, stops.get(stops.size() - 2), stop));
 			}
 		}
-		
+		log.info(r.getTransportMode());
+		networkForThisRoute.getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
 		NetworkRoute route = (NetworkRoute) networkForThisRoute.getFactory().createRoute(r.getTransportMode(), links.get(0), links.get(links.size()-1));
 		route.setLinkIds(links.get(0), links.subList(1, links.size()-1), links.get(links.size()-1));
 		return factory.createTransitRoute(r.getId(), route, stops, r.getTransportMode());
@@ -187,6 +195,10 @@ public class MatchedLines2newSchedule {
 		
 		Link startLink = networkForThisRoute.getLinks().get(start.getStopFacility().getLinkId());
 		Link endLink = networkForThisRoute.getLinks().get(end.getStopFacility().getLinkId());
+		// TODO find the NullPointer, endLink is not there
+		if(startLink.getToNode() == null|| endLink.getToNode() == null ){
+			log.info("");
+		}
 		List<Link> links = router.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 0).links;
 		Collection<Id> linkIds = new ArrayList<Id>();
 
@@ -209,13 +221,23 @@ public class MatchedLines2newSchedule {
 		}else{
 			fac = newSchedule.getFactory().createTransitStopFacility(fac.getId(), fac.getCoord(), fac.getIsBlockingLane());
 			nearest = networkForThisRoute.getNearestNode(fac.getCoord());
-			if(nearest.getInLinks().size() == 1){
+			if(nearest.getInLinks().size() >= 1){
 				fac.setLinkId(nearest.getInLinks().keySet().iterator().next());
 			}else if(nearest.getInLinks().size() < 1){
 				log.error("no inLink");
-			}else{
-				log.error("to many inLinks");
 			}
+//			else{
+//				Id id = null;
+//				Double dist = Double.MAX_VALUE;
+//				for(Link l: nearest.getInLinks().values()){
+//					if(GeoCalculator.distanceBetween2Points(fac.getCoord(), l.getCoord()) < dist){
+//						dist =  GeoCalculator.distanceBetween2Points(fac.getCoord(), l.getCoord());
+//						id = l.getId();
+//					}
+//					fac.setLinkId(id);
+//				}
+////				log.error("to many inLinks");
+//			}
 			newSchedule.addStopFacility(fac);
 		}
 		return newSchedule.getFactory().createTransitRouteStop(fac, s.getArrivalOffset(), s.getDepartureOffset());
@@ -227,8 +249,6 @@ public class MatchedLines2newSchedule {
 		for(Id linkId : r.getRoute().getLinkIds()){
 			addLink(networkForThisRoute, linkId);
 		}
-		//remove DeadEnds
-//		new NetworkCleaner().run(networkForThisRoute);
 	}
 
 	/**
