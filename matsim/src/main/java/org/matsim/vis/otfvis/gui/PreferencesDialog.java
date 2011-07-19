@@ -49,21 +49,21 @@ import javax.swing.event.ChangeListener;
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener, ItemListener {
 
 	private static final long serialVersionUID = 5778562849300898138L;
-	
+
 	private OTFVisConfigGroup visConfig;
-	
+
 	private JComboBox rightMFunc;
-	
+
 	private JComboBox middleMFunc;
-	
+
 	private JComboBox leftMFunc;
-	
+
 	private OTFHostControlBar host = null;
-	
+
 	private JSpinner agentSizeSpinner = null;
-	
+
 	private JSpinner linkWidthSpinner;
-	
+
 	private JSpinner delaySpinner = null;
 
 	public PreferencesDialog(final OTFFrame frame, final OTFHostControlBar mother) {
@@ -140,15 +140,13 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				synchBox.setVisible(true);
 				panel.add(synchBox);
 			}
-			if((host.getOTFHostConnectionManager().getOTFServer().isLive())||((visConfig.getFileVersion()>=1) &&(visConfig.getFileMinorVersion()>=4))) {
-				synchBox = new JCheckBox("show link Ids");
-				synchBox.setSelected(visConfig.isDrawingLinkIds());
-				synchBox.addItemListener(this);
-				synchBox.setBounds(10, 40, 200, 31);
-				synchBox.setVisible(true);
-				panel.add(synchBox);
-			}
-
+			synchBox = new JCheckBox("show link Ids");
+			synchBox.setSelected(visConfig.isDrawingLinkIds());
+			synchBox.addItemListener(this);
+			synchBox.setBounds(10, 40, 200, 31);
+			synchBox.setVisible(true);
+			panel.add(synchBox);
+			
 			synchBox = new JCheckBox("show overlays");
 			synchBox.setSelected(visConfig.drawOverlays());
 			synchBox.addItemListener(this);
@@ -187,8 +185,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				panel.add(synchBox);
 			}
 		}
-		
-		
+
+
 		// Colors
 		{
 			JPanel panel = new JPanel(null);
@@ -229,35 +227,35 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			getContentPane().add(this.agentSizeSpinner);
 		}
 
-		 //Link Width
-		 {
-		 JLabel label = new JLabel();
-		 getContentPane().add(label);
-		 label.setText("LinkWidth:");
-		 label.setBounds(10, 195, 80, 31);
-		 this.linkWidthSpinner = new JSpinner();
-		 SpinnerNumberModel model2 = new SpinnerNumberModel((int) visConfig.getLinkWidth(), 0.1, Double.MAX_VALUE, 10);
-		 this.linkWidthSpinner.setModel(model2);
-		 this.linkWidthSpinner.setBounds(90, 195, 153, 31);
-		 this.linkWidthSpinner.addChangeListener(this);
-		 getContentPane().add(label);
-		 getContentPane().add(this.linkWidthSpinner);
-		 }
+		//Link Width
+		{
+			JLabel label = new JLabel();
+			getContentPane().add(label);
+			label.setText("LinkWidth:");
+			label.setBounds(10, 195, 80, 31);
+			this.linkWidthSpinner = new JSpinner();
+			SpinnerNumberModel model2 = new SpinnerNumberModel((int) visConfig.getLinkWidth(), 0.1, Double.MAX_VALUE, 10);
+			this.linkWidthSpinner.setModel(model2);
+			this.linkWidthSpinner.setBounds(90, 195, 153, 31);
+			this.linkWidthSpinner.addChangeListener(this);
+			getContentPane().add(label);
+			getContentPane().add(this.linkWidthSpinner);
+		}
 
-		 //Delay ms
-		 {
-		 JLabel label = new JLabel();
-		 getContentPane().add(label);
-		 label.setText("AnimSpeed:");
-		 label.setBounds(10, 245, 110, 31);
-		 this.delaySpinner = new JSpinner();
-		 SpinnerNumberModel model2 = new SpinnerNumberModel(visConfig.getDelay_ms(), 0, Double.MAX_VALUE, 10);
-		 this.delaySpinner.setModel(model2);
-		 this.delaySpinner.setBounds(90, 245, 153, 31);
-		 this.delaySpinner.addChangeListener(this);
-		 getContentPane().add(label);
-		 getContentPane().add(this.delaySpinner);
-		 }
+		//Delay ms
+		{
+			JLabel label = new JLabel();
+			getContentPane().add(label);
+			label.setText("AnimSpeed:");
+			label.setBounds(10, 245, 110, 31);
+			this.delaySpinner = new JSpinner();
+			SpinnerNumberModel model2 = new SpinnerNumberModel(visConfig.getDelay_ms(), 0, Double.MAX_VALUE, 10);
+			this.delaySpinner.setModel(model2);
+			this.delaySpinner.setBounds(90, 245, 153, 31);
+			this.delaySpinner.addChangeListener(this);
+			getContentPane().add(label);
+			getContentPane().add(this.delaySpinner);
+		}
 
 	}
 
@@ -267,20 +265,20 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			this.visConfig.setAgentSize(((Double)(this.agentSizeSpinner.getValue())).floatValue());
 			if (this.host != null)
 				this.host.getOTFHostControl().invalidateDrawers();
-		 } else if (e.getSource() == this.linkWidthSpinner) {
-			 this.visConfig.setLinkWidth(((Double)(this.linkWidthSpinner.getValue())).floatValue());
-			 if (this.host != null){
+		} else if (e.getSource() == this.linkWidthSpinner) {
+			this.visConfig.setLinkWidth(((Double)(this.linkWidthSpinner.getValue())).floatValue());
+			if (this.host != null){
 				host.redrawDrawers();
-			 }
-		 } else if (e.getSource() == this.delaySpinner) {
-			 this.visConfig.setDelay_ms(((Double)(this.delaySpinner.getValue())).intValue());
-			 if (this.host != null){
+			}
+		} else if (e.getSource() == this.delaySpinner) {
+			this.visConfig.setDelay_ms(((Double)(this.delaySpinner.getValue())).intValue());
+			if (this.host != null){
 				host.redrawDrawers();
-			 }
+			}
 		}
 	}
 
-	
+
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
@@ -352,11 +350,11 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			// toggle draw Overlays
 			visConfig.setDrawTransitFacilities(!visConfig.isDrawTransitFacilities());
 		} 
-		}
+	}
 
 	public void setVisConfig(OTFVisConfigGroup visConfig) {
 		this.visConfig = visConfig;
 		initGUI();
 	}
-	
+
 }

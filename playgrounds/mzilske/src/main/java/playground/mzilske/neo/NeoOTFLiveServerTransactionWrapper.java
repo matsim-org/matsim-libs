@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
@@ -43,7 +43,7 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 		return delegate.getOTFVisConfig();
 	}
 
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
 		return delegate.getQuad(id, connect);
 	}
 

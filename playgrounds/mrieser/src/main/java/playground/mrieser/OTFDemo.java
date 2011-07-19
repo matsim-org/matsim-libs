@@ -105,7 +105,7 @@ public class OTFDemo {
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+		connect.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);

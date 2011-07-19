@@ -35,12 +35,10 @@ import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis2.LinkHandler;
 
 
 
@@ -70,18 +68,10 @@ public class OTFClientSwing implements Runnable {
 		otfClient.setHostConnectionManager(otfHostConnectionManager);
 		Gbl.printMemoryUsage();
 
-		this.connectionManager.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-		this.connectionManager.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-
+		this.connectionManager.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		this.connectionManager.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-		this.connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connectionManager.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-
-		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingSimpleQuadDrawer.class);
-		this.connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingAgentDrawer.class);
+		this.connectionManager.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
 		this.connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
-
 		this.connectionManager.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
 		this.connectionManager.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
 	}

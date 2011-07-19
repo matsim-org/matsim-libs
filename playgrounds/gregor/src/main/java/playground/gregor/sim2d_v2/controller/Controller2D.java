@@ -72,7 +72,7 @@ public class Controller2D extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			PersonalizableTravelCost travelCosts,
 			PersonalizableTravelTime travelTimes) {
-		PlansCalcRoute a = (PlansCalcRoute) super.createRoutingAlgorithm(travelCosts, travelTimes);
+		PlansCalcRoute a = new PlansCalcRoute(config.plansCalcRoute(), network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory());
 		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
 		return a;
 	}

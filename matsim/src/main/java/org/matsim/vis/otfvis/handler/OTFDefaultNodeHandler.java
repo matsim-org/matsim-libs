@@ -27,7 +27,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFDataXYCoordReceiver;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.VisNode;
@@ -48,8 +48,8 @@ public class OTFDefaultNodeHandler extends OTFDataReader   {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuad2.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuad2.offsetNorth));
+			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuadTree.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuadTree.offsetNorth));
 		}
 
 		@Override

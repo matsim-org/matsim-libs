@@ -38,7 +38,7 @@ import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 import org.matsim.vis.vecmathutils.VectorUtils;
@@ -84,11 +84,11 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	}
 	
 	private double writeLinkData(ByteBuffer out, VisLink visLink){
-		Point2D.Double linkStart = new Point2D.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-				visLink.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		Point2D.Double linkStart = new Point2D.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
+				visLink.getLink().getFromNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
 		
-		Point2D.Double linkEnd = new Point2D.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-				visLink.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		Point2D.Double linkEnd = new Point2D.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
+				visLink.getLink().getToNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
 		//calculate length and normal
 		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);

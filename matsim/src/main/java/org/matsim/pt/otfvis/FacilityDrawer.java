@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
@@ -75,18 +75,18 @@ public class FacilityDrawer {
 					if ( link==null ) {
 						log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
 						ByteBufferUtils.putString(out,"");
-						out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
-						out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
+						out.putDouble(facility.getCoord().getX() - OTFServerQuadTree.offsetEast);
+						out.putDouble(facility.getCoord().getY() - OTFServerQuadTree.offsetNorth);
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
 						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(facility.getId(), link) ;
-						out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
-						out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
+						out.putDouble( ps.getEasting() - OTFServerQuadTree.offsetEast ) ;
+						out.putDouble( ps.getNorthing() - OTFServerQuadTree.offsetNorth ) ;
 					}
 				} else {
 					ByteBufferUtils.putString(out,"");
-					out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
-					out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
+					out.putDouble(facility.getCoord().getX() - OTFServerQuadTree.offsetEast);
+					out.putDouble(facility.getCoord().getY() - OTFServerQuadTree.offsetNorth);
 				}
 			}
 

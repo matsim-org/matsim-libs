@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.data.fileio.qsim;
+package org.matsim.vis.otfvis;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.snapshots.writers.VisLink;
 import org.matsim.vis.snapshots.writers.VisNetwork;
@@ -36,15 +36,15 @@ import org.matsim.vis.snapshots.writers.VisNode;
  * @author dgrether
  * 
  */
-public class OTFQSimServerQuad extends OTFServerQuad2 {
+class LiveServerQuadTree extends OTFServerQuadTree {
 
 	private static final long serialVersionUID = 23L;
 
-	private static final Logger log = Logger.getLogger(OTFQSimServerQuad.class);
+	private static final Logger log = Logger.getLogger(LiveServerQuadTree.class);
 
 	transient private VisNetwork net;
 
-	public OTFQSimServerQuad(VisNetwork net) {
+	public LiveServerQuadTree(VisNetwork net) {
 		super(net.getNetwork());
 		this.net = net;
 	}
@@ -55,11 +55,11 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 	}
 
 	private void createFactoriesAndFillQuadTree(OTFConnectionManager connect) {
-		Collection<Class<OTFWriterFactory<VisNode>>> nodeFactories = connect.getQNodeEntries();
+		Collection<Class<OTFWriterFactory<VisNode>>> nodeFactories = connect.getNodeWriters();
 		List<OTFWriterFactory<VisNode>> nodeWriterFractoryObjects = instanciateFactories(nodeFactories);
 		installNodeWriterFactories(nodeWriterFractoryObjects);
 
-		Collection<Class<OTFWriterFactory<VisLink>>> linkFactories = connect.getQLinkEntries();
+		Collection<Class<OTFWriterFactory<VisLink>>> linkFactories = connect.getLinkWriters();
 		List<OTFWriterFactory<VisLink>> linkWriterFactoryObjects = instanciateFactories(linkFactories);
 		installLinkWriterFactories(linkWriterFactoryObjects);
 	}
@@ -82,7 +82,6 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 
 	private void installLinkWriterFactories(
 			List<OTFWriterFactory<VisLink>> linkWriterFactoryObjects) {
-		boolean first = true;
 		for (VisLink link : this.net.getVisLinks().values()) {
 			double middleEast = (link.getLink().getToNode().getCoord().getX() + link
 					.getLink().getFromNode().getCoord().getX())
@@ -95,11 +94,6 @@ public class OTFQSimServerQuad extends OTFServerQuad2 {
 				// null means take the default handler
 				if (writer != null) {
 					writer.setSrc(link);
-					if (first) {
-						log.info("Connecting Source QLink with "
-								+ writer.getClass().getName());
-						first = false;
-					}
 				}
 				this.put(middleEast, middleNorth, writer);
 			}

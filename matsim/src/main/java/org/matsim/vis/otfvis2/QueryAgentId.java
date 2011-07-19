@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -68,7 +68,7 @@ public final class QueryAgentId extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
 
 	}
 

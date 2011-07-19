@@ -1,9 +1,18 @@
-package playground.florian.GTFSConverter;
+package playground.mzilske.osm;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -16,27 +25,25 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
-import playground.mzilske.osm.OTFVisClient;
-import playground.mzilske.osm.WGS84ToOSMMercator;
-
-public class GtfsMain {
+public class OSMLiveRun {
 	
 	public static void main(String[] args) {
 		Scenario scenario = readScenario();
 		System.out.println("Scenario has " + scenario.getNetwork().getLinks().size() + " links.");
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-		scenario.getConfig().getQSimConfigGroup().setSnapshotPeriod(1);
+		scenario.getConfig().getQSimConfigGroup().setStartTime(60*60*8);
+		scenario.getConfig().getQSimConfigGroup().setSnapshotPeriod(10);
 		scenario.getConfig().otfVis().setDrawTransitFacilities(false);
 		runScenario(scenario);
 	}
 
 	private static Scenario readScenario() {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/urbana-champaign", new WGS84ToOSMMercator.Project());
-		gtfs.setCreateShapedNetwork(false);
-		//		gtfs.setDate(20110711);
-		gtfs.convert();
-		// gtfs.writeScenario();
-		Scenario scenario = gtfs.getScenario();
+		Config config = ConfigUtils.createConfig();
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		config.addQSimConfigGroup(qsim);
+		config.network().setInputFile("input/network.xml");
+		config.plans().setInputFile("input/plans.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}
 
@@ -62,6 +69,8 @@ public class GtfsMain {
 	}
 
 	private static void runWithOSM(Scenario scenario) {
+		FreespeedTravelTimeCost costCalculator = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
+		new PersonPrepareForSim(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), (NetworkImpl) scenario.getNetwork(), costCalculator, costCalculator, new DijkstraFactory()), (NetworkImpl) scenario.getNetwork()).run(scenario.getPopulation());
 		VisGUIMouseHandler.ORTHO = true;
 		OTFOGLDrawer.USE_GLJPANEL = true;
 		EventsManager events = EventsUtils.createEventsManager();

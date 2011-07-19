@@ -21,6 +21,8 @@ public class PotsdamRun implements Runnable {
 	@Override
 	public void run() {
 		Config config = ConfigUtils.createConfig();
+//		config.vspExperimental().setActivityDurationInterpretation(VspExperimentalConfigGroup.END_TIME_ONLY);
+//		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.network().setInputFile("input/network.xml");
 		config.plans().setInputFile("input/plans.xml");
 		config.controler().setOutputDirectory("output");
@@ -39,8 +41,13 @@ public class PotsdamRun implements Runnable {
 		StrategySettings expBeta = new StrategySettings(new IdImpl("2"));
 		expBeta.setModuleName("ChangeExpBeta");
 		expBeta.setProbability(0.6);
+		StrategySettings customTimes = new StrategySettings(new IdImpl("3"));
+		customTimes.setModuleName("playground.mzilske.teach.ChangeActivityTimesStrategy");
+		customTimes.setProbability(0.2);
+		
 		config.strategy().addStrategySettings(expBeta);
 		config.strategy().addStrategySettings(stratSets);
+		config.strategy().addStrategySettings(customTimes);
 		SimulationConfigGroup tmp = new SimulationConfigGroup();
 		tmp.setFlowCapFactor(0.01);
 		tmp.setStorageCapFactor(0.01);

@@ -21,7 +21,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -33,7 +33,7 @@ public abstract class AbstractQuery implements OTFQuery, OTFQueryRemote {
 	public abstract Type getType();
 
 	@Override
-	public abstract void installQuery(VisMobsimFeature otfVisQueueSimFeature, EventsManager events, OTFServerQuad2 quad);
+	public abstract void installQuery(VisMobsimFeature otfVisQueueSimFeature, EventsManager events, OTFServerQuadTree quad);
 
 	@Override
 	public abstract void setId(String id);

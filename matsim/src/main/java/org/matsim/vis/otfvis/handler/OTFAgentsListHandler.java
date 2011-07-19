@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
@@ -71,8 +71,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(agInfo.getEasting() - OTFServerQuad2.offsetEast));
-			out.putFloat((float)(agInfo.getNorthing()- OTFServerQuad2.offsetNorth));
+			out.putFloat((float)(agInfo.getEasting() - OTFServerQuadTree.offsetEast));
+			out.putFloat((float)(agInfo.getNorthing()- OTFServerQuadTree.offsetNorth));
 			out.putInt(agInfo.getAgentState().ordinal() ) ;
 			out.putInt(agInfo.getUserDefined());
 			out.putFloat((float)agInfo.getColorValueBetweenZeroAndOne());

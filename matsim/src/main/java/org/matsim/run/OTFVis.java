@@ -286,11 +286,8 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		QSim sim = new QSim(scenario, (EventsUtils.createEventsManager()));
-		OTFEvent2MVI converter = new OTFEvent2MVI(sim.getNetsimNetwork(), eventFile, mviFile, snapshotPeriod);
-		converter.convert(scenario.getConfig());
+		OTFEvent2MVI.convert(new QSimConfigGroup(), scenario.getNetwork(), eventFile, mviFile, snapshotPeriod);
 	}
 
 }

@@ -28,7 +28,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
 
@@ -60,8 +59,6 @@ public class OTFVisConfigGroup extends Module {
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Select";
-	private int fileVersion = OTFFileWriter.VERSION;
-	private int fileMinorVersion = OTFFileWriter.MINORVERSION;
 
 	private int bigTimeStep = 600;
 	private String queryType = "agentPlan";
@@ -302,38 +299,6 @@ public class OTFVisConfigGroup extends Module {
 	public void setRightMouseFunc(final String rightMouseFunc) {
 		if(this.rightMouseFunc.equals(rightMouseFunc)) setModified();
 		this.rightMouseFunc = rightMouseFunc;
-	}
-
-	/**
-	 * @return the fileVersion
-	 */
-	public int getFileVersion() {
-		return this.fileVersion;
-	}
-
-	/**
-	 * @param fileVersion the fileVersion to set
-	 */
-	public void setFileVersion(final int fileVersion) {
-		this.setModified();
-		log.info("File (major) version setting to: " + fileVersion ) ;
-		this.fileVersion = fileVersion;
-	}
-
-	/**
-	 * @return the fileMinorVersion
-	 */
-	public int getFileMinorVersion() {
-		return this.fileMinorVersion;
-	}
-
-	/**
-	 * @param fileMinorVersion the fileMinorVersion to set
-	 */
-	public void setFileMinorVersion(final int fileMinorVersion) {
-		this.setModified() ;
-		log.info("File minor version set to: " + fileMinorVersion ) ;
-		this.fileMinorVersion = fileMinorVersion;
 	}
 
 	/**

@@ -333,19 +333,26 @@ public class Fcd {
 	}
 
 	private Link getLinkWithRightDirection(FcdEvent fcdEvent, NetworkImpl net) {
-		Link link = net.getNearestLink(this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
-		double directionGiven_rad = this.networkMap.get(fcdEvent.getLinkId()).getDirection() * 2 * Math.PI / 360.0;
+		Id linkId = fcdEvent.getLinkId();
+		Coord coord = this.networkMap.get(linkId).getCoord();
+		double direction = this.networkMap.get(linkId).getDirection();
+		return getNearestLinkWithRightDirection(net, this.coordTransform.transform(coord), direction);
+	}
+
+	public static Link getNearestLinkWithRightDirection(NetworkImpl net, Coord coord, double direction) {
+		Link link = net.getNearestLink(coord);
+		double directionGiven_rad = direction * 2 * Math.PI / 360.0;
 		Coord vectorGiven = new CoordImpl(Math.cos(directionGiven_rad), Math.sin(directionGiven_rad));
 		// could be done without converting to a vector
 		
-		if(angleIsWithinEpsilon(this.getVector(link), vectorGiven)){
+		if(angleIsWithinEpsilon(getVector(link), vectorGiven)){
 			return link;
 		}
 	
 		// try the opposite link, if possible
 		for (Link tempLink : link.getToNode().getOutLinks().values()) {
 			if(tempLink.getToNode().getId().toString().equalsIgnoreCase(link.getFromNode().getId().toString())){
-				if(angleIsWithinEpsilon(this.getVector(tempLink), vectorGiven)){
+				if(angleIsWithinEpsilon(getVector(tempLink), vectorGiven)){
 					return tempLink;
 				}
 			}
@@ -353,14 +360,14 @@ public class Fcd {
 		return null;
 	}
 
-	private boolean angleIsWithinEpsilon(Coord coordOne, Coord coordTwo){
+	private static boolean angleIsWithinEpsilon(Coord coordOne, Coord coordTwo){
 		if(Math.abs(getAngleBetweenVectors(coordOne, coordTwo)) < 0.52){ // 30 Grad
 			return true;
 		}		
 		return false;
 	}
 
-	private double getAngleBetweenVectors(Coord coordInLink, Coord coordOutLink){
+	private static double getAngleBetweenVectors(Coord coordInLink, Coord coordOutLink){
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
 		double thetaDiff = thetaOutLink - thetaInLink;
@@ -374,7 +381,7 @@ public class Fcd {
 		return thetaDiff;
 	}	
 	
-	private Coord getVector(Link link){
+	private static Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
 		return new CoordImpl(x, y);

@@ -65,6 +65,10 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 
 	private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
 
+	public OTFConnectionManager() {
+		
+	}
+	
 	private static class Entry implements Serializable {
 
 		private static final long serialVersionUID = -2260651735789627280L;
@@ -119,28 +123,14 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		return clone;
 	}
 
-	public void connectQNodeToWriter(Class<? extends OTFDataWriter<? extends VisNode>> writer) {
+	public void connectNodeToWriter(Class<? extends OTFDataWriter<? extends VisNode>> writer) {
 		Entry entry = new Entry(VisNode.class, writer);
 		connections.add(entry);
 	}
 
-	public void connectQLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
+	public void connectLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
 		Entry entry = new Entry(VisLink.class, writer);
 		connections.add(entry);
-	}
-
-	public void connectQueueLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
-		Entry entry = new Entry(VisLink.class, writer);
-		connections.add(entry);
-	}
-
-	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<VisLink>>> getQueueLinkEntries() {
-		Collection<Class<OTFWriterFactory<VisLink>>> result = new ArrayList<Class<OTFWriterFactory<VisLink>>>();
-		for (Class<?> clazz : getToEntries(VisLink.class)) {
-			result.add((Class<OTFWriterFactory<VisLink>>) clazz);
-		}
-		return result;
 	}
 
 	public void connectWriterToReader(Class<? extends OTFDataWriter> writer, Class<? extends OTFDataReader> reader) {
@@ -247,7 +237,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<VisNode>>> getQNodeEntries() {
+	public Collection<Class<OTFWriterFactory<VisNode>>> getNodeWriters() {
 		Collection<Class<OTFWriterFactory<VisNode>>> result = new ArrayList<Class<OTFWriterFactory<VisNode>>>();
 		for (Class<?> clazz : getToEntries(VisNode.class)) {
 			result.add((Class<OTFWriterFactory<VisNode>>) clazz);
@@ -256,7 +246,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<VisLink>>> getQLinkEntries() {
+	public Collection<Class<OTFWriterFactory<VisLink>>> getLinkWriters() {
 		Collection<Class<OTFWriterFactory<VisLink>>> result = new ArrayList<Class<OTFWriterFactory<VisLink>>>();
 		for (Class<?> clazz : getToEntries(VisLink.class)) {
 			result.add((Class<OTFWriterFactory<VisLink>>) clazz);

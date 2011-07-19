@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -79,10 +79,10 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
-			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
-					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuadTree.offsetEast, 
+					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
+			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
+					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
 
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);

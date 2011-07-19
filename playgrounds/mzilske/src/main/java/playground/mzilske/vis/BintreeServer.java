@@ -15,8 +15,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -62,7 +61,7 @@ public final class BintreeServer implements OTFServerRemote {
 	
 	private Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 
-	private class MyQuadTree extends OTFServerQuad2 {
+	private class MyQuadTree extends OTFServerQuadTree {
 
 		private static final long serialVersionUID = 1L;
 
@@ -126,7 +125,7 @@ public final class BintreeServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
 		return quadTree;
 	}
 

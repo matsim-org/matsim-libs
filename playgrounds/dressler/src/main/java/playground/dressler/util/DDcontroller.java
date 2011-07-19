@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,7 +39,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 
@@ -133,12 +133,8 @@ public class DDcontroller {
 		}
 
 		if (otfvis) {
-		  QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
-			NetsimNetwork qnet = sim.getNetsimNetwork();
-
 			String eventFile = "./output/events.txt";
-			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
-			mviconverter.convert(scenario.getConfig());
+			OTFEvent2MVI.convert(new QSimConfigGroup(), scenario.getNetwork(), eventFile, "./output/otfvis.mvi", 60);
 
 			String[] visargs = {"./output/otfvis.mvi"};
 			OTFVis.main(visargs);

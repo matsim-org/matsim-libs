@@ -31,9 +31,6 @@ import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
@@ -42,6 +39,7 @@ import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
+import org.matsim.vis.otfvis2.LinkHandler;
 
 /**
  * This file starts OTFVis using a .mvi file.
@@ -69,18 +67,10 @@ public class OTFClientFile implements Runnable {
 		otfClient.setHostConnectionManager(masterHostControl);
 		Gbl.printMemoryUsage();
 
-		this.connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-		this.connect.connectQueueLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-
+		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
 		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		this.connect.connectWriterToReader(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connect.connectWriterToReader(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-
 		this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
-		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-		this.connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
-
+		this.connect.connectReaderToReceiver(LinkHandler.class,  OGLSimpleQuadDrawer.class);
 		this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 	}

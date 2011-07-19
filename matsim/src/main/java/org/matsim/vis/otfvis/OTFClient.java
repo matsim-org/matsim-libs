@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
@@ -81,7 +81,7 @@ public class OTFClient {
 
 	public final OTFClientQuad createNewView(OTFConnectionManager connect) {
 		log.info("Getting Quad id " + id);
-		OTFServerQuadI servQ = hostConnectionManager.getOTFServer().getQuad(id, connect);
+		OTFServerQuadTree servQ = hostConnectionManager.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, hostConnectionManager.getOTFServer(), connect);
 		log.info("Creating receivers...");

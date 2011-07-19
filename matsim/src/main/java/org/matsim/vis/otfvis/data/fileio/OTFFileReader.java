@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -68,39 +68,15 @@ public final class OTFFileReader implements OTFServerRemote {
 		this.fileName = fname;
 		this.sourceZipFile = new File(this.fileName);
 		otfVisConfig = readConfigOrUseDefaults();
-		openAndReadInfo();
+		openAndScanZipFile();
 	}
 
-	private void openAndReadInfo() {
-		if (!this.sourceZipFile.exists()){
-			String message = "The file: " + this.fileName + " cannot be found!";
-			log.error(message);
-			throw new RuntimeException(message);
-		}
-		ZipFile zipFile = null;
-		DataInputStream inFile = null;
+	private void openAndScanZipFile() {
 		try {
-			zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
-			ZipEntry infoEntry = zipFile.getEntry("info.bin");
-			inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
-			int version = inFile.readInt();
-			int minorversion = inFile.readInt();
-			inFile.readDouble(); // unused value 'intervall_s'
-			otfVisConfig.setFileVersion(version);
-			otfVisConfig.setFileMinorVersion(minorversion);
+			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			scanZIPFile(zipFile);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		finally {
-			if (inFile != null) {
-				try { inFile.close(); }
-				catch (IOException e) { log.warn("Could not close stream.", e); }
-			}
-			if (zipFile != null) {
-				try { zipFile.close(); }
-				catch (IOException e) { log.warn("Could not close stream.", e); }
-			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -142,48 +118,26 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(final String id, final OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(final String id, final OTFConnectionManager connect) {
 		log.info("reading quad from file...");
-		OTFServerQuadI quad = readQuad();
-		readConnectionManager(connect);
+		OTFServerQuadTree quad = readQuad();
 		return quad;
 	}
 
-	private OTFServerQuadI readQuad() {
-		OTFServerQuadI quad = null;
+	private OTFServerQuadTree readQuad() {
+		OTFServerQuadTree quad = null;
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry quadEntry = zipFile.getEntry("quad.bin");
 			BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(quadEntry));
-			try {
-				quad = (OTFServerQuadI) new OTFObjectInputStream(is).readObject();
-				log.debug("Read OTFServerQuadI from file, type: " + quad.getClass().getName());
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+			quad = (OTFServerQuadTree) new ObjectInputStream(is).readObject();
+			log.debug("Read OTFServerQuadI from file, type: " + quad.getClass().getName());
 			zipFile.close();
+			return quad;
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return quad;
-	}
-
-	private void readConnectionManager(OTFConnectionManager connect) {
-		try {
-			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
-			ZipEntry connectEntry = zipFile.getEntry("connect.bin");
-			if (connectEntry != null) {
-				BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(connectEntry));
-				try {
-					OTFConnectionManager connect2 = (OTFConnectionManager) new OTFObjectInputStream(is).readObject();
-					connect.addEntriesFrom(connect2);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-			}
-			zipFile.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -199,7 +153,7 @@ public final class OTFFileReader implements OTFServerRemote {
 			inFile.close();
 			zipFile.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return buffer;
 	}

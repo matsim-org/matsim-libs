@@ -41,11 +41,11 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
  * @author dstrippgen
  *
  */
-public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements OTFServerQuadI {
+public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 
-	private static final Logger log = Logger.getLogger(OTFServerQuad2.class);
+	private static final Logger log = Logger.getLogger(OTFServerQuadTree.class);
 
-	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
+	private final List<OTFDataWriter> additionalElements = new LinkedList<OTFDataWriter>();
 
 	private static final long serialVersionUID = 1L;
 	protected double minEasting;
@@ -59,18 +59,12 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	public static double offsetEast;
 	public static double offsetNorth;
 
-	public OTFServerQuad2(Network network) {
+	public OTFServerQuadTree(Network network) {
 		super(0,0,0,0);
 		this.setBoundingBoxFromNetwork(network);
 	}
 
-	/**
-	 * This method should be abstract as it has to be overwritten in subclasses.
-	 * Due to deserialization backwards compatibility this is not possible. dg dez 09
-	 */
-	@Override
 	public abstract void initQuadTree(final OTFConnectionManager connect);
-
 
 	protected void setBoundingBoxFromNetwork(Network n){
 		this.minEasting = Double.POSITIVE_INFINITY;
@@ -110,19 +104,15 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		this.top = new Node<OTFDataWriter>(minX, minY, maxX, maxY);
 	}
 
-
-	@Override
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
 	}
 
-	@Override
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
-		//int colls =
 		this.execute(0.,0.,this.easting, this.northing,
 				new ConvertToClientExecutor(connect,client));
 
@@ -144,7 +134,6 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		return client;
 	}
 
-	@Override
 	public void writeConstData(ByteBuffer out) {
 
 		for (OTFDataWriter element : this.values()) {
@@ -164,7 +153,6 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 		}
 	}
 
-	@Override
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 
 		this.execute(bounds, new WriteDataExecutor(out,false));
@@ -180,22 +168,18 @@ public abstract class OTFServerQuad2 extends QuadTree<OTFDataWriter> implements 
 	}
 
 	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
-	@Override
 	public double getMaxEasting() {
 		return this.maxEasting;
 	}
 
-	@Override
 	public double getMaxNorthing() {
 		return this.maxNorthing;
 	}
 
-	@Override
 	public double getMinEasting() {
 		return this.minEasting;
 	}
 
-	@Override
 	public double getMinNorthing() {
 		return this.minNorthing;
 	}

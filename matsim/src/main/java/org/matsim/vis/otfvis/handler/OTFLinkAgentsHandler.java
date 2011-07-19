@@ -34,7 +34,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
@@ -114,8 +114,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float) (pos.getEasting() - OTFServerQuad2.offsetEast));
-			out.putFloat((float) (pos.getNorthing() - OTFServerQuad2.offsetNorth));
+			out.putFloat((float) (pos.getEasting() - OTFServerQuadTree.offsetEast));
+			out.putFloat((float) (pos.getNorthing() - OTFServerQuadTree.offsetNorth));
 			out.putInt(pos.getUserDefined());
 			out.putFloat((float) pos.getColorValueBetweenZeroAndOne());
 			out.putInt(pos.getAgentState().ordinal());

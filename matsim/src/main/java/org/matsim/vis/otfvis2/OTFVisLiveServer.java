@@ -10,7 +10,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -19,8 +18,7 @@ import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -35,7 +33,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	private final OTFAgentsListHandler.Writer agentWriter;
 
-	private MyQuadTree quadTree;
+	private SnapshotWriterQuadTree quadTree;
 
 	private volatile boolean synchedPlayback = true;
 
@@ -86,32 +84,6 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	}
 
-	private class MyQuadTree extends OTFServerQuad2 {
-
-		private static final long serialVersionUID = 1L;
-
-		public MyQuadTree() {
-			super(scenario.getNetwork());
-		}
-
-		@Override
-		public void initQuadTree(OTFConnectionManager connect) {
-			initQuadTree();
-		}
-
-		private void initQuadTree() {
-			for (Link link : scenario.getNetwork().getLinks().values()) {
-				double middleEast = (link.getToNode().getCoord().getX() + link.getFromNode().getCoord().getX()) * 0.5 - this.minEasting;
-				double middleNorth = (link.getToNode().getCoord().getY() + link.getFromNode().getCoord().getY()) * 0.5 - this.minNorthing;
-				LinkHandler.Writer linkWriter = new LinkHandler.Writer();
-				linkWriter.setSrc(link);
-				this.put(middleEast, middleNorth, linkWriter);
-			}
-			this.addAdditionalElement(agentWriter);
-		}
-
-	}
-
 	private class SnapshotReceiver implements SnapshotWriter {
 
 		private TimeStep timeStep;
@@ -157,8 +129,9 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 		this.agentWriter = new OTFAgentsListHandler.Writer();
 		this.agentWriter.setSrc(this.positions );
 		this.snapshotReceiver = new SnapshotReceiver();
-		this.quadTree = new MyQuadTree();
+		this.quadTree = new SnapshotWriterQuadTree(scenario.getNetwork());
 		this.quadTree.initQuadTree();
+		this.quadTree.addAdditionalElement(agentWriter);
 		SimulationViewForQueries queueModel = new CurrentTimeStepView();
 		this.queryServer = new QueryServer(scenario, eventsManager, queueModel);
 		this.nextTimeStep = new TimeStep();
@@ -205,7 +178,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
 		return quadTree;
 	}
 

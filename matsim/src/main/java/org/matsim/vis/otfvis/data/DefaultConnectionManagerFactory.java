@@ -40,7 +40,7 @@ public class DefaultConnectionManagerFactory implements OTFConnectionManagerFact
 	@Override
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.connectQLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+		connect.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);

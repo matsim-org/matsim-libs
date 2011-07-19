@@ -37,9 +37,14 @@ public class Run {
 		
 		Person person = scenario.getPopulation().getFactory().createPerson(scenario.createId("1"));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
+		
 		Activity activity1 = scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", scenario.createId("i(1,1)"));
 		activity1.setEndTime(6*60*60);
 		plan.addActivity(activity1);
+		
+		
+		
+		
 		Leg leg = scenario.getPopulation().getFactory().createLeg("car");
 		// GenericRouteImpl route = new GenericRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,8)"));
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,1)"));
@@ -48,6 +53,9 @@ public class Run {
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", scenario.createId("i(8,1)")));
+		
+		
+		
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 		

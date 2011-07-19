@@ -28,10 +28,7 @@ import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
@@ -49,7 +46,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
   
   private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
   
-  void createSnapshotwriter(NetsimNetwork network, Scenario scenario, int snapshotPeriod, 
+  void createSnapshotwriter(Scenario scenario, int snapshotPeriod, 
       Integer iterationNumber, ControlerIO controlerIO) {
   	//don't write any snapshots if a iteration number is set and the snapshot interval condition isn't fulfilled.
   	int writeSnapshotsInterval = scenario.getConfig().getQSimConfigGroup().getWriteSnapshotsInterval();
@@ -71,7 +68,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
       if (snapshotFormat.contains("plansfile")) {
         String snapshotFilePrefix = controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
         String snapshotFileSuffix = "xml";
-        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, network.getNetwork()));
+        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, scenario.getNetwork()));
       }
       if (snapshotFormat.contains("transims")) {
         String snapshotFile = controlerIO.getIterationFilename(itNumber, "T.veh");
@@ -88,10 +85,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
       }
       if (snapshotFormat.contains("otfvis")) {
         String snapshotFile = controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
-        OTFFileWriter writer = null;
-
-        OTFConnectionManagerFactory connectionManagerFactory = new OTFFileWriterQSimConnectionManagerFactory();
-        writer = new OTFFileWriter(snapshotPeriod, new OTFQSimServerQuadBuilder(network), snapshotFile, connectionManagerFactory);
+        OTFFileWriter writer = new OTFFileWriter(snapshotPeriod, scenario.getNetwork(), snapshotFile);
         this.snapshotWriters.add(writer);
       }
     } else {

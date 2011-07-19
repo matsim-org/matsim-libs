@@ -27,6 +27,7 @@ import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -34,7 +35,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
@@ -210,12 +210,11 @@ public class AnalysisTest {
 			sr.close();
 			sw2.close();
 
-			QSim qsim = new QSim(scenario2, (EventsUtils.createEventsManager()));
-			new OTFEvent2MVI(qsim.getNetsimNetwork(), eventsOutputFilename,
+			OTFEvent2MVI.convert(new QSimConfigGroup(), scenario2.getNetwork(), eventsOutputFilename,
 					args[2] + "../" + args[args.length - 1] + "."
-							+ (scenario.equals("normal") ? "" : scenario + ".")
-							+ "vis.mvi", Integer
-							.parseInt(args[args.length - 2])).convert(scenario2.getConfig());
+					+ (scenario.equals("normal") ? "" : scenario + ".")
+					+ "vis.mvi", Integer
+					.parseInt(args[args.length - 2]));
 		}
 		System.out.println("done.");
 	}

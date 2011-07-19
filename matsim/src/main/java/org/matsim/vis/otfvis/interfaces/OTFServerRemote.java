@@ -24,7 +24,7 @@ import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 /**
@@ -41,7 +41,7 @@ public interface OTFServerRemote {
 
 	public boolean requestNewTime(int time, TimePreference searchDirection);
 
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect);
+	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect);
 
 	public byte[] getQuadConstStateBuffer(String id);
 

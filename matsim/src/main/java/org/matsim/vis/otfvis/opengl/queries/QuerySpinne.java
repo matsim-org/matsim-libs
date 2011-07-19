@@ -54,7 +54,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
@@ -343,7 +343,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuad2 quad) {
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
 		VisNetwork net = queueSimulation.getVisMobsim().getVisNetwork();
 		Population plans = queueSimulation.getVisMobsim().getScenario().getPopulation();
 		this.result = new Result();

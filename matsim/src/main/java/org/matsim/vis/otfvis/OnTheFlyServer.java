@@ -23,10 +23,8 @@ package org.matsim.vis.otfvis;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
@@ -34,9 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad2;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -75,17 +71,14 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	private volatile int localTime = 0;
 
-	private final Map<String, OTFServerQuad2> quads = new HashMap<String, OTFServerQuad2>();
+	private OTFServerQuadTree quad;
 
 	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
 
 	private EventsManager events;
 
-	private OTFQSimServerQuadBuilder quadBuilder;
-
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 
-	//	private final ByteBuffer buf = ByteBuffer.allocate(20000000);
 	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
 
 	private volatile double stepToTime = 0;
@@ -180,11 +173,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	@Override
 	public void pause(){
 		synchronized (updateFinished) {
-//			if (status == Status.PLAY) {
-//				status = Status.PAUSE;
-//			} else {
-				status = Status.PAUSE;
-//			}
+			status = Status.PAUSE;
 		}
 	}
 
@@ -208,17 +197,16 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) {
-		if (quads.containsKey(id)) {
-			return quads.get(id);
+	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
+		if (quad != null) {
+			return quad;
 		} else {
-			OTFServerQuad2 quad = this.quadBuilder.createAndInitOTFServerQuad(connect);
+			quad = new LiveServerQuadTree(this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 			quad.initQuadTree(connect);
 			for(OTFDataWriter<?> writer : additionalElements) {
 				log.info("Adding additional element: " + writer.getClass().getName());
 				quad.addAdditionalElement(writer);
 			}
-			quads.put(id, quad);
 			return quad;
 		}
 	}
@@ -234,7 +222,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 			accessToQNetwork.acquire();
 			byte[] result;
 			buf.position(0);
-			quads.get(id).writeConstData(buf);
+			quad.writeConstData(buf);
 			int pos = buf.position();
 			result = new byte[pos];
 			buf.position(0);
@@ -252,9 +240,8 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 		try {
 			accessToQNetwork.acquire();
 			byte[] result;
-			OTFServerQuad2 updateQuad = quads.get(id);
 			buf.position(0);
-			updateQuad.writeDynData(bounds, buf);
+			quad.writeDynData(bounds, buf);
 			int pos = buf.position();
 			result = new byte[pos];
 			buf.position(0);
@@ -269,7 +256,6 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
-		OTFServerQuad2 quad = quads.values().iterator().next();
 		query.installQuery(otfVisQueueSimFeature, events, quad);
 		activeQueries.add(query);
 		return query;
@@ -295,7 +281,6 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	public void setSimulation(VisMobsimFeature otfVisQueueSimFeature) {
 		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
-		this.quadBuilder = new OTFQSimServerQuadBuilder(otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 	}
 
 	@Override

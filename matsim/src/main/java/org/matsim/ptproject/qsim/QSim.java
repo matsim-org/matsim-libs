@@ -34,10 +34,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -47,7 +44,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.Initializable;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -340,7 +336,7 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
-		this.snapshotManager.createSnapshotwriter(this.netEngine.getNetsimNetwork(), this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
+		this.snapshotManager.createSnapshotwriter(this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
 		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
