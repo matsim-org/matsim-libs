@@ -65,15 +65,15 @@ public class PBox {
 	
 	private final ScorePlansHandler scorePlansHandler;
 	
-	public PBox(int numberOfCooperatives){
-		this.scorePlansHandler = new ScorePlansHandler(0.05, 0.03);
-		createCooperatives(numberOfCooperatives);
+	public PBox(int numberOfCooperatives, double costPerVehicle){
+		this.scorePlansHandler = new ScorePlansHandler(0.50 / 1000.0, 0.30 / 1000.0);
+		createCooperatives(numberOfCooperatives, costPerVehicle);
 	}
 
-	private void createCooperatives(int numberOfCooperatives) {
+	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i));
+			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i), costPerVehicle);
 			cooperatives.add(cooperative);
 		}
 		

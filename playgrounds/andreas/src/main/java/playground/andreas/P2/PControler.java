@@ -46,10 +46,11 @@ public class PControler{
 		if(args.length == 0){
 			log.info("Arg 1: config.xml");
 			log.info("Arg 2: Number of cooperatives");
+			log.info("Arg 3: Cost per vehicle");
 			System.exit(1);
 		}
 		
-		PBox pBox = new PBox(Integer.parseInt(args[1]));
+		PBox pBox = new PBox(Integer.parseInt(args[1]), Double.parseDouble(args[2]));
 		
 		PScenarioImpl scenario = new PScenarioImpl(ConfigUtils.loadConfig(args[0]));
 		ScenarioUtils.loadScenario(scenario);

@@ -64,6 +64,13 @@ public class PPlan {
 		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
 		+ ", corridor from " + this.startStop.getId() + " to " + this.endStop.getId();
 	}
+	
+	public String toString(double budget) {
+		return "Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+		+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
+		+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
+		+ ", corridor from " + this.startStop.getId() + " to " + this.endStop.getId() + ", line budget " + budget;
+	}
 
 	public Id getId() {
 		return id;
@@ -153,6 +160,22 @@ public class PPlan {
 		}
 		
 		if(this.endTime != testPlan.getEndTime()){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean isSameButOperationTime(PPlan testPlan) {
+		if(!this.startStop.getId().toString().equalsIgnoreCase(testPlan.getStartStop().getId().toString())){
+			return false;
+		}
+		
+		if(!this.endStop.getId().toString().equalsIgnoreCase(testPlan.getEndStop().getId().toString())){
+			return false;
+		}
+		
+		if(this.vehicleIds.size() != testPlan.getVehicleIds().size()){
 			return false;
 		}
 		

@@ -40,6 +40,7 @@ public class Cooperative {
 	private final static Logger log = Logger.getLogger(Cooperative.class);
 	
 	private final Id id;
+	private final double costPerVehicle;
 	private int numberOfRoutesCreated = 0;
 
 	private PPlan bestPlan;
@@ -47,11 +48,17 @@ public class Cooperative {
 
 	private TransitLine currentTransitLine;
 	
-	public Cooperative(Id id){
+	private double budget;
+	private double lastBudget;
+	
+	public Cooperative(Id id, double costPerVehicle){
 		this.id = id;
+		this.costPerVehicle = costPerVehicle;
 	}
 
 	public void init(SimpleCircleScheduleProvider simpleScheduleProvider) {
+		this.budget = 0.0;
+		
 		PPlan plan = new PPlan(new IdImpl("0"));
 		plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
 		plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
@@ -72,14 +79,49 @@ public class Cooperative {
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
 		
+		this.lastBudget = budget;
+		
 		if(this.bestPlan != null){
 			scorePlan(driverId2ScoreMap, this.bestPlan);
+			this.budget += this.bestPlan.getScore();
+			for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
+				route.setDescription(this.bestPlan.toString(this.budget));
+			}
 		}
 		scorePlan(driverId2ScoreMap, this.testPlan);
+		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
+			route.setDescription(this.testPlan.toString(this.budget));
+		}
 
 	}
 
-	public void replan(SimpleCircleScheduleProvider simpleScheduleProvider) {
+	public void replan(SimpleCircleScheduleProvider simpleScheduleProvider) {	
+		
+		if(this.budget <= 0 && this.bestPlan != null){
+			// decrease number of vehicles
+			
+			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) (this.budget / this.costPerVehicle));
+			
+			if(this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell < 1){
+				log.info("Best Plan set to null - restarting line " + this.id);
+				this.bestPlan = null;
+				this.budget = 0.0;
+			} else {
+				PPlan plan = new PPlan(this.bestPlan.getId());
+				plan.setScore(this.bestPlan.getScore());
+
+				plan.setStartStop(this.bestPlan.getStartStop());
+				plan.setEndStop(this.bestPlan.getEndStop());
+				plan.setStartTime(this.bestPlan.getStartTime());
+				plan.setEndTime(this.bestPlan.getEndTime());
+
+				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
+				
+				this.budget += this.costPerVehicle * numberOfVehiclesToSell;
+				log.info("Sold " + numberOfVehiclesToSell + " from line " + this.id);
+				this.bestPlan = plan;
+			}			
+		}
 		
 		if(this.bestPlan == null){
 			this.bestPlan = this.testPlan;
@@ -98,13 +140,17 @@ public class Cooperative {
 			plan.setEndTime(this.testPlan.getEndTime());
 			
 			if(this.bestPlan.isSameButVehSize(this.testPlan)){
-				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-			} else {
+				if(this.budget > this.costPerVehicle){
+					plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
+					this.budget -= this.costPerVehicle;
+					this.bestPlan = plan;
+					this.testPlan = null;
+				} 
+			} else if(this.bestPlan.isSameButOperationTime(this.testPlan)){
 				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-			}
-
-			this.bestPlan = plan;
-			this.testPlan = null;
+				this.bestPlan = plan;
+				this.testPlan = null;
+			}			
 		}
 		
 		// dumb simple replanning
@@ -151,26 +197,26 @@ public class Cooperative {
 			
 		} else {
 			
-			if(this.bestPlan.getVehicleIds().size() == 1){
-				// this plan has become non profitable
-				this.bestPlan = null;
-//			} else if(this.bestPlan.getTripsServed() == 0){
-				// plan not used anymore - delete it
+//			if(this.bestPlan.getVehicleIds().size() == 1){
+//				// this plan has become non profitable
 //				this.bestPlan = null;
-			} else {
-				// decrease number of vehicles
-				PPlan plan = new PPlan(this.bestPlan.getId());
-				plan.setScore(this.bestPlan.getScore());
-
-				plan.setStartStop(this.bestPlan.getStartStop());
-				plan.setEndStop(this.bestPlan.getEndStop());
-				plan.setStartTime(this.bestPlan.getStartTime());
-				plan.setEndTime(this.bestPlan.getEndTime());
-
-				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-				
-				this.bestPlan = plan;
-			}
+////			} else if(this.bestPlan.getTripsServed() == 0){
+//				// plan not used anymore - delete it
+////				this.bestPlan = null;
+//			} else {
+//				// decrease number of vehicles
+//				PPlan plan = new PPlan(this.bestPlan.getId());
+//				plan.setScore(this.bestPlan.getScore());
+//
+//				plan.setStartStop(this.bestPlan.getStartStop());
+//				plan.setEndStop(this.bestPlan.getEndStop());
+//				plan.setStartTime(this.bestPlan.getStartTime());
+//				plan.setEndTime(this.bestPlan.getEndTime());
+//
+//				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
+//				
+//				this.bestPlan = plan;
+//			}
 			
 			// create complete new route
 			PPlan plan = new PPlan(new IdImpl(simpleScheduleProvider.getIteration()));
@@ -212,9 +258,9 @@ public class Cooperative {
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
 		
-		for (TransitRoute route : plan.getLine().getRoutes().values()) {
-			route.setDescription(plan.toString());
-		}
+//		for (TransitRoute route : plan.getLine().getRoutes().values()) {
+//			route.setDescription(plan.toString(this.budget));
+//		}
 	}
 	
 
