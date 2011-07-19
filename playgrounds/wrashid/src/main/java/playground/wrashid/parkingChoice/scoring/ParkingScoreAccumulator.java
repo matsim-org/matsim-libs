@@ -1,26 +1,13 @@
 package playground.wrashid.parkingChoice.scoring;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import org.apache.commons.math.stat.descriptive.moment.Mean;
-import org.geotools.math.Statistics;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.statistics.HistogramDataset;
-import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -30,8 +17,9 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
-import playground.wrashid.parkingChoice.ParkingChoiceLib;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
+import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 public class ParkingScoreAccumulator implements AfterMobsimListener {
 
@@ -87,8 +75,77 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		}
 		writeWalkingDistanceStatisticsGraph(controler, walkingDistances);
 		printWalkingDistanceHistogramm(controler, walkingDistances);
+		writeOutParkingOccupancies(controler);
+		writeOutGraphParkingTypeOccupancies(controler);
 		
 		//eventsToScore.finish();
+	}
+
+	private void writeOutGraphParkingTypeOccupancies(Controler controler) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingOccupancy.png");
+
+		double matrix[][]=new double[96][5];
+		
+		for (Parking parking:parkingScoreCollector.parkingOccupancies.keySet()){
+			int graphIndex=-1;
+			if (parking.getId().toString().startsWith("gp")){
+				graphIndex=0;
+			} else if (parking.getId().toString().startsWith("ppIndoor")){
+				graphIndex=1;
+			}else if (parking.getId().toString().startsWith("ppOutdoor")){
+				graphIndex=2;
+			}else if (parking.getId().toString().startsWith("publicPOutsideCityZH")){
+				graphIndex=3;
+			}else if (parking.getId().toString().startsWith("stp")){
+				graphIndex=4;
+			} else {
+				DebugLib.stopSystemAndReportInconsistency("parking type (Id) unknown: " + parking.getId());
+			}
+			
+			int[] occupancy = parkingScoreCollector.parkingOccupancies.get(parking).getOccupancy();
+			for (int i=0;i<96;i++){
+				matrix[i][graphIndex]+=occupancy[i];
+			}
+		}
+		
+		String title="ParkingTypeOccupancies";
+		String xLabel="time (15min-bin)";
+		String yLabel="# of occupied parkings";
+		String[] seriesLabels=new String[5];
+		seriesLabels[0]="garageParkings";
+		seriesLabels[1]="privateParkingsIndoor";
+		seriesLabels[2]="privateParkingsOutdoor";
+		seriesLabels[3]="publicParkingsOutsideCityZH";
+		seriesLabels[4]="streetParkings";
+		double[] xValues=new double[96];
+		
+		for (int i=0;i<96;i++){
+			xValues[i]=i/(double)4;
+		}
+		
+		GeneralLib.writeGraphic(iterationFilename, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+	}
+
+	private void writeOutParkingOccupancies(Controler controler) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingOccupancy.txt");
+		
+		
+		ArrayList<String> list=new ArrayList<String>();
+		
+		for (Parking parking:parkingScoreCollector.parkingOccupancies.keySet()){
+			StringBuffer row = new StringBuffer (parking.getId().toString());
+			
+			ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(parking);
+			
+			for (int i=0;i<96;i++){
+				row.append("\t");
+				row.append(parkingOccupancyBins.getOccupancy(i*900));
+			}
+			
+			list.add(row.toString());
+		}
+		
+		GeneralLib.writeList(list, iterationFilename);
 	}
 
 	private void printWalkingDistanceHistogramm(Controler controler, HashMap<Id, Double> walkingDistance){

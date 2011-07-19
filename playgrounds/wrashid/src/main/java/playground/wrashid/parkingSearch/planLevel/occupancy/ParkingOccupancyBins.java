@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 
 /**
@@ -12,6 +13,7 @@ import playground.wrashid.lib.GeneralLib;
  */
 public class ParkingOccupancyBins {
 
+	int numberOfBins=96;
 	private int[] occupancy = null;
 
 	public int[] getOccupancy() {
@@ -22,16 +24,26 @@ public class ParkingOccupancyBins {
 	 * Initialize the data structures.
 	 */
 	public ParkingOccupancyBins() {
-		occupancy = new int[96];
+		init();
+	}
 
-		for (int i = 0; i < 96; i++) {
+	private void init() {
+		occupancy = new int[numberOfBins];
+
+		for (int i = 0; i < numberOfBins; i++) {
 			occupancy[i] = 0;
 		}
 	}
 	
+	public ParkingOccupancyBins(int numberOfBins) {
+		this.numberOfBins=numberOfBins;
+		init();
+		DebugLib.stopSystemAndReportInconsistency("probably won't work, as times are projected within 24 hours.");
+	}
+	
 	public int getPeakOccupanyOfDay(){
 		int peakOccupancy=0;
-		for (int i = 0; i < 96; i++) {
+		for (int i = 0; i < numberOfBins; i++) {
 			if (peakOccupancy<occupancy[i]){
 				peakOccupancy=occupancy[i];
 			}
@@ -51,7 +63,7 @@ public class ParkingOccupancyBins {
 
 		if (startBinIndex > endBinIndex) {
 
-			for (int i = startBinIndex; i < 96; i++) {
+			for (int i = startBinIndex; i < numberOfBins; i++) {
 				occupancy[i]++;
 			}
 
@@ -73,7 +85,7 @@ public class ParkingOccupancyBins {
 	 * @return
 	 */
 	public int getBinIndex(double time) {
-		return GeneralLib.getTimeBinIndex(time,900.0);
+		return GeneralLib.getTimeBinIndex(time,3600.0*24.0/numberOfBins);
 	}
 
 }

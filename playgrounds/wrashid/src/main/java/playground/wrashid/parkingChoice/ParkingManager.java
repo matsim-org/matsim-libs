@@ -36,8 +36,8 @@ public class ParkingManager implements StartupListener {
 
 	private HashMap<Id, Plan> planUsedInPreviousIteration=new HashMap<Id, Plan>(); 
 
-	private HashMap<Parking,int[]> parkingOccupancy=new HashMap<Parking, int[]>();
-	// TODO: cont' here.
+	
+	//private HashMap<Parking,int[]> parkingOccupancy=new HashMap<Parking, int[]>();
 	
 	
 	private QuadTree<Parking> parkings;
@@ -97,7 +97,9 @@ public class ParkingManager implements StartupListener {
 	public void addParkings(Collection<Parking> parkingCollection) {
 		for (Parking parking : parkingCollection) {
 			addParking(parking);
+			//parkingOccupancy.put(parking, new int[numberOfMinuteBinsForParkingOccupancy]);
 		}
+		
 	}
 
 	public void setParkingCollection(Collection<Parking> parkingCollection) {
