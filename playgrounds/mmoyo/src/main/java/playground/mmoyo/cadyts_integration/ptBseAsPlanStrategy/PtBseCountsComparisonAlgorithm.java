@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

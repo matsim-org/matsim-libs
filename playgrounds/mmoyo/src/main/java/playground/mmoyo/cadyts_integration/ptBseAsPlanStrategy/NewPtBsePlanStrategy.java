@@ -61,8 +61,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseCountsComparisonAlgorithm;
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis.PtBseOccupancyAnalyzer;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -507,8 +505,8 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	}
 	
 
-	public final String getCalibratorSettings() {
-		// yyyyyy this can be changed to package-private once the test is in the same package
+	protected final String getCalibratorSettings() {
+		// yyyyyy this can be changed to package-private once the test is in the same package. DONE
 		StringBuffer sBuff = new StringBuffer();
 		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]" ); 
 		sBuff.append("[CenterRegression=" + this.calibrator.getCenterRegression() + "]" );

@@ -17,7 +17,6 @@ public class AdaptedRouterTest extends MatsimTestCase {
 	public void testEquil() {
 	
 		String inputDir = this.getClassInputDirectory();
-		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/AdaptedRouterTest/";
 		
 		System.out.println(" Input Dir " + this.getInputDirectory());
 		System.out.println(" Output Dir " + this.getOutputDirectory());

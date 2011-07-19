@@ -3,7 +3,9 @@ package playground.mmoyo.utils;
 import org.matsim.api.core.v01.Id;
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 
+/**shows the content of a count comparison file*/
 public class CountComparison {
+	
 	public static void main(String[] args) {
 		String countComparisonFile = "../../input/juli/500/500.simBseCountCompareOccupancy.txt";
 		CountsReader countReader = new CountsReader(countComparisonFile);

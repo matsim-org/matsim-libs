@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ import org.matsim.pt.counts.SimpleWriter;
 import org.xml.sax.SAXException;
 
 /**
- *   Collects occupancy data of M44-line stations 
+ *   Collects occupancy data of transit-line stations 
  *
  */
 public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler, 
@@ -80,7 +80,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		//only line m44
+		//only specific transit line
 		Id transitLineId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
@@ -96,7 +96,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		//only line m44
+		//only specific transit line
 		Id transitLineId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;

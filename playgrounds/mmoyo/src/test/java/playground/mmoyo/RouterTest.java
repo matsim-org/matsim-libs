@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
+/*
 package playground.mmoyo;
 
 import java.io.IOException;
@@ -33,6 +33,7 @@ public class RouterTest extends MatsimTestCase {
 		/* for integration into MATSim, the following must work */
 		
 		/*
+		//TODO  use adapted router
 		ScenarioImpl scenario = new ScenarioImpl();
 		// setup very simple scenario
 		NetworkLayer network = scenario.getNetwork();
@@ -69,7 +70,8 @@ public class RouterTest extends MatsimTestCase {
 		assertEquals(TransportMode.walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(TransportMode.walk, legs.get(2).getMode());
-		*/
+		
 	}
 	
 }
+*/

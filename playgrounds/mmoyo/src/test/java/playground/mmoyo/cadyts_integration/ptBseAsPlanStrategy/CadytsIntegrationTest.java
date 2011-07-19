@@ -49,8 +49,6 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 
 		String inputDir = this.getInputDirectory();
 		String outputDir = this.getOutputDirectory();
-		//String inputDir = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
-		//String outputDir = "../playgrounds/mmoyo/test/output/playground/mmoyo/CadytsIntegrationTest/testCalibration/";
 
 		System.out.println(" Input Dir " + this.getInputDirectory() );
 		System.out.println(" Output Dir " + this.getOutputDirectory() );
@@ -150,6 +148,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		System.out.println("Plan_lambda_min " +  outStatData.getPlan_lambda_min() );
 		System.out.println("Plan_lambda_stddev " + outStatData.getPlan_lambda_stddev());
 		System.out.println("Total_ll " + outStatData.getTotal_ll() );
+		
 		/*
 		Assert.assertEquals("diferrent Count_ll", "-1.546875", outStatData.getCount_ll() );
 		Assert.assertEquals("diferrent Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );

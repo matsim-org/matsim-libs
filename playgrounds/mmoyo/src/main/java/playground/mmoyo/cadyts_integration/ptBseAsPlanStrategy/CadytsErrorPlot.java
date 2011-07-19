@@ -1,4 +1,4 @@
-package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.analysis;
+package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -23,19 +23,11 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
-/*
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.data.xy.XYDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-*/
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import org.matsim.counts.Volume;
+//import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -55,7 +47,7 @@ public class CadytsErrorPlot {
 	private static final String DOTPNG = ".png";
 	private static final String WSPLOT = "wsePlot.txt";
 	
-	public void createPlot(final TransitSchedule trSched, final PtBseCountsComparisonAlgorithm ccaOccupancy, final double minStddev, final String iterPath){
+	protected void createPlot(final TransitSchedule trSched, final PtBseCountsComparisonAlgorithm ccaOccupancy, final double minStddev, final String iterPath){
 		DataLoader dataLoader = new DataLoader();
 		List <TransitRouteStop> stoplist = dataLoader.getTransitRoute(strRoute, trSched).getStops();
 		StringBuffer sBuff = new StringBuffer();
@@ -106,22 +98,17 @@ public class CadytsErrorPlot {
 			chart.addSubtitle(new TextTitle(strStationInfo, new Font(Font.SANS_SERIF, Font.PLAIN, 10)));
 			
 			BarRenderer renderer = new BarRenderer();
-			//XYRenderer renderer = new BarRenderer();
 			renderer.setShadowVisible(false);
 			renderer.setBarPainter( new StandardBarPainter() );
 			
 			CategoryPlot plot =chart.getCategoryPlot();
-			//XYPlot plot = chart.getXYPlot();			
 			plot.setBackgroundPaint(Color.white);
 			plot.setRangeGridlinePaint(Color.gray);
 			plot.setRangeGridlinesVisible(true);
 			plot.setRenderer(0, renderer);
 			plot.getRangeAxis().setRange(0, maxError);   //set range so that all graphs have the same scale
 			plot.setDomainGridlinesVisible(true);
-			////plot.setDomainGridlinePaint(Color.gray);
 			plot.getDomainAxis().setTickLabelFont(new Font(Font.SANS_SERIF, Font.PLAIN, 7));
-			////plot.getDomainAxis().setFixedAutoRange(1.0);
-			////plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
 			
 			BufferedImage bufImage = chart.createBufferedImage(400, 350);
 			graphics.drawImage(bufImage, stopIndex*400, 0, null);
@@ -152,8 +139,8 @@ public class CadytsErrorPlot {
 		String trScheduleFilePath= "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 		double minstrdv = 8.0;
 		
-		String ocupFilePath = "../../input/juli/elMejor/500.simCountCompareOccupancy.txt";
-		final String iterPath = "../../input/juli/elMejor/";   //it is an output dir where the plot will be stored
+		String ocupFilePath = "../../input/juli/cadytsError/500.simCountCompareOccupancy.txt";
+		final String outputDir = "../../input/cadytsError/"; 
 		
 		//load data
 		DataLoader dataloader = new DataLoader();
@@ -168,8 +155,8 @@ public class CadytsErrorPlot {
 			double[] dblSimValues = countsReader.getStopSimCounts(stopId);
 			int[] intSimValues = new int[24];
 			System.out.println("\n"+ stopId);
-			for (int i=0;i<24;i++){  //convert from double to integer
-				intSimValues[i]=(int)dblSimValues[i];
+			for (int i=0;i<24;i++){  
+				intSimValues[i]=(int)dblSimValues[i];  //convert from double to integer
 				
 				//Volume vol = realCounts.getCounts().get(stopId).getVolume(i+1);
 				//double realCountValue = vol!=null? vol.getValue():0.0;
@@ -184,7 +171,7 @@ public class CadytsErrorPlot {
 		PtBseCountsComparisonAlgorithm ptBseCountsComparisonAlgorithm = new PtBseCountsComparisonAlgorithm(ptBseOccupancyAnalyzer, realCounts, net, 0.0);  //scaleFactor 0 because scaled value is read
 
 		CadytsErrorPlot cadytsErrorPlot = new CadytsErrorPlot();
-		cadytsErrorPlot.createPlot(schedule, ptBseCountsComparisonAlgorithm, minstrdv, iterPath);
+		cadytsErrorPlot.createPlot(schedule, ptBseCountsComparisonAlgorithm, minstrdv, outputDir);
 		
 	}
 	
