@@ -32,7 +32,8 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 	Stack<XYZAzimuthEvent> events = new Stack<XYZAzimuthEvent>();
 	List<String> groupIDs = new ArrayList<String>();
 
-	//	Map<String,double[][]> densityArrays;
+	List<Coordinate> queryCoordinates = null;// = new ArrayList<Coordinate>();
+
 
 	private double time = -1;
 	private Envelope envelope;
@@ -72,7 +73,6 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		if (this.events.size() == 0) {
 			return;
 		}
-		//		initDensityArrays();
 		Map<String, List<Coordinate>> groups = new HashMap<String,List<Coordinate>>();
 		Map<String, List<PersonInfo>> groupsDists = new HashMap<String,List<PersonInfo>>();
 		List<Coordinate> all = new ArrayList<Coordinate>();
@@ -97,47 +97,28 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 			groupsDists.put(key, groupDists);
 		}
 
-		double x = this.envelope.getMinX() + this.res/2;
 
+		for (Coordinate here : this.queryCoordinates) {
 
-		int xpos = 0;
-		for (; x < this.envelope.getMaxX(); x += this.res){
-			int ypos = 0;
-			double y = this.envelope.getMinY() + this.res/2;
-			for (; y < this.envelope.getMaxY(); y+=this.res) {
-				Coordinate here = new Coordinate(x,y);
-				for (String key : this.groupIDs) {
-					double rho = 0;
-					List<PersonInfo> l = groupsDists.get(key);
-					if (l == null) {
-						continue;
-					}
-					for (PersonInfo pi : l) {
-						double k = kernel((here.x-pi.c.x)/this.lambda/(pi.dist),(here.y-pi.c.y)/this.lambda/(pi.dist));
-						rho += 1./Math.pow(this.lambda,2)/Math.pow(pi.dist, 2)*k;
-
-
-						//							1/Math.pow(this.lambda * pi.dist,2) * Math.exp(-Math.pow(pi.c.distance(here), 2)/(2*Math.pow(this.lambda*pi.dist, 2)));
-					}
-					//					rho *= 1/(2*Math.PI);
-					if (rho > this.maxRho) {
-						this.maxRho = rho;
-					}
-					generateEvent(here,rho,key);
-					//					this.densityArrays.get(key)[xpos][ypos] = rho;
+			for (String key : this.groupIDs) {
+				double rho = 0;
+				List<PersonInfo> l = groupsDists.get(key);
+				if (l == null) {
+					continue;
 				}
-				//				if (this.eventsManger != null) {
-				//					double r = this.densityArrays.get("r")[xpos][ypos];
-				//					double g = this.densityArrays.get("g")[xpos][ypos];
-				//					//					double b = this.densityArrays.get("b")[xpos][ypos];
-				//					generateEvent(here,r,g,0 );
-				//				}
-				ypos++;
+				for (PersonInfo pi : l) {
+					double k = kernel((here.x-pi.c.x)/this.lambda/(pi.dist),(here.y-pi.c.y)/this.lambda/(pi.dist));
+					rho += 1./Math.pow(this.lambda,2)/Math.pow(pi.dist, 2)*k;
+				}
+				if (rho > this.maxRho) {
+					this.maxRho = rho;
+				}
+				generateEvent(here,rho,key);
 			}
-			xpos++;
 		}
 
 	}
+
 
 	private double kernel(double x,double y) {
 		double tmp = -1./2.*(Math.pow(x, 2)+Math.pow(y, 2));
@@ -188,16 +169,6 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 
 	}
 
-	//	private void initDensityArrays() {
-	//		this.densityArrays = new HashMap<String,double[][]>();
-	//		int xsize = (int) ((this.envelope.getMaxX() - this.envelope.getMinX())/this.res);
-	//		int ysize = (int) ((this.envelope.getMaxY() - this.envelope.getMinY())/this.res);
-	//		for (String key : this.groupIDs) {
-	//			double[][] array = new double[xsize][ysize];
-	//			this.densityArrays.put(key, array);
-	//		}
-	//	}
-
 	private String getKeyFromPersonId(Id personId) {
 		String tmp = personId.toString();
 		for (String key : this.groupIDs) {
@@ -241,4 +212,9 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 	/*package*/ void setStaticEnvironmentDistancesField(StaticEnvironmentDistancesField sedf) {
 		this.sedf = sedf;
 	}
+
+	/*package*/ void setQueryCoordinates(List<Coordinate> coordinates) {
+		this.queryCoordinates = coordinates;
+	}
+
 }

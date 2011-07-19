@@ -1,11 +1,12 @@
 package playground.gregor.multidestpeds.densityestimation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -28,6 +29,25 @@ public class DensityEstimatorFactory {
 	}
 
 	public NNGaussianKernelEstimator createDensityEstimator() {
+		NNGaussianKernelEstimator ret = createBasicEstimator();
+		Envelope e = getEnvelope();
+		ret.setEnvelope(e);
+
+		List<Coordinate> queryCoords = new ArrayList<Coordinate>();
+		double x = e.getMinX() + this.res/2;
+		for (; x < e.getMaxX(); x += this.res){
+			double y = e.getMinY() + this.res/2;
+			for (; y < e.getMaxY(); y+=this.res) {
+				Coordinate c = new Coordinate(x,y);
+				queryCoords.add(c);
+			}
+		}
+		ret.setQueryCoordinates(queryCoords);
+		return ret;
+	}
+
+
+	private NNGaussianKernelEstimator createBasicEstimator() {
 		NNGaussianKernelEstimator ret = new NNGaussianKernelEstimator();
 		ret.addGroupId("r");
 		ret.addGroupId("g");
@@ -40,6 +60,12 @@ public class DensityEstimatorFactory {
 
 		StaticEnvironmentDistancesField sedf = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
 		ret.setStaticEnvironmentDistancesField(sedf);
+
+
+		return ret;
+	}
+
+	private Envelope getEnvelope(){
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minX = Double.POSITIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
@@ -67,9 +93,7 @@ public class DensityEstimatorFactory {
 
 		Coordinate c1 = new Coordinate(minX,minY);
 		Coordinate c2 = new Coordinate(maxX,maxY);
-		ret.setEnvelope(new Envelope(c1,c2));
-
-
-		return ret;
+		Envelope e = new Envelope(c1,c2);
+		return e;
 	}
 }
