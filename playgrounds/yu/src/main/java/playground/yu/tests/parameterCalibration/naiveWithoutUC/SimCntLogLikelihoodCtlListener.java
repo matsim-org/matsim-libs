@@ -81,8 +81,14 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 								// int start_s = (hour - 1) * 3600;
 								// int end_s = hour * 3600 - 1;
 								double cntVal = volume.getValue();
-								double simVal = volumes.getVolumesForLink(link
-										.getId())[hour - 1] * countsScaleFactor;
+
+								int[] linkVols = volumes.getVolumesForLink(link
+										.getId());
+								double simVal = 0d;
+								if (linkVols != null) {
+									simVal = linkVols[hour - 1]
+											* countsScaleFactor;
+								}
 
 								double var = Math.max(minStdDev * minStdDev,
 										varianceScale * cntVal);
