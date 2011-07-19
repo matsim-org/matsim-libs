@@ -41,33 +41,36 @@ import org.matsim.pt.counts.SimpleWriter;
  * This is a modified copy of CountsComparisonAlgorithm, in order to realize the
  * same functionality for pt counts.
  */
-public class PtBseCountsComparisonAlgorithm {
+class PtBseCountsComparisonAlgorithm {
 	/**
 	 * The StopAttributes of the simulation
 	 */
-	protected final PtBseOccupancyAnalyzer oa;
+	private final PtBseOccupancyAnalyzer oa;
 	/**
 	 * The counts object
 	 */
-	protected Counts counts;
+	Counts counts;
+	// needed in CadytsErrorPlot
+	
 	/**
 	 * The result list
 	 */
-	protected final List<CountSimComparison> countSimComp;
+	private final List<CountSimComparison> countSimComp;
 
-	protected Node distanceFilterNode = null;
+	private Node distanceFilterNode = null;
 
-	protected Double distanceFilter = null;
+	private Double distanceFilter = null;
 
-	protected final Network network;
+	private final Network network;
 
-	protected double countsScaleFactor;
+	double countsScaleFactor;
+	// needed in CadytsErrorPlot
 
-	protected final static Logger log = Logger.getLogger(PtBseCountsComparisonAlgorithm.class);
+	final static Logger log = Logger.getLogger(PtBseCountsComparisonAlgorithm.class);
 	
-	protected StringBuffer content = new StringBuffer();
+	StringBuffer content = new StringBuffer();
 
-	public PtBseCountsComparisonAlgorithm(final PtBseOccupancyAnalyzer oa,
+	PtBseCountsComparisonAlgorithm(final PtBseOccupancyAnalyzer oa,
 			final Counts counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
@@ -85,7 +88,7 @@ public class PtBseCountsComparisonAlgorithm {
 	final String STR_HEAD =  "\nhour\tsimVal\tscaledSimVal\tcountVal\n";
 	final char CHR_HT = '\t';
 	final char CHR_NL ='\n';
-	protected void compare() {
+	void compare() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
 			Id stopId = count.getLocId();
@@ -140,7 +143,7 @@ public class PtBseCountsComparisonAlgorithm {
 		}
 	}
 
-	public int[] getVolumesForStop(Id stopId) {
+	int[] getVolumesForStop(Id stopId) {
 		return this.oa.getOccupancyVolumesForStop(stopId);
 	}
 
@@ -151,7 +154,7 @@ public class PtBseCountsComparisonAlgorithm {
 	 *         <code>true</true> if the Link with the given Id is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
-	protected boolean isInRange(final Coord stopCoord) {
+	boolean isInRange(final Coord stopCoord) {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}
@@ -165,11 +168,11 @@ public class PtBseCountsComparisonAlgorithm {
 	 *
 	 * @return the result list
 	 */
-	public List<CountSimComparison> getComparison() {
+	List<CountSimComparison> getComparison() {
 		return this.countSimComp;
 	}
 
-	public void run() {
+	void run() {
 		this.compare();
 	}
 
@@ -180,17 +183,17 @@ public class PtBseCountsComparisonAlgorithm {
 	 * @param distance
 	 * @param nodeId
 	 */
-	public void setDistanceFilter(final Double distance, final String nodeId) {
+	void setDistanceFilter(final Double distance, final String nodeId) {
 		this.distanceFilter = distance;
 		this.distanceFilterNode = this.network.getNodes().get(
 				new IdImpl(nodeId));
 	}
 
-	public void setCountsScaleFactor(final double countsScaleFactor) {
+	void setCountsScaleFactor(final double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
 	}
 
-	public void write(String outputFilename) {
+	void write(String outputFilename) {
 		new SimpleWriter(outputFilename, content.toString());
 	}
 }

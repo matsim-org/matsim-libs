@@ -35,7 +35,7 @@ import playground.mmoyo.analysis.counts.reader.CountsReader;
 import playground.mmoyo.io.TextFileWriter;
 import playground.mmoyo.utils.DataLoader;
 
-public class CadytsErrorPlot {
+class CadytsErrorPlot {
 	private static final String NL = "\n";
 	private static final String TAB = "\t";
 	private static final String SEP = " ";
@@ -47,7 +47,7 @@ public class CadytsErrorPlot {
 	private static final String DOTPNG = ".png";
 	private static final String WSPLOT = "wsePlot.txt";
 	
-	protected void createPlot(final TransitSchedule trSched, final PtBseCountsComparisonAlgorithm ccaOccupancy, final double minStddev, final String iterPath){
+	void createPlot(final TransitSchedule trSched, final PtBseCountsComparisonAlgorithm ccaOccupancy, final double minStddev, final String iterPath){
 		DataLoader dataLoader = new DataLoader();
 		List <TransitRouteStop> stoplist = dataLoader.getTransitRoute(strRoute, trSched).getStops();
 		StringBuffer sBuff = new StringBuffer();

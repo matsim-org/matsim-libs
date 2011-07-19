@@ -505,7 +505,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	}
 	
 
-	protected final String getCalibratorSettings() {
+	final String getCalibratorSettings() {
 		// yyyyyy this can be changed to package-private once the test is in the same package. DONE
 		StringBuffer sBuff = new StringBuffer();
 		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]" ); 
