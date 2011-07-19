@@ -170,6 +170,109 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	}
 
 
+	//Analysis methods
+	///////////////////////////////////////////////////////
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		int iter = event.getIteration();
+		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
+			ptBseOccupAnalyzer.reset(iter);
+			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
+		}
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		int it = event.getIteration();
+		if ( isActiveInThisIteration( it, event.getControler() ) ) {
+			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
+
+			//Get all M44 stations and invoke the method write to get all information of them
+			TransitLine specificLine = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
+			List<Id> stopIds = new ArrayList<Id>();
+			for (TransitRoute route :specificLine.getRoutes().values()){
+				for (TransitRouteStop stop: route.getStops()){
+					stopIds.add( stop.getStopFacility().getId());
+				}
+
+			}
+			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
+			ptBseOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts , stopIds );
+		}
+	}
+
+	//Determines the pt counts interval (currently each 10 iterations)
+	private boolean isActiveInThisIteration( int iter , Controler controler ) {
+		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0)  &&  (iter >= controler.getFirstIteration());
+	}
+
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		Config config = event.getControler().getConfig();
+		PtCountsConfigGroup ptCounts = config.ptCounts() ;
+		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
+			Controler controler = event.getControler();
+			int iter = event.getIteration();
+			if ( isActiveInThisIteration( iter, controler ) ) {
+
+				if ( config.ptCounts().getPtCountsInterval() != 10 )
+					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
+
+				controler.stopwatch.beginOperation("compare with pt counts");
+
+				Network network = controler.getNetwork();
+				PtBseCountsComparisonAlgorithm ccaBoard = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts, network, countsScaleFactor);
+				PtBseCountsComparisonAlgorithm ccaAlight = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts, network, countsScaleFactor);
+				PtBseCountsComparisonAlgorithm ccaOccupancy = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts, network, countsScaleFactor);
+
+				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
+				String distanceFilterCenterNodeId = config.findParam("ptCounts", "distanceFilterCenterNode");
+				if ((distanceFilterStr != null)
+						&& (distanceFilterCenterNodeId != null)) {
+					Double distanceFilter = Double.valueOf(distanceFilterStr);
+					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+				}
+
+				ccaBoard.setCountsScaleFactor(countsScaleFactor);
+				ccaAlight.setCountsScaleFactor(countsScaleFactor);
+				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
+
+				//filter stations here??
+
+				ccaBoard.run();
+				ccaAlight.run();
+				ccaOccupancy.run();
+
+				String outputFormat = config.findParam("ptCounts", "outputformat");
+				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
+					ControlerIO ctlIO=controler.getControlerIO();
+
+					String filename = ctlIO.getIterationFilename(iter, "ptBseCountscompare.kmz");
+					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
+							TransformationFactory.getCoordinateTransformation(config.global().getCoordinateSystem(),TransformationFactory.WGS84),
+							this.boardCounts, this.alightCounts, this.occupCounts);
+
+					kmlWriter.setIterationNumber(iter);
+					kmlWriter.writeFile(filename);
+					if (ccaBoard != null) {
+						ccaBoard.write(ctlIO.getIterationFilename(iter, "simBseCountCompareBoarding.txt"));
+					}
+					if (ccaAlight != null) {
+						ccaAlight.write(ctlIO.getIterationFilename(iter, "simBseCountCompareAlighting.txt"));
+					}
+					if (ccaOccupancy != null) {
+						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simBseCountCompareOccupancy.txt"));
+					}
+				}
+			
+				controler.stopwatch.endOperation("compare with pt counts");
+			}
+		}
+	}
+	
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
 	// yyyyyy this statement is no longer correct since someone added other public methods below.  kai, jul'11
@@ -401,112 +504,9 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		}
 
 	}
-	//Analysis methods
-	///////////////////////////////////////////////////////
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		int iter = event.getIteration();
-		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
-			ptBseOccupAnalyzer.reset(iter);
-			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
-		}
-	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		int it = event.getIteration();
-		if ( isActiveInThisIteration( it, event.getControler() ) ) {
-			event.getControler().getEvents().removeHandler(ptBseOccupAnalyzer);
-
-			//Get all M44 stations and invoke the method write to get all information of them
-			TransitLine specificLine = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(new IdImpl("B-M44"));
-			List<Id> stopIds = new ArrayList<Id>();
-			for (TransitRoute route :specificLine.getRoutes().values()){
-				for (TransitRouteStop stop: route.getStops()){
-					stopIds.add( stop.getStopFacility().getId());
-				}
-
-			}
-			String outFile = event.getControler().getControlerIO().getIterationFilename(it, "ptBseOccupancyAnalysis.txt");
-			ptBseOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts , stopIds );
-		}
-	}
-
-	//Determines the pt counts interval (currently each 10 iterations)
-	private boolean isActiveInThisIteration( int iter , Controler controler ) {
-		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0)  &&  (iter >= controler.getFirstIteration());
-	}
-
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		Config config = event.getControler().getConfig();
-		PtCountsConfigGroup ptCounts = config.ptCounts() ;
-		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
-			Controler controler = event.getControler();
-			int iter = event.getIteration();
-			if ( isActiveInThisIteration( iter, controler ) ) {
-
-				if ( config.ptCounts().getPtCountsInterval() != 10 )
-					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
-							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
-
-				controler.stopwatch.beginOperation("compare with pt counts");
-
-				Network network = controler.getNetwork();
-				PtBseCountsComparisonAlgorithm ccaBoard = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.boardCounts, network, countsScaleFactor);
-				PtBseCountsComparisonAlgorithm ccaAlight = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.alightCounts, network, countsScaleFactor);
-				PtBseCountsComparisonAlgorithm ccaOccupancy = new PtBseCountsComparisonAlgorithm(this.ptBseOccupAnalyzer, this.occupCounts, network, countsScaleFactor);
-
-				String distanceFilterStr = config.findParam("ptCounts", "distanceFilter");
-				String distanceFilterCenterNodeId = config.findParam("ptCounts", "distanceFilterCenterNode");
-				if ((distanceFilterStr != null)
-						&& (distanceFilterCenterNodeId != null)) {
-					Double distanceFilter = Double.valueOf(distanceFilterStr);
-					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-				}
-
-				ccaBoard.setCountsScaleFactor(countsScaleFactor);
-				ccaAlight.setCountsScaleFactor(countsScaleFactor);
-				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
-
-				//filter stations here??
-
-				ccaBoard.run();
-				ccaAlight.run();
-				ccaOccupancy.run();
-
-				String outputFormat = config.findParam("ptCounts", "outputformat");
-				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-					ControlerIO ctlIO=controler.getControlerIO();
-
-					String filename = ctlIO.getIterationFilename(iter, "ptBseCountscompare.kmz");
-					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
-							TransformationFactory.getCoordinateTransformation(config.global().getCoordinateSystem(),TransformationFactory.WGS84),
-							this.boardCounts, this.alightCounts, this.occupCounts);
-
-					kmlWriter.setIterationNumber(iter);
-					kmlWriter.writeFile(filename);
-					if (ccaBoard != null) {
-						ccaBoard.write(ctlIO.getIterationFilename(iter, "simBseCountCompareBoarding.txt"));
-					}
-					if (ccaAlight != null) {
-						ccaAlight.write(ctlIO.getIterationFilename(iter, "simBseCountCompareAlighting.txt"));
-					}
-					if (ccaOccupancy != null) {
-						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simBseCountCompareOccupancy.txt"));
-					}
-				}
-			
-				controler.stopwatch.endOperation("compare with pt counts");
-			}
-		}
-	}
 	
 
 	final String getCalibratorSettings() {
-		// yyyyyy this can be changed to package-private once the test is in the same package. DONE
 		StringBuffer sBuff = new StringBuffer();
 		sBuff.append("[BruteForce=" + this.calibrator.getBruteForce() + "]" ); 
 		sBuff.append("[CenterRegression=" + this.calibrator.getCenterRegression() + "]" );
