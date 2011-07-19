@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonCounterTest.java
+ * CapacityTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,69 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
-package playground.yu.test;
+package playground.yu.tests;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.MatsimConfigReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-/**
- * @author ychen
- *
- */
-public class PersonCounter extends AbstractPersonAlgorithm {
-	private int cnt, nullCnt;
+public class CapacityTest {
 
-	/**
-	 *
-	 */
-	public PersonCounter() {
-		this.cnt = 0;
-		this.nullCnt = 0;
-	}
-
-	@Override
-	public void run(final Person person) {
-		if (person != null)
-			this.cnt++;
-		else
-			this.nullCnt++;
-	}
-
-	@Override
-	public String toString() {
-		return "There are " + this.cnt + " persons and " + this.nullCnt
-				+ " (null)persons";
-	}
-
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
-		final String netFilename = "./test/yu/test/input/network.xml";
-		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
+		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
+		final String outputFilename = "test/yu/test/captest.txt";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configTest.xml");
-
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		Population population = scenario.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		plansReader.readFile(plansFilename);
-
-		PersonCounter pc = new PersonCounter();
-		pc.run(population);
-		System.out.println(pc.toString());
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
+			for (Link link : network.getLinks().values()) {
+				out.write(link.getId()
+								+ "\t"
+								+ link.getCapacity()
+								+ "\n");
+				out.flush();
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

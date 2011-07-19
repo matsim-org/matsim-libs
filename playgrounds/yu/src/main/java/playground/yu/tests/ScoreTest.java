@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.test;
+package playground.yu.tests;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

@@ -27,8 +27,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtl;
-
 /**
  * tries to observes log-likelihood values with different parameter
  * (traveling...) values
@@ -36,14 +34,16 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
  * @author yu
  *
  */
-public class RunDist {
+public class RunTravPt {
 
 	private static void run(Config config, String outputPath, double val) {
-		config.planCalcScore().setMonetaryDistanceCostRateCar(val);
+		// /////////////////////////////////////////////////////
+		config.planCalcScore().setTravelingPt_utils_hr(val);
+		// ///////////////////////////////////////////////////////
 		config.controler().setOutputDirectory(outputPath + val);
-
+		// //////////////////////////////////////////////////////
 		System.out
-				.println("################################################\nNAIVE Tests mit\t\"monetaryDistanceCostRateCar\"\t=\t"
+				.println("################################################\nNAIVE Tests mit\t\"travelingPt\"\t=\t"
 						+ val + "\tBEGAN!");
 
 		Controler ctl = new PCCtl(config);
@@ -51,10 +51,8 @@ public class RunDist {
 		ctl.setOverwriteFiles(true);
 		ctl.run();
 
-		System.out
-				.println("NAIVE Tests mit\t\"monetaryDistanceCostRateCar\"\t=\t"
-						+ val
-						+ "\tENDED!\n################################################");
+		System.out.println("NAIVE Tests mit\t\"travelingPt\"\t=\t" + val
+				+ "\tENDED!\n################################################");
 	}
 
 	/**
@@ -65,24 +63,30 @@ public class RunDist {
 		String outputPath = config.controler().getOutputDirectory();
 		/*
 		 * the outputPath should NOT end with"/", otherwise there could be
-		 * problems by command in linux
+		 * problems by command under linux
 		 */
 
-		if (args[1].equals("small")) { // small senarios
-			double minTravVal = Double.parseDouble(config.findParam("naivePC",
-					"minTravVal")), maxTravVal = Double.parseDouble(config
-					.findParam("naivePC", "maxTravVal")), stepSize = Double
-					.parseDouble(config.findParam("naivePC", "stepSize"));
+		if (args[1].equals("sequence")) { // sequence senarios
+			double minVal = Double.parseDouble(config.findParam("naivePC",
+					"minVal"))//
+			, maxVal = Double
+					.parseDouble(config.findParam("naivePC", "maxVal"))//
+			, stepSize = Double.parseDouble(config.findParam("naivePC",
+					"stepSize"));
 
-			for (double val = minTravVal; val <= maxTravVal; val += stepSize) {
+			for (double val = minVal; val <= maxVal; val += stepSize) {
 				run(config, outputPath, val);
 			}
-		} else if (args[1].equals("real")) { // real senarios
-			double distVal = -Double.parseDouble(args[2]) / 10000d;
+
+		} else if (args[1].equals("parallel")) { // parallel senarios
+			double travPtVal = -Double.parseDouble(args[2]/*
+														 * to be used value *
+														 * -10d
+														 */) / 10d;
 			if (args.length == 4 && args[3].equals("positive")) {
-				distVal = -distVal;
+				travPtVal = -travPtVal;
 			}
-			run(config, outputPath, distVal);
+			run(config, outputPath, travPtVal);
 		}
 
 	}

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.test;
+package playground.yu.tests;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;

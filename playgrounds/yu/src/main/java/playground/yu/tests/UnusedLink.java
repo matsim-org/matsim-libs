@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatrixTest.java
+ * UnusedLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+/**
+ * 
+ */
+package playground.yu.tests;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import Jama.Matrix;
+/**check 
+ * @author yu
+ *
+ */
+public class UnusedLink implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-public class MatrixTest {
-	public static void main(String[] args) {
-		double[] vector = new double[] { 1.5983495872350983452340958e-20,
-				-3.36549871354687981651654987e-15,
-				4.454574684765432135486765465e-16,
-				5.54687654324354687464653215e-20 };
-		Matrix vec = new Matrix(vector, 4);
-		vec.print(new DecimalFormat("0.###E00"), 15);
-		try {
-			PrintWriter writer = new PrintWriter("d:/tmp/a.log");
-			vec.print(writer, new DecimalFormat("0.###E00"), 5);
-			writer.close();
-			writer = new PrintWriter("d:/tmp/b.log");
-			vec.print(writer, new DecimalFormat(), 5);
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+	/* (non-Javadoc)
+	 * @see org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.api.experimental.events.LinkEnterEvent)
+	 */
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		// TODO Auto-generated method stub
+
 	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
+	 */
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler#handleEvent(org.matsim.core.api.experimental.events.LinkLeaveEvent)
+	 */
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

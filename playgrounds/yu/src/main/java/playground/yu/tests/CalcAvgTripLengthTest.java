@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CapacityTest.java
+ * CalcAvgTripLengthTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,45 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+package playground.yu.tests;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-public class CapacityTest {
+import playground.yu.analysis.MyCalcAverageTripLength;
 
-	public static void main(final String[] args) {
-		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
-		final String outputFilename = "test/yu/test/captest.txt";
+public class CalcAvgTripLengthTest {
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String popFilename = "../matsimTests/Calibration/fi4/1800.plans.xml.gz";
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
-			for (Link link : network.getLinks().values()) {
-				out.write(link.getId()
-								+ "\t"
-								+ link.getCapacity()
-								+ "\n");
-				out.flush();
-			}
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Population pop = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(popFilename);
+
+		CalcAverageTripLength catl = new MyCalcAverageTripLength(net);
+		catl.run(pop);
+		System.out.println("avg. trip length :\t" + catl.getAverageTripLength()
+				+ " [m]");
 	}
+
 }

@@ -33,7 +33,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.yu.test.ChangeLegModeWithParkLocation;
+import playground.yu.tests.ChangeLegModeWithParkLocation;
 
 /**
  * @author yu

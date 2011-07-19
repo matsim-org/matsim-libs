@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcAvgTripLengthTest.java
+ * PersonCounterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,39 +18,69 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+/**
+ *
+ */
+package playground.yu.tests;
 
-import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-import playground.yu.analysis.MyCalcAverageTripLength;
+/**
+ * @author ychen
+ *
+ */
+public class PersonCounter extends AbstractPersonAlgorithm {
+	private int cnt, nullCnt;
 
-public class CalcAvgTripLengthTest {
+	/**
+	 *
+	 */
+	public PersonCounter() {
+		this.cnt = 0;
+		this.nullCnt = 0;
+	}
+
+	@Override
+	public void run(final Person person) {
+		if (person != null)
+			this.cnt++;
+		else
+			this.nullCnt++;
+	}
+
+	@Override
+	public String toString() {
+		return "There are " + this.cnt + " persons and " + this.nullCnt
+				+ " (null)persons";
+	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String popFilename = "../matsimTests/Calibration/fi4/1800.plans.xml.gz";
+	public static void main(final String[] args) {
+		final String netFilename = "./test/yu/test/input/network.xml";
+		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl net = scenario.getNetwork();
+		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configTest.xml");
+
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		Population pop = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(popFilename);
+		Population population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(plansFilename);
 
-		CalcAverageTripLength catl = new MyCalcAverageTripLength(net);
-		catl.run(pop);
-		System.out.println("avg. trip length :\t" + catl.getAverageTripLength()
-				+ " [m]");
+		PersonCounter pc = new PersonCounter();
+		pc.run(population);
+		System.out.println(pc.toString());
 	}
-
 }

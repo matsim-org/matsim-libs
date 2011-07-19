@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.yu.test.ChangeLegModeWithParkLocation.ParkLocation;
+import playground.yu.tests.ChangeLegModeWithParkLocation.ParkLocation;
 import playground.yu.utils.io.SimpleWriter;
 
 /**

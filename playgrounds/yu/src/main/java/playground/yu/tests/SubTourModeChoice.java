@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.test;
+package playground.yu.tests;
 
 import java.util.ArrayList;
 import java.util.HashSet;

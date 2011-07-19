@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.test;
+package playground.yu.tests;
 
 import playground.yu.utils.charts.XYScatterLineChart;
 import playground.yu.utils.io.SimpleReader;

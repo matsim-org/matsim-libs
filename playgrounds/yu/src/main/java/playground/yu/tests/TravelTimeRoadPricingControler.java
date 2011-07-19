@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JamTest.java
+ * TravelTimeRoadPricingControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,87 +18,96 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+/**
+ * 
+ */
+package playground.yu.tests;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.io.IOUtils;
 
-public class JamTest extends Controler {
+import playground.yu.analysis.LegTravelTimeModalSplit;
+import playground.yu.analysis.PtCheck;
 
-	public JamTest(String[] configFileName) {
-		super(configFileName);
-	}
+/**
+ * @author yu
+ * 
+ */
+public class TravelTimeRoadPricingControler extends Controler {
 
-	public static class JamListener implements IterationEndsListener,
-			ShutdownListener, StartupListener {
-		private Controler c = null;
-		private BufferedWriter out = null;
-		private VolumesAnalyzer va = null;
+	private static class TTRPlistener implements IterationEndsListener,
+			IterationStartsListener, ShutdownListener {
+		private final PtCheck pc;
+		private LegTravelTimeModalSplit ttms = null;
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			c = event.getControler();
-			Network n = c.getNetwork();
-			try {
-				for (Id linkId : va.getLinkIds()) {
-					int[] v = va.getVolumesForLink(linkId);
-					StringBuffer sb = new StringBuffer("");
-					for (int i = 6; i < 10; i++) {
-						sb.append("\t" + v[i]);
-					}
-					out.write(linkId + "\t" +
-							n.getLinks().get(linkId).getCapacity() / 100.0 + sb + "\n");
-					out.flush();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		public TTRPlistener(String ptCheckFilename) throws IOException {
+			pc = new PtCheck(ptCheckFilename);
 		}
 
-		public void notifyStartup(StartupEvent event) {
-			va = new VolumesAnalyzer(3600, 3600 * 24 - 1, c.getNetwork());
-			c.getEvents().addHandler(va);
-			try {
-				out = IOUtils
-						.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename("travol.txt.gz"));
-				out.write("LinkId\tCapacity/100[Fz/h]\tVolume[Fz/h]\n");
-				out.flush();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			Controler ctl = event.getControler();
+			int idx = event.getIteration();
+			if (idx % 10 == 0) {
+				pc.resetCnt();
+				pc.run(ctl.getPopulation());
+				try {
+					pc.write(idx);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (idx == ctl.getLastIteration()) {
+				if (ttms != null) {
+					ttms.write(event.getControler().getControlerIO().getOutputFilename("traveltimes.txt"));
+					// ttms.writeCharts(getOutputFilename("traveltimes.png"));
+				}
 			}
 		}
 
 		public void notifyShutdown(ShutdownEvent event) {
 			try {
-				out.close();
+				pc.writeEnd();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			Controler c = event.getControler();
+			if (event.getIteration() == c.getLastIteration()) {
+				ttms = new LegTravelTimeModalSplit(3600, c.getPopulation());
+				c.getEvents().addHandler(ttms);
+			}
+		}
+	}
+
+	/**
+	 * @param configFileName
+	 */
+	public TravelTimeRoadPricingControler(String[] configFileName) {
+		super(configFileName);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		JamTest jt = new JamTest(args);
-		jt.addControlerListener(new JamListener());
-		jt.run();
+		final TravelTimeRoadPricingControler c = new TravelTimeRoadPricingControler(
+				args);
+		try {
+			c.addControlerListener(new TTRPlistener(
+					"test/yu/travelTimeRoadPricing/200-0.00005.txt"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		c.run();
 		System.exit(0);
 	}
 

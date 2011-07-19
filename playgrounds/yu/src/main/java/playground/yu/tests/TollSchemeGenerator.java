@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.yu.test;
+package playground.yu.tests;
 
 import java.io.IOException;
 

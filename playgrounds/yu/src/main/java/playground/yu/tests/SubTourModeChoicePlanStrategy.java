@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+package playground.yu.tests;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
