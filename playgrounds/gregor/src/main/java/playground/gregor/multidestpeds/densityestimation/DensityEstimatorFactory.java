@@ -28,6 +28,15 @@ public class DensityEstimatorFactory {
 		this.res = res;
 	}
 
+
+	public NNGaussianKernelEstimator createDensityEstimator(List<Coordinate> queryCoords) {
+		NNGaussianKernelEstimator ret = createBasicEstimator();
+		Envelope e = getEnvelope();
+		ret.setEnvelope(e);
+		ret.setQueryCoordinates(queryCoords);
+		return ret;
+	}
+
 	public NNGaussianKernelEstimator createDensityEstimator() {
 		NNGaussianKernelEstimator ret = createBasicEstimator();
 		Envelope e = getEnvelope();
