@@ -169,11 +169,11 @@ public class NetworkSink implements SinkSource {
 	}
 
 	private void tagWayBackward(Way way, Link l) {
-		way.getTags().add(new Tag("matsim:backward:link-id", l.getId().toString()));
+		way.getTags().add(new Tag("matsim:backward:link-id:" + l.getId().toString(), l.getId().toString()));
 	}
 
 	private void tagWayForward(Way way, Link l) {
-		way.getTags().add(new Tag("matsim:forward:link-id", l.getId().toString()));
+		way.getTags().add(new Tag("matsim:forward:link-id:" + l.getId().toString(), l.getId().toString()));
 	}
 
 	private static class OsmHighwayDefaults {
