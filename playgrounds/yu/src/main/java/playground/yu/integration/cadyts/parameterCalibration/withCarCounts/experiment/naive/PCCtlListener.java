@@ -85,12 +85,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		final Network network = ctl.getNetwork();
 		Config config = ctl.getConfig();
 
-		// set up center and radius of counts stations locations
-		distanceFilterCenterNodeCoord = network.getNodes()
-				.get(new IdImpl(config.counts().getDistanceFilterCenterNode()))
-				.getCoord();
-		distanceFilter = config.counts().getDistanceFilter();
-
+		String distFilterCenterNodeStr = config.counts()
+				.getDistanceFilterCenterNode();
+		if (distFilterCenterNodeStr != null) {
+			// set up center and radius of counts stations locations
+			distanceFilterCenterNodeCoord = network.getNodes()
+					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
+			distanceFilter = config.counts().getDistanceFilter();
+		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
 		/*
@@ -688,13 +690,17 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				// TODO calculate avg. value of llh
 				double avgLlh = llhSum / avgLlhOverIters;
 				System.out.println("avgLlh over " + avgLlhOverIters
-						+ " iterations at it." + iter + " =\t" + avgLlh
-						+ "\tbetaPerforming =\t"
-						+ config.planCalcScore().getTraveling_utils_hr());
+						+ " iterations at it." + iter + " =\t" + avgLlh);
 				llhSum = 0d;// refresh
 			}
 		}
 		// output - chart etc.
-		outputHalfway(ctl, 50);
+		String halfwayOutputIntervalStr = config.findParam(
+				BSE_CONFIG_MODULE_NAME, "halfwayOutputInterval");
+		int halfwayOutputInterval = 0;
+		if (halfwayOutputIntervalStr != null) {
+			halfwayOutputInterval = Integer.parseInt(halfwayOutputIntervalStr);
+		}
+		outputHalfway(ctl, halfwayOutputInterval);
 	}
 }
