@@ -520,6 +520,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private void outputHalfway(Controler ctl, int outputIterInterval) {
 		int iter = ctl.getIterationNumber();
+		if (outputIterInterval == 0) {
+			return;
+		}
 		if (iter % outputIterInterval == 0) {
 			ControlerIO ctlIO = ctl.getControlerIO();
 			int firstIter = ctl.getFirstIteration();
