@@ -14,14 +14,16 @@ public class RandomTest {
 
 		long before1 = System.currentTimeMillis();
 		for (long i = 0; i < 100000000; i++) {
-			rand1.nextLong();
+			double dbl = rand1.nextDouble();
+			dbl++; //just in case (fools the compiler)
 		}
 		long after1 = System.currentTimeMillis();
 		System.out.println("run time java.util.Random:" + (after1-before1));
 
 		long before2 = System.currentTimeMillis();
 		for (long i = 0; i < 100000000; i++) {
-			rand2.randomLong();
+			double dbl =rand2.nextDouble();
+			dbl++; //just in case (fools the compiler)
 		}
 		long after2 = System.currentTimeMillis();
 		System.out.println("run time XORShift:" + (after2-before2));
@@ -43,6 +45,11 @@ public class RandomTest {
 			this.x ^= (this.x >>> 35);
 			this.x ^= (this.x << 4);
 			return this.x;
+		}
+
+		public double nextDouble() {
+			long l = randomLong();
+			return (double)l/Long.MAX_VALUE;
 		}
 	}
 
