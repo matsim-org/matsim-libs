@@ -118,7 +118,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 
 	@Override
 	public void handleEvent(XYZAzimuthEvent event) {
-		XYZAzimuthPositionInfo info = new XYZAzimuthPositionInfo(event.getPersonId(), event.getCoordinate(), event.getAzimuth(), event.getTime());
+		XYZAzimuthPositionInfo info = new XYZAzimuthPositionInfo(event.getPersonId(), event.getCoordinate(), event.getVX(), event.getVY(), event.getTime());
 		this.visData.put(event.getPersonId(), info);
 	}
 

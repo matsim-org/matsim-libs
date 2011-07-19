@@ -105,16 +105,16 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		double [] gy = {0., -2.000, -3.000,-5.000,-3.500,-5.000};
 		for (int i = 0; i < rx.length; i++) {
 			Coordinate cr = new Coordinate(rx[i],ry[i]);
-			XYZAzimuthEventImpl er = new XYZAzimuthEventImpl(sc.createId("r" + Integer.toString(i)),cr, 0., 0.);
+			XYZAzimuthEventImpl er = new XYZAzimuthEventImpl(sc.createId("r" + Integer.toString(i)),cr, 0., 0., 0.);
 			events.processEvent(er);
 
 			Coordinate cg = new Coordinate(gx[i],gy[i]);
-			XYZAzimuthEventImpl eg = new XYZAzimuthEventImpl(sc.createId("g" + Integer.toString(i)),cg, 0., 0.);
+			XYZAzimuthEventImpl eg = new XYZAzimuthEventImpl(sc.createId("g" + Integer.toString(i)),cg, 0., 0., 0.);
 			events.processEvent(eg);
 		}
 
 		//Density estimation is only performed after a time increment
-		XYZAzimuthEventImpl dummy = new XYZAzimuthEventImpl(sc.createId("dummy"),new Coordinate(Double.NaN,Double.NaN), 0., 1.);
+		XYZAzimuthEventImpl dummy = new XYZAzimuthEventImpl(sc.createId("dummy"),new Coordinate(Double.NaN,Double.NaN), 0., 0., 1.);
 		events.processEvent(dummy);
 	}
 

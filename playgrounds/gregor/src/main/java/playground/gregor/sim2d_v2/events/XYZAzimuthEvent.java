@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
+@Deprecated //rename this class since Azimuth is no longer an attribute of this event type [GL Jul-2011]
 public interface XYZAzimuthEvent extends PersonEvent {
 
 	public double getX();
@@ -35,7 +36,9 @@ public interface XYZAzimuthEvent extends PersonEvent {
 
 	public double getZ();
 
-	public double getAzimuth();
+	public double getVX();
+
+	public double getVY();
 
 	// convenience method
 	public Coordinate getCoordinate();

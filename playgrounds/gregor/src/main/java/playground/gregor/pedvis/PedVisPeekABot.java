@@ -61,6 +61,7 @@ import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
+import playground.gregor.sim2d_v2.helper.GEO;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -259,7 +260,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	public void handleEvent(XYZAzimuthEvent e) {
 		testWait(e.getTime());
 		//		System.out.println(e.getPersonId().toString().hashCode());
-		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (e.getAzimuth()),(float)this.scale);
+		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (GEO.getAzimuth(e.getVX(),e.getVY())),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
 	}

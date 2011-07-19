@@ -91,9 +91,10 @@ public class XYZEventsFileReader extends MatsimXmlParser {
 			String x = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_X);
 			String y = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_Y);
 			String z = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_Z);
-			String azimuth = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_AZIMUTH);
+			String vx = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_VX);
+			String vy = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_VY);
 			String id = atts.getValue(PersonEventImpl.ATTRIBUTE_PERSON);
-			Event e = this.builder.createXYZAzimuthEvent(x, y, z, azimuth, id, time);
+			Event e = this.builder.createXYZAzimuthEvent(x, y, z, vx,vy, id, atts.getValue("time"));
 			this.events.processEvent(e);
 		} else if (DoubleValueStringKeyAtCoordinateEvent.EVENT_TYPE.equals(eventType)) {
 			String x = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_CENTER_X);

@@ -91,7 +91,7 @@ public class GhostPopulationEngine implements TickEventHandler {
 					events.processEvent(ghost);
 				} else if (e instanceof XYZAzimuthEvent) {
 					XYZAzimuthEvent xyz = (XYZAzimuthEvent)e;
-					XYZAzimuthEventImpl ghost = new XYZAzimuthEventImpl(id, xyz.getCoordinate(), xyz.getAzimuth(), xyz.getTime());
+					XYZAzimuthEventImpl ghost = new XYZAzimuthEventImpl(id, xyz.getCoordinate(), xyz.getVX(), xyz.getVY(), xyz.getTime());
 					events.processEvent(ghost);
 				} else if (e instanceof AgentArrivalEvent) {
 					AgentArrivalEvent arr = (AgentArrivalEvent)e;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -50,7 +51,12 @@ public class ASCIITableWriter implements XYZEventsHandler {
 
 
 		try {
-			this.writer.append(event.getTime() + "," + event.getPersonId() + "," + event.getX() + "," + event.getY() + "," + event.getAzimuth() + "\n");
+			String time = String.format("%12.6f", event.getTime());
+			String x = String.format("%12.6f", event.getX());
+			String y = String.format("%12.6f", event.getY());
+			String vx = String.format("%12.6f", event.getVX());
+			String vy = String.format("%12.6f", event.getVY());
+			this.writer.append(time + "\t" + event.getPersonId() + "\t" + x + "\t" + y + "\t" + vx + "\t" + vy + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-3);
@@ -62,7 +68,7 @@ public class ASCIITableWriter implements XYZEventsHandler {
 	private void init() {
 		try {
 			this.writer = new BufferedWriter(new FileWriter(new File(this.outputFile)));
-			this.writer.append("# time_stamp, id, x, y, azimuth\n");
+			this.writer.append("# time_stamp\t id\t x\t y\t vx\t vy\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);

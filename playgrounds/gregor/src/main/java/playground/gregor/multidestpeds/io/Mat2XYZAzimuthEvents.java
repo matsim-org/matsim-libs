@@ -66,8 +66,7 @@ import com.vividsolutions.jts.geom.LineString;
 @Deprecated
 public class Mat2XYZAzimuthEvents {
 
-	private static final double PI_HALF = Math.PI / 2;
-	private static final double TWO_PI = 2 * Math.PI;
+
 	// needed to generated "finish lines"
 	private static final double COS_LEFT = Math.cos(Math.PI / 2);
 	// needed to generated "finish lines"
@@ -124,10 +123,9 @@ public class Mat2XYZAzimuthEvents {
 				Id id = ped.id;
 				Coordinate c = ped.coords.get(time);
 				Coordinate v = ped.velocities.get(time);
-				float a = (float) getPhaseAngle(v.x, v.y);
 
 
-				XYZAzimuthEvent ev = new XYZAzimuthEventImpl(id, c, a, time);
+				XYZAzimuthEvent ev = new XYZAzimuthEventImpl(id, c, v.x, v.y, time);
 				manager.processEvent(ev);
 
 				if (checkForNextLink(ped,c)) {
@@ -223,23 +221,6 @@ public class Mat2XYZAzimuthEvents {
 
 	}
 
-	private static double getPhaseAngle(double dX, double dY) {
-		double alpha = 0.0;
-		if (dX > 0) {
-			alpha = Math.atan(dY / dX);
-		} else if (dX < 0) {
-			alpha = Math.PI + Math.atan(dY / dX);
-		} else { // i.e. DX==0
-			if (dY > 0) {
-				alpha = PI_HALF;
-			} else {
-				alpha = -PI_HALF;
-			}
-		}
-		if (alpha < 0.0)
-			alpha += TWO_PI;
-		return alpha;
-	}
 
 	private static void createFinishLines(Scenario sc) {
 

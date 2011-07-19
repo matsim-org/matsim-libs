@@ -58,8 +58,7 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class PhysicalFloor implements Floor {
 
-	private static final double PI_HALF = Math.PI / 2;
-	private static final double TWO_PI = 2 * Math.PI;
+
 	// needed to generated "finish lines"
 	private static final double COS_LEFT = Math.cos(Math.PI / 2);
 	// needed to generated "finish lines"
@@ -198,7 +197,7 @@ public class PhysicalFloor implements Floor {
 				it.remove();
 				// (the above removes the Agent2D "wrapper" since endLegAndAssumeControl only moves the wrapped agent, not
 				// the wrapper)
-				
+
 			}
 		}
 
@@ -226,16 +225,15 @@ public class PhysicalFloor implements Floor {
 		if (endOfLeg) {
 
 			return true;
-			// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves 
+			// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves
 			// the wrapped agent, not the wrapper)
-			
+
 		}
 
-		double azimuth = getAzimuth(oldPos, newPos);
 		agent.moveToPostion(newPos);
 
 		if (this.emitXYZAzimuthEvents ) {
-			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), azimuth, time);
+			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);
 			this.em.processEvent(e);
 		}
 		//			if (Sim2DConfig.DEBUG) {
@@ -277,7 +275,7 @@ public class PhysicalFloor implements Floor {
 				agent.endLegAndAssumeControl(time);
 
 				return true;
-				// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves 
+				// (returning "true" removes (or should remove) the Agent2D "wrapper" since endLegAndAssumeControl only moves
 				// the wrapped agent, not the wrapper)
 
 			} else {
@@ -290,30 +288,7 @@ public class PhysicalFloor implements Floor {
 		return false;
 	}
 
-	/**
-	 * @param newPos
-	 * @param oldPos
-	 * @return
-	 */
-	private double getAzimuth(Coordinate oldPos, Coordinate newPos) {
-		double alpha = 0.0;
-		double dX = oldPos.x - newPos.x;
-		double dY = oldPos.y - newPos.y;
-		if (dX > 0) {
-			alpha = Math.atan(dY / dX);
-		} else if (dX < 0) {
-			alpha = Math.PI + Math.atan(dY / dX);
-		} else { // i.e. DX==0
-			if (dY > 0) {
-				alpha = PI_HALF;
-			} else {
-				alpha = -PI_HALF;
-			}
-		}
-		if (alpha < 0.0)
-			alpha += TWO_PI;
-		return alpha;
-	}
+
 
 	/**
 	 * 
@@ -389,7 +364,7 @@ public class PhysicalFloor implements Floor {
 
 	@Deprecated //add method to PlanAgent
 	private PlanElement getPreviousPlanElement(MobsimAgent ma) {
-		
+
 		PlanAgent pda = (PlanAgent) ma ;
 		Leg leg = (Leg) pda.getCurrentPlanElement();
 		Plan plan = pda.getSelectedPlan();

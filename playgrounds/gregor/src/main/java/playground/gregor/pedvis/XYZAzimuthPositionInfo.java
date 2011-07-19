@@ -23,19 +23,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
+import playground.gregor.sim2d_v2.helper.GEO;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 
-	private final double azimuth;
 	private final Coordinate c;
 	private final double time;
 	private final Id id;
+	private final double vx;
+	private final double vy;
 
-	public XYZAzimuthPositionInfo(Id id,Coordinate c, double azimuth, double time) {
+	public XYZAzimuthPositionInfo(Id id,Coordinate c, double vx, double vy, double time) {
 		this.c = c;
-		this.azimuth = azimuth;
+		this.vx = vx;
+		this.vy = vy;
 		this.time = time;
 		this.id = id;
 	}
@@ -49,7 +53,7 @@ public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 	@Override
 	public double getAzimuth() {
-		return this.azimuth;
+		return GEO.getAzimuth(this.vx, this.vy);
 	}
 
 	@Override

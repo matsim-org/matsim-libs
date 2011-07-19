@@ -32,30 +32,34 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 	public static final String ATTRIBUTE_X = "x";
 	public static final String ATTRIBUTE_Y = "y";
 	public static final String ATTRIBUTE_Z = "z";
-	public static final String ATTRIBUTE_AZIMUTH = "azimuth";
+	public static final String ATTRIBUTE_VX = "vx";
+	public static final String ATTRIBUTE_VY = "vy";
 
 	private final Coordinate c;
-	private final double azimuth;
 	private final double x;
 	private final double y;
 	private final double z;
+	private final double vx;
+	private final double vy;
 
-	public XYZAzimuthEventImpl(Id id, double x, double y, double z, double azimuth, double time) {
+	public XYZAzimuthEventImpl(Id id, double x, double y, double z, double vx, double vy, double time) {
 		super(time, id);
 		this.c = new Coordinate(x, y, z);
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.azimuth = azimuth;
+		this.vx = vx;
+		this.vy = vy;
 	}
 
-	public XYZAzimuthEventImpl(Id id, Coordinate c, double azimuth, double time) {
+	public XYZAzimuthEventImpl(Id id, Coordinate c, double vx, double vy, double time) {
 		super(time, id);
 		this.c = c;
 		this.x = c.x;
 		this.y = c.y;
 		this.z = c.z;
-		this.azimuth = azimuth;
+		this.vx = vx;
+		this.vy = vy;
 	}
 
 	/*
@@ -74,7 +78,8 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 		attr.put(ATTRIBUTE_X, Double.toString(this.x));
 		attr.put(ATTRIBUTE_Y, Double.toString(this.y));
 		attr.put(ATTRIBUTE_Z, Double.toString(this.z));
-		attr.put(ATTRIBUTE_AZIMUTH, Double.toString(this.azimuth));
+		attr.put(ATTRIBUTE_VX, Double.toString(this.vx));
+		attr.put(ATTRIBUTE_VY, Double.toString(this.vy));
 		return attr;
 	}
 
@@ -108,15 +113,6 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 		return this.z;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d.events.XYZAzimuthEvent#getAzimuth()
-	 */
-	@Override
-	public double getAzimuth() {
-		return this.azimuth;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -126,6 +122,24 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 	@Override
 	public Coordinate getCoordinate() {
 		return this.c;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see playground.gregor.sim2d_v2.events.XYZAzimuthEvent#getVX()
+	 */
+	@Override
+	public double getVX() {
+		return this.vx;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see playground.gregor.sim2d_v2.events.XYZAzimuthEvent#getVY()
+	 */
+	@Override
+	public double getVY() {
+		return this.vy;
 	}
 
 }
