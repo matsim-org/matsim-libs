@@ -22,9 +22,15 @@ package playground.droeder.osm;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.math.analysis.solvers.NewtonSolver;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
@@ -33,54 +39,82 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
  *
  */
 public class LineNetworkStore {
+	private static final Logger log = Logger.getLogger(LineNetworkStore.class);
 	
-	private Network net;
-	private Map<String, Network> lineId2Network;
-	public final String ONE = "oneway";
-	public final String BOTH = "both";
+	private Network originNet;
+	private Map<Id, Map<String,NetworkImpl>> line2Dir2Network;
+	public static final String UP = "up";
+	public static final String DOWN = "down";
 
 	/**
 	 * 
 	 * @param net the origin Network
 	 */
 	public LineNetworkStore(Network net){
-		this.net = net;
-		this.lineId2Network = new HashMap<String, Network>();
+		this.originNet = net;
+		this.line2Dir2Network = new HashMap<Id, Map<String, NetworkImpl>>();
 	}
 	
-	public void addWay(Way w, String direction, String line){
-		Network net;
-		if(lineId2Network.containsKey(line)){
-			net = lineId2Network.get(line);
+	public void addWay(Way w, Id line){
+		Map<String, NetworkImpl> nets;
+		if(line2Dir2Network.containsKey(line)){
+			nets = line2Dir2Network.get(line);
 		}else{
-			net = NetworkImpl.createNetwork();
-			lineId2Network.put(line, net);
+			nets = new HashMap<String, NetworkImpl>();
+			nets.put(this.UP, NetworkImpl.createNetwork());
+			nets.put(this.DOWN, NetworkImpl.createNetwork());
+			line2Dir2Network.put(line, nets);
 		}
 		
-		if(direction.equals(this.ONE)){
-			this.addOneWay(w, net);
-		}else if(direction.equals(this.BOTH)){
-			this.addBoth(w, net);
+		NetworkImpl net;
+		for (Tag tag : w.getTags()) {
+			if (tag.getKey().startsWith("matsim:backward:link-id")) {
+				net = nets.get(this.DOWN);
+			}else if(tag.getKey().startsWith("matsim:forward:link-id") ) {
+				net = nets.get(this.UP);
+			}else{
+				continue;
+			}
+//			System.out.println(tag.getKey() + " " + tag.getValue());
+			addLink(net, tag.getValue());
 		}
 	}
 
-
-	/**
-	 * @param w
-	 * @param net2
-	 */
-	private void addBoth(Way w, Network net2) {
-//		this.addOneWay(w, net2);
-//		this.addOneWayReverse();
-	}
-
-	/**
-	 * @param w
-	 * @param net2
-	 */
-	private void addOneWay(Way w, Network net2) {
-		// TODO Auto-generated method stub
+	private void addLink(NetworkImpl net, String value) {
+		LinkImpl l = (LinkImpl) this.originNet.getLinks().get(new IdImpl(value));
+		Node from = l.getFromNode();
+		Node to = l.getToNode();
 		
+		if(!net.getNodes().containsKey(from.getId())){
+			from = net.createAndAddNode(from.getId(), from.getCoord());
+		}else{
+			from = net.getNodes().get(from.getId());
+		}
+		if(!net.getNodes().containsKey(to.getId())){
+			to = net.createAndAddNode(to.getId(), to.getCoord());
+		}else{
+			to = net.getNodes().get(to.getId());
+		}
+		if(!net.getLinks().containsKey(l.getId())){
+			net.createAndAddLink(l.getId(), from, to, l.getLength(), l.getFreespeed(), 
+					l.getCapacity(), l.getNumberOfLanes(), l.getOrigId(), l.getType());
+		}
 	}
+	
+	public Map<Id, Map<String, NetworkImpl>> getLine2Network(){
+		return this.line2Dir2Network;
+	}
+
+	/**
+	 * @param lineId
+	 */
+	public void clean() {
+		for(Map<String, NetworkImpl> nets: this.line2Dir2Network.values()){
+			for(NetworkImpl n : nets.values()){
+				new NetworkCleaner().run(n);
+			}
+		}
+	}
+
 
 }

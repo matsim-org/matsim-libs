@@ -20,17 +20,18 @@
 package playground.droeder.osm;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 
@@ -41,38 +42,32 @@ import playground.mzilske.osm.NetworkSink;
  * @author droeder
  *
  */
-public class DrOsmTransitMain {
+public class Osm2TransitlineNetworks {
 	
-	private final static Logger log = Logger.getLogger(DrOsmTransitMain.class);
+	private static final Logger log = Logger
+			.getLogger(Osm2TransitlineNetworks.class);
 	
 	String inFile;
 	String fromCoordSystem;
 	String toCoordSystem;
-	String networkOutFile;
-	String transitScheduleOutFile;
-	String vehiclesOutFile;
 	
-	public DrOsmTransitMain(String inFile, String fromCoordSystem, String toCoordSystem, String networkOutFile, String transitScheduleOutFile, String vehiclesOutFile){
+	public Osm2TransitlineNetworks(String inFile, String fromCoordSystem, String toCoordSystem){
 		this.inFile = inFile;
 		this.fromCoordSystem = fromCoordSystem;
 		this.toCoordSystem = toCoordSystem;
-		this.networkOutFile = networkOutFile;
-		this.transitScheduleOutFile = transitScheduleOutFile;
-		this.vehiclesOutFile = vehiclesOutFile;
-	}
-	
-	public static void main(String[] args) throws IOException {
-//		new OsmTransitMain("/Users/michaelzilske/Desktop/wurst/neu.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "/Users/michaelzilske/Desktop/wurst/net.osm", "/Users/michaelzilske/Desktop/wurst/transit.osm", "vehiclesOutFile").convertOsm2Matsim();
 	}
 	
 	public void convertOsm2Matsim(){
 		convertOsm2Matsim(null);
 	}
-		
+	
+	private ScenarioImpl scenario;
+	private Map<Id, Map<String, NetworkImpl>> line2Network;
+	
 	public void convertOsm2Matsim(String[] transitFilter){
 		
 		log.info("Start...");		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(inFile), false, CompressionMethod.None);		
@@ -108,18 +103,20 @@ public class DrOsmTransitMain {
 		networkGenerator.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300, false);
 		
 		log.info("Reading " + this.inFile);
-		DrTransitNetworkSink transitNetworkSink = new DrTransitNetworkSink(scenario.getNetwork(), scenario.getTransitSchedule(), coordinateTransformation, IdTrackerType.BitSet);
+		DrTransitNetworkSink transitNetworkSink = new DrTransitNetworkSink(scenario.getNetwork(), IdTrackerType.BitSet);
 		transitNetworkSink.setTransitModes(transitFilter);
 		reader.setSink(networkGenerator);
 		networkGenerator.setSink(transitNetworkSink);
 		reader.run();
-		log.info("Writing network to " + this.networkOutFile);
-		new NetworkWriter(scenario.getNetwork()).write(this.networkOutFile);
-		log.info("Writing transit schedule to " + this.transitScheduleOutFile);
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
-		log.info("Writing vehicles to " + this.vehiclesOutFile);
-		new VehicleWriterV1(scenario.getVehicles()).writeFile(this.vehiclesOutFile);
-		log.info("Done...");
+		line2Network = transitNetworkSink.getLine2Network();
 	}
-
+	
+	public Map<Id, Map<String, NetworkImpl>> getLine2Net(){
+		log.info("produced " + this.line2Network.size() + " networks...");
+		return this.line2Network;
+	}
+	
+	public Scenario getScenario(){
+		return this.scenario;
+	}
 }

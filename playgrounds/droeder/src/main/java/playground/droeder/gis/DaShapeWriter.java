@@ -153,8 +153,12 @@ public class DaShapeWriter {
 	}
 	
 	private static void write(Collection<Feature> features, String fileName){
-		ShapeFileWriter.writeGeometries(features, fileName); 
-		log.info(fileName + " written!"); 
+		if(features.isEmpty()){
+			log.error("can not write " + fileName + ", because featurelist is empty...");
+		}else{
+			ShapeFileWriter.writeGeometries(features, fileName); 
+			log.info(fileName + " written!"); 
+		}
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {

@@ -1,36 +1,22 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * Plansgenerator.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 package playground.droeder.osm;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -38,6 +24,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -60,16 +47,9 @@ import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactory;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-import playground.mzilske.osm.Stitcher;
-import playground.mzilske.osm.TransitNetworkSink;
-
-/**
- * @author droeder
- * based on <code>playground.mzilske.osm.TransitNetworkSink<code>
- *
- */
-public class DrTransitNetworkSink implements Sink{
-	static final Logger log = Logger.getLogger(TransitNetworkSink.class);
+public class DrTransitNetworkSink implements Sink {
+	
+	static final Logger log = Logger.getLogger(DrTransitNetworkSink.class);
 
 	private SimpleObjectStore<NodeContainer> allNodes;
 
@@ -93,16 +73,12 @@ public class DrTransitNetworkSink implements Sink{
 
 	private Network network;
 
-	private TransitSchedule transitSchedule;
-
-	private CoordinateTransformation coordinateTransformation;
-
 	private TreeSet<String> transitModes;
-	
-	public DrTransitNetworkSink(Network network, TransitSchedule transitSchedule, CoordinateTransformation coordinateTransformation, IdTrackerType idTrackerType){
+
+	private Map<Id, Map<String, NetworkImpl>> line2Network;
+
+	public DrTransitNetworkSink(Network network, IdTrackerType idTrackerType) {
 		this.network = network;
-		this.transitSchedule = transitSchedule;
-		this.coordinateTransformation = coordinateTransformation;
 		stopNodes = IdTrackerFactory.createInstance(idTrackerType);
 		routeWays = IdTrackerFactory.createInstance(idTrackerType);
 		allWaysTracker = IdTrackerFactory.createInstance(idTrackerType);
@@ -124,23 +100,50 @@ public class DrTransitNetworkSink implements Sink{
 				"afrl", true);
 	}
 
-	/**
-	 * @param transitFilter
-	 */
-	public void setTransitModes(String[] transitFilter) {
-		if(transitModes == null){
-			this.transitModes = new TreeSet<String>();
-		} else {
-			TreeSet<String> modes = new TreeSet<String>();
-			for (String string : transitModes) {
-				modes.add(string);
+	@Override
+	public void process(EntityContainer entityContainer) {
+		entityContainer.process(new EntityProcessor() {
+
+			@Override
+			public void process(BoundContainer arg0) {
+
 			}
-			this.transitModes = modes;
-		}		
-	}
-	
-	public Set<String> getTransitModes(){
-		return this.transitModes;
+
+			@Override
+			public void process(NodeContainer container) {
+
+				// stuff all nodes into a file
+				allNodesTracker.set(container.getEntity().getId());
+				allNodes.add(container);
+
+				// debug
+				count++;
+				if (count % 50000 == 0)
+					log.info(count + " nodes processed so far");
+			}
+
+			@Override
+			public void process(RelationContainer relationContainer) {
+				Relation relation = relationContainer.getEntity();
+				Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
+				if ("route".equals(tags.get("type"))){
+					if(tags.get("route") == null){
+						log.info("Got an empty route tag for tags " + tags.toString());
+					} else {
+						if(getTransitModes().contains(tags.get("route"))) {//&& "tram".equals(tags.get("route"))) {
+							transitLines.add(relationContainer);
+						}
+					}
+				}
+			}
+
+			@Override
+			public void process(WayContainer container) {
+				allWaysTracker.set(container.getEntity().getId());
+				allWays.add(container);
+			}
+
+		});
 	}
 
 	@Override
@@ -186,6 +189,7 @@ public class DrTransitNetworkSink implements Sink{
 		IndexedObjectStoreReader<NodeContainer> nodeReader = stopNodeStore.createReader();
 		IndexedObjectStoreReader<WayContainer> wayReader = routeSegmentStore.createReader();
 		log.info("Processing transit lines...");
+		LineNetworkStore netStore = new LineNetworkStore(network);
 		while (transitLineIterator.hasNext()) {
 			Relation relation = transitLineIterator.next().getEntity();
 			Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
@@ -201,91 +205,52 @@ public class DrTransitNetworkSink implements Sink{
 				name = name.replace('"', ' ').trim();
 				name = name.replace('&', ' ').trim();
 			}
-			String networkOperator = tags.get("network");
-//			System.out.println(networkOperator + " // " + route + " // " + ref + " // " + operator + " // " + name);
-			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(operator + "-" + route + "-" + ref + "-" + name + "-" + relation.getId()));
-			LinkedList<Node> stopsH = new LinkedList<Node>();
-			LinkedList<Node> stopsR = new LinkedList<Node>();
-			Stitcher stitcher = new Stitcher(network);
+			Id lineId = new IdImpl(operator + "-" + route + "-" + ref );
 			
 			for (RelationMember relationMember : relation.getMembers()) {
 				if (relationMember.getMemberType().equals(EntityType.Way)) {
 					if (allWaysTracker.get(relationMember.getMemberId())) {
 						Way way = wayReader.get(relationMember.getMemberId()).getEntity();
 						String role = relationMember.getMemberRole();
-						if (role.isEmpty() || role.startsWith("route")) {
-							stitcher.addBoth(way);
-						} else if (role.startsWith("forward")) {
-							stitcher.addForward(way);
-						} else if (role.startsWith("backward")) {
-							stitcher.addBackward(way);
-						}
+						netStore.addWay(way, lineId);
 					} else {
-						log.info("--- Missing way: " + relationMember.getMemberId());
+						log.info("--- Missing way: " + relationMember.getMemberId() + "on line " + lineId.toString());
 					}
 				} 
 			}
-			
-			transitSchedule.addTransitLine(line);
 			
 		}
 		transitLineIterator.release();
 		nodeReader.release();
 		wayReader.release();
-		
+//		netStore.clean();
+		this.line2Network = netStore.getLine2Network();
 	}
 
+	public Map<Id, Map<String, NetworkImpl>> getLine2Network(){
+		return this.line2Network;
+	}
 	@Override
 	public void release() {
-		
+
 	}
 
-	@Override
-	public void process(EntityContainer entityContainer) {
-		entityContainer.process(new EntityProcessor() {
-
-			@Override
-			public void process(BoundContainer arg0) {
-
+	public void setTransitModes(String[] transitModes) {
+		if(transitModes == null){
+			this.transitModes = new TreeSet<String>();
+		} else {
+			TreeSet<String> modes = new TreeSet<String>();
+			for (String string : transitModes) {
+				modes.add(string);
 			}
-
-			@Override
-			public void process(NodeContainer container) {
-
-				// stuff all nodes into a file
-				allNodesTracker.set(container.getEntity().getId());
-				allNodes.add(container);
-
-				// debug
-				count++;
-				if (count % 50000 == 0)
-					log.info(count + " nodes processed so far");
-			}
-
-			@Override
-			public void process(RelationContainer relationContainer) {
-				Relation relation = relationContainer.getEntity();
-				Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
-				if ("route".equals(tags.get("type"))){
-					if(tags.get("route") == null){
-						log.info("Got an empty route tag for tags " + tags.toString());
-					} else {
-						if(getTransitModes().contains(tags.get("route"))) {//&& "tram".equals(tags.get("route"))) {
-							transitLines.add(relationContainer);
-						}
-					}
-				}
-			}
+			this.transitModes = modes;
+		}
+	}
 
 
-			@Override
-			public void process(WayContainer container) {
-				allWaysTracker.set(container.getEntity().getId());
-				allWays.add(container);
-			}
 
-		});
-		
+	public TreeSet<String> getTransitModes() {
+		return this.transitModes;
 	}
 
 }
