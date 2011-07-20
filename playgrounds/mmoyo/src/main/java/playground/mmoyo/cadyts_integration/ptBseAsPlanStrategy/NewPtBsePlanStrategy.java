@@ -39,8 +39,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
+//import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+//import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -61,7 +61,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
 public class NewPtBsePlanStrategy implements PlanStrategy, 
-											AdditionalTeleportationDepartureEventHandler,  
+											/*AdditionalTeleportationDepartureEventHandler,*/  
 											IterationEndsListener, 
 											BeforeMobsimListener, 
 											AfterMobsimListener  {
@@ -75,6 +75,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	private SimResultsContainerImpl simResults;
 	final static String MODULE_NAME = "ptCounts";
 	final static String BSE_MOD_NAME = "bse";
+	final static String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
 	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
 	static double countsScaleFactor /*=1*/;  // not so great
 	private final Counts occupCounts = new Counts();
@@ -92,7 +93,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 		// add "this" to the events channel so that reset is called between iterations
 		// (yyyy I think this should now be better done by the controler listener mechanics.  kai, jul'11)
-		this.controler.getEvents().addHandler( this ) ;
+		/*this.controler.getEvents().addHandler( this ) ; no more*/
 		this.controler.addControlerListener(this) ;
 
 		// set up the bus occupancy analyzer ...  
@@ -133,8 +134,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 		controler.getScenario().addScenarioElement(this.occupCounts) ;
 	}
 
-	
-	final String STR_LINKOFFSETFILE = "linkCostOffsets.xml";
+	/*
 	@Override
 	public void reset(int iteration) {
 		// yyyy since this is now also a controler listener, material in here should be moved to "notifyIterationEnds".  kai, jul'11
@@ -162,7 +162,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	public void handleEvent(AdditionalTeleportationDepartureEvent eve) {
 		// dummy
 	}
-
+	*/
 
 	//Analysis methods
 	///////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
-			ptBseOccupAnalyzer.reset(iter);
+			ptBseOccupAnalyzer.clear();
 			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
 		}
 	}
@@ -202,6 +202,18 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		///////originally this was in reset method//////////////
+		this.calibrator.afterNetworkLoading(this.simResults);
+		// the remaining material is, in my view, "just" output:
+		String filename = this.controler.getControlerIO().getIterationFilename(event.getIteration(), STR_LINKOFFSETFILE) ;
+		try {
+			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO( this.controler.getScenario().getTransitSchedule() );
+			ptBseLinkCostOffsetsXMLFileIO.write( filename , this.calibrator.getLinkCostOffsets());
+			ptBseLinkCostOffsetsXMLFileIO = null;
+		}catch(IOException e) {
+			e.printStackTrace();
+		}///////////////////////////////////////////////////////
+		
 		generateAndWriteCountsComparisons(event);
 	}
 

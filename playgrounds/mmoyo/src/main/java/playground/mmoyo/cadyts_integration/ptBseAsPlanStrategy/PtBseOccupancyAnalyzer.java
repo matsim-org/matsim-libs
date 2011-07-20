@@ -61,7 +61,8 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private Map<Id, int[]> occupancies;  //Map< stopFacilityId,value[]>
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();  //Map< vehId,stopFacilityId> 
 	private final Map<Id, Integer> veh_passengers = new HashMap<Id, Integer>();  //Map<vehId,passengersNo. in Veh> 
-	private StringBuffer occupancyRecord;
+	private static String HEADER = "time\tvehId\tStopId\tno.ofPassengersInVeh\n";
+	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final static String STR_M44 = "M44";
 	
 	public PtBseOccupancyAnalyzer() {
@@ -73,11 +74,19 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void reset(int iteration) {
+		/*  moved to "clear" 
 		this.occupancies.clear();
 		this.veh_stops.clear();
-		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
+		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");*/
+		
 	}
-
+	
+	void clear() {
+		this.occupancies.clear();
+		this.veh_stops.clear();
+		this.occupancyRecord = new StringBuffer(HEADER);
+	}
+	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		//only specific transit line
