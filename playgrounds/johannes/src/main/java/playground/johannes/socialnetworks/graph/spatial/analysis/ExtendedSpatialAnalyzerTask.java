@@ -40,6 +40,7 @@ public class ExtendedSpatialAnalyzerTask extends AnalyzerTaskComposite {
 		addTask(new AcceptanceProbabilityTask());
 		Accessibility access = new Accessibility(new GravityCostFunction(1.5, 0, new CartesianDistanceCalculator()));
 		CachedAccessibility cachedAccess = new CachedAccessibility(access);
+		addTask(new DegreeAccessibilityTask(cachedAccess));
 		addTask(new EdgeLengthAccessibilityTask(cachedAccess));
 		addTask(new TransitivityAccessibilityTask(cachedAccess));
 	}

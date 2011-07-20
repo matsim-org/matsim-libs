@@ -21,16 +21,16 @@ package playground.johannes.socialnetworks.sim.locationChoice;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 /**
  * @author illenberger
@@ -40,17 +40,17 @@ public class ActivityMover {
 
 	private final PopulationFactory factory;
 	
-	private final LeastCostPathCalculator router;
+	private NetworkFactoryImpl netFactory;
 	
-	private final Network network;
+	private NetworkLegRouter legRouter;
 	
 	public ActivityMover(PopulationFactory factory, LeastCostPathCalculator router, Network network) {
 		this.factory = factory;
-		this.router = router;
-		this.network = network;
+		netFactory = new NetworkFactoryImpl((NetworkImpl) network);
+		legRouter = new NetworkLegRouter(network, router, netFactory);
 	}
 	
-	public void moveActivity(Plan plan, int idx, Id newLink) {
+	public void moveActivity(Plan plan, int idx, Id newLink, double desiredArrivalTime, double desiredDuration) {
 		Activity act = (Activity) plan.getPlanElements().get(idx);
 		
 		Activity newAct = factory.createActivityFromLinkId(act.getType(), newLink);
@@ -59,33 +59,32 @@ public class ActivityMover {
 			act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getMaximumDuration());
 		}
 		
-		newAct.setEndTime(act.getEndTime());
-		
 		Activity prev = (Activity) plan.getPlanElements().get(idx - 2);
 		Leg toLeg = (Leg)plan.getPlanElements().get(idx - 1);
 		Leg fromLeg = (Leg)plan.getPlanElements().get(idx + 1);
 		Activity next = (Activity) plan.getPlanElements().get(idx + 2);
 		
-		calcRoute(prev, newAct, toLeg);
-		calcRoute(newAct, next, fromLeg);
-
+		newAct.setStartTime(desiredArrivalTime);
+		newAct.setEndTime(desiredArrivalTime + desiredDuration);
+		
+		calcRoute(plan.getPerson(), prev, newAct, toLeg);
+		calcRoute(plan.getPerson(), newAct, next, fromLeg);
+		
+		double newEndTime = desiredArrivalTime - toLeg.getTravelTime();
+		newEndTime = Math.max(0, newEndTime);
+		
+		prev.setEndTime(newEndTime);
+		toLeg.setDepartureTime(newEndTime);
+		
+		next.setStartTime(newAct.getEndTime() + fromLeg.getTravelTime());
+		
 		plan.getPlanElements().set(idx, newAct);
 	}
 	
-	private double calcRoute(Activity prev, Activity next, Leg leg) {
-		Id link1 = prev.getLinkId();
-		Id link2 = next.getLinkId();
+	private double calcRoute(Person person, Activity prev, Activity next, Leg leg) {
+		
+		legRouter.routeLeg(person, leg, prev, next, prev.getEndTime());
 
-		Node node1 = network.getLinks().get(link1).getToNode();
-		Node node2 = network.getLinks().get(link2).getToNode();
-		
-		Path path = router.calcLeastCostPath(node1, node2, prev.getEndTime());
-		
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link1, link2);
-		route.setLinkIds(link1, NetworkUtils.getLinkIds(path.links), link2);
-		leg.setRoute(route);
-		leg.setTravelTime(path.travelTime);
-		
-		return path.travelTime;
+		return Double.NaN;
 	}
 }

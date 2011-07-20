@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TIntArrayList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 
 /**
@@ -48,8 +50,8 @@ public class SeedAPLTask extends AnalyzerTask {
 		if(seeds == null) {
 			seeds = new ArrayList<Vertex>(graph.getVertices().size());
 			for(Vertex vertex : graph.getVertices()) {
-				Integer it = ((SampledVertex)vertex).getIterationSampled();
-				if(it != null && it == 0) {
+				Integer it = ((SampledVertex)vertex).getIterationDetected();
+				if(it != null && it == -1) {
 					seeds.add(vertex);
 				}
 			}
@@ -74,6 +76,12 @@ public class SeedAPLTask extends AnalyzerTask {
 		
 		results.put(KEY, stats);
 		printStats(stats, KEY);
+		
+		try {
+			writeHistograms(stats, new LinearDiscretizer(1.0), KEY, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

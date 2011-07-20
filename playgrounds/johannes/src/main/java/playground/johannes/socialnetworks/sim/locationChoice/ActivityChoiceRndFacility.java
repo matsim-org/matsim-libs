@@ -19,61 +19,65 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.locationChoice;
 
-import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.util.TXTWriter;
-
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityChoice2 implements PlanStrategyModule {
-
-	private final String type = "leisure";
+public class ActivityChoiceRndFacility implements PlanStrategyModule {
+	
+	private static final String type = "leisure";
 	
 	private final Random random;
 	
-	private final Map<Person, SocialVertex> vertexMapping;
-	
 	private final ActivityMover mover;
-//	
-	private DescriptiveStatistics dists;
-//	
-	private DistanceCalculator distCalc = new CartesianDistanceCalculator();
 	
-	public ActivityChoice2(SocialGraph graph, ActivityMover mover, Random random) {
-		vertexMapping = new HashMap<Person, SocialVertex>(graph.getVertices().size());
-		for(SocialVertex vertex : graph.getVertices()) {
-			vertexMapping.put(vertex.getPerson().getPerson(), vertex);
-		}
-		
+	private Map<Person, Double> desiredArrivalTimes;
+	
+	private Map<Person, Double> desiredDurations;
+	
+	final private List<Id> linkIds;
+	
+	public ActivityChoiceRndFacility(ActivityFacilities facilities, Network network, ActivityMover mover, Random random, Map<Person, Double> desiredArrivalTimes, Map<Person, Double> desiredDurations) {
 		this.random = random;
 		this.mover = mover;
+		this.desiredArrivalTimes = desiredArrivalTimes;
+		this.desiredDurations = desiredDurations;
+		
+		linkIds = new ArrayList<Id>(network.getLinks().keySet());
+		
+		for(ActivityFacility facility : facilities.getFacilities().values()) {
+			boolean isLeisure = false;
+			for(ActivityOption option : facility.getActivityOptions().values()) {
+				if(option.getType().equalsIgnoreCase(type)) {
+					isLeisure = true;
+					break;
+				}
+			}
+			
+			if(isLeisure) {
+				if(facility.getLinkId() != null)
+					linkIds.add(facility.getLinkId());
+			}
+		}
 	}
 	
-	@Override
-	public void prepareReplanning() {
-		dists = new DescriptiveStatistics();
-	}
 
 	@Override
 	public void handlePlan(Plan plan) {
@@ -95,28 +99,20 @@ public class ActivityChoice2 implements PlanStrategyModule {
 			/*
 			 * randomly draw new location
 			 */
-			SocialVertex v_i = vertexMapping.get(plan.getPerson());
-			SocialVertex v_j = v_i.getNeighbours().get(random.nextInt(v_i.getNeighbours().size()));
-			Id link = ((Activity) v_j.getPerson().getPerson().getPlans().get(0).getPlanElements().get(0)).getLinkId();
+			Id link = linkIds.get(random.nextInt(linkIds.size()));
 			/*
 			 * move activity
 			 */
-			mover.moveActivity(plan, idx, link);
-
-			double d = distCalc.distance(v_i.getPoint(), v_j.getPoint());
-			dists.addValue(d);
+			mover.moveActivity(plan, idx, link, desiredArrivalTimes.get(plan.getPerson()), desiredDurations.get(plan.getPerson()));
 		}
 	}
 
 	@Override
+	public void prepareReplanning() {
+	}
+
+	@Override
 	public void finishReplanning() {
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(dists, FixedSampleSizeDiscretizer.create(dists.getValues(), 1, 50), true);
-		try {
-			TXTWriter.writeMap(hist, "d", "p", "/Users/jillenberger/Work/socialnets/locationChoice/output/choice.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

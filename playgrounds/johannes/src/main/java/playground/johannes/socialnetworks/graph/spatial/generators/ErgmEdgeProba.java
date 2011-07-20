@@ -45,12 +45,15 @@ public class ErgmEdgeProba extends ErgmTerm {
 		else if(Double.isInfinite(p))
 			return 0;
 		else {
-			return (1 - p) / p;
-//			if(Double.isNaN(r)) {
-//				System.err.println("NaN");
-//				return 0;
-//			} else
-//				return r;
+			double r = (1 - p) / p;
+			if(Double.isNaN(r)) {
+				System.err.println("NaN");
+				return 0;
+			} else if(Double.isInfinite(r)) {
+				System.err.println("Inf");
+				return r;
+			} else
+				return r;
 				
 		}
 	}

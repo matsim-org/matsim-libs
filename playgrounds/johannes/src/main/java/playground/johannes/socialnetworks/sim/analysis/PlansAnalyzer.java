@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -38,10 +40,12 @@ import org.matsim.api.core.v01.population.Population;
  */
 public class PlansAnalyzer {
 
-	public static Map<String, Double> analyze(Set<Plan> plans, PlansAnalyzerTask task) {
-		Map<String, Double> stats = new HashMap<String, Double>();
+	private static final Logger logger = Logger.getLogger(PlansAnalyzer.class);
+	
+	public static Map<String, DescriptiveStatistics> analyze(Set<Plan> plans, PlansAnalyzerTask task) {
+		Map<String, DescriptiveStatistics> stats = new HashMap<String, DescriptiveStatistics>();
 		if(plans.isEmpty()) {
-			System.err.println("No plans to analyze.");
+			logger.warn("No plans to analyze.");
 		} else {
 			task.analyze(plans, stats);
 		}
@@ -49,7 +53,13 @@ public class PlansAnalyzer {
 		
 	}
 	
-	public static Map<String, Double> analyzeSelectedPlans(Population population, PlansAnalyzerTask task) {
+	public static void analyze(Set<Plan> plans, PlansAnalyzerTask task, String output) throws IOException {
+		task.setOutputDirectory(output);
+		Map<String, DescriptiveStatistics> map = analyze(plans, task);
+		writeStatistics(map, output + "/statistics.txt");
+	}
+	
+	public static Map<String, DescriptiveStatistics> analyzeSelectedPlans(Population population, PlansAnalyzerTask task) {
 		Set<Plan> plans = new HashSet<Plan>();
 		
 		for(Person person : population.getPersons().values()) {
@@ -61,7 +71,14 @@ public class PlansAnalyzer {
 		return analyze(plans, task);
 	}
 	
-	public static Map<String, Double> analyzeUnselectedPlans(Population population, PlansAnalyzerTask task) {
+	public static void analyzeSelectedPlans(Population population, Set<Trajectory> trajectories, PlansAnalyzerTask task, String output) throws IOException {
+		task.setOutputDirectory(output);
+		Map<String, DescriptiveStatistics> map = analyzeSelectedPlans(population, task);
+		task.analyzeTrajectories(trajectories, map);
+		writeStatistics(map, output + "/statistics.txt");
+	}
+	
+	public static Map<String, DescriptiveStatistics> analyzeUnselectedPlans(Population population, PlansAnalyzerTask task) {
 		Set<Plan> plans = new HashSet<Plan>();
 		
 		for(Person person : population.getPersons().values()) {
@@ -74,13 +91,32 @@ public class PlansAnalyzer {
 		return analyze(plans, task);
 	}
 	
-	public static void write(Map<String, Double> stats, String filename) throws IOException {
+	public static void analyzeUnselectedPlans(Population population, Set<Trajectory> trajectories, PlansAnalyzerTask task, String output) throws IOException {
+		task.setOutputDirectory(output);
+		Map<String, DescriptiveStatistics> map = analyzeUnselectedPlans(population, task);
+		task.analyzeTrajectories(trajectories, map);
+		writeStatistics(map, output + "/statistics.txt");
+	}
+	
+	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
 		
-		for(Entry<String, Double> entry : stats.entrySet()) {
+		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
+		writer.newLine();
+		for(Entry<String, DescriptiveStatistics> entry : statsMap.entrySet()) {
 			writer.write(entry.getKey());
 			writer.write("\t");
-			writer.write(entry.getValue().toString());
+			writer.write(String.valueOf(entry.getValue().getMean()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMin()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMax()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getN()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getVariance()));
 			writer.newLine();
 		}
 		

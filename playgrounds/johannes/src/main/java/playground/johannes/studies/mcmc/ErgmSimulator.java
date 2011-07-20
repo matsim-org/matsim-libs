@@ -46,7 +46,6 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 import playground.johannes.socialnetworks.graph.generators.BarabasiAlbertGenerator;
 import playground.johannes.socialnetworks.graph.generators.RandomGraphGenerator;
-import playground.johannes.socialnetworks.graph.mcmc.ConserveDegreeDistribution;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.SampleAnalyzer;
@@ -125,6 +124,10 @@ public class ErgmSimulator {
 		AdjacencyMatrix<SocialSparseVertex> y = new AdjacencyMatrix<SocialSparseVertex>(graph, false);
 		
 		Ergm ergm = new Ergm();
+//		ergm.addComponent(new EdgePowerLawDistance(y, theta_distance, 10 * persons.size()));
+//		ErgmDensity eden = new ErgmDensity();
+//		eden.setTheta(6.9);
+//		ergm.addComponent(eden);
 		ergm.addComponent(new ErgmLnDistance(y, theta_distance));
 		ergm.addComponent(new ErgmAge(theta_age));
 		ergm.addComponent(new ErgmGender(theta_gender));
@@ -157,7 +160,7 @@ public class ErgmSimulator {
 		 * sample...
 		 */
 		if(conservePk)
-			sampler.sample(y, ergm, analyzer, new ConserveDegreeDistribution());
+			sampler.sample(y, ergm, analyzer);//, new ConserveDegreeDistribution());
 		else
 			sampler.sample(y, ergm, analyzer);
 		logger.info("Done.");

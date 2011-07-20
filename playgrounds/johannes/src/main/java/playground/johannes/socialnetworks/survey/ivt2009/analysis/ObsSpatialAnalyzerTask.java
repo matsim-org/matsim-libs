@@ -22,7 +22,7 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Set;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -34,25 +34,30 @@ import com.vividsolutions.jts.geom.Point;
 public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObsSpatialAnalyzerTask(Set<Point> points, Geometry boundary) {
+		
+//		addTask(new EpsilonTask(points));
+		
 //		EdgeLengthTask distanceTask = new EdgeLengthTask();
 //		distanceTask.setModule(EdgeLength.getInstance());
-		addTask(new EdgeLengthTask());
+//		addTask(new EdgeLengthTask());
 		
-//		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
-//		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
-//		addTask(acceptTask);
+		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
+		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
+		addTask(acceptTask);
 		
-//		Accessibility access = new Accessibility(new GravityCostFunction(1.6, 0));
+//		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
 //		access.setTargets(points);
 //		addTask(new EdgeLengthAccessibilityTask(access));
 //		
 //		addTask(new TripTask());
 		
-//		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask();
+//		AcceptancePropaCategoryTask t = new AcceptancePropaCategoryTask(access);
 //		t.setBoundary(boundary);
 //		t.setDestinations(points);
 //		addTask(t);
 //		
+//		TransitivityAccessibilityTask tatask = new TransitivityAccessibilityTask(access);
+//		addTask(tatask);
 //		PropConstAccessibilityTask t = new PropConstAccessibilityTask();
 //		t.setTargets(points);
 //		addTask(t);

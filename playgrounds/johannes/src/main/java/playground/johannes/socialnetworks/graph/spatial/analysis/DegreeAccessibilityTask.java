@@ -43,6 +43,10 @@ import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelati
  */
 public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 
+	public DegreeAccessibilityTask(Accessibility module) {
+		setModule(module);
+	}
+	
 	public DegreeAccessibilityTask(SpatialCostFunction function) {
 		setModule(new Accessibility(function));
 	}

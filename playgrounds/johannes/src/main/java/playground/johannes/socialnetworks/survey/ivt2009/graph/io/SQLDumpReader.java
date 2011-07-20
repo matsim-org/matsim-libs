@@ -126,7 +126,8 @@ public class SQLDumpReader {
 		String line;
 		while ((line = reader.readLine()) != null) {
 			String[] tokens = line.split(SEMICOLON);
-			String egoId = trimString(tokens[USER_ID_COL]);
+//			String egoId = trimString(tokens[USER_ID_COL]);
+			String egoId = tokens[USER_ID_COL];
 			if (!EMPTY.equalsIgnoreCase(egoId)) {
 
 				Map<String, String> egoData = rawData.get(egoId);
@@ -183,16 +184,17 @@ public class SQLDumpReader {
 				String latitude = tokens[0];
 				String longitude = tokens[1];
 				point = geoFactory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude)));
-			} else if(response.equalsIgnoreCase("602")) {
-				logger.info("Response code 602 - requesting google geo-coder...");
-				GeoCoordinate coord = geoCoder.requestCoordinate(tokens[6]);
-				if(coord != null)
-					point = geoFactory.createPoint(new Coordinate(coord.getLongitude(), coord.getLatitude()));
-			}
+			} //else if(response.equalsIgnoreCase("602")) {
+//				logger.info("Response code 602 - requesting google geo-coder...");
+//				GeoCoordinate coord = geoCoder.requestCoordinate(tokens[6]);
+//				if(coord != null)
+//					point = geoFactory.createPoint(new Coordinate(coord.getLongitude(), coord.getLatitude()));
+//			}
+			// disabled because of data privacy
 		}
 		
-		if(point == null)
-			logger.warn(String.format("Cannot decode location string: \"%1$s\".", location));
+//		if(point == null)
+//			logger.warn(String.format("Cannot decode location string: \"%1$s\".", location));
 		
 		return point;
 	}

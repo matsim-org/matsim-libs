@@ -22,6 +22,8 @@ package playground.johannes.socialnetworks.graph.analysis;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TObjectDoubleHashMap;
 
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
@@ -41,16 +43,62 @@ public class Centrality {
 	
 	private MatrixCentrality mCentrality;
 	
-	public void init(Graph graph) {
+	private Set<? extends Vertex> sources;
+	
+	public void init(Graph graph, boolean calcBetweenness) {
 		y = new AdjacencyMatrix<Vertex>(graph);
 		mCentrality = new MatrixCentrality();
+		mCentrality.setCalcBetweenness(calcBetweenness);
 		mCentrality.run(y);
+	}
+	
+	public void init(Graph graph) {
+		init(graph, true);
+	}
+	
+	public void init(Graph graph, Set<? extends Vertex> sources, Set<? extends Vertex> targets) {
+		init(graph, sources, targets, true);
+	}
+	
+	public void init(Graph graph, Set<? extends Vertex> sources, Set<? extends Vertex> targets, boolean calcBetweenness) {
+		this.sources = sources;
+		y = new AdjacencyMatrix<Vertex>(graph);
+		
+		int[] sourceIndices = new int[sources.size()];
+		int[] targetIndices = new int[targets.size()];
+		
+		int i = 0;
+		for(Vertex v : sources) {
+			sourceIndices[i] = y.getIndex(v);
+			i++;
+		}
+		
+		i = 0;
+		for(Vertex v : targets) {
+			targetIndices[i] = y.getIndex(v);
+			i++;
+		}
+		
+		mCentrality = new MatrixCentrality();
+		mCentrality.setCalcBetweenness(calcBetweenness);
+		mCentrality.run(y, sourceIndices, targetIndices);
 	}
 	
 	public DescriptiveStatistics closenessDistribution() {
 		DescriptiveStatistics ds = new DescriptiveStatistics();
-		for(double val : mCentrality.getVertexCloseness()) {
-			ds.addValue(val);
+		
+		if (sources == null) {
+			for (double val : mCentrality.getVertexCloseness()) {
+				if(!Double.isInfinite(val))
+					ds.addValue(val);
+			}
+		} else {
+			for(Vertex v : sources) {
+				int idx = y.getIndex(v);
+				double val = mCentrality.getVertexCloseness()[idx];
+				if(!Double.isInfinite(val))
+					ds.addValue(val);
+			}
 		}
 		return ds;
 	}
@@ -89,5 +137,9 @@ public class Centrality {
 	
 	public int radius() {
 		return mCentrality.getRadius();
+	}
+	
+	public DescriptiveStatistics getAPL() {
+		return mCentrality.getAPL();
 	}
 }

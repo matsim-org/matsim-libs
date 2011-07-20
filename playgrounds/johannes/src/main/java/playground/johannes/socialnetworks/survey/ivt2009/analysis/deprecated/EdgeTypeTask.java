@@ -79,7 +79,7 @@ public class EdgeTypeTask extends SocioMatrixTask {
 				
 				for(Entry<String, Distribution> entry : lenDistr.entrySet()) {
 					Distribution d = entry.getValue();
-					addSingleValue("d_mean_" + entry.getKey(), d.mean(), statsMap);
+					singleValueStats("d_mean_" + entry.getKey(), d.mean(), statsMap);
 					Distribution.writeHistogram(d.absoluteDistribution(1000), String.format("%1$s/d_%2$s.txt", getOutputDirectory(), entry.getKey()));
 					Distribution.writeHistogram(d.absoluteDistributionLog2(1000), String.format("%1$s/d_%2$s.log.txt", getOutputDirectory(), entry.getKey()));
 					

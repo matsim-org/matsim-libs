@@ -58,6 +58,11 @@ public class StatsMerge {
 		String outputTable = args[4];
 		String outputAvr = args[5];
 		
+		int valueColIdx = 1;
+		if(args.length >= 7) {
+			valueColIdx = Integer.parseInt(args[6]);
+		}
+		
 		logger.info(String.format("Root dir = %1$s", rootDir));
 		/*
 		 * Create a filename filter to filter only the dumps of interest.
@@ -123,7 +128,7 @@ public class StatsMerge {
 				/*
 				 * Open the stats.txt file.
 				 */
-				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
+				String path = String.format("%1$s/%2$s/statistics.txt", dumpDir.getAbsolutePath(), analyzerKey);
 				File file = new File(path);
 				if (file.exists()) {
 					BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -135,7 +140,7 @@ public class StatsMerge {
 							 * Retrieve the value for the property key and then
 							 * break.
 							 */
-							double value = Double.parseDouble(tokens[1]);
+							double value = Double.parseDouble(tokens[valueColIdx]);
 							String dumpName = dumpDir.getName().split("\\.")[1];
 							double[] values = dataTable.get(dumpName);
 							if (values == null)
@@ -145,6 +150,7 @@ public class StatsMerge {
 							break;
 						}
 					}
+					reader.close();
 				} else {
 					logger.warn(String.format("No stats file found: %1$s.", path));
 				}

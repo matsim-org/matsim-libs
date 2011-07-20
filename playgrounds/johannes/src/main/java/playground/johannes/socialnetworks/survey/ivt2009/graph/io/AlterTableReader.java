@@ -83,14 +83,18 @@ public class AlterTableReader {
 				String alterKey = tokens[2];
 				
 				String alterId;
-				if(tokens.length < 11)
+//				if(tokens.length < 11)
+				if(tokens.length < 6)
 					alterId = createDummyId();
-				else if(tokens[10].equalsIgnoreCase(""))
+//				else if(tokens[10].equalsIgnoreCase(""))
+				else if(tokens[5].equalsIgnoreCase(""))
 					alterId = createDummyId();
-				else if(tokens[10].equalsIgnoreCase("NICHT ANSCHREIBEN"))
+//				else if(tokens[10].equalsIgnoreCase("NICHT ANSCHREIBEN"))
+				else if(tokens[5].equalsIgnoreCase("NICHT ANSCHREIBEN"))
 					alterId = createDummyId();
 				else
-					alterId = tokens[10];
+//					alterId = tokens[10];
+					alterId = tokens[5];
 				/*
 				 * find ego
 				 */

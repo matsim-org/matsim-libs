@@ -106,10 +106,10 @@ public class WaveSizeTask extends AnalyzerTask {
 			sampledEdgesTotal += it.value();
 		}
 		
-		addSingleValue(NUM_DETECTED, detectedTotal, stats);
-		addSingleValue(NUM_SAMPLED, sampledTotal, stats);
-		addSingleValue("detectedEdges", detectedEdgesTotal, stats);
-		addSingleValue("sampledEdges", sampledEdgesTotal, stats);
+		singleValueStats(NUM_DETECTED, detectedTotal, stats);
+		singleValueStats(NUM_SAMPLED, sampledTotal, stats);
+		singleValueStats("detectedEdges", detectedEdgesTotal, stats);
+		singleValueStats("sampledEdges", sampledEdgesTotal, stats);
 		
 		
 		logger.info(String.format("%1$s vertices sampled, %2$s vertices detected.", sampledTotal, detectedTotal));

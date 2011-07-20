@@ -34,7 +34,7 @@ public class CentralityTest extends TestCase {
 
 	public void test() {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
-		SparseGraph graph = reader.readGraph("/Users/jillenberger/Work/work/socialnets/snowball/data/networks/cond-mat-2005-gc.graphml");
+		SparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/data/graphs/cond-mat-2005-gc.graphml");
 		
 //		System.out.println("Old version...");
 //		long time = System.currentTimeMillis();

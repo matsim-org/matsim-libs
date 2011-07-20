@@ -76,7 +76,7 @@ public class ActivityRandomizer2 implements PlanFilter {
 			if (validate(act)) {
 				Link link = links.get(random.nextInt(links.size()));
 
-				mover.moveActivity(plan, i, link.getId());
+				mover.moveActivity(plan, i, link.getId(), act.getStartTime(), act.getMaximumDuration());
 
 				result = true;
 			}

@@ -69,16 +69,16 @@ public class Merge {
 				throw new IllegalArgumentException(String.format("Constant parameter %1$s unknown.", constParamKey));
 			
 			String line;
-			
+			line = reader.readLine();
 			while((line = reader.readLine()) != null) {
 				String tokens[] = line.split("\t");
-				int key = Integer.parseInt(tokens[0]);
+				int key = (int) Double.parseDouble(tokens[0]);
 				double val = Double.parseDouble(tokens[1]);
 				
 				row.put(key, val);
 				dumpKeys.add(key);
 			}
-			
+			reader.close();
 			table.put(dumpKey, row);
 		}
 

@@ -29,7 +29,10 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
 
 /**
  * @author illenberger
@@ -49,11 +52,14 @@ public class SpatialAnalyzer {
 			output = args[1];
 		}
 		
-		SpatialCostFunction func = new GravityCostFunction(1.5, 0, new CartesianDistanceCalculator());
+		SpatialCostFunction func = new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator());
 		
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		Accessibility access = new Accessibility(func);
+//		task.addTask(new AcceptancePropaCategoryTask(access));
+		task.addTask(new TransitivityAccessibilityTask(access));
 //		task.addTask(new SpatialAnalyzerTask());
-		task.addTask(new ExtendedSpatialAnalyzerTask());
+//		task.addTask(new ExtendedSpatialAnalyzerTask());
 //		task.addTask(new AgeAccessibilityTask(func));
 		
 //		Accessibility access = new Accessibility(func);

@@ -28,9 +28,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.sna.util.MultiThreading;
 
 /**
  * A class to calculate centrality measures on graph represented as an adjacency
@@ -59,18 +61,22 @@ public class MatrixCentrality {
 	private int diameter;
 
 	private int radius;
+	
+	private DescriptiveStatistics apl;
 
 	private final int numThreads;
 	
 	private DijkstraFactory dijkstraFactory;
+	
+	private boolean calcBetweenness = true;
 
 	/**
 	 * Creates a new MatrixCentrality object that uses multiple threads for
 	 * computation. The number of threads is given by
-	 * {@link Runtime#availableProcessors()}.
+	 * {@link MultiThreading#getNumAllowedThreads()}.
 	 */
 	public MatrixCentrality() {
-		numThreads = Runtime.getRuntime().availableProcessors();
+		numThreads = MultiThreading.getNumAllowedThreads();
 	}
 
 	/**
@@ -86,6 +92,10 @@ public class MatrixCentrality {
 
 	public void setDijkstraFactory(DijkstraFactory factory) {
 		this.dijkstraFactory = factory;
+	}
+	
+	public void setCalcBetweenness(boolean calcBetweenness) {
+		this.calcBetweenness = calcBetweenness;
 	}
 	
 	/**
@@ -162,14 +172,30 @@ public class MatrixCentrality {
 	public int getRadius() {
 		return radius;
 	}
+	
+	public DescriptiveStatistics getAPL() {
+		return apl;
+	}
 
+	public void run(AdjacencyMatrix<?> y) {
+		int[] sources = new int[y.getVertexCount()];
+		int[] targets = new int[y.getVertexCount()];
+		
+		for(int i = 0; i < sources.length; i++) {
+			sources[i] = i;
+			targets[i] = i;
+		}
+		
+		run(y, sources, targets);
+	}
+	
 	/**
 	 * Builds the complete shortest path tree for all vertices and
 	 * simultaneously calculates closeness, betweenness, radius and diameter.
 	 * 
 	 * @param y an adjacency matrix.
 	 */
-	public void run(AdjacencyMatrix<?> y) {
+	public void run(AdjacencyMatrix<?> y, int[] sources, int[] targets) {
 		int n = y.getVertexCount();
 		vertexCloseness = new double[n];
 		Arrays.fill(vertexCloseness, Double.POSITIVE_INFINITY);
@@ -184,15 +210,17 @@ public class MatrixCentrality {
 			dijkstraFactory = new DijkstraFactory();
 		
 		List<CentralityThread> threads = new ArrayList<CentralityThread>();
-		int size = (int) Math.floor(n / (double) numThreads);
+		int size = (int) Math.floor(sources.length / (double) numThreads);
 		int i_start = 0;
 		int i_stop = size;
 		for (int i = 0; i < numThreads - 1; i++) {
-			threads.add(new CentralityThread(y, i_start, i_stop, dijkstraFactory));
+			int[] subSources = Arrays.copyOfRange(sources, i_start, i_stop);
+			threads.add(new CentralityThread(y, subSources, targets, dijkstraFactory, calcBetweenness));
 			i_start = i_stop;
 			i_stop += size;
 		}
-		threads.add(new CentralityThread(y, i_start, n, dijkstraFactory));
+		int[] subSources = Arrays.copyOfRange(sources, i_start, sources.length);
+		threads.add(new CentralityThread(y, subSources, targets, dijkstraFactory, calcBetweenness));
 		/*
 		 * start threads
 		 */
@@ -212,7 +240,16 @@ public class MatrixCentrality {
 		/*
 		 * merge results of threads
 		 */
+		apl = new DescriptiveStatistics();
+		double aplSum = 0;
+		double cnt = 0;
 		for (CentralityThread thread : threads) {
+			for(int i = 0; i < thread.pathLengths.size(); i++) {
+//				apl.addValue(thread.pathLengths.get(i));
+				aplSum += thread.pathLengths.get(i);
+				cnt++;
+			}
+			
 			for (int i = 0; i < n; i++) {
 				/*
 				 * if this thread did not calculate the closeness of i it
@@ -254,6 +291,10 @@ public class MatrixCentrality {
 		 * calculate mean values
 		 */
 		meanVertexCloseness = StatUtils.mean(vertexCloseness);
+		
+//		apl = totalPathLength/(double)totalPathCount;
+		apl.addValue(aplSum/cnt);
+		
 		double sum = 0;
 		for (int i = 0; i < y.getVertexCount(); i++)
 			sum += vertexBetweenness[i];
@@ -278,9 +319,11 @@ public class MatrixCentrality {
 
 		private Dijkstra dijkstra;
 
-		private int i_start;
+		private int[] sources;
 
-		private int i_stop;
+		private int[] targets;
+		
+		private boolean calcBetweenness;
 
 		private TIntDoubleHashMap[] edgeBetweenness;
 
@@ -296,15 +339,24 @@ public class MatrixCentrality {
 
 		private int radius;
 		
+//		private int totalPathLength;
+//		
+//		private int totalPathCount;
+		
+		private TIntArrayList pathLengths;
+		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 
-		public CentralityThread(AdjacencyMatrix<?> y, int i_start, int i_stop, DijkstraFactory dijkstraFactory) {
+		public CentralityThread(AdjacencyMatrix<?> y, int[] sources, int[] targets, DijkstraFactory dijkstraFactory, boolean calcBetweenness) {
 			dijkstra = dijkstraFactory.newDijkstra(y); 
-			this.i_start = i_start;
-			this.i_stop = i_stop;
+			this.sources = sources;
+			this.targets = targets;
+			this.calcBetweenness = calcBetweenness;
 			n = y.getVertexCount();
 			diameter = 0;
 			radius = Integer.MAX_VALUE;
+//			pathLengths = new TIntArrayList(sources.length * targets.length);
+			pathLengths = new TIntArrayList(sources.length + targets.length);
 			counter = 0;
 		}
 
@@ -328,12 +380,14 @@ public class MatrixCentrality {
 			long dkTime = 0;
 			long cTime = 0;
 
-			for (int i = i_start; i < i_stop; i++) {
+			for (int idx = 0; idx < sources.length; idx++) {
+				int i = sources[idx];
 				/*
 				 * run the Dijkstra to all nodes
 				 */
 				long time = System.currentTimeMillis();
-				TIntArrayList reachable = dijkstra.run(i, -1);
+//				TIntArrayList reachable = dijkstra.run(i, -1);
+				dijkstra.run(i, -1);
 
 				dkTime += System.currentTimeMillis() - time;
 				/*
@@ -345,51 +399,63 @@ public class MatrixCentrality {
 				/*
 				 * iterate over all reachable nodes
 				 */
-				for (int k = 0; k < reachable.size(); k++) {
-					int j = reachable.get(k);
+				int reachedTargets = 0;
+//				for (int k = 0; k < reachable.size(); k++) {
+				for (int k = 0; k < targets.length; k++) {
+					int j = targets[k];
 					/*
 					 * determine the length and number of paths
 					 */
 					pathAnalyzer.run(dijkstra.getSpanningTree(), j);
 					int pathLength = pathAnalyzer.pathLength;
 					int pathCount = pathAnalyzer.pathCount;
-					pathLengthSum += pathLength;
-					eccentricity = Math.max(eccentricity, pathLength);
-					/*
-					 * extract all paths
-					 */
-					int[][] matrix = new int[pathLength][pathCount];
-					pathExtractor.run(dijkstra.getSpanningTree(), matrix, j);
-					/*
-					 * increase betweenness values for each passed vertex and
-					 * edge
-					 */
-					for (int col = 0; col < pathCount; col++) {
-						int prevVertex = i;
-						/*
-						 * reverse the order in case we have some day directed
-						 * graphs...
-						 */
-						for (int row = pathLength - 1; row > -1; row--) {
-							int vertex = matrix[row][col];
-							vertexBetweenness[vertex]++;
+					if (pathLength > 0) {
+						reachedTargets++;
+						pathLengthSum += pathLength;
+						pathLengths.add(pathLength);
+						eccentricity = Math.max(eccentricity, pathLength);
+						
+						if (calcBetweenness) {
+							/*
+							 * extract all paths
+							 */
+							int[][] matrix = new int[pathLength][pathCount];
+							pathExtractor.run(dijkstra.getSpanningTree(), matrix, j);
+							/*
+							 * increase betweenness values for each passed
+							 * vertex and edge
+							 */
+							for (int col = 0; col < pathCount; col++) {
+								int prevVertex = i;
+								/*
+								 * reverse the order in case we have some day
+								 * directed graphs...
+								 */
+								for (int row = pathLength - 1; row > -1; row--) {
+									int vertex = matrix[row][col];
+									vertexBetweenness[vertex]++;
 
-							if (edgeBetweenness[prevVertex] == null) {
-								edgeBetweenness[prevVertex] = new TIntDoubleHashMap();
+									if (edgeBetweenness[prevVertex] == null) {
+										edgeBetweenness[prevVertex] = new TIntDoubleHashMap();
+									}
+									edgeBetweenness[prevVertex].adjustOrPutValue(vertex, 1.0, 1.0);
+
+									prevVertex = vertex;
+								}
+								/*
+								 * decrease betweenness of target node
+								 */
+								vertexBetweenness[j]--;
 							}
-							edgeBetweenness[prevVertex].adjustOrPutValue(vertex, 1.0, 1.0);
-
-							prevVertex = vertex;
 						}
-						/*
-						 * decrease betweenness of target node
-						 */
-						vertexBetweenness[j]--;
 					}
 				}
 
-				if (reachable.size() > 0)
-					vertexCloseness[i] = pathLengthSum / (double) reachable.size();
+				if (reachedTargets > 0) {
+					vertexCloseness[i] = pathLengthSum / (double) reachedTargets;
+//					totalPathLength += pathLengthSum;
+//					totalPathCount += reachedTargets;
+				}
 
 				diameter = Math.max(diameter, eccentricity);
 				radius = Math.min(radius, eccentricity);

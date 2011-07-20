@@ -19,14 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.interaction;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.interfaces.BasicScoring;
-
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
@@ -36,36 +30,33 @@ public class JointActivityScorer implements BasicScoring {
 
 	public static double totalJoinTime = 0;
 	
-//	private final static Logger logger = Logger.getLogger(JointActivityScorer.class);
+	public static int jointAgents = 0;
 	
-	private final static double beta_join = 100/3600.0;
+	public final double beta_join;
 	
-	private Person person;
+	private Person ego;
+	
+	private Person alter;
 	
 	private VisitorTracker tracker;
 	
-	private Set<Person> friends;
-	
 	private double score;
 	
-//	private static int joins;
-	
-	public JointActivityScorer(Person person, VisitorTracker tracker, Map<Person, SocialVertex> vertexMapping) {
-		this.person = person;
+	public JointActivityScorer(Person ego, Person alter, VisitorTracker tracker, double beta) {
+		this.ego = ego;
+		this.alter = alter;
 		this.tracker = tracker;
-		
-		SocialVertex vertex = vertexMapping.get(person);
-		friends = new HashSet<Person>();
-		for(SocialVertex neighbor : vertex.getNeighbours()) {
-			friends.add(neighbor.getPerson().getPerson());
-		}
+		this.beta_join = beta;
 	}
 	
 	@Override
 	public void finish() {
 		score = 0.0;
-		double time = tracker.timeOverlap(person, friends);
+		double time = tracker.timeOverlap(ego, alter);
 		score = beta_join * time;
+		
+		if(time > 0)
+			jointAgents++;
 		
 		totalJoinTime += time;
 	}

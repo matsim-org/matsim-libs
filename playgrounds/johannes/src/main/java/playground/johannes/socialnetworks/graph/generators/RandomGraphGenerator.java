@@ -51,10 +51,22 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
 	
 	private GraphBuilder<G, V, E> builder;
 	
+	private int invalidSequences;
+	
+	private int invalidGraphs;
+	
 	public RandomGraphGenerator(UnivariateRealFunction function, GraphBuilder<G, V, E> builder, long rndSeed) {
 		this.degreeDistribution = function;
 		this.builder = builder;
 		this.random = new Random(rndSeed);
+	}
+	
+	public int getInvalidSequences() {
+		return invalidSequences;
+	}
+	
+	public int getInvalidGraphs() {
+		return invalidGraphs;
 	}
 	
 	public G generate(int N, int maxDegree) {
@@ -86,6 +98,8 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
 			if(sum % 2 == 0) {
 				valid = true;
 				M = sum/2;
+			} else {
+				invalidSequences++;
 			}
 		}
 		/*
@@ -149,6 +163,7 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
 						if(connected) {
 							ProgressLogger.termiante();
 							logger.warn(String.format("Degree distribution not exact. %1$s vertices still pending.", pending.size()));
+							invalidGraphs++;
 							return graph;
 						}
 					}
@@ -159,6 +174,7 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
 		if(!pending.isEmpty()) {
 			ProgressLogger.termiante();
 			logger.warn(String.format("Degree distribution not exact. %1$s vertices still pending.", pending.size()));
+			invalidGraphs++;
 		}
 		
 		logger.info("Done.");

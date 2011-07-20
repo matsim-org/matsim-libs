@@ -111,7 +111,7 @@ public class Controller {
 		VisitorTracker tracker = new VisitorTracker();
 		eventManager.addHandler(tracker);
 
-		scorer = new EventsToScore(population, new JointActivityScoringFunctionFactory(tracker, graph));
+		scorer = new EventsToScore(population, new JointActivityScoringFunctionFactory(tracker, graph, null, 1));
 		eventManager.addHandler(scorer);
 
 		travelTime = new TravelTimeCalculator(network, 3600, 86400, new TravelTimeCalculatorConfigGroup());

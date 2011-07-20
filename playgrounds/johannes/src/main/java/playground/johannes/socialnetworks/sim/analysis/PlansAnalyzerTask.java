@@ -19,17 +19,68 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.sna.math.Discretizer;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 /**
  * @author illenberger
  *
  */
-public interface PlansAnalyzerTask {
+public abstract class PlansAnalyzerTask {
 
-	public void analyze(Set<Plan> plans, Map<String, Double> stats);
+	private static final Logger logger = Logger.getLogger(PlansAnalyzerTask.class);
 	
+	private String output;
+	
+	public void setOutputDirectory(String outputDir) {
+		this.output = outputDir;
+	}
+	
+	public String getOutputDirectory() {
+		return output;
+	}
+	
+	protected boolean outputDirectoryNotNull() {
+		if(getOutputDirectory() == null) {
+			logger.warn("No output directory specified.");
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public abstract void analyze(Set<Plan> plans, Map<String, DescriptiveStatistics> results);
+	
+	public void analyzeTrajectories(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		
+	}
+	
+	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
+		double[] values = stats.getValues();
+		if (values.length > 0) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+			Histogram.normalize(hist);
+			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), name, values.length / bins));
+		} else {
+			logger.warn("Cannot create histogram. No samples.");
+		}
+	}
+	
+	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
+		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
+		Histogram.normalize(hist);
+		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+	}
 }

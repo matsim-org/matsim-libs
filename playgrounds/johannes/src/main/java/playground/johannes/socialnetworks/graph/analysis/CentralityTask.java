@@ -86,8 +86,10 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 		printStats(bDistr, BETWEENNESS);
 //		logger.info(String.format("between_mean = %1$s, between_min = %2$s, between_max = %4$s", b_mean, b_min, b_max));
 		
-		addSingleValue(DIAMETER, module.diameter(), statsMap);
-		addSingleValue(RADIUS, new Double(module.radius()), statsMap);
+		statsMap.put("apl", module.getAPL());
+		printStats(module.getAPL(), "apl");
+		singleValueStats(DIAMETER, module.diameter(), statsMap);
+		singleValueStats(RADIUS, new Double(module.radius()), statsMap);
 		logger.info(String.format("diameter = %1$s, radius = %2$s", module.diameter(), module.radius()));
 		
 		if(getOutputDirectory() != null) {

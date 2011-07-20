@@ -48,21 +48,26 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		Visitor visitor = new Visitor();
-		visitor.person = event.getPersonId();
-		visitor.startEvent = event;
-		visitor.endEvent = null;
-		
-		startEvents.put(event.getPersonId(), visitor);
-		/*
-		 * add visitor to facility
-		 */
-		Set<Visitor> facilityVisitors = visitors.get(event.getFacilityId());
-		if(facilityVisitors == null) {
-			facilityVisitors = new HashSet<Visitor>();
-			visitors.put(event.getFacilityId(), facilityVisitors);
+		if (event.getActType().equals("leisure")) {
+			Visitor visitor = new Visitor();
+			visitor.person = event.getPersonId();
+			visitor.startEvent = event;
+			visitor.endEvent = null;
+
+			startEvents.put(event.getPersonId(), visitor);
+			/*
+			 * add visitor to facility
+			 */
+			// Set<Visitor> facilityVisitors =
+			// visitors.get(event.getFacilityId());
+			Set<Visitor> facilityVisitors = visitors.get(event.getLinkId());
+			if (facilityVisitors == null) {
+				facilityVisitors = new HashSet<Visitor>();
+				// visitors.put(event.getFacilityId(), facilityVisitors);
+				visitors.put(event.getLinkId(), facilityVisitors);
+			}
+			facilityVisitors.add(visitor);
 		}
-		facilityVisitors.add(visitor);
 	}
 
 	@Override
@@ -75,31 +80,34 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Visitor visitor = startEvents.get(event.getPersonId());
-		if(visitor != null) {
-			visitor.endEvent = event;
-			/*
-			 * add visit to person
-			 */
-			Set<Visit> facilityVisits = visits.get(event.getPersonId());
-			if(facilityVisits == null) {
-				facilityVisits = new HashSet<Visit>();
-				visits.put(event.getPersonId(), facilityVisits);
+		if (event.getActType().equals("leisure")) {
+			Visitor visitor = startEvents.get(event.getPersonId());
+			if (visitor != null) {
+				visitor.endEvent = event;
+				/*
+				 * add visit to person
+				 */
+				Set<Visit> facilityVisits = visits.get(event.getPersonId());
+				if (facilityVisits == null) {
+					facilityVisits = new HashSet<Visit>();
+					visits.put(event.getPersonId(), facilityVisits);
+				}
+
+				Visit visit = new Visit();
+				// visit.facility = event.getFacilityId();
+				visit.facility = event.getLinkId();
+				visit.startEvent = visitor.startEvent;
+				visit.endEvent = event;
+
+				facilityVisits.add(visit);
+			} else {
+				logger.warn(String.format("No visitor found for person %1$s.", event.getPersonId()));
 			}
-			
-			Visit visit = new Visit();
-			visit.facility = event.getFacilityId();
-			visit.startEvent = visitor.startEvent;
-			visit.endEvent = event;
-			
-			facilityVisits.add(visit);
-		} else {
-			logger.warn(String.format("No visitor found for person %1$s.", event.getPersonId()));
 		}
 
 	}
 	
-	public double timeOverlap(Person person, Set<Person> friends) {
+	public double timeOverlap(Person person, Person alter) {
 		Set<Visit> facilityVisits = visits.get(person.getId());
 		double sum = 0;
 		for (Visit visit : facilityVisits) {
@@ -109,8 +117,34 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 				for (Visitor visitor : facilityVisitors) {
 					if (visitor.startEvent.getActType().equalsIgnoreCase("leisure")) {
 
-						for (Person friend : friends) {
-							if (friend.getId().equals(visitor.person)) {
+						if (alter.getId().equals(visitor.person)) {
+							double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+							double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+							double delta = Math.max(0.0, end - start);
+							sum += delta;
+							break;
+						}
+
+					}
+				}
+			}
+		}
+
+		return sum;
+	}
+	
+	public double timeOverlap(Person person, Set<Person> alters) {
+		Set<Visit> facilityVisits = visits.get(person.getId());
+		double sum = 0;
+		for (Visit visit : facilityVisits) {
+			if (visit.startEvent.getActType().equalsIgnoreCase("leisure")) {
+
+				Set<Visitor> facilityVisitors = visitors.get(visit.facility);
+				for (Visitor visitor : facilityVisitors) {
+					if (visitor.startEvent.getActType().equalsIgnoreCase("leisure")) {
+
+						for (Person alter : alters) {
+							if (alter.getId().equals(visitor.person)) {
 								double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
 								double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
 								double delta = Math.max(0.0, end - start);

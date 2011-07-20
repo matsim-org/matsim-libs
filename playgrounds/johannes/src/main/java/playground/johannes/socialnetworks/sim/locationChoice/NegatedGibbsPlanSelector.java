@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.sim.locationChoice;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -35,7 +36,9 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsListener, IterationEndsListener {
 
-	private final double beta;
+	private static final Logger logger = Logger.getLogger(NegatedGibbsPlanSelector.class);
+	
+	private final double beta_join;
 	
 	private final Random random;
 	
@@ -48,7 +51,7 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 	private int cntReject;
 	
 	public NegatedGibbsPlanSelector(double beta, Random random) {
-		this.beta = beta;
+		this.beta_join = beta;
 		this.random = random;
 	}
 	
@@ -56,7 +59,7 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 	public Plan selectPlan(Person person) {
 		
 		if(person.getPlans().size() > 2)
-			throw new IllegalArgumentException("Person has more than two plan!");
+			throw new IllegalArgumentException("Person has more than two plans!");
 		
 		Plan newPlan;
 		Plan oldPlan;
@@ -77,7 +80,7 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 			oldScore = oldPlan.getScore();
 		
 		
-		double p = 1 / (1 + Math.exp(beta * (oldScore - newScore)));
+		double p = 1 / (1 + Math.exp(beta_join * (oldScore - newScore)));
 		
 		if(random.nextDouble() < p) {
 			/*
@@ -96,13 +99,10 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
-	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		System.err.println(String.format("Score of accepted plans: %1$s. (%2$s)", scoreAccept/(double)cntAccept, cntAccept));
-		System.err.println(String.format("Score of rejected plans: %1$s. (%2$s)", scoreReject/(double)cntReject, cntReject));
+		logger.info(String.format("Score of accepted plans: %1$s. (%2$s)", scoreAccept/(double)cntAccept, cntAccept));
+		logger.info(String.format("Score of rejected plans: %1$s. (%2$s)", scoreReject/(double)cntReject, cntReject));
 	}
 
 	@Override

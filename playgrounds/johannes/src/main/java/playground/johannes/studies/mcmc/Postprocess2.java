@@ -19,19 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.studies.mcmc;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
@@ -46,14 +38,18 @@ public class Postprocess2 {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run318/";
-		String statsPath = "1000000000/topo/statistics.txt";
+		String rootDir = "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/mcmc/runs/run334/";
+		String statsPath = "20000000000/topo/statistics.txt";
+		String statsPath2 = "20000000000/topo/statistics.txt";
 //		String key = "r_age";
-		String key1 = "c_global";
+		String key1 = "c_local";
+//		String key1 = "r_age";
+//		String key1 = "r_k";
 		String key2 = "n_vertex";
 		
-//		String thetaKey = "theta_age";
-		String thetaKey = "theta_distance";
+//		String thetaKey = "theta_gender";
+		String thetaKey = "theta_age";
+//		String thetaKey = "theta_distance";
 		
 //		TDoubleObjectHashMap<TDoubleDoubleHashMap> table = new TDoubleObjectHashMap<TDoubleDoubleHashMap>();
 //		TDoubleDoubleHashMap values = new TDoubleDoubleHashMap();
@@ -65,6 +61,7 @@ public class Postprocess2 {
 		File root = new File(rootDir + "/output/");
 		for(String runDir : root.list()) {
 			String statsFileName = String.format("%1$s/output/%2$s/%3$s", rootDir, runDir, statsPath);
+			String statsFileName2 = String.format("%1$s/output/%2$s/%3$s", rootDir, runDir, statsPath2);
 			File statsFile = new File(statsFileName);
 			if(statsFile.exists()) {
 				/*
@@ -78,7 +75,17 @@ public class Postprocess2 {
 					String tokens[] = line.split("\t");
 					if(tokens[0].equals(key1)) {
 						val1 = Double.parseDouble(tokens[1]);
-					} else if(tokens[0].equals(key2)) {
+					}// else if(tokens[0].equals(key2)) {
+//						val2 = Double.parseDouble(tokens[1]);
+//					}
+				}
+				/*
+				 * 
+				 */
+				reader = new BufferedReader(new FileReader(statsFileName2));
+				while((line = reader.readLine()) != null) {
+					String tokens[] = line.split("\t");
+					if(tokens[0].equals(key2)) {
 						val2 = Double.parseDouble(tokens[1]);
 					}
 				}
@@ -96,7 +103,7 @@ public class Postprocess2 {
 			}
 		}
 		
-		matrix.write(String.format("%1$s/output/c_global.txt", rootDir));
+		matrix.write(String.format("%1$s/analysis/c_local.txt", rootDir));
 	}
 
 }

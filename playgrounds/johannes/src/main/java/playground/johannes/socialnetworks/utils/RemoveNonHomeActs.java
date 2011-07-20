@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,9 +41,15 @@ public class RemoveNonHomeActs {
 	 */
 	public static void main(String[] args) {
 		Config config = new Config();
+		config.addCoreModules();
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.readFile(args[0]);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		netReader.readFile(config.getParam("network", "inputNetworkFile"));
+		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		popReader.readFile(config.getParam("plans", "inputPlansFile"));
 		
 		Population pop = scenario.getPopulation();
 		

@@ -187,17 +187,28 @@ public class PseudoSim {
 		logger.info("Processing events...");
 
 		Event event;
+		double lastTime = 0;
 		while ((event = eventQueue.poll()) != null) {
+			if((event.getTime() % 3600 == 0) && (event.getTime() > lastTime)) {
+				logger.info(String.format("Pseude simulation at %1$sh.", event.getTime()/3600));
+				lastTime = event.getTime();
+			}
 			eventManager.processEvent(event);
 		}
 	}
 
 	private double calcRouteTravelTime(LinkNetworkRoute route, double startTime, TravelTime travelTime) {
 		double tt = 0;
-		List<Id> ids = route.getLinkIds();
-		for (int i = 1; i < ids.size(); i++) {
-			tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime);
+		if (route.getStartLinkId() != route.getEndLinkId()) {
+
+			List<Id> ids = route.getLinkIds();
+			for (int i = 0; i < ids.size(); i++) {
+				tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime);
+				tt++;// 1 sec for each node
+			}
+			tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime);
 		}
-		return Math.max(tt, 1.0);
+
+		return tt;
 	}
 }

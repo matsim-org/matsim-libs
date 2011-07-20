@@ -42,6 +42,8 @@ public class Merge2 {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		System.out.println(args);
+		
 		String rootDir = args[0];
 		
 		int dumpStart = Integer.parseInt(args[1]);
@@ -64,20 +66,24 @@ public class Merge2 {
 			BufferedReader dumpReader;
 			if(constParamKey.equalsIgnoreCase("alpha")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, property)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
+				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", dumpKey, constParam, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
 			} else if(constParamKey.equalsIgnoreCase("seed")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, property)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
+				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", constParam, dumpKey, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
 			} else
 				throw new IllegalArgumentException(String.format("Constant parameter %1$s unknown.", constParamKey));
 			
-			String valueLine;
+			String valueLine;// = valueReader.readLine();
 			String dumpLine;
 			while((valueLine = valueReader.readLine()) != null) {
 				dumpLine = dumpReader.readLine();
+				if(dumpLine == null)
+					break;
 				
 				String tokens[] = valueLine.split("\t");
-//				int key = Integer.parseInt(tokens[0]);
+//				int key = (int) Double.parseDouble(tokens[0]);
 				double val = Double.parseDouble(tokens[1]);
 				
 				tokens = dumpLine.split("\t");
@@ -86,10 +92,12 @@ public class Merge2 {
 				row.put(key, val);
 				dumpKeys.add(key);
 			}
+			valueReader.close();
+			dumpReader.close();
 			
 			table.put(dumpKey, row);
 		}
-
+		
 		write(table, output, dumpKeys);
 	}
 	
@@ -119,7 +127,7 @@ public class Merge2 {
 					if(idx < 0) {
 						idx = -idx-2;
 					}
-					if(idx == keys.length - 1)
+					if(idx == keys.length - 1 || idx == -1)
 						writer.write("NA");
 					else
 						writer.write(String.valueOf(row.get(keys[idx])));

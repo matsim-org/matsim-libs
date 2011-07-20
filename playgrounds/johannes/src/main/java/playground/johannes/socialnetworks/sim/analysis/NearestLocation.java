@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -45,26 +46,23 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  * @author illenberger
  *
  */
-public class NearestLocation implements PlansAnalyzerTask {
+public class NearestLocation extends PlansAnalyzerTask {
 
-//	private final Map<Person, ChoiceSet> choiceSet;
-	
-	
-	private final String output;
+	private static final Logger logger = Logger.getLogger(NearestLocation.class);
 	
 	private final Map<Person, SocialVertex> vertexMapping;
 	
-	public NearestLocation(SocialGraph graph, String output) {
+	public NearestLocation(SocialGraph graph) {
 		vertexMapping = new HashMap<Person, SocialVertex>(graph.getVertices().size());
 		for(SocialVertex vertex : graph.getVertices()) {
 			vertexMapping.put(vertex.getPerson().getPerson(), vertex);
 		}
-		this.output = output;
 	}
 	
 	@Override
-	public void analyze(Set<Plan> plans, Map<String, Double> map) {
+	public void analyze(Set<Plan> plans, Map<String, DescriptiveStatistics> map) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
+		int cnt0 = 0;
 		for(Plan plan : plans) {
 			for(int idx = 2; idx < plan.getPlanElements().size(); idx += 2) {
 				Activity act = (Activity) plan.getPlanElements().get(idx);
@@ -79,25 +77,30 @@ public class NearestLocation implements PlansAnalyzerTask {
 						opportunities.add(neighbor.getPerson().getPerson());
 					}
 					
-					stats.addValue(nearestLocation(prev.getCoord(), opportunities));
+					double d = nearestLocation(prev.getCoord(), opportunities);
+					if(d > 0)
+						stats.addValue(d);
+					else
+						cnt0++;
 				}
 			}
 		}
+		
+		logger.warn(String.format("Ignored %1$s locations with zero distance.", cnt0));
 		try {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(1000.0), false);
-			TXTWriter.writeMap(hist, "d", "n", output + "/nearestLocs.txt");
+			TXTWriter.writeMap(hist, "d", "n", getOutputDirectory() + "/nearestLocs.txt");
 			
 			hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 50), true);
-			TXTWriter.writeMap(hist, "d", "n", output + "/nearestLocs.fixed.txt");
+			TXTWriter.writeMap(hist, "d", "n", getOutputDirectory() + "/nearestLocs.fixed.txt");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	private double nearestLocation(Coord origin, List<Person> opportunities) {
 		double d_min = Double.MAX_VALUE;
-//		Coord nearest = null;
+
 		for(Person p : opportunities) {
 			Coord dest = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getCoord();
 			double dx = origin.getX() - dest.getX();

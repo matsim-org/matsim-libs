@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.mz2005;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,17 +50,36 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 /**
  * @author illenberger
  *
  */
 public class PopulationGenerator {
+	
+	int jointTrpis;
 
+	int singleTrips;
+	
+	double distJoint;
+	
+	double distSingle;
+	
 	private static final Logger logger = Logger.getLogger(PopulationGenerator.class);
 	
 	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
+	private Map<Person, Activity> jointActivities = new HashMap<Person, Activity>();
+	
 	public Person createPerson(List<TripData> trips) {
+		DistanceCalculator calc = new WGS84DistanceCalculator();
+		GeometryFactory factory = new GeometryFactory();
 		/*
 		 * create a person and a plan
 		 */
@@ -113,6 +136,24 @@ public class PopulationGenerator {
 				next.setType(ActivityType.home.name());
 			
 			plan.addActivity(next);
+			
+			if(trip.accompanists > 0) {
+				jointActivities.put(person, next);
+			}
+			
+			if(next.getType().startsWith("l")) {
+				Point p1 = factory.createPoint(new Coordinate(((Activity) plan.getPlanElements().get(0)).getCoord().getX(), ((Activity) plan.getPlanElements().get(0)).getCoord().getY()));
+				Point p2 = factory.createPoint(new Coordinate(next.getCoord().getX(), next.getCoord().getY()));
+				double d = calc.distance(p1, p2);
+			if(trip.accompanists > 0) {
+				jointTrpis++;
+				
+				distJoint += d;
+			} else if(trip.accompanists == 0){
+				singleTrips++;
+				distSingle += d;
+			}
+			}
 		}
 		/*
 		 * if the last activity is not a home activity, add the home trip
@@ -151,7 +192,8 @@ public class PopulationGenerator {
 			} else
 				return "lindoor";
 		}
-		// return "leisure";
+//			return "leisure";
+//		}
 		else if (id == 11)
 			return "home";
 		else
@@ -184,15 +226,32 @@ public class PopulationGenerator {
 						return result;
 				}
 			});
-				if (pContainer.referenceDay < 6) {
+				if (pContainer.referenceDay == 7) {
 					Person p = generator.createPerson(pContainer.trips);
 					pop.addPerson(p);
 				}
 			}
 		}
 		
+		logger.info(String.format("Average distance for single trips: %1$s (%3$s), average distance for joint trips: %2$s (%4$s).", generator.distSingle/(double)generator.singleTrips, generator.distJoint/(double)generator.jointTrpis, generator.singleTrips, generator.jointTrpis));
 		logger.info(String.format("Created %1$s persons with at least one leg.", pop.getPersons().size()));
 		PopulationWriter writer = new PopulationWriter(pop, null);
-		writer.write(basedir + "/plans.w_dist_obj2.xml");
+//		writer.write(basedir + "/plans.sun.xml");
+		
+		BufferedWriter writer2 = new BufferedWriter(new FileWriter(basedir + "/jointActs.sun.txt"));
+		writer2.write("PersonID\tActIdx");
+		writer2.newLine();
+		for(Entry<Person, Activity> entry : generator.jointActivities.entrySet()) {
+			int idx = entry.getKey().getSelectedPlan().getPlanElements().indexOf(entry.getValue());
+			if(idx == -1)
+				System.err.println("Outch!");
+			else {
+				writer2.write(entry.getKey().getId().toString());
+				writer2.write("\t");
+				writer2.write(String.valueOf(idx));
+				writer2.newLine();
+			}
+		}
+		writer2.close();
 	}
 }

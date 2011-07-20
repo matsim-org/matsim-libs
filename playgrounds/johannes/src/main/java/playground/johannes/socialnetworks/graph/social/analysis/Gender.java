@@ -30,18 +30,18 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class Gender extends AbstractLinguisticAttribute {
 
 	public static final String MALE = "m";
-	
+
 	public static final String FEMALE = "f";
-	
+
 	private static Gender instance;
-	
+
 	public static Gender getInstance() {
-		if(instance == null)
+		if (instance == null)
 			instance = new Gender();
 		return instance;
 	}
@@ -49,39 +49,43 @@ public class Gender extends AbstractLinguisticAttribute {
 	@Override
 	protected String attribute(SocialVertex v) {
 		String gender = v.getPerson().getPerson().getSex();
-		if(MALE.equalsIgnoreCase(gender))
+		if (MALE.equalsIgnoreCase(gender))
 			return MALE;
-		else if(FEMALE.equalsIgnoreCase(gender))
+		else if (FEMALE.equalsIgnoreCase(gender))
 			return FEMALE;
 		else
 			return null;
 	}
-	
+
 	public double correlation(Set<? extends SocialEdge> edges) {
-		TDoubleArrayList values1 = new TDoubleArrayList(2 * edges.size());
-		TDoubleArrayList values2 = new TDoubleArrayList(2 * edges.size());
-		
-		for(SocialEdge edge : edges) {
-			String g1 = edge.getVertices().getFirst().getPerson().getPerson().getSex();
-			String g2 = edge.getVertices().getSecond().getPerson().getPerson().getSex();
-			
-			if(g1 != null && g2 != null) {
-				int val1 = 0;
-				if(g1.equalsIgnoreCase(FEMALE))
-					val1 = 1;
-				
-				int val2 = 0;
-				if(g2.equalsIgnoreCase(FEMALE))
-					val2 = 1;
-				
-				values1.add(val1);
-				values2.add(val2);
-				
-				values1.add(val2);
-				values2.add(val1);
+		if (edges.isEmpty())
+			return Double.NaN;
+		else {
+			TDoubleArrayList values1 = new TDoubleArrayList(2 * edges.size());
+			TDoubleArrayList values2 = new TDoubleArrayList(2 * edges.size());
+
+			for (SocialEdge edge : edges) {
+				String g1 = edge.getVertices().getFirst().getPerson().getPerson().getSex();
+				String g2 = edge.getVertices().getSecond().getPerson().getPerson().getSex();
+
+				if (g1 != null && g2 != null) {
+					int val1 = 0;
+					if (g1.equalsIgnoreCase(FEMALE))
+						val1 = 1;
+
+					int val2 = 0;
+					if (g2.equalsIgnoreCase(FEMALE))
+						val2 = 1;
+
+					values1.add(val1);
+					values2.add(val2);
+
+					values1.add(val2);
+					values2.add(val1);
+				}
 			}
+
+			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
 		}
-		
-		return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
 	}
 }

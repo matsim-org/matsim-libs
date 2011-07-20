@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanAnalyzerTaskComposite.java
+ * TopoAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.analysis;
+package playground.johannes.studies.netanalysis;
 
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.sna.util.Composite;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class PlanAnalyzerTaskComposite extends Composite<PlansAnalyzerTask> implements PlansAnalyzerTask {
+public class TopoAnalyzer {
 
-	@Override
-	public void analyze(Set<Plan> plans, Map<String, Double> stats) {
-		for(PlansAnalyzerTask task : components) {
-			task.analyze(plans, stats);
-		}
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		SparseGraph graph = reader.readGraph(args[0]);
+		
+		String output = null;
+		if(args.length > 1)
+			output = args[1];
+
+		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
+		composite.addTask(new TopologyAnalyzerTask());
+		composite.addTask(new ExtendedTopologyAnalyzerTask());
+		
+		if(output != null)
+			composite.setOutputDirectoy(output);
+		
+		GraphAnalyzer.analyze(graph, composite, output);
 	}
 
 }

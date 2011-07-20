@@ -28,7 +28,9 @@ import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
 import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
+import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.RandomPartition;
 import org.matsim.contrib.sna.graph.analysis.VertexFilter;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
@@ -36,10 +38,15 @@ import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 import org.matsim.contrib.sna.snowball.sim.Sampler;
 import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
+import org.matsim.contrib.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.snowball2.analysis.ClosenessSeed2Seed;
+import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
+import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.ConnectionSampleAnalyzer;
 
 /**
@@ -51,6 +58,7 @@ public class ConnectionSim {
 	private static final String MODULENAME = "snowballsim";
 	
 	public static void main(String[] args) {
+		MultiThreading.setNumAllowedThreads(4);
 		/*
 		 * Load config.
 		 */
@@ -129,7 +137,14 @@ public class ConnectionSim {
 	
 	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph, PiEstimator estimator) {
 		Map<String, AnalyzerTask> analyzers = new HashMap<String, AnalyzerTask>();
-		analyzers.put("topo", new SeedAPLTask());
+		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
+		composite.addTask(new GraphSizeTask());
+		composite.addTask(new WaveSizeTask());
+//		composite.addTask(new ComponentsTask());
+		composite.addTask(new IterationTask());
+//		composite.addTask(new ClosenessSeed2Seed());
+		composite.addTask(new SeedAPLTask());
+		analyzers.put("topo", composite);
 		return analyzers;
 	}
 

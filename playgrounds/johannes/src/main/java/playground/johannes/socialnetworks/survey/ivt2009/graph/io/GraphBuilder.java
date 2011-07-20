@@ -28,8 +28,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
@@ -416,19 +416,20 @@ public class GraphBuilder {
 		GraphBuilder builder = new GraphBuilder();
 		
 		ArrayList<String> alterTables = new ArrayList<String>();
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/alters1.txt");
-		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/alters2.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/alters1.txt");
+		alterTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/alters2.txt");
+		
 		
 		ArrayList<String> egoTables = new ArrayList<String>();
-		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/egos1.txt");
+//		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/egos1.txt");
 //		egoTables.add("/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/egos2.txt");
 		
 		ArrayList<String> sqlDumps = new ArrayList<String>();
-		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/snowball.csv");
+		sqlDumps.add("/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/raw/snowball.csv");
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = builder.buildGraph(alterTables, egoTables, sqlDumps);
 		SampledGraphProjMLWriter writer = new SampledGraphProjMLWriter(new SocialSparseGraphMLWriter());
-		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/01-2011/graph/graph.graphml");
+		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/05-2011/graph/graph.graphml");
 //		writer.write(graph, "/Users/jillenberger/Work/socialnets/data/ivt2009/09-2010/graph/sociogram/graph.graphml");
 	}
 }

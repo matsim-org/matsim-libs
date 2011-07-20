@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.Components;
 import org.matsim.contrib.sna.snowball.SampledVertex;
 import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
@@ -52,23 +52,24 @@ public class ConnectionSampleAnalyzer extends SampleAnalyzer {
 	
 	private int count;
 	
+	private int maxConnections;
+	
 	private BufferedWriter writer;
 	
-	private Components components;
-		
+	private static final Logger logger = Logger.getLogger(ConnectionSampleAnalyzer.class);
+	
 	public ConnectionSampleAnalyzer(int numSeeds, Map<String, AnalyzerTask> tasks, Collection<PiEstimator> estimators, String rootDirectory) {
 		super(tasks, estimators, rootDirectory);
 		matrix = new boolean[numSeeds][numSeeds];
 		try {
-			writer = new BufferedWriter(new FileWriter(getRootDirectory() + "/components.txt"));
-			writer.write("it\tn_connect\tn_component");
+			writer = new BufferedWriter(new FileWriter(getRootDirectory() + "/connects.txt"));
+			writer.write("it\tn_connect");
 			writer.newLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		components = new Components();
+		maxConnections = (int) (numSeeds * (numSeeds - 1) / 2.0);
 	}
 
 	@Override
@@ -81,19 +82,21 @@ public class ConnectionSampleAnalyzer extends SampleAnalyzer {
 					matrix[i][j] = true;
 					matrix[j][i] = true;
 					count++;
+
+					if(count % 10 == 0) {
+						logger.info(String.format("Detected %1$s of %2$s connections (%3$s)", count, maxConnections, count/(double)maxConnections));
+					}
 					
 					try {
 						writer.write(String.valueOf(sampler.getIteration()));
 						writer.write("\t");
 						writer.write(String.valueOf(count));
-						writer.write("\t");
-						writer.write(String.valueOf(components.countComponents(sampler.getSampledGraph())));
 						writer.newLine();
 						writer.flush();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					
+
 					File file = makeDirectories(String.format("%1$s/connect.%2$s", getRootDirectory(), count));
 					analyze(sampler.getSampledGraph(), file.getAbsolutePath());
 				}

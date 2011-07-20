@@ -28,8 +28,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.sna.util.ProgressLogger;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author illenberger
@@ -43,10 +46,10 @@ public class RemoveNonCarPlans {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
-
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/plans/plans.sun.xml");
+		
 		Set<Person> rmPersons = new HashSet<Person>();
 
 		logger.info("Parsing plans...");
@@ -82,7 +85,6 @@ public class RemoveNonCarPlans {
 
 		logger.info(String.format("%1$s persons left.", scenario.getPopulation().getPersons().size()));
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().getParam(
-				"popfilter", "outputPlansFile"));
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/plans/plans.sun.car.xml");
 	}
 }

@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public abstract class AbstractSpatialProperty extends AbstractVertexProperty {
 
-	protected Set<Point> targets;
+	private Set<Point> targets;
 	
 	protected DistanceCalculator calculator;
 	
