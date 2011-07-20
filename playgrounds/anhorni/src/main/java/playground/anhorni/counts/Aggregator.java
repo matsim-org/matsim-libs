@@ -44,6 +44,14 @@ public class Aggregator {
 		return this.volumes.get(hour).size();
 	}
 	
+	public TreeMap<Integer, List<Double>> getVolumes() {
+		return volumes;
+	}
+
+	public TreeMap<Integer, List<Double>> getVolumesDay() {
+		return volumesDay;
+	}
+
 	private void removeOutliers() {
 		
 		for (int hour = 0; hour < 24; hour++) {		
@@ -82,7 +90,7 @@ public class Aggregator {
 		}
 	}
 	
-	private double getDailyVolume(int date) {
+	public double getDailyVolume(int date) {
 		double dailyVol = 0.0;
 		for (double hourlyVol : this.volumesDay.get(date)) {
 			dailyVol += hourlyVol;

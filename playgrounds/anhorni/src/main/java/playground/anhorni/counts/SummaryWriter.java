@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.LineChart;
@@ -30,6 +31,11 @@ public class SummaryWriter {
 		this.writeVolumesBoxPlotsAbsolute(stations, outpath);
 		
 		this.writeDailyStdDevBoxPlots(stations, outpath);
+		this.writeSingleDays(stations, outpath, 7);
+		this.writeSingleDays(stations, outpath, 11);
+		this.writeSingleDays(stations, outpath, 17);
+		
+		this.writeSingleDays(stations, outpath, -1);
 	}
 	
 	public void writeRelative(Stations stations, String outpath) {	
@@ -356,6 +362,67 @@ public class SummaryWriter {
 			
 			boxPlotScaled.saveAsPng(outpath + "stdDevsScaled.png", 1000, 800);
 			log.info("Boxplot written to: " + outpath + "stdDevsScaled.png"); 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeSingleDays(Stations stations, String outpath, int hour) {	
+		String header = 	"Station\tLink\tVal\tMean\n";
+		try {
+			BufferedWriter out;
+			if (hour > -1) {
+				out = IOUtils.getBufferedWriter(outpath + "hour " + hour + "Counts.txt"); 
+			}
+			else {
+				out = IOUtils.getBufferedWriter(outpath + "dailyCounts.txt"); 
+			}
+			out.write(header);			
+			DecimalFormat formatter = new DecimalFormat("0.0");
+			DecimalFormatSymbols symbol = new DecimalFormatSymbols();
+			symbol.setDecimalSeparator('.');
+			formatter.setDecimalFormatSymbols(symbol);
+																	
+			int numberOfStations = 0;
+			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
+			while (stations_it.hasNext()) {
+				CountStation station = stations_it.next();
+				
+				// if station is not in region -> no sim vals
+				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
+				numberOfStations++;
+			
+				if (hour > -1) {
+					List<Double> volumes = station.getLink1().getAggregator().getVolumes().get(hour);
+					for (Double vol : volumes) {
+						double mean = station.getLink1().getAggregator().getAvg()[hour];
+						out.write(station.getId() + "\tLink1\t" + formatter.format(vol) + "\t" + formatter.format(mean)); 
+						out.newLine();
+					}
+					volumes = station.getLink2().getAggregator().getVolumes().get(hour);
+					for (Double vol : volumes) {
+						double mean = station.getLink2().getAggregator().getAvg()[hour];
+						out.write(station.getId() + "\tLink2\t" + formatter.format(vol) + "\t" + formatter.format(mean)); 
+						out.newLine();
+					}
+				}	
+				else {
+					for (Integer date : station.getLink1().getAggregator().getVolumesDay().keySet()) {
+							double vol =  station.getLink1().getAggregator().getDailyVolume(date);
+							double mean = station.getLink1().getAggregator().getAvgDay();
+							out.write(station.getId() + "\tLink1\t" + formatter.format(vol) + "\t" + formatter.format(mean) + "\t" + date); 
+							out.newLine();
+					}
+					for (Integer date : station.getLink2().getAggregator().getVolumesDay().keySet()) {
+						double vol =  station.getLink2().getAggregator().getDailyVolume(date);
+						double mean = station.getLink2().getAggregator().getAvgDay();
+						out.write(station.getId() + "\tLink2\t" + formatter.format(vol) + "\t" + formatter.format(mean) + "\t" + date); 
+						out.newLine();
+					}
+				}
+			}
+			out.flush();
+			out.close(); 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
