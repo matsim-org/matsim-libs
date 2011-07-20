@@ -372,7 +372,7 @@ public class SummaryWriter {
 		try {
 			BufferedWriter out;
 			if (hour > -1) {
-				out = IOUtils.getBufferedWriter(outpath + "hour " + hour + "Counts.txt"); 
+				out = IOUtils.getBufferedWriter(outpath + "hour" + hour + "Counts.txt"); 
 			}
 			else {
 				out = IOUtils.getBufferedWriter(outpath + "dailyCounts.txt"); 
