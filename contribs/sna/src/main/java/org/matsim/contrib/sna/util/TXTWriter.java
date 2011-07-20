@@ -23,14 +23,20 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger
@@ -69,7 +75,7 @@ public class TXTWriter {
 		writer.close();
 	}
 	
-	public static void writeMap(TObjectDoubleHashMap<String> map, String keyCol, String valCol, String file) throws IOException {
+	public static void writeMap(TObjectDoubleHashMap<String> map, String keyCol, String valCol, String file, boolean sortValues) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		writer.write(keyCol);
@@ -78,7 +84,37 @@ public class TXTWriter {
 		writer.newLine();
 		
 		String[] keys = map.keys(new String[map.size()]);
-		Arrays.sort(keys);
+		if(sortValues) {
+			List<Tuple<String, Double>> list = new LinkedList<Tuple<String,Double>>();
+			TObjectDoubleIterator<String> it = map.iterator();
+			for(int i = 0; i < map.size(); i++) {
+				it.advance();
+				list.add(new Tuple<String, Double>(it.key(), it.value()));
+			}
+			
+			Collections.sort(list, new Comparator<Tuple<String, Double>>() {
+
+				@Override
+				public int compare(Tuple<String, Double> o1, Tuple<String, Double> o2) {
+					double result = o1.getSecond() - o2.getSecond();
+					if(result == 0) {
+						if(o1.getFirst().equals(o2.getFirst()))
+							return 0;
+						else
+							return o1.hashCode() - o2.hashCode();
+					} else if(result < 0)
+						return 1;
+					else
+						return -1;
+				}
+			});
+			
+			for(int i = 0; i < list.size(); i++) {
+				keys[i] = list.get(i).getFirst();
+			}
+		} else {
+			Arrays.sort(keys);
+		}
 		
 		for(String key : keys) {
 			writer.write(key);
@@ -88,6 +124,10 @@ public class TXTWriter {
 		}
 		
 		writer.close();
+	}
+	
+	public static void writeMap(TObjectDoubleHashMap<String> map, String keyCol, String valCol, String file) throws IOException {
+		writeMap(map, keyCol, valCol, file, false);
 	}
 	
 	public static void writeBoxplotStats(TDoubleObjectHashMap<DescriptiveStatistics> table, String file) throws IOException {

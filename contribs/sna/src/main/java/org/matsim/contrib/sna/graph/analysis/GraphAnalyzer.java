@@ -105,7 +105,11 @@ public class GraphAnalyzer {
 	}
 	
 	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		writeStatistics(statsMap, filename, false);
+	}
+	
+	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename, boolean append) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename, append));
 		
 		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
 		writer.newLine();

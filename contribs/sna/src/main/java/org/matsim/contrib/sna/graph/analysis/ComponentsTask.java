@@ -63,7 +63,7 @@ public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
 		DescriptiveStatistics distr = module.distribution(graph);
 		double numComponents = distr.getN();
-		addSingleValue(NUM_COMPONENTS, numComponents, statsMap);
+		singleValueStats(NUM_COMPONENTS, numComponents, statsMap);
 
 		logger.info(String.format("%1$s disconnected components.", numComponents));
 		

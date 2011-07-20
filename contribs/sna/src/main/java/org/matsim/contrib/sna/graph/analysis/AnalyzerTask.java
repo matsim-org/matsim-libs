@@ -134,10 +134,12 @@ public abstract class AnalyzerTask {
 	
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
-		if(values.length > 0) {
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
-		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length/bins));
+		if (values.length > 0) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats,
+					FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+			Histogram.normalize(hist);
+			TXTWriter.writeMap(hist, name, "p",
+					String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length / bins));
 		} else {
 			logger.warn("Cannot create histogram. No samples.");
 		}
@@ -159,9 +161,10 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
-	protected void addSingleValue(String key, double value, Map<String, DescriptiveStatistics> stats) {
+	protected DescriptiveStatistics singleValueStats(String key, double value, Map<String, DescriptiveStatistics> stats) {
 		DescriptiveStatistics ds = new DescriptiveStatistics();
 		ds.addValue(value);
 		stats.put(key, ds);
+		return ds;
 	}
 }

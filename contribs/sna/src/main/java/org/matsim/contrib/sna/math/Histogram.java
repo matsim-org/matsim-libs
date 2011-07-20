@@ -20,6 +20,7 @@
 package org.matsim.contrib.sna.math;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleFunction;
 
 import java.util.Arrays;
@@ -135,6 +136,10 @@ public class Histogram {
 			sum += values[i];
 		}
 
+		return normalize(histogram, sum);
+	}
+	
+	public static TDoubleDoubleHashMap normalize(TDoubleDoubleHashMap histogram, double sum) {
 		final double norm = 1 / sum;
 
 		TDoubleFunction fct = new TDoubleFunction() {
@@ -147,5 +152,16 @@ public class Histogram {
 		histogram.transformValues(fct);
 
 		return histogram;
+
+	}
+	
+	public static double sum(TDoubleDoubleHashMap histogram) {
+		TDoubleDoubleIterator it = histogram.iterator();
+		double sum = 0;
+		for(int i = 0; i < histogram.size(); i++) {
+			it.advance();
+			sum += it.value();
+		}
+		return sum;
 	}
 }

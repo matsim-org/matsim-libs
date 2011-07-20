@@ -87,7 +87,7 @@ public class FixedSampleSizeDiscretizer {
 	 * @return a new discretizer.
 	 */
 	public static FixedBordersDiscretizer create(double[] samples, int size, int bins) {
-		int newsize = samples.length / bins;
+		int newsize = (int) Math.ceil(samples.length / (double)bins);
 		newsize = Math.max(newsize, size);
 		return create(samples, newsize);
 	}
