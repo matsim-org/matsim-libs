@@ -236,6 +236,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 					emissionsInFourSituations[i][1] = this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
 				} 
 				catch(Exception e){
+					logger.error("Error: " + e.getMessage());
 				}
 			}
 			// in the hashOfPollutant we save the V and EFA in 4 Situations
@@ -250,11 +251,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 
 		if(this.personId2emissionsInGrammPerType.get(personId) == null) {
 			this.personId2emissionsInGrammPerType.put(personId, arrayOfemissionFactor); // data is read for the first time, doesn't need to be summed up per link
-			
-//			if(personId.equals(new IdImpl("556128.2#3625"))){
-//				logger.warn(arrayOfemissionFactor[0]);
-//			}
-			
 		}
 		else{
 			double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
@@ -263,9 +259,9 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
 			}
 			
-//			if(personId.equals(new IdImpl("556128.2#3625"))){
-//				logger.warn(arrayOfemissionFactor[0]);
-//			}
+			if(personId.equals(new IdImpl("556128.2#3625"))){
+				logger.warn(arrayOfemissionFactor[0] + "; Distance: " + distance + "; AvgSpeed: " + averageSpeed + "; hashOfPollutant: " + hashOfPollutant.get("FC")[0][0]);
+			}
 			
 			// put newValue in the Map
 			personId2emissionsInGrammPerType.put(personId, actualEmissions);
