@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg;
 
@@ -55,9 +55,9 @@ import cadyts.utilities.misc.DynamicData;
 
 /**
  * shows the Utility Offset of activity location for originating traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OriginationUtilOffsetExtractor extends
 		ActivityLocationUtilOffsetExtractor implements ActivityEndEventHandler,
@@ -75,6 +75,7 @@ public class OriginationUtilOffsetExtractor extends
 				lowerLimit, gridLength);
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id agentId = event.getPersonId();
 		if (endedActs.containsKey(agentId))/* Is it a legal Leg? */{
@@ -85,6 +86,7 @@ public class OriginationUtilOffsetExtractor extends
 	/**
 	 * one trip ends
 	 */
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id agentId = event.getPersonId();
 
@@ -96,6 +98,7 @@ public class OriginationUtilOffsetExtractor extends
 		}
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		endedActs.put(event.getPersonId(), event);
 		/* beginning of new Leg */
@@ -104,6 +107,7 @@ public class OriginationUtilOffsetExtractor extends
 	/**
 	 * addition of
 	 */
+	@Override
 	public void output(String outputFilenameBase) {
 		// for (Id agentId : this.tmpAgentLegUtilOffsets.keySet()) {
 		// ActivityEndEvent aee = this.endedActs.remove(agentId);
@@ -120,16 +124,16 @@ public class OriginationUtilOffsetExtractor extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String linkOffsetUtilOffsetFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.linkCostOffsets.xml"//
-		, networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml"//
-		, countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml"//
-		, eventsFilename = "../integration-demandCalibration/test/DestinationUtilOffset/1000.events.txt.gz"//
-		, outputFilenameBase = "../integration-demandCalibration/test/DestinationUtilOffset2/tmp/1000.origUtiloffset."//
+		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.linkCostOffsets.xml"//
+			, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
+			, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
+			, eventsFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.events.txt.gz"//
+		, outputFilenameBase = "test/output/OUO/1000.origUtiloffset."//
 		;
 
-		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
+		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -145,7 +149,7 @@ public class OriginationUtilOffsetExtractor extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

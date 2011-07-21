@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forPlan;
 
@@ -53,9 +53,9 @@ import cadyts.utilities.misc.DynamicData;
 
 /**
  * shows the Utility Offset of activity location for originating traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OriginationUtilOffsetExtractor extends
 		ActivityLocationUtilOffsetExtractor implements
@@ -77,6 +77,7 @@ public class OriginationUtilOffsetExtractor extends
 				lowerLimit, gridLength);
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		Id agentId = event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -118,16 +119,16 @@ public class OriginationUtilOffsetExtractor extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String linkOffsetUtilOffsetFilename = "test/DestinationUtilOffset/1000.linkCostOffsets.xml"//
-		, networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml"//
-		, countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml"//
-		, eventsFilename = "test/DestinationUtilOffset/1000.events.txt.gz"//
-		, outputFilenameBase = "test/DestinationUtilOffset2/1000.origPlanUtiloffset."//
+		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.linkCostOffsets.xml"//
+			, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
+			, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
+			, eventsFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.events.txt.gz"//
+		, outputFilenameBase = "test/output/P_OUO/1000.origPlanUtiloffset."//
 		;
 
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -143,7 +144,7 @@ public class OriginationUtilOffsetExtractor extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////
