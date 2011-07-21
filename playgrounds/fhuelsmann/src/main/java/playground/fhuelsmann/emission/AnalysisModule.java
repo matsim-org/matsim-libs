@@ -20,11 +20,8 @@
  * *********************************************************************** */
 package playground.fhuelsmann.emission;
 
-import java.util.ArrayList;
-
 
 import org.matsim.api.core.v01.Id;
-
 import playground.fhuelsmann.emission.objects.HbefaObject;
 
 
@@ -49,10 +46,8 @@ public interface AnalysisModule {
 			final double averageSpeed, final int roadType,  
 			final double freeVelocity, final double distance,HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable);
 	
-	//public void calculatePerLinkPtBikeWalk(final Id linkId);
+	public void calculatePerLinkPtBikeWalk(final Id linkId, final Id personId);
 	
-	//public void calculatePerPersonPtBikeWalk(final Id personId);
-	
-	
+	public void calculatePerPersonPtBikeWalk(final Id personId,final Id linkId);
 
 }

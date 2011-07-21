@@ -56,15 +56,15 @@ public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
 	// INPUT
-/*	private static String runDirectory = "../../run980/";
-	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.txt.gz";
+	private static String runDirectory = "../../run980/";
+	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.xml.gz";
 	private static String netFile = runDirectory + "980.output_network.xml.gz";
-	private static String plansFile = runDirectory + "ITERS/it.1000/980.1000.plans.xml.gz";*/
+	private static String plansFile = runDirectory + "ITERS/it.1000/980.1000.plans.xml.gz";
 
-	private static String runDirectory = "../../detailedEval/policies/mobilTUM/policyCase/";
+/*	private static String runDirectory = "../../detailedEval/policies/mobilTUM/policyCase/";
 	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String plansFile = runDirectory + "output_plans.xml.gz";*/
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
@@ -142,6 +142,7 @@ public class EmissionTool {
 		// create an event object
 		//		EventsManager eventsManager = new EventsManagerImpl();	
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+	
 		// create the handler 
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(population, vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
 		warmEmissionHandler.setListOfPollutant(listOfPollutant);
@@ -158,6 +159,7 @@ public class EmissionTool {
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
 	//	System.out.println("###########################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+commuterHdv2WarmEmissionsInGrammPerType);
 		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
+		Map<Id, double[]> linkIdComHdvPec2emissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLinkComHdvPec();
 
 		// coldstart emissions
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
@@ -170,6 +172,7 @@ public class EmissionTool {
 //		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
 		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
+		printer.printEmissionTable(linkIdComHdvPec2emissionsInGrammPerType, "EmissionsPerLinkWarmComHdvPec.txt");
 		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
 //		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 

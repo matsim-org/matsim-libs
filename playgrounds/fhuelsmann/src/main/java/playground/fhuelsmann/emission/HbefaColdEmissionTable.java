@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
 import playground.fhuelsmann.emission.objects.HbefaColdObject;
 
 public class HbefaColdEmissionTable {

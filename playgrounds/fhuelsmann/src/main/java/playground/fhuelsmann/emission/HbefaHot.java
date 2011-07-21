@@ -1,13 +1,10 @@
 package playground.fhuelsmann.emission;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 
 import playground.fhuelsmann.emission.objects.HotValue;
 
