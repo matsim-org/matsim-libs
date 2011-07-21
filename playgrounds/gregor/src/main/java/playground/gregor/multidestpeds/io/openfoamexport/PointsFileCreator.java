@@ -22,7 +22,7 @@ public class PointsFileCreator extends FoamFileWriter {
 	public void create() throws IOException {
 		BufferedWriter bf = new BufferedWriter(new FileWriter(this.fileName));
 		writeHeader(bf);
-		writeDict(bf,"2.0", "ascii", "vectorField", "\"const/boundaryData/"+this.portName + "\"", "points");
+		writeDict(bf,"2.0", "ascii", "vectorField", "\"constant/boundaryData/"+this.portName + "\"", "points");
 		writePoints(bf);
 
 		bf.close();
