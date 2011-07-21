@@ -113,18 +113,18 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 			e.printStackTrace();
 		}
 		CalibrationStatReader.StatisticsData statData6= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
-		Assert.assertEquals("diferrent Count_ll", statData6.getCount_ll() , "-8520.428031642501" );
-		Assert.assertEquals("diferrent Count_ll_pred_err", statData6.getCount_ll_pred_err() , "3023.1044688142874" );
-		Assert.assertEquals("diferrent Link_lambda_avg", statData6.getLink_lambda_avg() , "-0.05958198651884198" );
-		Assert.assertEquals("diferrent Link_lambda_max", statData6.getLink_lambda_max() , "18.83853210238568" );
-		Assert.assertEquals("diferrent Link_lambda_min", statData6.getLink_lambda_min() , "-59.09955284636061" );
-		Assert.assertEquals("diferrent Link_lambda_stddev", statData6.getLink_lambda_stddev() , "1.1566935710525457" );
+		Assert.assertEquals("diferrent Count_ll", statData6.getCount_ll() , "-1.546875" );
+		Assert.assertEquals("diferrent Count_ll_pred_err", statData6.getCount_ll_pred_err() , "9.917082938182276E-8" );
+		Assert.assertEquals("diferrent Link_lambda_avg", statData6.getLink_lambda_avg() , "0.0013507168476099964" );
+		Assert.assertEquals("diferrent Link_lambda_max", statData6.getLink_lambda_max() , "0.031434867572002166" );
+		Assert.assertEquals("diferrent Link_lambda_min", statData6.getLink_lambda_min() , "0.0" );
+		Assert.assertEquals("diferrent Link_lambda_stddev", statData6.getLink_lambda_stddev() , "0.0058320747961925256" );
 		Assert.assertEquals("diferrent P2p_ll", statData6.getP2p_ll() , "--" );
-		Assert.assertEquals("diferrent Plan_lambda_avg", statData6.getPlan_lambda_avg() , "-2.291334470647554" );
-		Assert.assertEquals("diferrent Plan_lambda_max", statData6.getPlan_lambda_max() , "15.0" );
-		Assert.assertEquals("diferrent Plan_lambda_min", statData6.getPlan_lambda_min() , "-15.0" );
-		Assert.assertEquals("diferrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "11.356042894952115" );
-		Assert.assertEquals("diferrent Total_ll", statData6.getTotal_ll() , "-8520.428031642501" );
+		Assert.assertEquals("diferrent Plan_lambda_avg", statData6.getPlan_lambda_avg() , "0.04322293912351989" );
+		Assert.assertEquals("diferrent Plan_lambda_max", statData6.getPlan_lambda_max() , "0.04715229919344063" );
+		Assert.assertEquals("diferrent Plan_lambda_min", statData6.getPlan_lambda_min() , "0.03929357905359915" );
+		Assert.assertEquals("diferrent Plan_lambda_stddev", statData6.getPlan_lambda_stddev() , "0.004200662608832472" );
+		Assert.assertEquals("diferrent Total_ll", statData6.getTotal_ll() , "-1.546875" );
 
 		//now test calibration-stats.txt from calibration
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
@@ -136,20 +136,6 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		}
 		
 		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
-		System.out.println("Count_ll "  +  outStatData.getCount_ll() );
-		System.out.println("Count_ll_pred_err "  +  outStatData.getCount_ll_pred_err() );
-		System.out.println("Link_lambda_avg " + outStatData.getLink_lambda_avg() );
-		System.out.println("Link_lambda_max " + outStatData.getLink_lambda_max() );
-		System.out.println("Link_lambda_min " + outStatData.getLink_lambda_min() );
-		System.out.println("Link_lambda_stddev " + outStatData.getLink_lambda_stddev());
-		System.out.println("P2p_ll "  + outStatData.getP2p_ll());
-		System.out.println("Plan_lambda_avg " + outStatData.getPlan_lambda_avg() );
-		System.out.println("Plan_lambda_max " + outStatData.getPlan_lambda_max() );
-		System.out.println("Plan_lambda_min " +  outStatData.getPlan_lambda_min() );
-		System.out.println("Plan_lambda_stddev " + outStatData.getPlan_lambda_stddev());
-		System.out.println("Total_ll " + outStatData.getTotal_ll() );
-		
-		/*
 		Assert.assertEquals("diferrent Count_ll", "-1.546875", outStatData.getCount_ll() );
 		Assert.assertEquals("diferrent Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
 		Assert.assertEquals("diferrent Link_lambda_avg", "0.0013507168476099964", outStatData.getLink_lambda_avg() );
@@ -162,7 +148,6 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("diferrent Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
 		Assert.assertEquals("diferrent Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
 		Assert.assertEquals("diferrent Total_ll", "-1.546875", outStatData.getTotal_ll() );
-		*/
 
 		//test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
