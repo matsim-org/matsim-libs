@@ -75,7 +75,7 @@ public class DrTransitNetworkSink implements Sink {
 
 	private TreeSet<String> transitModes;
 
-	private Map<Id, Map<String, NetworkImpl>> line2Network;
+	private Map<Id, NetworkImpl> line2Network;
 
 	public DrTransitNetworkSink(Network network, IdTrackerType idTrackerType) {
 		this.network = network;
@@ -227,7 +227,7 @@ public class DrTransitNetworkSink implements Sink {
 		this.line2Network = netStore.getLine2Network();
 	}
 
-	public Map<Id, Map<String, NetworkImpl>> getLine2Network(){
+	public Map<Id, NetworkImpl> getLine2Network(){
 		return this.line2Network;
 	}
 	@Override

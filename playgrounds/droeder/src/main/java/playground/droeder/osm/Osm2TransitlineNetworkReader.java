@@ -42,16 +42,16 @@ import playground.mzilske.osm.NetworkSink;
  * @author droeder
  *
  */
-public class Osm2TransitlineNetworks {
+public class Osm2TransitlineNetworkReader {
 	
 	private static final Logger log = Logger
-			.getLogger(Osm2TransitlineNetworks.class);
+			.getLogger(Osm2TransitlineNetworkReader.class);
 	
 	String inFile;
 	String fromCoordSystem;
 	String toCoordSystem;
 	
-	public Osm2TransitlineNetworks(String inFile, String fromCoordSystem, String toCoordSystem){
+	public Osm2TransitlineNetworkReader(String inFile, String fromCoordSystem, String toCoordSystem){
 		this.inFile = inFile;
 		this.fromCoordSystem = fromCoordSystem;
 		this.toCoordSystem = toCoordSystem;
@@ -62,7 +62,7 @@ public class Osm2TransitlineNetworks {
 	}
 	
 	private ScenarioImpl scenario;
-	private Map<Id, Map<String, NetworkImpl>> line2Network;
+	private Map<Id, NetworkImpl> line2Network;
 	
 	public void convertOsm2Matsim(String[] transitFilter){
 		
@@ -111,7 +111,7 @@ public class Osm2TransitlineNetworks {
 		line2Network = transitNetworkSink.getLine2Network();
 	}
 	
-	public Map<Id, Map<String, NetworkImpl>> getLine2Net(){
+	public Map<Id, NetworkImpl> getLine2Net(){
 		log.info("produced " + this.line2Network.size() + " networks...");
 		return this.line2Network;
 	}

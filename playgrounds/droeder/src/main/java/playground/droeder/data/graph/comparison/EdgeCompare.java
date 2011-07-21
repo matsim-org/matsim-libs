@@ -57,15 +57,20 @@ public class EdgeCompare extends AbstractCompare{
 		int cnt = 0;
 		double weighting = 0.0;
 		
-		// TODO weighted by length
 		while(candIt.hasNext() && refIt.hasNext()){
 			if((rs == null) && (cs == null)){
 				rs = refIt.next();
 				cs = candIt.next();
-			}else if(sc.refIsUndershot()){
-				rs = refIt.next();
-			}else if(!sc.refIsUndershot()){
+			}else if(candIt.hasNext() && refIt.hasNext()){
+				if(sc.refIsUndershot()){
+					rs = refIt.next();
+				}else if(!sc.refIsUndershot()){
+					cs = candIt.next();
+				}
+			}else if(candIt.hasNext()){
 				cs = candIt.next();
+			}else if(refIt.hasNext()){
+				rs = refIt.next();
 			}
 			sc = new SegmentCompare(rs, cs);
 			cnt++;
@@ -89,8 +94,11 @@ public class EdgeCompare extends AbstractCompare{
 					(Math.abs(1 - (matchedLengthRef / refTotalLength)) / lengthTolerancePercentage ) + 
 					(Math.abs(1 - (matchedLengthComp / compTotalLength)) / lengthTolerancePercentage ));
 			return true;
+		} else if(isPartlyMatched(dDistMax, dPhiMax, lengthTolerancePercentage)){
+			return true;
+		}else{
+			return false;
 		}
-		return false;
 	}
 	
 	public boolean isPartlyMatched(Double dDistMax, Double dPhiMax, Double lengthTolerancePercentage) {

@@ -58,6 +58,10 @@ public class StraightComparer{
 		this.baseB_CD = this.getBase(two, one.getEnd());
 		this.baseC_AB = this.getBase(one, two.getStart());
 		this.baseD_AB = this.getBase(one, two.getEnd());
+//		if(!(baseA_CD== null)) System.out.println("A_CD: " + baseA_CD.toString());
+//		if(!(baseB_CD== null)) System.out.println("B_CD: " + baseB_CD.toString());
+//		if(!(baseC_AB== null)) System.out.println("C_AB: " + baseC_AB.toString());
+//		if(!(baseD_AB== null)) System.out.println("D_AB: " + baseD_AB.toString());
 	}
 	
 	public double getAverageDistance(){
@@ -107,6 +111,24 @@ public class StraightComparer{
 	 * computes the base of the perpendicular of the "point" on the straight s
 	 */
 	private Coord getBase(Straight s, Coord point){
+		//handle vertical straights
+		if(s.getStart().getX() == s.getEnd().getX()){
+			if(s.getStart().getY() < s.getEnd().getY()){
+				if(s.getStart().getY() < point.getY() && s.getEnd().getY() > point.getY()){
+					return new CoordImpl(s.getStart().getX(), point.getY());
+				}else{
+					return null;
+				}
+			}else if(s.getStart().getY() > s.getEnd().getY()){
+				if(s.getStart().getY() > point.getY() && s.getEnd().getY() < point.getY()){
+					return new CoordImpl(s.getStart().getX(), point.getY());
+				}else{
+					return null;
+				}
+			}else{
+				return new CoordImpl(s.getStart().getX(), point.getY());
+			}
+		}
 		Vector2D a, b, c, r1, r2, p;
 		a = new Vector2D(s.getStart().getX(), s.getStart().getY());
 		b = new Vector2D(s.getEnd().getX(), s.getEnd().getY());
@@ -127,7 +149,7 @@ public class StraightComparer{
 		double[] answers = solver.solve(values);
 		
 		// get the base of the perpendicular from c to the straight ab
-		p = a.add(new Vector2D(answers[0], r1));
+		p = a.add(new Vector2D(answers[1], r2));
 		
 		/*
 		 * return the point only, if it is beetween the point a && b, because otherwise it is not interesting
@@ -153,25 +175,6 @@ public class StraightComparer{
 		return GeoCalculator.angleBeetween2Straights(
 				new Tuple<Coord, Coord>(this.one.getStart(), this.one.getEnd()), 
 				new Tuple<Coord, Coord>(this.two.getStart(), this.two.getEnd()));
-	}
-}
-
-class Straight{
-	
-	private Coord start;
-	private Coord end;
-
-	public Straight(Coord one, Coord two){
-		this.start = one;
-		this.end = two;
-	}
-	
-	public Coord getStart(){
-		return this.start;
-	}
-	
-	public Coord getEnd(){
-		return this.end;
 	}
 }
 

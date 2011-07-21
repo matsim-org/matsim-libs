@@ -42,7 +42,7 @@ public class LineNetworkStore {
 	private static final Logger log = Logger.getLogger(LineNetworkStore.class);
 	
 	private Network originNet;
-	private Map<Id, Map<String,NetworkImpl>> line2Dir2Network;
+	private HashMap<Id, NetworkImpl> line2Network;
 	public static final String UP = "up";
 	public static final String DOWN = "down";
 
@@ -52,31 +52,24 @@ public class LineNetworkStore {
 	 */
 	public LineNetworkStore(Network net){
 		this.originNet = net;
-		this.line2Dir2Network = new HashMap<Id, Map<String, NetworkImpl>>();
+		this.line2Network = new HashMap<Id, NetworkImpl>();
 	}
 	
 	public void addWay(Way w, Id line){
-		Map<String, NetworkImpl> nets;
-		if(line2Dir2Network.containsKey(line)){
-			nets = line2Dir2Network.get(line);
+		NetworkImpl net;
+		if(line2Network.containsKey(line)){
+			net = line2Network.get(line);
 		}else{
-			nets = new HashMap<String, NetworkImpl>();
-			nets.put(this.UP, NetworkImpl.createNetwork());
-			nets.put(this.DOWN, NetworkImpl.createNetwork());
-			line2Dir2Network.put(line, nets);
+			net = NetworkImpl.createNetwork();
+			line2Network.put(line, net);
 		}
 		
-		NetworkImpl net;
 		for (Tag tag : w.getTags()) {
-			if (tag.getKey().startsWith("matsim:backward:link-id")) {
-				net = nets.get(this.DOWN);
-			}else if(tag.getKey().startsWith("matsim:forward:link-id") ) {
-				net = nets.get(this.UP);
-			}else{
-				continue;
+			if (tag.getKey().startsWith("matsim:backward:link-id") || 
+					tag.getKey().startsWith("matsim:forward:link-id")) {
+				addLink(net, tag.getValue());
 			}
-//			System.out.println(tag.getKey() + " " + tag.getValue());
-			addLink(net, tag.getValue());
+				//			System.out.println(tag.getKey() + " " + tag.getValue());
 		}
 	}
 
@@ -101,20 +94,7 @@ public class LineNetworkStore {
 		}
 	}
 	
-	public Map<Id, Map<String, NetworkImpl>> getLine2Network(){
-		return this.line2Dir2Network;
+	public Map<Id, NetworkImpl> getLine2Network(){
+		return this.line2Network;
 	}
-
-	/**
-	 * @param lineId
-	 */
-	public void clean() {
-		for(Map<String, NetworkImpl> nets: this.line2Dir2Network.values()){
-			for(NetworkImpl n : nets.values()){
-				new NetworkCleaner().run(n);
-			}
-		}
-	}
-
-
 }
