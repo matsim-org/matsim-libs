@@ -118,8 +118,8 @@ public class ScenarioGenerator {
 		reader.setHighwayDefaults(6, "residential",   4,  5.0/3.6, 1.0,  10000);
 		reader.setHighwayDefaults(6, "living_street", 4,  5.0/3.6, 1.0,  10000);
 		reader.setHighwayDefaults(6,"path",           4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6,"cycleay",           4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6,"footway",           4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6,"cycleay",        4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(6,"footway",        4,  5.0/3.6, 1.0,  10000);
 		reader.setKeepPaths(true);
 		reader.parse(gripsNetworkFile);
 
