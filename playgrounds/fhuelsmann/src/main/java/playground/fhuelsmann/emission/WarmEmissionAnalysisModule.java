@@ -231,13 +231,8 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			// place 0 for freeFlow ....
 			double[][] emissionsInFourSituations = new double[4][2];	
 			for(int i = 0; i < 4; i++){
-				try{
-					emissionsInFourSituations[i][0] = this.hbefaHot.getHbefaHot().get(keys[i]).getV();
-					emissionsInFourSituations[i][1] = this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
-				} 
-				catch(Exception e){
-					logger.error("Error: " + e.getMessage());
-				}
+				emissionsInFourSituations[i][0] = this.hbefaHot.getHbefaHot().get(keys[i]).getV();
+				emissionsInFourSituations[i][1] = this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
 			}
 			// in the hashOfPollutant we save the V and EFA in 4 Situations
 			hashOfPollutant.put(Pollutant, emissionsInFourSituations);
