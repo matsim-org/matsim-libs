@@ -29,12 +29,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.fhuelsmann.emission.objects.HbefaObject;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class WarmEmissionAnalysisModule implements AnalysisModule{
+	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
 	private VisumObject[] roadTypes = null;
 	private EmissionsPerEvent emissionFactor = null;
@@ -47,8 +51,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 	private Map<Id, double[]> personId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	private ArrayList<String> listOfPollutant;
 //	private Population population = null;
-
-
 
 	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant,VisumObject[] roadTypes, EmissionsPerEvent emissionFactor, HbefaHot hbefahot) {
 		this.roadTypes = roadTypes;
@@ -139,7 +141,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 				double [] actualEmissions = new double[listOfPollutant.size()]; // new data is saved after summation
 				double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); //oldValue is the previous sum
 				for(int i = 0; i < actualEmissions.length ; i++){
-					actualEmissions[i]= previousEmissions[i] + inputForHdvEmissions[i];
+					actualEmissions[i] = previousEmissions[i] + inputForHdvEmissions[i];
 				}
 				personId2emissionsInGrammPerType.put(personId, actualEmissions);// put newValue in the Map
 			}	
@@ -160,7 +162,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			HbefaObject[][] hbefaTable,
 			HbefaObject[][] hbefaHdvTable) {
 		
-		String[] hubSizeAgeArray =fuelSizeAge.split(";");
+		String[] hubSizeAgeArray = fuelSizeAge.split(";");
 		
 		String[] VehicleAttributes = new String[3];
 		VehicleAttributes = calculateVehicleAttributes(hubSizeAgeArray);
@@ -169,11 +171,11 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		Map<String, double[][]> hashOfPollutant = new TreeMap<String,double[][]>();
 		
 		for( String Pollutant : listOfPollutant ){
-			for(int i=0; i<4;i++)
-				keys[i]=makeKey(Pollutant,roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
+			for(int i = 0; i < 4; i++)
+				keys[i] = makeKey(Pollutant, roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
 			// place 0 for freeFlow ....
 			double[][] emissionsInFourSituations = new double[4][2];	
-			for(int i=0; i<4;i++){
+			for(int i = 0; i < 4; i++){
 				try{
 					emissionsInFourSituations[i][0]= this.hbefaHot.getHbefaHot().get(keys[i]).getV();
 					emissionsInFourSituations[i][1]= this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
@@ -190,7 +192,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		/** get emissions calculated per event for the average speed approach or the fraction approach **/
 		//double [] arrayOfemissionFactor =	emissionFactor.emissionAvSpeedCalculateDetailed(hashOfPollutant, averageSpeed, distance);
 		double [] arrayOfemissionFactor = emissionFactor.emissionFractionCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-
+		
 		if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
 			this.linkId2emissionsInGrammPerType.put(linkId, arrayOfemissionFactor);// data is read for the first time, doesn't need to be summed up per link
 		}
@@ -198,12 +200,11 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
 			double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId); //oldValue is the previous sum
 			for(int i = 0; i < actualEmissions.length ; i++){
-				actualEmissions[i]= previousEmissions[i] + arrayOfemissionFactor[i];
+				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
 			}
 			linkId2emissionsInGrammPerType.put(linkId, actualEmissions);// put newValue in the Map
 		}
 	}
-	
 	
 	@Override
 	/** emission calculation per person for passenger cars with a vehicle assigned **/
@@ -217,47 +218,55 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			HbefaObject[][] hbefaTable,
 			HbefaObject[][] hbefaHdvTable) {
 		
-		String[] hubSizeAgeArray =fuelSizeAge.split(";");
-		
+		String[] hubSizeAgeArray = fuelSizeAge.split(";");
 		String[] VehicleAttributes = new String[3];
 		VehicleAttributes = calculateVehicleAttributes(hubSizeAgeArray);
-		
 		
 		// make 4 keys for each person 
 		String[] keys = new String[4];
 		Map<String, double[][]> hashOfPollutant = new TreeMap<String,double[][]>();
 		for( String Pollutant : listOfPollutant ){
-			for(int i=0; i<4;i++)
-				keys[i]=makeKey(Pollutant,roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
+			for(int i = 0; i < 4; i++)
+				keys[i] = makeKey(Pollutant, roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
 			// place 0 for freeFlow ....
 			double[][] emissionsInFourSituations = new double[4][2];	
-			for(int i=0; i<4;i++){
+			for(int i = 0; i < 4; i++){
 				try{
-					emissionsInFourSituations[i][0]= this.hbefaHot.getHbefaHot().get(keys[i]).getV();
-					emissionsInFourSituations[i][1]= this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
+					emissionsInFourSituations[i][0] = this.hbefaHot.getHbefaHot().get(keys[i]).getV();
+					emissionsInFourSituations[i][1] = this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
 				} 
 				catch(Exception e){
 				}
 			}
-			// in the hashPfPollutant we save the V and EFA in 4 Situations
-			hashOfPollutant.put(Pollutant, emissionsInFourSituations);	
+			// in the hashOfPollutant we save the V and EFA in 4 Situations
+			hashOfPollutant.put(Pollutant, emissionsInFourSituations);
 		}
 		// as result we have here a hashmap with the pollutant and an array with value v and EFA
 		int NumberOfPollutant = hashOfPollutant.size();
 
 		/** get emissions calculated per event for the average speed approach or the fraction approach **/
-		//double [] arrayOfemissionFactor =	emissionFactor.emissionAvSpeedCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-		double [] arrayOfemissionFactor =	emissionFactor.emissionFractionCalculateDetailed(hashOfPollutant, averageSpeed, distance);
+		// double [] arrayOfemissionFactor = emissionFactor.emissionAvSpeedCalculateDetailed(hashOfPollutant, averageSpeed, distance);
+		double [] arrayOfemissionFactor = emissionFactor.emissionFractionCalculateDetailed(hashOfPollutant, averageSpeed, distance);
 
 		if(this.personId2emissionsInGrammPerType.get(personId) == null) {
-			this.personId2emissionsInGrammPerType.put(personId, arrayOfemissionFactor);// data is read for the first time, doesn't need to be summed up per link
+			this.personId2emissionsInGrammPerType.put(personId, arrayOfemissionFactor); // data is read for the first time, doesn't need to be summed up per link
+			
+//			if(personId.equals(new IdImpl("556128.2#3625"))){
+//				logger.warn(arrayOfemissionFactor[0]);
+//			}
+			
 		}
 		else{
 			double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-			double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); //oldValue is the previous sum
+			double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); // oldValue is the previous sum
 			for(int i = 0; i < actualEmissions.length ; i++){
-				actualEmissions[i]= previousEmissions[i] + arrayOfemissionFactor[i];
+				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
 			}
+			
+//			if(personId.equals(new IdImpl("556128.2#3625"))){
+//				logger.warn(arrayOfemissionFactor[0]);
+//			}
+			
 			// put newValue in the Map
 			personId2emissionsInGrammPerType.put(personId, actualEmissions);
 		}
@@ -278,7 +287,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			this.linkId2emissionsInGrammPerType.put(linkId, emissions);
 			// data is read for the first time, doesn't need to be summed up per link
 		}
-
 	}
 	
 	public synchronized void calculatePerPersonPtBikeWalk(
@@ -327,7 +335,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		catch (Exception e){
 			System.err.println("Error: " + e);
 		}
-		
 	}
 
 	public void createRoadTypes(String filename){
@@ -361,12 +368,9 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		return this.linkIdComHdvPec2emissionsInGrammPerType;
 	}
 
-	
 	public Map<Id, double[]> getWarmEmissionsPerPerson() {
 		return this.personId2emissionsInGrammPerType;
 	}
-	
-
 	
 	public String makeKey(String pollutant, int roadType,String technology,String Sizeclass,String EmConcept,int traficSitNumber){
 		return "PC[3.1]"+";"+"pass. car"+";"+"2010"+";"+";"+pollutant+";"+";"+this.vehicleCharacteristic[roadType][traficSitNumber]+";"+"0%"+";"+technology+";"+Sizeclass+";"+EmConcept+";";

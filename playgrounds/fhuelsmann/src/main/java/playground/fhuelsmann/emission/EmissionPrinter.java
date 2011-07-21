@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +37,7 @@ import org.matsim.api.core.v01.population.Population;
  *
  */
 public class EmissionPrinter {
+	private static final Logger logger = Logger.getLogger(EmissionPrinter.class);
 
 	private String runDirectory;
 
@@ -74,11 +76,11 @@ public class EmissionPrinter {
 				}
 				else{
 					// only values of the fraction approach
-					fcEmissions = personId2emissionsInGrammPerType.get(personId)[5];
-					noxEmissions = personId2emissionsInGrammPerType.get(personId)[6];
-					co2Emissions = personId2emissionsInGrammPerType.get(personId)[7];
-					no2Emissions = personId2emissionsInGrammPerType.get(personId)[8];
-					pmEmissions = personId2emissionsInGrammPerType.get(personId)[9];
+					fcEmissions = personId2emissionsInGrammPerType.get(personId)[0];
+					noxEmissions = personId2emissionsInGrammPerType.get(personId)[1];
+					co2Emissions = personId2emissionsInGrammPerType.get(personId)[2];
+					no2Emissions = personId2emissionsInGrammPerType.get(personId)[3];
+					pmEmissions = personId2emissionsInGrammPerType.get(personId)[4];
 				}
 				outLine = personId.toString()+ "\t" + xHome.toString() + "\t" + yHome.toString() + "\t"
 				+ fcEmissions.toString() + "\t" + noxEmissions.toString() + "\t" + co2Emissions.toString() + "\t" 
@@ -87,7 +89,7 @@ public class EmissionPrinter {
 			}
 			//Close the output stream
 			out.close();
-			System.out.println("Finished writing output to " + outFile);
+			logger.info("Finished writing output to " + outFile);
 		}
 		catch (Exception e){
 			System.err.println("Error: " + e.getMessage());
@@ -112,7 +114,7 @@ public class EmissionPrinter {
 			}
 			//Close the output stream
 			out.close();
-			System.out.println("Finished writing output to " + outFile);
+			logger.info("Finished writing output to " + outFile);
 		}
 		catch (Exception e){
 			System.err.println("Error: " + e.getMessage());
@@ -133,7 +135,7 @@ public class EmissionPrinter {
 			}	
 			//Close the output stream
 			out.close();
-			System.out.println("Finished writing output to " + outFile);
+			logger.info("Finished writing output to " + outFile);
 		}catch (Exception e){
 			System.err.println("Error: " + e.getMessage());
 		}
