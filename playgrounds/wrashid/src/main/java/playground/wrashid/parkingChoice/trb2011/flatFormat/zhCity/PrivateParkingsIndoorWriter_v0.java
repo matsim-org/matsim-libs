@@ -280,7 +280,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	}
 
 	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree() {
-		String facilitiesPath = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		String facilitiesPath = "P:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		return getFacilitiesQuadTree(facilities);

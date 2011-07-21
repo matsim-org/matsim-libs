@@ -108,12 +108,12 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	private static void readParkings(double streetParkingCalibrationFactor, String streetParkingsFile, LinkedList<Parking> parkingCollection) {
+	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<Parking> parkingCollection) {
 		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		flatParkingFormatReaderV1.parse(streetParkingsFile);
+		flatParkingFormatReaderV1.parse(parkingsFile);
 		
 		LinkedList<Parking> parkings= flatParkingFormatReaderV1.getParkings();
-		calibarteParkings(parkings,streetParkingCalibrationFactor);
+		calibarteParkings(parkings,parkingCalibrationFactor);
 		
 		parkingCollection.addAll(parkings);
 	}
