@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.szenarios.munich;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -200,7 +198,7 @@ public class UrbanSuburbanAnalyzer {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
-			if(isPersonFromMID(person)){
+			if(isPersonNonFreight(person)){
 				if(isPersonsHomeInShape(person, featuresInShape)){
 					filteredPopulation.addPerson(person);
 				}
@@ -233,7 +231,7 @@ public class UrbanSuburbanAnalyzer {
 		Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
 		for(Feature feature : featuresInShape){
 			if(feature.getDefaultGeometry().contains(geo)){
-				//					logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
+				//logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
 				isInShape = true;
 				break;
 			}

@@ -83,7 +83,7 @@ public class LegModeDistanceDistribution {
 	private void run(String[] args) {
 		loadSceanrio(this.initialScenario, netFile, initialPlansFile);
 		loadSceanrio(this.finalScenario, netFile, finalPlansFile);
-		setDistanceClasses();
+		setDistanceClasses(9);
 		getUsedModes();
 		Population initialPop = this.initialScenario.getPopulation();
 		Population finalPop = this.finalScenario.getPopulation();
@@ -218,13 +218,13 @@ public class LegModeDistanceDistribution {
 		logger.info("The following transport modes are found in the initial population: " + this.usedModes);
 	}
 
-	private void setDistanceClasses() {
+	private void setDistanceClasses(int i) {
 		this.distanceClasses.add(0);
-		for(int noOfClasses = 0; noOfClasses < 9; noOfClasses++){
+		for(int noOfClasses = 0; noOfClasses < i; noOfClasses++){
 			int distanceClass = 100 * (int) Math.pow(2, noOfClasses);
 			this.distanceClasses.add(distanceClass);
 		}
-		logger.info("The following distance classes are defined: " + this.distanceClasses);
+		logger.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
 	private void loadSceanrio(Scenario scenario, String netFile, String plansFile) {
