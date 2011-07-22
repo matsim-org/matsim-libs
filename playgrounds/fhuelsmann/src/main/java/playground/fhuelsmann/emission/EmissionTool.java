@@ -39,6 +39,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -121,8 +123,7 @@ public class EmissionTool {
 
 		// create an event object
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-	
-		// create the handler 
+		// create the handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(population, vehicles, network, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(), hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(), warmEmissionAnalysisModule);//,hbefaHot.getHbefaHot());
 		warmEmissionHandler.setListOfPollutant(listOfPollutants);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(network, hbefaColdTable, coldEmissionAnalysisModule);
@@ -148,6 +149,7 @@ public class EmissionTool {
 
 		// =======================================================================================================	
 		// print output files
+		// old version
 		EmissionPrinter printer = new EmissionPrinter(runDirectory);
 		printer.printHomeLocation2Emissions(population, personId2WarmEmissionsInGrammPerType, "EmissionsPerHomeLocationWarm.txt");
 		printer.printColdEmissionTable(personId2ColdEmissions, "EmissionsPerPersonCold.txt");
@@ -156,6 +158,10 @@ public class EmissionTool {
 		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
 		printer.printEmissionTable(linkIdComHdvPec2emissionsInGrammPerType, "EmissionsPerLinkWarmComHdvPec.txt");
 
+		// new version using EmissionEvents
+		EventWriterXML eWriter = new EventWriterXML(runDirectory + "emission.events.xml.gz");
+		eWriter.closeFile();
+		
 		// =======================================================================================================	
 		//further processing of emissions
 //		UrbanSuburbanAnalyzer usa = new UrbanSuburbanAnalyzer(this.scenario);
