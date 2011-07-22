@@ -36,7 +36,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 		String parkingId=atts.getValue("id");
 		double x=new Double(atts.getValue("x"));
 		double y=new Double(atts.getValue("y"));
-		int capacity=new Integer(atts.getValue("capacity"));
+		double capacity=new Double(atts.getValue("capacity"));
 		Coord coord=new CoordImpl(x, y);
 		
 		if (parkingType.equalsIgnoreCase("public")){

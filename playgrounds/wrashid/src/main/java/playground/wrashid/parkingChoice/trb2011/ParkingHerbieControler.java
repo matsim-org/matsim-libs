@@ -61,7 +61,7 @@ public class ParkingHerbieControler {
 		
 		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity(controler);
 		
-		String streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity.xml";
+		String streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0.xml";
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
 		
 		return parkingCollection;
@@ -81,11 +81,11 @@ public class ParkingHerbieControler {
 		String garageParkingsFile=parkingDataBase + "garageParkings.xml";
 		readParkings(garageParkingCalibrationFactor, garageParkingsFile,parkingCollection);
 		
-		String privateIndoorParkingsFile=parkingDataBase + "privateParkingsIndoor.xml";
+		String privateIndoorParkingsFile=parkingDataBase + "privateParkings_v1.xml";
 		readParkings(privateParkingsIndoorCalibrationFactor, privateIndoorParkingsFile,parkingCollection);
 		
-		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
-		readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
+		//String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
+		//readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
 		
 		return parkingCollection;
 	}

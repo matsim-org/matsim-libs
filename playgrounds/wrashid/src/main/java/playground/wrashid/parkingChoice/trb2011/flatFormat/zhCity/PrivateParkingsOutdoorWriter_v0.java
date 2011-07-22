@@ -22,7 +22,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 	private static LinkedList<PrivateParking> privateParkings;
 	
 	public static void main(String[] args) {
-		String sourcePathPrivateParkingsOutdoor = "ETH/static data/parking/zürich city/Private Parkplätze/PrivateParkingIndoor.txt";
+		String sourcePathPrivateParkingsOutdoor = "ETH/static data/parking/zürich city/Private Parkplätze/PrivateParkingOutdoor.txt";
 		StringMatrix privateParkingOutdoorFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePathPrivateParkingsOutdoor);
 
 		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree();
@@ -39,7 +39,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 		}
 		
 		PrivateParkingsOutdoorWriter_v0 privateParkingsWriter=new PrivateParkingsOutdoorWriter_v0();
-		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsOutdoor.xml", sourcePathPrivateParkingsOutdoor);
+		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkingsOutdoor_v0.xml", sourcePathPrivateParkingsOutdoor);
 	}
 	
 	public void writeFile(final String filename, String source) {
@@ -67,7 +67,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 	
 	private void createPrivateParkings(BufferedWriter writer) throws IOException {
 		for (int i=0;i<privateParkings.size();i++){
-			if (privateParkings.get(i).getCapacity()<1){
+			if (privateParkings.get(i).getCapacity()<=0){
 				DebugLib.stopSystemAndReportInconsistency();
 			}
 			

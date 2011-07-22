@@ -25,7 +25,7 @@ public static void main(String[] args) {
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				ParkingImpl parking = new ParkingImpl(new CoordImpl(i * 1000 + 500, j * 1000 + 500));
-				parking.setMaxCapacity(30000);
+				parking.setMaxCapacity(30000.0);
 				parkingCollection.add(parking);
 			}
 		}

@@ -30,7 +30,7 @@ import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParking
  * 
  * 
  */
-public class ProvideEnoughParkingsForAllActivitiesWriter extends MatsimXmlWriter {
+public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWriter {
 
 	private static BasicPointVisualizer basicPointVisualizer = new BasicPointVisualizer();
 
@@ -75,7 +75,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter extends MatsimXmlWriter
 
 		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
 		
-		ProvideEnoughParkingsForAllActivitiesWriter garageParkingsOutsideZHCityWriter=new ProvideEnoughParkingsForAllActivitiesWriter();
+		ProvideEnoughParkingsForAllActivitiesWriter_v0 garageParkingsOutsideZHCityWriter=new ProvideEnoughParkingsForAllActivitiesWriter_v0();
 		garageParkingsOutsideZHCityWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/publicParkingsOutsideZHCity.xml", sourcePath,garageParkingData);
 
 	}

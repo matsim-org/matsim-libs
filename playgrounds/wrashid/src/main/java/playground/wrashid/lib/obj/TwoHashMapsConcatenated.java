@@ -1,6 +1,7 @@
 package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
+import java.util.Set;
 //TODO: write tests.
 public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 
@@ -23,6 +24,13 @@ public class TwoHashMapsConcatenated<ClassKey1,ClassKey2,ClassValue> {
 		}
 	}
 	
+	public Set<ClassKey2> getKeySet2(ClassKey1 key1){
+		return hashMap.get(key1).keySet();
+	}
+
+	public Set<ClassKey1> getKeySet1(){
+		return hashMap.keySet();
+	}
 	
 	
 }

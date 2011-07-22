@@ -19,8 +19,10 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.StringMatrix;
+import playground.wrashid.lib.tools.facility.FacilityLib;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 
@@ -44,11 +46,17 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 		HashMap<Integer, String> mainUsagePurposeOfBuilding = getMainBuildingUsagePurpose();
 		
 		privateParkings = new LinkedList<PrivateParking>();
+		int totalDistributedCapacity=0;
 		
 		for (int i=1;i<privateParkingIndoorFile.getNumberOfRows();i++){
 			int EGID = privateParkingIndoorFile.getInteger(i, 0);
 			int capacity= privateParkingIndoorFile.getInteger(i, 3);
+			totalDistributedCapacity+=capacity;
 			Coord coord=new CoordImpl(privateParkingIndoorFile.getDouble(i, 1),privateParkingIndoorFile.getDouble(i, 2));
+			
+			if (i==14955){
+				System.out.println();
+			}
 			
 			if (capacity>0){
 				if (mainBuildingUsagePurposeKnown(mainUsagePurposeOfBuilding, EGID)){
@@ -65,25 +73,37 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 					} else if (mainUsagePurpose.equalsIgnoreCase("Produktion")){
 						mapPrivatParkingsToFacilities(capacity, coord, new String[]{"work_sector2","work_sector3","work"});
 					}else {
-						assignParkingCapacityToClosestFacility(coord,capacity );
+						assignParkingCapacityToClosestFacility(coord,capacity);
 					}
-				
+					checkNumberOfParkingsConsistency(totalDistributedCapacity);
 				} else {
-					assignParkingCapacityToClosestFacility(coord,capacity );
+					assignParkingCapacityToClosestFacility(coord,capacity);
 				}
+				checkNumberOfParkingsConsistency(totalDistributedCapacity);
 			}
-			
-			
 		}
 		
 		PrivateParkingsIndoorWriter_v0 privateParkingsWriter=new PrivateParkingsIndoorWriter_v0();
-		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/privateParkingsIndoor.xml", sourcePathPrivateParkingsIndoor);
+		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkingsIndoor_v0.xml", sourcePathPrivateParkingsIndoor);
 
 	}
+	
+	
 
-	
-	
-	
+	private static void checkNumberOfParkingsConsistency(double totalDistributedCapacity) {
+		double totalCapacity=0;
+		for (Parking parking:privateParkings){
+			totalCapacity+=parking.getCapacity();
+		}
+		
+		
+		if (totalCapacity-totalDistributedCapacity>0.1){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+	}
+
+
+
 	public void writeFile(final String filename, String source) {
 		String dtd = "./test/input/playground/wrashid/parkingChoice/infrastructure/flatParkingFormat_v1.dtd";
 
@@ -109,7 +129,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	
 	private void createPrivateParkings(BufferedWriter writer) throws IOException {
 		for (int i=0;i<privateParkings.size();i++){
-			if (privateParkings.get(i).getCapacity()<1){
+			if (privateParkings.get(i).getCapacity()<=0){
 				DebugLib.stopSystemAndReportInconsistency();
 			}
 			
@@ -176,49 +196,55 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	private static void assign75PercentOfCapacityToMainActivity(String activityType, ActivityFacilityImpl closestActivityFacility,
 			Coord coord, int parkingCapacity) {
 
-		int percentageOfMainActivity=75;
+		if (closestActivityFacility.getActivityOptions().size()==1){
+			ActInfo actInfo=new ActInfo(closestActivityFacility.getId(), activityType);
+			PrivateParking privateParking=new PrivateParking(coord, actInfo);
+			privateParking.setCapacity(parkingCapacity);
+			privateParkings.add(privateParking);
+			return;
+		}
+		
+		double percentageOfMainActivity=75;
 		
 		// parking for main activity in building
 		ActInfo actInfo=new ActInfo(closestActivityFacility.getId(), activityType);
 		PrivateParking privateParking=new PrivateParking(coord, actInfo);
-		privateParking.setCapacity((int) Math.round((double) parkingCapacity*(double) percentageOfMainActivity/100));
+		privateParking.setCapacity(parkingCapacity* percentageOfMainActivity/100.0);
 		privateParkings.add(privateParking);
 		
-		if (privateParking.getCapacity()<1){
+		if (privateParking.getCapacity()<=0){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 		
 		// parking for secondary activities in building
-		int activityCapacities[]=new int[closestActivityFacility.getActivityOptions().size()-1];
-		int sumOfFacilityActivityCapacities=0;
+		double activityCapacities[]=new double[closestActivityFacility.getActivityOptions().size()];
+		double sumOfFacilityActivityCapacities=0;
 		
 		int i=0;
 		for (ActivityOption activityOption: closestActivityFacility.getActivityOptions().values()){
-			if (activityOption.getType().equalsIgnoreCase(activityType)){
-				continue;
+			activityCapacities[i]=activityOption.getCapacity();
+			
+			if (!activityOption.getType().equalsIgnoreCase(activityType)){
+				sumOfFacilityActivityCapacities+=activityOption.getCapacity();
 			}
 			
-			activityCapacities[i]=(int) Math.round(activityOption.getCapacity());
-			sumOfFacilityActivityCapacities+=activityOption.getCapacity();
 			i++;
 		}
 		
-		i=0;
+		i=-1;
 		for (ActivityOption activityOption: closestActivityFacility.getActivityOptions().values()){
+			i++;
 			if (activityOption.getType().equalsIgnoreCase(activityType)){
 				continue;
 			}
 			
 			actInfo=new ActInfo(closestActivityFacility.getId(), activityOption.getType());
 			privateParking=new PrivateParking(coord, actInfo);
-			double currentParkingCapacity=(double)parkingCapacity* (double)activityCapacities[i]/ (double)sumOfFacilityActivityCapacities*(double) (100-percentageOfMainActivity)/ (double)100;
-			int roundedCapacity=(int) Math.round(currentParkingCapacity);
-			if (roundedCapacity>0){
-				privateParking.setCapacity(roundedCapacity);
+			double currentParkingCapacity=parkingCapacity* activityCapacities[i]/ sumOfFacilityActivityCapacities*(100.0-percentageOfMainActivity)/ 100.0;
+			if (currentParkingCapacity>0){
+				privateParking.setCapacity(currentParkingCapacity);
 				privateParkings.add(privateParking);
 			}
-			
-			i++;
 		}
 		
 	}
@@ -230,12 +256,12 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	
 	public static void assignParkingCapacityToClosestFacility(Coord coord, int parkingCapacity, QuadTree<ActivityFacilityImpl> facilitiesQuadTree, LinkedList<PrivateParking> privateParkings){
 		ActivityFacilityImpl closestFacility=facilitiesQuadTree.get(coord.getX(), coord.getY());
-		int activityCapacities[]=new int[closestFacility.getActivityOptions().size()];
-		int sumOfFacilityActivityCapacities=0;
+		double activityCapacities[]=new double[closestFacility.getActivityOptions().size()];
+		double sumOfFacilityActivityCapacities=0;
 		
 		int i=0;
 		for (ActivityOption activityOption: closestFacility.getActivityOptions().values()){
-			activityCapacities[i]=(int) Math.round(activityOption.getCapacity());
+			activityCapacities[i]=activityOption.getCapacity();
 			sumOfFacilityActivityCapacities+=activityOption.getCapacity();
 			i++;
 		}
@@ -245,10 +271,9 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 			ActInfo actInfo=new ActInfo(closestFacility.getId(), activityOption.getType());
 			PrivateParking privateParking=new PrivateParking(coord, actInfo);
 			
-			double currentParkingCapacity=(double)parkingCapacity* (double)activityCapacities[i]/ (double)sumOfFacilityActivityCapacities;
-			int roundedCapacity=(int) Math.round(currentParkingCapacity);
-			if (roundedCapacity>0){
-				privateParking.setCapacity(roundedCapacity);
+			double currentParkingCapacity=parkingCapacity* activityCapacities[i]/ sumOfFacilityActivityCapacities;
+			if (currentParkingCapacity>0){
+				privateParking.setCapacity(currentParkingCapacity);
 				privateParkings.add(privateParking);
 			}
 			

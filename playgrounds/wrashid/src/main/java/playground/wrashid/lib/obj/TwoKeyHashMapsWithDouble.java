@@ -21,12 +21,21 @@
 package playground.wrashid.lib.obj;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class TwoKeyHashMapsWithDouble<ClassKey1,ClassKey2> {
 
 	// TODO: write test
 private HashMap<ClassKey1, DoubleValueHashMap<ClassKey2>> hashMap=new HashMap<ClassKey1, DoubleValueHashMap<ClassKey2>>();
 	
+	public DoubleValueHashMap<ClassKey2> getDoubleValueHashMap(ClassKey1 key1){
+		return hashMap.get(key1);
+	}
+
+	public Set<ClassKey1> getKeySet1(){
+		return hashMap.keySet();
+	}
+
 	public void put(ClassKey1 key1, ClassKey2 key2, double value){
 		checkHashMapAndInitializeIfNeeded(key1);
 		hashMap.get(key1).put(key2, value);

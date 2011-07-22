@@ -13,7 +13,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.parkingId = parkingId;
 	}
 
-	public void setMaxCapacity(Integer maxCapacity) {
+	public void setMaxCapacity(double maxCapacity) {
 		this.maxCapacity = maxCapacity;
 	}
 
