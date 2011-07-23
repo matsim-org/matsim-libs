@@ -87,20 +87,18 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	private void writeOutGraphParkingTypeOccupancies(Controler controler) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingOccupancy.png");
 
-		double matrix[][]=new double[96][5];
+		double matrix[][]=new double[96][4];
 		
 		for (Parking parking:parkingScoreCollector.parkingOccupancies.keySet()){
 			int graphIndex=-1;
 			if (parking.getId().toString().startsWith("gp")){
 				graphIndex=0;
-			} else if (parking.getId().toString().startsWith("ppIndoor")){
+			} else if (parking.getId().toString().startsWith("privateParkings")){
 				graphIndex=1;
-			}else if (parking.getId().toString().startsWith("ppOutdoor")){
-				graphIndex=2;
 			}else if (parking.getId().toString().startsWith("publicPOutsideCityZH")){
-				graphIndex=3;
+				graphIndex=2;
 			}else if (parking.getId().toString().startsWith("stp")){
-				graphIndex=4;
+				graphIndex=3;
 			} else {
 				DebugLib.stopSystemAndReportInconsistency("parking type (Id) unknown: " + parking.getId());
 			}
@@ -114,12 +112,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		String title="ParkingTypeOccupancies";
 		String xLabel="time (15min-bin)";
 		String yLabel="# of occupied parkings";
-		String[] seriesLabels=new String[5];
+		String[] seriesLabels=new String[4];
 		seriesLabels[0]="garageParkings";
-		seriesLabels[1]="privateParkingsIndoor";
-		seriesLabels[2]="privateParkingsOutdoor";
-		seriesLabels[3]="publicParkingsOutsideCityZH";
-		seriesLabels[4]="streetParkings";
+		seriesLabels[1]="privateParkings";
+		seriesLabels[2]="publicParkingsOutsideCityZH";
+		seriesLabels[3]="streetParkings";
 		double[] xValues=new double[96];
 		
 		for (int i=0;i<96;i++){

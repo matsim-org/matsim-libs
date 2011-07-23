@@ -70,8 +70,8 @@ public class ParkingHerbieControler {
 	public static LinkedList<Parking> getParkingCollectionZHCity(Controler controler) {
 		double streetParkingCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "streetParkingCalibrationFactorZHCity"));
 		double garageParkingCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "garageParkingCalibrationFactorZHCity"));
-		double privateParkingsIndoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingsIndoorCalibrationFactorZHCity"));
-		double privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingsOutdoorCalibrationFactorZHCity"));
+		double privateParkingCalibrationFactorZHCity=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingCalibrationFactorZHCity"));
+		//double privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking", "privateParkingsOutdoorCalibrationFactorZHCity"));
 		
 		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
 		
@@ -82,7 +82,7 @@ public class ParkingHerbieControler {
 		readParkings(garageParkingCalibrationFactor, garageParkingsFile,parkingCollection);
 		
 		String privateIndoorParkingsFile=parkingDataBase + "privateParkings_v1.xml";
-		readParkings(privateParkingsIndoorCalibrationFactor, privateIndoorParkingsFile,parkingCollection);
+		readParkings(privateParkingCalibrationFactorZHCity, privateIndoorParkingsFile,parkingCollection);
 		
 		//String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
 		//readParkings(privateParkingsOutdoorCalibrationFactor, privateOutdoorParkingsFile,parkingCollection);
