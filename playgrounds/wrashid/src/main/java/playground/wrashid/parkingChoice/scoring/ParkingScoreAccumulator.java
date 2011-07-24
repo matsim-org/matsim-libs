@@ -2,9 +2,11 @@ package playground.wrashid.parkingChoice.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -17,13 +19,19 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
+import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
+import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 public class ParkingScoreAccumulator implements AfterMobsimListener {
 
+	private static Set<String> selectedParkings;
+	private static double[] sumOfOccupancyCountsOfSelectedParkings;
 	private final ParkingScoreCollector parkingScoreCollector;
 	private Double averageWalkingDistance=null;
 
@@ -32,9 +40,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	}
 
 	private ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph = new ParkingWalkingDistanceMeanAndStandardDeviationGraph();
+	private ParkingManager parkingManager;
 
-	public ParkingScoreAccumulator(ParkingScoreCollector parkingScoreCollector) {
+	public ParkingScoreAccumulator(ParkingScoreCollector parkingScoreCollector, ParkingManager parkingManager) {
 		this.parkingScoreCollector = parkingScoreCollector;
+		this.parkingManager=parkingManager;
 	}
 
 	@Override
@@ -79,9 +89,53 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		if (!ParkingChoiceLib.isTestCaseRun){
 			writeOutParkingOccupancies(controler);
 			writeOutGraphParkingTypeOccupancies(controler);
+			writeOutGraphComparingSumOfSelectedParkingsToCounts(controler);
 		}
 		
 		//eventsToScore.finish();
+	}
+
+	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingOccupancyCountsComparison.png");
+
+		HashMap<String, String> mappingOfParkingNameToParkingId = SingleDayGarageParkingsCount.getMappingOfParkingNameToParkingId();
+		int[] sumOfSelectedParkingSimulatedCounts=new int[96];
+		
+		for (String parkingName:selectedParkings){
+			ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(new IdImpl(mappingOfParkingNameToParkingId.get(parkingName)));
+			
+			if (parkingOccupancyBins==null){
+				continue;
+			}
+			
+			int[] occupancy = parkingOccupancyBins.getOccupancy();
+			for (int i=0;i<96;i++){
+				sumOfSelectedParkingSimulatedCounts[i]+=occupancy[i];
+			}
+		}
+		
+		
+		double matrix[][]=new double[96][2];
+		
+		for (int i=0;i<96;i++){
+			matrix[i][0]=sumOfSelectedParkingSimulatedCounts[i];
+			matrix[i][1]=sumOfOccupancyCountsOfSelectedParkings[i];
+		}
+		
+		
+		String title="Parking Garage Counts Comparison";
+		String xLabel="time (15min-bin)";
+		String yLabel="# of occupied parkings";
+		String[] seriesLabels=new String[2];
+		seriesLabels[0]="simulated counts";
+		seriesLabels[1]="real counts";
+		double[] xValues=new double[96];
+		
+		for (int i=0;i<96;i++){
+			xValues[i]=i/(double)4;
+		}
+		
+		GeneralLib.writeGraphic(iterationFilename, matrix, title, xLabel, yLabel, seriesLabels, xValues);		
 	}
 
 	private void writeOutGraphParkingTypeOccupancies(Controler controler) {
@@ -89,7 +143,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 		double matrix[][]=new double[96][4];
 		
-		for (Parking parking:parkingScoreCollector.parkingOccupancies.keySet()){
+		for (Id parkingId:parkingScoreCollector.parkingOccupancies.keySet()){
+			Parking parking=parkingManager.getParkingsHashMap().get(parkingId);
 			int graphIndex=-1;
 			if (parking.getId().toString().startsWith("gp")){
 				graphIndex=0;
@@ -103,7 +158,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				DebugLib.stopSystemAndReportInconsistency("parking type (Id) unknown: " + parking.getId());
 			}
 			
-			int[] occupancy = parkingScoreCollector.parkingOccupancies.get(parking).getOccupancy();
+			int[] occupancy = parkingScoreCollector.parkingOccupancies.get(parking.getId()).getOccupancy();
 			for (int i=0;i<96;i++){
 				matrix[i][graphIndex]+=occupancy[i];
 			}
@@ -132,10 +187,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		
 		ArrayList<String> list=new ArrayList<String>();
 		
-		for (Parking parking:parkingScoreCollector.parkingOccupancies.keySet()){
+		for (Id parkingId:parkingScoreCollector.parkingOccupancies.keySet()){
+			Parking parking=parkingManager.getParkingsHashMap().get(parkingId);
 			StringBuffer row = new StringBuffer (parking.getId().toString());
 			
-			ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(parking);
+			ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(parking.getId());
 			
 			for (int i=0;i<96;i++){
 				row.append("\t");
@@ -167,6 +223,37 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		parkingWalkingDistanceGraph.updateStatisticsForIteration(controler.getIterationNumber(), walkingDistance);
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceOverIterations.png");
 		parkingWalkingDistanceGraph.writeGraphic(fileName);
+	}
+
+	public static void initializeParkingCounts(Controler controler) {
+		String baseFolder=null;
+		Double countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking", "countsScalingFactor"));
+		
+		if (ParkingHerbieControler.isRunningOnServer){
+			baseFolder = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/counts/";
+		} else {
+			baseFolder = "H:/data/experiments/TRBAug2011/parkings/counts/";
+		}
+		StringMatrix countsMatrix = GeneralLib.readStringMatrix(baseFolder + "parkingGarageCountsCityZH27-April-2011.txt", "\t");
+		
+		HashMap<String, Double[]> occupancyOfAllSelectedParkings = SingleDayGarageParkingsCount.getOccupancyOfAllSelectedParkings(countsMatrix);
+		
+		selectedParkings=occupancyOfAllSelectedParkings.keySet();
+		
+		sumOfOccupancyCountsOfSelectedParkings=new double[96];
+		
+		for (String parkingName:selectedParkings){
+			Double[] occupancyBins = occupancyOfAllSelectedParkings.get(parkingName);
+			
+			if (occupancyBins==null){
+				DebugLib.stopSystemAndReportInconsistency();
+			}
+			
+			for (int i=0;i<96;i++){
+				sumOfOccupancyCountsOfSelectedParkings[i]+=countsScalingFactor*occupancyBins[i];
+			}
+		}
+		
 	}
 
 	

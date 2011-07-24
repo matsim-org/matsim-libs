@@ -34,7 +34,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	private DoubleValueHashMap<Id> sumOfParkingDurations;
 
-	public HashMap<Parking, ParkingOccupancyBins> parkingOccupancies = new HashMap<Parking, ParkingOccupancyBins>();
+	public HashMap<Id, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id, ParkingOccupancyBins>();
 
 	private boolean finishHandlingCalled;
 
@@ -80,12 +80,12 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	private void updateParkingOccupanciesParkingArrival(ParkingDepartureEvent event) {
 		Parking parking = event.getParking();
-		if (!parkingOccupancies.containsKey(parking)) {
-			parkingOccupancies.put(parking, new ParkingOccupancyBins());
+		if (!parkingOccupancies.containsKey(parking.getId())) {
+			parkingOccupancies.put(parking.getId(), new ParkingOccupancyBins());
 		}
 
 		if (currentArrivalTime.containsKey(event.getAgentDepartureEvent().getPersonId())) {
-			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parking);
+			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parking.getId());
 			parkingOccupancyBins.inrementParkingOccupancy(currentArrivalTime.get(event.getAgentDepartureEvent().getPersonId()),
 					event.getAgentDepartureEvent().getTime());
 		}
@@ -160,11 +160,11 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	private void updateParkingOccupancy(Id personId, Double arrivalTime, Double departureTime) {
 		Parking parking = currentParking.get(personId);
-		if (!parkingOccupancies.containsKey(parking)) {
-			parkingOccupancies.put(parking, new ParkingOccupancyBins());
+		if (!parkingOccupancies.containsKey(parking.getId())) {
+			parkingOccupancies.put(parking.getId(), new ParkingOccupancyBins());
 		}
 
-		ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parking);
+		ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parking.getId());
 		parkingOccupancyBins.inrementParkingOccupancy(arrivalTime, departureTime);
 	}
 

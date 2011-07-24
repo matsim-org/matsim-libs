@@ -11,11 +11,13 @@ import org.matsim.core.controler.listener.StartupListener;
 import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.infrastructure.FlatParkingFormatReaderV1;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 
 public class ParkingHerbieControler {
 
 	static String parkingDataBase=null;
 	static ParkingModule parkingModule;
+	public static boolean isRunningOnServer=false;
 	
 	public static void main(String[] args) {
 		
@@ -43,16 +45,22 @@ public class ParkingHerbieControler {
 				String isRunningOnServer = event.getControler().getConfig().findParam("parking", "isRunningOnServer");
 				if (Boolean.parseBoolean(isRunningOnServer)){
 					parkingDataBase="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
+					ParkingHerbieControler.isRunningOnServer=true;
 				} else {
 					parkingDataBase="H:/data/experiments/TRBAug2011/parkings/flat/";
+					ParkingHerbieControler.isRunningOnServer=false;
 				}
 				
 				LinkedList<Parking> parkingCollection = getParkingsForScenario(event.getControler());
 				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
+				
+				ParkingScoreAccumulator.initializeParkingCounts(event.getControler());
 			}
 		});
 		
 	}
+	
+	
 
 
 

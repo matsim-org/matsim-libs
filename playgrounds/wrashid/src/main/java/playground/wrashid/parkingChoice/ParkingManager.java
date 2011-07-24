@@ -41,6 +41,13 @@ public class ParkingManager implements StartupListener {
 	
 	
 	private QuadTree<Parking> parkings;
+	//key: parkingId
+	private HashMap<Id,Parking> parkingsHashMap=new HashMap<Id, Parking>();
+	
+	public HashMap<Id, Parking> getParkingsHashMap() {
+		return parkingsHashMap;
+	}
+
 	public QuadTree<Parking> getParkings() {
 		return parkings;
 	}
@@ -108,12 +115,14 @@ public class ParkingManager implements StartupListener {
 
 	private void addParking(Parking parking) {
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
+		parkingsHashMap.put(parking.getId(), parking);
 	}
 
 	public ParkingManager(Controler controler, Collection<Parking> parkingCollection) {
 		this.controler = controler;
 		this.parkingCollection = parkingCollection;
 		currentParkingLocation = new HashMap<Id, Parking>();
+		
 	}
 
 	private void initializeQuadTree(NetworkImpl network) {

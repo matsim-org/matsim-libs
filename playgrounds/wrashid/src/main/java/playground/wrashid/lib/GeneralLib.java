@@ -7,14 +7,13 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -668,20 +667,34 @@ public class GeneralLib {
 	// playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
 	// be refactored by calling this method.
 	public static StringMatrix readStringMatrix(String fileName) {
+		return readStringMatrix(fileName,null);
+	}
+	
+	public static StringMatrix readStringMatrix(String fileName, String delim) {
 		StringMatrix matrix = new StringMatrix();
 
 		try {
 
-			FileReader fr = new FileReader(fileName);
+			//FileReader fr = new FileReader(fileName);
 
-			BufferedReader br = new BufferedReader(fr);
+			FileInputStream fis = new FileInputStream(fileName);
+			InputStreamReader isr = new InputStreamReader(fis,
+								      "ISO-8859-1");
+
+			
+			
+			BufferedReader br = new BufferedReader(isr);
 			String line;
 			StringTokenizer tokenizer;
 			line = br.readLine();
 			while (line != null) {
 				LinkedList<String> row = new LinkedList<String>();
 
-				tokenizer = new StringTokenizer(line);
+				if (delim==null){
+					tokenizer = new StringTokenizer(line);
+				} else {
+					tokenizer = new StringTokenizer(line,delim);
+				}
 
 				while (tokenizer.hasMoreTokens()) {
 					row.add(tokenizer.nextToken());

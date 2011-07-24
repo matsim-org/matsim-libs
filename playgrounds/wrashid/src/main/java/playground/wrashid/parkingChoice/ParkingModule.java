@@ -47,7 +47,7 @@ public class ParkingModule {
 		parkingSimulation.addParkingArrivalEventHandler(parkingScoreCollector);
 		parkingSimulation.addParkingDepartureEventHandler(parkingScoreCollector);
 		controler.addControlerListener(parkingManager);
-		parkingScoreAccumulator = new ParkingScoreAccumulator(parkingScoreCollector);
+		parkingScoreAccumulator = new ParkingScoreAccumulator(parkingScoreCollector, parkingManager);
 		controler.addControlerListener(parkingScoreAccumulator);
 		PlanUpdater planUpdater=new PlanUpdater(parkingManager);
 		controler.addControlerListener(planUpdater);

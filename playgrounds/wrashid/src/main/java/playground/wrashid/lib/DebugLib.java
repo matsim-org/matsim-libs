@@ -30,7 +30,11 @@ public class DebugLib {
 		throw new Error("system is in inconsistent state");
 	}
 
-	public static void emptyMethodForBreakPoint() {
+	public static void criticalTODO(){
+		stopSystemAndReportInconsistency("critical TODO still missing here");
+	}
+	
+	public static void continueHere(){
 		
 	}
 
