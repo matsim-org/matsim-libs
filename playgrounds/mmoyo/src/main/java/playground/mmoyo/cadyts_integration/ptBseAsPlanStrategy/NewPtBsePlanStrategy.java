@@ -98,7 +98,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 
 		// set up the bus occupancy analyzer ...  
 		this.ptBseOccupAnalyzer = new PtBseOccupancyAnalyzer();
-		this.controler.getEvents().addHandler(ptBseOccupAnalyzer);
+		//this.controler.getEvents().addHandler(ptBseOccupAnalyzer); //not here, it is added in notifyBeforeMobsim
 		// ... and connect it to the simResults container:
 		this.simResults = new SimResultsContainerImpl( ptBseOccupAnalyzer );
 
@@ -170,7 +170,7 @@ public class NewPtBsePlanStrategy implements PlanStrategy,
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter, event.getControler() ) ) {
-			ptBseOccupAnalyzer.clear();
+			ptBseOccupAnalyzer.reset(iter);
 			event.getControler().getEvents().addHandler(ptBseOccupAnalyzer);  //Necessary because it is removed in notifyAfterMobsim 18.jul.2011
 		}
 	}

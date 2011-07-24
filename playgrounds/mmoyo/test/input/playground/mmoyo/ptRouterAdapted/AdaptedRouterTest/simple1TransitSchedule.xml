@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="stop1" x="1100.0" y="2800.0" linkRefId= "20"/>
+		<stopFacility id="stop2" x="1100.0" y="4800.0" linkRefId= "21"/>
+		<stopFacility id="stop3" x="1100.0" y="6800.0" linkRefId= "22"/>
+		<stopFacility id="stop4" x="1100.0" y="8800.0" linkRefId= "23"/>
+		<stopFacility id="stop5" x="2800.0" y="8900.0" linkRefId= "16"/>
+		<stopFacility id="stop6" x="4800.0" y="8900.0" linkRefId= "17"/>
+		<stopFacility id="stop7" x="6800.0" y="8900.0" linkRefId= "18"/>
+		<stopFacility id="stop8" x="8800.0" y="8900.0" linkRefId= "19"/>
+		<stopFacility id="stop9" x="2800.0" y="2900.0" linkRefId= "9"/>
+		<stopFacility id="stop10" x="2900.0" y="1200.0" linkRefId= "64"/>
+		<stopFacility id="stop11" x="4800.0" y="950.0" linkRefId= "1"/>
+		<stopFacility id="stop12" x="6800.0" y="950.0" linkRefId= "2"/>
+		<stopFacility id="stop13" x="8800.0" y="950.0" linkRefId= "3"/>
+		<stopFacility id="stop14" x="9100.0" y="2800.0" linkRefId= "36"/>
+		<stopFacility id="stop15" x="9100.0" y="4800.0" linkRefId= "37"/>
+		<stopFacility id="stop16" x="9100.0" y="6800.0" linkRefId= "38"/>
+		<stopFacility id="stop17" x="9100.0" y="8800.0" linkRefId= "39"/>
+	</transitStops>
+	<transitLine id="Blue Line">
+		<transitRoute id="Blue Line.Blue.101.H">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="stop1" arrivalOffset="00:00:00" departureOffset="00:00:00"/>
+				<stop refId="stop2" arrivalOffset="00:00:20" departureOffset="00:00:25"/>
+				<stop refId="stop3" arrivalOffset="00:00:40" departureOffset="00:00:45"/>
+				<stop refId="stop4" arrivalOffset="00:01:00" departureOffset="00:01:00"/>
+			</routeProfile>
+			<route>
+				<link refId="20"/>
+				<link refId="21"/>
+				<link refId="22"/>
+				<link refId="23"/>
+			</route>
+			<departures>
+				<departure id="Blue0800" departureTime="08:00:00" vehicleRefId="tr_1" />
+				<departure id="Blue0805" departureTime="08:05:00" vehicleRefId="tr_2" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

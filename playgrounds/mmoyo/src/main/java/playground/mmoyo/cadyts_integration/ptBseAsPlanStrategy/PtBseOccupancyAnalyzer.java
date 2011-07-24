@@ -74,17 +74,9 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		/*  moved to "clear" 
 		this.occupancies.clear();
 		this.veh_stops.clear();
-		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");*/
-		
-	}
-	
-	void clear() {
-		this.occupancies.clear();
-		this.veh_stops.clear();
-		this.occupancyRecord = new StringBuffer(HEADER);
+		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	}
 	
 	@Override

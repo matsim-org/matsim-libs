@@ -35,7 +35,7 @@ public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandl
 											VehicleArrivesAtFacilityEventHandler,
 											VehicleDepartsAtFacilityEventHandler{
 
-	private static final Logger log = Logger.getLogger(OccupancyAnalyzer.class);
+	private static final Logger log = Logger.getLogger(PassengerTrackerFromEvents.class);
 	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();
 	private final Map<Id, List<Id>> veh_passengers = new HashMap<Id, List<Id>>();
 	public final Map<Id, List<Id>> stop_passengers = new HashMap<Id, List<Id>>();
