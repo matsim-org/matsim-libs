@@ -69,10 +69,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private JFormattedTextField scaleField;
 
-	private final OTFHostConnectionManager masterHostConnectionManager;
-
-	private final List <OTFHostConnectionManager> hostConnectionManagers = new ArrayList<OTFHostConnectionManager>();
-
 	private final OTFHostControl hostControl;
 
 	private int gotoIter = 0;
@@ -95,16 +91,17 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	 */
 	private PlayOrPause playOrPause = PlayOrPause.PLAY;
 
-	public OTFHostControlBar(OTFHostConnectionManager masterHostConnectionManager)  {
-		this.masterHostConnectionManager = masterHostConnectionManager;
-		this.hostConnectionManagers.add(this.masterHostConnectionManager);
-		this.hostControl = new OTFHostControl(masterHostConnectionManager, this);
+	private OTFServerRemote server;
+
+	public OTFHostControlBar(OTFServerRemote server)  {
+		this.server = server;
+		this.hostControl = new OTFHostControl(server, this);
 		this.setFloatable(false);
 
 		playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
 		pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
-		if (!this.masterHostConnectionManager.getOTFServer().isLive()) {
+		if (!server.isLive()) {
 			add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
@@ -124,7 +121,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		timeField.addActionListener( this );
 
 		createCheckBoxes();
-		add(new JLabel(this.masterHostConnectionManager.getAddress()));
 
 		JLabel lab = new JLabel("Scale: ");
 		lab.setMaximumSize(new Dimension(100,30));
@@ -229,7 +225,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private void forwardToTime(String newTime) {
 		final int newTime_s = (int) Time.parseTime(newTime);
-		progressBar = new OTFAbortGoto(masterHostConnectionManager.getOTFServer(), newTime_s, gotoIter);
+		progressBar = new OTFAbortGoto(server, newTime_s, gotoIter);
 		progressBar.start();
 		new Thread() {
 			@Override
@@ -280,7 +276,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	private void createCheckBoxes() {
-		if (masterHostConnectionManager.getOTFServer().isLive()) {
+		if (server.isLive()) {
 			JCheckBox synchBox = new JCheckBox(TOGGLE_SYNCH);
 			synchBox.setMnemonic(KeyEvent.VK_V);
 			synchBox.setSelected(synchronizedPlay);
@@ -312,17 +308,6 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		public void setBorder(final Border border) {
 			// ignore border setting to overwrite specific look&feel
 		}
-	}
-
-	public void addSlave(OTFHostConnectionManager slave) {
-		this.hostConnectionManagers.add(slave);
-	}
-
-	/**
-	 * Method should be removed again when we once finish the refactoring
-	 */
-	public OTFHostConnectionManager getOTFHostConnectionManager(){
-		return this.masterHostConnectionManager;
 	}
 
 	public OTFHostControl getOTFHostControl() {

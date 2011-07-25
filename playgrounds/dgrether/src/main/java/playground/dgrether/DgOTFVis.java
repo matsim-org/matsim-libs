@@ -9,11 +9,13 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
 
@@ -52,11 +54,12 @@ public class DgOTFVis {
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		qSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+		
 		qSim.setControlerIO(controlerIO);
 		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+		
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		OTFClientLive.run(scenario.getConfig(), server);
 		qSim.run();
 
 	}

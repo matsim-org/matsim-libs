@@ -28,13 +28,12 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -59,10 +58,13 @@ import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.TeleportationVisData;
 import org.matsim.vis.snapshots.writers.VisLink;
@@ -74,15 +76,17 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	private static final Logger log = Logger.getLogger(OTFVisMobsimFeature.class);
 
-	protected OnTheFlyServer otfServer = null;
+	private final OnTheFlyServer server;
 
 	private boolean doVisualizeTeleportedAgents = false;
 
-	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
+	private final OTFAgentsListHandler.Writer teleportationWriter;
 
-	private OTFAgentsListHandler.Writer teleportationWriter;
+	public OTFAgentsListHandler.Writer getTeleportationWriter() {
+		return teleportationWriter;
+	}
 
-	private VisMobsim queueSimulation;
+	private final VisMobsim queueSimulation;
 
 	/** 
 	 * These are agents which are being teleported right now.
@@ -109,17 +113,13 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 
-	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
+	public OTFVisMobsimFeature(OnTheFlyServer server, VisMobsim queueSimulation) {
+		this.server = server;
 		this.queueSimulation = queueSimulation;
+		this.teleportationWriter = new OTFAgentsListHandler.Writer();
+		this.teleportationWriter.setSrc(visData.values());
 	}
 
-	/*
-	 * TODO: Erzeugung des Servers hier rausschmeissen. In eine statische Factory in OnTheFlyServer
-	 * verlegen. Der Server muss damit extern erzeugt und dieser Klasse im Konstruktor 
-	 * uebergeben werden. Der Client muss ebenfalls extern erzeugt und gestartet werden.
-	 * Und zwar unabhaengig davon. Das ist gerade der Witz am Client-Server-Prinzip.
-	 * michaz feb 11
-	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
 		log.info("receiving simulationInitializedEvent") ;
@@ -129,63 +129,6 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 				agents.put( pag.getId(), pag) ;
 			}
 		}
-
-		Config config = this.queueSimulation.getScenario().getConfig();
-		UUID idOne = UUID.randomUUID();
-		this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), queueSimulation.getEventsManager());
-		this.otfServer.setSimulation(this);
-
-		// the "connect" statements for the regular links are called by
-		// new DefaultConnectionManagerFactory().createConnectionManager() above.  kai, aug'10
-
-		this.teleportationWriter = new OTFAgentsListHandler.Writer();
-		this.teleportationWriter.setSrc(visData.values());
-		this.otfServer.addAdditionalElement(this.teleportationWriter);
-		this.connectionManager.connectWriterToReader(
-				OTFAgentsListHandler.Writer.class,
-				OTFAgentsListHandler.class);
-		this.connectionManager.connectReaderToReceiver(
-				OTFAgentsListHandler.class,
-				AgentPointDrawer.class);
-
-		if (config.scenario().isUseTransit()) {
-			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(
-					queueSimulation.getVisNetwork().getNetwork(),
-					((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule(),
-					((QSim) queueSimulation).getTransitEngine().getAgentTracker()
-			));
-			this.connectionManager.connectWriterToReader(
-					FacilityDrawer.DataWriter_v1_0.class,
-					FacilityDrawer.DataReader_v1_0.class);
-			this.connectionManager.connectReaderToReceiver(
-					FacilityDrawer.DataReader_v1_0.class,
-					FacilityDrawer.DataDrawer.class);
-			this.connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
-		}
-		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
-			this.otfServer.addAdditionalElement(new OTFLaneWriter(this.queueSimulation.getVisNetwork(), ((ScenarioImpl) this.queueSimulation.getScenario()).getLaneDefinitions()));
-			this.connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
-			this.connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-			this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-			config.otfVis().setScaleQuadTreeRect(true);
-		} else if (config.scenario().isUseSignalSystems()) {
-			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
-			this.queueSimulation.getEventsManager().addHandler(signalTracker);
-			SignalsData signalsData = this.queueSimulation.getScenario().getScenarioElement(SignalsData.class);
-			LaneDefinitions laneDefs = ((ScenarioImpl)this.queueSimulation.getScenario()).getLaneDefinitions();
-			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
-			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
-			this.otfServer.addAdditionalElement(new OTFSignalWriter(this.queueSimulation.getVisNetwork(), laneDefs, systemsData, groupsData , signalTracker));
-			this.connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-			this.connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-			this.connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-			config.otfVis().setScaleQuadTreeRect(true);
-		}
-
-		OTFClientLive client = new OTFClientLive(this.otfServer, this.connectionManager);
-		new Thread(client).start();
-
-		this.otfServer.pause();
 	}
 
 	@Override
@@ -200,7 +143,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
-		this.otfServer.blockUpdates();
+		this.server.blockUpdates();
 	}
 	
 	@Override
@@ -208,8 +151,8 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		double time = event.getSimulationTime() ;
 		this.updateTeleportedAgents(time);
 		this.visualizeTrackedAndTeleportingAgents();
-		this.otfServer.unblockUpdates();
-		this.otfServer.updateStatus(time);
+		this.server.unblockUpdates();
+		this.server.updateStatus(time);
 	}
 
 	private void visualizeTrackedAndTeleportingAgents() {
@@ -260,10 +203,6 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 				teleportationVisData.calculatePosition(time);
 			}
 		}
-	}
-
-	void setConnectionManager(OTFConnectionManager connectionManager) {
-		this.connectionManager = connectionManager;
 	}
 
 	public void setVisualizeTeleportedAgents(boolean active) {

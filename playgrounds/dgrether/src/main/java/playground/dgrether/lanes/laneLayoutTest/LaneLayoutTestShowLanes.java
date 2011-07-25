@@ -29,7 +29,9 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 /**
@@ -57,13 +59,11 @@ public class LaneLayoutTestShowLanes {
 		
 		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
 		QSim otfVisQSim = new QSim(sc, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
-		QSim queueSimulation = otfVisQSim;
-		queueSimulation.setControlerIO(controlerIO);
-		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
-		queueSimulation.run();
+		otfVisQSim.setControlerIO(controlerIO);
+		otfVisQSim.setIterationNumber(sc.getConfig().controler().getLastIteration());
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
+		OTFClientLive.run(sc.getConfig(), server);
+		otfVisQSim.run();
 	
 	}
 

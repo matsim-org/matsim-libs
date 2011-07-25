@@ -1,7 +1,10 @@
 package playground.gregor.pedvis;
 
+import java.awt.BorderLayout;
 import java.util.LinkedHashMap;
 import java.util.UUID;
+
+import javax.swing.SwingUtilities;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
@@ -10,12 +13,25 @@ import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.gui.OTFQueryControl;
+import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.VisMobsim;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
@@ -25,13 +41,11 @@ import playground.gregor.sim2d_v2.events.XYZEventsHandler;
 
 public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 
-	protected OnTheFlyServer otfServer = null;
+	protected OnTheFlyServer server = null;
 	private final VisMobsim queueSimulation;
 
 	private OTFAgentsListHandler.Writer walk2dWriter;
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
-
-	private final OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
 
 	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
 		this.queueSimulation = queueSimulation;
@@ -39,33 +53,68 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		UUID idOne = UUID.randomUUID();
-		this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueSimulation.getEventsManager());
-		this.otfServer.setSimulation(this);
+		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getEventsManager());
+		this.server.setSimulation(this);
 
 
 		this.walk2dWriter = new OTFAgentsListHandler.Writer();
 		this.walk2dWriter.setSrc(this.visData.values());
-		this.otfServer.addAdditionalElement(this.walk2dWriter);
+		this.server.addAdditionalElement(this.walk2dWriter);
 
-		this.connectionManager.connectWriterToReader(
+		final OTFConnectionManager connectionManager = new OTFConnectionManager();
+		connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+		connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
+		connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
+		connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
+		connectionManager.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
+		connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
+		
+		connectionManager.connectWriterToReader(
 				OTFAgentsListHandler.Writer.class,
 				OTFAgentsListHandler.class);
-		this.connectionManager.connectReaderToReceiver(
+		connectionManager.connectReaderToReceiver(
 				OTFAgentsListHandler.class,
 				AgentPointDrawer.class);
 
-		OTFClientLive client = new OTFClientLive(this.otfServer, this.connectionManager);
-		new Thread(client).start();
-		this.otfServer.pause();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				OTFClient otfClient = new OTFClient();
+				otfClient.setServer(server);
+				SettingsSaver saver = new SettingsSaver("otfsettings");
+				OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
+				if (visconf == null) {
+					visconf = server.getOTFVisConfig();
+				}
+				visconf.setCachingAllowed(false); // no use to cache in live mode
+				OTFClientControl.getInstance().setOTFVisConfig(visconf);
+				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
+				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
+				clientQuadTree.createReceiver(connectionManager);
+				clientQuadTree.getConstData();
+				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
+				hostControlBar.updateTimeLabel();
+				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar);
+				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
+				queryControl.setQueryTextField(queryControlBar.getTextField());
+				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				mainDrawer.setQueryHandler(queryControl);
+				otfClient.addDrawerAndInitialize(mainDrawer, saver);
+				otfClient.show();
+			}
+		});
+		this.server.pause();
 
 	}
 
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 		double time = e.getSimulationTime() ;
-		this.otfServer.unblockUpdates();
-		this.otfServer.updateStatus(time);
+		this.server.unblockUpdates();
+		this.server.updateStatus(time);
 
 	}
 

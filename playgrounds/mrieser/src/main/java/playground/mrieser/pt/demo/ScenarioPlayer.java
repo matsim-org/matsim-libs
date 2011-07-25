@@ -40,7 +40,9 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 /**
@@ -53,7 +55,8 @@ public class ScenarioPlayer {
 	public static void play(final Scenario scenario, final EventsManager events) {
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 		final QSim sim = new QSim(scenario, events);
-		sim.addFeature(new OTFVisMobsimFeature(sim));
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();
 	}
 

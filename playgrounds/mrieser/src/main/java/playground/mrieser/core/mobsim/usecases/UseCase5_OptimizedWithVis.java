@@ -27,7 +27,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
@@ -52,9 +51,8 @@ public class UseCase5_OptimizedWithVis {
 		/* **************************************************************** */
 
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
-		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("foobar", server);
 		OTFVisClient client = new OTFVisClient();
-		client.setHostConnectionManager(hostConnectionManager);
+		client.setServer(server);
 		client.setSwing(true);
 		client.run();
 

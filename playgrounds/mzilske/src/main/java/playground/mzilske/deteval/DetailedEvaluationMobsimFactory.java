@@ -31,7 +31,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
@@ -106,9 +105,8 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 
 		if (useOTFVis) {
 			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
-			OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 			OTFVisClient client = new OTFVisClient();
-			client.setHostConnectionManager(hostConnectionManager);
+			client.setServer(server);
 			client.setSwing(true);
 			client.run();
 			VisNetwork visNetwork = netFeature.getVisNetwork();

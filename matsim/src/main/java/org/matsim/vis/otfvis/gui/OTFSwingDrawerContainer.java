@@ -9,7 +9,7 @@ import java.awt.geom.Point2D.Double;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 
@@ -23,7 +23,7 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 	
 	public Rectangle currentRect;
 	
-	public OTFSwingDrawerContainer(OTFClientQuad quad, OTFHostControlBar hostControlBar) {
+	public OTFSwingDrawerContainer(OTFClientQuadTree quad, OTFHostControlBar hostControlBar) {
 		super(new BorderLayout());
 		delegate = new OTFSwingDrawer(quad, hostControlBar, this);
 		networkScrollPane = new MyNetVisScrollPane(delegate);
@@ -51,7 +51,7 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 	}
 
 	@Override
-	public OTFClientQuad getQuad() {
+	public OTFClientQuadTree getQuad() {
 		return delegate.getQuad();
 	}
 

@@ -108,8 +108,8 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 		this.additionalElements.add(element);
 	}
 
-	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
-		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
+	public OTFClientQuadTree convertToClient(final OTFServerRemote host, final OTFConnectionManager connect) {
+		final OTFClientQuadTree client = new OTFClientQuadTree(host, 0., 0.,this.easting, this.northing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
@@ -186,9 +186,9 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 
 	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
 		final OTFConnectionManager connect;
-		final OTFClientQuad client;
+		final OTFClientQuadTree client;
 
-		public ConvertToClientExecutor(OTFConnectionManager connect2, OTFClientQuad client) {
+		public ConvertToClientExecutor(OTFConnectionManager connect2, OTFClientQuadTree client) {
 			this.connect = connect2;
 			this.client = client;
 		}

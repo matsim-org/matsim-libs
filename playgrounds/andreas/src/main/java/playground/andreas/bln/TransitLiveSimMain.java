@@ -10,8 +10,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class TransitLiveSimMain {
 
@@ -41,9 +43,12 @@ public class TransitLiveSimMain {
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim sim = new QSim(scenario, events);
 		sim.getTransitEngine().setUseUmlaeufe(true);
-		OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
-		otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
-		sim.addFeature(otfVisQSimFeature);
+		
+		
+		
+		
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,scenario, events, sim);
+		OTFClientLive.run(config, server);
 
 
 //		if(useHeadwayControler){

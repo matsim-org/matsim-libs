@@ -9,19 +9,19 @@ import javax.swing.SwingUtilities;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
-import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.QueryEntry;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
@@ -34,51 +34,42 @@ public final class OTFVisClient implements Runnable {
 
 	private boolean swing = false;
 
-	private OTFClient otfClient = new OTFClient();
+	private OTFServerRemote server;
 
-	private OTFHostConnectionManager masterHostControl;
-
-	private OTFConnectionManager connect = new OTFConnectionManager();
-
-	public OTFVisClient() {
-		super();
-	}
-
-	private void prepareConnectionManager() {
-		this.connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
-		this.connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
+	private void createDrawer() {
+		OTFClient otfClient = new OTFClient();
+		otfClient.setServer(server);
+		OTFConnectionManager connect = new OTFConnectionManager();
+		connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
+		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		if (swing) {
-			this.connect.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
-			this.connect.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
-			this.connect.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
+			connect.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
+			connect.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
+			connect.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
+			connect.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
 		} else {
-			this.connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
-			this.connect.connectReaderToReceiver(LinkHandler.class,  OGLSimpleQuadDrawer.class);
-			this.connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
-			this.connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+			connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
+			connect.connectReaderToReceiver(LinkHandler.class,  OGLSimpleQuadDrawer.class);
+			connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
+			connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		}
-	}
-
-	private OTFClientQuad getRightDrawerComponent() {
-		OTFConnectionManager connectR = this.connect.clone();
-		OTFClientQuad clientQ2 = otfClient.createNewView(connectR);
-		return clientQ2;
-	}
-
-	private OTFDrawer createDrawer(){
-		prepareConnectionManager();
 		OTFTimeLine timeLine = new OTFTimeLine("time", otfClient.getHostControlBar().getOTFHostControl());
 		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
 		otfClient.getHostControlBar().addDrawer(timeLine);
+		OTFServerQuadTree servQ = server.getQuad(connect);
+		OTFClientQuadTree clientQuadTree = servQ.convertToClient(server, connect);
+		clientQuadTree.createReceiver(connect);
+		clientQuadTree.getConstData();
+		otfClient.getHostControlBar().updateTimeLabel();
+		OTFClientControl.getInstance().setOTFVisConfig(server.getOTFVisConfig());
 		OTFDrawer mainDrawer;
 		if (swing) {
-			mainDrawer = new OTFSwingDrawerContainer(this.getRightDrawerComponent(), otfClient.getHostControlBar());
+			mainDrawer = new OTFSwingDrawerContainer(clientQuadTree, otfClient.getHostControlBar());
 		} else {
-			mainDrawer = new OTFOGLDrawer(this.getRightDrawerComponent(), otfClient.getHostControlBar());
+			mainDrawer = new OTFOGLDrawer(clientQuadTree, otfClient.getHostControlBar());
 		}
-		if (masterHostControl.getOTFServer().isLive()) {
-			final OTFQueryControl queryControl = new OTFQueryControl(otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
+		if (server.isLive()) {
+			final OTFQueryControl queryControl = new OTFQueryControl(server, otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
 			queryControl.getQueries().clear();
 			queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));
 			queryControl.setAgentIdResolver(new IdResolver() {
@@ -95,11 +86,9 @@ public final class OTFVisClient implements Runnable {
 			otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 			mainDrawer.setQueryHandler(queryControl);
 		}
-		return mainDrawer;
-	}
-
-	private OTFVisConfigGroup createOTFVisConfig() {
-		return this.masterHostControl.getOTFServer().getOTFVisConfig();
+		
+		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
+		otfClient.show();
 	}
 
 	public void setSwing(boolean swing) {
@@ -111,16 +100,13 @@ public final class OTFVisClient implements Runnable {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig());
-				otfClient.addDrawerAndInitialize(createDrawer(), new SettingsSaver(masterHostControl.getAddress()));
-				otfClient.show();
+				createDrawer();
 			}
 		});
 	}
 
-	public void setHostConnectionManager(OTFHostConnectionManager hostConnectionManager) {
-		this.masterHostControl = hostConnectionManager;
-		this.otfClient.setHostConnectionManager(hostConnectionManager);
+	public void setServer(OTFServerRemote server) {
+		this.server = server;
 	}
 
 }

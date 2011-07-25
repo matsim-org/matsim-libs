@@ -22,7 +22,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.pt.analysis.RouteOccupancy;
@@ -79,7 +81,9 @@ public class OccupancyCounts {
 		events.addHandler(analysis2);
 
 		QSim sim = new QSim(scenario, events);
-		sim.addFeature(new OTFVisMobsimFeature(sim));
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		OTFClientLive.run(scenario.getConfig(), server);
+
 		sim.run();
 
 		///////////show and save results/////////////////////

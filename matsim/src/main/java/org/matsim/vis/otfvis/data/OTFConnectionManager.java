@@ -59,7 +59,7 @@ import org.matsim.vis.snapshots.writers.VisNode;
  *
  * @author dstrippgen
  */
-public class OTFConnectionManager implements Cloneable, Serializable {
+public class OTFConnectionManager implements Serializable {
 
 	private static final long serialVersionUID = 6481835753628883014L;
 
@@ -110,18 +110,6 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	private final List<Entry> connections = new LinkedList<Entry>();
-
-	@Override
-	public OTFConnectionManager clone() {
-		OTFConnectionManager clone = new OTFConnectionManager();
-		Iterator<Entry> iter = connections.iterator();
-		while(iter.hasNext()) {
-			Entry entry = iter.next();
-			Entry entry1 = new Entry(entry.from, entry.to);
-			clone.connections.add(entry1);
-		}
-		return clone;
-	}
 
 	public void connectNodeToWriter(Class<? extends OTFDataWriter<? extends VisNode>> writer) {
 		Entry entry = new Entry(VisNode.class, writer);

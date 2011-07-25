@@ -25,12 +25,14 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -128,14 +130,12 @@ public class OTFVisFromLastIteration {
 			otfVisQSim.addQueueSimulationListeners(engine);
 		}
 
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis()
-				.isShowTeleportedAgents());
-		QSim queueSimulation = otfVisQSim;
-		queueSimulation.setControlerIO(controlerIO);
-		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
-		queueSimulation.run();
+		
+		otfVisQSim.setControlerIO(controlerIO);
+		otfVisQSim.setIterationNumber(sc.getConfig().controler().getLastIteration());
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);
+		OTFClientLive.run(config, server);
+		otfVisQSim.run();
 	}
 
 	private void handleNoLongerSupportedParameters(String configfile, String liveConfFile)

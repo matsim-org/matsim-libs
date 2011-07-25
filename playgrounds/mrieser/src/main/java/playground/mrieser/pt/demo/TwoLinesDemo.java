@@ -52,7 +52,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.mrieser.pt.analysis.RouteOccupancy;
 import playground.mrieser.pt.analysis.VehicleTracker;
@@ -311,7 +313,8 @@ public class TwoLinesDemo {
 		events.addHandler(analysis2);
 
 		QSim sim = new QSim(this.scenario, events);
-		sim.addFeature(new OTFVisMobsimFeature(sim));
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();
 
 		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");

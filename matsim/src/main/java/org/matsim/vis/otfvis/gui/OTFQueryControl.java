@@ -40,6 +40,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -63,10 +64,12 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private JTextField textField;
 
-	private IdResolver agentIdResolver;
+	private IdResolver agentIdResolver = new MyIdResolver();;
 
 	private final OTFHostControlBar hostControlBar;
-	
+
+	private final OTFServerRemote server;
+
 	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
 
 	private final Vector<QueryEntry> queries = new Vector<QueryEntry>(Arrays
@@ -75,20 +78,20 @@ public class OTFQueryControl implements OTFQueryHandler {
 					new QueryEntry("agentEvents",
 							"show the actual events of an agent",
 							QueryAgentEvents.class), new QueryEntry(
-							"agentPTBus",
-							"highlight all buses of a given line",
-							QueryAgentPTBus.class), new QueryEntry(
-							"linkSpinneALL", "show Spinne of ALL traffic",
-							QuerySpinne.class), new QueryEntry("linkSpinneNOW",
-							"show Spinne of all veh on the link NOW",
-							QuerySpinneNOW.class)));
+									"agentPTBus",
+									"highlight all buses of a given line",
+									QueryAgentPTBus.class), new QueryEntry(
+											"linkSpinneALL", "show Spinne of ALL traffic",
+											QuerySpinne.class), new QueryEntry("linkSpinneNOW",
+													"show Spinne of all veh on the link NOW",
+													QuerySpinneNOW.class)));
 
 	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFHostControlBar handler, final OTFVisConfigGroup config) {
+	public OTFQueryControl(OTFServerRemote server, OTFHostControlBar handler, final OTFVisConfigGroup config) {
 		this.config = config;
-		this.agentIdResolver = new MyIdResolver();
 		this.hostControlBar = handler;
+		this.server = server;
 	}
 
 	@Override
@@ -99,18 +102,18 @@ public class OTFQueryControl implements OTFQueryHandler {
 	}
 
 	@Override
-	public void handleClick(String viewId, Point2D.Double point, int mouseButton) {
+	public void handleClick(Point2D.Double point, int mouseButton) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(point.x, point.y,
 				0, 0);
 		// Only handle clicks with the main == zoom button
 		if ((mouseButton == 1) || (mouseButton == 4))
-			handleClick(viewId, origRect, mouseButton);
+			handleClick(origRect, mouseButton);
 	}
 
 	@Override
 	synchronized public void removeQueries() {
-		if(this.hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
-			((OTFLiveServerRemote) this.hostControlBar.getOTFHostConnectionManager().getOTFServer()).removeQueries();
+		if(server.isLive()) {
+			((OTFLiveServerRemote) server).removeQueries();
 		}
 		for (OTFQueryResult query : this.queryEntries.values()) {
 			query.remove();
@@ -128,7 +131,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	}
 
 	@Override
-	public void handleClick(String viewId, Rectangle2D.Double origRect, int mouseButton) {
+	public void handleClick(Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
 			hostControlBar.redrawDrawers();
@@ -175,16 +178,12 @@ public class OTFQueryControl implements OTFQueryHandler {
 		queryEntries.put(remoteQuery, queryResult);
 		return queryResult;
 	}
-	
+
 	@Override
 	public OTFQueryRemote doQuery(final AbstractQuery query) {
-		if(this.hostControlBar.getOTFHostConnectionManager().getOTFServer().isLive()) {
-			return ((OTFLiveServerRemote) this.hostControlBar.getOTFHostConnectionManager().getOTFServer()).answerQuery(query);
-		} else {
-			return null;
-		}
+		return ((OTFLiveServerRemote) server).answerQuery(query);
 	}
-	
+
 	private void handleIdQuery(Collection<String> list, String queryName) {
 		if (!this.config.isMultipleSelect()) {
 			removeQueries();
@@ -205,7 +204,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	protected AbstractQuery createQuery(String className) {
 		try {
 			Class<? extends AbstractQuery> classDefinition = (Class<? extends AbstractQuery>) Class
-					.forName(className);
+			.forName(className);
 			return classDefinition.newInstance();
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);

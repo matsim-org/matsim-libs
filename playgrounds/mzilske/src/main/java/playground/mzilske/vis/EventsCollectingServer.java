@@ -144,12 +144,12 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(OTFConnectionManager connect) {
 		return quadTree;
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) {
+	public byte[] getQuadConstStateBuffer() {
 		byte[] result;
 		byteBuffer.position(0);
 		quadTree.writeConstData(byteBuffer);
@@ -161,7 +161,7 @@ public final class EventsCollectingServer implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
+	public byte[] getQuadDynStateBuffer(Rect bounds) {
 		byte[] result;
 		byteBuffer.position(0);
 		positions.clear();

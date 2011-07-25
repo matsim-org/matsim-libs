@@ -46,8 +46,10 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 
@@ -193,11 +195,9 @@ public class DataPrepare {
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(visScenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(visScenario.getConfig().otfVis().isShowTeleportedAgents());
-		QSim client = otfVisQSim;
-		client.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		otfVisQSim.run();
 	}
 
 	public static void main(final String[] args) {

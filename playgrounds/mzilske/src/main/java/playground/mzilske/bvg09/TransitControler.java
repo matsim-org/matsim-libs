@@ -52,8 +52,10 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 /**
@@ -140,9 +142,8 @@ public class TransitControler extends Controler {
 	protected void runMobSim() {
 		QSim sim = new QSim(this.scenarioData, this.events);
 		if (useOTFVis) {
-			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(sim);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(sim.getScenario().getConfig().otfVis().isShowTeleportedAgents());
-			sim.addFeature(otfVisQSimFeature);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenarioData.getConfig(), this.scenarioData, events, sim);
+			OTFClientLive.run(this.scenarioData.getConfig(), server);
 		}
 		sim.getTransitEngine().setUseUmlaeufe(true);
 		sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

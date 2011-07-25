@@ -14,8 +14,11 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
+import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.andreas.P.init.CreateInitialTimeSchedule;
 import playground.andreas.P.init.PConfigGroup;
@@ -45,11 +48,6 @@ public class PControler extends Controler {
 		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());
 
-		if (this.useOTFVis) {
-			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(simulation.getScenario().getConfig().otfVis().isShowTeleportedAgents());
-			simulation.addFeature(otfVisQSimFeature);
-		}
 
 		if (simulation instanceof IOSimulation){
 			((IOSimulation)simulation).setControlerIO(this.getControlerIO());
@@ -59,6 +57,10 @@ public class PControler extends Controler {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
 				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
 			}
+		}
+		if (this.useOTFVis) {
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,getScenario(), events, simulation);
+			OTFClientLive.run(config, server);
 		}
 		simulation.run();
 	}	

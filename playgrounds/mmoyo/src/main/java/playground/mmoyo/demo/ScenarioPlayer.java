@@ -26,7 +26,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -40,9 +42,9 @@ public class ScenarioPlayer {
 		events.addHandler(writertxt);
 		
 		final QSim sim = new QSim(scenario, events);
-		OTFVisMobsimFeature oTFVisMobsimFeature = new OTFVisMobsimFeature(sim);
-		sim.addQueueSimulationListeners(oTFVisMobsimFeature);
-		sim.getEventsManager().addHandler(oTFVisMobsimFeature);
+
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();
 		
 		writer.closeFile();

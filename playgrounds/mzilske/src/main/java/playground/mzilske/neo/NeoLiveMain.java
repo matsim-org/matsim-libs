@@ -10,7 +10,6 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 import org.neo4j.graphdb.Transaction;
@@ -44,10 +43,10 @@ public class NeoLiveMain {
 				events.addHandler(snapshotGenerator);
 				server.setSnapshotGenerator(snapshotGenerator);
 
-				OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", new NeoOTFLiveServerTransactionWrapper(server, scenario));
+				NeoOTFLiveServerTransactionWrapper wrappedServer = new NeoOTFLiveServerTransactionWrapper(server, scenario);
 
 				OTFVisClient client = new OTFVisClient();
-				client.setHostConnectionManager(hostConnectionManager);
+				client.setServer(wrappedServer);
 				client.setSwing(false);
 				client.run();
 

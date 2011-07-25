@@ -30,7 +30,9 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 
 public class TransitControler {
@@ -66,13 +68,11 @@ public class TransitControler {
 //			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
-				OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
 				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
-				otfVisQSimFeature.setVisualizeTeleportedAgents(otfVisConfig.isShowTeleportedAgents());
-				simulation.addQueueSimulationListeners(otfVisQSimFeature);
-				simulation.getEventsManager().addHandler(otfVisQSimFeature) ;
 				otfVisConfig.setDrawTransitFacilities(false) ;
 				otfVisConfig.setShowParking(true) ;
+				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, simulation);
+				OTFClientLive.run(sc.getConfig(), server);
 			}
 
 //			if(this.useHeadwayControler){

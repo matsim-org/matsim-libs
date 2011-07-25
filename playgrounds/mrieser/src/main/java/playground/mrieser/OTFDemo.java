@@ -115,8 +115,8 @@ public class OTFDemo {
 		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
-		connect.connectWriterToReader(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
-		connect.connectReaderToReceiver(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
+		connect.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
+		connect.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
 
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
 //		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).run();

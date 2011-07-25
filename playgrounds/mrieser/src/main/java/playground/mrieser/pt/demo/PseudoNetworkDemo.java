@@ -43,7 +43,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class PseudoNetworkDemo {
 
@@ -107,7 +109,9 @@ public class PseudoNetworkDemo {
 
 		final QSim sim = new QSim(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
-		sim.addFeature(new OTFVisMobsimFeature(sim));
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		
 		sim.run();
 		writer.closeFile();
 	}

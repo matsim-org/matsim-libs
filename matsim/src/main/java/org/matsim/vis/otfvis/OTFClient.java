@@ -33,15 +33,12 @@ import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFFrame;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 
 
@@ -49,23 +46,19 @@ import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
  * @author dgrether
  *
  */
-public class OTFClient {
+public final class OTFClient {
 
 	private static final Logger log = Logger.getLogger(OTFClient.class);
-
-	// Keine Ahnung.
-	private static final String id = "id";
-
+	
 	private OTFFrame frame;
 
 	private OTFHostControlBar hostControlBar;
-
-	private OTFHostConnectionManager hostConnectionManager;
 
 	private JPanel compositePanel;
 
 	private OTFDrawer mainDrawer;
 
+	private OTFServerRemote server;
 
 	public OTFClient() {
 		this.frame = new OTFFrame("MATSim OTFVis");
@@ -74,27 +67,13 @@ public class OTFClient {
 		log.info("created MainFrame");
 	}
 
-	public final void setHostConnectionManager(OTFHostConnectionManager otfHostConnectionManager) {
-		this.hostConnectionManager = otfHostConnectionManager;
-		this.hostControlBar = new OTFHostControlBar(otfHostConnectionManager);
-	}
-
-	public final OTFClientQuad createNewView(OTFConnectionManager connect) {
-		log.info("Getting Quad id " + id);
-		OTFServerQuadTree servQ = hostConnectionManager.getOTFServer().getQuad(id, connect);
-		log.info("Converting Quad");
-		OTFClientQuad clientQ = servQ.convertToClient(id, hostConnectionManager.getOTFServer(), connect);
-		log.info("Creating receivers...");
-		clientQ.createReceiver(connect);
-		log.info("Reading data...");
-		clientQ.getConstData();
-		this.hostControlBar.updateTimeLabel();
-		log.info("Created OTFClientQuad!");
-		return clientQ;
+	public void setServer(OTFServerRemote server) {
+		this.server = server;
+		this.hostControlBar = new OTFHostControlBar(server);
 	}
 
 	@SuppressWarnings("serial")
-	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save) {
+	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save, final OTFServerRemote server) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -106,7 +85,7 @@ public class OTFClient {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				PreferencesDialog preferencesDialog = new PreferencesDialog(frame, hostControlBar);
+				PreferencesDialog preferencesDialog = new PreferencesDialog(server, frame, hostControlBar);
 				preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
 				preferencesDialog.setVisible(true);
 			}
@@ -155,7 +134,7 @@ public class OTFClient {
 		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-		buildMenu(frame, hostControlBar, saver);
+		buildMenu(frame, hostControlBar, saver, server);
 		log.info("created HostControlBar");
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");

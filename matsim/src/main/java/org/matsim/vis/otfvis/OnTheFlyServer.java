@@ -28,8 +28,20 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
+import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -87,13 +99,12 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	private Semaphore accessToQNetwork = new Semaphore(1);
 
-	private void init(EventsManager events){
-		this.events = events;
+	public OnTheFlyServer(EventsManager events) {
+		this.events = events; 
 	}
 
-	public static OnTheFlyServer createInstance(String readableName, EventsManager events) {
-		OnTheFlyServer instance = new OnTheFlyServer();
-		instance.init(events);
+	public static OnTheFlyServer createInstance(EventsManager events) {
+		OnTheFlyServer instance = new OnTheFlyServer(events);
 		return instance;
 	}
 
@@ -197,7 +208,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(OTFConnectionManager connect) {
 		if (quad != null) {
 			return quad;
 		} else {
@@ -217,7 +228,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(String id) {
+	public byte[] getQuadConstStateBuffer() {
 		try {
 			accessToQNetwork.acquire();
 			byte[] result;
@@ -236,7 +247,7 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(final String id, final QuadTree.Rect bounds) {
+	public byte[] getQuadDynStateBuffer(final QuadTree.Rect bounds) {
 		try {
 			accessToQNetwork.acquire();
 			byte[] result;

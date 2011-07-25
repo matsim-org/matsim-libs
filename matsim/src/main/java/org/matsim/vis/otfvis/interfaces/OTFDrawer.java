@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 
 
 /**
@@ -41,7 +41,7 @@ public interface OTFDrawer {
 	
 	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e);
 	
-	public OTFClientQuad getQuad();
+	public OTFClientQuadTree getQuad();
 	
 	public Component getComponent();
 	

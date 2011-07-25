@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;

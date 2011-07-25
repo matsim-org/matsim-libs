@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
@@ -112,9 +111,8 @@ public class City2000WMobsimFactory implements MobsimFactory {
 			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
 			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap();
 			server.addAdditionalPlans(freightAgentPlans);
-			OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
 			OTFVisClient client = new OTFVisClient();
-			client.setHostConnectionManager(hostConnectionManager);
+			client.setServer(server);
 			client.setSwing(false);
 			client.run();
 			VisNetwork visNetwork = netFeature.getVisNetwork();

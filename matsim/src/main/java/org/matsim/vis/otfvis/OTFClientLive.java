@@ -24,61 +24,83 @@ import java.awt.BorderLayout;
 
 import javax.swing.SwingUtilities;
 
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.core.config.Config;
+import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
+import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
+import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
+import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
-public class OTFClientLive implements Runnable {
+public class OTFClientLive {
 
-	private OTFClient otfClient = new OTFClient();
-
-	private OTFConnectionManager connect = new OTFConnectionManager();
-
-	private SettingsSaver saver;
-
-	private OTFHostConnectionManager masterHostControl;
-
-	public OTFClientLive(OnTheFlyServer otfServer, OTFConnectionManager connectionManager) {
-		super();
-		masterHostControl = new OTFHostConnectionManager("live", otfServer);
-		otfClient.setHostConnectionManager(masterHostControl);
-		this.connect = connectionManager;
-	}
-
-	private OTFVisConfigGroup createOTFVisConfig() {
-		saver = new SettingsSaver("otfsettings");
-		OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
-		if (visconf == null) {
-			visconf = this.masterHostControl.getOTFServer().getOTFVisConfig();
-		}
-		visconf.setCachingAllowed(false); // no use to cache in live mode
-		return visconf;
-	}
-
-	private OTFDrawer createDrawer(){
-		OTFClientQuad clientQ = otfClient.createNewView(connect);
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfClient.getHostControlBar());
-		OTFQueryControl queryControl = new OTFQueryControl(otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
-		OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
-		queryControl.setQueryTextField(queryControlBar.getTextField());
-		otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-		mainDrawer.setQueryHandler(queryControl);
-		return mainDrawer;
-	}
-	
-	@Override
-	public final void run() {
+	public static void run(final Config config, final OnTheFlyServer server) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig());
-				otfClient.addDrawerAndInitialize(createDrawer(), saver);
+				OTFConnectionManager connectionManager = new OTFConnectionManager();
+				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
+				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
+				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
+				connectionManager.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
+				connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
+				
+				if (config.scenario().isUseTransit()) {
+					connectionManager.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
+					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
+					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
+				}
+				
+				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
+					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
+					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
+				} else if (config.scenario().isUseSignalSystems()) {
+					connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
+					connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
+					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
+				}
+				OTFClient otfClient = new OTFClient();
+				otfClient.setServer(server);
+				SettingsSaver saver = new SettingsSaver("otfsettings");
+				OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
+				if (visconf == null) {
+					visconf = server.getOTFVisConfig();
+				}
+				visconf.setCachingAllowed(false); // no use to cache in live mode
+				OTFClientControl.getInstance().setOTFVisConfig(visconf);
+				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
+				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
+				clientQuadTree.createReceiver(connectionManager);
+				clientQuadTree.getConstData();
+				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
+				hostControlBar.updateTimeLabel();
+				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar);
+				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
+				queryControl.setQueryTextField(queryControlBar.getTextField());
+				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				mainDrawer.setQueryHandler(queryControl);
+				otfClient.addDrawerAndInitialize(mainDrawer, saver);
 				otfClient.show();
 			}
 		});

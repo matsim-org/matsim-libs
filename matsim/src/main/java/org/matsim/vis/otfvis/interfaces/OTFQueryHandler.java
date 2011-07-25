@@ -44,8 +44,8 @@ public interface OTFQueryHandler {
 	
 	public void drawQueries(OTFDrawer drawer);
 	
-	public void handleClick(String id, Double point, int mouseButton);
+	public void handleClick(Double point, int mouseButton);
 	
-	public void handleClick(String id, Rectangle2D.Double origRect, int button);
+	public void handleClick(Rectangle2D.Double origRect, int button);
 
 }

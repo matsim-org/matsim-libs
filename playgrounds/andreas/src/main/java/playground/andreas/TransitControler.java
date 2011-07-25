@@ -10,7 +10,10 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.andreas.fixedHeadway.FixedHeadwayControler;
 import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
@@ -39,11 +42,7 @@ public class TransitControler extends Controler {
 		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());
 
-		if (this.useOTFVis) {
-			OTFVisMobsimFeature otfVisQSimFeature = new OTFVisMobsimFeature(simulation);
-			otfVisQSimFeature.setVisualizeTeleportedAgents(simulation.getScenario().getConfig().otfVis().isShowTeleportedAgents());
-			simulation.addFeature(otfVisQSimFeature);
-		}
+		
 
 		if(this.useHeadwayControler){
 			simulation.getTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
@@ -58,6 +57,10 @@ public class TransitControler extends Controler {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
 				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
 			}
+		}
+		if (this.useOTFVis) {
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,getScenario(), events, simulation);
+			OTFClientLive.run(config, server);
 		}
 		simulation.run();
 	}	

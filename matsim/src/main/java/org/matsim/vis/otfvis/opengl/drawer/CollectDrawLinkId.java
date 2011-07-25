@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -60,7 +60,7 @@ public class CollectDrawLinkId {
 		this.height = rect.height;
 	}
 
-	public void prepare(OTFClientQuad quad) {
+	public void prepare(OTFClientQuadTree quad) {
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
 		double regionHeight = (quad.getMaxNorthing()-quad.getMinNorthing())*0.1;

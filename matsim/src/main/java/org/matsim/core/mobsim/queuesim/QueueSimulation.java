@@ -59,7 +59,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -75,7 +74,6 @@ import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -86,7 +84,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, AcceptsVisMobsimFeatures, Netsim {
+public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, Netsim {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -652,16 +650,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	public void setControlerIO(ControlerIO controlerIO) {
 		this.controlerIO = controlerIO;
 	}
-
-
-	@Override
-	public void addFeature(VisMobsimFeature queueSimulationFeature) {
-		//		this.queueSimulationFeatures.add( queueSimulationFeature ) ;
-		this.addQueueSimulationListeners(queueSimulationFeature);
-		this.getEventsManager().addHandler(queueSimulationFeature) ;
-		throw new UnsupportedOperationException("not tested") ;
-	}
-
 
 	@Override
 	public AgentCounterI getAgentCounter() {

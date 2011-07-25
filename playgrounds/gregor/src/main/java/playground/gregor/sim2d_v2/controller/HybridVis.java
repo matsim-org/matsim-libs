@@ -87,7 +87,8 @@ public class HybridVis {
 			qSim.addQueueSimulationListeners(engine);
 		}
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		qSim.addFeature(queueSimulationFeature);
+		qSim.addQueueSimulationListeners(queueSimulationFeature);
+		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
 		//		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		qSim.setControlerIO(controlerIO);
 		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());

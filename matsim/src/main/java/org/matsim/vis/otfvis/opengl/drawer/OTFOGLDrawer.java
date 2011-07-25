@@ -78,7 +78,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -119,7 +119,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private VisGUIMouseHandler mouseMan = null;
 
-	private final OTFClientQuad clientQ;
+	private final OTFClientQuadTree clientQ;
 
 	private String lastTime = "";
 
@@ -262,7 +262,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		return canvas;
 	}
 
-	public OTFOGLDrawer(OTFClientQuad clientQ, OTFHostControlBar hostControlBar) {
+	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar) {
 		this.clientQ = clientQ;
 		this.hostControlBar = hostControlBar;
 		GLCapabilities caps = new GLCapabilities();
@@ -578,13 +578,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			return;
 		}
 		Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
-		if(this.queryHandler != null) this.queryHandler.handleClick(this.clientQ.getId(),origPoint, mouseButton);
+		if(this.queryHandler != null) this.queryHandler.handleClick(origPoint,mouseButton);
 	}
 
 	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
-		if(this.queryHandler != null) this.queryHandler.handleClick(this.clientQ.getId(),origRect, button);
+		if(this.queryHandler != null) this.queryHandler.handleClick(origRect,button);
 	}
 
 	@Override
@@ -634,7 +634,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	@Override
-	public OTFClientQuad getQuad() {
+	public OTFClientQuadTree getQuad() {
 		return this.clientQ;
 	}
 

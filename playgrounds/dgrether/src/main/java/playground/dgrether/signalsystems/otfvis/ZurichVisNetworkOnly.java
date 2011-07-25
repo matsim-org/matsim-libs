@@ -29,7 +29,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.DgPaths;
 
@@ -65,12 +67,11 @@ public class ZurichVisNetworkOnly {
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);
 		QSim otfVisQSim = new QSim(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		
-		QSim client = otfVisQSim;
-		client.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		
+		otfVisQSim.run();
 	}
 
 }

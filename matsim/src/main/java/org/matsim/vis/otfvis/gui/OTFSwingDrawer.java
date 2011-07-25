@@ -35,7 +35,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 
@@ -77,7 +77,7 @@ public class OTFSwingDrawer extends JComponent {
 
 	private final int frameDefaultHeight;
 
-	private final OTFClientQuad quad;
+	private final OTFClientQuadTree quad;
 
 	private OTFQueryHandler queryHandler;
 
@@ -87,7 +87,7 @@ public class OTFSwingDrawer extends JComponent {
 
 	// --------------- CONSTRUCTION ---------------
 
-	public OTFSwingDrawer(OTFClientQuad quad, OTFHostControlBar hostControlBar, OTFSwingDrawerContainer parentDrawer) {
+	public OTFSwingDrawer(OTFClientQuadTree quad, OTFHostControlBar hostControlBar, OTFSwingDrawerContainer parentDrawer) {
 		this.quad = quad;
 		this.parentDrawer = parentDrawer;
 		// calculate size of frame
@@ -181,7 +181,7 @@ public class OTFSwingDrawer extends JComponent {
 		}
 	}
 
-	public OTFClientQuad getQuad() {
+	public OTFClientQuadTree getQuad() {
 		return quad;
 	}
 
@@ -191,12 +191,12 @@ public class OTFSwingDrawer extends JComponent {
 
 	public void handleClick(Double point, int mouseButton, MouseEvent e) {
 		Point2D.Double origPoint = new Point2D.Double(point.x + this.quad.offsetEast, point.y + this.quad.offsetNorth);
-		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origPoint, mouseButton);
+		if(this.queryHandler != null) this.queryHandler.handleClick(origPoint, mouseButton);
 	}
 
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.quad.offsetEast, currentRect.y + this.quad.offsetNorth, currentRect.width, currentRect.height);
-		if(this.queryHandler != null) this.queryHandler.handleClick(this.quad.getId(), origRect, button);
+		if(this.queryHandler != null) this.queryHandler.handleClick(origRect, button);
 	}
 
 	public void setQueryHandler(OTFQueryHandler queryHandler) {

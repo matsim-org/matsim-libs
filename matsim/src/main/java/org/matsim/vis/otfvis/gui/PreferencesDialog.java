@@ -40,6 +40,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+
 /**
  * The class responsible for drawing the PreferencesDialog.
  * 
@@ -50,6 +52,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private static final long serialVersionUID = 5778562849300898138L;
 
+	private final OTFServerRemote server;
+	
 	private OTFVisConfigGroup visConfig;
 
 	private JComboBox rightMFunc;
@@ -66,8 +70,9 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private JSpinner delaySpinner = null;
 
-	public PreferencesDialog(final OTFFrame frame, final OTFHostControlBar mother) {
+	public PreferencesDialog(final OTFServerRemote server, final OTFFrame frame, final OTFHostControlBar mother) {
 		super(frame);
+		this.server = server;
 		this.host = mother;
 	}
 
@@ -132,7 +137,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			panel.setBounds(250, 130, 220, 200);
 
 			JCheckBox synchBox; 
-			if(host.getOTFHostConnectionManager().getOTFServer().isLive()) {
+			if(server.isLive()) {
 				synchBox = new JCheckBox("show non-moving items");
 				synchBox.setSelected(visConfig.isShowParking());
 				synchBox.addItemListener(this);
@@ -176,7 +181,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			synchBox.setBounds(10, 140, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
-			if (host.getOTFHostConnectionManager().getOTFServer().isLive()) {
+			if (server.isLive()) {
 				synchBox = new JCheckBox("show transit facilities");
 				synchBox.setSelected(visConfig.isDrawTransitFacilities());
 				synchBox.addItemListener(this);
@@ -324,7 +329,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			visConfig.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
 			visConfig.setShowParking(!visConfig.isShowParking());
 			if (host != null) {
-				host.getOTFHostConnectionManager().getOTFServer().toggleShowParking();
+				server.toggleShowParking();
 				host.clearCaches();
 				host.redrawDrawers();
 			}

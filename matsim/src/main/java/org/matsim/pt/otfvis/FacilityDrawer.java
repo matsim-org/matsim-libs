@@ -51,14 +51,14 @@ import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 public class FacilityDrawer {
 	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
 
-	public static class DataWriter_v1_0 extends OTFDataWriter<Void> {
+	public static class Writer extends OTFDataWriter<Void> {
 
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;
 		private final transient TransitStopAgentTracker agentTracker;
 		private final transient Network network ;
 
-		public DataWriter_v1_0(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+		public Writer(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
 			this.network = network ;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
@@ -101,7 +101,7 @@ public class FacilityDrawer {
 
 	}
 
-	public static class DataReader_v1_0 extends OTFDataReader {
+	public static class Reader extends OTFDataReader {
 
 		private DataDrawer drawer = null;
 

@@ -63,7 +63,6 @@ import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.MobsimTimer;
-import org.matsim.ptproject.qsim.interfaces.AcceptsVisMobsimFeatures;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
@@ -87,7 +86,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
 import org.matsim.vis.snapshots.writers.VisNetwork;
 
 /**
@@ -100,7 +98,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
+public class QSim implements VisMobsim, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -784,14 +782,6 @@ public class QSim implements VisMobsim, AcceptsVisMobsimFeatures, Netsim {
 	public final MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
 	}
-
-	@Override
-	@Deprecated // if you think you need to use this, ask kai.  aug'10
-	public final void addFeature(final VisMobsimFeature queueSimulationFeature) {
-		this.addQueueSimulationListeners(queueSimulationFeature);
-		this.getEventsManager().addHandler(queueSimulationFeature) ;
-	}
-
 
 	Integer getIterationNumber() {
 		return this.iterationNumber;

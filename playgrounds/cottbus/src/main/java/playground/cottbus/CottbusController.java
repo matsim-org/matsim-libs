@@ -31,7 +31,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class CottbusController {
 	
@@ -59,12 +61,10 @@ public class CottbusController {
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(sc, e);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
 		
-		QSim sim = otfVisQSim;
-		sim.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, e, otfVisQSim);
+		OTFClientLive.run(sc.getConfig(), server);
+		otfVisQSim.run();
 		
 		
 	}

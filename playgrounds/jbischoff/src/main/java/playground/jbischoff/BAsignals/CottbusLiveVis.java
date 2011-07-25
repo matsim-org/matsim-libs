@@ -31,11 +31,13 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
@@ -72,11 +74,11 @@ public class CottbusLiveVis {
 			SignalEngine engine = new QSimSignalEngine(jbBuilder.createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		qSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		qSim.setControlerIO(controlerIO);
 		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+
 		qSim.run();
 	}
 

@@ -11,7 +11,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis2.OTFVisClient;
 
 public class Main {	
@@ -40,10 +39,8 @@ public class Main {
 		
 		new MatsimEventsReader(events).readFile(eventsFileName);
 		
-		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("Wurst", server);
-		
 		OTFVisClient client = new OTFVisClient();
-		client.setHostConnectionManager(hostConnectionManager);
+		client.setServer(server);
 		client.setSwing(false);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread() {

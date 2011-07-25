@@ -41,11 +41,11 @@ public interface OTFServerRemote {
 
 	public boolean requestNewTime(int time, TimePreference searchDirection);
 
-	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect);
+	public OTFServerQuadTree getQuad(OTFConnectionManager connect);
 
-	public byte[] getQuadConstStateBuffer(String id);
+	public byte[] getQuadConstStateBuffer();
 
-	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds);
+	public byte[] getQuadDynStateBuffer(QuadTree.Rect bounds);
 
 	public int getLocalTime();
 

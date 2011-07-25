@@ -26,7 +26,9 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * @author	rschneid-btu
@@ -72,13 +74,10 @@ public class FourWaysVis {
 		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
-		
-		
-		QSim client = otfVisQSim;
-		client.run();
+			
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		otfVisQSim.run();
 		
 		
 	}

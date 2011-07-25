@@ -24,6 +24,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -31,7 +32,8 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9Runner;
 import playground.dgrether.signalsystems.DgSensorManager;
@@ -68,11 +70,10 @@ public class DgGershensonRoederLiveVisStarter {
 		SignalEngine engine = new QSimSignalEngine(signalManager);
 		QSim otfVisQSim = new QSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
-		OTFVisMobsimFeature qSimFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(qSimFeature);
 		
-		QSim client = otfVisQSim;
-		client.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		otfVisQSim.run();
 	}
 	
 	public static void main(String[] args) {

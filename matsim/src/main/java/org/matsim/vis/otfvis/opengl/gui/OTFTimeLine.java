@@ -38,7 +38,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
@@ -186,7 +186,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	}
 
 	@Override
-	public OTFClientQuad getQuad() {
+	public OTFClientQuadTree getQuad() {
 		return null;
 	}
 

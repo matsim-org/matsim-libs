@@ -43,16 +43,16 @@ public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
 		return delegate.getOTFVisConfig();
 	}
 
-	public OTFServerQuadTree getQuad(String id, OTFConnectionManager connect) {
-		return delegate.getQuad(id, connect);
+	public OTFServerQuadTree getQuad(OTFConnectionManager connect) {
+		return delegate.getQuad(connect);
 	}
 
-	public byte[] getQuadConstStateBuffer(String id) {
-		return delegate.getQuadConstStateBuffer(id);
+	public byte[] getQuadConstStateBuffer() {
+		return delegate.getQuadConstStateBuffer();
 	}
 
-	public byte[] getQuadDynStateBuffer(String id, Rect bounds) {
-		return delegate.getQuadDynStateBuffer(id, bounds);
+	public byte[] getQuadDynStateBuffer(Rect bounds) {
+		return delegate.getQuadDynStateBuffer(bounds);
 	}
 
 	public Collection<Double> getTimeSteps() {

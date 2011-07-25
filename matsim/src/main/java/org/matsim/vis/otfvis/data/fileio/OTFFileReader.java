@@ -118,7 +118,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public OTFServerQuadTree getQuad(final String id, final OTFConnectionManager connect) {
+	public OTFServerQuadTree getQuad(final OTFConnectionManager connect) {
 		log.info("reading quad from file...");
 		OTFServerQuadTree quad = readQuad();
 		return quad;
@@ -142,7 +142,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadConstStateBuffer(final String id) {
+	public byte[] getQuadConstStateBuffer() {
 		byte[] buffer = null;
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
@@ -159,7 +159,7 @@ public final class OTFFileReader implements OTFServerRemote {
 	}
 
 	@Override
-	public byte[] getQuadDynStateBuffer(final String id, final Rect bounds) {
+	public byte[] getQuadDynStateBuffer(final Rect bounds) {
 		if (bounds == null) {
 			log.warn("Bounds are ignored but set! [[I don't understand what this means here.  kai, feb'11]]");
 		}

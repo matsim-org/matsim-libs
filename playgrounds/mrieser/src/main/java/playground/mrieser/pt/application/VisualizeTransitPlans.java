@@ -58,7 +58,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 public class VisualizeTransitPlans {
@@ -202,11 +204,9 @@ public class VisualizeTransitPlans {
 	private void visualize() {
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim otfVisQSim = new QSim(this.visScenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(otfVisQSim);
-		otfVisQSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(this.visScenario.getConfig().otfVis().isShowTeleportedAgents());
-		QSim client = otfVisQSim;
-		client.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.visScenario.getConfig(), this.visScenario, events, otfVisQSim);
+		OTFClientLive.run(this.visScenario.getConfig(), server);
+		otfVisQSim.run();
 	}
 
 	/**

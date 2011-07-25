@@ -15,12 +15,13 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
-import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
@@ -60,11 +61,10 @@ public class OSMLiveRun {
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		qSim.addFeature(queueSimulationFeature);
-		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
 		qSim.setControlerIO(controlerIO);
 		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		OTFClientLive.run(scenario.getConfig(), server);
 		qSim.run();
 	}
 
@@ -77,10 +77,9 @@ public class OSMLiveRun {
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		qSim.addSnapshotWriter(server.getSnapshotReceiver());
-		OTFHostConnectionManager hostConnectionManager = new OTFHostConnectionManager("wurst", server);
 		
 		OTFVisClient client = new OTFVisClient();
-		client.setHostConnectionManager(hostConnectionManager);
+		client.setServer(server);
 		client.setSwing(false);
 		client.run();
 		qSim.run();
