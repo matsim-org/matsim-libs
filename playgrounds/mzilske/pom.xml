@@ -87,11 +87,9 @@
 			<version>2.3.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql-jdbc4</artifactId>
-			<version>8.4-701</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/postgresql-8.4-701.jdbc4.jar</systemPath>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.4-701.jdbc4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
@@ -99,18 +97,15 @@
 			<version>0.32.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>uk.co.randomjunk</groupId>
-			<artifactId>tagtransform</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/tagtransform.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>org.openstreetmap</groupId>
 			<artifactId>jmapviewer</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/jmapview.jar</systemPath>
+			<version>0.1-20110219</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-tagtransform-plugin</artifactId>
+			<version>0.1-20090508</version>
 		</dependency>
 
 	</dependencies>
