@@ -44,7 +44,6 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 		
 		if (walkingDistance>1500.0){
 			walkingScore+=walkingDistance*disutilityOfWalkingPerMeter*2;
-			System.out.println();
 		}
 		
 		double priceScore=0.0;

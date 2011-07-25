@@ -236,7 +236,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceHistogramm.png");
 		
-		GeneralLib.generateHistogram(fileName, values, 80, "Histogram Parking Walking Distance - It."+controler.getIterationNumber(), "distance", "number");
+		GeneralLib.generateHistogram(fileName, values, 10, "Histogram Parking Walking Distance - It."+controler.getIterationNumber(), "distance", "number");
 	}
 
 	private void writeWalkingDistanceStatisticsGraph(Controler controler, HashMap<Id, Double> walkingDistance) {
