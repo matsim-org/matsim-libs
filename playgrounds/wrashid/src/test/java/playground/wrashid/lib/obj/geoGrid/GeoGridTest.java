@@ -33,22 +33,5 @@ public class GeoGridTest extends TestCase{
 		assertEquals(8.0, geoGrid.getValue(secondCoord));
 	}
 	
-	public void testGridBordersAndMissingValues(){
-		GeoGrid geoGrid=new GeoGrid(10);
-		geoGrid.addGridInformation(new GridDataItem(1.0, 1.0, new CoordImpl(5.0,5.0)));
-		geoGrid.addGridInformation(new GridDataItem(2.0, 1.0, new CoordImpl(15.0,5.0)));
-		geoGrid.addGridInformation(new GridDataItem(3.0, 1.0, new CoordImpl(15.0,15.0)));
-		geoGrid.addGridInformation(new GridDataItem(4.0, 1.0, new CoordImpl(5.0,15.0)));
-
-		geoGrid.markDataCollectionPhaseAsFishished();
-		
-		assertEquals(1.0, geoGrid.getValue(new CoordImpl(5.0,5.0)));
-		assertEquals(2.0, geoGrid.getValue(new CoordImpl(10.0,5.0)));
-		assertEquals(3.0, geoGrid.getValue(new CoordImpl(15.0,10.0)));
-		assertEquals(3.0, geoGrid.getValue(new CoordImpl(10.0,10.0)));
-		assertEquals(3.0, geoGrid.getValue(new CoordImpl(10.0,15.0)));
-		assertEquals(4.0, geoGrid.getValue(new CoordImpl(5.0,10.0)));
-		assertEquals(2.5, geoGrid.getValue(new CoordImpl(25.0,5.0)));
-	}
 	
 }
