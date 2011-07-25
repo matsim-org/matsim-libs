@@ -51,12 +51,8 @@ public class CompareScores {
 	private void append2ScoresFile(List<Double> bestScoresPerAgent, List<Double> executedScoresPerAgent, List<Id> agentIds) {
 		DecimalFormat formatter = new DecimalFormat("0.00000000000000");
 		for (int i = 0; i < bestScoresPerAgent.size(); i++) {
-			try {
-				
-				String identical ="";
-				if (Math.abs(bestScoresPerAgent.get(i) - executedScoresPerAgent.get(i)) > 0.00001) identical="*"; 
-				
-				this.bufferedWriterScores.write(agentIds.get(i).toString() + identical + "\t" 
+			try {				
+				this.bufferedWriterScores.write(agentIds.get(i).toString() + "\t" 
 						+ formatter.format(bestScoresPerAgent.get(i)) +  "\t" 
 						+ formatter.format(executedScoresPerAgent.get(i)) + "\t");
 			} catch (IOException e) {
