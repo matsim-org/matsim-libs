@@ -2,7 +2,6 @@ package playground.gregor.multidestpeds.densityestimation;
 
 import junit.framework.Assert;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -13,7 +12,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -60,9 +58,6 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 	private final int offsetY = 6;
 
 	private final double epsilon = 1e-15;
-
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testNNGaussianKernelEstimator() {
