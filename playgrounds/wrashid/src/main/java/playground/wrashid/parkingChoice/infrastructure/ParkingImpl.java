@@ -106,10 +106,12 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 
 	@Override
 	public int compareTo(ParkingImpl otherParking) {
+		// the ordering is done inverse to the ususal ordering, because in a 
+		// priority queue the first element is the smallest one, but we need the biggest one
 		if (score > otherParking.getScore()) {
-			return 1;
-		} else if (getScore() < otherParking.getScore()) {
 			return -1;
+		} else if (score < otherParking.getScore()) {
+			return 1;
 		} else {
 			return 0;
 		}

@@ -10,5 +10,7 @@ public interface ParkingScoringFunction {
 
 	public void assignScore(ParkingImpl parking, Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
 			Double estimatedParkingDuration);
-	
+
+	public Double getScore(ParkingImpl parking, Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
+			Double estimatedParkingDuration);
 }

@@ -1,5 +1,8 @@
 package playground.wrashid.parkingChoice.apiDefImpl;
 
+import java.util.Collection;
+import java.util.PriorityQueue;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
@@ -11,17 +14,32 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class PriceAndDistanceParkingSelectionManager extends ShortestWalkingDistanceParkingSelectionManager {
 
-	private final ParkingScoringFunction parkingScoringFunction;
+	public static ParkingScoringFunction parkingScoringFunction;
 
 	public PriceAndDistanceParkingSelectionManager(ParkingManager parkingManager, ParkingScoringFunction parkingScoringFunction) {
 		super(parkingManager);
-		this.parkingScoringFunction = parkingScoringFunction;
+		PriceAndDistanceParkingSelectionManager.parkingScoringFunction = parkingScoringFunction;
 	}
 
 	public Parking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
 			Double estimatedParkingDuration) {
-		// TODO Auto-generated method stub
-		return getParkingWithShortestWalkingDistance(targtLocationCoord,targetActInfo,personId);
+
+		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(targtLocationCoord, 200.0, personId, 0.0,
+				targetActInfo, parkingManager.getParkings());
+
+		PriorityQueue<ParkingImpl> priorityQueue = new PriorityQueue<ParkingImpl>();
+		for (Parking parking : parkingsInSurroundings) {
+			ParkingImpl parkingImpl = (ParkingImpl) parking;
+			parkingScoringFunction.assignScore(parkingImpl, targtLocationCoord, targetActInfo, personId, arrivalTime,
+					estimatedParkingDuration);
+			priorityQueue.add(parkingImpl);
+		}
+
+		
+
+		ParkingImpl selectedParking = priorityQueue.poll();
+
+		return selectedParking;
 	}
-	
+
 }

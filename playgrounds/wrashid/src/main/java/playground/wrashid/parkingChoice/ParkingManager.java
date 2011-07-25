@@ -183,7 +183,8 @@ public class ParkingManager implements StartupListener {
 
 		Coord activityCoord = activityFacility.getCoord();
 
-		Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), null, null);
+		//TODO: change estimated home parking duration + home arrival time (this could be made more precise)
+		Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), 19*3600.0, 8*3600.0);
 		parkVehicle(person.getId(), bestParking);
 	}
 	

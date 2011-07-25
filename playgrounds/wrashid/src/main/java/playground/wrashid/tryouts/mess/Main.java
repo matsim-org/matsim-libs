@@ -17,15 +17,14 @@ import playground.wrashid.lib.GeneralLib;
 public class Main {
 
 	public static void main(String[] args) {
-		QuadTree<Integer> quadTree = new QuadTree<Integer>(0, 0, 9000, 9000);
-
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				quadTree.put(i * 1000 + 500, j * 1000 + 500, 1);
-			}
+		
+		
+		
+		if (-28800.121845080957 > 0.31){
+			System.out.println("bad");
+		} else {
+			System.out.println("good");
 		}
-
-		quadTree.put(8500.0, 9000, 1);
 		
 	}
 

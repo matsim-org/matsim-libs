@@ -19,9 +19,11 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
+import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingChoice.ParkingManager;
+import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
@@ -34,6 +36,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	private static double[] sumOfOccupancyCountsOfSelectedParkings;
 	private final ParkingScoreCollector parkingScoreCollector;
 	private Double averageWalkingDistance=null;
+	public static DoubleValueHashMap<Id> scores=new DoubleValueHashMap<Id>();
 
 	public Double getAverageWalkingDistance() {
 		return averageWalkingDistance;
@@ -77,10 +80,27 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
 				walkingDistances.put(personId, sumOfWalkingTimes * event.getControler().getConfig().plansCalcRoute().getWalkSpeed());
 
-				// this is only the implicit disutility (not an explicit one)
-				disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
+				
+				String parkingSelectionManager = controler.getConfig().findParam("parking", "parkingSelectionManager");
+				if (parkingSelectionManager.equalsIgnoreCase("shortestWalkingDistance")){
+					// this is only the implicit disutility (not an explicit one)
+					disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
+					scoringFuncAccumulator.addMoney(disutilityOfWalking);
+					//TODO: here the explicit disutility of walking is totally missing
+					
+				} else if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
+					//TODO: perhaps later make the parking price based on acutal parking duration instead of
+					//an estimation.
+					scoringFuncAccumulator.addMoney(scores.get(personId));
+					// implicity disutility of not beeing able to perform
+					disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
+					scoringFuncAccumulator.addMoney(disutilityOfWalking);
+				} else {
+					DebugLib.stopSystemAndReportInconsistency("unknown parkingSelectionManager:" + parkingSelectionManager);
+				}
+				
 
-				scoringFuncAccumulator.addMoney(disutilityOfWalking);
+				
 			}
 
 		}

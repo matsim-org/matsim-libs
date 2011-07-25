@@ -4,11 +4,17 @@ import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingChoice.ParkingModule;
+import playground.wrashid.parkingChoice.apiDefImpl.ParkingScoringFunctionZhScenario_v1;
+import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelectionManager;
+import playground.wrashid.parkingChoice.apiDefImpl.ShortestWalkingDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.FlatParkingFormatReaderV1;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
@@ -55,6 +61,24 @@ public class ParkingHerbieControler {
 				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
 				
 				ParkingScoreAccumulator.initializeParkingCounts(event.getControler());
+				
+				initParkingSelectionManager(event.getControler());
+			}
+
+			private void initParkingSelectionManager(Controler controler) {
+				String parkingSelectionManager = controler.getConfig().findParam("parking", "parkingSelectionManager");
+				if (parkingSelectionManager.equalsIgnoreCase("shortestWalkingDistance")){
+					parkingModule.setParkingSelectionManager(new ShortestWalkingDistanceParkingSelectionManager(parkingModule.getParkingManager()) );
+				} else if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
+					parkingModule.setParkingSelectionManager(new PriceAndDistanceParkingSelectionManager(parkingModule.getParkingManager(), new ParkingScoringFunctionZhScenario_v1()));				
+					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeter=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeter"));
+					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPowerFactor=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPowerFactor"));
+					ParkingScoringFunctionZhScenario_v1.streetParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "streetParkingPricePerSecond"));
+					ParkingScoringFunctionZhScenario_v1.garageParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "garageParkingPricePerSecond"));
+				} else {
+					DebugLib.stopSystemAndReportInconsistency("unknown parkingSelectionManager:" + parkingSelectionManager);
+				}
+				
 			}
 		});
 		
@@ -132,5 +156,14 @@ public class ParkingHerbieControler {
 			parking.setCapacity(capacity*calibrationFactor);
 		}
 	}
+	
+	public static Coord getCoordinatesQuaiBridgeZH(){
+		return new CoordImpl(683423.0,246819.0);
+	}
+	
+	public static Coord getCoordinatesLindenhofZH(){
+		return new CoordImpl(683235.0,247497.0);
+	}
+	
 	
 }

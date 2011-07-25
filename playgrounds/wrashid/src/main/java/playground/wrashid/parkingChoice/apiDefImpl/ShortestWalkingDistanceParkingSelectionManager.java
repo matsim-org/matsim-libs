@@ -21,7 +21,7 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSelectionManager {
 
-	private final ParkingManager parkingManager;
+	protected final ParkingManager parkingManager;
 
 	public ShortestWalkingDistanceParkingSelectionManager(ParkingManager parkingManager){
 		this.parkingManager = parkingManager;
@@ -61,6 +61,7 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		return bestParking;
 	}
 	
+	// TODO: probably remove OPTIONALtimeOfDayInSeconds parameter...
 	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Id personId,
 			double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo, QuadTree<Parking> parkings) {
 		double maxWalkingDistanceSearchSpaceInMeters = 1000000; // TODO: add this
