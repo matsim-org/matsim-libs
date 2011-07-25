@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich;
+package playground.benjamin.szenarios.munich.analysis;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
