@@ -26,6 +26,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -88,12 +91,12 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 	public void handleEvent(AgentDepartureEvent event) {
 		this.agentdeparture.put(event.getPersonId(), event.getTime());
-		//		Id personId= event.getPersonId();
-		//		Id linkId = event.getLinkId();
-		//		if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
-		//			System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
-		//			linkAndAgentAccountAnalysisModule.calculatePerPersonPtBikeWalk(personId, linkId);
-		//			linkAndAgentAccountAnalysisModule.calculatePerLinkPtBikeWalk(linkId, personId);}
+				Id personId= event.getPersonId();
+				Id linkId = event.getLinkId();
+				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
+				//	System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
+					linkAndAgentAccountAnalysisModule.calculatePerPersonPtBikeWalk(personId, linkId);
+					linkAndAgentAccountAnalysisModule.calculatePerLinkPtBikeWalk(linkId, personId);}
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {	
@@ -105,6 +108,15 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		String roadTypeString = link.getType();
 		Integer roadType = null;
 		Vehicle veh = null;
+		
+	/*	Person person = population.getPersons().get(personId);
+		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				String mode = leg.getMode();
+				if (personId.toString().contains("pv_pt_")&& mode.equals("pt"))
+					System.out.println("pv_pt_ "+mode);}}*/
+		
 		try{
 			roadType = Integer.parseInt(roadTypeString);
 		}
@@ -140,12 +152,28 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 				// # with leg car --> they have a vehicletype
 				if (veh != null ){
 					VehicleType vehType = veh.getType();
+					//fuelSizeAge= fuel type, engine size, year - Euro class
 					String fuelSizeAge = vehType.getDescription();
-					linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);											
-					linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);
+					
+					if(!fuelSizeAge.contains("Baujahr") || fuelSizeAge.contains("hubraum")
+							||!fuelSizeAge.contains("Hubraum") ||!fuelSizeAge.contains("Antriebsart")
+							|| fuelSizeAge.contains("99999") || fuelSizeAge.contains("99998")|| fuelSizeAge.contains("99994")
+							|| fuelSizeAge.contains("99997") || fuelSizeAge.equals("") || fuelSizeAge.contains("default")
+							|| fuelSizeAge.contains("Antriebsart:3") || fuelSizeAge.contains("Antriebsart:7") 
+							|| fuelSizeAge.contains("Antriebsart:8")|| fuelSizeAge.contains("Antriebsart:9")){
+					
+						linkAndAgentAccountAnalysisModule.calculateEmissionsPerLinkForComHdvPecWithoutVeh(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
+						linkAndAgentAccountAnalysisModule.calculateEmissionsPerCommuterHdvPcWithoutVeh(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);			
+					
+					}else{
+						
+						linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);											
+						linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);
+					}
 				}
 				// # with leg car -> they have no vehicletype
 				else{
+		
 					linkAndAgentAccountAnalysisModule.calculateEmissionsPerLinkForComHdvPecWithoutVeh(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
 					linkAndAgentAccountAnalysisModule.calculateEmissionsPerCommuterHdvPcWithoutVeh(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
 				}

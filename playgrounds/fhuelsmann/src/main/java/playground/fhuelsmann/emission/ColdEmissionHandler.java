@@ -20,38 +20,30 @@ package playground.fhuelsmann.emission;
  * *********************************************************************** */
 
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
+
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 
 
 
 
 public class ColdEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler,
-ActivityEndEventHandler,ActivityStartEventHandler{
+ActivityEndEventHandler,ActivityStartEventHandler,AgentDepartureEventHandler{
 
 
 	private Network network = null;
@@ -90,6 +82,15 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 		this.linkenter.put(event.getPersonId(), event.getTime());}
 
 	
+	public void handleEvent(AgentDepartureEvent event) {
+				Id personId= event.getPersonId();
+				Id linkId = event.getLinkId();
+				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
+					//System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
+					coldstartAnalyseModul.calculatePerPersonPtBikeWalk(personId, linkId,this.hbefaColdTable);
+
+					}
+	}
 	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
@@ -102,25 +103,24 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 					
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double distance = link.getLength();
-		
+	
 
 		if (this.accumulate.containsKey(personId) && this.activityDuration.containsKey(personId)){
 
 			try {
-				double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
+				double totalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
 				double actDuration = this.activityDuration.get(personId);
 				
 //				String id = event.getPersonId().toString();
 //				if(id.contains("569253.3#11147"))	
 //				System.out.println("TotalDistance " +TotalDistance + " actDuration " + actDuration);
 				
-				double actStart= event.getTime();
-				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
+				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, totalDistance, this.hbefaColdTable);
 //				System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
 				
 				this.accumulate.remove(personId);
 			
-			} catch (IOException e) {
+			} catch (Exception e) {
 					// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
@@ -137,7 +137,7 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 			
 			try {
 				this.coldstartAnalyseModul.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -149,7 +149,6 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 	public void handleEvent(ActivityEndEvent  event) {
 		
 		Id personId= event.getPersonId();
-		Id linkId = event.getLinkId();
 	
 		this.activityend.put(event.getPersonId(), event.getTime());
 		
@@ -157,7 +156,7 @@ ActivityEndEventHandler,ActivityStartEventHandler{
 		double actstart = this.activitystart.get(personId);// EndTime
 		double actDuration = event.getTime() - actstart;
 		this.activityDuration.put(personId, actDuration);
-
+		
 //		String id = event.getPersonId().toString();
 //		if(id.contains("569253.3#11147"))	
 //			System.out.println("startTime" +event.getTime()+"actDuration" + actDuration);

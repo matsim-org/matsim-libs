@@ -85,8 +85,9 @@ public class EmissionsPerEvent {
 
 	public double [] emissionFractionCalculateDetailed(Map<String, double[][]> hashOfPollutant, double averageSpeed, double distance){
 
+		
 		double[] arrayOfEmissions = new double[hashOfPollutant.size()];
-		// for every Pollutant in the Order of the List in EmissionTool
+		// for every pollutant in the Order of the List in EmissionTool
 
 		for( Entry<String, double[][]> Pollutant : hashOfPollutant.entrySet() ){
 
@@ -116,6 +117,12 @@ public class EmissionsPerEvent {
 				arrayOfEmissions[getIndexOfPollutant(Pollutant.getKey().toString())]=result;
 			}
 		}
+	//	System.out.println("################fc"+arrayOfEmissions[0]);
+	//	System.out.println("################nox"+arrayOfEmissions[1]);
+	//	System.out.println("################co2"+arrayOfEmissions[2]);
+	//	System.out.println("################no2"+arrayOfEmissions[3]);
+	//	System.out.println("################p"+arrayOfEmissions[4]);
+		
 		return arrayOfEmissions;
 	}
 

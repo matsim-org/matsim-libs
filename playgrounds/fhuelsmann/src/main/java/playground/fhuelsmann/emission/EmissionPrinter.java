@@ -120,6 +120,7 @@ public class EmissionPrinter {
 			System.err.println("Error: " + e.getMessage());
 		}
 	}
+	
 
 	public void printColdEmissionTable(Map<Id, Map<String, Double>> personId2ColdEmissions, String filename){
 		String outFile = runDirectory + filename;

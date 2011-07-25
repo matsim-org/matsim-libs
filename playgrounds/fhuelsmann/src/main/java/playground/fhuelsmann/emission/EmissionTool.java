@@ -50,16 +50,18 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
 //import playground.benjamin.szenarios.munich.UrbanSuburbanAnalyzer;
+
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
-	private static String runDirectory = "../../runs-svn/run972/";
-	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "ITERS/it.500/500.plans.xml.gz";
+	private static String runDirectory = "../../run980/";
+	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.xml.gz";
+	private static String netFile = runDirectory + "980.output_network.xml.gz";
+	private static String plansFile = runDirectory + "980.output_plans.xml.gz";
+
 
 /*	private static String runDirectory = "../../detailedEval/policies/mobilTUM/policyCase/";
 	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
@@ -137,9 +139,7 @@ public class EmissionTool {
 		// =======================================================================================================		
 		// warm emissions
 		Map<Id, double[]> personId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerPerson();
-//		System.out.println("###########################<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+commuterHdv2WarmEmissionsInGrammPerType);
 		Map<Id, double[]> linkId2WarmEmissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLink();
-		Map<Id, double[]> linkIdComHdvPec2emissionsInGrammPerType = warmEmissionAnalysisModule.getWarmEmissionsPerLinkComHdvPec();
 
 		// coldstart emissions
 		Map<Id, Map<String, Double>> personId2ColdEmissions = coldEmissionAnalysisModule.getColdEmissionsPerPerson();
@@ -156,7 +156,8 @@ public class EmissionTool {
 		printer.printHomeLocation2Emissions(population, personId2TotalEmissionsInGrammPerType, "EmissionsPerHomeLocationTotal.txt");
 		printer.printEmissionTable(personId2WarmEmissionsInGrammPerType, "EmissionsPerPersonWarm.txt");
 		printer.printEmissionTable(linkId2WarmEmissionsInGrammPerType, "EmissionsPerLinkWarm.txt");
-		printer.printEmissionTable(linkIdComHdvPec2emissionsInGrammPerType, "EmissionsPerLinkWarmComHdvPec.txt");
+
+
 
 		// new version using EmissionEvents
 		EventWriterXML eWriter = new EventWriterXML(runDirectory + "emission.events.xml.gz");

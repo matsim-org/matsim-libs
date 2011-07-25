@@ -29,10 +29,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+
 
 import playground.fhuelsmann.emission.objects.HbefaObject;
 import playground.fhuelsmann.emission.objects.VisumObject;
@@ -46,12 +45,14 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 	//	private int counter=0;
 	private HbefaHot hbefaHot = new HbefaHot();
 	//	private Map<Id, double[]> linkIdWalkBkePt2emissionsInGrammPerType = new TreeMap<Id,double[]>();
-	private Map<Id, double[]> linkIdComHdvPec2emissionsInGrammPerType =(new TreeMap<Id,double[]>());
 	private Map<Id, double[]> linkId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	private Map<Id, double[]> personId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
 	private ArrayList<String> listOfPollutant;
 	//	private Population population = null;
+	
+	private Map<String, Integer> hotKeys = new TreeMap<String,Integer>();
 
+	
 	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant,VisumObject[] roadTypes, EmissionsPerEvent emissionFactor, HbefaHot hbefahot) {
 		this.roadTypes = roadTypes;
 		this.emissionFactor = emissionFactor;
@@ -81,27 +82,27 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		double [] inputForHdvEmissions = emissionFactor.collectInputForEmissionFraction(listOfPollutant,hbefaRoadType, averageSpeed, distance, hbefaHdvTable);
 
 		if(!personId.toString().contains("gv_")){
-			if(this.linkIdComHdvPec2emissionsInGrammPerType.get(linkId) == null) {
-				this.linkIdComHdvPec2emissionsInGrammPerType.put(linkId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
+			if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
+				this.linkId2emissionsInGrammPerType.put(linkId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
 			}else{
 				double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-				double [] previousEmissions = this.linkIdComHdvPec2emissionsInGrammPerType.get(linkId);		
+				double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId);		
 				for(int i = 0; i < actualEmissions.length ; i++){
 					actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];
 				}
-				linkIdComHdvPec2emissionsInGrammPerType.put(linkId, actualEmissions);
+				linkId2emissionsInGrammPerType.put(linkId, actualEmissions);
 			}
-			//// else of gv,...
+			//// else gv,... so far only fc and co2 emissionFactors are listed in the hbefaHdvTable
 		}else{
-			if(this.linkIdComHdvPec2emissionsInGrammPerType.get(linkId) == null) {
-				this.linkIdComHdvPec2emissionsInGrammPerType.put(linkId, inputForHdvEmissions);// data is read for the first time, doesn't need to be summed up per link
+			if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
+				this.linkId2emissionsInGrammPerType.put(linkId, inputForHdvEmissions);// data is read for the first time, doesn't need to be summed up per link
 			}else{
 				double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-				double [] previousEmissions = this.linkIdComHdvPec2emissionsInGrammPerType.get(linkId); // previousEmissions is the previous sum
+				double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId); // previousEmissions is the previous sum
 				for(int i = 0; i < actualEmissions.length ; i++){
 					actualEmissions[i]= previousEmissions[i] + inputForHdvEmissions[i];
 				}
-				linkIdComHdvPec2emissionsInGrammPerType.put(linkId, actualEmissions);// put newValue in the Map
+				linkId2emissionsInGrammPerType.put(linkId, actualEmissions);// put newValue in the Map
 			}
 		}
 	}
@@ -134,7 +135,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 					actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];		
 				personId2emissionsInGrammPerType.put(personId, actualEmissions);
 			}
-		}else{
+		}else{ //gv_... so far only fc and co2 emissionFactors are listed in the hbefaHdvTable
 			if(this.personId2emissionsInGrammPerType.get(personId) == null) {
 				this.personId2emissionsInGrammPerType.put(personId, inputForHdvEmissions);// data is read for the first time, doesn't need to be summed up per link
 			}else{
@@ -144,7 +145,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 					actualEmissions[i] = previousEmissions[i] + inputForHdvEmissions[i];
 				}
 				personId2emissionsInGrammPerType.put(personId, actualEmissions);// put newValue in the Map
-			}	
+				}
 		}
 	}
 
@@ -165,6 +166,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		String[] hubSizeAgeArray = fuelSizeAge.split(";");
 
 		String[] VehicleAttributes = new String[3];
+	
 		VehicleAttributes = calculateVehicleAttributes(hubSizeAgeArray);
 
 		String[] keys = new String[4];
@@ -173,15 +175,12 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		for( String Pollutant : listOfPollutant ){
 			for(int i = 0; i < 4; i++)
 				keys[i] = makeKey(Pollutant, roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
+	
 			// place 0 for freeFlow ....
 			double[][] emissionsInFourSituations = new double[4][2];	
 			for(int i = 0; i < 4; i++){
-				try{
 					emissionsInFourSituations[i][0]= this.hbefaHot.getHbefaHot().get(keys[i]).getV();
 					emissionsInFourSituations[i][1]= this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
-				} 
-				catch(Exception e){
-				}
 			}
 			// in the hashPfPollutant we save the V and EFA in 4 Situations
 			hashOfPollutant.put(Pollutant, emissionsInFourSituations);	
@@ -206,6 +205,14 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		}
 	}
 
+	public Map<String, Integer> getHotKeys() {
+		return hotKeys;
+	}
+
+	public void setHotKeys(Map<String, Integer> hotKeys) {
+		this.hotKeys = hotKeys;
+	}
+
 	@Override
 	/** emission calculation per person for passenger cars with a vehicle assigned **/
 	public synchronized void calculateEmissionsPerPerson(double travelTime,
@@ -218,10 +225,11 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			HbefaObject[][] hbefaTable,
 			HbefaObject[][] hbefaHdvTable) {
 
-		String[] hubSizeAgeArray = fuelSizeAge.split(";");
+		String[] fuelSizeAgeArray = fuelSizeAge.split(";");
+		//array order - fuel type[0], engine size 1], year[2]
 		String[] VehicleAttributes = new String[3];
-		VehicleAttributes = calculateVehicleAttributes(hubSizeAgeArray);
-
+		VehicleAttributes = calculateVehicleAttributes(fuelSizeAgeArray);
+		
 		// make 4 keys
 		String[] keys = new String[4];
 		// 
@@ -254,11 +262,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			for(int i = 0; i < actualEmissions.length ; i++){
 				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
 			}
-
-			if(personId.equals(new IdImpl("556128.2#3625"))){
-				logger.warn(arrayOfemissionFactor[0] + "; Distance: " + distance + "; AvgSpeed: " + averageSpeed + "; hashOfPollutant: " + hashOfPollutant.get("FC")[0][0]);
-			}
-
 			// put newValue in the Map
 			personId2emissionsInGrammPerType.put(personId, actualEmissions);
 		}
@@ -356,10 +359,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		return this.linkId2emissionsInGrammPerType;
 	}
 
-	public Map<Id, double[]> getWarmEmissionsPerLinkComHdvPec() {
-		return this.linkIdComHdvPec2emissionsInGrammPerType;
-	}
-
 	public Map<Id, double[]> getWarmEmissionsPerPerson() {
 		return this.personId2emissionsInGrammPerType;
 	}
@@ -386,8 +385,8 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		result[0]="null"; //technology
 		if (antriebsart==1) result[0]="petrol (4S)"; 	
 		else if(antriebsart==2) result[0]="diesel";	
-		else if (antriebsart==99998 && antriebsart==99999) result[0]="petrol (4S)";
-		else result[0]="diesel";
+	//	else if (antriebsart==99998 && antriebsart==99999) result[0]="petrol (4S)";
+	//	else result[0]="diesel";
 
 		result[1]="null";
 		int hubraum=0;
@@ -398,8 +397,8 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		if (hubraum <= 1400) result[1]="<1,4L";	
 		else if(hubraum <= 2000 && hubraum > 1400) result[1]="1,4-<2L";
 		else if(hubraum >2000 ) result[1]=">=2L";
-		else if (hubraum == 99998 && hubraum ==99999) result[1]="1,4-<2L";
-		else result[1]="1,4-<2L";
+	//	else if (hubraum == 99998 && hubraum ==99999) result[1]="1,4-<2L";
+	//	else result[1]="1,4-<2L";
 
 		result[2]="null";//emConcept
 		int bauJahr=0;	
@@ -421,10 +420,10 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		else if(bauJahr <2011 && result[0].equals("diesel") ) result[2]="PC-D-Euro-4";
 		else if(bauJahr <2015 && result[0].equals("petrol (4S)") ) result[2]="PC-P-Euro-5";
 		else if(bauJahr <2015 && result[0].equals("diesel") ) result[2]="PC-D-Euro-5";
-		else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("diesel")) result[2]="PC-D-Euro-2";
-		else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
-		else if (result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
-		else if (result[0].equals("diesel")) result[2]="PC-D-Euro-2";
+	//	else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("diesel")) result[2]="PC-D-Euro-2";
+	//	else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
+	//	else if (result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
+	//	else if (result[0].equals("diesel")) result[2]="PC-D-Euro-2";
 
 		return result;
 	}

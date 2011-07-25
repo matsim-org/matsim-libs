@@ -26,7 +26,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
+
 
 import playground.fhuelsmann.emission.objects.HbefaColdObject;
 
@@ -103,18 +103,4 @@ public class HbefaColdEmissionTable {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public void printHbefaCold(){
-		
-		
-		for(Entry<String,Map<Integer,Map<Integer,HbefaColdObject>>> component : this.HbefaColdEmissionTable.entrySet()){	
-			for(Entry<Integer,Map<Integer,HbefaColdObject>> distance : this.HbefaColdEmissionTable.get(component.getKey()).entrySet()){	
-				for(Entry<Integer,HbefaColdObject> parkingTime : this.HbefaColdEmissionTable.get(component.getKey()).get(distance.getKey()).entrySet()){
-	//				System.out.println(component.getKey() + ";" + distance.getKey() + ";" + parkingTime.getKey() +";" + parkingTime.getValue().getColdEF() );
-				}
-			}
-		}
-	
-	}
-
 }
