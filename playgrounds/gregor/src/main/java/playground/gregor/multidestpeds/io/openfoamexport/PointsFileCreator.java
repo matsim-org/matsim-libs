@@ -1,7 +1,5 @@
 package playground.gregor.multidestpeds.io.openfoamexport;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -9,35 +7,34 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class PointsFileCreator extends FoamFileWriter {
 
+
 	private final List<Coordinate> points;
-	private final String fileName;
-	private final String portName;
+	private final String location;
+	private static final String OBJECT = "points";
 
-	public PointsFileCreator(String fileName, List<Coordinate> points, String portName) {
-		this.fileName = fileName;
+	public PointsFileCreator(String baseDir, String location, List<Coordinate> points) {
+		super(baseDir + "/" + location + "/" + OBJECT);
 		this.points = points;
-		this.portName = portName;
+		this.location =location;
 	}
 
+	@Override
 	public void create() throws IOException {
-		BufferedWriter bf = new BufferedWriter(new FileWriter(this.fileName));
-		writeHeader(bf);
-		writeDict(bf,"2.0", "ascii", "vectorField", "\"constant/boundaryData/"+this.portName + "\"", "points");
-		writePoints(bf);
+		writeHeader();
+		writeDict("2.0", "ascii", "vectorField", "\"" + this.location + "\"", OBJECT);
+		writePoints();
 
-		bf.close();
+		super.writer.close();
 	}
 
 
-	private void writePoints(BufferedWriter bf) throws IOException {
-		bf.append("\n");
-		bf.append("(\n");
+	private void writePoints() throws IOException {
+		super.writer.append("\n");
+		super.writer.append("(\n");
 		for (Coordinate c : this.points){
-			bf.append(" (" + c.x + " " + c.y + " " + c.z + ")\n");
+			super.writer.append(" (" + c.x + " " + c.y + " " + c.z + ")\n");
 		}
-
-
-		bf.append(" )\n");
+		super.writer.append(" )\n");
 	}
 
 

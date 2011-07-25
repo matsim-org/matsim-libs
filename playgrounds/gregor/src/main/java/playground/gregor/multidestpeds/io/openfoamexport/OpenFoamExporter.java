@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +32,7 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHandler{
 
+	private static final String  CONSTANT = "constant";
 	private static final String BOUNDARY_DATA = "boundaryData";
 	private static final String POINTS = "points";
 	//	private static final String NORTH_PORT ="northPort";?
@@ -45,11 +48,15 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 	private final Map<String, List<Coordinate>> ports;
 	private final Map<Coordinate,String> coordPortMapping = new HashMap<Coordinate,String>();
 	private final Map<String, String> groupMapping;
+	private final Map<String, Set<String>> portGroupMapping;
+	private final List<PedestrianGroup> groups;
 
-	public OpenFoamExporter(String outputDir,Map<String,List<Coordinate>> ports, Map<String, String> groupMapping) {
+	public OpenFoamExporter(String outputDir,Map<String,List<Coordinate>> ports, Map<String, String> groupMapping, Map<String, Set<String>> portGroupMapping, List<PedestrianGroup> groups) {
 		this.outputDir = outputDir;
 		this.ports = ports;
 		this.groupMapping = groupMapping;
+		this.portGroupMapping = portGroupMapping;
+		this.groups = groups;
 
 	}
 
@@ -87,6 +94,9 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 			String key = e.getKey();
 
 			String port = this.coordPortMapping.get(c);
+			if (!this.portGroupMapping.get(port).contains(key)){
+				continue;
+			}
 			String group = this.groupMapping.get(key);
 			Map<String, Map<Coordinate, Double>> pMap = densities.get(port);
 			if (pMap == null){
@@ -115,9 +125,9 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 				for (Coordinate c : this.ports.get(port)) {
 					rhos.add(ee.getValue().get(c));
 				}
-				String location = this.outputDir + "/" + BOUNDARY_DATA + "/" + port + "/" + timeString;
+				String location =  CONSTANT + "/"+ BOUNDARY_DATA + "/" + port + "/" + timeString;
 				try {
-					new DensityFileCreator(location,group,rhos).create();
+					new DensityFileCreator(this.outputDir,location,group,rhos).create();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 					System.exit(-3);
@@ -129,7 +139,7 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 	}
 
 	private void initFrameAtPort(String port, String timeString) {
-		String baseDir = this.outputDir + "/" + BOUNDARY_DATA + "/" + port;
+		String baseDir = this.outputDir + "/" + CONSTANT + "/"+ BOUNDARY_DATA + "/" + port;
 		new File(baseDir + "/" + timeString).mkdir();
 	}
 
@@ -151,9 +161,9 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 
 		//port directories
 		for (Entry<String, List<Coordinate>> e : this.ports.entrySet()) {
-			new File(this.outputDir + "/" + BOUNDARY_DATA + "/" + e.getKey()).mkdirs();
+			new File(this.outputDir + "/" + CONSTANT + "/"+ BOUNDARY_DATA + "/" + e.getKey()).mkdirs();
 			try {
-				new PointsFileCreator(this.outputDir + "/" + BOUNDARY_DATA + "/" + e.getKey() + "/" + POINTS,e.getValue(),e.getKey()).create();
+				new PointsFileCreator(this.outputDir,  CONSTANT + "/"+ BOUNDARY_DATA + "/" + e.getKey() ,e.getValue()).create();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				System.exit(-1);
@@ -166,6 +176,14 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 			for (Coordinate c : e.getValue()) {
 				this.coordPortMapping.put(c, port);
 			}
+		}
+
+		// pedestrianProperties
+		try {
+			new PedestrianPropertiesFileCreator(this.outputDir,CONSTANT,this.groups).create();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 
 		this.initialized = true;
@@ -184,6 +202,8 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 		}
 	}
 
+	@Deprecated
+	// should be configured in an OpenFoamConfigGroup
 	public static void main(String [] args) {
 
 		String events = "/Users/laemmel/devel/dfg/events.xml";
@@ -212,7 +232,28 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 		groupMapping.put("g", "ped1Rho");
 		groupMapping.put("r", "ped2Rho");
 
-		OpenFoamExporter exporter = new OpenFoamExporter(outputDir,ports,groupMapping);
+		//group port mapping
+		Map<String,Set<String>> portGroupMapping = new HashMap<String,Set<String>>();
+		HashSet<String> set1 = new HashSet<String>();
+		set1.add("g");
+		portGroupMapping.put("westPort", set1);
+		HashSet<String> set2 = new HashSet<String>();
+		set2.add("r");
+		portGroupMapping.put("northPort", set2);
+
+
+		//pedestrian groups
+		List<PedestrianGroup> groups = new ArrayList<PedestrianGroup>();
+		PedestrianGroup grp1 = new PedestrianGroup("ped1");
+		grp1.setOrigin("westPort", new Coordinate(1,0,0));
+		grp1.addDestination("eastPort", -100, new Coordinate(1,0,0));
+		groups.add(grp1);
+		PedestrianGroup grp2 = new PedestrianGroup("ped2");
+		grp2.setOrigin("northPort", new Coordinate(0,-1,0));
+		grp2.addDestination("southPort", -100, new Coordinate(0,-1,0));
+		groups.add(grp2);
+
+		OpenFoamExporter exporter = new OpenFoamExporter(outputDir,ports,groupMapping,portGroupMapping,groups);
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(exporter);

@@ -1,38 +1,52 @@
 package playground.gregor.multidestpeds.io.openfoamexport;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 abstract class FoamFileWriter {
 
-	public void writeDict(BufferedWriter bf, String version, String format, String clazz,
+
+	protected BufferedWriter writer;
+
+	public FoamFileWriter(String fileName) {
+		try {
+			this.writer = new BufferedWriter(new FileWriter(fileName));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void writeDict(String version, String format, String clazz,
 			String location, String object) throws IOException {
-		startDict(bf);
-		addEntryToDict(bf,"version",version);
-		addEntryToDict(bf,"format",format);
-		addEntryToDict(bf,"class",clazz);
-		addEntryToDict(bf,"location",location);
-		addEntryToDict(bf,"object",object);
-		endDict(bf);
+		startDict();
+		addEntryToDict("version",version);
+		addEntryToDict("format",format);
+		addEntryToDict("class",clazz);
+		addEntryToDict("location",location);
+		addEntryToDict("object",object);
+		endDict();
 	}
 
-	private void addEntryToDict(BufferedWriter bf, String name, String value) throws IOException {
-		bf.append("\t" + name + "\t" + value + ";\n");
+	abstract void create() throws IOException;
 
-	}
-
-	private void endDict(BufferedWriter bf) throws IOException {
-		bf.append("}\n");
+	private void addEntryToDict(String name, String value) throws IOException {
+		this.writer.append("\t" + name + "\t" + value + ";\n");
 
 	}
 
-	private void startDict(BufferedWriter bf) throws IOException {
-		bf.append("\n");
-		bf.append("FoamFile\n");
-		bf.append("{\n");
+	private void endDict() throws IOException {
+		this.writer.append("}\n");
+
 	}
 
-	protected void writeHeader(BufferedWriter bf) throws IOException {
-		bf.append("// -*- C++ -*-\n");
+	private void startDict() throws IOException {
+		this.writer.append("\n");
+		this.writer.append("FoamFile\n");
+		this.writer.append("{\n");
+	}
+
+	protected void writeHeader() throws IOException {
+		this.writer.append("// -*- C++ -*-\n");
 	}
 }
