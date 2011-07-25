@@ -30,7 +30,6 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -42,9 +41,9 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
 
@@ -156,19 +155,16 @@ public class FacilityDrawer {
 				for (VisBusStop stop : this.stops) {
 					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
 				}
-				initTexts();
-			}
-		}
-
-		public void initTexts() {
-			for (VisBusStop stop : this.stops) {
-				if ( stop.linkId!=null ) {
-					stop.stopText = InfoTextContainer.showTextOnce(stop.buildText(),
-							(float) stop.x - 100.0f, (float) stop.y + 50.0f, -0.001f); // kai: text size
-					stop.stopText.setLinkId(new IdImpl(stop.linkId));
+				for (VisBusStop stop : this.stops) {
+					if ( stop.linkId!=null ) {
+						stop.stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f); 
+						OTFOGLDrawer drawer = (OTFOGLDrawer) OTFClientControl.getInstance().getMainOTFDrawer();
+						stop.stopText.draw(drawer.getTextRenderer(), gl, drawer.getViewBounds());
+					}
 				}
 			}
 		}
+
 
 	}
 
@@ -181,15 +177,7 @@ public class FacilityDrawer {
 		private InfoText stopText;
 
 		public void setnOfPeople(int nOfPeople) {
-			int oldnOfPeople = this.nOfPeople;
 			this.nOfPeople = nOfPeople;
-			if (oldnOfPeople != nOfPeople) {
-				updateText();
-			}
-		}
-
-		private void updateText() {
-			stopText.setText(buildText());
 		}
 
 		private String buildText() {

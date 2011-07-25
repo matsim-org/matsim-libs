@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
+import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
@@ -116,7 +116,8 @@ public class QueryAgentPTBus extends AbstractQuery {
 				gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 				gl.glEnd();
 				drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
-				InfoTextContainer.showTextOnce("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250, -0.0007f);
+				InfoText text = new InfoText("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250);
+				text.draw(drawer.getTextRenderer(), gl, drawer.getMouseHandler().getBounds());
 
 			}
 			gl.glDisable(GL.GL_BLEND);

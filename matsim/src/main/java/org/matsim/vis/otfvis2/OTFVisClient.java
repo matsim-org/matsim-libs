@@ -1,8 +1,6 @@
 package org.matsim.vis.otfvis2;
 
 import java.awt.BorderLayout;
-import java.awt.geom.Rectangle2D.Double;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -12,11 +10,7 @@ import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
-import org.matsim.vis.otfvis.gui.OTFQueryControl.IdResolver;
-import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
-import org.matsim.vis.otfvis.gui.QueryEntry;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -69,22 +63,22 @@ public final class OTFVisClient implements Runnable {
 			mainDrawer = new OTFOGLDrawer(clientQuadTree, otfClient.getHostControlBar());
 		}
 		if (server.isLive()) {
-			final OTFQueryControl queryControl = new OTFQueryControl(server, otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
-			queryControl.getQueries().clear();
-			queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));
-			queryControl.setAgentIdResolver(new IdResolver() {
-
-				@Override
-				public List<String> resolveId(Double origRect) {
-					QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) queryControl.createQuery(new QueryAgentId(origRect));
-					return agentIdQuery.agentIds;
-				}
-
-			});
-			OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
-			queryControl.setQueryTextField(queryControlBar.getTextField());
-			otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-			mainDrawer.setQueryHandler(queryControl);
+//			final OTFQueryControl queryControl = new OTFQueryControl(server, otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
+//			queryControl.getQueries().clear();
+//			queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));
+//			queryControl.setAgentIdResolver(new IdResolver() {
+//
+//				@Override
+//				public List<String> resolveId(Double origRect) {
+//					QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) queryControl.createQuery(new QueryAgentId(origRect));
+//					return agentIdQuery.agentIds;
+//				}
+//
+//			});
+//			OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, OTFClientControl.getInstance().getOTFVisConfig());
+//			queryControl.setQueryTextField(queryControlBar.getTextField());
+//			otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+//			mainDrawer.setQueryHandler(queryControl);
 		}
 		
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
@@ -96,7 +90,7 @@ public final class OTFVisClient implements Runnable {
 	}
 
 	@Override
-	public final void run() {
+	public void run() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

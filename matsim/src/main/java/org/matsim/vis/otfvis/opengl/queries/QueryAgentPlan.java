@@ -55,7 +55,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshots.writers.VisMobsimFeature;
@@ -206,11 +205,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				// We know where the agent is, so we draw stuff around them.
 				drawArrowFromAgentToTextLabel(pos, gl);
 				drawCircleAroundAgent(pos, gl);
-				createLabelTextIfNecessary(pos);
-				updateAgentTextPosition(pos);
-			} else {
-				fillActivityLabel();
-			}
+				createLabelTextIfNecessary(drawer, pos);
+				
+			} 
 			unPrepare(gl);
 		}
 
@@ -264,24 +261,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			DrawingUtils.drawCircle(gl, (float) pos.x, (float) pos.y, 200.f);
 		}
 
-		private void updateAgentTextPosition(Point2D.Double pos) {
-			if (this.agentText != null) {
-				this.agentText.setX((float) pos.x + 250);
-				this.agentText.setY((float) pos.y + 250);
-			}
-		}
-
 		private Double getAgentPositionFromPointLayer(String agentIdString,
 				OGLAgentPointLayer layer) {
 			return layer.getAgentCoords(agentIdString.toCharArray());
-		}
-
-		private void fillActivityLabel() {
-			if ((activityNr != -1) && (activityNr < this.acts.size())) {
-				InfoText posT = this.activityTexts.get(activityNr);
-				posT.setColor(new Color(255, 50, 50, 180));
-				posT.setFill((float) this.activityFinished);
-			}
 		}
 
 		private void calcOffsetIfNecessary(OTFOGLDrawer drawer) {
@@ -301,31 +283,24 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
 			activityTexts = new ArrayList<InfoText>();
 			for (MyInfoText activityEntry : this.acts ) {
-				InfoText activityText = InfoTextContainer.showTextPermanent(
-						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth,
-						-0.001f);
+				InfoText activityText = new InfoText(
+						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth);
 				activityText.setAlpha(0.5f);
+				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getBounds());
 				this.activityTexts.add(activityText);
 			}
 		}
 
-		private void createLabelTextIfNecessary(Point2D.Double pos) {
-			this.agentText = InfoTextContainer.showTextPermanent(
-					this.agentId, (float) pos.x, (float) pos.y,
-					-0.0003f);
+		private void createLabelTextIfNecessary(OTFOGLDrawer drawer, Point2D.Double pos) {
+			this.agentText = new InfoText(
+					this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			this.agentText.setAlpha(0.7f);
+			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getBounds());
 		}
 
 		@Override
 		public void remove() {
-			if (this.activityTexts != null) {
-				for (InfoText inf : this.activityTexts) {
-					InfoTextContainer.removeTextPermanent(inf);
-				}
-			}
-			if (this.agentText != null) {
-				InfoTextContainer.removeTextPermanent(this.agentText);
-			}
+
 		}
 
 		@Override

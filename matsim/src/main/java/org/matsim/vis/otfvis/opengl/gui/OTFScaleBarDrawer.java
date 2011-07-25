@@ -13,7 +13,6 @@ import javax.media.opengl.glu.GLU;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.InfoText;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
@@ -42,16 +41,11 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 	public OTFScaleBarDrawer() {
 		this.bg = "sb_background.png";
 		this.sb = "scalebar.png";
-		initTextRenderer();
-	}
-
-	private void initTextRenderer() {
 		// Create the text renderer
 		Font font = new Font("SansSerif", Font.PLAIN, 30);
 		this.textRenderer = new TextRenderer(font, true, false);
-		InfoText.setRenderer(this.textRenderer);
 	}
-	
+
 	@Override
 	public void onDraw(GL gl) {
 		if (this.back == null){

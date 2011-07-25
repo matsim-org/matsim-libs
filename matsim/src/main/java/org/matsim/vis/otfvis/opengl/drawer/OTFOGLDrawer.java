@@ -84,7 +84,6 @@ import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.gui.OTFScaleBarDrawer;
 import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
@@ -127,8 +126,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private final List<OTFGLAbstractDrawable> overlayItems = new ArrayList<OTFGLAbstractDrawable>();
 
-	private StatusTextDrawer statusDrawer = null;
-
 	private OTFQueryHandler queryHandler = null;
 
 	private Component canvas = null;
@@ -153,48 +150,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	public static boolean USE_GLJPANEL = false;
 
 	private float oldWidth = 0.0f;
+	
 	private float oldHeight = 0.0f;
 
-	public static class StatusTextDrawer {
-
-		private TextRenderer textRenderer;
-		private String status;
-		private int statusWidth;
-		private final GLAutoDrawable drawable;
-
-		public StatusTextDrawer(GLAutoDrawable drawable) {
-			initTextRenderer();
-			this.drawable = drawable;
-		}
-
-		private void initTextRenderer() {
-			// Create the text renderer
-			Font font = new Font("SansSerif", Font.PLAIN, 32);
-			this.textRenderer = new TextRenderer(font, true, false);
-			InfoText.setRenderer(this.textRenderer);
-		}
-
-		private void displayStatusText(String text) {
-			this.status  = text;
-
-			if (this.statusWidth == 0) {
-				// Place it at a fixed offset wrt the upper right corner
-				this.statusWidth = (int) this.textRenderer.getBounds("FPS: 10000.00").getWidth();
-			}
-
-			// Calculate text location and color
-			int x = this.drawable.getWidth() - this.statusWidth - 5;
-			int y = this.drawable.getHeight() - 30;
-
-			// Render the text
-			this.textRenderer.setColor(Color.DARK_GRAY);
-			this.textRenderer.beginRendering(this.drawable.getWidth(), this.drawable.getHeight());
-			this.textRenderer.draw(this.status, x, y);
-			this.textRenderer.endRendering();
-		}
-
+	private TextRenderer textRenderer;
+	
+	public TextRenderer getTextRenderer() {
+		return textRenderer;
 	}
 
+	private String status;
+	private int statusWidth;
 
 	public static class FastColorizer {
 
@@ -263,6 +229,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar) {
+		Font font = new Font("SansSerif", Font.PLAIN, 32);
+		textRenderer = new TextRenderer(font, true, false);
 		this.clientQ = clientQ;
 		this.hostControlBar = hostControlBar;
 		GLCapabilities caps = new GLCapabilities();
@@ -286,41 +254,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 
 	}
-
+	
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
-	}
-
-	private void displayLinkIds(Map<Coord, String> linkIds) {
-		String testText = "0000000";
-		Rectangle2D test = InfoText.getBoundsOf(testText);
-		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
-		double xRaster = test.getWidth(), yRaster = test.getHeight();
-		for( Entry<Coord, String> e : linkIds.entrySet()) {
-			Coord coord = e.getKey();
-			String linkId = e.getValue();
-			float east = (float)coord.getX() ;
-			float north = (float)coord.getY() ;
-			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
-			float textY = north -(float)(north % yRaster) +80;
-			CoordImpl text = new CoordImpl(textX,textY);
-			int i = 1;
-			while (xymap.get(text) != null) {
-				text = new CoordImpl(textX,  i* (float)yRaster + textY);
-				if(xymap.get(text) == null) break;
-				text = new CoordImpl(textX + i* (float)xRaster, textY);
-				if(xymap.get(text) == null) break;
-				i++;
-			}
-			xymap.put(text, Boolean.TRUE);
-			InfoTextContainer.showTextOnce(linkId, (float)text.getX(), (float)text.getY(), -0.0005f);
-			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
-			this.gl.glLineWidth(2);
-			this.gl.glBegin(GL.GL_LINE_STRIP);
-			this.gl.glVertex3d(east, north,0);
-			this.gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
-			this.gl.glEnd();
-		}
 	}
 
 	private boolean isZoomBigEnoughForLabels() {
@@ -364,7 +300,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 
 		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
-			this.statusDrawer.displayStatusText(this.lastTime);
+			drawFrameRate(drawable);
 		}
 
 		this.mouseMan.drawElements(this.gl);
@@ -395,9 +331,59 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		if (this.current == null) {
 			this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
 		}
-		Collection<String> visibleLinkIds = coordStringPairs.values();
-		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
 		this.gl.glDisable(GL.GL_BLEND);
+	}
+
+	private void drawFrameRate(GLAutoDrawable drawable) {
+		this.status  = this.lastTime;
+		
+		if (this.statusWidth == 0) {
+			// Place it at a fixed offset wrt the upper right corner
+			this.statusWidth = (int) this.textRenderer.getBounds("FPS: 10000.00").getWidth();
+		}
+		
+		// Calculate text location and color
+		int x = drawable.getWidth() - this.statusWidth - 5;
+		int y = drawable.getHeight() - 30;
+		
+		// Render the text
+		this.textRenderer.setColor(Color.DARK_GRAY);
+		this.textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
+		this.textRenderer.draw(this.status, x, y);
+		this.textRenderer.endRendering();
+	}
+
+	private void displayLinkIds(Map<Coord, String> linkIds) {
+		String testText = "0000000";
+		Rectangle2D test = textRenderer.getBounds(testText);
+		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
+		double xRaster = test.getWidth(), yRaster = test.getHeight();
+		for( Entry<Coord, String> e : linkIds.entrySet()) {
+			Coord coord = e.getKey();
+			String linkId = e.getValue();
+			float east = (float)coord.getX() ;
+			float north = (float)coord.getY() ;
+			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
+			float textY = north -(float)(north % yRaster) +80;
+			CoordImpl text = new CoordImpl(textX,textY);
+			int i = 1;
+			while (xymap.get(text) != null) {
+				text = new CoordImpl(textX,  i* (float)yRaster + textY);
+				if(xymap.get(text) == null) break;
+				text = new CoordImpl(textX + i* (float)xRaster, textY);
+				if(xymap.get(text) == null) break;
+				i++;
+			}
+			xymap.put(text, Boolean.TRUE);
+			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
+			this.gl.glLineWidth(2);
+			this.gl.glBegin(GL.GL_LINE_STRIP);
+			this.gl.glVertex3d(east, north,0);
+			this.gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
+			this.gl.glEnd();
+			InfoText infoText = new InfoText(linkId, (float)text.getX(), (float)text.getY());
+			infoText.draw(textRenderer, this.gl, this.mouseMan.viewBounds);
+		}
 	}
 
 	@Override
@@ -443,7 +429,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			GL gl = drawable.getGL();
 			gl.glViewport(0, 0, width, height);
 			this.mouseMan.setFrustrum(gl);
-			this.statusDrawer = new StatusTextDrawer(drawable);
 		}
 	}
 
