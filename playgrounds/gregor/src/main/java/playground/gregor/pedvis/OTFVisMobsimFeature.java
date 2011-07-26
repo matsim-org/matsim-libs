@@ -70,34 +70,34 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 		connectionManager.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
-		
-		connectionManager.connectWriterToReader(
-				OTFAgentsListHandler.Writer.class,
-				OTFAgentsListHandler.class);
-		connectionManager.connectReaderToReceiver(
-				OTFAgentsListHandler.class,
-				AgentPointDrawer.class);
+
+		//		connectionManager.connectWriterToReader(
+		//				OTFAgentsListHandler.Writer.class,
+		//				OTFAgentsListHandler.class);
+		//		connectionManager.connectReaderToReceiver(
+		//				OTFAgentsListHandler.class,
+		//				AgentPointDrawer.class);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				OTFClient otfClient = new OTFClient();
-				otfClient.setServer(server);
+				otfClient.setServer(OTFVisMobsimFeature.this.server);
 				SettingsSaver saver = new SettingsSaver("otfsettings");
 				OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
 				if (visconf == null) {
-					visconf = server.getOTFVisConfig();
+					visconf = OTFVisMobsimFeature.this.server.getOTFVisConfig();
 				}
 				visconf.setCachingAllowed(false); // no use to cache in live mode
 				OTFClientControl.getInstance().setOTFVisConfig(visconf);
-				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
-				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
+				OTFServerQuadTree serverQuadTree = OTFVisMobsimFeature.this.server.getQuad(connectionManager);
+				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(OTFVisMobsimFeature.this.server, connectionManager);
 				clientQuadTree.createReceiver(connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 				hostControlBar.updateTimeLabel();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar);
-				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(OTFVisMobsimFeature.this.server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
