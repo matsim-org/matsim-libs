@@ -1,0 +1,5 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence,shape_dist_traveled
+TEST_TRIP_WD,6:00:00,6:00:00,TEST_STOP_1,1,0
+TEST_TRIP_WD,6:20:00,6:20:00,TEST_STOP_2,2,1
+TEST_TRIP_WE,6:10:00,6:10:00,TEST_STOP_1,1,0
+TEST_TRIP_WE,6:35:00,6:35:00,TEST_STOP_2,2,1

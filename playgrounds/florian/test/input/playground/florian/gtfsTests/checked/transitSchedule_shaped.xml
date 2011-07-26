@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="TEST_STOP_1" x="2946052.0" y="-6537867.0" linkRefId="dL1_TEST_STOP_1" name="GTFS TEST STOP 1"
+ isBlocking="false"/>
+		<stopFacility id="TEST_STOP_2" x="2947585.0" y="-6535114.0" linkRefId="dL1_TEST_STOP_2" name="GTFS TEST STOP 2"
+ isBlocking="false"/>
+	</transitStops>
+	<transitLine id="TEST_ROUTE">
+		<transitRoute id="TEST_TRIP_WD">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="TEST_STOP_1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="TEST_STOP_2" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="dL1_TEST_STOP_1"/>
+				<link refId="0.1"/>
+				<link refId="0.2"/>
+				<link refId="dL2_TEST_STOP_2"/>
+				<link refId="dL1_TEST_STOP_2"/>
+			</route>
+			<departures>
+				<departure id="TEST_TRIP_WD.0" departureTime="06:00:00" vehicleRefId="TEST_TRIP_WD.0"/>
+				<departure id="TEST_TRIP_WD.1" departureTime="08:00:00" vehicleRefId="TEST_TRIP_WD.1"/>
+				<departure id="TEST_TRIP_WD.10" departureTime="18:00:00" vehicleRefId="TEST_TRIP_WD.10"/>
+				<departure id="TEST_TRIP_WD.2" departureTime="09:00:00" vehicleRefId="TEST_TRIP_WD.2"/>
+				<departure id="TEST_TRIP_WD.3" departureTime="10:00:00" vehicleRefId="TEST_TRIP_WD.3"/>
+				<departure id="TEST_TRIP_WD.4" departureTime="11:00:00" vehicleRefId="TEST_TRIP_WD.4"/>
+				<departure id="TEST_TRIP_WD.5" departureTime="12:00:00" vehicleRefId="TEST_TRIP_WD.5"/>
+				<departure id="TEST_TRIP_WD.6" departureTime="13:00:00" vehicleRefId="TEST_TRIP_WD.6"/>
+				<departure id="TEST_TRIP_WD.7" departureTime="14:00:00" vehicleRefId="TEST_TRIP_WD.7"/>
+				<departure id="TEST_TRIP_WD.8" departureTime="15:00:00" vehicleRefId="TEST_TRIP_WD.8"/>
+				<departure id="TEST_TRIP_WD.9" departureTime="16:00:00" vehicleRefId="TEST_TRIP_WD.9"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="TEST_TRIP_WE">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="TEST_STOP_1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="TEST_STOP_2" arrivalOffset="00:25:00" departureOffset="00:25:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="dL1_TEST_STOP_1"/>
+				<link refId="0.1"/>
+				<link refId="0.2"/>
+				<link refId="dL2_TEST_STOP_2"/>
+				<link refId="dL1_TEST_STOP_2"/>
+			</route>
+			<departures>
+				<departure id="TEST_TRIP_WE.0" departureTime="06:10:00" vehicleRefId="TEST_TRIP_WE.0"/>
+				<departure id="TEST_TRIP_WE.1" departureTime="08:10:00" vehicleRefId="TEST_TRIP_WE.1"/>
+				<departure id="TEST_TRIP_WE.2" departureTime="10:10:00" vehicleRefId="TEST_TRIP_WE.2"/>
+				<departure id="TEST_TRIP_WE.3" departureTime="12:10:00" vehicleRefId="TEST_TRIP_WE.3"/>
+				<departure id="TEST_TRIP_WE.4" departureTime="14:10:00" vehicleRefId="TEST_TRIP_WE.4"/>
+				<departure id="TEST_TRIP_WE.5" departureTime="16:10:00" vehicleRefId="TEST_TRIP_WE.5"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

@@ -1,0 +1,2 @@
+service_id,date,exception_type
+TEST_SERVICEID_WE,20110711,1

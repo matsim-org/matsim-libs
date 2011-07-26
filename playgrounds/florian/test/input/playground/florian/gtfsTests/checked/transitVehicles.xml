@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="dummy_Bus">
+		<description>
+				Dummy Vehicle Type for GTFS Converter. The Id gives Information about the GTFS-Type. Please change the following parameters for fitting your purposes.
+		</description>
+		<capacity>
+			<seats persons="50"/>
+			<standingRoom persons="50"/>
+		</capacity>
+		<length meter="5.0"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="1.0"/>
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+	</vehicleType>
+	<vehicle id="TEST_TRIP_WE.1" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WE.2" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WE.0" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.8" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.9" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.4" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.5" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.6" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.10" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.7" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WE.3" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WE.4" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WE.5" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.3" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.2" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.1" type="dummy_Bus"/>
+	<vehicle id="TEST_TRIP_WD.0" type="dummy_Bus"/>
+</vehicleDefinitions>

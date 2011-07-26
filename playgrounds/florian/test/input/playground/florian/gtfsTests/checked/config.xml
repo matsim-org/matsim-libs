@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+<!-- ====================================================================== -->
+
+	<module name="controler" >
+		<param name="enableLinkToLinkRouting" value="false" />
+
+		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
+		<param name="eventsFileFormat" value="xml" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1000" />
+
+		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim -->
+		<param name="mobsim" value="null" />
+		<param name="outputDirectory" value="./output" />
+
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra or AStarLandmarks -->
+		<param name="routingAlgorithmType" value="Dijkstra" />
+
+		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
+		<param name="runId" value="null" />
+
+		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
+		<param name="writeEventsInterval" value="10" />
+
+		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
+		<param name="writePlansInterval" value="10" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="counts" >
+
+		<!-- Specifies over how many iterations the link volumes should be averaged that are used for the counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeCountsInterval -->
+		<param name="averageCountsOverIterations" value="5" />
+
+		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
+		<param name="countsScaleFactor" value="1.0" />
+
+		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
+		<param name="distanceFilter" value="null" />
+
+		<!-- node id for center node of distance filter -->
+		<param name="distanceFilterCenterNode" value="null" />
+
+		<!-- input file name to counts package -->
+		<param name="inputCountsFile" value="null" />
+
+		<!-- possible values: `html', `kml', `txt', `all' -->
+		<param name="outputformat" value="null" />
+
+		<!-- Specifies how often the counts comparison should be calculated and written. -->
+		<param name="writeCountsInterval" value="10" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="facilities" >
+		<param name="inputFacilitiesFile" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global" >
+		<param name="coordinateSystem" value="Atlantis" />
+		<param name="numberOfThreads" value="2" />
+		<param name="randomSeed" value="4711" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="households" >
+		<param name="inputFile" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="linkStats" >
+
+		<!-- Specifies over how many iterations the link volumes should be averaged that are used for the link statistics. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeLinkStatsInterval -->
+		<param name="averageLinkStatsOverIterations" value="5" />
+
+		<!-- Specifies how often the link stats should be calculated and written. Use 0 to disable the generation of link stats. -->
+		<param name="writeLinkStatsInterval" value="10" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="locationchoice" >
+		<param name="algorithm" value="null" />
+		<param name="centerNode" value="null" />
+		<param name="constrained" value="false" />
+		<param name="fixByActType" value="false" />
+		<param name="flexible_types" value="null" />
+		<param name="maxDistanceEpsilon" value="-1.0" />
+		<param name="maxRecursions" value="1" />
+		<param name="planSelector" value="SelectExpBeta" />
+		<param name="radius" value="null" />
+		<param name="recursionTravelSpeed" value="8.5" />
+		<param name="recursionTravelSpeedChange" value="0.1" />
+		<param name="restraintFcnExp" value="0.0" />
+		<param name="restraintFcnFactor" value="0.0" />
+		<param name="scaleFactor" value="1" />
+		<param name="searchSpaceBeta" value="0.0001" />
+		<param name="simple_tg" value="false" />
+		<param name="travelTimes" value="true" />
+		<param name="tt_approximationLevel" value="0" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="multimodal" >
+
+		<!-- Use this, if your network is not multi modal. Links with free speeds that are lower than the specified cutoff value will be usable for walk and bike trips. -->
+		<param name="createMultiModalNetwork" value="false" />
+
+		<!-- Only used, if createMultiModalNetwork is enabled (set value in m/s). -->
+		<param name="cuttoffValueForNonCarModes" value="22.22222222222222" />
+		<param name="dropNonCarRoutes" value="false" />
+		<param name="multiModalSimulationEnabled" value="false" />
+
+		<!-- Use number of threads > 1 for parallel version using the specified number of threads. -->
+		<param name="numberOfThreads" value="1" />
+		<param name="simulatedModes" value="pt,walk,ride,bike" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network" >
+		<param name="inputChangeEventsFile" value="null" />
+		<param name="inputNetworkFile" value="../playgrounds/florian/network.xml" />
+		<param name="laneDefinitionsFile" value="null" />
+		<param name="timeVariantNetwork" value="false" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="otfvis" >
+
+		<!-- The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts rather ungracefully, or displays no agents at all. -->
+		<param name="agentSize" value="120.0" />
+
+		<!-- coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg'' -->
+		<param name="coloringScheme" value="standard" />
+		<param name="leftMouseFunc" value="Zoom" />
+
+		<!-- The (initial) width of the links of the network. Use positive floating point values. -->
+		<param name="linkWidth" value="30.0" />
+
+		<!-- Link width is proportional to `numberOfLanes' or to `capacity'. -->
+		<param name="linkwidthIsProportionalTo" value="numberOfLanes" />
+		<param name="middleMouseFunc" value="Pan" />
+		<param name="rightMouseFunc" value="Select" />
+		<param name="showTeleportation" value="false" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planCalcScore" >
+
+		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
+		<param name="BrainExpBeta" value="2.0" />
+		<param name="PathSizeLogitBeta" value="1.0" />
+
+		<!-- [utils] alternative-specific constant for bike.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+		<param name="constantBike" value="0.0" />
+
+		<!-- [utils] alternative-specific constant for car.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+		<param name="constantCar" value="0.0" />
+
+		<!-- [utils] alternative-specific constant for pt.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+		<param name="constantPt" value="0.0" />
+
+		<!-- [utils] alternative-specific constant for walk.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+		<param name="constantWalk" value="0.0" />
+
+		<!-- [utils/hr] utility for departing early (i.e. before the earliest end time).  Probably implemented correctly, but not tested. -->
+		<param name="earlyDeparture" value="-0.0" />
+
+		<!-- [utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative -->
+		<param name="lateArrival" value="-18.0" />
+
+		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
+		<param name="learningRate" value="1.0" />
+
+		<!-- [utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils -->
+		<param name="marginalUtilityOfMoney" value="1.0" />
+
+		<!-- DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense. -->
+		<param name="marginalUtlOfDistanceWalk" value="0.0" />
+
+		<!-- [unit_of_money/m] conversion of car distance into money -->
+		<param name="monetaryDistanceCostRateCar" value="0.0" />
+
+		<!-- [unit_of_money/m] conversion of pt distance into money -->
+		<param name="monetaryDistanceCostRatePt" value="0.0" />
+
+		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
+		<param name="performing" value="6.0" />
+
+		<!-- [utils/hr] additional marginal utility of traveling by car.  normally negative.  this comes on top of the opportunity cost of time -->
+		<param name="traveling" value="-6.0" />
+		<param name="travelingBike" value="-6.0" />
+
+		<!-- [utils/hr] additional marginal utility offset of traveling by pt.  normally negative.  this comes on top of the opportunity cost of time -->
+		<param name="travelingPt" value="-6.0" />
+
+		<!-- [utils/hr] additional marginal utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk -->
+		<param name="travelingWalk" value="-6.0" />
+
+		<!-- [utils] utility of switching a line (= transfer penalty).  Normally negative -->
+		<param name="utilityOfLineSwitch" value="-1.0" />
+
+		<!-- [utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested. -->
+		<param name="waiting" value="-0.0" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planomat" >
+		<param name="doLogging" value="false" />
+		<param name="jgapMaxGenerations" value="100" />
+		<param name="levelOfTimeResolution" value="7" />
+		<param name="populationSize" value="-2147483648" />
+		<param name="possibleModes" value="" />
+		<param name="routingCapability" value="fixedRoute" />
+		<param name="simLegInterpretation" value="CetinCompatible" />
+		<param name="tripStructureAnalysisLayer" value="facility" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans" >
+		<param name="inputPlansFile" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planscalcroute" >
+
+		<!-- factor with which beeline distances (and therefore times) are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3 -->
+		<param name="beelineDistanceFactor" value="1.3" />
+		<param name="bikeSpeed" value="4.166666666666667" />
+		<param name="ptSpeed" value="6.944444444444445" />
+
+		<!-- factor with which times from the car freespeed travel time calculation are multiplied in order to obtain the pt travel times.  Default is something like 2 -->
+		<param name="ptSpeedFactor" value="2.0" />
+
+		<!-- Allowed values: freespeed, beeline. Determines if travel times for non-simulated pt legs are estimated by ptSpeedFactor * <freespeed car travel time> ("freespeed") or by (<beeline distance> * beelineDistanceFactor) / ptSpeed ("beeline") -->
+		<param name="ptSpeedMode" value="freespeed" />
+		<param name="undefinedModeSpeed" value="13.88888888888889" />
+		<param name="walkSpeed" value="0.8333333333333333" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="ptCounts" >
+
+		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
+		<param name="countsScaleFactor" value="1.0" />
+
+		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
+		<param name="distanceFilter" value="null" />
+
+		<!-- node id for center node of distance filter -->
+		<param name="distanceFilterCenterNode" value="null" />
+
+		<!-- input file containing the alighting (getting off) counts for pt -->
+		<param name="inputAlightCountsFile" value="null" />
+
+		<!-- input file containing the boarding (getting on) counts for pt -->
+		<param name="inputBoardCountsFile" value="null" />
+
+		<!-- input file containing the occupancy counts for pt -->
+		<param name="inputOccupancyCountsFile" value="null" />
+
+		<!-- possible values: `html', `kml', `txt', `all' -->
+		<param name="outputformat" value="null" />
+
+		<!-- every how many iterations (starting with 0) counts comparisons are generated -->
+		<param name="ptCountsInterval" value="10" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="qsim" >
+		<param name="endTime" value="undefined" />
+		<param name="flowCapacityFactor" value="1.0" />
+
+		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
+		<param name="numberOfThreads" value="1" />
+
+		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
+		<param name="removeStuckVehicles" value="true" />
+
+		<!-- `maxOfStarttimeAndEarliestActivityEnd' (default behavior) or `onlyUseStarttime' -->
+		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
+
+		<!-- Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible. -->
+		<param name="snapshotFormat" value="" />
+
+		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!) -->
+		<param name="snapshotStyle" value="equiDist" />
+		<param name="snapshotperiod" value="00:00:00" />
+		<param name="startTime" value="undefined" />
+		<param name="storageCapacityFactor" value="1.0" />
+
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="100.0" />
+		<param name="timeStepSize" value="00:00:01" />
+
+		<!-- `queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes -->
+		<param name="trafficDynamics" value="queue" />
+
+		<!-- Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: teleport, wait, exception -->
+		<param name="vehicleBehavior" value="teleport" />
+
+		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
+		<param name="writeSnapshotsInterval" value="1" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="roadpricing" >
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="scenario" >
+
+		<!-- Set this parameter to true if households should be used, false if not. -->
+		<param name="useHouseholds" value="false" />
+
+		<!-- Set this parameter to true if knowledge should be used, false if not. -->
+		<param name="useKnowledge" value="true" />
+
+		<!-- Set this parameter to true if lanes should be used, false if not. -->
+		<param name="useLanes" value="false" />
+
+		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
+		<param name="useRoadpricing" value="false" />
+
+		<!-- Set this parameter to true if signal systems should be used, false if not. -->
+		<param name="useSignalsystems" value="false" />
+
+		<!-- Set this parameter to true if transit should be simulated, false if not. -->
+		<param name="useTransit" value="true" />
+
+		<!-- Set this parameter to true if vehicles should be used, false if not. -->
+		<param name="useVehicles" value="true" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="signalsystems" >
+		<param name="ambertimes" value="null" />
+		<param name="intergreentimes" value="null" />
+		<param name="signalcontrol" value="null" />
+		<param name="signalgroups" value="null" />
+		<param name="signalsystems" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="strategy" >
+		<param name="ExternalExeConfigTemplate" value="null" />
+		<param name="ExternalExeTimeOut" value="3600" />
+		<param name="ExternalExeTmpFileRootDir" value="null" />
+
+		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
+		<param name="maxAgentPlanMemorySize" value="0" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="transit" >
+
+		<!-- Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt,bus,train,tram'. -->
+		<param name="transitModes" value="pt" />
+
+		<!-- Input file containing the transit schedule to be simulated. -->
+		<param name="transitScheduleFile" value="../playgrounds/florian/transitSchedule.xml" />
+
+		<!-- Input file containing the vehicles used by the departures in the transit schedule. -->
+		<param name="vehiclesFile" value="transitVehicles.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="transitRouter" >
+
+		<!-- additional time the router allocates when a line switch happens, Can be interpreted as a 'savity' time that agents need to savely transfer from one line to another -->
+		<param name="additionalTransferTime" value="0.0" />
+
+		<!-- step size to increase searchRadius if no stops are found -->
+		<param name="extensionRadius" value="200.0" />
+
+		<!-- maximum beeline distance between stops that agents could transfer to by walking -->
+		<param name="maxBeelineWalkConnectionDistance" value="100.0" />
+
+		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
+		<param name="searchRadius" value="1000.0" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="travelTimeCalculator" >
+
+		<!-- Transport modes that will be respected by the travel time collector. 'car' is default, which includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
+		<param name="analyzedModes" value="car" />
+		<param name="calculateLinkToLinkTravelTimes" value="false" />
+		<param name="calculateLinkTravelTimes" value="true" />
+
+		<!-- If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored. -->
+		<param name="filterModes" value="false" />
+
+		<!-- How to deal with congested time bins that have no link entry events. `optimistic' assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic. -->
+		<param name="travelTimeAggregator" value="optimistic" />
+
+		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
+		<param name="travelTimeBinSize" value="900" />
+		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
+
+		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
+		<param name="travelTimeGetter" value="average" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="vspExperimental" >
+
+		<!-- String: minOfDurationAndEndTime', 'tryEndTimeThenDuration', 'endTimeOnly' -->
+		<param name="activityDurationInterpretation" value="minOfDurationAndEndTime" />
+
+		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
+		<param name="chainBasedModes" value="car" />
+
+		<!-- coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg'' -->
+		<param name="coloring" value="standard" />
+
+		<!-- Set this filename of MZ05 daily analysis -->
+		<param name="inputMZ05File" value="" />
+
+		<!-- (do not use) set the traffic mode option for subTourModeChoice by Yu -->
+		<param name="modes" value="car, pt" />
+
+		<!-- (not yet implemented) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
+		<param name="removingUnnecessaryPlanAttributes" value="false" />
+
+		<!-- indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal utilities of time.
+		Default is false although some of us (bk, kn) think this should always be true.
+This is only a suggestion since there is (by matsim design) no way to enforce that mental modules obey this. -->
+		<param name="usingOpportunityCostOfTimeForPtRouting" value="false" />
+
+		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
+  When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
+		<param name="vspDefaultsCheckingLevel" value="ignore" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

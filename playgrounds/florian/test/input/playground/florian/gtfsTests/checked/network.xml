@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="TEST_STOP_1" x="2946052.0" y="-6537867.0" />
+		<node id="TEST_STOP_2" x="2947585.0" y="-6535114.0" />
+		<node id="dN_TEST_STOP_1" x="2946053.0" y="-6537866.0" />
+		<node id="dN_TEST_STOP_2" x="2947586.0" y="-6535113.0" />
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="NaN">
+		<link id="0" from="TEST_STOP_1" to="TEST_STOP_2" length="3151.0471275434775" freespeed="2.625872606286231" capacity="1500.0" permlanes="1.0" oneway="1" modes="pt" />
+		<link id="dL1_TEST_STOP_1" from="dN_TEST_STOP_1" to="TEST_STOP_1" length="1.4142135623730951" freespeed="1000.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="pt" />
+		<link id="dL1_TEST_STOP_2" from="dN_TEST_STOP_2" to="TEST_STOP_2" length="1.4142135623730951" freespeed="1000.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="pt" />
+		<link id="dL2_TEST_STOP_1" from="TEST_STOP_1" to="dN_TEST_STOP_1" length="1.4142135623730951" freespeed="1000.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="pt" />
+		<link id="dL2_TEST_STOP_2" from="TEST_STOP_2" to="dN_TEST_STOP_2" length="1.4142135623730951" freespeed="1000.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="pt" />
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>
