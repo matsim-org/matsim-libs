@@ -37,7 +37,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -60,7 +59,8 @@ public class GtfsConverter {
 
 	private Config config;
 	private ScenarioImpl scenario;
-	private List<String> vehicleIds = new ArrayList<String>();
+	private Map<String,Integer> vehicleIdsAndTypes = new HashMap<String,Integer>();
+	private Map<Id,Integer> vehicleTypesToRoutesAssignments = new HashMap<Id,Integer>();
 	private boolean createShapedNetwork = false;
 
 	private long date = 0;
@@ -202,7 +202,7 @@ public class GtfsConverter {
 	}
 
 
-	void writeScenario() {
+	public void writeScenario() {
 		writeConfig();
 		writeNetwork();
 		writeTransitSchedule();
@@ -271,17 +271,19 @@ public class GtfsConverter {
 		return usedTripIds;
 	}
 
-	private static Map<Id,String> getRouteNames(String routesFilename) {
+	private Map<Id,String> getRouteNames(String routesFilename) {
 		Map<Id,String> routeNames = new HashMap<Id,String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(routesFilename)));
 			List<String> header = new ArrayList<String>(Arrays.asList(splitRow(br.readLine())));
 			int routeIdIndex = header.indexOf("route_id");
 			int routeLongNameIndex = header.indexOf("route_long_name");
+			int vehicleTypeIndex = header.indexOf("route_type");
 			String row = br.readLine();
 			do {
 				String[] entries = splitRow(row);
-				routeNames.put(new IdImpl(entries[routeIdIndex]), entries[routeLongNameIndex]);				
+				routeNames.put(new IdImpl(entries[routeIdIndex]), entries[routeLongNameIndex]);
+				this.vehicleTypesToRoutesAssignments.put(new IdImpl(entries[routeIdIndex]), Integer.parseInt(entries[vehicleTypeIndex].trim()));
 				row = br.readLine();
 			}while(row!= null);
 		} catch (FileNotFoundException e) {
@@ -292,7 +294,7 @@ public class GtfsConverter {
 		return routeNames;
 	}
 
-	private static Map<Id,Id> getRouteToTripAssignments(String tripsFilename){
+	private Map<Id,Id> getRouteToTripAssignments(String tripsFilename){
 		Map<Id,Id> routeTripAssignment = new HashMap<Id,Id>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(tripsFilename)));
@@ -426,7 +428,7 @@ public class GtfsConverter {
 							if(time>startTime){
 								Departure d = ts.getFactory().createDeparture(new IdImpl(tripId.toString() + "." + departureCounter), time);
 								d.setVehicleId(new IdImpl(tripId.toString() + "." + departureCounter));
-								this.vehicleIds.add(tripId.toString() + "." + departureCounter);
+								this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.vehicleTypesToRoutesAssignments.get(routeToTripAssignments.get(tripId)));
 								ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).addDeparture(d);
 								departureCounter++;
 							}						
@@ -462,7 +464,7 @@ public class GtfsConverter {
 			Departure departure = ts.getFactory().createDeparture(new IdImpl(entries[tripIdIndex] + "." + idCounter), departureTime);
 			String vehicleId = entries[tripIdIndex] + "." + idCounter;
 			departure.setVehicleId(new IdImpl(vehicleId));		
-			this.vehicleIds.add(vehicleId);
+			this.vehicleIdsAndTypes.put(vehicleId,vehicleTypesToRoutesAssignments.get(routeToTripAssignments.get(new IdImpl(entries[tripIdIndex]))));
 			do {				
 				entries = GtfsConverter.splitRow(row);
 				Id currentTripId = new IdImpl(currentTrip);
@@ -490,7 +492,7 @@ public class GtfsConverter {
 						departure = ts.getFactory().createDeparture(new IdImpl(entries[tripIdIndex] + "." + idCounter), departureTime);
 						vehicleId = tripId.toString() + "." + idCounter;
 						departure.setVehicleId(new IdImpl(vehicleId));
-						this.vehicleIds.add(vehicleId);												
+						this.vehicleIdsAndTypes.put(vehicleId,vehicleTypesToRoutesAssignments.get(routeToTripAssignments.get(tripId)));												
 						TransitStopFacility stop = ts.getFacilities().get(stopId);
 						TransitRouteStop routeStop = ts.getFactory().createTransitRouteStop(stop, 0, Time.parseTime(entries[departureTimeIndex].trim())-departureTime);
 						stops.add(routeStop);
@@ -499,6 +501,15 @@ public class GtfsConverter {
 				}						
 				row = br.readLine();
 			}while(row!= null);
+			// The last trip of the file was not added, so it needs to be added now
+			if(tripIds.contains(new IdImpl(currentTrip))){
+				Id currentTripId = new IdImpl(currentTrip);
+				//finish old route
+				TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
+				TransitRoute tr = ts.getFactory().createTransitRoute(currentTripId, tripRoute.get(currentTripId), stops, "pt");
+				tr.addDeparture(departure);
+				tl.addRoute(tr);
+			}
 		} catch (FileNotFoundException e) {
 			System.out.println(stopTimesFilename + " not found!");
 		} catch (IOException e) {
@@ -676,6 +687,7 @@ public class GtfsConverter {
 						netRoute.setLinkIds(route.getFirst(), route.subList(1, route.size()-1), route.getLast());
 					}
 					tripRoutes.put(new IdImpl(currentTrip), netRoute);
+					// Start new Route
 					currentTrip = entries[tripIdIndex];
 					route = new LinkedList<Id>();
 					route.add(ts.getFacilities().get(new IdImpl(entries[stopIdIndex])).getLinkId());
@@ -684,7 +696,9 @@ public class GtfsConverter {
 				row = br.readLine();
 			}while(row!= null);		
 			NetworkRoute netRoute = (NetworkRoute) (new LinkNetworkRouteFactory()).createRoute(route.getFirst(), route.getLast());
-			netRoute.setLinkIds(route.getFirst(), route, route.getLast());
+			if(route.size() > 2){
+				netRoute.setLinkIds(route.getFirst(), route.subList(1, route.size()-1), route.getLast());
+			}
 			tripRoutes.put(new IdImpl(currentTrip), netRoute);
 		} catch (FileNotFoundException e) {
 			System.out.println(stopTimesFilename + " not found!");
@@ -867,16 +881,28 @@ public class GtfsConverter {
 
 
 	private void createTransitVehiclesDummy(){
-		// TYPE
-		VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummyType"));
-		vt.setDescription("Dummy Vehicle Type for GTFS Converter");
-		VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-		vc.setSeats(50);
-		vc.setStandingRoom(50);
-		vt.setCapacity(vc);
-		vt.setLength(5);
-		scenario.getVehicles().getVehicleTypes().put(new IdImpl("dummyType"), vt);
-		for(String s: vehicleIds){
+		for(String s: vehicleIdsAndTypes.keySet()){
+			// TYPE
+			VehicleType vt;
+			switch(vehicleIdsAndTypes.get(s)){
+				case 0: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Tram"));break;
+				case 1: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Subway"));break;
+				case 2: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Rail"));break;
+				case 3: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Bus"));break;
+				case 4: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Ferry"));break;
+				case 5: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_CableCar"));break;
+				case 6: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Gondola"));break;
+				case 7: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_Funicular"));break;
+				default: vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("dummy_UnidentifiedType"));
+			}
+			vt.setDescription("Dummy Vehicle Type for GTFS Converter. The Id gives Information about the GTFS-Type. Please change the following parameters for fitting your purposes.");
+			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
+			vc.setSeats(50);
+			vc.setStandingRoom(50);
+			vt.setCapacity(vc);
+			vt.setLength(5);
+			scenario.getVehicles().getVehicleTypes().put(vt.getId(), vt);
+			// Vehicle
 			Vehicle v = scenario.getVehicles().getFactory().createVehicle(new IdImpl(s), vt);
 			scenario.getVehicles().getVehicles().put(new IdImpl(s), v);
 		}
