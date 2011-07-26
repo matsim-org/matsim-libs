@@ -23,11 +23,49 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+//interface ConfigKey {} 
+
 /**
  * config group for experimental parameters. this group and its parameters should not be used outside of vsp.
  * @author dgrether
+ * @author nagel
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
+	
+	// === testing area begin === 
+	// The following contains the beginning of a more general infrastructure for config, since I am getting tired of
+	// re-typing the same thing many times every time I add a config parameter.
+	// The idea is essentially based on the fact that "toString()" of an enum type returns the enum type string.
+	// Unfortunately, I did not get around to finishing this. 
+	
+//	private enum VspExperimentalConfigKey implements ConfigKey { 
+//		activityDurationInterpretation,
+//		vspDefaultsCheckingLevel
+//	} 
+//	
+//	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
+//	
+//	private void addParamNew( final String keyStr, final String value ) {
+//		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
+//			if ( keyStr.equalsIgnoreCase( key.toString() ) ) {
+//				addParam( key, value ) ;
+//			}
+//		}
+//		throw new RuntimeException("keyStr was not found as key: " + keyStr ) ;	
+//	}
+//	
+//	private void addParam( final ConfigKey key, final String value ) {
+//		String retVal = this.typedParam.put( key,value );
+//		if ( !retVal.equals(value) ) {
+//			Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
+//		}
+//	}
+//
+//	private String getValue( final ConfigKey key ) {
+//		return this.typedParam.get(key) ;
+//	}
+	
+	// === testing area end ===
 
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
