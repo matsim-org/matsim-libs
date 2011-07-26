@@ -43,7 +43,7 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 		double walkingScore=walkingDistance*disutilityOfWalkingPerMeter;
 		
 		//TODO: carve out long distance util factor
-		if (walkingDistance>1500.0){
+		if (walkingDistance>300.0){
 			walkingScore+=walkingDistance*disutilityOfWalkingPerMeter*2;
 		}
 		
