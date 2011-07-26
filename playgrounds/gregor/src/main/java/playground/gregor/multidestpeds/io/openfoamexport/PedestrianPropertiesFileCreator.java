@@ -128,6 +128,7 @@ public class PedestrianPropertiesFileCreator extends FoamFileWriter{
 		this.numIndent--;
 		indent();
 		super.writer.append("}\n\n");
+		this.numIndent--;
 	}
 
 	private void startGroup(String name) throws IOException {
@@ -136,6 +137,7 @@ public class PedestrianPropertiesFileCreator extends FoamFileWriter{
 		this.numIndent++;
 		indent();
 		super.writer.append("{\n");
+		this.numIndent++;
 	}
 
 	private void endPeds() throws IOException {

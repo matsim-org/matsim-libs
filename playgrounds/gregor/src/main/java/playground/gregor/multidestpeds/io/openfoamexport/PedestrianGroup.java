@@ -21,7 +21,7 @@ public class PedestrianGroup {
 
 
 
-	/*package*/ void setOrigin(String origin, Coordinate direction) {
+	public void setOrigin(String origin, Coordinate direction) {
 		this.orgin = origin;
 		this.direction = direction;
 	}
@@ -34,7 +34,7 @@ public class PedestrianGroup {
 		return this.direction;
 	}
 
-	/*package*/ void addDestination(String dest, double pot, Coordinate direction) {
+	public void addDestination(String dest, double pot, Coordinate direction) {
 		Destination d = new Destination();
 		d.name = dest;
 		d.potential = pot;

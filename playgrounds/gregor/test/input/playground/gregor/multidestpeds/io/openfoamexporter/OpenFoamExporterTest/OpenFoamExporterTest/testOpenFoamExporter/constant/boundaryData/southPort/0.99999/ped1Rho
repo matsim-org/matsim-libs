@@ -1,0 +1,16 @@
+// -*- C++ -*-
+
+FoamFile
+{
+	version	2.0;
+	format	ascii;
+	class	scalarAverageField;
+	location	"constant/boundaryData/southPort/0.99999";
+	object	ped1Rho;
+}
+
+
+4
+(
+ 1.0 1.0 1.0 1.0
+ )

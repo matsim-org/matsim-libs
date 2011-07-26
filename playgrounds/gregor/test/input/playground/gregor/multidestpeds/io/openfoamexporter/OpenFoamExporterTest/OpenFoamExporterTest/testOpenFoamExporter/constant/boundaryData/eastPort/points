@@ -1,0 +1,17 @@
+// -*- C++ -*-
+
+FoamFile
+{
+	version	2.0;
+	format	ascii;
+	class	vectorField;
+	location	"constant/boundaryData/eastPort";
+	object	points;
+}
+
+(
+ (1.0 0.45 0.0)
+ (1.0 0.55 0.0)
+ (1.0 0.45 0.1)
+ (1.0 0.55 0.1)
+ )
