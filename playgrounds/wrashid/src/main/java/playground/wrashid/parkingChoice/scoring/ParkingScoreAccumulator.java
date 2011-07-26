@@ -37,6 +37,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	private final ParkingScoreCollector parkingScoreCollector;
 	private Double averageWalkingDistance = null;
 	public static DoubleValueHashMap<Id> scores = new DoubleValueHashMap<Id>();
+	public static HashMap<Id, Double> parkingWalkDistances=new HashMap<Id, Double>();
 
 	public Double getAverageWalkingDistance() {
 		return averageWalkingDistance;
@@ -52,7 +53,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		HashMap<Id, Double> walkingDistances = new HashMap<Id, Double>();
+		HashMap<Id, Double> sumOfParkingWalkDistances = new HashMap<Id, Double>();
 		parkingScoreCollector.finishHandling();
 
 		Controler controler = event.getControler();
@@ -78,7 +79,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				double disutilityOfWalking = 0;
 				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
-				walkingDistances.put(personId, sumOfWalkingTimes
+				sumOfParkingWalkDistances.put(personId, sumOfWalkingTimes
 						* event.getControler().getConfig().plansCalcRoute().getWalkSpeed());
 
 				if (!ParkingChoiceLib.isTestCaseRun) {
@@ -107,8 +108,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			}
 
 		}
-		writeWalkingDistanceStatisticsGraph(controler, walkingDistances);
-		printWalkingDistanceHistogramm(controler, walkingDistances);
+		writeWalkingDistanceStatisticsGraph(controler, parkingWalkDistances);
+		printWalkingDistanceHistogramm(controler, parkingWalkDistances);
+		
+		updateAverageValue(sumOfParkingWalkDistances);
+		
 		if (!ParkingChoiceLib.isTestCaseRun) {
 			writeOutParkingOccupancies(controler);
 			writeOutGraphParkingTypeOccupancies(controler);
@@ -116,6 +120,28 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		}
 
 		// eventsToScore.finish();
+		findLargestWalkingDistance(parkingWalkDistances);
+		parkingWalkDistances=new HashMap<Id, Double>();
+	}
+
+	private void findLargestWalkingDistance(HashMap<Id, Double> parkingWalkDistances) {
+		int numberOfLongDistanceWalks=0;
+		for (Id personId:parkingWalkDistances.keySet()){
+			Double walkingDistance = parkingWalkDistances.get(personId);
+			if (walkingDistance> 300){
+//				System.out.println(personId + "\t" + walkingDistance);
+				numberOfLongDistanceWalks++;
+			}
+		}
+		
+		System.out.println();
+		
+		// 1000055924
+	}
+
+	private void updateAverageValue(HashMap<Id, Double> sumOfParkingWalkDistances) {
+		double[] values = Collections.convertDoubleCollectionToArray(sumOfParkingWalkDistances.values());
+		averageWalkingDistance = new Mean().evaluate(values);
 	}
 
 	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler) {
@@ -237,9 +263,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			values[0] = -1.0;
 		}
 
-		averageWalkingDistance = new Mean().evaluate(values);
-
-		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceHistogramm.png");
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"walkingDistanceHistogramm.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Parking Walking Distance - It." + controler.getIterationNumber(), "distance", "number");

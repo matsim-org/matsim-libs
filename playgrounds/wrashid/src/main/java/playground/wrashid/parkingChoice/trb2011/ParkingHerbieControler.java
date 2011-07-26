@@ -4,6 +4,7 @@ import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -30,7 +31,6 @@ public class ParkingHerbieControler {
 		HerbieControler hControler=new HerbieControler(args);
 		
 		
-		
 		parkingModule=new ParkingModule(hControler, null);
 		
 		prepareParkingsForScenario(hControler);
@@ -39,10 +39,18 @@ public class ParkingHerbieControler {
 
 		hControler.run();
 		
+		postProcess(hControler);
 	}
 	
 	
 	
+	private static void postProcess(HerbieControler hControler) {
+		
+		
+	}
+
+
+
 	private static void prepareParkingsForScenario(HerbieControler hControler) {
 		hControler.addControlerListener(new StartupListener() {
 			
