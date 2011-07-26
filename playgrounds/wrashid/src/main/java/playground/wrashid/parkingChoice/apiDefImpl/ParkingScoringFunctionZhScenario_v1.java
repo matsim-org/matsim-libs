@@ -15,10 +15,10 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFunction {
 
 	public static double disutilityOfWalkingPerMeter; // should be negative
-	public static double disutilityOfWalkingPowerFactor; // must be positive
 	
 	public static double streetParkingPricePerSecond; // should be positive
 	public static double garageParkingPricePerSecond; // should be positive
+	public static double disutilityOfWalkingPerMeterForMoreThan300Meters;
 	
 
 	public ParkingScoringFunctionZhScenario_v1(){

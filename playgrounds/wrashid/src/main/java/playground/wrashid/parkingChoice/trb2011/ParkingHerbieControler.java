@@ -80,7 +80,7 @@ public class ParkingHerbieControler {
 				} else if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
 					parkingModule.setParkingSelectionManager(new PriceAndDistanceParkingSelectionManager(parkingModule.getParkingManager(), new ParkingScoringFunctionZhScenario_v1()));				
 					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeter=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeter"));
-					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPowerFactor=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPowerFactor"));
+					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeterForMoreThan300Meters=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeterForMoreThan300Meters"));
 					ParkingScoringFunctionZhScenario_v1.streetParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "streetParkingPricePerSecond"));
 					ParkingScoringFunctionZhScenario_v1.garageParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "garageParkingPricePerSecond"));
 				} else {
