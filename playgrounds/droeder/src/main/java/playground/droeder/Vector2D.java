@@ -38,6 +38,11 @@ public class Vector2D {
 		this.y = v.getY() * factor;
 	}
 	
+	public Vector2D(Double factor, Double x, Double y){
+		this.x = factor * x;
+		this.y = factor * y;
+	}
+	
 	public Vector2D orthogonal(){
 		if((this.x == 0.0) && (this.y == 0.0)){
 			return new Vector2D(Math.random(), Math.random());
@@ -46,7 +51,7 @@ public class Vector2D {
 		}else if(this.y == 0){
 			return new Vector2D(0.0, 1.0);
 		}else{
-			return new Vector2D(this.y, -this.x);
+			return new Vector2D((1 / this.absolut()), this.y, -this.x);
 		}
 	}
 	

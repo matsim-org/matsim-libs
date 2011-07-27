@@ -53,16 +53,16 @@ public abstract class AbstractCompare implements Comparable<AbstractCompare>{
 	}
 	
 	/**
-	 * @return the refId
+	 * @return the reference Id
 	 */
 	public Id getRefId() {
 		return refId;
 	}
 
 	/**
-	 * @return the compId
+	 * @return the candidate Id
 	 */
-	public Id getCompId() {
+	public Id getCandId() {
 		return compId;
 	}
 	

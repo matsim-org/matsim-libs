@@ -47,12 +47,31 @@ public class StraightComparer{
 	}
 	
 	public boolean straightOneIsUndershot(){
-		if(one.getEnd().getX() < two.getEnd().getX()){
+		if(isVertical(one) || isVertical(two)){
+			if(one.getEnd().getY() < two.getEnd().getY()){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			if(one.getEnd().getX() < two.getEnd().getX()){
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	/**
+	 * @param one2
+	 * @return
+	 */
+	private boolean isVertical(Straight s) {
+		if(s.getStart().getX() == s.getEnd().getX()){
 			return true;
 		}
 		return false;
 	}
-	
+
 	private void computeBases() {
 		this.baseA_CD = this.getBase(two, one.getStart());
 		this.baseB_CD = this.getBase(two, one.getEnd());
@@ -149,7 +168,7 @@ public class StraightComparer{
 		double[] answers = solver.solve(values);
 		
 		// get the base of the perpendicular from c to the straight ab
-		p = a.add(new Vector2D(answers[1], r2));
+		p = a.add(new Vector2D(answers[0], r1));
 		
 		/*
 		 * return the point only, if it is beetween the point a && b, because otherwise it is not interesting

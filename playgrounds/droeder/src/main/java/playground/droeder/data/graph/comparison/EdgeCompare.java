@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.data.graph.comparison;
 
+import java.util.Iterator;
 import java.util.ListIterator;
 
 import playground.droeder.data.graph.MatchingEdge;
@@ -49,8 +50,8 @@ public class EdgeCompare extends AbstractCompare{
 	 * @param compareElement
 	 */
 	private void computeValues(MatchingEdge refElement,	MatchingEdge compareElement) {
-		ListIterator<MatchingSegment> candIt = refElement.getSegments().listIterator();
-		ListIterator<MatchingSegment> refIt = compareElement.getSegments().listIterator();
+		Iterator<MatchingSegment> candIt = refElement.getSegments().iterator();
+		Iterator<MatchingSegment> refIt = compareElement.getSegments().iterator();
 		
 		MatchingSegment rs = null, cs = null;
 		SegmentCompare sc = null;
@@ -94,9 +95,7 @@ public class EdgeCompare extends AbstractCompare{
 					(Math.abs(1 - (matchedLengthRef / refTotalLength)) / lengthTolerancePercentage ) + 
 					(Math.abs(1 - (matchedLengthComp / compTotalLength)) / lengthTolerancePercentage ));
 			return true;
-		} else if(isPartlyMatched(dDistMax, dPhiMax, lengthTolerancePercentage)){
-			return true;
-		}else{
+		} else{
 			return false;
 		}
 	}

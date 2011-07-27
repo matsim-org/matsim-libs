@@ -20,11 +20,16 @@
 package playground.droeder.data.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.ListIterator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
@@ -36,7 +41,7 @@ public class MatchingEdge implements GraphElement{
 	private Id id;
 	private MatchingNode toNode;
 	private MatchingNode fromNode;
-	private ArrayList<MatchingSegment> segments;
+	private SortedMap<Id, MatchingSegment> segments;
 	private int segmentCounter = 0;
 	private Double lengthOfSegments = 0.0;
 	
@@ -44,7 +49,7 @@ public class MatchingEdge implements GraphElement{
 		this.id = id;
 		this.toNode = to;
 		this.fromNode = from;
-		this.segments = new ArrayList<MatchingSegment>();
+		this.segments = new TreeMap<Id, MatchingSegment>(new SegmentIdComparator());
 		this.addSegment(new MatchingSegment(from.getCoord(), to.getCoord(), this.id, this.segmentCounter));
 	}
 	
@@ -96,7 +101,7 @@ public class MatchingEdge implements GraphElement{
 	}
 	
 	private void addSegment(MatchingSegment s){
-		this.segments.add(s);
+		this.segments.put(s.getId(),s);
 		this.lengthOfSegments += s.getLength();
 		this.segmentCounter++;
 	}
@@ -118,7 +123,31 @@ public class MatchingEdge implements GraphElement{
 	/**
 	 * @return
 	 */
-	public ArrayList<MatchingSegment> getSegments(){
-		return this.segments;
+	public Collection<MatchingSegment> getSegments(){
+		return this.segments.values();
 	}
+	
+	public SortedMap<Id, MatchingSegment> getSegmentMap(){
+		return segments;
+	}
+}
+class SegmentIdComparator implements Comparator<Id>{
+	
+
+	/* (non-Javadoc)
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
+	public int compare(Id o1, Id o2) {
+		Double v1, v2;
+		v1 = Double.valueOf(o1.toString().split("_")[0]);
+		v2 = Double.valueOf(o2.toString().split("_")[0]);
+		if(v1<v2){
+			return -11;
+		}else if(v1==v2){
+			return 0;
+		}else{
+			return 1;
+		}
+	}
+	
 }

@@ -39,7 +39,7 @@ public class MatchingSegment implements GraphElement {
 	public MatchingSegment (Coord start, Coord end, Id parentEdgeId, int segmentCounter){
 		this.start = start;
 		this.end = end;
-		this.id = new IdImpl(parentEdgeId + "_" + segmentCounter);
+		this.id = new IdImpl(segmentCounter + "_" + parentEdgeId);
 		this.parentEdgeId = parentEdgeId;
 		this.length = GeoCalculator.distanceBetween2Points(start, end);
 	}
@@ -72,5 +72,10 @@ public class MatchingSegment implements GraphElement {
 	
 	public Double getLength(){
 		return this.length;
+	}
+	
+	@Override
+	public String toString(){
+		return (this.id.toString() + " from: " + start.toString()+ " to:" + end.toString());
 	}
 }
