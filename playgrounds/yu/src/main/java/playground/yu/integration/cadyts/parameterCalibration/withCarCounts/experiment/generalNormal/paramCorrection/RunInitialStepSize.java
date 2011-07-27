@@ -69,10 +69,8 @@ public class RunInitialStepSize {
 		String outputPath = config.controler().getOutputDirectory();
 		/* please without "/" at the end */
 
-		double initialStepSize = Double.parseDouble(args[1]/*
-															 * to be used value
-															 * * -10d
-															 */) / 10d;
+		double initialStepSize = Double.parseDouble(args[1]
+		/* to be used value * 10d */) / 10d;
 		run(config, outputPath, initialStepSize);
 	}
 

@@ -37,7 +37,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu
- * 
+ *
  */
 public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 
@@ -53,15 +53,17 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Link link : (net.getLinks()).values()) {
+		for (Link link : net.getLinks().values()) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
-				if (m == null)
+				if (m == null) {
 					m = new HashMap<Id, Double>();
-				m.put(linkId, Double.valueOf(((v != null) ? v[i] : 0) * 10.0
-						/ link.getCapacity() * capPeriod));
+				}
+				m.put(linkId,
+						Double.valueOf((v != null ? v[i] : 0) / flowCapFactor
+								/ link.getCapacity() * capPeriod));
 				saturationLevels.set(i, m);
 			}
 		}
@@ -80,11 +82,11 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Double> m = saturationLevels.get(i);
-				if (m == null)
+				if (m == null) {
 					m = new HashMap<Id, Double>();
-				m
-						.put(linkId, Double.valueOf(((v != null) ? v[i] : 0)
-								/ flowCapFactor
+				}
+				m.put(linkId,
+						Double.valueOf((v != null ? v[i] : 0) / flowCapFactor
 								/ net.getLinks().get(linkId).getCapacity()
 								* capPeriod));
 				saturationLevels.set(i, m);
@@ -98,7 +100,9 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 	 */
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
-				"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", ch1903);
+				"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
+				gk4);
+		MATSimNet2QGIS.setFlowCapFactor(0.1);
 		/*
 		 * //////////////////////////////////////////////////////////////////////
 		 * /Traffic saturation level and MATSim-network to Shp-file
@@ -106,15 +110,15 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		 */
 		Network net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz",
+		mn2q.readEvents(
+				"../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz",
 				new EventHandler[] { va });
 		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
-		for (int i = 0; i < 24; i++) {
-			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class, sls
-					.get(i));
+		for (int i = 6; i < 20; i++) {/* 7-20 */
+			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class,
+					sls.get(i));
 		}
-		mn2q
-				.writeShapeFile("../matsimTests/Calibration/rop.1-24.680.saturationLevel.shp");
+		mn2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900.saturationLevel.shp");
 	}
 
 }

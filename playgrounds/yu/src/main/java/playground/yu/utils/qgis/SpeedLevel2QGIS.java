@@ -43,8 +43,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -56,9 +54,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * show the quotient (speed/freespeed) in QGIS map
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
@@ -95,8 +93,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
-				MultiPolygon mp = new MultiPolygon(new Polygon[] { p },
-						geofac);
+				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
 				int size = 2 + parameters.size();
 				Object[] o = new Object[size];
 				o[0] = mp;
@@ -126,10 +123,8 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					m = new HashMap<Id, Double>();
 					speeds.add(i, m);
 				}
-				double speed = clas.getAvgSpeed(linkId, (i * 3600))
-						/ 3.6
-						/ network.getLinks().get(linkId).getFreespeed(
-								i * 3600.0);
+				double speed = clas.getAvgSpeed(linkId, (i * 3600))/* km/h */
+						/ 3.6 / network.getLinks().get(linkId).getFreespeed();
 				m.put(linkId, speed);
 			}
 		}
@@ -142,7 +137,8 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
-				"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", ch1903);
+				"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
+				gk4);
 
 		/*
 		 * //////////////////////////////////////////////////////////////////////
@@ -154,27 +150,32 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net, 3600);
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../matsimTests/Calibration/e5_700/700.events.txt.gz",
+		mn2q.readEvents(
+				"../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz",
 				new EventHandler[] { clas, va });
 
-		RoadPricingScheme rps = new RoadPricingScheme();
+		/*RoadPricingScheme rps = new RoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
-		tollReader.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
+		tollReader
+				.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
 
-		Collection<Id> links = rps.getLinkIdSet();
+		Collection<Id> links = rps.getLinkIdSet();*/
+
+		Set<Id> links=net.getLinks().keySet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
-		Set<Id> linkIds = rps.getLinkIdSet();
+//		Set<Id> linkIds = rps.getLinkIdSet();
+
+
 		for (int i = 6; i < 20; i++) {
 			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
-					"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml",
-					ch1903);
+					"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
+					gk4);
 
-			sl2q.setLinkIds(linkIds);
+			sl2q.setLinkIds(links);
 			sl2q.addParameter("sl", Double.class, sls.get(i));
-			sl2q
-					.writeShapeFile("../matsimTests/Calibration/e5_700/speedLevels/700."
-							+ (i + 1) + ".shp");
+			sl2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900."
+					+ (i + 1) + "speedLevel.shp");
 		}
 
 		System.out.println("----->done!");

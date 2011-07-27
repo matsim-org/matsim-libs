@@ -78,10 +78,10 @@ public class DestinationUtilOffsetExtractor extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1301/ITERS/it.1000/1301.1000.linkCostOffsets.xml"//
+		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/sp/1000.linkCostOffsets.xml"//
 		, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
 		, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
-		, eventsFilename = "../../runs-svn/run1301/ITERS/it.1000/1301.1000.events.txt.gz"//
+		, eventsFilename = "../../runs-svn/run1300/sp/1000.events.txt.gz"//
 		, outputFilenameBase = "test/output/test/1000.destUtiloffset."//
 		;
 

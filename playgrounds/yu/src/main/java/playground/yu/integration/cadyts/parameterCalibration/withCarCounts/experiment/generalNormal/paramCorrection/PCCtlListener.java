@@ -20,7 +20,12 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,6 +48,8 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.LinkCostOffsets2QGIS;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
@@ -56,6 +63,7 @@ import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.utilities.math.MultinomialLogit;
 import cadyts.utilities.math.Vector;
+import cadyts.utilities.misc.DynamicData;
 
 public class PCCtlListener extends BseParamCalibrationControlerListener
 		implements StartupListener, ShutdownListener, IterationEndsListener {
@@ -65,8 +73,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private int cycleIdx = 0, cycle;
 
 	private SimpleWriter writer = null, writerCV = null;
-	// private static List<Link> links = new ArrayList<Link>();
-	// private static Set<Id> linkIds = new HashSet<Id>();
+	private static List<Link> links = new ArrayList<Link>();
+	private static Set<Id> linkIds = new HashSet<Id>();
 	private XYLineChart chart;// paramChart
 
 	private int paramDim;
@@ -78,6 +86,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private double[][] paramArrays/* performing, traveling and so on */;
 
 	private double llhSum = 0d;
+	private boolean writeQGISFile = false;
 
 	// private ChoiceParameterCalibrator2<Link> calibrator = null;
 	private void setMatsimParameters(Controler ctl) {
@@ -221,8 +230,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						+ entry.getKey().toString());
 			} else if (isInRange(entry.getKey(), network)) {
 				// for ...2QGIS
-				// links.add(network.getLinks().get(entry.getKey()));
-				// linkIds.add(entry.getKey());
+				links.add(network.getLinks().get(entry.getKey()));
+				linkIds.add(entry.getKey());
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : entry.getValue().getVolumes().values()) {
 					int hour = volume.getHour();
@@ -514,7 +523,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	}
 
 	public void setWriteQGISFile(boolean writeQGISFile) {
-		// dummy
+		this.writeQGISFile = writeQGISFile;
 	}
 
 	private void outputHalfway(Controler ctl, int outputIterInterval) {
@@ -566,12 +575,40 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
 
 		if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
+			ControlerIO io = ctl.getControlerIO();
 			// ***************************************************
-			calibrator.setFlowAnalysisFile(ctl.getControlerIO()
-					.getIterationFilename(iter, "flowAnalysis.log"));
+			calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
+					"flowAnalysis.log"));
 			calibrator.afterNetworkLoading(resultsContainer);
 			// ************************************************
+			// TODO write utilityOffset -> QGIS
+			if (iter % 10 == 0) {
+				// Controler ctl = event.getControler();
 
+				try {
+					DynamicData<Link> linkCostOffsets = calibrator
+							.getLinkCostOffsets();
+					new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(io
+							.getIterationFilename(iter, "linkCostOffsets.xml"),
+							linkCostOffsets);
+					if (writeQGISFile) {
+						for (int i = caliStartTime; i <= caliEndTime; i++) {
+							LinkCostOffsets2QGIS lco2QGSI = new LinkCostOffsets2QGIS(
+									ctl.getNetwork(), ctl.getConfig().global()
+											.getCoordinateSystem(), i, i);
+							lco2QGSI.createLinkCostOffsets(links,
+									linkCostOffsets);
+							lco2QGSI.output(linkIds,
+									io.getIterationFilename(iter, ""));
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// ALSO TO CONFIGURATE IT IN CONFIGFILE
+			// ************************************************
 			writerCV.writeln(iter
 					+ ":\n"
 					+ ((ChoiceParameterCalibrator<Link>) calibrator)
@@ -660,9 +697,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						System.err.println("could not find link "
 								+ entry.getKey().toString());
 					} else if (isInRange(entry.getKey(), network)) {
-						// for ...2QGIS
-						// links.add(network.getLinks().get(entry.getKey()));
-						// linkIds.add(entry.getKey());
 						// ---------GUNNAR'S CODES---------------------
 						for (Volume volume : entry.getValue().getVolumes()
 								.values()) {

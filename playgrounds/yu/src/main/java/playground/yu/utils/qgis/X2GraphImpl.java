@@ -57,7 +57,15 @@ public abstract class X2GraphImpl implements X2Graph {
 
 	public void addParameter(String paramName, Class<?> clazz, Map<Id, ?> params) {
 		attrTypes.add(AttributeTypeFactory.newAttributeType(paramName, clazz));
-		this.parameters.add(params);
+		parameters.add(params);
+	}
+
+	// TESTS
+	public void removeParameter(String paramName, Class<?> clazz,
+			Map<Id, ?> params) {
+		attrTypes.remove(AttributeTypeFactory
+				.newAttributeType(paramName, clazz));
+		parameters.remove(params);
 	}
 
 	protected LinearRing getLinearRing(Link link) {
@@ -78,7 +86,7 @@ public abstract class X2GraphImpl implements X2Graph {
 		Coordinate toB = new Coordinate(to.x + xwidth, to.y + ywidth, 0);
 		// ////////////////////////////////////////////////////////////////////////
 		return new LinearRing(new CoordinateArraySequence(new Coordinate[] {
-				from, to, toB, fromB, from }), this.geofac);
+				from, to, toB, fromB, from }), geofac);
 	}
 
 	protected double getLinkWidth(Link link) {

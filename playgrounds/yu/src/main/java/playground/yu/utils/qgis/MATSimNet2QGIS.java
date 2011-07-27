@@ -60,9 +60,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * This class founds on many codes of Gregor Laemmel. man should for this "playground.yu.integration.cadyts.demandCalibration.withCarCounts.run"
  * install com.sun.media.jai and javax.media.jai from http://jai.dev.java.net
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MATSimNet2QGIS implements X2QGIS {
 
@@ -70,9 +70,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
 	 * Laemmel's
-	 * 
+	 *
 	 * @author ychen
-	 * 
+	 *
 	 */
 	public static class ShapeFileWriter2 {
 
@@ -90,7 +90,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	protected static double flowCapFactor = 0.1;
-	protected Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	protected Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	protected CoordinateReferenceSystem crs = null;
 	protected X2GraphImpl n2g = null;
 
@@ -118,7 +118,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 			for (Id linkId : linkIds2paint) {
 				links2paint.add(linkImpls.get(linkId));
 			}
-			((Network2PolygonGraph) this.n2g).setLinks2paint(links2paint);
+			((Network2PolygonGraph) n2g).setLinks2paint(links2paint);
 		}
 	}
 
@@ -155,7 +155,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 			final Map<Id, ?> parameters) {
 		n2g.addParameter(paraName, clazz, parameters);
 	}
-
+//TESTS
+	public void removeParameter(final String paraName, final Class<?> clazz,
+			final Map<Id, ?> parameters) {
+		n2g.removeParameter(paraName, clazz, parameters);
+	}
 	// /////////////////////////////
 	/**
 	 * @return the network
@@ -166,9 +170,10 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	public void readEvents(final String eventsFilename,
 			final EventHandler[] handlers) {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		for (EventHandler handler : handlers)
+		EventsManager events = EventsUtils.createEventsManager();
+		for (EventHandler handler : handlers) {
 			events.addHandler(handler);
+		}
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 

@@ -190,6 +190,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		}
 	}
 
+	/**
+	 * @param linkId
+	 * @param time
+	 * @return avg. speed [km/h]
+	 */
 	public double getAvgSpeed(final Id linkId, final double time) {
 		SpeedCounter sc = speedCounters.get(linkId.toString());
 		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLinks()
@@ -277,9 +282,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 				if (link != null) {
 					line.append(link.getCapacity());
 				} else {
-					log.info(
-							"NULLPOINT ERROR:\tlink\t" + linkId
-									+ "\tdoes not exist in network!");
+					log.info("NULLPOINT ERROR:\tlink\t" + linkId
+							+ "\tdoes not exist in network!");
 				}
 
 				for (int j = 0; j < nofBins - 1; j++) {
@@ -361,11 +365,12 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String eventsFilename = args[1];
 		final String outputPath = args[2];
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
 		events.addHandler(clas);
 
@@ -401,18 +406,19 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		final String roadPricingFilename = args[2];
 		final String outputPath = args[3];
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario
-				.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
+				scenario.getRoadPricingScheme());
 		tollReader.parse(roadPricingFilename);
-		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, scenario
-				.getRoadPricingScheme());
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network,
+				scenario.getRoadPricingScheme());
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

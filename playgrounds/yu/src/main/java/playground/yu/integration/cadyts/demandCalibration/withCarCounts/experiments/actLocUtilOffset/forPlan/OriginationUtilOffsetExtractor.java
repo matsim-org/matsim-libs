@@ -119,11 +119,11 @@ public class OriginationUtilOffsetExtractor extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.linkCostOffsets.xml"//
+		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/sp/1000.linkCostOffsets.xml"//
 			, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
 			, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
-			, eventsFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.events.txt.gz"//
-		, outputFilenameBase = "test/output/P_OUO/1000.origPlanUtiloffset."//
+			, eventsFilename = "../../runs-svn/run1300/sp/1000.events.txt.gz"//
+		, outputFilenameBase = "test/output/test/1000.origPlanUtiloffset."//
 		;
 
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;

@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -124,16 +123,17 @@ public class OriginationUtilOffsetExtractor extends
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.linkCostOffsets.xml"//
-			, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
-			, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
-			, eventsFilename = "../../runs-svn/run1300/ITERS/it.1000/1000.events.txt.gz"//
-		, outputFilenameBase = "test/output/OUO/1000.origUtiloffset."//
+		String linkOffsetUtilOffsetFilename = "../../runs-svn/run1300/sp/1000.linkCostOffsets.xml"//
+		, networkFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"//
+		, countsFilename = "D:/Daten/work/shared-svn/studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml"//
+		, eventsFilename = "../../runs-svn/run1300/sp/1000.events.txt.gz"//
+		, outputFilenameBase = "test/output/test/1000.origUtiloffset."//
 		;
 
-		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;
+		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -163,8 +163,8 @@ public class OriginationUtilOffsetExtractor extends
 				.entrySet()) {
 			if (timeGridUtilOffsetsPair.getValue().size() > 0) {
 				ActivityLocationUtilOffset2QGIS aluo2qgis = new ActivityLocationUtilOffset2QGIS(
-						scenario, ch1903, 1000d, timeGridUtilOffsetsPair
-								.getValue());
+						scenario, ch1903, 1000d,
+						timeGridUtilOffsetsPair.getValue());
 				aluo2qgis.writeShapeFile(outputFilenameBase + "grid."
 						+ timeGridUtilOffsetsPair.getKey() + ".shp");
 			}
