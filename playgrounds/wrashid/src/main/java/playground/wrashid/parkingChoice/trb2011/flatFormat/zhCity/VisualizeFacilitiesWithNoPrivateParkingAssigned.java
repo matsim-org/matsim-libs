@@ -32,13 +32,13 @@ public class VisualizeFacilitiesWithNoPrivateParkingAssigned {
 		BasicPointVisualizer basicPointVisualizer = new BasicPointVisualizer();
 
 		for (ActivityFacilityImpl actFacility : facilitiesQuadTree.values()) {
-			if (isInZHCityRectangle(actFacility.getCoord())) {
+			if (GeneralLib.isInZHCityRectangle(actFacility.getCoord())) {
 				facilities.put(actFacility.getId().toString(), actFacility);
 			}
 		}
 
 		for (Parking parking : parkingCollection) {
-			if (isInZHCityRectangle(parking.getCoord())) {
+			if (GeneralLib.isInZHCityRectangle(parking.getCoord())) {
 				PrivateParking privateParking = (PrivateParking) parking;
 				Id facilityId = privateParking.getActInfo().getFacilityId();
 				if (facilities.containsKey(facilityId.toString())) {
@@ -58,14 +58,6 @@ public class VisualizeFacilitiesWithNoPrivateParkingAssigned {
 
 	}
 
-	private static boolean isInZHCityRectangle(Coord coord) {
-		if (coord.getX() > 676227.0 && coord.getX() < 689671.0) {
-			if (coord.getY() > 241585.0 && coord.getY() < 254320.0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
+	
 
 }

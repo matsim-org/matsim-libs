@@ -188,7 +188,7 @@ public class ParkingManager implements StartupListener {
 		parkVehicle(person.getId(), bestParking);
 	}
 	
-	public boolean considerForParking(Id agentId){
+	public static boolean considerForParking(Id agentId){
 		int freightAgentIdStart=2000000000;
 		Integer currentAgentId=null;
 		

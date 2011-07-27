@@ -771,4 +771,14 @@ public class GeneralLib {
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getBikeSpeed();
 	}
 
+	public static boolean isInZHCityRectangle(Coord coord) {
+		if (coord.getX() > 676227.0 && coord.getX() < 689671.0) {
+			if (coord.getY() > 241585.0 && coord.getY() < 254320.0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 }

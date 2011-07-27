@@ -308,16 +308,16 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 		String facilitiesPath = "P:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
-		return getFacilitiesQuadTree(facilities);
+		return getFacilitiesQuadTree(facilities.getFacilities().values());
 	}
 	
-	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(ActivityFacilitiesImpl facilities) {
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(Collection<ActivityFacility> facilities) {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
 		double maxY = Double.MIN_VALUE;
 		
-		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
+		for (ActivityFacility activityFacility : facilities) {
 			if (activityFacility.getCoord().getX() < minX) {
 				minX = activityFacility.getCoord().getX();
 			}
@@ -337,7 +337,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 
 		QuadTree<ActivityFacilityImpl> quadTree = new QuadTree<ActivityFacilityImpl>(minX - 1.0, minY - 1.0, maxX + 1.0, maxY + 1.0);
 	
-		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
+		for (ActivityFacility activityFacility : facilities) {
 			quadTree.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), (ActivityFacilityImpl) activityFacility);
 		}
 	

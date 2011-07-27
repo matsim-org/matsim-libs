@@ -4,13 +4,13 @@ import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.meisterk.kti.controler.KTIControler;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.apiDefImpl.ParkingScoringFunctionZhScenario_v1;
@@ -28,31 +28,26 @@ public class ParkingHerbieControler {
 	
 	public static void main(String[] args) {
 		
-		HerbieControler hControler=new HerbieControler(args);
+		//HerbieControler hControler=new HerbieControler(args);
+		KTIControler ktiControler=new KTIControler(args);
 		
 		
-		parkingModule=new ParkingModule(hControler, null);
+		parkingModule=new ParkingModule(ktiControler, null);
 		
-		prepareParkingsForScenario(hControler);
+		prepareParkingsForScenario(ktiControler);
 		
-//		hControler.setOverwriteFiles(true);
+		ktiControler.setOverwriteFiles(true);
 
-		hControler.run();
+		ktiControler.run();
 		
-		postProcess(hControler);
 	}
 	
 	
-	
-	private static void postProcess(HerbieControler hControler) {
-		
-		
-	}
 
 
 
-	private static void prepareParkingsForScenario(HerbieControler hControler) {
-		hControler.addControlerListener(new StartupListener() {
+	private static void prepareParkingsForScenario(Controler controler) {
+		controler.addControlerListener(new StartupListener() {
 			
 			@Override
 			public void notifyStartup(StartupEvent event) {
