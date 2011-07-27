@@ -16,23 +16,23 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 
 	public void calculateColdEmissionsPerLink(Id personId, double actDuration,double distance, HbefaColdEmissionTable hbefaColdTable) {
 
-		int dis=-1;
+		int distance_km=-1;
 		if ((distance/1000) <1.0  ) {
-			dis =0;
+			distance_km =0;
 		}
 		else {
-			dis=1;
+			distance_km=1;
 		}
 
-		int time =(int)(actDuration/3600);
-		if (time>12) time =12; 
+		int vehicleParkingTime_h =(int)(actDuration/3600);
+		if (vehicleParkingTime_h>12) vehicleParkingTime_h =12; 
 
 		int nightTime = 12;
 		int initDis =1;
 	
 		for(Entry<String,Map<Integer,Map<Integer,HbefaColdObject>>> component : hbefaColdTable.getHbefaColdTable().entrySet()){
 
-			double coldEfOtherAct = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(dis).get(time).getColdEF();	
+			double coldEfOtherAct = hbefaColdTable.getHbefaColdTable().get(component.getKey()).get(distance_km).get(vehicleParkingTime_h).getColdEF();	
 
 			if(this.coldEmissionsPerson.get(personId) == null){
 			
