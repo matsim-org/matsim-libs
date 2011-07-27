@@ -19,25 +19,22 @@ package playground.fhuelsmann.emission;
  *                                                                         *
  * *********************************************************************** */
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -48,41 +45,29 @@ import playground.fhuelsmann.emission.objects.HbefaObject;
 public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
-	private Network network = null;
-	private Population population = null;
-	private Vehicles vehicles = null;
-	private HbefaObject[][] hbefaTable = null;
-	private HbefaObject[][] hbefaHdvTable = null;
-	private AnalysisModule linkAndAgentAccountAnalysisModule = null;
-	private ArrayList<String> listOfPollutant = new ArrayList<String>();	
+	private final Network network;
+	private final Vehicles vehicles;
+	private final HbefaObject[][] hbefaTable;
+	private final HbefaObject[][] hbefaHdvTable;
+	private final AnalysisModule linkAndAgentAccountAnalysisModule;
+	private final EventsManager eventsManager;
+	private static int linkLeaveWarnCnt = 0;
+	private static int maxLinkLeaveWarnCnt = 10;
 
-	public ArrayList<String> getListOfPollutant() {
-		return listOfPollutant;
-	}
+	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
+	private final Map<Id, Double> agentarrival = new HashMap<Id, Double>();
+	private final Map<Id, Double> agentdeparture = new HashMap<Id, Double>();
 
-	public void setListOfPollutant(ArrayList<String> listOfPollutant) {
-		this.listOfPollutant = listOfPollutant;
-	}
-
-	public WarmEmissionHandler(Population population, Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable,
-			HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule) {
-		this.population = population;
+	public WarmEmissionHandler(Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable,
+			HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule, EventsManager eventsManager) {
 		this.vehicles = vehicles;
 		this.network = network;
 		this.hbefaTable = hbefaTable;
 		this.hbefaHdvTable = hbefaHdvTable;
 		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
+		this.eventsManager = eventsManager;
 	}
-
-	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
-	private final Map<Id, Double> agentarrival = new TreeMap<Id, Double>();
-	private final Map<Id, Double> agentdeparture = new TreeMap<Id, Double>();
-
 	public void reset(int iteration) {
-	}
-
-	public void handleEvent(LinkEnterEvent event) {
-		this.linkenter.put(event.getPersonId(), event.getTime());
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -91,99 +76,82 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 	public void handleEvent(AgentDepartureEvent event) {
 		this.agentdeparture.put(event.getPersonId(), event.getTime());
-				Id personId= event.getPersonId();
-				Id linkId = event.getLinkId();
-				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
-				//	System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
-					linkAndAgentAccountAnalysisModule.calculatePerPersonPtBikeWalk(personId, linkId);
-					linkAndAgentAccountAnalysisModule.calculatePerLinkPtBikeWalk(linkId, personId);}
+		//				Id personId= event.getPersonId();
+		//				Id linkId = event.getLinkId();
+		//				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
+		//				//	System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
+		//					linkAndAgentAccountAnalysisModule.calculatePerPersonPtBikeWalk(personId, linkId);
+		//					linkAndAgentAccountAnalysisModule.calculatePerLinkPtBikeWalk(linkId, personId);}
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {	
+	public void handleEvent(LinkEnterEvent event) {
+		this.linkenter.put(event.getPersonId(), event.getTime());
+	}
+
+	public void handleEvent(LinkLeaveEvent event) {
+		
+		// TODO: is legMode = car?
+		
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
+		Double leaveTime = event.getTime();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-		Double distance = link.getLength();
+		Double linkLength = link.getLength();
 		Double freeVelocity = link.getFreespeed();
 		String roadTypeString = link.getType();
 		Integer roadType = null;
-		Vehicle veh = null;
-		
-	/*	Person person = population.getPersons().get(personId);
-		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				String mode = leg.getMode();
-				if (personId.toString().contains("pv_pt_")&& mode.equals("pt"))
-					System.out.println("pv_pt_ "+mode);}}*/
-		
+
 		try{
 			roadType = Integer.parseInt(roadTypeString);
 		}
-		catch (NumberFormatException e){
+		catch(NumberFormatException e){
 			logger.warn("Error: roadtype missing! Exception " + e);
 		}
 		Double enterTime = 0.0;
 		Double travelTime = 0.0;
-		Double averageSpeed = 0.0;
 
 		if(this.linkenter.containsKey(event.getPersonId())){
+			enterTime = this.linkenter.get(personId);
 			if (this.agentarrival.containsKey(personId)){
-				double arrivalTime = this.agentarrival.get(personId);			
-				double departureTime = this.agentdeparture.get(personId);			
-				enterTime = this.linkenter.get(personId);
-				travelTime = event.getTime() - enterTime - departureTime + arrivalTime;				
-				averageSpeed=(distance / 1000) / (travelTime / 3600);				
+				double arrivalTime = this.agentarrival.get(personId);		
+				double departureTime = this.agentdeparture.get(personId);	
+				travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
 				this.agentarrival.remove(personId);
 			}
 			else{
-				enterTime = this.linkenter.get(personId);
-				travelTime = event.getTime() - enterTime;
-				averageSpeed=(distance / 1000) / (travelTime / 3600);
+				travelTime = leaveTime - enterTime;
 			}
 
-			if (personId.toString().contains("#")){
-				try{		
-					Id vehId = personId;
-					veh = this.vehicles.getVehicles().get(vehId);
-				}
-				catch(Exception e){
-				}	
-				// # with leg car --> they have a vehicletype
-				if (veh != null ){
-					VehicleType vehType = veh.getType();
-					//fuelSizeAge= fuel type, engine size, year - Euro class
-					String fuelSizeAge = vehType.getDescription();
-					
-					if(!fuelSizeAge.contains("Baujahr") || fuelSizeAge.contains("hubraum")
-							||!fuelSizeAge.contains("Hubraum") ||!fuelSizeAge.contains("Antriebsart")
-							|| fuelSizeAge.contains("99999") || fuelSizeAge.contains("99998")|| fuelSizeAge.contains("99994")
-							|| fuelSizeAge.contains("99997") || fuelSizeAge.equals("") || fuelSizeAge.contains("default")
-							|| fuelSizeAge.contains("Antriebsart:3") || fuelSizeAge.contains("Antriebsart:7") 
-							|| fuelSizeAge.contains("Antriebsart:8")|| fuelSizeAge.contains("Antriebsart:9")){
-					
-						linkAndAgentAccountAnalysisModule.calculateEmissionsPerLinkForComHdvPecWithoutVeh(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
-						linkAndAgentAccountAnalysisModule.calculateEmissionsPerCommuterHdvPcWithoutVeh(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);			
-					
-					}else{
-						
-						linkAndAgentAccountAnalysisModule.calculateEmissionsPerLink(travelTime, linkId, personId, averageSpeed,roadType, fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);											
-						linkAndAgentAccountAnalysisModule.calculateEmissionsPerPerson(travelTime, personId, averageSpeed,roadType,fuelSizeAge, freeVelocity, distance, hbefaTable,hbefaHdvTable);
-					}
-				}
-				// # with leg car -> they have no vehicletype
-				else{
-		
-					linkAndAgentAccountAnalysisModule.calculateEmissionsPerLinkForComHdvPecWithoutVeh(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
-					linkAndAgentAccountAnalysisModule.calculateEmissionsPerCommuterHdvPcWithoutVeh(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
-				}
+			Id vehicleId = personId;
+			String fuelSizeAge = null;
+			if(this.vehicles.getVehicles().containsKey(vehicleId)){
+				Vehicle vehicle = this.vehicles.getVehicles().get(vehicleId);
+				VehicleType vehicleType = vehicle.getType();
+				fuelSizeAge = vehicleType.getDescription();
 			}
 			else{
-				// gv_, pv_car_
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerLinkForComHdvPecWithoutVeh(travelTime, linkId, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);
-				linkAndAgentAccountAnalysisModule.calculateEmissionsPerCommuterHdvPcWithoutVeh(travelTime, personId, averageSpeed,roadType, freeVelocity, distance, hbefaTable,hbefaHdvTable);				
-			}	
-		}	
+				// do nothing
+			}
+			linkAndAgentAccountAnalysisModule.calculateWarmEmissions(
+					linkId,
+					personId,
+					roadType,
+					freeVelocity,
+					linkLength,
+					enterTime,
+					travelTime,
+					fuelSizeAge,
+					hbefaTable,
+					hbefaHdvTable,
+					eventsManager);
+		}
+		else{
+			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
+				linkLeaveWarnCnt++;
+				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. Thus, no emissions are calculated for this link.");
+				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt)
+					logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
 	}
 }
-

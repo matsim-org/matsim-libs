@@ -22,40 +22,43 @@
 /**  @author friederike**/
 
 package playground.fhuelsmann.emission;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 
-
+import playground.benjamin.events.WarmEmissionEventImpl;
 import playground.fhuelsmann.emission.objects.HbefaObject;
+import playground.fhuelsmann.emission.objects.HotValue;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class WarmEmissionAnalysisModule implements AnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private VisumObject[] roadTypes = null;
-	private EmissionsPerEvent emissionFactor = null;
-	private String[][] vehicleCharacteristic = new String[100][4];
-	//	private int counter=0;
-	private HbefaHot hbefaHot = new HbefaHot();
-	//	private Map<Id, double[]> linkIdWalkBkePt2emissionsInGrammPerType = new TreeMap<Id,double[]>();
-	private Map<Id, double[]> linkId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
-	private Map<Id, double[]> personId2emissionsInGrammPerType = new TreeMap<Id,double[]>();
-	private ArrayList<String> listOfPollutant;
-	//	private Population population = null;
-	
-	private Map<String, Integer> hotKeys = new TreeMap<String,Integer>();
+	private final VisumObject[] roadTypes;
+	private final EmissionsPerEvent emissionPerEvent;
+	private final HbefaHot hbefaHot;
+	private final ArrayList<String> listOfPollutant;
+	private static int vehInfoWarnCnt = 0;
+	private static int maxVehInfoWarnCnt = 10;
+	private boolean completeAndValidVehInfo;
 
-	
-	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant,VisumObject[] roadTypes, EmissionsPerEvent emissionFactor, HbefaHot hbefahot) {
+	private final String[][] roadTypesTrafficSituations = new String[100][4];
+
+	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant, VisumObject[] roadTypes, EmissionsPerEvent emissionFactor, HbefaHot hbefahot) {
 		this.roadTypes = roadTypes;
-		this.emissionFactor = emissionFactor;
+		this.emissionPerEvent = emissionFactor;
 		this.hbefaHot = hbefahot;
 		this.listOfPollutant = listOfPollutant;
 	}
@@ -64,245 +67,99 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		return this.roadTypes[roadType].getHBEFA_RT_NR();
 	}
 
-	/** emission calculation per link for heavy duty vehicles, passenger cars without a vehicle assigned and commuter traffic (pt and car) **/
-	public  void calculateEmissionsPerLinkForComHdvPecWithoutVeh(double travelTime, Id linkId, Id personId, double averageSpeed, 
-			int roadType, double freeVelocity, double distance, HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable) {
-
-		/* the arrays double[] are going to be filled with:
-		massOfFuel [0]
-		noxEmissions [1]
-		co2Emissions[2]
-		no2Emissions[3]
-		pmEmissions[4]*/
-		int NumberOfPollutant = listOfPollutant.size();
-		int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
-		//get emissions calculated per event by fraction approach
-		double [] inputForEmissions = emissionFactor.collectInputForEmissionFraction (listOfPollutant,hbefaRoadType, averageSpeed, distance,hbefaTable);
-		//only for CO2 and FC are values available, otherwise 0.0
-		double [] inputForHdvEmissions = emissionFactor.collectInputForEmissionFraction(listOfPollutant,hbefaRoadType, averageSpeed, distance, hbefaHdvTable);
-
-		if(!personId.toString().contains("gv_")){
-			if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
-				this.linkId2emissionsInGrammPerType.put(linkId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
-			}else{
-				double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-				double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId);		
-				for(int i = 0; i < actualEmissions.length ; i++){
-					actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];
-				}
-				linkId2emissionsInGrammPerType.put(linkId, actualEmissions);
-			}
-			//// else gv,... so far only fc and co2 emissionFactors are listed in the hbefaHdvTable
-		}else{
-			if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
-				this.linkId2emissionsInGrammPerType.put(linkId, inputForHdvEmissions);// data is read for the first time, doesn't need to be summed up per link
-			}else{
-				double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-				double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId); // previousEmissions is the previous sum
-				for(int i = 0; i < actualEmissions.length ; i++){
-					actualEmissions[i]= previousEmissions[i] + inputForHdvEmissions[i];
-				}
-				linkId2emissionsInGrammPerType.put(linkId, actualEmissions);// put newValue in the Map
-			}
-		}
-	}
-
-	/** emission calculation per person for heavy duty vehicles, passenger cars without a vehicle assigned and commuter traffic (pt and car) **/
-	public  void calculateEmissionsPerCommuterHdvPcWithoutVeh(double travelTime, Id personId, double averageSpeed, int roadType, double freeVelocity, double distance, HbefaObject[][] hbefaTable,HbefaObject[][] hbefaHdvTable) {
-
-		/* the arrays double[] are going to be filled with:
-		massOfFuel [0]
-		noxEmissions [1]
-		co2Emissions[2]
-		no2Emissions[3]
-		pmEmissions[4]*/
-
-		//linkage between Hbefa road types and Visum road types
-		int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
-
-		//get emissions calculated per event by fraction approach
-		double [] inputForEmissions = emissionFactor.collectInputForEmissionFraction (listOfPollutant,hbefaRoadType, averageSpeed, distance,hbefaTable);
-		//only for CO2 and FC are values available, otherwise 0.0
-		double [] inputForHdvEmissions = emissionFactor.collectInputForEmissionFraction(listOfPollutant,hbefaRoadType, averageSpeed, distance, hbefaHdvTable);
-
-		if(  !personId.toString().contains("gv_")){
-			if(this.personId2emissionsInGrammPerType.get(personId) == null) {
-				this.personId2emissionsInGrammPerType.put(personId, inputForEmissions);// data is read for the first time, doesn't need to be summed up per link
-			}else{
-				double [] actualEmissions = new double[listOfPollutant.size()]; // new data is saved after summation
-				double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId);
-				for(int i = 0; i < actualEmissions.length ; i++)
-					actualEmissions[i]= previousEmissions[i] + inputForEmissions[i];		
-				personId2emissionsInGrammPerType.put(personId, actualEmissions);
-			}
-		}else{ //gv_... so far only fc and co2 emissionFactors are listed in the hbefaHdvTable
-			if(this.personId2emissionsInGrammPerType.get(personId) == null) {
-				this.personId2emissionsInGrammPerType.put(personId, inputForHdvEmissions);// data is read for the first time, doesn't need to be summed up per link
-			}else{
-				double [] actualEmissions = new double[listOfPollutant.size()]; // new data is saved after summation
-				double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); //oldValue is the previous sum
-				for(int i = 0; i < actualEmissions.length ; i++){
-					actualEmissions[i] = previousEmissions[i] + inputForHdvEmissions[i];
-				}
-				personId2emissionsInGrammPerType.put(personId, actualEmissions);// put newValue in the Map
-				}
-		}
-	}
-
 	@Override
-	/** emission calculation per link for passenger cars with a vehicle assigned **/
-	public  void calculateEmissionsPerLink(
-			double travelTime,
-			Id linkId, 
-			Id personId,
-			double averageSpeed,
-			int roadType,
-			String fuelSizeAge, 
-			double freeVelocity, 
-			double distance,
-			HbefaObject[][] hbefaTable,
-			HbefaObject[][] hbefaHdvTable) {
-
-		String[] hubSizeAgeArray = fuelSizeAge.split(";");
-
-		String[] VehicleAttributes = new String[3];
-	
-		VehicleAttributes = calculateVehicleAttributes(hubSizeAgeArray);
-
-		String[] keys = new String[4];
-		Map<String, double[][]> hashOfPollutant = new TreeMap<String,double[][]>();
-
-		for( String Pollutant : listOfPollutant ){
-			for(int i = 0; i < 4; i++)
-				keys[i] = makeKey(Pollutant, roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
-	
-			// place 0 for freeFlow ....
-			double[][] emissionsInFourSituations = new double[4][2];	
-			for(int i = 0; i < 4; i++){
-					emissionsInFourSituations[i][0]= this.hbefaHot.getHbefaHot().get(keys[i]).getV();
-					emissionsInFourSituations[i][1]= this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
-			}
-			// in the hashPfPollutant we save the V and EFA in 4 Situations
-			hashOfPollutant.put(Pollutant, emissionsInFourSituations);	
-		}
-		// as result we have here a hashmap with the pollutant and an array as value with v and Efa
-		int NumberOfPollutant = hashOfPollutant.size();
-
-		/** get emissions calculated per event for the average speed approach or the fraction approach **/
-		//double [] arrayOfemissionFactor =	emissionFactor.emissionAvSpeedCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-		double [] arrayOfemissionFactor = emissionFactor.emissionFractionCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-
-		if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
-			this.linkId2emissionsInGrammPerType.put(linkId, arrayOfemissionFactor);// data is read for the first time, doesn't need to be summed up per link
-		}
-		else{
-			double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-			double [] previousEmissions = this.linkId2emissionsInGrammPerType.get(linkId); //oldValue is the previous sum
-			for(int i = 0; i < actualEmissions.length ; i++){
-				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
-			}
-			linkId2emissionsInGrammPerType.put(linkId, actualEmissions);// put newValue in the Map
-		}
-	}
-
-	public Map<String, Integer> getHotKeys() {
-		return hotKeys;
-	}
-
-	public void setHotKeys(Map<String, Integer> hotKeys) {
-		this.hotKeys = hotKeys;
-	}
-
-	@Override
-	/** emission calculation per person for passenger cars with a vehicle assigned **/
-	public synchronized void calculateEmissionsPerPerson(double travelTime,
-			Id personId, 
-			double averageSpeed,
-			int roadType,
-			String fuelSizeAge, 
-			double freeVelocity, 
-			double distance,
-			HbefaObject[][] hbefaTable,
-			HbefaObject[][] hbefaHdvTable) {
-
-		String[] fuelSizeAgeArray = fuelSizeAge.split(";");
-		//array order - fuel type[0], engine size 1], year[2]
-		String[] VehicleAttributes = new String[3];
-		VehicleAttributes = calculateVehicleAttributes(fuelSizeAgeArray);
+	public void calculateWarmEmissions(Id linkId, Id personId,
+			Integer roadType, Double freeVelocity, Double linkLength,
+			Double enterTime, Double travelTime, String ageFuelCcm,
+			HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable,
+			EventsManager eventsManager) {
 		
-		// make 4 keys
-		String[] keys = new String[4];
-		// 
-		Map<String, double[][]> hashOfPollutant = new TreeMap<String,double[][]>();
-		for( String Pollutant : listOfPollutant ){
-			for(int i = 0; i < 4; i++)
-				keys[i] = makeKey(Pollutant, roadType, VehicleAttributes[0], VehicleAttributes[1], VehicleAttributes[2], i);
-			// place 0 for freeFlow ....
-			double[][] emissionsInFourSituations = new double[4][2];
-			for(int i = 0; i < 4; i++){
-				emissionsInFourSituations[i][0] = this.hbefaHot.getHbefaHot().get(keys[i]).getV();
-				emissionsInFourSituations[i][1] = this.hbefaHot.getHbefaHot().get(keys[i]).getEFA();
+		completeAndValidVehInfo = false;
+
+		// TODO: use freeVelocity, not hbefa value!
+		// TODO: Delete EmissionPerEvent, transfer important methods to this class
+		// TODO: Kill this array, set return type to Map
+		double [] emissionsOfEvent;
+		Map<String, Double> warmEmissions = new HashMap<String, Double>();
+		Map<String, double[][]> hashOfPollutant = new TreeMap<String, double[][]>();
+
+		if(ageFuelCcm != null){// check for non-existing vehicle information
+			completeAndValidVehInfo = true;
+			String[] ageFuelCcmArray = ageFuelCcm.split(";");
+//			logger.info(personId + " " + ageFuelCcmArray[0] + " " + ageFuelCcmArray[1] + " " + ageFuelCcmArray[2]);
+//			for(String string : ageFuelCcmArray){// check for non-valid vehicle information
+//				if(string == null || string == ""){
+			if(!ageFuelCcm.contains("Baujahr") || ageFuelCcm.contains("hubraum")
+							||!ageFuelCcm.contains("Hubraum") ||!ageFuelCcm.contains("Antriebsart")
+							|| ageFuelCcm.contains("99999") || ageFuelCcm.contains("99998")|| ageFuelCcm.contains("99994")
+							|| ageFuelCcm.contains("99997") || ageFuelCcm.equals("") || ageFuelCcm.contains("default")
+							|| ageFuelCcm.contains("Antriebsart:3") || ageFuelCcm.contains("Antriebsart:7") 
+							|| ageFuelCcm.contains("Antriebsart:8")|| ageFuelCcm.contains("Antriebsart:9")){
+					completeAndValidVehInfo = false;
+//				}
 			}
-			// in the hashOfPollutant we save the V and EFA in 4 Situations
-			hashOfPollutant.put(Pollutant, emissionsInFourSituations);
-		}
-		// as result we have here a hashmap with the pollutant and an array with value v and EFA
-		int NumberOfPollutant = hashOfPollutant.size();
+			String[] fuelCcmEuro = null;
+			if(completeAndValidVehInfo){
+				fuelCcmEuro = mapVehicleAttributesFromMiD2Hbefa(ageFuelCcmArray);
 
-		/** get emissions calculated per event for the average speed approach or the fraction approach **/
-		// double [] arrayOfemissionFactor = emissionFactor.emissionAvSpeedCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-		double [] arrayOfemissionFactor = emissionFactor.emissionFractionCalculateDetailed(hashOfPollutant, averageSpeed, distance);
-
-		if(this.personId2emissionsInGrammPerType.get(personId) == null) {
-			this.personId2emissionsInGrammPerType.put(personId, arrayOfemissionFactor); // data is read for the first time, doesn't need to be summed up per link
+				String[] keys = new String[4];
+				for(String pollutant : listOfPollutant){
+					double[][] emissionsInFourSituations = new double[4][2];
+					for(int i = 0; i < 4; i++){// [0] for freeFlow, [1] for heavy, [2] for saturated, [3] for Stop&Go
+						keys[i] = makeKey(pollutant, roadType, fuelCcmEuro[0], fuelCcmEuro[1], fuelCcmEuro[2], i);
+						HotValue hotValue = this.hbefaHot.getHbefaHot().get(keys[i]);
+						if (hotValue != null) {
+							emissionsInFourSituations[i][0] = hotValue.getV();
+							emissionsInFourSituations[i][1] = hotValue.getEFA();
+						} else {
+							completeAndValidVehInfo = false;
+						}
+					}
+					// in hashOfPollutant we save V and EFA for 4 traffic situations
+					hashOfPollutant.put(pollutant, emissionsInFourSituations);
+				}
+			}
 		}
 		else{
-			double [] actualEmissions = new double[NumberOfPollutant]; // new data is saved after summation
-			double [] previousEmissions = this.personId2emissionsInGrammPerType.get(personId); // oldValue is the previous sum
-			for(int i = 0; i < actualEmissions.length ; i++){
-				actualEmissions[i] = previousEmissions[i] + arrayOfemissionFactor[i];
+			// do nothing
+		}
+
+		if(completeAndValidVehInfo){
+			emissionsOfEvent = emissionPerEvent.calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
+			for(int i = 0; i < listOfPollutant.size(); i++){
+				String pollutant = listOfPollutant.get(i);
+				Double value = emissionsOfEvent[i];
+				warmEmissions.put(pollutant, value);
 			}
-			// put newValue in the Map
-			personId2emissionsInGrammPerType.put(personId, actualEmissions);
 		}
+		else{
+			if(vehInfoWarnCnt < maxVehInfoWarnCnt){
+				vehInfoWarnCnt++;
+				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
+				if (vehInfoWarnCnt == maxVehInfoWarnCnt)
+					logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			// linkage between Hbefa road types and Visum road types
+			int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
+
+			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
+				emissionsOfEvent = emissionPerEvent.calculateAverageEmissions (listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaTable);
+			}
+			else{// HDV emissions; TODO: "only for CO2 and FC are values available, otherwise 0.0", "so far only fc and co2 emissionFactors are listed in the hbefaHdvTable" --- WHAT?!?
+				emissionsOfEvent = emissionPerEvent.calculateAverageEmissions(listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaHdvTable);
+			}
+			for(int i = 0; i < listOfPollutant.size(); i++){
+				String pollutant = listOfPollutant.get(i);
+				Double value = emissionsOfEvent[i];
+				warmEmissions.put(pollutant, value);
+			}
+		}
+		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
+		eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	public synchronized void calculatePerLinkPtBikeWalk(
-			Id linkId,
-			Id personId) {
-
-		double[] emissions = new double [5];
-		emissions[0]=0.0;
-		emissions[1]=0.0;
-		emissions[2]=0.0;
-		emissions[3]=0.0;
-		emissions[4]=0.0;	
-
-		if(this.linkId2emissionsInGrammPerType.get(linkId) == null) {
-			this.linkId2emissionsInGrammPerType.put(linkId, emissions);
-			// data is read for the first time, doesn't need to be summed up per link
-		}
-	}
-
-	public synchronized void calculatePerPersonPtBikeWalk(
-			Id personId,
-			Id linkId) {
-
-		double[] emissions = new double [5];
-		emissions[0]=0.0;
-		emissions[1]=0.0;
-		emissions[2]=0.0;
-		emissions[3]=0.0;
-		emissions[4]=0.0;	
-
-		if(this.personId2emissionsInGrammPerType.get(personId) == null) {
-			this.personId2emissionsInGrammPerType.put(personId, emissions);// data is read for the first time, doesn't need to be summed up per link
-		}
-
-	}
-
+	// TODO: Put in main
 	public void createRoadTypesTafficSituation(String filename) {
-
 		int[] counter = new int[100];
 		for(int i=0; i<100;i++)
 			counter[i]=0;
@@ -322,16 +179,17 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 				int roadtype=Integer.valueOf(array[0]);
 				int traficSitIndex = counter[roadtype]++;
 				//			System.out.println(roadtype+";"+traficSitIndex);
-				this.vehicleCharacteristic[roadtype][traficSitIndex] = array[3]; 	
+				this.roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3]; 	
 				//		System.out.println("5.05" + this.vehicleCharacteristic);
 			}
 			in.close();
 		}
 		catch (Exception e){
-			System.err.println("Error: " + e);
+			logger.error("Error: " + e);
 		}
 	}
 
+	// TODO: Put in main
 	public void createRoadTypes(String filename){
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
@@ -355,76 +213,47 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		}
 	}
 
-	public Map<Id, double[]> getWarmEmissionsPerLink() {
-		return this.linkId2emissionsInGrammPerType;
-	}
-
-	public Map<Id, double[]> getWarmEmissionsPerPerson() {
-		return this.personId2emissionsInGrammPerType;
-	}
-
-	public String makeKey(String pollutant, int roadType,String technology,String Sizeclass,String EmConcept,int traficSitNumber){
-		return "PC[3.1]"+";"+"pass. car"+";"+"2010"+";"+";"+pollutant+";"+";"+this.vehicleCharacteristic[roadType][traficSitNumber]+";"+"0%"+";"+technology+";"+Sizeclass+";"+EmConcept+";";
+	public String makeKey(String pollutant, int roadType, String technology, String Sizeclass, String EmConcept, int traficSitNumber){
+		return "PC[3.1]" + ";" + "pass. car" + ";" + "2010" + ";" + ";" + pollutant + ";" + ";" + this.roadTypesTrafficSituations[roadType][traficSitNumber]
+		                                                                                                                                    + ";" + "0%" + ";" + technology + ";" + Sizeclass + ";" + EmConcept + ";";
 	}
 
 	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer
-	private int splitAndConvert(String str,String splittZeichen){
+	private int splitAndConvert(String string, String splittZeichen){
 
-		String[] array = str.split(splittZeichen);
+		String[] array = string.split(splittZeichen);
 		return Integer.valueOf(array[1]);
 	}
 
-	private String[] calculateVehicleAttributes(String[] hubSizeAgeArray){
+	private String[] mapVehicleAttributesFromMiD2Hbefa(String[] ageFuelCcmArray){
+		String[] fuelCcmEuro = new String[3];
 
-		String[] result = new String[3];
-		int antriebsart=0;
-		try{
-			antriebsart =  Integer.valueOf(splitAndConvert(hubSizeAgeArray[1],":"));
-		} catch(ArrayIndexOutOfBoundsException e){}
+		int fuelType = splitAndConvert(ageFuelCcmArray[1], ":");
+		if(fuelType == 1) fuelCcmEuro[0] = "petrol (4S)";
+		else if(fuelType == 2) fuelCcmEuro[0] = "diesel";
+		else completeAndValidVehInfo = false;
 
-		result[0]="null"; //technology
-		if (antriebsart==1) result[0]="petrol (4S)"; 	
-		else if(antriebsart==2) result[0]="diesel";	
-	//	else if (antriebsart==99998 && antriebsart==99999) result[0]="petrol (4S)";
-	//	else result[0]="diesel";
+		int cubicCap = splitAndConvert(ageFuelCcmArray[2], ":");
+		if (cubicCap <= 1400) fuelCcmEuro[1] = "<1,4L";	
+		else if(cubicCap <= 2000 && cubicCap > 1400) fuelCcmEuro[1] = "1,4-<2L";
+		else if(cubicCap > 2000 && cubicCap < 90000) fuelCcmEuro[1] = ">=2L";
+		else completeAndValidVehInfo = false;
 
-		result[1]="null";
-		int hubraum=0;
-		try{
-			hubraum = Integer.valueOf(splitAndConvert(hubSizeAgeArray[2],":"));
-		} catch(ArrayIndexOutOfBoundsException e){}
-
-		if (hubraum <= 1400) result[1]="<1,4L";	
-		else if(hubraum <= 2000 && hubraum > 1400) result[1]="1,4-<2L";
-		else if(hubraum >2000 ) result[1]=">=2L";
-	//	else if (hubraum == 99998 && hubraum ==99999) result[1]="1,4-<2L";
-	//	else result[1]="1,4-<2L";
-
-		result[2]="null";//emConcept
-		int bauJahr=0;	
-		try{
-
-			bauJahr = Integer.valueOf(splitAndConvert(hubSizeAgeArray[0],":"));
-
-		} catch(ArrayIndexOutOfBoundsException e){}
-
-		if (bauJahr < 1993 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-0";
-		else if (bauJahr < 1993 && result[0].equals("diesel")) result[2]="PC-D-Euro-0";
-		else if(bauJahr <1997 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-1";
-		else if(bauJahr <1997 && result[0].equals("diesel")) result[2]="PC-D-Euro-1";
-		else if(bauJahr <2001 && result[0].equals("petrol (4S)") ) result[2]="PC-P-Euro-2";
-		else if(bauJahr <2001 && result[0].equals("diesel") ) result[2]="PC-D-Euro-2";
-		else if(bauJahr <2006 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-3";
-		else if(bauJahr <2006 && result[0].equals("diesel")) result[2]="PC-D-Euro-3";
-		else if(bauJahr <2011 && result[0].equals("petrol (4S)") ) result[2]="PC-P-Euro-4";
-		else if(bauJahr <2011 && result[0].equals("diesel") ) result[2]="PC-D-Euro-4";
-		else if(bauJahr <2015 && result[0].equals("petrol (4S)") ) result[2]="PC-P-Euro-5";
-		else if(bauJahr <2015 && result[0].equals("diesel") ) result[2]="PC-D-Euro-5";
-	//	else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("diesel")) result[2]="PC-D-Euro-2";
-	//	else if (bauJahr==99998 && bauJahr==99999 && result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
-	//	else if (result[0].equals("petrol (4S)")) result[2]="PC-P-Euro-2";
-	//	else if (result[0].equals("diesel")) result[2]="PC-D-Euro-2";
-
-		return result;
+		int year = splitAndConvert(ageFuelCcmArray[0], ":");
+		if (year < 1993 && fuelCcmEuro[0].equals("petrol (4S)")) fuelCcmEuro[2] = "PC-P-Euro-0";
+		else if (year < 1993 && fuelCcmEuro[0].equals("diesel")) fuelCcmEuro[2] = "PC-D-Euro-0";
+		else if(year < 1997 && fuelCcmEuro[0].equals("petrol (4S)")) fuelCcmEuro[2] = "PC-P-Euro-1";
+		else if(year < 1997 && fuelCcmEuro[0].equals("diesel")) fuelCcmEuro[2] = "PC-D-Euro-1";
+		else if(year < 2001 && fuelCcmEuro[0].equals("petrol (4S)") ) fuelCcmEuro[2] = "PC-P-Euro-2";
+		else if(year < 2001 && fuelCcmEuro[0].equals("diesel") ) fuelCcmEuro[2] = "PC-D-Euro-2";
+		else if(year < 2006 && fuelCcmEuro[0].equals("petrol (4S)")) fuelCcmEuro[2] = "PC-P-Euro-3";
+		else if(year < 2006 && fuelCcmEuro[0].equals("diesel")) fuelCcmEuro[2] = "PC-D-Euro-3";
+		else if(year < 2011 && fuelCcmEuro[0].equals("petrol (4S)") ) fuelCcmEuro[2] = "PC-P-Euro-4";
+		else if(year < 2011 && fuelCcmEuro[0].equals("diesel") ) fuelCcmEuro[2] = "PC-D-Euro-4";
+		else if(year < 2015 && fuelCcmEuro[0].equals("petrol (4S)") ) fuelCcmEuro[2] = "PC-P-Euro-5";
+		else if(year < 2015 && fuelCcmEuro[0].equals("diesel") ) fuelCcmEuro[2] = "PC-D-Euro-5";
+		else completeAndValidVehInfo = false;
+		
+		return fuelCcmEuro;
 	}
 }

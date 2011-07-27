@@ -71,7 +71,6 @@ public class HotValue {
 		}catch(Exception e){
 			System.out.println("V " +  e);
 		}
-		
 		return Double.valueOf(value[0]);
 	}
 	
@@ -80,10 +79,10 @@ public class HotValue {
 			String[] num = value[1].split(",");
 			String newNumber = num[0]+"."+num[1] ;
 			return Double.valueOf(newNumber);
-		}catch(Exception e){
-			System.out.println("EFA " +  e);}
-		
+		}
+		catch(Exception e){
+			System.out.println("EFA " +  e);
+			}
 		return Double.valueOf(value[1]);
 	}
-	
 }

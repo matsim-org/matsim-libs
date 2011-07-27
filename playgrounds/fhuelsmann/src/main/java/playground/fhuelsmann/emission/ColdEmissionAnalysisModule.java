@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
-
 import playground.fhuelsmann.emission.objects.HbefaColdObject;
 
 public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
@@ -75,7 +74,10 @@ public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
 			
 			else {//do nothing
 				}
-		
+			
+//			//TODO: CO2 not directly available for cold emissions; thus it could be calculated through fc as follows:
+//			get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866)/0.273;
+			
 		}
 	}
 
