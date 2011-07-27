@@ -22,23 +22,27 @@ import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 
 public class ParkingHerbieControler {
 
-	static String parkingDataBase=null;
+	static String parkingDataBase="H:/data/experiments/TRBAug2011/parkings/flat/";
 	static ParkingModule parkingModule;
 	public static boolean isRunningOnServer=false;
+	public static boolean isKTIMode=true;
 	
 	public static void main(String[] args) {
+		Controler controler=null;
+		if (isKTIMode){
+			controler=new KTIControler(args);
+		} else {
+			controler=new HerbieControler(args);
+		}
 		
-		//HerbieControler hControler=new HerbieControler(args);
-		KTIControler ktiControler=new KTIControler(args);
 		
+		parkingModule=new ParkingModule(controler, null);
 		
-		parkingModule=new ParkingModule(ktiControler, null);
+		prepareParkingsForScenario(controler);
 		
-		prepareParkingsForScenario(ktiControler);
-		
-		ktiControler.setOverwriteFiles(true);
+		controler.setOverwriteFiles(true);
 
-		ktiControler.run();
+		controler.run();
 		
 	}
 	
@@ -95,8 +99,13 @@ public class ParkingHerbieControler {
 		double parkingsOutsideZHCityScaling=Double.parseDouble(controler.getConfig().findParam("parking", "publicParkingsCalibrationFactorOutsideZHCity"));
 		
 		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity(controler);
+		String streetParkingsFile=null;
+		if (isKTIMode){
+			streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0_kti.xml";
+		} else {
+			streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0.xml";
+		}
 		
-		String streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0.xml";
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile,parkingCollection);
 		
 		return parkingCollection;
@@ -116,7 +125,13 @@ public class ParkingHerbieControler {
 		String garageParkingsFile=parkingDataBase + "garageParkings.xml";
 		readParkings(garageParkingCalibrationFactor, garageParkingsFile,parkingCollection);
 		
-		String privateIndoorParkingsFile=parkingDataBase + "privateParkings_v1.xml";
+		String privateIndoorParkingsFile=null;
+		if (isKTIMode){
+			privateIndoorParkingsFile=parkingDataBase + "privateParkings_v1_kti.xml";
+		} else {
+			privateIndoorParkingsFile=parkingDataBase + "privateParkings_v1.xml";
+		}
+		
 		readParkings(privateParkingCalibrationFactorZHCity, privateIndoorParkingsFile,parkingCollection);
 		
 		//String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
@@ -134,10 +149,10 @@ public class ParkingHerbieControler {
 		String garageParkingsFile=parkingDataBase + "garageParkings.xml";
 		readParkings(1.0, garageParkingsFile,parkingCollection);
 		
-		String privateIndoorParkingsFile=parkingDataBase + "privateParkingsIndoor.xml";
+		String privateIndoorParkingsFile=parkingDataBase + "privateParkingsIndoor_v0.xml";
 		readParkings(1.0, privateIndoorParkingsFile,parkingCollection);
 		
-		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor.xml";
+		String privateOutdoorParkingsFile=parkingDataBase + "privateParkingsOutdoor_v0.xml";
 		readParkings(1.0, privateOutdoorParkingsFile,parkingCollection);
 		
 		return parkingCollection;

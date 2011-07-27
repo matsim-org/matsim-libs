@@ -59,7 +59,7 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		reducedPrivateParkings=reducePrivateParkings(assignedPrivateParkings);
 		//checkParking(reducedPrivateParkings,"p3");
 		PrivateParkingsWriter_v1 privateParkingsWriter=new PrivateParkingsWriter_v1();
-		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkings_v1.xml", "PrivateParkingWriter_v1");
+		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkings_v1_kti.xml", "PrivateParkingWriter_v1");
 
 	}
 	

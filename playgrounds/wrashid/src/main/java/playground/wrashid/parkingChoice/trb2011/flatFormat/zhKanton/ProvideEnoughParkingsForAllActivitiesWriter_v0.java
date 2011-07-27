@@ -37,10 +37,14 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 	private static QuadTree<Parking> parkingsQuadTreeOutsideCityZH=null;
 	
 	public static void main(String[] args) {
-		String inputPlansFile = "K:/Projekte/herbie/output/demandCreation/plans.xml.gz";
-		String inputNetworkFile = "K:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
-		String inputFacilities = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		//String inputPlansFile = "K:/Projekte/herbie/output/demandCreation/plans.xml.gz";
+		//String inputFacilities = "K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		//String inputNetworkFile = "K:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
 
+		String inputPlansFile = "P:/Projekte/matsim/data/switzerland/plans/teleatlas-ivtcheu-zrhCutC/census2000v2_zrhCutC_10pct/plans.xml.gz";
+		String inputFacilities = "P:/Projekte/matsim/data/switzerland/facilities/facilities.zrhCutC.xml.gz";
+		String inputNetworkFile = "P:/Projekte/matsim/data/switzerland/networks/teleatlas-ivtcheu-zrhCutC/network.xml.gz";
+		
 		String outputKmlFile = "C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/kmls/parkingsOutsideZHCity.kml";
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
@@ -76,7 +80,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
 		
 		ProvideEnoughParkingsForAllActivitiesWriter_v0 garageParkingsOutsideZHCityWriter=new ProvideEnoughParkingsForAllActivitiesWriter_v0();
-		garageParkingsOutsideZHCityWriter.writeFile("C:/data/My Dropbox/ETH/Projekte/TRB Aug 2011/parkings/flat/publicParkingsOutsideZHCity.xml", sourcePath,garageParkingData);
+		garageParkingsOutsideZHCityWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/publicParkingsOutsideZHCity_v0_kti.xml", sourcePath,garageParkingData);
 
 	}
 
