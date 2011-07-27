@@ -197,8 +197,9 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			//Read File Line By Line
+			//Read first line:
 			br.readLine();
+			//Read File Line By Line:
 			while ((strLine = br.readLine()) != null){
 
 				//for all lines (whole text) we split the line to an array 
