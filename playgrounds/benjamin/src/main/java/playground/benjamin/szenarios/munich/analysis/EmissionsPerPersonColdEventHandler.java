@@ -36,7 +36,6 @@ public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHand
 
 	Map<Id, Map<String, Double>> coldEmissionsTotal = new HashMap<Id, Map<String, Double>>();
 
-	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		Id vehicleId = event.getVehicleId();
 		Map<String, Double> coldEmissionsOfEvent = event.getColdEmissions();
@@ -68,7 +67,6 @@ public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHand
 		return coldEmissionsTotal;
 	}
 
-	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 	}

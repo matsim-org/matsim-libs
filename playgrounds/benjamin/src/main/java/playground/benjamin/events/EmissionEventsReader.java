@@ -75,7 +75,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 	private void startEvent(final Attributes attributes){
 
 		String eventType = attributes.getValue("type");
-		String hotEventType = HotEmissionEventImpl.EVENT_TYPE;
+		String hotEventType = WarmEmissionEventImpl.EVENT_TYPE;
 		String coldEventType = ColdEmissionEventImpl.EVENT_TYPE;
 
 		Double time = 0.0;
@@ -102,7 +102,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 				}
 
 				if(hotEventType.equals(eventType)){
-					this.eventsManager.processEvent(new HotEmissionEventImpl(
+					this.eventsManager.processEvent(new WarmEmissionEventImpl(
 							time,
 							linkId,
 							vehicleId,
@@ -110,7 +110,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					));
 				}
 				if(coldEventType.equals(eventType)){
-					this.eventsManager.processEvent(new HotEmissionEventImpl(
+					this.eventsManager.processEvent(new WarmEmissionEventImpl(
 							time,
 							linkId,
 							vehicleId,

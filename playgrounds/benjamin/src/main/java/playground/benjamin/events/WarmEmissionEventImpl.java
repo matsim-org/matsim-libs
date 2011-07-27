@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEvent.java
+ * EmissionEventHotImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,57 @@
 package playground.benjamin.events;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.events.EventImpl;
 
 /**
- * Event to indicate that emissions were produced.
  * @author benjamin
  *
  */
-public interface HotEmissionEvent extends Event{
+public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEvent{
+	private Id linkId;
+	private Id vehicleId;
+	private Map<String, Double> hotEmissions;
+	
+	public WarmEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> hotEmissions) {
+		super(time);
+		this.linkId = linkId;
+		this.vehicleId = vehicleId;
+		this.hotEmissions = hotEmissions;
+	}
 
-	public final static String EVENT_TYPE = "hotEmissionEvent";
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
 	
-	public final static String ATTRIBUTE_LINK_ID = "linkId";
-	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
+	@Override
+	public Id getVehicleId() {
+		return vehicleId;
+	}
 	
-	public Id getLinkId();
-	
-	public Id getVehicleId();
+	@Override
+	public Map<String, Double> getHotEmissions() {
+		return hotEmissions;
+	}
 
-	public Map<String, Double> getHotEmissions();
+	@Override
+	public Map<String, String> getAttributes(){
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
+		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+		for(Entry<String, Double> entry : hotEmissions.entrySet()){
+			String pollutant = entry.getKey();
+			String value = entry.getValue().toString();
+			attributes.put(pollutant, value);
+		}
+		return attributes;
+	}
+
+	@Override
+	public String getEventType() {
+		return WarmEmissionEvent.EVENT_TYPE;
+	}
 }

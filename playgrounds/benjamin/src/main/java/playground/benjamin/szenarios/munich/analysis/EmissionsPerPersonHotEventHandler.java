@@ -25,22 +25,21 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.events.HotEmissionEvent;
-import playground.benjamin.events.HotEmissionEventHandler;
+import playground.benjamin.events.WarmEmissionEvent;
+import playground.benjamin.events.WarmEmissionEventHandler;
 
 /**
  * @author benjamin
  *
  */
-public class EmissionsPerPersonHotEventHandler implements HotEmissionEventHandler {
+public class EmissionsPerPersonHotEventHandler implements WarmEmissionEventHandler {
 
 	Map<Id, Map<String, Double>> hotEmissionsTotal = new HashMap<Id, Map<String, Double>>();
 
 	public EmissionsPerPersonHotEventHandler() {
 	}
 
-	@Override
-	public void handleEvent(HotEmissionEvent event) {
+	public void handleEvent(WarmEmissionEvent event) {
 		Id vehicleId = event.getVehicleId();
 		Map<String, Double> hotEmissionsOfEvent = event.getHotEmissions();
 
@@ -71,7 +70,6 @@ public class EmissionsPerPersonHotEventHandler implements HotEmissionEventHandle
 		return hotEmissionsTotal;
 	}
 
-	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 	}

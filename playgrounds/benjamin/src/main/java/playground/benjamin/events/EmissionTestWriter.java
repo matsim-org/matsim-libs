@@ -47,7 +47,7 @@ public class EmissionTestWriter {
 		Map<String, Double> hotEmissions = new HashMap<String, Double>();
 		hotEmissions.put("FC", 1000.0);
 		hotEmissions.put("CO2", 3000.0);
-		Event hotEvent = new HotEmissionEventImpl(3600, linkId, vehicleId, hotEmissions);
+		Event hotEvent = new WarmEmissionEventImpl(3600, linkId, vehicleId, hotEmissions);
 		
 		Map<String, Double> coldEmissions = new HashMap<String, Double>();
 		coldEmissions.put("FC", 20.0);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHotImpl.java
+ * EmissionEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,58 +19,14 @@
  * *********************************************************************** */
 package playground.benjamin.events;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
+ * Implement this to get notified when HotEmissionEvents are thrown
  * @author benjamin
  *
  */
-public class HotEmissionEventImpl extends EventImpl implements HotEmissionEvent{
-	private Id linkId;
-	private Id vehicleId;
-	private Map<String, Double> hotEmissions;
-	
-	public HotEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> hotEmissions) {
-		super(time);
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
-		this.hotEmissions = hotEmissions;
-	}
 
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
-	
-	@Override
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-	
-	@Override
-	public Map<String, Double> getHotEmissions() {
-		return hotEmissions;
-	}
-
-	@Override
-	public Map<String, String> getAttributes(){
-		Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
-		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<String, Double> entry : hotEmissions.entrySet()){
-			String pollutant = entry.getKey();
-			String value = entry.getValue().toString();
-			attributes.put(pollutant, value);
-		}
-		return attributes;
-	}
-
-	@Override
-	public String getEventType() {
-		return HotEmissionEvent.EVENT_TYPE;
-	}
+public interface WarmEmissionEventHandler extends EventHandler {
+	public void handleEvent (WarmEmissionEvent event);
 }

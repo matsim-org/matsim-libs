@@ -73,7 +73,7 @@ public class EmissionsPerPersonAnalysis {
 		processEmissions();
 		hotEmissions = hotHandler.getHotEmissionsPerPerson();
 		coldEmissions = coldHandler.getColdEmissionsPerPerson();
-		createListOfPollutants(hotEmissions, coldEmissions);
+		fillListOfPollutants(hotEmissions, coldEmissions);
 		setNonCalculatedEmissions(scenario.getPopulation(), hotEmissions);
 		setNonCalculatedEmissions(scenario.getPopulation(), coldEmissions);
 		totalEmissions = sumUpEmissions(hotEmissions, coldEmissions);
@@ -159,7 +159,7 @@ public class EmissionsPerPersonAnalysis {
 		}
 	}
 
-	private void createListOfPollutants(Map<Id, Map<String, Double>> hotEmissions, Map<Id, Map<String, Double>> coldEmissions) {
+	private void fillListOfPollutants(Map<Id, Map<String, Double>> hotEmissions, Map<Id, Map<String, Double>> coldEmissions) {
 		listOfPollutants = new TreeSet<String>();
 		for(Map<String, Double> emissionType2Value : hotEmissions.values()){
 			for(String pollutant : emissionType2Value.keySet()){
