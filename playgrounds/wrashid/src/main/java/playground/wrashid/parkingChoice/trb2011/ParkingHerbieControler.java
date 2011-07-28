@@ -101,7 +101,7 @@ public class ParkingHerbieControler {
 		LinkedList<Parking> parkingCollection=getParkingCollectionZHCity(controler);
 		String streetParkingsFile=null;
 		if (isKTIMode){
-			streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0_kti_dilZh30km_10pct.xml";
+			streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml";
 		} else {
 			streetParkingsFile=parkingDataBase + "publicParkingsOutsideZHCity_v0.xml";
 		}
