@@ -41,4 +41,8 @@ public class DebugLib {
 	public static void emptyFunctionForSettingBreakPoint(){
 		
 	}
+	
+	public static void haltSystemToPrintCrutialHint(String hintString){
+		throw new Error(hintString);
+	}
 }

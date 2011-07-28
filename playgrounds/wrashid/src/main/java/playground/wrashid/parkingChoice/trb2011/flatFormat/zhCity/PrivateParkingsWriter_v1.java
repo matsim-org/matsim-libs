@@ -34,13 +34,16 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
  * @author wrashid
  *
  */
+
 public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 
 	private static QuadTree<ActivityFacilityImpl> facilitiesQuadTree;
 	private static LinkedList<PrivateParking> reducedPrivateParkings;
 
 	public static void main(String[] args) {
-		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree();
+		String facilitiesPath ="H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		String outputFilePath = "C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkings_v1_kti_allFacilities.xml";
+		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree(facilitiesPath);
 		
 		LinkedList<Parking> privateParkings = getPrivateParkings();
 		//checkParking(privateParkings,"p1");
@@ -59,7 +62,7 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		reducedPrivateParkings=reducePrivateParkings(assignedPrivateParkings);
 		//checkParking(reducedPrivateParkings,"p3");
 		PrivateParkingsWriter_v1 privateParkingsWriter=new PrivateParkingsWriter_v1();
-		privateParkingsWriter.writeFile("C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkings_v1_kti.xml", "PrivateParkingWriter_v1");
+		privateParkingsWriter.writeFile(outputFilePath, "PrivateParkingWriter_v1");
 
 	}
 	

@@ -305,16 +305,21 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 		return bestActivityFacility;
 	}
 
-	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree() {
-		String facilitiesPath=null;
-		if (ParkingHerbieControler.isKTIMode){
-			facilitiesPath ="P:/Projekte/matsim/data/switzerland//facilities/facilities.zrhCutC.xml.gz";
-		} else {
-			facilitiesPath = "P:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
-		}
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(String facilitiesPath) {
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		return getFacilitiesQuadTree(facilities.getFacilities().values());
+	}
+	
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree() {
+		String facilitiesPath=null;
+		if (ParkingHerbieControler.isKTIMode){
+			facilitiesPath ="H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		} else {
+			facilitiesPath = "P:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		}
+		
+		return getFacilitiesQuadTree(facilitiesPath);
 	}
 	
 	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(Collection<ActivityFacility> facilities) {
