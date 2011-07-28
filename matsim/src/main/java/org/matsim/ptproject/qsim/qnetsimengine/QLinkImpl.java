@@ -628,7 +628,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	private void calculateFlowCapacity(final double time) {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
-		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
+		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
 		* this.getQSimEngine().getMobsim().getSimTimer().getSimTimestepSize()
 		* this.getQSimEngine().getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
@@ -660,7 +660,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
-				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity
+				log.warn("Link " + this.getLink().getId() + " too small: enlarge storage capacity from: " + this.storageCapacity
 						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
