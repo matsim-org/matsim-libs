@@ -62,7 +62,7 @@ public final class OTFVisClient implements Runnable {
 		} else {
 			mainDrawer = new OTFOGLDrawer(clientQuadTree, otfClient.getHostControlBar());
 		}
-		if (server.isLive()) {
+//		if (server.isLive()) {
 //			final OTFQueryControl queryControl = new OTFQueryControl(server, otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());
 //			queryControl.getQueries().clear();
 //			queryControl.getQueries().add(new QueryEntry("agentPlan", "show the current plan of an agent", QueryAgentPlan.class));
@@ -79,7 +79,7 @@ public final class OTFVisClient implements Runnable {
 //			queryControl.setQueryTextField(queryControlBar.getTextField());
 //			otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 //			mainDrawer.setQueryHandler(queryControl);
-		}
+//		}
 		
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
 		otfClient.show();

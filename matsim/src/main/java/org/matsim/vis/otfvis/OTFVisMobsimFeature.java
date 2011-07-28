@@ -99,12 +99,9 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent ev) {
-		log.info("receiving simulationInitializedEvent") ;
-		for ( MobsimAgent mag : this.queueSimulation.getAgents() ) {
-			if ( mag instanceof MobsimAgent ) {
-				MobsimAgent pag = (MobsimAgent) mag ;
-				agents.put( pag.getId(), pag) ;
-			}
+		log.info("receiving simulationInitializedEvent");
+		for (MobsimAgent mag : this.queueSimulation.getAgents()) {
+			agents.put(mag.getId(), mag);
 		}
 	}
 
@@ -186,6 +183,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		this.doVisualizeTeleportedAgents = active;
 	}
 
+	@Override
 	public void removeTrackedAgent(Id id) {
 		trackedAgents.remove(id);
 	}
@@ -195,6 +193,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		return queueSimulation;
 	}
 
+	@Override
 	public Plan findPlan(Id agentId) {
 		MobsimAgent agent = agents.get(agentId);
 		if (agent != null && agent instanceof PlanAgent ) {
@@ -203,6 +202,7 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		return null;
 	}
 
+	@Override
 	public void addTrackedAgent(Id agentId) {
 		trackedAgents.add(agentId);
 	}

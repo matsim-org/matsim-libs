@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
@@ -103,13 +102,11 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 
 		if (sim instanceof QSim) {
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				if (mobsimAgent instanceof MobsimAgent) {
-					PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
-					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
-					
-					// mark the agent as currently performing an Activity
-					replanningSet.add(((MobsimAgent) mobsimAgent).getId());
-				}
+				PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
+				personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
+				
+				// mark the agent as currently performing an Activity
+				replanningSet.add(mobsimAgent.getId());
 			}
 		}
 	}

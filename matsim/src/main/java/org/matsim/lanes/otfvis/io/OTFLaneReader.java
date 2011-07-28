@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
@@ -40,8 +39,6 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  *
  */
 public class OTFLaneReader extends OTFDataReader {
-	
-	private static final Logger log = Logger.getLogger(OTFLaneReader.class);
 	
 	protected OTFLaneSignalDrawer drawer;
 
@@ -64,9 +61,10 @@ public class OTFLaneReader extends OTFDataReader {
 	}
 	
 	private void connectVisLinksWithoutLanes(Map<OTFLinkWLanes, List<String>> outLinks) {
-		for (OTFLinkWLanes link : outLinks.keySet()){
-			if (link.getLaneData() == null || link.getLaneData().isEmpty()){
-				for (String outLinkId : outLinks.get(link)){
+		for (Map.Entry<OTFLinkWLanes, List<String>> e : outLinks.entrySet()) {
+			OTFLinkWLanes link = e.getKey();
+			if (link.getLaneData() == null || link.getLaneData().isEmpty()) {
+				for (String outLinkId : e.getValue()) {
 					OTFLinkWLanes outlink = this.drawer.getLanesLinkData().get(outLinkId);
 					link.addToLink(outlink);
 				}

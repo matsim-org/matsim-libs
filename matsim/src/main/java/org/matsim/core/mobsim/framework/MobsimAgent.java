@@ -22,9 +22,6 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 
 /**Design decisions:<ul>
  * <li>The concept that I found was that, at the end of a PlanElement, the agent got control from the relevant engine 

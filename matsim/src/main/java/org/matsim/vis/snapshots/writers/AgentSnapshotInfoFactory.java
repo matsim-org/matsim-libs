@@ -37,7 +37,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  */
 public class AgentSnapshotInfoFactory {
 
-	private Scenario sc = null ;
+//	private Scenario sc = null ;
 	private static final double TWO_PI = 2.0 * Math.PI;
 	private static final double PI_HALF = Math.PI / 2.0;
 	/**
@@ -66,7 +66,7 @@ public class AgentSnapshotInfoFactory {
 	private static final AgentSnapshotInfoFactory defaultFactory = new AgentSnapshotInfoFactory( null ) ;
 
 	public AgentSnapshotInfoFactory( Scenario sc ) {
-		this.sc = sc ;
+//		this.sc = sc ;
 	}
 
 	// static creators based on x/y
