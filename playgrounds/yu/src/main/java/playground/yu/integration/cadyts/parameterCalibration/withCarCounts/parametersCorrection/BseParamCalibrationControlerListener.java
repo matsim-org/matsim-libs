@@ -51,6 +51,7 @@ public abstract class BseParamCalibrationControlerListener implements
 	protected CadytsChoice chooser;
 	protected final static int DEFAULT_CALIBRATION_START_TIME = 1,
 			DEFAULT_CALIBRATION_END_TIME = 24;
+	protected int writeLinkUtilOffsetsInterval = 100;
 	public static final String BSE_CONFIG_MODULE_NAME = "bse";
 
 	protected class SimResultsContainerImpl implements SimResults<Link> {

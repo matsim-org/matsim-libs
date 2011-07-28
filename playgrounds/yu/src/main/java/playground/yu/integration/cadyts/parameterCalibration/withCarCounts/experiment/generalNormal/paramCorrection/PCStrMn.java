@@ -40,6 +40,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
 import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
@@ -86,6 +87,8 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		super.beforePopulationRunHook(population);// iter++
 		// cadyts class - create new BasicStatistics Objects
 		betaTravelingPtStats = new BasicStatistics();
+
+		((Events2Score4PC_mnl) chooser).createWriter();
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
@@ -100,6 +103,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			 */
 			chooser.setPersonScore(person);
 		}
+		((Events2Score4PC_mnl) chooser).closeWriter();
 	}
 
 	@Override

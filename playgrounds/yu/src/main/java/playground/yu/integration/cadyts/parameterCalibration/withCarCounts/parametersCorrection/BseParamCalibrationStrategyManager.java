@@ -61,6 +61,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 		iter = firstIteration;
 	}
 
+	@Override
 	public void init(final Calibrator<Link> calibrator,
 			final TravelTime travelTimes) {
 		this.calibrator = (AnalyticalCalibrator<Link>) calibrator;
@@ -73,6 +74,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 		this.chooser = chooser;
 	}
 
+	@Override
 	protected void beforePopulationRunHook(Population population) {
 		iter++;
 	}
@@ -91,12 +93,13 @@ public abstract class BseParamCalibrationStrategyManager extends
 	// }
 	// }
 	// }
+	@Override
 	protected void afterRemovePlanHook(Plan plan) {
 		removeds.add(new Tuple<Id, Plan>(plan.getPerson().getId(), plan));
 	}
 
 	protected void resetChooser() {
-		chooser.reset(iter);
+//		chooser.reset(iter);
 		chooser.reset(removeds);
 		removeds.clear();
 	}
@@ -104,7 +107,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	/**
 	 * only for the Agent with number of plans == choiceSetSize or
 	 * maxPlansPerAgent
-	 * 
+	 *
 	 * @param person
 	 * @return
 	 */
@@ -121,7 +124,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	/**
 	 * creates a {@code cadyts.demand.Plan<Link>} choice set, which contains
 	 * only one {@code cadyts.demand.Plan<Link>}
-	 * 
+	 *
 	 * @param plan
 	 * @return
 	 */

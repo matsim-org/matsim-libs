@@ -62,6 +62,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	protected MultinomialLogit mnl;
 	// private boolean outputCalcDetail = false;
 	private SimpleWriter writer = null;
+	private int iteration = -1;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
@@ -422,6 +423,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 					}
 				}
 				writer.writeln("///////////////////////////////////////");
+				writer.flush();
 			}
 		}
 	}
@@ -509,20 +511,37 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
+		this.iteration = iteration;
+	}
+
+	public void createWriter() {
+
 		ControlerConfigGroup ctlCfg = config.controler();
 		if (iteration <= ctlCfg.getLastIteration()
 				&& iteration > ctlCfg.getLastIteration() - 100) {
 			// outputCalcDetail = true;
 			ControlerIO ctlIO = new ControlerIO(ctlCfg.getOutputDirectory());
 			writer = new SimpleWriter(ctlIO.getIterationFilename(iteration,
-					"scoreCalcDetails.log"));
+					"scoreCalcDetails.log.gz"));
 
 			StringBuilder head = new StringBuilder("AgentID");
 			for (String attrName : attrNameList) {
 				head.append("\t");
 				head.append(attrName);
 			}
+			head.append("\tselected");
+			writer.writeln(head);
 
+		}
+	}
+
+	/**
+	 * should be called after that all setPersonScore(Person) have been called
+	 * in every iteration.
+	 */
+	public void closeWriter() {
+		if (writer != null) {
+			writer.close();
 		}
 	}
 }

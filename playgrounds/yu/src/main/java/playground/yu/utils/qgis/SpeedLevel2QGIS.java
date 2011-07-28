@@ -139,7 +139,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
 				"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
 				gk4);
-
+		MATSimNet2QGIS.setFlowCapFactor(0.1);
 		/*
 		 * //////////////////////////////////////////////////////////////////////
 		 * /Traffic speed level and MATSim-network to Shp-file
@@ -150,33 +150,40 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net, 3600);
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+
 		mn2q.readEvents(
-				"../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz",
+				"../../runs-svn/run1532/ITERS/it.1900/1532.1900.events.xml.gz",
 				new EventHandler[] { clas, va });
 
-		/*RoadPricingScheme rps = new RoadPricingScheme();
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
-		tollReader
-				.parse("../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml");
+		/*
+		 * RoadPricingScheme rps = new RoadPricingScheme();
+		 * RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
+		 * tollReader .parse(
+		 * "../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml"
+		 * );
+		 *
+		 * Collection<Id> links = rps.getLinkIdSet();
+		 */
 
-		Collection<Id> links = rps.getLinkIdSet();*/
-
-		Set<Id> links=net.getLinks().keySet();
+		Set<Id> links = net.getLinks().keySet();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
 
-//		Set<Id> linkIds = rps.getLinkIdSet();
-
+		// Set<Id> linkIds = rps.getLinkIdSet();
 
 		for (int i = 6; i < 20; i++) {
-			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
-					"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
-					gk4);
+			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class,
+					sls.get(i));
 
-			sl2q.setLinkIds(links);
-			sl2q.addParameter("sl", Double.class, sls.get(i));
-			sl2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900."
-					+ (i + 1) + "speedLevel.shp");
+			// SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
+			// "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
+			// gk4);
+			//
+			// sl2q.setLinkIds(links);
+			// sl2q.addParameter("sl", Double.class, sls.get(i));
+			// sl2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900."
+			// + (i + 1) + "speedLevel.shp");
 		}
+		mn2q.writeShapeFile("../../runs-svn/run1532/ITERS/it.1900/1532.1900.speedLevel.shp");
 
 		System.out.println("----->done!");
 	}

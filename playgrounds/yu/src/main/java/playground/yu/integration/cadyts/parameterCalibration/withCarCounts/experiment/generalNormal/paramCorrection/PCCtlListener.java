@@ -49,7 +49,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.LinkCostOffsets2QGIS;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
@@ -86,7 +85,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private double[][] paramArrays/* performing, traveling and so on */;
 
 	private double llhSum = 0d;
-	private boolean writeQGISFile = false;
+	private boolean writeQGISFile = true;
 
 	// private ChoiceParameterCalibrator2<Link> calibrator = null;
 	private void setMatsimParameters(Controler ctl) {
@@ -432,9 +431,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			paramArrays[i] = new double[arraySize];// e.g. traveling,
 			// performing
 		}
-	}
 
-	private void setWriteLlh(Config config) {
+		Config config = ctl.getConfig();
+
 		String avgLlhOverItersStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 				"averageLogLikelihoodOverIterations");
 		if (avgLlhOverItersStr != null) {
@@ -445,6 +444,13 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				"writeLogLikelihoodInterval");
 		if (writeLlhItervalStr != null) {
 			writeLlhInterval = Integer.parseInt(writeLlhItervalStr);
+		}
+		// writeLinkUtilOffsetsInterval
+		String writeLinkUtilOffsetsIntervalStr = config.findParam(
+				BSE_CONFIG_MODULE_NAME, "writeLinkUtilOffsetsInterval");
+		if (writeLinkUtilOffsetsIntervalStr != null) {
+			writeLinkUtilOffsetsInterval = Integer
+					.parseInt(writeLinkUtilOffsetsIntervalStr);
 		}
 	}
 
@@ -488,10 +494,6 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// INITIALIZING OUTPUT
 		initializeOutput(ctl);
-
-		// set interval of writing log-likelihood, and avg log-likelihood over
-		// Iterations
-		setWriteLlh(config);
 	}
 
 	@Override
@@ -581,33 +583,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					"flowAnalysis.log"));
 			calibrator.afterNetworkLoading(resultsContainer);
 			// ************************************************
-			// TODO write utilityOffset -> QGIS
-			if (iter % 10 == 0) {
-				// Controler ctl = event.getControler();
-
+			if (iter % writeLinkUtilOffsetsInterval == 0) {
 				try {
 					DynamicData<Link> linkCostOffsets = calibrator
 							.getLinkCostOffsets();
 					new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(io
-							.getIterationFilename(iter, "linkCostOffsets.xml"),
+							.getIterationFilename(iter, "linkUtilOffsets.xml"),
 							linkCostOffsets);
-					if (writeQGISFile) {
-						for (int i = caliStartTime; i <= caliEndTime; i++) {
-							LinkCostOffsets2QGIS lco2QGSI = new LinkCostOffsets2QGIS(
-									ctl.getNetwork(), ctl.getConfig().global()
-											.getCoordinateSystem(), i, i);
-							lco2QGSI.createLinkCostOffsets(links,
-									linkCostOffsets);
-							lco2QGSI.output(linkIds,
-									io.getIterationFilename(iter, ""));
-						}
-					}
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-
-			// ALSO TO CONFIGURATE IT IN CONFIGFILE
 			// ************************************************
 			writerCV.writeln(iter
 					+ ":\n"
