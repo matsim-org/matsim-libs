@@ -12,6 +12,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.kti.controler.KTIControler;
 import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.apiDefImpl.ParkingScoringFunctionZhScenario_v1;
 import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelectionManager;
@@ -34,6 +35,7 @@ public class ParkingHerbieControler {
 		} else {
 			controler=new HerbieControler(args);
 		}
+		GeneralLib.controler=controler;
 		
 		
 		parkingModule=new ParkingModule(controler, null);
@@ -78,10 +80,13 @@ public class ParkingHerbieControler {
 					parkingModule.setParkingSelectionManager(new ShortestWalkingDistanceParkingSelectionManager(parkingModule.getParkingManager()) );
 				} else if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
 					parkingModule.setParkingSelectionManager(new PriceAndDistanceParkingSelectionManager(parkingModule.getParkingManager(), new ParkingScoringFunctionZhScenario_v1()));				
-					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeter=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeter"));
-					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeterForMoreThan300Meters=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeterForMoreThan300Meters"));
+					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeterShorterThanhresholdDistance=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeterShorterThanhresholdDistance"));
+					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeterLongerThanThresholdDistance=Double.parseDouble(controler.getConfig().findParam("parking", "disutilityOfWalkingPerMeterLongerThanThresholdDistance"));
+					ParkingScoringFunctionZhScenario_v1.thresholdWalkingDistance=Double.parseDouble(controler.getConfig().findParam("parking", "thresholdWalkingDistance"));
+					ParkingScoringFunctionZhScenario_v1.boardingDurationInSeconds=Double.parseDouble(controler.getConfig().findParam("parking", "boardingDurationInSeconds"));
 					ParkingScoringFunctionZhScenario_v1.streetParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "streetParkingPricePerSecond"));
 					ParkingScoringFunctionZhScenario_v1.garageParkingPricePerSecond=Double.parseDouble(controler.getConfig().findParam("parking", "garageParkingPricePerSecond"));
+					
 				} else {
 					DebugLib.stopSystemAndReportInconsistency("unknown parkingSelectionManager:" + parkingSelectionManager);
 				}

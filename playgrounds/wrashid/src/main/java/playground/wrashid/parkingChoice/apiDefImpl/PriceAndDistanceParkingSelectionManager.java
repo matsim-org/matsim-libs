@@ -42,6 +42,10 @@ public class PriceAndDistanceParkingSelectionManager extends ShortestWalkingDist
 		double walkingDistance = GeneralLib.getDistance(targtLocationCoord, selectedParking.getCoord());
 		ParkingScoreAccumulator.parkingWalkDistances.put(personId, walkingDistance);
 		
+		if (GeneralLib.isInZHCityRectangle(targtLocationCoord)){
+			ParkingScoreAccumulator.parkingWalkDistancesInZHCity.add(walkingDistance);
+		}
+		
 		if (walkingDistance>2000){
 		//	System.out.println();
 		}

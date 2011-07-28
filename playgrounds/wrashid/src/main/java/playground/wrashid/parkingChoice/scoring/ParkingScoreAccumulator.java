@@ -2,6 +2,7 @@ package playground.wrashid.parkingChoice.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.moment.Mean;
@@ -23,7 +24,6 @@ import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingChoice.ParkingManager;
-import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
@@ -38,7 +38,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	private Double averageWalkingDistance = null;
 	public static DoubleValueHashMap<Id> scores = new DoubleValueHashMap<Id>();
 	public static HashMap<Id, Double> parkingWalkDistances=new HashMap<Id, Double>();
-
+	public static LinkedList<Double> parkingWalkDistancesInZHCity=new LinkedList<Double>();
+	
 	public Double getAverageWalkingDistance() {
 		return averageWalkingDistance;
 	}
@@ -128,6 +129,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		// eventsToScore.finish();
 		findLargestWalkingDistance(parkingWalkDistances);
 		parkingWalkDistances=new HashMap<Id, Double>();
+		parkingWalkDistancesInZHCity=new LinkedList<Double>();
 		scores=new DoubleValueHashMap<Id>();
 	}
 
@@ -295,6 +297,20 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				"Histogram Parking Walking Distance - It." + controler.getIterationNumber(), "distance", "number");
 		
 		writeOutWalkingDistanceHistogramToTxtFile(controler,values);
+		writeOutWalkingDistanceZHCity(controler);
+	}
+
+	private void writeOutWalkingDistanceZHCity(Controler controler) {
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"walkingDistanceHistogrammZHCity.txt");
+		
+		double[] walkingDistances=new double[parkingWalkDistancesInZHCity.size()];
+		
+		for (int i=0;i<parkingWalkDistancesInZHCity.size();i++){
+			walkingDistances[i]=parkingWalkDistancesInZHCity.get(i);
+		}
+		
+		GeneralLib.writeArrayToFile(walkingDistances, fileName, "parking walking distance [m]");
 	}
 
 	private void writeOutWalkingDistanceHistogramToTxtFile(Controler controler, double[] values) {

@@ -14,12 +14,13 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFunction {
 
-	public static double disutilityOfWalkingPerMeter; // should be negative
+	public static double disutilityOfWalkingPerMeterShorterThanhresholdDistance; // should be negative
 	
 	public static double streetParkingPricePerSecond; // should be positive
 	public static double garageParkingPricePerSecond; // should be positive
-	public static double disutilityOfWalkingPerMeterForMoreThan300Meters;
-	
+	public static double thresholdWalkingDistance;
+	public static double disutilityOfWalkingPerMeterLongerThanThresholdDistance;
+	public static double boardingDurationInSeconds;
 
 	public ParkingScoringFunctionZhScenario_v1(){
 	}
@@ -40,10 +41,10 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 		double distanzLindenhof = GeneralLib.getDistance(parking.getCoord(), ParkingHerbieControler.getCoordinatesLindenhofZH());
 		
 		double walkingDistance = GeneralLib.getDistance(parking.getCoord(), targtLocationCoord);
-		double walkingScore=walkingDistance*disutilityOfWalkingPerMeter;
+		double walkingScore=walkingDistance*disutilityOfWalkingPerMeterShorterThanhresholdDistance;
 		
-		if (walkingDistance>300.0){
-			walkingScore+=walkingDistance*disutilityOfWalkingPerMeterForMoreThan300Meters;
+		if (walkingDistance>thresholdWalkingDistance){
+			walkingScore+=walkingDistance*disutilityOfWalkingPerMeterLongerThanThresholdDistance;
 //			System.out.println();
 		}
 		
@@ -58,7 +59,14 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 			
 		}
 		
-		double totalScore=walkingScore+priceScore;
+		// TODO: convert this perhaps to opportunity loss of activity performance again.
+		double bordingScore=GeneralLib.getWalkingSpeed()*boardingDurationInSeconds*disutilityOfWalkingPerMeterShorterThanhresholdDistance;
+		
+		//TODO: perhaps also add explict loss of activity performance due to walking here,
+		// or should it be assumed, that the walking term already contains that?
+		
+		double totalScore=walkingScore+priceScore+bordingScore;
+		
 		return totalScore;
 	}
 

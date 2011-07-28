@@ -763,6 +763,10 @@ public class GeneralLib {
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getWalkSpeed();
 	}
 	
+	public static double getWalkingSpeed(){
+		return controler.getConfig().plansCalcRoute().getWalkSpeed();
+	}
+	
 	public static double getPtTravelDuration(double distance){
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getPtSpeed();
 	}
