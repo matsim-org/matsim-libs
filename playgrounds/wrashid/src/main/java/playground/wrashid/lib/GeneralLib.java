@@ -781,4 +781,14 @@ public class GeneralLib {
 		return false;
 	}
 	
+	public static void writeArrayToFile(double[] array, String fileName, String headerLine){
+		double matrix[][]=new double[array.length][1];
+		
+		for (int i=0;i<array.length;i++){
+			matrix[i][1]=array[i];
+		}
+		
+		GeneralLib.writeMatrix(matrix, fileName, headerLine);
+	}
+	
 }

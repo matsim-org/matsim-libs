@@ -38,4 +38,7 @@ public class DebugLib {
 		
 	}
 
+	public static void emptyFunctionForSettingBreakPoint(){
+		
+	}
 }

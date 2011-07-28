@@ -97,9 +97,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 						// acutal parking duration instead of
 						// an estimation.
 						scoringFuncAccumulator.addMoney(scores.get(personId));
+						DebugLib.emptyFunctionForSettingBreakPoint();
 						// implicity disutility of not beeing able to perform
-						disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
-						scoringFuncAccumulator.addMoney(disutilityOfWalking);
+						// TODO: the following lines are removed for the time, so that they
+						// can be repaired. For the herbie run1, they give sumOfActTotalScore=0, because
+						// activityScoringFunction.finish() is invoked after the current code for it.
+						// therefore we need to find a solution to solve this problem...
+						
+						//disutilityOfWalking = -1 * Math.abs(sumOfActTotalScore) * sumOfWalkingTimes / sumOfParkingDurations;
+						//scoringFuncAccumulator.addMoney(disutilityOfWalking);
 					} else {
 						DebugLib.stopSystemAndReportInconsistency("unknown parkingSelectionManager:" + parkingSelectionManager);
 					}
@@ -122,6 +128,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		// eventsToScore.finish();
 		findLargestWalkingDistance(parkingWalkDistances);
 		parkingWalkDistances=new HashMap<Id, Double>();
+		scores=new DoubleValueHashMap<Id>();
 	}
 
 	private void findLargestWalkingDistance(HashMap<Id, Double> parkingWalkDistances) {
@@ -145,13 +152,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	}
 
 	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler) {
-		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
 				"parkingOccupancyCountsComparison.png");
-
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"parkingOccupancyCountsComparison.txt");
+		
 		HashMap<String, String> mappingOfParkingNameToParkingId = SingleDayGarageParkingsCount
 				.getMappingOfParkingNameToParkingId();
 		int[] sumOfSelectedParkingSimulatedCounts = new int[96];
-
+		int numberOfColumns=2;
 		for (String parkingName : selectedParkings) {
 			ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(new IdImpl(
 					mappingOfParkingNameToParkingId.get(parkingName)));
@@ -166,7 +175,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			}
 		}
 
-		double matrix[][] = new double[96][2];
+		double matrix[][] = new double[96][numberOfColumns];
 
 		for (int i = 0; i < 96; i++) {
 			matrix[i][0] = sumOfSelectedParkingSimulatedCounts[i];
@@ -185,14 +194,24 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			xValues[i] = i / (double) 4;
 		}
 
-		GeneralLib.writeGraphic(iterationFilename, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		GeneralLib.writeGraphic(iterationFilenamePng, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		
+		String txtFileHeader=seriesLabels[0];
+		
+		for (int i=1;i<numberOfColumns;i++){
+			txtFileHeader+="\t"+seriesLabels[i];
+		}
+		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
 	private void writeOutGraphParkingTypeOccupancies(Controler controler) {
-		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
-				"parkingOccupancy.png");
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"parkingOccupancyByParkingTypes.png");
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"parkingOccupancyByParkingTypes.txt");
 
-		double matrix[][] = new double[96][4];
+		int numberOfColumns=4;
+		double matrix[][] = new double[96][numberOfColumns];
 
 		for (Id parkingId : parkingScoreCollector.parkingOccupancies.keySet()) {
 			Parking parking = parkingManager.getParkingsHashMap().get(parkingId);
@@ -218,7 +237,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		String title = "ParkingTypeOccupancies";
 		String xLabel = "time (15min-bin)";
 		String yLabel = "# of occupied parkings";
-		String[] seriesLabels = new String[4];
+		String[] seriesLabels = new String[numberOfColumns];
 		seriesLabels[0] = "garageParkings";
 		seriesLabels[1] = "privateParkings";
 		seriesLabels[2] = "publicParkingsOutsideCityZH";
@@ -226,10 +245,16 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		double[] xValues = new double[96];
 
 		for (int i = 0; i < 96; i++) {
-			xValues[i] = i / (double) 4;
+			xValues[i] = i / (double) numberOfColumns;
 		}
 
-		GeneralLib.writeGraphic(iterationFilename, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		GeneralLib.writeGraphic(iterationFilenamePng, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		
+		String txtFileHeader=seriesLabels[0];
+		for (int i=1;i<numberOfColumns;i++){
+			txtFileHeader+="\t"+seriesLabels[i];
+		}
+		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
 	private void writeOutParkingOccupancies(Controler controler) {
@@ -268,6 +293,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Parking Walking Distance - It." + controler.getIterationNumber(), "distance", "number");
+		
+		writeOutWalkingDistanceHistogramToTxtFile(controler,values);
+	}
+
+	private void writeOutWalkingDistanceHistogramToTxtFile(Controler controler, double[] values) {
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"walkingDistanceHistogramm.txt");
+		
+		GeneralLib.writeArrayToFile(values, fileName, "parkingWalkingDistances [m]");
 	}
 
 	private void writeWalkingDistanceStatisticsGraph(Controler controler, HashMap<Id, Double> walkingDistance) {
