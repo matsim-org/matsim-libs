@@ -26,21 +26,19 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
-public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
-ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
+public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+AgentArrivalEventHandler, AgentDepartureEventHandler{
 
 	private final Network network;
 	private final HbefaColdEmissionTable hbefaColdTable;
@@ -49,11 +47,11 @@ ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
 
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> linkleave = new TreeMap<Id, Double>();
-	private final Map<Id, Double> activityend = new TreeMap<Id, Double>();
-	private final Map<Id, Double> activitystart = new TreeMap<Id, Double>();
-	
-	private final  Map<Id, Double> accumulate = new TreeMap<Id, Double>();
-	private final  Map<Id, Double> activityDuration = new TreeMap<Id, Double>();
+	private final Map<Id, Double> startEngine = new TreeMap<Id, Double>();
+	private final Map<Id, Double> stopEngine = new TreeMap<Id, Double>();
+
+	private final  Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
+	private final  Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
 
 	public ColdEmissionHandler(
 			final Network network,
@@ -76,84 +74,73 @@ ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		//				Id personId= event.getPersonId();
-		//				Id linkId = event.getLinkId();
-		//				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
-		//					//System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
-		//					coldstartAnalyseModul.calculatePerPersonPtBikeWalk(personId, linkId,this.hbefaColdTable);
-		//					}
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		Id personId= event.getPersonId();	
-		Id linkId = event.getLinkId();
-
-		this.activitystart.put(event.getPersonId(), event.getTime());
-
-		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-		double distance = link.getLength();
-
-		if(this.accumulate.containsKey(personId) && this.activityDuration.containsKey(personId)){
-
-			double totalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
-			double actDuration = this.activityDuration.get(personId);
-			//				String id = event.getPersonId().toString();
-			//				if(id.contains("569253.3#11147"))	
-			//				System.out.println("TotalDistance " +TotalDistance + " actDuration " + actDuration);
-			this.coldEmissionAnalysisModule.calculateColdEmissions(linkId, personId, actDuration, totalDistance, this.hbefaColdTable);
-			//				System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
-			this.accumulate.remove(personId);
-
-		}
-		else {
-			this.accumulate.put(personId, distance);
-			this.activityDuration.put(personId, event.getTime());
-
-			double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
-			double actDuration = this.activityDuration.get(personId);
-
-			this.coldEmissionAnalysisModule.calculateColdEmissions(linkId, personId, actDuration, TotalDistance, this.hbefaColdTable);
-		}	
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent  event) {
-		Id personId= event.getPersonId();
-
-		this.activityend.put(event.getPersonId(), event.getTime());
-
-		if (this.activityDuration.containsKey(personId)){
-			double actstart = this.activitystart.get(personId);// EndTime
-			double actDuration = event.getTime() - actstart;
-			this.activityDuration.put(personId, actDuration);
-			//		String id = event.getPersonId().toString();
-			//		if(id.contains("569253.3#11147"))	
-			//			System.out.println("startTime" +event.getTime()+"actDuration" + actDuration);
-		}
-	}
-
-	@Override
 	public void handleEvent(LinkLeaveEvent event) {	
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
-
-		this.linkleave.put(event.getPersonId(), event.getTime());
+		Double time = event.getTime();
+		this.linkleave.put(personId, time);
 
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
-		double distance = link.getLength();
+		double linkLength = link.getLength();
 
-		if (this.accumulate.get(personId) != null){
+		if (this.accumulatedDistance.get(personId) != 0.0){
+			double distanceSoFar = this.accumulatedDistance.get(personId);
+			this.accumulatedDistance.put(personId, distanceSoFar + linkLength);
+		}
+		else{
+			this.accumulatedDistance.put(personId, linkLength);
+		}
+	}
 
-			double oldValue = this.accumulate.get(personId);
-			this.accumulate.put(personId, oldValue + distance);
-			//		String id = event.getPersonId().toString();
-			//		if(id.contains("569253.3#11147"))		
-			//			System.out.println(event.getLinkId()+"   "+distance);
-		}
-		else {
-			this.accumulate.put(personId, distance);
-		}
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+//		if(event.getLegMode().equals("car")){
+			Id personId= event.getPersonId();
+			Double stopEngineTime = event.getTime();
+			this.stopEngine.put(personId, stopEngineTime);
+//		}
+//		else{
+//			// no engine to stop...
+//		}
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+//		if(event.getLegMode().equals("car")){
+			Id personId= event.getPersonId();	
+			Id linkId = event.getLinkId();
+			Double startEngineTime = event.getTime();
+			this.startEngine.put(personId, startEngineTime);
+
+			Double parkingDuration;
+			if (this.stopEngine.containsKey(personId)){
+				double stopEngineTime = this.stopEngine.get(personId);
+				parkingDuration = startEngineTime - stopEngineTime;
+			}
+			else{
+				parkingDuration = startEngineTime; //parking duration is assumed to be the time from midnight to engine start time
+			}
+			this.parkingDuration.put(personId, parkingDuration);
+
+			Double accumulatedDistance;
+			if(this.accumulatedDistance.containsKey(personId)){
+				accumulatedDistance = this.accumulatedDistance.get(personId);
+			}
+			else{
+				accumulatedDistance = 0.0;
+				this.accumulatedDistance.put(personId, 0.0);
+			}
+			this.coldEmissionAnalysisModule.calculateColdEmissions(
+					linkId,
+					personId,
+					startEngineTime,
+					parkingDuration,
+					accumulatedDistance,
+					this.hbefaColdTable,
+					this.emissionEventsManager);
+//		}
+//		else{
+//			// no emissions to calculate...
+//		}
 	}
 }

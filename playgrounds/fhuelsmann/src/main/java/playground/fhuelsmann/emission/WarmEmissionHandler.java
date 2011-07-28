@@ -132,7 +132,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			else{
 				// do nothing
 			}
-			warmEmissionAnalysisModule.calculateWarmEmissions(
+			this.warmEmissionAnalysisModule.calculateWarmEmissions(
 					linkId,
 					personId,
 					roadType,
@@ -141,9 +141,9 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 					enterTime,
 					travelTime,
 					fuelSizeAge,
-					hbefaTable,
-					hbefaHdvTable,
-					eventsManager);
+					this.hbefaTable,
+					this.hbefaHdvTable,
+					this.eventsManager);
 		}
 		else{
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){

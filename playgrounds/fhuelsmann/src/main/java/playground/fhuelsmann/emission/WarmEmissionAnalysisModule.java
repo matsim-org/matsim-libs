@@ -63,7 +63,7 @@ public class WarmEmissionAnalysisModule{
 			Integer roadType, Double freeVelocity, Double linkLength,
 			Double enterTime, Double travelTime, String ageFuelCcm,
 			HbefaObject[][] hbefaTable, HbefaObject[][] hbefaHdvTable,
-			EventsManager eventsManager) {
+			EventsManager emissionEventsManager) {
 		
 		completeAndValidVehInfo = false;
 
@@ -134,7 +134,7 @@ public class WarmEmissionAnalysisModule{
 			}
 		}
 		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
-		eventsManager.processEvent(warmEmissionEvent);
+		emissionEventsManager.processEvent(warmEmissionEvent);
 	}
 
 	public Map<String, Double> calculateDetailedEmissions(Map<String, double[][]> hashOfPollutant, double travelTime, double linkLength){

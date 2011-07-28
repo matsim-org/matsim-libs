@@ -130,33 +130,6 @@ public class EmissionTool {
 		logger.info("Terminated. Output can be found in " + outputFile);
 	}
 
-	private void loadScenario() {
-		Config config = scenario.getConfig();
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(plansFile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
-		scenarioLoader.loadScenario();
-	}
-
-	private void defineListOfPollutants() {
-		listOfPollutants.add("FC");
-		listOfPollutants.add("NOx");
-		listOfPollutants.add("CO2(total)");
-		listOfPollutants.add("NO2");
-		listOfPollutants.add("PM");
-		//		listOfPollutants.add("Benzene");
-		//		listOfPollutants.add("CH4");
-		//		listOfPollutants.add("CO");
-		//		listOfPollutants.add("CO(rep.)");
-		//		listOfPollutants.add("HC");
-		//		listOfPollutants.add("NH3");
-		//		listOfPollutants.add("NMHC");
-		//		listOfPollutants.add("Pb");
-		//		listOfPollutants.add("N20");
-		//		listOfPollutants.add("PN");
-		//		listOfPollutants.add("SO2");
-	}
-
 	private String[][] createRoadTypesTafficSituation(
 			String filename) {
 		String[][] roadTypesTrafficSituations = new String[100][4];
@@ -210,6 +183,33 @@ public class EmissionTool {
 		catch (Exception e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void loadScenario() {
+		Config config = scenario.getConfig();
+		config.network().setInputFile(netFile);
+//		config.plans().setInputFile(plansFile);
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
+		scenarioLoader.loadScenario();
+	}
+
+	private void defineListOfPollutants() {
+		listOfPollutants.add("FC");
+		listOfPollutants.add("NOx");
+		listOfPollutants.add("CO2(total)");
+		listOfPollutants.add("NO2");
+		listOfPollutants.add("PM");
+		//		listOfPollutants.add("Benzene");
+		//		listOfPollutants.add("CH4");
+		//		listOfPollutants.add("CO");
+		//		listOfPollutants.add("CO(rep.)");
+		//		listOfPollutants.add("HC");
+		//		listOfPollutants.add("NH3");
+		//		listOfPollutants.add("NMHC");
+		//		listOfPollutants.add("Pb");
+		//		listOfPollutants.add("N20");
+		//		listOfPollutants.add("PN");
+		//		listOfPollutants.add("SO2");
 	}
 
 	public static void main (String[] args) throws Exception{
