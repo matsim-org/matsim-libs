@@ -23,6 +23,7 @@ import org.apache.commons.math.linear.BlockRealMatrix;
 import org.apache.commons.math.linear.DecompositionSolver;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.SingularValueDecompositionImpl;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -36,30 +37,53 @@ import playground.droeder.Vector2D;
  */
 public class StraightComparer{
 	
+	private static final Logger log = Logger.getLogger(StraightComparer.class);
+	
 	private Straight one;
 	private Straight two;
 	private Coord baseA_CD, baseB_CD, baseC_AB, baseD_AB;
-
+	private double angle;
+	private double avDist;
+	private double matchedLengthOne;
+	private double matchedLengthTwo;
+	private boolean match = false;
+	private boolean oneIsUnderShot;
+	
 	public StraightComparer(Straight one, Straight two){
 		this.one = one;
 		this.two = two;
-		this.computeBases();
+		this.angle = GeoCalculator.angleBeetween2Straights(
+				new Tuple<Coord, Coord>(this.one.getStart(), this.one.getEnd()), 
+				new Tuple<Coord, Coord>(this.two.getStart(), this.two.getEnd()));
+		this.computeValues();
 	}
-	
-	public boolean straightOneIsUndershot(){
-		if(isVertical(one) || isVertical(two)){
-			if(one.getEnd().getY() < two.getEnd().getY()){
-				return true;
+
+	private void computeValues() {
+		if(this.angle == 0.0){
+			if(isVertical(this.one) && isVertical(this.two)){
+				this.handleVertical();
+			}else if(isHorizontal(this.one) && isHorizontal(this.two)){
+				this.handleHorizontal();
 			}else{
-				return false;
+				this.handleParallel();
 			}
-		}else{
-			if(one.getEnd().getX() < two.getEnd().getX()){
-				return true;
-			}
-			return false;
+		}else if(this.angle < (Math.PI / 2)){
+			//if the angle beetween two straights is bigger than Pi/2 they point into different directions and can't match
+			this.handleSomeAngle();
 		}
 	}
+
+	/**
+	 * @param one2
+	 * @return
+	 */
+	private boolean isHorizontal(Straight s) {
+		if(s.getStart().getY() == s.getEnd().getY()){
+			return true;
+		}
+		return false;
+	}
+
 	
 	/**
 	 * @param one2
@@ -71,61 +95,118 @@ public class StraightComparer{
 		}
 		return false;
 	}
-
-	private void computeBases() {
-		this.baseA_CD = this.getBase(two, one.getStart());
-		this.baseB_CD = this.getBase(two, one.getEnd());
-		this.baseC_AB = this.getBase(one, two.getStart());
-		this.baseD_AB = this.getBase(one, two.getEnd());
-//		if(!(baseA_CD== null)) System.out.println("A_CD: " + baseA_CD.toString());
-//		if(!(baseB_CD== null)) System.out.println("B_CD: " + baseB_CD.toString());
-//		if(!(baseC_AB== null)) System.out.println("C_AB: " + baseC_AB.toString());
-//		if(!(baseD_AB== null)) System.out.println("D_AB: " + baseD_AB.toString());
+	
+	/**
+	 * 
+	 */
+	private void handleHorizontal() {
+		//prepare for easier handling
+		double x11, x12, x21, x22;
+		x11 = one.getStart().getX();
+		x12 = one.getEnd().getX();
+		if(x11 <= x12){
+			x21 = two.getStart().getX();
+			x22 = two.getEnd().getX();
+			if(!(x21 > x22)){
+				log.error("if the angle is smaller than Pi/2 this should not happen!");
+			}
+		}else{
+			x11 = one.getEnd().getX();
+			x12 = one.getStart().getX();
+			x21 = two.getEnd().getX();
+			x22 = two.getStart().getX();
+			if(!(x21 > x22)){
+				log.error("if the angle is smaller than Pi/2 this should not happen!");
+			}
+		}
+		
+		/* 	x11 --- x12
+		 *  x21  -- x22
+		 */ 
+		if(x11 < x21){
+			if(x12 < x22){
+				/* 	x11 --  x12
+				 *  x21  -- x22
+				 */ 
+				if(x12 > x21){
+					
+				}else{
+					this.setNoMatch();
+				}
+			}
+			/* 	x11 ---- x12
+			 *  x21  --  x22
+			 */ 
+			else{
+				
+			}
+		}else{
+			
+		}
 	}
 	
+	/**
+	 * 
+	 */
+	private void handleVertical() {
+		double y11, y12, y21, y22;
+		
+		
+		y11 = one.getStart().getY();
+		y12 = one.getEnd().getY();
+		y21 = two.getStart().getY();
+		y22 = two.getEnd().getY();
+	}
+
+	/**
+	 * 
+	 */
+	private void handleParallel() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * 
+	 */
+	private void handleSomeAngle() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void setNoMatch(){
+		this.match = false;
+		this.matchedLengthOne = 0;
+		this.matchedLengthTwo = 0;
+		this.avDist = 0;
+	}
+	
+	public boolean matched(){
+		return this.match;
+	}
+	
+	public boolean straightOneIsUndershot(){
+		return this.oneIsUnderShot;
+	}
+	
+	public Double getAngle(){
+		return this.angle;
+	}
+
 	public double getAverageDistance(){
-		return Math.min(getMinDist(one.getStart(), baseC_AB, two.getStart(), baseA_CD), getMinDist(one.getEnd(), baseD_AB, two.getEnd(), baseB_CD));
+		return this.avDist;
 	}
 	
-	private Double getMinDist(Coord point1, Coord baseOn1, Coord point2, Coord baseOn2){
-		if(baseOn1 == null && baseOn2 == null){
-			return GeoCalculator.distanceBetween2Points(point1, point2);
-		}else if(baseOn1 == null){
-			return Math.min(GeoCalculator.distanceBetween2Points(point1, point2), GeoCalculator.distanceBetween2Points(point1, baseOn2));
-		}else if(baseOn2 == null){
-			return Math.min(GeoCalculator.distanceBetween2Points(point1, point2), GeoCalculator.distanceBetween2Points(point2, baseOn1));
-		}else{
-			return Double.MAX_VALUE;
-		}
-	}
-	
-	public Double getTotalMatchedLengthStraightOne(){
-		if(this.baseA_CD == null && this.baseB_CD == null && this.baseC_AB == null && this.baseD_AB == null){
-			return 0.0;
-		}else if(this.baseC_AB == null && this.baseD_AB == null){
-			return GeoCalculator.distanceBetween2Points(one.getStart(), one.getEnd());
-		}else if(this.baseC_AB == null){
-			return GeoCalculator.distanceBetween2Points(one.getStart(), this.baseD_AB);
-		}else if (this.baseD_AB == null){
-			return GeoCalculator.distanceBetween2Points(this.baseC_AB, one.getEnd());
-		}else{
-			return GeoCalculator.distanceBetween2Points(this.baseC_AB, this.baseD_AB);
-		}
+	public Double getMatchedLengthOne(){
+		return this.matchedLengthOne;
 	}
 
-	public Double getTotalMatchedLengthStraightTwo(){
-		if(this.baseA_CD == null && this.baseB_CD == null && this.baseC_AB == null && this.baseD_AB == null){
-			return 0.0;
-		}else if(this.baseA_CD == null && this.baseB_CD== null){
-			return GeoCalculator.distanceBetween2Points(two.getStart(), two.getEnd());
-		}else if(this.baseA_CD == null){
-			return GeoCalculator.distanceBetween2Points(two.getStart(), this.baseB_CD);
-		}else if(this.baseB_CD == null){
-			return GeoCalculator.distanceBetween2Points(this.baseA_CD, two.getEnd());
-		}else{
-			return GeoCalculator.distanceBetween2Points(baseA_CD, baseB_CD);
-		}
+	public Double getMatchedLengthTwo(){
+		return this.matchedLengthTwo;
 	}
+	
+	
+	
 	/*
 	 * computes the base of the perpendicular of the "point" on the straight s
 	 */
@@ -188,12 +269,6 @@ public class StraightComparer{
 			}
 		}
 		return null;
-	}
-	
-	public Double getAngle(){
-		return GeoCalculator.angleBeetween2Straights(
-				new Tuple<Coord, Coord>(this.one.getStart(), this.one.getEnd()), 
-				new Tuple<Coord, Coord>(this.two.getStart(), this.two.getEnd()));
 	}
 }
 

@@ -22,6 +22,7 @@ package playground.droeder;
 import org.apache.commons.math.geometry.Vector3D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author droeder
@@ -59,6 +60,14 @@ public class GeoCalculator {
 			return Math.acos(value);
 		}
 	}
+	
+	public static double angleStraight2e1(Tuple<Coord, Coord> one){
+		return angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0)));
+	}
+	
+//	public static double angleBeetween2StraightsDeg(Tuple<Coord, Coord> one, Tuple<Coord, Coord> two){
+//		return (angleBeetween2Straights(one, two)/(Math.PI * 2) * 360);
+//	}
 	
 	@Deprecated
 	public static double averageStraightDistance(Tuple<Coord, Coord> straightOne, Tuple<Coord, Coord> straightTwo){

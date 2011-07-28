@@ -40,9 +40,9 @@ public class SegmentCompare extends AbstractCompare{
 				new Straight(cand.getStart(), cand.getEnd()));
 		this.deltaAngle = c.getAngle();
 		this.avDist = c.getAverageDistance();
-		this.matchedLengthRef = c.getTotalMatchedLengthStraightOne();
+		this.matchedLengthRef = c.getMatchedLengthOne();
 		this.lengthDiffRef = 1- (matchedLengthRef / ref.getLength());
-		this.matchedLengthCand = c.getTotalMatchedLengthStraightTwo();
+		this.matchedLengthCand = c.getMatchedLengthTwo();
 		this.lenghtDiffCand = 1 - (matchedLengthCand / cand.getLength());
 		this.sOneIsUndershot = c.straightOneIsUndershot();
 	}

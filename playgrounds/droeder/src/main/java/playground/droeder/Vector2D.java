@@ -85,9 +85,10 @@ public class Vector2D {
 		return ((this.x * v.getX()) + (this.y * v.getY()));
 	}
 	
-	public void addFactor(Double f){
+	public Vector2D addFactor(Double f){
 		this.x = this.x * f;
 		this.y = this.y * f;
+		return this;
 	}
 	
 	@Override
