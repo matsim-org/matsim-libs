@@ -1,4 +1,3 @@
-package playground.fhuelsmann.emission;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhEmissions.java
@@ -18,6 +17,7 @@ package playground.fhuelsmann.emission;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.fhuelsmann.emission;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -23,10 +23,6 @@
 
 package playground.fhuelsmann.emission;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,16 +44,17 @@ public class WarmEmissionAnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
 	private final VisumObject[] roadTypes;
+	private final String[][] roadTypesTrafficSituations;
+	
 	private final HbefaHot hbefaHot;
 	private final ArrayList<String> listOfPollutant;
 	private static int vehInfoWarnCnt = 0;
 	private static int maxVehInfoWarnCnt = 10;
 	private boolean completeAndValidVehInfo;
 
-	private final String[][] roadTypesTrafficSituations = new String[100][4];
-
-	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant, VisumObject[] roadTypes, HbefaHot hbefahot){
+	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant, VisumObject[] roadTypes, String[][] roadTypesTrafficSituations, HbefaHot hbefahot){
 		this.roadTypes = roadTypes;
+		this.roadTypesTrafficSituations = roadTypesTrafficSituations;
 		this.hbefaHot = hbefahot;
 		this.listOfPollutant = listOfPollutant;
 	}
@@ -206,65 +203,10 @@ public class WarmEmissionAnalysisModule{
 		}
 		return avgEmissionsOfEvent;
 	}
-	
-	// TODO: Put in some reader
-	public void createRoadTypesTafficSituation(String filename) {
-		int[] counter = new int[100];
-		for(int i=0; i<100;i++)
-			counter[i]=0;
-		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			// Get the object of DataInputStream
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine="";
-			//Read File Line By Line
-			br.readLine();
-
-			while ((strLine = br.readLine()) != null){
-
-				//for all lines (whole text) we split the line to an array 
-				String[] array = strLine.split(";");
-				int roadtype=Integer.valueOf(array[0]);
-				int traficSitIndex = counter[roadtype]++;
-				//			System.out.println(roadtype+";"+traficSitIndex);
-				this.roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3]; 	
-				//		System.out.println("5.05" + this.vehicleCharacteristic);
-			}
-			in.close();
-		}
-		catch (Exception e){
-			logger.error("Error: " + e);
-		}
-	}
-
-	// TODO: Put in some reader
-	public void createRoadTypes(String filename){
-		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			// Get the object of DataInputStream
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine;
-			//Read File Line By Line
-			br.readLine();
-			while ((strLine = br.readLine()) != null){
-
-				//for all lines (whole text) we split the line to an array 
-				String[] array = strLine.split(",");
-				VisumObject obj = new VisumObject(Integer.parseInt(array[0]), array[2]);
-				this.roadTypes[obj.getVISUM_RT_NR()] = obj;
-			}
-			in.close();
-		}
-		catch (Exception e){
-			System.err.println("Error: " + e.getMessage());
-		}
-	}
 
 	public String makeKey(String pollutant, int roadType, String technology, String Sizeclass, String EmConcept, int traficSitNumber){
 		return "PC[3.1]" + ";" + "pass. car" + ";" + "2010" + ";" + ";" + pollutant + ";" + ";" + this.roadTypesTrafficSituations[roadType][traficSitNumber]
-		                                                                                                                                    + ";" + "0%" + ";" + technology + ";" + Sizeclass + ";" + EmConcept + ";";
+		       + ";" + "0%" + ";" + technology + ";" + Sizeclass + ";" + EmConcept + ";";
 	}
 
 	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer

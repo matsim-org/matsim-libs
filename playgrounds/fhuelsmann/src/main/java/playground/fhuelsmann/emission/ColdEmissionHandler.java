@@ -1,4 +1,5 @@
 /* *********************************************************************** *
+ /* *********************************************************************** *
  * project: org.matsim.*
  * FhEmissions.java
  *                                                                         *
@@ -16,6 +17,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
+ *                                                                         
  * *********************************************************************** */
 package playground.fhuelsmann.emission;
 
@@ -37,28 +39,32 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
-public class ColdEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler,
+public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
 ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
 
 	private final Network network;
 	private final HbefaColdEmissionTable hbefaColdTable;
-	private final ColdEmissionAnalysisModule coldstartAnalysisModule;
+	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	private final EventsManager emissionEventsManager;
-
-	public ColdEmissionHandler(final Network network, HbefaColdEmissionTable hbefaTable, ColdEmissionAnalysisModule coldEmissionAnalysisModule, EventsManager emissionEventsManager ) {
-		this.network = network;
-		this.hbefaColdTable = hbefaTable;
-		this.coldstartAnalysisModule = coldEmissionAnalysisModule;
-		this.emissionEventsManager = emissionEventsManager;
-	}
 
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> linkleave = new TreeMap<Id, Double>();
 	private final Map<Id, Double> activityend = new TreeMap<Id, Double>();
 	private final Map<Id, Double> activitystart = new TreeMap<Id, Double>();
-
+	
 	private final  Map<Id, Double> accumulate = new TreeMap<Id, Double>();
 	private final  Map<Id, Double> activityDuration = new TreeMap<Id, Double>();
+
+	public ColdEmissionHandler(
+			final Network network,
+			HbefaColdEmissionTable hbefaTable,
+			ColdEmissionAnalysisModule coldEmissionAnalysisModule,
+			EventsManager emissionEventsManager ){
+		this.network = network;
+		this.hbefaColdTable = hbefaTable;
+		this.coldEmissionAnalysisModule = coldEmissionAnalysisModule;
+		this.emissionEventsManager = emissionEventsManager;
+	}
 
 	@Override
 	public void reset(int iteration) {
@@ -89,31 +95,27 @@ ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double distance = link.getLength();
 
-
-		if (this.accumulate.containsKey(personId) && this.activityDuration.containsKey(personId)){
+		if(this.accumulate.containsKey(personId) && this.activityDuration.containsKey(personId)){
 
 			double totalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
 			double actDuration = this.activityDuration.get(personId);
 			//				String id = event.getPersonId().toString();
 			//				if(id.contains("569253.3#11147"))	
 			//				System.out.println("TotalDistance " +TotalDistance + " actDuration " + actDuration);
-			this.coldstartAnalysisModule.calculateColdEmissionsPerLink(personId, actDuration, totalDistance, this.hbefaColdTable);
+			this.coldEmissionAnalysisModule.calculateColdEmissions(linkId, personId, actDuration, totalDistance, this.hbefaColdTable);
 			//				System.out.println("personId "+ personId + " actStart " +actStart+ " actDuration " + actDuration+ " Distance " + TotalDistance );
 			this.accumulate.remove(personId);
 
 		}
 		else {
-			// System.out.println("count1    "+count1++);
-
 			this.accumulate.put(personId, distance);
 			this.activityDuration.put(personId, event.getTime());
 
 			double TotalDistance =  this.accumulate.get(personId);//without Distance of LinkID of startact; one link is counted too much
 			double actDuration = this.activityDuration.get(personId);
 
-			this.coldstartAnalysisModule.calculateColdEmissionsPerLink(personId, actDuration, TotalDistance, this.hbefaColdTable);
+			this.coldEmissionAnalysisModule.calculateColdEmissions(linkId, personId, actDuration, TotalDistance, this.hbefaColdTable);
 		}	
-
 	}
 
 	@Override

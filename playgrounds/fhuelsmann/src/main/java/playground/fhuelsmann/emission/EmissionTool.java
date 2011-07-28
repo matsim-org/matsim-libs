@@ -20,6 +20,10 @@
 
 package playground.fhuelsmann.emission;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -38,7 +42,6 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
 import playground.fhuelsmann.emission.objects.VisumObject;
-
 
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
@@ -93,10 +96,9 @@ public class EmissionTool {
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
 
-		VisumObject[] visumObject = new VisumObject[100];
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutants, visumObject, hbefaHot);
-		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
-		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+		VisumObject[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
+		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutants, roadTypes, roadTypesTrafficSituations, hbefaHot);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 
 		// create two event manager
@@ -153,6 +155,61 @@ public class EmissionTool {
 		//		listOfPollutants.add("N20");
 		//		listOfPollutants.add("PN");
 		//		listOfPollutants.add("SO2");
+	}
+
+	private String[][] createRoadTypesTafficSituation(
+			String filename) {
+		String[][] roadTypesTrafficSituations = new String[100][4];
+		int[] counter = new int[100];
+		for(int i=0; i<100;i++)
+			counter[i]=0;
+		try{
+			FileInputStream fstream = new FileInputStream(filename);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine="";
+			//Read File Line By Line
+			br.readLine();
+	
+			while ((strLine = br.readLine()) != null){
+				//for all lines (whole text) we split the line to an array 
+				String[] array = strLine.split(";");
+				int roadtype=Integer.valueOf(array[0]);
+				int traficSitIndex = counter[roadtype]++;
+				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3];
+			}
+			in.close();
+			return roadTypesTrafficSituations;
+		}
+		catch (Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+
+	VisumObject[] createRoadTypes(String filename){
+		VisumObject[] roadTypes = new VisumObject[100];
+		try{
+			FileInputStream fstream = new FileInputStream(filename);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			//Read File Line By Line
+			br.readLine();
+			while ((strLine = br.readLine()) != null){
+	
+				//for all lines (whole text) we split the line to an array 
+				String[] array = strLine.split(",");
+				VisumObject obj = new VisumObject(Integer.parseInt(array[0]), array[2]);
+				roadTypes[obj.getVISUM_RT_NR()] = obj;
+			}
+			in.close();
+			return roadTypes;
+		}
+		catch (Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void main (String[] args) throws Exception{
