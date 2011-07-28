@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,11 +44,10 @@ import playground.fhuelsmann.emission.objects.HbefaObject;
 import playground.fhuelsmann.emission.objects.HotValue;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
-public class WarmEmissionAnalysisModule implements AnalysisModule{
+public class WarmEmissionAnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
 	private final VisumObject[] roadTypes;
-	private final EmissionsPerEvent emissionPerEvent;
 	private final HbefaHot hbefaHot;
 	private final ArrayList<String> listOfPollutant;
 	private static int vehInfoWarnCnt = 0;
@@ -56,18 +56,12 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 
 	private final String[][] roadTypesTrafficSituations = new String[100][4];
 
-	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant, VisumObject[] roadTypes, EmissionsPerEvent emissionFactor, HbefaHot hbefahot) {
+	public WarmEmissionAnalysisModule(ArrayList<String> listOfPollutant, VisumObject[] roadTypes, HbefaHot hbefahot){
 		this.roadTypes = roadTypes;
-		this.emissionPerEvent = emissionFactor;
 		this.hbefaHot = hbefahot;
 		this.listOfPollutant = listOfPollutant;
 	}
 
-	public  String findHbefaFromVisumRoadType(int roadType){
-		return this.roadTypes[roadType].getHBEFA_RT_NR();
-	}
-
-	@Override
 	public void calculateWarmEmissions(Id linkId, Id personId,
 			Integer roadType, Double freeVelocity, Double linkLength,
 			Double enterTime, Double travelTime, String ageFuelCcm,
@@ -77,9 +71,6 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		completeAndValidVehInfo = false;
 
 		// TODO: use freeVelocity, not hbefa value!
-		// TODO: Delete EmissionPerEvent, transfer important methods to this class
-		// TODO: Kill this array, set return type to Map
-		double [] emissionsOfEvent;
 		Map<String, Double> warmEmissions = new HashMap<String, Double>();
 		Map<String, double[][]> hashOfPollutant = new TreeMap<String, double[][]>();
 
@@ -125,12 +116,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		}
 
 		if(completeAndValidVehInfo){
-			emissionsOfEvent = emissionPerEvent.calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
-			for(int i = 0; i < listOfPollutant.size(); i++){
-				String pollutant = listOfPollutant.get(i);
-				Double value = emissionsOfEvent[i];
-				warmEmissions.put(pollutant, value);
-			}
+			warmEmissions = calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
 		}
 		else{
 			if(vehInfoWarnCnt < maxVehInfoWarnCnt){
@@ -139,26 +125,89 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 				if (vehInfoWarnCnt == maxVehInfoWarnCnt)
 					logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
-			// linkage between Hbefa road types and Visum road types
+			// "linkage between Hbefa road types and Visum road types" -- WHY another mapping here?!?
 			int hbefaRoadType = Integer.valueOf(findHbefaFromVisumRoadType(roadType));
 
+			// TODO: use freeVelocity, not hbefa value!
 			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
-				emissionsOfEvent = emissionPerEvent.calculateAverageEmissions (listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaTable);
+				warmEmissions = calculateAverageEmissions (listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaTable);
 			}
 			else{// HDV emissions; TODO: "only for CO2 and FC are values available, otherwise 0.0", "so far only fc and co2 emissionFactors are listed in the hbefaHdvTable" --- WHAT?!?
-				emissionsOfEvent = emissionPerEvent.calculateAverageEmissions(listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaHdvTable);
-			}
-			for(int i = 0; i < listOfPollutant.size(); i++){
-				String pollutant = listOfPollutant.get(i);
-				Double value = emissionsOfEvent[i];
-				warmEmissions.put(pollutant, value);
+				warmEmissions = calculateAverageEmissions(listOfPollutant, hbefaRoadType, travelTime, linkLength, hbefaHdvTable);
 			}
 		}
 		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
 		eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	// TODO: Put in main
+	public Map<String, Double> calculateDetailedEmissions(Map<String, double[][]> hashOfPollutant, double travelTime, double linkLength){
+		Map<String, Double> emissionsOfEvent = new HashMap<String, Double>();
+		
+		for( Entry<String, double[][]> entry : hashOfPollutant.entrySet() ){
+
+			String pollutant = entry.getKey();
+			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
+
+			double freeFlowSpeed = entry.getValue()[0][0]; // freeFlow
+			double stopGoSpeed = entry.getValue()[3][0]; // Stop&Go
+
+			double efFreeFlow = entry.getValue()[0][1];
+			double efStopGo = entry.getValue()[3][1];
+
+			double freeFlowFraction = 0.0;
+			double stopGoFraction = 0.0;
+			double stopGoTime = 0.0;
+
+			if (averageSpeed < stopGoSpeed){
+				double generatedEmissions = linkLength / 1000 * efStopGo;
+				emissionsOfEvent.put(pollutant, generatedEmissions);
+			}
+			else {
+				stopGoTime= (linkLength / 1000) / averageSpeed - (linkLength / 1000) / freeFlowSpeed;
+
+				stopGoFraction = stopGoSpeed * stopGoTime;
+				freeFlowFraction = (linkLength / 1000) - stopGoFraction;
+				double generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
+				emissionsOfEvent.put(pollutant, generatedEmissions);
+			}
+		}
+		return emissionsOfEvent;
+	}
+
+	public Map<String, Double> calculateAverageEmissions(ArrayList<String> listOfPollutant, int Hbefa_road_type, double travelTime, double linkLength, HbefaObject[][] HbefaTable) {
+		Map<String, Double> avgEmissionsOfEvent = new HashMap<String, Double>();
+	
+		// TODO: Why can road type be 0 here?
+		if (Hbefa_road_type == 0){
+			for(String pollutant : listOfPollutant)	avgEmissionsOfEvent.put(pollutant, 0.0);
+		}
+		else {	
+			double freeFlowSpeed = HbefaTable[Hbefa_road_type][0].getVelocity();
+			double stopGoSpeed = HbefaTable[Hbefa_road_type][3].getVelocity();
+			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
+
+			for(String pollutant : listOfPollutant){
+				Double generatedEmissions;
+				Double efFreeFlow = HbefaTable[Hbefa_road_type][0].getEf(pollutant);
+				if(averageSpeed < stopGoSpeed){
+					generatedEmissions = linkLength / 1000 * efFreeFlow;
+					avgEmissionsOfEvent.put(pollutant, generatedEmissions);
+				}
+				else{
+					Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
+					Double stopGoFraction = stopGoSpeed * stopGoTime;
+					Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
+					Double efStopGo = HbefaTable[Hbefa_road_type][3].getEf(pollutant);
+					
+					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
+					avgEmissionsOfEvent.put(pollutant, generatedEmissions);
+				}
+			}
+		}
+		return avgEmissionsOfEvent;
+	}
+	
+	// TODO: Put in some reader
 	public void createRoadTypesTafficSituation(String filename) {
 		int[] counter = new int[100];
 		for(int i=0; i<100;i++)
@@ -189,7 +238,7 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		}
 	}
 
-	// TODO: Put in main
+	// TODO: Put in some reader
 	public void createRoadTypes(String filename){
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
@@ -197,9 +246,8 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			//Read first line:
+			//Read File Line By Line
 			br.readLine();
-			//Read File Line By Line:
 			while ((strLine = br.readLine()) != null){
 
 				//for all lines (whole text) we split the line to an array 
@@ -256,5 +304,9 @@ public class WarmEmissionAnalysisModule implements AnalysisModule{
 		else completeAndValidVehInfo = false;
 		
 		return fuelCcmEuro;
+	}
+
+	public  String findHbefaFromVisumRoadType(int roadType){
+		return this.roadTypes[roadType].getHBEFA_RT_NR();
 	}
 }

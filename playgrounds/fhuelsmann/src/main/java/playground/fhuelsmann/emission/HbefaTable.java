@@ -78,9 +78,6 @@ public class HbefaTable {
 						Double.parseDouble(array[11]), //NO2
 						Double.parseDouble(array[12])); // PM
 
-
-
-
 				int row = Integer.parseInt(array[1]);
 
 				this.hbefaTable [row] [place] = 
@@ -90,13 +87,9 @@ public class HbefaTable {
 				if (place==4) place =0;
 
 			}
-
-			//Close the input stream
 			in.close();
 		} catch (Exception e) {
-			// Pass this exception upwards, because there is no way we can continue if we couldn't read this file!
 			throw new RuntimeException(e);
 		}
 	}
-
 }

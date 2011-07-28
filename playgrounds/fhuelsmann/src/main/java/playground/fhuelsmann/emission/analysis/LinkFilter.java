@@ -1,4 +1,4 @@
-package playground.fhuelsmann.emission;
+package playground.fhuelsmann.emission.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;

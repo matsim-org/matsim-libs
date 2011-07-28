@@ -42,7 +42,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, AgentDepartureEventHandler{
 
 	private final Network network;
 	private final HbefaColdEmissionTable hbefaColdTable;
-	private final AnalysisModuleCold coldstartAnalysisModule;
+	private final ColdEmissionAnalysisModule coldstartAnalysisModule;
 	private final EventsManager emissionEventsManager;
 
 	public ColdEmissionHandler(final Network network, HbefaColdEmissionTable hbefaTable, ColdEmissionAnalysisModule coldEmissionAnalysisModule, EventsManager emissionEventsManager ) {

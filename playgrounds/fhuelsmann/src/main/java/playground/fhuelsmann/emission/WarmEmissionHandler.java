@@ -49,7 +49,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private final Vehicles vehicles;
 	private final HbefaObject[][] hbefaTable;
 	private final HbefaObject[][] hbefaHdvTable;
-	private final AnalysisModule linkAndAgentAccountAnalysisModule;
+	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	private final EventsManager eventsManager;
 	private static int linkLeaveWarnCnt = 0;
 	private static int maxLinkLeaveWarnCnt = 10;
@@ -59,12 +59,12 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private final Map<Id, Double> agentdeparture = new HashMap<Id, Double>();
 
 	public WarmEmissionHandler(Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable,
-			HbefaObject[][] hbefaHdvTable, AnalysisModule linkAndAgentAccountAnalysisModule, EventsManager eventsManager) {
+			HbefaObject[][] hbefaHdvTable, WarmEmissionAnalysisModule warmEmissionAnalysisModule, EventsManager eventsManager) {
 		this.vehicles = vehicles;
 		this.network = network;
 		this.hbefaTable = hbefaTable;
 		this.hbefaHdvTable = hbefaHdvTable;
-		this.linkAndAgentAccountAnalysisModule = linkAndAgentAccountAnalysisModule;
+		this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
 		this.eventsManager = eventsManager;
 	}
 	public void reset(int iteration) {
@@ -132,7 +132,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			else{
 				// do nothing
 			}
-			linkAndAgentAccountAnalysisModule.calculateWarmEmissions(
+			warmEmissionAnalysisModule.calculateWarmEmissions(
 					linkId,
 					personId,
 					roadType,

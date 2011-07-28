@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Id;
 
 import playground.fhuelsmann.emission.objects.HbefaColdObject;
 
-public class ColdEmissionAnalysisModule implements AnalysisModuleCold{
+public class ColdEmissionAnalysisModule{
 
 
 	public Map<Id, Map<String,Double>> coldEmissionsPerson = new TreeMap<Id, Map<String,Double>>();

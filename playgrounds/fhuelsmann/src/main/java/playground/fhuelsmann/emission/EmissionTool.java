@@ -94,8 +94,7 @@ public class EmissionTool {
 		vehicleReader.readFile(vehicleFile);
 
 		VisumObject[] visumObject = new VisumObject[100];
-		EmissionsPerEvent emissionsPerEvent = new EmissionsPerEvent();
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutants, visumObject, emissionsPerEvent, hbefaHot);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutants, visumObject, hbefaHot);
 		warmEmissionAnalysisModule.createRoadTypes(visum2hbefaRoadTypeFile);
 		warmEmissionAnalysisModule.createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();

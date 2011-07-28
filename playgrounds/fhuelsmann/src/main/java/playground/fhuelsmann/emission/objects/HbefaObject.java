@@ -1,4 +1,3 @@
-package playground.fhuelsmann.emission.objects;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhMain.java
@@ -18,61 +17,25 @@ package playground.fhuelsmann.emission.objects;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.fhuelsmann.emission.objects;
 
 /**
-
-
 VehCat;Road_Category;IDTS;TS;S (speed);RPA;%stop;mKr;EF_Nox;EF_CO2(rep.);EF_CO2(total);NO2;PM
-
-**/
+ **/
 public class HbefaObject {
 
 	private static int Road_Category ;
-	private String IDTS;
-	private double velocity;
-	private double RPA;
-	private double stop;
-	
-	
-	public double getMkr() {
-		return mkr;
-	}
-	public void setMkr(double mkr) {
-		this.mkr = mkr;
-	}
-	public double getNo2() {
-		return no2;
-	}
-	public void setNo2(double no2) {
-		this.no2 = no2;
-	}
-	public double getPm() {
-		return pm;
-	}
-	public void setPm(double pm) {
-		this.pm = pm;
-	}
+	private final String IDTS;
+	private final double velocity;
+	private final double RPA;
+	private final double stop;
 
-	public double getEmissionFactorCo2Rep() {
-		return emissionFactorCo2Rep;
-	}
-	public void setEmissionFactorCo2Rep(double emissionFactorCo2Rep) {
-		this.emissionFactorCo2Rep = emissionFactorCo2Rep;
-	}
-	public double getEmissionFactorCo2Total() {
-		return emissionFactorCo2Total;
-	}
-	public void setEmissionFactorCo2Total(double emissionFactorCo2Total) {
-		this.emissionFactorCo2Total = emissionFactorCo2Total;
-	}
-	
-	private double emissionFactorNox;
-	private double mkr;
-	private double emissionFactorCo2Rep;
-	private double emissionFactorCo2Total;
-	private double no2;
-	private double pm;
-	
+	private final double emissionFactorNox;
+	private final double mkr;
+	private final double emissionFactorCo2Rep;
+	private final double emissionFactorCo2Total;
+	private final double no2;
+	private final double pm;
 
 	public HbefaObject(
 			int road_Category, 
@@ -86,53 +49,65 @@ public class HbefaObject {
 			double emissionFactorCo2Total,
 			double NO2, 
 			double PM){
-		
+
 		this.Road_Category= road_Category;
-		this.IDTS= iDTS;
-		this.velocity= velocity;
-		this.RPA=rPA;
-		this.stop= stop;
-		this.mkr= mkr;
+		this.IDTS = iDTS;
+		this.velocity = velocity;
+		this.RPA = rPA;
+		this.stop = stop;
+		this.mkr = mkr;
 		this.emissionFactorNox = emissionFactorNox;
 		this.emissionFactorCo2Rep = emissionFactorCo2Rep;
 		this.emissionFactorCo2Total = emissionFactorCo2Total;
-		this.no2 =NO2;
-		this.pm= PM;
-		
+		this.no2 = NO2;
+		this.pm = PM;
+
+	}
+
+	public double getMkr() {
+		return mkr;
+	}
+	public double getNo2() {
+		return no2;
+	}
+	public double getPm() {
+		return pm;
+	}
+	public double getEmissionFactorCo2Rep() {
+		return emissionFactorCo2Rep;
+	}
+	public double getEmissionFactorCo2Total() {
+		return emissionFactorCo2Total;
 	}
 	public double getEmissionFactorNox() {
 		return emissionFactorNox;
 	}
-	public void setEmissionFactorNox(double emissionFactorNox) {
-		this.emissionFactorNox = emissionFactorNox;
-	}
-	public int getRoad_Category() {
-		return Road_Category;
-	}
-	public void setRoad_Category(int road_Category) {
-		Road_Category = road_Category;
-	}
-	public String getIDTS() {
-		return IDTS;
-	}
-	public void setIDTS(String iDTS) {
-		IDTS = iDTS;
-	}
 	public double getVelocity() {
 		return velocity;
 	}
-	public void setVelocity(double velocity) {
-		this.velocity = velocity;
+//	public int getRoad_Category() {
+//		return Road_Category;
+//	}
+//	public String getIDTS() {
+//		return IDTS;
+//	}
+//	public double getRPA() {
+//		return RPA;
+//	}
+//	public double getStop() {
+//		return stop;
+//	}
+	
+	// TODO: change data format of HbefaTable!
+	public Double getEf(String pollutant) {
+		Double efFreeFlow = null;
+		
+		if(pollutant.equals("FC")) efFreeFlow = getMkr();
+		else if (pollutant.equals("NOx")) efFreeFlow = getEmissionFactorNox();
+		else if (pollutant.equals("CO2(total)")) efFreeFlow = getEmissionFactorCo2Total();
+		else if (pollutant.equals("NO2")) efFreeFlow = getNo2();
+		else if (pollutant.equals("PM")) efFreeFlow = getPm();
+		
+		return efFreeFlow;
 	}
-	public double getRPA() {
-		return RPA;
-	}
-	public void setRPA(double rPA) {
-		RPA = rPA;
-	}
-	public double getStop() {
-		return stop;
-	}
-	public void setStop(double stop) {
-		this.stop = stop;
-	}}
+}
