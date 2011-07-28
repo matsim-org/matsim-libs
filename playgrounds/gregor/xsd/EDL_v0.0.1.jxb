@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="1.0"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              schemaLocation = "EDL_v0.0.1.xsd">
+
+<jxb:globalBindings>
+   <jxb:javaType name="int"  xmlType="xs:positiveInteger"
+                  parseMethod="javax.xml.bind.DatatypeConverter.parseInt" 
+                  printMethod="javax.xml.bind.DatatypeConverter.printInt"/> 
+</jxb:globalBindings>
+
+
+
+<jxb:schemaBindings>
+  <jxb:package name="playground.gregor.grips.jaxb.EDL001" />
+  <jxb:nameXmlTransform>
+    <jxb:elementName prefix="XML" />
+    <jxb:typeName prefix="XML"  />
+    <jxb:modelGroupName prefix="XML" />
+    <jxb:anonymousTypeName prefix="XML" />
+  </jxb:nameXmlTransform>      
+              
+</jxb:schemaBindings>              
+              
+</jxb:bindings>
+
+
