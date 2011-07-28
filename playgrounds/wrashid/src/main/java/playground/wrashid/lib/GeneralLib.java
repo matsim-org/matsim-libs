@@ -785,7 +785,7 @@ public class GeneralLib {
 		double matrix[][]=new double[array.length][1];
 		
 		for (int i=0;i<array.length;i++){
-			matrix[i][1]=array[i];
+			matrix[i][0]=array[i];
 		}
 		
 		GeneralLib.writeMatrix(matrix, fileName, headerLine);
