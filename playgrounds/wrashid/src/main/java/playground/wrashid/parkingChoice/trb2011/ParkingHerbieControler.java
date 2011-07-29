@@ -3,6 +3,7 @@ package playground.wrashid.parkingChoice.trb2011;
 import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -75,20 +76,25 @@ public class ParkingHerbieControler {
 
 			private void modifyParkingCollectionIfMainExperimentForTRB2011(Controler controler,
 					LinkedList<Parking> parkingCollection) {
+					
+				Random rand=new Random();
+				
 				if (controler.getConfig().findParam("parking", "isMainTRB2011Experiment") != null) {
+					double percentagePublicParkingsToKeep=Double.parseDouble(controler.getConfig().findParam("parking", "mainExperimentTRB2011.percentagePublicParkingsToKeep"));
 					LinkedList<Parking> tmpList = new LinkedList<Parking>();
 					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
 					for (Parking parking : parkingCollection) {
-						
-											
-						Coord clusterCenter1 = new CoordImpl(679990.8, 246986.4);
+						Coord clusterCenter1 = new CoordImpl(683397.7, 247567.2);
 						Coord clusterCenter2 = new CoordImpl(681701.7, 247278.6);
-						Coord clusterCenter3 = new CoordImpl(683201.2, 247391.5);
-						Coord clusterCenter4 = new CoordImpl(682332.3, 248547.8);
-						Coord clusterCenter5 = new CoordImpl(683673.9, 251789.5);
+						Coord clusterCenter3 = new CoordImpl(683418.5, 251898.3);
+						Coord clusterCenter4 = new CoordImpl(684998.5, 246843.4);
 
 						if (!(parking instanceof PrivateParking)) {
+							if (rand.nextDouble()>percentagePublicParkingsToKeep/100.0){
+								continue;
+							}
+							
 							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter1) < clusterRadius) {
 								tmpList.add(parking);
 							}
@@ -99,9 +105,6 @@ public class ParkingHerbieControler {
 								tmpList.add(parking);
 							}
 							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter4) < clusterRadius) {
-								tmpList.add(parking);
-							}
-							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter5) < clusterRadius) {
 								tmpList.add(parking);
 							}
 						}
