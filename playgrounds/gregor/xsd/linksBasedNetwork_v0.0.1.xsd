@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+<xs:schema
+	targetNamespace="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
 	xmlns="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
 	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
@@ -10,20 +11,34 @@
 
 	<xs:complexType name="linksBasedNetworkType">
 		<xs:sequence>
-		<xs:element name="links" type="linksBasedNetworkLinksType" />
+			<xs:element name="links" type="linksBasedNetworkLinksType" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="linksBasedNetworkLinksType">
+		<xs:sequence>
+			<xs:element name="link" type="linksBasedNetworkLinkType"
+				minOccurs="1" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
 
-
-	<xs:complexType name="linksBasedNetworkLinksType">
+	<xs:complexType name="linksBasedNetworkLinkType">
 		<xs:sequence>
 			<xs:element name="Id" type="xs:int" minOccurs="1"
 				maxOccurs="1" />
-			<xs:element name="fromNodeId" type="xs:int" minOccurs="1"
+			<xs:element name="fromLinkId" type="xs:int" minOccurs="1"
 				maxOccurs="1" />
-			<xs:element name="toNodeId" type="xs:int" minOccurs="1"
+			<xs:element name="toLinkId" type="xs:int" minOccurs="1"
 				maxOccurs="1" />
+			<xs:element name="length" type="xs:double" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="freespeed" type="xs:double" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="numOfLanes" type="xs:double" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="geometry" type="gml:AbstractGeometryType"
+				nillable="true" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
 

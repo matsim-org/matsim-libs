@@ -23,7 +23,6 @@
 			<xs:element name="node" type="linksAndNodesBasedNetworkNodeType"
 				minOccurs="2" maxOccurs="unbounded" />
 		</xs:sequence>
-
 	</xs:complexType>
 
 	<xs:complexType name="linksAndNodesBasedNetworkNodeType">
@@ -35,7 +34,17 @@
 		</xs:sequence>
 	</xs:complexType>
 
+
+
 	<xs:complexType name="linksAndNodesBasedNetworkLinksType">
+		<xs:sequence>
+			<xs:element name="Link" type="linksAndNodesBasedNetworkLinkType"
+				minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="linksAndNodesBasedNetworkLinkType">
 		<xs:sequence>
 			<xs:element name="Id" type="xs:int" minOccurs="1"
 				maxOccurs="1" />
@@ -43,6 +52,10 @@
 				maxOccurs="1" />
 			<xs:element name="toNodeId" type="xs:int" minOccurs="1"
 				maxOccurs="1" />
+				<xs:element name="length" type="xs:double"/>
+				<xs:element name="freespeed" type="xs:double"/>
+				<xs:element name="numOfLanes" type="xs:double" />
+				<xs:element name="geometry" type="gml:AbstractGeometryType" nillable="true" />
 		</xs:sequence>
 	</xs:complexType>
 
