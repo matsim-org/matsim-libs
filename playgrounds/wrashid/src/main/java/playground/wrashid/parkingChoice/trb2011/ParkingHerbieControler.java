@@ -77,6 +77,7 @@ public class ParkingHerbieControler {
 
 			private void modifyParkingCollectionIfMainExperimentForTRB2011(Controler controler, LinkedList<Parking> parkingCollection) {
 				if (controler.getConfig().findParam("parking", "isMainTRB2011Experiment")!=null){
+					LinkedList<Parking> tmpList=new LinkedList<Parking>();
 					System.out.println("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius=500.0;
 					for (Parking parking:parkingCollection){
@@ -86,18 +87,20 @@ public class ParkingHerbieControler {
 						Coord clusterCenter4=new CoordImpl(683430.2,247702.8);
 						
 						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter1)<clusterRadius){
-							parkingCollection.remove(parking);
+							tmpList.add(parking);
 						}
 						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter2)<clusterRadius){
-							parkingCollection.remove(parking);
+							tmpList.add(parking);
 						}
 						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter3)<clusterRadius){
-							parkingCollection.remove(parking);
+							tmpList.add(parking);
 						}
 						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter4)<clusterRadius){
-							parkingCollection.remove(parking);
+							tmpList.add(parking);
 						}
+						
 					}
+					parkingCollection.removeAll(tmpList);
 					System.out.println("mainExperimentTRB2011 - updatedNumberOfParkings:" + parkingCollection.size());
 				}
 				
