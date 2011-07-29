@@ -91,7 +91,7 @@ public class ParkingHerbieControler {
 						Coord clusterCenter4 = new CoordImpl(684998.5, 246843.4);
 
 						if (!(parking instanceof PrivateParking)) {
-							if (rand.nextDouble()>percentagePublicParkingsToKeep/100.0){
+							if (rand.nextDouble()<percentagePublicParkingsToKeep/100.0){
 								continue;
 							}
 							
