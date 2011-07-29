@@ -55,6 +55,7 @@ public class EmissionTool {
 	private static String runDirectory = "../../runs-svn/run972/";
 	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
+	// TODO: use output_events, output_vehicles
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
