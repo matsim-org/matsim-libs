@@ -19,55 +19,55 @@
  * *********************************************************************** */
 package playground.fhuelsmann.emission.objects;
 
-public class HbefaColdObject {
+public class HbefaColdEmissionFactor {
 
-	private String VehCat ;
-	private String Component;
-	private String parkingTime;
-	private String distance;
-	private double coldEF;
+	private final String vehCat ;
+	private final String component;
+	private final String parkingTime;
+	private final String distance;
+	private final double coldEF;
 	
 	
-	public String getVehCat() {
-		return VehCat;
-	}
-	public void setVehCat(String vehCat) {
-		VehCat = vehCat;
-	}
-	public String getComponent() {
-		return Component;
-	}
-	public void setComponent(String component) {
-		Component = component;
-	}
-	public String getParkingTime() {
-		return parkingTime;
-	}
-	public void setParkingTime(String parkingTime) {
-		this.parkingTime = parkingTime;
-	}
-	public String getDistance() {
-		return distance;
-	}
-	public void setDistance(String distance) {
-		this.distance = distance;
-	}
+//	public String getVehCat() {
+//		return this.vehCat;
+//	}
+//	public void setVehCat(String vehCat) {
+//		this.vehCat = vehCat;
+//	}
+//	public String getComponent() {
+//		return this.component;
+//	}
+//	public void setComponent(String component) {
+//		this.component = component;
+//	}
+//	public String getParkingTime() {
+//		return parkingTime;
+//	}
+//	public void setParkingTime(String parkingTime) {
+//		this.parkingTime = parkingTime;
+//	}
+//	public String getDistance() {
+//		return distance;
+//	}
+//	public void setDistance(String distance) {
+//		this.distance = distance;
+//	}
 	public double getColdEF() {
 		return coldEF;
 	}
-	public void setColdEF(double coldEF) {
-		this.coldEF = coldEF;
-	}
+//	public void setColdEF(double coldEF) {
+//		this.coldEF = coldEF;
+//	}
 
-	public HbefaColdObject(
+	public HbefaColdEmissionFactor(
 			String vehCat, 
 			String component,
 			String parkingTime,
 			String distance, 
 			double coldEF){
 		
-		this.VehCat= vehCat;
-		this.Component= component;
+		this.vehCat= vehCat;
+		this.component= component;
 		this.parkingTime=parkingTime;
 		this.distance= distance;
 		this.coldEF= coldEF;

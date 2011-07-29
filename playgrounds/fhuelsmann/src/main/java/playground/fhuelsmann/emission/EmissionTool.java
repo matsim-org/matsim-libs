@@ -39,10 +39,10 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
-import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
-import playground.fhuelsmann.emission.objects.HbefaHot;
-import playground.fhuelsmann.emission.objects.HbefaTable;
-import playground.fhuelsmann.emission.objects.VisumObject;
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
+import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
@@ -84,23 +84,25 @@ public class EmissionTool {
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
 		// read different hbefa tables
-		HbefaTable hbefaTable = new HbefaTable();
-		hbefaTable.makeHbefaTable(hbefaAverageFleetEmissionFactorsFile);
-		HbefaTable hbefaHdvTable = new HbefaTable();
-		hbefaHdvTable.makeHbefaTable(hbefaAverageFleetHdvEmissionFactorsFile);
-		HbefaColdEmissionTable hbefaColdTable = new HbefaColdEmissionTable();
-		hbefaColdTable.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
-		HbefaHot hbefaHot = new HbefaHot();
-		hbefaHot.makeHbefaHot(hbefaHotFile);
+		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
+		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
+		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
+		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
+		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
+		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
+		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
 
 		// read the vehicle file
 		Vehicles vehicles = new VehiclesImpl();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
 
-		VisumObject[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
+		// TODO: make the following homogeneous?!?
+		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
 		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(roadTypes, roadTypesTrafficSituations, hbefaHot, hbefaTable, hbefaHdvTable, emissionEventsManager);
+		
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(roadTypes, roadTypesTrafficSituations, hbefaWarmEmissionTableCreatorDetailed, hbefaAvgWarmEmissionTableCreator, hbefaAvgWarmEmissionTableCreatorHDV, emissionEventsManager);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 		// create the handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
@@ -109,7 +111,7 @@ public class EmissionTool {
 				warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
 				network,
-				hbefaColdTable,
+				hbefaAvgColdEmissionTableCreator,
 				coldEmissionAnalysisModule,
 				emissionEventsManager);
 		// create the writer for emission events
@@ -155,8 +157,8 @@ public class EmissionTool {
 		}
 	}
 
-	VisumObject[] createRoadTypes(String filename){
-		VisumObject[] roadTypes = new VisumObject[100];
+	VisumRoadTypes[] createRoadTypes(String filename){
+		VisumRoadTypes[] roadTypes = new VisumRoadTypes[100];
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
 			// Get the object of DataInputStream
@@ -169,7 +171,7 @@ public class EmissionTool {
 	
 				//for all lines (whole text) we split the line to an array 
 				String[] array = strLine.split(",");
-				VisumObject obj = new VisumObject(Integer.parseInt(array[0]), array[2]);
+				VisumRoadTypes obj = new VisumRoadTypes(Integer.parseInt(array[0]), array[2]);
 				roadTypes[obj.getVISUM_RT_NR()] = obj;
 			}
 			in.close();

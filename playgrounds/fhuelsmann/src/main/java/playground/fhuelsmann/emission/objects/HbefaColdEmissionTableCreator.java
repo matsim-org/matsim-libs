@@ -27,12 +27,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class HbefaColdEmissionTable {
+public class HbefaColdEmissionTableCreator {
 
-	private final  Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdObject>>> HbefaColdEmissionTable =
-		new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaColdObject>>>();
+	private final  Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> HbefaColdEmissionTable =
+		new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>>();
 
-	public Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdObject>>> getHbefaColdTable() {
+	public Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> getHbefaColdTable() {
 		return this.HbefaColdEmissionTable;
 	}
 
@@ -43,14 +43,14 @@ public class HbefaColdEmissionTable {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			// TODO: test for header line!
+			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
 			// Read and forget header line
 			br.readLine();
 			// Read file line by line
 			while ((strLine = br.readLine()) != null)   {
 				//for all lines (whole text) we split the line to an array 
 				String[] array = strLine.split(";");
-				HbefaColdObject obj = new HbefaColdObject(
+				HbefaColdEmissionFactor obj = new HbefaColdEmissionFactor(
 						array[0], //vehCat
 						array[1], //component
 						array[2], //parkingTime
@@ -65,15 +65,15 @@ public class HbefaColdEmissionTable {
 						this.HbefaColdEmissionTable.get(coldPollutant).get(distance).put(parkingTime, obj);
 					}
 					else{
-						Map<Integer, HbefaColdObject> tempParkingTime = new TreeMap<Integer, HbefaColdObject>();
+						Map<Integer, HbefaColdEmissionFactor> tempParkingTime = new TreeMap<Integer, HbefaColdEmissionFactor>();
 						tempParkingTime.put(parkingTime, obj);
 						this.HbefaColdEmissionTable.get(coldPollutant).put(distance, tempParkingTime);	  
 					}
 				}
 				else{
-					Map<Integer,HbefaColdObject> tempParkingTime =	new TreeMap<Integer, HbefaColdObject>();
+					Map<Integer,HbefaColdEmissionFactor> tempParkingTime =	new TreeMap<Integer, HbefaColdEmissionFactor>();
 					tempParkingTime.put(parkingTime, obj);
-					Map<Integer, Map<Integer, HbefaColdObject>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaColdObject>>();
+					Map<Integer, Map<Integer, HbefaColdEmissionFactor>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaColdEmissionFactor>>();
 					tempDistance.put(parkingTime, tempParkingTime);
 					this.HbefaColdEmissionTable.put(coldPollutant, tempDistance);				
 				}

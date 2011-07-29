@@ -31,14 +31,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.benjamin.events.ColdEmissionEventImpl;
 import playground.fhuelsmann.emission.objects.ColdPollutant;
-import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
-import playground.fhuelsmann.emission.objects.HbefaColdObject;
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionFactor;
 
 public class ColdEmissionAnalysisModule {
 
 	public void calculateColdEmissions(Id linkId, Id personId,
 			double startEngineTime, double parkingDuration,
-			double accumulatedDistance, HbefaColdEmissionTable hbefaColdTable,
+			double accumulatedDistance, HbefaColdEmissionTableCreator hbefaColdTable,
 			EventsManager emissionEventsManager) {
 
 		// TODO: CO2 not directly available for cold emissions; thus it could be
@@ -65,8 +65,8 @@ public class ColdEmissionAnalysisModule {
 		Double generatedEmissions = null;
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 		
-		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdObject>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
-			Map<Integer, Map<Integer, HbefaColdObject>> value = entry.getValue();
+		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
+			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
 			double coldEfOtherAct = value.get(distance_km).get(parkingDuration_h).getColdEF();
 			double coldEfNight = 0.0;
 			if (!personId.toString().contains("gv_")){ // HDV emissions; TODO: better filter?

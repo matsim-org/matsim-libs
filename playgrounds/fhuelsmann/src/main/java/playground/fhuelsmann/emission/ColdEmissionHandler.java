@@ -37,13 +37,13 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
-import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 
 	private final Network network;
-	private final HbefaColdEmissionTable hbefaColdTable;
+	private final HbefaColdEmissionTableCreator hbefaColdTable;
 	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	private final EventsManager emissionEventsManager;
 
@@ -57,7 +57,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 
 	public ColdEmissionHandler(
 			final Network network,
-			HbefaColdEmissionTable hbefaTable,
+			HbefaColdEmissionTableCreator hbefaTable,
 			ColdEmissionAnalysisModule coldEmissionAnalysisModule,
 			EventsManager emissionEventsManager ){
 		this.network = network;

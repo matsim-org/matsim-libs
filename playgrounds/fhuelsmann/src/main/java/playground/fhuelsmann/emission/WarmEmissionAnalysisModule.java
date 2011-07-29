@@ -35,33 +35,33 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.events.WarmEmissionEventImpl;
-import playground.fhuelsmann.emission.objects.HbefaHot;
-import playground.fhuelsmann.emission.objects.HbefaObject;
-import playground.fhuelsmann.emission.objects.HbefaTable;
-import playground.fhuelsmann.emission.objects.HotValue;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactors;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactorsDetailed;
 import playground.fhuelsmann.emission.objects.WarmPollutant;
-import playground.fhuelsmann.emission.objects.VisumObject;
+import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 
 public class WarmEmissionAnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final VisumObject[] roadTypes;
+	private final VisumRoadTypes[] roadTypes;
 	private final String[][] roadTypesTrafficSituations;
 
-	private final HbefaHot hbefaHot;
-	private final HbefaTable hbefaTable;
+	private final HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed;
+	private final HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreator;
 
-	private final HbefaTable hbefaHdvTable;
+	private final HbefaWarmEmissionTableCreator hbefaHdvTable;
 
 	private final EventsManager eventsManager;
 	private static int vehInfoWarnCnt = 0;
 	private static int maxVehInfoWarnCnt = 10;
 
-	public WarmEmissionAnalysisModule(VisumObject[] roadTypes, String[][] roadTypesTrafficSituations, HbefaHot hbefahot, HbefaTable hbefaTable, HbefaTable hbefaHdvTable, EventsManager eventsManager){
+	public WarmEmissionAnalysisModule(VisumRoadTypes[] roadTypes, String[][] roadTypesTrafficSituations, HbefaWarmEmissionTableCreatorDetailed hbefahot, HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreator, HbefaWarmEmissionTableCreator hbefaHdvTable, EventsManager eventsManager){
 		this.roadTypes = roadTypes;
 		this.roadTypesTrafficSituations = roadTypesTrafficSituations;
-		this.hbefaHot = hbefahot;
-		this.hbefaTable = hbefaTable;
+		this.hbefaWarmEmissionTableCreatorDetailed = hbefahot;
+		this.hbefaWarmEmissionTableCreator = hbefaWarmEmissionTableCreator;
 		this.hbefaHdvTable = hbefaHdvTable;
 		this.eventsManager = eventsManager;
 	}
@@ -109,10 +109,10 @@ public class WarmEmissionAnalysisModule{
 
 			// TODO: use freeVelocity, not hbefa value!
 			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, hbefaTable.getHbefaTableWithSpeedAndEmissionFactor());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, hbefaWarmEmissionTableCreator.getHbefaWarmEmissionTable());
 			}
 			else{// HDV emissions; TODO: "only for CO2 and FC are values available, otherwise 0.0", "so far only fc and co2 emissionFactors are listed in the hbefaHdvTable" --- WHAT?!?
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, hbefaHdvTable.getHbefaWarmEmissionTable());
 			}
 		}
 		return warmEmissions;
@@ -136,10 +136,10 @@ public class WarmEmissionAnalysisModule{
 			double[][] emissionsInFourSituations = new double[4][2];
 			for(int i = 0; i < 4; i++){// [0] for freeFlow, [1] for heavy, [2] for saturated, [3] for Stop&Go
 				String key = makeKey(warmPollutant, roadType, fuelCcmEuro[0], fuelCcmEuro[1], fuelCcmEuro[2], i);
-				HotValue hotValue = this.hbefaHot.getHbefaHot().get(key);
-				if (hotValue != null) {
-					emissionsInFourSituations[i][0] = hotValue.getV();
-					emissionsInFourSituations[i][1] = hotValue.getEFA();
+				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.hbefaWarmEmissionTableCreatorDetailed.getHbefaHot().get(key);
+				if (hbefaWarmEmissionFactorsDetailed != null) {
+					emissionsInFourSituations[i][0] = hbefaWarmEmissionFactorsDetailed.getV();
+					emissionsInFourSituations[i][1] = hbefaWarmEmissionFactorsDetailed.getEFA();
 				} else {
 					return null;
 				}
@@ -184,7 +184,7 @@ public class WarmEmissionAnalysisModule{
 		return emissionsOfEvent;
 	}
 
-	private Map<WarmPollutant, Double> calculateAverageEmissions(int hbefa_road_type, double travelTime, double linkLength, HbefaObject[][] HbefaTable) {
+	private Map<WarmPollutant, Double> calculateAverageEmissions(int hbefa_road_type, double travelTime, double linkLength, HbefaWarmEmissionFactors[][] HbefaTable) {
 		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
 		// TODO: Why can road type be 0 here?

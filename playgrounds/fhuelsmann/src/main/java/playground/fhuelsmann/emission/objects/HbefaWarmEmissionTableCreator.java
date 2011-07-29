@@ -25,7 +25,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-public class HbefaTable {
+public class HbefaWarmEmissionTableCreator {
 
 	/**
 	 *  2-dim array , contains the values of HBEFA i.e Speed and Factor. 
@@ -35,26 +35,26 @@ public class HbefaTable {
 	 *  [1][2]1;48.9208374;0.349735767
 	 *  [1][3]1;12.75674725;0.710567832
 	 **/
-	private final HbefaObject [] [] hbefaTable = new HbefaObject [59][4];
+	private final HbefaWarmEmissionFactors [] [] hbefaWarmEmissionFactors = new HbefaWarmEmissionFactors [59][4];
 
-	public HbefaObject[][] getHbefaTableWithSpeedAndEmissionFactor() {
-		return hbefaTable;}
+	public HbefaWarmEmissionFactors[][] getHbefaWarmEmissionTable() {
+		return hbefaWarmEmissionFactors;}
 
-	public void makeHbefaTable(String filename){
+	public void makeHbefaWarmTable(String filename){
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			int place = 0;
-			// TODO: test for header line!
+			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
 			// Read and forget header line
 			br.readLine();
 			// Read file line by line
 			while ((strLine = br.readLine()) != null)   {
 
 				String[] array = strLine.split(";");
-				HbefaObject row = new HbefaObject(
+				HbefaWarmEmissionFactors row = new HbefaWarmEmissionFactors(
 						Integer.parseInt(array[1])      // Road_Category
 						,array[2], 					    //IDTS
 						Double.parseDouble(array[4]),   //S (speed)
@@ -69,7 +69,7 @@ public class HbefaTable {
 
 				int rowNumber = Integer.parseInt(array[1]);
 
-				this.hbefaTable [rowNumber] [place] = row;
+				this.hbefaWarmEmissionFactors [rowNumber] [place] = row;
 
 				place++;
 				if (place==4) place =0;

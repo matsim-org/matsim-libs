@@ -21,7 +21,7 @@ package playground.fhuelsmann.emission.objects;
 
 import java.util.HashMap;
 
-public class HbefaObject {
+public class HbefaWarmEmissionFactors {
 
 	private final int road_Category ;
 	private final String IDTS;
@@ -31,7 +31,7 @@ public class HbefaObject {
 
 	private final HashMap<WarmPollutant, Double> emissionFactors;
 
-	public HbefaObject(
+	public HbefaWarmEmissionFactors(
 			int road_Category, 
 			String iDTS, 
 			double velocity,

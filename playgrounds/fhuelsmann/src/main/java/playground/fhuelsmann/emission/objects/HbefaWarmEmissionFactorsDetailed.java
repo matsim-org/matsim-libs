@@ -21,9 +21,6 @@
 package playground.fhuelsmann.emission.objects;
 
 /** 
- * 
-/** 
- * 
  *  @author friederike *
  * Hot value class has the array value, which contains the KM, Velocity , EFA etc..
  * in order to read the data, you should use getValue()[index] the index is the column index.
@@ -45,13 +42,13 @@ FC		RUR/MW/80/Freeflow	0%	111113	PC petrol <1,4L PreEuro 3WCat 1987-90	petrol (4
 FC		RUR/MW/80/Freeflow	0%	111110	PC petrol <1,4L Euro-1	petrol (4S)	<1,4L	PC-P-Euro-1	50000,00	1,00	82,80			41,58								
 FC		RUR/MW/80/Freeflow	0%	111120	PC petrol <1,4L Euro-2	petrol (4S)	<1,4L	PC-P-Euro-2	50000,00	1,00	82,80			39,54								
 4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26
-
  */
-public class HotValue {
+
+public class HbefaWarmEmissionFactorsDetailed {
 
 	private String[] value;
 	
-	public HotValue(String[] value){
+	public HbefaWarmEmissionFactorsDetailed(String[] value){
 		super();
 		setValue(value);
 	}
@@ -66,10 +63,10 @@ public class HotValue {
 	public double getV(){
 		try{
 			String[] num = value[0].split(",");
-			String newNumber = num[0]+"."+num[1] ;
+			String newNumber = num[0] + "." + num[1] ;
 			return Double.valueOf(newNumber);
 		}catch(Exception e){
-			System.out.println("V " +  e);
+			System.out.println("V " + e);
 		}
 		return Double.valueOf(value[0]);
 	}
@@ -77,7 +74,7 @@ public class HotValue {
 	public double getEFA(){
 		try{
 			String[] num = value[1].split(",");
-			String newNumber = num[0]+"."+num[1] ;
+			String newNumber = num[0] + "." + num[1] ;
 			return Double.valueOf(newNumber);
 		}
 		catch(Exception e){
