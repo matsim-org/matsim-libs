@@ -40,8 +40,8 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
-import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
+import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
 import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 
 public class EmissionTool {
@@ -102,7 +102,13 @@ public class EmissionTool {
 		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
 		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(roadTypes, roadTypesTrafficSituations, hbefaWarmEmissionTableCreatorDetailed, hbefaAvgWarmEmissionTableCreator, hbefaAvgWarmEmissionTableCreatorHDV, emissionEventsManager);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
+				roadTypes,
+				roadTypesTrafficSituations,
+				hbefaWarmEmissionTableCreatorDetailed,
+				hbefaAvgWarmEmissionTableCreator,
+				hbefaAvgWarmEmissionTableCreatorHDV,
+				emissionEventsManager);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 		// create the handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
