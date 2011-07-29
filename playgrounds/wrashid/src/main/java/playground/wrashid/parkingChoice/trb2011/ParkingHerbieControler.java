@@ -80,10 +80,13 @@ public class ParkingHerbieControler {
 					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
 					for (Parking parking : parkingCollection) {
-						Coord clusterCenter1 = new CoordImpl(682914.5, 247209.3);
-						Coord clusterCenter2 = new CoordImpl(684773.4, 253849.4);
-						Coord clusterCenter3 = new CoordImpl(681902.0, 247578.1);
-						Coord clusterCenter4 = new CoordImpl(683430.2, 247702.8);
+						
+											
+						Coord clusterCenter1 = new CoordImpl(679990.8, 246986.4);
+						Coord clusterCenter2 = new CoordImpl(681701.7, 247278.6);
+						Coord clusterCenter3 = new CoordImpl(683201.2, 247391.5);
+						Coord clusterCenter4 = new CoordImpl(682332.3, 248547.8);
+						Coord clusterCenter5 = new CoordImpl(683673.9, 251789.5);
 
 						if (!(parking instanceof PrivateParking)) {
 							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter1) < clusterRadius) {
@@ -96,6 +99,9 @@ public class ParkingHerbieControler {
 								tmpList.add(parking);
 							}
 							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter4) < clusterRadius) {
+								tmpList.add(parking);
+							}
+							if (GeneralLib.getDistance(parking.getCoord(), clusterCenter5) < clusterRadius) {
 								tmpList.add(parking);
 							}
 						}
