@@ -49,9 +49,8 @@ public class WarmEmissionAnalysisModule{
 	private final String[][] roadTypesTrafficSituations;
 
 	private final HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed;
-	private final HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreator;
-
-	private final HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreatorHDV;
+	private final HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator;
+	private final HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV;
 
 	private final EventsManager eventsManager;
 	private static int vehInfoWarnCnt = 0;
@@ -60,14 +59,14 @@ public class WarmEmissionAnalysisModule{
 	public WarmEmissionAnalysisModule(VisumRoadTypes[] roadTypes,
 			String[][] roadTypesTrafficSituations,
 			HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed,
-			HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreator,
-			HbefaWarmEmissionTableCreator hbefaWarmEmissionTableCreatorHDV,
+			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator,
+			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV,
 			EventsManager eventsManager){
 		this.roadTypes = roadTypes;
 		this.roadTypesTrafficSituations = roadTypesTrafficSituations;
 		this.hbefaWarmEmissionTableCreatorDetailed = hbefaWarmEmissionTableCreatorDetailed;
-		this.hbefaWarmEmissionTableCreator = hbefaWarmEmissionTableCreator;
-		this.hbefaWarmEmissionTableCreatorHDV = hbefaWarmEmissionTableCreatorHDV;
+		this.hbefaAvgWarmEmissionTableCreator = hbefaAvgWarmEmissionTableCreator;
+		this.hbefaAvgWarmEmissionTableCreatorHDV = hbefaAvgWarmEmissionTableCreatorHDV;
 		this.eventsManager = eventsManager;
 	}
 
@@ -114,10 +113,10 @@ public class WarmEmissionAnalysisModule{
 
 			// TODO: use freeVelocity, not hbefa value!
 			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaWarmEmissionTableCreator.getHbefaWarmEmissionTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreator.getHbefaWarmEmissionTable());
 			}
 			else{// HDV emissions; TODO: "only for CO2 and FC are values available, otherwise 0.0", "so far only fc and co2 emissionFactors are listed in the hbefaHdvTable" --- WHAT?!?
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaWarmEmissionTableCreatorHDV.getHbefaWarmEmissionTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmEmissionTable());
 			}
 		}
 		return warmEmissions;
