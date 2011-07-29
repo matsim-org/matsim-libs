@@ -4,6 +4,7 @@ import herbie.running.controler.HerbieControler;
 
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -24,6 +25,7 @@ import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 
 public class ParkingHerbieControler {
 
+	private final static Logger log = Logger.getLogger(ParkingHerbieControler.class);
 	static String parkingDataBase = "H:/data/experiments/TRBAug2011/parkings/flat/";
 	static ParkingModule parkingModule;
 	public static boolean isRunningOnServer = false;
@@ -75,7 +77,7 @@ public class ParkingHerbieControler {
 					LinkedList<Parking> parkingCollection) {
 				if (controler.getConfig().findParam("parking", "isMainTRB2011Experiment") != null) {
 					LinkedList<Parking> tmpList = new LinkedList<Parking>();
-					System.out.println("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
+					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
 					for (Parking parking : parkingCollection) {
 						Coord clusterCenter1 = new CoordImpl(682914.5, 247209.3);
@@ -100,7 +102,7 @@ public class ParkingHerbieControler {
 
 					}
 					parkingCollection.removeAll(tmpList);
-					System.out.println("mainExperimentTRB2011 - updatedNumberOfParkings:" + parkingCollection.size());
+					log.info("mainExperimentTRB2011 - updatedNumberOfParkings:" + parkingCollection.size());
 				}
 
 			}
