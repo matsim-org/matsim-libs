@@ -43,10 +43,11 @@ public class LinkVolumeAnalyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String networkFileName = "H:/data/experiments/TRBAug2011/matsim/network.multimodal-wu.xml.gz";
-		final String eventsFileName = "H:/data/experiments/TRBAug2011/runs/run1/output/ITERS/it.150/herbie.150.events.xml.gz";
-		final String plansFileName = "H:/data/experiments/TRBAug2011/runs/run1/output/ITERS/it.150/herbie.150.plans.xml.gz";
-		final String facilitiesFileName = "H:/data/experiments/TRBAug2011/herbie/facilitiesWFreight.xml.gz";
+		String outputFolder="H:/data/experiments/TRBAug2011/runs/ktiRun19/output/";
+		final String networkFileName = outputFolder + "output_network.xml.gz";
+		final String eventsFileName = outputFolder + "ITERS/it.50/50.events.xml.gz";
+		final String plansFileName = outputFolder + "output_plans.xml.gz";
+		final String facilitiesFileName = outputFolder + "output_facilities.xml.gz";
 
 		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 
@@ -136,7 +137,7 @@ public class LinkVolumeAnalyzer {
 		// identify clusters (remove cluster duplicates/nearby clusters) =>
 		// write on this also in the paper.
 		HashMap<Coord, Double> clusterCenters = new HashMap<Coord, Double>();
-		int leastNumberOfActsInCluster = 5;
+		int leastNumberOfActsInCluster = 20;
 
 		while (facilitiesPriorityQueue.size() > 0) {
 			ActivityFacility actFacility = facilitiesPriorityQueue.poll().getKey();
@@ -191,11 +192,9 @@ public class LinkVolumeAnalyzer {
 		double result = 0;
 		// result += volumesPerHourForLink[7];
 		// result += volumesPerHourForLink[8];
-		result += volumesPerHourForLink[15];
 		result += volumesPerHourForLink[16];
 		result += volumesPerHourForLink[17];
 		result += volumesPerHourForLink[18];
-		result += volumesPerHourForLink[19];
 
 		return result;
 	}
@@ -242,7 +241,7 @@ public class LinkVolumeAnalyzer {
 			if (GeneralLib.isInZHCityRectangle(network.getLinks().get(event.getLinkId()).getCoord())) {
 				Id personId = event.getPersonId();
 				if (!stopFollowingAgent.containsKey(personId) && ParkingManager.considerForParking(personId)) {
-					if ((event.getTime() > 15 * 3600 && event.getTime() < 19 * 3600)) {
+					if ((event.getTime() > 16 * 3600 && event.getTime() < 19 * 3600)) {
 						this.peakHourTravellingAgentLinkIds.put(event.getLinkId(), personId);
 						stopFollowingAgent.put(personId, null);
 					}

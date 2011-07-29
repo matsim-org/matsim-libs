@@ -67,11 +67,38 @@ public class ParkingHerbieControler {
 				}
 				
 				LinkedList<Parking> parkingCollection = getParkingsForScenario(event.getControler());
+				modifyParkingCollectionIfMainExperimentForTRB2011(event.getControler(),parkingCollection);
 				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
 				
 				ParkingScoreAccumulator.initializeParkingCounts(event.getControler());
 				
 				initParkingSelectionManager(event.getControler());
+			}
+
+			private void modifyParkingCollectionIfMainExperimentForTRB2011(Controler controler, LinkedList<Parking> parkingCollection) {
+				if (controler.getConfig().findParam("parking", "isMainTRB2011Experiment")!=null){
+					for (Parking parking:parkingCollection){
+						double clusterRadius=500.0;
+						Coord clusterCenter1=new CoordImpl(682914.5,247209.3);
+						Coord clusterCenter2=new CoordImpl(684773.4,253849.4);
+						Coord clusterCenter3=new CoordImpl(681902.0,247578.1);
+						Coord clusterCenter4=new CoordImpl(683430.2,247702.8);
+						
+						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter1)<clusterRadius){
+							parkingCollection.remove(parking);
+						}
+						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter2)<clusterRadius){
+							parkingCollection.remove(parking);
+						}
+						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter3)<clusterRadius){
+							parkingCollection.remove(parking);
+						}
+						if (GeneralLib.getDistance(parking.getCoord(), clusterCenter4)<clusterRadius){
+							parkingCollection.remove(parking);
+						}
+					}
+				}
+				
 			}
 
 			private void initParkingSelectionManager(Controler controler) {
