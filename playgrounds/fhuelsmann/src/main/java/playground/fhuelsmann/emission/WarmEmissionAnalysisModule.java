@@ -115,7 +115,7 @@ public class WarmEmissionAnalysisModule{
 			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
 				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreator.getHbefaWarmEmissionTable());
 			}
-			else{// HDV emissions; TODO: "only for CO2 and FC are values available, otherwise 0.0", "so far only fc and co2 emissionFactors are listed in the hbefaHdvTable" --- WHAT?!?
+			else{
 				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmEmissionTable());
 			}
 		}
