@@ -30,6 +30,8 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.benjamin.events.ColdEmissionEventImpl;
+import playground.fhuelsmann.emission.objects.ColdPollutant;
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
 import playground.fhuelsmann.emission.objects.HbefaColdObject;
 
 public class ColdEmissionAnalysisModule {
@@ -59,22 +61,26 @@ public class ColdEmissionAnalysisModule {
 		int nightTime = 12;
 		int initDis = 1;
 
-		String pollutant = null;
+		ColdPollutant coldPollutant = null;
 		Double generatedEmissions = null;
-		// TODO: What is this? Why do we need to iterate?
-		for (Entry<String, Map<Integer, Map<Integer, HbefaColdObject>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
+		
+		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdObject>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
 			Map<Integer, Map<Integer, HbefaColdObject>> value = entry.getValue();
 			double coldEfOtherAct = value.get(distance_km).get(parkingDuration_h).getColdEF();
 			double coldEfNight = 0.0;
 			if (!personId.toString().contains("gv_")){ // HDV emissions; TODO: better filter?
 				coldEfNight = value.get(initDis).get(nightTime).getColdEF();
 			}
-			pollutant = entry.getKey();
+			coldPollutant = entry.getKey();
 			generatedEmissions = coldEfNight + coldEfOtherAct;
+			coldEmissions.put(coldPollutant, generatedEmissions);
 		}
-		Map<String, Double> coldEmissions = new HashMap<String, Double>();
-		coldEmissions.put(pollutant, generatedEmissions);
-		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, linkId, personId, coldEmissions);
+		Map<String, Double> coldEmissionStrings = new HashMap<String, Double>();
+		for (Entry<ColdPollutant, Double> entry : coldEmissions.entrySet()) {
+			coldEmissionStrings.put(entry.getKey().getText(), entry.getValue());
+		}
+		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, linkId, personId, coldEmissionStrings);
 		emissionEventsManager.processEvent(coldEmissionEvent);
 	}
 }

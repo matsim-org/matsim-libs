@@ -1,4 +1,3 @@
-package playground.fhuelsmann.emission.objects;
 /* *********************************************************************** *
  * project: org.matsim.*
  * FhMain.java
@@ -18,11 +17,7 @@ package playground.fhuelsmann.emission.objects;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-
-
-//VehCat;Year;Component;ParkingTime [h];Distance [km];EFA_km_weighted
-
+package playground.fhuelsmann.emission.objects;
 
 public class HbefaColdObject {
 
@@ -63,7 +58,6 @@ public class HbefaColdObject {
 	public void setColdEF(double coldEF) {
 		this.coldEF = coldEF;
 	}
-
 
 	public HbefaColdObject(
 			String vehCat, 

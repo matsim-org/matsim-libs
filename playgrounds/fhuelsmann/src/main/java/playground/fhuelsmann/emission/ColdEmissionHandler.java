@@ -37,6 +37,8 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
+
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 

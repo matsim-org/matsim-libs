@@ -1,4 +1,4 @@
-package playground.fhuelsmann.emission;
+package playground.fhuelsmann.emission.objects;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import playground.fhuelsmann.emission.objects.HotValue;
 
 public class HbefaHot {
 

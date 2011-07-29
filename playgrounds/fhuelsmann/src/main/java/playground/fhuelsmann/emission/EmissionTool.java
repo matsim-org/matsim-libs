@@ -17,14 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.fhuelsmann.emission;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +39,9 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesImpl;
 
+import playground.fhuelsmann.emission.objects.HbefaColdEmissionTable;
+import playground.fhuelsmann.emission.objects.HbefaHot;
+import playground.fhuelsmann.emission.objects.HbefaTable;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class EmissionTool {
@@ -54,7 +55,6 @@ public class EmissionTool {
 	private static String runDirectory = "../../runs-svn/run972/";
 	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
@@ -67,7 +67,6 @@ public class EmissionTool {
 	private static String outputFile = runDirectory + "emission.events.xml.gz";
 
 	// =======================================================================================================		
-	// private final ArrayList<String> listOfPollutants;
 	private final Scenario scenario;
 
 	public EmissionTool(){
@@ -76,7 +75,6 @@ public class EmissionTool {
 	}
 
 	private void run(String[] args) {
-//		defineListOfPollutants();
 		loadScenario();
 		Network network = scenario.getNetwork();
 		
@@ -103,8 +101,6 @@ public class EmissionTool {
 		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(roadTypes, roadTypesTrafficSituations, hbefaHot, hbefaTable, hbefaHdvTable, emissionEventsManager);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
-
-		
 		// create the handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
 				vehicles,
@@ -190,21 +186,6 @@ public class EmissionTool {
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
 		scenarioLoader.loadScenario();
 	}
-
-//	private void defineListOfPollutants() {
-//
-//		//		listOfPollutants.add("Benzene");
-		//		listOfPollutants.add("CH4");
-		//		listOfPollutants.add("CO");
-		//		listOfPollutants.add("CO(rep.)");
-		//		listOfPollutants.add("HC");
-		//		listOfPollutants.add("NH3");
-		//		listOfPollutants.add("NMHC");
-		//		listOfPollutants.add("Pb");
-		//		listOfPollutants.add("N20");
-		//		listOfPollutants.add("PN");
-		//		listOfPollutants.add("SO2");
-//	}
 
 	public static void main (String[] args) throws Exception{
 		EmissionTool emissionTool = new EmissionTool();

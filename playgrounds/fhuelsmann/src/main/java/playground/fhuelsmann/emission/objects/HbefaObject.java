@@ -21,11 +21,6 @@ package playground.fhuelsmann.emission.objects;
 
 import java.util.HashMap;
 
-import playground.fhuelsmann.emission.Pollutant;
-
-/**
-VehCat;Road_Category;IDTS;TS;S (speed);RPA;%stop;mKr;EF_Nox;EF_CO2(rep.);EF_CO2(total);NO2;PM
- **/
 public class HbefaObject {
 
 	private final int road_Category ;
@@ -34,7 +29,7 @@ public class HbefaObject {
 	private final double RPA;
 	private final double stop;
 
-	private HashMap<Pollutant, Double> emissionFactors;
+	private final HashMap<WarmPollutant, Double> emissionFactors;
 
 	public HbefaObject(
 			int road_Category, 
@@ -55,12 +50,12 @@ public class HbefaObject {
 		this.RPA = rPA;
 		this.stop = stop;
 
-		this.emissionFactors = new HashMap<Pollutant, Double>();
-		this.emissionFactors.put(Pollutant.FC, mkr);
-		this.emissionFactors.put(Pollutant.NOX, emissionFactorNox);
-		this.emissionFactors.put(Pollutant.CO2_TOTAL, emissionFactorCo2Total);
-		this.emissionFactors.put(Pollutant.NO2, NO2);
-		this.emissionFactors.put(Pollutant.PM, PM);
+		this.emissionFactors = new HashMap<WarmPollutant, Double>();
+		this.emissionFactors.put(WarmPollutant.FC, mkr);
+		this.emissionFactors.put(WarmPollutant.NOX, emissionFactorNox);
+		this.emissionFactors.put(WarmPollutant.CO2_TOTAL, emissionFactorCo2Total);
+		this.emissionFactors.put(WarmPollutant.NO2, NO2);
+		this.emissionFactors.put(WarmPollutant.PM, PM);
 	}
 
 	public double getVelocity() {
@@ -79,7 +74,7 @@ public class HbefaObject {
 //		return stop;
 //	}
 	
-	public Double getEf(Pollutant pollutant) {
-		return this.emissionFactors.get(pollutant);
+	public Double getEf(WarmPollutant warmPollutant) {
+		return this.emissionFactors.get(warmPollutant);
 	}
 }

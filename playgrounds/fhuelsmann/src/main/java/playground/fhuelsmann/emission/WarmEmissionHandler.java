@@ -62,17 +62,21 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		this.agentarrival.put(event.getPersonId(), event.getTime());
+//		if(event.getLegMode().equals("car")){
+			this.agentarrival.put(event.getPersonId(), event.getTime());
+//		}
+//		else{
+//			// link travel time calcualtion not neccessary for other modes
+//		}
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-		this.agentdeparture.put(event.getPersonId(), event.getTime());
-		//				Id personId= event.getPersonId();
-		//				Id linkId = event.getLinkId();
-		//				if (event.getLegMode().equals("pt")|| event.getLegMode().equals("walk")|| event.getLegMode().equals("bike"))	{
-		//				//	System.out.println("+++++++personId "+personId+" leg "+ event.getLegMode());
-		//					linkAndAgentAccountAnalysisModule.calculatePerPersonPtBikeWalk(personId, linkId);
-		//					linkAndAgentAccountAnalysisModule.calculatePerLinkPtBikeWalk(linkId, personId);}
+//		if(event.getLegMode().equals("car")){
+			this.agentdeparture.put(event.getPersonId(), event.getTime());
+//		}
+//		else{
+//			// link travel time calcualtion not neccessary for other modes
+//		}
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
@@ -80,9 +84,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		
-		// TODO: is legMode = car?
-		
 		Id personId= event.getPersonId();
 		Id linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
@@ -114,14 +115,20 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			}
 
 			Id vehicleId = personId;
-			String fuelSizeAge = null;
+			String ageFuelCcm;
 			if(this.vehicles.getVehicles().containsKey(vehicleId)){
 				Vehicle vehicle = this.vehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
-				fuelSizeAge = vehicleType.getDescription();
-			}
-			else{
-				// do nothing
+				String description = vehicleType.getDescription();
+				if (description.equals("default")) {
+					ageFuelCcm = null;
+					// This person has a vehicle of the "default" vehicle type.
+					// We don't know anything about it.
+				} else {
+					ageFuelCcm = description;
+				}
+			} else {
+				ageFuelCcm = null;
 			}
 			warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 					linkId,
@@ -131,7 +138,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 					linkLength,
 					enterTime,
 					travelTime,
-					fuelSizeAge);
+					ageFuelCcm);
 		}
 		else{
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){

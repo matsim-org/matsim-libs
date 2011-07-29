@@ -23,7 +23,6 @@
 
 package playground.fhuelsmann.emission;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,8 +35,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.events.WarmEmissionEventImpl;
+import playground.fhuelsmann.emission.objects.HbefaHot;
 import playground.fhuelsmann.emission.objects.HbefaObject;
+import playground.fhuelsmann.emission.objects.HbefaTable;
 import playground.fhuelsmann.emission.objects.HotValue;
+import playground.fhuelsmann.emission.objects.WarmPollutant;
 import playground.fhuelsmann.emission.objects.VisumObject;
 
 public class WarmEmissionAnalysisModule{
@@ -47,11 +49,11 @@ public class WarmEmissionAnalysisModule{
 	private final String[][] roadTypesTrafficSituations;
 
 	private final HbefaHot hbefaHot;
-	private HbefaTable hbefaTable;
+	private final HbefaTable hbefaTable;
 
-	private HbefaTable hbefaHdvTable;
+	private final HbefaTable hbefaHdvTable;
 
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 	private static int vehInfoWarnCnt = 0;
 	private static int maxVehInfoWarnCnt = 10;
 
@@ -68,26 +70,34 @@ public class WarmEmissionAnalysisModule{
 			Integer roadType, Double freeVelocity, Double linkLength,
 			Double enterTime, Double travelTime, String ageFuelCcm) {
 
-		Map<Pollutant, Double> warmEmissions = calculateWarmEmissions(personId, roadType, linkLength, travelTime, ageFuelCcm);
+		Map<WarmPollutant, Double> warmEmissions = calculateWarmEmissions(personId, roadType, linkLength, travelTime, ageFuelCcm);
 		Map<String, Double> warmEmissionStrings = new HashMap<String, Double>();
-		for (Entry<Pollutant, Double> entry : warmEmissions.entrySet()) {
+		for (Entry<WarmPollutant, Double> entry : warmEmissions.entrySet()) {
 			warmEmissionStrings.put(entry.getKey().getText(), entry.getValue());
 		}
 		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissionStrings);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	private Map<Pollutant, Double> calculateWarmEmissions(Id personId,
+	private Map<WarmPollutant, Double> calculateWarmEmissions(Id personId,
 			Integer roadType, Double linkLength, Double travelTime,
 			String ageFuelCcm) {
 		// TODO: use freeVelocity, not hbefa value!
+		Map<WarmPollutant, double[][]> hashOfPollutant;
+		if(ageFuelCcm != null) {
+			hashOfPollutant = findEmissions(roadType, ageFuelCcm);
+		} else {
+			hashOfPollutant = null;
+			// We don't know anything about the vehicle this person is driving, so we don't know
+			// how polluting it is.
+		}
 
-		Map<Pollutant, double[][]> hashOfPollutant = findEmissions(roadType, ageFuelCcm);
-
-		Map<Pollutant, Double> warmEmissions;
+		Map<WarmPollutant, Double> warmEmissions;
 		if(hashOfPollutant != null){
 			warmEmissions = calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
 		} else {
+			// We don't know how polluting this person's vehicle is, so we calculate it emissions
+			// based on averages.
 			if(vehInfoWarnCnt < maxVehInfoWarnCnt){
 				vehInfoWarnCnt++;
 				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
@@ -112,8 +122,8 @@ public class WarmEmissionAnalysisModule{
 		return this.roadTypes[roadType].getHBEFA_RT_NR();
 	}
 
-	private Map<Pollutant, double[][]> findEmissions(Integer roadType, String ageFuelCcm) {
-		Map<Pollutant, double[][]> hashOfPollutant = new TreeMap<Pollutant, double[][]>();
+	private Map<WarmPollutant, double[][]> findEmissions(Integer roadType, String ageFuelCcm) {
+		Map<WarmPollutant, double[][]> hashOfPollutant = new TreeMap<WarmPollutant, double[][]>();
 
 		String[] ageFuelCcmArray = ageFuelCcm.split(";");
 
@@ -122,10 +132,10 @@ public class WarmEmissionAnalysisModule{
 			return null;
 		}
 		
-		for(Pollutant pollutant : Pollutant.values()) {
+		for(WarmPollutant warmPollutant : WarmPollutant.values()) {
 			double[][] emissionsInFourSituations = new double[4][2];
 			for(int i = 0; i < 4; i++){// [0] for freeFlow, [1] for heavy, [2] for saturated, [3] for Stop&Go
-				String key = makeKey(pollutant, roadType, fuelCcmEuro[0], fuelCcmEuro[1], fuelCcmEuro[2], i);
+				String key = makeKey(warmPollutant, roadType, fuelCcmEuro[0], fuelCcmEuro[1], fuelCcmEuro[2], i);
 				HotValue hotValue = this.hbefaHot.getHbefaHot().get(key);
 				if (hotValue != null) {
 					emissionsInFourSituations[i][0] = hotValue.getV();
@@ -135,17 +145,17 @@ public class WarmEmissionAnalysisModule{
 				}
 			}
 			// in hashOfPollutant we save V and EFA for 4 traffic situations
-			hashOfPollutant.put(pollutant, emissionsInFourSituations);
+			hashOfPollutant.put(warmPollutant, emissionsInFourSituations);
 		}
 		return hashOfPollutant;
 	}
 
-	private Map<Pollutant, Double> calculateDetailedEmissions(Map<Pollutant, double[][]> hashOfPollutant, double travelTime, double linkLength){
-		Map<Pollutant, Double> emissionsOfEvent = new HashMap<Pollutant, Double>();
+	private Map<WarmPollutant, Double> calculateDetailedEmissions(Map<WarmPollutant, double[][]> hashOfPollutant, double travelTime, double linkLength){
+		Map<WarmPollutant, Double> emissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
-		for( Entry<Pollutant, double[][]> entry : hashOfPollutant.entrySet() ){
+		for( Entry<WarmPollutant, double[][]> entry : hashOfPollutant.entrySet() ){
 
-			Pollutant pollutant = entry.getKey();
+			WarmPollutant warmPollutant = entry.getKey();
 			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
 			double freeFlowSpeed = entry.getValue()[0][0]; // freeFlow
@@ -160,7 +170,7 @@ public class WarmEmissionAnalysisModule{
 
 			if (averageSpeed < stopGoSpeed){
 				double generatedEmissions = linkLength / 1000 * efStopGo;
-				emissionsOfEvent.put(pollutant, generatedEmissions);
+				emissionsOfEvent.put(warmPollutant, generatedEmissions);
 			}
 			else {
 				stopGoTime= (linkLength / 1000) / averageSpeed - (linkLength / 1000) / freeFlowSpeed;
@@ -168,19 +178,19 @@ public class WarmEmissionAnalysisModule{
 				stopGoFraction = stopGoSpeed * stopGoTime;
 				freeFlowFraction = (linkLength / 1000) - stopGoFraction;
 				double generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
-				emissionsOfEvent.put(pollutant, generatedEmissions);
+				emissionsOfEvent.put(warmPollutant, generatedEmissions);
 			}
 		}
 		return emissionsOfEvent;
 	}
 
-	private Map<Pollutant, Double> calculateAverageEmissions(int hbefa_road_type, double travelTime, double linkLength, HbefaObject[][] HbefaTable) {
-		Map<Pollutant, Double> avgEmissionsOfEvent = new HashMap<Pollutant, Double>();
+	private Map<WarmPollutant, Double> calculateAverageEmissions(int hbefa_road_type, double travelTime, double linkLength, HbefaObject[][] HbefaTable) {
+		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
 		// TODO: Why can road type be 0 here?
 		if (hbefa_road_type == 0) {
-			for(Pollutant pollutant : Pollutant.values())	{
-				avgEmissionsOfEvent.put(pollutant, 0.0);
+			for(WarmPollutant warmPollutant : WarmPollutant.values())	{
+				avgEmissionsOfEvent.put(warmPollutant, 0.0);
 			}
 		}
 		else {	
@@ -188,30 +198,39 @@ public class WarmEmissionAnalysisModule{
 			double stopGoSpeed = HbefaTable[hbefa_road_type][3].getVelocity();
 			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
-			for(Pollutant pollutant : Pollutant.values()) {
+			for(WarmPollutant warmPollutant : WarmPollutant.values()) {
 				Double generatedEmissions;
-				Double efFreeFlow = HbefaTable[hbefa_road_type][0].getEf(pollutant);
+				Double efFreeFlow = HbefaTable[hbefa_road_type][0].getEf(warmPollutant);
 				if(averageSpeed < stopGoSpeed){
 					generatedEmissions = linkLength / 1000 * efFreeFlow;
-					avgEmissionsOfEvent.put(pollutant, generatedEmissions);
+					avgEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 				}
 				else{
 					Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
 					Double stopGoFraction = stopGoSpeed * stopGoTime;
 					Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
-					Double efStopGo = HbefaTable[hbefa_road_type][3].getEf(pollutant);
+					Double efStopGo = HbefaTable[hbefa_road_type][3].getEf(warmPollutant);
 
 					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
-					avgEmissionsOfEvent.put(pollutant, generatedEmissions);
+					avgEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 				}
 			}
 		}
 		return avgEmissionsOfEvent;
 	}
 
-	private String makeKey(Pollutant pollutant, int roadType, String technology, String Sizeclass, String EmConcept, int traficSitNumber){
-		return "PC[3.1]" + ";" + "pass. car" + ";" + "2010" + ";" + ";" + pollutant + ";" + ";" + this.roadTypesTrafficSituations[roadType][traficSitNumber]
-		                                                                                                                                    + ";" + "0%" + ";" + technology + ";" + Sizeclass + ";" + EmConcept + ";";
+	private String makeKey(WarmPollutant warmPollutant, int roadType, String technology, String sizeClass, String emConcept, int traficSitNumber){
+		return "PC[3.1]" + ";"
+		+ "pass. car" + ";"
+		+ "2010" + ";"
+		+ ";"
+		+ warmPollutant + ";"
+		+ ";"
+		+ this.roadTypesTrafficSituations[roadType][traficSitNumber] + ";"
+		+ "0%" + ";"
+		+ technology + ";"
+		+ sizeClass + ";"
+		+ emConcept + ";";
 	}
 
 	private String[] mapVehicleAttributesFromMiD2Hbefa(String[] ageFuelCcmArray){
@@ -252,5 +271,4 @@ public class WarmEmissionAnalysisModule{
 		String[] array = string.split(splittZeichen);
 		return Integer.valueOf(array[1]);
 	}
-	
 }

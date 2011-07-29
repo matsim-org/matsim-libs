@@ -18,14 +18,12 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-package playground.fhuelsmann.emission;
+package playground.fhuelsmann.emission.objects;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-
-import playground.fhuelsmann.emission.objects.HbefaObject;
-
 
 public class HbefaTable {
 
@@ -37,45 +35,36 @@ public class HbefaTable {
 	 *  [1][2]1;48.9208374;0.349735767
 	 *  [1][3]1;12.75674725;0.710567832
 	 **/
-	// typ map hotkey auf hotvalue
 	private final HbefaObject [] [] hbefaTable = new HbefaObject [59][4];
 
-	//aufteilen in key und value
 	public HbefaObject[][] getHbefaTableWithSpeedAndEmissionFactor() {
 		return hbefaTable;}
 
 	public void makeHbefaTable(String filename){
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
-			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			//Read File Line By Line
-
 			int place = 0;
-
+			// TODO: test for header line!
+			// Read and forget header line
 			br.readLine();
-
+			// Read file line by line
 			while ((strLine = br.readLine()) != null)   {
-				//hotKey = createhotKey(array);
-				//hotValue = createhotValue(array);
-				//hbefaTable.put(hotKey,hotValue);
-				//for all lines (whole text) we split the line to an array 
-
 
 				String[] array = strLine.split(";");
 				HbefaObject row = new HbefaObject(
-						Integer.parseInt(array[1]) //Road_Category
-						,array[2], //IDTS
-						Double.parseDouble(array[4]), //S (speed)
-						Double.parseDouble(array[5]), //RPA
-						Double.parseDouble(array[6]), //%stop
-						Double.parseDouble(array[7]), //mKr
-						Double.parseDouble(array[8]), //EF_Nox
-						Double.parseDouble(array[9]), //EF_CO2(rep.)
-						Double.parseDouble(array[10]),//EF_CO2(total)
-						Double.parseDouble(array[11]), //NO2
+						Integer.parseInt(array[1])      // Road_Category
+						,array[2], 					    //IDTS
+						Double.parseDouble(array[4]),   //S (speed)
+						Double.parseDouble(array[5]),   //RPA
+						Double.parseDouble(array[6]),   //%stop
+						Double.parseDouble(array[7]),   //mKr
+						Double.parseDouble(array[8]),   //EF_Nox
+						Double.parseDouble(array[9]),   //EF_CO2(rep.)
+						Double.parseDouble(array[10]),  //EF_CO2(total)
+						Double.parseDouble(array[11]),  //NO2
 						Double.parseDouble(array[12])); // PM
 
 				int rowNumber = Integer.parseInt(array[1]);
@@ -84,7 +73,6 @@ public class HbefaTable {
 
 				place++;
 				if (place==4) place =0;
-
 			}
 			in.close();
 		} catch (Exception e) {
