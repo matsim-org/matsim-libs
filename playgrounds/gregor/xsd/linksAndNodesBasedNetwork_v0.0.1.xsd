@@ -10,8 +10,8 @@
 
 	<xs:complexType name="linksAndNodesBasedNetworkType">
 		<xs:sequence>
-		<xs:element name="linksAndNodesBasedNetworkNodes" type="linksAndNodesBasedNetworkNodesType"/>
-		<xs:element name="linksAndNodesBasedNetworkLinks" type="linksAndNodesBasedNetworkLinksType"/>
+		<xs:element name="nodes" type="linksAndNodesBasedNetworkNodesType"/>
+		<xs:element name="links" type="linksAndNodesBasedNetworkLinksType"/>
 		</xs:sequence>
 	</xs:complexType>
 

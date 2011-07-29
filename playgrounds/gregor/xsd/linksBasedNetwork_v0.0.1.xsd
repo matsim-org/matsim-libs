@@ -10,7 +10,7 @@
 
 	<xs:complexType name="linksBasedNetworkType">
 		<xs:sequence>
-		<xs:element name="linksBasedNetworkLinks" type="linksBasedNetworkLinksType" />
+		<xs:element name="links" type="linksBasedNetworkLinksType" />
 		</xs:sequence>
 	</xs:complexType>
 
