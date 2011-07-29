@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+	xmlns="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+	<xs:import namespace="http://www.opengis.net/gml"
+		schemaLocation="http://schemas.opengis.net/gml/2.1.2/geometry.xsd" />
+
+
+	<xs:complexType name="linksAndNodesBasedNetworkType">
+		<xs:sequence>
+		<xs:element name="linksAndNodesBasedNetworkNodes" type="linksAndNodesBasedNetworkNodesType"/>
+		<xs:element name="linksAndNodesBasedNetworkLinks" type="linksAndNodesBasedNetworkLinksType"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+
+
+	<xs:complexType name="linksAndNodesBasedNetworkNodesType">
+		<xs:sequence>
+			<xs:element name="node" type="linksAndNodesBasedNetworkNodeType"
+				minOccurs="2" maxOccurs="unbounded" />
+		</xs:sequence>
+
+	</xs:complexType>
+
+	<xs:complexType name="linksAndNodesBasedNetworkNodeType">
+		<xs:sequence>
+			<xs:element name="Id" type="xs:int" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="coordinate" type="gml:CoordType"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="linksAndNodesBasedNetworkLinksType">
+		<xs:sequence>
+			<xs:element name="Id" type="xs:int" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="fromNodeId" type="xs:int" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="toNodeId" type="xs:int" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+</xs:schema>

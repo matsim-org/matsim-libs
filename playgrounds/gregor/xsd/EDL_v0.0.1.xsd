@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas"
-	xmlns="http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas"
+<xs:schema targetNamespace="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+	xmlns="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
 	xmlns:gml="http://www.opengis.net/gml"
 	elementFormDefault="qualified"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+	<xs:include schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/linksAndNodesBasedNetwork_v0.0.1.xsd" />
+	<xs:include schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/linksBasedNetwork_v0.0.1.xsd" />
 
 <xs:import namespace="http://www.opengis.net/gml" schemaLocation="http://schemas.opengis.net/gml/2.1.2/geometry.xsd" />
 	<xs:element name="EDL">
@@ -16,14 +19,15 @@
 		</xs:complexType>
 	</xs:element>
 	
-	<xs:complexType name="networkType">
+	<xs:complexType name="networkType" abstract="true">
 		<xs:sequence>
 			<xs:element name="SRS" type="SRSType"  minOccurs="1" maxOccurs="1"/>
-			<xs:element name="nodes" type="nodesType"  minOccurs="1" maxOccurs="1"/>
-			<xs:element name="links" type="linksType"  minOccurs="1" maxOccurs="1"/>
+			<xs:choice>
+			<xs:element name="linksBasedNetwork" type="linksBasedNetworkType"/>
+			<xs:element name="linksAndNodesBasedNetwork" type="linksAndNodesBasedNetworkType"/>
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
-
 	<xs:complexType name="populationType">
 		<xs:sequence>
 			<xs:element name="SRS" type="SRSType"  minOccurs="1" maxOccurs="1"/>
@@ -54,27 +58,6 @@
 	</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:complexType name="nodesType">
-	<xs:sequence>
-	<xs:element name="node" type="nodeType" minOccurs="2" maxOccurs="unbounded"/>
-	</xs:sequence>
-	
-	</xs:complexType>
-	
-	<xs:complexType name="nodeType">
-	<xs:sequence>
-	<xs:element name="Id" type="xs:int" minOccurs="1" maxOccurs="1" />
-	<xs:element name="xCoordinate" type="xs:double" minOccurs="1" maxOccurs="1" />
-	<xs:element name="yCoordinate" type="xs:double" minOccurs="1" maxOccurs="1" />
-	</xs:sequence>
-	</xs:complexType>
 
-	<xs:complexType name="linksType">
-	<xs:sequence>
-	<xs:element name="Id" type="xs:int" minOccurs="1" maxOccurs="1" />
-	<xs:element name="fromNodeId" type="xs:int" minOccurs="1" maxOccurs="1" />
-	<xs:element name="toNodeId" type="xs:int" minOccurs="1" maxOccurs="1" />
-	</xs:sequence>	
-	</xs:complexType>
 
 </xs:schema>
