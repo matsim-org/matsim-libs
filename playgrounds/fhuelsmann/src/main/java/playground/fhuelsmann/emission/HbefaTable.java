@@ -65,7 +65,7 @@ public class HbefaTable {
 
 
 				String[] array = strLine.split(";");
-				HbefaObject obj = new HbefaObject(
+				HbefaObject row = new HbefaObject(
 						Integer.parseInt(array[1]) //Road_Category
 						,array[2], //IDTS
 						Double.parseDouble(array[4]), //S (speed)
@@ -78,10 +78,9 @@ public class HbefaTable {
 						Double.parseDouble(array[11]), //NO2
 						Double.parseDouble(array[12])); // PM
 
-				int row = Integer.parseInt(array[1]);
+				int rowNumber = Integer.parseInt(array[1]);
 
-				this.hbefaTable [row] [place] = 
-					obj;
+				this.hbefaTable [rowNumber] [place] = row;
 
 				place++;
 				if (place==4) place =0;

@@ -67,19 +67,22 @@ public class EmissionTool {
 	private static String outputFile = runDirectory + "emission.events.xml.gz";
 
 	// =======================================================================================================		
-	private final ArrayList<String> listOfPollutants;
+	// private final ArrayList<String> listOfPollutants;
 	private final Scenario scenario;
 
 	public EmissionTool(){
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
-		this.listOfPollutants =  new ArrayList<String>();
 	}
 
 	private void run(String[] args) {
-		defineListOfPollutants();
+//		defineListOfPollutants();
 		loadScenario();
 		Network network = scenario.getNetwork();
+		
+		// create two event manager
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
 		// read different hbefa tables
 		HbefaTable hbefaTable = new HbefaTable();
@@ -98,20 +101,15 @@ public class EmissionTool {
 
 		VisumObject[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
 		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(listOfPollutants, roadTypes, roadTypesTrafficSituations, hbefaHot);
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(roadTypes, roadTypesTrafficSituations, hbefaHot, hbefaTable, hbefaHdvTable, emissionEventsManager);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
 
-		// create two event manager
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
+		
 		// create the handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
 				vehicles,
 				network,
-				hbefaTable.getHbefaTableWithSpeedAndEmissionFactor(),
-				hbefaHdvTable.getHbefaTableWithSpeedAndEmissionFactor(),
-				warmEmissionAnalysisModule,
-				emissionEventsManager);
+				warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
 				network,
 				hbefaColdTable,
@@ -193,13 +191,9 @@ public class EmissionTool {
 		scenarioLoader.loadScenario();
 	}
 
-	private void defineListOfPollutants() {
-		listOfPollutants.add("FC");
-		listOfPollutants.add("NOx");
-		listOfPollutants.add("CO2(total)");
-		listOfPollutants.add("NO2");
-		listOfPollutants.add("PM");
-		//		listOfPollutants.add("Benzene");
+//	private void defineListOfPollutants() {
+//
+//		//		listOfPollutants.add("Benzene");
 		//		listOfPollutants.add("CH4");
 		//		listOfPollutants.add("CO");
 		//		listOfPollutants.add("CO(rep.)");
@@ -210,7 +204,7 @@ public class EmissionTool {
 		//		listOfPollutants.add("N20");
 		//		listOfPollutants.add("PN");
 		//		listOfPollutants.add("SO2");
-	}
+//	}
 
 	public static void main (String[] args) throws Exception{
 		EmissionTool emissionTool = new EmissionTool();

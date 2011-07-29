@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -40,17 +39,13 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import playground.fhuelsmann.emission.objects.HbefaObject;
 
 public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
 	private final Network network;
 	private final Vehicles vehicles;
-	private final HbefaObject[][] hbefaTable;
-	private final HbefaObject[][] hbefaHdvTable;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
-	private final EventsManager eventsManager;
 	private static int linkLeaveWarnCnt = 0;
 	private static int maxLinkLeaveWarnCnt = 10;
 
@@ -58,14 +53,10 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private final Map<Id, Double> agentarrival = new HashMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new HashMap<Id, Double>();
 
-	public WarmEmissionHandler(Vehicles vehicles, final Network network, HbefaObject[][] hbefaTable,
-			HbefaObject[][] hbefaHdvTable, WarmEmissionAnalysisModule warmEmissionAnalysisModule, EventsManager eventsManager) {
+	public WarmEmissionHandler(Vehicles vehicles, final Network network, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
 		this.vehicles = vehicles;
 		this.network = network;
-		this.hbefaTable = hbefaTable;
-		this.hbefaHdvTable = hbefaHdvTable;
 		this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
-		this.eventsManager = eventsManager;
 	}
 	public void reset(int iteration) {
 	}
@@ -132,7 +123,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			else{
 				// do nothing
 			}
-			this.warmEmissionAnalysisModule.calculateWarmEmissions(
+			warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 					linkId,
 					personId,
 					roadType,
@@ -140,10 +131,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 					linkLength,
 					enterTime,
 					travelTime,
-					fuelSizeAge,
-					this.hbefaTable,
-					this.hbefaHdvTable,
-					this.eventsManager);
+					fuelSizeAge);
 		}
 		else{
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
