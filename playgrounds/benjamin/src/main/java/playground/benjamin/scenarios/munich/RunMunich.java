@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BkMain.java
+ * RunMunich.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich.testroad;
+package playground.benjamin.scenarios.munich;
 
-import org.matsim.api.core.v01.Scenario;
+import java.io.IOException;
+import java.util.Set;
+
+import org.geotools.feature.Feature;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 /**
  * @author benjamin
  *
  */
-public class RunTestRoadCapacityChanges {
+public class RunMunich {
+	
+	static String configFile = "../../detailedEval/testRuns/input/config.xml";
+	static String zone30Shape = "../../detailedEval/policies/mobilTUM/zone30.shp";
+	static boolean considerZone30 = true;
+	
 
-	static String inputPath = "../../detailedEval/teststrecke/sim/input/";
-	static String configName = "_config_capacityChanges.xml";
-	// String configName = "_config.xml";
-
-	static String enterLinkId = "592536888";
-	static String leaveLinkId = "590000822";
-	static int startCapacity = 1200;
-	static int stepSize = 50;
-	
-	
-	
-	static int [] days = {
-			20090707,
-			20090708,
-			20090709
-	};
-	
 	public static void main(String[] args) {
-
-
-		for(int day : days){
-			String config = inputPath + day + configName;
-			Controler controler = new Controler(config);
-			controler.setOverwriteFiles(true);
-			Scenario scenario = controler.getScenario();
-			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, enterLinkId, leaveLinkId, startCapacity, stepSize));
-			controler.run();
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		confReader.readFile(configFile);
+		Controler controler = new Controler(config);
+		
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(true);
+		
+		if(considerZone30){
+			Set<Feature> featuresInZone30 = readShape(zone30Shape);
+			controler.addControlerListener(new SetLinkAttributesControlerListener (featuresInZone30));
 		}
+		controler.run();
+	}
+
+
+	private static Set<Feature> readShape(String shapeFile) {
+		final Set<Feature> featuresInZone30;
+		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		return featuresInZone30;
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeCalculatorGesamtschweiz
+ * BkMain.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.zurich;
+package playground.benjamin.scenarios.munich.testroad;
 
-import java.util.Random;
-
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
 
 
 /**
- * @author dgrether
+ * @author benjamin
  *
  */
-public class IncomeCalculatorGesamtschweiz {
-	
-	private static final Logger log = Logger.getLogger(IncomeCalculatorGesamtschweiz.class);
-	
-	private Random random;
+public class RunTestRoadCapacityChanges {
 
-	public IncomeCalculatorGesamtschweiz() {
-		long seed = 984521478;
-		this.random = new Random(seed);
-	}
-	
-	
-	public double calculateIncome(double median){
-//		double medianLorenz = calculateLorenzValue(0.5);
-//	  double totalIncome =  median / medianLorenz;
-		
-		double rnd = this.random.nextDouble();
-		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
+	static String inputPath = "../../detailedEval/teststrecke/sim/input/";
+	static String configName = "_config_capacityChanges.xml";
+	// String configName = "_config.xml";
 
-		double income = lorenzDerivative * median;
-		
-		double scale = calculateLorenzDerivativeValue(0.5);
-		income /= scale;
-		return income;
-	}
+	static String enterLinkId = "592536888";
+	static String leaveLinkId = "590000822";
+	static int startCapacity = 1200;
+	static int stepSize = 50;
 	
 	
-	private double calculateLorenzValue(double x){
-		return 0.3178 * Math.pow(x, 3) + 0.2259 * Math.pow(x, 2) + 0.4467 * x;
-	}
 	
+	static int [] days = {
+			20090707,
+			20090708,
+			20090709
+	};
+	
+	public static void main(String[] args) {
 
-	private double calculateLorenzDerivativeValue(double x){
-		return 0.9534 * Math.pow(x, 2.0) + 0.4518 * x + 0.4467;
-	}
 
+		for(int day : days){
+			String config = inputPath + day + configName;
+			Controler controler = new Controler(config);
+			controler.setOverwriteFiles(true);
+			Scenario scenario = controler.getScenario();
+			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, enterLinkId, leaveLinkId, startCapacity, stepSize));
+			controler.run();
+		}
+	}
 }

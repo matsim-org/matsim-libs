@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich.testroad;
+package playground.benjamin.scenarios.munich.testroad;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

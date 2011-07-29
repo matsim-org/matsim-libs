@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.tests;
+package playground.benjamin.scenarios.tests;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import org.matsim.households.Income;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.dataprepare.IncomeStats;
-import playground.benjamin.szenarios.zurich.IncomeCalculatorKantonZurich;
+import playground.benjamin.scenarios.zurich.IncomeCalculatorKantonZurich;
 
 
 /**

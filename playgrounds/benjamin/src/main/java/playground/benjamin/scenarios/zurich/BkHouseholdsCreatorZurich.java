@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.zurich;
+package playground.benjamin.scenarios.zurich;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

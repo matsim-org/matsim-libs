@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich.testroad;
+package playground.benjamin.scenarios.munich.testroad;
 
 import java.util.SortedMap;
 import java.util.TreeMap;

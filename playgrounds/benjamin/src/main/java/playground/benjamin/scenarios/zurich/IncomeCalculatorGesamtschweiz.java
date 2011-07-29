@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunMunich.java
+ * IncomeCalculatorGesamtschweiz
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.szenarios.munich;
+package playground.benjamin.scenarios.zurich;
 
-import java.io.IOException;
-import java.util.Set;
+import java.util.Random;
 
-import org.geotools.feature.Feature;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.apache.log4j.Logger;
+
 
 /**
- * @author benjamin
+ * @author dgrether
  *
  */
-public class RunMunich {
+public class IncomeCalculatorGesamtschweiz {
 	
-	static String configFile = "../../detailedEval/testRuns/input/config.xml";
-	static String zone30Shape = "../../detailedEval/policies/mobilTUM/zone30.shp";
-	static boolean considerZone30 = true;
+	private static final Logger log = Logger.getLogger(IncomeCalculatorGesamtschweiz.class);
+	
+	private Random random;
+
+	public IncomeCalculatorGesamtschweiz() {
+		long seed = 984521478;
+		this.random = new Random(seed);
+	}
+	
+	
+	public double calculateIncome(double median){
+//		double medianLorenz = calculateLorenzValue(0.5);
+//	  double totalIncome =  median / medianLorenz;
+		
+		double rnd = this.random.nextDouble();
+		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
+
+		double income = lorenzDerivative * median;
+		
+		double scale = calculateLorenzDerivativeValue(0.5);
+		income /= scale;
+		return income;
+	}
+	
+	
+	private double calculateLorenzValue(double x){
+		return 0.3178 * Math.pow(x, 3) + 0.2259 * Math.pow(x, 2) + 0.4467 * x;
+	}
 	
 
-	public static void main(String[] args) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
-		confReader.readFile(configFile);
-		Controler controler = new Controler(config);
-		
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		
-		if(considerZone30){
-			Set<Feature> featuresInZone30 = readShape(zone30Shape);
-			controler.addControlerListener(new SetLinkAttributesControlerListener (featuresInZone30));
-		}
-		controler.run();
+	private double calculateLorenzDerivativeValue(double x){
+		return 0.9534 * Math.pow(x, 2.0) + 0.4518 * x + 0.4467;
 	}
 
-
-	private static Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInZone30;
-		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return featuresInZone30;
-	}
 }
