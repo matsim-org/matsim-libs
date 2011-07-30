@@ -10,12 +10,12 @@ public class TimeDataCollectorTest extends TestCase{
 	
 	public void testExtrapolateValueAtTime( ){
 		TimeDataCollector myCollector =setUpTimeDataCollector();
-	
-		double ex1= myCollector.extrapolateValueAtTimeFromDataCollector(0.5*(3600*24.0/3));
+		//(0,5), (8*3600,10), (16*3600,20)
+		double ex1= myCollector.extrapolateValueAtTimeFromDataCollector(0.25*(3600*24));
 		assertEquals(7.5, ex1);
 		
-		double ex2= myCollector.extrapolateValueAtTimeFromDataCollector(1.2*(3600*24.0/3));
-		assertEquals(12.0, ex2);
+		double ex2= myCollector.extrapolateValueAtTimeFromDataCollector(0.75*(3600*24.0));
+		assertEquals(15.0, ex2);
 		
 		
 	}
@@ -33,12 +33,16 @@ public class TimeDataCollectorTest extends TestCase{
 		
 	}
 	
+	/**
+	 * // 3 entries - (0,5), (8*3600,10), (16*3600,20)
+	 * @return
+	 */
 	public TimeDataCollector setUpTimeDataCollector(){
 		TimeDataCollector myCollector = new TimeDataCollector(3);
-		// 3 entries
+		// 3 entries - (0,5), (8*3600,10), (16*3600,20)
 		myCollector.addDataPoint(0, 0.0, 5);
-		myCollector.addDataPoint(1, 1*(3600*24.0/3), 10);
-		myCollector.addDataPoint(2, 2*(3600*24.0/3), 20);
+		myCollector.addDataPoint(1, 0.5*(3600*24.0), 10);
+		myCollector.addDataPoint(2, (3600*24.0), 20);
 		return myCollector;
 	}
 	

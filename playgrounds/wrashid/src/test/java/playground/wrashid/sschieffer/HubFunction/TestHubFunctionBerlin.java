@@ -193,7 +193,6 @@ public class TestHubFunctionBerlin extends TestCase{
 	    }
 	    
 	    System.out.println("average hub1"+ aveHub1/numHub1);
-	    
 	    System.out.println("average hub2"+ aveHub2/numHub2);		
 		assertTrue(aveHub1/numHub1<aveHub2/numHub2);
 	}
