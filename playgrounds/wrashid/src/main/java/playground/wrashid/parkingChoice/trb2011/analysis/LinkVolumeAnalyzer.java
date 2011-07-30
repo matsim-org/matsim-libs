@@ -43,7 +43,7 @@ public class LinkVolumeAnalyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolder="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/runs/ktiRun28/output/";
+		String outputFolder="/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/runs/ktiRun24/output/";
 //		String outputFolder="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
 		final String networkFileName = outputFolder + "output_network.xml.gz";
 		final String eventsFileName = outputFolder + "ITERS/it.50/50.events.xml.gz";
