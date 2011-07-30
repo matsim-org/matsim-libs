@@ -138,7 +138,7 @@ public class LinkVolumeAnalyzer {
 		// identify clusters (remove cluster duplicates/nearby clusters) =>
 		// write on this also in the paper.
 		HashMap<Coord, Double> clusterCenters = new HashMap<Coord, Double>();
-		int leastNumberOfActsInCluster = 18;
+		int leastNumberOfActsInCluster = 100;
 
 		while (facilitiesPriorityQueue.size() > 0) {
 			ActivityFacility actFacility = facilitiesPriorityQueue.poll().getKey();
