@@ -85,10 +85,10 @@ public class ParkingHerbieControler {
 					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
 					for (Parking parking : parkingCollection) {
-						Coord clusterCenter1 = new CoordImpl(679293.2, 249315.4);
-						Coord clusterCenter2 = new CoordImpl(681902.0, 247578.1);
-						Coord clusterCenter3 = new CoordImpl(683128.8, 247551.6);
-						Coord clusterCenter4 = new CoordImpl(682187.3, 249308.7);
+						Coord clusterCenter1 = new CoordImpl(684149.1, 246562.3);
+						Coord clusterCenter2 = new CoordImpl(682361.4, 248520.4);
+						Coord clusterCenter3 = new CoordImpl(681551.2, 247606.6);
+						Coord clusterCenter4 = new CoordImpl(683206.5, 247454.3);
 
 						if (!(parking instanceof PrivateParking)) {
 							if (rand.nextDouble()<percentagePublicParkingsToKeep/100.0){

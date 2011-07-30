@@ -43,6 +43,8 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 		double walkingDistance = GeneralLib.getDistance(parking.getCoord(), targtLocationCoord);
 		double walkingScore=walkingDistance*disutilityOfWalkingPerMeterShorterThanhresholdDistance;
 		
+		//TODO: should this formula be changed to adhere the formula used for trb or should I change
+		// the formula?
 		if (walkingDistance>thresholdWalkingDistance){
 			walkingScore+=walkingDistance*disutilityOfWalkingPerMeterLongerThanThresholdDistance;
 //			System.out.println();
