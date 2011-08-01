@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	targetNamespace="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+	xmlns="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
+	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+
+
+	<xs:complexType name="osmBasedNetworkType">
+
+	</xs:complexType>
+
+
+</xs:schema>

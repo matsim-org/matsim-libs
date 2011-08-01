@@ -9,6 +9,9 @@
 		schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/linksAndNodesBasedNetwork_v0.0.1.xsd" />
 	<xs:include
 		schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/linksBasedNetwork_v0.0.1.xsd" />
+	<xs:include
+		schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/osmBasedNetwork_v0.0.1.xsd" />
+
 
 	<xs:import namespace="http://www.opengis.net/gml"
 		schemaLocation="http://schemas.opengis.net/gml/2.1.2/geometry.xsd" />
@@ -29,6 +32,7 @@
 			<xs:choice>
 				<xs:element name="linksBasedNetwork" type="linksBasedNetworkType" />
 				<xs:element name="linksAndNodesBasedNetwork" type="linksAndNodesBasedNetworkType" />
+				<xs:element name="osmBasedNetwork" type="osmBasedNetworkType" />
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>

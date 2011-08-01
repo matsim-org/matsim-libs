@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="api">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="version" />
+        <xs:element ref="area" />
+        <xs:element ref="tracepoints" />
+        <xs:element ref="waynodes" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="area">
+    <xs:complexType>
+      <xs:attribute name="maximum" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="changeset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="gpx_file">
+    <xs:complexType>
+      <xs:attribute name="user" type="xs:string" use="required" />
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="timestamp" type="xs:string" use="required" />
+      <xs:attribute name="lat" type="xs:string" use="required" />
+      <xs:attribute name="pending" use="optional" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="true" />
+            <xs:enumeration value="false" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="public" use="optional" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="true" />
+            <xs:enumeration value="false" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="lon" type="xs:string" use="required" />
+      <xs:attribute name="id" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="home">
+    <xs:complexType>
+      <xs:attribute name="zoom" type="xs:string" use="required" />
+      <xs:attribute name="lat" type="xs:string" use="required" />
+      <xs:attribute name="lon" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="member">
+    <xs:complexType>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="way" />
+            <xs:enumeration value="node" />
+            <xs:enumeration value="relation" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ref" type="xs:string" use="required" />
+      <xs:attribute name="role" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nd">
+    <xs:complexType>
+      <xs:attribute name="ref" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="node">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="user" type="xs:string" use="optional" />
+      <xs:attribute name="timestamp" type="xs:string" use="optional" />
+      <xs:attribute name="lat" type="xs:string" use="required" />
+      <xs:attribute name="visible" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="true" />
+            <xs:enumeration value="false" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="lon" type="xs:string" use="required" />
+      <xs:attribute name="changeset" type="xs:string" use="optional" />
+      <xs:attribute name="id" type="xs:string" use="required" />
+	  <xs:attribute name="action" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="osm">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="user" />
+        <xs:element ref="preferences" />
+        <xs:element ref="gpx_file" />
+        <xs:element ref="api" />
+        <xs:element ref="changeset" />
+        <xs:choice>
+          <xs:element ref="node" />
+          <xs:element ref="way" />
+          <xs:element ref="relation" />
+        </xs:choice>
+      </xs:choice>
+      <xs:attribute name="version" type="xs:string" use="required" fixed="0.6" />
+      <xs:attribute name="generator" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="preferences">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="relation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="tag" />
+          <xs:element ref="member" />
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="user" type="xs:string" use="optional" />
+      <xs:attribute name="timestamp" type="xs:string" use="optional" />
+      <xs:attribute name="visible" type="xs:string" use="optional" />
+      <xs:attribute name="changeset" type="xs:string" use="optional" />
+      <xs:attribute name="id" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tag">
+    <xs:complexType>
+      <xs:attribute name="v" type="xs:string" use="required" />
+      <xs:attribute name="k" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tracepoints">
+    <xs:complexType>
+      <xs:attribute name="per_page" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="user">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="home" minOccurs="0" />
+      </xs:sequence>
+      <xs:attribute name="account_created" type="xs:string" use="required" />
+      <xs:attribute name="display_name" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="version">
+    <xs:complexType>
+      <xs:attribute name="minimum" type="xs:string" use="required" />
+      <xs:attribute name="maximum" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="way">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="nd" />
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="nd" />
+        <xs:choice>
+          <xs:element ref="tag" />
+          <xs:element ref="nd" />
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="user" type="xs:string" use="optional" />
+      <xs:attribute name="timestamp" type="xs:string" use="optional" />
+      <xs:attribute name="visible" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="true" />
+            <xs:enumeration value="false" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="changeset" type="xs:string" use="optional" />
+      <xs:attribute name="id" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="waynodes">
+    <xs:complexType>
+      <xs:attribute name="maximum" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
