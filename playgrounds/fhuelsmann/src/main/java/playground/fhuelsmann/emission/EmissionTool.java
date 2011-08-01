@@ -55,6 +55,11 @@ public class EmissionTool {
 	private static String runDirectory = "../../runs-svn/run972/";
 	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
+	
+//	private static String runDirectory = "../../runs-svn/run973/";
+//	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
+//	private static String netFile = runDirectory + "output_network.xml.gz";
+	
 	// TODO: use output_events, output_vehicles
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
@@ -63,7 +68,7 @@ public class EmissionTool {
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-	private static String vehicleFile = "../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
+	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 	
 	private static String outputFile = runDirectory + "emission.events.xml.gz";
 

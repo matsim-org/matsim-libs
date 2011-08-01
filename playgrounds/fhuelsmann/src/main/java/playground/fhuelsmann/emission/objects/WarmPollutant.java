@@ -2,7 +2,7 @@ package playground.fhuelsmann.emission.objects;
 
 public enum WarmPollutant {
 	
-	FC("FC"), NOX("NOx"), CO2_TOTAL("CO2(total)"), NO2("NO2"), PM("PM");
+	FC("FC"), NOX("NOx"), CO2_TOTAL("CO2total"), NO2("NO2"), PM("PM");
 	
 	private String key;
 

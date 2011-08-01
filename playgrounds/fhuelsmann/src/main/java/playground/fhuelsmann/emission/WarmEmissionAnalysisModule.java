@@ -92,16 +92,15 @@ public class WarmEmissionAnalysisModule{
 			hashOfPollutant = findEmissions(roadType, ageFuelCcm);
 		} else {
 			hashOfPollutant = null;
-			// We don't know anything about the vehicle this person is driving, so we don't know
-			// how polluting it is.
+			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
 		}
 
 		Map<WarmPollutant, Double> warmEmissions;
 		if(hashOfPollutant != null){
 			warmEmissions = calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
+			logger.info(warmEmissions);
 		} else {
-			// We don't know how polluting this person's vehicle is, so we calculate it emissions
-			// based on averages.
+			// We don't know how polluting this person's vehicle is, so we calculate its emissions based on averages.
 			if(vehInfoWarnCnt < maxVehInfoWarnCnt){
 				vehInfoWarnCnt++;
 				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
