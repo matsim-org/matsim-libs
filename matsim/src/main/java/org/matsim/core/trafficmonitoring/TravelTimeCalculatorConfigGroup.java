@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -212,7 +213,7 @@ public class TravelTimeCalculatorConfigGroup extends Module {
 	}
 	
 	public void setAnalyzedModes(final String analyzedModes) {
-		this.analyzedModes = analyzedModes.toLowerCase();
+		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 	}
 	
 }

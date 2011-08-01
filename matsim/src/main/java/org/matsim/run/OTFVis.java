@@ -136,7 +136,7 @@ public class OTFVis {
 	}
 
 	private static final void play(String filename, boolean useSwing) {
-		String lowerCaseFilename = filename.toLowerCase();
+		String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
 		if (lowerCaseFilename.endsWith(".mvi")) {
 			if (useSwing) {
 				playMVI_Swing(filename);

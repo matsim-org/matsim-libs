@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -40,7 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMinCost, TravelCost {
+public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCost {
 
 	private final static double MIDNIGHT = 24.0*3600;
 
@@ -70,32 +69,6 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelMin
 		}
 		return cost;
 	}
-
-	@Override
-	public double getLinkMinimumTravelCost(final Link link) {
-		double cost;
-		if (((TransitRouterNetworkLink) link).route == null) {
-			// it's a transfer link (walk)
-//			cost = -getMinLinkTravelTime(link) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
-			cost = -getMinLinkTravelTime(link) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() - this.config.getUtilityOfLineSwitch_utl();
-		} else {
-			cost = -getMinLinkTravelTime(link) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
-		}
-		return cost;
-	}
-
-	private double getMinLinkTravelTime(final Link link) {
-		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.route != null) {
-			// agent stays on the same route, so use transit line travel time
-			double arrivalOffset = (wrapped.toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? wrapped.toNode.stop.getArrivalOffset() : wrapped.toNode.stop.getDepartureOffset();
-			return arrivalOffset - wrapped.fromNode.stop.getDepartureOffset();
-		}
-		// different transit routes, so it must be a line switch
-		double time2 = wrapped.getLength() / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
-		return time2;
-	}
-
 
 	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
