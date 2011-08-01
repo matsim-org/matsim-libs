@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.Event;
  */
 public interface WarmEmissionEvent extends Event{
 
-	public final static String EVENT_TYPE = "hotEmissionEvent";
+	public final static String EVENT_TYPE = "warmEmissionEvent";
 	
 	public final static String ATTRIBUTE_LINK_ID = "linkId";
 	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
@@ -40,5 +40,5 @@ public interface WarmEmissionEvent extends Event{
 	
 	public Id getVehicleId();
 
-	public Map<String, Double> getHotEmissions();
+	public Map<String, Double> getWarmEmissions();
 }

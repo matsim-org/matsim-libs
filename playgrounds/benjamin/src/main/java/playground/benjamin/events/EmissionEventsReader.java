@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -61,7 +62,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 	}
-	
+
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		// ignore characters to prevent OutOfMemoryExceptions
@@ -75,52 +76,69 @@ public class EmissionEventsReader extends MatsimXmlParser{
 	private void startEvent(final Attributes attributes){
 
 		String eventType = attributes.getValue("type");
-		String hotEventType = WarmEmissionEventImpl.EVENT_TYPE;
-		String coldEventType = ColdEmissionEventImpl.EVENT_TYPE;
 
 		Double time = 0.0;
 		Id linkId = null;
 		Id vehicleId = null;
-		Map<String, Double> hotEmissions = new HashMap<String, Double>();
+		Map<String, Double> warmEmissions = new HashMap<String, Double>();
 		Map<String, Double> coldEmissions = new HashMap<String, Double>();
 
-		if(hotEventType.equals(eventType) || coldEventType.equals(eventType)){
+		if(WarmEmissionEventImpl.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getValue(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));				
+				if (attributes.getQName(i).equals("time")){
+					time = Double.parseDouble(attributes.getValue(i));
 				}
-				else if(attributes.getValue(i).equals("linkId")){
+				else if(attributes.getQName(i).equals("type")){
+					eventType = attributes.getValue(i);
+				}
+				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_LINK_ID)){
 					linkId = new IdImpl((attributes.getValue(i)));
 				}
-				else if(attributes.getValue(i).equals("vehicleId")){
+				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
 					vehicleId = new IdImpl((attributes.getValue(i)));
 				}
-				else{
+				else {
 					String pollutant = attributes.getQName(i);
 					Double value = Double.parseDouble(attributes.getValue(i));
-					hotEmissions.put(pollutant, value);
+					warmEmissions.put(pollutant, value);
 				}
-
-				if(hotEventType.equals(eventType)){
-					this.eventsManager.processEvent(new WarmEmissionEventImpl(
-							time,
-							linkId,
-							vehicleId,
-							hotEmissions
-					));
+				this.eventsManager.processEvent(new WarmEmissionEventImpl(
+						time,
+						linkId,
+						vehicleId,
+						warmEmissions
+				));
+			}
+		}
+		else if (ColdEmissionEventImpl.EVENT_TYPE.equals(eventType)){
+			for (int i = 0; i < attributes.getLength(); i++){
+				if (attributes.getQName(i).equals("time")){
+					time = Double.parseDouble(attributes.getValue(i));
 				}
-				if(coldEventType.equals(eventType)){
-					this.eventsManager.processEvent(new WarmEmissionEventImpl(
-							time,
-							linkId,
-							vehicleId,
-							coldEmissions
-					));
+				else if(attributes.getQName(i).equals("type")){
+					eventType = attributes.getValue(i);
 				}
+				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_LINK_ID)){
+					linkId = new IdImpl((attributes.getValue(i)));
+				}
+				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
+					vehicleId = new IdImpl((attributes.getValue(i)));
+				}
+				else {
+					String pollutant = attributes.getQName(i);
+					Double value = Double.parseDouble(attributes.getValue(i));
+					coldEmissions.put(pollutant, value);
+				}
+				this.eventsManager.processEvent(new WarmEmissionEventImpl(
+						time,
+						linkId,
+						vehicleId,
+						coldEmissions
+				));
 			}
 		}
 		else{
-			logger.warn("You are trying to read a non emission events file. For reading these, please use EventsReaderXMLv1.");
+			logger.warn("You are trying to read a non emission events file. For reading this, please use " + EventsReaderXMLv1.class);
 			throw new RuntimeException();
 		}
 	}

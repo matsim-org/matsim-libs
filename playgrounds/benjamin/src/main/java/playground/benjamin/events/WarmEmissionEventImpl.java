@@ -32,13 +32,13 @@ import org.matsim.core.events.EventImpl;
 public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEvent{
 	private Id linkId;
 	private Id vehicleId;
-	private Map<String, Double> hotEmissions;
+	private Map<String, Double> warmEmissions;
 	
-	public WarmEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> hotEmissions) {
+	public WarmEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> warmEmissions) {
 		super(time);
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
-		this.hotEmissions = hotEmissions;
+		this.warmEmissions = warmEmissions;
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEven
 	}
 	
 	@Override
-	public Map<String, Double> getHotEmissions() {
-		return hotEmissions;
+	public Map<String, Double> getWarmEmissions() {
+		return warmEmissions;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEven
 		Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
 		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<String, Double> entry : hotEmissions.entrySet()){
+		for(Entry<String, Double> entry : warmEmissions.entrySet()){
 			String pollutant = entry.getKey();
 			String value = entry.getValue().toString();
 			attributes.put(pollutant, value);
