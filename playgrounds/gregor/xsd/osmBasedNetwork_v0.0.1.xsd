@@ -4,12 +4,13 @@
 	xmlns="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd"
 	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
-
-
+	<xs:include
+		schemaLocation="http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/osm.xsd" />
 
 	<xs:complexType name="osmBasedNetworkType">
-
+	<xs:sequence>
+	<xs:element ref="osm"/>
+	</xs:sequence>
 	</xs:complexType>
-
 
 </xs:schema>
