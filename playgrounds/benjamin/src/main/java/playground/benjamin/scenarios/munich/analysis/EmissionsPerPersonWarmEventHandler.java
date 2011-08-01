@@ -32,16 +32,16 @@ import playground.benjamin.events.WarmEmissionEventHandler;
  * @author benjamin
  *
  */
-public class EmissionsPerPersonHotEventHandler implements WarmEmissionEventHandler {
+public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHandler {
 
 	Map<Id, Map<String, Double>> hotEmissionsTotal = new HashMap<Id, Map<String, Double>>();
 
-	public EmissionsPerPersonHotEventHandler() {
+	public EmissionsPerPersonWarmEventHandler() {
 	}
 
 	public void handleEvent(WarmEmissionEvent event) {
 		Id vehicleId = event.getVehicleId();
-		Map<String, Double> hotEmissionsOfEvent = event.getHotEmissions();
+		Map<String, Double> hotEmissionsOfEvent = event.getWarmEmissions();
 
 		if(!hotEmissionsTotal.containsKey(vehicleId)){
 			hotEmissionsTotal.put(vehicleId, hotEmissionsOfEvent);
@@ -66,7 +66,7 @@ public class EmissionsPerPersonHotEventHandler implements WarmEmissionEventHandl
 		}
 	}
 
-	public Map<Id, Map<String, Double>> getHotEmissionsPerPerson() {
+	public Map<Id, Map<String, Double>> getWarmEmissionsPerPerson() {
 		return hotEmissionsTotal;
 	}
 

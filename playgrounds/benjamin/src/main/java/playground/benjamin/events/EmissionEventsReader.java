@@ -129,7 +129,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					Double value = Double.parseDouble(attributes.getValue(i));
 					coldEmissions.put(pollutant, value);
 				}
-				this.eventsManager.processEvent(new WarmEmissionEventImpl(
+				this.eventsManager.processEvent(new ColdEmissionEventImpl(
 						time,
 						linkId,
 						vehicleId,

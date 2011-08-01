@@ -53,16 +53,16 @@ public class EmissionsPerPersonAnalysis {
 
 	private final String runNumber = "972";
 	private final String runDirectory = "../../runs-svn/run" + runNumber + "/";
-//	private final String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	//	private final String netFile = runDirectory + runNumber + ".output_network.xml.gz";
 	private final String netFile = runDirectory + "output_network.xml.gz";
-//	private final String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
+	//	private final String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
 	private final String plansFile = runDirectory + "output_plans.xml.gz";
 	private final String emissionFile = runDirectory + "emission.events.xml.gz";
-	
+
 	private Scenario scenario;
-	private EmissionsPerPersonHotEventHandler hotHandler;
+	private EmissionsPerPersonWarmEventHandler warmHandler;
 	private EmissionsPerPersonColdEventHandler coldHandler;
-	private Map<Id, Map<String, Double>> hotEmissions;
+	private Map<Id, Map<String, Double>> warmEmissions;
 	private Map<Id, Map<String, Double>> coldEmissions;
 	private Map<Id, Map<String, Double>> totalEmissions;
 	private SortedSet<String> listOfPollutants;
@@ -71,13 +71,13 @@ public class EmissionsPerPersonAnalysis {
 	private void run() {
 		loadScenario();
 		processEmissions();
-		hotEmissions = hotHandler.getHotEmissionsPerPerson();
+		warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		coldEmissions = coldHandler.getColdEmissionsPerPerson();
-		fillListOfPollutants(hotEmissions, coldEmissions);
-		setNonCalculatedEmissions(scenario.getPopulation(), hotEmissions);
+		fillListOfPollutants(warmEmissions, coldEmissions);
+		setNonCalculatedEmissions(scenario.getPopulation(), warmEmissions);
 		setNonCalculatedEmissions(scenario.getPopulation(), coldEmissions);
-		totalEmissions = sumUpEmissions(hotEmissions, coldEmissions);
-		printEmissions(scenario.getPopulation(), hotEmissions, "EmissionsPerHomeLocationWarm.txt");
+		totalEmissions = sumUpEmissions(warmEmissions, coldEmissions);
+		printEmissions(scenario.getPopulation(), warmEmissions, "EmissionsPerHomeLocationWarm.txt");
 		printEmissions(scenario.getPopulation(), coldEmissions, "EmissionsPerHomeLocationCold.txt");
 		printEmissions(scenario.getPopulation(), totalEmissions, "EmissionsPerHomeLocationTotal.txt");
 	}
@@ -103,40 +103,50 @@ public class EmissionsPerPersonAnalysis {
 
 				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
 
-				// TODO: make this in line with listOfPollutants, ordering right?
 				Map<String, Double> emissionType2Value = emissions.get(personId);
 				for(String pollutant : listOfPollutants){
-					Double value = emissionType2Value.get(pollutant);
-					out.append(value + "\t");
+					if(emissionType2Value.get(pollutant) != null){
+						out.append(emissionType2Value.get(pollutant) + "\t");
+					} else{
+						out.append("0.0" + "\t");
+					}
 				}
 				out.append("\n");
 			}
 			//Close the output stream
 			out.close();
 			logger.info("Finished writing output to " + outFile);
-		}
-		catch (Exception e){
-			logger.warn("Error: " + e.getMessage());
+		} catch (Exception e){
+			throw new RuntimeException(e);
 		}
 	}
 
-	private Map<Id, Map<String, Double>> sumUpEmissions(Map<Id, Map<String, Double>> hotEmissions, Map<Id, Map<String, Double>> coldEmissions) {
+	private Map<Id, Map<String, Double>> sumUpEmissions(Map<Id, Map<String, Double>> warmEmissions, Map<Id, Map<String, Double>> coldEmissions) {
 		Map<Id, Map<String, Double>> totalEmissions = new HashMap<Id, Map<String, Double>>();
-		for(Entry<Id, Map<String, Double>> entry : hotEmissions.entrySet()){
+		for(Entry<Id, Map<String, Double>> entry : warmEmissions.entrySet()){
 			Id personId = entry.getKey();
-			Map<String, Double> individualHotEmissions = entry.getValue();
+			Map<String, Double> individualWarmEmissions = entry.getValue();
 
 			if(coldEmissions.containsKey(personId)){
 				Map<String, Double> individualSumOfEmissions = new HashMap<String, Double>();
 				Map<String, Double> individualColdEmissions = coldEmissions.get(personId);
-				for(String pollutant : individualHotEmissions.keySet()){
-					Double individualValue = individualHotEmissions.get(pollutant) + individualColdEmissions.get(pollutant);
+				Double individualValue;
+
+				for(String pollutant : listOfPollutants){
+					if(individualWarmEmissions.containsKey(pollutant)){
+						if(individualColdEmissions.containsKey(pollutant)){
+							individualValue = individualWarmEmissions.get(pollutant) + individualColdEmissions.get(pollutant);
+						} else{
+							individualValue = individualWarmEmissions.get(pollutant);
+						}
+					} else{
+						individualValue = individualColdEmissions.get(pollutant);
+					}
 					individualSumOfEmissions.put(pollutant, individualValue);
 				}
 				totalEmissions.put(personId, individualSumOfEmissions);
-			}
-			else{
-				totalEmissions.put(personId, individualHotEmissions);
+			} else{
+				totalEmissions.put(personId, individualWarmEmissions);
 			}
 		}
 		return totalEmissions;
@@ -152,16 +162,15 @@ public class EmissionsPerPersonAnalysis {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 				emissionsPerPerson.put(personId, emissionType2Value);
-			}
-			else{
+			} else{
 				// do nothing
 			}
 		}
 	}
 
-	private void fillListOfPollutants(Map<Id, Map<String, Double>> hotEmissions, Map<Id, Map<String, Double>> coldEmissions) {
+	private void fillListOfPollutants(Map<Id, Map<String, Double>> warmEmissions, Map<Id, Map<String, Double>> coldEmissions) {
 		listOfPollutants = new TreeSet<String>();
-		for(Map<String, Double> emissionType2Value : hotEmissions.values()){
+		for(Map<String, Double> emissionType2Value : warmEmissions.values()){
 			for(String pollutant : emissionType2Value.keySet()){
 				if(!listOfPollutants.contains(pollutant)){
 					listOfPollutants.add(pollutant);
@@ -181,9 +190,9 @@ public class EmissionsPerPersonAnalysis {
 	private void processEmissions() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		hotHandler = new EmissionsPerPersonHotEventHandler();
+		warmHandler = new EmissionsPerPersonWarmEventHandler();
 		coldHandler = new EmissionsPerPersonColdEventHandler();
-		eventsManager.addHandler(hotHandler);
+		eventsManager.addHandler(warmHandler);
 		eventsManager.addHandler(coldHandler);
 		emissionReader.parse(emissionFile);
 	}
