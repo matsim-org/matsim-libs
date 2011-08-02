@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.droeder.data.graph.comparison.Straight;
+
 /**
  * @author droeder
  *
@@ -62,7 +64,15 @@ public class GeoCalculator {
 	}
 	
 	public static double angleStraight2e1(Tuple<Coord, Coord> one){
-		return angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0)));
+		if(one.getSecond().getY() < one.getFirst().getY()){
+			return ((2* Math.PI) - angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0))));
+		}else{
+			return angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0)));
+		}
+	}
+	
+	public static double angleStraight2e1(Straight one){
+		return angleStraight2e1(new Tuple<Coord, Coord>(one.getStart(), one.getEnd()));
 	}
 	
 //	public static double angleBeetween2StraightsDeg(Tuple<Coord, Coord> one, Tuple<Coord, Coord> two){

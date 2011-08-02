@@ -20,6 +20,7 @@
 package playground.droeder.data.graph.comparison;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author droeder
@@ -35,12 +36,20 @@ public class Straight{
 		this.end = two;
 	}
 	
+	public Straight(Tuple<Coord, Coord> t){
+		this.start = t.getFirst();
+		this.end = t.getSecond();
+	}
+	
 	public Coord getStart(){
 		return this.start;
 	}
 	
 	public Coord getEnd(){
 		return this.end;
+	}
+	public String toString(){
+		return start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY();
 	}
 }
 

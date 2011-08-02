@@ -34,15 +34,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaPaths;
 import playground.droeder.data.graph.MatchingEdge;
@@ -589,183 +582,183 @@ public class GraphMatching {
 	}
 	
 	
-//	public static void main(String[] args){
-//		MatchingGraph ref = new MatchingGraph();
-//		MatchingNode r1, r2, r3;
-//		
-//		r1 = new MatchingNode(new IdImpl("r1"), new CoordImpl(0, 0));
-//		r2 = new MatchingNode(new IdImpl("r2"), new CoordImpl(0, 100));
-//		r3 = new MatchingNode(new IdImpl("r3"), new CoordImpl(0,200));
-//		ref.addNode(r1);
-//		ref.addNode(r2);
-//		ref.addNode(r3);
-//		
-//		ref.addEdge(new MatchingEdge(new IdImpl("re12"), r1, r2));
-//		ref.addEdge(new MatchingEdge(new IdImpl("re23"), r2, r3));
-//		ref.addEdge(new MatchingEdge(new IdImpl("re32"), r3, r2));
-//		ref.addEdge(new MatchingEdge(new IdImpl("re21"), r2, r1));
-//		
-//		MatchingGraph match = new MatchingGraph();
-//		final MatchingNode m1, m2, m3, m4, m5, m6;
-//		m1 = new MatchingNode(new IdImpl("m1"), new CoordImpl(1,-1));
-//		m2 = new MatchingNode(new IdImpl("m2"), new CoordImpl(100,100));
-//		m3 = new MatchingNode(new IdImpl("m3"), new CoordImpl(1,201));
-//		m4 = new MatchingNode(new IdImpl("m4"), new CoordImpl(-10,-1));
-//		m5 = new MatchingNode(new IdImpl("m5"), new CoordImpl(-11,100));
-//		m6 = new MatchingNode(new IdImpl("m6"), new CoordImpl(-10,202));
-//		match.addNode(m1);
-//		match.addNode(m2);
-//		match.addNode(m3);
-//		match.addNode(m4);
-//		match.addNode(m5);
-//		match.addNode(m6);
-//		
-//		MatchingEdge me12 = new MatchingEdge(new IdImpl("me12"), m1, m2);
-////		me12.addShapePointsAndCreateSegments(new ArrayList<Coord>(){{
-////			add(m1.getCoord());
-////			add(new CoordImpl(5,50));
-////			add(m2.getCoord());
-////		}});
-//		match.addEdge(me12);
-//		match.addEdge(new MatchingEdge(new IdImpl("me23"), m2, m3));
-//		match.addEdge(new MatchingEdge(new IdImpl("me32"), m3, m2));
-//		match.addEdge(new MatchingEdge(new IdImpl("me21"), m2, m1));
-//		
-//		MatchingEdge me45 = new MatchingEdge(new IdImpl("me45"), m4, m5);
-//		me45.addShapePointsAndCreateSegments(new ArrayList<Coord>(){{
-//			add(m4.getCoord());
-//			add(new CoordImpl(5,25));
-//			add(new CoordImpl(-5,50));
-//			add(m5.getCoord());
+	public static void main(String[] args){
+		MatchingGraph ref = new MatchingGraph();
+		MatchingNode r1, r2, r3;
+		
+		r1 = new MatchingNode(new IdImpl("r1"), new CoordImpl(0, 0));
+		r2 = new MatchingNode(new IdImpl("r2"), new CoordImpl(0, 100));
+		r3 = new MatchingNode(new IdImpl("r3"), new CoordImpl(0,200));
+		ref.addNode(r1);
+		ref.addNode(r2);
+		ref.addNode(r3);
+		
+		ref.addEdge(new MatchingEdge(new IdImpl("re12"), r1, r2));
+		ref.addEdge(new MatchingEdge(new IdImpl("re23"), r2, r3));
+		ref.addEdge(new MatchingEdge(new IdImpl("re32"), r3, r2));
+		ref.addEdge(new MatchingEdge(new IdImpl("re21"), r2, r1));
+		
+		MatchingGraph match = new MatchingGraph();
+		final MatchingNode m1, m2, m3, m4, m5, m6;
+		m1 = new MatchingNode(new IdImpl("m1"), new CoordImpl(1,-1));
+		m2 = new MatchingNode(new IdImpl("m2"), new CoordImpl(100,100));
+		m3 = new MatchingNode(new IdImpl("m3"), new CoordImpl(1,201));
+		m4 = new MatchingNode(new IdImpl("m4"), new CoordImpl(-10,-1));
+		m5 = new MatchingNode(new IdImpl("m5"), new CoordImpl(-11,100));
+		m6 = new MatchingNode(new IdImpl("m6"), new CoordImpl(-10,202));
+		match.addNode(m1);
+		match.addNode(m2);
+		match.addNode(m3);
+		match.addNode(m4);
+		match.addNode(m5);
+		match.addNode(m6);
+		
+		MatchingEdge me12 = new MatchingEdge(new IdImpl("me12"), m1, m2);
+//		me12.addShapePointsAndCreateSegments(new ArrayList<Coord>(){{
+//			add(m1.getCoord());
+//			add(new CoordImpl(5,50));
+//			add(m2.getCoord());
 //		}});
-//		match.addEdge(me45);
-//		match.addEdge(new MatchingEdge(new IdImpl("me56"), m5, m6));
-//		match.addEdge(new MatchingEdge(new IdImpl("me65"), m6, m5));
-//		match.addEdge(new MatchingEdge(new IdImpl("me54"), m5, m4));
-//		
-//		
+		match.addEdge(me12);
+		match.addEdge(new MatchingEdge(new IdImpl("me23"), m2, m3));
+		match.addEdge(new MatchingEdge(new IdImpl("me32"), m3, m2));
+		match.addEdge(new MatchingEdge(new IdImpl("me21"), m2, m1));
+		
+		MatchingEdge me45 = new MatchingEdge(new IdImpl("me45"), m4, m5);
+		me45.addShapePointsAndCreateSegments(new ArrayList<Coord>(){{
+			add(m4.getCoord());
+			add(new CoordImpl(5,25));
+			add(new CoordImpl(-5,50));
+			add(m5.getCoord());
+		}});
+		match.addEdge(me45);
+		match.addEdge(new MatchingEdge(new IdImpl("me56"), m5, m6));
+		match.addEdge(new MatchingEdge(new IdImpl("me65"), m6, m5));
+		match.addEdge(new MatchingEdge(new IdImpl("me54"), m5, m4));
+		
+		
+		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+		GraphMatching gm = new GraphMatching(ref, match);
+		gm.setMaxAngle(Math.PI/4);
+		gm.setMaxDist(25.0);
+		gm.setMaxLengthTolerancePerc(0.2);
+		gm.run();
+		gm.nodes2Shape(OUT);
+		gm.baseSegments2Shape(OUT);
+		gm.matchedSegments2Shape(OUT);
+	}
+	
+//	public static void main(String[] args){
+//		final String PATH = DaPaths.OUTPUT + "bvg09/";
 //		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
-//		GraphMatching gm = new GraphMatching(ref, match);
-//		gm.setMaxAngle(Math.PI/8);
-//		gm.setMaxDist(25.0);
+//		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
+//		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
+//		
+//
+//		MatchingEdge e;
+//		MatchingNode start, end;
+//		
+//		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		visumSc.getConfig().scenario().setUseTransit(true);
+//		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
+//		reader.readFile(VISUMTRANSITFILE);
+//		MatchingGraph v = new MatchingGraph();
+//		List<TransitStopFacility> facs;
+//		ArrayList<Coord> shape;
+//		
+//		String temp;
+//		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
+//			temp = line.getId().toString().substring(0, 1);
+//			
+//			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V") || temp.equals("N")) continue;
+//			
+//			for(TransitRoute route: line.getRoutes().values()){
+//				facs = new ArrayList<TransitStopFacility>();
+//				shape = new ArrayList<Coord>();
+//				for(TransitRouteStop stop : route.getStops()){
+//					facs.add(stop.getStopFacility());
+//					shape.add(stop.getStopFacility().getCoord());
+//				}
+//				if(facs.size() < 2){
+//					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+//							line.getId() + " beacause it have less than 2 stops!");
+//					continue;
+//				}
+//				
+//				// create or get start-node
+//				if(v.getNodes().containsKey(facs.get(0).getId())){
+//					start = v.getNodes().get(facs.get(0).getId());
+//				}else{
+//					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+//					v.addNode(start);
+//				}
+//
+//				// create or get end-node
+//				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+//					end = v.getNodes().get(facs.get(facs.size()-1).getId());
+//				}else{
+//					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+//					v.addNode(end);
+//				}
+//				
+//				e = new MatchingEdge(route.getId(), start, end);
+//				e.addShapePointsAndCreateSegments(shape);
+//				v.addEdge(e);
+//			}
+//		}
+//		
+//		ScenarioImpl hafasSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		hafasSc.getConfig().scenario().setUseTransit(true);
+//		TransitScheduleReader reader2 = new TransitScheduleReader(hafasSc);
+//		reader2.readFile(HAFASTRANSITFILE);
+//		MatchingGraph h = new MatchingGraph();
+//		
+//		
+//		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
+//			for(TransitRoute route: line.getRoutes().values()){
+//				facs = new ArrayList<TransitStopFacility>();
+//				shape = new ArrayList<Coord>();
+//				for(TransitRouteStop stop : route.getStops()){
+//					facs.add(stop.getStopFacility());
+//					shape.add(stop.getStopFacility().getCoord());
+//				}
+//				if(facs.size() < 2){
+//					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
+//							line.getId() + " beacause it have less than 2 stops!");
+//					continue;
+//				}
+//				
+//				if(h.getNodes().containsKey(facs.get(0).getId())){
+//					start = h.getNodes().get(facs.get(0).getId());
+//				}else{
+//					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
+//					h.addNode(start);
+//				}
+//				
+//				if(h.getNodes().containsKey(facs.get(facs.size()-1).getId())){
+//					end = h.getNodes().get(facs.get(facs.size()-1).getId());
+//				}else{
+//					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
+//					h.addNode(end);
+//				}
+//				
+//				e = new MatchingEdge(new IdImpl(line.getId() + "_" + route.getId()), 
+//						h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
+//				e.addShapePointsAndCreateSegments(shape);
+//				h.addEdge(e);
+//			}
+//		}
+//		
+//		GraphMatching gm = new GraphMatching(v, h);
+//		gm.setMaxAngle(Math.PI / 6);
+//		gm.setMaxDist(500.0);
 //		gm.setMaxLengthTolerancePerc(0.1);
 //		gm.run();
 //		gm.nodes2Shape(OUT);
 //		gm.baseSegments2Shape(OUT);
 //		gm.matchedSegments2Shape(OUT);
+//		gm.unmatchedAfterPrematchingOut(OUT);
 //	}
-	
-	public static void main(String[] args){
-		final String PATH = DaPaths.OUTPUT + "bvg09/";
-		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
-		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
-		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
-		
-
-		MatchingEdge e;
-		MatchingNode start, end;
-		
-		ScenarioImpl visumSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		visumSc.getConfig().scenario().setUseTransit(true);
-		TransitScheduleReader reader = new TransitScheduleReader(visumSc);
-		reader.readFile(VISUMTRANSITFILE);
-		MatchingGraph v = new MatchingGraph();
-		List<TransitStopFacility> facs;
-		ArrayList<Coord> shape;
-		
-		String temp;
-		for(TransitLine line: visumSc.getTransitSchedule().getTransitLines().values()){
-			temp = line.getId().toString().substring(0, 1);
-			
-			if(temp.equals("P") || temp.equals("S") || temp.equals("R") || temp.equals("V") || temp.equals("N")) continue;
-			
-			for(TransitRoute route: line.getRoutes().values()){
-				facs = new ArrayList<TransitStopFacility>();
-				shape = new ArrayList<Coord>();
-				for(TransitRouteStop stop : route.getStops()){
-					facs.add(stop.getStopFacility());
-					shape.add(stop.getStopFacility().getCoord());
-				}
-				if(facs.size() < 2){
-					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
-							line.getId() + " beacause it have less than 2 stops!");
-					continue;
-				}
-				
-				// create or get start-node
-				if(v.getNodes().containsKey(facs.get(0).getId())){
-					start = v.getNodes().get(facs.get(0).getId());
-				}else{
-					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
-					v.addNode(start);
-				}
-
-				// create or get end-node
-				if(v.getNodes().containsKey(facs.get(facs.size()-1).getId())){
-					end = v.getNodes().get(facs.get(facs.size()-1).getId());
-				}else{
-					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
-					v.addNode(end);
-				}
-				
-				e = new MatchingEdge(route.getId(), start, end);
-				e.addShapePointsAndCreateSegments(shape);
-				v.addEdge(e);
-			}
-		}
-		
-		ScenarioImpl hafasSc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		hafasSc.getConfig().scenario().setUseTransit(true);
-		TransitScheduleReader reader2 = new TransitScheduleReader(hafasSc);
-		reader2.readFile(HAFASTRANSITFILE);
-		MatchingGraph h = new MatchingGraph();
-		
-		
-		for(TransitLine line: hafasSc.getTransitSchedule().getTransitLines().values()){
-			for(TransitRoute route: line.getRoutes().values()){
-				facs = new ArrayList<TransitStopFacility>();
-				shape = new ArrayList<Coord>();
-				for(TransitRouteStop stop : route.getStops()){
-					facs.add(stop.getStopFacility());
-					shape.add(stop.getStopFacility().getCoord());
-				}
-				if(facs.size() < 2){
-					log.error("can not create an edge for TransitRoute " + route.getId() + " on TransitLine " +
-							line.getId() + " beacause it have less than 2 stops!");
-					continue;
-				}
-				
-				if(h.getNodes().containsKey(facs.get(0).getId())){
-					start = h.getNodes().get(facs.get(0).getId());
-				}else{
-					start = new MatchingNode(facs.get(0).getId(), facs.get(0).getCoord());
-					h.addNode(start);
-				}
-				
-				if(h.getNodes().containsKey(facs.get(facs.size()-1).getId())){
-					end = h.getNodes().get(facs.get(facs.size()-1).getId());
-				}else{
-					end = new MatchingNode(facs.get(facs.size()-1).getId(), facs.get(facs.size()-1).getCoord());
-					h.addNode(end);
-				}
-				
-				e = new MatchingEdge(new IdImpl(line.getId() + "_" + route.getId()), 
-						h.getNodes().get(facs.get(0).getId()), h.getNodes().get(facs.get(facs.size()-1).getId()));
-				e.addShapePointsAndCreateSegments(shape);
-				h.addEdge(e);
-			}
-		}
-		
-		GraphMatching gm = new GraphMatching(v, h);
-		gm.setMaxAngle(Math.PI / 6);
-		gm.setMaxDist(500.0);
-		gm.setMaxLengthTolerancePerc(0.1);
-		gm.run();
-		gm.nodes2Shape(OUT);
-		gm.baseSegments2Shape(OUT);
-		gm.matchedSegments2Shape(OUT);
-		gm.unmatchedAfterPrematchingOut(OUT);
-	}
 	
 //	public static void main(String[] args){
 //		final String PATH = DaPaths.OUTPUT + "bvg09/";
