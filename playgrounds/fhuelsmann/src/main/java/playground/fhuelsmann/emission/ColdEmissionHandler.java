@@ -24,6 +24,7 @@ package playground.fhuelsmann.emission;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -41,6 +42,7 @@ import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentDepartureEventHandler{
+	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
 	private final Network network;
 	private final HbefaColdEmissionTableCreator hbefaColdTable;
@@ -85,11 +87,10 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		double linkLength = link.getLength();
 
-		if (this.accumulatedDistance.get(personId) != 0.0){
+		if (this.accumulatedDistance.get(personId) != null){
 			double distanceSoFar = this.accumulatedDistance.get(personId);
 			this.accumulatedDistance.put(personId, distanceSoFar + linkLength);
-		}
-		else{
+		} else {
 			this.accumulatedDistance.put(personId, linkLength);
 		}
 	}
@@ -113,14 +114,12 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			Id linkId = event.getLinkId();
 			Double startEngineTime = event.getTime();
 			this.startEngine.put(personId, startEngineTime);
-			this.accumulatedDistance.remove(personId);
 
 			Double parkingDuration;
 			if (this.stopEngine.containsKey(personId)){
 				double stopEngineTime = this.stopEngine.get(personId);
 				parkingDuration = startEngineTime - stopEngineTime;
-			}
-			else{
+			} else {
 				parkingDuration = 43200.0; //parking duration is assumed to at least 12 hours during the night time
 			}
 			this.parkingDuration.put(personId, parkingDuration);
@@ -128,12 +127,9 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			Double accumulatedDistance;
 			if(this.accumulatedDistance.containsKey(personId)){
 				accumulatedDistance = this.accumulatedDistance.get(personId);
-		
-			}
-			else{
+			} else {
 				accumulatedDistance = 0.0;
 				this.accumulatedDistance.put(personId, 0.0);
-				
 			}
 			this.coldEmissionAnalysisModule.calculateColdEmissions(
 					linkId,
@@ -143,6 +139,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 					accumulatedDistance,
 					this.hbefaColdTable,
 					this.emissionEventsManager);
+			this.accumulatedDistance.remove(personId);
 //		}
 //		else{
 //			// no emissions to calculate...
