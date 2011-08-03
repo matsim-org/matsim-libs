@@ -2,11 +2,18 @@ package playground.mzilske.osm;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jdesktop.swingx.JXMapViewer;
+import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
+import org.jdesktop.swingx.mapviewer.GeoPosition;
+import org.jdesktop.swingx.mapviewer.TileFactory;
+import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -39,9 +46,8 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.otfvis2.LinkHandler;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
-import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
-public final class OTFVisClient implements Runnable {
+public final class JXMapOTFVisClient implements Runnable {
 
 	private boolean swing = false;
 
@@ -79,7 +85,7 @@ public final class OTFVisClient implements Runnable {
 		clientQ.createReceiver(connect);
 		clientQ.getConstData();
 		hostControlBar.updateTimeLabel();
-		
+
 		final OTFDrawer mainDrawer;
 		if (swing) {
 			mainDrawer = new OTFSwingDrawerContainer(clientQ, hostControlBar);
@@ -89,9 +95,49 @@ public final class OTFVisClient implements Runnable {
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
 
 		final JPanel compositePanel = otfClient.getCompositePanel();
-		final JMapViewer jMapViewer = new MyJMapViewer(compositePanel);
+		final JXMapViewer jMapViewer = new JXMapViewer();
+
+		final int max=17;
+		TileFactoryInfo info = new TileFactoryInfo(1,max-2,max,
+				256, true, true, // tile size is 256 and x/y orientation is normal
+				"http://tile.openstreetmap.org",//5/15/10.png",
+				"x","y","z") {
+			public String getTileUrl(int x, int y, int zoom) {
+				zoom = max-zoom;
+				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
+				return url;
+			}
+
+		};
+		TileFactory tf = new DefaultTileFactory(info);
+
+		//		TileFactory tf = new MyWMSTileFactory(new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:beatty"));
+		//		jMapViewer.setTileFactory(tf);
+
+
+		jMapViewer.setTileFactory(tf);
+		jMapViewer.setPanEnabled(false);
+		jMapViewer.setZoomEnabled(false);
 		compositePanel.add(jMapViewer);
-		
+
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				RepaintManager myManager = new RepaintManager() {
+					public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
+						super.addDirtyRegion(c, x, y, w, h);
+						if (c == jMapViewer) {
+							addDirtyRegion(compositePanel, x, y, w, h);
+						}
+					}
+				};
+				RepaintManager.setCurrentManager(myManager);
+			}
+
+		});
+
+
 		final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
 
 		((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
@@ -104,13 +150,15 @@ public final class OTFVisClient implements Runnable {
 					Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
 					double scale = mainDrawer.getScale();
 					int zoomDiff = (int) log2(scale);
-					jMapViewer.setDisplayPositionByLatLon(center.getY(), center.getX(), WGS84ToOSMMercator.SCALE - zoomDiff);
+					jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
+					jMapViewer.setZoom((17 - (WGS84ToOSMMercator.SCALE - zoomDiff)));
 					compositePanel.repaint();
 				}
 			}
 
 		});
 		otfClient.show();
+		// mainDrawer.setScale(8.0);
 	}
 
 	public void setSwing(boolean swing) {
@@ -138,7 +186,7 @@ public final class OTFVisClient implements Runnable {
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
-		OTFVisClient client = new OTFVisClient();
+		JXMapOTFVisClient client = new JXMapOTFVisClient();
 		client.setServer(server);
 		client.setSwing(false);
 		client.run();
