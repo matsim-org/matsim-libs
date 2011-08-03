@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEvent.java
+ * EmissionEventHotImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.events.EventImpl;
 
 /**
- * Event to indicate that emissions were produced.
  * @author benjamin
  *
  */
-public interface WarmEmissionEvent extends Event{
+public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEvent{
+	private final Id linkId;
+	private final Id vehicleId;
+	private final Map<WarmPollutant, Double> warmEmissions;
+	
+	public WarmEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions) {
+		super(time);
+		this.linkId = linkId;
+		this.vehicleId = vehicleId;
+		this.warmEmissions = warmEmissions;
+	}
 
-	public final static String EVENT_TYPE = "warmEmissionEvent";
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
 	
-	public final static String ATTRIBUTE_LINK_ID = "linkId";
-	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
+	@Override
+	public Id getVehicleId() {
+		return vehicleId;
+	}
 	
-	public Id getLinkId();
-	
-	public Id getVehicleId();
+	@Override
+	public Map<WarmPollutant, Double> getWarmEmissions() {
+		return warmEmissions;
+	}
 
-	public Map<String, Double> getWarmEmissions();
+	@Override
+	public Map<String, String> getAttributes(){
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
+		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+		for(Entry<WarmPollutant, Double> entry : warmEmissions.entrySet()){
+			WarmPollutant pollutant = entry.getKey();
+			Double value = entry.getValue();
+			attributes.put(pollutant.toString(), value.toString());
+		}
+		return attributes;
+	}
+
+	@Override
+	public String getEventType() {
+		return WarmEmissionEvent.EVENT_TYPE;
+	}
 }

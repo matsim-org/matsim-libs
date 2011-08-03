@@ -17,60 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
-
-/**
- * @author benjamin
- *
- */
-public class WarmEmissionEventImpl extends EventImpl implements WarmEmissionEvent{
-	private Id linkId;
-	private Id vehicleId;
-	private Map<String, Double> warmEmissions;
+public enum ColdPollutant {
 	
-	public WarmEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> warmEmissions) {
-		super(time);
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
-		this.warmEmissions = warmEmissions;
-	}
-
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
+	FC("FC"), NOx("NOx"), NO2("NO2"), PM("PM"),
+	CO("CO"), HC("HC");
 	
-	@Override
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-	
-	@Override
-	public Map<String, Double> getWarmEmissions() {
-		return warmEmissions;
+	private String key;
+
+	ColdPollutant(String key) {
+		this.key = key;
 	}
 
-	@Override
-	public Map<String, String> getAttributes(){
-		Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
-		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<String, Double> entry : warmEmissions.entrySet()){
-			String pollutant = entry.getKey();
-			String value = entry.getValue().toString();
-			attributes.put(pollutant, value);
-		}
-		return attributes;
-	}
-
-	@Override
-	public String getEventType() {
-		return WarmEmissionEvent.EVENT_TYPE;
+	public String getText() {
+		return key;
 	}
 }

@@ -17,16 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * Implement this to get notified when ColdEmissionEvents are thrown
+ * Implement this to get notified when HotEmissionEvents are thrown
  * @author benjamin
  *
  */
 
-public interface ColdEmissionEventHandler extends EventHandler {
-	public void handleEvent (ColdEmissionEvent event);
+public interface WarmEmissionEventHandler extends EventHandler {
+	public void handleEvent (WarmEmissionEvent event);
 }

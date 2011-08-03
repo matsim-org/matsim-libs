@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHandler.java
+ * EmissionEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
-import org.matsim.core.events.handler.EventHandler;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
- * Implement this to get notified when HotEmissionEvents are thrown
+ * Event to indicate that emissions were produced.
  * @author benjamin
  *
  */
+public interface ColdEmissionEvent extends Event{
 
-public interface WarmEmissionEventHandler extends EventHandler {
-	public void handleEvent (WarmEmissionEvent event);
+	public final static String EVENT_TYPE = "coldEmissionEvent";
+	
+	public final static String ATTRIBUTE_LINK_ID = "linkId";
+	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
+	
+	public Id getLinkId();
+	
+	public Id getVehicleId();
+
+	public Map<ColdPollutant, Double> getColdEmissions();
 }

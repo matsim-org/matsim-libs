@@ -25,8 +25,9 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.events.WarmEmissionEvent;
-import playground.benjamin.events.WarmEmissionEventHandler;
+import playground.benjamin.events.emissions.WarmEmissionEvent;
+import playground.benjamin.events.emissions.WarmEmissionEventHandler;
+import playground.benjamin.events.emissions.WarmPollutant;
 
 /**
  * @author benjamin
@@ -34,40 +35,53 @@ import playground.benjamin.events.WarmEmissionEventHandler;
  */
 public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHandler {
 
-	Map<Id, Map<String, Double>> hotEmissionsTotal = new HashMap<Id, Map<String, Double>>();
+	Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();
 
 	public EmissionsPerPersonWarmEventHandler() {
 	}
 
 	public void handleEvent(WarmEmissionEvent event) {
 		Id vehicleId = event.getVehicleId();
-		Map<String, Double> hotEmissionsOfEvent = event.getWarmEmissions();
+		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 
-		if(!hotEmissionsTotal.containsKey(vehicleId)){
-			hotEmissionsTotal.put(vehicleId, hotEmissionsOfEvent);
+		if(!warmEmissionsTotal.containsKey(vehicleId)){
+			warmEmissionsTotal.put(vehicleId, warmEmissionsOfEvent);
 		}
 		else{
-			Map<String, Double> hotEmissionsSoFar = hotEmissionsTotal.get(vehicleId);
-			for(Entry<String, Double> entry : hotEmissionsOfEvent.entrySet()){
-				String pollutant = entry.getKey();
+			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(vehicleId);
+			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+				WarmPollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
 				
-				if(!hotEmissionsSoFar.containsKey(pollutant)){
-					hotEmissionsSoFar.put(pollutant, eventValue);
-					hotEmissionsTotal.put(vehicleId, hotEmissionsSoFar);
+				if(!warmEmissionsSoFar.containsKey(pollutant)){
+					warmEmissionsSoFar.put(pollutant, eventValue);
+					warmEmissionsTotal.put(vehicleId, warmEmissionsSoFar);
 				}
 				else{
-					Double previousValue = hotEmissionsSoFar.get(pollutant);
+					Double previousValue = warmEmissionsSoFar.get(pollutant);
 					Double newValue = previousValue + eventValue;
-					hotEmissionsSoFar.put(pollutant, newValue);
-					hotEmissionsTotal.put(vehicleId, hotEmissionsSoFar);
+					warmEmissionsSoFar.put(pollutant, newValue);
+					warmEmissionsTotal.put(vehicleId, warmEmissionsSoFar);
 				}
 			}
 		}
 	}
 
 	public Map<Id, Map<String, Double>> getWarmEmissionsPerPerson() {
-		return hotEmissionsTotal;
+		Map<Id, Map<String, Double>> personId2warmEmissionsAsString = new HashMap<Id, Map<String, Double>>();
+
+		for (Entry<Id, Map<WarmPollutant, Double>> entry1: this.warmEmissionsTotal.entrySet()){
+			Id personId = entry1.getKey();
+			Map<WarmPollutant, Double> pollutant2Values = entry1.getValue();
+			Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
+			for (Entry<WarmPollutant, Double> entry2: pollutant2Values.entrySet()){
+				String pollutant = entry2.getKey().toString();
+				Double value = entry2.getValue();
+				pollutantString2Values.put(pollutant, value);
+			}
+			personId2warmEmissionsAsString.put(personId, pollutantString2Values);
+		}
+		return personId2warmEmissionsAsString;
 	}
 
 	public void reset(int iteration) {

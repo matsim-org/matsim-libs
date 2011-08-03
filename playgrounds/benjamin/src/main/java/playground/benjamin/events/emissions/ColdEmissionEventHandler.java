@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHotImpl.java
+ * EmissionEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,60 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
+ * Implement this to get notified when ColdEmissionEvents are thrown
  * @author benjamin
  *
  */
-public class ColdEmissionEventImpl extends EventImpl implements ColdEmissionEvent{
-	private Id linkId;
-	private Id vehicleId;
-	private Map<String, Double> coldEmissions;
-	
-	public ColdEmissionEventImpl(double time, Id linkId, Id vehicleId, Map<String, Double> coldEmissions) {
-		super(time);
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
-		this.coldEmissions = coldEmissions;
-	}
 
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
-	
-	@Override
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-	
-	@Override
-	public Map<String, Double> getColdEmissions() {
-		return coldEmissions;
-	}
-
-	@Override
-	public Map<String, String> getAttributes(){
-		Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
-		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<String, Double> entry : coldEmissions.entrySet()){
-			String pollutant = entry.getKey();
-			String value = entry.getValue().toString();
-			attributes.put(pollutant, value);
-		}
-		return attributes;
-	}
-
-	@Override
-	public String getEventType() {
-		return ColdEmissionEvent.EVENT_TYPE;
-	}
+public interface ColdEmissionEventHandler extends EventHandler {
+	public void handleEvent (ColdEmissionEvent event);
 }

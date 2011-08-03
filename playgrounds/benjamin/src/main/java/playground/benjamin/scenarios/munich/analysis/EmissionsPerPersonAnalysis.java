@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.benjamin.events.EmissionEventsReader;
+import playground.benjamin.events.emissions.EmissionEventsReader;
 
 /**
  * @author benjamin

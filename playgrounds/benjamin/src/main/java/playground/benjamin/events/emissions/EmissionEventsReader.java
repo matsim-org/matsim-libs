@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events;
+package playground.benjamin.events.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,8 +80,8 @@ public class EmissionEventsReader extends MatsimXmlParser{
 		Double time = 0.0;
 		Id linkId = null;
 		Id vehicleId = null;
-		Map<String, Double> warmEmissions = new HashMap<String, Double>();
-		Map<String, Double> coldEmissions = new HashMap<String, Double>();
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 
 		if(WarmEmissionEventImpl.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
@@ -98,7 +98,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					vehicleId = new IdImpl((attributes.getValue(i)));
 				}
 				else {
-					String pollutant = attributes.getQName(i);
+					WarmPollutant pollutant = WarmPollutant.valueOf(attributes.getQName(i));
 					Double value = Double.parseDouble(attributes.getValue(i));
 					warmEmissions.put(pollutant, value);
 				}
@@ -125,7 +125,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					vehicleId = new IdImpl((attributes.getValue(i)));
 				}
 				else {
-					String pollutant = attributes.getQName(i);
+					ColdPollutant pollutant = ColdPollutant.valueOf(attributes.getQName(i));
 					Double value = Double.parseDouble(attributes.getValue(i));
 					coldEmissions.put(pollutant, value);
 				}
