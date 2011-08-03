@@ -152,7 +152,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 
 		mn2q.readEvents(
-				"../../runs-svn/run1532/ITERS/it.1900/1532.1900.events.xml.gz",
+				"../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz",
 				new EventHandler[] { clas, va });
 
 		/*
@@ -183,7 +183,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 			// sl2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900."
 			// + (i + 1) + "speedLevel.shp");
 		}
-		mn2q.writeShapeFile("../../runs-svn/run1532/ITERS/it.1900/1532.1900.speedLevel.shp");
+		mn2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900.speedLevel.shp");
 
 		System.out.println("----->done!");
 	}

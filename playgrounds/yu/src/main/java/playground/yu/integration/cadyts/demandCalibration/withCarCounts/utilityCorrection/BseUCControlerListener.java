@@ -272,6 +272,7 @@ public class BseUCControlerListener implements StartupListener,
 								+ Calibrator.DEFAULT_PROPORTIONAL_ASSIGNMENT);
 			}
 		}
+
 		// SET pcaCoverage
 		// {
 		// String pcaCoverageStr = config.findParam("bse", "pcaCoverage");

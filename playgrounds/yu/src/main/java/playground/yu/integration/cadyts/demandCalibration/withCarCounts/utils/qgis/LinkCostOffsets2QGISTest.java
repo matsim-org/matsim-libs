@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
@@ -44,8 +43,8 @@ import cadyts.utilities.misc.DynamicData;
 
 public class LinkCostOffsets2QGISTest {
 	private static boolean isInRange(final Id linkId, final Network net) {
-		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl("2531")).getCoord();
+		Coord distanceFilterCenterNodeCoord = net.getNodes()
+				.get(new IdImpl("2531")).getCoord();
 		double distanceFilter = 30000;
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {
@@ -61,28 +60,29 @@ public class LinkCostOffsets2QGISTest {
 	 */
 	public static void main(String[] args) {
 		// MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String netFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
 		// String netFilename = "examples/equil/network.xml";
 		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
-		String linkCostOffsetFilename = "../runs-svn/run1300/ITERS/it.1000/1000.linkCostOffsets.xml";
+		String linkCostOffsetFilename = "../../runs-svn/run1532/ITERS/it.1900/1532.1900.linkCostOffsets.xml";
 		// String linkCostOffsetFilename =
 		// "../matsimTests/Calibration/linkCostOffsets/output/ITERS/it.100/100.linkCostOffsets.xml";
-		String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
+		String countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml";
 		// String countsFilename = "examples/equil/counts100.xml";
-		String outputBase = "../runs-svn/run1300/ITERS/it.1000/originalQGISWithArrowhead/1000.linkCostOffsets.";
+		String outputBase = "../../runs-svn/run1532/ITERS/it.1900/1532.1900.linkUtilOffsets.";
 		// String outputBase =
 		// "../matsimTests/Calibration/linkCostOffsets/output/ITERS/it.100/100.";
-		String crs = X2QGIS.ch1903;
-		int arStartTime = 9/* 7 */;
-		int arEndTime = /* 20 */9;
+		String crs = X2QGIS.gk4;
+		int arStartTime = 20/* 7 */;
+		int arEndTime = /* 20 */20;
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(countsFilename);
+
 		Collection<Link> countLinks = new HashSet<Link>();
 		Set<Id> countLinkIds = new HashSet<Id>();
 		// countLinkIds.addAll(counts.getCounts().keySet());

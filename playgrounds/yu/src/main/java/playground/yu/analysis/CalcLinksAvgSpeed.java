@@ -74,8 +74,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
 	private Set<Id> interestLinks = null;
 	private final int binSize, nofBins;
-	private final double[] speeds;
-	private final int[] speedsCount;
+	private double[] speeds;
+	private int[] speedsCount;
 	private RoadPricingScheme toll = null;
 
 	/**
@@ -255,6 +255,8 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	@Override
 	public void reset(final int iteration) {
 		speedCounters.clear();
+		speeds = new double[nofBins - 1];
+		speedsCount = new int[nofBins - 1];
 	}
 
 	/**

@@ -22,11 +22,12 @@ package playground.yu.run;
 
 import org.matsim.core.controler.Controler;
 
+import playground.yu.analysis.QVProfilControlerListener;
 import playground.yu.analysis.RouteTravelTimeSummary;
 import playground.yu.counts.CntSimCap4Chart;
 
 public class Run {
-
+	// test/input/2routesCntsVorEngpass/travPt/cfgCreateCntsCSLM.xml false
 	/**
 	 * @param args
 	 *            args[0] - configfile;
@@ -40,7 +41,9 @@ public class Run {
 		if (args.length >= 3 && Boolean.parseBoolean(args[2])) {
 			controler.addControlerListener(new CntSimCap4Chart());
 			controler.addControlerListener(new RouteTravelTimeSummary());
+
 		}
+		controler.addControlerListener(new QVProfilControlerListener());
 		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
 		controler.setOverwriteFiles(true);
 		controler.run();

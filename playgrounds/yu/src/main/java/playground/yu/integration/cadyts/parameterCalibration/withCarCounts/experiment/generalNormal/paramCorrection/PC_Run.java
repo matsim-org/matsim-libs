@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.yu.analysis.QVProfilControlerListener;
 import playground.yu.analysis.RouteTravelTimeSummary;
 import playground.yu.counts.CntSimCap4Chart;
 
@@ -46,6 +47,9 @@ public class PC_Run {
 			ctl.addControlerListener(new CntSimCap4Chart());
 			ctl.addControlerListener(new RouteTravelTimeSummary());
 		}
+		//TODO set in config
+		ctl.addControlerListener(new QVProfilControlerListener());
+
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
 		ctl.run();
