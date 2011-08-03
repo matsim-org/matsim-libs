@@ -939,10 +939,15 @@ public class GtfsConverter {
 				String[] entries = GtfsConverter.splitRow(row);
 				String tripId = entries[tripIdIndex];
 				Integer stopSequence = Integer.parseInt(entries[stopSequenceIndex]);
-				if(rowToTripAssignments.containsKey(tripId)){
-					rowToTripAssignments.get(tripId).add(stopSequence, row);
-				}else{
+				if(!rowToTripAssignments.containsKey(tripId)){
 					rowToTripAssignments.put(tripId, new ArrayList<String>());
+				}
+				if(stopSequence < rowToTripAssignments.get(tripId).size()){
+					rowToTripAssignments.get(tripId).set(stopSequence, row);
+				}else{
+					for(int i=rowToTripAssignments.get(tripId).size(); i<=stopSequence; i++){
+						rowToTripAssignments.get(tripId).add("");
+					}
 				}
 				row = br.readLine();
 			}while(row != null);
