@@ -113,6 +113,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			Id linkId = event.getLinkId();
 			Double startEngineTime = event.getTime();
 			this.startEngine.put(personId, startEngineTime);
+			this.accumulatedDistance.remove(personId);
 
 			Double parkingDuration;
 			if (this.stopEngine.containsKey(personId)){
@@ -120,17 +121,19 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 				parkingDuration = startEngineTime - stopEngineTime;
 			}
 			else{
-				parkingDuration = startEngineTime; //parking duration is assumed to be the time from midnight to engine start time
+				parkingDuration = 43200.0; //parking duration is assumed to at least 12 hours during the night time
 			}
 			this.parkingDuration.put(personId, parkingDuration);
 
 			Double accumulatedDistance;
 			if(this.accumulatedDistance.containsKey(personId)){
 				accumulatedDistance = this.accumulatedDistance.get(personId);
+		
 			}
 			else{
 				accumulatedDistance = 0.0;
 				this.accumulatedDistance.put(personId, 0.0);
+				
 			}
 			this.coldEmissionAnalysisModule.calculateColdEmissions(
 					linkId,
