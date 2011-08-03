@@ -1,9 +1,11 @@
 package playground.florian.GTFSConverter;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,10 +84,6 @@ public class GtfsConverter {
 
 
 	private TransitSchedule ts;
-
-
-
-	
 
 
 	public GtfsConverter(String filepath, CoordinateTransformation transform) {
@@ -926,9 +924,48 @@ public class GtfsConverter {
 			return weekday;
 		}		
 	}
-
-
-
+	
+	public static void convertStopTimesToAcceptedFormat(String stopTimesPath){
+		Map<String,List<String>> rowToTripAssignments = new HashMap<String,List<String>>();
+		File f = new File(stopTimesPath);
+		// READ FILE
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(f));
+			List<String> header = new ArrayList<String>(Arrays.asList(GtfsConverter.splitRow(br.readLine())));
+			int tripIdIndex = header.indexOf("trip_id");
+			int stopSequenceIndex = header.indexOf("stop_sequence");
+			String row = br.readLine();
+			do{
+				String[] entries = GtfsConverter.splitRow(row);
+				String tripId = entries[tripIdIndex];
+				Integer stopSequence = Integer.parseInt(entries[stopSequenceIndex]);
+				if(rowToTripAssignments.containsKey(tripId)){
+					rowToTripAssignments.get(tripId).add(stopSequence, row);
+				}else{
+					rowToTripAssignments.put(tripId, new ArrayList<String>());
+				}
+				row = br.readLine();
+			}while(row != null);
+		} catch (FileNotFoundException e) {
+			System.out.println("Couldn't find " + f.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// WRITE FILE
+		File of = new File(stopTimesPath + "_b");
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(of));
+			for(String tripId: rowToTripAssignments.keySet()){
+				for(String row: rowToTripAssignments.get(tripId)){
+					bw.write(row + "\n");
+				}
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Couldn't write to " + of.getAbsolutePath());
+		}
+	}
 
 
 	private static String[] splitRow(String row){
