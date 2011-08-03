@@ -21,7 +21,7 @@ package playground.benjamin.events.emissions;
 
 public enum WarmPollutant {
 	
-	FC("FC"), NOx("NOx"), NO2("NO2"), PM("PM"),
+	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
 	CO2_TOTAL("CO2(total)");
 	
 	private String key;

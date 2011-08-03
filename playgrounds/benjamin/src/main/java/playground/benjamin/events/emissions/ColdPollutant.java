@@ -21,7 +21,7 @@ package playground.benjamin.events.emissions;
 
 public enum ColdPollutant {
 	
-	FC("FC"), NOx("NOx"), NO2("NO2"), PM("PM"),
+	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
 	CO("CO"), HC("HC");
 	
 	private String key;
@@ -32,5 +32,15 @@ public enum ColdPollutant {
 
 	public String getText() {
 		return key;
+	}
+	
+	public static ColdPollutant getValue(String key){
+		for(ColdPollutant cp : ColdPollutant.values()){
+			String cpString = cp.getText();
+			if(cpString.equals(key)){
+				return cp;
+			}
+		}
+		return null;
 	}
 }
