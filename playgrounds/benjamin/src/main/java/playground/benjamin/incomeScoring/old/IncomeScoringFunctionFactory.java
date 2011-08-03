@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.old.income;
+package playground.benjamin.incomeScoring.old;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;

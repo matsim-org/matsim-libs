@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.income;
+package playground.benjamin.incomeScoring.old;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;

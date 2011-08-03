@@ -17,12 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.income;
+package playground.benjamin.incomeScoring.old;
 
 import playground.benjamin.BkPaths;
 
 
-public class BKickIncomeControlerMain {
+public class BkControlerIncomeMain {
 	
 	public static void main(String[] args){
 //		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
@@ -30,7 +30,7 @@ public class BKickIncomeControlerMain {
 //		new BKickIncomeControler(config).run();
 		
 		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
-		new BKickIncomeControler(config).run();
+		new BkControlerIncome(config).run();
 	}
 
 }
