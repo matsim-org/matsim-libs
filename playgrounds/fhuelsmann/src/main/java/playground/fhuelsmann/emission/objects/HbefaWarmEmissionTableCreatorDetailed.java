@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class HbefaWarmEmissionTableCreatorDetailed {
 
-	Map<String, HbefaWarmEmissionFactorsDetailed> hbefaWarmEmissionFactorsDetailed = new HashMap<String, HbefaWarmEmissionFactorsDetailed>() ;
+	Map<String, HbefaWarmEmissionFactorsDetailed> hbefaWarmTableDetailed = new HashMap<String, HbefaWarmEmissionFactorsDetailed>() ;
 
 	public void makeHbefaWarmTableDetailed(String filename){
 
@@ -46,15 +46,15 @@ public class HbefaWarmEmissionTableCreatorDetailed {
 				String[] value = new String[2];
 
 				//create the key, the key is an array , hotKey	
-				for(int i=0;i<13;i++)
-					if (!(i==8 || i==9))
-						key +=row[i]+";";
+				for(int i = 0; i < 13; i++)
+					if (!(i == 8 || i == 9))
+						key += row[i] + ";";
 
 				//create the value, the value is an array , hotValue	
 				value[0] = row[15];
 				value[1] = row[18];
 
-				hbefaWarmEmissionFactorsDetailed.put(key, new HbefaWarmEmissionFactorsDetailed(value));
+				hbefaWarmTableDetailed.put(key, new HbefaWarmEmissionFactorsDetailed(value));
 			}
 		}
 		catch(Exception e ){
@@ -62,29 +62,24 @@ public class HbefaWarmEmissionTableCreatorDetailed {
 		}
 	}
 
-	public Map<String, HbefaWarmEmissionFactorsDetailed> getHbefaHot() {
-		return hbefaWarmEmissionFactorsDetailed;
+	public Map<String, HbefaWarmEmissionFactorsDetailed> getHbefaWarmTableDetailed() {
+		return hbefaWarmTableDetailed;
 	}
 
-	public void setHbefaHot(Map<String, HbefaWarmEmissionFactorsDetailed> hbefaHot) {
-		hbefaWarmEmissionFactorsDetailed = hbefaHot;
-	}
-
-	private String[] split(String hbefa,String symbol) {
+	private String[] split(String hbefa, String symbol) {
 		String[] result = new String[27];
-		int index=0;
-		String part="";
+		int index = 0;
+		String part = "";
 
-		for(int i=0;i<hbefa.length();i++){
-			if (hbefa.substring(i, i+1).equals(symbol)){
-				result[index++]= ""+ part;
-				part="";
-			}
-			else {
-				part+= hbefa.substring(i,i+1);
+		for(int i = 0; i < hbefa.length(); i++){
+			if (hbefa.substring(i, i + 1).equals(symbol)){
+				result[index++] = "" + part;
+				part = "";
+			} else {
+				part += hbefa.substring(i, i+1);
 			}
 		}
-		result[index++]=part;
+		result[index++] = part;
 		return result;
 	}		
 }

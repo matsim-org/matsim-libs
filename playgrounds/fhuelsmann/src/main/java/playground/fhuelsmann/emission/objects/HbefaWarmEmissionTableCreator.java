@@ -35,10 +35,10 @@ public class HbefaWarmEmissionTableCreator {
 	 *  [1][2]1;48.9208374;0.349735767
 	 *  [1][3]1;12.75674725;0.710567832
 	 **/
-	private final HbefaWarmEmissionFactors [] [] hbefaWarmEmissionFactors = new HbefaWarmEmissionFactors [59][4];
+	private final HbefaWarmEmissionFactors [] [] hbefaWarmTable = new HbefaWarmEmissionFactors [59][4];
 
-	public HbefaWarmEmissionFactors[][] getHbefaWarmEmissionTable() {
-		return hbefaWarmEmissionFactors;}
+	public HbefaWarmEmissionFactors[][] getHbefaWarmTable() {
+		return hbefaWarmTable;}
 
 	public void makeHbefaWarmTable(String filename){
 		try{
@@ -69,7 +69,7 @@ public class HbefaWarmEmissionTableCreator {
 
 				int rowNumber = Integer.parseInt(array[1]);
 
-				this.hbefaWarmEmissionFactors [rowNumber] [place] = row;
+				this.hbefaWarmTable [rowNumber] [place] = row;
 
 				place++;
 				if (place==4) place =0;

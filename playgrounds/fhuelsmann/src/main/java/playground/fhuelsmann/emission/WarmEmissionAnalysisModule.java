@@ -34,13 +34,13 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
-import playground.benjamin.events.WarmEmissionEventImpl;
+import playground.benjamin.events.emissions.WarmEmissionEventImpl;
+import playground.benjamin.events.emissions.WarmPollutant;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactors;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactorsDetailed;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
 import playground.fhuelsmann.emission.objects.VisumRoadTypes;
-import playground.fhuelsmann.emission.objects.WarmPollutant;
 
 public class WarmEmissionAnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
@@ -75,18 +75,16 @@ public class WarmEmissionAnalysisModule{
 			Double enterTime, Double travelTime, String ageFuelCcm) {
 
 		Map<WarmPollutant, Double> warmEmissions = calculateWarmEmissions(personId, roadType, linkLength, travelTime, ageFuelCcm);
-		Map<String, Double> warmEmissionStrings = new HashMap<String, Double>();
-		for (Entry<WarmPollutant, Double> entry : warmEmissions.entrySet()) {
-			warmEmissionStrings.put(entry.getKey().getText(), entry.getValue());
-		}
-		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissionStrings);
+		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
 	private Map<WarmPollutant, Double> calculateWarmEmissions(Id personId,
 			Integer roadType, Double linkLength, Double travelTime,
 			String ageFuelCcm) {
+
 		// TODO: use freeVelocity, not hbefa value!
+
 		Map<WarmPollutant, double[][]> hashOfPollutant;
 		if(ageFuelCcm != null) {
 			hashOfPollutant = findEmissions(roadType, ageFuelCcm);
@@ -94,11 +92,9 @@ public class WarmEmissionAnalysisModule{
 			hashOfPollutant = null;
 			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
 		}
-
 		Map<WarmPollutant, Double> warmEmissions;
 		if(hashOfPollutant != null){
 			warmEmissions = calculateDetailedEmissions(hashOfPollutant, travelTime, linkLength);
-			logger.info(warmEmissions);
 		} else {
 			// We don't know how polluting this person's vehicle is, so we calculate its emissions based on averages.
 			if(vehInfoWarnCnt < maxVehInfoWarnCnt){
@@ -112,10 +108,10 @@ public class WarmEmissionAnalysisModule{
 
 			// TODO: use freeVelocity, not hbefa value!
 			if(!personId.toString().contains("gv_")){// Non-HDV emissions; TODO: better filter?!?
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreator.getHbefaWarmEmissionTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreator.getHbefaWarmTable());
 			}
 			else{
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmEmissionTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmTable());
 			}
 		}
 		return warmEmissions;
@@ -134,16 +130,18 @@ public class WarmEmissionAnalysisModule{
 		if (fuelCcmEuro == null) {
 			return null;
 		}
-		
+
 		for(WarmPollutant warmPollutant : WarmPollutant.values()) {
 			double[][] emissionsInFourSituations = new double[4][2];
 			for(int i = 0; i < 4; i++){// [0] for freeFlow, [1] for heavy, [2] for saturated, [3] for Stop&Go
 				String key = makeKey(warmPollutant, roadType, fuelCcmEuro[0], fuelCcmEuro[1], fuelCcmEuro[2], i);
-				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.hbefaWarmEmissionTableCreatorDetailed.getHbefaHot().get(key);
+				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.hbefaWarmEmissionTableCreatorDetailed.getHbefaWarmTableDetailed().get(key);
 				if (hbefaWarmEmissionFactorsDetailed != null) {
 					emissionsInFourSituations[i][0] = hbefaWarmEmissionFactorsDetailed.getV();
 					emissionsInFourSituations[i][1] = hbefaWarmEmissionFactorsDetailed.getEFA();
 				} else {
+					logger.warn("For traffic situation " + i + " and pollutant " + warmPollutant + " no vehicle specific emission factor is found."
+							+ "\n" + " Continuing calculation with fleet average values instead.");
 					return null;
 				}
 			}
@@ -227,7 +225,7 @@ public class WarmEmissionAnalysisModule{
 		+ "pass. car" + ";"
 		+ "2010" + ";"
 		+ ";"
-		+ warmPollutant + ";"
+		+ warmPollutant.getText() + ";"
 		+ ";"
 		+ this.roadTypesTrafficSituations[roadType][traficSitNumber] + ";"
 		+ "0%" + ";"
@@ -270,7 +268,7 @@ public class WarmEmissionAnalysisModule{
 
 	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer
 	private int splitAndConvert(String string, String splittZeichen){
-	
+
 		String[] array = string.split(splittZeichen);
 		return Integer.valueOf(array[1]);
 	}

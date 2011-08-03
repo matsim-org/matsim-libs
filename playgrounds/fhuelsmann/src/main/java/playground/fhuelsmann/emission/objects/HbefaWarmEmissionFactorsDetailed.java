@@ -47,7 +47,7 @@ FC		RUR/MW/80/Freeflow	0%	111120	PC petrol <1,4L Euro-2	petrol (4S)	<1,4L	PC-P-E
 public class HbefaWarmEmissionFactorsDetailed {
 
 	private String[] value;
-	
+
 	public HbefaWarmEmissionFactorsDetailed(String[] value){
 		super();
 		setValue(value);
@@ -66,11 +66,10 @@ public class HbefaWarmEmissionFactorsDetailed {
 			String newNumber = num[0] + "." + num[1] ;
 			return Double.valueOf(newNumber);
 		}catch(Exception e){
-			System.out.println("V " + e);
+			throw new RuntimeException(e);
 		}
-		return Double.valueOf(value[0]);
 	}
-	
+
 	public double getEFA(){
 		try{
 			String[] num = value[1].split(",");
@@ -78,8 +77,7 @@ public class HbefaWarmEmissionFactorsDetailed {
 			return Double.valueOf(newNumber);
 		}
 		catch(Exception e){
-			System.out.println("EFA " +  e);
-			}
-		return Double.valueOf(value[1]);
+			throw new RuntimeException(e);
+		}
 	}
 }

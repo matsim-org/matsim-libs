@@ -66,10 +66,10 @@ public class HbefaColdEmissionFactor {
 			String distance, 
 			double coldEF){
 		
-		this.vehCat= vehCat;
-		this.component= component;
-		this.parkingTime=parkingTime;
-		this.distance= distance;
-		this.coldEF= coldEF;
+		this.vehCat = vehCat;
+		this.component = component;
+		this.parkingTime = parkingTime;
+		this.distance = distance;
+		this.coldEF = coldEF;
 		}
 }

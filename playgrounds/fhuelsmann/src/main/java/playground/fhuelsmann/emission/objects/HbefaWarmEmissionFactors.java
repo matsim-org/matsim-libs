@@ -21,6 +21,8 @@ package playground.fhuelsmann.emission.objects;
 
 import java.util.HashMap;
 
+import playground.benjamin.events.emissions.WarmPollutant;
+
 public class HbefaWarmEmissionFactors {
 
 	private final int road_Category ;
@@ -37,12 +39,12 @@ public class HbefaWarmEmissionFactors {
 			double velocity,
 			double rPA,
 			double stop, 
-			double mkr,
-			double emissionFactorNox,
+			double emissionFactorFC,
+			double emissionFactorNOx,
 			double emissionFactorCo2Rep,
 			double emissionFactorCo2Total,
-			double NO2, 
-			double PM){
+			double emissionFactorNO2, 
+			double emissionFactorPM){
 
 		this.road_Category= road_Category;
 		this.IDTS = iDTS;
@@ -51,11 +53,11 @@ public class HbefaWarmEmissionFactors {
 		this.stop = stop;
 
 		this.emissionFactors = new HashMap<WarmPollutant, Double>();
-		this.emissionFactors.put(WarmPollutant.FC, mkr);
-		this.emissionFactors.put(WarmPollutant.NOX, emissionFactorNox);
+		this.emissionFactors.put(WarmPollutant.FC, emissionFactorFC);
+		this.emissionFactors.put(WarmPollutant.NOx, emissionFactorNOx);
+		this.emissionFactors.put(WarmPollutant.NO2, emissionFactorNO2);
+		this.emissionFactors.put(WarmPollutant.PM, emissionFactorPM);
 		this.emissionFactors.put(WarmPollutant.CO2_TOTAL, emissionFactorCo2Total);
-		this.emissionFactors.put(WarmPollutant.NO2, NO2);
-		this.emissionFactors.put(WarmPollutant.PM, PM);
 	}
 
 	public double getVelocity() {
