@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.charts;
+package playground.benjamin.scenarios.zurich.analysis.charts;
 
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;

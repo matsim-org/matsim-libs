@@ -35,7 +35,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.old.charts.BkAvgTollPaidQuantilesChart;
+import playground.benjamin.scenarios.zurich.analysis.charts.BkAvgTollPaidQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;

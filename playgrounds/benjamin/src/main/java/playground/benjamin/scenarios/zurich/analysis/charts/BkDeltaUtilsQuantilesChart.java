@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.old.charts;
+package playground.benjamin.scenarios.zurich.analysis.charts;
 
 import java.util.SortedMap;
 import java.util.TreeMap;

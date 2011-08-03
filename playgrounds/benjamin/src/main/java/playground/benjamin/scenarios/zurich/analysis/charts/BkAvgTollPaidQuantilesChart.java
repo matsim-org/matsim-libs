@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.charts;
+package playground.benjamin.scenarios.zurich.analysis.charts;
 
 import java.awt.BasicStroke;
 import java.util.ArrayList;
