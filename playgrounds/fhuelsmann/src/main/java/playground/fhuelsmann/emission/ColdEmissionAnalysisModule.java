@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,6 +36,7 @@ import playground.fhuelsmann.emission.objects.HbefaColdEmissionFactor;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 
 public class ColdEmissionAnalysisModule {
+	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 
 	public void calculateColdEmissions(Id linkId, Id personId,
 			double startEngineTime, double parkingDuration,
