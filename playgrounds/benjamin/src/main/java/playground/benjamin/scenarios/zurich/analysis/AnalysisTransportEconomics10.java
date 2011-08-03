@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.analysis;
+package playground.benjamin.scenarios.zurich.analysis;
 
 import java.util.Map;
 

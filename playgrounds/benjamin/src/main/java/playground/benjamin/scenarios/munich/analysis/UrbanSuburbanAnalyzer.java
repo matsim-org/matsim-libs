@@ -29,10 +29,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,9 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import playground.benjamin.scenarios.munich.analysis.filter.HomeLocationFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
 /**
  * @author benjamin
@@ -76,12 +73,12 @@ public class UrbanSuburbanAnalyzer {
 	private static String outputPath = runDirectory + "urbanSuburban/";
 
 	//===
-	private Scenario scenario;
+	private final Scenario scenario;
 
 
 	public UrbanSuburbanAnalyzer(){
 		Config config = ConfigUtils.createConfig();
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario = ScenarioUtils.createScenario(config);
 	}
 
 	public UrbanSuburbanAnalyzer(Scenario scenario){
@@ -183,60 +180,21 @@ public class UrbanSuburbanAnalyzer {
 		return noOfLegs;
 	}
 
-	public Population getMiDPopulation(Population population) {
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
-		for(Person person : population.getPersons().values()){
-			if(isPersonFromMID(person)){
-				filteredPopulation.addPerson(person);
-			}
-		}
-		return filteredPopulation;
-	}
-
 	public Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
-			if(isPersonNonFreight(person)){
-				if(isPersonsHomeInShape(person, featuresInShape)){
+			PersonFilter personFilter = new PersonFilter();
+			boolean isPersonNonFreight = personFilter.isPersonNonFreight(person);
+			if(isPersonNonFreight){
+				HomeLocationFilter homeLocationFilter = new HomeLocationFilter();
+				boolean isPersonsHomeInShape = homeLocationFilter.isPersonsHomeInShape(person, featuresInShape);
+				if(isPersonsHomeInShape){
 					filteredPopulation.addPerson(person);
 				}
 			}
 		}
 		return filteredPopulation;
-	}
-
-	private boolean isPersonNonFreight(Person person) {
-		boolean isNonFreight = false;
-		if(!person.getId().toString().contains("gv_")){
-			isNonFreight = true;
-		}
-		return isNonFreight;
-	}
-
-	private boolean isPersonFromMID(Person person) {
-		boolean isFromMID = false;
-		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
-			isFromMID = true;
-		}
-		return isFromMID;
-	}
-
-	private boolean isPersonsHomeInShape(Person person, Set<Feature> featuresInShape) {
-		boolean isInShape = false;
-		Activity homeAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-		Coord homeCoord = homeAct.getCoord();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
-		for(Feature feature : featuresInShape){
-			if(feature.getDefaultGeometry().contains(geo)){
-				//logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
-				isInShape = true;
-				break;
-			}
-		}
-		return isInShape;
 	}
 
 	public Set<Feature> readShape(String shapeFile) {

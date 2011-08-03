@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Trb09Analysis
+ * MiDPersonFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.old.analysis;
+package playground.benjamin.scenarios.munich.analysis.filter;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author benjamin
  *
  */
-public class MoneyEventHandler implements AgentMoneyEventHandler{
-
-	SortedMap<Id, Double> id2Toll = new TreeMap<Id, Double>();
+public class PersonFilter {
 	
-	@Override
-	public void handleEvent(AgentMoneyEvent event) {
-		
-		Id id = event.getPersonId();
-		Double toll = event.getAmount();
-		
-		if(id2Toll.containsKey(id)){
-			double sumToll = id2Toll.get(id).doubleValue() + toll;
-			id2Toll.put(id, sumToll);
+	public Population getMiDPopulation(Population population) {
+		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population filteredPopulation = new PopulationImpl(emptyScenario);
+		for(Person person : population.getPersons().values()){
+			if(isPersonFromMID(person)){
+				filteredPopulation.addPerson(person);
+			}
 		}
-		else{
-			id2Toll.put(id, toll);
-		}	
+		return filteredPopulation;
 	}
 
-	public Map<Id, Double> getPersonId2TollMap() {
-		return Collections.unmodifiableMap(id2Toll);
+	private boolean isPersonFromMID(Person person) {
+		boolean isFromMID = false;
+		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
+			isFromMID = true;
+		}
+		return isFromMID;
 	}
 	
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub	
+	public boolean isPersonNonFreight(Person person) {
+		boolean isNonFreight = false;
+		if(!person.getId().toString().contains("gv_")){
+			isNonFreight = true;
+		}
+		return isNonFreight;
 	}
 }

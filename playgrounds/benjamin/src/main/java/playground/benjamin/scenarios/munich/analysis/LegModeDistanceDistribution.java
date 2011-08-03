@@ -39,12 +39,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
 /**
  * @author benjamin
@@ -64,13 +64,13 @@ public class LegModeDistanceDistribution {
 
 	private final Scenario initialScenario;
 	private final Scenario finalScenario;
-	private List<Integer> distanceClasses;
-	private SortedSet<String> usedModes;
+	private final List<Integer> distanceClasses;
+	private final SortedSet<String> usedModes;
 
 	public LegModeDistanceDistribution(){
 		Config config = ConfigUtils.createConfig();
-		this.initialScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		this.finalScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.initialScenario = ScenarioUtils.createScenario(config);
+		this.finalScenario = ScenarioUtils.createScenario(config);
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
 	}
@@ -87,8 +87,9 @@ public class LegModeDistanceDistribution {
 		getUsedModes();
 		Population initialPop = this.initialScenario.getPopulation();
 		Population finalPop = this.finalScenario.getPopulation();
-		Population initialMiDPop = getMiDPopulation(initialPop);
-		Population finalMiDPop = getMiDPopulation(finalPop);
+		PersonFilter filter = new PersonFilter();
+		Population initialMiDPop = filter.getMiDPopulation(initialPop);
+		Population finalMiDPop = filter.getMiDPopulation(finalPop);
 		SortedMap<String, Map<Integer, Integer>> initialMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(initialMiDPop);
 		SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(finalMiDPop);
 		SortedMap<String, Map<Integer, Integer>> differenceMode2DistanceClassNoOfLegs = calculateDifferenceMode2DistanceClassNoOfLegs(initialMode2DistanceClassNoOfLegs, finalMode2DistanceClassNoOfLegs);
@@ -179,25 +180,6 @@ public class LegModeDistanceDistribution {
 			mode2DistanceClassNoOfLegs.put(mode, distanceClass2NoOfLegs);
 		}
 		return mode2DistanceClassNoOfLegs;
-	}
-
-	private boolean isPersonFromMID(Person person) {
-		boolean isFromMID = false;
-		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
-			isFromMID = true;
-		}
-		return isFromMID;
-	}
-
-	private Population getMiDPopulation(Population population) {
-		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population filteredPopulation = new PopulationImpl(emptyScenario);
-		for(Person person : population.getPersons().values()){
-			if(isPersonFromMID(person)){
-				filteredPopulation.addPerson(person);
-			}
-		}
-		return filteredPopulation;
 	}
 
 	private void getUsedModes() {
