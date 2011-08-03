@@ -51,8 +51,8 @@ public interface OTFDrawer {
 	
 	public void setQueryHandler(OTFQueryHandler queryHandler);
 	
-	public void setScale(float scale);
+	public void setScale(double scale);
 	
-	public float getScale();
+	public double getScale();
 	
 }

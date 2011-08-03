@@ -624,12 +624,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	@Override
-	public float getScale(){
+	public double getScale(){
 		return this.mouseMan.getScale();
 	}
 
 	@Override
-	public void setScale(float scale){
+	public void setScale(double scale){
 		this.mouseMan.scaleNetwork(scale);
 		hostControlBar.updateScaleLabel();
 	}

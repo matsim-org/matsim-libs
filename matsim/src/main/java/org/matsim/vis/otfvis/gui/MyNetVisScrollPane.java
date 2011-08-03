@@ -44,7 +44,7 @@ public class MyNetVisScrollPane extends JScrollPane {
 		revalidate();
 	}
 
-	public double scaleNetwork(Rectangle destrect, float factor) {
+	public double scaleNetwork(Rectangle destrect, double scale) {
 		Rectangle viewRect = getViewport().getViewRect();
 		Point p = viewRect.getLocation(); // top-left
 		p.translate(viewRect.width / 2, viewRect.height / 2); // center 
@@ -52,7 +52,7 @@ public class MyNetVisScrollPane extends JScrollPane {
 		destP.translate(destrect.width / 2, destrect.height / 2); // center 
 		moveNetwork(destP.x - p.x, destP.y - p.y);
 		double scaleUp = Math.min(viewRect.width / destrect.width, viewRect.height / destrect.height);
-		double newScale = scaleUp * factor;
+		double newScale = scaleUp * scale;
 		scaleNetwork(newScale);
 		return newScale;
 	}

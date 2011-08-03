@@ -55,7 +55,7 @@ class VizGuiHandler extends MouseInputAdapter {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (currentRect.getHeight() > 10 && currentRect.getWidth() > 10) {
-			float scale =  otfSwingDrawer.getScale();
+			double scale =  otfSwingDrawer.getScale();
 			otfSwingDrawer.setScale(currentRect,scale);
 			currentRect.setSize(0,0);
 		}
@@ -90,14 +90,14 @@ class VizGuiHandler extends MouseInputAdapter {
 	}
 
 	private void pressed_ZOOM_OUT() {
-		float scale = this.otfSwingDrawer.getScale() / 1.42f;
+		double scale = this.otfSwingDrawer.getScale() / 1.42f;
 		if (scale > 0.02) {
 			this.otfSwingDrawer.setScale(scale);
 		}
 	}
 
 	private void pressed_ZOOM_IN() {
-		float scale = this.otfSwingDrawer.getScale() * 1.42f;
+		double scale = this.otfSwingDrawer.getScale() * 1.42f;
 		if ( scale < 100) {
 			this.otfSwingDrawer.setScale(scale);
 		}

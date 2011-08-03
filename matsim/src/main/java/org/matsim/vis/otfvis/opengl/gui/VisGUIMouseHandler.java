@@ -83,7 +83,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 	private Point start = null;
 
 	private Rectangle currentRect = null;
-	private float scale = 1.f;
+	private double scale = 1.;
 
 	private int button = 0;
 	private final OTFDrawer clickHandler;
@@ -318,7 +318,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 	}
 
 
-	private void scaleNetworkRelative(float scale) {
+	private void scaleNetworkRelative(double scale) {
 		if (!ORTHO) {
 			this.scale *= scale;
 			double zPos = (cameraStart.getZ()*(scale));
@@ -332,8 +332,8 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		}
 	}
 
-	public void scaleNetwork(float scale) {
-		float scaleFactor = scale / this.scale;
+	public void scaleNetwork(double scale) {
+		double scaleFactor = scale / this.scale;
 		scaleNetworkRelative(scaleFactor);
 	}
 
@@ -366,7 +366,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		return new CoordImpl(Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
 	}
 
-	public float getScale() {
+	public double getScale() {
 		return this.scale;
 	}
 

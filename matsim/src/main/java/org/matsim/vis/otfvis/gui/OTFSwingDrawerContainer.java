@@ -56,7 +56,7 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 	}
 
 	@Override
-	public float getScale() {
+	public double getScale() {
 		return delegate.getScale();
 	}
 
@@ -81,13 +81,13 @@ public class OTFSwingDrawerContainer extends JPanel implements OTFDrawer {
 	}
 
 	@Override
-	public void setScale(float scale) {
+	public void setScale(double scale) {
 		this.networkScrollPane.scaleNetwork(scale);
 		this.delegate.hostControlBar.updateScaleLabel();
 	}
 	
-	public void setScale(Rectangle destrect, float factor){
-		this.networkScrollPane.scaleNetwork(destrect, factor);
+	public void setScale(Rectangle destrect, double scale){
+		this.networkScrollPane.scaleNetwork(destrect, scale);
 		this.delegate.hostControlBar.updateScaleLabel();
 	}
 
