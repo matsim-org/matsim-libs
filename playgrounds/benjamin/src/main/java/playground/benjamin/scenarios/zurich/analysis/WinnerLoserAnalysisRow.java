@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.analysis;
+package playground.benjamin.scenarios.zurich.analysis;
 
 import org.matsim.api.core.v01.Id;
 
@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
  * @author benkick
  */
 
-public class Row {
+public class WinnerLoserAnalysisRow {
 	private Id id;
 	private Double personalIncome;
 	private Double incomeRank;
@@ -39,7 +39,7 @@ public class Row {
 	private boolean isSelectedPlanCar;
 
 	//constructor: set all variables to null or 0.0
-	public Row() {
+	public WinnerLoserAnalysisRow() {
 		this.setId(null);
 		this.setPersonalIncome(0.0);
 		this.setIncomeRank(0.0);

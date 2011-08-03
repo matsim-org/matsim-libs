@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.analysis;
+package playground.benjamin.scenarios.zurich.analysis;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -39,15 +39,15 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
-import playground.benjamin.analysis.filter.BkAnalysisFilter;
+import playground.benjamin.scenarios.zurich.analysis.filter.WinnerLoserAnalysisFilter;
 
 /**
  * @author benjamin after kn and dgrether
  */
 
-public class BkAnalysis {
+public class WinnerLoserAnalysis {
 	
-	private static final Logger log = Logger.getLogger(BkAnalysis.class);
+	private static final Logger log = Logger.getLogger(WinnerLoserAnalysis.class);
 	
 	String netfile = "../runs-svn/run860/run860.output_network.xml.gz";
 	String plansfile1 = "../runs-svn/run860/run860.output_plans.xml.gz";
@@ -57,7 +57,7 @@ public class BkAnalysis {
 	
 	//main class
 	public static void main(final String[] args) throws IOException {
-		BkAnalysis app = new BkAnalysis();
+		WinnerLoserAnalysis app = new WinnerLoserAnalysis();
 		app.run(args);
 	}
 
@@ -110,16 +110,16 @@ public class BkAnalysis {
 		SortedMap<Id, Double> isSelectedPlanCar = getIsSelectedPlanCarFromPlans(population1);
 		
 		//if desired, add additional maps (see maps above, eg: homeX, homeY, isCarAvail, isSelectedPlanCar)
-		SortedMap<Id, Row> populationInformation = putAllNeededPopulationInfoInOneMap(personalIncome, incomeRank, scores1, scores2);
+		SortedMap<Id, WinnerLoserAnalysisRow> populationInformation = putAllNeededPopulationInfoInOneMap(personalIncome, incomeRank, scores1, scores2);
 
 //======================================================================================================================================================
 
 		// apply filters and output to text files
-		BkAnalysisFilter filter = new BkAnalysisFilter();
-		SortedMap<Id, Row> winner = filter.getWinner(populationInformation);
-		SortedMap<Id, Row> loser = filter.getLoser(populationInformation);
+		WinnerLoserAnalysisFilter filter = new WinnerLoserAnalysisFilter();
+		SortedMap<Id, WinnerLoserAnalysisRow> winner = filter.getWinner(populationInformation);
+		SortedMap<Id, WinnerLoserAnalysisRow> loser = filter.getLoser(populationInformation);
 		
-		BkAnalysisWriter writer = new BkAnalysisWriter(outputPath);
+		WinnerLoserAnalysisWriter writer = new WinnerLoserAnalysisWriter(outputPath);
 		writer.writeFile(winner, "winner");
 		writer.writeFile(loser, "loser");
 		writer.writeFile(populationInformation, "wholePopulation");
@@ -131,19 +131,19 @@ public class BkAnalysis {
 
 //============================================================================================================	
 
-	private SortedMap<Id, Row> putAllNeededPopulationInfoInOneMap(SortedMap<Id, Double> personalIncome, SortedMap<Id, Double> incomeRank,
+	private SortedMap<Id, WinnerLoserAnalysisRow> putAllNeededPopulationInfoInOneMap(SortedMap<Id, Double> personalIncome, SortedMap<Id, Double> incomeRank,
 			SortedMap<Id, Double> scores1, SortedMap<Id, Double> scores2) {
 		
-		SortedMap<Id, Row> result = new TreeMap<Id, Row>(new ComparatorImplementation());
+		SortedMap<Id, WinnerLoserAnalysisRow> result = new TreeMap<Id, WinnerLoserAnalysisRow>(new ComparatorImplementation());
 		for(Id id : scores1.keySet()){						
 			
 			//Row can be extended to all the needed information
-			Row row = new Row();
-			row.setId(id);
-			row.setPersonalIncome(personalIncome.get(id));
-			row.setIncomeRank(incomeRank.get(id));
-			row.setScore1(scores1.get(id));
-			row.setScore2(scores2.get(id));
+			WinnerLoserAnalysisRow winnerLoserAnalysisRow = new WinnerLoserAnalysisRow();
+			winnerLoserAnalysisRow.setId(id);
+			winnerLoserAnalysisRow.setPersonalIncome(personalIncome.get(id));
+			winnerLoserAnalysisRow.setIncomeRank(incomeRank.get(id));
+			winnerLoserAnalysisRow.setScore1(scores1.get(id));
+			winnerLoserAnalysisRow.setScore2(scores2.get(id));
 			
 //			row.setHomeX(homeX.get(id));
 //			row.setHomeY(homeY.get(id));
@@ -151,7 +151,7 @@ public class BkAnalysis {
 //			row.setCarAvail(isCarAvail.get(id));
 //			row.setSelectedPlanCar(isSelectedPlanCar.get(id));
 			
-			result.put(id, row);
+			result.put(id, winnerLoserAnalysisRow);
 		}
 		return result;
 	}

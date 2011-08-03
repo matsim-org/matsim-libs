@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgAnalysisReaderFilter
+ * BkAnalysisWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.analysis.filter;
+package playground.benjamin.scenarios.zurich.analysis;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.roadpricing.RoadPricingScheme;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.SortedMap;
 
-import playground.dgrether.analysis.io.DgAnalysisReaderFilter;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author benjamin
  *
  */
-public class OnlyInnerZurichFilter implements DgAnalysisReaderFilter {
+public class WinnerLoserAnalysisWriter {
+	private String outputPath;
 
-	private RoadPricingScheme tollLinks ;
-
-	public OnlyInnerZurichFilter(RoadPricingScheme tollLinks) {
-		this.tollLinks = tollLinks;
+	public WinnerLoserAnalysisWriter(String outputPath) {
+		this.outputPath = outputPath;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.dgrether.analysis.io.DgAnalysisReaderFilter#doAcceptPerson(org.matsim.api.core.v01.population.Person)
-	 */
-	@Override
-	public boolean doAcceptPerson(Person person) {
-		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
-            if (pe instanceof Activity) {
-                Activity act = (Activity) pe;
-			if (this.tollLinks.getLinkIdSet().contains(act.getLinkId())) {
-				return true;
-            }
-            }
+	public void writeFile(SortedMap<Id, WinnerLoserAnalysisRow> map, String outputFile) throws IOException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputPath + outputFile + ".txt")));
+		bw.write("PersonId \t PersonalIncome \t IncomeRank \t Score1 \t Score2 \t ScoreDiff");
+		bw.newLine();
+		for(WinnerLoserAnalysisRow winnerLoserAnalysisRow : map.values()) {
+			bw.write(winnerLoserAnalysisRow.getId() + "\t" + winnerLoserAnalysisRow.getPersonalIncome() + "\t" + winnerLoserAnalysisRow.getIncomeRank() + "\t" + winnerLoserAnalysisRow.getScore1() + "\t" + winnerLoserAnalysisRow.getScore2() + "\t" + winnerLoserAnalysisRow.getScoreDiff());
+			bw.newLine();
 		}
-		return false;
+		bw.close();
 	}
-
 }

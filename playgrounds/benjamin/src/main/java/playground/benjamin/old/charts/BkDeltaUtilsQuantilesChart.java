@@ -33,15 +33,15 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.analysis.Row;
+import playground.benjamin.scenarios.zurich.analysis.WinnerLoserAnalysisRow;
 
 public class BkDeltaUtilsQuantilesChart {
 	
 	private XYSeriesCollection dataset;
-	private SortedMap<Id, Row> populationInformation;
+	private SortedMap<Id, WinnerLoserAnalysisRow> populationInformation;
 	
 	//constructor for row approach
-	public BkDeltaUtilsQuantilesChart(SortedMap<Id, Row> populationInformation) {
+	public BkDeltaUtilsQuantilesChart(SortedMap<Id, WinnerLoserAnalysisRow> populationInformation) {
 		this.populationInformation = populationInformation;
 		this.dataset = createNeededDataset();
 	}
@@ -70,14 +70,14 @@ public class BkDeltaUtilsQuantilesChart {
 	 * @return Map from income to the chosen information (e.g. scoreDiff)
 	 * 
 	 */
-	private SortedMap<Double, Double> personalIncomeInQuantiles2Scores(SortedMap<Id, Row> populationInformation) {
+	private SortedMap<Double, Double> personalIncomeInQuantiles2Scores(SortedMap<Id, WinnerLoserAnalysisRow> populationInformation) {
 		SortedMap<Double, Double> result = new TreeMap<Double, Double>();
 		
 		//iterating over a map and getting the desired values out of Row (personal income and score difference)
-		for (Entry<Id, Row> entry: populationInformation.entrySet()){
-			Row row = entry.getValue();
-			Double personalIncome = row.getPersonalIncome();
-			Double scoreDiff = row.getScoreDiff();
+		for (Entry<Id, WinnerLoserAnalysisRow> entry: populationInformation.entrySet()){
+			WinnerLoserAnalysisRow winnerLoserAnalysisRow = entry.getValue();
+			Double personalIncome = winnerLoserAnalysisRow.getPersonalIncome();
+			Double scoreDiff = winnerLoserAnalysisRow.getScoreDiff();
 			result.put(personalIncome, scoreDiff);
 		}
 		return result;

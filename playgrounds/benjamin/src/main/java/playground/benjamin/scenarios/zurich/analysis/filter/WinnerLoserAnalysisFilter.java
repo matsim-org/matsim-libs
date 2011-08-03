@@ -18,41 +18,41 @@
  * *********************************************************************** */
 
 
-package playground.benjamin.analysis.filter;
+package playground.benjamin.scenarios.zurich.analysis.filter;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.analysis.BkAnalysis;
-import playground.benjamin.analysis.Row;
+import playground.benjamin.scenarios.zurich.analysis.WinnerLoserAnalysis;
+import playground.benjamin.scenarios.zurich.analysis.WinnerLoserAnalysisRow;
 
 
 /**
  * @author benkick and fuerbas
  */
 
-public class BkAnalysisFilter extends BkAnalysis {
+public class WinnerLoserAnalysisFilter extends WinnerLoserAnalysis {
 
-	public BkAnalysisFilter() {
+	public WinnerLoserAnalysisFilter() {
 	}
 
-	public SortedMap<Id, Row> getWinner(SortedMap<Id, Row> populationInformation) {
-		SortedMap<Id, Row> winner = new TreeMap<Id, Row>(new ComparatorImplementation());
-		for (Row row : populationInformation.values()) {
-			if (row.getScoreDiff() >= 0) {
-				winner.put(row.getId(), row);
+	public SortedMap<Id, WinnerLoserAnalysisRow> getWinner(SortedMap<Id, WinnerLoserAnalysisRow> populationInformation) {
+		SortedMap<Id, WinnerLoserAnalysisRow> winner = new TreeMap<Id, WinnerLoserAnalysisRow>(new ComparatorImplementation());
+		for (WinnerLoserAnalysisRow winnerLoserAnalysisRow : populationInformation.values()) {
+			if (winnerLoserAnalysisRow.getScoreDiff() >= 0) {
+				winner.put(winnerLoserAnalysisRow.getId(), winnerLoserAnalysisRow);
 			}
 		}
 		return winner;
 	}
 
-	public SortedMap<Id, Row> getLoser(SortedMap<Id, Row> populationInformation) {
-		SortedMap<Id, Row> loser = new TreeMap<Id, Row>(new ComparatorImplementation());
-		for (Row row : populationInformation.values()) {
-			if (row.getScoreDiff() < 0) {
-				loser.put(row.getId(), row);
+	public SortedMap<Id, WinnerLoserAnalysisRow> getLoser(SortedMap<Id, WinnerLoserAnalysisRow> populationInformation) {
+		SortedMap<Id, WinnerLoserAnalysisRow> loser = new TreeMap<Id, WinnerLoserAnalysisRow>(new ComparatorImplementation());
+		for (WinnerLoserAnalysisRow winnerLoserAnalysisRow : populationInformation.values()) {
+			if (winnerLoserAnalysisRow.getScoreDiff() < 0) {
+				loser.put(winnerLoserAnalysisRow.getId(), winnerLoserAnalysisRow);
 			}
 		}
 		return loser;		
