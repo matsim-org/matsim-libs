@@ -40,15 +40,16 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 public final class JXMapOTFVisClient {
 
 	public static void run(final Config config, final OTFServerRemote server) {
-		run(server, osmTileFactory());
+		final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
+		run(server, osmTileFactory(), coordinateTransformation);
 	}
 	
-	public static void run(final Config config, final OTFServerRemote server, final WMSService wms) {
+	public static void run(final Config config, final OTFServerRemote server, final WMSService wms, final CoordinateTransformation coordinateTransformation) {
 		final TileFactory tf = new MyWMSTileFactory(wms);
-		run(server, tf);
+		run(server, tf, coordinateTransformation);
 	}
 
-	private static void run(final OTFServerRemote server, final TileFactory tf) {
+	private static void run(final OTFServerRemote server, final TileFactory tf, final CoordinateTransformation coordinateTransformation) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -101,9 +102,6 @@ public final class JXMapOTFVisClient {
 					}
 
 				});
-
-
-				final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
 
 				((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
 
