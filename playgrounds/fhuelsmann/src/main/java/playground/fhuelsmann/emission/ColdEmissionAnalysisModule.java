@@ -54,20 +54,20 @@ public class ColdEmissionAnalysisModule {
 		} else {
 			distance_km = 1;
 		}
-		
+
 		//for parking duration there are 13 categories in hours: 0-1; 1-2,......,11-12; 12- max
 		int parkingDuration_h = (int) (parkingDuration / 3600);
-		if (parkingDuration_h >= 12)
+		if (parkingDuration_h >= 12){
 			parkingDuration_h = 12;
-
+		}
 		ColdPollutant coldPollutant = null;
 		Double generatedEmissions = null;
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
-		
+
 		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
 			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
 			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEF();
-				
+
 			coldPollutant = entry.getKey();
 			generatedEmissions = coldEf ;
 			coldEmissions.put(coldPollutant, generatedEmissions);
