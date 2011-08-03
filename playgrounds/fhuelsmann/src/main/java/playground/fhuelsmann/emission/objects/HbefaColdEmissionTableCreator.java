@@ -59,7 +59,7 @@ public class HbefaColdEmissionTableCreator {
 						array[3], //distance
 						Double.parseDouble(array[4]));//coldEF
 				
-				ColdPollutant coldPollutant = ColdPollutant.valueOf(array[1]);
+				ColdPollutant coldPollutant = ColdPollutant.getValue(array[1]);
 				int parkingTime = Integer.valueOf(array[2].split("-")[0]);
 				int distance = Integer.valueOf(array[3].split("-")[0]);
 				if (this.hbefaColdTable.get(coldPollutant) != null){

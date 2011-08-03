@@ -54,7 +54,7 @@ public class HbefaWarmEmissionFactors {
 
 		this.emissionFactors = new HashMap<WarmPollutant, Double>();
 		this.emissionFactors.put(WarmPollutant.FC, emissionFactorFC);
-		this.emissionFactors.put(WarmPollutant.NOx, emissionFactorNOx);
+		this.emissionFactors.put(WarmPollutant.NOX, emissionFactorNOx);
 		this.emissionFactors.put(WarmPollutant.NO2, emissionFactorNO2);
 		this.emissionFactors.put(WarmPollutant.PM, emissionFactorPM);
 		this.emissionFactors.put(WarmPollutant.CO2_TOTAL, emissionFactorCo2Total);
