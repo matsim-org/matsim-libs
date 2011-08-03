@@ -101,7 +101,16 @@
 			<artifactId>jmapviewer</artifactId>
 			<version>0.1-20110219</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.swinglabs</groupId>
+			<artifactId>swingx</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swinglabs</groupId>
+			<artifactId>swingx-ws</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagtransform-plugin</artifactId>

@@ -14,26 +14,18 @@ import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
-import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
-import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
-import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -44,157 +36,116 @@ import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
-import org.matsim.vis.otfvis2.LinkHandler;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
-public final class JXMapOTFVisClient implements Runnable {
+public final class JXMapOTFVisClient {
 
-	private boolean swing = false;
-
-	private OTFClient otfClient = new OTFClient();
-
-	private OTFServerRemote server;
-
-	double log2 (double scale) {
-		return Math.log(scale) / Math.log(2);
+	public static void run(final Config config, final OTFServerRemote server) {
+		run(server, osmTileFactory());
+	}
+	
+	public static void run(final Config config, final OTFServerRemote server, final WMSService wms) {
+		final TileFactory tf = new MyWMSTileFactory(wms);
+		run(server, tf);
 	}
 
-	private void createDrawer() {
-		otfClient.setServer(server);
-		OTFConnectionManager connect = new OTFConnectionManager();
-		OTFClientControl.getInstance().setOTFVisConfig(server.getOTFVisConfig());
-		connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
-		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		if (swing) {
-			connect.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
-			connect.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
-			connect.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
-			connect.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
-		} else {
-			connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
-			connect.connectReaderToReceiver(LinkHandler.class,  OGLSimpleQuadDrawer.class);
-			connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
-			connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		}
-		OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-		OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
-		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
-		hostControlBar.addDrawer(timeLine);
-		OTFServerQuadTree servQ = server.getQuad(connect);
-		OTFClientQuadTree clientQ = servQ.convertToClient(server, connect);
-		clientQ.createReceiver(connect);
-		clientQ.getConstData();
-		hostControlBar.updateTimeLabel();
+	private static void run(final OTFServerRemote server, final TileFactory tf) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				OTFClient otfClient = new OTFClient();
+				VisGUIMouseHandler.ORTHO = true;
+				OTFOGLDrawer.USE_GLJPANEL = true;
+				otfClient.setServer(server);
+				OTFConnectionManager connect = new OTFConnectionManager();
+				OTFClientControl.getInstance().setOTFVisConfig(server.getOTFVisConfig());
+				connect.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+				connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+				connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
+				connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
+				connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
+				connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+				
+				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
+				OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
+				otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
+				hostControlBar.addDrawer(timeLine);
+				OTFServerQuadTree servQ = server.getQuad(connect);
+				OTFClientQuadTree clientQ = servQ.convertToClient(server, connect);
+				clientQ.createReceiver(connect);
+				clientQ.getConstData();
+				hostControlBar.updateTimeLabel();
 
-		final OTFDrawer mainDrawer;
-		if (swing) {
-			mainDrawer = new OTFSwingDrawerContainer(clientQ, hostControlBar);
-		} else {
-			mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar);
-		}
-		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
+				final OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar);
+				otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
 
-		final JPanel compositePanel = otfClient.getCompositePanel();
-		final JXMapViewer jMapViewer = new JXMapViewer();
+				final JPanel compositePanel = otfClient.getCompositePanel();
+				final JXMapViewer jMapViewer = new JXMapViewer();
+				jMapViewer.setTileFactory(tf);
+				jMapViewer.setPanEnabled(false);
+				jMapViewer.setZoomEnabled(false);
+				compositePanel.add(jMapViewer);
 
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						RepaintManager myManager = new RepaintManager() {
+							public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
+								super.addDirtyRegion(c, x, y, w, h);
+								if (c == jMapViewer) {
+									addDirtyRegion(compositePanel, x, y, w, h);
+								}
+							}
+						};
+						RepaintManager.setCurrentManager(myManager);
+					}
+
+				});
+
+
+				final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
+
+				((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
+
+					@Override
+					public void stateChanged(ChangeEvent e) {
+						if (((OTFOGLDrawer) mainDrawer).getViewBounds() != null) {
+							double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
+							double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
+							Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+							double scale = mainDrawer.getScale();
+							int zoomDiff = (int) log2(scale);
+							jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
+							jMapViewer.setZoom((17 - (WGS84ToOSMMercator.SCALE - zoomDiff)));
+							compositePanel.repaint();
+						}
+					}
+
+				});
+				otfClient.show();
+			}
+		});
+	}
+
+	private static TileFactory osmTileFactory() {
 		final int max=17;
 		TileFactoryInfo info = new TileFactoryInfo(1,max-2,max,
-				256, true, true, // tile size is 256 and x/y orientation is normal
-				"http://tile.openstreetmap.org",//5/15/10.png",
+				256, true, true,
+				"http://tile.openstreetmap.org",
 				"x","y","z") {
 			public String getTileUrl(int x, int y, int zoom) {
 				zoom = max-zoom;
 				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
 				return url;
 			}
-
+	
 		};
 		TileFactory tf = new DefaultTileFactory(info);
-
-		//		TileFactory tf = new MyWMSTileFactory(new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:beatty"));
-		//		jMapViewer.setTileFactory(tf);
-
-
-		jMapViewer.setTileFactory(tf);
-		jMapViewer.setPanEnabled(false);
-		jMapViewer.setZoomEnabled(false);
-		compositePanel.add(jMapViewer);
-
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				RepaintManager myManager = new RepaintManager() {
-					public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
-						super.addDirtyRegion(c, x, y, w, h);
-						if (c == jMapViewer) {
-							addDirtyRegion(compositePanel, x, y, w, h);
-						}
-					}
-				};
-				RepaintManager.setCurrentManager(myManager);
-			}
-
-		});
-
-
-		final CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Deproject();
-
-		((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				if (((OTFOGLDrawer) mainDrawer).getViewBounds() != null) {
-					double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
-					double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
-					Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
-					double scale = mainDrawer.getScale();
-					int zoomDiff = (int) log2(scale);
-					jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
-					jMapViewer.setZoom((17 - (WGS84ToOSMMercator.SCALE - zoomDiff)));
-					compositePanel.repaint();
-				}
-			}
-
-		});
-		otfClient.show();
-		// mainDrawer.setScale(8.0);
+		return tf;
 	}
 
-	public void setSwing(boolean swing) {
-		this.swing = swing;
+	private static double log2 (double scale) {
+		return Math.log(scale) / Math.log(2);
 	}
-
-	@Override
-	public final void run() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				createDrawer();
-			}
-		});
-	}
-
-	public void setServer(OTFServerRemote server) {
-		this.server = server;
-	}
-
-	public static final void playNetwork(final String filename) {
-		VisGUIMouseHandler.ORTHO = true;
-		OTFOGLDrawer.USE_GLJPANEL = true;
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(filename);
-		EventsManager events = EventsUtils.createEventsManager();
-		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
-		JXMapOTFVisClient client = new JXMapOTFVisClient();
-		client.setServer(server);
-		client.setSwing(false);
-		client.run();
-		server.getSnapshotReceiver().finish();
-	}
-
-	public static void main(String[] args) {
-		playNetwork("input/network.xml");
-	}
-
+	
 }

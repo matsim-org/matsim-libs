@@ -13,11 +13,8 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
-import playground.mzilske.osm.OTFVisClient;
+import playground.mzilske.osm.JXMapOTFVisClient;
 import playground.mzilske.osm.WGS84ToOSMMercator;
 
 public class GtfsMain {
@@ -32,7 +29,7 @@ public class GtfsMain {
 	}
 
 	private static Scenario readScenario() {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/urbana-champaign", new WGS84ToOSMMercator.Project());
+		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new WGS84ToOSMMercator.Project());
 		gtfs.setCreateShapedNetwork(false);
 		//		gtfs.setDate(20110711);
 		gtfs.convert();
@@ -63,17 +60,11 @@ public class GtfsMain {
 	}
 
 	private static void runWithOSM(Scenario scenario) {
-		VisGUIMouseHandler.ORTHO = true;
-		OTFOGLDrawer.USE_GLJPANEL = true;
 		EventsManager events = EventsUtils.createEventsManager();
-		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
-		qSim.addSnapshotWriter(server.getSnapshotReceiver());
-		
-		OTFVisClient client = new OTFVisClient();
-		client.setServer(server);
-		client.setSwing(false);
-		client.run();
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 	}
+	
 }
