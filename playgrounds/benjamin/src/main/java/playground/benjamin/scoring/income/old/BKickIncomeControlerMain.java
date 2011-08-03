@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*																															*
+ * project: org.matsim.*
+ * BKickIncomeControlerMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.distance;
+package playground.benjamin.scoring.income.old;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import playground.benjamin.BkPaths;
 
 
-/**
- * @author dgrether
- *
- */
-public class BkScoringFunctionFactory implements ScoringFunctionFactory {
-
-	private PlanCalcScoreConfigGroup configGroup;
-
-	public BkScoringFunctionFactory(
-			PlanCalcScoreConfigGroup charyparNagelScoring) {
-		this.configGroup = charyparNagelScoring;
-	}
-
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		return new BkScoringFunction(plan, this.configGroup);
+public class BKickIncomeControlerMain {
+	
+	public static void main(String[] args){
+//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
+//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
+//		new BKickIncomeControler(config).run();
+		
+		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
+		new BKickIncomeControler(config).run();
 	}
 
 }

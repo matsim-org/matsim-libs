@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.incomeScoring;
+package playground.benjamin.scoring.income;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
-import playground.benjamin.incomeScoring.ScoringFromLeg;
+import playground.benjamin.scoring.income.ScoringFromLeg;
 
 /**
  * @author dgrether

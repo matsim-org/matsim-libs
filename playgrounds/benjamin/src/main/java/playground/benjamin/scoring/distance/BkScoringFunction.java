@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.distance;
+package playground.benjamin.scoring.distance;
 
 import java.util.TreeMap;
 

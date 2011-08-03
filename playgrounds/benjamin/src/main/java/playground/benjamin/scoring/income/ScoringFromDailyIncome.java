@@ -1,4 +1,4 @@
-package playground.benjamin.incomeScoring.old;
+package playground.benjamin.scoring.income;
 
 import org.matsim.core.scoring.interfaces.BasicScoring;
 

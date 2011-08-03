@@ -38,9 +38,9 @@ import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.incomeScoring.IncomeScoringFunctionFactory;
-import playground.benjamin.incomeScoring.IncomeTollTravelCostCalculatorFactory;
-import playground.benjamin.incomeScoring.IncomeTravelCostCalculatorFactory;
+import playground.benjamin.scoring.income.IncomeScoringFunctionFactory;
+import playground.benjamin.scoring.income.IncomeTollTravelCostCalculatorFactory;
+import playground.benjamin.scoring.income.IncomeTravelCostCalculatorFactory;
 
 /**
  * Tests the routing of the BkIncomeControler

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Income1TravelCostCalculatorFactory
+ * IncomePlansCalcRoute
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.incomeScoring.old;
+package playground.benjamin.scoring.income.old;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 
 
 /**
- * @author bkick after dgrether
+ * @author dgrether
  *
  */
-public class IncomeTravelCostCalculatorFactory implements TravelCostCalculatorFactory {
+public class IncomePlansCalcRoute extends PlansCalcRoute{
 
-	private PersonHouseholdMapping personHouseholdMapping;
+	
+	private BKickIncomeTravelTimeDistanceCostCalculator incomeCostCalculator;
+	private PersonHouseholdMapping hhdb;
 
-	public IncomeTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping) {
-		this.personHouseholdMapping = personHouseholdMapping;
+	/**
+	 * Uses the speed factors from the config group and the rerouting of the factory 
+	 * @param hhdb 
+	 */
+	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
+			final PersonalizableTravelCost costCalculator,
+			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory, PersonHouseholdMapping hhdb){
+		super(group, network, costCalculator, timeCalculator, factory);
+		this.incomeCostCalculator = (BKickIncomeTravelTimeDistanceCostCalculator)costCalculator;
+		this.hhdb = hhdb;
+	}
+
+	@Override
+	public void run(final Person person) {
+		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(person.getId()).getIncome());
+		super.run(person);
 	}
 	
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
-		
-		return new PersonalizableTravelCost() {
 
-			@Override
-			public void setPerson(Person person) {
-				incomeTravelCostCalculator.setPerson(person);
-			}
-
-			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				double generalizedTravelCost = incomeTravelCostCalculator.getLinkGeneralizedTravelCost(link, time);
-				return generalizedTravelCost;
-			}
-			
-		};
+	@Override
+	public void run(Plan plan){
+		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(plan.getPerson().getId()).getIncome());
+		super.run(plan);
 	}
-
+	
 }

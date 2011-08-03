@@ -29,7 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.incomeScoring.old.BkControlerIncome;
+import playground.benjamin.scoring.income.old.BkControlerIncome;
 
 /**
  * Tests the routing of the BkControlerIncome

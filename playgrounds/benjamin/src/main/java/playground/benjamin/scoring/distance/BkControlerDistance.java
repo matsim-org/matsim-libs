@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickIncomeControlerMain
+ * BKickControler2
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.incomeScoring.old;
+package playground.benjamin.scoring.distance;
 
-import playground.benjamin.BkPaths;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+
+import playground.benjamin.BkControler;
 
 
-public class BkControlerIncomeMain {
+/**
+ * Controler for first zurich scenario test run of estimated scoring function.
+ * @author dgrether
+ *
+ */
+public class BkControlerDistance extends BkControler {
+
+	public BkControlerDistance(String configFileName) {
+		super(configFileName);
+	}
 	
-	public static void main(String[] args){
-//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
-//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
-//		new BKickIncomeControler(config).run();
-		
-		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
-		new BkControlerIncome(config).run();
+	public BkControlerDistance(Config conf){
+		super(conf);
+	}
+
+	public BkControlerDistance(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new BkScoringFunctionFactory(this.config.planCalcScore());
+	}
+
+	
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println();
+		} else {
+			final Controler controler = new BkControlerDistance(args);
+			controler.run();
+		}
+		System.exit(0);
 	}
 
 }

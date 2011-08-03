@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.incomeScoring;
+package playground.benjamin.scoring.income;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -28,8 +28,8 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.benjamin.incomeScoring.IncomeTollTravelCostCalculator;
-import playground.benjamin.incomeScoring.IncomeTravelCostCalculator;
+import playground.benjamin.scoring.income.IncomeTollTravelCostCalculator;
+import playground.benjamin.scoring.income.IncomeTravelCostCalculator;
 
 
 /**
