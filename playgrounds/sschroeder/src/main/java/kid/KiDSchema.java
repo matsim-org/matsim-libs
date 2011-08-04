@@ -13,6 +13,7 @@ public class KiDSchema {
 	public final static String VEHICLE_TYPE = "K01";
 	public static String VEHICLE_MOBILITY = "K30";
 	public static String VEHICLE_ANZAHLFAHRTEN = "K31";
+	public static String VEHICLE_ANZAHLFAHRTENKETTEN = "K33";
 	public static String VEHICLE_LOCATION_GEO_LONG = "K24d";
 	public static String VEHICLE_LOCATION_GEO_LAT = "K24e";
 	
