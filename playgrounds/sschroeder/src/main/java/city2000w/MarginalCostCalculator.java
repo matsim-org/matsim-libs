@@ -12,9 +12,9 @@ import vrp.algorithms.ruinAndRecreate.recreation.RecreationListener;
 public class MarginalCostCalculator implements RecreationListener {
 
 	public class CostTableKey {
-		private Id from;
-		private Id to;
-		private int size;
+		public Id from;
+		public Id to;
+		public int size;
 
 		public CostTableKey(Id from, Id to, int size) {
 			this.from = from;
@@ -40,35 +40,39 @@ public class MarginalCostCalculator implements RecreationListener {
 	}
 	
 	class Entry {
-		public double sum = 0.0;
+		public double cost = 0.0;
 		
 		public int number = 0;
 		
 		public Entry(double cost){
 			number++;
-			sum = cost;
+			this.cost = cost;
 		}
 	}
 
 	private static Logger logger = Logger.getLogger(MarginalCostCalculator.class);
 	
-	private Map<CostTableKey,Entry> marginalCostTable = new HashMap<CostTableKey, Entry>();
+	private Map<CostTableKey,Entry> marginalCostRecorder = new HashMap<CostTableKey, Entry>();
+	
+	private Map<CostTableKey,Double> marginalCostTable = new HashMap<MarginalCostCalculator.CostTableKey, Double>();
+	
+	private Map<CostTableKey,Double> avgShareTable = new HashMap<MarginalCostCalculator.CostTableKey, Double>();
 	
 	@Override
 	public void inform(RecreationEvent event) {
 		CostTableKey key = new CostTableKey(getFrom(event),getTo(event),getSize(event));
 		
-		logger.info(key + " mc=" + event.getCost());
-		if(marginalCostTable.containsKey(key)){
-			marginalCostTable.get(key).number++;
-			marginalCostTable.get(key).sum += event.getCost();
+//		logger.info(key + " mc=" + event.getCost());
+		if(marginalCostRecorder.containsKey(key)){
+			marginalCostRecorder.get(key).number++;
+			marginalCostRecorder.get(key).cost += event.getCost();
 		}
 		else{
-			marginalCostTable.put(key, new Entry(event.getCost()));
+			marginalCostRecorder.put(key, new Entry(event.getCost()));
 		}
 	}
 	
-	public Map<CostTableKey, Entry> getMarginalCostTable() {
+	public Map<CostTableKey, Double> getMarginalCostTable() {
 		return marginalCostTable;
 	}
 
@@ -87,21 +91,40 @@ public class MarginalCostCalculator implements RecreationListener {
 	public void finish(){
 		logger.info("finish");
 		double sumMC = 0.0;
-		for(CostTableKey key : marginalCostTable.keySet()){
-			Entry entry = marginalCostTable.get(key);
-			double avgMC = entry.sum/(double)entry.number;
+		for(CostTableKey key : marginalCostRecorder.keySet()){
+			Entry entry = marginalCostRecorder.get(key);
+			double avgMC = entry.cost/(double)entry.number;
+			marginalCostTable.put(key, avgMC);
 			sumMC += avgMC;
-			logger.info(key + " avgMarginalCost=" + avgMC);
 		}
-		for(CostTableKey key : marginalCostTable.keySet()){
-			Entry entry = marginalCostTable.get(key);
-			double avgMC = entry.sum/(double)entry.number;
-			logger.info(key + " shareOfTotalCosts=" + avgMC/sumMC);
+		for(CostTableKey key : marginalCostRecorder.keySet()){
+			Entry entry = marginalCostRecorder.get(key);
+			double avgMC = entry.cost/(double)entry.number;
+			double avgShareOfTotCosts = avgMC/sumMC;
+			avgShareTable.put(key, avgShareOfTotCosts);
 		}
 	}
 	
 	public void reset(){
-		marginalCostTable = new HashMap<MarginalCostCalculator.CostTableKey, MarginalCostCalculator.Entry>();
+		marginalCostRecorder = new HashMap<MarginalCostCalculator.CostTableKey, MarginalCostCalculator.Entry>();
+		avgShareTable.clear();
+		marginalCostTable.clear();
+	}
+
+	public Map<CostTableKey, Double> getAvgShareTable() {
+		return avgShareTable;
+	}
+
+	public void printTables() {
+		logger.info("cost tables");
+		for(CostTableKey key : marginalCostTable.keySet()){
+			logger.info(key + " mc=" + marginalCostTable.get(key));
+		}
+		logger.info("cost shares");
+		for(CostTableKey key : avgShareTable.keySet()){
+			logger.info(key + " mc-share=" + avgShareTable.get(key));
+		}
+		
 	}
 
 }

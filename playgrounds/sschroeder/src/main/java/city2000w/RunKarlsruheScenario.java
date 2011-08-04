@@ -33,10 +33,12 @@ import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.TSPAgentFactory;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TransportServiceProviders;
 import freight.AnotherCarrierAgentFactory;
 import freight.CarrierPlanReader;
+import freight.TSPAgentFactoryImpl;
 import freight.TSPPlanReader;
 
 /**
@@ -83,10 +85,6 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		readTransportServiceProviders();
 		
-		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders());
-		
-		tspAgentTracker.getCostListeners().add(new DefaultLSPShipmentTracker());
-		
 		createCarrierContracts(tspAgentTracker.createCarrierContracts());
 		
 		createCarrierPlans();
@@ -95,6 +93,11 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		
+		TSPAgentFactory tspAgentFactory = new TSPAgentFactoryImpl(carrierAgentTracker);
+		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders(),tspAgentFactory);
+		
+		
 		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
 		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
 		
@@ -160,7 +163,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void createCarrierPlans() {
 		for(CarrierImpl carrier : carriers.getCarriers().values()){
-			RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder planBuilder = new RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(scenario.getNetwork());
+			RAndRPickupAndDeliveryCarrierPlanBuilder planBuilder = new RAndRPickupAndDeliveryCarrierPlanBuilder(scenario.getNetwork());
 //			RuinAndRecreateCarrierPlanBuilder planBuilder = new RuinAndRecreateCarrierPlanBuilder(scenario.getNetwork());
 //			ClarkeAndWrightCarrierPlanBuilder planBuilder = new ClarkeAndWrightCarrierPlanBuilder(scenario.getNetwork());
 			CarrierPlan plan = planBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
@@ -171,7 +174,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void createCarrierContracts(List<Contract> contracts) {
 		for(Contract contract : contracts){
-			Id carrierId = contract.getOffer().getCarrierId();
+			Id carrierId = contract.getOffer().getId();
 			carriers.getCarriers().get(carrierId).getContracts().add(contract);
 		}
 	}

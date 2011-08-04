@@ -26,9 +26,9 @@ import freight.LocationsImpl;
 import freight.RuinAndRecreateSolver;
 import freight.VRPTransformation;
 
-public class RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder {
+public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 	
-private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder.class);
+private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryCarrierPlanBuilder.class);
 	
 	private Network network;
 	
@@ -41,7 +41,7 @@ private static Logger logger = Logger.getLogger(RuinAndRecreatePickupAndDelivery
 		this.marginalCostCalculator = marginalCostCalculator;
 	}
 
-	public RuinAndRecreatePickupAndDeliveryCarrierPlanBuilder(Network network){
+	public RAndRPickupAndDeliveryCarrierPlanBuilder(Network network){
 		this.network = network;
 		iniTrafo();
 	}

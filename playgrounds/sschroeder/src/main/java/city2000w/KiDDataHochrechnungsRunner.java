@@ -9,7 +9,11 @@ import kid.KiDStats;
 import kid.ScheduledVehicle;
 import kid.ScheduledVehicles;
 import kid.Vehicle;
+import kid.filter.And;
+import kid.filter.KernstadtFilter;
+import kid.filter.LkwKleiner3Punkt5TFilter;
 import kid.filter.VehicleFilter;
+import kid.filter.WeekFilter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,11 +57,14 @@ public class KiDDataHochrechnungsRunner {
 		//kidReader.getVehicleFilter().add(new SattelzugmaschinenFilter());
 //		kidReader.getVehicleFilter().add(new WeekFilter());
 //		kidReader.getVehicleFilter().add(new LkwGroesser3Punkt5TFilter());
-//		//kidReader.getVehicleFilter().add(new LkwKleiner3Punkt5TFilter());
+		And and = new And(new WeekFilter(), new LkwKleiner3Punkt5TFilter());
+		and.addFilter(new KernstadtFilter());
+		kidReader.setVehicleFilter(and);
 		kidReader.run();
 		
 		double totalFahrleistung = 0.00;
 		double totLegs = 0;
+		double totChains = 0;
 		int count = 0;
 		for(ScheduledVehicle vehicle : vehicles.getScheduledVehicles().values()){
 			String fzgTyp = vehicle.getVehicle().getAttributes().get(KiDSchema.VEHICLE_TYPE);
@@ -75,7 +82,15 @@ public class KiDDataHochrechnungsRunner {
 			
 			String anzahlFarten = vehicle.getVehicle().getAttributes().get(KiDSchema.VEHICLE_ANZAHLFAHRTEN);
 			
-			totLegs += getTotLegs(anzahlFarten,korrekturFaktor,hochrechnungsFaktor);
+			double fahrtenHochgerechnet = getTotLegs(anzahlFarten,korrekturFaktor,hochrechnungsFaktor);
+			totLegs += fahrtenHochgerechnet/NOFARBEITSTAGE_MO_FR;
+			logger.info("id=" + vehicle.getVehicle().getId() + "; #fahrten=" + anzahlFarten + " hochgrechnet=" + fahrtenHochgerechnet 
+					+ " proTag=" + fahrtenHochgerechnet/NOFARBEITSTAGE_MO_FR);
+			
+			String anzahlFahrtenketten = vehicle.getVehicle().getAttributes().get(KiDSchema.VEHICLE_ANZAHLFAHRTENKETTEN);
+			double kettenHochgerechnet = getTotLegs(anzahlFahrtenketten,korrekturFaktor,hochrechnungsFaktor);
+			totChains += kettenHochgerechnet/NOFARBEITSTAGE_MO_FR;
+			
 			double fzgLeistung = getFahrleistung(fahrleistung,korrekturFaktor,hochrechnungsFaktor);
 			totalFahrleistung += fzgLeistung;
 			//logger.info("fzgLeistung=" + fzgLeistung + "; fahrleistung="+fahrleistung+"; kFaktor=" + korrekturFaktor + "; hFaktor=" + hochrechnungsFaktor);
@@ -83,12 +98,16 @@ public class KiDDataHochrechnungsRunner {
 			
 		}
 		double fzg_days = (double)KiDStats.WorkingDays_without_saturday*(double)KiDStats.NoLkw_kl3punkt5;
-		System.out.println("#fzg="+ count + " fahrleistung=" + totalFahrleistung + " fzgDays=" + fzg_days + " km/tag=" + totalFahrleistung/fzg_days);
-		System.out.println("totLegs=" + totLegs + " avgLegs=" + totLegs/((double)KiDStats.NoLkw_gr3punkt5*(double)KiDStats.WorkingDays_without_saturday));
+		System.out.println("#fzg="+ count + " fahrleistung[in Mio]=" + totalFahrleistung/1000000 + " fzgDays=" + fzg_days + " km/tag=" + totalFahrleistung/fzg_days);
+		System.out.println("totFahrten[in Mio]=" + totLegs/1000000 + " avgLegs=" + totLegs/((double)KiDStats.NoLkw_gr3punkt5*(double)KiDStats.WorkingDays_without_saturday));
 		//double fzg_days = (double)(KiDStats.NoGesamt)*(double)KiDStats.WorkingDays_without_saturday;
 		//System.out.println("#fzg="+ count + " fahrleistung=" + totalFahrleistung + " fzgDays=" + fzg_days + " km/tag=" + totalFahrleistung/fzg_days);
+		System.out.println("ketten[in 1000]=" + totChains/1000);
 		
-		
+	}
+
+	private static double getDouble(String hochrechnungsTage) {
+		return Double.parseDouble(hochrechnungsTage);
 	}
 
 	private static double getTotLegs(String anzahlFarten, String korrekturFaktor,String hochrechnungsFaktor) {
