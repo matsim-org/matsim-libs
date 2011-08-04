@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
@@ -55,8 +54,9 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private final Map<Id, Double> startEngine = new TreeMap<Id, Double>();
 	private final Map<Id, Double> stopEngine = new TreeMap<Id, Double>();
 
-	private final  Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
-	private final  Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
+	private final Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
+	private final Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
+	private final Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
 
 	public ColdEmissionHandler(
 			final Network network,
@@ -100,28 +100,22 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 	public void handleEvent(AgentArrivalEvent event) {
 //		if(event.getLegMode().equals("car")){
 			Id personId= event.getPersonId();
-			Id linkId = event.getLinkId();
 			Double stopEngineTime = event.getTime();
 			this.stopEngine.put(personId, stopEngineTime);
 			
 			double startEngineTime = this.startEngine.get(personId);
 			double parkingDuration = this.parkingDuration.get(personId);
+			Id coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
 			
 			Double accumulatedDistance;
 			if(this.accumulatedDistance.containsKey(personId)){
 				accumulatedDistance = this.accumulatedDistance.get(personId);
-				//if (personId.toString().contains("pv_car_9177_9162_426")){
-				//	double distanceSoFar = this.accumulatedDistance.get(personId);
-				//	System.out.println("-------g------distanceSoFar "+distanceSoFar);
-				//	System.out.println("++++++++++++accumulatedDistance "+accumulatedDistance);
-			//	}
-				
 			} else {
 				accumulatedDistance = 0.0;
 				this.accumulatedDistance.put(personId, 0.0);
 			}
 			this.coldEmissionAnalysisModule.calculateColdEmissions(
-					linkId,
+					coldEmissionEventLinkId,
 					personId,
 					startEngineTime,
 					parkingDuration,
@@ -131,16 +125,18 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			this.accumulatedDistance.remove(personId);
 //		}
 //		else{
-//			// no engine to stop...
+//			// emissions to calculate...
 //		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 //		if(event.getLegMode().equals("car")){
-			Id personId= event.getPersonId();	
+			Id linkId = event.getLinkId();
+			Id personId= event.getPersonId();
 			Double startEngineTime = event.getTime();
 			this.startEngine.put(personId, startEngineTime);
+			this.personId2coldEmissionEventLinkId.put(personId, linkId);
 
 			Double parkingDuration;
 			if (this.stopEngine.containsKey(personId)){
@@ -148,12 +144,12 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 				parkingDuration = startEngineTime - stopEngineTime;
 
 			} else {
-				parkingDuration = 43200.0; //parking duration is assumed to at least 12 hours during the night time
+				parkingDuration = 43200.0; //parking duration is assumed to be at least 12 hours when parking overnight
 			}
 			this.parkingDuration.put(personId, parkingDuration);
 //			}
 //			else{
-//				// no engine to stop...
+//				// no engine to start...
 //			}
 	}
 }

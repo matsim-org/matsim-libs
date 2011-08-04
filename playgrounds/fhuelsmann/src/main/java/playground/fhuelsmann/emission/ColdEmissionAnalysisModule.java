@@ -38,7 +38,7 @@ import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 
-	public void calculateColdEmissions(Id linkId, Id personId,
+	public void calculateColdEmissions(Id coldEmissionEventLinkId, Id personId,
 			double startEngineTime, double parkingDuration,
 			double accumulatedDistance, HbefaColdEmissionTableCreator hbefaColdTable,
 			EventsManager emissionEventsManager) {
@@ -47,9 +47,12 @@ public class ColdEmissionAnalysisModule {
 		// calculated through fc as follows:
 		// get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866)/0.273;
 
-		//two categories for distance: 0: 0-1km; 1: 1-2km; the data doesn't provide further distance categories
-		//for the average cold start emission factors; the largest part of the cold start emissions is 
-		//emitted during the first few kilometers
+		/* Two categories for distance driven AFTER coldstart:
+		 - 0: 0-1km;
+		 - 1: 1-2km;
+		 The data doesn't provide further distance categories for average cold start emission factors;
+		 the largest part of the cold start emissions is emitted during the first few kilometers;
+		 here it is assumed to be emitted at the first link of the leg*/
 		int distance_km = -1;
 		if ((accumulatedDistance / 1000) < 1.0) {
 			distance_km = 0;
@@ -73,7 +76,7 @@ public class ColdEmissionAnalysisModule {
 			generatedEmissions = coldEf ;
 			coldEmissions.put(coldPollutant, generatedEmissions);
 		}
-		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, linkId, personId, coldEmissions);
+		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
 		emissionEventsManager.processEvent(coldEmissionEvent);
 	}
 }
