@@ -114,6 +114,9 @@ public class RadialRuin implements RuinStrategy {
 	public void run(Solution initialSolution) {
 		clear();
 		int nOfNodes2BeRemoved = selectNumberOfNearestNeighbors();
+		if(nOfNodes2BeRemoved == 0){
+			return;
+		}
 		Customer randomCustomer = pickRandomCustomer();
 		TreeSet<ReferencedCustomer> tree = distanceNodeTree.get(randomCustomer.getId());
 		Iterator<ReferencedCustomer> descendingIterator = tree.descendingIterator();

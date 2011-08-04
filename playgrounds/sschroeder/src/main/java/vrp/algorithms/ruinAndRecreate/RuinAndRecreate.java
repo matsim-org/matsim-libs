@@ -118,6 +118,7 @@ public class RuinAndRecreate {
 
 	public void run(){
 		logger.info("run ruin-and-recreate");
+		verify();
 		init();
 		randomWalk(warmUpIterations);
 		logger.info("run mutations");
@@ -140,6 +141,13 @@ public class RuinAndRecreate {
 		informFinish();
 	}
 	
+	private void verify() {
+		if(currentSolution.getTourAgents().isEmpty() || currentSolution.getTourAgents().size() < 1){
+			return;
+		}
+		
+	}
+
 	public VrpSolution getVrpSolution() {
 		return vrpSolution;
 	}
