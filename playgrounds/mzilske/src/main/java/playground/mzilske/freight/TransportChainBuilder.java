@@ -33,7 +33,7 @@ public class TransportChainBuilder {
 		this.shipment = shipment;
 	}
 
-	public void scheduleLeg(Offer offer){
+	public void scheduleLeg(CarrierOffer offer){
 		if(!openPickUp){
 			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
 		}
@@ -45,7 +45,7 @@ public class TransportChainBuilder {
 		openLeg = true;
 	}
 	
-	public void scheduleLeg(Offer offer, double duration){
+	public void scheduleLeg(CarrierOffer offer, double duration){
 		if(!openPickUp){
 			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
 		}
@@ -102,7 +102,7 @@ public class TransportChainBuilder {
 		return new TransportChain(shipment,chainElements);
 	}
 
-	private ChainLeg createLeg(Offer offer) {
+	private ChainLeg createLeg(CarrierOffer offer) {
 		return new ChainLeg(offer);
 	}
 

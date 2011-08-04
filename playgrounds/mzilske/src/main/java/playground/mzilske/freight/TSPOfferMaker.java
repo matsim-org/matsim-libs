@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Id;
 
 public interface TSPOfferMaker {
 	
-	public TSPOffer getOffer(Id from, Id to, int size, double memorizedPrice);
+	public TSPOffer requestOffer(Id from, Id to, int size, Double startPickup, Double endPickup, Double startDelivery, Double endDelivery, Double memorizedPrice);
 	
-	public void setTSP(TransportServiceProviderImpl tsp);
 }

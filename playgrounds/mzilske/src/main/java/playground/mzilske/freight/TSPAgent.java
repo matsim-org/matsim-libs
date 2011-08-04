@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.mzilske.freight.TSPTotalCostListener.TSPCostEvent;
+
 
 /**
  * @author stscr
@@ -24,20 +26,41 @@ public class TSPAgent {
 	private Logger logger = Logger.getLogger(TSPAgent.class);
 	
 	public static class CostParameter{
-		public static double transshipmentHandlingCost_per_unit = 0.0;
-		public static double transshipmentCost = 25;
+		public static double transshipmentHandlingCostPerUnit = 2.0;
+		public static double transshipmentCost = 5;
 	}
 	
 	private TransportServiceProviderImpl tsp;
+	
+	private Id id;
 	
 	private Collection<TransportChainAgent> transportChainAgents = new ArrayList<TransportChainAgent>();
 
 	private Map<Shipment,TransportChainAgent> shipmentChainMap = new HashMap<Shipment, TransportChainAgent>();
 	
+	private Map<TSPOffer,List<CarrierOffer>> tspCarrierOfferMap = new HashMap<TSPOffer, List<CarrierOffer>>();
+	
 	private TSPOfferMaker offerMaker;
+	
+	private CostMemory costMemory;
+	
+	public void setCostMemory(CostMemory costMemory) {
+		this.costMemory = costMemory;
+	}
+
+	private TSPAgentTracker tspAgentTracker;
+
+	public void setTspAgentTracker(TSPAgentTracker tspAgentTracker) {
+		this.tspAgentTracker = tspAgentTracker;
+	}
 
 	public TSPAgent(TransportServiceProviderImpl tsp){
 		this.tsp = tsp;
+		this.id = tsp.getId();
+	}
+	
+	Id getId(){
+		return this.id;
 	}
 	
 	Map<Shipment, TransportChainAgent> getShipmentChainMap() {
@@ -50,18 +73,13 @@ public class TSPAgent {
 		for(TransportChain chain : tsp.getSelectedPlan().getChains()){
 			TransportChainAgent chainAgent = new TransportChainAgent(chain);
 			transportChainAgents.add(chainAgent);
-			List<Contract> chainShipments = chainAgent.createCarrierShipments();
+			List<Contract> chainShipments = chainAgent.createCarrierContracts();
 			for(Contract t : chainShipments){
 				shipments.add(t);
 				shipmentChainMap.put(t.getShipment(), chainAgent);				
 			}
 		}
 		return shipments;
-	}
-	
-	public void setOfferMaker(TSPOfferMaker offerMaker) {
-		offerMaker.setTSP(tsp);
-		this.offerMaker = offerMaker;
 	}
 
 	private void clear() {
@@ -73,6 +91,7 @@ public class TSPAgent {
 		for(TransportChainAgent tca : transportChainAgents){
 			tca.reset();
 		}
+		tspCarrierOfferMap.clear();
 	}
 
 	Collection<TransportChainAgent> getTransportChainAgents(){
@@ -82,7 +101,7 @@ public class TSPAgent {
 	List<Tuple<TSPShipment,Double>> calculateCostsOfSelectedPlanPerShipment(){
 		List<Tuple<TSPShipment,Double>> costsPerShipment = new ArrayList<Tuple<TSPShipment,Double>>();
 		for(TransportChainAgent tca : transportChainAgents){
-			double cost = tca.getCost() + umschlagskosten(tca.getNumberOfStopps()) + strafkosten(tca.hasSucceeded()); 
+			double cost = tca.getCost() + umschlagskosten(tca.getNumberOfTranshipments()) + strafkosten(tca.hasSucceeded()); 
 			Tuple<TSPShipment,Double> shipmentCostTuple = new Tuple<TSPShipment,Double>(tca.getTpChain().getShipment(),cost);
 			costsPerShipment.add(shipmentCostTuple);
 		}
@@ -120,39 +139,40 @@ public class TSPAgent {
 	private double calculateFeesAndTransshipmentCosts() {
 		double cost = 0.0;
 		for(TransportChainAgent tca : transportChainAgents){
-			cost += tca.getFees() + tca.getNumberOfStopps()*CostParameter.transshipmentCost;
+			cost += tca.getFees() + tca.getNumberOfTranshipments()*CostParameter.transshipmentCost;
 		}
 		return cost;
 	}
 
-	public TSPOffer requestService(Id from, Id to, int size) {
-		return offerMaker.getOffer(from,to,size,getMemorizedPrice(from,to,size));
+	public TSPOffer requestService(Id from, Id to, int size, double startPickup, double endPickup, double startDelivery, double endDelivery) {
+		Double memorizedCost = costMemory.getCost(from, to, size);
+		return offerMaker.requestOffer(from, to, size, startPickup, endPickup, startDelivery, endDelivery, memorizedCost);
 	}
 
-	private double getMemorizedPrice(Id from, Id to, int size) {
-		return 0.0;
-	}
-	
+
 	public Collection<Contract> registerChainAndGetCarrierContracts(TransportChain chain){
-		Collection<Contract> carrierContracts = new ArrayList<Contract>();
 		TransportChainAgent chainAgent = new TransportChainAgent(chain);
 		transportChainAgents.add(chainAgent);
-		List<Contract> chainShipments = chainAgent.createCarrierShipments();
-		for(Contract c : chainShipments){
-			carrierContracts.add(c);
-			shipmentChainMap.put(c.getShipment(), chainAgent);				
+		List<Contract> carrierContracts = chainAgent.createCarrierContracts();
+		for(Contract c : carrierContracts){
+			shipmentChainMap.put(c.getShipment(), chainAgent);
+			logger.info("register shipment: " + c.getShipment());
 		}
 		return carrierContracts;
 	}
 	
-	public void removeChain(TransportChain chain){
+	public Collection<Contract> removeChainAndGetAffectedCarrierContracts(TransportChain chain){
+		Collection<Contract> associatedCarrierContracts = new ArrayList<Contract>();
 		TransportChainAgent chainAgent = findChainAgent(chain);
 		if(chainAgent != null){
-			transportChainAgents.remove(chainAgent);
+			associatedCarrierContracts.addAll(chainAgent.getCarrierContracts());
 			for(Shipment s : chainAgent.getShipments()){
 				shipmentChainMap.remove(s);
+				logger.info("remove shipment: " + s);
 			}
+			transportChainAgents.remove(chainAgent);
 		}
+		return associatedCarrierContracts;
 	}
 
 	private TransportChainAgent findChainAgent(TransportChain chain) {
@@ -168,8 +188,52 @@ public class TSPAgent {
 		shipmentChainMap.get(shipment).informPickup(shipment, time);
 	}
 
-	public void shiopmentDelivered(Shipment shipment, double time) {
+	public void shipmentDelivered(Shipment shipment, double time) {
 		shipmentChainMap.get(shipment).informDelivery(shipment, time);
 		
 	}
+
+	public boolean hasShipment(Shipment shipment) {
+		if(shipmentChainMap.containsKey(shipment)){
+			return true;
+		}
+		return false;
+	}
+
+	public void setOfferMaker(TSPOfferMaker offerMaker) {
+		this.offerMaker = offerMaker;
+	}
+
+	public void memorizeOffer(TSPOffer tspOffer, List<CarrierOffer> carrierOffers) {
+		tspCarrierOfferMap.put(tspOffer, carrierOffers);
+	}
+	
+	public List<CarrierOffer> getCarrierOffer(TSPOffer tspOffer){
+		return tspCarrierOfferMap.get(tspOffer);
+	}
+
+	public void calculateCosts() {
+		assertEqualTransportChainAgentsAndContracts(transportChainAgents.size(),tsp.getContracts().size());
+		int volumes = 0;
+		for(TransportChainAgent a : transportChainAgents){
+			TSPShipment tspShipment = a.getTpChain().getShipment();
+			volumes += tspShipment.getSize();
+			double costOfChain = 0.0;
+			costOfChain += a.getFees() + 
+				a.getNumberOfTranshipments()*tspShipment.getSize()*CostParameter.transshipmentHandlingCostPerUnit;
+			costMemory.memorizeCost(tspShipment.getFrom(), tspShipment.getTo(), tspShipment.getSize(), costOfChain);
+		}
+		TSPCostEvent costEvent = new TSPCostEvent(id);
+		costEvent.setVolume(volumes);
+		tspAgentTracker.informTotalCost(id,costEvent);
+	}
+
+	private void assertEqualTransportChainAgentsAndContracts(int nOfChainAgents, int nOfContracts) {
+		if(nOfChainAgents != nOfContracts){
+			throw new IllegalStateException("inconsistent state. we have " + nOfChainAgents + " chainAgents. but " + nOfContracts + " contracts");
+		}
+		
+	}
+
+	
 }

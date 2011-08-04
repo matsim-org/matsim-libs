@@ -8,7 +8,7 @@ public class CarrierTimeDistanceCostFunction implements CarrierCostFunction {
 	
 	public static double COST_PER_VEHICLEKM = 1;
 	
-	public static double CITY_TOLL = 0;
+	public static double CITY_TOLL = 100.0;
 	
 	private static Logger logger = Logger.getLogger(CarrierTimeDistanceCostFunction.class);
 	
@@ -29,10 +29,21 @@ public class CarrierTimeDistanceCostFunction implements CarrierCostFunction {
 	public double calculateCost(CarrierVehicle carrierVehicle, double distance, double time) {
 		double cost = distance/1000*COST_PER_VEHICLEKM + time/3600*25;
 		if(carrierVehicle.getCapacity() == 20){
-			logger.info(carrierVehicle.getVehicleId() + " pays maut");
-			cost += CITY_TOLL;
+			if(hasContractsInCity()){
+				logger.info(carrierVehicle.getVehicleId() + " pays maut");
+				cost += CITY_TOLL;
+			}
 		}
 		return cost;
+	}
+
+	private boolean hasContractsInCity() {
+		for(Contract c : carrier.getContracts()){
+			if(!c.getShipment().getTo().toString().equals("i(8,4)R")){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

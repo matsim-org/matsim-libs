@@ -28,6 +28,8 @@ public class TransportChainAgent {
 	private TransportChain tpChain;
 
 	private List<Shipment> shipments = new ArrayList<Shipment>();
+	
+	private List<Contract> contracts = new ArrayList<Contract>();
 
 	private int currentShipmentIndex;
 	
@@ -45,8 +47,10 @@ public class TransportChainAgent {
 	 * activities a shipment is created. It is stored in a list with tuples of carrierIds and shipments. 
 	 * @return
 	 */
-	public List<Contract> createCarrierShipments(){
-		List<Contract> shipments = new ArrayList<Contract>();
+	public List<Contract> createCarrierContracts(){
+		reset();
+		this.contracts.clear();
+		this.shipments.clear();
 		Id from = null;
 		Id to = null;
 		TimeWindow pickUpTimeWindow = null;
@@ -66,7 +70,8 @@ public class TransportChainAgent {
 				deliveryTimeWindow = new TimeWindow(delivery.getTimeWindow().getStart(),
 						delivery.getTimeWindow().getEnd());
 				Shipment shipment = createAndRegisterShipment(from,to,tpChain.getShipment().getSize(), pickUpTimeWindow,deliveryTimeWindow);
-				shipments.add(new Contract(shipment,acceptedOffer));				
+				Contract contract = new Contract(shipment,acceptedOffer);
+				this.contracts.add(contract);
 			}
 			if(element instanceof ChainLeg){
 				ChainLeg leg = (ChainLeg)element;
@@ -74,7 +79,7 @@ public class TransportChainAgent {
 			}
 		}
 		initIterator();
-		return shipments;
+		return this.contracts;
 	}
 		
 	private void initIterator() {
@@ -94,8 +99,7 @@ public class TransportChainAgent {
 		initIterator();
 	}
 
-	private Shipment createAndRegisterShipment(Id from, Id to, Integer size,
-			TimeWindow pickUpTimeWindow, TimeWindow deliveryTimeWindow) {
+	private Shipment createAndRegisterShipment(Id from, Id to, Integer size,TimeWindow pickUpTimeWindow, TimeWindow deliveryTimeWindow) {
 		Shipment shipment = new Shipment(from,to,size,pickUpTimeWindow,deliveryTimeWindow);
 		shipments.add(shipment);
 		return shipment;
@@ -142,7 +146,7 @@ public class TransportChainAgent {
 		
 	}
 
-	public int getNumberOfStopps() {
+	public int getNumberOfTranshipments() {
 		int nOfStopps = getTpChain().getChainTriples().size() - 1;
 		return nOfStopps;
 	}
@@ -167,6 +171,10 @@ public class TransportChainAgent {
 	
 	Collection<Shipment> getShipments(){
 		return shipments;
+	}
+
+	Collection<? extends Contract> getCarrierContracts() {
+		return contracts;
 	}
 	
 }

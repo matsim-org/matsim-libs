@@ -4,7 +4,11 @@ import org.matsim.api.core.v01.Id;
 
 public interface OfferMaker {
 
-	public abstract Offer requestOffer(Id linkId, Id linkId2, int shipmentSize, Double memorizedPrice);
+	public abstract void init();
+	
+	public abstract void reset();
+	
+	public abstract CarrierOffer requestOffer(Id linkId, Id linkId2, int shipmentSize, Double memorizedPrice);
 
-	public abstract Offer requestOffer(Id from, Id to, int shimpentSize, Double startPickup, Double endPickup, Double startDelivery, Double endDelivery, Double memorizedPrice);
+	public abstract CarrierOffer requestOffer(Id from, Id to, int shimpentSize, Double startPickup, Double endPickup, Double startDelivery, Double endDelivery, Double memorizedPrice);
 }

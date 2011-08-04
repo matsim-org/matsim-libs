@@ -9,21 +9,21 @@ import org.matsim.api.core.v01.Id;
  * @author stefan
  *
  */
-public class TSPOffer {
+public class TSPOffer implements Offer{
 	
 	private Id tspId;
 	
 	private double price;
 
-	public Id getTspId() {
+	public Id getId() {
 		return tspId;
 	}
 
-	public void setTspId(Id tspId) {
+	public void setId(Id tspId) {
 		this.tspId = tspId;
 	}
 
-	public double getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 

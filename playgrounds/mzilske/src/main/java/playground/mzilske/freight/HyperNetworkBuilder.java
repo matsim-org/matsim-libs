@@ -74,9 +74,9 @@ public class HyperNetworkBuilder {
 
 	private void addLinks(Id fromNode, Id toNode) {
 		int shipmentSize = 1;
-		Collection<Offer> offers = carrierAgentTracker.getOffers(linkId(fromNode), linkId(toNode), shipmentSize);
-		for (Offer offer : offers) {
-			Id intermediateNode = intermediateNode(fromNode, offer.getCarrierId(), toNode);
+		Collection<CarrierOffer> offers = carrierAgentTracker.getOffers(linkId(fromNode), linkId(toNode), shipmentSize);
+		for (CarrierOffer offer : offers) {
+			Id intermediateNode = intermediateNode(fromNode, offer.getId(), toNode);
 			Node node = network.getFactory().createNode(intermediateNode, nullCoord);
 			network.addNode(node);
 			Link link = network.getFactory().createLink(link(fromNode, intermediateNode), 

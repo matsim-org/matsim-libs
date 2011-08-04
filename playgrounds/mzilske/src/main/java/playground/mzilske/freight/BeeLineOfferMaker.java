@@ -24,9 +24,9 @@ public class BeeLineOfferMaker implements OfferMaker {
 	 * @see playground.mzilske.freight.OfferMaker#requestOffer(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, int, java.lang.Double)
 	 */
 	@Override
-	public Offer requestOffer(Id linkId, Id linkId2, int shipmentSize, Double memorizedPrice) {
-		Offer offer = new Offer();
-		offer.setCarrierId(carrier.getId());
+	public CarrierOffer requestOffer(Id linkId, Id linkId2, int shipmentSize, Double memorizedPrice) {
+		CarrierOffer offer = new CarrierOffer();
+		offer.setId(carrier.getId());
 		double price;
 	
 		if (memorizedPrice != null) {
@@ -76,11 +76,23 @@ public class BeeLineOfferMaker implements OfferMaker {
 
 
 	@Override
-	public Offer requestOffer(Id from, Id to, int shimpentSize,
+	public CarrierOffer requestOffer(Id from, Id to, int shimpentSize,
 			Double startPickup, Double endPickup, Double startDelivery,
 			Double endDelivery, Double memorizedPrice) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
