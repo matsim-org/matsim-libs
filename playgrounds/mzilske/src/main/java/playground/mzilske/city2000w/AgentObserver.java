@@ -1,7 +1,6 @@
 package playground.mzilske.city2000w;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.mzilske.freight.FreightConstants;
@@ -153,6 +153,11 @@ public class AgentObserver implements ActivityEndEventHandler, LinkEnterEventHan
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+	}
+	
+	public void makeChart(){
+		XYLineChart chart = new XYLineChart("TLC","iteration","costs");
+		
 	}
 
 }

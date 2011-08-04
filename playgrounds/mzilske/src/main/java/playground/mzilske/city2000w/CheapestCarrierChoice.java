@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.Offer;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChain.ChainActivity;
@@ -43,7 +43,7 @@ public class CheapestCarrierChoice {
 			for(ChainTriple chainTriple : chain.getChainTriples()){
 				ChainActivity firstActivity = chainTriple.getFirstActivity();
 				ChainActivity secondActivity = chainTriple.getSecondActivity();
-				Offer acceptedOffer = pickOffer(firstActivity.getLocation(), secondActivity.getLocation(), chain.getShipment().getSize());
+				CarrierOffer acceptedOffer = pickOffer(firstActivity.getLocation(), secondActivity.getLocation(), chain.getShipment().getSize());
 				chainBuilder.schedule(firstActivity);
 				chainBuilder.schedule(new ChainLeg(acceptedOffer));
 				chainBuilder.schedule(secondActivity);
@@ -56,18 +56,18 @@ public class CheapestCarrierChoice {
 		tsp.setSelectedPlan(newPlan);
 	}
 
-	private Offer pickOffer(Id sourceLinkId, Id destinationLinkId, int size) {
-		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
-		Collections.sort(offers, new Comparator<Offer>() {
+	private CarrierOffer pickOffer(Id sourceLinkId, Id destinationLinkId, int size) {
+		ArrayList<CarrierOffer> offers = new ArrayList<CarrierOffer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
+		Collections.sort(offers, new Comparator<CarrierOffer>() {
 
 			@Override
-			public int compare(Offer arg0, Offer arg1) {
+			public int compare(CarrierOffer arg0, CarrierOffer arg1) {
 				return arg0.getPrice().compareTo(arg1.getPrice());
 			}
 			
 		});
-		Offer bestOffer = offers.get(0);
-		logger.info("pick carrierId=" + offers.get(0).getCarrierId() + " for " + sourceLinkId + " to " + destinationLinkId + " with price of " + offers.get(0).getPrice());
+		CarrierOffer bestOffer = offers.get(0);
+		logger.info("pick carrierId=" + offers.get(0).getId() + " for " + sourceLinkId + " to " + destinationLinkId + " with price of " + offers.get(0).getPrice());
 		return bestOffer;
 	}
 	

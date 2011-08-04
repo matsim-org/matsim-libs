@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.Offer;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPKnowledge;
@@ -46,7 +46,7 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 			TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
 			chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
 			for (Id transshipmentCentre : transshipmentCentres) { 
-				Offer acceptedOffer = pickUnknownOffer(fromLocation, transshipmentCentre, s.getSize(), tspKnowledge);
+				CarrierOffer acceptedOffer = pickUnknownOffer(fromLocation, transshipmentCentre, s.getSize(), tspKnowledge);
 
 				//					Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
 				chainBuilder.scheduleLeg(acceptedOffer);
@@ -55,7 +55,7 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 				// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
 				fromLocation = transshipmentCentre;
 			}
-			Offer acceptedOffer = pickUnknownOffer(fromLocation, s.getTo(), s.getSize(), tspKnowledge);
+			CarrierOffer acceptedOffer = pickUnknownOffer(fromLocation, s.getTo(), s.getSize(), tspKnowledge);
 			chainBuilder.scheduleLeg(acceptedOffer);
 			chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
 			chains.add(chainBuilder.build());
@@ -65,18 +65,18 @@ public class CheapestCarrierWithVorlaufTSPPlanBuilder {
 		return plan;
 	}
 
-	private Offer pickUnknownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
-		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
+	private CarrierOffer pickUnknownOffer(Id sourceLinkId, Id destinationLinkId, int size, TSPKnowledge tspKnowledge) {
+		ArrayList<CarrierOffer> offers = new ArrayList<CarrierOffer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
 		sortOffers(offers);
-		logger.info("pick carrierId=" + offers.get(0).getCarrierId() + " for " + sourceLinkId + " to " + destinationLinkId + " with price of " + offers.get(0).getPrice());
+		logger.info("pick carrierId=" + offers.get(0).getId() + " for " + sourceLinkId + " to " + destinationLinkId + " with price of " + offers.get(0).getPrice());
 		return offers.get(0);
 	}
 
-	private void sortOffers(ArrayList<Offer> offers) {
-		Collections.sort(offers, new Comparator<Offer>() {
+	private void sortOffers(ArrayList<CarrierOffer> offers) {
+		Collections.sort(offers, new Comparator<CarrierOffer>() {
 
 			@Override
-			public int compare(Offer arg0, Offer arg1) {
+			public int compare(CarrierOffer arg0, CarrierOffer arg1) {
 				return arg0.getPrice().compareTo(arg1.getPrice());
 			}
 			

@@ -9,7 +9,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.Offer;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPPlan;
@@ -42,14 +42,14 @@ public class CheapestCarrierTSPPlanBuilder {
 			TransportChainBuilder chainBuilder = new TransportChainBuilder(s);
 			chainBuilder.schedulePickup(fromLocation, s.getPickUpTimeWindow());
 			for (Id transshipmentCentre : transshipmentCentres) { 
-				Offer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
+				CarrierOffer acceptedOffer = pickOffer(fromLocation, transshipmentCentre, s.getSize());
 				chainBuilder.scheduleLeg(acceptedOffer);
 				chainBuilder.scheduleDelivery(transshipmentCentre, new TimeWindow(0.0,24*3600));
 				chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(1400,24*3600)); // works
 				// chainBuilder.schedulePickup(transshipmentCentre, new TimeWindow(120,24*3600)); // too early
 				fromLocation = transshipmentCentre;
 			}
-			Offer acceptedOffer = pickOffer(fromLocation, s.getTo(), s.getSize());
+			CarrierOffer acceptedOffer = pickOffer(fromLocation, s.getTo(), s.getSize());
 			chainBuilder.scheduleLeg(acceptedOffer);
 			chainBuilder.scheduleDelivery(s.getTo(),s.getDeliveryTimeWindow());
 			chains.add(chainBuilder.build());
@@ -59,17 +59,17 @@ public class CheapestCarrierTSPPlanBuilder {
 		return plan;
 	}
 
-	private Offer pickOffer(Id sourceLinkId, Id destinationLinkId, int size) {
-		ArrayList<Offer> offers = new ArrayList<Offer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
-		Collections.sort(offers, new Comparator<Offer>() {
+	private CarrierOffer pickOffer(Id sourceLinkId, Id destinationLinkId, int size) {
+		ArrayList<CarrierOffer> offers = new ArrayList<CarrierOffer>(carrierAgentTracker.getOffers(sourceLinkId, destinationLinkId, size));
+		Collections.sort(offers, new Comparator<CarrierOffer>() {
 
 			@Override
-			public int compare(Offer arg0, Offer arg1) {
+			public int compare(CarrierOffer arg0, CarrierOffer arg1) {
 				return arg0.getPrice().compareTo(arg1.getPrice());
 			}
 			
 		});
-		Offer bestOffer = offers.get(0);
+		CarrierOffer bestOffer = offers.get(0);
 		return bestOffer;
 	}
 	
