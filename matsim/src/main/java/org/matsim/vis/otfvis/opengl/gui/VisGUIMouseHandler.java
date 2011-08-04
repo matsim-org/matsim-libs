@@ -34,6 +34,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -75,8 +76,10 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 	private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
 	private double[] modelview = new double[16];
 	private double[] projection = new double[16];
-	public int[] viewport = new int[4];
-	public QuadTree.Rect viewBounds = null;
+	private int[] viewport = new int[4];
+	private QuadTree.Rect viewBounds = null;
+
+
 
 	private Camera camera = new Camera();
 
@@ -115,7 +118,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		cameraAnimator.start();
 	}
 
-	private void scrollToNewPos(Point3f cameraEnd){
+	private void scrollToNewPos(Point3f cameraEnd) {
 		Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		scrollCamera(cameraStart, cameraEnd, "location");
 		scrollCamera(cameraTarget, targetEnd, "target");
@@ -197,12 +200,20 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		screenRect.add(e.getPoint());
 		if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
 			if (button == 1 || button == 4) {
-				int deltax = Math.abs(start.x - e.getX());
-				int deltay = Math.abs(start.y - e.getY());
-				double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
-				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
 				if (button == 1) {
-					scrollToNewPos(newPos);
+					int deltax = Math.abs(start.x - e.getX());
+					int deltay = Math.abs(start.y - e.getY());
+					double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
+					if (!ORTHO) {
+						Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
+						scrollToNewPos(newPos);
+					} else {
+						Rectangle2D scaledNewViewBounds = quadTreeRectToRectangle2D(viewBounds.scale(ratio - 1, ratio - 1));
+						Rectangle2D scaledAndTranslatedNewViewBounds = new Rectangle2D.Double(scaledNewViewBounds.getX() + (currentRect.getCenterX() - viewBounds.centerX), scaledNewViewBounds.getY() + (currentRect.getCenterY() - viewBounds.centerY), scaledNewViewBounds.getWidth(), scaledNewViewBounds.getHeight());
+						Animator viewBoundsAnimator = PropertySetter.createAnimator(2020, this, "viewBounds", getViewBounds(), scaledAndTranslatedNewViewBounds);
+						viewBoundsAnimator.start();
+						// TODO: Scale property
+					}
 					Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
 					rectFader.setStartDelay(200);
 					rectFader.setAcceleration(0.4f);
@@ -257,7 +268,6 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		float ty1 = tc.top();
 		float tx2 = tc.right();
 		float ty2 = tc.bottom();
-		float z = 20f;
 		t.enable();
 		t.bind();
 
@@ -265,10 +275,10 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		else gl.glColor4f(alpha, alpha, alpha, alpha);
 
 		gl.glBegin(GL_QUADS);
-		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(currentRect.x, currentRect.y, z);
-		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(currentRect.x, currentRect.y + currentRect.height, z);
-		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y + currentRect.height, z);
-		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y, z);
+		gl.glTexCoord2f(tx1, ty1); gl.glVertex2f(currentRect.x, currentRect.y);
+		gl.glTexCoord2f(tx2, ty1); gl.glVertex2f(currentRect.x, currentRect.y + currentRect.height);
+		gl.glTexCoord2f(tx2, ty2); gl.glVertex2f(currentRect.x + currentRect.width, currentRect.y + currentRect.height);
+		gl.glTexCoord2f(tx1, ty2); gl.glVertex2f(currentRect.x + currentRect.width, currentRect.y);
 		gl.glEnd();
 		t.disable();
 
@@ -292,7 +302,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
 
-		
+
 		if (ORTHO) {
 			glu.gluOrtho2D(viewBounds.minX, viewBounds.maxX, viewBounds.minY, viewBounds.maxY);
 		} else {
@@ -308,7 +318,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		gl.glGetDoublev( GL_MODELVIEW_MATRIX, modelview,0);
 		gl.glGetDoublev( GL_PROJECTION_MATRIX, projection,0);
 		gl.glGetIntegerv( GL_VIEWPORT, viewport,0 );
-		
+
 		if (!ORTHO) {
 			Point3f p1 = getOGLPos(viewport[0], viewport[1]);
 			Point3f p2 = getOGLPos(viewport[0]+viewport[2], viewport[1]+viewport[3]);
@@ -332,7 +342,7 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		}
 	}
 
-	public void scaleNetwork(double scale) {
+	public void setScale(double scale) {
 		double scaleFactor = scale / this.scale;
 		scaleNetworkRelative(scaleFactor);
 	}
@@ -394,12 +404,29 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 		viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
 	}
 
-	public QuadTree.Rect getBounds() {
-		return viewBounds;
-	}
-
 	public Point3f getView() {
 		return cameraStart;
 	}
 
+	public void setViewBoundsAsQuadTreeRect(QuadTree.Rect viewBounds) {
+		this.viewBounds = viewBounds;
+	}
+
+	public QuadTree.Rect getViewBoundsAsQuadTreeRect() {
+		return viewBounds;
+	}
+
+	public Rectangle2D getViewBounds() {
+		QuadTree.Rect viewBounds = this.viewBounds;
+		return quadTreeRectToRectangle2D(viewBounds);
+	}
+
+	private Rectangle2D quadTreeRectToRectangle2D(QuadTree.Rect viewBounds) {
+		return new Rectangle2D.Double(viewBounds.minX, viewBounds.minY, viewBounds.maxX-viewBounds.minX, viewBounds.maxY-viewBounds.minY);
+	}
+
+	public void setViewBounds(Rectangle2D viewBounds) {
+		this.viewBounds = new QuadTree.Rect(viewBounds.getMinX(), viewBounds.getMinY(), viewBounds.getMaxX(), viewBounds.getMaxY());
+	}
+	
 }

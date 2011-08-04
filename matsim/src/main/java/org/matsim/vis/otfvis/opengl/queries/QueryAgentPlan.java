@@ -286,7 +286,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				InfoText activityText = new InfoText(
 						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth);
 				activityText.setAlpha(0.5f);
-				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getBounds());
+				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 				this.activityTexts.add(activityText);
 			}
 		}
@@ -295,7 +295,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			this.agentText = new InfoText(
 					this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			this.agentText.setAlpha(0.7f);
-			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getBounds());
+			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

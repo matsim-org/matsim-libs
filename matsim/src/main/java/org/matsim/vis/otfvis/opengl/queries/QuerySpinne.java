@@ -131,7 +131,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				this.agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getBounds());
+				this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);
@@ -192,15 +192,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double a=1,b=4,c=1,d=3;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
 			InfoText text1 = new InfoText("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text1.draw(drawer.getTextRenderer(), gl, drawer.getMouseHandler().getBounds());
+			text1.draw(drawer.getTextRenderer(), gl, drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=5;d=7;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
 			InfoText text2 = new InfoText("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text2.draw(drawer.getTextRenderer(),gl, drawer.getMouseHandler().getBounds());
+			text2.draw(drawer.getTextRenderer(),gl, drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=9;d=11;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoText text3 = new InfoText("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text3.draw(drawer.getTextRenderer(),gl, drawer.getMouseHandler().getBounds());
+			text3.draw(drawer.getTextRenderer(),gl, drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

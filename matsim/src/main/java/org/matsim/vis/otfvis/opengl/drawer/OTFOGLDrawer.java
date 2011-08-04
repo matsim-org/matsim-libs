@@ -267,7 +267,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	private Map<Coord, String> findVisibleLinks() {
-		Rect rect = this.mouseMan.getBounds();
+		Rect rect = this.mouseMan.getViewBoundsAsQuadTreeRect();
 		Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
 		CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
 		linkIdQuery.prepare(this.clientQ);
@@ -382,7 +382,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			this.gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
 			this.gl.glEnd();
 			InfoText infoText = new InfoText(linkId, (float)text.getX(), (float)text.getY());
-			infoText.draw(textRenderer, this.gl, this.mouseMan.viewBounds);
+			infoText.draw(textRenderer, this.gl, this.mouseMan.getViewBoundsAsQuadTreeRect());
 		}
 	}
 
@@ -418,9 +418,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 			int height) {
 		if (mouseMan.ORTHO) {
 			if (oldWidth != 0.0f) {
-				double pixelSizeX = (mouseMan.viewBounds.maxX - mouseMan.viewBounds.minX) / oldWidth;
-				double pixelSizeY = (mouseMan.viewBounds.maxY - mouseMan.viewBounds.minY) / oldHeight;
-				mouseMan.viewBounds = new QuadTree.Rect(mouseMan.viewBounds.minX, mouseMan.viewBounds.maxY - pixelSizeY * height, mouseMan.viewBounds.minX + pixelSizeX * width, mouseMan.viewBounds.maxY);
+				double pixelSizeX = (mouseMan.getViewBoundsAsQuadTreeRect().maxX - mouseMan.getViewBoundsAsQuadTreeRect().minX) / oldWidth;
+				double pixelSizeY = (mouseMan.getViewBoundsAsQuadTreeRect().maxY - mouseMan.getViewBoundsAsQuadTreeRect().minY) / oldHeight;
+				mouseMan.setViewBoundsAsQuadTreeRect(new QuadTree.Rect(mouseMan.getViewBoundsAsQuadTreeRect().minX, mouseMan.getViewBoundsAsQuadTreeRect().maxY - pixelSizeY * height, mouseMan.getViewBoundsAsQuadTreeRect().minX + pixelSizeX * width, mouseMan.getViewBoundsAsQuadTreeRect().maxY));
 				redraw();
 			}
 			oldWidth = width;
@@ -581,7 +581,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 		QuadTree.Rect rect;
 		if (nRedrawn > 0) {
-			rect = this.mouseMan.getBounds();
+			rect = this.mouseMan.getViewBoundsAsQuadTreeRect();
 		} else {
 			// The first time redraw() is called, it is important that clientQ.getSceneGraph() is called with the whole area rather with what may be visible.
 			// This is because the display-list based StaticNetLayer is initialized then, and it must contain the whole network.
@@ -630,13 +630,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	@Override
 	public void setScale(double scale){
-		this.mouseMan.scaleNetwork(scale);
+		this.mouseMan.setScale(scale);
 		hostControlBar.updateScaleLabel();
 	}
 
 
 	public Rect getViewBounds() {
-		return this.mouseMan.getBounds();
+		return this.mouseMan.getViewBoundsAsQuadTreeRect();
 	}
 
 	public SceneGraph getCurrentSceneGraph() {
