@@ -69,8 +69,6 @@ public class ColdEmissionAnalysisModule {
 		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
 			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
 			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEF();
-			if (personId.toString().contains("pv_car_9177_9162_426"))
-				System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<coldEf "+coldEf);
 			coldPollutant = entry.getKey();
 			generatedEmissions = coldEf ;
 			coldEmissions.put(coldPollutant, generatedEmissions);
