@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
@@ -38,16 +37,13 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -168,12 +164,12 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			services = new Map[size];
 			shapes = new Map[size]; 
 			routes = new SortedMap[size];
-			int r=0;
+			int publicSystemNumber=0;
 			for(File root:roots) {
-				stops[r]=new HashMap<String, Stop>();
-				services[r]=new HashMap<String, Service>();
-				shapes[r]=new HashMap<String, Shape>();
-				routes[r]=new TreeMap<String, Route>();
+				stops[publicSystemNumber]=new HashMap<String, Stop>();
+				services[publicSystemNumber]=new HashMap<String, Service>();
+				shapes[publicSystemNumber]=new HashMap<String, Shape>();
+				routes[publicSystemNumber]=new TreeMap<String, Route>();
 				for(GTFSDefinitions gtfs:GTFSDefinitions.values()) {
 					File file = new File(root.getPath()+"/"+gtfs.fileName);
 					reader = new BufferedReader(new FileReader(file));
@@ -182,12 +178,12 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 					while(line!=null) {
 						String[] parts = line.split(",");
 						Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
-						m.invoke(this, new Object[]{parts,indices,r});
+						m.invoke(this, new Object[]{parts,indices,publicSystemNumber});
 						line = reader.readLine();
 					}
 					reader.close();
 				}
-				r++;
+				publicSystemNumber++;
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -230,43 +226,42 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * @param parts
 	 * @param indices
 	 */
-	public void processStop(String[] parts, int[] indices, int r) {
-		stops[r].put(parts[indices[0]],new Stop(new CoordImpl(Double.parseDouble(parts[indices[1]]),Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
+	public void processStop(String[] parts, int[] indices, int publicSystemNumber) {
+		stops[publicSystemNumber].put(parts[indices[0]],new Stop(new CoordImpl(Double.parseDouble(parts[indices[1]]),Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
 	}
-	public void processCalendar(String[] parts, int[] indices, int r) {
+	public void processCalendar(String[] parts, int[] indices, int publicSystemNumber) {
 		boolean[] days = new boolean[7];
 		for(int d=0; d<days.length; d++)
 			days[d]=parts[d+indices[1]].equals("1");
-		services[r].put(parts[indices[0]], new Service(days, parts[indices[2]], parts[indices[3]]));
+		services[publicSystemNumber].put(parts[indices[0]], new Service(days, parts[indices[2]], parts[indices[3]]));
 	}
-	public void processCalendarDate(String[] parts, int[] indices, int r) {
-		Service actual = services[r].get(parts[indices[0]]);
+	public void processCalendarDate(String[] parts, int[] indices, int publicSystemNumber) {
+		Service actual = services[publicSystemNumber].get(parts[indices[0]]);
 		if(parts[indices[2]].equals("2"))
 			actual.addException(parts[indices[1]]);
 		else
 			actual.addAddition(parts[indices[1]]);
 	}
-	public void processShape(String[] parts, int[] indices, int r) {
-		Shape actual = shapes[r].get(parts[indices[0]]);
+	public void processShape(String[] parts, int[] indices, int publicSystemNumber) {
+		Shape actual = shapes[publicSystemNumber].get(parts[indices[0]]);
 		if(actual==null) {
 			actual = new Shape(parts[indices[0]]);
-			shapes[r].put(parts[indices[0]], actual);
+			shapes[publicSystemNumber].put(parts[indices[0]], actual);
 		}
 		actual.addPoint(new CoordImpl(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),Integer.parseInt(parts[indices[3]]));
 	}
-	public void processRoute(String[] parts, int[] indices, int r) {
-		routes[r].put(parts[indices[0]], new Route(parts[indices[1]], RouteTypes.values()[Integer.parseInt(parts[indices[2]])]));
+	public void processRoute(String[] parts, int[] indices, int publicSystemNumber) {
+		routes[publicSystemNumber].put(parts[indices[0]], new Route(parts[indices[1]], RouteTypes.values()[Integer.parseInt(parts[indices[2]])]));
 	}
-	public void processTrip(String[] parts, int[] indices, int r) {
-		Route route = routes[r].get(parts[indices[0]]);
-		if(parts.length==5) {
-			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), shapes[r].get(parts[indices[3]]),route));
-		}
+	public void processTrip(String[] parts, int[] indices, int publicSystemNumber) {
+		Route route = routes[publicSystemNumber].get(parts[indices[0]]);
+		if(parts.length==5)
+			route.putTrip(parts[indices[1]], new Trip(services[publicSystemNumber].get(parts[indices[2]]), shapes[publicSystemNumber].get(parts[indices[3]]),parts[indices[1]]));
 		else
-			route.putTrip(parts[indices[1]], new Trip(services[r].get(parts[indices[2]]), null, route));
+			route.putTrip(parts[indices[1]], new Trip(services[publicSystemNumber].get(parts[indices[2]]), null, parts[indices[1]]));
 	}
-	public void processStopTime(String[] parts, int[] indices, int r) {
-		for(Route actualRoute:routes[r].values()) {
+	public void processStopTime(String[] parts, int[] indices, int publicSystemNumber) {
+		for(Route actualRoute:routes[publicSystemNumber].values()) {
 			Trip trip = actualRoute.getTrips().get(parts[indices[0]]);
 			if(trip!=null) {
 				try {
@@ -279,8 +274,8 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			}
 		}
 	}
-	public void processFrequency(String[] parts, int[] indices, int r) {
-		for(Route actualRoute:routes[r].values()) {
+	public void processFrequency(String[] parts, int[] indices, int publicSystemNumber) {
+		for(Route actualRoute:routes[publicSystemNumber].values()) {
 			Trip trip = actualRoute.getTrips().get(parts[indices[0]]);
 			if(trip!=null) {
 				try {
@@ -297,30 +292,30 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * From the loaded information calculates all the necessary information for MATSim
 	 * @throws IOException 
 	 */
-	private void calculateUnknownInformation() throws IOException {
+	private void calculateUnknownInformation(CoordinateTransformation coordinateTransformation) throws IOException {
 		//New Stops according to the modes
-		for(int r=0; r<roots.length; r++)
-			for(Route route:routes[r].values())
+		for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++)
+			for(Route route:routes[publicSystemNumber].values())
 				for(Trip trip:route.getTrips().values())
 					for(Entry<Integer,StopTime> stopTime:trip.getStopTimes().entrySet())
-						if(stops[r].get(stopTime.getValue().getStopId()).getRouteType()==null)
-							stops[r].get(stopTime.getValue().getStopId()).setRouteType(route.getRouteType());
+						if(stops[publicSystemNumber].get(stopTime.getValue().getStopId()).getRouteType()==null)
+							stops[publicSystemNumber].get(stopTime.getValue().getStopId()).setRouteType(route.getRouteType());
 		//Path
 		boolean shape = false;
 		if(shape)
 			generateRepeatedMRTStops();
-		for(int r=0; r<roots.length; r++) {
-			if(r==0) {
-				RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, routes[r], stops[r]);
+		for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++) {
+			if(publicSystemNumber==0) {
+				RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, routes[publicSystemNumber], stops[publicSystemNumber]);
 				routesPathsGenerator.run();
 			}
-			for(Entry<String,Route> route:routes[r].entrySet())
+			for(Entry<String,Route> route:routes[publicSystemNumber].entrySet())
 				if(!route.getValue().getRouteType().wayType.equals(Route.WayTypes.ROAD))
 					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet())
 						if(shape && trip.getValue().getShape()!= null)
-							addNewLinksSequenceShape(trip, route.getValue().getRouteType(), route.getKey(), r);
+							addNewLinksSequenceShape(trip, route.getValue().getRouteType(), route.getKey(), publicSystemNumber);
 						else
-							addNewLinksSequence(trip.getValue(), route.getValue().getRouteType(), route.getKey(), r);
+							addNewLinksSequence(trip.getValue(), route.getValue().getRouteType(), route.getKey(), publicSystemNumber);
 		}
 		//Splitting of stop-links
 		splitBusStopLinks(MAX_DISTANCE_STOP_LINK);
@@ -336,9 +331,8 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 					}
 			}*/
 		//Coordinates system of the network
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N");
 		for(Node node:network.getNodes().values())
-			((NodeImpl)node).setCoord(ct.transform(node.getCoord()));
+			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		for(Link link:network.getLinks().values()) {
 			if(((LinkImpl)link).getOrigId()!=null)
 				((LinkImpl)link).setLength(((LinkImpl)link).getLength()*1000);
@@ -393,14 +387,14 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * @param trip
 	 * @param withShape
 	 */
-	private void addNewLinksSequence(Trip trip, RouteTypes routeType, String routeKey, int r) {
+	private void addNewLinksSequence(Trip trip, RouteTypes routeType, String routeKey, int publicSystemNumber) {
 		double length;
 		double freeSpeed=50;
 		double capacity=1000;
 		double nOfLanes=1;
 		StopTime stopTime = trip.getStopTimes().get(1);
 		String id = stopTime.getStopId();
-		Stop stop = stops[r].get(id);
+		Stop stop = stops[publicSystemNumber].get(id);
 		NodeImpl node = (NodeImpl) network.getNodes().get(new IdImpl(id));
 		if(node==null) {
 			node = new NodeImpl(new IdImpl(id));
@@ -408,7 +402,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			network.addNode(node);
 		}
 		String id2 = trip.getStopTimes().get(2).getStopId();
-		Stop stop2 = stops[r].get(id2);
+		Stop stop2 = stops[publicSystemNumber].get(id2);
 		NodeImpl node2 = (NodeImpl) network.getNodes().get(new IdImpl(id2));
 		if(node2==null) {
 			node2 = new NodeImpl(new IdImpl(id2));
@@ -430,20 +424,20 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 		if(parts.length>1) {
 			for(String part:parts)
 				if(part.startsWith(routeKey)) {
-					Stop nStop = stops[r].get(part);
-					Stop nStopR = stops[r].get(part+"_r");
+					Stop nStop = stops[publicSystemNumber].get(part);
+					Stop nStopR = stops[publicSystemNumber].get(part+"_r");
 					if(nStop==null && nStopR==null) {
 						nStop = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 						nStop.setLinkId(id2);
 						nStop.setFixedLinkId();
-						stops[r].put(part,nStop);
+						stops[publicSystemNumber].put(part,nStop);
 						stopTime.setStopId(part);
 					}
 					else if(nStopR==null && !nStop.getLinkId().equals(id2)) {
 							nStopR = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 							nStopR.setLinkId(id2);
 							nStopR.setFixedLinkId();
-							stops[r].put(part+"_r",nStopR);
+							stops[publicSystemNumber].put(part+"_r",nStopR);
 							stopTime.setStopId(part+"_r");
 					}
 					else
@@ -458,7 +452,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				Stop nStopR = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 				nStopR.setLinkId(id2);
 				nStopR.setFixedLinkId();
-				stops[r].put(id+"_r",nStopR);
+				stops[publicSystemNumber].put(id+"_r",nStopR);
 				stopTime.setStopId(id+"_r");
 			}
 			else
@@ -469,7 +463,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			if(trip.getStopTimes().get(p)!=null) {
 				stopTime = trip.getStopTimes().get(p);
 				id = stopTime.getStopId();
-				stop = stops[r].get(id);
+				stop = stops[publicSystemNumber].get(id);
 				node = (NodeImpl) network.getNodes().get(new IdImpl(id));
 				if(node==null) {
 					node = new NodeImpl(new IdImpl(id));
@@ -491,20 +485,20 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				if(parts.length>1) {
 					for(String part:parts)
 						if(part.startsWith(routeKey)) {
-							Stop nStop = stops[r].get(part);
-							Stop nStopR = stops[r].get(part+"_r");
+							Stop nStop = stops[publicSystemNumber].get(part);
+							Stop nStopR = stops[publicSystemNumber].get(part+"_r");
 							if(nStop==null && nStopR==null) {
 								nStop = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 								nStop.setLinkId(id2);
 								nStop.setFixedLinkId();
-								stops[r].put(part,nStop);
+								stops[publicSystemNumber].put(part,nStop);
 								stopTime.setStopId(part);
 							}
 							else if(nStopR==null && !nStop.getLinkId().equals(id2)) {
 								nStopR = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 								nStopR.setLinkId(id2);
 								nStopR.setFixedLinkId();
-								stops[r].put(part+"_r",nStopR);
+								stops[publicSystemNumber].put(part+"_r",nStopR);
 								stopTime.setStopId(part+"_r");
 							}
 							else
@@ -519,7 +513,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 						Stop nStopR = new Stop(stop.getPoint(), stop.getName(), stop.isBlocks());
 						nStopR.setLinkId(id2);
 						nStopR.setFixedLinkId();
-						stops[r].put(id+"_r",nStopR);
+						stops[publicSystemNumber].put(id+"_r",nStopR);
 						stopTime.setStopId(id+"_r");
 					}
 					else
@@ -536,14 +530,14 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				e.printStackTrace();
 			}*/
 	}
-	private void addNewLinksSequenceShape(Entry<String,Trip> tripE, RouteTypes routeType, String routeKey, int r) {
+	private void addNewLinksSequenceShape(Entry<String,Trip> tripE, RouteTypes routeType, String routeKey, int publicSystemNumber) {
 		Shape shape = tripE.getValue().getShape();
 		Iterator<StopTime> iStopTime=tripE.getValue().getStopTimes().values().iterator();
 		String stopId = iStopTime.next().getStopId();
-		double nearest = CoordUtils.calcDistance(shape.getPoints().get(1),stops[r].get(stopId).getPoint());
+		double nearest = CoordUtils.calcDistance(shape.getPoints().get(1),stops[publicSystemNumber].get(stopId).getPoint());
 		int nearI = 1;
 		for(int n=2; n<shape.getPoints().size(); n++) {
-			double distance = CoordUtils.calcDistance(shape.getPoints().get(n),stops[r].get(stopId).getPoint());
+			double distance = CoordUtils.calcDistance(shape.getPoints().get(n),stops[publicSystemNumber].get(stopId).getPoint());
 			if(distance<nearest) {
 				nearest = distance;
 				nearI = n;
@@ -552,7 +546,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 		Point2D pPoint = nearI==1?null:new Point2D(shape.getPoints().get(nearI-1).getX(), shape.getPoints().get(nearI-1).getY());
 		Point2D point = new Point2D(shape.getPoints().get(nearI).getX(), shape.getPoints().get(nearI).getY());
 		Point2D nPoint = new Point2D(shape.getPoints().get(nearI+1).getX(), shape.getPoints().get(nearI+1).getY());
-		Point2D sPoint = new Point2D(stops[r].get(stopId).getPoint().getX(), stops[r].get(stopId).getPoint().getY());
+		Point2D sPoint = new Point2D(stops[publicSystemNumber].get(stopId).getPoint().getX(), stops[publicSystemNumber].get(stopId).getPoint().getY());
 		Line2D line = pPoint==null?null:new Line2D(pPoint, point);
 		Line2D lineN = new Line2D(point, nPoint);
 		Node previous = null, node = null;
@@ -569,13 +563,13 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				String idS = stopId;
 				link = addLink(idS, previous, node, routeType);
 				tripE.getValue().addLink(link);
-				stops[r].get(stopId).setLinkId(idS);
+				stops[publicSystemNumber].get(stopId).setLinkId(idS);
 				if(iStopTime.hasNext())
 					stopId = iStopTime.next().getStopId();
-				nearest = CoordUtils.calcDistance(shape.getPoints().get(1),stops[r].get(stopId).getPoint());
+				nearest = CoordUtils.calcDistance(shape.getPoints().get(1),stops[publicSystemNumber].get(stopId).getPoint());
 				nearI = 1;
 				for(int n=2; n<shape.getPoints().size(); n++) {
-					double distance = CoordUtils.calcDistance(shape.getPoints().get(n),stops[r].get(stopId).getPoint());
+					double distance = CoordUtils.calcDistance(shape.getPoints().get(n),stops[publicSystemNumber].get(stopId).getPoint());
 					if(distance<nearest) {
 						nearest = distance;
 						nearI = n;
@@ -584,7 +578,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				pPoint = nearI==1?null:new Point2D(shape.getPoints().get(nearI-1).getX(), shape.getPoints().get(nearI-1).getY());
 				point = new Point2D(shape.getPoints().get(nearI).getX(), shape.getPoints().get(nearI).getY());
 				nPoint = new Point2D(shape.getPoints().get(nearI+1).getX(), shape.getPoints().get(nearI+1).getY());
-				sPoint = new Point2D(stops[r].get(stopId).getPoint().getX(), stops[r].get(stopId).getPoint().getY());
+				sPoint = new Point2D(stops[publicSystemNumber].get(stopId).getPoint().getX(), stops[publicSystemNumber].get(stopId).getPoint().getY());
 				line = pPoint==null?null:new Line2D(pPoint, point);
 				lineN = new Line2D(point, nPoint);
 			}
@@ -608,10 +602,10 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 					tripE.getValue().addLink(link);
 					pPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 					point = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-					sPoint = new Point2D(stops[r].get(stopId).getPoint().getX(), stops[r].get(stopId).getPoint().getY());
+					sPoint = new Point2D(stops[publicSystemNumber].get(stopId).getPoint().getX(), stops[publicSystemNumber].get(stopId).getPoint().getY());
 					line = new Line2D(pPoint, point);
 					if(line.isNearestInside(sPoint)) {
-						stops[r].get(stopId).setLinkId(idS);
+						stops[publicSystemNumber].get(stopId).setLinkId(idS);
 						if(iStopTime.hasNext())
 							stopId = iStopTime.next().getStopId();
 						else
@@ -624,7 +618,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				String idS = stopId;
 				link = addLink(idS, previous, node, routeType);
 				tripE.getValue().addLink(link);
-				stops[r].get(stopId).setLinkId(idS);
+				stops[publicSystemNumber].get(stopId).setLinkId(idS);
 				if(iStopTime.hasNext()) {
 					stopId = iStopTime.next().getStopId();
 				}
@@ -633,7 +627,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			}
 			previous = node;
 		}
-		Window window = new Window(tripE.getKey(),network,tripE.getValue(),stops[r]);
+		Window window = new Window(tripE.getKey(),network,tripE.getValue(),stops[publicSystemNumber]);
 		window.setVisible(true);
 		while(window.isVisible())
 			try {
@@ -724,7 +718,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	public void write(String filename, CoordinateTransformation coordinateTransformation) {
 			loadGTFSFiles();
 			try {
-				calculateUnknownInformation();
+				calculateUnknownInformation(coordinateTransformation);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -732,8 +726,8 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 			//writeXML(filename+"t");
 			TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();
 			TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();
-			for(int r=0; r<roots.length; r++)
-				for(Entry<String, Stop> stop: stops[r].entrySet())
+			for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++)
+				for(Entry<String, Stop> stop: stops[publicSystemNumber].entrySet())
 					if(stop.getValue().getLinkId()!=null) {
 						Coord result = coordinateTransformation.transform(stop.getValue().getPoint());
 						TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(new IdImpl(stop.getKey()), result, stop.getValue().isBlocks());
@@ -741,14 +735,14 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 						transitStopFacility.setName(stop.getValue().getName());
 						transitSchedule.addStopFacility(transitStopFacility);
 					}
-			for(int r=0; r<roots.length; r++)
-				for(Entry<String,Route> route:routes[r].entrySet()) {
+			for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++)
+				for(Entry<String,Route> route:routes[publicSystemNumber].entrySet()) {
 					TransitLine transitLine = transitScheduleFactory.createTransitLine(new IdImpl(route.getKey()));
 					transitSchedule.addTransitLine(transitLine);
 					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet()) {
 						boolean isService=false;
 						for(String serviceId:serviceIds)
-							if(trip.getValue().getService().equals(services[r].get(serviceId)))
+							if(trip.getValue().getService().equals(services[publicSystemNumber].get(serviceId)))
 								isService = true;
 						if(isService) {
 							NetworkRoute networkRoute = (NetworkRoute) ((NetworkFactoryImpl)network.getFactory()).createRoute(/*TODO*/TransportMode.car, trip.getValue().getLinks().get(0).getId(), trip.getValue().getLinks().get(trip.getValue().getLinks().size()-1).getId());

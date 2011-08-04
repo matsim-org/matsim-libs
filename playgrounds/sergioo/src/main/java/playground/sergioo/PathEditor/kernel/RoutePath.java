@@ -41,6 +41,7 @@ public class RoutePath {
 	
 	//Constants
 	private static final double MIN_DISTANCE_DELTA = 20*180/(6371000*Math.PI);
+	private static final String ROAD_MODE = "car";
 	//Attributes
 	private Map<String, Stop> stops;
 	public List<Link> links;
@@ -71,7 +72,7 @@ public class RoutePath {
 				return getLinkMinimumTravelCost(link);
 			}
 			public double getLinkMinimumTravelCost(Link link) {
-				return link.getLength();
+				return link.getLength()/link.getFreespeed();
 			}
 		};
 		preProcessData = new PreProcessEuclidean(travelMinCost);
@@ -362,13 +363,13 @@ public class RoutePath {
 				prevLL.add(network.getLinks().get(new IdImpl(prevStop.getLinkId())));
 			}
 			else
-				prevLL=getBestLinksMode(network,"Car", prevStop.getPoint(),trip.getShape());
+				prevLL=getBestLinksMode(network, prevStop.getPoint(),trip.getShape());
 			if(nextStop.getLinkId()!=null) {
 				nextLL=new ArrayList<Link>();
 				nextLL.add(network.getLinks().get(new IdImpl(nextStop.getLinkId())));
 			}
 			else
-				nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape());
+				nextLL=getBestLinksMode(network, nextStop.getPoint(),trip.getShape());
 			List<Tuple<Path,Link[]>> paths = new ArrayList<Tuple<Path,Link[]>>();
 			for(int i=0; i<prevLL.size(); i++)
 				for(int j=0; j<nextLL.size(); j++) {
@@ -416,7 +417,7 @@ public class RoutePath {
 				bestPath.links.add(nextL);
 			}
 			else {
-				nextLL=getBestLinksMode(network,"Car", nextStop.getPoint(),trip.getShape());
+				nextLL=getBestLinksMode(network, nextStop.getPoint(),trip.getShape());
 				List<Tuple<Path,Link>> paths = new ArrayList<Tuple<Path,Link>>();
 				for(int i=0; i<nextLL.size(); i++) {
 					nextL = nextLL.get(i);
@@ -447,12 +448,12 @@ public class RoutePath {
 			prevStop = nextStop;
 		}
 	}
-	private List<Link> getBestLinksMode(Network network, String mode, Coord coord, Shape shape) {
+	private List<Link> getBestLinksMode(Network network, Coord coord, Shape shape) {
 		List<Double> nearestDistances = new ArrayList<Double>();
 		List<Link> nearestLinks = new ArrayList<Link>();
 		for(double minDistance=this.minDistance;nearestLinks.size()<numCandidates;minDistance+=MIN_DISTANCE_DELTA)
 			for(Link link:network.getLinks().values())
-				if(link.getAllowedModes().contains(mode)) {
+				if(link.getAllowedModes().contains(ROAD_MODE)) {
 					Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 					Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 					Vector2D linkVector = new Vector2D(fromPoint, toPoint);
@@ -600,7 +601,7 @@ public class RoutePath {
 					return getLinkMinimumTravelCost(link);
 				}
 				public double getLinkMinimumTravelCost(Link link) {
-					return link.getLength();
+					return link.getLength()/link.getFreespeed();
 				}
 			};
 			preProcessData = new PreProcessEuclidean(travelMinCost);
@@ -612,7 +613,7 @@ public class RoutePath {
 					return getLinkMinimumTravelCost(link);
 				}
 				public double getLinkMinimumTravelCost(Link link) {
-					return link.getLength()*Math.pow(trip.getShape().getDistance(link),1);
+					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
 				}
 			};
 			preProcessData = new PreProcessEuclidean(travelMinCost);

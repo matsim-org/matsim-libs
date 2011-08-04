@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -239,6 +240,7 @@ public class VisumFile2MatsimNetwork {
 		long id=0;
 		List<String> zeroCapacity=new ArrayList<String>();
 		List<String> loops=new ArrayList<String>();
+		LinkFactory linkFactory = new LinkFactoryImpl();
 		while (line!=null && line.length()>0) {
 			final String[] parts = line.split(";");
 			String origId = parts[columnsIndices[0]];
@@ -249,7 +251,7 @@ public class VisumFile2MatsimNetwork {
 			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
-				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
+				Link link = linkFactory.createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
 				Set<String> modes = new HashSet<String>();
 				modes.add("Car");
