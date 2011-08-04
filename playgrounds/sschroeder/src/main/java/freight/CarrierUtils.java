@@ -8,6 +8,7 @@ import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierKnowledge;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Shipment.TimeWindow;
@@ -40,8 +41,8 @@ public class CarrierUtils {
 	}
 	
 	public static Offer createOffer(String carrierId){
-		Offer offer = new Offer();
-		offer.setCarrierId(makeId(carrierId));
+		Offer offer = new CarrierOffer();
+		offer.setId(makeId(carrierId));
 		return offer;
 	}
 	

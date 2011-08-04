@@ -6,8 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierVehicle;
@@ -31,7 +34,76 @@ import vrp.basics.CrowFlyDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
 
-public class MarginalCostOM implements OfferMaker{
+public class AverageMarginalCostOM implements OfferMaker{
+	
+	public static class AvgMarginalCostCalculator {
+		private Collection<Contract> currentContracts;
+		
+		private Network network;
+		
+		private Id depotLocation;
+
+		public AvgMarginalCostCalculator(Collection<Contract> currentContracts, Network network, Id depotLocation) {
+			super();
+			this.currentContracts = currentContracts;
+			this.network = network;
+			this.depotLocation = depotLocation;
+		}
+		
+		public double calculateShareOfDistance(Shipment requestedShipment, double totalDistance){
+			double sumOfWeights = 0.0;
+			double weightOfRequestedShipment = getBeeLineDistance(depotLocation, requestedShipment) * size(requestedShipment); 
+			sumOfWeights += weightOfRequestedShipment;
+			for(Contract c : currentContracts){
+				sumOfWeights += getBeeLineDistance(depotLocation, c.getShipment()) * size(c.getShipment());
+			}
+			double avgMC = weightOfRequestedShipment/sumOfWeights * totalDistance;
+//			assertNotHigherThan(200000,avgMC,requestedShipment,totalCosts);
+			return avgMC;
+		}
+		
+		public double calculateShareOfTime(Shipment requestedShipment, double totalTime){
+			double sumOfWeights = 0.0;
+			double weightOfRequestedShipment = getBeeLineTime(depotLocation, requestedShipment) * size(requestedShipment); 
+			sumOfWeights += weightOfRequestedShipment;
+			for(Contract c : currentContracts){
+				sumOfWeights += getBeeLineTime(depotLocation, c.getShipment()) * size(c.getShipment());
+			}
+			double avgMC = weightOfRequestedShipment/sumOfWeights * totalTime;
+//			assertNotHigherThan(200000,avgMC,requestedShipment,totalCosts);
+			return avgMC;
+		}
+		
+		private double getBeeLineTime(Id depotLocation,Shipment requestedShipment) {
+			double speed = 25;
+			double beelineDistance = getBeeLineDistance(depotLocation, requestedShipment);
+			return beelineDistance/speed;
+		}
+
+		private void assertNotHigherThan(int i, double avgMC, Shipment shipment,double totCosts) {
+			if(avgMC > i){
+				throw new IllegalStateException("strange.");
+			}
+			
+		}
+
+		private double size(Shipment shipment) {
+			return Math.log(shipment.getSize());
+		}
+
+		private double getBeeLineDistance(Id depotLocation, Shipment shipment) {
+			Coord locCoord = findCoord(depotLocation);
+			Coord from = findCoord(shipment.getFrom());
+			Coord to = findCoord(shipment.getTo());
+			double distance = CoordUtils.calcDistance(locCoord, from) +
+					CoordUtils.calcDistance(from, to) + CoordUtils.calcDistance(to, locCoord);
+			return distance;
+		}
+		
+		private Coord findCoord(Id location) {
+			return network.getLinks().get(location).getCoord();
+		}
+	}
 	
 	public static class ServiceProviderImpl implements ServiceProvider {
 
@@ -85,7 +157,7 @@ public class MarginalCostOM implements OfferMaker{
 		
 	}
 	
-	private static Logger logger = Logger.getLogger(MarginalCostOM.class);
+	private static Logger logger = Logger.getLogger(AverageMarginalCostOM.class);
 	
 	private CarrierImpl carrier;
 	
@@ -105,7 +177,13 @@ public class MarginalCostOM implements OfferMaker{
 	
 	private Map<ServiceProvider,Tour> tours = new HashMap<ServiceProvider, Tour>();
 	
-	public MarginalCostOM(CarrierImpl carrier, Locations locations) {
+	private Network network;
+
+	public void setNetwork(Network network) {
+		this.network = network;
+	}
+
+	public AverageMarginalCostOM(CarrierImpl carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();
@@ -165,14 +243,14 @@ public class MarginalCostOM implements OfferMaker{
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;
 		vrp.algorithms.ruinAndRecreate.basics.Shipment shipment = VrpUtils.createShipment(vrpTransformation.getFromCustomer(requestedShipment), vrpTransformation.getToCustomer(requestedShipment));
+		double totalCosts = 0.0;
 		if(!serviceProviders.isEmpty()){
 			vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer cheapestOffer = null;
 			Tour bestTour = null;
 			if(isMorning(startPickup)){
 				for(ServiceProviderImpl sP : morningService){
-					double totalCostsBefore = sP.getCostsOfCurrentTour();
 					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment);
-					double totalCostsAfter = sP.getCostsOfCurrentTour();
+					totalCosts += sP.getCostsOfCurrentTour();
 					if(o != null){
 						if(cheapestOffer == null){
 							cheapestOffer = o;
@@ -194,6 +272,7 @@ public class MarginalCostOM implements OfferMaker{
 			}
 			else{
 				for(ServiceProviderImpl sP : afternoonService){
+					totalCosts += sP.getCostsOfCurrentTour();
 					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment);
 					if(o != null){
 						if(cheapestOffer == null){
@@ -223,14 +302,25 @@ public class MarginalCostOM implements OfferMaker{
 		offer.setPrice(sP.getCostsOfCurrentTour());
 		if(bestOffer != null && bestOffer.getPrice() < offer.getPrice()){
 			logger.info(carrier.getId() + " inserts " + requestedShipment + " into " + tours.get(bestServiceProvider) + "; costs=" + bestOffer.getPrice());
+			totalCosts += bestOffer.getPrice();
+			bestOffer.setPrice(new AvgMarginalCostCalculator(carrier.getContracts(), network, carrierVehicle.getLocation()).calculateShareOfDistance(requestedShipment, totalCosts));
+			assertPriceNotHigherThan(200000,bestOffer.getPrice());
 			return bestOffer;
 		}
 		else{
 			logger.info(carrier.getId() + " inserts " + requestedShipment + " into " + roundTour + "; costs=" + offer.getPrice());
+			assertPriceNotHigherThan(200000,offer.getPrice());
 			return offer;
 		}
 	}
 	
+
+	private void assertPriceNotHigherThan(int i, Double price) {
+		if(price > i){
+			throw new IllegalStateException("price too hight");
+		}
+		
+	}
 
 	private boolean isMorning(Double startPickup) {
 		if(startPickup == 0.0){

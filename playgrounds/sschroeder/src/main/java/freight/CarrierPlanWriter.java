@@ -101,7 +101,8 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 	}
 
 	private void startAndEndVehicle(CarrierVehicle v) throws IOException {
-		writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"/>\n");
+		writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"" +
+				" cap=\"" + v.getCapacity() + "\"/>\n");
 	}
 
 	private void endScheduledTour(BufferedWriter writer) throws IOException {

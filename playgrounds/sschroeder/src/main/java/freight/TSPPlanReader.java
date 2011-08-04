@@ -12,7 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.mzilske.freight.Offer;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TSPShipment.TimeWindow;
@@ -41,7 +41,7 @@ public class TSPPlanReader extends MatsimXmlParser{
 	
 	public void read(String filename){
 
-		logger.info("read carrier plans");
+		logger.info("read tsp plans");
 		this.setValidating(false);
 		parse(filename);
 		logger.info("done");
@@ -95,8 +95,8 @@ public class TSPPlanReader extends MatsimXmlParser{
 			}
 		}
 		if(name.equals("leg")){
-			Offer offer = new Offer();
-			offer.setCarrierId(makeId(atts.getValue("carrierId")));
+			CarrierOffer offer = new CarrierOffer();
+			offer.setId(makeId(atts.getValue("carrierId")));
 			currentChainBuilder.scheduleLeg(offer);
 		}
 	}

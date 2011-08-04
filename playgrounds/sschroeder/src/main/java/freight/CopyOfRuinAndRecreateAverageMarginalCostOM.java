@@ -10,8 +10,6 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.mzilske.freight.CarrierCostFunction;
 import playground.mzilske.freight.CarrierImpl;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierPlanBuilder;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.CarrierOffer;
@@ -20,7 +18,7 @@ import playground.mzilske.freight.Shipment;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule;
 
-public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
+public class CopyOfRuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 
 	private CarrierImpl carrier;
 	
@@ -32,8 +30,6 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 	
 	private CarrierCostFunction carrierCostCalculator;
 	
-	private CarrierPlanBuilder carrierPlanBuilder;
-	
 	public void setCarrierCostFunction(CarrierCostFunction carrierCostCalculator) {
 		this.carrierCostCalculator = carrierCostCalculator;
 	}
@@ -44,7 +40,7 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 	}
 
 
-	public RuinAndRecreateAverageMarginalCostOM(CarrierImpl carrier, Locations locations) {
+	public CopyOfRuinAndRecreateAverageMarginalCostOM(CarrierImpl carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();
@@ -77,9 +73,6 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 		double tourCost = 0.0;
 		List<Contract> carrierContracts = new ArrayList<Contract>(carrier.getContracts());
 		carrierContracts.add(CarrierUtils.createContract(requestedShipment, new CarrierOffer()));
-//		CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrierContracts);
-//		plan.getScore();
-//		
 		List<Schedule> schedules = getSchedules(carrierContracts);
 		for(Schedule schedule : schedules){
 			Collection<Contract> contracts = schedule.getContracts();
@@ -115,7 +108,7 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 		List<Contract> forenoon = new ArrayList<Contract>();
 		List<Contract> afternoon = new ArrayList<Contract>();
 		for(Contract c : carrierContracts){
-			if(c.getShipment().getPickupTimeWindow().getStart() < 24*3600){
+			if(c.getShipment().getPickupTimeWindow().getStart() < 10000){
 				forenoon.add(c);
 			}
 			else{
@@ -123,7 +116,7 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 			}
 		}
 		schedules.add(new Schedule(forenoon,0.0));
-		schedules.add(new Schedule(afternoon,24*3600));
+		schedules.add(new Schedule(afternoon,10000.0));
 		return schedules;
 	}
 

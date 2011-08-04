@@ -1,6 +1,5 @@
 package freight;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,16 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import playground.mzilske.freight.TSPOffer;
+import city2000w.TRBShippersContractGenerator.TimeProfile;
 
 public class ShipperPlanReader extends MatsimXmlParser{
 
@@ -38,6 +35,10 @@ public class ShipperPlanReader extends MatsimXmlParser{
 	private CommodityFlow currentComFlow;
 
 	private TSPOffer currentTspOffer;
+	
+	private Integer currentFrequency;
+	
+	private List<TimeProfile> currentTimeProfile;
 	
 	
 	public ShipperPlanReader(Collection<ShipperImpl> shippers) {
@@ -82,6 +83,14 @@ public class ShipperPlanReader extends MatsimXmlParser{
 					getDouble(atts.getValue("endDelivery")));
 			currentShipments.add(shipment);
 		}
+		if(name.equals("frequency")){
+			currentTimeProfile = new ArrayList<TimeProfile>();
+			currentFrequency = getInt(atts.getValue("id"));
+		}
+		if(name.equals("timeProfile")){
+			currentTimeProfile.add(new TimeProfile(getDouble(atts.getValue("startPickup")), getDouble(atts.getValue("endPickup")), 
+					getDouble(atts.getValue("startDelivery")), getDouble(atts.getValue("endDelivery"))));
+		}
 	}
 
 	@Override
@@ -97,13 +106,18 @@ public class ShipperPlanReader extends MatsimXmlParser{
 		if(name.equals("shipper")){
 			shippers.add(currentShipper);
 		}
+		if(name.equals("frequency")){
+			currentShipper.getShipperKnowledge().addTimeProfile(currentFrequency, currentTimeProfile);
+			currentTimeProfile = null;
+			currentFrequency = null;
+		}
 	}
 
 	private TSPOffer makeTspOffer(String tspIdString, String priceString) {
 		TSPOffer offer = new TSPOffer();
 		Id tspId = makeId(tspIdString);
 		Double price = Double.parseDouble(priceString);
-		offer.setTspId(tspId);
+		offer.setId(tspId);
 		offer.setPrice(price);
 		return offer;
 	}

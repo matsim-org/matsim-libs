@@ -14,6 +14,12 @@ public class ShipperImpl {
 	
 	private Id locationId;
 	
+	private ShipperKnowledge shipperKnowledge = new ShipperKnowledge();
+	
+	public ShipperKnowledge getShipperKnowledge() {
+		return shipperKnowledge;
+	}
+
 	private Collection<ShipperContract> contracts = new ArrayList<ShipperContract>();
 
 	public ShipperImpl(Id id, Id locationId) {

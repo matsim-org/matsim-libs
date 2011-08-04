@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 
 public class ShipperShipment {
 	
-	static class TimeWindow {
+	public static class TimeWindow {
 		private double start;
 		
 		private double end;

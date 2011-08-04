@@ -20,7 +20,7 @@ import playground.mzilske.freight.Shipment;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule;
 
-public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
+public class RuinAndRecreateAverageMarginalCostOM_V2 implements OfferMaker{
 
 	private CarrierImpl carrier;
 	
@@ -44,7 +44,7 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 	}
 
 
-	public RuinAndRecreateAverageMarginalCostOM(CarrierImpl carrier, Locations locations) {
+	public RuinAndRecreateAverageMarginalCostOM_V2(CarrierImpl carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();
@@ -74,60 +74,18 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 		}
 		Shipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
 		vrpTransformation.addShipment(requestedShipment);
-		double tourCost = 0.0;
 		List<Contract> carrierContracts = new ArrayList<Contract>(carrier.getContracts());
 		carrierContracts.add(CarrierUtils.createContract(requestedShipment, new CarrierOffer()));
-//		CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrierContracts);
-//		plan.getScore();
-//		
-		List<Schedule> schedules = getSchedules(carrierContracts);
-		for(Schedule schedule : schedules){
-			Collection<Contract> contracts = schedule.getContracts();
-			if(contracts.isEmpty()){
-				continue;
-			}
-			Collection<vrp.basics.Tour> vrpSolution = new ArrayList<vrp.basics.Tour>();
-			RuinAndRecreateSolver ruinAndRecreateSolver = new RuinAndRecreateSolver(vrpSolution, vrpTransformation);
-			ruinAndRecreateSolver.setNumberOfWarmUpIterations(2);
-			ruinAndRecreateSolver.setNofIterations(10);
-			ruinAndRecreateSolver.solve(contracts, carrierVehicle);
-			tourCost += ruinAndRecreateSolver.getVrpSolution().getTransportCosts();
-		}
+		CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrierContracts);
+		double tourCost = plan.getScore();
 		double avgMCInMeters=new AverageMarginalCostOM.AvgMarginalCostCalculator(carrierContracts, network, carrierVehicle.getLocation()).calculateShareOfDistance(requestedShipment, tourCost);
-//		double avgMCInSeconds=new AverageMarginalCostOM.AvgMarginalCostCalculator(carrierContracts, network, carrierVehicle.getLocation()).calculateShareOfTime(requestedShipment, tourCost);
-		//		assertNotHigherThan(200000, avgMCInMeters);
 		double mcCost = carrierCostCalculator.calculateCost(carrierVehicle, avgMCInMeters, 0.0);
 		CarrierOffer offer = new CarrierOffer();
 		offer.setId(carrier.getId());
 		offer.setPrice(mcCost);
 		return offer;
 	}
-	
-	private void assertNotHigherThan(int i, double avgMC) {
-		if(avgMC > i){
-			throw new IllegalStateException("strange");
-		}
-		return;
-	}
-
-	private List<Schedule> getSchedules(Collection<Contract> carrierContracts) {
-		List<Schedule> schedules = new ArrayList<RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule>();
-		List<Contract> forenoon = new ArrayList<Contract>();
-		List<Contract> afternoon = new ArrayList<Contract>();
-		for(Contract c : carrierContracts){
-			if(c.getShipment().getPickupTimeWindow().getStart() < 24*3600){
-				forenoon.add(c);
-			}
-			else{
-				afternoon.add(c);
-			}
-		}
-		schedules.add(new Schedule(forenoon,0.0));
-		schedules.add(new Schedule(afternoon,24*3600));
-		return schedules;
-	}
-
-	@Override
+		@Override
 	public void init() {
 		// TODO Auto-generated method stub
 		
@@ -136,6 +94,13 @@ public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void setCarrierPlanBuilder(
+			RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder rAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder) {
+		this.carrierPlanBuilder = rAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
 		
 	}
 }

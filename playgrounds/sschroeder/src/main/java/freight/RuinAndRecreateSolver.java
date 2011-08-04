@@ -1,5 +1,6 @@
 package freight;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
@@ -9,8 +10,10 @@ import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.Shipment;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
-import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
+import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
+import vrp.algorithms.ruinAndRecreate.recreation.RecreationListener;
 import vrp.api.VRP;
+import vrp.basics.ManhattanDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpSolution;
 import vrp.basics.VrpUtils;
@@ -22,7 +25,10 @@ public class RuinAndRecreateSolver implements VRPSolver {
 	private VRPTransformation vrpTransformation;
 	private VrpSolution vrpSolution = null;
 	private Collection<Tour> initialSolution = null;
-	
+	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
+	private int nOfWarmUpIterations = 4;
+	private int nOfIterations = 25;
+ 	
 	public void setInitialSolution(Collection<Tour> initialSolution) {
 		this.initialSolution = initialSolution;
 	}
@@ -42,7 +48,10 @@ public class RuinAndRecreateSolver implements VRPSolver {
 		vrpSolution = null;
 		Id depotId = carrierVehicle.getLocation();
 		VrpBuilder vrpBuilder = new VrpBuilder(depotId);
-		vrpBuilder.setConstraints(new CapacityConstraint(carrierVehicle.getCapacity()));
+		ManhattanDistance costs = new ManhattanDistance();
+		costs.speed = 25;
+		vrpBuilder.setCosts(costs);
+		vrpBuilder.setConstraints(new CapacityPickupsDeliveriesSequenceConstraint(carrierVehicle.getCapacity()));
 		for(Contract c : contracts){
 			Shipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
@@ -50,16 +59,46 @@ public class RuinAndRecreateSolver implements VRPSolver {
 		vrpBuilder.setVrpTransformation(vrpTransformation);
 		VRP vrp = vrpBuilder.buildVrp();
 		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
-		if(initialSolution == null){
-			initialSolution = VrpUtils.createTrivialSolution(vrp);
-		}
+		rrFactory.setWarmUp(nOfWarmUpIterations);
+		rrFactory.setIterations(nOfIterations);
+		addListener(rrFactory);
+		initialSolution = VrpUtils.createTrivialSolution(vrp);
 		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, carrierVehicle.getCapacity());
+		ruinAndRecreateAlgo.setWarmUpIterations(nOfWarmUpIterations);
+		
 		ruinAndRecreateAlgo.run();
+		finishListener();
 		tours.addAll(ruinAndRecreateAlgo.getSolution());
 		vrpSolution = ruinAndRecreateAlgo.getVrpSolution();
 	}
 
+	public void setNofIterations(int nOfIterations) {
+		this.nOfIterations = nOfIterations;
+	}
+
+	private void finishListener() {
+		for(RecreationListener rl : recreationListeners){
+			rl.finish();
+		}
+	}
+
+	private void addListener(RuinAndRecreateFactory rrFactory) {
+		for(RecreationListener rl : recreationListeners){
+			rrFactory.addRecreationListener(rl);
+		}
+		
+	}
+
 	public VrpSolution getVrpSolution() {
 		return vrpSolution;
+	}
+
+	public void addRecreationListener(RecreationListener recreationListener) {
+		recreationListeners.add(recreationListener);
+	}
+
+	public void setNumberOfWarmUpIterations(int i) {
+		this.nOfWarmUpIterations = i;
+		
 	}
 }

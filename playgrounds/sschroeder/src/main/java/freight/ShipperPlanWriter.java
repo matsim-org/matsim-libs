@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
+import city2000w.TRBShippersContractGenerator.TimeProfile;
+
 import utils.XmlWriterUtils;
 
 
@@ -29,23 +31,42 @@ public class ShipperPlanWriter extends MatsimXmlWriter{
 	
 	public void write(String filename){
 		try{
+			logger.info("write shipper plans");
 			openFile(filename);
 			writeXmlHead();
 			startShippers(writer);
 			for(ShipperImpl shipper : shippers){
 				startShipper(shipper,writer);
 				startAndEndCommodityFlows(shipper.getContracts(),writer);
+				startAndEndKnowledge(shipper.getShipperKnowledge(),writer);
 				startAndEndScheduledCommodityFlows(shipper.getSelectedPlan(),writer);
 				endShipper(writer);
 			}
 			endShippers(writer);
 			close();
+			logger.info("done");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
 			System.exit(1);
 		}
+	}
+
+	private void startAndEndKnowledge(ShipperKnowledge shipperKnowledge,BufferedWriter writer) throws IOException {
+		writer.write(XmlWriterUtils.tabs(3) + "<knowledge>" + XmlWriterUtils.newLine());
+		for(Integer freq : shipperKnowledge.getTimeProfileMap().keySet()){
+			writer.write(XmlWriterUtils.tabs(4) + "<frequency id=" + XmlWriterUtils.inQuotation(freq) + ">" + XmlWriterUtils.newLine());
+			for(TimeProfile timeProfile : shipperKnowledge.getTimeProfileMap().get(freq)){
+				writer.write(XmlWriterUtils.tabs(5) + "<timeProfile ");
+				writer.write("startPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupStart));
+				writer.write(" endPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupEnd));
+				writer.write(" startDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryStart));
+				writer.write(" endDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryEnd) + "/>" + XmlWriterUtils.newLine());
+			}
+			writer.write(XmlWriterUtils.tabs(4) + "</frequency>" + XmlWriterUtils.newLine());
+		}
+		writer.write(XmlWriterUtils.tabs(3) + "</knowledge>" + XmlWriterUtils.newLine());
 	}
 
 	private void startShippers(BufferedWriter writer) throws IOException {
@@ -109,7 +130,7 @@ public class ShipperPlanWriter extends MatsimXmlWriter{
 	private void startScheduledFlow(ScheduledCommodityFlow sCF, BufferedWriter writer) throws IOException {
 		writer.write(XmlWriterUtils.tabs(4) + "<scheduledFlow ");
 		writer.write("comFlowId=" + XmlWriterUtils.inQuotation(getComFlowId(sCF.getCommodityFlow())) + " ");
-		writer.write("tspId=" + XmlWriterUtils.inQuotation(sCF.getTspOffer().getTspId().toString()) + " ");
+		writer.write("tspId=" + XmlWriterUtils.inQuotation(sCF.getTspOffer().getId().toString()) + " ");
 		writer.write("price=" + XmlWriterUtils.inQuotation(sCF.getTspOffer().getPrice()) + ">" + XmlWriterUtils.newLine());
 	}
 

@@ -30,7 +30,5 @@ public class ScheduledCommodityFlow {
 	public TSPOffer getTspOffer() {
 		return tspOffer;
 	}
-	
-	
 
 }

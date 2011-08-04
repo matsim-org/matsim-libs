@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Offer;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
@@ -58,6 +58,8 @@ public class CarrierPlanReader extends MatsimXmlParser{
 	public static String VEHICLE = "vehicle";
 	
 	public static String VEHICLES = "vehicles";
+	
+	private static final String CAPACITY = "cap";
 	
 	public CarrierImpl currentCarrier = null;
 	
@@ -111,7 +113,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 				shipment = CarrierUtils.createShipment(from, to, size, 0, 24*3600, 0, 24*3600);
 			}
 			currentShipments.put(atts.getValue(ID), shipment);
-			CarrierUtils.createAndAddContract(currentCarrier, shipment, new Offer());
+			CarrierUtils.createAndAddContract(currentCarrier, shipment, new CarrierOffer());
 		}
 	
 		if(name.equals(VEHICLES)){
@@ -119,7 +121,16 @@ public class CarrierPlanReader extends MatsimXmlParser{
 		}
 		if(name.equals(VEHICLE)){
 			String vId = atts.getValue(ID);
-			CarrierVehicle vehicle = CarrierUtils.createAndAddVehicle(currentCarrier, vId, atts.getValue(LINKID),30);
+			String linkId = atts.getValue(LINKID);
+			String capacity = atts.getValue(CAPACITY);
+			Integer cap = null;
+			if(capacity != null){
+				cap = getInt(capacity);
+			}
+			else{
+				throw new IllegalStateException("no capacity available");
+			}
+			CarrierVehicle vehicle = CarrierUtils.createAndAddVehicle(currentCarrier, vId, linkId, cap);
 			vehicles.put(vId,vehicle);
 		}
 		if(name.equals("tours")){ 
