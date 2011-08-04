@@ -36,7 +36,6 @@ public class CordonPlanAnalyzer {
 		for (Person person:population.getPersons().values()){
 			Plan plan=person.getSelectedPlan();
 			
-			Boolean lastActInCordon=null;
 			Activity prevAct=null;
 			Leg prevLeg=null;
 			
