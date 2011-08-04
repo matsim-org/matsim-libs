@@ -928,10 +928,12 @@ public class GtfsConverter {
 	public static void convertStopTimesToAcceptedFormat(String stopTimesPath){
 		Map<String,List<String>> rowToTripAssignments = new HashMap<String,List<String>>();
 		File f = new File(stopTimesPath);
+		String headerText = "error";
 		// READ FILE
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(f));
-			List<String> header = new ArrayList<String>(Arrays.asList(GtfsConverter.splitRow(br.readLine())));
+			headerText = br.readLine();
+			List<String> header = new ArrayList<String>(Arrays.asList(GtfsConverter.splitRow(headerText)));
 			int tripIdIndex = header.indexOf("trip_id");
 			int stopSequenceIndex = header.indexOf("stop_sequence");
 			String row = br.readLine();
@@ -948,6 +950,7 @@ public class GtfsConverter {
 					for(int i=rowToTripAssignments.get(tripId).size(); i<=stopSequence; i++){
 						rowToTripAssignments.get(tripId).add("");
 					}
+					rowToTripAssignments.get(tripId).set(stopSequence, row);
 				}
 				row = br.readLine();
 			}while(row != null);
@@ -960,9 +963,12 @@ public class GtfsConverter {
 		File of = new File(stopTimesPath + "_b");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(of));
+			bw.write(headerText + "\n");
 			for(String tripId: rowToTripAssignments.keySet()){
 				for(String row: rowToTripAssignments.get(tripId)){
-					bw.write(row + "\n");
+					if(!row.equals("")){
+						bw.write(row + "\n");
+					}					
 				}
 			}
 			bw.flush();
