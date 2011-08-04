@@ -69,6 +69,9 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 	private void writeTransportChains(TransportServiceProviderImpl tsp)
 			throws IOException {
 		if(tsp.getSelectedPlan() != null){
+			if(tsp.getSelectedPlan().getChains() == null){
+				return;
+			}
 			startTransportChains(writer);
 			for(TransportChain chain : tsp.getSelectedPlan().getChains()){
 				startAndEndChain(chain, writer);
@@ -143,7 +146,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 			}
 			if(element instanceof ChainLeg){
 				ChainLeg leg = (ChainLeg)element;
-				writer.write(tab(5) + "<leg carrierId=" + quotation() + leg.getAcceptedOffer().getCarrierId().toString() + quotation() + "/>" + newLine()); 
+				writer.write(tab(5) + "<leg carrierId=" + quotation() + leg.getAcceptedOffer().getId().toString() + quotation() + "/>" + newLine()); 
 			}
 		}
 		writer.write(tab(4) + "</transportChain>" + newLine());
