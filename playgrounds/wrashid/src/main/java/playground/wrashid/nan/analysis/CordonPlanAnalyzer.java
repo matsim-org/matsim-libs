@@ -30,7 +30,6 @@ public class CordonPlanAnalyzer {
 		
 		int nuberTripsWorkRelated=0;
 		int numberOfTripsShopAndLeisureRelated=0;
-		int numberOfOtherLegs=0;
 		
 		Population population = scenario.getPopulation();
 		
@@ -74,38 +73,21 @@ public class CordonPlanAnalyzer {
 							}
 						}
 						
-						//e) COMING FROM OC TO C FOR ACT
-						
+						//e) COMING FROM OC TO C FOR ACT (shop/leisure)
+						if (!isInsideCordon(prevAct) && isInsideCordon(activity)){
+							if (equalsActType(activity, "shop") || equalsActType(activity, "leisure")){
+								numberOfTripsShopAndLeisureRelated++;
+							}
+						}
 						
 						//f) COMING FROM C TO C FOR ACT
-						
-						
-//						if (lastActInCordon!=null && lastActInCordon && !isInsideCordon(activity.getCoord())){					
-//							if (prevAct.getType().startsWith("work")){
-//								nuberTripsWorkRelated++;
-//							}else if (activity.getType().equalsIgnoreCase("shop") || activity.getType().equalsIgnoreCase("leisure") ){
-//								numberOfTripsShopAndLeisureRelated++;
-//							} else {
-//								numberOfOtherLegs++;
-//							}
-//						}
-//						
-//						if (lastActInCordon!=null && !lastActInCordon && isInsideCordon(activity.getCoord())){
-//							if (activity.getType().startsWith("work")){
-//								nuberTripsWorkRelated++;
-//							} else if (activity.getType().equalsIgnoreCase("shop") || activity.getType().equalsIgnoreCase("leisure") ){
-//								numberOfTripsShopAndLeisureRelated++;
-//							} else {
-//								numberOfOtherLegs++;
-//							}
-//		
-//						}
-						
+						if (isInsideCordon(prevAct) && isInsideCordon(activity)){
+							if (equalsActType(activity, "shop") || equalsActType(activity, "leisure")){
+								numberOfTripsShopAndLeisureRelated++;
+							}
+						}						
 					}
-					
-//					if (isInsideCordon(activity.getCoord())){
-//						lastActInCordon=true;
-//					}
+				
 					
 					prevAct=activity;
 				}
@@ -120,7 +102,6 @@ public class CordonPlanAnalyzer {
 		
 		System.out.println("nuberTripsWorkRelated:" + nuberTripsWorkRelated);
 		System.out.println("numberOfTripsShopAndLeisureRelated:" + numberOfTripsShopAndLeisureRelated);
-		System.out.println("numberOfOtherLegs:" + numberOfOtherLegs);
 		
 	}
 	
@@ -132,16 +113,11 @@ public class CordonPlanAnalyzer {
 		Coord center=new CoordImpl(683400.75,247500.0687); 
 		double radius=1000;
 		
-		return getDistance(center,coord)<radius;
+		return GeneralLib.getDistance(center,coord)<radius;
 	}
 	
 	private static boolean isInsideCordon(Activity act){
 		return isInsideCordon(act.getCoord());
 	}
-	 
-	 public static double getDistance(Coord coordA, Coord coordB) {
-			double xDiff = coordA.getX() - coordB.getX();
-			double yDiff = coordA.getY() - coordB.getY();
-			return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-		}
+	
 }
