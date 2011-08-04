@@ -100,34 +100,22 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 	public void handleEvent(AgentArrivalEvent event) {
 //		if(event.getLegMode().equals("car")){
 			Id personId= event.getPersonId();
+			Id linkId = event.getLinkId();
 			Double stopEngineTime = event.getTime();
 			this.stopEngine.put(personId, stopEngineTime);
-//		}
-//		else{
-//			// no engine to stop...
-//		}
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-//		if(event.getLegMode().equals("car")){
-			Id personId= event.getPersonId();	
-			Id linkId = event.getLinkId();
-			Double startEngineTime = event.getTime();
-			this.startEngine.put(personId, startEngineTime);
-
-			Double parkingDuration;
-			if (this.stopEngine.containsKey(personId)){
-				double stopEngineTime = this.stopEngine.get(personId);
-				parkingDuration = startEngineTime - stopEngineTime;
-			} else {
-				parkingDuration = 43200.0; //parking duration is assumed to at least 12 hours during the night time
-			}
-			this.parkingDuration.put(personId, parkingDuration);
-
+			
+			double startEngineTime = this.startEngine.get(personId);
+			double parkingDuration = this.parkingDuration.get(personId);
+			
 			Double accumulatedDistance;
 			if(this.accumulatedDistance.containsKey(personId)){
 				accumulatedDistance = this.accumulatedDistance.get(personId);
+				//if (personId.toString().contains("pv_car_9177_9162_426")){
+				//	double distanceSoFar = this.accumulatedDistance.get(personId);
+				//	System.out.println("-------g------distanceSoFar "+distanceSoFar);
+				//	System.out.println("++++++++++++accumulatedDistance "+accumulatedDistance);
+			//	}
+				
 			} else {
 				accumulatedDistance = 0.0;
 				this.accumulatedDistance.put(personId, 0.0);
@@ -143,7 +131,29 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			this.accumulatedDistance.remove(personId);
 //		}
 //		else{
-//			// no emissions to calculate...
+//			// no engine to stop...
 //		}
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+//		if(event.getLegMode().equals("car")){
+			Id personId= event.getPersonId();	
+			Double startEngineTime = event.getTime();
+			this.startEngine.put(personId, startEngineTime);
+
+			Double parkingDuration;
+			if (this.stopEngine.containsKey(personId)){
+				double stopEngineTime = this.stopEngine.get(personId);
+				parkingDuration = startEngineTime - stopEngineTime;
+
+			} else {
+				parkingDuration = 43200.0; //parking duration is assumed to at least 12 hours during the night time
+			}
+			this.parkingDuration.put(personId, parkingDuration);
+//			}
+//			else{
+//				// no engine to stop...
+//			}
 	}
 }
