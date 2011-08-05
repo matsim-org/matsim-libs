@@ -47,16 +47,15 @@ import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
-//	private static String runDirectory = "../../run980/";
+	private final static String runNumber = "973";
+	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+	
 //	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.xml.gz";
 //	private static String netFile = runDirectory + "980.output_network.xml.gz";
-//	private static String plansFile = runDirectory + "980.output_plans.xml.gz";
 
-//	private static String runDirectory = "../../runs-svn/run972/";
 //	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
 //	private static String netFile = runDirectory + "output_network.xml.gz";
 	
-	private static String runDirectory = "../../runs-svn/run973/";
 	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 	
@@ -70,7 +69,7 @@ public class EmissionTool {
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
 	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 	
-	private static String outputFile = runDirectory + "emission.events.xml.gz";
+	private static String outputFile = runDirectory + runNumber + ".emission.events.xml.gz";
 
 	// =======================================================================================================		
 	private final Scenario scenario;
@@ -196,7 +195,6 @@ public class EmissionTool {
 	private void loadScenario() {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);
-//		config.plans().setInputFile(plansFile);
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
 		scenarioLoader.loadScenario();
 	}
