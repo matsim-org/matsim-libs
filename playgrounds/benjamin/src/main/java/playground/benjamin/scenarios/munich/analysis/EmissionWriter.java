@@ -68,7 +68,7 @@ public class EmissionWriter {
 					if(emissionType2Value.get(pollutant) != null){
 						out.append(emissionType2Value.get(pollutant) + "\t");
 					} else{
-						out.append("0.0" + "\t");
+						out.append("0.0" + "\t"); // TODO: do I still need this?
 					}
 				}
 				out.append("\n");

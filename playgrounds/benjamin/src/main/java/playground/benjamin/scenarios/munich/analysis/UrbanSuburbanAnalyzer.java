@@ -55,15 +55,14 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run30/";
-	private static String runNumber = "970";
+	private static String runNumber = "973";
 	private static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 
-	//	private static String netFile = runDirectory + "output_network.xml.gz";
-	//	private static String plansFile = runDirectory + "output_plans.xml.gz";
-	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-	private static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
+	private static String netFile = runDirectory + "output_network.xml.gz";
+	private static String plansFile = runDirectory + "output_plans.xml.gz";
+//	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+//	private static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
 
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";

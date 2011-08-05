@@ -51,7 +51,7 @@ public class EmissionsPerPersonAggregator {
 	private Map<Id, Map<String, Double>> totalEmissions;
 	private SortedSet<String> listOfPollutants;
 
-	public EmissionsPerPersonAggregator(Population population, String emissionFile) {
+	EmissionsPerPersonAggregator(Population population, String emissionFile) {
 		this.population = population;
 		this.emissionFile = emissionFile;
 	}
@@ -66,19 +66,19 @@ public class EmissionsPerPersonAggregator {
 		totalEmissions = sumUpEmissions(warmEmissions, coldEmissions);
 	}
 
-	public Map<Id, Map<String, Double>> getTotalEmissions() {
+	Map<Id, Map<String, Double>> getTotalEmissions() {
 		return totalEmissions;
 	}
 	
-	public Map<Id, Map<String, Double>> getColdEmissions() {
+	Map<Id, Map<String, Double>> getColdEmissions() {
 		return coldEmissions;
 	}
 
-	public Map<Id, Map<String, Double>> getWarmEmissions() {
+	Map<Id, Map<String, Double>> getWarmEmissions() {
 		return warmEmissions;
 	}
 	
-	public SortedSet<String> getListOfPollutants() {
+	SortedSet<String> getListOfPollutants() {
 		return listOfPollutants;
 	}
 	

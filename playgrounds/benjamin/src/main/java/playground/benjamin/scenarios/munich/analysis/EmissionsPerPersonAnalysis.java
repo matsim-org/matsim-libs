@@ -34,13 +34,13 @@ import org.matsim.core.utils.misc.ConfigUtils;
  */
 public class EmissionsPerPersonAnalysis {
 
-	private final static String runNumber = "972";
+	private final static String runNumber = "973";
 	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	//	private final String netFile = runDirectory + runNumber + ".output_network.xml.gz";
 	private final static String netFile = runDirectory + "output_network.xml.gz";
 	//	private final String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
 	private final static String plansFile = runDirectory + "output_plans.xml.gz";
-	private final static String emissionFile = runDirectory + "emission.events.xml.gz";
+	private final static String emissionFile = runDirectory + runNumber + ".emission.events.xml.gz";
 	
 	private static Scenario scenario;
 	
@@ -54,20 +54,20 @@ public class EmissionsPerPersonAnalysis {
 		SortedSet<String> listOfPollutants = epa.getListOfPollutants();
 		EmissionWriter emissionWriter = new EmissionWriter();
 		emissionWriter.writeHomeLocation2Emissions(
-				scenario.getPopulation(),
+				population,
 				listOfPollutants,
 				epa.getWarmEmissions(),
-				runDirectory + "EmissionsPerHomeLocationWarm.txt");
+				runDirectory + runNumber + ".emissionsWarmPerHomeLocation.txt");
 		emissionWriter.writeHomeLocation2Emissions(
-				scenario.getPopulation(),
+				population,
 				listOfPollutants,
 				epa.getColdEmissions(),
-				runDirectory + "EmissionsPerHomeLocationCold.txt");
+				runDirectory + runNumber + ".emissionsColdPerHomeLocation.txt");
 		emissionWriter.writeHomeLocation2Emissions(
-				scenario.getPopulation(),
+				population,
 				listOfPollutants,
 				epa.getTotalEmissions(),
-				runDirectory + "EmissionsPerHomeLocationTotal.txt");
+				runDirectory + runNumber + ".emissionsTotalPerHomeLocation.txt");
 	}
 	
 	private static void loadScenario() {
