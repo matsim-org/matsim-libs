@@ -194,9 +194,9 @@ public class ModalSplitLogExtractor {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String filenameBase = "../../runs-svn/run1535/1535.";
+		String filenameBase = "../../runs-svn/run1536/1536.";
 		// String logFilename = filenameBase + "logfile2.short.log";
-		String logFilename = filenameBase + "logfile.log";
+		String logFilename = filenameBase + "logfile.log.gz";
 		// String filenameBase = "D:/tmp/";
 		// String logFilename = filenameBase + "prepare3.log";
 		// String logFilename = "../runs-svn/run669/logfile.txt";
@@ -205,7 +205,7 @@ public class ModalSplitLogExtractor {
 		// String logFilename2 = filenameBase + "logfile.log";
 		// String logFilename3 = filenameBase + "logfile2.log";
 		// ###################################
-		int maxIter = 345;
+		int maxIter = 1001;
 		// ###################################
 		ModalSplitLogExtractor msle = new ModalSplitLogExtractor(maxIter);
 		// reading

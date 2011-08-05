@@ -650,7 +650,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 					writer.writeln(sb);
 					writer.flush();
-				}/* initialStepSize==0, no parameters are changed */
+				}
+				/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
 				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
 

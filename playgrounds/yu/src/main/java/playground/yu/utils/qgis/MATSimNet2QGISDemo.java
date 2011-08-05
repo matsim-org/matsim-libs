@@ -29,7 +29,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
@@ -71,9 +70,9 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 			// outputFileP =
 			// "../matsimTests/locationChoice/chessboard/Polygon.shp";
 			// width = 10d;
-			netfile = "test/input/2routesCntsVorEngpass/network.xml";
-			outputFileLs = "test/output/2routesCntsVorEngpass/networkLinks.shp";
-			outputFileP = "test/output/2routesCntsVorEngpass/networkPolygon.shp";
+			netfile = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
+			outputFileLs = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/Links.shp";
+			outputFileP = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/Polygon.shp";
 			width = 0.01;
 		} else {
 			netfile = args[0];
@@ -82,8 +81,8 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 			width = Double.parseDouble(args[3]);
 		}
 		// String coordinateSys = ch1903;
-		 String coordinateSys = "DHDN_GK4";
-//		String coordinateSys = TransformationFactory.ATLANTIS;
+		String coordinateSys = gk4;
+		// String coordinateSys = TransformationFactory.ATLANTIS;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem(coordinateSys);
