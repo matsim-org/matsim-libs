@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
+import vrp.api.Costs;
 import vrp.basics.Delivery;
 import vrp.basics.EnRouteDelivery;
 import vrp.basics.EnRoutePickup;
@@ -22,15 +23,21 @@ import vrp.basics.TourActivity;
  * @author stefan schroeder
  *
  */
-public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints {
+public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Constraints {
 
-	private Logger logger = Logger.getLogger(CapacityPickupsDeliveriesSequenceConstraint.class);
+	private Logger logger = Logger.getLogger(TimeAndCapacityPickupsDeliveriesSequenceConstraint.class);
 	
 	private int maxCap;
 	
-	public CapacityPickupsDeliveriesSequenceConstraint(int maxCap) {
+	private int maxTime;
+	
+	private Costs costs;
+	
+	public TimeAndCapacityPickupsDeliveriesSequenceConstraint(int maxCap, int maxTime, Costs costs) {
 		super();
 		this.maxCap = maxCap;
+		this.costs = costs;
+		this.maxTime = maxTime;
 	}
 
 	
@@ -39,8 +46,17 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 		boolean deliveryStarted = false;
 		Set<Id> openCustomers = new HashSet<Id>();
 		double time = 0.0;
+		TourActivity lastAct = null;
 		for(TourActivity tourAct : tour.getActivities()){
-			
+			if(lastAct == null){
+				lastAct = tourAct;
+			}
+			else{
+				time += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
+			}
+			if(time > maxTime){
+				return false;
+			}
 			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
 				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);
 				return false;
@@ -72,8 +88,6 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 					return false;
 				}
 			}
-
-			
 		}
 		return true;
 	}

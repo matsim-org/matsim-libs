@@ -10,8 +10,16 @@ import java.util.LinkedList;
 
 public class Tour {
 	
+	public static class Costs {
+		public double time;
+		public double distance;
+		public double generalizedCosts;
+	}
+	
 	private LinkedList<TourActivity> tourActivities = new LinkedList<TourActivity>();
 
+	private Costs costs = null;
+	
 	public LinkedList<TourActivity> getActivities() {
 		return tourActivities;
 	}
@@ -29,5 +37,9 @@ public class Tour {
 		}
 		return tour;
 	}
-	
+
+	public Costs getCosts() {
+		return costs;
+	}
+
 }

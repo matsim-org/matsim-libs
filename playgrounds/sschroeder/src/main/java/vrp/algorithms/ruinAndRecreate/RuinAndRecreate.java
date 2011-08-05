@@ -118,8 +118,10 @@ public class RuinAndRecreate {
 
 	public void run(){
 		logger.info("run ruin-and-recreate");
+		logger.info("#warmupIterations="+warmUpIterations+ "; #iterations="+nOfMutations);
 		verify();
 		init();
+		logger.info("#customer: " + vrp.getCustomers().values().size());
 		randomWalk(warmUpIterations);
 		logger.info("run mutations");
 		while(currentMutation < nOfMutations){
