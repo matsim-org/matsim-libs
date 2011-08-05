@@ -1,4 +1,4 @@
-package freight;
+package freight.offermaker;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import freight.CarrierUtils;
+import freight.vrp.Locations;
+import freight.vrp.VRPTransformation;
 
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierVehicle;

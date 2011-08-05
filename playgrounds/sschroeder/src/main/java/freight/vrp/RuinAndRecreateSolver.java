@@ -1,4 +1,4 @@
-package freight;
+package freight.vrp;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,6 @@ import vrp.basics.ManhattanDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpSolution;
 import vrp.basics.VrpUtils;
-import city2000w.VrpBuilder;
 
 public class RuinAndRecreateSolver implements VRPSolver {
 	

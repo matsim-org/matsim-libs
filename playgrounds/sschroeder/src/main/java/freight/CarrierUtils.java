@@ -9,9 +9,9 @@ import playground.mzilske.freight.CarrierKnowledge;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.Offer;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Shipment.TimeWindow;
+import playground.mzilske.freight.api.Offer;
 
 public class CarrierUtils {
 	

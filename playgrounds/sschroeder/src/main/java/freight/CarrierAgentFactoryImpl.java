@@ -8,9 +8,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
+import freight.offermaker.RuinAndRecreateAverageMarginalCostOM_V2;
+import freight.offermaker.RuinAndRecreateMarginalCostOM;
+import freight.offermaker.RuinAndRecreateOfferMakingStrategy;
+import freight.utils.OfferRecorder;
+import freight.vrp.LocationsImpl;
 
 import playground.mzilske.freight.CarrierAgent;
-import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierCostCalculatorImpl;
 import playground.mzilske.freight.CarrierImpl;
@@ -19,8 +23,9 @@ import playground.mzilske.freight.CostMemoryConsolePrinter;
 import playground.mzilske.freight.CostMemoryImpl;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.TollCalculator;
+import playground.mzilske.freight.api.CarrierAgentFactory;
 
-public class AnotherCarrierAgentFactory implements CarrierAgentFactory{
+public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 
 	class MotorwayTollCalc implements TollCalculator {
 
@@ -64,7 +69,7 @@ public class AnotherCarrierAgentFactory implements CarrierAgentFactory{
 	public void setOfferMaker(OfferMaker offerMaker) {
 	}
 
-	public AnotherCarrierAgentFactory(Network network, PlanAlgorithm router) {
+	public CarrierAgentFactoryImpl(Network network, PlanAlgorithm router) {
 		super();
 		this.network = network;
 		this.router = router;

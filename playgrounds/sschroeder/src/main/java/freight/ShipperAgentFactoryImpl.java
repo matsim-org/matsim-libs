@@ -1,5 +1,7 @@
 package freight;
 
+import freight.api.ShipperAgentFactory;
+
 public class ShipperAgentFactoryImpl implements ShipperAgentFactory {
 
 	@Override

@@ -1,4 +1,4 @@
-package freight;
+package freight.offermaker;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +19,10 @@ import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.Shipment;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule;
+import freight.CarrierUtils;
+import freight.vrp.Locations;
+import freight.vrp.RuinAndRecreateSolver;
+import freight.vrp.VRPTransformation;
 
 public class RuinAndRecreateAverageMarginalCostOM implements OfferMaker{
 

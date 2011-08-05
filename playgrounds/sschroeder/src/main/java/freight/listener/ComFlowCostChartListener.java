@@ -1,4 +1,4 @@
-package freight;
+package freight.listener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 
+import freight.CommodityFlow;
+import freight.ShipperAgent;
 import freight.ShipperAgent.DetailedCost;
 
 public class ComFlowCostChartListener implements ShipperDetailedCostListener {

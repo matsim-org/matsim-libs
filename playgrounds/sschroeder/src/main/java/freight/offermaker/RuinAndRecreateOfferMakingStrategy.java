@@ -1,10 +1,12 @@
-package freight;
+package freight.offermaker;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
+
+import freight.utils.OfferRecorder;
 
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierOffer;

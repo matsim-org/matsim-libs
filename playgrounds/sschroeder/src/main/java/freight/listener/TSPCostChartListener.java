@@ -1,4 +1,4 @@
-package freight;
+package freight.listener;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

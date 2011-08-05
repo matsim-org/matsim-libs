@@ -1,4 +1,4 @@
-package freight;
+package freight.vrp;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+
 
 import playground.mzilske.freight.Shipment;
 import vrp.api.Customer;

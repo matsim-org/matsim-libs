@@ -6,13 +6,13 @@ import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CostMemoryImpl;
 import playground.mzilske.freight.TSPAgent;
-import playground.mzilske.freight.TSPAgentFactory;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TransportServiceProviderImpl;
-import city2000w.CarrierCostRequester;
+import playground.mzilske.freight.api.TSPAgentFactory;
 import city2000w.NotSoRandomTSPPlanBuilder;
-import city2000w.OfferSelectorImpl;
 import city2000w.RandomTSPPlanBuilder;
+import freight.offermaker.CarrierCostRequester;
+import freight.offermaker.OfferSelectorImpl;
 
 public class TSPAgentFactoryImpl implements TSPAgentFactory {
 

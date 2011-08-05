@@ -1,5 +1,6 @@
-package freight;
+package freight.listener;
 
+import freight.ShipperAgent;
 import freight.ShipperAgent.TotalCost;
 
 public interface ShipperTotalCostListener {

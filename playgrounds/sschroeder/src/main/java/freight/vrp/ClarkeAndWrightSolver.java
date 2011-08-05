@@ -1,10 +1,9 @@
-package freight;
+package freight.vrp;
 
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import city2000w.VrpBuilder;
 
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;

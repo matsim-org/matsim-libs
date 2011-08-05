@@ -1,4 +1,4 @@
-package freight;
+package freight.listener;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
+import freight.ShipperAgent;
 import freight.ShipperAgent.TotalCost;
 
 public class TLCCostChartListener implements ShipperTotalCostListener{

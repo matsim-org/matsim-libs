@@ -1,4 +1,4 @@
-package freight;
+package freight.vrp;
 
 import java.util.Collection;
 

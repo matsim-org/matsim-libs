@@ -10,6 +10,9 @@ import org.matsim.api.core.v01.Id;
 import playground.mzilske.freight.TSPContract;
 import freight.ShipperAgent.DetailedCost;
 import freight.ShipperAgent.TotalCost;
+import freight.api.ShipperAgentFactory;
+import freight.listener.ShipperDetailedCostListener;
+import freight.listener.ShipperTotalCostListener;
 
 public class ShipperAgentTracker {
 	
