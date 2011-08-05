@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 
+import freight.offermaker.OfferSelectorImpl;
+
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPAgentTracker;

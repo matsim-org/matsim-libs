@@ -21,9 +21,9 @@ import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 import playground.mzilske.freight.TourBuilder;
 import vrp.basics.TourActivity;
-import freight.ClarkeAndWrightSolver;
-import freight.LocationsImpl;
-import freight.VRPTransformation;
+import freight.vrp.ClarkeAndWrightSolver;
+import freight.vrp.LocationsImpl;
+import freight.vrp.VRPTransformation;
 
 public class ClarkeAndWrightCarrierPlanBuilder {
 	

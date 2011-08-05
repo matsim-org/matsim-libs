@@ -3,32 +3,41 @@ package city2000w;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.mzilske.freight.CarrierCapabilities;
+import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
-import playground.mzilske.freight.Tour.Delivery;
-import playground.mzilske.freight.Tour.Pickup;
-import playground.mzilske.freight.Tour.TourElement;
 import playground.mzilske.freight.TourBuilder;
+import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
+import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
+import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
+import vrp.api.Constraints;
 import vrp.api.Customer;
+import vrp.api.VRP;
+import vrp.basics.CrowFlyDistance;
+import vrp.basics.ManhattanDistance;
 import vrp.basics.TourActivity;
-import freight.vrp.LocationsImpl;
+import vrp.basics.VrpUtils;
+import freight.CarrierUtils;
+import freight.vrp.Locations;
 import freight.vrp.RuinAndRecreateSolver;
 import freight.vrp.VRPTransformation;
+import freight.vrp.VrpBuilder;
 
-public class RAndRPickupAndDeliveryCarrierPlanBuilder {
+public class RRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder {
 	
 	static class TimeBin {
 		double start;
@@ -82,6 +91,8 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 		public TimeCluster getCluster(double time);
 		
 		public TimeCluster getCluster(double start, double end);
+		
+		public Iterator<TimeCluster> iterator();
 	}
 	
 	static class WeekClusters implements Clusters{
@@ -118,6 +129,11 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 			}
 			return null;
 		}
+
+		@Override
+		public Iterator<TimeCluster> iterator() {
+			return clusters.values().iterator();
+		}
 	}
 	
 	static class TimeCluster {
@@ -134,13 +150,19 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 		List<Contract> contracts = new ArrayList<Contract>();
 	}
 	
-	private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryCarrierPlanBuilder.class);
+	private static Logger logger = Logger.getLogger(RRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.class);
 	
 	private Network network;
 	
 	private VRPTransformation vrpTrafo;
 	
-	private Clusters timeClusters = null;
+	private CarrierImpl carrier;
+	
+	public void setCarrier(CarrierImpl carrier) {
+		this.carrier = carrier;
+	}
+
+	private Clusters timeClusters = new WeekClusters();
 	
 	public void setWeek(){
 		timeClusters = new WeekClusters();
@@ -150,68 +172,113 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 		timeClusters = clusters;
 	}
 
-	public RAndRPickupAndDeliveryCarrierPlanBuilder(Network network){
+	public RRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder(Network network){
 		this.network = network;
-		iniTrafo();
 	}
-
-	private void iniTrafo() {
-		LocationsImpl locations = new LocationsImpl();
-		makeLocations(locations);
-		vrpTrafo = new VRPTransformation(locations);
-		
-	}
-
-	private void makeLocations(LocationsImpl locations) {
-		locations.addAllLinks((Collection<Link>) network.getLinks().values());
-	}
-
 	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<Contract> contracts) {
 		logger.info("build plan");
 		logger.info(contracts.size() + " number of contracts");
 		if(contracts.isEmpty()){
 			return getEmptyPlan(carrierCapabilities);
 		}
-		if(timeClusters != null){
-			clusterContracts(contracts);
-		}
-		Collection<Tour> tours = new ArrayList<Tour>();
+		clusterContracts(contracts);
+		Iterator<TimeCluster> clusterIter = timeClusters.iterator();
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		Collection<vrp.basics.Tour> vrpSolution = new ArrayList<vrp.basics.Tour>();
-		RuinAndRecreateSolver ruinAndRecreateSolver = new RuinAndRecreateSolver(vrpSolution, vrpTrafo);
-		ruinAndRecreateSolver.solve(contracts, carrierCapabilities.getCarrierVehicles().iterator().next());
-		for(CarrierVehicle carrierVehicle : carrierCapabilities.getCarrierVehicles()){
-			TourBuilder tourBuilder = new TourBuilder();
-			Id vehicleStartLocation = carrierVehicle.getLocation();
-			tourBuilder.scheduleStart(vehicleStartLocation);
+		Double planScore = null;
+		int counter = 0;
+		while(clusterIter.hasNext()){
+			if(counter > 1){
+				break;
+			}
+			counter++;
+		
+			TimeCluster cluster = clusterIter.next();
+			Collection<vrp.basics.Tour> vrpSolution = new ArrayList<vrp.basics.Tour>();
+			VRPTransformation vrpTransformation = new VRPTransformation(new Locations(){
+
+				@Override
+				public Coord getCoord(Id id) {
+					return network.getLinks().get(id).getCoord();
+				}
+				
+			});
+			List<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>(carrierCapabilities.getCarrierVehicles());
+			int usedVehicleCounter = 0;
+			CarrierVehicle vehicle = carrierCapabilities.getCarrierVehicles().iterator().next();
+			RuinAndRecreate ruinAndRecreate = prepareAlgo(vrpSolution,vrpTransformation,cluster.contracts,vehicle);
+			ruinAndRecreate.run();
+			if(planScore == null){
+				planScore = ruinAndRecreate.getVrpSolution().getTransportCosts();
+			}
+			else{
+				planScore += ruinAndRecreate.getVrpSolution().getTransportCosts();
+			}
 			for(vrp.basics.Tour tour : vrpSolution){
-				List<TourElement> enRouteActivities = new ArrayList<Tour.TourElement>();
+				TourBuilder tourBuilder = new TourBuilder();
+				boolean tourStarted = false;
+				double start = cluster.timeBin.start; 
 				for(TourActivity act : tour.getActivities()){
 					Shipment shipment = getShipment(act.getCustomer());
+					if(act instanceof vrp.basics.DepotActivity){
+						if(tourStarted){
+							tourBuilder.scheduleEnd(act.getCustomer().getLocation().getId());
+						}
+						else{
+							tourStarted = true;
+							tourBuilder.scheduleStart(act.getCustomer().getLocation().getId());
+							start = act.getCustomer().getTheoreticalTimeWindow().getStart();
+						}
+					}
 					if(act instanceof vrp.basics.EnRouteDelivery){
-						enRouteActivities.add(new Delivery(shipment));
+						tourBuilder.scheduleDelivery(shipment);
 					}
 					if(act instanceof vrp.basics.EnRoutePickup){
-						enRouteActivities.add(new Pickup(shipment));
+						tourBuilder.schedulePickup(shipment);
 					}
 				}
-				List<TourElement> tourActivities = new ArrayList<Tour.TourElement>();
-				tourActivities.addAll(enRouteActivities);
-				for(TourElement e : tourActivities){
-					tourBuilder.schedule(e);
+				Tour vehicleTour = tourBuilder.build();
+				CarrierVehicle availableVehicle = null;
+				if(usedVehicleCounter < carrierVehicles.size()){
+					availableVehicle = carrierVehicles.get(usedVehicleCounter);
+					usedVehicleCounter++;
 				}
+				else{
+					availableVehicle = CarrierUtils.createAndAddVehicle(carrier, getVehicleId(carrierVehicles), vehicle.getLocation().toString(), vehicle.getCapacity());
+				}
+				scheduledTours.add(new ScheduledTour(vehicleTour, availableVehicle, start));
 			}
-			tourBuilder.scheduleEnd(vehicleStartLocation);
-			Tour tour = tourBuilder.build();
-			tours.add(tour);
-			ScheduledTour scheduledTour = new ScheduledTour(tour, carrierVehicle, 0.0);
-			scheduledTours.add(scheduledTour);
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(scheduledTours);
-		carrierPlan.setScore(ruinAndRecreateSolver.getVrpSolution().getTransportCosts());
+		carrierPlan.setScore(planScore);
 		return carrierPlan;
 	}
 		
+
+	private RuinAndRecreate prepareAlgo(Collection<vrp.basics.Tour> vrpSolution, VRPTransformation vrpTransformation, Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
+		Id depotId = carrierVehicle.getLocation();
+		VrpBuilder vrpBuilder = new VrpBuilder(depotId);
+		CrowFlyDistance costs = new CrowFlyDistance();
+		costs.speed = 25;
+		vrpBuilder.setCosts(costs);
+		Constraints constraints = new TimeAndCapacityPickupsDeliveriesSequenceConstraint(carrierVehicle.getCapacity(),8*3600,costs);
+		vrpBuilder.setConstraints(constraints);
+		for(Contract c : contracts){
+			Shipment s = c.getShipment();
+			vrpTransformation.addShipment(s);
+		}
+		vrpBuilder.setVrpTransformation(vrpTransformation);
+		VRP vrp = vrpBuilder.buildVrp();
+		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
+		rrFactory.setWarmUp(4);
+		rrFactory.setIterations(20);
+		Collection<vrp.basics.Tour> initialSolution = VrpUtils.createTrivialSolution(vrp);
+		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, carrierVehicle.getCapacity());
+		return ruinAndRecreateAlgo;
+	}
+
+	private String getVehicleId(List<CarrierVehicle> vehicles) {
+		return "veh_" + carrier.getId().toString() + "_" + (vehicles.size()+1);
+	}
 
 	private void clusterContracts(Collection<Contract> contracts) {
 		for(Contract c : contracts){

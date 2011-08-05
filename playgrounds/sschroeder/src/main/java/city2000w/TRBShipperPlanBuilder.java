@@ -16,6 +16,7 @@ import freight.ShipperKnowledge;
 import freight.ShipperPlan;
 import freight.ShipperShipment;
 import freight.ShipperUtils;
+import freight.offermaker.OfferSelectorImpl;
 
 public class TRBShipperPlanBuilder {
 	

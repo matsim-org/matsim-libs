@@ -27,16 +27,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
-import playground.mzilske.freight.CarrierAgentFactory;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.TSPAgentFactory;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TransportServiceProviders;
-import freight.AnotherCarrierAgentFactory;
+import playground.mzilske.freight.api.CarrierAgentFactory;
+import playground.mzilske.freight.api.TSPAgentFactory;
+import freight.CarrierAgentFactoryImpl;
 import freight.CarrierPlanReader;
 import freight.TSPAgentFactoryImpl;
 import freight.TSPPlanReader;
@@ -91,7 +91,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
-		CarrierAgentFactory carrierAgentFactory = new AnotherCarrierAgentFactory(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		CarrierAgentFactory carrierAgentFactory = new CarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm());
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		
 		TSPAgentFactory tspAgentFactory = new TSPAgentFactoryImpl(carrierAgentTracker);

@@ -25,9 +25,9 @@ import playground.mzilske.freight.Tour.TourElement;
 import playground.mzilske.freight.TourBuilder;
 import vrp.api.Customer;
 import vrp.basics.TourActivity;
-import freight.LocationsImpl;
-import freight.RuinAndRecreateSolver;
-import freight.VRPTransformation;
+import freight.vrp.LocationsImpl;
+import freight.vrp.RuinAndRecreateSolver;
+import freight.vrp.VRPTransformation;
 
 public class RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder implements CarrierPlanBuilder {
 	
