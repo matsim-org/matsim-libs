@@ -12,7 +12,7 @@ function print_help()
 }
 
 if [ "$#" = 2 ]; then
-command="xjc -d ../src/main/java/  -b $1 -b gml.jxb xmlschemaBindings.xsd $2"
+command="xjc -d ../src/main/java/  -b $1 xmlschemaBindings.xsd $2"
 echo $command
 $command
 else

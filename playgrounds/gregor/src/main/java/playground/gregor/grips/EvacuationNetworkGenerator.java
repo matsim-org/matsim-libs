@@ -71,12 +71,12 @@ public class EvacuationNetworkGenerator {
 		Node safeNodeB = this.network.getFactory().createNode(this.safeNodeBId, safeCoord);
 		this.network.addNode(safeNodeB);
 
-		double capacity = 100000.;
+		double capacity = 1000000.;
 		Link l = this.network.getFactory().createLink(this.safeLinkId, safeNodeA, safeNodeB);
 		l.setLength(10);
 		l.setFreespeed(100000);
 		l.setCapacity(capacity);
-		l.setNumberOfLanes(1);
+		l.setNumberOfLanes(100);
 		this.network.addLink(l);
 
 		int linkId = 1;

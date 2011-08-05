@@ -38,9 +38,25 @@
 			<version>1.0.2</version>
 		</dependency>
 		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>gml-v_3_2_1-schema</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>com.vividsolutions</groupId>
 			<artifactId>jts</artifactId>
 			<version>1.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>iso-19139-d_2007_04_17-schema</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>mzilske</artifactId>
+			<version>0.4.0-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

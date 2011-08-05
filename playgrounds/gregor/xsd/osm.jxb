@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="1.0"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              schemaLocation = "http://matsim.svn.sourceforge.net/viewvc/matsim/playgrounds/trunk/gregor/xsd/osm.xsd">
+
+
+
+
+<jxb:schemaBindings>
+  <jxb:package name="playground.gregor.grips.jaxb.osm" />
+</jxb:schemaBindings>              
+              
+</jxb:bindings>
