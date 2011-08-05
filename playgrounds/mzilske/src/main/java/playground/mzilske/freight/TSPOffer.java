@@ -5,6 +5,8 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.api.Offer;
+
 /**
  * @author stefan
  *

@@ -14,13 +14,13 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 import playground.mzilske.freight.CarrierTotalCostListener.CarrierCostEvent;
+import playground.mzilske.freight.api.CarrierAgentFactory;
 
 public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler {
 	
@@ -149,12 +149,6 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		return shipmentStatusListeners;
 	}
 
-	private void informCostListeners(Shipment shipment, Double cost) {
-		for(CarrierCostListener cl : costListeners){
-			cl.informCost(shipment, cost);
-		}
-	}
-
 	private void createCarrierAgents() {
 		for (CarrierImpl carrier : carriers) {
 			CarrierAgent carrierAgent = carrierAgentFactory.createAgent(this,carrier);
@@ -172,20 +166,6 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		for (ShipmentStatusListener listener: shipmentStatusListeners) {
 			listener.shipmentDelivered(shipment, time);
 		}
-	}
-
-	public Collection<CarrierOffer> getOffers(Id linkId, Id linkId2, int shipmentSize) {
-		Collection<CarrierOffer> offers = new ArrayList<CarrierOffer>();
-		for (CarrierAgent carrierAgent : carrierAgents) {
-			CarrierOffer offer = carrierAgent.requestOffer(linkId, linkId2, shipmentSize);
-			if(offer instanceof NoOffer){
-				continue;
-			}
-			else {
-				offers.add(offer);
-			}
-		}
-		return offers;
 	}
 	
 	public Collection<CarrierOffer> getOffers(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {

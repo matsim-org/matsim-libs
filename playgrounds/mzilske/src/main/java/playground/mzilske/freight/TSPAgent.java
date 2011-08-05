@@ -69,6 +69,12 @@ public class TSPAgent {
 
 	List<Contract> createCarrierShipments(){
 		clear();
+		if(tsp.getSelectedPlan() == null){
+			return Collections.EMPTY_LIST;
+		}
+		if(tsp.getSelectedPlan().getChains() == null){
+			return Collections.EMPTY_LIST;
+		}
 		List<Contract> shipments = new ArrayList<Contract>();
 		for(TransportChain chain : tsp.getSelectedPlan().getChains()){
 			TransportChainAgent chainAgent = new TransportChainAgent(chain);

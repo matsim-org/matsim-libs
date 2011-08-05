@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.mzilske.freight.TSPTotalCostListener.TSPCostEvent;
+import playground.mzilske.freight.api.TSPAgentFactory;
 
 
 /**

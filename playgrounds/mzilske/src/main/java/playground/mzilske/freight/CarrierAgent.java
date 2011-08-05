@@ -20,7 +20,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.freight.CarrierTotalCostListener.CarrierCostEvent;
@@ -29,9 +28,8 @@ import playground.mzilske.freight.Tour.TourElement;
 
 public class CarrierAgent {
 	
+	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 	
-	private static final double EPSILON = 0.0001;
-
 	private CarrierImpl carrier;
 	
 	private Collection<Id> driverIds = new ArrayList<Id>();
@@ -42,13 +40,9 @@ public class CarrierAgent {
 	
 	private Map<Id, CarrierDriverAgent> carrierDriverAgents = new HashMap<Id, CarrierDriverAgent>();
 	
-	private CostAllocatorImpl costAllocator = null;
-
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
 
 	private CarrierAgentTracker tracker;
-	
-	private static Logger logger = Logger.getLogger(CarrierAgent.class);
 
 	private CarrierCostFunction costCalculator;
 
@@ -241,22 +235,16 @@ public class CarrierAgent {
 		
 	}
 
-	public void setCostAllocator(CostAllocatorImpl costAllocator) {
-		this.costAllocator = costAllocator;
-	}
-
 	public Collection<Id> getDriverIds() {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
 	public void activityStartOccurs(Id personId, String activityType, double time) {
 		carrierDriverAgents.get(personId).activityStartOccurs(activityType, time);
-//		logger.info("driver had a start of an activity " + activityType + ", time=" + time);
 	}
 
 	public void activityEndOccurs(Id personId, String activityType, double time) {
 		carrierDriverAgents.get(personId).activityEndOccurs(activityType, time);
-//		logger.info("driver had an end of an activity " + activityType + ", time=" + time);
 	}
 	
 	public void tellDistance(Id personId, double distance) {
@@ -286,8 +274,6 @@ public class CarrierAgent {
 		costMemory.memorizeCost(from, to, size, cost);
 	}
 
-	
-
 	private Person createDriverPerson(Id driverId) {
 		Person person = new PersonImpl(driverId);
 		return person;
@@ -310,16 +296,6 @@ public class CarrierAgent {
 		}
 		Double memorizedPrice = costMemory.getCost(linkId, linkId2, shipmentSize);
 		return offerMaker.requestOffer(linkId,linkId2,shipmentSize,startPickup,endPickup,startDelivery,endDelivery,memorizedPrice);
-	}
-	
-	public CarrierOffer requestOffer(Id linkId, Id linkId2, int shipmentSize) {
-		if(requestIsNoGo(linkId,linkId2)){
-			return new NoOffer();
-		}
-		Offer offer = new CarrierOffer();
-		offer.setId(carrier.getId());
-		Double memorizedPrice = costMemory.getCost(linkId, linkId2, shipmentSize);
-		return offerMaker.requestOffer(linkId,linkId2,shipmentSize,memorizedPrice);
 	}
 
 	public void setCostMemory(CostMemory costMemory) {
@@ -397,35 +373,4 @@ public class CarrierAgent {
 	public void setTollCalculator(TollCalculator tollCalculator) {
 		this.tollCalculator = tollCalculator;
 	}
-	
-//	public List<Tuple<Shipment, Double>> calculateCostsPerShipment() {
-//	logger.info("carrierId="+carrier.getId());
-//	List<Tuple<Shipment,Double>> listOfCostPerShipment = new ArrayList<Tuple<Shipment,Double>>();
-//	for(Id driverId : driverIds){
-//		ScheduledTour tour = driverTourMap.get(driverId);
-//		costCalculator.init(carrier);
-//		CarrierDriverAgent carrierDriverAgent = carrierDriverAgents.get(driverId);
-//		double cost = costCalculator.calculateCost(carrierDriverAgent.getCarrierVehicle(), carrierDriverAgent.getDistance(), carrierDriverAgent.getTime());
-//		List<Tuple<Shipment,Double>> listOfCostPerShipmentPerDriver = costAllocator.allocateCost(tour.getTour().getShipments(), cost);
-//		listOfCostPerShipment.addAll(listOfCostPerShipmentPerDriver);
-//	}
-//	if (! listOfCostPerShipment.isEmpty()) {
-//		assertSum(listOfCostPerShipment, calculateCost());
-//	}
-//	for (Tuple<Shipment,Double> t : listOfCostPerShipment) {
-//		memorizeCost(t.getFirst().getFrom(), t.getFirst().getTo(), t.getFirst().getSize(), t.getSecond());
-//		logger.info("Ich bin carrier " + carrier.getId() + " and memorize the cost of shipment="+t.getFirst()+", cost="+t.getSecond());
-//	}
-//	return listOfCostPerShipment;
-//}
-	
-//	private void assertSum(List<Tuple<Shipment, Double>> listOfCostPerShipment, double calculateCostOfSelectedPlan) {
-//		double sum = 0.0;
-//		for (Tuple<Shipment, Double> t : listOfCostPerShipment) {
-//			sum += t.getSecond();
-//		}
-//		if ( Math.abs(calculateCostOfSelectedPlan - sum) > EPSILON) {
-//			throw new RuntimeException ("For the moment, we want the total cost to be the sum of the costs per shipment.");
-//		}
-//	}
 }

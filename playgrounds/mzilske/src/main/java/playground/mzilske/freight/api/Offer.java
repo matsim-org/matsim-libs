@@ -1,4 +1,4 @@
-package playground.mzilske.freight;
+package playground.mzilske.freight.api;
 
 import org.matsim.api.core.v01.Id;
 

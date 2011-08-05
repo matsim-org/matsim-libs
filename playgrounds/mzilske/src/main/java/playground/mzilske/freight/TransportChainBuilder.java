@@ -31,6 +31,9 @@ public class TransportChainBuilder {
 	
 	public TransportChainBuilder(TSPShipment shipment) {
 		this.shipment = shipment;
+		if(shipment == null){
+			throw new IllegalStateException("tspShipment cannot be null.");
+		}
 	}
 
 	public void scheduleLeg(CarrierOffer offer){

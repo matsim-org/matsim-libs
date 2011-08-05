@@ -144,6 +144,7 @@ public class Tour {
 	private Id startLinkId;
 	private Id endLinkId;
 
+
 	Tour(Id startLinkId, List<TourElement> tourElements, Id endLinkId) {
 		this.startLinkId = startLinkId;
 		this.tourElements = Collections.unmodifiableList(tourElements);
