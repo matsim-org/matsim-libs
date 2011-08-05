@@ -15,7 +15,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
 
-public class CordonPlanAnalyzer {
+public class CordonTripCountAnalyzer {
 
 	/**
 	 * @param args
