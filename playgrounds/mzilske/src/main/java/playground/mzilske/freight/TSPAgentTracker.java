@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.mzilske.freight.TSPTotalCostListener.TSPCostEvent;
 import playground.mzilske.freight.api.TSPAgentFactory;
@@ -80,24 +79,6 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		agent.shipmentDelivered(shipment,time);
 	}
 
-	public void calculateCostsScoreTSPAndInform(){
-		for(TSPAgent tspAgent : tspAgents){
-			tspAgent.scoreSelectedPlan();
-			List<Tuple<TSPShipment,Double>> shipmentCostTuple = tspAgent.calculateCostsOfSelectedPlanPerShipment();
-			for(Tuple<TSPShipment,Double> t : shipmentCostTuple){
-				logger.info(t.getFirst()+";cost="+t.getSecond());
-				informCostListeners(t.getFirst(),t.getSecond());
-			}
-		}
-	}
-	
-	private void informCostListeners(TSPShipment shipment, Double cost) {
-		for(TSPCostListener cl : costListeners){
-			cl.informCost(shipment, cost);
-		}
-		
-	}
-
 	private void createTSPAgents() {
 		for(TransportServiceProviderImpl tsp : transportServiceProviders){
 			TSPAgent tspAgent = tspAgentFactory.createTspAgent(this, tsp);
@@ -121,14 +102,31 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		return offers;
 	}
 	
-//	public Collection<TSPOffer> requestService(Collection<ServiceRequest> shipperRequests){
-//		Collection<TSPOffer> offers = new ArrayList<TSPOffer>();
-//		for(TSPAgent tspAgent : tspAgents){
-//			TSPOffer offer = tspAgent.requestService(shipperRequests);
-//			offers.add(offer);
-//		}
-//		return offers;
-//	}
+	public void offerGranted(TSPContract contract){
+		/*
+		 * add contract to tspContracts
+		 */
+		Id tspId = contract.getOffer().getId();
+		TransportServiceProviderImpl tsp = findTsp(tspId);
+		if(tsp == null){
+			throw new IllegalStateException("tsp " + tspId + " does not exist");
+		}
+		tsp.getContracts().add(contract);
+		TSPAgent tspAgent = findAgentForTSP(tspId);
+		
+	}
+	
+	public void offerRejected(TSPOffer offer){
+		/*
+		 * remove open offers and according transportChain
+		 */
+	}
+	
+	public void contractAnnulled(TSPContract contract){
+		/*
+		 * remove offer from tspAgent
+		 */
+	}
 
 	private TSPAgent findAgentForTSP(Id tspId) {
 		for(TSPAgent a : tspAgents){
