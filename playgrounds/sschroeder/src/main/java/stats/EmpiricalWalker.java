@@ -9,7 +9,7 @@ import org.apache.commons.math.stat.Frequency;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
- * @author stefan
+ * @author stefan schroeder
  *
  */
 public class EmpiricalWalker {

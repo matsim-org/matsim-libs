@@ -48,4 +48,10 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 		throw new RuntimeException("no contracts or shipments");
 	}
 
+	@Override
+	public Collection<playground.mzilske.freight.Tour> solve() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

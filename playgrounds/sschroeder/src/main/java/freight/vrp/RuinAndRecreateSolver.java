@@ -100,4 +100,10 @@ public class RuinAndRecreateSolver implements VRPSolver {
 		this.nOfWarmUpIterations = i;
 		
 	}
+
+	@Override
+	public Collection<playground.mzilske.freight.Tour> solve() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
