@@ -72,24 +72,6 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		texture = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("icon18.png"));
 	}
 
-	private static void setAgentSize(GL gl) {
-		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-		if (gl.isFunctionAvailable("glPointParameterf")) {
-			// Query for the max point size supported by the hardware
-			float [] maxSize = {0.0f};
-			gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
-			float quadratic[] =  { 0.0f, 0.0001f, 0.000000f };
-			gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
-
-			gl.glPointSize(agentSize/10.f);
-			gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
-			gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
-
-		} else {
-			gl.glPointSize(agentSize/10.f);
-		}
-	}
-
 	private static int infocnt = 0 ;
 	private void drawArray(GL gl) {
 
@@ -119,6 +101,12 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 			gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
 			gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 		}
+	}
+
+	private static void setAgentSize(GL gl) {
+		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
+		double scale = OTFClientControl.getInstance().getMainOTFDrawer().getScale();
+		gl.glPointSize(agentSize / (float) scale);
 	}
 
 	void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
