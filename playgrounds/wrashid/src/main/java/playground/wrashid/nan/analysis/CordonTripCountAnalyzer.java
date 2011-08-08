@@ -108,14 +108,14 @@ public class CordonTripCountAnalyzer {
 		return act.getType().startsWith(type);
 	}
 	
-	private static boolean isInsideCordon(Coord coord){
+	public static boolean isInsideCordon(Coord coord){
 		Coord center=new CoordImpl(683400.75,247500.0687); 
 		double radius=1000;
 		
 		return GeneralLib.getDistance(center,coord)<radius;
 	}
 	
-	private static boolean isInsideCordon(Activity act){
+	public static boolean isInsideCordon(Activity act){
 		return isInsideCordon(act.getCoord());
 	}
 	
