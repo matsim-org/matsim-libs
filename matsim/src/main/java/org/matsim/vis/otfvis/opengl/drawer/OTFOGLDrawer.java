@@ -84,7 +84,6 @@ import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.gui.OTFScaleBarDrawer;
 import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
@@ -150,11 +149,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	public static boolean USE_GLJPANEL = false;
 
 	private float oldWidth = 0.0f;
-	
+
 	private float oldHeight = 0.0f;
 
 	private TextRenderer textRenderer;
-	
+
 	public TextRenderer getTextRenderer() {
 		return textRenderer;
 	}
@@ -248,13 +247,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 		this.overlayItems.add(matsimLogo);
 
-		Point3f initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
+		Rectangle2D initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
 		if (initialZoom != null) {
-			this.mouseMan.setToNewPos(initialZoom);
+			this.mouseMan.setViewBounds(initialZoom);
 		}
 
 	}
-	
+
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
 	}
@@ -336,16 +335,16 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private void drawFrameRate(GLAutoDrawable drawable) {
 		this.status  = this.lastTime;
-		
+
 		if (this.statusWidth == 0) {
 			// Place it at a fixed offset wrt the upper right corner
 			this.statusWidth = (int) this.textRenderer.getBounds("FPS: 10000.00").getWidth();
 		}
-		
+
 		// Calculate text location and color
 		int x = drawable.getWidth() - this.statusWidth - 5;
 		int y = drawable.getHeight() - 30;
-		
+
 		// Render the text
 		this.textRenderer.setColor(Color.DARK_GRAY);
 		this.textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
@@ -416,20 +415,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		if (mouseMan.ORTHO) {
-			if (oldWidth != 0.0f) {
-				double pixelSizeX = (mouseMan.getViewBoundsAsQuadTreeRect().maxX - mouseMan.getViewBoundsAsQuadTreeRect().minX) / oldWidth;
-				double pixelSizeY = (mouseMan.getViewBoundsAsQuadTreeRect().maxY - mouseMan.getViewBoundsAsQuadTreeRect().minY) / oldHeight;
-				mouseMan.setViewBoundsAsQuadTreeRect(new QuadTree.Rect(mouseMan.getViewBoundsAsQuadTreeRect().minX, mouseMan.getViewBoundsAsQuadTreeRect().maxY - pixelSizeY * height, mouseMan.getViewBoundsAsQuadTreeRect().minX + pixelSizeX * width, mouseMan.getViewBoundsAsQuadTreeRect().maxY));
-				redraw();
-			}
-			oldWidth = width;
-			oldHeight = height;
-		} else {
-			GL gl = drawable.getGL();
-			gl.glViewport(0, 0, width, height);
-			this.mouseMan.setFrustrum(gl);
+		if (oldWidth != 0.0f) {
+			double pixelSizeX = (mouseMan.getViewBoundsAsQuadTreeRect().maxX - mouseMan.getViewBoundsAsQuadTreeRect().minX) / oldWidth;
+			double pixelSizeY = (mouseMan.getViewBoundsAsQuadTreeRect().maxY - mouseMan.getViewBoundsAsQuadTreeRect().minY) / oldHeight;
+			mouseMan.setViewBoundsAsQuadTreeRect(new QuadTree.Rect(mouseMan.getViewBoundsAsQuadTreeRect().minX, mouseMan.getViewBoundsAsQuadTreeRect().maxY - pixelSizeY * height, mouseMan.getViewBoundsAsQuadTreeRect().minX + pixelSizeX * width, mouseMan.getViewBoundsAsQuadTreeRect().maxY));
+			redraw();
 		}
+		oldWidth = width;
+		oldHeight = height;
 	}
 
 	private void showZoomDialog() {
@@ -457,7 +450,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 				public void actionPerformed( ActionEvent e ) {
 					int num = Integer.parseInt(e.getActionCommand());
 					OTFOGLDrawer.this.lastZoom = zooms.get(num);
-					OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart());
+					OTFOGLDrawer.this.mouseMan.setViewBounds(OTFOGLDrawer.this.lastZoom.getZoomstart());
 					OTFOGLDrawer.this.zoomD.setVisible(false);
 				}
 			} );
@@ -487,7 +480,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	private void storeZoom(boolean withName, String name) {
-		Point3f zoomstore = this.mouseMan.getView();
+		Rectangle2D zoomstore = this.mouseMan.getViewBounds();
 		if(withName) {
 			final JDialog d = new JDialog((JFrame)null,"Name for this zoom", true);
 			JTextField field = new JTextField(20);
@@ -546,7 +539,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 				@Override
 				public void actionPerformed( ActionEvent e ) {
 					showZoomDialog();
-					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart());
+					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setViewBounds(OTFOGLDrawer.this.lastZoom.getZoomstart());
 				}
 			} );
 			popmen.add( new AbstractAction("Delete last Zoom") {

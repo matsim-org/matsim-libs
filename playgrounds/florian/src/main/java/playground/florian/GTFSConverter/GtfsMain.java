@@ -2,15 +2,10 @@ package playground.florian.GTFSConverter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.run.OTFVis;
-import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -39,23 +34,15 @@ public class GtfsMain {
 	}
 
 	private static void runScenario(Scenario scenario) {
-		// runWithClassicOTFVis(scenario);
-		runWithOSM(scenario);
+		runWithClassicOTFVis(scenario);
+		// runWithOSM(scenario);
 	}
 
 	private static void runWithClassicOTFVis(Scenario scenario) {
 		EventsManager events = EventsUtils.createEventsManager();
-		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
-		if (scenario.getConfig().scenario().isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
-			qSim.addQueueSimulationListeners(engine);
-		}
-		qSim.setControlerIO(controlerIO);
-		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);
-
 		qSim.run();
 	}
 

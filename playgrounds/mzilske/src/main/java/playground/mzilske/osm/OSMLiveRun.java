@@ -23,7 +23,6 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.vis.otfvis2.OTFVisLiveServer;
 
 public class OSMLiveRun {
@@ -71,7 +70,6 @@ public class OSMLiveRun {
 	private static void runWithOSM(Scenario scenario) {
 		FreespeedTravelTimeCost costCalculator = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		new PersonPrepareForSim(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), (NetworkImpl) scenario.getNetwork(), costCalculator, costCalculator, new DijkstraFactory()), (NetworkImpl) scenario.getNetwork()).run(scenario.getPopulation());
-		VisGUIMouseHandler.ORTHO = true;
 		OTFOGLDrawer.USE_GLJPANEL = true;
 		EventsManager events = EventsUtils.createEventsManager();
 		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);

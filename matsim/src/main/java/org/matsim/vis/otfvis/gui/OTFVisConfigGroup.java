@@ -21,14 +21,13 @@
 package org.matsim.vis.otfvis.gui;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
-import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
 
 /**
@@ -38,7 +37,6 @@ import org.matsim.vis.otfvis.opengl.gl.Point3f;
  *
  */
 public class OTFVisConfigGroup extends Module {
-	private static final Logger log = Logger.getLogger(OTFVisConfigGroup.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -118,8 +116,8 @@ public class OTFVisConfigGroup extends Module {
 		setModified();
 		this.zooms.remove(entry);
 	}
-	public Point3f getZoomValue(final String zoomName) {
-		Point3f result = null;
+	public Rectangle2D getZoomValue(final String zoomName) {
+		Rectangle2D result = null;
 		for(ZoomEntry entry : this.zooms) {
 			if(entry.getName().equals(zoomName)) {
 				result = entry.getZoomstart();

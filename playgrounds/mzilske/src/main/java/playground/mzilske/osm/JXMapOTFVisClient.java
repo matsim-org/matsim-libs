@@ -31,7 +31,6 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
-import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
@@ -54,7 +53,6 @@ public final class JXMapOTFVisClient {
 			@Override
 			public void run() {
 				OTFClient otfClient = new OTFClient();
-				VisGUIMouseHandler.ORTHO = true;
 				OTFOGLDrawer.USE_GLJPANEL = true;
 				otfClient.setServer(server);
 				OTFConnectionManager connect = new OTFConnectionManager();
