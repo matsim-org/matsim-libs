@@ -450,6 +450,10 @@ public class GeneralLib {
 
 		}
 	}
+	
+	public static void generateSimpleHistogram(String fileName, double[] value,int numberOfBins){
+		generateHistogram(fileName,value,numberOfBins,"","","");
+	}
 
 	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
 			String[] seriesLabels, double[] xValues) {

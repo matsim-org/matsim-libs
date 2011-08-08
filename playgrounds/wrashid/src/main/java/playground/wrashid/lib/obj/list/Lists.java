@@ -14,6 +14,18 @@ public class Lists {
 		return arrayList;
 	}
 	
+	public static double[] getArray(Collection<Double> collection){
+		double[] array=new double[collection.size()];
+		
+		int i=0;
+		for (Double d:collection){
+			array[i]=d;
+			i++;
+		}
+		
+		return array;
+	}
+	
 	public static double getSum(Collection<Double> collection){
 		int sum=0;
 		

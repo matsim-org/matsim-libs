@@ -18,14 +18,23 @@ import playground.wrashid.lib.GeneralLib;
 public class IntegerValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Integer> hm = new HashMap<KeyClass, Integer>();
-
+	private int defaultStartValue=0;
+	
+	public IntegerValueHashMap() {
+		
+	}
+	
+	public IntegerValueHashMap(int defaultStartValue) {
+		this.defaultStartValue=defaultStartValue;
+	}
+	
 	public Set<KeyClass> getKeySet() {
 		return hm.keySet();
 	}
 
 	public int get(KeyClass id) {
 		if (!hm.containsKey(id)) {
-			hm.put(id, 0);
+			hm.put(id, defaultStartValue);
 		}
 
 		return hm.get(id);
@@ -45,7 +54,7 @@ public class IntegerValueHashMap<KeyClass> {
 
 	public void incrementBy(KeyClass id, Integer incValue) {
 		if (!hm.containsKey(id)) {
-			hm.put(id, 0);
+			hm.put(id, defaultStartValue);
 		}
 
 		int oldValue = hm.get(id);
