@@ -79,7 +79,7 @@ public class CordonLineCrossingLog {
 			if (CordonTripCountAnalyzer.isInsideCordon(prevAct) && !CordonTripCountAnalyzer.isInsideCordon(nextAct)){
 				if (CordonTripCountAnalyzer.isInsideCordon(prevLink) && !CordonTripCountAnalyzer.isInsideCordon(curLink)){
 					if (lastLegIndexRegisteredForCrossing.get(personId)!=currentLegIndex.get(personId)){
-						cordonLeavingTimes.add(event.getTime());
+						cordonLeavingTimes.add(GeneralLib.projectTimeWithin24Hours(event.getTime()));
 						lastLegIndexRegisteredForCrossing.put(personId, currentLegIndex.get(personId));
 					}
 				}
@@ -88,7 +88,7 @@ public class CordonLineCrossingLog {
 			if (!CordonTripCountAnalyzer.isInsideCordon(prevAct) && CordonTripCountAnalyzer.isInsideCordon(nextAct)){
 				if (!CordonTripCountAnalyzer.isInsideCordon(prevLink) && CordonTripCountAnalyzer.isInsideCordon(curLink)){
 					if (lastLegIndexRegisteredForCrossing.get(personId)!=currentLegIndex.get(personId)){
-						cordonEnteringTimes.add(event.getTime());
+						cordonEnteringTimes.add(GeneralLib.projectTimeWithin24Hours(event.getTime()));
 						lastLegIndexRegisteredForCrossing.put(personId, currentLegIndex.get(personId));
 					}
 				}
