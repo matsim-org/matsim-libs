@@ -78,7 +78,7 @@ public class Main_exampleV2GTest extends TestCase{
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=1.0; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+		final String outputPath="test/output";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans2.xml";
 		

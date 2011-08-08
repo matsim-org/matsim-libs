@@ -61,7 +61,7 @@ import lpsolve.LpSolveException;
 public class V2GTestOnePlan_hubsourceV2G extends TestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
+	final String outputPath ="test/output";
 	public Id agentOne=null;
 	
 	Controler controler; 
