@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -137,20 +138,23 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	}
 
 	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
-		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
+		Scenario scenario = this.qSim.getScenario();
+		TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
+		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = this.qSim.getScenario().getScenarioElement( ReconstructingUmlaufBuilder.class ) ;
-		if (reconstructingUmlaufBuilder != null) {
-			log.warn("found pre-existing ReconstructingUmlaufBuilder in scenario, thus using that one. This should be ok but it is not systematically tested.") ;
-			log.warn("(A possible problem is that it will use the parameters from the original UmlaufBuilder, not the ones defined here.)") ;
+		UmlaufCache umlaufCache = scenario.getScenarioElement(UmlaufCache.class) ;
+		if (umlaufCache != null && umlaufCache.getTransitSchedule() == transitSchedule) { // has someone put a new transitschedule into the scenario?
+			log.info("found pre-existing Umlaeufe in scenario, and the transit schedule is still the same, so using them.");
 		} else {
-			reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(this.qSim.getScenario().getNetwork(),
-					((ScenarioImpl) this.qSim.getScenario()).getTransitSchedule().getTransitLines().values(),
-					((ScenarioImpl) this.qSim.getScenario()).getVehicles(), this.qSim.getScenario().getConfig()
-							.planCalcScore());
+			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(scenario.getNetwork(),
+					transitSchedule.getTransitLines().values(),
+					vehicles,
+					scenario.getConfig().planCalcScore());
+			Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
+			umlaufCache = new UmlaufCache(transitSchedule, umlaeufe);
+			scenario.addScenarioElement(umlaufCache); // possibly overwriting the existing one
 		}
-		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
-		for (Umlauf umlauf : umlaeufe) {
+		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);

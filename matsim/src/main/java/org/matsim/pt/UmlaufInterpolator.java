@@ -19,11 +19,15 @@ public class UmlaufInterpolator {
 
 	private final Network network;
 	private final PlanCalcScoreConfigGroup config;
+	private final FreespeedTravelTimeCost travelTimes;
+	private final LeastCostPathCalculator routingAlgo;
 
 	public UmlaufInterpolator(Network network, final PlanCalcScoreConfigGroup config) {
 		super();
 		this.network = network;
 		this.config = config;
+		this.travelTimes = new FreespeedTravelTimeCost(this.config);
+		this.routingAlgo = new Dijkstra(network, travelTimes, travelTimes);
 	}
 
 	public void addUmlaufStueckToUmlauf(UmlaufStueck umlaufStueck, Umlauf umlauf) {
@@ -41,9 +45,6 @@ public class UmlaufInterpolator {
 	}
 
 	private void insertWenden(Id fromLinkId, Id toLinkId, Umlauf umlauf) {
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(this.config);
-		LeastCostPathCalculator routingAlgo = new Dijkstra(network, calculator, calculator);
-
 		Node startNode = this.network.getLinks().get(fromLinkId).getToNode();
 		Node endNode = this.network.getLinks().get(toLinkId).getFromNode();
 

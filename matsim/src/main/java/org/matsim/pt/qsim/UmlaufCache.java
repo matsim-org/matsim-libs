@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*																															*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt;
+package org.matsim.pt.qsim;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImplFactory;
+import java.util.Collection;
 
-/**
- * @author mrieser
- */
-public class TransitControlerListener implements StartupListener {
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-		final Scenario scenario = event.getControler().getScenario();
-		if (event.getControler().getTransitRouterFactory() == null) {
-			
-			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore()
-					, scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
-					scenario.getConfig().vspExperimental());
-			
-			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
-					((ScenarioImpl)scenario).getTransitSchedule(), transitRouterConfig ));
-		}
+class UmlaufCache {
 
+	private final TransitSchedule transitSchedule;
+	private final Collection<Umlauf> umlaeufe;
+
+	public UmlaufCache(TransitSchedule transitSchedule, Collection<Umlauf> umlaeufe) {
+		this.transitSchedule = transitSchedule;
+		this.umlaeufe = umlaeufe;
+	}
+
+	public TransitSchedule getTransitSchedule() {
+		return this.transitSchedule;
+	}
+
+	public Collection<Umlauf> getUmlaeufe() {
+		return this.umlaeufe;
 	}
 
 }
