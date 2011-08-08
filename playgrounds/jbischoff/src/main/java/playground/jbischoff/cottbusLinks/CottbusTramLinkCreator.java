@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package cottbusLinks;
+package playground.jbischoff.cottbusLinks;
 
 import java.io.BufferedReader;
 import java.io.File;
