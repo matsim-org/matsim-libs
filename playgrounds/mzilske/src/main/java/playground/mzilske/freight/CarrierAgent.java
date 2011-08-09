@@ -366,6 +366,9 @@ public class CarrierAgent {
 	}
 
 	public void tellLink(Id personId, Id linkId) {
+		if(tollCalculator == null){
+			return;
+		}
 		double toll = tollCalculator.getToll(linkId);
 		carrierDriverAgents.get(personId).tellToll(toll);
 	}
