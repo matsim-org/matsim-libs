@@ -21,9 +21,12 @@ package playground.droeder.gis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -150,6 +153,19 @@ public class DaShapeWriter {
 		}
 		
 		write(createDefaultLineStringFeature(lineStrings, attributes), fileName);
+	}
+	
+	public static void writeDefaultLineStrings2Shape(String fileName, String name, Map<String, List<Coord>> lineStrings){
+		Map<String, SortedMap<Integer, Coord>> map = new HashMap<String, SortedMap<Integer,Coord>>();
+		SortedMap<Integer, Coord> ls;
+		for(Entry<String, List<Coord>> e: lineStrings.entrySet()){
+			ls = new TreeMap<Integer, Coord>();
+			for(int i = 0; i< e.getValue().size(); i++){
+				ls.put(i, e.getValue().get(i));
+			}
+			map.put(e.getKey(), ls);
+		}
+		writeDefaultLineString2Shape(fileName, name, map, null);
 	}
 	
 	private static void write(Collection<Feature> features, String fileName){

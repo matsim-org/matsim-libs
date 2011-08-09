@@ -136,14 +136,8 @@ public class GraphMatching2 {
 						this.nodeRef2Cand.put(n.getId(), nc.getCandId());
 						break;
 					}
-//					else{
-//						log.error("\t\tcan not match candNode " + nc.getCandId() +" to refNode " + nc.getRefId() + " because it's matched to another node...");
-//					}
 				}
 			}
-//			if(!this.nodeRef2Cand.containsKey(n.getId())){
-//				log.error("\t\tcan't find a match for reference-node " + n.getId());
-//			}
 			cnt++;
 			if(cnt%msg==0){
 				msg*=2;
@@ -151,7 +145,6 @@ public class GraphMatching2 {
 			}
 			
 		}
-		
 		this.nodes2Shp(this.nodeRef2Cand, this.outDir + "nodes_bottom_up.shp", "nodesBottomUp");
 		log.info("\tfinished node-matching. " + 
 				this.nodeRef2Cand.size() + " of " + this.reference.getNodes().size() 
@@ -254,28 +247,10 @@ public class GraphMatching2 {
 		}
 		
 		log.info("\tfinished segment-matching. " + 
-				this.segmentRef2Cand.size() + " of " + this.reference.getEdges().size() + 
-				" edges from the referenceGraph got a match for all or some of their segments...");
+				this.segmentRef2Cand.size() + " of " + this.edgePreProcessRef2Cand.size() + 
+				" prematched edges from the referenceGraph got a match for all or some of their segments...");
 	}
 
-//	/**
-//	 * @param pre
-//	 * @param matchedSegments 
-//	 * @return
-//	 */
-//	private boolean containsCompleteCandidate(Entry<Id, Id> pre, Map<Id, List<Id>> matchedSegments) {
-//		List<Id> temp = new ArrayList<Id>();
-//		for(List<Id> e: matchedSegments.values()){
-//			temp.addAll(e);
-//		}
-//		
-//		for(Id id: candidate.getEdges().get(pre.getValue()).getSegmentMap().keySet()){
-//			if(!temp.contains(id)){
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
 
 	/**
 	 * 
@@ -288,13 +263,20 @@ public class GraphMatching2 {
 		for(Entry<Id, Id> preMapped : edgePreProcessRef2Cand.entrySet()){
 			
 			comp = new EdgeCompare(reference.getEdges().get(preMapped.getKey()), candidate.getEdges().get(preMapped.getValue()));
+			/*
+			 * TODO don't know why so many prematches are deleted here!!!
+			 *		there must be a bug in the EdgeCompare, where the segments are compared
+			 */
 			if(comp.isMatched(this.deltaDist, this.deltaPhi, this.maxRelLengthDiff)){
 				edgeRef2Cand.put(preMapped.getKey(), preMapped.getValue());
+			}else{
+				//TODO DEBUG
+//				System.out.println(comp.toString());
 			}
 			cnt++;
 			if(cnt%msg==0){
 				msg*=2;
-				log.info("\t\tprocessed " + cnt + " of " + this.reference.getEdges().size() + " edges from the reference-Graph...");
+				log.info("\t\tprocessed " + cnt + " of " + this.edgePreProcessRef2Cand.size() + " prematched edges from the reference-Graph...");
 			}
 			
 		}

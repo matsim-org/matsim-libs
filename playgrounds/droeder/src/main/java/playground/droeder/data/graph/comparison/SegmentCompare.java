@@ -29,6 +29,7 @@ public class SegmentCompare extends AbstractCompare{
 	
 	private Double deltaAngle, avDist, matchedLengthRef, matchedLengthCand, lengthDiffRef, lenghtDiffCand; 
 	private boolean sOneIsUndershot;
+	private boolean match;
 
 	public SegmentCompare(MatchingSegment refElement, MatchingSegment compareElement) {
 		super(refElement, compareElement);
@@ -45,6 +46,7 @@ public class SegmentCompare extends AbstractCompare{
 		this.matchedLengthCand = c.getMatchedLengthTwo();
 		this.lenghtDiffCand = 1 - (matchedLengthCand / cand.getLength());
 		this.sOneIsUndershot = c.straightOneIsUndershot();
+		this.match = c.possibleMatch();
 	}
 	
 	public boolean isMatched(Double deltaDist, Double deltaPhi, Double relLengthDiff){
@@ -53,6 +55,10 @@ public class SegmentCompare extends AbstractCompare{
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean possibleMatch(){
+		return this.match;
 	}
 
 	@Override
@@ -93,5 +99,30 @@ public class SegmentCompare extends AbstractCompare{
 	 */
 	public Double getMatchedLengthComp() {
 		return matchedLengthCand;
+	}
+
+	/**
+	 * @return the lengthDiffRef
+	 */
+	public Double getLengthDiffRef() {
+		return lengthDiffRef;
+	}
+
+	/**
+	 * @return the lenghtDiffCand
+	 */
+	public Double getLenghtDiffCand() {
+		return lenghtDiffCand;
+	}
+	
+	@Override
+	public String toString(){
+		StringBuffer b = new StringBuffer();
+		b.append("refId: " + super.getRefId() +"\tcandId: " + super.getCandId() + "\n");
+		b.append("possibleMatch: " + this.possibleMatch() + "\trefIsUndershot: " + sOneIsUndershot + "\n" );
+		b.append("\n");
+		
+		
+		return b.toString();
 	}
 }

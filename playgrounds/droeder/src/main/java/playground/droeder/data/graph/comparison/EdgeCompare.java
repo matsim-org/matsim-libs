@@ -20,7 +20,6 @@
 package playground.droeder.data.graph.comparison;
 
 import java.util.Iterator;
-import java.util.ListIterator;
 
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingSegment;
@@ -50,31 +49,59 @@ public class EdgeCompare extends AbstractCompare{
 	 * @param compareElement
 	 */
 	private void computeValues(MatchingEdge refElement,	MatchingEdge compareElement) {
-		Iterator<MatchingSegment> candIt = refElement.getSegments().iterator();
-		Iterator<MatchingSegment> refIt = compareElement.getSegments().iterator();
+		Iterator<MatchingSegment> candIt = compareElement.getSegments().iterator();
+		Iterator<MatchingSegment> refIt = refElement.getSegments().iterator();
 		
 		MatchingSegment rs = null, cs = null;
 		SegmentCompare sc = null;
-		int cnt = 0;
 		double weighting = 0.0;
+		boolean first = true;
+		boolean refIter = true;
 		
-		while(candIt.hasNext() && refIt.hasNext()){
+		while(candIt.hasNext() || refIt.hasNext()){
 			if((rs == null) && (cs == null)){
 				rs = refIt.next();
 				cs = candIt.next();
 			}else if(candIt.hasNext() && refIt.hasNext()){
-				if(sc.refIsUndershot()){
-					rs = refIt.next();
-				}else if(!sc.refIsUndershot()){
-					cs = candIt.next();
+				if(!first){
+					if(refIter){
+						cs = candIt.next();
+						refIter = false;
+					}else{
+						rs = refIt.next();
+						refIter = true;
+					}
+				}else{
+					if(sc.refIsUndershot()){
+						refIter = true;
+						rs = refIt.next();
+					}else if(!sc.refIsUndershot()){
+						refIter = false;
+						cs = candIt.next();
+					}
 				}
 			}else if(candIt.hasNext()){
+				refIter = false;
 				cs = candIt.next();
 			}else if(refIt.hasNext()){
+				refIter = true;
 				rs = refIt.next();
 			}
 			sc = new SegmentCompare(rs, cs);
-			cnt++;
+			if(!sc.possibleMatch()){
+				if(!first){
+					break;
+				}else{
+					first = false;
+					continue;
+				}
+			}
+			first = true;
+//			System.out.println(rs.toString() + " " + cs.toString());
+//			System.out.println(rs.getLength() + "\t\t\t" + cs.getLength());
+//			System.out.println(sc.getMatchedLengthRef() + "\t\t\t" + sc.getMatchedLengthComp());
+//			System.out.println();
+			
 			matchedLengthRef += sc.getMatchedLengthRef();
 			matchedLengthComp += sc.getMatchedLengthComp();
 			weighting += (0.5 * (matchedLengthComp + matchedLengthRef));
@@ -158,5 +185,14 @@ public class EdgeCompare extends AbstractCompare{
 	 */
 	public Double getMatchedLengthComp() {
 		return matchedLengthComp;
+	}
+	
+	@Override
+	public String toString(){
+		StringBuffer b = new StringBuffer();
+		b.append("refTotalL: " + refTotalLength + " refMatchedL: " + matchedLengthRef + "\n");
+		b.append("matchTotalL: " + compTotalLength + " matchMatchedL: " + matchedLengthComp + "\n");
+		b.append("avDist:" + avDist + " avAngle: " + avAngle + "\n");
+		return b.toString();
 	}
 }

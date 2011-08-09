@@ -55,6 +55,7 @@ public class StraightComparer{
 		this.angle = GeoCalculator.angleBeetween2Straights(
 				new Tuple<Coord, Coord>(this.one.getStart(), this.one.getEnd()), 
 				new Tuple<Coord, Coord>(this.two.getStart(), this.two.getEnd()));
+		this.setNoMatch();
 		this.computeValues();
 	}
 
@@ -194,7 +195,6 @@ public class StraightComparer{
 	/**
 	 * 
 	 */
-	@SuppressWarnings("unused")
 	private void handleSomeAngle() {
 		/*
 		 * change the coordinateSystem for easier handling
@@ -208,11 +208,37 @@ public class StraightComparer{
 		if(one.getStart().getX() > one.getEnd().getX()){
 			this.setNoMatch();
 			log.error("this should not happen after coordinateTransformation");
+		}else if(!partlyCongruent(one, two)){
+			this.setNoMatch();
 		}else{
 			Coord baseAB_C = getBase(one, two.getStart());
 			Coord baseAB_D = getBase(one, two.getEnd());
 			Coord baseCD_A = getBase(two, one.getStart());
 			Coord baseCD_B = getBase(two, one.getEnd());
+			if(one.getEnd().getX() < two.getEnd().getX()){
+				oneIsUnderShot = true;
+			}
+			if(basePartOfStraight(one, baseAB_C)){
+				if(!(basePartOfStraight(one, baseAB_D) || basePartOfStraight(two, baseCD_B))){
+					this.setNoMatch();
+					return;
+				}
+			}
+			if(basePartOfStraight(two, baseCD_A)){
+				if(!(basePartOfStraight(one, baseAB_D) || basePartOfStraight(two, baseCD_B))){
+					this.setNoMatch();
+					return;
+				}
+			}
+			
+//			if(!(basePartOfStraight(one, baseAB_C) || basePartOfStraight(one, baseAB_D))){
+//				this.setNoMatch();
+//				return;
+//			}
+//			if(!(basePartOfStraight(two, baseCD_A) || basePartOfStraight(two, baseCD_B))){
+//				this.setNoMatch();
+//				return;
+//			}
 			
 			Coord oneOne, oneTwo, twoOne, twoTwo;
 			if(basePartOfStraight(one, baseAB_C)){
@@ -246,6 +272,7 @@ public class StraightComparer{
 									GeoCalculator.distanceBetween2Points(one.getEnd(), baseAB_D), 
 									GeoCalculator.distanceBetween2Points(two.getEnd(), baseCD_B)));
 		}
+		//TODO debug
 //		log.info("rotation " + angle2e1);
 //		System.out.println(this.one);
 //		System.out.println(one);
@@ -253,6 +280,24 @@ public class StraightComparer{
 //		System.out.println(two);
 	}
 	
+	/**
+	 * @param one2
+	 * @param two2
+	 * @return
+	 */
+	private boolean partlyCongruent(Straight one, Straight two) {
+		if(one.getStart().getX() < two.getStart().getX() && two.getStart().getX() < one.getEnd().getX()){
+			return true;
+		}else if(one.getStart().getX() < two.getEnd().getX() && two.getEnd().getX() < one.getEnd().getX()){
+			return true;
+		}else if(two.getStart().getX() < one.getStart().getX() && one.getStart().getX() < two.getEnd().getX()){
+			return true;
+		}else if(two.getStart().getX() < one.getEnd().getX() && one.getEnd().getX() < two.getEnd().getX()){
+			return true;
+		}
+		return false;
+	}
+
 	private Double getMin(Double one, Double two, Double three){
 		Double temp = Math.min(one, two);
 		return Math.min(temp, three);
@@ -285,7 +330,7 @@ public class StraightComparer{
 		this.avDist = Double.NaN;
 	}
 	
-	public boolean matched(){
+	public boolean possibleMatch(){
 		return this.match;
 	}
 	
@@ -337,8 +382,11 @@ public class StraightComparer{
 		// get the base of the perpendicular from c to the straight ab
 		p = a.add(new Vector2D(answers[0], r1));
 		Coord base = new CoordImpl(p.getX(), p.getY());
-//		System.out.println(base.getX() + "\t" + base.getY());
+		
+		//TODO debug
+//		System.out.print(base.getX() + "\t" + base.getY() + "\t");
 //		System.out.println(basePartOfStraight(s, base));
+//		
 		return base;
 	}
 	
