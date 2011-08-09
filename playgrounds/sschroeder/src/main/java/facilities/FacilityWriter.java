@@ -14,9 +14,9 @@ public class FacilityWriter extends MatsimXmlWriter{
 	
 	private static Logger logger = Logger.getLogger(FacilityWriter.class);
 	
-	private Collection<Facility> facilities;
+	private Collection<? extends Facility> facilities;
 	
-	public FacilityWriter(Collection<Facility> facilities) {
+	public FacilityWriter(Collection<? extends Facility> facilities) {
 		super();
 		this.facilities = facilities;
 	}

@@ -100,25 +100,9 @@ public class BestInsertion implements RecreationStrategy{
 	}
 
 	private TourAgent createTourAgent(Shipment shipmentWithoutService) {
-		Tour tour = null;
-		if(isDepot(shipmentWithoutService.getFrom())){
-			tour = tourAgentFactory.createRoundTour(depot, shipmentWithoutService.getTo());
-		}
-		else if(isDepot(shipmentWithoutService.getTo())){
-			tour = tourAgentFactory.createRoundTour(depot, shipmentWithoutService.getFrom());
-		}
-		else{
-			tour = tourAgentFactory.createRoundTour(depot, shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
-		}
-		TourAgent agent = tourAgentFactory.createTourAgent(vrp, tour, VrpUtils.createVehicle(newVehicleCapacity));
+		Tour tour = tourAgentFactory.createRoundTour(shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
+		TourAgent agent = tourAgentFactory.createTourAgent(tour, VrpUtils.createVehicle(newVehicleCapacity));
 		return agent;
-	}
-
-	private boolean isDepot(Customer customer) {
-		if(customer.getId().equals(vrp.getDepotId())){
-			return true;
-		}
-		return false;
 	}
 
 	public void setNewVehicleCapacity(int newVehicleCapacity) {

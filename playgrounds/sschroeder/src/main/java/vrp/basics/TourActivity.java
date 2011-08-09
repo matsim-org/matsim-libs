@@ -17,7 +17,7 @@ public class TourActivity {
 	
 	private double practical_latestArrivalTime = Double.MAX_VALUE;
 	
-	private Integer currentLoad = null; //after this activity has occured
+	private int currentLoad = 0; //after this activity has occured
 	
 	public TourActivity(Customer customer) {
 		super();

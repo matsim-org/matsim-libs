@@ -11,17 +11,8 @@ import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.VRP;
 
+public class VRPWithMultipleDepotsImpl implements VRP{
 
-/**
- * 
- * @author stefan schroeder
- *
- */
-
-public class VrpImpl implements VRP{
-	
-	private Id depotId;
-	
 	private Costs costs;
 	
 	private Constraints constraints;
@@ -30,13 +21,28 @@ public class VrpImpl implements VRP{
 	
 	private Map<Id,Customer> depots;
 	
-	public VrpImpl(Id depotId, Collection<Customer> customers, Costs costs, Constraints constraints){
-		this.depotId = depotId;
+	public VRPWithMultipleDepotsImpl(Collection<Id> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
+		super();
 		this.costs = costs;
 		this.constraints = constraints;
 		mapCustomers(customers);
-		depots = new HashMap<Id, Customer>();
-		depots.put(depotId, getDepot());
+		mapDepots(depots);
+	}
+
+	private void mapDepots(Collection<Id> depots) {
+		for(Id id : depots){
+			if(customers.containsKey(id)){
+				this.depots.put(id, customers.get(id));
+			}
+			else{
+				throw new IllegalStateException("depot not in customerList which contains all customers inclusive depots");
+			}
+		}
+	}
+
+	@Override
+	public Id getDepotId() {
+		return null;
 	}
 	
 	private void mapCustomers(Collection<Customer> customers) {
@@ -46,22 +52,22 @@ public class VrpImpl implements VRP{
 		}
 	}
 
-	public Id getDepotId() {
-		return depotId;
-	}
-
+	@Override
 	public Constraints getConstraints() {
 		return constraints;
 	}
 
+	@Override
 	public Costs getCosts() {
 		return costs;
 	}
 
+	@Override
 	public Customer getDepot() {
-		return customers.get(depotId);
+		return null;
 	}
 
+	@Override
 	public Map<Id, Customer> getCustomers() {
 		return customers;
 	}

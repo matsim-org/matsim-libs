@@ -24,7 +24,7 @@ public class CustomerImpl implements Customer {
 	
 	private double serviceTime;
 	
-	private TimeWindow timeWindow;
+	private TimeWindow timeWindow = new TimeWindow(0.0, Double.MAX_VALUE);
 
 	public CustomerImpl(Id customerId, Node locationNode) {
 		super();

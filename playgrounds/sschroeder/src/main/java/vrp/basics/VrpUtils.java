@@ -118,7 +118,7 @@ public class VrpUtils {
 				TourActivity newCustomer = createTourActivity(tourAct.getCustomer());
 				tour.getActivities().add(newCustomer);
 			}
-			TourAgent newTourAgent = tourAgentFactory.createTourAgent(vrp, tour, vehicle);
+			TourAgent newTourAgent = tourAgentFactory.createTourAgent(tour, vehicle);
 			agents.add(newTourAgent);
 		}
 		return new Solution(agents);  

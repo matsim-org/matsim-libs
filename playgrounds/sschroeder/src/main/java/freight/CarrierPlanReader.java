@@ -108,9 +108,15 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			Id to = makeId(atts.getValue(TO));
 			int size = getInt(atts.getValue(SIZE));
 			String startPickup = atts.getValue("startPickup");
+			String endPickup = atts.getValue("endPickup");
+			String startDelivery = atts.getValue("startDelivery");
+			String endDelivery = atts.getValue("endDelivery");
 			Shipment shipment = null;
-			if(startPickup == null){
+			if(startPickup == null ){
 				shipment = CarrierUtils.createShipment(from, to, size, 0, 24*3600, 0, 24*3600);
+			}
+			else{
+				shipment = CarrierUtils.createShipment(from, to, size, getDouble(startPickup), getDouble(endPickup), getDouble(startDelivery), getDouble(endDelivery));
 			}
 			currentShipments.put(atts.getValue(ID), shipment);
 			CarrierUtils.createAndAddContract(currentCarrier, shipment, new CarrierOffer());
@@ -168,6 +174,10 @@ public class CarrierPlanReader extends MatsimXmlParser{
 				currentTourBuilder.scheduleGeneralActivity(atts.getValue(TYPE), makeId(atts.getValue(LINKID)), duration);
 			}
 		}
+	}
+
+	private double getDouble(String value) {
+		return Double.parseDouble(value);
 	}
 
 	@Override

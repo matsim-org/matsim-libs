@@ -28,6 +28,7 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 	}
 	
 	private void updateTimeWindowsAndLoadsAtTourActivities(Tour tour) {
+		reset(tour);
 		TourActivity nextCustomer = null;
 		TourActivity lastCustomer = null;
 		double costs = 0.0;
@@ -41,7 +42,6 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 			else{
 				TourActivity currentAct = tour.getActivities().get(j);
 				double late = Math.min(currentAct.getLatestArrTime(), nextCustomer.getLatestArrTime() - currentAct.getServiceTime() - getTime(currentAct,nextCustomer));
-//				logger.debug("customer=" + customer + " late(Min(" + customer.getLate() + ", " + nextCustomer.getLate() + " - " + nextCustomer.getServiceTime() + " - " + getTime(customer, nextCustomer) + ")=" + late);
 				currentAct.setLatestArrTime(late);
 				nextCustomer = currentAct;
 			}
@@ -52,11 +52,13 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 			else{
 				TourActivity currentAct = tour.getActivities().get(i);	
 				double early = Math.max(currentAct.getEarliestArrTime(), lastCustomer.getEarliestArrTime() + lastCustomer.getServiceTime() + getTime(lastCustomer,currentAct));
-//				logger.debug("customer=" + customer + " early(Max(" + customer.getEarly() + ", " + lastCustomer.getEarly() + " + " + lastCustomer.getServiceTime() + " + " + getTime(lastCustomer, customer) + ")=" + early);
 				currentAct.setEarliestArrTime(early);
 				int currentLoad = lastCustomer.getCurrentLoad() + (int)currentAct.getCustomer().getDemand();
 				currentAct.setCurrentLoad(currentLoad);
 				costs += this.costs.getCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
+				tour.costs.generalizedCosts += this.costs.getCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
+				tour.costs.distance += this.costs.getDistance(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
+				tour.costs.time  += this.costs.getTime(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
 				lastCustomer = currentAct;
 			}
 			j--;
@@ -64,6 +66,13 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 		tourCost = costs;
 	}
 	
+	private void reset(Tour tour) {
+		tour.costs.generalizedCosts = 0.0;
+		tour.costs.distance = 0.0;
+		tour.costs.time = 0.0;
+		
+	}
+
 	private double getTime(TourActivity act1, TourActivity act2) {
 		return costs.getTime(act1.getLocation(), act2.getLocation());
 	}
@@ -77,9 +86,4 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 		}
 		return loadAtDepot*-1;
 	}
-
-	public double getTourCost() {
-		return tourCost;
-	}
-
 }

@@ -57,7 +57,7 @@ class RRTourAgent implements TourAgent {
 		this.costs = costs;
 		this.activityStatusUpdater = updater;
 		updater.update(tour);
-		currentCost = updater.getTourCost();
+		currentCost = tour.costs.generalizedCosts;
 	}
 
 	public void setTourBuilder(TourBuilder tourBuilder) {
@@ -74,7 +74,7 @@ class RRTourAgent implements TourAgent {
 	
 	public boolean tourIsValid(){
 		activityStatusUpdater.update(tour);
-		currentCost = activityStatusUpdater.getTourCost();
+		currentCost = tour.costs.generalizedCosts;
 		if(constraint.judge(tour)){
 			return true;
 		}
@@ -95,13 +95,13 @@ class RRTourAgent implements TourAgent {
 	 */
 	
 	public Offer requestService(Shipment shipment){
-		TourResult tourTrippel = tourBuilder.buildTour(tour, shipment);
-		if(tourTrippel != null){
-			Offer offer = new Offer(this, tourTrippel.marginalCosts);
+		Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment);
+		if(newTour != null){
+			double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
+			Offer offer = new Offer(this, marginalCosts);
 			openOffer = offer;
-			tourOfLastOffer = tourTrippel.tour;
-			costOfOfferedTour = tourTrippel.totalCosts;
-			logger.debug("lastOffer: " + offer);
+			tourOfLastOffer = newTour;
+			costOfOfferedTour = newTour.costs.generalizedCosts;
 			return offer;
 		}
 		else{
@@ -111,13 +111,13 @@ class RRTourAgent implements TourAgent {
 	
 	 @Override
 	public void run() {
-		 TourResult tourInformation = tourBuilder.buildTour(tour, newShipment);
-		 if(tourInformation != null){
-			 Offer offer = new Offer(this, tourInformation.marginalCosts);
+		 Tour newTour = tourBuilder.addShipmentAndGetTour(tour, newShipment);
+		 if(newTour != null){
+			 double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
+			 Offer offer = new Offer(this, marginalCosts);
 			 openOffer = offer;
-			 tourOfLastOffer = tourInformation.tour;
-			 costOfOfferedTour = tourInformation.totalCosts;
-			 logger.debug("lastOffer: " + offer);
+			 tourOfLastOffer = newTour;
+			 costOfOfferedTour = newTour.costs.generalizedCosts;
 		 }
 	}
 
@@ -171,7 +171,7 @@ class RRTourAgent implements TourAgent {
 			if(c.getCustomer().getId().equals(customer.getId())){
 				tour.getActivities().remove(c);
 				activityStatusUpdater.update(tour);
-				currentCost = activityStatusUpdater.getTourCost();
+				currentCost = tour.costs.generalizedCosts;
 				break;
 			}
 		}

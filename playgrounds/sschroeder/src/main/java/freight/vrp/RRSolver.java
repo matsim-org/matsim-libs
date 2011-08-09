@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.Shipment;
@@ -21,11 +20,8 @@ import vrp.api.Customer;
 import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.TourActivity;
-import vrp.basics.VrpUtils;
 
 public class RRSolver implements VRPSolver{
-
-	private Collection<Contract> contracts;
 	
 	private Id depotLocation;
 	
@@ -34,11 +30,16 @@ public class RRSolver implements VRPSolver{
 	private VRPTransformation vrpTransformation;
 	
 	private Network network;
+	
+	private Collection<Shipment> shipments;
+	
+	private Collection<CarrierVehicle> vehicles;
 
-	public RRSolver(Collection<Contract> contracts, CarrierCapabilities carrierCapabilities, Network network) {
+	public RRSolver(Collection<Shipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
 		super();
-		this.contracts = contracts;
-		CarrierVehicle vehicle = carrierCapabilities.getCarrierVehicles().iterator().next();
+		this.shipments = shipments;
+		this.vehicles = vehicles;
+		CarrierVehicle vehicle = vehicles.iterator().next();
 		this.depotLocation = vehicle.getLocation();
 		this.capacity = vehicle.getCapacity();
 		this.network = network;
@@ -111,8 +112,7 @@ public class RRSolver implements VRPSolver{
 		vrpBuilder.setCosts(costs);
 		Constraints constraints = new TimeAndCapacityPickupsDeliveriesSequenceConstraint(capacity,8*3600,costs);
 		vrpBuilder.setConstraints(constraints);
-		for(Contract c : contracts){
-			Shipment s = c.getShipment();
+		for(Shipment s : shipments){
 			vrpTransformation.addShipment(s);
 		}
 		vrpBuilder.setVrpTransformation(vrpTransformation);
@@ -120,7 +120,7 @@ public class RRSolver implements VRPSolver{
 		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
 		rrFactory.setWarmUp(4);
 		rrFactory.setIterations(20);
-		Collection<vrp.basics.Tour> initialSolution = VrpUtils.createTrivialSolution(vrp);
+		Collection<vrp.basics.Tour> initialSolution = new TrivialInitialSolutionFactory(vrp).createInitialSolution();
 		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, capacity);
 		return ruinAndRecreateAlgo;
 	}

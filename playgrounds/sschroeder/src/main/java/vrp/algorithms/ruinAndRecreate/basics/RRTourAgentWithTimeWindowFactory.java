@@ -17,11 +17,19 @@ import vrp.basics.VrpUtils;
 
 public class RRTourAgentWithTimeWindowFactory implements TourAgentFactory{
 
-	public Tour createRoundTour(Customer depot, Customer n) {
+	private VRP vrp;
+	
+	public RRTourAgentWithTimeWindowFactory(VRP vrp) {
+		super();
+		this.vrp = vrp;
+	}
+
+	public Tour createRoundTour(Customer n) {
+		Customer depot = getClosestDepot(n);
 		return VrpUtils.createRoundTour(depot, n);
 	}
 
-	public TourAgent createTourAgent(VRP vrp, Tour tour, Vehicle vehicle) {
+	public TourAgent createTourAgent(Tour tour, Vehicle vehicle) {
 		TourActivityStatusUpdater updater = new TourActivityStatusUpdaterWithTWImpl(vrp.getCosts());
 		BestTourBuilder tourBuilder = new BestTourBuilder();
 		tourBuilder.setConstraints(vrp.getConstraints());
@@ -33,8 +41,38 @@ public class RRTourAgentWithTimeWindowFactory implements TourAgentFactory{
 		return tourAgent;
 	}
 
-	public Tour createRoundTour(Customer depot, Customer i, Customer j) {
-		return VrpUtils.createRoundTour(depot, i, j);
+	public Tour createRoundTour(Customer i, Customer j) {
+		Tour tour = null;
+		Customer depot = null;
+		if(vrp.getDepots().containsKey(i.getId())){
+			tour = createRoundTour(j);
+		}
+		else if(vrp.getDepots().containsKey(j.getId())){
+			tour = createRoundTour(i);
+		}
+		else{
+			depot = getClosestDepot(i);
+			tour = VrpUtils.createRoundTour(depot, i, j);
+		}
+		return tour;
+	}
+
+	private Customer getClosestDepot(Customer n) {
+		Customer bestDepot = null;
+		Double minCost2Depot = Double.MAX_VALUE; 
+		for(Customer depot : vrp.getDepots().values()){
+			if(bestDepot == null){
+				bestDepot = depot;
+			}
+			else{
+				double costs = vrp.getCosts().getCost(depot.getLocation(), n.getLocation());
+				if(costs < minCost2Depot){
+					minCost2Depot = costs;
+					bestDepot = depot;
+				}
+			}
+		}
+		return bestDepot;
 	}
 
 }

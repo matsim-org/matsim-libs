@@ -70,9 +70,16 @@ public class FacilityShapeFileWriter {
 		this.referenceSystem = referenceSystem;
 	}
 
-	public void write(String filename) throws IOException{
+	public void write(String filename) {
 		createFeatures();
-		writeFeatures(filename);
+		try {
+			writeFeatures(filename);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error(e);
+			System.exit(1);
+		}
 	}
 
 	private void writeFeatures(String filename) throws IOException {

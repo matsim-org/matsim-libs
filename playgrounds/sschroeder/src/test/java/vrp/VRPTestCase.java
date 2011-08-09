@@ -1,6 +1,7 @@
 package vrp;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import vrp.basics.ManhattanDistance;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
 import vrp.basics.Tour;
+import vrp.basics.TourActivityFactory;
 
 public class VRPTestCase extends TestCase{
 	
@@ -35,7 +37,7 @@ public class VRPTestCase extends TestCase{
 	
 	/*
 	 * 	|
-	 * 	|
+	 * 10	|
 	 * 9|
 	 * 8|
 	 * 7|
@@ -45,14 +47,14 @@ public class VRPTestCase extends TestCase{
 	 * 3|
 	 * 2|
 	 * 1|_________________________________
-	 *   1 2 3 4 5 6 7 8 9
+	 *   1 2 3 4 5 6 7 8 9 10
 	 * depotNode=0,0
 	 * node(1,0)=1,0 --> 0+1=1=ungerade => delivery => demand=-1
 	 * node(1,1)=1,1 --> 1+1=2=gerade => pickup => demand=+1
 	 *   
 	 */
 	
-	public void init(){
+	protected void init(){
 		costs = new ManhattanDistance();
 		nodes = new Nodes();
 		customers = new ArrayList<Customer>();
@@ -60,13 +62,22 @@ public class VRPTestCase extends TestCase{
 		createNodesAndCustomer();
 	}
 	
-	public Customer getDepot(){
+	protected Customer getDepot(){
 		return customerMap.get(makeId(0,0));
+	}
+	
+	protected Tour makeTour(Collection<Customer> tourSequence){
+		Tour tour = new Tour();
+		TourActivityFactory activityFactory = new TourActivityFactory();
+		for(Customer c : tourSequence){
+			tour.getActivities().add(activityFactory.createTourActivity(c));
+		}
+		return tour;
 	}
 
 	private void createNodesAndCustomer() {
-		for(int i=0;i<10;i++){
-			for(int j=0;j<10;j++){
+		for(int i=0;i<11;i++){
+			for(int j=0;j<11;j++){
 				Id nodeId = makeId(i,j);
 				Node node = makeNode(nodeId);
 				node.setCoord(makeCoord(i,j));
@@ -100,7 +111,7 @@ public class VRPTestCase extends TestCase{
 		return new NodeImpl(nodeId);
 	}
 
-	private Id makeId(int i, int j) {
+	protected Id makeId(int i, int j) {
 		return new IdImpl(i + "," + j);
 	}
 

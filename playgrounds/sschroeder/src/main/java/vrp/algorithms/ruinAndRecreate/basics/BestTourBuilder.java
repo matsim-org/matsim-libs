@@ -36,18 +36,19 @@ public class BestTourBuilder implements TourBuilder {
 	
 	private Costs costs;
 	
-	private Constraints constraints;
+	private Constraints constraints = new Constraints(){
+
+		@Override
+		public boolean judge(Tour tour) {
+			return true;
+		}
+		
+	};
 	
 	private TourActivityStatusUpdater tourActivityUpdater;
 	
-	public void setDepot(Customer depot) {
-	}
-
 	public void setTourActivityStatusUpdater(TourActivityStatusUpdater tourActivityUpdater) {
 		this.tourActivityUpdater = tourActivityUpdater;
-	}
-
-	public void setOldTour(Tour tour){
 	}
 	
 	public void setCosts(Costs costs){
@@ -73,7 +74,7 @@ public class BestTourBuilder implements TourBuilder {
 					newTour.getActivities().add(i,VrpUtils.createTourActivity(customer));
 					assertCustomerIsOnlyOnceInTour(newTour,customer);
 					tourActivityUpdater.update(newTour);
-					double totalCosts = tourActivityUpdater.getTourCost();
+					double totalCosts = newTour.costs.generalizedCosts;
 					if(this.constraints.judge(newTour)){
 						bestMarginalCost = marginalCost; 
 						bestTour = newTour;
@@ -105,7 +106,8 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	public TourResult buildTour(Tour tour, Shipment shipment){
+	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment){
+		verify();
 		TourResult tourTrippel = null;
 		if(isDepot(tour,shipment.getFrom())){
 			tourTrippel = buildTour(tour, shipment.getTo());
@@ -116,9 +118,19 @@ public class BestTourBuilder implements TourBuilder {
 		else{
 			tourTrippel = buildTourWithEnRoutePickupAndDelivery(tour,shipment);
 		}
-		return tourTrippel;
+		return tourTrippel.tour;
 	}
 	
+	private void verify() {
+		if(tourActivityUpdater == null){
+			throw new IllegalStateException("tourActivityStatusUpdater is not set. this cannot be.");
+		}
+		if(costs == null){
+			throw new IllegalStateException("costsObj is not set. this cannot be");
+		}
+		
+	}
+
 	private TourResult buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
 		Node fromLocation = shipment.getFrom().getLocation();
 		Node toLocation = shipment.getTo().getLocation();
@@ -140,7 +152,7 @@ public class BestTourBuilder implements TourBuilder {
 				if(marginalCost < bestMarginalCost){
 					Tour newTour = buildTour(tour,shipment,i,j);
 					tourActivityUpdater.update(newTour);
-					double totCosts = tourActivityUpdater.getTourCost();
+					double totCosts = newTour.costs.generalizedCosts;
 					if(this.constraints.judge(newTour)){
 						bestMarginalCost = marginalCost;
 						bestTour = newTour;

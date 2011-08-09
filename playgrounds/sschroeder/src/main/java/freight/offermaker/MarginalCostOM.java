@@ -58,14 +58,15 @@ public class MarginalCostOM implements OfferMaker{
 		
 		public double getCostsOfCurrentTour(){
 			updater.update(tour);
-			return updater.getTourCost();
+			return tour.costs.generalizedCosts;
 		}
 
 		@Override
 		public vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer requestService(vrp.algorithms.ruinAndRecreate.basics.Shipment shipment) {
-			TourResult tourTrippel = tourBuilder.buildTour(tour, shipment);
-			if(tourTrippel != null){
-				vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer offer = new vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer(this, tourTrippel.marginalCosts);
+			Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment);
+			if(newTour != null){
+				double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
+				vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer offer = new vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer(this, marginalCosts);
 				return offer;
 			}
 			else{
@@ -77,7 +78,6 @@ public class MarginalCostOM implements OfferMaker{
 		public void offerGranted(
 				vrp.algorithms.ruinAndRecreate.basics.Shipment shipment) {
 			throw new UnsupportedOperationException();
-			
 		}
 
 		@Override

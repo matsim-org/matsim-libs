@@ -53,7 +53,7 @@ public class RuinAndRecreateFactory {
 	 * @return
 	 */
 	public RuinAndRecreate createStandardAlgo(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory();
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(vrp);
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
@@ -95,7 +95,7 @@ public class RuinAndRecreateFactory {
 	}
 
 	public RuinAndRecreate createAlgoWithTimeWindows(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
-		RRTourAgentWithTimeWindowFactory tourAgentFactory = new RRTourAgentWithTimeWindowFactory();
+		RRTourAgentWithTimeWindowFactory tourAgentFactory = new RRTourAgentWithTimeWindowFactory(vrp);
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
@@ -126,7 +126,7 @@ public class RuinAndRecreateFactory {
 		Collection<TourAgent> tourAgents = new ArrayList<TourAgent>();
 		for(Tour tour : tours){
 			Vehicle vehicle = VrpUtils.createVehicle(vehicleCapacity);
-			tourAgents.add(tourAgentFactory.createTourAgent(vrp, tour, vehicle));
+			tourAgents.add(tourAgentFactory.createTourAgent(tour, vehicle));
 		}
 		return new Solution(tourAgents);
 	}

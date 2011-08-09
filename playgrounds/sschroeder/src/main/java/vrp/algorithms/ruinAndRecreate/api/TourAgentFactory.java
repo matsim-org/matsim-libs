@@ -1,7 +1,6 @@
 package vrp.algorithms.ruinAndRecreate.api;
 
 import vrp.api.Customer;
-import vrp.api.VRP;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 
@@ -13,10 +12,11 @@ import vrp.basics.Vehicle;
 
 public interface TourAgentFactory {
 
-	public Tour createRoundTour(Customer depot, Customer n);
+	public Tour createRoundTour(Customer n);
 
-	public TourAgent createTourAgent(VRP vrp, Tour tour, Vehicle createVehicle);
+	public TourAgent createTourAgent(Tour tour, Vehicle vehicle);
 
-	public Tour createRoundTour(Customer depot, Customer from, Customer to);
+	public Tour createRoundTour(Customer from, Customer to);
+	
 
 }

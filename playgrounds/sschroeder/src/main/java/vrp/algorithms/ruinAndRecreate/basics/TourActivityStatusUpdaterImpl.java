@@ -23,17 +23,15 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 		this.costs = costs;
 	}
 	
-	public double getTourCost(){
-		return tourCost;
-	}
-
 	public void update(Tour tour){
+		reset(tour);
 		double cost = 0.0;
 		int loadAtDepot = getLoadAtDepot(tour);
 		tour.getActivities().get(0).setCurrentLoad(loadAtDepot);
 		for(int i=1;i<tour.getActivities().size();i++){
 			TourActivity fromAct = tour.getActivities().get(i-1);
 			TourActivity toAct = tour.getActivities().get(i);
+			cost += costs.getCost(fromAct.getLocation(),toAct.getLocation());
 			tour.costs.generalizedCosts += costs.getCost(fromAct.getLocation(),toAct.getLocation());
 			tour.costs.distance += costs.getDistance(fromAct.getLocation(),toAct.getLocation());
 			tour.costs.time  += costs.getTime(fromAct.getLocation(),toAct.getLocation());
@@ -45,6 +43,12 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 		tourCost = cost;
 	}
 	
+	private void reset(Tour tour) {
+		tour.costs.generalizedCosts = 0.0;
+		tour.costs.time = 0.0;
+		tour.costs.distance = 0.0;
+	}
+
 	private void assertEqual(int currentLoad, int currentLoad2) {
 		if(currentLoad == currentLoad2){
 			return;

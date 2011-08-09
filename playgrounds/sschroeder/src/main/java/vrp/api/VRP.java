@@ -24,4 +24,5 @@ public interface VRP {
 	
 	public Map<Id,Customer> getCustomers(); //inclusive depot
 	
+	public Map<Id,Customer> getDepots();
 }

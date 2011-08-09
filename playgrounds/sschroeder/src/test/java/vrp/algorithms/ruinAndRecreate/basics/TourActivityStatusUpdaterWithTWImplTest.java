@@ -4,22 +4,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import vrp.VRPTestCase;
+import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.api.Customer;
 import vrp.basics.Tour;
 
-public class TourActivityStatusUpdaterImplTest extends VRPTestCase{
+public class TourActivityStatusUpdaterWithTWImplTest extends VRPTestCase{
 	
 	Tour tour;
 	
 	Tour anotherTour;
 	
-	TourActivityStatusUpdaterImpl statusUpdater;
+	TourActivityStatusUpdater statusUpdater;
 	
 	public void setUp(){
 		init();
 		Customer depot = getDepot();
 		Customer cust1 = customerMap.get(makeId(0,10));
 		Customer cust2 = customerMap.get(makeId(10,0));
+		cust1.setTheoreticalTimeWindow(8, 12);
+		cust2.setTheoreticalTimeWindow(30, 30);
 		Collection<Customer> tourSequence = new ArrayList<Customer>();
 		tourSequence.add(depot);
 		tourSequence.add(cust1);
@@ -36,7 +39,7 @@ public class TourActivityStatusUpdaterImplTest extends VRPTestCase{
 		anotherTourSequence.add(depot);
 		anotherTour = makeTour(anotherTourSequence);
 		
-		statusUpdater = new TourActivityStatusUpdaterImpl(costs);
+		statusUpdater = new TourActivityStatusUpdaterWithTWImpl(costs);
 	}
 	
 	public void tearDown(){
@@ -89,4 +92,28 @@ public class TourActivityStatusUpdaterImplTest extends VRPTestCase{
 		assertEquals(38.0, anotherTour.costs.time);
 	}
 
+	public void testPracticalTimeWindowsOfDepotStart(){
+		statusUpdater.update(tour);
+		assertEquals(0.0,tour.getActivities().get(0).getEarliestArrTime());
+		assertEquals(0.0,tour.getActivities().get(0).getLatestArrTime());
+	}
+	
+	public void testPracticalTimeWindowsOfFirstCustomer(){
+		statusUpdater.update(tour);
+		assertEquals(10.0,tour.getActivities().get(1).getEarliestArrTime());
+		assertEquals(10.0,tour.getActivities().get(1).getLatestArrTime());
+	}
+	
+	public void testPracticalTimeWindowsOfSecondCustomer(){
+		statusUpdater.update(tour);
+		assertEquals(30.0,tour.getActivities().get(2).getEarliestArrTime());
+		assertEquals(30.0,tour.getActivities().get(2).getLatestArrTime());
+	}
+	
+	public void testPracticalTimeWindowsOfDepotEnd(){
+		statusUpdater.update(tour);
+		assertEquals(40.0,tour.getActivities().get(3).getEarliestArrTime());
+		assertEquals(Double.MAX_VALUE,tour.getActivities().get(3).getLatestArrTime());
+	}
+	
 }

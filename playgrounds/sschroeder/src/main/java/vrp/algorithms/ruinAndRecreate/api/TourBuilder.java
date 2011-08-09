@@ -1,6 +1,5 @@
 package vrp.algorithms.ruinAndRecreate.api;
 
-import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder.TourResult;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.basics.Tour;
 
@@ -11,5 +10,5 @@ import vrp.basics.Tour;
  */
 
 public interface TourBuilder {
-	TourResult buildTour(Tour tour, Shipment shipment);
+	Tour addShipmentAndGetTour(Tour tour, Shipment shipment);
 }
