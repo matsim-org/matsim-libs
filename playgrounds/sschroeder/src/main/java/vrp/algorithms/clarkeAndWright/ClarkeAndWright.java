@@ -17,7 +17,7 @@ import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.api.VRP;
-import vrp.basics.DepotActivity;
+import vrp.basics.OtherDepotActivity;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.VrpUtils;
@@ -255,7 +255,7 @@ public class ClarkeAndWright {
 
 	private void updateTourAssignment(Tour tour) {
 		for(TourActivity act : tour.getActivities()){
-			if(act instanceof DepotActivity){
+			if(act instanceof OtherDepotActivity){
 				continue;
 			}
 			else{

@@ -67,12 +67,12 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 				List<TourElement> enRouteActivities = new ArrayList<Tour.TourElement>();
 				for(TourActivity act : tour.getActivities()){
 					Shipment shipment = getShipment(act.getCustomer().getId());
-					if(act instanceof vrp.basics.Delivery){
+					if(act instanceof vrp.basics.DepotDelivery){
 						pickupsAtDepot.add(new Pickup(shipment));
 						enRouteActivities.add(new Delivery(shipment));
 						continue;
 					}
-					if(act instanceof vrp.basics.Pickup){
+					if(act instanceof vrp.basics.DepotPickup){
 						enRouteActivities.add(new Pickup(shipment));
 						deliveriesAtDepot.add(new Delivery(shipment));
 						continue;

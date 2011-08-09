@@ -2,7 +2,7 @@ package vrp.algorithms.ruinAndRecreate.basics;
 
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.api.Costs;
-import vrp.basics.Delivery;
+import vrp.basics.DepotDelivery;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 
@@ -32,18 +32,16 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 		int loadAtDepot = getLoadAtDepot(tour);
 		tour.getActivities().get(0).setCurrentLoad(loadAtDepot);
 		for(int i=1;i<tour.getActivities().size();i++){
-			cost += costs.getCost(tour.getActivities().get(i-1).getLocation(),tour.getActivities().get(i).getLocation());
-			int loadAtCustomer = tour.getActivities().get(i-1).getCurrentLoad() + (int)tour.getActivities().get(i).getCustomer().getDemand();
-			tour.getActivities().get(i).setCurrentLoad(loadAtCustomer);
+			TourActivity fromAct = tour.getActivities().get(i-1);
+			TourActivity toAct = tour.getActivities().get(i);
+			tour.costs.generalizedCosts += costs.getCost(fromAct.getLocation(),toAct.getLocation());
+			tour.costs.distance += costs.getDistance(fromAct.getLocation(),toAct.getLocation());
+			tour.costs.time  += costs.getTime(fromAct.getLocation(),toAct.getLocation());
+			int loadAtCustomer = fromAct.getCurrentLoad() + (int)toAct.getCustomer().getDemand();
+			toAct.setCurrentLoad(loadAtCustomer);
 		}
 		int size = tour.getActivities().size();
-		try{
-			assertEqual(tour.getActivities().get(size-2).getCurrentLoad(),tour.getActivities().get(size-1).getCurrentLoad());
-		}
-		catch(IllegalStateException e){
-			System.out.println("!!!!!!!!!!!!" + tour);
-			System.exit(1);
-		}
+		assertEqual(tour.getActivities().get(size-2).getCurrentLoad(),tour.getActivities().get(size-1).getCurrentLoad());
 		tourCost = cost;
 	}
 	
@@ -52,7 +50,7 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 			return;
 		}
 		else{
-			throw new IllegalStateException();
+			throw new IllegalStateException("currentLoad of second-last activity must be equal to currentLoad of last activity");
 		}
 		
 	}
@@ -60,7 +58,7 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 	private int getLoadAtDepot(Tour tour) {
 		int loadAtDepot = 0;
 		for(TourActivity tA : tour.getActivities()){
-			if(tA instanceof Delivery){
+			if(tA instanceof DepotDelivery){
 				loadAtDepot += tA.getCustomer().getDemand();
 			}
 		}

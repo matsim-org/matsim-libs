@@ -8,9 +8,9 @@ import vrp.api.Customer;
  *
  */
 
-public class DepotActivity extends TourActivity {
+public class OtherDepotActivity extends TourActivity {
 
-	public DepotActivity(Customer customer) {
+	public OtherDepotActivity(Customer customer) {
 		super(customer);
 		// TODO Auto-generated constructor stub
 	}

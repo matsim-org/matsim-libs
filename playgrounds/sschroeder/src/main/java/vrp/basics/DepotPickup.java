@@ -8,9 +8,9 @@ import vrp.api.Customer;
  *
  */
 
-public class Pickup extends TourActivity{
+public class DepotPickup extends TourActivity{
 
-	public Pickup(Customer customer) {
+	public DepotPickup(Customer customer) {
 		super(customer);
 	}
 

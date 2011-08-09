@@ -10,20 +10,7 @@ import vrp.api.Node;
  */
 
 public class TourActivity {
-	
-	static class ActivityRelation {
-		private TourActivity relatedActivity;
-
-		public ActivityRelation(TourActivity relatedActivity) {
-			super();
-			this.relatedActivity = relatedActivity;
-		}
-
-		public TourActivity getRelatedActivity() {
-			return relatedActivity;
-		}
-	}
-	
+		
 	private Customer customer;
 
 	private double practical_earliestArrivalTime = 0.0;

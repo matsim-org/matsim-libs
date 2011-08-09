@@ -11,10 +11,10 @@ import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
-import vrp.basics.Delivery;
+import vrp.basics.DepotDelivery;
 import vrp.basics.EnRouteDelivery;
 import vrp.basics.EnRoutePickup;
-import vrp.basics.Pickup;
+import vrp.basics.DepotPickup;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 
@@ -65,7 +65,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
-			if(tourAct instanceof EnRoutePickup || tourAct instanceof Pickup){
+			if(tourAct instanceof EnRoutePickup || tourAct instanceof DepotPickup){
 				if(deliveryStarted){
 					if(!openCustomers.isEmpty()){
 						return false;
@@ -76,7 +76,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				}
 				openCustomers.add(tourAct.getCustomer().getId());
 			}
-			if(tourAct instanceof EnRouteDelivery || tourAct instanceof Delivery){
+			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DepotDelivery){
 				if(deliveryStarted == false){
 					deliveryStarted = true;
 				}

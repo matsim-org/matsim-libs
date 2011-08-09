@@ -80,21 +80,21 @@ public class VrpUtils {
 				tourAct.setTimeWindow(start, end);
 			}
 			else {
-				tourAct = new DepotActivity(customer);
+				tourAct = new OtherDepotActivity(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 		}
 		else{
 			if(customer.getDemand() < 0){
-				tourAct = new Delivery(customer);
+				tourAct = new DepotDelivery(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 			else if(customer.getDemand() > 0){
-				tourAct = new Pickup(customer);
+				tourAct = new DepotPickup(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 			else {
-				tourAct = new DepotActivity(customer);
+				tourAct = new OtherDepotActivity(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 		}

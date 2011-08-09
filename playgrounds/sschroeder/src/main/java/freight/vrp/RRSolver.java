@@ -67,7 +67,7 @@ public class RRSolver implements VRPSolver{
 			boolean tourStarted = false;
 			for(TourActivity act : tour.getActivities()){
 				Shipment shipment = getShipment(act.getCustomer());
-				if(act instanceof vrp.basics.DepotActivity){
+				if(act instanceof vrp.basics.OtherDepotActivity){
 					if(tourStarted){
 						tourBuilder.scheduleEnd(act.getCustomer().getLocation().getId());
 					}

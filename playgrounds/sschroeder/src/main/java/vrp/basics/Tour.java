@@ -18,7 +18,7 @@ public class Tour {
 	
 	private LinkedList<TourActivity> tourActivities = new LinkedList<TourActivity>();
 
-	private Costs costs = null;
+	public Costs costs = new Costs();
 	
 	public LinkedList<TourActivity> getActivities() {
 		return tourActivities;

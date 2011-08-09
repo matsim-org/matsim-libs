@@ -21,8 +21,6 @@ public class NodeImpl implements Comparable<NodeImpl>, Node {
 	
 	private Coord coord;
 	
-	private Relation relationship;
-
 	/* (non-Javadoc)
 	 * @see core.basic.Node#getCoord()
 	 */
@@ -47,21 +45,6 @@ public class NodeImpl implements Comparable<NodeImpl>, Node {
 	 */
 	public Id getId() {
 		return id;
-	}
-
-	
-	/* (non-Javadoc)
-	 * @see core.basic.Node#getRelationship()
-	 */
-	public Relation getRelationship() {
-		return relationship;
-	}
-
-	/* (non-Javadoc)
-	 * @see core.basic.Node#setRelationship(core.basic.NodeImpl.Relationship)
-	 */
-	public void setRelationship(Relation relationship) {
-		this.relationship = relationship;
 	}
 
 	public int getMatrixId() {
