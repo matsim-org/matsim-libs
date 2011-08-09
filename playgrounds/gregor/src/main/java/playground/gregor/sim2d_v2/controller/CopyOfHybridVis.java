@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -16,22 +17,27 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.gregor.pedvis.OTFVisMobsimFeature;
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
+import playground.mzilske.osm.JXMapOTFVisClient;
 
-public class HybridVis {
+public class CopyOfHybridVis {
 
-	private static final Logger log = Logger.getLogger(HybridVis.class);
+	private static final Logger log = Logger.getLogger(CopyOfHybridVis.class);
 
 	public static void main (String [] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
@@ -53,7 +59,7 @@ public class HybridVis {
 		ScenarioUtils.loadScenario(scenario);
 
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);
-		loader.load2DScenario();
+		//		loader.load2DScenario();
 
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
@@ -86,12 +92,23 @@ public class HybridVis {
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		qSim.addQueueSimulationListeners(queueSimulationFeature);
-		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
-		//		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
-		qSim.setControlerIO(controlerIO);
-		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+
+		//		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
+		//		qSim.addQueueSimulationListeners(queueSimulationFeature);
+		//		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
+		//		//		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
+		//		qSim.setControlerIO(controlerIO);
+		//		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		WMSService wms = new WMSService("http://192.168.35.78:8080/geoserver/wms?service=WMS&","bln");
+		JXMapOTFVisClient.run(scenario.getConfig(), server, wms, TransformationFactory.getCoordinateTransformation("EPSG: 32633", "EPSG: 4326"));
+		//		JXMapOTFVisClient.run(scenario.getConfig(), server);
+		qSim.run();
+
+
+
+
 		qSim.run();
 	}
 }

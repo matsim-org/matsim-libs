@@ -58,7 +58,9 @@ public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 	@Override
 	public double getColorValueBetweenZeroAndOne() {
-		MatsimRandom.reset(Long.parseLong(this.id.toString()));
+		//		int id = Integer.parseInt(this.id.toString());
+		int id = this.id.hashCode();
+		MatsimRandom.reset(id);
 		return MatsimRandom.getRandom().nextDouble();
 	}
 
@@ -74,13 +76,15 @@ public class XYZAzimuthPositionInfo implements AgentSnapshotInfo {
 
 	@Override
 	public int getType() {
-		int id = Integer.parseInt(this.id.toString());
+		//		int id = Integer.parseInt(this.id.toString());
+		int id = this.id.hashCode();
 		return id <= 2519 ? 1 : id <= 2639 ? 30 : 254;
 	}
 
 	@Override
 	public int getUserDefined() {
-		int id = Integer.parseInt(this.id.toString());
+		//		int id = Integer.parseInt(this.id.toString());
+		int id = this.id.hashCode();
 		return id <= 2519 ? 1 : id <= 2639 ? 30 : 254;
 	}
 
