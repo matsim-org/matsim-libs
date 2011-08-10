@@ -32,7 +32,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
+import playground.benjamin.events.emissions.ColdPollutant;
 import playground.benjamin.events.emissions.EmissionEventsReader;
+import playground.benjamin.events.emissions.WarmPollutant;
 
 /**
  * @author benjamin
@@ -60,7 +62,7 @@ public class EmissionsPerPersonAggregator {
 		processEmissions();
 		warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		coldEmissions = coldHandler.getColdEmissionsPerPerson();
-		fillListOfPollutants(warmEmissions, coldEmissions);
+		defineListOfPollutants();
 		setNonCalculatedEmissions(this.population, warmEmissions);
 		setNonCalculatedEmissions(this.population, coldEmissions);
 		totalEmissions = sumUpEmissions(warmEmissions, coldEmissions);
@@ -129,21 +131,13 @@ public class EmissionsPerPersonAggregator {
 		}
 	}
 
-	private void fillListOfPollutants(Map<Id, Map<String, Double>> warmEmissions, Map<Id, Map<String, Double>> coldEmissions) {
+	private void defineListOfPollutants() {
 		listOfPollutants = new TreeSet<String>();
-		for(Map<String, Double> emissionType2Value : warmEmissions.values()){
-			for(String pollutant : emissionType2Value.keySet()){
-				if(!listOfPollutants.contains(pollutant)){
-					listOfPollutants.add(pollutant);
-				}
-			}
+		for(WarmPollutant wp : WarmPollutant.values()){
+			listOfPollutants.add(wp.toString());
 		}
-		for(Map<String, Double> emissionType2Value : coldEmissions.values()){
-			for(String pollutant : emissionType2Value.keySet()){
-				if(!listOfPollutants.contains(pollutant)){
-					listOfPollutants.add(pollutant);
-				}
-			}
+		for(ColdPollutant cp : ColdPollutant.values()){
+			listOfPollutants.add(cp.toString());
 		}
 		logger.info("The following pollutants are considered: " + listOfPollutants);
 	}

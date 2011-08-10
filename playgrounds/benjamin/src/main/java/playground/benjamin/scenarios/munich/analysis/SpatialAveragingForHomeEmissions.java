@@ -41,14 +41,16 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+
 import com.vividsolutions.jts.util.Assert;
 
 /**
  * @author benjamin
  *
  */
-public class SpatialAveragingForEmissions {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingForEmissions.class);
+public class SpatialAveragingForHomeEmissions {
+	private static final Logger logger = Logger.getLogger(SpatialAveragingForHomeEmissions.class);
 
 	private final String runNumber1 = "972";
 	private final String runNumber2 = "973";
@@ -61,16 +63,16 @@ public class SpatialAveragingForEmissions {
 	private final String emissionFile1 = runDirectory1 + runNumber1 + ".emission.events.xml.gz";
 	private final String emissionFile2 = runDirectory2 + runNumber2 + ".emission.events.xml.gz";
 
-	private final String outFile1 = runDirectory2 + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocation.txt";
-	private final String outFile2 = runDirectory2 + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocationSmoothed.txt";
-	
+	private final String outFile1 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocation.txt";
+	private final String outFile2 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocationSmoothed.txt";
+
 	static final double xMin = 4452550.25;
 	static final double xMax = 4479483.33;
 	static final double yMin = 5324955.00;
 	static final double yMax = 5345696.81;
-	
-	static int noOfXbins = 40;
-	static int noOfYbins = 30;
+
+	static int noOfXbins = 80;
+	static int noOfYbins = 60;
 	static int minimumNoOfPeopleInCell = 2;
 
 	private void run() throws IOException{
@@ -88,8 +90,7 @@ public class SpatialAveragingForEmissions {
 		Map<Id, Map<String, Double>> emissionsTotal1 = epa1.getTotalEmissions();
 		Map<Id, Map<String, Double>> emissionsTotal2 = epa2.getTotalEmissions();
 
-//		Filter!
-		
+
 		Map<Id, Map<String, Double>> deltaEmissionsTotal = calcualateEmissionDifferences(emissionsTotal1, emissionsTotal2);
 		EmissionWriter eWriter = new EmissionWriter();
 		eWriter.writeHomeLocation2Emissions(pop1, listOfPollutants, deltaEmissionsTotal, outFile1);
@@ -97,28 +98,32 @@ public class SpatialAveragingForEmissions {
 		int[][] noOfPeopleInCell = new int[noOfXbins][noOfYbins];
 		double[][] weightOfCell = new double[noOfXbins][noOfYbins];
 		double[][] weightedValuesOfCell = new double[noOfXbins][noOfYbins];
-		
+
+		PersonFilter filter = new PersonFilter();
 		for(Person person : pop1.getPersons().values()){
-			Id personId = person.getId();
-			Coord homeCoord = getHomeCoord(person);
-			double xHome = homeCoord.getX();
-			double yHome = homeCoord.getY();
+			boolean isPersonFromMiD = filter.isPersonFromMID(person);
+			if(isPersonFromMiD){
+				Id personId = person.getId();
+				Coord homeCoord = getHomeCoord(person);
+				double xHome = homeCoord.getX();
+				double yHome = homeCoord.getY();
 
-			Integer xbin = mapXCoordToBin(xHome) ;
-			Integer ybin = mapYCoordToBin(yHome) ;
-			if ( xbin != null && ybin != null ) {
+				Integer xbin = mapXCoordToBin(xHome);
+				Integer ybin = mapYCoordToBin(yHome);
+				if ( xbin != null && ybin != null ){
 
-				noOfPeopleInCell[xbin][ybin] ++;
+					noOfPeopleInCell[xbin][ybin] ++;
 
-				for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-						double value = deltaEmissionsTotal.get(personId).get("CO2_TOTAL");
-						// TODO: not distance between data points, but distance between
-						// data point and cell centroid is used now; is the former to expensive?
-						double weightForOtherCell = calculateWeightForOtherCell(xHome, yHome, cellCentroid.getX(), cellCentroid.getY());
-						weightOfCell[xIndex][yIndex] += weightForOtherCell;
-						weightedValuesOfCell[xIndex][yIndex] += weightForOtherCell * value;
+					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+							double value = deltaEmissionsTotal.get(personId).get("CO2_TOTAL");
+							// TODO: not distance between data points, but distance between
+							// data point and cell centroid is used now; is the former to expensive?
+							double weightOfPersonForCell = calculateWeightForOtherCell(xHome, yHome, cellCentroid.getX(), cellCentroid.getY());
+							weightOfCell[xIndex][yIndex] += weightOfPersonForCell;
+							weightedValuesOfCell[xIndex][yIndex] += weightOfPersonForCell * value;
+						}
 					}
 				}
 			}
@@ -141,17 +146,17 @@ public class SpatialAveragingForEmissions {
 
 	private double calculateWeightForOtherCell(double x1, double y1, double x2, double y2) {
 		double distance = Math.abs(Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))); // TODO: need to check if distance > 0 ?!?
-		return Math.exp((-distance * distance) / (5000. * 5000.)); // TODO: what is this normalization for?
+		return Math.exp((-distance * distance) / (1000. * 1000.)); // TODO: what is this normalization for?
 	}
 
 	private double findBinCenterY(int yIndex) {
-		double yBinCenter = yMin + ((1. * yIndex + .5) / noOfYbins) * (yMax - yMin); // TODO: ???
+		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin); // TODO: ???
 		Assert.equals(mapYCoordToBin(yBinCenter), yIndex);
 		return yBinCenter ;
 	}
 
 	private double findBinCenterX(int xIndex) {
-		double xBinCenter = xMin + ((1. * xIndex + .5) / noOfXbins) * (xMax - xMin); // TODO: ???
+		double xBinCenter = xMin + ((xIndex + .5) / noOfXbins) * (xMax - xMin); // TODO: ???
 		Assert.equals(mapXCoordToBin(xBinCenter), xIndex);
 		return xBinCenter ;
 	}
@@ -166,13 +171,13 @@ public class SpatialAveragingForEmissions {
 	private Integer mapYCoordToBin(double yCoord) {
 		if (yCoord <= yMin || yCoord >= yMax) return null; // yHome is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYbins); // gives the relative position along the y-range
-		return (int) relativePositionY; // returns the number of the bin
+		return (int) relativePositionY; // returns the number of the bin [0..n-1]
 	}
 
 	private Integer mapXCoordToBin(double xCoord) {
 		if (xCoord <= xMin || xCoord >= xMax) return null; // xHome is not in area of interest
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
-		return (int) relativePositionX; // returns the number of the bin
+		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 
 	private Coord getHomeCoord(Person person) {
@@ -210,6 +215,6 @@ public class SpatialAveragingForEmissions {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingForEmissions().run();
+		new SpatialAveragingForHomeEmissions().run();
 	}
 }

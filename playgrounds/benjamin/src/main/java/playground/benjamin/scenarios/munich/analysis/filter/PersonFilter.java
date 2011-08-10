@@ -43,7 +43,7 @@ public class PersonFilter {
 		return filteredPopulation;
 	}
 
-	private boolean isPersonFromMID(Person person) {
+	public boolean isPersonFromMID(Person person) {
 		boolean isFromMID = false;
 		if(!person.getId().toString().contains("gv_") && !person.getId().toString().contains("pv_")){
 			isFromMID = true;
@@ -51,11 +51,11 @@ public class PersonFilter {
 		return isFromMID;
 	}
 	
-	public boolean isPersonNonFreight(Person person) {
-		boolean isNonFreight = false;
-		if(!person.getId().toString().contains("gv_")){
-			isNonFreight = true;
+	public boolean isPersonFreight(Person person) {
+		boolean isFreight = false;
+		if(person.getId().toString().contains("gv_")){
+			isFreight = true;
 		}
-		return isNonFreight;
+		return isFreight;
 	}
 }

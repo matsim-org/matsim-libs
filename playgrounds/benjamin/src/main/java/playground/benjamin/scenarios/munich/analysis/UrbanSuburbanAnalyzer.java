@@ -184,8 +184,8 @@ public class UrbanSuburbanAnalyzer {
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
 			PersonFilter personFilter = new PersonFilter();
-			boolean isPersonNonFreight = personFilter.isPersonNonFreight(person);
-			if(isPersonNonFreight){
+			boolean isPersonFreight = personFilter.isPersonFreight(person);
+			if(!isPersonFreight){
 				HomeLocationFilter homeLocationFilter = new HomeLocationFilter();
 				boolean isPersonsHomeInShape = homeLocationFilter.isPersonsHomeInShape(person, featuresInShape);
 				if(isPersonsHomeInShape){
