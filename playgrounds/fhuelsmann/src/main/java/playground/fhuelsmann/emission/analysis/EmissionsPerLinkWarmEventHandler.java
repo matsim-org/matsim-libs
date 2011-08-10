@@ -50,35 +50,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			}
 		}
 	}
-/*		if(!warmEmissionsTotal.containsKey(linkId)){
-	
-			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-			WarmPollutant pollutant = entry.getKey();
-			Double eventValue = entry.getValue();
-
-			if(!warmEmissionsOfEvent.containsKey(pollutant)){
-				warmEmissionsOfEvent.put(pollutant, eventValue);
-				warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);}
-			if(linkId.toString().equals("10038"))
-			System.out.println("++++++++linkId "+linkId+ " pollutant "+ pollutant+" eventValue "+eventValue);
-			}
-		}
-		else{
-			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
-			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-				WarmPollutant pollutant = entry.getKey();
-				Double eventValue = entry.getValue();
-				
-					Double previousValue = warmEmissionsSoFar.get(pollutant);
-					Double newValue = previousValue + eventValue;
-					warmEmissionsSoFar.put(pollutant, newValue);
-					warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
-					if(linkId.toString().equals("10038"))
-					System.out.println("linkId "+linkId+ " pollutant "+ pollutant+ " previousValue "+previousValue+" eventValue "+eventValue
-							+" newValue "+newValue);
-				
-			}
-		}*/
 
 
 	public Map<Id, Map<String, Double>> getWarmEmissionsPerLink() {
