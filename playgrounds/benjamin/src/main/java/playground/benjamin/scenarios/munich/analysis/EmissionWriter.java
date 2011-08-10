@@ -91,7 +91,7 @@ public class EmissionWriter {
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.append("personId \t xHome \t yHome \t");
+			out.append("linkId \t xHome \t yHome \t");
 			for (String pollutant : listOfPollutants){
 				out.append(pollutant + "[g] \t");
 			}

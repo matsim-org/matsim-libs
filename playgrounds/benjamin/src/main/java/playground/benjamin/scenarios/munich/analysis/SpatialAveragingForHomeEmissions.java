@@ -96,8 +96,8 @@ public class SpatialAveragingForHomeEmissions {
 		eWriter.writeHomeLocation2Emissions(pop1, listOfPollutants, deltaEmissionsTotal, outFile1);
 
 		int[][] noOfPeopleInCell = new int[noOfXbins][noOfYbins];
-		double[][] weightOfCell = new double[noOfXbins][noOfYbins];
-		double[][] weightedValuesOfCell = new double[noOfXbins][noOfYbins];
+		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
+		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
 		PersonFilter filter = new PersonFilter();
 		for(Person person : pop1.getPersons().values()){
@@ -120,9 +120,9 @@ public class SpatialAveragingForHomeEmissions {
 							double value = deltaEmissionsTotal.get(personId).get("CO2_TOTAL");
 							// TODO: not distance between data points, but distance between
 							// data point and cell centroid is used now; is the former to expensive?
-							double weightOfPersonForCell = calculateWeightForOtherCell(xHome, yHome, cellCentroid.getX(), cellCentroid.getY());
-							weightOfCell[xIndex][yIndex] += weightOfPersonForCell;
-							weightedValuesOfCell[xIndex][yIndex] += weightOfPersonForCell * value;
+							double weightOfPersonForCell = calculateWeightOfPersonForCell(xHome, yHome, cellCentroid.getX(), cellCentroid.getY());
+							sumOfweightsForCell[xIndex][yIndex] += weightOfPersonForCell;
+							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfPersonForCell * value;
 						}
 					}
 				}
@@ -134,7 +134,7 @@ public class SpatialAveragingForHomeEmissions {
 			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 				Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 				if(noOfPeopleInCell[xIndex][yIndex] > minimumNoOfPeopleInCell){
-					double averageValue = weightedValuesOfCell[xIndex][yIndex] / weightOfCell[xIndex][yIndex];
+					double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 					String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\n";
 					writer.append(outString);
 				}
@@ -144,7 +144,7 @@ public class SpatialAveragingForHomeEmissions {
 		logger.info("Finished writing output to " + outFile2);
 	}
 
-	private double calculateWeightForOtherCell(double x1, double y1, double x2, double y2) {
+	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
 		double distance = Math.abs(Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))); // TODO: need to check if distance > 0 ?!?
 		return Math.exp((-distance * distance) / (1000. * 1000.)); // TODO: what is this normalization for?
 	}

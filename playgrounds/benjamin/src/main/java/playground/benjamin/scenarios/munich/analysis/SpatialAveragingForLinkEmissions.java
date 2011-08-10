@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -37,11 +39,15 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.benjamin.events.emissions.ColdPollutant;
 import playground.benjamin.events.emissions.EmissionEventsReader;
 import playground.benjamin.events.emissions.WarmPollutant;
+
+import com.vividsolutions.jts.util.Assert;
 
 /**
  * @author benjamin
@@ -59,8 +65,7 @@ public class SpatialAveragingForLinkEmissions {
 	private final String emissionFile1 = runDirectory1 + runNumber1 + ".emission.events.xml.gz";
 	private final String emissionFile2 = runDirectory2 + runNumber2 + ".emission.events.xml.gz";
 
-	private final String outPath1 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".";
-	private final String outPath2 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".";
+	private final String outPath = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".";
 
 	EmissionsPerLinkWarmEventHandler warmHandler;
 	EmissionsPerLinkColdEventHandler coldHandler;
@@ -71,7 +76,16 @@ public class SpatialAveragingForLinkEmissions {
 	static int noOfTimeBins = 15;
 	double simulationEndTime;
 
-	private void run() {
+	static final double xMin = 4452550.25;
+	static final double xMax = 4479483.33;
+	static final double yMin = 5324955.00;
+	static final double yMax = 5345696.81;
+
+	static int noOfXbins = 80;
+	static int noOfYbins = 60;
+	static int minimumNoOfLinksInCell = 1;
+
+	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile);
 		defineListOfPollutants();
 		Scenario scenario = loadScenario(netFile);
@@ -92,12 +106,94 @@ public class SpatialAveragingForLinkEmissions {
 		setNonCalculatedEmissions(scenario.getNetwork(), this.time2EmissionsTotal2);
 
 		Map<Double, Map<Id, Map<String, Double>>> time2deltaEmissionsTotal = calcualateEmissionDifferences(time2EmissionsTotal1, time2EmissionsTotal2);
+		
 		EmissionWriter eWriter = new EmissionWriter();
 		for(double endOfTimeInterval : time2deltaEmissionsTotal.keySet()){
 			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2deltaEmissionsTotal.get(endOfTimeInterval);
-			String outFile = outPath1 + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocation.txt";
+			String outFile = outPath + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocation.txt";
 			eWriter.writeLinkLocation2Emissions(scenario.getNetwork(), listOfPollutants, deltaEmissionsTotal, outFile);
+
+			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
+			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
+			double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
+
+			for(Link link : scenario.getNetwork().getLinks().values()){
+				Id linkId = link.getId();
+				Coord linkCoord = link.getCoord();
+				double xLink = linkCoord.getX();
+				double yLink = linkCoord.getY();
+
+				Integer xbin = mapXCoordToBin(xLink);
+				Integer ybin = mapYCoordToBin(yLink);
+				if ( xbin != null && ybin != null ){
+
+					noOfLinksInCell[xbin][ybin] ++;
+					
+					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+							double value = deltaEmissionsTotal.get(linkId).get("CO2_TOTAL");
+							// TODO: not distance between data points, but distance between
+							// data point and cell centroid is used now; is the former to expensive?
+							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+						}
+					}
+				}
+			}
+			BufferedWriter writer = IOUtils.getBufferedWriter(outPath + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocationSmoothed.txt");
+			writer.append("xCentroid \t yCentroid \t CO2_TOTAL \n");
+			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+					if(noOfLinksInCell[xIndex][yIndex] > minimumNoOfLinksInCell){
+						double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+						String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\n";
+						writer.append(outString);
+					}
+				}
+			}
+			writer.close();
+			logger.info("Finished writing output to " + outPath + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocationSmoothed.txt");
 		}
+
+	}
+
+	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
+		double distance = Math.abs(Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))); // TODO: need to check if distance > 0 ?!?
+		return Math.exp((-distance * distance) / (1000. * 1000.)); // TODO: what is this normalization for?
+	}
+
+	private double findBinCenterY(int yIndex) {
+		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin); // TODO: ???
+		Assert.equals(mapYCoordToBin(yBinCenter), yIndex);
+		return yBinCenter ;
+	}
+
+	private double findBinCenterX(int xIndex) {
+		double xBinCenter = xMin + ((xIndex + .5) / noOfXbins) * (xMax - xMin); // TODO: ???
+		Assert.equals(mapXCoordToBin(xBinCenter), xIndex);
+		return xBinCenter ;
+	}
+
+	private Coord findCellCentroid(int xIndex, int yIndex) {
+		double xCentroid = findBinCenterX(xIndex);
+		double yCentroid = findBinCenterY(yIndex);
+		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
+		return cellCentroid;
+	}
+
+	private Integer mapYCoordToBin(double yCoord) {
+		if (yCoord <= yMin || yCoord >= yMax) return null; // yHome is not in area of interest
+		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYbins); // gives the relative position along the y-range
+		return (int) relativePositionY; // returns the number of the bin [0..n-1]
+	}
+
+	private Integer mapXCoordToBin(double xCoord) {
+		if (xCoord <= xMin || xCoord >= xMax) return null; // xHome is not in area of interest
+		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
+		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 
 	private Map<Double, Map<Id, Map<String, Double>>> calcualateEmissionDifferences(
@@ -115,13 +211,6 @@ public class SpatialAveragingForLinkEmissions {
 				for(String pollutant : entry1.getValue().keySet()){
 					Double emissionsBefore = entry1.getValue().get(pollutant);
 					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
-
-//					if(emissionsBefore == null || emissionsAfter == null){
-//						logger.info(linkId);
-//						logger.info(endOfTimeInterval + ": " + pollutant + ": " + emissionsBefore);
-//						logger.info(endOfTimeInterval + ": " + pollutant + ": " + emissionsAfter);
-//					}
-
 					Double emissionDifference = emissionsAfter - emissionsBefore;
 					emissionDifferenceMap.put(pollutant, emissionDifference);
 				}
@@ -247,7 +336,7 @@ public class SpatialAveragingForLinkEmissions {
 		configReader.readFile(configfile);
 		Double endTime = config.getQSimConfigGroup().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + endTime / 3600 / noOfTimeBins + "time bins.");
+		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hours time bins.");
 		return endTime;
 	}
 
