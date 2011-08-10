@@ -148,9 +148,9 @@ public class LPPHEV extends LP{
 			
 		}
 		
-		if(isOutput()|| printCount<10){
-			String filename= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger/SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+".png";
-			String filename2= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger/SOC_of_"+vehicleType+"afterLPPHEV_AgentBat" + id.toString()+".png";
+		if(isOutput()){
+			String filename= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger_SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+".png";
+			String filename2= DecentralizedSmartCharger.outputPath+ "DecentralizedCharger_SOC_of_"+vehicleType+"afterLPPHEV_AgentBat" + id.toString()+".png";
 			
 			visualizeSOCAgentWithAndWithoutNonBattery(getSolver().getPtrVariables(), filename,filename2, id);
 			
@@ -208,11 +208,11 @@ public class LPPHEV extends LP{
 					getSolver().setOutputfile(DecentralizedSmartCharger.outputPath+"V2G/LP/PHEV/LP_agent_reschedule"+ id.toString()+"printLp.txt");
 					getSolver().printLp();
 				}
-				if(isOutput()|| id.toString().equals(Integer.toString(1))){
+				if(isOutput()){
 					double currentM= System.currentTimeMillis();
 					int currentMilli= (int) Math.round(currentM-(System.currentTimeMillis()%100000.0));
-					String filename= DecentralizedSmartCharger.outputPath+ "V2G/SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+"_"+currentMilli+".png";
-					String filename2= DecentralizedSmartCharger.outputPath+ "V2G/SOC_of_"+vehicleType+"afterLPPHEV_AgentBat" + id.toString()+"_"+currentMilli+".png";
+					String filename= DecentralizedSmartCharger.outputPath+ "V2G_SOC_of_"+vehicleType+"afterLPPHEV_Agent" + id.toString()+"_"+currentMilli+".png";
+					String filename2= DecentralizedSmartCharger.outputPath+ "V2G_SOC_of_"+vehicleType+"afterLPPHEV_AgentBat" + id.toString()+"_"+currentMilli+".png";
 					
 					visualizeSOCAgentWithAndWithoutNonBattery(getSolver().getPtrVariables(), filename,filename2, id);
 					

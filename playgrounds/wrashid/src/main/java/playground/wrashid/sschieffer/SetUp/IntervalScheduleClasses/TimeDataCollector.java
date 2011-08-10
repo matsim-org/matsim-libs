@@ -249,8 +249,7 @@ public class TimeDataCollector {
 		
 		// extrapolate with linear function - f = a + b * x
 		double gradient=(getYAtEntry(minAbove)-getYAtEntry(minBelow))/secBin; // rise/run
-		return getYAtEntry(minBelow)+ gradient* (time-getXAtEntry(minBelow));
-		
+		return getYAtEntry(minBelow)+ gradient* (time-getXAtEntry(minBelow));		
 	}
 	
 	public XYSeries getXYSeries(String nameForSeries){

@@ -87,7 +87,7 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
 		final double ev=1.0; 
 		
-		final String outputPath="test/output";
+		final String outputPath="test/output/";
 		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
 		

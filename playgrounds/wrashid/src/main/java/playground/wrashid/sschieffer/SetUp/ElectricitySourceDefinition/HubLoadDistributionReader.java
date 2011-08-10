@@ -22,6 +22,7 @@ package playground.wrashid.sschieffer.SetUp.ElectricitySourceDefinition;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.Effect3D;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
@@ -339,7 +344,7 @@ public class HubLoadDistributionReader {
 						stochasticHubLoadAfterVehicleAndHubSources.get(hub).makeXYSeriesXSecBinBinFromLoadSchedule("stochastic hub load after vehicle and hub sources", 
 								DecentralizedSmartCharger.SECONDSPER15MIN),
 						"stochastic hub load original",
-						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSource_"+hub+".png", 
+						outputPath+"V2G_stochasticHubSourceBeforeAfterVehicleHubSource_"+hub+".png", 
 						"StochasticHubSourceBeforeAfterVehicleHubSource_"+hub, false); 
 										
 			}
@@ -389,7 +394,7 @@ public class HubLoadDistributionReader {
 								"fitted stochastic hub load after vehicle and hub sources",
 								DecentralizedSmartCharger.SECONDSPER15MIN),
 						"stochastic hub load original",
-						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceFITTED_"+hub+".png", 
+						outputPath+"V2G_stochasticHubSourceBeforeAfterVehicleHubSourceFITTED_"+hub+".png", 
 						"StochasticHubSourceBeforeAfterVehicleHubSourceFITTED_"+hub, true); 
 				
 				// plot original stochastic load with updated actual 15min stochastic load
@@ -397,7 +402,7 @@ public class HubLoadDistributionReader {
 						stochasticHubLoadDistribution.get(hub), 					
 						stochasticHubLoadAfter15MinBins.get(hub).getXYSeries("15min bin stochastic hub load after vehicle and hub sources"),
 						"stochastic hub load original",
-						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceACTUAL_"+hub+".png", 
+						outputPath+"V2G_stochasticHubSourceBeforeAfterVehicleHubSourceACTUAL_"+hub+".png", 
 						"StochasticHubSourceBeforeAfterVehicleHubSourceACTUAL_"+hub, true);
 				
 				// plot fitted stochastic load and actual 15 min bin stochastic load for comparison
@@ -405,7 +410,7 @@ public class HubLoadDistributionReader {
 						stochasticHubLoadAfterVehicleAndHubSources.get(hub),
 						stochasticHubLoadAfter15MinBins.get(hub).getXYSeries("15min bin stochastic hub load after vehicle and hub sources"), 					
 						"fitted stochastic hub load after vehicle and hub sources",								
-						outputPath+"V2G/stochasticHubSourceBeforeAfterVehicleHubSourceFittedActual15Min_"+hub+".png", 
+						outputPath+"V2G_stochasticHubSourceBeforeAfterVehicleHubSourceFittedActual15Min_"+hub+".png", 
 						"StochasticHubSourceBeforeAfterVehicleHubSourceFittedActual15Min_"+hub, false); 
 			}
 		}
@@ -782,7 +787,7 @@ public class HubLoadDistributionReader {
                 );
       
         }
-        String s= outputPath+ "Hub/connectivityOfAgentsOverDay.png";
+        String s= outputPath+ "Hub_connectivityOfAgentsOverDay.png";
         ChartUtilities.saveChartAsPNG(new File(s) , chart, 1000, 1000);
        
 	}
@@ -1129,7 +1134,7 @@ public class HubLoadDistributionReader {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub_electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
             
 			
 			//************************************
@@ -1165,7 +1170,7 @@ public class HubLoadDistributionReader {
 	        );
         	
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub_pricesHub_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		
@@ -1261,8 +1266,21 @@ public class HubLoadDistributionReader {
     	            )
     	        );
         	
+        	plot.setDomainZeroBaselineVisible(true);
         	
-        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub/hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png") , chart, 1000, 1000);
+        	Axis xaxis = plot.getDomainAxis();
+        	Axis yaxis = plot.getRangeAxis();
+        	xaxis.setLabelFont(new Font("Arial", Font.PLAIN,12));
+        	yaxis.setLabelFont(new Font("Arial", Font.PLAIN,12));
+        	NumberAxis xNumAxis= (NumberAxis) xaxis;
+        	NumberAxis yNumAxis= (NumberAxis) yaxis;
+        	xNumAxis.setTickUnit(new NumberTickUnit(3600));
+        	yNumAxis.setTickUnit(new NumberTickUnit(0.00001));
+        	yNumAxis.setTickLabelFont(new Font("Arial", Font.PLAIN,12));
+        	xNumAxis.setTickLabelFont(new Font("Arial", Font.PLAIN,12));
+        	yaxis.setMinorTickMarksVisible(false);
+        	
+        	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub_hubDeterministicforEVs_PHEVsLoad_"+ i.toString()+".png") , chart, 1000, 1000);
             
 		}
 		}

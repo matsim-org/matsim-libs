@@ -89,7 +89,7 @@ public class Main_exampleDecentralizedSmartCharger {
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {		
 		
 		/*************
-		 * SIMULLATION VARIABLES
+		 * SIMULATION VARIABLES
 		 * ************
 		 * The simulation needs 
 		 * <li>	% of phevs, evs in the simulation * 

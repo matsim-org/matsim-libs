@@ -367,7 +367,7 @@ public class DecentralizedSmartCharger {
 		
 		wrapUpTime = System.currentTimeMillis();
 		System.out.println("Decentralized Smart Charger DONE");
-		writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		//writeSummaryDSCHTML("DSC"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		writeSummaryDSCPerAgent("DSCPerAgent");
 		
 		deleteAgentsInList(chargingFailureEV);
@@ -876,7 +876,7 @@ public class DecentralizedSmartCharger {
 		myV2G.calcV2GVehicleStats();
 		myV2G.calcHubSourceStats();
 		System.out.println("DONE V2G");
-		writeSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
+		//writeHTMLSummaryV2G("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 		writeSummaryV2GTXT("V2G"+vehicles.getKeySet().size()+"agents_"+minChargingLength+"chargingLength");
 	}
 	
@@ -1598,7 +1598,7 @@ public class DecentralizedSmartCharger {
         	}        	
         	
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger/agentPlans/"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
+        ChartUtilities.saveChartAsPNG(new File(outputPath+ "DecentralizedCharger_agentPlans_"+ id.toString()+"_dayPlan.png") , chart, 1000, 1000);
 		  
 	}
 	
@@ -1619,7 +1619,7 @@ public class DecentralizedSmartCharger {
 						myHubLoadReader.deterministicHubLoadDistribution.get(i),//before 
 						myHubLoadReader.deterministicHubLoadAfter15MinBins.get(i).getXYSeries("Free Load at Hub "+ i.toString()+ " after"),//after
 						"Free Load at Hub "+ i.toString()+ " before",
-						outputPath+"Hub/deterministicLoadBeforeAfter_hub"+i.toString()+".png", 
+						outputPath+"Hub_deterministicLoadBeforeAfter_hub"+i.toString()+".png", 
 						"DeterministicLoadBeforeAfter_hub"+i.toString(), true);
 				
 			}   		    		
@@ -1642,7 +1642,7 @@ public class DecentralizedSmartCharger {
 				XYSeries sAfter = myHubLoadReader.stochasticHubLoadAfter15MinBins.get(i).getXYSeries("Stochastic free load at hub "+ i.toString()+ " after V2G");
 				
 				visualizeTwoXYLoadSeriesBeforeAfter(sBefore, sAfter, 						
-						outputPath+"V2G/stochasticLoadBeforeAfterV2G_hub"+i.toString()+".png", 
+						outputPath+"V2G_stochasticLoadBeforeAfterV2G_hub"+i.toString()+".png", 
 						"StochasticLoadBeforeAfter_hub"+i.toString());
 			}   		    		
      
@@ -1662,7 +1662,7 @@ public class DecentralizedSmartCharger {
 		visualizeTwoXYLoadSeriesBeforeAfter(sBefore,
 				sAfter,
 				"Stochastic free load Agent "+ id.toString()+ " before V2G",						
-				outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle"+id.toString()+".png", 
+				outputPath+"V2G_stochasticLoadBeforeAfter_agentVehicle"+id.toString()+".png", 
 				"StochasticLoadBeforeAfter_agentVehicle"+id.toString(), false);     
 	}
 	
@@ -1682,7 +1682,7 @@ public class DecentralizedSmartCharger {
 		visualizeTwoXYLoadSeriesBeforeAfter(sBefore,
 				sAfter,
 				"Hub Source '"+name +"' at Link "+ linkId.toString()+ "before V2G",						
-				outputPath+"V2G/stochasticHubSourceBeforeAfter15MinBin_"+name+".png", 
+				outputPath+"V2G_stochasticHubSourceBeforeAfter15MinBin_"+name+".png", 
 				"StochasticHubSourceBeforeAfter15MinBin_"+name, false); 
 	}
 	
@@ -1926,7 +1926,7 @@ public class DecentralizedSmartCharger {
         chart.setTitle(new TextTitle("Distribution of charging times for all agents by agent Id number", 
     		   new Font("Arial", Font.BOLD, 20)));
         
-        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
+        ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger_allAgentsChargingTimes.png"), chart, 2000, (int)(20.0*(vehicles.getKeySet().size())));//width, height	
 	
 	}
 	
@@ -2017,7 +2017,7 @@ public class DecentralizedSmartCharger {
 			chartEV.setTitle(new TextTitle("Charging times for EV agents", 
 		    		   new Font("Arial", Font.BOLD, 20)));
 			
-			ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/EVAgentsChargingTimes.png"), chartEV, 2000, (int)(20.0*(vehicleEV)));//width, height	
+			ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger_EVAgentsChargingTimes.png"), chartEV, 2000, (int)(20.0*(vehicleEV)));//width, height	
 	        
 		}
 		
@@ -2040,7 +2040,7 @@ public class DecentralizedSmartCharger {
 	        }
 			 chartPHEV.setTitle(new TextTitle("Charging times for PHEV agents", 
 		     		   new Font("Arial", Font.BOLD, 20)));
-			 ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger/PHEVAgentsChargingTimes.png"), chartPHEV, 2000, (int)(20.0*(vehiclePHEV)));//width, height	
+			 ChartUtilities.saveChartAsPNG(new File(outputPath + "DecentralizedCharger_PHEVAgentsChargingTimes.png"), chartPHEV, 2000, (int)(20.0*(vehiclePHEV)));//width, height	
 		    	
 		}
 		        
@@ -2296,12 +2296,12 @@ public class DecentralizedSmartCharger {
 		    	out.write("HUB"+hub.toString()+"</br> </br>");
 		    	
 		    	out.write("Prices </br>");		    	
-		    	String picPrices=  outputPath+ "Hub/pricesHub_"+ hub.toString()+".png";
+		    	String picPrices=  outputPath+ "Hub_pricesHub_"+ hub.toString()+".png";
 		    	out.write("<img src='"+picPrices+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    
 		    	out.write("Load Before and after </br>");
-		    	String picBeforeAfter= outputPath+"Hub/deterministicLoadBeforeAfter_hub1.png";
+		    	String picBeforeAfter= outputPath+"Hub_deterministicLoadBeforeAfter_hub1.png";
 		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    }
@@ -2380,7 +2380,7 @@ public class DecentralizedSmartCharger {
 	 * writes out html summary of results from V2G
 	 * @param configName
 	 */
-	public void writeSummaryV2G(String configName){
+	public void writeHTMLSummaryV2G(String configName){
 		try{
 		    // Create file 
 			String title=(outputPath + configName+ "_summary.html");
@@ -2435,7 +2435,7 @@ public class DecentralizedSmartCharger {
 		    	 //Vehicle 1
 			    out.write("Vehicle Load of agent: 1 </br> </br>");
 		    	out.write("Stochastic load before and after </br>");
-		    	String picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_agentVehicle1.png";
+		    	String picBeforeAfter= outputPath+"V2G_stochasticLoadBeforeAfter_agentVehicle1.png";
 		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    }else{
@@ -2448,7 +2448,7 @@ public class DecentralizedSmartCharger {
 		    	out.write("HUB"+hub.toString()+"</br> </br>");
 		    			    	
 		    	out.write("Stochastic load before and after </br>");
-		    	String picBeforeAfter= outputPath+"V2G/stochasticLoadBeforeAfter_hub"+hub.toString()+".png";
+		    	String picBeforeAfter= outputPath+"V2G_stochasticLoadBeforeAfter_hub"+hub.toString()+".png";
 		    	out.write("<img src='"+picBeforeAfter+"' alt='' width='80%'");
 		    	out.write("</br> </br>");
 		    }
@@ -2553,8 +2553,7 @@ public class DecentralizedSmartCharger {
 		    out.write(myV2G.getTotalDirectCompensationPHEV()+"\t");
 		    
 		    out.write(myV2G.getIndirectSavingReschedulingEV()+"\t");
-		    out.write(myV2G.getIndirectSavingReschedulingPHEV()+"\n");
-		  
+		    out.write(myV2G.getIndirectSavingReschedulingPHEV()+"\n");		  
 		    //*********************
 		    		  
 		   
@@ -2585,10 +2584,7 @@ public class DecentralizedSmartCharger {
 		    out.write("charging time: \t");
 		    out.write("number of charging slots: \t");		        	    
 		    
-		    out.write("Joules from battery [J]: \t");			   
-		    out.write("Joules not from engine [J]: \t");
-		    out.write("Emissions [kg]: \n");
-		   
+		   		   
 		    //*********************
 		    for(Id id: vehicles.getKeySet()){
 		    	out.write(id.toString()+ "\t");
@@ -2596,13 +2592,7 @@ public class DecentralizedSmartCharger {
 		    	
 		    	out.write(agentChargingCosts.get(id)+ "\t");
 		    	out.write(agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule()+ "\t");
-		    	out.write(agentChargingSchedules.get(id).getNumberOfEntries() + " \t");		    			    	
-		    	
-		    	out.write(getTotalDrivingConsumptionOfAgentFromBattery(id)+ "\t");
-		    	double joulesNotEngine=getTotalDrivingConsumptionOfAgentFromOtherSources(id);
-		    	out.write(joulesNotEngine+ "\t");		
-		    	
-		    	out.write(joulesToEmissionInKg(id, joulesNotEngine)+ "\n");
+		    	out.write(agentChargingSchedules.get(id).getNumberOfEntries() + " \t");			    	
 		    }
 		    		   
 		    //Close the output stream

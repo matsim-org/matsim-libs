@@ -121,7 +121,7 @@ public class StochasticLoadCollector {
 			stochasticHubLoadDistribution.put(hubId, 
 					LoadFileReader.makeSchedule(stochasticFreeLoad.getFittedFunction()));
 			
-			LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochastic free load for hub "+ hubId+".png","stochastic free load for hub "+ hubId, "Load [W]", 
+			LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G_stochastic free load for hub "+ hubId+".png","stochastic free load for hub "+ hubId, "Load [W]", 
 					stochasticFreeLoad.getLoadFigureData(), stochasticFreeLoad.getFittedLoadFigureData());
 		}else{
 			// given as loadINtervals
@@ -167,7 +167,7 @@ public class StochasticLoadCollector {
 						
 						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
 						
-						LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochasticHubSourceAtLink"+ linkId.toString()+name+".png",
+						LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G_stochasticHubSourceAtLink"+ linkId.toString()+name+".png",
 								"stochastic hub source at link "+linkId.toString()+ ": "+name, "Load [W]", 
 								stochasticHubSourceLoad.getLoadFigureData(), stochasticHubSourceLoad.getFittedLoadFigureData());
 						
@@ -179,7 +179,7 @@ public class StochasticLoadCollector {
 						stochasticHubSource.put(linkId, stochasticGeneralSources.get(i));
 						
 						stochasticGeneralSources.get(i).getLoadSchedule().visualizeLoadDistribution("stochastic hubsource "+ linkId.toString()+name, 
-								mySimulation.outputPath+"V2G/stochastic hubsource "+ linkId.toString() +name+".png");
+								mySimulation.outputPath+"V2G_stochastic hubsource "+ linkId.toString() +name+".png");
 							
 						}
 					}
@@ -216,7 +216,7 @@ public class StochasticLoadCollector {
 					agentSource.put(id, 
 							LoadFileReader.makeSchedule(stochasticVehicleLoad.getFittedFunction()));
 					
-					LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png","stochastic vehicle load "+ id.toString(), "Load [W]", 
+					LoadFileReader.visualizeTwoHubSeries(mySimulation.outputPath+"V2G_stochastic vehicle load "+ id.toString() +".png","stochastic vehicle load "+ id.toString(), "Load [W]", 
 							stochasticVehicleLoad.getLoadFigureData(), stochasticVehicleLoad.getFittedLoadFigureData());
 					
 				}
@@ -229,7 +229,7 @@ public class StochasticLoadCollector {
 							Schedule.makeScheduleFromArrayListLoadIntervals(list));
 					
 					agentSource.get(id).visualizeLoadDistribution("stochastic vehicle load "+ id.toString() +" from input schedule",
-							mySimulation.outputPath+"V2G/stochastic vehicle load "+ id.toString() +".png");
+							mySimulation.outputPath+"V2G_stochastic vehicle load "+ id.toString() +".png");
 					
 				}
 			}
