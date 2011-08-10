@@ -9,7 +9,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class VisualizerRunner {
 
 	/**
-	 * @param args
+	 * @param args: 0 - MATSim XML network file, 1 - Title
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
