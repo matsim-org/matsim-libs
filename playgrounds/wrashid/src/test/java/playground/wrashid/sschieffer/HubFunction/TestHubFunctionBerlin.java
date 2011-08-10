@@ -180,7 +180,7 @@ public class TestHubFunctionBerlin extends TestCase{
 			    	}else{ 
 			    		aveHub1+=cost;
 			    		numHub1++;
-			    		}
+			    	}
 			    	
 			    	out.write(mySimulation.mySmartCharger.agentChargingSchedules.get(id).getTotalTimeOfIntervalsInSchedule()+ "\n");
 			    	

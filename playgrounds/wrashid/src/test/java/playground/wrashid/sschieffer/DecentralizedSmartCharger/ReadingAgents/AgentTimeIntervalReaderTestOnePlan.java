@@ -71,7 +71,7 @@ import lpsolve.LpSolveException;
 public class AgentTimeIntervalReaderTestOnePlan extends MatsimTestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
+	final String outputPath="test/output/";
 	public Id agentOne=null;
 	
 	Controler controler; 

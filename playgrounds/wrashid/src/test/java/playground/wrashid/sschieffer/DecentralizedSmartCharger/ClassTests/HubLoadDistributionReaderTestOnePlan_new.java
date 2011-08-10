@@ -50,7 +50,7 @@ import lpsolve.LpSolveException;
 public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 
 	String configPath="test/input/playground/wrashid/sschieffer/config_plans1.xml";
-	final String outputPath ="D:\\ETH\\MasterThesis\\TestOutput\\";
+	final String outputPath="test/output/";
 		
 	final double electrification= 1.0; 
 	// rate of Evs in the system - if ev =0% then phev= 100-0%=100%

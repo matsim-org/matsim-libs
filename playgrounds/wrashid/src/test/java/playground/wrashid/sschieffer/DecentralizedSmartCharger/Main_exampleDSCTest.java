@@ -74,7 +74,7 @@ public class Main_exampleDSCTest extends TestCase{
 	
 		final double ev=0.5; 
 		
-		final String outputPath="D:\\ETH\\MasterThesis\\TestOutput\\";
+		final String outputPath="test/output/";
 		String configPath="test/input/playground/wrashid/sschieffer/config_plans2.xml";				
 		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
 		
