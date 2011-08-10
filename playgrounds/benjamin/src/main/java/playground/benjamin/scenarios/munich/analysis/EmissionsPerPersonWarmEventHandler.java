@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.benjamin.events.emissions.WarmEmissionEvent;
@@ -34,6 +35,7 @@ import playground.benjamin.events.emissions.WarmPollutant;
  *
  */
 public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHandler {
+	private static final Logger logger = Logger.getLogger(EmissionsPerPersonWarmEventHandler.class);
 
 	Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();
 
@@ -44,26 +46,19 @@ public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHand
 		Id vehicleId = event.getVehicleId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 
-		if(!warmEmissionsTotal.containsKey(vehicleId)){
-			warmEmissionsTotal.put(vehicleId, warmEmissionsOfEvent);
-		}
-		else{
+		if(warmEmissionsTotal.get(vehicleId) != null){
 			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(vehicleId);
 			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 				WarmPollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
-				
-				if(!warmEmissionsSoFar.containsKey(pollutant)){
-					warmEmissionsSoFar.put(pollutant, eventValue);
-					warmEmissionsTotal.put(vehicleId, warmEmissionsSoFar);
-				}
-				else{
-					Double previousValue = warmEmissionsSoFar.get(pollutant);
-					Double newValue = previousValue + eventValue;
-					warmEmissionsSoFar.put(pollutant, newValue);
-					warmEmissionsTotal.put(vehicleId, warmEmissionsSoFar);
-				}
+
+				Double previousValue = warmEmissionsSoFar.get(pollutant);
+				Double newValue = previousValue + eventValue;
+				warmEmissionsSoFar.put(pollutant, newValue);
 			}
+			warmEmissionsTotal.put(vehicleId, warmEmissionsSoFar);
+		} else {
+			warmEmissionsTotal.put(vehicleId, warmEmissionsOfEvent);
 		}
 	}
 

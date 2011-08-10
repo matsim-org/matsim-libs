@@ -36,7 +36,7 @@ import playground.benjamin.events.emissions.ColdPollutant;
  */
 public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandler{
 	private static final Logger logger = Logger.getLogger(EmissionsPerLinkColdEventHandler.class);
-	
+
 	Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = new HashMap<Double, Map<Id, Map<ColdPollutant, Double>>>();
 
 	private final int noOfTimeBins;
@@ -58,7 +58,7 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 			if(time > i * timeBinSize && time <= (i + 1) * timeBinSize){
 				endOfTimeInterval = (i + 1) * timeBinSize;
 				Map<Id, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
-				
+
 				if(time2coldEmissionsTotal.get(endOfTimeInterval) != null){
 					coldEmissionsTotal = time2coldEmissionsTotal.get(endOfTimeInterval);
 
@@ -67,17 +67,12 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 						for(Entry<ColdPollutant, Double> entry : coldEmissionsOfEvent.entrySet()){
 							ColdPollutant pollutant = entry.getKey();
 							Double eventValue = entry.getValue();
-
-							if(coldEmissionsSoFar.get(pollutant) != null){
-								Double previousValue = coldEmissionsSoFar.get(pollutant);
-								Double newValue = previousValue + eventValue;
-								coldEmissionsSoFar.put(pollutant, newValue);
-								coldEmissionsTotal.put(linkId, coldEmissionsSoFar);
-							} else {
-								coldEmissionsSoFar.put(pollutant, eventValue);
-								coldEmissionsTotal.put(linkId, coldEmissionsSoFar);
-							}
+							
+							Double previousValue = coldEmissionsSoFar.get(pollutant);
+							Double newValue = previousValue + eventValue;
+							coldEmissionsSoFar.put(pollutant, newValue);
 						}
+						coldEmissionsTotal.put(linkId, coldEmissionsSoFar);
 					} else {
 						coldEmissionsTotal.put(linkId, coldEmissionsOfEvent);
 					}
@@ -96,12 +91,12 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 			Double endOfTimeInterval = entry0.getKey();
 			Map<Id, Map<ColdPollutant, Double>> linkId2coldEmissions = entry0.getValue();
 			Map<Id, Map<String, Double>> linkId2coldEmissionsAsString = new HashMap<Id, Map<String, Double>>();
-			
+
 			for (Entry<Id, Map<ColdPollutant, Double>> entry1: linkId2coldEmissions.entrySet()){
 				Id linkId = entry1.getKey();
 				Map<ColdPollutant, Double> pollutant2Values = entry1.getValue();
 				Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
-				
+
 				for (Entry<ColdPollutant, Double> entry2: pollutant2Values.entrySet()){
 					String pollutant = entry2.getKey().toString();
 					Double value = entry2.getValue();

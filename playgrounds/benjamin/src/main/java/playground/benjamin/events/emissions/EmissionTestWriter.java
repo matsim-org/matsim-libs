@@ -45,20 +45,31 @@ public class EmissionTestWriter {
 		Id vehicleId = new IdImpl("38");
 		
 		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();
-		warmEmissions.put(WarmPollutant.FC, 1000.0);
-		warmEmissions.put(WarmPollutant.CO2_TOTAL, 3000.0);
-		Event hotEvent = new WarmEmissionEventImpl(3600, linkId, vehicleId, warmEmissions);
+		warmEmissions.put(WarmPollutant.CO2_TOTAL, 1000.0);
+		warmEmissions.put(WarmPollutant.FC, 2000.0);
+		warmEmissions.put(WarmPollutant.NO2, 3000.0);
+		warmEmissions.put(WarmPollutant.NOX, 4000.0);
+		warmEmissions.put(WarmPollutant.PM, 5000.0);
+		Event warmEvent1 = new WarmEmissionEventImpl(77, linkId, vehicleId, warmEmissions);
+		Event warmEvent2 = new WarmEmissionEventImpl(144, linkId, vehicleId, warmEmissions);
 		
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
-		coldEmissions.put(ColdPollutant.CO, 20.0);
-		coldEmissions.put(ColdPollutant.HC, 365.0);
-		Event coldEvent = new ColdEmissionEventImpl(3500, linkId, vehicleId, coldEmissions);
+		coldEmissions.put(ColdPollutant.CO, 100.0);
+		coldEmissions.put(ColdPollutant.FC, 200.0);
+		coldEmissions.put(ColdPollutant.HC, 300.0);
+		coldEmissions.put(ColdPollutant.NO2, 400.0);
+		coldEmissions.put(ColdPollutant.NOX, 500.0);
+		coldEmissions.put(ColdPollutant.PM, 600.0);
+		Event coldEvent1 = new ColdEmissionEventImpl(55, linkId, vehicleId, coldEmissions);
+		Event coldEvent2 = new ColdEmissionEventImpl(110, linkId, vehicleId, coldEmissions);
 		
 		String outputfile = "../../runs-svn/testEvents.xml";
 		EventWriterXML eWriter = new EventWriterXML(outputfile);
 		eventsManager.addHandler(eWriter);
-		eventsManager.processEvent(hotEvent);
-		eventsManager.processEvent(coldEvent);
+		eventsManager.processEvent(warmEvent1);
+		eventsManager.processEvent(warmEvent2);
+		eventsManager.processEvent(coldEvent1);
+		eventsManager.processEvent(coldEvent2);
 		eWriter.closeFile();
 		logger.info("Finished writing output to " + outputfile);
 	}

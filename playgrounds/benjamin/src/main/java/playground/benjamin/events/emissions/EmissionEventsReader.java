@@ -102,13 +102,13 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					Double value = Double.parseDouble(attributes.getValue(i));
 					warmEmissions.put(pollutant, value);
 				}
-				this.eventsManager.processEvent(new WarmEmissionEventImpl(
-						time,
-						linkId,
-						vehicleId,
-						warmEmissions
-				));
 			}
+			this.eventsManager.processEvent(new WarmEmissionEventImpl(
+					time,
+					linkId,
+					vehicleId,
+					warmEmissions
+			));
 		}
 		else if (ColdEmissionEventImpl.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
@@ -129,13 +129,13 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					Double value = Double.parseDouble(attributes.getValue(i));
 					coldEmissions.put(pollutant, value);
 				}
-				this.eventsManager.processEvent(new ColdEmissionEventImpl(
-						time,
-						linkId,
-						vehicleId,
-						coldEmissions
-				));
 			}
+			this.eventsManager.processEvent(new ColdEmissionEventImpl(
+					time,
+					linkId,
+					vehicleId,
+					coldEmissions
+			));
 		}
 		else{
 			logger.warn("You are trying to read a non emission events file. For reading this, please use " + EventsReaderXMLv1.class);
