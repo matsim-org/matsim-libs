@@ -68,7 +68,7 @@ public class SpatialAveragingForLinkEmissions {
 	Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2;
 	private SortedSet<String> listOfPollutants;
 
-	static int noOfTimeBins = 30;
+	static int noOfTimeBins = 15;
 	double simulationEndTime;
 
 	private void run() {
@@ -89,13 +89,13 @@ public class SpatialAveragingForLinkEmissions {
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal2 = warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal2 = coldHandler.getColdEmissionsPerLinkAndTimeInterval();
 		time2EmissionsTotal2 = sumUpEmissions(time2warmEmissionsTotal2, time2coldEmissionsTotal2);
-		setNonCalculatedEmissions(scenario.getNetwork(), this.time2EmissionsTotal1);
+		setNonCalculatedEmissions(scenario.getNetwork(), this.time2EmissionsTotal2);
 
 		Map<Double, Map<Id, Map<String, Double>>> time2deltaEmissionsTotal = calcualateEmissionDifferences(time2EmissionsTotal1, time2EmissionsTotal2);
 		EmissionWriter eWriter = new EmissionWriter();
 		for(double endOfTimeInterval : time2deltaEmissionsTotal.keySet()){
 			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2deltaEmissionsTotal.get(endOfTimeInterval);
-			String outFile = outPath1 + endOfTimeInterval + ".emissionsTotalPerLinkLocation.txt";
+			String outFile = outPath1 + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocation.txt";
 			eWriter.writeLinkLocation2Emissions(scenario.getNetwork(), listOfPollutants, deltaEmissionsTotal, outFile);
 		}
 	}
@@ -114,12 +114,14 @@ public class SpatialAveragingForLinkEmissions {
 				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
 					Double emissionsBefore = entry1.getValue().get(pollutant);
-					logger.warn(linkId);
-					logger.warn(endOfTimeInterval);
-					logger.warn(time2EmissionsTotal2.get(endOfTimeInterval).get(linkId));
-					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval)
-					.get(linkId)
-					.get(pollutant);
+					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
+
+//					if(emissionsBefore == null || emissionsAfter == null){
+//						logger.info(linkId);
+//						logger.info(endOfTimeInterval + ": " + pollutant + ": " + emissionsBefore);
+//						logger.info(endOfTimeInterval + ": " + pollutant + ": " + emissionsAfter);
+//					}
+
 					Double emissionDifference = emissionsAfter - emissionsBefore;
 					emissionDifferenceMap.put(pollutant, emissionDifference);
 				}
@@ -133,19 +135,28 @@ public class SpatialAveragingForLinkEmissions {
 	private void setNonCalculatedEmissions(Network network,	Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal) {
 		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
 			Map<Id, Map<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
-			
+
 			for(Link link : network.getLinks().values()){
 				Id linkId = link.getId();
-				if(emissionsTotal.get(linkId) == null){
-					Map<String, Double> emissionType2Value = new HashMap<String, Double>();
+				Map<String, Double> emissionType2Value = new HashMap<String, Double>();
+
+				if(emissionsTotal.get(linkId) != null){
 					for(String pollutant : listOfPollutants){
-						// setting emissions for links that had no emissions on it to 0.0 
+						emissionType2Value = emissionsTotal.get(linkId);
+						if(emissionType2Value.get(pollutant) != null){
+							// do nothing
+						} else {
+							// setting some emission types that are not available for the link to 0.0
+							emissionType2Value.put(pollutant, 0.0);
+						}
+					}
+				} else {
+					for(String pollutant : listOfPollutants){
+						// setting all emission types for links that had no emissions on it to 0.0 
 						emissionType2Value.put(pollutant, 0.0);
 					}
-					emissionsTotal.put(linkId, emissionType2Value);
-				} else {
-					// do nothing
 				}
+				emissionsTotal.put(linkId, emissionType2Value);
 			}
 			time2EmissionsTotal.put(endOfTimeInterval, emissionsTotal);
 		}
@@ -236,6 +247,7 @@ public class SpatialAveragingForLinkEmissions {
 		configReader.readFile(configfile);
 		Double endTime = config.getQSimConfigGroup().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
+		logger.info("Aggregating emissions for " + endTime / 3600 / noOfTimeBins + "time bins.");
 		return endTime;
 	}
 
