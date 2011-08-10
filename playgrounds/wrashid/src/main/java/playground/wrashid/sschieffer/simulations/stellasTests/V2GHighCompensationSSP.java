@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
 //package playground.wrashid.sschieffer;
-package playground.wrashid.sschieffer.simulations;
+package playground.wrashid.sschieffer.simulations.stellasTests;
 
 import java.io.IOException;
 
@@ -54,36 +54,14 @@ import java.util.*;
 
 
 /**
- * This class highlights how to use V2G functions of this package:
+ * This V2G simulation tests the V2G behavior for extremely high 
+ * V2G regulation compensaion of 1CHF/kWh
+ * for simulation SSA
  * 
- * V2G can only follow after the Decentralized Smart Charger has been run
- * since its based on the charging schedules planned by the Decentralized Smart Charger
- * 
- * For all specified stochastic loads the V2G procedure will then check if rescheduling is possible 
- * and if the utility of the agent can be increased by rescheduling.
- * 
- * 
- * PLease provide the following folders and sub-folders in the output path to store results locally
- * 
- * <ul>
- * 		<li>DecentralizedCharger
- * 			<ul>
- * 				<li>agentPlans
- * 				<li>LP	
- * 					<ul><li>EV <li> PHEV</ul>
- * 			</ul>
- * 		<li>Hub
- * 		<li>V2G
- * 			<ul>
- * 				<li>agentPlans
- * 				<li>LP
- * 					<ul><li>EV <li> PHEV</ul>
- *  		</ul>
- * </ul>
  * @author Stella
  *
  */
-public class Main_V2G {
+public class V2GHighCompensationSSP {
 	
 	public static void main(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {
 		
@@ -91,18 +69,19 @@ public class Main_V2G {
 		 * SET UP STANDARD Decentralized Smart Charging simulation 
 		 * *************/
 		
-		//percent of population with electric vehicles
 		final double electrification= 1.0; 
 		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
-		final double ev=0.0; 
+		final double ev=0.9; 
 		
-		//final String outputPath="/cluster/home/baug/stellas/Runs/24hrV2G20000Plans15Min/Results";
-		final String outputPath="test/output/";
-		//String configPath="test/scenarios/berlin/config.xml";
-		String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
 		
-		double kWHEV =24;
-		double kWHPHEV =24;
+		//final String outputPath="D:/ETH/MasterThesis/TestOutput/";
+		final String outputPath="/cluster/home/baug/stellas/Runs/HighCompensationSSD/";
+		
+		String configPath="/cluster/home/baug/stellas/Runs/berlinInput/config.xml";
+		//String configPath="test/input/playground/wrashid/sschieffer/config.xml";// 100 agents
+		
+		double kWHEV =16;
+		double kWHPHEV =16;
 		boolean gasHigh = false;
 		
 		final double standardChargingLength=15.0*DecentralizedSmartCharger.SECONDSPERMIN;
@@ -120,64 +99,19 @@ public class Main_V2G {
 		double priceMaxPerkWh=0.11;
 		double priceMinPerkWh=0.07;
 		
-		String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
-		
+		//String freeLoadTxt= "test/input/playground/wrashid/sschieffer/freeLoad15minBinSec_berlin16000.txt";
+		String freeLoadTxt="/cluster/home/baug/stellas/Runs/berlinInput/freeLoad15minBinSec_berlin16000.txt";
 		ArrayList<HubInfoDeterministic> myHubInfo = new ArrayList<HubInfoDeterministic>(0);
 		myHubInfo.add(new HubInfoDeterministic(1, freeLoadTxt, priceMaxPerkWh, priceMinPerkWh));
 		
-		/*
-		 * ************************
-		 * Stochastic Sources
-		 * <p>
-		 * the information about the stochastic load distribution over the day is given in Watt. 
-		 * It can be given as a txt file with 96 bins (15 min intervals) 
-		 * or with discrete load intervals which reflects the intermittent character of some loads better (ArrayList<LoadDistributionIntervals>)</p>
-		 * 
-		 *  * the sources are given in [Watt]
-		 * <li> negative values mean, that the source needs energy --> regulation up
-		 * <li> positive values mean, that the source has too much energy--> regulation down
-		 * 
-		 * StochasticLoadSources can be defined for
-		 * <li> general hub stochastic Load 
-		 * <li> for vehicles (i.e. solar roof) given as HashMap with AgentId and String for (HashMap <Id, String> stochasticVehicleLoad)
-		 * OR HashMap <Id, ArrayList<LoadDIstrubitionIntervals>>
-		 * <li> local sources for hubs (wind turbine, etc) given in 96 bin txt file with 97 data points (String stochasticHubLoadTxt)
-			INPUT AS
-			<li>TEXT FILE: 
-			The example below only adds the generalStochastic load in form of a txt file to Hub1
-			<li> Discrete LOAD INTERVALS:
-			ArrayList<LoadDistributionInterval> discreteLoadIntervals= new ArrayList<LoadDistributionInterval>(0);
-			// the following line adds a loadInterval between seconds 0- 30000 of 100000W to the load Distribution
-			discreteLoadIntervals.add(new LoadDistributionInterval(0, 30000, 100000));
-			hubInfo1.setStochasticVehicleSourcesIntervals(discreteLoadIntervals);
-		 */			
-					
+							
 		ArrayList<HubInfoStochastic> myStochasticHubInfo = new ArrayList<HubInfoStochastic>(0);
-		String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
+		//String stochasticGeneral= "test/input/playground/wrashid/sschieffer/stochasticRandom+-5000.txt";
+		String stochasticGeneral= "/cluster/home/baug/stellas/Runs/berlinInput/stochasticRandom+-5000.txt";
+		
 		HubInfoStochastic hubInfo1= new HubInfoStochastic(1, stochasticGeneral);
 		
-		/*
-		 * ADDING A HUB LOAD
-		 * - by generating a general hub source 
-		 */
-		ArrayList<GeneralSource> generalHubSource= new ArrayList<GeneralSource>(0);
-		ArrayList<LoadDistributionInterval> generalHubLoad= new ArrayList<LoadDistributionInterval>(0);
-		generalHubLoad.add(new LoadDistributionInterval(3500, 7000, 5000));
-		generalHubSource.add(new GeneralSource(
-				generalHubLoad,
-				new IdImpl(1),				
-				"random load", 
-				0.005) );
-		hubInfo1.setStochasticGeneralSources(generalHubSource);
 		
-		/*
-		 * ADDING A VEHICLE LOAD
-		 */
-		HashMap <Id, ArrayList<LoadDistributionInterval>> vehicleLoadHashMap = new HashMap<Id, ArrayList<LoadDistributionInterval>>();
-		ArrayList<LoadDistributionInterval> vehicleLoad= new ArrayList<LoadDistributionInterval>(0);
-		vehicleLoad.add(new LoadDistributionInterval(3500, 7000, 3500));
-		vehicleLoadHashMap.put(new IdImpl(1), vehicleLoad);
-		hubInfo1.setStochasticVehicleSourcesIntervals(vehicleLoadHashMap);
 		
 		// add hubInfo to stochastic load
 		myStochasticHubInfo.add(hubInfo1);
@@ -211,14 +145,21 @@ public class Main_V2G {
 		 * 50% do only down, 50% do up and down
 		 */
 		
-		final double xPercentDown=0.0;
 		final double xPercentDownUp=1.0;
+		final double xPercentDown=1.0-xPercentDownUp;
 		
-			
-		// compensation for V2Gs for regulation up, down or feed in
-		double compensationPerKWHRegulationUp=0.1;
-		double compensationPerKWHRegulationDown=0.005;
-		double compensationPERKWHFeedInVehicle=0.005;
+		
+		/*
+		 * if you also want to include information about vehicle and other hub sources 
+		 * <li> create the objects (ArrayList<GeneralSource>  stochasticHubLoadTxt=null; HashMap <Id, String> stochasticVehicleLoad= new HashMap <Id, String> ();)
+		 * <li>use the following constructor: 
+		 * myStochasticHubInfo.add(new HubInfo(1, stochasticGeneral, stochasticHubLoadTxt, stochasticVehicleLoad));
+		 */
+		
+				
+		double compensationPerKWHRegulationUp=1.0;
+		double compensationPerKWHRegulationDown=1.0;
+		double compensationPERKWHFeedInVehicle=1.0;
 		
 		mySimulation.setUpV2G(				
 				xPercentDown,
@@ -284,9 +225,13 @@ public class Main_V2G {
 		System.out.println("average joules saved by local stochastic production EV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionEV());
 		System.out.println("average joules saved by local stochastic production PHEV: "+mySimulation.getAverageJouleSavedByLocalV2GProductionPHEV());
 		
+		
+		
+		
 		/*
 		 * HUBSOURCES
 		 */
+		
 		System.out.println("average revenue from feed in for hub sources: "+mySimulation.getAverageFeedInRevenueHubSources());
 		System.out.println("average extra charging cost for hub sources: "+mySimulation.getAverageExtraChargingHubSources());
 		System.out.println("total energy for hub sources: "+mySimulation.getTotalJoulesFeedInHubSources());
