@@ -69,6 +69,7 @@ public class DummyLPEVTest extends TestCase{
 	public void testLPDummy() throws LpSolveException{
 		LPEV l= new LPEV(0.0, true);
 		LpSolve solver = LpSolve.makeLp(0, 1);
+		solver.solve();
 		assertEquals(true, true);
 	}
 
