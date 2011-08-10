@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EmissionsPerLinkWarmEventHandler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.fhuelsmann.emission.analysis;
 
 import java.util.HashMap;
@@ -9,6 +28,11 @@ import org.matsim.api.core.v01.Id;
 import playground.benjamin.events.emissions.WarmEmissionEvent;
 import playground.benjamin.events.emissions.WarmEmissionEventHandler;
 import playground.benjamin.events.emissions.WarmPollutant;
+
+/**
+ * @author benjamin, friederike
+ *
+ */
 
 public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler {
 
@@ -30,12 +54,13 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 				WarmPollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
-				
+				if(linkId.toString().equals("10038"))
+					System.out.println("linkId "+linkId+ "pollutant "+ pollutant+ " eventValue "+eventValue);
 				if(!warmEmissionsSoFar.containsKey(pollutant)){
 					warmEmissionsSoFar.put(pollutant, eventValue);
 					warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
-				//	if(linkId.toString().equals("10038"))
-				//	System.out.println("linkId "+linkId+ " pollutant "+ pollutant+" eventValue "+eventValue);
+					if(linkId.toString().equals("10038"))
+					System.out.println("linkId "+linkId+ " pollutant "+ pollutant+" eventValue "+eventValue);
 				}
 				else{
 			
@@ -43,9 +68,9 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				Double newValue = previousValue + eventValue;
 				warmEmissionsSoFar.put(pollutant, newValue);
 				warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
-			//		if(linkId.toString().equals("10038"))
-			//		System.out.println("linkId "+linkId+ "pollutant "+ pollutant+ " previousValue "+previousValue+" eventValue "+eventValue
-			//				+" newValue "+newValue);
+					if(linkId.toString().equals("10038"))
+					System.out.println("linkId "+linkId+ "pollutant "+ pollutant+ " previousValue "+previousValue+" eventValue "+eventValue
+							+" newValue "+newValue);
 				}
 			}
 		}
