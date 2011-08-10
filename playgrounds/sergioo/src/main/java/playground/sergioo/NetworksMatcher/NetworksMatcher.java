@@ -25,6 +25,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class NetworksMatcher {
 
+
+	//Main
+
 	/**
 	 * @param args
 	 */
@@ -35,6 +38,9 @@ public class NetworksMatcher {
 		Network networkHighResolution = scenario.getNetwork();
 		Network networkLowResolutionPolyline = getNetworkFromShapeFilePolyline(args[1]);
 		Network networkLowResolutionLength = getNetworkFromShapeFileLength(args[1]);
+		MatchingProcess matchingProcess = new MatchingProcess();
+		matchingProcess.execute(networkHighResolution, networkLowResolutionLength);
+		matchingProcess.applyProperties(false);
 		Window windowHR = new Window("High Resolution Network", networkHighResolution);
 		Window windowLRP = new Window("Low Resolution Network Polyline", networkLowResolutionPolyline);
 		Window windowLRL = new Window("Low Resolution Network Length", networkLowResolutionLength);
@@ -43,7 +49,10 @@ public class NetworksMatcher {
 		windowLRL.setVisible(true);
 		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolutionPolyline.getLinks().size()+" "+networkLowResolutionLength.getLinks().size());
 	}
-	
+
+
+	//Methods
+
 	public static Network getNetworkFromShapeFilePolyline(String fileName) {
 		ShapeFileReader shapeFileReader =  new ShapeFileReader();
 		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
@@ -80,7 +89,6 @@ public class NetworksMatcher {
 		return network;
 	}
 	
-
 	public static Network getNetworkFromShapeFileLength(String fileName) {
 		ShapeFileReader shapeFileReader =  new ShapeFileReader();
 		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
@@ -106,4 +114,6 @@ public class NetworksMatcher {
 			}
 		return network;
 	}
+
+
 }
