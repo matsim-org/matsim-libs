@@ -72,7 +72,7 @@ import junit.framework.TestCase;
 public class TestHubFunctionBerlin extends TestCase{
 	
 	public static DecentralizedChargingSimulation mySimulation;
-	final String outputPath="D:/ETH/MasterThesis/TestOutput/";
+	final String outputPath="test/output/";
 	
 	public static void testMain(String[] args) throws IOException, ConvergenceException, FunctionEvaluationException, IllegalArgumentException {		
 		
