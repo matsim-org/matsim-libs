@@ -14,8 +14,17 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 public class ChangeActivityTimesEasy implements PlanStrategyModule, ActivityEndEventHandler {
 
 	
-	private final double VARIATION;
-//	Variation in Seconds
+	private double VARIATION;
+public double getVARIATION() {
+		return VARIATION;
+	}
+
+
+	public void setVARIATION(double variation) {
+		VARIATION = variation;
+	}
+
+	//	Variation in Seconds
 	private Random rnd;
 	
 	public ChangeActivityTimesEasy(){
