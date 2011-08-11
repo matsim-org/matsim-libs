@@ -316,12 +316,4 @@ public class NetworkDeserializer {
 		return ret;
 	}
 
-	public static void main(String [] args) throws JAXBException, MalformedURLException, SAXException {
-
-		String input = "/Users/laemmel/tmp/network.xml";
-		String output = "/Users/laemmel/tmp/matsimNetwork.xml";
-		Network netw = new NetworkDeserializer().deserialize(input);
-		new NetworkWriter(netw).write(output);
-	}
-
 }
