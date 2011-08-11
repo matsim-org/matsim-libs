@@ -1,6 +1,7 @@
 package playground.gregor.grips.helper;
 
-import org.geotools.geometry.Geometry;
+import com.vividsolutions.jts.geom.Geometry;
+
 
 public class Building {
 
@@ -16,8 +17,8 @@ public class Building {
 	public Geometry getGeometry() {
 		return this.geometry;
 	}
-	public void setGeometry(Geometry geometry) {
-		this.geometry = geometry;
+	public void setGeometry(Geometry geo) {
+		this.geometry = geo;
 	}
 
 }

@@ -2,6 +2,7 @@ package playground.gregor.grips.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,10 @@ import javax.xml.bind.Unmarshaller;
 
 
 import net.opengis.gml.v_3_1_1.AbstractFeatureType;
+import net.opengis.gml.v_3_1_1.AbstractRingPropertyType;
+import net.opengis.gml.v_3_1_1.AbstractSurfaceType;
+import net.opengis.gml.v_3_1_1.PolygonType;
+import net.opengis.gml.v_3_1_1.SurfacePropertyType;
 import net.opengis.wfs.v_1_1_0.FeatureCollectionType;
 
 import org.matsim.api.core.v01.network.Network;
@@ -19,11 +24,18 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
+
 import playground.gregor.grips.helper.Building;
 import playground.gregor.grips.jaxb.EDL.building.BuildingType;
 
 
 public class BuildingsDeserializer {
+
+	private static final GeometryFactory geoFac = new GeometryFactory();
 
 	public List<Building> deserialize(String file) {
 		JAXBElement<FeatureCollectionType> jaxfts = parseFeatureCollection(file);
@@ -36,14 +48,54 @@ public class BuildingsDeserializer {
 	private List<Building> processList(
 			List<JAXBElement<? extends AbstractFeatureType>> list) {
 
+		List<Building> blds = new ArrayList<Building>();
 		for (JAXBElement<? extends AbstractFeatureType>  el : list) {
 			AbstractFeatureType val = el.getValue();
 			if (val instanceof BuildingType) {
-				System.out.println(((BuildingType)val).getFloorplan());
+				blds.add(processBuilding((BuildingType)val));
 			} else {
 				throw new RuntimeException("Unexpected feature type:" + val + "! Aboarding...");
 			}
 		}
+		return blds;
+	}
+
+	private Building processBuilding(BuildingType val) {
+		AbstractSurfaceType sf = val.getFloorplan().getSurface().getValue();
+
+		Building ret = new Building();
+
+		Geometry geo = null;
+		if (sf instanceof PolygonType) {
+			geo = getPolygonGeometry((PolygonType)sf);
+		}
+
+		ret.setGeometry(geo);
+
+		int pop = val.getPopulation();
+		ret.setNumOfPersons(pop);
+		return ret;
+	}
+
+	private Polygon getPolygonGeometry(PolygonType sf) {
+		JAXBElement<AbstractRingPropertyType> exter = sf.getExterior();
+		List<JAXBElement<AbstractRingPropertyType>> inters = sf.getInterior();
+		BigInteger dim = sf.getSrsDimension();
+		LinearRing shell = getLinearRing(dim,exter);
+
+		LinearRing [] holes = new LinearRing [inters.size()];
+		int pos = 0;
+		for (JAXBElement<AbstractRingPropertyType> inter : inters) {
+			LinearRing lrInt = getLinearRing(dim,inter);
+			holes[pos++] = lrInt;
+		}
+		Polygon p = geoFac.createPolygon(shell, holes);
+		return p;
+	}
+
+	private LinearRing getLinearRing(BigInteger dim,
+			JAXBElement<AbstractRingPropertyType> ring) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
