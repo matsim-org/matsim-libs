@@ -84,21 +84,21 @@ public class EmissionWriter {
 	}
 
 	void writeLinkLocation2Emissions(
-			Network network,
 			SortedSet<String> listOfPollutants,
 			Map<Id, Map<String, Double>> emissions,
+			Network network,
 			String outFile){
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.append("linkId \t xHome \t yHome \t");
+			out.append("linkId\txLink\tyLink\t");
 			for (String pollutant : listOfPollutants){
-				out.append(pollutant + "[g] \t");
+				out.append(pollutant + "[g]\t");
 			}
 			out.append("\n");
 
-			for(Link link : network.getLinks().values()){
-				Id linkId = link.getId();
+			for(Id linkId : emissions.keySet()){
+				Link link = network.getLinks().get(linkId);
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();
 				Double yLink = linkCoord.getY();
@@ -107,11 +107,7 @@ public class EmissionWriter {
 
 				Map<String, Double> emissionType2Value = emissions.get(linkId);
 				for(String pollutant : listOfPollutants){
-					if(emissionType2Value.get(pollutant) != null){
-						out.append(emissionType2Value.get(pollutant) + "\t");
-					} else{
-						out.append("0.0" + "\t"); // TODO: do I still need this?
-					}
+					out.append(emissionType2Value.get(pollutant) + "\t");
 				}
 				out.append("\n");
 			}
