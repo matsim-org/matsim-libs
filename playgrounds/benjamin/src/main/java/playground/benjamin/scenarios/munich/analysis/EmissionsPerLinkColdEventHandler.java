@@ -112,7 +112,7 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 	@Override
 	public void reset(int iteration) {
 		this.time2coldEmissionsTotal.clear();
-		logger.info("Resetting cold emission handler to " + this.time2coldEmissionsTotal);
+		logger.info("Resetting cold emission aggregation to " + this.time2coldEmissionsTotal);
 	}
 
 }

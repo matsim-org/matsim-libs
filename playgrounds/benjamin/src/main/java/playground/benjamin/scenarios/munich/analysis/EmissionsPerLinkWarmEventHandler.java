@@ -112,6 +112,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	@Override
 	public void reset(int iteration) {
 		this.time2warmEmissionsTotal.clear();
-		logger.info("Resetting warm emission handler to " + this.time2warmEmissionsTotal);
+		logger.info("Resetting warm emission aggregation to " + this.time2warmEmissionsTotal);
 	}
 }

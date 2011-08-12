@@ -21,6 +21,8 @@ package playground.benjamin.scenarios.munich.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -28,6 +30,15 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +51,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
@@ -48,6 +61,7 @@ import playground.benjamin.events.emissions.ColdPollutant;
 import playground.benjamin.events.emissions.EmissionEventsReader;
 import playground.benjamin.events.emissions.WarmPollutant;
 
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
 /**
@@ -70,6 +84,7 @@ public class SpatialAveragingForLinkEmissions {
 
 	Scenario scenario;
 	Network network;
+	private FeatureType featureType;
 	EmissionsPerLinkWarmEventHandler warmHandler;
 	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
@@ -91,6 +106,7 @@ public class SpatialAveragingForLinkEmissions {
 		defineListOfPollutants();
 		loadScenario(netFile);
 		this.network = this.scenario.getNetwork();
+		initFeatures();
 
 		processEmissions(emissionFile1);
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
@@ -115,6 +131,8 @@ public class SpatialAveragingForLinkEmissions {
 		//		EmissionWriter eWriter = new EmissionWriter();
 		BufferedWriter writer = IOUtils.getBufferedWriter(outPath + "movie.emissionsTotalPerLinkLocationSmoothed.txt");
 		writer.append("xCentroid\tyCentroid\tCO2_TOTAL\tTIME\n");
+
+		Collection<Feature> features = new ArrayList<Feature>();
 
 		for(double endOfTimeInterval : time2deltaEmissionsTotal.keySet()){
 			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2deltaEmissionsTotal.get(endOfTimeInterval);
@@ -159,6 +177,16 @@ public class SpatialAveragingForLinkEmissions {
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
 							writer.append(outString);
+						
+							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
+							try {
+								Feature feature = this.featureType.create(new Object[] {
+										point, dateTimeString, averageValue
+								});
+								features.add(feature);
+							} catch (IllegalAttributeException e1) {
+								throw new RuntimeException(e1);
+							}
 						}
 					}
 				}
@@ -166,6 +194,8 @@ public class SpatialAveragingForLinkEmissions {
 		}
 		writer.close();
 		logger.info("Finished writing output to " + outPath + "movie.emissionsTotalPerLinkLocationSmoothed.txt");
+		
+		ShapeFileWriter.writeGeometries(features, outPath + "movie.emissionsTotalPerLinkLocationSmoothed.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -335,6 +365,29 @@ public class SpatialAveragingForLinkEmissions {
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
 		emissionReader.parse(emissionFile);
+	}
+
+	@SuppressWarnings("deprecation")
+	private void initFeatures() {
+		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
+				"Point", Point.class, true, null, null, null);
+		AttributeType time = AttributeTypeFactory.newAttributeType(
+				"Time", String.class);
+		AttributeType co2Emissions = AttributeTypeFactory.newAttributeType(
+				"deltaCO2", String.class);
+		
+		Exception ex;
+		try {
+			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
+			        {point, time, co2Emissions}, "EmissionPoint");
+			return;
+		} catch (FactoryRegistryException e0) {
+			ex = e0;
+		} catch (SchemaException e0) {
+			ex = e0;
+		}
+		throw new RuntimeException(ex);
+		
 	}
 
 	private void loadScenario(String netFile) {
