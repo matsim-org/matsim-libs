@@ -3,7 +3,6 @@ package playground.gregor.grips.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import javax.xml.bind.Unmarshaller;
 import net.opengis.gml.v_3_2_1.AbstractCurveType;
 import net.opengis.gml.v_3_2_1.AbstractFeatureType;
 import net.opengis.gml.v_3_2_1.CoordinatesType;
-import net.opengis.gml.v_3_2_1.DirectPositionListType;
 import net.opengis.gml.v_3_2_1.FeatureArrayPropertyType;
 import net.opengis.gml.v_3_2_1.FeatureCollectionType;
 import net.opengis.gml.v_3_2_1.LineStringType;
@@ -28,11 +26,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
-import org.xml.sax.SAXException;
 
 import playground.gregor.grips.helper.ProtoLink;
 import playground.gregor.grips.helper.ProtoNetwork;
@@ -56,15 +52,15 @@ public class NetworkDeserializer {
 
 	private static final GeometryFactory geoFac = new GeometryFactory();
 
-	public Network deserialize(String file) {
-		NetworkImpl net = NetworkImpl.createNetwork();
+	public ProtoNetwork deserialize(String file) {
+		//		NetworkImpl net = NetworkImpl.createNetwork();
 		JAXBElement<FeatureCollectionType> fts = parseFeatureCollection(file);
 		FeatureCollectionType ftst = fts.getValue();
 		FeatureArrayPropertyType members = ftst.getFeatureMembers();
 		List<JAXBElement<? extends AbstractFeatureType>> list = members.getAbstractFeature();
 		ProtoNetwork protoNet = processList(list);
-		createNetwork(net,protoNet);
-		return net;
+		//		createNetwork(net,protoNet);
+		return protoNet;
 	}
 
 	private void createNetwork(NetworkImpl net, ProtoNetwork protoNet) {
@@ -173,7 +169,6 @@ public class NetworkDeserializer {
 			LineStringType lrt = (LineStringType)geo;
 
 			int dim = lrt.getSrsDimension().intValue();
-			//			CoordinatesType ct = lrt.getCoordinates();
 			List<Double> pl = lrt.getPosList().getValue();
 
 			List<Coordinate> coords = getCoordinates(pl,dim);
