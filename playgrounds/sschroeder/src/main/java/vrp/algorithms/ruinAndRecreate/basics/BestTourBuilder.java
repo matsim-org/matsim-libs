@@ -11,6 +11,7 @@ import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
+import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
 
 /**
@@ -23,23 +24,23 @@ public class BestTourBuilder implements TourBuilder {
 	
 	private static Logger logger = Logger.getLogger(BestTourBuilder.class);
 	
-	public static class TourResult {
-		public Tour tour;
-		public double totalCosts;
-		public double marginalCosts;
-		public TourResult(Tour tour, double totalCosts, double marginalCosts) {
-			this.tour = tour;
-			this.totalCosts = totalCosts;
-			this.marginalCosts = marginalCosts;
-		}
-	}
-	
 	private Costs costs;
 	
+	private Vehicle vehicle;
+	
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+
 	private Constraints constraints = new Constraints(){
 
 		@Override
 		public boolean judge(Tour tour) {
+			return true;
+		}
+
+		@Override
+		public boolean judge(Tour tour, Vehicle vehicle) {
 			return true;
 		}
 		
@@ -59,10 +60,9 @@ public class BestTourBuilder implements TourBuilder {
 		this.constraints = constraints;
 	}
 	
-	private TourResult buildTour(Tour tour, Customer customer){
+	private Tour buildTour(Tour tour, Customer customer){
 		double bestMarginalCost = Double.MAX_VALUE;
 		Tour bestTour = null;
-		double bestTotalCosts = Double.MAX_VALUE;
 		for(int i=1;i<tour.getActivities().size();i++){	
 				double marginalCost = getCosts(getActLocation(tour, i-1), customer.getLocation()) + 
 					getCosts(customer.getLocation(), getActLocation(tour, i)) - getCosts(getActLocation(tour, i-1), getActLocation(tour, i));
@@ -74,16 +74,14 @@ public class BestTourBuilder implements TourBuilder {
 					newTour.getActivities().add(i,VrpUtils.createTourActivity(customer));
 					assertCustomerIsOnlyOnceInTour(newTour,customer);
 					tourActivityUpdater.update(newTour);
-					double totalCosts = newTour.costs.generalizedCosts;
-					if(this.constraints.judge(newTour)){
+					if(this.constraints.judge(newTour,vehicle)){
 						bestMarginalCost = marginalCost; 
 						bestTour = newTour;
-						bestTotalCosts = totalCosts;
 					}
 				}
 		}
 		if(bestTour != null){
-			return new TourResult(bestTour,bestTotalCosts,bestMarginalCost);
+			return bestTour;
 		}
 		return null;
 	}
@@ -108,17 +106,17 @@ public class BestTourBuilder implements TourBuilder {
 
 	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment){
 		verify();
-		TourResult tourTrippel = null;
+		Tour newTour = null;
 		if(isDepot(tour,shipment.getFrom())){
-			tourTrippel = buildTour(tour, shipment.getTo());
+			newTour = buildTour(tour, shipment.getTo());
 		}
 		else if(isDepot(tour,shipment.getTo())){
-			tourTrippel = buildTour(tour, shipment.getFrom());
+			newTour = buildTour(tour, shipment.getFrom());
 		}
 		else{
-			tourTrippel = buildTourWithEnRoutePickupAndDelivery(tour,shipment);
+			newTour = buildTourWithEnRoutePickupAndDelivery(tour,shipment);
 		}
-		return tourTrippel.tour;
+		return newTour;
 	}
 	
 	private void verify() {
@@ -131,11 +129,10 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	private TourResult buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
+	private Tour buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
 		Node fromLocation = shipment.getFrom().getLocation();
 		Node toLocation = shipment.getTo().getLocation();
 		Double bestMarginalCost = Double.MAX_VALUE;
-		Double bestTotalCosts = null;
 		Tour bestTour = null;
 		for(int i=1;i<tour.getActivities().size();i++){
 			double marginalCostComp1 = getCosts(getActLocation(tour, i-1),fromLocation) + getCosts(fromLocation,getActLocation(tour, i)) - getCosts(getActLocation(tour, i-1),getActLocation(tour, i));
@@ -152,17 +149,15 @@ public class BestTourBuilder implements TourBuilder {
 				if(marginalCost < bestMarginalCost){
 					Tour newTour = buildTour(tour,shipment,i,j);
 					tourActivityUpdater.update(newTour);
-					double totCosts = newTour.costs.generalizedCosts;
-					if(this.constraints.judge(newTour)){
+					if(this.constraints.judge(newTour,vehicle)){
 						bestMarginalCost = marginalCost;
 						bestTour = newTour;
-						bestTotalCosts = totCosts;
 					}
 				}
 			}
 		}
 		if(bestTour != null){
-			return new TourResult(bestTour,bestTotalCosts,bestMarginalCost);
+			return bestTour;
 		}
 		return null;
 	

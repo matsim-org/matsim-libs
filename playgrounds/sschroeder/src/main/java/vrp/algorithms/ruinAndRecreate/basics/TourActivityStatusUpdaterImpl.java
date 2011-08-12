@@ -16,8 +16,6 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 	
 	private Costs costs;
 	
-	private double tourCost;
-	
 	public TourActivityStatusUpdaterImpl(Costs costs) {
 		super();
 		this.costs = costs;
@@ -38,25 +36,12 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 			int loadAtCustomer = fromAct.getCurrentLoad() + (int)toAct.getCustomer().getDemand();
 			toAct.setCurrentLoad(loadAtCustomer);
 		}
-		int size = tour.getActivities().size();
-		assertEqual(tour.getActivities().get(size-2).getCurrentLoad(),tour.getActivities().get(size-1).getCurrentLoad());
-		tourCost = cost;
 	}
 	
 	private void reset(Tour tour) {
 		tour.costs.generalizedCosts = 0.0;
 		tour.costs.time = 0.0;
 		tour.costs.distance = 0.0;
-	}
-
-	private void assertEqual(int currentLoad, int currentLoad2) {
-		if(currentLoad == currentLoad2){
-			return;
-		}
-		else{
-			throw new IllegalStateException("currentLoad of second-last activity must be equal to currentLoad of last activity");
-		}
-		
 	}
 
 	private int getLoadAtDepot(Tour tour) {

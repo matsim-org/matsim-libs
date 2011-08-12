@@ -13,15 +13,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import vrp.algorithms.ruinAndRecreate.api.TourAgent;
+import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
+import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
+import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
+import vrp.api.VRP;
 import vrp.basics.CustomerImpl;
 import vrp.basics.ManhattanDistance;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
+import vrp.basics.Relation;
 import vrp.basics.Tour;
 import vrp.basics.TourActivityFactory;
+import vrp.basics.VehicleType;
+import vrp.basics.VrpUtils;
 
 public class VRPTestCase extends TestCase{
 	
@@ -34,6 +42,8 @@ public class VRPTestCase extends TestCase{
 	public List<Customer> customers;
 	
 	public Map<Id,Customer> customerMap;
+	
+	public Constraints constraints;
 	
 	/*
 	 * 	|
@@ -60,10 +70,21 @@ public class VRPTestCase extends TestCase{
 		customers = new ArrayList<Customer>();
 		customerMap = new HashMap<Id, Customer>();
 		createNodesAndCustomer();
+		constraints = new CapacityPickupsDeliveriesSequenceConstraint(20);
+		
 	}
 	
 	protected Customer getDepot(){
 		return customerMap.get(makeId(0,0));
+	}
+	
+	protected void setRelation(Customer c1, Customer c2){
+		c1.setRelation(new Relation(c2));
+		c2.setRelation(new Relation(c1));
+	}
+	
+	protected TourAgent getTourAgent(VRP vrp, Tour tour1, VehicleType type1) {
+		return new RRTourAgentFactory(vrp).createTourAgent(tour1, VrpUtils.createVehicle(type1));
 	}
 	
 	protected Tour makeTour(Collection<Customer> tourSequence){

@@ -12,14 +12,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import freight.CarrierUtils;
-import freight.vrp.Locations;
-import freight.vrp.VRPTransformation;
-
 import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
@@ -28,7 +24,6 @@ import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
 import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
 import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder;
-import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder.TourResult;
 import vrp.algorithms.ruinAndRecreate.basics.TourActivityStatusUpdaterImpl;
 import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
 import vrp.api.Costs;
@@ -37,6 +32,9 @@ import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
+import freight.CarrierUtils;
+import freight.vrp.Locations;
+import freight.vrp.VRPTransformation;
 
 public class AverageMarginalCostOM implements OfferMaker{
 	

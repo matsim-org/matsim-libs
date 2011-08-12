@@ -16,8 +16,6 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 
 	private Costs costs;
 	
-	private double tourCost;
-	
 	public TourActivityStatusUpdaterWithTWImpl(Costs costs) {
 		super();
 		this.costs = costs;
@@ -63,7 +61,6 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 			}
 			j--;
 		}
-		tourCost = costs;
 	}
 	
 	private void reset(Tour tour) {

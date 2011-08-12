@@ -15,6 +15,7 @@ import vrp.algorithms.ruinAndRecreate.ruin.RadialRuin;
 import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import vrp.api.VRP;
+import vrp.basics.MultipleDepotsInitialSolutionFactory;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
@@ -61,7 +62,7 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setNewVehicleCapacity(vehicleCapacity);
+		recreationStrategy.setInitialSolutionFactory(new MultipleDepotsInitialSolutionFactory());
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
@@ -103,7 +104,6 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setNewVehicleCapacity(vehicleCapacity);
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		

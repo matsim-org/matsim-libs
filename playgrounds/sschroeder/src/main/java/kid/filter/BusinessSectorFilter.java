@@ -24,7 +24,7 @@ public class BusinessSectorFilter implements VehicleFilter{
 	}
 
 	public boolean judge(Vehicle vehicle) {
-		if(vehicle.getAttributes().get(KiDSchema.COMPANY_SECTOR).equals(sector)){
+		if(vehicle.getAttributes().get(KiDSchema.COMPANY_WIRTSCHAFTSZWEIG).equals(sector)){
 			if(vehicle.getAttributes().get(KiDSchema.COMPANY_KREISTYP).equals("1")){
 //				if(vehicle.getAttributes().get(KiDSchema.COMPANY_FUHRPARK_PKW).equals("450")){
 //					print(vehicle);

@@ -12,7 +12,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -21,9 +20,7 @@ import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.freight.CarrierAgent;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierImpl;
-import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.api.CarrierAgentFactory;
-import freight.CarrierAgentFactoryImpl;
 import freight.CarrierPlanReader;
 
 

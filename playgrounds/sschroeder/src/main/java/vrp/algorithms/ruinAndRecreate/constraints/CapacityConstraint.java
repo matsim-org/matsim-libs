@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import vrp.api.Constraints;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
+import vrp.basics.Vehicle;
 
 
 /**
@@ -28,6 +29,24 @@ public class CapacityConstraint implements Constraints {
 	
 	public boolean judge(Tour tour) {
 		int currentCap = 0;
+		for(TourActivity tourAct : tour.getActivities()){
+			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
+				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);
+				return false;
+			}
+			if(tourAct.hasTimeWindowConflict()){
+				logger.debug("timeWindow-conflic on tour " + tour);
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	@Override
+	public boolean judge(Tour tour, Vehicle vehicle) {
+		int currentCap = 0;
+		maxCap = vehicle.getCapacity();
 		for(TourActivity tourAct : tour.getActivities()){
 			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
 				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);

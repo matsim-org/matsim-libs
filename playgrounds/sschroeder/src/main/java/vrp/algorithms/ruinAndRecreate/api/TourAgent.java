@@ -16,7 +16,7 @@ import vrp.basics.TourActivity;
  *
  */
 
-public interface TourAgent extends ServiceProvider, Runnable{
+public interface TourAgent extends ServiceProvider{
 
 	abstract int getTourSize();
 
@@ -37,7 +37,6 @@ public interface TourAgent extends ServiceProvider, Runnable{
 	public abstract boolean tourIsValid();
 	
 	public Offer getOpenOffer();
-	
-	public void setNewShipment(Shipment shipment);
+
 
 }

@@ -44,8 +44,12 @@ public class VRPTransformation {
 	}
 	
 	public void addAndCreateCustomer(String customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
+		addAndCreateCustomer(makeId(customerId), linkId, demand, startTime, endTime, serviceTime);
+	}
+	
+	public void addAndCreateCustomer(Id customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
 		Node node = makeNode(linkId);
-		Customer customer = VrpUtils.createCustomer(makeId(customerId), node, demand, startTime, endTime, serviceTime);
+		Customer customer = VrpUtils.createCustomer(customerId, node, demand, startTime, endTime, serviceTime);
 		nodes.put(node.getId(), node);
 		customers.put(customer.getId(), customer);
 	}

@@ -48,6 +48,12 @@ public class VrpUtils {
 	
 	private static void assertCustomerRelation(Customer i, Customer j) {
 		if(i.hasRelation()){
+			if(i.getDemand() > 0 && j.getDemand() > 0){
+				throw new IllegalStateException("cannot be a relation. both customers have goods to be picked up");
+			}
+			if(i.getDemand() < 0 && j.getDemand() < 0){
+				throw new IllegalStateException("cannot be a relation. both customers have goods to be delivered");
+			}
 			if(i.getRelation().getCustomer().getId().equals(j.getId())){
 				if(i.getDemand() > 0 && j.getDemand() < 0){
 					return;
@@ -103,6 +109,10 @@ public class VrpUtils {
 	
 	public static Vehicle createVehicle(int newVehicleCapacity) {
 		return new Vehicle(newVehicleCapacity);
+	}
+	
+	public static Vehicle createVehicle(VehicleType type){
+		return new Vehicle(type);
 	}
 	
 	public static Tour createEmptyCustomerTour(){

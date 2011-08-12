@@ -105,7 +105,7 @@ public class RadialRuin implements RuinStrategy {
 	}
 
 	private boolean isDepot(Customer c) {
-		if(c == vrp.getDepot()){
+		if(vrp.getDepots().containsKey(c.getId())){
 			return true;
 		}
 		return false;

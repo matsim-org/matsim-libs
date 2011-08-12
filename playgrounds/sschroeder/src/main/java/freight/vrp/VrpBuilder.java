@@ -32,7 +32,7 @@ public class VrpBuilder {
 		this.costs = costs;
 	}
 	
-	public VRP buildVrp(){
+	public VRP buildVRP(){
 		String depotId = "depot";
 		vrpTrafo.addAndCreateCustomer(depotId, depotLocationId, 0, 0.0, 48*3600, 0.0);
 		VRP vrp = new VrpImpl(makeId(depotId), vrpTrafo.getCustomers(), costs, constraints);
@@ -43,7 +43,7 @@ public class VrpBuilder {
 		return new IdImpl(depotId);
 	}
 
-	public void setVrpTransformation(VRPTransformation vrpTrafo) {
+	public void setVRPTransformation(VRPTransformation vrpTrafo) {
 		this.vrpTrafo = vrpTrafo;
 	}
 

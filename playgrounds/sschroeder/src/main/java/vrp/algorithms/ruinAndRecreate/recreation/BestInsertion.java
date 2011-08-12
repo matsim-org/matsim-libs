@@ -14,10 +14,10 @@ import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
-import vrp.api.Customer;
 import vrp.api.VRP;
+import vrp.basics.InitialSolutionFactory;
 import vrp.basics.Tour;
-import vrp.basics.VrpUtils;
+import vrp.basics.Vehicle;
 
 
 /**
@@ -34,11 +34,9 @@ public class BestInsertion implements RecreationStrategy{
 	
 	private VRP vrp;
 	
-	private int newVehicleCapacity;
-	
-	private Customer depot;
-	
 	private TourAgentFactory tourAgentFactory;
+	
+	private InitialSolutionFactory initialSolutionFactory;
 	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
@@ -49,21 +47,23 @@ public class BestInsertion implements RecreationStrategy{
 	public BestInsertion(VRP vrp) {
 		super();
 		this.vrp = vrp;
-		this.depot = vrp.getDepot();
 	}
 	
+	public void setInitialSolutionFactory(InitialSolutionFactory initialSolutionFactory) {
+		this.initialSolutionFactory = initialSolutionFactory;
+	}
+
 	public void setTourAgentFactory(TourAgentFactory tourAgentFactory) {
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
 	public void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
-//		List<Customer> customersWithoutService = getCustomers(shipmentsWithoutService);
 		Collections.shuffle(shipmentsWithoutService, MatsimRandom.getRandom());
 		for(Shipment shipmentWithoutService : shipmentsWithoutService){
+			assertShipmentIsInCorrectOrder(shipmentWithoutService);
 			Offer bestOffer = null;
 			for(TourAgent agent : tentativeSolution.getTourAgents()){
 				Offer offer = agent.requestService(shipmentWithoutService);
-//				logger.debug(offer);
 				if(offer == null){
 					continue;
 				}
@@ -92,6 +92,15 @@ public class BestInsertion implements RecreationStrategy{
 		}
 	}
 
+	
+
+	private void assertShipmentIsInCorrectOrder(Shipment shipmentWithoutService) {
+		if(shipmentWithoutService.getFrom().getDemand() < 0){
+			throw new IllegalStateException("this must be a pickup and can thus not be smaller than 0. " + shipmentWithoutService.getFrom().getId() + "; " + shipmentWithoutService.getTo().getId());
+		}
+		
+	}
+
 	private void informListeners(Shipment shipment, double cost) {
 		for(RecreationListener l : recreationListeners){
 			l.inform(new RecreationEvent(shipment,cost));
@@ -100,13 +109,10 @@ public class BestInsertion implements RecreationStrategy{
 	}
 
 	private TourAgent createTourAgent(Shipment shipmentWithoutService) {
-		Tour tour = tourAgentFactory.createRoundTour(shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
-		TourAgent agent = tourAgentFactory.createTourAgent(tour, VrpUtils.createVehicle(newVehicleCapacity));
+		Tour tour = initialSolutionFactory.createRoundTour(vrp, shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
+		Vehicle vehicle = initialSolutionFactory.createVehicle(vrp, tour);
+		TourAgent agent = tourAgentFactory.createTourAgent(tour, vehicle);
 		return agent;
-	}
-
-	public void setNewVehicleCapacity(int newVehicleCapacity) {
-		this.newVehicleCapacity = newVehicleCapacity;
 	}
 
 	@Override

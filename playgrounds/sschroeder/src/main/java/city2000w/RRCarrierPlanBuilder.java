@@ -3,6 +3,8 @@ package city2000w;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.mzilske.freight.CarrierCapabilities;
@@ -17,7 +19,7 @@ import freight.vrp.VRPSolver;
 
 class RRCarrierPlanBuilder {
 
-
+	private static Logger logger = Logger.getLogger(RRCarrierPlanBuilder.class);
 	private CarrierCapabilities caps;
 	private Collection<Contract> contracts;
 	private Network network;
@@ -38,6 +40,8 @@ class RRCarrierPlanBuilder {
 		}
 		VRPSolver vrpSolver = new RRSolver(getShipments(contracts), getVehicles(caps), network);
 		Collection<Tour> tours = vrpSolver.solve();
+		logger.info(tours.size());
+
 		Collection<ScheduledTour> scheduledTours = makeScheduledTours(tours);
 		return new CarrierPlan(scheduledTours);
 	}
@@ -45,13 +49,20 @@ class RRCarrierPlanBuilder {
 	private Collection<ScheduledTour> makeScheduledTours(Collection<Tour> tours) {
 		Collection<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
 		for(Tour t : tours){
-			sTours.add(new ScheduledTour(t, getVehicle(caps), 0.0));
+			sTours.add(new ScheduledTour(t, getVehicle(t,caps), 0.0));
 		}
 		return sTours;
 	}
 	
-	private CarrierVehicle getVehicle(CarrierCapabilities caps) {
-		return caps.getCarrierVehicles().iterator().next();
+	private CarrierVehicle getVehicle(Tour t, CarrierCapabilities caps) {
+		Id locationId = t.getStartLinkId();
+		CarrierVehicle cV = null;
+		for(CarrierVehicle vehicle : caps.getCarrierVehicles()){
+			if(vehicle.getLocation().equals(locationId)){
+				cV = vehicle;
+			}
+		}
+		return cV;
 	}
 	
 	private Collection<CarrierVehicle> getVehicles(CarrierCapabilities caps) {

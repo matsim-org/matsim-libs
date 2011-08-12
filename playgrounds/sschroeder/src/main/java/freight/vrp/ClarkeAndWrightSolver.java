@@ -12,6 +12,7 @@ import vrp.algorithms.clarkeAndWright.ClarkeAndWright;
 import vrp.algorithms.clarkeAndWright.ClarkeWrightCapacityConstraint;
 import vrp.api.VRP;
 import vrp.basics.Tour;
+import vrp.basics.VRPDistanceMatrixBuilder;
 
 public class ClarkeAndWrightSolver implements VRPSolver {
 
@@ -34,8 +35,8 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 			Shipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
-		vrpBuilder.setVrpTransformation(vrpTransformation);
-		VRP vrp = vrpBuilder.buildVrp();
+		vrpBuilder.setVRPTransformation(vrpTransformation);
+		VRP vrp = vrpBuilder.buildVRP();
 		ClarkeAndWright clarkAndWright = new ClarkeAndWright(vrp);
 		clarkAndWright.run();
 		tours.addAll(clarkAndWright.getSolution());

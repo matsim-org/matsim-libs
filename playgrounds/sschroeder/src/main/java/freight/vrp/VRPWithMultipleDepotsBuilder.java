@@ -1,7 +1,6 @@
-package vrp.basics;
+package freight.vrp;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,15 @@ import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.Node;
 import vrp.api.VRP;
+import vrp.basics.CrowFlyDistance;
+import vrp.basics.Tour;
+import vrp.basics.VRPWithMultipleDepotsAndVehiclesImpl;
+import vrp.basics.VRPWithMultipleDepotsImpl;
+import vrp.basics.Vehicle;
+import vrp.basics.VehicleType;
 
-public class VRPBuilder {
+public class VRPWithMultipleDepotsBuilder {
 	
 	private Constraints constraints = new Constraints(){
 
@@ -30,37 +33,23 @@ public class VRPBuilder {
 		
 	};
 	
+	private VRPTransformation vrpTrafo;
+	
 	private Costs costs = new CrowFlyDistance();
 	
 	private List<Id> depots = new ArrayList<Id>();
 	
-	private Collection<Customer> customers = new ArrayList<Customer>();
+	private List<Id> depotLocations = new ArrayList<Id>();
 	
 	private Map<Id,VehicleType> types = new HashMap<Id, VehicleType>();
-
-	public Customer createAndAddCustomer(Id id, Node node, int demand, double start, double end, double serviceTime, boolean isDepot){
-		Customer customer = createCustomer(id, node, demand, start, end, serviceTime);
-		addCustomer(customer,isDepot);
-		return customer;
+	
+	public void addDepot(Id depotId, Id depotLocationId){
+		depots.add(depotId);
+		depotLocations.add(depotLocationId);
 	}
 	
-	public void addCustomer(Customer customer, boolean isDepot){
-		customers.add(customer);
-		if(isDepot){
-			depots.add(customer.getId());
-		}
-	}
-	
-	public void assignVehicleType(Id depotId, VehicleType vehicleType){
-		types.put(depotId, vehicleType);
-	}
-	
-	private Customer createCustomer(Id id, Node node, int demand, double start, double end, double serviceTime){
-		Customer customer = new CustomerImpl(id, node);
-		customer.setDemand(demand);
-		customer.setServiceTime(serviceTime);
-		customer.setTheoreticalTimeWindow(start, end);
-		return customer;
+	public void assignVehicleType(Id depotId, VehicleType type){
+		types.put(depotId, type);
 	}
 	
 	public void setConstraints(Constraints constraints){
@@ -73,7 +62,10 @@ public class VRPBuilder {
 	
 	public VRP buildVRP(){
 		verify();
-		VRPWithMultipleDepotsAndVehiclesImpl vrp = new VRPWithMultipleDepotsAndVehiclesImpl(depots, customers, costs, constraints);
+		for(int i=0;i<depots.size();i++){
+			vrpTrafo.addAndCreateCustomer(depots.get(i), depotLocations.get(i), 0, 0.0, Double.MAX_VALUE, 0.0);
+		}
+		VRPWithMultipleDepotsAndVehiclesImpl vrp = new VRPWithMultipleDepotsAndVehiclesImpl(depots, vrpTrafo.getCustomers(), costs, constraints);
 		for(Id id : types.keySet()){
 			vrp.assignVehicleType(id, types.get(id));
 		}
@@ -90,10 +82,19 @@ public class VRPBuilder {
 		}
 		
 	}
-
+	
 	private void verify() {
 		if(depots.isEmpty()){
 			throw new IllegalStateException("at least one depot must be set");
 		}
+		if(vrpTrafo == null){
+			throw new IllegalStateException("vrpTrafo not set");
+		}
+		
 	}
+
+	public void setVRPTransformation(VRPTransformation vrpTrafo) {
+		this.vrpTrafo = vrpTrafo;
+	}
+
 }

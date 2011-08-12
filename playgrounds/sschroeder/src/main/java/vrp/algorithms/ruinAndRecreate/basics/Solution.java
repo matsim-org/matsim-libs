@@ -13,12 +13,6 @@ import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 
 public class Solution {
 	
-	private double transportTime;
-	
-	private double transportDistance;
-	
-	private double transportCosts;
-	
 	private Collection<TourAgent> tourAgents;
 	
 	private CostFunction costFunction;

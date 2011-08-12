@@ -71,4 +71,10 @@ public class VrpImpl implements VRP{
 		return depots;
 	}
 
+	@Override
+	public VehicleType getVehicleType(Id depotId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -3,6 +3,7 @@ package vrp.algorithms.clarkeAndWright;
 import vrp.api.Constraints;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
+import vrp.basics.Vehicle;
 
 /**
  * 
@@ -30,6 +31,12 @@ public class ClarkeWrightCapacityConstraint implements Constraints{
 		else{
 			return false;
 		}
+	}
+
+	@Override
+	public boolean judge(Tour tour, Vehicle vehicle) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

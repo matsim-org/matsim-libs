@@ -12,7 +12,6 @@ import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
-import vrp.api.Node;
 import vrp.api.VRP;
 import vrp.basics.VrpUtils;
 
@@ -53,7 +52,7 @@ public class RandomRuin implements RuinStrategy {
 	}
 
 	private boolean isDepot(Customer c) {
-		if(c == vrp.getDepot()){
+		if(vrp.getDepots().containsKey(c.getId())){
 			return true;
 		}
 		return false;

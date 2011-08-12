@@ -55,8 +55,8 @@ public class RuinAndRecreateSolver implements VRPSolver {
 			Shipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
-		vrpBuilder.setVrpTransformation(vrpTransformation);
-		VRP vrp = vrpBuilder.buildVrp();
+		vrpBuilder.setVRPTransformation(vrpTransformation);
+		VRP vrp = vrpBuilder.buildVRP();
 		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
 		rrFactory.setWarmUp(nOfWarmUpIterations);
 		rrFactory.setIterations(nOfIterations);

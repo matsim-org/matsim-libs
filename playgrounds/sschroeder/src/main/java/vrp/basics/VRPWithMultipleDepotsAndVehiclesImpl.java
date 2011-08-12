@@ -2,9 +2,9 @@ package vrp.basics;
 
 import java.util.Collection;
 import java.util.HashMap;
-
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
@@ -12,8 +12,10 @@ import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.VRP;
 
-public class VRPWithMultipleDepotsImpl implements VRP{
+public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 
+	private static Logger logger = Logger.getLogger(VRPWithMultipleDepotsAndVehiclesImpl.class);
+	
 	private Costs costs;
 	
 	private Constraints constraints;
@@ -22,12 +24,29 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 	
 	private Map<Id,Customer> depots;
 	
-	public VRPWithMultipleDepotsImpl(Collection<Id> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
+	private Map<Id,VehicleType> vehicleTypes;
+	
+	public VRPWithMultipleDepotsAndVehiclesImpl(Collection<Id> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
 		super();
 		this.costs = costs;
 		this.constraints = constraints;
 		mapCustomers(customers);
 		mapDepots(depots);
+		vehicleTypes = new HashMap<Id,VehicleType>();
+	}
+	
+
+	public void assignVehicleType(Id depotId, VehicleType vehicleType){
+		if(depots.containsKey(depotId)){
+			vehicleTypes.put(depotId, vehicleType);
+		}
+		else{
+			logger.warn("cannot assign vehicleType, since depot " + depotId + " does not exist");
+		}
+	}
+	
+	public VehicleType getVehicleType(Id depotId){
+		return vehicleTypes.get(depotId);
 	}
 
 	private void mapDepots(Collection<Id> depots) {
@@ -78,13 +97,6 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 	public Map<Id, Customer> getDepots() {
 		return depots;
 	}
-
-	@Override
-	public VehicleType getVehicleType(Id depotId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 
 }

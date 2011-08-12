@@ -9,7 +9,6 @@ import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourBuilder;
-import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder.TourResult;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
@@ -34,13 +33,9 @@ class RRTourAgent implements TourAgent {
 
 	private Double currentCost = null;
 	
-	private Costs costs;
-	
 	private Constraints constraint;
 	
 	private Offer openOffer = null;
-	
-	private Shipment newShipment = null;
 	
 	private Double costOfOfferedTour = null; 
 	
@@ -54,7 +49,6 @@ class RRTourAgent implements TourAgent {
 		super();
 		this.tour = tour;
 		this.vehicle = vehicle;
-		this.costs = costs;
 		this.activityStatusUpdater = updater;
 		updater.update(tour);
 		currentCost = tour.costs.generalizedCosts;
@@ -75,7 +69,7 @@ class RRTourAgent implements TourAgent {
 	public boolean tourIsValid(){
 		activityStatusUpdater.update(tour);
 		currentCost = tour.costs.generalizedCosts;
-		if(constraint.judge(tour)){
+		if(constraint.judge(tour,vehicle)){
 			return true;
 		}
 		else{
@@ -109,17 +103,6 @@ class RRTourAgent implements TourAgent {
 		}
 	}
 	
-	 @Override
-	public void run() {
-		 Tour newTour = tourBuilder.addShipmentAndGetTour(tour, newShipment);
-		 if(newTour != null){
-			 double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
-			 Offer offer = new Offer(this, marginalCosts);
-			 openOffer = offer;
-			 tourOfLastOffer = newTour;
-			 costOfOfferedTour = newTour.costs.generalizedCosts;
-		 }
-	}
 
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTourSize()
@@ -212,11 +195,6 @@ class RRTourAgent implements TourAgent {
 	@Override
 	public Offer getOpenOffer() {
 		return openOffer;
-	}
-
-	@Override
-	public void setNewShipment(Shipment shipment) {
-		newShipment = shipment;
 	}
 
 }

@@ -1,4 +1,4 @@
-package freight.vrp;
+package vrp.basics;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,22 +7,15 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
+
 import vrp.api.Customer;
 import vrp.api.VRP;
-import vrp.basics.Tour;
-import vrp.basics.VrpUtils;
 
 public class TrivialInitialSolutionFactory implements InitialSolutionFactory{
 
-	private VRP vrp;
-	
-	public TrivialInitialSolutionFactory(VRP vrp) {
-		super();
-		this.vrp = vrp;
-	}
 
 	@Override
-	public Collection<Tour> createInitialSolution() {
+	public Collection<Tour> createInitialSolution(VRP vrp) {
 		Collection<Tour> tours = new ArrayList<Tour>();
 		Customer depot = vrp.getDepot();
 		Set<Id> customersWithService = new HashSet<Id>();
@@ -52,6 +45,18 @@ public class TrivialInitialSolutionFactory implements InitialSolutionFactory{
 			}
 		}
 		return tours;
+	}
+
+	@Override
+	public Tour createRoundTour(VRP vrp, Customer from, Customer to) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Vehicle createVehicle(VRP vrp, Tour tour) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

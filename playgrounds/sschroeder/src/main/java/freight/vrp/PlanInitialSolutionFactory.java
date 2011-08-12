@@ -3,8 +3,11 @@ package freight.vrp;
 import java.util.Collection;
 
 import playground.mzilske.freight.CarrierPlan;
+import vrp.api.Customer;
 import vrp.api.VRP;
+import vrp.basics.InitialSolutionFactory;
 import vrp.basics.Tour;
+import vrp.basics.Vehicle;
 
 public class PlanInitialSolutionFactory implements InitialSolutionFactory{
 
@@ -22,9 +25,23 @@ public class PlanInitialSolutionFactory implements InitialSolutionFactory{
 	}
 
 	@Override
-	public Collection<Tour> createInitialSolution() {
-		
+	public Collection<Tour> createInitialSolution(VRP vrp) {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Tour createRoundTour(VRP vrp, Customer from, Customer to) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Vehicle createVehicle(VRP vrp, Tour tour) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

@@ -1,6 +1,7 @@
 package vrp.api;
 
 import vrp.basics.Tour;
+import vrp.basics.Vehicle;
 
 /**
  * 
@@ -11,5 +12,7 @@ import vrp.basics.Tour;
 public interface Constraints {
 	
 	public boolean judge(Tour tour);
+	
+	public boolean judge(Tour tour, Vehicle vehicle);
 
 }

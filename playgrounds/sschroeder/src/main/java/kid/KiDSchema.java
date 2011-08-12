@@ -17,9 +17,11 @@ public class KiDSchema {
 	public static String VEHICLE_LOCATION_GEO_LONG = "K24d";
 	public static String VEHICLE_LOCATION_GEO_LAT = "K24e";
 	
+	public static String VEHICLE_WIRTSCHAFTSZWEIG = "K19b";
+	
 	public static String VEHICLE_TAGESFAHRLEISTUNG = "K34";
 	
-	public static String COMPANY_SECTOR = "H01"; //Halter
+	public static String COMPANY_WIRTSCHAFTSZWEIG = "H01"; //Halter
 	public static String COMPANY_KREISTYP = "H04";
 	public static String COMPANY_EMPLOYEES = "H05";
 	
