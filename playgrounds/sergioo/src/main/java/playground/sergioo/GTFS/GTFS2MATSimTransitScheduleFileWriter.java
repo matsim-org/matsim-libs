@@ -52,7 +52,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.sergioo.GTFS.Route.RouteTypes;
+import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
 import playground.sergioo.GTFS.auxiliar.LinkStops;
 import playground.sergioo.PathEditor.gui.Window;
 import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
@@ -138,7 +138,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				Link link = new LinkFactoryImpl().createLink(new IdImpl(line), network.getNodes().get(new IdImpl(fromNode)), network.getNodes().get(new IdImpl(toNode)), network, distance, DEFAULT_FREE_SPEED, DEFAULT_CAPCITY, 1);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
-				modes.add(Route.RouteTypes.BUS.name);
+				modes.add(RouteTypes.BUS.name);
 				link.setAllowedModes(modes);
 				network.addLink(link);
 				line = reader.readLine();
@@ -310,7 +310,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 				routesPathsGenerator.run();
 			}
 			for(Entry<String,Route> route:routes[publicSystemNumber].entrySet())
-				if(!route.getValue().getRouteType().wayType.equals(Route.WayTypes.ROAD))
+				if(!route.getValue().getRouteType().wayType.equals(GTFSDefinitions.WayTypes.ROAD))
 					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet())
 						if(shape && trip.getValue().getShape()!= null)
 							addNewLinksSequenceShape(trip, route.getValue().getRouteType(), route.getKey(), publicSystemNumber);
@@ -906,7 +906,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 		Network network = scenario.getNetwork();
 		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
 		//Transformation for Singapore
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_SVY21);
 		g2m.write(args[0],coordinateTransformation);
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);

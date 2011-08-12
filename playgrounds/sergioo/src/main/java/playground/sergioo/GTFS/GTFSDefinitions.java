@@ -1,6 +1,8 @@
 package playground.sergioo.GTFS;
 
 public enum GTFSDefinitions {
+	
+	//Constants
 	/**
 	 * Values
 	 */
@@ -12,10 +14,35 @@ public enum GTFSDefinitions {
 	TRIPS("Trip","trips.txt",new String[]{"route_id","trip_id","service_id","shape_id"}),
 	STOP_TIMES("StopTime","stop_times.txt",new String[]{"trip_id","stop_sequence","arrival_time","departure_time","stop_id"}),
 	FREQUENCIES("Frequency","frequencies.txt",new String[]{"trip_id","start_time","end_time","headway_secs"});
+	public enum WayTypes {
+		RAIL,
+		ROAD,
+		WATER,
+		CABLE;
+	}
+	public enum RouteTypes {
+		//Values
+		TRAM("tram",WayTypes.RAIL),
+		SUBWAY("subway",WayTypes.RAIL),
+		RAIL("rail",WayTypes.RAIL),
+		BUS("bus",WayTypes.ROAD),
+		FERRY("ferry",WayTypes.WATER),
+		CABLE_CAR("cable car",WayTypes.CABLE);
+		//Attributes
+		public String name;
+		public WayTypes wayType;
+		//Methods
+		private RouteTypes(String name,WayTypes wayType) {
+			this.name = name;
+			this.wayType = wayType;
+		}
+	}
+	
 	//Attributes
 	public String name;
 	public String fileName;
 	public String[] columns;
+	
 	//Methods
 	/**
 	 * 
@@ -55,4 +82,5 @@ public enum GTFSDefinitions {
 	public String getFunction() {
 		return "process"+name;
 	}
+	
 }

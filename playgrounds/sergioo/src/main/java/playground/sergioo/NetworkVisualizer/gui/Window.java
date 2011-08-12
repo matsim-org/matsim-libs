@@ -28,7 +28,6 @@ import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,6 +44,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class Window extends JFrame implements ActionListener {
 	/**
@@ -142,6 +142,49 @@ public class Window extends JFrame implements ActionListener {
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
 	}
+	public Window(String title, Network network, TransitSchedule transitSchedule) {
+		setTitle(title);
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		this.network = network;
+		lines = new ArrayList<Tuple<Coord,Coord>>();
+		points = new ArrayList<Coord>();
+		this.setLocation(0,0);
+		this.setLayout(new BorderLayout());
+		option = Option.SELECT_LINK;
+		panel = new PanelNetwork(this, transitSchedule);
+		this.setSize(width+GAPX, height+GAPY);
+		this.add(panel, BorderLayout.CENTER);
+		JPanel buttonsPanel = new JPanel();
+		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
+		for(Option option:Option.values()) {
+			JButton optionButton = new JButton(option.caption);
+			optionButton.setActionCommand(option.name());
+			optionButton.addActionListener(this);
+			buttonsPanel.add(optionButton);
+		}
+		this.add(buttonsPanel, BorderLayout.EAST);
+		JPanel infoPanel = new JPanel();
+		infoPanel.setLayout(new BorderLayout());
+		saveButton = new JButton("Save");
+		saveButton.addActionListener(this);
+		saveButton.setActionCommand("Save");
+		infoPanel.add(saveButton, BorderLayout.WEST);
+		JPanel labelsPanel = new JPanel();
+		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labelsPanel.setBorder(new TitledBorder("Information"));
+		labels = new JLabel[Label.values().length];
+		labels[0]=new JLabel("");
+		labelsPanel.add(labels[0]);
+		labels[1]=new JLabel("");
+		labelsPanel.add(labels[1]);
+		infoPanel.add(labelsPanel, BorderLayout.CENTER);JPanel coordsPanel = new JPanel();
+		coordsPanel.setLayout(new GridLayout(1,2));
+		coordsPanel.setBorder(new TitledBorder("Coordinates"));
+		coordsPanel.add(lblCoords[0]);
+		coordsPanel.add(lblCoords[1]);
+		infoPanel.add(coordsPanel, BorderLayout.EAST);
+		this.add(infoPanel, BorderLayout.SOUTH);
+	}
 	public Option getOption() {
 		return option;
 	}
@@ -164,19 +207,11 @@ public class Window extends JFrame implements ActionListener {
 	public Coord getSelectedPoint() {
 		return selectedPoint;
 	}
+	public Network getNetwork() {
+		return network;
+	}
 	public Collection<? extends Link> getNetworkLinks() {
 		return network.getLinks().values();
-	}
-	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
-		Collection<Link> links =  new HashSet<Link>();
-		for(Link link:network.getLinks().values()) {
-			Coord from = link.getFromNode().getCoord();
-			Coord to = link.getToNode().getCoord();
-			if((xMin<from.getX()&&yMin<from.getY()&&xMax>from.getX()&&yMax>from.getY())||
-					(xMin<to.getX()&&yMin<to.getY()&&xMax>to.getX()&&yMax>to.getY()))
-				links.add(link);
-		}
-		return links;
 	}
 	public Collection<Tuple<Coord, Coord>> getLines() {
 		return lines;

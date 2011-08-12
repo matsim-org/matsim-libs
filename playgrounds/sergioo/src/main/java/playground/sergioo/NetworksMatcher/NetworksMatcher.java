@@ -40,7 +40,7 @@ public class NetworksMatcher {
 		Network networkLowResolutionLength = getNetworkFromShapeFileLength(args[1]);
 		MatchingProcess matchingProcess = new MatchingProcess();
 		matchingProcess.execute(networkHighResolution, networkLowResolutionLength);
-		matchingProcess.applyProperties(false);
+		//matchingProcess.applyProperties(false);
 		Window windowHR = new Window("High Resolution Network", networkHighResolution);
 		Window windowLRP = new Window("Low Resolution Network Polyline", networkLowResolutionPolyline);
 		Window windowLRL = new Window("Low Resolution Network Length", networkLowResolutionLength);

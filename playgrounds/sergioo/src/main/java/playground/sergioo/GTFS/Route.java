@@ -3,32 +3,9 @@ package playground.sergioo.GTFS;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+
 public class Route {
-	
-	//Constants
-	public enum WayTypes {
-		RAIL,
-		ROAD,
-		WATER,
-		CABLE;
-	}
-	public enum RouteTypes {
-		//Values
-		TRAM("tram",WayTypes.RAIL),
-		SUBWAY("subway",WayTypes.RAIL),
-		RAIL("rail",WayTypes.RAIL),
-		BUS("bus",WayTypes.ROAD),
-		FERRY("ferry",WayTypes.WATER),
-		CABLE_CAR("cable car",WayTypes.CABLE);
-		//Attributes
-		public String name;
-		public WayTypes wayType;
-		//Methods
-		private RouteTypes(String name,WayTypes wayType) {
-			this.name = name;
-			this.wayType = wayType;
-		}
-	}
 	                           
 	//Attributes
 	private String shortName;

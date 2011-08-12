@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import util.geometry.Point2D;
 
@@ -54,17 +55,13 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 	
 	private int iniX;
 	private int iniY;
-	private double pointsSize;
 	private Color backgroundColor = Color.WHITE;
 	private Color linkSelectedColor = Color.GREEN;
 	private Color nodeSelectedColor = Color.MAGENTA;
 	private Color linesColor = Color.BLACK;
 	private Color pointsColor = Color.RED;
-	private Color networkColor = Color.LIGHT_GRAY;
 	private Stroke selectedStroke = new BasicStroke(2);
 	private Stroke linesStroke = new BasicStroke(1);
-	private Stroke pointsStroke = new BasicStroke(1);
-	private Stroke networkStroke = new BasicStroke(0.5f);
 	private boolean withSelected = true;
 	private boolean withLines = true;
 	private boolean withPoints = true;
@@ -73,12 +70,25 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 	private double yMax;
 	private double xMin;
 	private double yMin;
+	private NetworkPainter networkPainter;
 	
 	//Methods
 	public PanelNetwork(Window window) {
 		this.window = window;
 		this.setBackground(backgroundColor);
 		camera = new Camera();
+		networkPainter = new SimpleNetworkPainter(new NetworkByCamera(window.getNetwork()));
+		calculateBoundaries();
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addKeyListener(this);
+		setFocusable(true);
+	}
+	public PanelNetwork(Window window, TransitSchedule transitSchedule) {
+		this.window = window;
+		this.setBackground(backgroundColor);
+		camera = new Camera();
+		networkPainter = new PublicTransportNetworkPainter(new NetworkByCamera(window.getNetwork()), transitSchedule);
 		calculateBoundaries();
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -117,7 +127,11 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 		super.paintComponent(g);
 		Graphics2D g2=(Graphics2D)g;
 		if(withNetwork)
-			paintNetwork(g2);
+			try {
+				networkPainter.paintNetwork(g2, camera);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		if(withLines)
 			paintLines(g2);
 		if(withPoints)
@@ -125,59 +139,42 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 		if(withSelected)
 			paintSelected(g2);
 	}
-	private void paintNetwork(Graphics2D g2) {
-		g2.setColor(networkColor);
-		g2.setStroke(networkStroke);
-		pointsSize=0.5;
-		for(Link link:window.getNetworkLinks(camera.getUpLeftCorner().getX(),camera.getUpLeftCorner().getY()+camera.getSize().getY(),camera.getUpLeftCorner().getX()+camera.getSize().getX(),camera.getUpLeftCorner().getY()))
-			paintLink(g2,link);
-	}
 	private void paintSelected(Graphics2D g2) {
-		g2.setStroke(selectedStroke);
-		g2.setColor(linkSelectedColor);
 		Link link=window.getSelectedLink();
-		pointsSize=3;
 		if(link!=null)
-			paintLink(g2, link);
-		g2.setColor(nodeSelectedColor);
+			paintLink(g2, link, selectedStroke, 3, linkSelectedColor);
 		Node node = window.getSelectedNode();
-		pointsSize = 5;
 		if(node!=null)
-			paintCircle(g2, node.getCoord());
+			paintCircle(g2, node.getCoord(), 5, nodeSelectedColor);
 		Tuple<Coord, Coord> line = window.getSelectedLine();
-		pointsSize = 3;
 		if(line!=null)
-			paintLine(g2, line);
+			paintLine(g2, line, selectedStroke, linesColor);
 		Coord point = window.getSelectedPoint();
-		pointsSize = 5;
 		if(point!=null)
-			paintCircle(g2, point);
+			paintCircle(g2, point, 5, pointsColor);
 	}
 	private void paintLines(Graphics2D g2) {
-		g2.setColor(linesColor);
-		g2.setStroke(linesStroke);
 		for(Tuple<Coord, Coord> line:window.getLines())
-			paintLine(g2, line);
+			paintLine(g2, line, linesStroke, linesColor);
 	}
 	private void paintPoints(Graphics2D g2) {
-		g2.setColor(pointsColor);
-		g2.setStroke(pointsStroke);
-		pointsSize = 3;
 		for(Coord point:window.getPoints())
-			paintCircle(g2, point);
+			paintCircle(g2, point, 3, pointsColor);
 	}
-	private void paintLink(Graphics2D g2, Link link) {
-		paintLine(g2, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()));
-		paintCircle(g2,link.getToNode().getCoord());
+	private void paintLink(Graphics2D g2, Link link, Stroke stroke, double pointSize, Color color) {
+		paintLine(g2, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
+		paintCircle(g2,link.getToNode().getCoord(), pointSize, color);
 	}
-	private void paintLine(Graphics2D g2, Tuple<Coord,Coord> coords) {
+	private void paintLine(Graphics2D g2, Tuple<Coord,Coord> coords, Stroke stroke, Color color) {
+		g2.setStroke(stroke);
+		g2.setColor(color);
 		g2.drawLine(camera.getIntX(coords.getFirst().getX()),
 				camera.getIntY(coords.getFirst().getY()),
 				camera.getIntX(coords.getSecond().getX()),
 				camera.getIntY(coords.getSecond().getY()));
 	}
-	private void paintCircle(Graphics2D g2, Coord coord) {
-		Shape circle = new Ellipse2D.Double(camera.getIntX(coord.getX())-pointsSize,camera.getIntY(coord.getY())-pointsSize,pointsSize*2,pointsSize*2);
+	private void paintCircle(Graphics2D g2, Coord coord, double pointSize, Color color) {
+		Shape circle = new Ellipse2D.Double(camera.getIntX(coord.getX())-pointSize,camera.getIntY(coord.getY())-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
 	}
 	public void zoomIn(double x, double y) {
@@ -268,6 +265,12 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 			break;
 		case 'v':
 			setBoundaries();
+			break;
+		case 't':
+			((PublicTransportNetworkPainter)networkPainter).setWeight(((PublicTransportNetworkPainter)networkPainter).getWeight()/1.5f);
+			break;
+		case 'g':
+			((PublicTransportNetworkPainter)networkPainter).setWeight(((PublicTransportNetworkPainter)networkPainter).getWeight()*1.5f);
 			break;
 		}
 		repaint();

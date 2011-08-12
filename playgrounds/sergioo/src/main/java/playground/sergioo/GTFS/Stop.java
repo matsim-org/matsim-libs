@@ -2,6 +2,8 @@ package playground.sergioo.GTFS;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+
 public class Stop {
 	
 	//Attributes
@@ -28,7 +30,7 @@ public class Stop {
 	/**
 	 * The route type
 	 */
-	private Route.RouteTypes routeType;
+	private RouteTypes routeType;
 	
 	//Methods
 	/**
@@ -101,13 +103,13 @@ public class Stop {
 	/**
 	 * @return the routeType
 	 */
-	public Route.RouteTypes getRouteType() {
+	public RouteTypes getRouteType() {
 		return routeType;
 	}
 	/**
 	 * @param routeType the routeType to set
 	 */
-	public void setRouteType(Route.RouteTypes routeType) {
+	public void setRouteType(RouteTypes routeType) {
 		this.routeType = routeType;
 	}
 	
