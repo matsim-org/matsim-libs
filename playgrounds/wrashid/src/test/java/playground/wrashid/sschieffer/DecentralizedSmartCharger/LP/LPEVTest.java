@@ -59,7 +59,6 @@ import lpsolve.LpSolveException;
  *<li>objective
  *<li>(in)equalities
  *<li>bounds
- *
  * @author Stella
  *
  */

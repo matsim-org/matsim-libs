@@ -66,7 +66,7 @@ public class HubLoadDistributionReaderTestOnePlan_new extends TestCase{
 	
 	public static DecentralizedSmartCharger myDecentralizedSmartCharger;
 	
-	// gas Price is 0.000203...
+	
 	final static double optimalPrice=0.00001;// below gas price
 	final static double suboptimalPrice=optimalPrice*3; // above gas price
 	

@@ -84,7 +84,7 @@ public class Main_exampleV2GTestHubAndVehicleStochasticLoad extends TestCase{
 		 * *************/
 		
 		final double electrification= 1.0;
-		// rate of Evs in the system - if ev =0% then phev= 100-0%=100%
+		
 		final double ev=1.0; 
 		
 		final String outputPath="test/output/";

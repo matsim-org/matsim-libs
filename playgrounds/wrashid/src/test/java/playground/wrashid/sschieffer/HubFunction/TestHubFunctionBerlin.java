@@ -20,7 +20,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.wrashid.sschieffer.HubFunction;
 
 import java.io.BufferedWriter;
@@ -103,7 +102,7 @@ public class TestHubFunctionBerlin extends TestCase{
 		int numberOfHubsInY=1;
 		StellasHubMapping myMappingClass= new StellasHubMapping(numberOfHubsInX,numberOfHubsInY);
 		
-		double priceMaxPerkWhHub1=0.11;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html
+		double priceMaxPerkWhHub1=0.11;
 		double priceMinPerkWhHub1=0.07;
 		
 		double priceMaxPerkWhHub2=100.0;// http://www.ekz.ch/internet/ekz/de/privatkunden/Tarife_neu/Tarife_Mixstrom.html

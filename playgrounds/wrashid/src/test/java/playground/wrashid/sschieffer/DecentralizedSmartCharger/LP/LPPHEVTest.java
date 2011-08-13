@@ -63,7 +63,6 @@ import lpsolve.LpSolveException;
  *<li>objective
  *<li>(in)equalities
  *<li>bounds
- *
  *2) checks if calcEnergyUsageFromCombustionEngine returns correct result for mock case
  *
  * @author Stella

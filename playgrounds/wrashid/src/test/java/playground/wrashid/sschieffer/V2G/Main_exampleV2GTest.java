@@ -59,7 +59,6 @@ import junit.framework.TestCase;
  * with random numbers and probability density functions the exact charging times and thus V2G are different every time
  * 
  * @author Stella
- *
  */
 public class Main_exampleV2GTest extends TestCase{
 	

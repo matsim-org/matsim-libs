@@ -32,7 +32,6 @@ import playground.wrashid.sschieffer.SetUp.EnergyConsumptionInit;
  */
 public class EnergyConsumptionInitTest extends MatsimTestCase{
 
-	 // 100 agents
 	static String configPath="test/input/playground/wrashid/sschieffer/config.xml";
 	final static Controler controler=new Controler(configPath);
 	

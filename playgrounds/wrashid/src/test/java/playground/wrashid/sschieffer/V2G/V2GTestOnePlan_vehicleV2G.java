@@ -56,7 +56,6 @@ import lpsolve.LpSolveException;
  * <li> checks attributeSuperfluousVehicleLoads Function
  * 
  * @author Stella
- *
  */
 public class V2GTestOnePlan_vehicleV2G extends TestCase{
 

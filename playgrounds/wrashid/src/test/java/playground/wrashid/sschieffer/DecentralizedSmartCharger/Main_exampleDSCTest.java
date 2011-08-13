@@ -57,7 +57,6 @@ import junit.framework.TestCase;
  * using the equil scenario with 2 agents
  * 
  * @author Stella
- *
  */
 public class Main_exampleDSCTest extends TestCase{
 	

@@ -56,9 +56,7 @@ import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
 
 /**
- 
  * @author Stella
- *
  */
 public class DummyLPEVTest extends TestCase{
 

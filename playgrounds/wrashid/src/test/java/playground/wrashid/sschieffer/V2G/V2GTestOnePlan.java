@@ -53,7 +53,6 @@ import lpsolve.LpSolveException;
  * <li> checks the most important V2G function reschedule at the example of one agent
  * 
  * @author Stella
- *
  */
 public class V2GTestOnePlan extends TestCase{
 

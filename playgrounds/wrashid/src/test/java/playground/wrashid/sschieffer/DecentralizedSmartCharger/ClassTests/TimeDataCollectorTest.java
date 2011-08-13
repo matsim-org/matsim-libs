@@ -15,8 +15,7 @@ public class TimeDataCollectorTest extends TestCase{
 		assertEquals(7.5, ex1);
 		
 		double ex2= myCollector.extrapolateValueAtTimeFromDataCollector(0.75*(3600*24.0));
-		assertEquals(15.0, ex2);
-		
+		assertEquals(15.0, ex2);		
 		
 	}
 	
