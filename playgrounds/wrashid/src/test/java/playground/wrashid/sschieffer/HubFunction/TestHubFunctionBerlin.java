@@ -186,7 +186,7 @@ public class TestHubFunctionBerlin extends TestCase{
 			    	
 		    }
 		//Close the output stream
-	    out.close();
+		out.close();
 	    
 	    }catch (Exception e){
 	    	//Catch exception if any
