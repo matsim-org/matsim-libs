@@ -88,6 +88,11 @@ public class CustomerImpl implements Customer {
 		}
 		return false;
 	}
+
+	@Override
+	public void removeRelation() {
+		this.relationship = null;
+	}
 	
 	
 }

@@ -22,6 +22,8 @@ public interface Customer {
 
 	public abstract void setRelation(Relation relationship);
 	
+	public abstract void removeRelation();
+	
 	public abstract boolean hasRelation();
 
 	public abstract int getDemand();

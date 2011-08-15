@@ -15,6 +15,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
+import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -23,11 +24,13 @@ import vrp.api.Node;
 import vrp.api.VRP;
 import vrp.basics.CustomerImpl;
 import vrp.basics.ManhattanDistance;
+import vrp.basics.MultipleDepotsInitialSolutionFactory;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
 import vrp.basics.Relation;
 import vrp.basics.Tour;
 import vrp.basics.TourActivityFactory;
+import vrp.basics.VRPBuilder;
 import vrp.basics.VehicleType;
 import vrp.basics.VrpUtils;
 
@@ -44,6 +47,9 @@ public class VRPTestCase extends TestCase{
 	public Map<Id,Customer> customerMap;
 	
 	public Constraints constraints;
+	
+	public boolean init = false;
+	
 	
 	/*
 	 * 	|
@@ -71,7 +77,45 @@ public class VRPTestCase extends TestCase{
 		customerMap = new HashMap<Id, Customer>();
 		createNodesAndCustomer();
 		constraints = new CapacityPickupsDeliveriesSequenceConstraint(20);
+		init = true;
 		
+	}
+	
+	protected VRP getVRP(){
+		if(!init){
+			init();
+			init = true;
+		}
+		Customer depot1 = customerMap.get(makeId(0,0));
+		depot1.setDemand(0);
+		Customer depot2 = customerMap.get(makeId(10,0));
+		depot2.setDemand(0);
+		VRPBuilder vrpBuilder = new VRPBuilder();
+		vrpBuilder.addCustomer(depot1, true);
+		vrpBuilder.addCustomer(depot2, true);
+		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)), false);
+		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)), false);
+		Customer c1 = customerMap.get(makeId(1,4));
+		vrpBuilder.addCustomer(c1, false);
+		Customer c2 = customerMap.get(makeId(1,5));
+		vrpBuilder.addCustomer(c2, false);
+		setRelation(c1,c2);
+		vrpBuilder.setCosts(costs);
+		vrpBuilder.setConstraints(constraints);
+		vrpBuilder.assignVehicleType(depot1.getId(), new VehicleType(2));
+		vrpBuilder.assignVehicleType(depot2.getId(), new VehicleType(2));
+		return vrpBuilder.buildVRP();
+	}
+	
+	protected Solution getInitialSolution(VRP vrp){
+		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<TourAgent> agents = new ArrayList<TourAgent>();
+		for(Tour t : tours){
+			VehicleType type = vrp.getVehicleType(t.getActivities().get(0).getCustomer().getId());
+			TourAgent a = new RRTourAgentFactory(vrp).createTourAgent(t, VrpUtils.createVehicle(type));
+			agents.add(a);
+		}
+		return new Solution(agents);
 	}
 	
 	protected Customer getDepot(){

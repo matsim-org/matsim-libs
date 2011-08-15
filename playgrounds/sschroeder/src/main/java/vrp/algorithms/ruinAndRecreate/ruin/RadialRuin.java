@@ -118,6 +118,7 @@ public class RadialRuin implements RuinStrategy {
 			return;
 		}
 		Customer randomCustomer = pickRandomCustomer();
+		logger.info("randCust: " + randomCustomer);
 		TreeSet<ReferencedCustomer> tree = distanceNodeTree.get(randomCustomer.getId());
 		Iterator<ReferencedCustomer> descendingIterator = tree.descendingIterator();
 		int counter = 0;
@@ -126,6 +127,7 @@ public class RadialRuin implements RuinStrategy {
 		while(descendingIterator.hasNext() && counter<nOfNodes2BeRemoved){
 			ReferencedCustomer refNode = descendingIterator.next();
 			Customer customer = refNode.getCustomer();
+			logger.info("remCust: " + customer);
 			if(removedCustomers.contains(customer.getId())){
 				continue;
 			}
