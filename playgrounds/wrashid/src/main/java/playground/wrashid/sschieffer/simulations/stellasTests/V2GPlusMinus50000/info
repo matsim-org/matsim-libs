@@ -1,7 +1,0 @@
-The folder V2G 50000 runs the simulations
-	EV penetration
-SS	0.1	0.25	0.75	0.9
-
-with 100% regulation up and down (m n o  p)
-
-and a V2G random input load between -50000 and 50000 W
