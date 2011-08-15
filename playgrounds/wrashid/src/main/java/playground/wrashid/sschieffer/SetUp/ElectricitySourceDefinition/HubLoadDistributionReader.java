@@ -1132,11 +1132,9 @@ public class HubLoadDistributionReader {
 	                0.0f //float dash_phase
 	            )
 	        );
-        	
-        	
+        	        	
         	ChartUtilities.saveChartAsPNG(new File(outputPath+ "Hub_electricityPricesHub_"+ i.toString()+".png") , chartOnlyCharging, 1000, 1000);
-            
-			
+            			
 			//************************************
 			JFreeChart chart = ChartFactory.createXYLineChart("Electricity And Gas Prices at Hub "+ i.toString(), 
 					"time [s]", 
