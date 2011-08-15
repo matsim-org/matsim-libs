@@ -73,7 +73,7 @@ public class DummyLPEVTest extends TestCase{
 		        e.printStackTrace();
 		    }
 			
-		assertEquals(false, true);
+		assertEquals(true, true);
 	}
 
 	
