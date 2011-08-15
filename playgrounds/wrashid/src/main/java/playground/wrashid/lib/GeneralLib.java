@@ -674,6 +674,30 @@ public class GeneralLib {
 		return readStringMatrix(fileName,null);
 	}
 	
+	public static LinkedList<String> readFileRows(String fileName){
+		LinkedList<String> list=new LinkedList<String>();
+		
+		try {
+
+			FileInputStream fis = new FileInputStream(fileName);
+			InputStreamReader isr = new InputStreamReader(fis,
+								      "ISO-8859-1");
+
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			line = br.readLine();
+			while (line != null) {
+				list.add(line);
+				line = br.readLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		
+		return list;
+	}
+	
 	public static StringMatrix readStringMatrix(String fileName, String delim) {
 		StringMatrix matrix = new StringMatrix();
 
@@ -797,6 +821,17 @@ public class GeneralLib {
 		}
 		
 		GeneralLib.writeMatrix(matrix, fileName, headerLine);
+	}
+	
+	public static LinkedList<String> convertStringArrayToList(String[] array){
+		LinkedList<String> list=new LinkedList<String>();
+		for (int i=0;i<array.length;i++){
+			String trimedString = array[i].trim();
+			if (trimedString.length()>0){
+				list.add(trimedString);
+			}
+		}
+		return list;
 	}
 	
 }

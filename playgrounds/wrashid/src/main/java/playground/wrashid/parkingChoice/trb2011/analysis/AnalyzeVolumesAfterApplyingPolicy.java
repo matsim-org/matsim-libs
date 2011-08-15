@@ -17,15 +17,15 @@ import playground.wrashid.parkingChoice.trb2011.analysis.LinkVolumeAnalyzer.Peak
 public class AnalyzeVolumesAfterApplyingPolicy {
 
 	public static void main(String[] args) {
-		String outputFolder="H:/data/experiments/TRBAug2011/runs/ktiRun31/output/";
-		final String networkFileName = outputFolder + "output_network.xml.gz";
-		final String eventsFileName = outputFolder + "ITERS/it.50/50.events.xml.gz";
+		String outputFolderBaseCase="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
+		final String networkFileName = outputFolderBaseCase + "output_network.xml.gz";
+		final String eventsFileName = outputFolderBaseCase + "ITERS/it.50/50.events.xml.gz";
 		
 		NetworkImpl network = GeneralLib.readNetwork(networkFileName);
 		
 		VolumesAnalyzer volumeAnalyzerBaseScenario = loadVolumeOfBaseScenario(network, eventsFileName);
 		
-		String outputFolderAfterApplyingPolicy="H:/data/experiments/TRBAug2011/runs/ktiRun35/output/";
+		String outputFolderAfterApplyingPolicy="H:/data/experiments/TRBAug2011/runs/ktiRun40/output/";
 		final String eventsFileNameAfterApplyingPolicy = outputFolderAfterApplyingPolicy + "ITERS/it.50/50.events.xml.gz";
 		
 		VolumesAnalyzer volumeAnalyzerAfterApplyingPolicy = loadVolumeOfBaseScenario(network, eventsFileNameAfterApplyingPolicy);
