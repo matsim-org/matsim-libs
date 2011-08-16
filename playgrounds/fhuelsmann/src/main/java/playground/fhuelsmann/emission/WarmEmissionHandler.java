@@ -62,21 +62,21 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-//		if(event.getLegMode().equals("car")){
+		if(event.getLegMode().equals("car")){
 			this.agentarrival.put(event.getPersonId(), event.getTime());
-//		}
-//		else{
-//			// link travel time calcualtion not neccessary for other modes
-//		}
+		}
+		else{
+			// link travel time calcualtion not neccessary for other modes
+		}
 	}
 
 	public void handleEvent(AgentDepartureEvent event) {
-//		if(event.getLegMode().equals("car")){
+		if(event.getLegMode().equals("car")){
 			this.agentdeparture.put(event.getPersonId(), event.getTime());
-//		}
-//		else{
-//			// link travel time calcualtion not neccessary for other modes
-//		}
+		}
+		else{
+			// link travel time calcualtion not neccessary for other modes
+		}
 	}
 
 	public void handleEvent(LinkEnterEvent event) {

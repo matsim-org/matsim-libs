@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -47,19 +48,23 @@ import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
-	private final static String runNumber = "973";
+	private final static String runNumber = "983";
 	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+	private static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	private static final Integer lastIteration = getLastIteration(configFile);
 	
-//	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.xml.gz";
-//	private static String netFile = runDirectory + "980.output_network.xml.gz";
+	// TODO: use output_events, output_vehicles
+	private static String eventsFile = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration + ".events.xml.gz";
+	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	private static String vehicleFile = "../../detailedEval/pop/140k-synthetische-personen/vehicles.xml";
 
 //	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
 //	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 	
-	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	
-	// TODO: use output_events, output_vehicles
+//	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
+//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
@@ -67,9 +72,8 @@ public class EmissionTool {
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
 	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 	
-	private static String outputFile = runDirectory + runNumber + ".emission.events.xml.gz";
+	private static String outputFile = runDirectory + runNumber + "." + lastIteration + ".emission.events.xml.gz";
 
 	// =======================================================================================================		
 	private final Scenario scenario;
@@ -202,5 +206,14 @@ public class EmissionTool {
 	public static void main (String[] args) throws Exception{
 		EmissionTool emissionTool = new EmissionTool();
 		emissionTool.run(args);
+	}
+
+	private static int getLastIteration(String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		Integer lastIteration = config.controler().getLastIteration();
+		return lastIteration;
 	}
 }

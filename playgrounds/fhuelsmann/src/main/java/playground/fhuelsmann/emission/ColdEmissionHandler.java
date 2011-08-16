@@ -98,7 +98,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-//		if(event.getLegMode().equals("car")){
+		if(event.getLegMode().equals("car")){
 			Id personId= event.getPersonId();
 			Double stopEngineTime = event.getTime();
 			this.stopEngine.put(personId, stopEngineTime);
@@ -123,15 +123,15 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 					this.hbefaColdTable,
 					this.emissionEventsManager);
 			this.accumulatedDistance.remove(personId);
-//		}
-//		else{
-//			// emissions to calculate...
-//		}
+		}
+		else{
+			// emissions to calculate...
+		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-//		if(event.getLegMode().equals("car")){
+		if(event.getLegMode().equals("car")){
 			Id linkId = event.getLinkId();
 			Id personId= event.getPersonId();
 			Double startEngineTime = event.getTime();
@@ -147,9 +147,9 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 				parkingDuration = 43200.0; //parking duration is assumed to be at least 12 hours when parking overnight
 			}
 			this.parkingDuration.put(personId, parkingDuration);
-//			}
-//			else{
-//				// no engine to start...
-//			}
+			}
+			else{
+				// no engine to start...
+			}
 	}
 }
