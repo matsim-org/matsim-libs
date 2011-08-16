@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui;
+package playground.sergioo.NetworkVisualizer.gui.networkPainters;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,7 +9,10 @@ import java.awt.geom.Ellipse2D;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.sergioo.NetworkVisualizer.gui.Camera;
 
 public class SimpleNetworkPainter implements NetworkPainter {
 	
@@ -19,8 +22,8 @@ public class SimpleNetworkPainter implements NetworkPainter {
 	private NetworkByCamera networkByCamera;
 	
 	//Methods
-	public SimpleNetworkPainter(NetworkByCamera networkByCamera) {
-		this.networkByCamera =  networkByCamera;
+	public SimpleNetworkPainter(Network network) {
+		this.networkByCamera =  new NetworkByCamera(network);
 	}
 	public SimpleNetworkPainter(NetworkByCamera networkByCamera, Color networkColor, Stroke networkStroke) {
 		this.networkByCamera =  networkByCamera;

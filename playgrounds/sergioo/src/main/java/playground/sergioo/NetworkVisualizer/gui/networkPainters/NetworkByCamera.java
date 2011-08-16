@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui;
+package playground.sergioo.NetworkVisualizer.gui.networkPainters;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+
+import playground.sergioo.NetworkVisualizer.gui.Camera;
 
 public class NetworkByCamera {
 

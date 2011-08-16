@@ -1,4 +1,4 @@
-package playground.sergioo.NetworksMatcher;
+package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.Collection;
 

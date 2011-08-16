@@ -39,19 +39,26 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import playground.sergioo.NetworkVisualizer.gui.NetworkWindow.Label;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport.PublicTransportNetworkPainter;
 
 import util.geometry.Point2D;
 
-public class PanelNetwork extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class NetworkPanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	//Attributes
-	private Camera camera;
-	private Window window;
+	
+	
+	private final Camera camera;
+	private final NetworkWindow window;
+	private final NetworkManager networkManager;
+	private final NetworkPainter networkPainter;
 	
 	private int iniX;
 	private int iniY;
@@ -70,34 +77,29 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 	private double yMax;
 	private double xMin;
 	private double yMin;
-	private NetworkPainter networkPainter;
 	
 	//Methods
-	public PanelNetwork(Window window) {
+	public NetworkPanel(NetworkWindow window, NetworkManager networkManager, NetworkPainter networkPainter) {
 		this.window = window;
+		this.networkManager = networkManager;
+		this.networkPainter = networkPainter;
 		this.setBackground(backgroundColor);
 		camera = new Camera();
-		networkPainter = new SimpleNetworkPainter(new NetworkByCamera(window.getNetwork()));
 		calculateBoundaries();
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public PanelNetwork(Window window, TransitSchedule transitSchedule) {
-		this.window = window;
-		this.setBackground(backgroundColor);
-		camera = new Camera();
-		networkPainter = new PublicTransportNetworkPainter(new NetworkByCamera(window.getNetwork()), transitSchedule);
-		calculateBoundaries();
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		addKeyListener(this);
-		setFocusable(true);
+	public Camera getCamera() {
+		return camera;
+	}
+	public NetworkManager getNetworkManager() {
+		return networkManager;
 	}
 	private void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		for(Link link:window.getNetworkLinks()) {
+		for(Link link:networkManager.getNetworkLinks()) {
 			if(link!=null) {
 				if(link.getFromNode().getCoord().getX()<xMin)
 					xMin = link.getFromNode().getCoord().getX();
@@ -140,25 +142,25 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 			paintSelected(g2);
 	}
 	private void paintSelected(Graphics2D g2) {
-		Link link=window.getSelectedLink();
+		Link link=networkManager.getSelectedLink();
 		if(link!=null)
 			paintLink(g2, link, selectedStroke, 3, linkSelectedColor);
-		Node node = window.getSelectedNode();
+		Node node = networkManager.getSelectedNode();
 		if(node!=null)
 			paintCircle(g2, node.getCoord(), 5, nodeSelectedColor);
-		Tuple<Coord, Coord> line = window.getSelectedLine();
+		Tuple<Coord, Coord> line = networkManager.getSelectedLine();
 		if(line!=null)
 			paintLine(g2, line, selectedStroke, linesColor);
-		Coord point = window.getSelectedPoint();
+		Coord point = networkManager.getSelectedPoint();
 		if(point!=null)
 			paintCircle(g2, point, 5, pointsColor);
 	}
 	private void paintLines(Graphics2D g2) {
-		for(Tuple<Coord, Coord> line:window.getLines())
+		for(Tuple<Coord, Coord> line:networkManager.getLines())
 			paintLine(g2, line, linesStroke, linesColor);
 	}
 	private void paintPoints(Graphics2D g2) {
-		for(Coord point:window.getPoints())
+		for(Coord point:networkManager.getPoints())
 			paintCircle(g2, point, 3, pointsColor);
 	}
 	private void paintLink(Graphics2D g2, Link link, Stroke stroke, double pointSize, Color color) {
@@ -189,33 +191,57 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 	public Point2D getCenter() {
 		return camera.getCenter();
 	}
+	public void withStops() {
+		withPoints = true;
+	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		else {
-			if(window.getOption().equals(Window.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Window.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectLink();
-			else if(window.getOption().equals(Window.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Window.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectNode();
-			else if(window.getOption().equals(Window.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectPoint(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Window.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectPoint();
-			else if(window.getOption().equals(Window.Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
+			if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
+				networkManager.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				window.refreshLabel(Label.LINK);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
+				networkManager.unselectLink();
+				window.refreshLabel(Label.LINK);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+				networkManager.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				window.refreshLabel(Label.NODE);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+				networkManager.unselectNode();
+				window.refreshLabel(Label.NODE);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON1) {
+				networkManager.selectPoint(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				window.refreshLabel(Label.POINT);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON3) {
+				networkManager.unselectPoint();
+				window.refreshLabel(Label.POINT);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINE) && e.getButton()==MouseEvent.BUTTON1) {
+				networkManager.selectLine(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				window.refreshLabel(Label.LINE);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINE) && e.getButton()==MouseEvent.BUTTON3) {
+				networkManager.unselectLine();
+				window.refreshLabel(Label.LINE);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
 				camera.zoomIn(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Window.Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
+				window.cameraChange(camera);
+			}
+			else if(window.getOption().equals(SimpleNetworkWindow.Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
 				camera.zoomOut(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
+				window.cameraChange(camera);
+			}
 		}
 		repaint();
-	}
-	public void withStops() {
-		withPoints = true;
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -240,6 +266,7 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
+		window.cameraChange(camera);
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
@@ -261,7 +288,8 @@ public class PanelNetwork extends JPanel implements MouseListener, MouseMotionLi
 			withPoints = !withPoints;
 			break;
 		case 'o':
-			window.selectOppositeLink();
+			networkManager.selectOppositeLink();
+			window.refreshLabel(Label.LINK);
 			break;
 		case 'v':
 			setBoundaries();

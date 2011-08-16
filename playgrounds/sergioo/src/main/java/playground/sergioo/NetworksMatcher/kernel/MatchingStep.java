@@ -1,4 +1,4 @@
-package playground.sergioo.NetworksMatcher;
+package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.Collection;
 
@@ -66,26 +66,26 @@ public class MatchingStep {
 		for(Link link:networkB.getLinks().values())
 			networks[1].addLink(link);
 		for(NodesMatching matching:nodesMatchings) {
-			NodeNetwork nodeNetworkA = matching.getSubNodeNetworkA();
-			networks[0].addNode(nodeNetworkA);
-			for(Id linkId:matching.getSubNodeNetworkA().getSubNetwork().getLinks().keySet())
+			NetworkNode networkNodeA = matching.getSubNetworkNodeA();
+			networks[0].addNode(networkNodeA);
+			for(Id linkId:matching.getSubNetworkNodeA().getSubNetwork().getLinks().keySet())
 				networks[0].removeLink(linkId);
-			for(Node node:matching.getSubNodeNetworkA().getSubNetwork().getNodes().values()) {
+			for(Node node:matching.getSubNetworkNodeA().getSubNetwork().getNodes().values()) {
 				for(Link link:node.getOutLinks().values())
-					link.setFromNode(nodeNetworkA);
+					link.setFromNode(networkNodeA);
 				for(Link link:node.getInLinks().values())
-					link.setToNode(nodeNetworkA);
+					link.setToNode(networkNodeA);
 				networks[0].removeNode(node.getId());
 			}
-			NodeNetwork nodeNetworkB = matching.getSubNodeNetworkB();
-			networks[1].addNode(nodeNetworkB);
-			for(Id linkId:matching.getSubNodeNetworkB().getSubNetwork().getLinks().keySet())
+			NetworkNode networkNodeB = matching.getSubNetworkNodeB();
+			networks[1].addNode(networkNodeB);
+			for(Id linkId:matching.getSubNetworkNodeB().getSubNetwork().getLinks().keySet())
 				networks[1].removeLink(linkId);
-			for(Node node:matching.getSubNodeNetworkB().getSubNetwork().getNodes().values()) {
+			for(Node node:matching.getSubNetworkNodeB().getSubNetwork().getNodes().values()) {
 				for(Link link:node.getOutLinks().values())
-					link.setFromNode(nodeNetworkB);
+					link.setFromNode(networkNodeB);
 				for(Link link:node.getInLinks().values())
-					link.setToNode(nodeNetworkB);
+					link.setToNode(networkNodeB);
 				networks[1].removeNode(node.getId());
 			}
 		}
@@ -94,7 +94,7 @@ public class MatchingStep {
 
 	public boolean isMatched(Node nodeA, Node nodeB) {
 		for(NodesMatching nodesMatching:nodesMatchings)
-			if(nodeA.getId().equals(nodesMatching.getSubNodeNetworkA().getId()) && nodeB.getId().equals(nodesMatching.getSubNodeNetworkB().getId()))
+			if(nodeA.getId().equals(nodesMatching.getSubNetworkNodeA().getId()) && nodeB.getId().equals(nodesMatching.getSubNetworkNodeB().getId()))
 				return true;
 		return false;
 	}

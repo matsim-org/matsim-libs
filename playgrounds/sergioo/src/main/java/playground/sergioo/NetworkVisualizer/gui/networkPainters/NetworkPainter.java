@@ -1,6 +1,8 @@
-package playground.sergioo.NetworkVisualizer.gui;
+package playground.sergioo.NetworkVisualizer.gui.networkPainters;
 
 import java.awt.Graphics2D;
+
+import playground.sergioo.NetworkVisualizer.gui.Camera;
 
 public interface NetworkPainter {
 	

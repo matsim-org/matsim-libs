@@ -1,4 +1,4 @@
-package playground.sergioo.NetworksMatcher;
+package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
-public class NodeNetwork implements Node {
+public class NetworkNode implements Node {
 
 
 	//Attributes
@@ -30,7 +30,7 @@ public class NodeNetwork implements Node {
 
 	//Methods
 
-	public NodeNetwork(Network subNetwork) {
+	public NetworkNode(Network subNetwork) {
 		String idText = "";
 		for(Node node:subNetwork.getNodes().values())
 			idText+=node.getId()+"-";

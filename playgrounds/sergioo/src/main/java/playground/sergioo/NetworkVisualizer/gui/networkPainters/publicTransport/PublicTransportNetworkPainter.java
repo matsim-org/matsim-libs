@@ -1,11 +1,9 @@
-package playground.sergioo.NetworkVisualizer.gui;
+package playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +18,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -27,6 +26,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+import playground.sergioo.NetworkVisualizer.gui.Camera;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkByCamera;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
 
 public class PublicTransportNetworkPainter implements NetworkPainter {
 	
@@ -41,24 +43,25 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 	private Stroke networkStroke = new BasicStroke(0.1f);
 	private Map<RouteTypes, Map<String, Color>> colors;
 	private NetworkByCamera networkByCamera;
-	private TransitSchedule transitSchedule;
 	private Map<Id, LinkDrawInformation> linksDrawInformation;
 	private float weight = 0.001f;
 	
 	//Methods
-	public PublicTransportNetworkPainter(NetworkByCamera networkByCamera, TransitSchedule transitSchedule) {
-		this.networkByCamera =  networkByCamera;
-		this.transitSchedule = transitSchedule;
+	public PublicTransportNetworkPainter(Network network, TransitSchedule transitSchedule) {
+		this.networkByCamera =  new NetworkByCamera(network);
+		initialize(transitSchedule);
+	}
+	public void initialize(TransitSchedule transitSchedule) {
 		colors = new HashMap<RouteTypes, Map<String, Color>>();
 		Map<String, Color> busColorsMap = new HashMap<String, Color>();
-		busColorsMap.put("SBS", Color.BLUE);
+		busColorsMap.put("SBS", new Color(100,50,0));
 		busColorsMap.put("SMRT", Color.BLACK);
 		colors.put(RouteTypes.BUS, busColorsMap);
 		Map<String, Color> mrtColorsMap = new TreeMap<String, Color>();
-		mrtColorsMap.put("EW", Color.GREEN);
-		mrtColorsMap.put("NS", Color.RED);
-		mrtColorsMap.put("NE", Color.MAGENTA);
-		mrtColorsMap.put("CC", Color.ORANGE);
+		mrtColorsMap.put("EW",  new Color(5,157,77));
+		mrtColorsMap.put("NS", new Color(217,29,7));
+		mrtColorsMap.put("NE", new Color(145,17,162));
+		mrtColorsMap.put("CC", new Color(250,155,16));
 		mrtColorsMap.put(OTHER_COLOR, Color.DARK_GRAY);
 		colors.put(RouteTypes.SUBWAY, mrtColorsMap);
 		Map<String, Color> tramColorsMap = new HashMap<String, Color>();
@@ -194,10 +197,6 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 				networkByCamera.getIntY(coords.getFirst().getY()),
 				networkByCamera.getIntX(coords.getSecond().getX()),
 				networkByCamera.getIntY(coords.getSecond().getY()));
-	}
-	private void paintCircle(Graphics2D g2, Coord coord, double pointSize, Color color) throws Exception {
-		Shape circle = new Ellipse2D.Double(networkByCamera.getIntX(coord.getX())-pointSize,networkByCamera.getIntY(coord.getY())-pointSize,pointSize*2,pointSize*2);
-		g2.fill(circle);
 	}
 	
 }
