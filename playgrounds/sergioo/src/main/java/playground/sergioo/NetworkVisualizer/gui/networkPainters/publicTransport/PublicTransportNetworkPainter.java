@@ -35,7 +35,8 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 	//Constants
 	private static final String NUM_TIMES_LINK_ROUTE_FILE = "./data/NetworkCharacteristics/linkDrawInformation.txt";
 	private static final String SEPARATOR = "~~~";
-	private static final float MRT_FACTOR = 2000/80;
+	private static final float MRT_FACTOR = 1920/132;
+	private static final float MRT_FACTOR_2 = 930/132;
 	private static final String OTHER_COLOR = "other";
 	
 	//Attributes
@@ -148,7 +149,7 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 								if(linkDrawInformationO!=null)
 									linkDrawInformationO.increaseThickness(thickness);
 							}
-							linksDrawInformation.put(link.getId(), new LinkDrawInformation(thickness*(routeType.equals(RouteTypes.BUS)?1:MRT_FACTOR),color));
+							linksDrawInformation.put(link.getId(), new LinkDrawInformation(thickness*(routeType.equals(RouteTypes.BUS)?1:color.equals(colors.get(RouteTypes.SUBWAY).get("CC"))?MRT_FACTOR_2:MRT_FACTOR),color));
 						}
 					}
 				if(i%10000==0)
@@ -174,10 +175,18 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 		networkByCamera.setCamera(camera);
 		for(Link link:networkByCamera.getNetworkLinks()) {
 			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
-			if(linkDrawInformation!=null)
-				paintLink(g2, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
-			else
+			if(linkDrawInformation==null)
 				paintLink(g2, link, networkStroke, 0.5, networkColor);
+		}
+		for(Link link:networkByCamera.getNetworkLinks()) {
+			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
+			if(linkDrawInformation!=null && linkDrawInformation.getColor().equals(new Color(100,50,0)))
+				paintLink(g2, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
+		}
+		for(Link link:networkByCamera.getNetworkLinks()) {
+			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
+			if(linkDrawInformation!=null && !linkDrawInformation.getColor().equals(new Color(100,50,0)))
+				paintLink(g2, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
 		}
 	}
 	public float getWeight() {
