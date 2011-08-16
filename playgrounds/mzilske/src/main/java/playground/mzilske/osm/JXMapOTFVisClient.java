@@ -108,7 +108,6 @@ public final class JXMapOTFVisClient {
 							double scale = mainDrawer.getScale();
 							int zoom = (int) log2(scale);
 							jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
-							System.out.println(zoom);
 							jMapViewer.setZoom(zoom);
 							compositePanel.repaint();
 						}
