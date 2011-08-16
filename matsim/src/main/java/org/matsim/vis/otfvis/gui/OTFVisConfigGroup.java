@@ -73,6 +73,8 @@ public class OTFVisConfigGroup extends Module {
 	private boolean modified = false;
 	private boolean cachingAllowed = true;
 	private int delay_ms = 30;
+	private int maximumZoom = 17;
+	private boolean mapOverlayMode = false;
 
 	private boolean drawScaleBar = false;
 	private boolean showTeleportedAgents = false;
@@ -492,7 +494,21 @@ public class OTFVisConfigGroup extends Module {
 		this.linkWidthIsProportionalTo = linkWidthIsProportionalTo;
 	}
 
+	public int getMaximumZoom() {
+		return maximumZoom;
+	}
 
+	public void setMaximumZoom(int maximumZoom) {
+		this.maximumZoom = maximumZoom;
+	}
+
+	public boolean isMapOverlayMode() {
+		return mapOverlayMode;
+	}
+
+	public void setMapOverlayMode(boolean mapOverlayMode) {
+		this.mapOverlayMode = mapOverlayMode;
+	}
 
 
 }

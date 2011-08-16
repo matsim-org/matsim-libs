@@ -60,7 +60,7 @@ public final class OTFVisClient implements Runnable {
 		if (swing) {
 			mainDrawer = new OTFSwingDrawerContainer(clientQuadTree, otfClient.getHostControlBar());
 		} else {
-			mainDrawer = new OTFOGLDrawer(clientQuadTree, otfClient.getHostControlBar());
+			mainDrawer = new OTFOGLDrawer(clientQuadTree, otfClient.getHostControlBar(), server.getOTFVisConfig());
 		}
 //		if (server.isLive()) {
 //			final OTFQueryControl queryControl = new OTFQueryControl(server, otfClient.getHostControlBar(), OTFClientControl.getInstance().getOTFVisConfig());

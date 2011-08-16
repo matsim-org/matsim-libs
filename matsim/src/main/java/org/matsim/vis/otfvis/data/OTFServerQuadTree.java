@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.data;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -27,8 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
@@ -48,16 +52,16 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 	private final List<OTFDataWriter> additionalElements = new LinkedList<OTFDataWriter>();
 
 	private static final long serialVersionUID = 1L;
-	protected double minEasting;
-	protected double maxEasting;
-	protected double minNorthing;
-	protected double maxNorthing;
-	protected double easting;
-	protected double northing;
+	private double minEasting;
+	private double maxEasting;
+	private double minNorthing;
+	private double maxNorthing;
+	private double easting;
+	private double northing;
 
-	// Change this, find better way to transport this info into Writers
-	public static double offsetEast;
-	public static double offsetNorth;
+	private static double offsetEast;
+	private static double offsetNorth;
+	private static CoordinateTransformation transformation = new IdentityTransformation();
 
 	public OTFServerQuadTree(Network network) {
 		super(0,0,0,0);
@@ -73,10 +77,11 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 		this.maxNorthing = Double.NEGATIVE_INFINITY;
 
 		for (org.matsim.api.core.v01.network.Node node : n.getNodes().values()) {
-			this.minEasting = Math.min(this.minEasting, node.getCoord().getX());
-			this.maxEasting = Math.max(this.maxEasting, node.getCoord().getX());
-			this.minNorthing = Math.min(this.minNorthing, node.getCoord().getY());
-			this.maxNorthing = Math.max(this.maxNorthing, node.getCoord().getY());
+			Coord coord = transformation.transform(node.getCoord());
+			this.minEasting = Math.min(this.minEasting, coord.getX());
+			this.maxEasting = Math.max(this.maxEasting, coord.getX());
+			this.minNorthing = Math.min(this.minNorthing, coord.getY());
+			this.maxNorthing = Math.max(this.maxNorthing, coord.getY());
 		}
 		// make sure, the bounding box is bigger than the biggest element, otherwise
 		// requests with null == use biggest bounding box will fail on the leftmost elements
@@ -182,6 +187,16 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 
 	public double getMinNorthing() {
 		return this.minNorthing;
+	}
+
+	public static Point2D.Double transform(Coord coord) {
+		Coord transformedCoord = transformation.transform(coord);
+		Point2D.Double result = new Point2D.Double(transformedCoord.getX() - offsetEast, transformedCoord.getY() - offsetNorth);
+		return result;
+	}
+
+	public static void setTransformation(CoordinateTransformation transformation) {
+		OTFServerQuadTree.transformation = transformation;
 	}
 
 	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {

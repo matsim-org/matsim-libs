@@ -17,17 +17,15 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.gregor.grips.config.GripsConfigModule;
+
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.gregor.grips.config.GripsConfigModule;
-import playground.mzilske.osm.WGS84ToOSMMercator;
 
 /**
  * Grips scenario generator
@@ -107,7 +105,7 @@ public class ScenarioGenerator {
 		// Step 1 raw network input
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
-		CoordinateTransformation ct =  new WGS84ToOSMMercator.Project();
+		CoordinateTransformation ct =  new WGS84ToMercator.Project(18);
 		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
 		//		reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
 		//		reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);

@@ -7,10 +7,10 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.mzilske.osm.WGS84ToOSMMercator;
 
 
 public class PotsdamNet {
@@ -23,7 +23,7 @@ public class PotsdamNet {
 
 		// CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395"); 
 
-		CoordinateTransformation ct = new WGS84ToOSMMercator.Project();
+		CoordinateTransformation ct = new WGS84ToMercator.Project(18);
 		
 		// CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25833"); 
 		

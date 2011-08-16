@@ -11,14 +11,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator.Project;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.mzilske.osm.WGS84ToOSMMercator;
-import playground.mzilske.osm.WGS84ToOSMMercator.Project;
 
 public class ShapeFileTransformer {
 
@@ -26,7 +26,7 @@ public class ShapeFileTransformer {
 	public static void main(String [] args) throws IOException {
 		String shapeFile = "/Users/laemmel/svn/shared-svn/studies/countries/de/hh/hafen_fest_evacuation/GDIToMATSimData/population.shp";
 		CoordinateTransformation transform1 = TransformationFactory.getCoordinateTransformation("EPSG: 32632", "EPSG: 4326");
-		Project transform2 = new WGS84ToOSMMercator.Project();
+		Project transform2 = new WGS84ToMercator.Project(17);
 		FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
 
 		List<Feature> fts= new ArrayList<Feature>();

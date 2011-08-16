@@ -79,10 +79,8 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
-			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuadTree.offsetEast, 
-					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
-					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
+			Point2D.Double.Double linkStart = OTFServerQuadTree.transform(this.src.getLink().getFromNode().getCoord());
+			Point2D.Double.Double linkEnd = OTFServerQuadTree.transform(this.src.getLink().getToNode().getCoord());
 
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);

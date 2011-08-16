@@ -104,7 +104,15 @@ public class VisGUIMouseHandler extends MouseInputAdapter {
 			function = OTFClientControl.getInstance().getOTFVisConfig().getRightMouseFunc();
 			break;
 		}
-		if(function.equals("Zoom")) button = 1;
+		if(function.equals("Zoom")) { 
+			if (OTFClientControl.getInstance().getOTFVisConfig().isMapOverlayMode()) {
+				// Zooming via a rectangle is disabled in map overlay mode,
+				// because we can only zoom in straight powers of two. Compare Google maps.
+				button = 0;
+			} else {
+				button = 1;
+			}
+		}
 		else if (function.equals("Pan")) button = 2;
 		else if (function.equals("Menu")) button = 3;
 		else if (function.equals("Select")) button = 4;

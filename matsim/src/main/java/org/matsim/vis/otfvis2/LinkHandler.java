@@ -53,10 +53,8 @@ public final class LinkHandler extends OTFDataReader {
 			String id = this.src.getId().toString();
 			ByteBufferUtils.putString(out, id);
 
-			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getFromNode().getCoord().getX() - OTFServerQuadTree.offsetEast, 
-					this.src.getFromNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getToNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
-					this.src.getToNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
+			Point2D.Double.Double linkStart = OTFServerQuadTree.transform(this.src.getFromNode().getCoord());
+			Point2D.Double.Double linkEnd = OTFServerQuadTree.transform(this.src.getToNode().getCoord());
 
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);

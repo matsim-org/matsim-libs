@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.handler;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -56,7 +58,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	public static boolean showParked = false;
 
-	protected List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
+	private List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
 
 	static public class Writer extends OTFDefaultLinkHandler.Writer {
 
@@ -105,17 +107,12 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			return new Writer();
 		}
 
-		/**The API method is writeDynData.  writeDynData calls writeAgent.  Could make it "protected", but I don't
-		 * want proliferation of inheritance all over the project.  Still leaving it package-private to allow
-		 * inheritance inside the package.  kai, jan'11  
-		 */
 		private void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
-			// making this private; I don't see any reason to make it more public.  kai, jan'11
-
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float) (pos.getEasting() - OTFServerQuadTree.offsetEast));
-			out.putFloat((float) (pos.getNorthing() - OTFServerQuadTree.offsetNorth));
+			Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(pos.getEasting(), pos.getNorthing()));
+			out.putFloat((float) point.getX());
+			out.putFloat((float) point.getY());
 			out.putInt(pos.getUserDefined());
 			out.putFloat((float) pos.getColorValueBetweenZeroAndOne());
 			out.putInt(pos.getAgentState().ordinal());

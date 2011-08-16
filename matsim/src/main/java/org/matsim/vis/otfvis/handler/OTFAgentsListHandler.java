@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.handler;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -71,8 +73,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(agInfo.getEasting() - OTFServerQuadTree.offsetEast));
-			out.putFloat((float)(agInfo.getNorthing()- OTFServerQuadTree.offsetNorth));
+			Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(agInfo.getEasting(), agInfo.getNorthing()));
+			out.putFloat((float) point.getX());
+			out.putFloat((float) point.getY());
 			out.putInt(agInfo.getAgentState().ordinal() ) ;
 			out.putInt(agInfo.getUserDefined());
 			out.putFloat((float)agInfo.getColorValueBetweenZeroAndOne());

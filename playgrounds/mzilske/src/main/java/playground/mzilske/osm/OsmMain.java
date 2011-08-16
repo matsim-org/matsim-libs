@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
@@ -41,7 +42,7 @@ public class OsmMain {
 		
 		SimplifyTask simplify = new SimplifyTask(IdTrackerType.BitSet);
 		
-		CoordinateTransformation coordinateTransformation = new WGS84ToOSMMercator.Project();
+		CoordinateTransformation coordinateTransformation = new WGS84ToMercator.Project(18);
 		NetworkSink sink = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		sink.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		sink.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);

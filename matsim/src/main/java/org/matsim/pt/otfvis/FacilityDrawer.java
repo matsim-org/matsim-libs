@@ -20,6 +20,7 @@
 
 package org.matsim.pt.otfvis;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -74,18 +76,21 @@ public class FacilityDrawer {
 					if ( link==null ) {
 						log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
 						ByteBufferUtils.putString(out,"");
-						out.putDouble(facility.getCoord().getX() - OTFServerQuadTree.offsetEast);
-						out.putDouble(facility.getCoord().getY() - OTFServerQuadTree.offsetNorth);
+						Point2D.Double point = OTFServerQuadTree.transform(facility.getCoord());
+						out.putDouble(point.getX());
+						out.putDouble(point.getY());
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
 						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(facility.getId(), link) ;
-						out.putDouble( ps.getEasting() - OTFServerQuadTree.offsetEast ) ;
-						out.putDouble( ps.getNorthing() - OTFServerQuadTree.offsetNorth ) ;
+						Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(ps.getEasting(), ps.getNorthing()));
+						out.putDouble(point.getX()) ;
+						out.putDouble(point.getY()) ;
 					}
 				} else {
 					ByteBufferUtils.putString(out,"");
-					out.putDouble(facility.getCoord().getX() - OTFServerQuadTree.offsetEast);
-					out.putDouble(facility.getCoord().getY() - OTFServerQuadTree.offsetNorth);
+					Point2D.Double point = OTFServerQuadTree.transform(facility.getCoord());
+					out.putDouble(point.getX());
+					out.putDouble(point.getY());
 				}
 			}
 

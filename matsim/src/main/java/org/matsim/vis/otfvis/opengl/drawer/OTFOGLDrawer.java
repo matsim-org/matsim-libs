@@ -76,10 +76,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
@@ -145,21 +145,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	private Collection<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 
-	// Experimental mode for michaz
-	public static boolean USE_GLJPANEL = false;
-
 	private float oldWidth = 0.0f;
 
 	private float oldHeight = 0.0f;
 
 	private TextRenderer textRenderer;
 
-	public TextRenderer getTextRenderer() {
-		return textRenderer;
-	}
-
 	private String status;
+	
 	private int statusWidth;
+
+	private OTFVisConfigGroup otfVisConfig;
 
 	public static class FastColorizer {
 
@@ -212,14 +208,39 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 	}
 
+	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar, OTFVisConfigGroup otfVisConfig) {
+		Font font = new Font("SansSerif", Font.PLAIN, 32);
+		textRenderer = new TextRenderer(font, true, false);
+		this.clientQ = clientQ;
+		this.hostControlBar = hostControlBar;
+		this.otfVisConfig = otfVisConfig;
+		GLCapabilities caps = new GLCapabilities();
+		this.canvas = createGLCanvas(this, caps);
+		this.mouseMan = new VisGUIMouseHandler(this);
+		this.canvas.addMouseListener(this.mouseMan);
+		this.canvas.addMouseMotionListener(this.mouseMan);
+		this.canvas.addMouseWheelListener(this.mouseMan);
+		this.scaleBar = new OTFScaleBarDrawer();
+		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
+		this.overlayItems.add(matsimLogo);
+		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
+		if (initialZoom != null) {
+			this.mouseMan.setViewBounds(initialZoom);
+		}
+	}
+
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
 		Component canvas;
-		if (USE_GLJPANEL) {
+		if (otfVisConfig.isMapOverlayMode()) {
+			// A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
+			// The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
+			// We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
 			GLJPanel glJPanel = new GLJPanel(caps);
 			glJPanel.addGLEventListener(drawer);
-			glJPanel.setOpaque(false);
+			glJPanel.setOpaque(false); // So that the map shines through
 			canvas = glJPanel;
 		} else {
+			// This is the default JOGL component. JOGL doc recommends using it if you do not need a GLJPanel.
 			GLCanvas glCanvas = new GLCanvas(caps);
 			glCanvas.addGLEventListener(drawer);
 			canvas = glCanvas;
@@ -227,40 +248,17 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		return canvas;
 	}
 
-	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar) {
-		Font font = new Font("SansSerif", Font.PLAIN, 32);
-		textRenderer = new TextRenderer(font, true, false);
-		this.clientQ = clientQ;
-		this.hostControlBar = hostControlBar;
-		GLCapabilities caps = new GLCapabilities();
-		this.canvas = createGLCanvas(this, caps);
-		this.mouseMan = new VisGUIMouseHandler(this);
-		// Don't call this here! It is a straight lie, because the Drawer has now idea at this point what its bounds are (because it isn't visible yet).
-		// This was apparently just a hack to fetch the whole area the first time "redraw" is called. Fixed this elsewhere.
-		// michaz May '11
-		// this.mouseMan.setBounds(null, (float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
-		this.canvas.addMouseListener(this.mouseMan);
-		this.canvas.addMouseMotionListener(this.mouseMan);
-		this.canvas.addMouseWheelListener(this.mouseMan);
-		this.scaleBar = new OTFScaleBarDrawer();
-
-		OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
-		this.overlayItems.add(matsimLogo);
-
-		Rectangle2D initialZoom = OTFClientControl.getInstance().getOTFVisConfig().getZoomValue("*Initial*");
-		if (initialZoom != null) {
-			this.mouseMan.setViewBounds(initialZoom);
-		}
-
-	}
-
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
 	}
 
+	public TextRenderer getTextRenderer() {
+		return textRenderer;
+	}
+
 	private boolean isZoomBigEnoughForLabels() {
 		CoordImpl size  = this.mouseMan.getPixelsize();
-		final double cellWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+		final double cellWidth = otfVisConfig.getLinkWidth();
 		final double pixelsizeStreet = 5;
 		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
 	}
@@ -276,7 +274,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
+		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		this.gl = drawable.getGL();
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -284,7 +282,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.gl.glEnable(GL.GL_BLEND);
 		this.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		this.mouseMan.setFrustrum(this.gl);
-		components = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor().getColorComponents(components);
+		components = otfVisConfig.getNetworkColor().getColorComponents(components);
 		this.gl.glColor4d(components[0], components[1], components[2], components[3]);
 		if (this.currentSceneGraph != null) {
 			this.currentSceneGraph.draw();
@@ -294,27 +292,27 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 
 		Map<Coord, String> coordStringPairs = findVisibleLinks();
-		if (OTFClientControl.getInstance().getOTFVisConfig().isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
+		if (otfVisConfig.isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
 			displayLinkIds(coordStringPairs);
 		}
 
-		if (OTFClientControl.getInstance().getOTFVisConfig().drawTime()) {
+		if (otfVisConfig.drawTime()) {
 			drawFrameRate(drawable);
 		}
 
 		this.mouseMan.drawElements(this.gl);
 
-		if(OTFClientControl.getInstance().getOTFVisConfig().drawOverlays()) {
+		if(otfVisConfig.drawOverlays()) {
 			for (OTFGLAbstractDrawable item : this.overlayItems) {
 				item.draw();
 			}
 		}
 
-		if (OTFClientControl.getInstance().getOTFVisConfig().drawScaleBar()) {
+		if (otfVisConfig.drawScaleBar()) {
 			this.scaleBar.draw();
 		}
 
-		if (OTFClientControl.getInstance().getOTFVisConfig().renderImages() && (this.lastShot < this.now)){
+		if (otfVisConfig.renderImages() && (this.lastShot < this.now)){
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
 			try {
@@ -393,7 +391,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	public void init(GLAutoDrawable drawable) {
 		this.gl = drawable.getGL();
 		this.gl.setSwapInterval(0);
-		float[] components = OTFClientControl.getInstance().getOTFVisConfig().getBackgroundColor().getColorComponents(new float[4]);
+		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -413,8 +411,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 	}
 
 	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
-			int height) {
+	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 		if (oldWidth != 0.0f) {
 			double pixelSizeX = (mouseMan.getViewBoundsAsQuadTreeRect().maxX - mouseMan.getViewBoundsAsQuadTreeRect().minX) / oldWidth;
 			double pixelSizeY = (mouseMan.getViewBoundsAsQuadTreeRect().maxY - mouseMan.getViewBoundsAsQuadTreeRect().minY) / oldHeight;
@@ -436,8 +433,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		GridLayout gbl = new GridLayout(3,3);
 		this.zoomD.getContentPane().setLayout( gbl );
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
-		final List<ZoomEntry> zooms = OTFClientControl.getInstance().getOTFVisConfig().getZooms();
-		log.debug("Number of zooms: " + OTFClientControl.getInstance().getOTFVisConfig().getZooms().size());
+		final List<ZoomEntry> zooms = otfVisConfig.getZooms();
+		log.debug("Number of zooms: " + otfVisConfig.getZooms().size());
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			JButton b = new JButton(z.getName());//icon);
@@ -498,7 +495,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.canvas.repaint();
 
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
-		OTFClientControl.getInstance().getOTFVisConfig().addZoom(new ZoomEntry(image,zoomstore, name));
+		otfVisConfig.addZoom(new ZoomEntry(image,zoomstore, name));
 
 	}
 
@@ -547,7 +544,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 				@Override
 				public void actionPerformed( ActionEvent e ) {
 					if(OTFOGLDrawer.this.lastZoom != null) {
-						OTFClientControl.getInstance().getOTFVisConfig().deleteZoom(OTFOGLDrawer.this.lastZoom);
+						otfVisConfig.deleteZoom(OTFOGLDrawer.this.lastZoom);
 						OTFOGLDrawer.this.lastZoom = null;
 					}
 				}

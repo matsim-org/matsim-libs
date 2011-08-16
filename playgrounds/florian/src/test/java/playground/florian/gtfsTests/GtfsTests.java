@@ -6,6 +6,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -16,13 +17,12 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 
 import playground.florian.GTFSConverter.GtfsConverter;
-import playground.mzilske.osm.WGS84ToOSMMercator;
 
 public class GtfsTests extends MatsimTestCase {
 	
 	
 	public void testGtfsStandardConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToOSMMercator.Project());
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToMercator.Project(18));
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
@@ -39,7 +39,7 @@ public class GtfsTests extends MatsimTestCase {
 	}
 	
 	public void testGtfsShapedConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToOSMMercator.Project());
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToMercator.Project(18));
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.setCreateShapedNetwork(true);

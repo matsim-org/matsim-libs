@@ -28,8 +28,13 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -200,6 +205,29 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 		if (quad != null) {
 			return quad;
 		} else {
+			Config config = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig();
+			String scenarioCRS = config.global().getCoordinateSystem();
+			int maxZoom = config.otfVis().getMaximumZoom();
+	
+			if (config.otfVis().isMapOverlayMode()) {
+				// Transform everything from network coordinates first to WGS84 and then to standard mercator projection as used by OSM tiles and Geoserver.
+				// The user needs to know the maximum zoom level they would like to use beforehand.
+				// The coordinates are transformed so that one unit is one pixel in the maximum zoom level.
+				final CoordinateTransformation scenario2wgs84 = TransformationFactory.getCoordinateTransformation(scenarioCRS, TransformationFactory.WGS84);
+				final CoordinateTransformation wgs842Mercator = new WGS84ToMercator.Project(maxZoom);
+
+				// Must be called before the constructor of LiveServerQuadTree
+				// TODO: Get rid of global variables.
+				OTFServerQuadTree.setTransformation(new CoordinateTransformation() {
+
+					@Override
+					public Coord transform(Coord coord) {
+						return wgs842Mercator.transform(scenario2wgs84.transform(coord));
+					}
+
+				});
+			}
+
 			quad = new LiveServerQuadTree(this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
 			quad.initQuadTree(connect);
 			for(OTFDataWriter<?> writer : additionalElements) {

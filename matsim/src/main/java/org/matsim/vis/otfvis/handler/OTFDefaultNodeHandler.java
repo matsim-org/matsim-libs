@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.handler;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -48,8 +49,9 @@ public class OTFDefaultNodeHandler extends OTFDataReader   {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuadTree.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuadTree.offsetNorth));
+			Point2D.Double point = OTFServerQuadTree.transform(this.src.getNode().getCoord());
+			out.putFloat((float) point.getX()); 
+			out.putFloat((float) point.getY());
 		}
 
 		@Override

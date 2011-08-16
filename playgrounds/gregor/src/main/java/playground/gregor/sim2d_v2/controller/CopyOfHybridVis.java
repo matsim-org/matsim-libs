@@ -17,8 +17,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
@@ -28,8 +26,6 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.gregor.pedvis.OTFVisMobsimFeature;
-import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
@@ -102,7 +98,7 @@ public class CopyOfHybridVis {
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		WMSService wms = new WMSService("http://192.168.35.78:8080/geoserver/wms?service=WMS&","bln");
-		JXMapOTFVisClient.run(scenario.getConfig(), server, wms, TransformationFactory.getCoordinateTransformation("EPSG: 32633", "EPSG: 4326"));
+		JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
 		//		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 

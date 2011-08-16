@@ -2,7 +2,6 @@ package playground.gregor.pedvis;
 
 import java.awt.BorderLayout;
 import java.util.LinkedHashMap;
-import java.util.UUID;
 
 import javax.swing.SwingUtilities;
 
@@ -15,7 +14,6 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -96,7 +94,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 				hostControlBar.updateTimeLabel();
-				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar);
+				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, visconf);
 				OTFQueryControl queryControl = new OTFQueryControl(OTFVisMobsimFeature.this.server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());

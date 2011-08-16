@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -83,12 +86,10 @@ class LiveServerQuadTree extends OTFServerQuadTree {
 	private void installLinkWriterFactories(
 			List<OTFWriterFactory<VisLink>> linkWriterFactoryObjects) {
 		for (VisLink link : this.net.getVisLinks().values()) {
-			double middleEast = (link.getLink().getToNode().getCoord().getX() + link
-					.getLink().getFromNode().getCoord().getX())
-					* 0.5 - this.minEasting;
-			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link
-					.getLink().getFromNode().getCoord().getY())
-					* 0.5 - this.minNorthing;
+			Point2D.Double fromCoord = transform(link.getLink().getFromNode().getCoord());
+			Point2D.Double toCoord = transform(link.getLink().getToNode().getCoord());
+			double middleEast = (toCoord.getX() + fromCoord.getX()) * 0.5;
+			double middleNorth = (toCoord.getY() + fromCoord.getY()) * 0.5;
 			for (OTFWriterFactory<VisLink> fac : linkWriterFactoryObjects) {
 				OTFDataWriter<VisLink> writer = fac.getWriter();
 				// null means take the default handler
@@ -114,9 +115,8 @@ class LiveServerQuadTree extends OTFServerQuadTree {
 						first = false;
 					}
 				}
-				this.put(node.getNode().getCoord().getX() - this.minEasting,
-						node.getNode().getCoord().getY() - this.minNorthing,
-						writer);
+				Point2D.Double coord = transform(node.getNode().getCoord());
+				this.put(coord.getX(), coord.getY(), writer);
 			}
 		}
 	}

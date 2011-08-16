@@ -1,8 +1,10 @@
 package playground.florian.GTFSConverter;
 
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.run.OTFVis;
@@ -10,7 +12,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.mzilske.osm.JXMapOTFVisClient;
-import playground.mzilske.osm.WGS84ToOSMMercator;
 
 public class GtfsMain {
 	
@@ -24,7 +25,7 @@ public class GtfsMain {
 	}
 
 	private static Scenario readScenario() {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new WGS84ToOSMMercator.Project());
+		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new WGS84ToMercator.Project(18));
 		gtfs.setCreateShapedNetwork(false);
 		//		gtfs.setDate(20110711);
 		gtfs.convert();
@@ -34,8 +35,8 @@ public class GtfsMain {
 	}
 
 	private static void runScenario(Scenario scenario) {
-		runWithClassicOTFVis(scenario);
-		// runWithOSM(scenario);
+		// runWithClassicOTFVis(scenario);
+		runWithOSM(scenario);
 	}
 
 	private static void runWithClassicOTFVis(Scenario scenario) {
@@ -50,6 +51,8 @@ public class GtfsMain {
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+		WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:beatty");
+		// JXMapOTFVisClient.run(scenario.getConfig(), server, wms, new WGS84ToOSMMercator.Deproject());
 		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 	}

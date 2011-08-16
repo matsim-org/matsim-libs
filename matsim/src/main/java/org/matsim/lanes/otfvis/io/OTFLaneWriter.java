@@ -84,11 +84,9 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	}
 	
 	private double writeLinkData(ByteBuffer out, VisLink visLink){
-		Point2D.Double linkStart = new Point2D.Double(visLink.getLink().getFromNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
-				visLink.getLink().getFromNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
+		Point2D.Double linkStart = OTFServerQuadTree.transform(visLink.getLink().getFromNode().getCoord());
+		Point2D.Double linkEnd = OTFServerQuadTree.transform(visLink.getLink().getToNode().getCoord());
 		
-		Point2D.Double linkEnd = new Point2D.Double(visLink.getLink().getToNode().getCoord().getX() - OTFServerQuadTree.offsetEast,
-				visLink.getLink().getToNode().getCoord().getY() - OTFServerQuadTree.offsetNorth);
 		//calculate length and normal
 		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
 		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
@@ -122,7 +120,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		}
 		return linkLengthCorrectionFactor;
 	}
-	
+
 	private void writeLaneData(ByteBuffer out, VisLink visLink, LanesToLinkAssignment l2l, Map<Id, java.lang.Double> linkLengthCorrectionFactorsByLinkId){
 		double linkLengthCorrectionFactor = linkLengthCorrectionFactorsByLinkId.get(visLink.getLink().getId());
 		//start to write the data

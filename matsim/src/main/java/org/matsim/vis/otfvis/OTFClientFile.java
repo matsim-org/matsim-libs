@@ -79,8 +79,8 @@ public class OTFClientFile implements Runnable {
 		connect.connectReaderToReceiver(LinkHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		OTFVisConfigGroup createOTFVisConfig = otfServer.getOTFVisConfig();
-		OTFClientControl.getInstance().setOTFVisConfig(createOTFVisConfig);
+		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
+		OTFClientControl.getInstance().setOTFVisConfig(otfVisConfig);
 		OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 		OTFHostControl otfHostControl = hostControlBar.getOTFHostControl();
 		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);
@@ -92,7 +92,7 @@ public class OTFClientFile implements Runnable {
 		clientQ.getConstData();
 		hostControlBar.updateTimeLabel();
 		OTFClientQuadTree clientQuadTree = clientQ;
-		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar);
+		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));
 		otfClient.show();
 	}
