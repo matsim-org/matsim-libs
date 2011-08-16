@@ -24,6 +24,7 @@ import java.util.SortedSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -36,12 +37,17 @@ public class EmissionsPerPersonAnalysis {
 
 	private final static String runNumber = "973";
 	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-	//	private final String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-	private final static String netFile = runDirectory + "output_network.xml.gz";
-	//	private final String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
-	private final static String plansFile = runDirectory + "output_plans.xml.gz";
-	private final static String emissionFile = runDirectory + runNumber + ".emission.events.xml.gz";
 	
+	private final static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	private final static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
+	private static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	private final static Integer lastIteration = getLastIteration(configFile);
+	private final static String emissionFile = runDirectory + runNumber + "." + lastIteration + ".emission.events.xml.gz";
+	
+//	private final static String netFile = runDirectory + "output_network.xml.gz";
+//	private final static String plansFile = runDirectory + "output_plans.xml.gz";
+//	private final static String emissionFile = runDirectory + runNumber + ".emission.events.xml.gz";
+
 	private static Scenario scenario;
 	
 	public static void main(String[] args) {
@@ -57,19 +63,20 @@ public class EmissionsPerPersonAnalysis {
 				population,
 				listOfPollutants,
 				epa.getWarmEmissions(),
-				runDirectory + runNumber + ".emissionsWarmPerHomeLocation.txt");
+				runDirectory + runNumber + "." + lastIteration + ".emissionsWarmPerHomeLocation.txt");
 		emissionWriter.writeHomeLocation2Emissions(
 				population,
 				listOfPollutants,
 				epa.getColdEmissions(),
-				runDirectory + runNumber + ".emissionsColdPerHomeLocation.txt");
+				runDirectory + runNumber + "." + lastIteration + ".emissionsColdPerHomeLocation.txt");
 		emissionWriter.writeHomeLocation2Emissions(
 				population,
 				listOfPollutants,
 				epa.getTotalEmissions(),
-				runDirectory + runNumber + ".emissionsTotalPerHomeLocation.txt");
+				runDirectory + runNumber + "." + lastIteration + ".emissionsTotalPerHomeLocation.txt");
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static void loadScenario() {
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
@@ -77,5 +84,14 @@ public class EmissionsPerPersonAnalysis {
 		config.plans().setInputFile(plansFile);
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
 		scenarioLoader.loadScenario() ;
+	}
+
+	private static Integer getLastIteration(String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		Integer lastIteration = config.controler().getLastIteration();
+		return lastIteration;
 	}
 }

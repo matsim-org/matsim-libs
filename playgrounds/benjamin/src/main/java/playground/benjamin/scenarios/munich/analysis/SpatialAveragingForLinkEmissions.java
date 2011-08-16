@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,9 +52,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.events.emissions.ColdPollutant;
 import playground.benjamin.events.emissions.EmissionEventsReader;
@@ -71,16 +70,21 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveragingForLinkEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissions.class);
 
-	private final String runNumber1 = "972";
-	private final String runNumber2 = "973";
-	private final String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String configFile = runDirectory1 + "output_config.xml.gz";
-	private final String netFile = runDirectory1 + "output_network.xml.gz";
-	private final String emissionFile1 = runDirectory1 + runNumber1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + runNumber2 + ".emission.events.xml.gz";
+	private final static String runNumber1 = "981";
+	private final static String runNumber2 = "983";
+	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	
+	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration1 = getLastIteration(configFile1);
+	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration2 = getLastIteration(configFile2);
+	private final String emissionFile1 = runDirectory1 + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
-	private final String outPath = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".";
+//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
+//	private final String configFile1 = runDirectory1 + "output_config.xml.gz";
 
 	Scenario scenario;
 	Network network;
@@ -89,6 +93,7 @@ public class SpatialAveragingForLinkEmissions {
 	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
 
+	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static int noOfTimeBins = 30;
 	double simulationEndTime;
 
@@ -100,11 +105,15 @@ public class SpatialAveragingForLinkEmissions {
 	static int noOfXbins = 80;
 	static int noOfYbins = 60;
 	static int minimumNoOfLinksInCell = 1;
+	static String pollutant = WarmPollutant.PM.toString();
+
+	// OUTPUT
+	private final String outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
 
 	private void run() throws IOException{
-		this.simulationEndTime = getEndTime(configFile);
+		this.simulationEndTime = getEndTime(configFile1);
 		defineListOfPollutants();
-		loadScenario(netFile);
+		loadScenario(netFile1);
 		this.network = this.scenario.getNetwork();
 		initFeatures();
 
@@ -128,16 +137,16 @@ public class SpatialAveragingForLinkEmissions {
 
 		Map<Double, Map<Id, Map<String, Double>>> time2deltaEmissionsTotal = calcualateEmissionDifferences(time2EmissionsTotalFiltered1, time2EmissionsTotalFiltered2);
 
-		//		EmissionWriter eWriter = new EmissionWriter();
-		BufferedWriter writer = IOUtils.getBufferedWriter(outPath + "movie.emissionsTotalPerLinkLocationSmoothed.txt");
-		writer.append("xCentroid\tyCentroid\tCO2_TOTAL\tTIME\n");
+//		EmissionWriter eWriter = new EmissionWriter();
+//		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "Smoothed.txt");
+//		writer.append("xCentroid\tyCentroid\tCO2_TOTAL\tTIME\n");
 
 		Collection<Feature> features = new ArrayList<Feature>();
 
 		for(double endOfTimeInterval : time2deltaEmissionsTotal.keySet()){
 			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2deltaEmissionsTotal.get(endOfTimeInterval);
-			//			String outFile = outPath + (int) endOfTimeInterval + ".emissionsTotalPerLinkLocation.txt";
-			//			eWriter.writeLinkLocation2Emissions(listOfPollutants, deltaEmissionsTotal, network, outFile);
+//			String outFile = outPathStub + (int) endOfTimeInterval + ".txt";
+//			eWriter.writeLinkLocation2Emissions(listOfPollutants, deltaEmissionsTotal, network, outFile);
 
 			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
 			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -158,7 +167,7 @@ public class SpatialAveragingForLinkEmissions {
 					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaEmissionsTotal.get(linkId).get("CO2_TOTAL");
+							double value = deltaEmissionsTotal.get(linkId).get(pollutant);
 							// TODO: not distance between data points, but distance between
 							// data point and cell centroid is used now; is the former to expensive?
 							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
@@ -175,8 +184,8 @@ public class SpatialAveragingForLinkEmissions {
 						if(endOfTimeInterval <= 86400.){
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
-							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
-							writer.append(outString);
+//							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
+//							writer.append(outString);
 						
 							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
 							try {
@@ -192,10 +201,11 @@ public class SpatialAveragingForLinkEmissions {
 				}
 			}
 		}
-		writer.close();
-		logger.info("Finished writing output to " + outPath + "movie.emissionsTotalPerLinkLocationSmoothed.txt");
+//		writer.close();
+//		logger.info("Finished writing output to " + outPathStub + "Smoothed.txt");
 		
-		ShapeFileWriter.writeGeometries(features, outPath + "movie.emissionsTotalPerLinkLocationSmoothed.shp");
+		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
+		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -370,11 +380,11 @@ public class SpatialAveragingForLinkEmissions {
 	@SuppressWarnings("deprecation")
 	private void initFeatures() {
 		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
-				"Point", Point.class, true, null, null, null);
+				"Point", Point.class, true, null, null, this.targetCRS);
 		AttributeType time = AttributeTypeFactory.newAttributeType(
 				"Time", String.class);
 		AttributeType co2Emissions = AttributeTypeFactory.newAttributeType(
-				"deltaCO2", String.class);
+				"deltaCO2", Double.class);
 		
 		Exception ex;
 		try {
@@ -387,9 +397,9 @@ public class SpatialAveragingForLinkEmissions {
 			ex = e0;
 		}
 		throw new RuntimeException(ex);
-		
 	}
 
+	@SuppressWarnings("deprecation")
 	private void loadScenario(String netFile) {
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
@@ -422,5 +432,14 @@ public class SpatialAveragingForLinkEmissions {
 
 	public static void main(String[] args) throws IOException{
 		new SpatialAveragingForLinkEmissions().run();
+	}
+
+	private static Integer getLastIteration(String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		Integer lastIteration = config.controler().getLastIteration();
+		return lastIteration;
 	}
 }

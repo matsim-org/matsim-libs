@@ -19,14 +19,23 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,14 +44,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.benjamin.events.emissions.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
 /**
@@ -52,19 +66,29 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveragingForHomeEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingForHomeEmissions.class);
 
-	private final String runNumber1 = "972";
-	private final String runNumber2 = "973";
-	private final String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-	private final String netFile2 = runDirectory2 + "output_network.xml.gz";
-	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
-	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
-	private final String emissionFile1 = runDirectory1 + runNumber1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + runNumber2 + ".emission.events.xml.gz";
+	private final static String runNumber1 = "981";
+	private final static String runNumber2 = "982";
+	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	private final String netFile2 = runDirectory2 + runNumber2 + ".output_network.xml.gz";
+	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml.gz";
+	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
+//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
+//	private final String netFile2 = runDirectory2 + "output_network.xml.gz";
+//	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
+//	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
+	
+	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration1 = getLastIteration(configFile1);
+	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration2 = getLastIteration(configFile2);
+	private final String emissionFile1 = runDirectory1 + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
-	private final String outFile1 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocation.txt";
-	private final String outFile2 = runDirectory2 + "emissions/" + runNumber2 + "-" + runNumber1 + ".emissionsTotalPerHomeLocationSmoothed.txt";
+	private FeatureType featureType;
+	
+	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
 	static final double xMin = 4452550.25;
 	static final double xMax = 4479483.33;
@@ -74,33 +98,37 @@ public class SpatialAveragingForHomeEmissions {
 	static int noOfXbins = 80;
 	static int noOfYbins = 60;
 	static int minimumNoOfPeopleInCell = 2;
+	static String pollutant = WarmPollutant.FC.toString();
+
+	// OUTPUT
+	private final String outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
 
 	private void run() throws IOException{
-		Scenario sc1 = loadScenario(netFile1, plansFile1);
-		Scenario sc2 = loadScenario(netFile2, plansFile2);
-		Population pop1 = sc1.getPopulation();
-		Population pop2 = sc2.getPopulation();
+		Scenario scenario = loadScenario(netFile1, plansFile1);
+		Population population = scenario.getPopulation();
+		initFeatures();
 
-		EmissionsPerPersonAggregator epa1 = new EmissionsPerPersonAggregator(pop1, emissionFile1);
-		EmissionsPerPersonAggregator epa2 = new EmissionsPerPersonAggregator(pop2, emissionFile2);
+		EmissionsPerPersonAggregator epa1 = new EmissionsPerPersonAggregator(population, emissionFile1);
+		EmissionsPerPersonAggregator epa2 = new EmissionsPerPersonAggregator(population, emissionFile2);
 		epa1.run();
 		epa2.run();
 
-		SortedSet<String> listOfPollutants = epa1.getListOfPollutants();
 		Map<Id, Map<String, Double>> emissionsTotal1 = epa1.getTotalEmissions();
 		Map<Id, Map<String, Double>> emissionsTotal2 = epa2.getTotalEmissions();
 
 
 		Map<Id, Map<String, Double>> deltaEmissionsTotal = calcualateEmissionDifferences(emissionsTotal1, emissionsTotal2);
-		EmissionWriter eWriter = new EmissionWriter();
-		eWriter.writeHomeLocation2Emissions(pop1, listOfPollutants, deltaEmissionsTotal, outFile1);
+//		EmissionWriter eWriter = new EmissionWriter();
+//		eWriter.writeHomeLocation2Emissions(pop1, listOfPollutants, deltaEmissionsTotal, outPathStub + ".txt");
 
+		Collection<Feature> features = new ArrayList<Feature>();
+		
 		int[][] noOfPeopleInCell = new int[noOfXbins][noOfYbins];
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
 		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
-
+		
 		PersonFilter filter = new PersonFilter();
-		for(Person person : pop1.getPersons().values()){
+		for(Person person : population.getPersons().values()){
 			boolean isPersonFromMiD = filter.isPersonFromMID(person);
 			if(isPersonFromMiD){
 				Id personId = person.getId();
@@ -117,31 +145,45 @@ public class SpatialAveragingForHomeEmissions {
 					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaEmissionsTotal.get(personId).get("CO2_TOTAL");
 							// TODO: not distance between data points, but distance between
 							// data point and cell centroid is used now; is the former to expensive?
 							double weightOfPersonForCell = calculateWeightOfPersonForCell(xHome, yHome, cellCentroid.getX(), cellCentroid.getY());
 							sumOfweightsForCell[xIndex][yIndex] += weightOfPersonForCell;
+
+							double value = deltaEmissionsTotal.get(personId).get(pollutant);
 							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfPersonForCell * value;
 						}
 					}
 				}
 			}
 		}
-		BufferedWriter writer = IOUtils.getBufferedWriter(outFile2);
-		writer.append("xCentroid \t yCentroid \t CO2_TOTAL \n");
+//		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + ".txt");
+//		writer.append("xCentroid\tyCentroid\t"pollutant"\n");
 		for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 				Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 				if(noOfPeopleInCell[xIndex][yIndex] > minimumNoOfPeopleInCell){
-					double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
-					String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\n";
-					writer.append(outString);
+					double avgValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
+					// String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\n";
+					// writer.append(outString);
+
+					Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
+					try {
+						Feature feature = this.featureType.create(new Object[] {
+								point, avgValue
+						});
+						features.add(feature);
+					} catch (IllegalAttributeException e1) {
+						throw new RuntimeException(e1);
+					}
 				}
 			}
 		}
-		writer.close();
-		logger.info("Finished writing output to " + outFile2);
+//		writer.close();
+//		logger.info("Finished writing output to " + outPathStub + ".txt");
+		
+		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".emissionsPerHomeSmoothed.shp");
+		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".emissionsPerHomeSmoothed.shp");
 	}
 
 	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
@@ -204,6 +246,7 @@ public class SpatialAveragingForHomeEmissions {
 		return delta;
 	}
 
+	@SuppressWarnings("deprecation")
 	private Scenario loadScenario(String netFile, String plansFile) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -214,7 +257,37 @@ public class SpatialAveragingForHomeEmissions {
 		return scenario;
 	}
 
+	@SuppressWarnings("deprecation")
+	private void initFeatures() {
+		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
+				"Point", Point.class, true, null, null, this.targetCRS);
+		AttributeType deltaEmissions = AttributeTypeFactory.newAttributeType(
+				"deltaEmiss", Double.class);
+		
+		Exception ex;
+		try {
+			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
+			        {point, deltaEmissions}, "EmissionPoint");
+			return;
+		} catch (FactoryRegistryException e0) {
+			ex = e0;
+		} catch (SchemaException e0) {
+			ex = e0;
+		}
+		throw new RuntimeException(ex);
+		
+	}
+
 	public static void main(String[] args) throws IOException{
 		new SpatialAveragingForHomeEmissions().run();
+	}
+
+	private static Integer getLastIteration(String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		Integer lastIteration = config.controler().getLastIteration();
+		return lastIteration;
 	}
 }
