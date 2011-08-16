@@ -61,7 +61,6 @@ public class Mobility {
 		}
 
 	private void run(String[] args) {
-		System.out.println("Hello World");
 		loadScenario();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 	
