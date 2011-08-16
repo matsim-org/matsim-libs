@@ -181,7 +181,7 @@ public class SpatialAveragingForLinkEmissions {
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(noOfLinksInCell[xIndex][yIndex] > minimumNoOfLinksInCell){
-						if(endOfTimeInterval <= 86400.){
+						if(endOfTimeInterval < Time.MIDNIGHT){
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 //							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
@@ -383,13 +383,13 @@ public class SpatialAveragingForLinkEmissions {
 				"Point", Point.class, true, null, null, this.targetCRS);
 		AttributeType time = AttributeTypeFactory.newAttributeType(
 				"Time", String.class);
-		AttributeType co2Emissions = AttributeTypeFactory.newAttributeType(
-				"deltaCO2", Double.class);
+		AttributeType deltaEmissions = AttributeTypeFactory.newAttributeType(
+				"deltaEmiss", Double.class);
 		
 		Exception ex;
 		try {
 			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
-			        {point, time, co2Emissions}, "EmissionPoint");
+			        {point, time, deltaEmissions}, "EmissionPoint");
 			return;
 		} catch (FactoryRegistryException e0) {
 			ex = e0;
