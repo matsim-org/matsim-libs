@@ -68,6 +68,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	private static final double MAX_DISTANCE_STOP_LINK = 50*180/(6371000*Math.PI);
 	private static final double DEFAULT_FREE_SPEED = 20;
 	private static final double DEFAULT_CAPCITY = 500;
+	
 	//Attributes
 	/**
 	 * The folder root of the GTFS files
@@ -896,7 +897,11 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	}*/
 	//Main method
 	/**
-	 * @param args
+	 * @param args:
+	 * 0 - Transit schedule file
+	 * 1 - Input network file
+	 * 2 - Output network file
+	 * 3 - Name of the network 
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
