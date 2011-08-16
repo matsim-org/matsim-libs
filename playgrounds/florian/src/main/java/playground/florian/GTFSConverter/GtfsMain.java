@@ -4,7 +4,7 @@ import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.run.OTFVis;
@@ -15,6 +15,8 @@ import playground.mzilske.osm.JXMapOTFVisClient;
 
 public class GtfsMain {
 	
+	private static final String CRS = "EPSG:3395";
+
 	public static void main(String[] args) {
 		Scenario scenario = readScenario();
 		System.out.println("Scenario has " + scenario.getNetwork().getLinks().size() + " links.");
@@ -25,12 +27,13 @@ public class GtfsMain {
 	}
 
 	private static Scenario readScenario() {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new WGS84ToMercator.Project(18));
+		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new GeotoolsTransformation("WGS84", CRS));
 		gtfs.setCreateShapedNetwork(false);
 		//		gtfs.setDate(20110711);
 		gtfs.convert();
 		// gtfs.writeScenario();
 		Scenario scenario = gtfs.getScenario();
+		scenario.getConfig().global().setCoordinateSystem(CRS);
 		return scenario;
 	}
 
@@ -52,7 +55,7 @@ public class GtfsMain {
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:beatty");
-		// JXMapOTFVisClient.run(scenario.getConfig(), server, wms, new WGS84ToOSMMercator.Deproject());
+		// JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
 		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 	}
