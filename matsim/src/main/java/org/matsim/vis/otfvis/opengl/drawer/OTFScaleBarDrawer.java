@@ -1,4 +1,4 @@
-package org.matsim.vis.otfvis.opengl.gui;
+package org.matsim.vis.otfvis.opengl.drawer;
 
 import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
 import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
@@ -11,8 +11,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;

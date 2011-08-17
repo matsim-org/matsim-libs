@@ -31,14 +31,14 @@ import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
+import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFSwingDrawerContainer;
+import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
-import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 import org.matsim.vis.otfvis2.LinkHandler;
 
 

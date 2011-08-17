@@ -25,7 +25,6 @@ import java.awt.geom.Point2D;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
-import org.matsim.vis.otfvis.opengl.gui.ValueColorizer;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 
 /***

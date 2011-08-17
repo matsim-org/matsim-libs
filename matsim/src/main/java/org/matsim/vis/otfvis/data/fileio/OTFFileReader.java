@@ -39,7 +39,6 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.opengl.gui.SettingsSaver;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The Reader is the the mvi playing OTFServer.

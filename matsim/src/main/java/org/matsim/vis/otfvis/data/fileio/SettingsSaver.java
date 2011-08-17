@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.opengl.gui;
+package org.matsim.vis.otfvis.data.fileio;
 
 import java.io.File;
 import java.io.FileInputStream;

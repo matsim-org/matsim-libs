@@ -75,8 +75,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private static boolean includeRoutes = true ;
 
-	private static final long serialVersionUID = 1L;
-
 	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
 	private Id agentId;
@@ -286,7 +284,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				InfoText activityText = new InfoText(
 						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth);
 				activityText.setAlpha(0.5f);
-				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
+				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getViewBoundsAsQuadTreeRect());
 				this.activityTexts.add(activityText);
 			}
 		}
@@ -295,7 +293,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			this.agentText = new InfoText(
 					this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			this.agentText.setAlpha(0.7f);
-			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getMouseHandler().getViewBoundsAsQuadTreeRect());
+			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

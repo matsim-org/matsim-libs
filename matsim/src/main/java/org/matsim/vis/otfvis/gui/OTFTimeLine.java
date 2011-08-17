@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.opengl.gui;
+package org.matsim.vis.otfvis.gui;
 
 import java.awt.Component;
 import java.awt.Graphics;
@@ -39,7 +39,6 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
-import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 
