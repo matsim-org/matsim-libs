@@ -23,6 +23,7 @@ package org.matsim.withinday.trafficmonitoring;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,9 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -64,7 +68,6 @@ import org.matsim.core.utils.misc.Time;
  * TODO: 
  * - take transport mode for multi-modal simulations into account
  * - make storedTravelTimesBinSize configurable (e.g. via config)
- * - react to network change events
  * 
  * @author cdobler
  */
@@ -81,6 +84,9 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	private Map<Id, TripBin> regularActiveTrips; // PersonId
 	private Map<Id, TravelTimeInfo> travelTimeInfos; // LinkId
 
+	// Links that are changed by network change events
+	private Map<Double, Collection<Link>> changedLinks;
+	
 	/*
 	 * For parallel Execution
 	 */
@@ -91,7 +97,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 	private int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
-
+	
 	// use the factory
 	/*package*/ TravelTimeCollector(Scenario scenario, int id) {
 		/*
@@ -113,11 +119,34 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	private void init() {
 		regularActiveTrips = new HashMap<Id, TripBin>();
 		travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
+		changedLinks = new HashMap<Double, Collection<Link>>();
 
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
 			travelTimeInfos.put(link.getId(), travelTimeInfo);
 		}
+		
+		/*
+		 * If the network is time variant, we have to update the link parameters
+		 * according to the network change events.
+		 */
+		if (this.network instanceof NetworkImpl) {
+			Collection<NetworkChangeEvent> networkChangeEvents = ((NetworkImpl) this.network).getNetworkChangeEvents();
+			if (networkChangeEvents != null) {
+				for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
+					ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
+					if (freespeedChange != null) {
+						double startTime = networkChangeEvent.getStartTime();
+						Collection<Link> links = changedLinks.get(startTime);
+						if (links == null) {
+							links = new HashSet<Link>();
+							changedLinks.put(startTime, links);
+						}
+						links.addAll(networkChangeEvent.getLinks());
+					}
+				}				
+			}
+		}		
 	}
 
 	@Override
@@ -160,7 +189,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 			travelTimeInfo.checkActiveState();
 			travelTimeInfo.checkBinSize(tripTime);
-//			if (linkId.toString().equals("103771")) log.error(time + "," + tripTime);
 		}
 	}
 
@@ -208,9 +236,19 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		initParallelThreads();
 	}
 
-	// Add Link TravelTimes
+	// Update Link TravelTimeInfos if link attributes have changed
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
+		
+		if (links != null) {
+			for (Link link : links) {
+				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
+				TravelTimeInfo travelTimeInfo = travelTimeInfos.get(link.getId());
+				travelTimeInfo.init(freeSpeedTravelTime);
+				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
+			}
+		}
 	}
 
 	// Update Link TravelTimes
@@ -298,7 +336,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	 * reaching this Barrier. Now the Threads will start moving the Nodes. We
 	 * wait until all of them reach the TimeStepEndBarrier to move on. We should
 	 * not have any Problems with Race Conditions because even if the Threads
-	 * would be faster than this Thread, means the reach the TimeStepEndBarrier
+	 * would be faster than this Thread, means they reach the TimeStepEndBarrier
 	 * before this Method does, it should work anyway.
 	 */
 	private void run(double time) {
@@ -420,9 +458,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 					startBarrier.await();
 
-					// for (TravelTimeInfo travelTimeInfo : travelTimeInfos) {
-					// calcBinTravelTime(this.time, travelTimeInfo);
-					// }
 					Iterator<TravelTimeInfo> iter = activeTravelTimeInfos.iterator();
 					while (iter.hasNext()) {
 						TravelTimeInfo travelTimeInfo = iter.next();
