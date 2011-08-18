@@ -21,6 +21,7 @@ package playground.fhuelsmann.emission.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -42,14 +43,10 @@ import org.matsim.core.network.NetworkImpl;
  */
 
 public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
-
-//	private final static int NUM_OF_HOURS = 30;
-
-	//private double[] congestionLength = new double[NUM_OF_HOURS];
-	//private int[] travelDistanceCnt = new int[NUM_OF_HOURS];
+	
 
 	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
-	Map<Id, Double> stopGoFractionSum = new HashMap<Id, Double>();
+	Map<Id, Map<Integer,Double>> stopGoFractionSum = new HashMap<Id, Map<Integer,Double>>();
 
 	private final Network network;
 
@@ -76,35 +73,51 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 		double stopGoFraction = 0.0;
 		double stopGoTime = 0.0;
 		double distance = link.getLength(); 
+	
 		
 		if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
-		
+			double timeClass = enterTime / 3600;
+			int timeClassrounded = (int) timeClass+1;
 			double travelTime = event.getTime()-enterTime;
 			double averageSpeed=distance/travelTime;
 
-				if (averageSpeed < stopGoSpeed){
+			if (averageSpeed < stopGoSpeed){
 					stopGoFraction = distance/1000;
 				}
-				if (averageSpeed > freeTravelSpeed){
+			else if (averageSpeed > freeTravelSpeed){
 					stopGoFraction = 0.0;
 				}
-				else {
+			else {
 					stopGoTime= (distance / 1000) / averageSpeed - (distance / 1000) / freeTravelSpeed;
 					stopGoFraction = stopGoSpeed * stopGoTime;
-
-				}
+				//	if(linkId.toString().equals("576273431-592536888"))
+					//	System.out.println("linkId "+linkId+ " stopGoFraction "+stopGoFraction);
 			}
 			
-		if(!stopGoFractionSum.containsKey(linkId)){
-			stopGoFractionSum.put(linkId, stopGoFraction);
-		}
-		else{		
-				Double previousValue = stopGoFractionSum.get(linkId);
-				Double newValue = previousValue + stopGoFraction;
-				stopGoFractionSum.put(linkId, newValue);
-			//	if(linkId.toString().equals("576273431-592536888"))
-			//	System.out.println("++++++++++++++++++++++++++++++linkId "+linkId+ " previousValue "+previousValue+" newValue "+newValue);
+			if(!stopGoFractionSum.containsKey(linkId)){
+			
+				Map<Integer, Double> timeClass2CongLength = new TreeMap<Integer, Double>();
+				timeClass2CongLength.put(timeClassrounded,stopGoFraction);
+				stopGoFractionSum.put(linkId, timeClass2CongLength);
+				if(linkId.toString().equals("576273431-592536888"))
+				System.out.println("linkId "+linkId+ " timeClass2CongLength "+timeClass2CongLength);
+			}
+			else{		
+				if(stopGoFractionSum.get(linkId).containsKey(timeClassrounded)){
+					Map<Integer, Double> newValue = stopGoFractionSum.get(linkId);
+					newValue.put(timeClassrounded,newValue.get(timeClassrounded)+stopGoFraction);
+					stopGoFractionSum.put(linkId, newValue);
+				}
+				else{
+					Map<Integer, Double> newValue = stopGoFractionSum.get(linkId);
+			
+					newValue.put(timeClassrounded,stopGoFraction);
+					stopGoFractionSum.put(linkId, newValue);
+					//if(linkId.toString().equals("576273431-592536888"))
+					//	System.out.println("++++++++++++++++++++++++++++++linkId "+linkId+ " newValue "+newValue);
+				}
+			}
 		}
 	}
 }
