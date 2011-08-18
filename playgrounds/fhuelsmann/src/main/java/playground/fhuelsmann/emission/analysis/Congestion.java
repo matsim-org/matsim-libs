@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkImpl;
 /**
  * @author friederike
  * 
- * calculates the length of congestion on each link over a day; TO DO calculate the length of congestion per hour
+ * calculates the length of congestion on each link per hour
  *
  */
 
