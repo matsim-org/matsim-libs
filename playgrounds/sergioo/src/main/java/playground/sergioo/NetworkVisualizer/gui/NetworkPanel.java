@@ -20,58 +20,38 @@
 
 package playground.sergioo.NetworkVisualizer.gui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Ellipse2D;
+import java.lang.reflect.InvocationTargetException;
 
-import javax.swing.JPanel;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.NetworkVisualizer.gui.NetworkWindow.Label;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkManager;
 import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
+import playground.sergioo.NetworkVisualizer.gui.networkPainters.SimpleNetworkPainter;
 import playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport.PublicTransportNetworkPainter;
 
 import util.geometry.Point2D;
 
-public class NetworkPanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class NetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, KeyListener {
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	//Attributes
-	
-	
-	private final Camera camera;
 	private final NetworkWindow window;
-	private final NetworkManager networkManager;
-	private final NetworkPainter networkPainter;
-	
 	private int iniX;
 	private int iniY;
 	private Color backgroundColor = Color.WHITE;
-	private Color linkSelectedColor = Color.GREEN;
-	private Color nodeSelectedColor = Color.MAGENTA;
-	private Color linesColor = Color.BLACK;
-	private Color pointsColor = Color.RED;
-	private Stroke selectedStroke = new BasicStroke(2);
-	private Stroke linesStroke = new BasicStroke(1);
-	private boolean withSelected = true;
-	private boolean withLines = true;
-	private boolean withPoints = true;
 	private boolean withNetwork = true;
 	private double xMax;
 	private double yMax;
@@ -79,12 +59,11 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 	private double yMin;
 	
 	//Methods
-	public NetworkPanel(NetworkWindow window, NetworkManager networkManager, NetworkPainter networkPainter) {
+	public NetworkPanel(NetworkWindow window, NetworkPainter networkPainter) {
+		super();
 		this.window = window;
-		this.networkManager = networkManager;
-		this.networkPainter = networkPainter;
+		layers.add(new Layer(networkPainter));
 		this.setBackground(backgroundColor);
-		camera = new Camera();
 		calculateBoundaries();
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -94,12 +73,9 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 	public Camera getCamera() {
 		return camera;
 	}
-	public NetworkManager getNetworkManager() {
-		return networkManager;
-	}
 	private void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		for(Link link:networkManager.getNetworkLinks()) {
+		for(Link link:((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().getNetworkLinks()) {
 			if(link!=null) {
 				if(link.getFromNode().getCoord().getX()<xMin)
 					xMin = link.getFromNode().getCoord().getX();
@@ -128,56 +104,12 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2=(Graphics2D)g;
-		if(withNetwork)
+		for(Layer layer:layers)
 			try {
-				networkPainter.paintNetwork(g2, camera);
+				layer.paint(g2, camera);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		if(withLines)
-			paintLines(g2);
-		if(withPoints)
-			paintPoints(g2);
-		if(withSelected)
-			paintSelected(g2);
-	}
-	private void paintSelected(Graphics2D g2) {
-		Link link=networkManager.getSelectedLink();
-		if(link!=null)
-			paintLink(g2, link, selectedStroke, 3, linkSelectedColor);
-		Node node = networkManager.getSelectedNode();
-		if(node!=null)
-			paintCircle(g2, node.getCoord(), 5, nodeSelectedColor);
-		Tuple<Coord, Coord> line = networkManager.getSelectedLine();
-		if(line!=null)
-			paintLine(g2, line, selectedStroke, linesColor);
-		Coord point = networkManager.getSelectedPoint();
-		if(point!=null)
-			paintCircle(g2, point, 5, pointsColor);
-	}
-	private void paintLines(Graphics2D g2) {
-		for(Tuple<Coord, Coord> line:networkManager.getLines())
-			paintLine(g2, line, linesStroke, linesColor);
-	}
-	private void paintPoints(Graphics2D g2) {
-		for(Coord point:networkManager.getPoints())
-			paintCircle(g2, point, 3, pointsColor);
-	}
-	private void paintLink(Graphics2D g2, Link link, Stroke stroke, double pointSize, Color color) {
-		paintLine(g2, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
-		paintCircle(g2,link.getToNode().getCoord(), pointSize, color);
-	}
-	private void paintLine(Graphics2D g2, Tuple<Coord,Coord> coords, Stroke stroke, Color color) {
-		g2.setStroke(stroke);
-		g2.setColor(color);
-		g2.drawLine(camera.getIntX(coords.getFirst().getX()),
-				camera.getIntY(coords.getFirst().getY()),
-				camera.getIntX(coords.getSecond().getX()),
-				camera.getIntY(coords.getSecond().getY()));
-	}
-	private void paintCircle(Graphics2D g2, Coord coord, double pointSize, Color color) {
-		Shape circle = new Ellipse2D.Double(camera.getIntX(coord.getX())-pointSize,camera.getIntY(coord.getY())-pointSize,pointSize*2,pointSize*2);
-		g2.fill(circle);
 	}
 	public void zoomIn(double x, double y) {
 		camera.zoomIn(x, y);
@@ -191,9 +123,6 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 	public Point2D getCenter() {
 		return camera.getCenter();
 	}
-	public void withStops() {
-		withPoints = true;
-	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
@@ -201,36 +130,20 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		else {
 			if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				networkManager.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				window.refreshLabel(Label.LINK);
 			}
 			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				networkManager.unselectLink();
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().unselectLink();
 				window.refreshLabel(Label.LINK);
 			}
 			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				networkManager.selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectNode(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 				window.refreshLabel(Label.NODE);
 			}
 			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				networkManager.unselectNode();
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().unselectNode();
 				window.refreshLabel(Label.NODE);
-			}
-			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON1) {
-				networkManager.selectPoint(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				window.refreshLabel(Label.POINT);
-			}
-			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_POINT) && e.getButton()==MouseEvent.BUTTON3) {
-				networkManager.unselectPoint();
-				window.refreshLabel(Label.POINT);
-			}
-			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINE) && e.getButton()==MouseEvent.BUTTON1) {
-				networkManager.selectLine(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-				window.refreshLabel(Label.LINE);
-			}
-			else if(window.getOption().equals(SimpleNetworkWindow.Option.SELECT_LINE) && e.getButton()==MouseEvent.BUTTON3) {
-				networkManager.unselectLine();
-				window.refreshLabel(Label.LINE);
 			}
 			else if(window.getOption().equals(SimpleNetworkWindow.Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
 				camera.zoomIn(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
@@ -279,26 +192,20 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 			withNetwork  = !withNetwork;
 			break;
 		case 's':
-			withSelected  = !withSelected;
-			break;
-		case 'l':
-			withLines = !withLines;
-			break;
-		case 'p':
-			withPoints = !withPoints;
+			((SimpleNetworkPainter)layers.get(0).getPainter()).changeSelected();
 			break;
 		case 'o':
-			networkManager.selectOppositeLink();
+			((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectOppositeLink();
 			window.refreshLabel(Label.LINK);
 			break;
 		case 'v':
 			setBoundaries();
 			break;
 		case 't':
-			((PublicTransportNetworkPainter)networkPainter).setWeight(((PublicTransportNetworkPainter)networkPainter).getWeight()/1.5f);
+			((PublicTransportNetworkPainter)layers.get(0).getPainter()).setWeight(((PublicTransportNetworkPainter)layers.get(0).getPainter()).getWeight()/1.5f);
 			break;
 		case 'g':
-			((PublicTransportNetworkPainter)networkPainter).setWeight(((PublicTransportNetworkPainter)networkPainter).getWeight()*1.5f);
+			((PublicTransportNetworkPainter)layers.get(0).getPainter()).setWeight(((PublicTransportNetworkPainter)layers.get(0).getPainter()).getWeight()*1.5f);
 			break;
 		}
 		repaint();
@@ -310,6 +217,22 @@ public class NetworkPanel extends JPanel implements MouseListener, MouseMotionLi
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
+	}
+	public String getLabelText(Label label) {
+		try {
+			return (String) NetworkManager.class.getMethod("refresh"+label.text, new Class[0]).invoke(((NetworkPainter)layers.get(0).getPainter()).getNetworkManager(), new Object[0]);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 }

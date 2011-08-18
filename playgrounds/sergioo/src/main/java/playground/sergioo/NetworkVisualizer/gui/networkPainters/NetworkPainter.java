@@ -1,13 +1,22 @@
 package playground.sergioo.NetworkVisualizer.gui.networkPainters;
 
-import java.awt.Graphics2D;
+import org.matsim.api.core.v01.network.Network;
 
-import playground.sergioo.NetworkVisualizer.gui.Camera;
+import playground.sergioo.NetworkVisualizer.gui.Painter;
 
-public interface NetworkPainter {
+public abstract class NetworkPainter implements Painter {
+	
+	//Attributes
+	protected final NetworkByCamera networkByCamera;
+	protected final NetworkManager networkManager;
 	
 	//Methods
-	public NetworkByCamera getNetworkByCamera();
-	public void paintNetwork(Graphics2D g2, Camera camera) throws Exception;
+	public NetworkPainter(Network network) {
+		networkByCamera =  new NetworkByCamera(network);
+		networkManager = new NetworkManager(network);
+	}
+	public NetworkManager getNetworkManager() {
+		return networkManager;
+	}
 	
 }

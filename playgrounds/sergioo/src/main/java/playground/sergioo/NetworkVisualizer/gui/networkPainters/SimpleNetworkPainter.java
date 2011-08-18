@@ -10,35 +10,37 @@ import java.awt.geom.Ellipse2D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.NetworkVisualizer.gui.Camera;
 
-public class SimpleNetworkPainter implements NetworkPainter {
+public class SimpleNetworkPainter extends NetworkPainter {
 	
 	//Attributes
 	private Color networkColor = Color.LIGHT_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.5f);
-	private NetworkByCamera networkByCamera;
+	private Color linkSelectedColor = Color.GREEN;
+	private Color nodeSelectedColor = Color.MAGENTA;
+	private Stroke selectedStroke = new BasicStroke(2);
+	private boolean withSelected = true;
 	
 	//Methods
 	public SimpleNetworkPainter(Network network) {
-		this.networkByCamera =  new NetworkByCamera(network);
+		super(network);
 	}
-	public SimpleNetworkPainter(NetworkByCamera networkByCamera, Color networkColor, Stroke networkStroke) {
-		this.networkByCamera =  networkByCamera;
+	public SimpleNetworkPainter(Network network, Color networkColor, Stroke networkStroke) {
+		super(network);
 		this.networkColor = networkColor;
 		this.networkStroke = networkStroke;
 	}
 	@Override
-	public NetworkByCamera getNetworkByCamera() {
-		return networkByCamera;
-	}
-	@Override
-	public void paintNetwork(Graphics2D g2, Camera camera) throws Exception {
+	public void paint(Graphics2D g2, Camera camera) throws Exception {
 		networkByCamera.setCamera(camera);
 		for(Link link:networkByCamera.getNetworkLinks())
 			paintLink(g2,link, networkStroke, 0.5, networkColor);
+		if(withSelected)
+			paintSelected(g2);
 	}
 	private void paintLink(Graphics2D g2, Link link, Stroke stroke, double pointSize, Color color) throws Exception {
 		paintLine(g2, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
@@ -56,5 +58,15 @@ public class SimpleNetworkPainter implements NetworkPainter {
 		Shape circle = new Ellipse2D.Double(networkByCamera.getIntX(coord.getX())-pointSize,networkByCamera.getIntY(coord.getY())-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
 	}
-	
+	private void paintSelected(Graphics2D g2) throws Exception {
+		Link link=networkManager.getSelectedLink();
+		if(link!=null)
+			paintLink(g2, link, selectedStroke, 3, linkSelectedColor);
+		Node node = networkManager.getSelectedNode();
+		if(node!=null)
+			paintCircle(g2, node.getCoord(), 5, nodeSelectedColor);
+	}
+	public void changeSelected() {
+		withSelected = !withSelected;
+	}
 }

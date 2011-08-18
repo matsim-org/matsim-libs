@@ -2,7 +2,6 @@ package playground.sergioo.NetworkVisualizer.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
 import java.text.NumberFormat;
 
 import javax.swing.JFrame;
@@ -52,19 +51,7 @@ public abstract class NetworkWindow extends JFrame implements ActionListener {
 	
 	//Methods
 	public void refreshLabel(Label label) {
-		try {
-			labels[label.ordinal()].setText((String) NetworkManager.class.getMethod("refresh"+label.text, new Class[0]).invoke(panel.getNetworkManager(), new Object[0]));
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+		labels[label.ordinal()].setText(panel.getLabelText(label));
 	}
 	public Option getOption() {
 		return option;

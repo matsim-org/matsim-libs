@@ -57,7 +57,7 @@ public class SimpleNetworkWindow extends NetworkWindow {
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		panel = new NetworkPanel(this, new NetworkManager(networkPainter.getNetworkByCamera().getNetwork()), networkPainter);
+		panel = new NetworkPanel(this, networkPainter);
 		this.setSize(width+GAPX, height+GAPY);
 		this.add(panel, BorderLayout.CENTER);
 		JPanel buttonsPanel = new JPanel();

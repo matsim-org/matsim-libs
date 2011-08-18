@@ -9,13 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
-
 import playground.sergioo.NetworkVisualizer.gui.Camera;
-import playground.sergioo.NetworkVisualizer.gui.NetworkManager;
 import playground.sergioo.NetworkVisualizer.gui.NetworkPanel;
 import playground.sergioo.NetworkVisualizer.gui.NetworkWindow;
 import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
@@ -51,8 +45,8 @@ public class DoubleNetworkWindow extends NetworkWindow {
 		this.setLayout(new BorderLayout());
 		this.networkPainterA = networkPainterA;
 		this.networkPainterB = networkPainterB;
-		panel = new NetworkPanel(this, new NetworkManager(networkPainterA.getNetworkByCamera().getNetwork()), networkPainterA);
-		panelB = new NetworkPanel(this, new NetworkManager(networkPainterB.getNetworkByCamera().getNetwork()), networkPainterB);
+		panel = new NetworkPanel(this, networkPainterA);
+		panelB = new NetworkPanel(this, networkPainterB);
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout(1,2));
 		panelsPanel.add(panel, BorderLayout.WEST);
@@ -94,8 +88,8 @@ public class DoubleNetworkWindow extends NetworkWindow {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
 			this.remove(panel);
-			panel = new NetworkPanel(this, new NetworkManager(networkPainterA.getNetworkByCamera().getNetwork()), networkPainterA);
-			panelB = new NetworkPanel(this, new NetworkManager(networkPainterB.getNetworkByCamera().getNetwork()), networkPainterB);
+			panel = new NetworkPanel(this, networkPainterA);
+			panelB = new NetworkPanel(this, networkPainterB);
 			panelsPanel = new JPanel();
 			panelsPanel.setLayout(new GridLayout(1,2));
 			panelsPanel.add(panel, BorderLayout.WEST);
@@ -104,7 +98,7 @@ public class DoubleNetworkWindow extends NetworkWindow {
 		}
 		else {
 			this.remove(panelsPanel);
-			panel = new DoubleNetworkPanel(this, new NetworkManager(networkPainterA.getNetworkByCamera().getNetwork()), networkPainterA, new NetworkManager(networkPainterB.getNetworkByCamera().getNetwork()), networkPainterB);
+			panel = new DoubleNetworkPanel(this, networkPainterA, networkPainterB);
 			this.add(panel, BorderLayout.CENTER);
 		}
 	}

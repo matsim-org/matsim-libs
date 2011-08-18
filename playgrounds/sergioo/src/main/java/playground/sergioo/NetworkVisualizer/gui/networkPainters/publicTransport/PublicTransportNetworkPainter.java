@@ -27,10 +27,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
 import playground.sergioo.NetworkVisualizer.gui.Camera;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkByCamera;
 import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
 
-public class PublicTransportNetworkPainter implements NetworkPainter {
+public class PublicTransportNetworkPainter extends NetworkPainter {
 	
 	//Constants
 	private static final String NUM_TIMES_LINK_ROUTE_FILE = "./data/NetworkCharacteristics/linkDrawInformation.txt";
@@ -43,13 +42,12 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 	private Color networkColor = Color.LIGHT_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.1f);
 	private Map<RouteTypes, Map<String, Color>> colors;
-	private NetworkByCamera networkByCamera;
 	private Map<Id, LinkDrawInformation> linksDrawInformation;
 	private float weight = 0.001f;
 	
 	//Methods
 	public PublicTransportNetworkPainter(Network network, TransitSchedule transitSchedule) {
-		this.networkByCamera =  new NetworkByCamera(network);
+		super(network);
 		initialize(transitSchedule);
 	}
 	public void initialize(TransitSchedule transitSchedule) {
@@ -167,11 +165,7 @@ public class PublicTransportNetworkPainter implements NetworkPainter {
 		}
 	}
 	@Override
-	public NetworkByCamera getNetworkByCamera() {
-		return networkByCamera;
-	}
-	@Override
-	public void paintNetwork(Graphics2D g2, Camera camera) throws Exception {
+	public void paint(Graphics2D g2, Camera camera) throws Exception {
 		networkByCamera.setCamera(camera);
 		for(Link link:networkByCamera.getNetworkLinks()) {
 			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
