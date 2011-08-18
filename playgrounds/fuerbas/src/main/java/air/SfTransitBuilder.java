@@ -139,8 +139,8 @@ public class SfTransitBuilder {
 						
 			if (!schedule.getTransitLines().containsKey(transitLineId)) {
 				TransitLine transLine = sf.createTransitLine(transitLineId);
-				schedule.addTransitLine(transLine);
 				transLine.addRoute(transRouteMap.get(transitLineId));	
+				schedule.addTransitLine(transLine);
 			}
 			
 			if (!veh.getVehicleTypes().containsKey(vehTypeId)) {
