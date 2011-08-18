@@ -55,6 +55,8 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	
 	private static int netDisplList = -1;
 	
+	private static int nItems = 0;
+	
 	private static float basicLineWidth_m = 30.f;
 
 	@Override
@@ -110,7 +112,11 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	private void checkNetList(GL gl) {
 		float cellWidthAct_m = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-		if (getBasicLineWidth_m() != cellWidthAct_m){
+		if (getBasicLineWidth_m() != cellWidthAct_m || items.size() > nItems) {
+			// If the line width has changed (reason for redrawing)
+			// or if the number of visible links is bigger than last time
+			// (i.e. the user has zoomed out)
+			// we need to recreate the display list.
 			gl.glDeleteLists(netDisplList, 1);
 			netDisplList = -2;
 		}
@@ -121,6 +127,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 			for (OTFDrawable item : items) {
 				item.draw();
 			}
+			nItems = items.size();
 			gl.glEndList();
 		}
 	}
