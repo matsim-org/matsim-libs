@@ -32,38 +32,37 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.DeprecatedConstants;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.CharyparNagelScoringFunctionFactory4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerfStuck_mnl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.Events2Score4TravPerf_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import cadyts.utilities.math.MultinomialLogit;
 
 public class MNLUtilsTest {
 	public static void main(String[] args) {
-		String eventsFilename = "test/mnlUtilsTest/400.events.txt.gz";
-		String popFilename = "test/mnlUtilsTest/output_plans.xml.gz";
-		String netFilename = "test/prepare3/network.xml";
-		String configFilename = "test/prepare3/config4UtilTest.xml";
+		String eventsFilename = "test/output/2routesCntsVorEngpass/pCMit_changeSingleLegModeDist2travPt-7.5/ITERS/it.500/500.events.xml.gz";
+		String popFilename = "test/output/2routesCntsVorEngpass/pCMit_changeSingleLegModeDist2travPt-7.5/output_plans.xml.gz";
+		// String netFilename = "test/prepare3/network.xml";
+		String configFilename = "test/input/2routesCntsVorEngpass/dist2/cfgPCchangeSingleLegModeTest.xml";
 
 		double travelingPt = -3d;
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
-				.createConfig());
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils
+				.loadConfig(configFilename));
 
 		Config config = scenario.getConfig();
-		new MatsimConfigReader(config).readFile(configFilename);
 
-		new MatsimNetworkReader(scenario).readFile(netFilename);
+		// new MatsimConfigReader(config).readFile(configFilename);
+
+		// new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -93,8 +92,10 @@ public class MNLUtilsTest {
 		scoringConfigGroup.setTravelingPt_utils_hr(travelingPt);
 
 		// pop?
-		Population pop = scenario.getPopulation();
+
 		new MatsimPopulationReader(scenario).readFile(popFilename);
+		Population pop = scenario.getPopulation();
+
 		// deletes all unselected plans
 		for (Person person : pop.getPersons().values()) {
 			List<Plan> plans = new ArrayList<Plan>();
@@ -110,11 +111,11 @@ public class MNLUtilsTest {
 			selectedScores.put(person.getId(), person.getSelectedPlan()
 					.getScore());
 		}
-		Events2Score4TravPerf_mnl events2score = new
+		Events2Score4PC events2score = new
 		// DummyEvents2Score_mnl
-		Events2Score4TravPerfStuck_mnl//
-		(mnl, new CharyparNagelScoringFunctionFactory4PC(scoringConfigGroup),
-				pop, 4, scoringConfigGroup);
+		Events2Score4PC_mnl//
+		(config, new CharyparNagelScoringFunctionFactory4PC(scoringConfigGroup,
+				scenario.getNetwork()), pop);
 		events.addHandler(events2score);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
@@ -132,8 +133,8 @@ public class MNLUtilsTest {
 				double yuScore = events2score.getAgentScore(person.getId());
 
 				events2score.setPersonAttrs(person, null);
-				double mnlScore = events2score.getMultinomialLogit().getUtils()
-						.get(0);
+				double mnlScore = ((Events2Score4PC_mnl) events2score)
+						.getMultinomialLogit().getUtils().get(0);
 				if (matsimScore != yuScore || matsimScore != mnlScore) {
 					System.err.println("matsim:\t" + matsimScore + "\tyu:\t"
 							+ yuScore + "\tmnl:\t" + mnlScore);

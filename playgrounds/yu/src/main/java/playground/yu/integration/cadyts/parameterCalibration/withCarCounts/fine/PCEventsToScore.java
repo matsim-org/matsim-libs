@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MnlChoice.java
+ * Events2Score4onlyTravPt.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,29 +21,38 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.fine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.ScoringFunctionAccumulator4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
@@ -53,30 +62,328 @@ import cadyts.utilities.math.Vector;
  * @author yu
  *
  */
-public class Events2Score4PC_mnl extends Events2Score4PC implements
-		MultinomialLogitChoice {
+public class PCEventsToScore extends EventsToScore implements CadytsChoice {
+	private final static Logger log = Logger.getLogger(PCEventsToScore.class);
 
-	private final static Logger log = Logger
-			.getLogger(Events2Score4PC_mnl.class);
+	public static List<String> attrNameList = new ArrayList<String>();
+	public static List<Double> paramScaleFactorList = new ArrayList<Double>();
 
-	protected MultinomialLogit mnl;
-	// private boolean outputCalcDetail = false;
+	protected final Config config;
+	/** Map<personId,Map<Plan,attr>> */
+	protected Map<Id/* agent */, Map<Plan, Double>> legDursCar = new HashMap<Id, Map<Plan, Double>>(),
+			legDursPt = new HashMap<Id, Map<Plan, Double>>(),
+			legDursWalk = new HashMap<Id, Map<Plan, Double>>(),
+			actAttrs = new HashMap<Id, Map<Plan, Double>>(),
+			stuckAttrs = new HashMap<Id, Map<Plan, Double>>(),
+			distancesCar = new HashMap<Id, Map<Plan, Double>>(),
+			distancesPt = new HashMap<Id, Map<Plan, Double>>(),
+			distancesWalk = new HashMap<Id, Map<Plan, Double>>();
+	protected Map<Id/* agent */, Map<Plan, Integer>> carLegNos = new HashMap<Id, Map<Plan, Integer>>(),
+			ptLegNos = new HashMap<Id, Map<Plan, Integer>>(),
+			walkLegNos = new HashMap<Id, Map<Plan, Integer>>();
+	protected Population pop = null;
+	protected ScoringFunctionFactory sfFactory = null;
+	protected PlanCalcScoreConfigGroup scoring;
+	// protected boolean setPersonScore = true;
+	protected int maxPlansPerAgent;
+	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
+	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
+
+	private MultinomialLogit mnl;
 	private SimpleWriter writer = null;
 	private int iteration = -1;
 
-	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
-			Population pop) {
-		super(config, sfFactory, pop);
-		mnl = createMultinomialLogit(config);
+	public PCEventsToScore(Config config, ScoringFunctionFactory factory,
+			Population population) {
+		super(population, factory, config.planCalcScore().getLearningRate());
+		attrNameList.clear();
+		this.config = config;
+
+		// #####################################
+		// travelTime
+		attrNameList.add("traveling");
+		attrNameList.add("travelingPt");
+		attrNameList.add("travelingWalk");
+
+		// actPerforming
+		attrNameList.add("performing");
+
+		// attrNameList.add("lateArrival");//TODO in
+		// ActivityScoringFunction4PC
+
+		// stuck
+		attrNameList.add("stuck");
+
+		// distanceAttr
+		attrNameList.add("monetaryDistanceCostRateCar");
+		attrNameList.add("monetaryDistanceCostRatePt");
+		attrNameList.add("marginalUtlOfDistanceWalk");
+
+		// LegOffsetAttr
+		attrNameList.add("constantCar");
+		attrNameList.add("constantPt");
+		attrNameList.add("constantWalk");
+
+		// #####################################
+		scoring = config.planCalcScore();
+		pop = population;
+		maxPlansPerAgent = config.strategy().getMaxAgentPlanMemorySize();
+		sfFactory = factory;
+
+		mnl = MultinomialLogitCreator.createMultinomialLogit(config);
 	}
 
 	@Override
-	public MultinomialLogit getMultinomialLogit() {
-		return mnl;
+	public PlanCalcScoreConfigGroup getScoring() {
+		return scoring;
 	}
 
-	public void setMultinomialLogit(MultinomialLogit mnl) {
-		this.mnl = mnl;
+	@Override
+	public Double getAgentScore(final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
+		if (data == null) {
+			return null;
+		}
+		return data.getSecond().getScore();
+	}
+
+	protected Tuple<Plan, ScoringFunction> getScoringDataForAgent(
+			final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
+		if (data == null) {
+			Person person = pop.getPersons().get(agentId);
+			if (person == null) {
+				return null;
+			}
+			data = new Tuple<Plan, ScoringFunction>(
+					person.getSelectedPlan(),
+					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
+			agentScorers.put(agentId, data);
+		}
+		return data;
+	}
+
+	@Override
+	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(agentId);
+		if (data == null) {
+			return null;
+		}
+		return data.getSecond();
+	}
+
+	public void setSfFactory(ScoringFunctionFactory sfFactory) {
+		this.sfFactory = sfFactory;
+	}
+
+	/**
+	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
+	 * This method should be called after removedPlans, i.e. there should be
+	 * only choiceSetSize plans in the memory of an agent.
+	 *
+	 * @param person
+	 * @param monetaryDistanceCostRateCarStats
+	 */
+
+	@Override
+	public void reset(List<Tuple<Id, Plan>> toRemoves) {
+		for (Tuple<Id, Plan> agentIdPlanPair : toRemoves) {
+			Id agentId = agentIdPlanPair.getFirst();
+			Plan plan = agentIdPlanPair.getSecond();
+			Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
+					.get(agentId), legDurMapWalk = legDursWalk.get(agentId), actPerformMap = actAttrs
+					.get(agentId), stuckAttrMap = stuckAttrs.get(agentId), distanceMapCar = distancesCar
+					.get(agentId), distanceMapPt = distancesPt.get(agentId), distanceMapWalk = distancesWalk
+					.get(agentId);
+			Map<Plan, Integer> carLegNoMap = carLegNos.get(agentId), ptLegNoMap = ptLegNos
+					.get(agentId), walkLegNoMap = walkLegNos.get(agentId);
+
+			if (legDurMapCar == null || legDurMapPt == null
+					|| legDurMapWalk == null || actPerformMap == null
+					|| stuckAttrMap == null || distanceMapCar == null
+					|| distanceMapPt == null || distanceMapWalk == null
+					|| carLegNoMap == null || ptLegNoMap == null
+					|| walkLegNoMap == null) {
+				throw new NullPointerException("BSE:\t\twasn't person\t"
+						+ agentId + "\tsimulated?????");
+			}
+
+			legDurMapCar.remove(plan);
+			legDurMapPt.remove(plan);
+			legDurMapWalk.remove(plan);
+
+			actPerformMap.remove(plan);
+
+			stuckAttrMap.remove(plan);
+
+			distanceMapCar.remove(plan);
+			distanceMapPt.remove(plan);
+			distanceMapWalk.remove(plan);
+
+			carLegNoMap.remove(plan);
+			ptLegNoMap.remove(plan);
+			walkLegNoMap.remove(plan);
+		}
+	}
+
+	@Override
+	public void reset(final int iteration) {
+		agentScorers.clear();
+		agentPlanElementIndex.clear();
+		super.reset(iteration);
+		this.iteration = iteration;
+	}
+
+	/**
+	 * this method will be called in
+	 * {@code DummyPlansScoring4PC.notifyScoring(ScoringEvent)}
+	 */
+	@Override
+	public void finish() {
+		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : agentScorers
+				.entrySet()) {
+			Id agentId = entry.getKey();
+
+			Plan plan = entry.getValue().getFirst();
+			ScoringFunction sf = entry.getValue().getSecond();
+			sf.finish();
+			double score = sf.getScore();
+			// **********************codes from {@code EventsToScore}
+			/* this line of code must stay under the line of "sf.getScore" */
+			ScoringFunctionAccumulator4PC sfa = (ScoringFunctionAccumulator4PC) sf;
+
+			// legTravTimeCar
+			Map<Plan, Double> legDurMapCar = legDursCar.get(agentId);
+			if (legDurMapCar == null) {
+				legDurMapCar = new HashMap<Plan, Double>();
+				legDursCar.put(agentId, legDurMapCar);
+			}
+			legDurMapCar.put(plan, sfa.getTravTimeAttrCar());
+
+			// legTravTimePt
+			Map<Plan, Double> legDurMapPt = legDursPt.get(agentId);
+			if (legDurMapPt == null) {
+				legDurMapPt = new HashMap<Plan, Double>();
+				legDursPt.put(agentId, legDurMapPt);
+			}
+			legDurMapPt.put(plan, sfa.getTravTimeAttrPt());
+
+			// legTravTimeWalk
+			Map<Plan, Double> legDurMapWalk = legDursWalk.get(agentId);
+			if (legDurMapWalk == null) {
+				legDurMapWalk = new HashMap<Plan, Double>();
+				legDursWalk.put(agentId, legDurMapWalk);
+			}
+			legDurMapWalk.put(plan, sfa.getTravTimeAttrWalk());
+
+			// actDuration
+			Map<Plan, Double> actAttrMap = actAttrs.get(agentId);
+			if (actAttrMap == null) {
+				actAttrMap = new HashMap<Plan, Double>();
+				actAttrs.put(agentId, actAttrMap);
+			}
+			actAttrMap.put(plan, sfa.getPerfAttr());
+
+			// stuckAttrs
+			Map<Plan, Double> stuckAttrMap = stuckAttrs.get(agentId);
+			if (stuckAttrMap == null) {
+				stuckAttrMap = new HashMap<Plan, Double>();
+				stuckAttrs.put(agentId, stuckAttrMap);
+			}
+			stuckAttrMap.put(plan, sfa.getStuckAttr());
+
+			// distancesCar
+			Map<Plan, Double> distanceMapCar = distancesCar.get(agentId);
+			if (distanceMapCar == null) {
+				distanceMapCar = new HashMap<Plan, Double>();
+				distancesCar.put(agentId, distanceMapCar);
+			}
+			distanceMapCar.put(plan, sfa.getDistanceCar());
+
+			// distancesPt
+			Map<Plan, Double> distanceMapPt = distancesPt.get(agentId);
+			if (distanceMapPt == null) {
+				distanceMapPt = new HashMap<Plan, Double>();
+				distancesPt.put(agentId, distanceMapPt);
+			}
+			distanceMapPt.put(plan, sfa.getDistancePt());
+
+			// distancesWalk
+			Map<Plan, Double> distanceMapWalk = distancesWalk.get(agentId);
+			if (distanceMapWalk == null) {
+				distanceMapWalk = new HashMap<Plan, Double>();
+				distancesWalk.put(agentId, distanceMapWalk);
+			}
+			distanceMapWalk.put(plan, sfa.getDistanceWalk());
+
+			// carLegNo
+			Map<Plan, Integer> carLegNoMap = carLegNos.get(agentId);
+			if (carLegNoMap == null) {
+				carLegNoMap = new HashMap<Plan, Integer>();
+				carLegNos.put(agentId, carLegNoMap);
+			}
+			carLegNoMap.put(plan, sfa.getCarLegNo());
+
+			// ptLegNo
+			Map<Plan, Integer> ptLegNoMap = ptLegNos.get(agentId);
+			if (ptLegNoMap == null) {
+				ptLegNoMap = new HashMap<Plan, Integer>();
+				ptLegNos.put(agentId, ptLegNoMap);
+			}
+			ptLegNoMap.put(plan, sfa.getPtLegNo());
+
+			// walkLegNo
+			Map<Plan, Integer> walkLegNoMap = walkLegNos.get(agentId);
+			if (walkLegNoMap == null) {
+				walkLegNoMap = new HashMap<Plan, Integer>();
+				walkLegNos.put(agentId, walkLegNoMap);
+			}
+			walkLegNoMap.put(plan, sfa.getWalkLegNo());
+			// *********************codes from {@code EventsToScore}
+			Double oldScore = plan.getScore();
+			if (oldScore == null) {
+				plan.setScore(score);
+			} else {
+				double learningRate = scoring.getLearningRate();
+				plan.setScore(learningRate * score + (1 - learningRate)
+						* oldScore);
+			}
+			// System.out.println("SCORING:\tscoringFunction:\t"
+			// + sf.getClass().getName() + "\tscore:\t" + score);
+		}
+	}
+
+	@Override
+	public void handleEvent(final ActivityStartEvent event) {
+		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
+				.getPersonId());
+		if (data != null) {
+			int index = increaseAgentPlanElementIndex(event.getPersonId());
+			data.getSecond().startActivity(event.getTime(),
+					(Activity) data.getFirst().getPlanElements().get(index));
+		}
+	}
+
+	protected int increaseAgentPlanElementIndex(final Id personId) {
+		Integer index = agentPlanElementIndex.get(personId);
+		if (index == null) {
+			agentPlanElementIndex.put(personId, Integer.valueOf(1));
+			return 1;
+		}
+		agentPlanElementIndex.put(personId,
+				Integer.valueOf(1 + index.intValue()));
+		return 1 + index.intValue();
+	}
+
+	@Override
+	public void handleEvent(final AgentDepartureEvent event) {
+		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
+				.getPersonId());
+		if (data != null) {
+			int index = increaseAgentPlanElementIndex(event.getPersonId());
+			data.getSecond().startLeg(event.getTime(),
+					(Leg) data.getFirst().getPlanElements().get(index));
+		}
 	}
 
 	/**
@@ -429,90 +736,14 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		}
 	}
 
-	private MultinomialLogit createMultinomialLogit(Config config) {
-		int choiceSetSize = config.strategy().getMaxAgentPlanMemorySize(), // =4
-		attributeCount = Integer.parseInt(config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
-
-		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
-		double traveling = scoring.getTraveling_utils_hr();
-		double betaStuck = Math.min(
-				Math.min(scoring.getLateArrival_utils_hr(),
-						scoring.getEarlyDeparture_utils_hr()),
-				Math.min(traveling, scoring.getWaiting_utils_hr()));
-
-		// initialize MultinomialLogit
-		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
-				attributeCount);// =5 [travCar,travPt,travWalk,Perf,Stuck]
-
-		mnl.setUtilityScale(scoring.getBrainExpBeta());
-
-		for (int i = 0; i < choiceSetSize; i++) {
-			mnl.setASC(i, 0);
+	/**
+	 * should be called after that all setPersonScore(Person) have been called
+	 * in every iteration.
+	 */
+	public void closeWriter() {
+		if (writer != null) {
+			writer.close();
 		}
-		// travelTime
-		int attrNameIndex = attrNameList.indexOf("traveling");
-		mnl.setCoefficient(attrNameIndex,
-				traveling * paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("travelingPt");
-		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr()
-				* paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("travelingWalk");
-		mnl.setCoefficient(attrNameIndex, scoring.getTravelingWalk_utils_hr()
-				* paramScaleFactorList.get(attrNameIndex));
-
-		//
-		attrNameIndex = attrNameList.indexOf("performing");
-		mnl.setCoefficient(attrNameIndex, scoring.getPerforming_utils_hr()
-				* paramScaleFactorList.get(attrNameIndex));
-		//
-		attrNameIndex = attrNameList.indexOf("stuck");
-		mnl.setCoefficient(attrNameIndex,
-				betaStuck * paramScaleFactorList.get(attrNameIndex));
-
-		// distances
-		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRateCar");
-		mnl.setCoefficient(
-				attrNameIndex,
-				scoring.getMonetaryDistanceCostRateCar()
-						* scoring.getMarginalUtilityOfMoney()
-						* paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
-		mnl.setCoefficient(
-				attrNameIndex,
-				scoring.getMonetaryDistanceCostRatePt()
-						* scoring.getMarginalUtilityOfMoney()
-						* paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
-		mnl.setCoefficient(
-				attrNameIndex,
-				scoring.getMarginalUtlOfDistanceWalk()
-						* paramScaleFactorList.get(attrNameIndex));
-
-		// constants
-		attrNameIndex = attrNameList.indexOf("constantCar");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantCar()
-				* paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("constantPt");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantPt()
-				* paramScaleFactorList.get(attrNameIndex));
-
-		attrNameIndex = attrNameList.indexOf("constantWalk");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk()
-				* paramScaleFactorList.get(attrNameIndex));
-
-		return mnl;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		super.reset(iteration);
-		this.iteration = iteration;
 	}
 
 	public void createWriter() {
@@ -533,16 +764,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 			head.append("\tselected");
 			writer.writeln(head);
 
-		}
-	}
-
-	/**
-	 * should be called after that all setPersonScore(Person) have been called
-	 * in every iteration.
-	 */
-	public void closeWriter() {
-		if (writer != null) {
-			writer.close();
 		}
 	}
 }
