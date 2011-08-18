@@ -3,39 +3,61 @@ package playground.sergioo.NetworksMatcher.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import playground.sergioo.NetworkVisualizer.gui.Camera;
-import playground.sergioo.NetworkVisualizer.gui.NetworkPanel;
-import playground.sergioo.NetworkVisualizer.gui.NetworkWindow;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
+import playground.sergioo.Visualizer2D.Camera;
+import playground.sergioo.Visualizer2D.LayersWindow;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
-public class DoubleNetworkWindow extends NetworkWindow {
+public class DoubleNetworkWindow extends LayersWindow implements ActionListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	//Constants
-	private static int GAPX = 50;
-	private static int GAPY = 120;
-	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
-	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
-	public static int MIN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width/2;
-	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/3;
-	public static int FRAMESIZE = 20;
+	//Enumerations
+	public enum Option implements LayersWindow.Option {
+		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
+		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
+		SELECT_ZONE("<html>Z<br/>O<br/>N<br/>E</html>"),
+		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		private String caption;
+		private Option(String caption) {
+			this.caption = caption;
+		}
+		@Override
+		public String getCaption() {
+			return caption;
+		}
+	}
+	
+	public enum Label implements LayersWindow.Label {
+		LINK("Link"),
+		NODE("Node");
+		private String text;
+		private Label(String text) {
+			this.text = text;
+		}
+		@Override
+		public String getText() {
+			return text;
+		}
+	}
 	
 	//Attributes
 	private JButton readyButton;
+	private NetworkPanel panelA;
 	private NetworkPanel panelB;
-	private NetworkPainter networkPainterA;
-	private NetworkPainter networkPainterB;
+	private NetworkPanel activePanel;
+	private JPanel panelsPanel = new JPanel();
+	private DoubleNetworkPanel doublePanel;
 	private boolean networksSeparated = true;
-	private JPanel panelsPanel;
 	
 	//Methods
 	public DoubleNetworkWindow(String title, NetworkPainter networkPainterA, NetworkPainter networkPainterB) {
@@ -43,21 +65,21 @@ public class DoubleNetworkWindow extends NetworkWindow {
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		this.networkPainterA = networkPainterA;
-		this.networkPainterB = networkPainterB;
-		panel = new NetworkPanel(this, networkPainterA);
+		panelA = new NetworkPanel(this, networkPainterA);
 		panelB = new NetworkPanel(this, networkPainterB);
+		activePanel = panelA;
+		doublePanel = new DoubleNetworkPanel(this, networkPainterA, networkPainterB);
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout(1,2));
-		panelsPanel.add(panel, BorderLayout.WEST);
+		panelsPanel.add(panelA, BorderLayout.WEST);
 		panelsPanel.add(panelB, BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
-		this.setSize(width+GAPX, height+GAPY);
+		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
 		for(Option option:Option.values()) {
 			JButton optionButton = new JButton(option.caption);
-			optionButton.setActionCommand(option.name());
+			optionButton.setActionCommand(option.getCaption());
 			optionButton.addActionListener(this);
 			buttonsPanel.add(optionButton);
 		}
@@ -83,32 +105,50 @@ public class DoubleNetworkWindow extends NetworkWindow {
 		coordsPanel.add(lblCoords[1]);
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
+		setSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 	}
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
-			this.remove(panel);
-			panel = new NetworkPanel(this, networkPainterA);
-			panelB = new NetworkPanel(this, networkPainterB);
+			this.remove(doublePanel);
+			activePanel = panelA;
 			panelsPanel = new JPanel();
 			panelsPanel.setLayout(new GridLayout(1,2));
-			panelsPanel.add(panel, BorderLayout.WEST);
+			panelsPanel.add(panelA, BorderLayout.WEST);
 			panelsPanel.add(panelB, BorderLayout.EAST);
 			this.add(panelsPanel, BorderLayout.CENTER);
 		}
 		else {
 			this.remove(panelsPanel);
-			panel = new DoubleNetworkPanel(this, networkPainterA, networkPainterB);
-			this.add(panel, BorderLayout.CENTER);
+			this.add(doublePanel, BorderLayout.CENTER);
 		}
 	}
-	@Override
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
-			panel.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-			panelB.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-			panel.repaint();
-			panelB.repaint();
+			if(activePanel==panelA) {
+				panelB.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				panelB.repaint();
+			}
+			else {
+				panelA.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				panelA.repaint();
+			}
+		}
+	}
+	public void setActivePanel(NetworkPanel panel) {
+		activePanel = panel;
+	}
+	public void refreshLabel(Label label) {
+		labels[label.ordinal()].setText(activePanel.getLabelText(label));
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		for(Option option:Option.values())
+			if(e.getActionCommand().equals(option.getCaption()))
+				this.option = option;
+		if(e.getActionCommand().equals(READY_TO_EXIT)) {
+			setVisible(false);
+			readyToExit = true;
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer;
+package playground.sergioo.Visualizer2D;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -7,9 +7,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.sergioo.NetworkVisualizer.gui.SimpleNetworkWindow;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.SimpleNetworkPainter;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport.PublicTransportNetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleNetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport.PublicTransportNetworkWindow;
 
 public class VisualizerRunner {
 
@@ -19,13 +19,13 @@ public class VisualizerRunner {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[1]);
-		SimpleNetworkWindow window = null;
+		PublicTransportNetworkWindow window = null;
 		if(args.length<3)
-			window = new SimpleNetworkWindow(args[0], new SimpleNetworkPainter(scenario.getNetwork()));
+			window = new PublicTransportNetworkWindow(args[0], new SimpleNetworkPainter(scenario.getNetwork()));
 		else {
 			((ScenarioImpl)scenario).getConfig().scenario().setUseTransit(true);
 			new TransitScheduleReader(scenario).readFile(args[2]);
-			window = new SimpleNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()));
+			window = new PublicTransportNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()));
 		}
 		window.setVisible(true);
 	}

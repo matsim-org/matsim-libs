@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui.networkPainters;
+package playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.sergioo.NetworkVisualizer.gui.Camera;
+import playground.sergioo.Visualizer2D.Camera;
 
 public class NetworkByCamera {
 
@@ -23,6 +23,9 @@ public class NetworkByCamera {
 	}
 	public Network getNetwork() {
 		return network;
+	}
+	public Camera getCamera() {
+		return camera;
 	}
 	public void setCamera(Camera camera) {
 		this.camera = camera;
@@ -60,18 +63,6 @@ public class NetworkByCamera {
 			}
 			return nodes;
 		}
-		else
-			throw new Exception("No camera defined");
-	}
-	public int getIntX(double x) throws Exception {
-		if(camera!=null)
-			return camera.getIntX(x);
-		else
-			throw new Exception("No camera defined");
-	}
-	public int getIntY(double y) throws Exception {
-		if(camera!=null)
-			return camera.getIntY(y);
 		else
 			throw new Exception("No camera defined");
 	}

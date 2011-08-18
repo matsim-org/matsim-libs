@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui.networkPainters;
+package playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters;
 
 import java.util.Collection;
 

@@ -22,10 +22,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.sergioo.NetworkVisualizer.gui.NetworkWindow;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.SimpleNetworkPainter;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkWindow;
 import playground.sergioo.NetworksMatcher.kernel.MatchingProcess;
+import playground.sergioo.Visualizer2D.LayersWindow;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleNetworkPainter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -46,10 +46,10 @@ public class NetworksMatcher {
 		windowLRP.setVisible(true);*/
 		Network networkHighResolution = scenario.getNetwork();
 		Network networkLowResolutionLength = getNetworkFromShapeFileLength(args[1]);
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM48N/*SVY21*/, TransformationFactory.WGS84_UTM48N);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolutionLength.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
-		NetworkWindow windowHR = new DoubleNetworkWindow("High Resolution Network", new SimpleNetworkPainter(networkHighResolution), new SimpleNetworkPainter(networkLowResolutionLength));
+		LayersWindow windowHR = new DoubleNetworkWindow("High Resolution Network", new SimpleNetworkPainter(networkHighResolution), new SimpleNetworkPainter(networkLowResolutionLength));
 		windowHR.setVisible(true);
 		while(!windowHR.isReadyToExit())
 			try {

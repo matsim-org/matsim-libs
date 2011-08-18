@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport;
+package playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport;
 
 import java.awt.Color;
 

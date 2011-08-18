@@ -1,6 +1,7 @@
-package playground.sergioo.NetworkVisualizer.gui;
+package playground.sergioo.Visualizer2D;
 
 import java.awt.Graphics2D;
+
 
 public class Layer {
 	
@@ -9,7 +10,7 @@ public class Layer {
 	private final Painter painter;
 	
 	//Method
-	protected Layer(Painter painter) {
+	public Layer(Painter painter) {
 		super();
 		this.painter = painter;
 		visible = true;
@@ -17,9 +18,9 @@ public class Layer {
 	public Painter getPainter() {
 		return painter;
 	}
-	public void paint(Graphics2D g2, Camera camera) throws Exception {
+	public void paint(Graphics2D g2, LayersPanel layersPanel) throws Exception {
 		if(visible)
-			painter.paint(g2, camera);
+			painter.paint(g2, layersPanel);
 	}
 	public void changeVisible() {
 		visible = !visible;

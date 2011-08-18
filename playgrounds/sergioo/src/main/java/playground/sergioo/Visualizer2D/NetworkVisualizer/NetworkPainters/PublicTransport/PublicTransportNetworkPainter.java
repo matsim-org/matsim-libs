@@ -1,4 +1,4 @@
-package playground.sergioo.NetworkVisualizer.gui.networkPainters.publicTransport;
+package playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -26,8 +26,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
-import playground.sergioo.NetworkVisualizer.gui.Camera;
-import playground.sergioo.NetworkVisualizer.gui.networkPainters.NetworkPainter;
+import playground.sergioo.Visualizer2D.LayersPanel;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport.LinkDrawInformation;
 
 public class PublicTransportNetworkPainter extends NetworkPainter {
 	
@@ -165,22 +166,26 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 		}
 	}
 	@Override
-	public void paint(Graphics2D g2, Camera camera) throws Exception {
-		networkByCamera.setCamera(camera);
-		for(Link link:networkByCamera.getNetworkLinks()) {
-			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
-			if(linkDrawInformation==null)
-				paintLink(g2, link, networkStroke, 0.5, networkColor);
-		}
-		for(Link link:networkByCamera.getNetworkLinks()) {
-			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
-			if(linkDrawInformation!=null && linkDrawInformation.getColor().equals(new Color(100,50,0)))
-				paintLink(g2, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
-		}
-		for(Link link:networkByCamera.getNetworkLinks()) {
-			LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
-			if(linkDrawInformation!=null && !linkDrawInformation.getColor().equals(new Color(100,50,0)))
-				paintLink(g2, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
+	public void paint(Graphics2D g2, LayersPanel layersPanel) {
+		networkByCamera.setCamera(layersPanel.getCamera());
+		try {
+			for(Link link:networkByCamera.getNetworkLinks()) {
+				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
+				if(linkDrawInformation==null)
+					paintLink(g2, layersPanel, link, networkStroke, 0.5, networkColor);
+			}
+			for(Link link:networkByCamera.getNetworkLinks()) {
+				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
+				if(linkDrawInformation!=null && linkDrawInformation.getColor().equals(new Color(100,50,0)))
+					paintLink(g2, layersPanel, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
+			}
+			for(Link link:networkByCamera.getNetworkLinks()) {
+				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
+				if(linkDrawInformation!=null && !linkDrawInformation.getColor().equals(new Color(100,50,0)))
+					paintLink(g2, layersPanel, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	public float getWeight() {
@@ -189,17 +194,9 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 	public void setWeight(float weight) {
 		this.weight = weight;
 	}
-	private void paintLink(Graphics2D g2, Link link, Stroke stroke, double pointSize, Color color) throws Exception {
-		paintLine(g2, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
+	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
 		//paintCircle(g2,link.getToNode().getCoord(), pointSize, color);
-	}
-	private void paintLine(Graphics2D g2, Tuple<Coord,Coord> coords, Stroke stroke, Color color) throws Exception {
-		g2.setStroke(stroke);
-		g2.setColor(color);
-		g2.drawLine(networkByCamera.getIntX(coords.getFirst().getX()),
-				networkByCamera.getIntY(coords.getFirst().getY()),
-				networkByCamera.getIntX(coords.getSecond().getX()),
-				networkByCamera.getIntY(coords.getSecond().getY()));
 	}
 	
 }
