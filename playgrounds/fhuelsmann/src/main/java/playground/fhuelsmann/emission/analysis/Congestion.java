@@ -34,6 +34,8 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import org.matsim.core.network.NetworkImpl;
 
+import playground.benjamin.events.emissions.WarmPollutant;
+
 
 /**
  * @author friederike
@@ -46,13 +48,17 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 	
 
 	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
-	Map<Id, Map<Integer,Double>> stopGoFractionSum = new HashMap<Id, Map<Integer,Double>>();
+	Map<Double, Map<Id,Double>> stopGoFractionSum = new HashMap<Double, Map<Id,Double>>();
 
 	private final Network network;
+	private final int noOfTimeBins;
+	private final double timeBinSize;
 
-	public Congestion(final Network network) {
+
+	public Congestion(final Network network,double simulationEndTime, int noOfTimeBins) {
 		this.network = network;
-
+		this.noOfTimeBins = noOfTimeBins;
+		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
 	
 	public void reset(final int iteration) {
@@ -77,8 +83,7 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 		
 		if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
-			double timeClass = enterTime / 3600;
-			int timeClassrounded = (int) timeClass+1;
+			double endOfTimeInterval = 0.0;
 			double travelTime = event.getTime()-enterTime;
 			double averageSpeed=distance/travelTime;
 
@@ -95,7 +100,33 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 					//	System.out.println("linkId "+linkId+ " stopGoFraction "+stopGoFraction);
 			}
 			
-			if(!stopGoFractionSum.containsKey(linkId)){
+			for(int i = 0; i < noOfTimeBins; i++){
+				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
+					endOfTimeInterval = (i + 1) * timeBinSize;
+					Map<Id, Double> linkId2stopGoFraction = new HashMap<Id,  Double>();;
+					
+					if(stopGoFractionSum.get(endOfTimeInterval) != null){
+						linkId2stopGoFraction = stopGoFractionSum.get(endOfTimeInterval);
+
+						if(linkId2stopGoFraction.get(linkId) != null){
+						double warmEmissionsSoFar = linkId2stopGoFraction.get(linkId);
+						
+								Double newValue = stopGoFraction + warmEmissionsSoFar;
+							
+								linkId2stopGoFraction.put(linkId, newValue);
+						} else {
+							linkId2stopGoFraction.put(linkId, stopGoFraction);
+						}
+					} else {
+						linkId2stopGoFraction.put(linkId, stopGoFraction);
+					}
+					stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
+					if(linkId.toString().equals("576273431-592536888"))
+						System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " warmEmissionsTotal "+linkId2stopGoFraction);
+				}
+			}
+			
+	/*		if(!stopGoFractionSum.containsKey(linkId)){
 			
 				Map<Integer, Double> timeClass2CongLength = new TreeMap<Integer, Double>();
 				timeClass2CongLength.put(timeClassrounded,stopGoFraction);
@@ -117,7 +148,7 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 					//if(linkId.toString().equals("576273431-592536888"))
 					//	System.out.println("++++++++++++++++++++++++++++++linkId "+linkId+ " newValue "+newValue);
 				}
-			}
+			}*/
 		}
 	}
 }
