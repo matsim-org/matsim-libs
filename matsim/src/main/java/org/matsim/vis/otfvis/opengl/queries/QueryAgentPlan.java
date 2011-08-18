@@ -52,6 +52,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
@@ -190,7 +191,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		protected void drawWithGLDrawer(OTFOGLDrawer drawer) {
-			GL gl = drawer.getGL();
+			GL gl = OTFGLAbstractDrawable.getGl();
 			if (hasPlan) {
 				calcOffsetIfNecessary(drawer);
 				rewindGLBuffers();
@@ -284,7 +285,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				InfoText activityText = new InfoText(
 						activityEntry.name, activityEntry.east - (float) drawer.getQuad().offsetEast, activityEntry.north - (float) drawer.getQuad().offsetNorth);
 				activityText.setAlpha(0.5f);
-				activityText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getViewBoundsAsQuadTreeRect());
+				activityText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getGl(), drawer.getViewBoundsAsQuadTreeRect());
 				this.activityTexts.add(activityText);
 			}
 		}
@@ -293,7 +294,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			this.agentText = new InfoText(
 					this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			this.agentText.setAlpha(0.7f);
-			this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getViewBoundsAsQuadTreeRect());
+			this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getGl(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

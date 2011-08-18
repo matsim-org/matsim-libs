@@ -164,7 +164,7 @@ public class FacilityDrawer {
 					if ( stop.linkId!=null ) {
 						stop.stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f); 
 						OTFOGLDrawer drawer = (OTFOGLDrawer) OTFClientControl.getInstance().getMainOTFDrawer();
-						stop.stopText.draw(drawer.getTextRenderer(), gl, drawer.getViewBounds());
+						stop.stopText.draw(drawer.getTextRenderer(), gl, drawer.getViewBoundsAsQuadTreeRect());
 					}
 				}
 			}

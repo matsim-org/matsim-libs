@@ -139,20 +139,20 @@ public class MGC {
 		if (wkt_CRS == null) {
 			wkt_CRS = crsString;
 		}
-
+		CoordinateReferenceSystem crs;
 		try {
-			return CRS.parseWKT(wkt_CRS);
-		} catch (FactoryException e) {
-			log.info("seems to be no WKT: " + wkt_CRS, e);
+			crs = CRS.parseWKT(wkt_CRS);
+		} catch (FactoryException fe) {
+			try {
+				log.warn("Assuming that coordinates are in longitude first notation, i.e. (longitude, latitude).");
+				crs = CRS.decode(crsString,true);
+			} catch (NoSuchAuthorityCodeException e) {
+				throw new IllegalArgumentException(e);
+			} catch (FactoryException e) {
+				throw new IllegalArgumentException(e);
+			}
 		}
-		try {
-			log.warn("Assuming that coordinates are in longitude first notation, i.e. (longitude, latitude).");
-			return CRS.decode(crsString,true);
-		} catch (NoSuchAuthorityCodeException e) {
-			throw new IllegalArgumentException(e);
-		} catch (FactoryException e) {
-			throw new IllegalArgumentException(e);
-		}
+		return crs;
 	}
 
 }

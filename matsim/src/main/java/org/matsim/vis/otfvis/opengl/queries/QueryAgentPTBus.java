@@ -43,6 +43,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
@@ -92,7 +93,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 			}
 
-			GL gl = drawer.getGL();
+			GL gl = OTFGLAbstractDrawable.getGl();
 			gl.glEnable(GL.GL_BLEND);
 			gl.glColor4d(0.6, 0.0,0.2,.2);
 

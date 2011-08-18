@@ -18,7 +18,7 @@ public class JXMapMain {
 
 
 	public static void main(String[] args) {
-		String filename = "/Users/michaelzilske/gregor-scenario-11-09-08/network.xml";
+		String filename = "/Users/zilske/gregor-scenario-11-09-08/network.xml";
 		Config config = ConfigUtils.createConfig();
 		config.otfVis().setMaximumZoom(17);
 		config.global().setCoordinateSystem("EPSG:32633");

@@ -59,6 +59,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshots.writers.VisLink;
@@ -131,13 +132,13 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				this.agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				this.agentText.draw(drawer.getTextRenderer(), drawer.getGL(), drawer.getViewBoundsAsQuadTreeRect());
+				this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getGl(), drawer.getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);
 			this.colors.position(0);
 
-			GL gl = drawer.getGL();
+			GL gl = OTFGLAbstractDrawable.getGl();
 			Color color = Color.ORANGE;
 			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
 			gl.glColor4d(1., 1.,1.,.3);
@@ -169,13 +170,13 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 		}
 		private void drawCaption(OTFOGLDrawer drawer) {
-			QuadTree.Rect bounds = drawer.getViewBounds();
+			QuadTree.Rect bounds = drawer.getViewBoundsAsQuadTreeRect();
 
 			double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.22;
 			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
 			double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
-			GL gl = drawer.getGL();
+			GL gl = OTFGLAbstractDrawable.getGl();
 			Color color = new Color(255,255,255,200);
 			gl.glEnable(GL.GL_BLEND);
 			drawQuad(gl, minX, maxX, minY, maxY, color);

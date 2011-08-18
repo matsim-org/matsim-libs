@@ -30,7 +30,6 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
@@ -84,7 +83,7 @@ public final class JXMapOTFVisClient {
 				clientQ.getConstData();
 				hostControlBar.updateTimeLabel();
 
-				final OTFDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, config.otfVis());
+				final OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, config.otfVis());
 				otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
 
 				final JPanel compositePanel = otfClient.getCompositePanel();
@@ -97,20 +96,18 @@ public final class JXMapOTFVisClient {
 				installCustomRepaintManager(compositePanel, jMapViewer);
 
 				final CoordinateTransformation coordinateTransformation = new WGS84ToMercator.Deproject(config.otfVis().getMaximumZoom());
-				((OTFOGLDrawer) mainDrawer).addChangeListener(new ChangeListener() {
+				mainDrawer.addChangeListener(new ChangeListener() {
 
 					@Override
 					public void stateChanged(ChangeEvent e) {
-						if (((OTFOGLDrawer) mainDrawer).getViewBounds() != null) {
-							double x = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerX + mainDrawer.getQuad().offsetEast;
-							double y = ((OTFOGLDrawer) mainDrawer).getViewBounds().centerY + mainDrawer.getQuad().offsetNorth;
-							Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
-							double scale = mainDrawer.getScale();
-							int zoom = (int) log2(scale);
-							jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
-							jMapViewer.setZoom(zoom);
-							compositePanel.repaint();
-						}
+						double x = mainDrawer.getViewBoundsAsQuadTreeRect().centerX + mainDrawer.getQuad().offsetEast;
+						double y = mainDrawer.getViewBoundsAsQuadTreeRect().centerY + mainDrawer.getQuad().offsetNorth;
+						Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+						double scale = mainDrawer.getScale();
+						int zoom = (int) log2(scale);
+						jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
+						jMapViewer.setZoom(zoom);
+						compositePanel.repaint();
 					}
 
 				});

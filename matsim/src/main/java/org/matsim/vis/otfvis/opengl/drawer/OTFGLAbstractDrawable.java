@@ -41,22 +41,19 @@ import org.matsim.vis.otfvis.gui.OTFDrawable;
  */
 public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 
-	//	private boolean isValid = true; // setting this from "default" to "private" curiously does not seem to make a difference.  kai, jan'10
-
-	private static GL gl; // setting this to private seems to work.  kai, jan'10
-	// yyyyyy michaz writes that the SceneLayers are reinstantiated in every time step.  In consequence, display speed critically 
-	// depends on the fact that the infrastructure behind the SceneLayers is NOT taken down in every time step.  This seems
-	// to be achieved by static variables such as this one.  kai, jan'11
+	// We need to statically cache the GL context here. The reason is that OTFDrawable tries to 
+	// be a common interface for things which are drawable by Swing and things which are drawable by OpenGL.
+	// So the context is not passed in with every call to draw (as would usually be the case).
+	// So we have to cache it. In the OpenGL community, it is generally
+	// recommended *not* to store GL contexts anywhere, because the driver may create and pass
+	// a new one at any time.  michaz
+	private static GL gl; 
 
 	@Override
 	public final void draw() {
-		// Make sure onDraw is called only once per object	// this comment may have had something to do with the isValid, which 
-															// did not work (I think).  kai, feb'11
 		onDraw(gl);
-//		isValid = true;
 	}
 	
-
 	/**
 	 * 
 	 * This is the OpenGL init command passed down. OpenGL may call init any time, for example when switching
@@ -79,16 +76,7 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	
 	abstract protected void onDraw( GL gl ) ;
 
-	/**<p>
-	 * This setter is, if I see it correctly, only called once, in "drawNetList" inside "OTFOGLDrawer".
-	 * OTFOGLDrawer has its own (private, non-static) gl variable.  In that call, the content of that non-static
-	 * variable is pushed to the static variable here. --???  kai, jan'10
-	 * </p>
-	 *
-	 * @param gl
-	 */
 	static void setGl(GL gl) {
-		// package-private seems to be sufficient--?  kai, jan'11
 		OTFGLAbstractDrawable.gl = gl;
 	}
 	
