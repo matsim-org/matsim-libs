@@ -74,7 +74,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 							Double previousValue = warmEmissionsSoFar.get(pollutant);
 							Double newValue = previousValue + eventValue;
 							warmEmissionsSoFar.put(pollutant, newValue);
-							
 						}
 						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
 					} else {
@@ -84,13 +83,11 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 					warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
 				}
 				time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
-				//if(linkId.toString().equals("576273431-592536888"))
-				//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " warmEmissionsTotal "+warmEmissionsTotal);
 			}
 		}
 	}
 
-/*	public Map<Double, Map<Id, Map<String, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
+	public Map<Double, Map<Id, Map<String, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal = new HashMap<Double, Map<Id, Map<String, Double>>>();
 
 		for(Entry<Double, Map<Id, Map<WarmPollutant, Double>>> entry0 : this.time2warmEmissionsTotal.entrySet()){
@@ -99,7 +96,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			Map<Id, Map<String, Double>> linkId2warmEmissionsAsString = new HashMap<Id, Map<String, Double>>();
 
 			for (Entry<Id, Map<WarmPollutant, Double>> entry1: linkId2warmEmissions.entrySet()){
-				Id personId = entry1.getKey();
+				Id linkId = entry1.getKey();
 				Map<WarmPollutant, Double> pollutant2Values = entry1.getValue();
 				Map<String, Double> pollutantString2Values = new HashMap<String, Double>();
 
@@ -108,12 +105,12 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 					Double value = entry2.getValue();
 					pollutantString2Values.put(pollutant, value);
 				}
-				linkId2warmEmissionsAsString.put(personId, pollutantString2Values);
+				linkId2warmEmissionsAsString.put(linkId, pollutantString2Values);
 			}
 			time2warmEmissionsTotal.put(endOfTimeInterval, linkId2warmEmissionsAsString);
 		}
 		return time2warmEmissionsTotal;
-	}*/
+	}
 
 	@Override
 	public void reset(int iteration) {

@@ -121,34 +121,28 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 						linkId2stopGoFraction.put(linkId, stopGoFraction);
 					}
 					stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
-					if(linkId.toString().equals("576273431-592536888"))
-						System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " warmEmissionsTotal "+linkId2stopGoFraction);
-				}
-			}
-			
-	/*		if(!stopGoFractionSum.containsKey(linkId)){
-			
-				Map<Integer, Double> timeClass2CongLength = new TreeMap<Integer, Double>();
-				timeClass2CongLength.put(timeClassrounded,stopGoFraction);
-				stopGoFractionSum.put(linkId, timeClass2CongLength);
-				if(linkId.toString().equals("576273431-592536888"))
-				System.out.println("linkId "+linkId+ " timeClass2CongLength "+timeClass2CongLength);
-			}
-			else{		
-				if(stopGoFractionSum.get(linkId).containsKey(timeClassrounded)){
-					Map<Integer, Double> newValue = stopGoFractionSum.get(linkId);
-					newValue.put(timeClassrounded,newValue.get(timeClassrounded)+stopGoFraction);
-					stopGoFractionSum.put(linkId, newValue);
-				}
-				else{
-					Map<Integer, Double> newValue = stopGoFractionSum.get(linkId);
-			
-					newValue.put(timeClassrounded,stopGoFraction);
-					stopGoFractionSum.put(linkId, newValue);
 					//if(linkId.toString().equals("576273431-592536888"))
-					//	System.out.println("++++++++++++++++++++++++++++++linkId "+linkId+ " newValue "+newValue);
+					//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " aggegatedCongestion "+linkId2stopGoFraction);
 				}
-			}*/
+			}
 		}
+	}
+	
+	public Map<Double, Map<Id, Double>> getCongestionPerLinkAndTimeInterval() {
+		Map<Double, Map<Id, Double>>stopGoFractionSum = new HashMap<Double, Map<Id,Double>>();
+
+		for(Entry<Double, Map<Id, Double>> entry0 : this.stopGoFractionSum.entrySet()){
+			Double endOfTimeInterval = entry0.getKey();
+			Map<Id, Double> linkId2congestion = entry0.getValue();
+			Map<Id, Double> linkId2congestionAsString = new HashMap<Id, Double>();
+
+				for (Entry<Id, Double> entry1: linkId2congestion.entrySet()){
+					Id linkId = entry1.getKey();
+					Double value = entry1.getValue();
+					linkId2congestionAsString.put(linkId, value);	
+				}
+				stopGoFractionSum.put(endOfTimeInterval, linkId2congestionAsString);
+		}
+		return stopGoFractionSum;
 	}
 }
