@@ -88,13 +88,13 @@ public class KiDDataHochrechnungsRunner {
 		}
 		
 		public void finish() throws IOException{
-			double fzg_days = (double)KiDStats.WorkingDays_without_saturday*(double)anzahlFahrzeuge;
+			double fzg_days = KiDStats.WorkingDays_without_saturday*anzahlFahrzeuge;
 			if(writer != null){
 				writer.write(description + "\n");
 				writer.write("#Fahrzeuge (in Mio.Kfz)=" + anzahlFahrzeuge/1000000 + "\n");
 				writer.write("Fahrzeugfahrleistung [in Mio.Fzkm/a]=" + totalFahrleistung/1000000 + "\n");
 				writer.write("Fahrzeugfahrleistung [km/Kfz*d]=" + (totalFahrleistung)/(fzg_days) + "\n");
-				writer.write("Fahrtenhäufigkeit [Fahrten/Kfz*d]=" + anzahlFahrten/(fzg_days) + "\n");
+				writer.write("Fahrtenh√§ufigkeit [Fahrten/Kfz*d]=" + anzahlFahrten/(fzg_days) + "\n");
 				writer.write("#Fahrtenaufkommen [in Mio]=" + anzahlFahrten/1000000 + "\n");
 				writer.write("#Fahrtenketten[in Fketten/Kfz*d]=" + totChains/fzg_days + "\n");
 				writer.write("\n");
@@ -105,7 +105,7 @@ public class KiDDataHochrechnungsRunner {
 			System.out.println("#Fahrzeuge (in Mio.Kfz)=" + anzahlFahrzeuge/1000000);
 			System.out.println("Fahrzeugfahrleistung [in Mio.Fzkm/a]=" + totalFahrleistung/1000000);
 			System.out.println("Fahrzeugfahrleistung [km/Kfz*d]=" + (totalFahrleistung)/(fzg_days));
-			System.out.println("Fahrtenhäufigkeit [Fahrten/Kfz*d]=" + anzahlFahrten/(fzg_days));
+			System.out.println("Fahrtenh√§ufigkeit [Fahrten/Kfz*d]=" + anzahlFahrten/(fzg_days));
 			System.out.println("#Fahrtenaufkommen [in Mio]=" + anzahlFahrten/1000000);
 			//double fzg_days = (double)(KiDStats.NoGesamt)*(double)KiDStats.WorkingDays_without_saturday;
 			//System.out.println("#fzg="+ count + " fahrleistung=" + totalFahrleistung + " fzgDays=" + fzg_days + " km/tag=" + totalFahrleistung/fzg_days);
@@ -128,7 +128,7 @@ public class KiDDataHochrechnungsRunner {
 			int nOLegs = Integer.parseInt(anzahlFarten);
 			double kFaktor = Float.parseFloat(korrekturFaktor);
 			double hFaktor = Float.parseFloat(hochrechnungsFaktor);
-			return (double)nOLegs*kFaktor*hFaktor;
+			return nOLegs*kFaktor*hFaktor;
 		}
 
 		private double getFahrleistung(String fahrleistung, String korrekturFaktor, String hochrechnungsFaktor) {
