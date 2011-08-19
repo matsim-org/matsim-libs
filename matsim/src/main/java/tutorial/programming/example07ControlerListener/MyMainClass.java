@@ -3,7 +3,7 @@ package tutorial.programming.example07ControlerListener;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFClientFile;
 
 
 
@@ -14,7 +14,7 @@ public class MyMainClass {
 	 */
 	public static void main(String[] args) {
 		//set a default config for convenience...
-		String [] config = {"./examples/tutorial/multipleIterations.xml"};
+		String [] config = {"examples/tutorial/config/example5-config.xml"};
 		//Create an instance of the controler and
 		Controler controler = new Controler(config);
 		//so we don't have to delete the output directory
@@ -28,7 +28,7 @@ public class MyMainClass {
 		Scenario sc = controler.getScenario() ;
 		Config cf = sc.getConfig() ;
 		String dir = cf.controler().getOutputDirectory();
-		new OTFClientSwing("file:" + dir + "/ITERS/it.10/10.otfvis.mvi").run();
+		new OTFClientFile(dir + "/ITERS/it.10/10.otfvis.mvi").run();
 	}
 
 

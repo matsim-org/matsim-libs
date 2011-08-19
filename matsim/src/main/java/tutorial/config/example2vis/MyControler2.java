@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.run.Controler;
-import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFClientFile;
 
 
 /**
@@ -51,8 +51,7 @@ public class MyControler2 {
 		String dir = cf.controler().getOutputDirectory();
 		log.info("The following should bring up the slow gui.  This sometimes hangs ..." );
 		log.info("There is also kmz output in " + dir + "/ITERS/it.0" ) ;
-		log.warn("However, if you want to run larger scenarios, you HAVE to learn how to use the graphics-hardware-accelerated otfvis." ) ;
-		new OTFClientSwing("file:" + dir + "/ITERS/it.0/0.otfvis.mvi").run();
+		new OTFClientFile(dir + "/ITERS/it.0/0.otfvis.mvi").run();
 
 	}
 
