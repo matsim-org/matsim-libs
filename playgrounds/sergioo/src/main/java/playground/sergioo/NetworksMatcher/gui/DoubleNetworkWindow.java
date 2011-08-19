@@ -22,6 +22,12 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
+	private enum PanelIds implements LayersWindow.PanelId {
+		A,
+		B,
+		ACTIVE,
+		DOUBLE;
+	}
 	public enum Option implements LayersWindow.Option {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
 		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
@@ -36,7 +42,6 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 			return caption;
 		}
 	}
-	
 	public enum Label implements LayersWindow.Label {
 		LINK("Link"),
 		NODE("Node");
@@ -52,12 +57,8 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 	
 	//Attributes
 	private JButton readyButton;
-	private NetworkPanel panelA;
-	private NetworkPanel panelB;
-	private NetworkPanel activePanel;
-	private JPanel panelsPanel = new JPanel();
-	private DoubleNetworkPanel doublePanel;
 	private boolean networksSeparated = true;
+	private JPanel panelsPanel;
 	
 	//Methods
 	public DoubleNetworkWindow(String title, NetworkPainter networkPainterA, NetworkPainter networkPainterB) {
@@ -65,14 +66,14 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		panelA = new NetworkPanel(this, networkPainterA);
-		panelB = new NetworkPanel(this, networkPainterB);
-		activePanel = panelA;
-		doublePanel = new DoubleNetworkPanel(this, networkPainterA, networkPainterB);
+		panels.put(PanelIds.A, new NetworkPanel(this, networkPainterA));
+		panels.put(PanelIds.B, new NetworkPanel(this, networkPainterB));
+		panels.put(PanelIds.ACTIVE, panels.get(PanelIds.A));
+		panels.put(PanelIds.DOUBLE, new DoubleNetworkPanel(this, networkPainterA, networkPainterB));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout(1,2));
-		panelsPanel.add(panelA, BorderLayout.WEST);
-		panelsPanel.add(panelB, BorderLayout.EAST);
+		panelsPanel.add(panels.get(PanelIds.A), BorderLayout.WEST);
+		panelsPanel.add(panels.get(PanelIds.B), BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
@@ -110,36 +111,36 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
-			this.remove(doublePanel);
-			activePanel = panelA;
+			this.remove(panels.get(PanelIds.DOUBLE));
+			panels.put(PanelIds.ACTIVE, panels.get(PanelIds.A));
 			panelsPanel = new JPanel();
 			panelsPanel.setLayout(new GridLayout(1,2));
-			panelsPanel.add(panelA, BorderLayout.WEST);
-			panelsPanel.add(panelB, BorderLayout.EAST);
+			panelsPanel.add(panels.get(PanelIds.A), BorderLayout.WEST);
+			panelsPanel.add(panels.get(PanelIds.B), BorderLayout.EAST);
 			this.add(panelsPanel, BorderLayout.CENTER);
 		}
 		else {
 			this.remove(panelsPanel);
-			this.add(doublePanel, BorderLayout.CENTER);
+			this.add(panels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
 		}
 	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
-			if(activePanel==panelA) {
-				panelB.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-				panelB.repaint();
+			if(panels.get(PanelIds.ACTIVE)==panels.get(PanelIds.A)) {
+				panels.get(PanelIds.B).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				panels.get(PanelIds.B).repaint();
 			}
 			else {
-				panelA.getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-				panelA.repaint();
+				panels.get(PanelIds.A).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				panels.get(PanelIds.A).repaint();
 			}
 		}
 	}
 	public void setActivePanel(NetworkPanel panel) {
-		activePanel = panel;
+		panels.put(PanelIds.ACTIVE, panel);
 	}
 	public void refreshLabel(Label label) {
-		labels[label.ordinal()].setText(activePanel.getLabelText(label));
+		labels[label.ordinal()].setText(((NetworkPanel)panels.get(PanelIds.ACTIVE)).getLabelText(label));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

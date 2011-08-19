@@ -35,7 +35,9 @@ public class NetworksMatcher {
 	//Main
 
 	/**
-	 * @param args
+	 * @param args:
+	 *  0 - First network MATSim file
+	 *  1 - Second network shape file
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -49,7 +51,7 @@ public class NetworksMatcher {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM48N/*SVY21*/, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolutionLength.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
-		LayersWindow windowHR = new DoubleNetworkWindow("High Resolution Network", new SimpleNetworkPainter(networkHighResolution), new SimpleNetworkPainter(networkLowResolutionLength));
+		LayersWindow windowHR = new DoubleNetworkWindow("Networks matching", new SimpleNetworkPainter(networkHighResolution), new SimpleNetworkPainter(networkLowResolutionLength));
 		windowHR.setVisible(true);
 		while(!windowHR.isReadyToExit())
 			try {
