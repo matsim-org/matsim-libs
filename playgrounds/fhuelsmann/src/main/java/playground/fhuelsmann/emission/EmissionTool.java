@@ -48,7 +48,7 @@ import playground.fhuelsmann.emission.objects.VisumRoadTypes;
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
 
-	private final static String runNumber = "983";
+	private final static String runNumber = "985";
 	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	private static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
 	private static final Integer lastIteration = getLastIteration(configFile);
