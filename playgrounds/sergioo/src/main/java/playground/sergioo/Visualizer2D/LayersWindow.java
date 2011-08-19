@@ -1,6 +1,8 @@
 package playground.sergioo.Visualizer2D;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,6 +15,9 @@ public abstract class LayersWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
+	public interface PanelId {
+		public String name();
+	}
 	public interface Option {
 		public String getCaption();
 	}
@@ -28,6 +33,7 @@ public abstract class LayersWindow extends JFrame {
 	protected JLabel[] labels;
 	protected JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	protected boolean readyToExit = false;
+	protected final Map<PanelId, LayersPanel> panels = new HashMap<PanelId, LayersPanel>();
 	
 	//Methods
 	public Option getOption() {

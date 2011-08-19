@@ -41,7 +41,11 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	
 	//Enumerations
+	private enum PanelIds implements LayersWindow.PanelId {
+		ONE;
+	}
 	public enum Option implements LayersWindow.Option {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
 		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
@@ -55,7 +59,6 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 			return caption;
 		}
 	}
-	
 	public enum Label implements LayersWindow.Label {
 		LINK("Link"),
 		NODE("Node");
@@ -70,7 +73,6 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	}
 	
 	//Attributes
-	protected NetworkPanel panel;
 	private JButton readyButton;
 	
 	//Methods
@@ -78,9 +80,9 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		setTitle(title);
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
-		this.setLayout(new BorderLayout());
-		panel = new NetworkPanel(this, networkPainter);
-		this.add(panel, BorderLayout.CENTER);
+		this.setLayout(new BorderLayout()); 
+		panels.put(PanelIds.ONE, new NetworkPanel(this, networkPainter));
+		this.add(panels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
@@ -115,7 +117,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		pack();
 	}
 	public void refreshLabel(Label label) {
-		labels[label.ordinal()].setText(panel.getLabelText(label));
+		labels[label.ordinal()].setText(((NetworkPanel)panels.get(PanelIds.ONE)).getLabelText(label));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

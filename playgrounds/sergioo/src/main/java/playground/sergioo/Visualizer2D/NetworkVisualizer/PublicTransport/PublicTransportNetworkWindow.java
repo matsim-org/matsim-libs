@@ -43,6 +43,9 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
+	private enum PanelIds implements LayersWindow.PanelId {
+		ONE;
+	}
 	public enum Option implements LayersWindow.Option {
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		private String caption;
@@ -54,7 +57,6 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 			return caption;
 		}
 	}
-	
 	public enum Label implements LayersWindow.Label {
 		LINK("Link"),
 		NODE("Node");
@@ -69,7 +71,6 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 	}
 	
 	//Attributes
-	protected PublicTransportNetworkPanel panel;
 	private JButton readyButton;
 	
 	//Methods
@@ -78,8 +79,8 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		panel = new PublicTransportNetworkPanel(this, networkPainter);
-		this.add(panel, BorderLayout.CENTER);
+		panels.put(PanelIds.ONE, new PublicTransportNetworkPanel(this, networkPainter));
+		this.add(panels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
