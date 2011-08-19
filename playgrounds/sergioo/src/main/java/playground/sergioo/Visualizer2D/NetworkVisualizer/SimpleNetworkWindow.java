@@ -81,8 +81,8 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout()); 
-		panels.put(PanelIds.ONE, new NetworkPanel(this, networkPainter));
-		this.add(panels.get(PanelIds.ONE), BorderLayout.CENTER);
+		layersPanels.put(PanelIds.ONE, new NetworkPanel(this, networkPainter));
+		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
@@ -117,7 +117,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		pack();
 	}
 	public void refreshLabel(Label label) {
-		labels[label.ordinal()].setText(((NetworkPanel)panels.get(PanelIds.ONE)).getLabelText(label));
+		labels[label.ordinal()].setText(((NetworkPanel)layersPanels.get(PanelIds.ONE)).getLabelText(label));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

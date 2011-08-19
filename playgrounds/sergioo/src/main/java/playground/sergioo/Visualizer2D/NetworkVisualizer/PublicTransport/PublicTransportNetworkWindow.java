@@ -79,8 +79,8 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		panels.put(PanelIds.ONE, new PublicTransportNetworkPanel(this, networkPainter));
-		this.add(panels.get(PanelIds.ONE), BorderLayout.CENTER);
+		layersPanels.put(PanelIds.ONE, new PublicTransportNetworkPanel(this, networkPainter));
+		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));

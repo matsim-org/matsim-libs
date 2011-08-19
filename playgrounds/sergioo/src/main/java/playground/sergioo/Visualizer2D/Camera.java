@@ -26,6 +26,9 @@ public class Camera {
 	public Vector2D getSize() {
 		return size;
 	}
+	public double getAspectRatio() {
+		return size.getX()/-size.getY();
+	}
 	public void setCamera(Point2D upLeftCorner, Vector2D size) {
 		this.upLeftCorner.setX(upLeftCorner.getX());
 		this.upLeftCorner.setY(upLeftCorner.getY());
@@ -59,4 +62,5 @@ public class Camera {
 	public void centerCamera(double x, double y) {
 		upLeftCorner.translate(new Vector2D(getCenter(),new Point2D(x, y)));
 	}
+	
 }

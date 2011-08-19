@@ -61,8 +61,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 		layers.add(new Layer(networkPainter));
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
-		double networkAspect = camera.getSize().getX()/-camera.getSize().getY();
-		super.setSize(networkAspect,Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
+		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -85,12 +84,12 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getDoubleX(e.getX()), getDoubleY(e.getY()));
+			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getDoubleX(e.getX()), getDoubleY(e.getY()));
+				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getDoubleX(e.getX()), getDoubleY(e.getY()));
+				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
 		}
 		repaint();
 	}
@@ -113,14 +112,14 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getDoubleX(e.getX()),getDoubleX(iniX),getDoubleY(e.getY()),getDoubleY(iniY));
+		camera.move(getWorldX(e.getX()),getWorldX(iniX),getWorldY(e.getY()),getWorldY(iniY));
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getDoubleX(e.getX()),getDoubleY(e.getY()));
+		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

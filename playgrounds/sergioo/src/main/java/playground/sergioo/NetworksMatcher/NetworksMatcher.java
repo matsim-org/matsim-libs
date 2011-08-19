@@ -48,7 +48,7 @@ public class NetworksMatcher {
 		windowLRP.setVisible(true);*/
 		Network networkHighResolution = scenario.getNetwork();
 		Network networkLowResolutionLength = getNetworkFromShapeFileLength(args[1]);
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM48N/*SVY21*/, TransformationFactory.WGS84_UTM48N);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolutionLength.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		LayersWindow windowHR = new DoubleNetworkWindow("Networks matching", new SimpleNetworkPainter(networkHighResolution), new SimpleNetworkPainter(networkLowResolutionLength));
@@ -59,8 +59,6 @@ public class NetworksMatcher {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		((DoubleNetworkWindow)windowHR).setNetworksSeparated();
-		windowHR.setVisible(true);
 		MatchingProcess matchingProcess = new MatchingProcess();
 		matchingProcess.execute(networkHighResolution, networkLowResolutionLength);
 		//matchingProcess.applyProperties(false);

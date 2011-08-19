@@ -20,7 +20,6 @@
 
 package playground.sergioo.NetworksMatcher.gui;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -36,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkWindow.Label;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkWindow.Option;
-import playground.sergioo.Visualizer2D.Camera;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkManager;
@@ -52,28 +50,23 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	private static final long serialVersionUID = 1L;
 	
 	//Attributes
-	private final DoubleNetworkWindow window;
+	private final DoubleNetworkWindow doubleNetworkWindow;
 	private int iniX;
 	private int iniY;
-	private Color backgroundColor = Color.WHITE;
 	private boolean withNetwork = true;
 	
 	//Methods
-	public NetworkPanel(DoubleNetworkWindow window, NetworkPainter networkPainter) {
+	public NetworkPanel(DoubleNetworkWindow doubleNetworkWindow, NetworkPainter networkPainter) {
 		super();
-		this.window = window;
+		this.doubleNetworkWindow = doubleNetworkWindow;
 		layers.add(new Layer(networkPainter));
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
-		double networkAspect = camera.getSize().getX()/-camera.getSize().getY();
-		super.setSize(networkAspect,Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
+		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		setFocusable(true);
-	}
-	public Camera getCamera() {
-		return camera;
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
@@ -103,41 +96,41 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		this.requestFocus();
-		window.setActivePanel(this);
+		doubleNetworkWindow.setActivePanel(this);
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getDoubleX(e.getX()), getDoubleY(e.getY()));
+			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
-			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectLink(getDoubleX(e.getX()),getDoubleY(e.getY()));
-				window.refreshLabel(Label.LINK);
+			if(doubleNetworkWindow.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Label.LINK);
 			}
-			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
+			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().unselectLink();
-				window.refreshLabel(Label.LINK);
+				doubleNetworkWindow.refreshLabel(Label.LINK);
 			}
-			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectNode(getDoubleX(e.getX()),getDoubleY(e.getY()));
-				window.refreshLabel(Label.NODE);
+			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Label.NODE);
 			}
-			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().unselectNode();
-				window.refreshLabel(Label.NODE);
+				doubleNetworkWindow.refreshLabel(Label.NODE);
 			}
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
-				camera.zoomIn(getDoubleX(e.getX()), getDoubleY(e.getY()));
-				window.cameraChange(camera);
+			else if(doubleNetworkWindow.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
+				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				doubleNetworkWindow.cameraChange(camera);
 			}
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
-				camera.zoomOut(getDoubleX(e.getX()), getDoubleY(e.getY()));
-				window.cameraChange(camera);
+			else if(doubleNetworkWindow.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
+				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				doubleNetworkWindow.cameraChange(camera);
 			}
 		}
 		repaint();
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		window.setActivePanel(this);
+		this.requestFocus();
+		doubleNetworkWindow.setActivePanel(this);
 		iniX = e.getX();
 		iniY = e.getY();
 	}
@@ -155,16 +148,16 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		window.setActivePanel(this);
-		camera.move(getDoubleX(e.getX()),getDoubleX(iniX),getDoubleY(e.getY()),getDoubleY(iniY));
+		doubleNetworkWindow.setActivePanel(this);
+		camera.move(getWorldX(e.getX()),getWorldX(iniX),getWorldY(e.getY()),getWorldY(iniY));
 		iniX = e.getX();
 		iniY = e.getY();
+		doubleNetworkWindow.cameraChange(camera);
 		repaint();
-		window.cameraChange(camera);
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getDoubleX(e.getX()),getDoubleY(e.getY()));
+		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -177,11 +170,15 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			break;
 		case 'o':
 			((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectOppositeLink();
-			window.refreshLabel(Label.LINK);
+			doubleNetworkWindow.refreshLabel(Label.LINK);
 			break;
 		case 'v':
 			viewAll();
+			doubleNetworkWindow.cameraChange(camera);
 			break;
+		case 'm':
+			doubleNetworkWindow.setNetworksSeparated();
+			break;	
 		}
 		repaint();
 	}

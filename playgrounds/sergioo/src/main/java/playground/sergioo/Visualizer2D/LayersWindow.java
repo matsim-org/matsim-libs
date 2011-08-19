@@ -33,7 +33,7 @@ public abstract class LayersWindow extends JFrame {
 	protected JLabel[] labels;
 	protected JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	protected boolean readyToExit = false;
-	protected final Map<PanelId, LayersPanel> panels = new HashMap<PanelId, LayersPanel>();
+	protected final Map<PanelId, LayersPanel> layersPanels = new HashMap<PanelId, LayersPanel>();
 	
 	//Methods
 	public Option getOption() {

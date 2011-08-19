@@ -17,14 +17,14 @@ public abstract class Painter {
 	protected void paintLine(Graphics2D g2, LayersPanel layersPanel, Tuple<Coord,Coord> coords, Stroke stroke, Color color) {
 		g2.setStroke(stroke);
 		g2.setColor(color);
-		g2.drawLine(layersPanel.getIntX(coords.getFirst().getX()),
-				layersPanel.getIntY(coords.getFirst().getY()),
-				layersPanel.getIntX(coords.getSecond().getX()),
-				layersPanel.getIntY(coords.getSecond().getY()));
+		g2.drawLine(layersPanel.getScreenX(coords.getFirst().getX()),
+				layersPanel.getScreenY(coords.getFirst().getY()),
+				layersPanel.getScreenX(coords.getSecond().getX()),
+				layersPanel.getScreenY(coords.getSecond().getY()));
 	}
 	protected void paintCircle(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
 		g2.setColor(color);
-		Shape circle = new Ellipse2D.Double(layersPanel.getIntX(coord.getX())-pointSize,layersPanel.getIntY(coord.getY())-pointSize,pointSize*2,pointSize*2);
+		Shape circle = new Ellipse2D.Double(layersPanel.getScreenX(coord.getX())-pointSize,layersPanel.getScreenY(coord.getY())-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
 	}
 	

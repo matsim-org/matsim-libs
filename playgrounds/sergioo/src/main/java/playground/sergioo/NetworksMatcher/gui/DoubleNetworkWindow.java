@@ -1,6 +1,7 @@
 package playground.sergioo.NetworksMatcher.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import playground.sergioo.Visualizer2D.Camera;
@@ -66,14 +68,17 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
-		panels.put(PanelIds.A, new NetworkPanel(this, networkPainterA));
-		panels.put(PanelIds.B, new NetworkPanel(this, networkPainterB));
-		panels.put(PanelIds.ACTIVE, panels.get(PanelIds.A));
-		panels.put(PanelIds.DOUBLE, new DoubleNetworkPanel(this, networkPainterA, networkPainterB));
+		layersPanels.put(PanelIds.A, new NetworkPanel(this, networkPainterA));
+		layersPanels.put(PanelIds.B, new NetworkPanel(this, networkPainterB));
+		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
+		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
+		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
+		layersPanels.get(PanelIds.ACTIVE).requestFocus();
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkPanel(this, networkPainterA, networkPainterB));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout(1,2));
-		panelsPanel.add(panels.get(PanelIds.A), BorderLayout.WEST);
-		panelsPanel.add(panels.get(PanelIds.B), BorderLayout.EAST);
+		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
+		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
 		option = Option.ZOOM;
 		JPanel buttonsPanel = new JPanel();
@@ -111,36 +116,38 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
-			this.remove(panels.get(PanelIds.DOUBLE));
-			panels.put(PanelIds.ACTIVE, panels.get(PanelIds.A));
-			panelsPanel = new JPanel();
-			panelsPanel.setLayout(new GridLayout(1,2));
-			panelsPanel.add(panels.get(PanelIds.A), BorderLayout.WEST);
-			panelsPanel.add(panels.get(PanelIds.B), BorderLayout.EAST);
+			this.remove(layersPanels.get(PanelIds.DOUBLE));
+			layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 			this.add(panelsPanel, BorderLayout.CENTER);
 		}
 		else {
 			this.remove(panelsPanel);
-			this.add(panels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
+			this.add(layersPanels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
 		}
+		setVisible(true);
+		repaint();
+		if(networksSeparated)
+			layersPanels.get(PanelIds.ACTIVE).requestFocus();
+		else
+			layersPanels.get(PanelIds.DOUBLE).requestFocus();
 	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
-			if(panels.get(PanelIds.ACTIVE)==panels.get(PanelIds.A)) {
-				panels.get(PanelIds.B).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-				panels.get(PanelIds.B).repaint();
+			if(layersPanels.get(PanelIds.ACTIVE)==layersPanels.get(PanelIds.A)) {
+				layersPanels.get(PanelIds.B).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				layersPanels.get(PanelIds.B).repaint();
 			}
 			else {
-				panels.get(PanelIds.A).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
-				panels.get(PanelIds.A).repaint();
+				layersPanels.get(PanelIds.A).getCamera().setCamera(camera.getUpLeftCorner(), camera.getSize());
+				layersPanels.get(PanelIds.A).repaint();
 			}
 		}
 	}
 	public void setActivePanel(NetworkPanel panel) {
-		panels.put(PanelIds.ACTIVE, panel);
+		layersPanels.put(PanelIds.ACTIVE, panel);
 	}
 	public void refreshLabel(Label label) {
-		labels[label.ordinal()].setText(((NetworkPanel)panels.get(PanelIds.ACTIVE)).getLabelText(label));
+		labels[label.ordinal()].setText(((NetworkPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

@@ -20,7 +20,6 @@
 
 package playground.sergioo.Visualizer2D.NetworkVisualizer;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -34,7 +33,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.sergioo.Visualizer2D.Camera;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkManager;
@@ -54,7 +52,6 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	private final SimpleNetworkWindow window;
 	private int iniX;
 	private int iniY;
-	private Color backgroundColor = Color.WHITE;
 	private boolean withNetwork = true;
 	
 	//Methods
@@ -64,15 +61,11 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		layers.add(new Layer(networkPainter));
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
-		double networkAspect = camera.getSize().getX()/-camera.getSize().getY();
-		super.setSize(networkAspect,Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
+		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		setFocusable(true);
-	}
-	public Camera getCamera() {
-		return camera;
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
@@ -86,12 +79,11 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		this.requestFocus();
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getDoubleX(e.getX()), getDoubleY(e.getY()));
+			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectLink(getDoubleX(e.getX()),getDoubleY(e.getY()));
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
 				window.refreshLabel(Label.LINK);
 			}
 			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
@@ -99,7 +91,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 				window.refreshLabel(Label.LINK);
 			}
 			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectNode(getDoubleX(e.getX()),getDoubleY(e.getY()));
+				((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				window.refreshLabel(Label.NODE);
 			}
 			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
@@ -107,9 +99,9 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 				window.refreshLabel(Label.NODE);
 			}
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getDoubleX(e.getX()), getDoubleY(e.getY()));
+				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getDoubleX(e.getX()), getDoubleY(e.getY()));
+				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
 		}
 		repaint();
 	}
@@ -131,6 +123,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
+		this.requestFocus();
 		iniX = e.getX();
 		iniY = e.getY();
 	}
@@ -148,14 +141,14 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getDoubleX(e.getX()),getDoubleX(iniX),getDoubleY(e.getY()),getDoubleY(iniY));
+		camera.move(getWorldX(e.getX()),getWorldX(iniX),getWorldY(e.getY()),getWorldY(iniY));
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getDoubleX(e.getX()),getDoubleY(e.getY()));
+		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
