@@ -181,7 +181,7 @@ public class SpatialAveragingForLinkEmissions {
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(noOfLinksInCell[xIndex][yIndex] > minimumNoOfLinksInCell){
-						if(endOfTimeInterval < Time.MIDNIGHT){
+						if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 //							String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";

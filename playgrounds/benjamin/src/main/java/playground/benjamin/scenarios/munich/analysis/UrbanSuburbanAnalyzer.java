@@ -55,24 +55,26 @@ public class UrbanSuburbanAnalyzer {
 	private static final Logger logger = Logger.getLogger(UrbanSuburbanAnalyzer.class);
 
 	// INPUT
-	private static String runNumber = "973";
+	private static String runNumber = "985";
 	private static String runDirectory = "../../runs-svn/run" + runNumber + "/";
 	private static String shapeDirectory = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/";
 
-	private static String netFile = runDirectory + "output_network.xml.gz";
-	private static String plansFile = runDirectory + "output_plans.xml.gz";
-//	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-//	private static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
+//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	private static String plansFile = runDirectory + "output_plans.xml.gz";
+	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	private static String plansFile = runDirectory + runNumber + ".output_plans.xml.gz";
 
 	private static String urbanShapeFile = shapeDirectory + "urbanAreas.shp";
 	private static String suburbanShapeFile = shapeDirectory + "suburbanAreas.shp";
 	private static String cityShapeFile = shapeDirectory + "cityArea.shp";
-
+	
 	// OUTPUT
 	private static String outputPath = runDirectory + "urbanSuburban/";
 
 	//===
-	private final Scenario scenario;
+	Scenario scenario;
+	PersonFilter personFilter = new PersonFilter();
+	HomeLocationFilter homeLocationFilter = new HomeLocationFilter();
 
 
 	public UrbanSuburbanAnalyzer(){
@@ -91,29 +93,53 @@ public class UrbanSuburbanAnalyzer {
 	}
 
 	public void run() {
-		Set<Feature> urbanShape = readShape(urbanShapeFile);
-		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
-		Set<Feature> cityShape = readShape(cityShapeFile);
-
+//		Set<Feature> urbanShape = readShape(urbanShapeFile);
+//		Set<Feature> suburbanShape = readShape(suburbanShapeFile);
+//		Set<Feature> cityShape = readShape(cityShapeFile);
+//
+//		Population population = scenario.getPopulation();
+//		Population mucPop = getRelevantPopulation(population, cityShape);
+//		Population urbanMucPop = getRelevantPopulation(population, urbanShape);
+//		Population suburbanMucPop = getRelevantPopulation(population, suburbanShape);
+//		mucPop.setName("mucPop");
+//		urbanMucPop.setName("urbanMucPop");
+//		suburbanMucPop.setName("suburbanMucPop");
+//		
+//		Map<String, Integer> mucMode2NoOfLegs = getMode2NoOfLegs(mucPop);
+//		Map<String, Integer> urbanMode2NoOfLegs = getMode2NoOfLegs(urbanMucPop);
+//		Map<String, Integer> suburbanMode2NoOfLegs = getMode2NoOfLegs(suburbanMucPop);
+//		Integer mucTotalLegs = calculateTotalLegs(mucPop);
+//		Integer urbanTotalLegs = calculateTotalLegs(urbanMucPop);
+//		Integer suburbanTotalLegs = calculateTotalLegs(suburbanMucPop);
+//
+//		writeInformation(mucPop, mucMode2NoOfLegs, mucTotalLegs);
+//		writeInformation(urbanMucPop, urbanMode2NoOfLegs, urbanTotalLegs);
+//		writeInformation(suburbanMucPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
+		
 		Population population = scenario.getPopulation();
-		Population mucPop = getRelevantPopulation(population, cityShape);
-		Population urbanMucPop = getRelevantPopulation(population, urbanShape);
-		Population suburbanMucPop = getRelevantPopulation(population, suburbanShape);
-
+		Population midPop = personFilter.getMiDPopulation(population);
+		Population outCommuter = personFilter.getOutCommuter(population);
+		Population mucPop = personFilter.getMunichPopulation(population);
+		Population innCommuter = personFilter.getInnCommuter(population);
+		
+		midPop.setName("midPop");
+		outCommuter.setName("outCommuter");
 		mucPop.setName("mucPop");
-		urbanMucPop.setName("urbanMucPop");
-		suburbanMucPop.setName("suburbanMucPop");
-
+		innCommuter.setName("innCommuter");
+		
+		Map<String, Integer> midMode2NoOfLegs = getMode2NoOfLegs(midPop);
+		Map<String, Integer> outMode2NoOfLegs = getMode2NoOfLegs(outCommuter);
 		Map<String, Integer> mucMode2NoOfLegs = getMode2NoOfLegs(mucPop);
-		Map<String, Integer> urbanMode2NoOfLegs = getMode2NoOfLegs(urbanMucPop);
-		Map<String, Integer> suburbanMode2NoOfLegs = getMode2NoOfLegs(suburbanMucPop);
+		Map<String, Integer> innMode2NoOfLegs = getMode2NoOfLegs(innCommuter);
+		Integer midTotalLegs = calculateTotalLegs(midPop);
+		Integer outTotalLegs = calculateTotalLegs(outCommuter);
 		Integer mucTotalLegs = calculateTotalLegs(mucPop);
-		Integer urbanTotalLegs = calculateTotalLegs(urbanMucPop);
-		Integer suburbanTotalLegs = calculateTotalLegs(suburbanMucPop);
-
+		Integer innTotalLegs = calculateTotalLegs(innCommuter);
+		
+		writeInformation(midPop, midMode2NoOfLegs, midTotalLegs);
+		writeInformation(outCommuter, outMode2NoOfLegs, outTotalLegs);
 		writeInformation(mucPop, mucMode2NoOfLegs, mucTotalLegs);
-		writeInformation(urbanMucPop, urbanMode2NoOfLegs, urbanTotalLegs);
-		writeInformation(suburbanMucPop, suburbanMode2NoOfLegs, suburbanTotalLegs);
+		writeInformation(innCommuter, innMode2NoOfLegs, innTotalLegs);
 	}
 
 	private void writeInformation(Population population, Map<String, Integer> mode2NoOfLegs, Integer totalLegs) {
@@ -183,12 +209,8 @@ public class UrbanSuburbanAnalyzer {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
-			PersonFilter personFilter = new PersonFilter();
-			boolean isPersonFreight = personFilter.isPersonFreight(person);
-			if(!isPersonFreight){
-				HomeLocationFilter homeLocationFilter = new HomeLocationFilter();
-				boolean isPersonsHomeInShape = homeLocationFilter.isPersonsHomeInShape(person, featuresInShape);
-				if(isPersonsHomeInShape){
+			if(!personFilter.isPersonFreight(person)){
+				if(homeLocationFilter.isPersonsHomeInShape(person, featuresInShape)){
 					filteredPopulation.addPerson(person);
 				}
 			}
