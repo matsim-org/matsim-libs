@@ -76,7 +76,7 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
 		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkPanel(this, networkPainterA, networkPainterB));
 		panelsPanel = new JPanel();
-		panelsPanel.setLayout(new GridLayout(1,2));
+		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
 		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
@@ -116,13 +116,15 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
-			this.remove(layersPanels.get(PanelIds.DOUBLE));
+			panelsPanel.remove(layersPanels.get(PanelIds.DOUBLE));
 			layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
-			this.add(panelsPanel, BorderLayout.CENTER);
+			panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
+			panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
 		}
 		else {
-			this.remove(panelsPanel);
-			this.add(layersPanels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
+			panelsPanel.remove(layersPanels.get(PanelIds.A));
+			panelsPanel.remove(layersPanels.get(PanelIds.B));
+			panelsPanel.add(layersPanels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
 		}
 		setVisible(true);
 		repaint();
