@@ -46,7 +46,6 @@ public class CongestionEmissionCorrelate {
 						if(linkWarmEmissions.containsKey(pollutant)){
 							if (congestion.get(time).get(linkId)!=0.0){
 								ratio = linkWarmEmissions.get(pollutant) / congestion.get(time).get(linkId);
-										;
 							}
 							else {ratio = 0.0;}
 						} 

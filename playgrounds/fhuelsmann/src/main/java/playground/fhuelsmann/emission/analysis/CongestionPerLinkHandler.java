@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Congestion.java
+ * CongestionPerLinkHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,9 +19,14 @@
  * *********************************************************************** */
 package playground.fhuelsmann.emission.analysis;
 
+
+/**
+ * @author friederike 
+ *
+ */
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -32,19 +37,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import org.matsim.core.network.NetworkImpl;
-
-import playground.benjamin.events.emissions.WarmPollutant;
-
-
-/**
- * @author friederike
- * 
- * calculates the length of congestion on each link per hour
- *
- */
-
-public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
+public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeaveEventHandler {
 	
 
 	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
@@ -55,7 +48,7 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 	private final double timeBinSize;
 
 
-	public Congestion(final Network network,double simulationEndTime, int noOfTimeBins) {
+	public CongestionPerLinkHandler(final Network network,double simulationEndTime, int noOfTimeBins) {
 		this.network = network;
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
@@ -145,4 +138,5 @@ public class Congestion implements LinkEnterEventHandler,LinkLeaveEventHandler {
 		}
 		return stopGoFractionSum;
 	}
+
 }

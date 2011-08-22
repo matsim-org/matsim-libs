@@ -38,7 +38,10 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.benjamin.events.emissions.EmissionEventsReader;
 
-
+/**
+ * @author friederike 
+ *
+ */
 
 
 public class CongestionAndEmissionComparison {
@@ -77,10 +80,10 @@ public class CongestionAndEmissionComparison {
 	EventsManager emissioneventsManager = EventsUtils.createEventsManager();
 	
 	
-	Congestion cong = new Congestion(network, this.simulationEndTime, noOfTimeBins);
+	CongestionPerLinkHandler congestionHandler = new CongestionPerLinkHandler(network, this.simulationEndTime, noOfTimeBins);
 	EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
 	
-	eventsManager.addHandler(cong);
+	eventsManager.addHandler(congestionHandler);
 	emissioneventsManager.addHandler(warmHandler);
 	
 	MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
@@ -91,7 +94,7 @@ public class CongestionAndEmissionComparison {
 	
 	CongestionEmissionCorrelate congestionEmissionCorrelate = new CongestionEmissionCorrelate();
 	Map<Double, Map<Id,Map<String, Double>>> warmEmissions = warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
-	Map<Double,Map<Id,Double>> congestion = cong.getCongestionPerLinkAndTimeInterval();
+	Map<Double,Map<Id,Double>> congestion = congestionHandler.getCongestionPerLinkAndTimeInterval();
 	congestionEmissionCorrelate.defineListOfPollutants();
 	
 	Map<Double, Map<Id,Map<String, Double>>> congestionEmissionComparison = congestionEmissionCorrelate.compareEmissioneAndCongestion(warmEmissions,congestion);
