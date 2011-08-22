@@ -142,6 +142,7 @@ import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
@@ -933,7 +934,8 @@ public class Controler {
 				SnapshotWriterFactory snapshotWriterFactory = register.getInstance(snapshotFormat);
 				String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 				String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
-				snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
+				SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
+				((VisMobsim) simulation).addSnapshotWriter(snapshotWriter);
 			}
 		}
 	}
