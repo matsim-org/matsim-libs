@@ -64,7 +64,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
@@ -227,11 +226,6 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 			else if (itNumber == null) {
 				log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
 				itNumber = 0;
-			}
-			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
-				String snapshotFileSuffix = "xml";
-				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
 			}
 			if (snapshotFormat.contains("transims")) {
 				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");

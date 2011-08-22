@@ -54,6 +54,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -677,6 +678,63 @@ public class ControlerTest {
 		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
+	}
+	
+	@Test
+	public void testOTFVisSnapshotWriterOnQueueSimulation() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.simulation().setSnapshotFormat("otfvis");
+		config.simulation().setSnapshotPeriod(600);
+		config.simulation().setSnapshotStyle("equiDist");
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+	}
+	
+	@Test
+	public void testKMLSnapshotWriterOnQueueSimulation() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.simulation().setSnapshotFormat("googleearth");
+		config.simulation().setSnapshotPeriod(600);
+		config.simulation().setSnapshotStyle("equiDist");
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "googleearth.kmz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "googleearth.kmz")).exists());
+	}
+	
+	@Test
+	public void testTransimsSnapshotWriterOnQueueSimulation() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.simulation().setSnapshotFormat("transims");
+		config.simulation().setSnapshotPeriod(10);
+		config.simulation().setSnapshotStyle("equiDist");
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
 	}
 
 	/*package*/ static class FakeMobsim implements Simulation {

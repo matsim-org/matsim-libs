@@ -674,7 +674,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			} else if ("equiDist".equals(snapshotStyle)) {
 				getVehiclePositionsEquil(positions);
 			} else {
-				log.warn("The snapshotStyle \"" + snapshotStyle
+				throw new RuntimeException("The snapshotStyle \"" + snapshotStyle
 						+ "\" is not supported.");
 			}
 

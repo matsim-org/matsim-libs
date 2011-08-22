@@ -70,7 +70,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 import org.matsim.vis.snapshots.writers.VisMobsim;
@@ -259,13 +258,8 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 				log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
 				itNumber = 0;
 			}
-			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
-				String snapshotFileSuffix = "xml";
-				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, this.networkLayer));
-			}
 			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh.gz");
 				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
 			}
 			if (snapshotFormat.contains("googleearth")) {
@@ -273,9 +267,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 				String coordSystem = this.config.global().getCoordinateSystem();
 				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
 						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-			}
-			if (snapshotFormat.contains("netvis")) {
-				throw new IllegalStateException("netvis is no longer supported by this simulation");
 			}
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");

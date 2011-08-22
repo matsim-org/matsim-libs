@@ -29,7 +29,6 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
@@ -63,11 +62,6 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
       else if (itNumber == null) {
         log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
         itNumber = 0;
-      }
-      if (snapshotFormat.contains("plansfile")) {
-        String snapshotFilePrefix = controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
-        String snapshotFileSuffix = "xml";
-        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix, scenario.getNetwork()));
       }
       if (snapshotFormat.contains("transims")) {
         String snapshotFile = controlerIO.getIterationFilename(itNumber, "T.veh");

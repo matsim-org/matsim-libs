@@ -37,7 +37,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
@@ -206,11 +205,6 @@ public class Events2Snapshot {
 
 		String snapshotFormat = this.config.getQSimConfigGroup().getSnapshotFormat();
 
-		if (snapshotFormat.contains("plansfile")) {
-			String snapshotFilePrefix = outputDir + "/positionInfoPlansFile";
-			String snapshotFileSuffix = "xml";
-			this.visualizer.addSnapshotWriter(new PlansFileSnapshotWriter(snapshotFilePrefix, snapshotFileSuffix, this.network));
-		}
 		if (snapshotFormat.contains("transims")) {
 			String snapshotFile = outputDir + "T.veh";
 			this.visualizer.addSnapshotWriter(new TransimsSnapshotWriter(snapshotFile));
