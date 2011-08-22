@@ -21,7 +21,6 @@
 package cottbus;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * @author jbischoff
+ * @author fuerbas
  *
  */
 
@@ -61,7 +60,7 @@ public class SfCottbusPtSchedule {
 	private Network network;
 	private TransitSchedule schedule;
 	private TransitScheduleFactory schedulefactory;
-	
+	private String pt_mode;
 	private String NETWORK = "INPUTFILE_NETWORK";
 	private String LINES = "E:\\Cottbus\\Cottbus_pt\\lines\\lines.csv";
 	
@@ -83,18 +82,28 @@ public class SfCottbusPtSchedule {
 //		Linienliste einlesen, Linien als Strings speichern, über alle Linien gleiches Schema ausführen...
 		
 		String[] lines = cottbus.getLineNumbers(cottbus.LINES);
+		
 		for(int nLines = 0; nLines<24; nLines++) {
 			List<String> transitStopIdStrings = new ArrayList<String>();
 			List<String> stopLinkString = new ArrayList<String>();
 			String linesfile = lines[nLines]+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
+			if (nLines <=7) cottbus.pt_mode="tram";
+			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
+			else cottbus.pt_mode="train";
+			
 			while(br.ready()) {
 				String[] lineEntries = br.readLine().split(";");
 				transitStopIdStrings.add(lineEntries[1]);
 				stopLinkString.add(lineEntries[6]);
 			}
-			cottbus.createTransitStopFacilities(cottbus.network, cottbus.schedule, transitStopIdStrings, stopLinkString);
+			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString);
 			
+			String[] routes = null;
+			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
+			
+			
+						
 		}
 		
 		
@@ -127,25 +136,38 @@ public class SfCottbusPtSchedule {
 		
 	}
 	
-	private TransitRoute createTransitRoute(String transitRouteId, NetworkRoute netRoute, List<TransitRouteStop> stopList, TransitScheduleFactory tsf, String pt_mode) {
-		TransitRoute transitRoute = tsf.createTransitRoute(new IdImpl(transitRouteId), netRoute, stopList, pt_mode);
+	private TransitRoute createTransitRoute(String transitRouteId, NetworkRoute netRoute, List<TransitRouteStop> stopList, String pt_mode) {
+		TransitRoute transitRoute = this.schedulefactory.createTransitRoute(new IdImpl(transitRouteId), netRoute, stopList, pt_mode);
 		return transitRoute;
 	}
 	
-	private List<TransitRouteStop> createTransitStopFacilities(Network network, TransitSchedule tsf, List<String> ids, List<String> links) {
+	private List<TransitRouteStop> createTransitStopFacilities(List<String> ids, List<String> links) {
+		
+		List<Id> linkList = new ArrayList<Id>();
 		List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();
+		List<TransitStopFacility> facilList = new ArrayList<TransitStopFacility>();
+		TransitStopFacility trastofac = null;
+		
 		for(int index = 0; index<ids.size(); index++)	{
-			
+						
 //			eine facility mit mehreren stops erstellen
-			
 			Id facilId = new IdImpl(ids.get(index));
 			Id linkId = new IdImpl(links.get(index));
-			TransitStopFacility trastofac = tsf.getFactory().createTransitStopFacility(facilId, network.getLinks().get(linkId).getCoord(), true);
-			trastofac.setLinkId(linkId);
-			TransitRouteStop transStop = tsf.getFactory().createTransitRouteStop(trastofac, 0, 0);
-			tsf.addStopFacility(trastofac);
-			stopList.add(transStop);
+			if (!this.schedule.getFacilities().containsKey(facilId)) {
+				trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
+				facilList.add(trastofac);
+				trastofac.setLinkId(linkId);
+				this.schedule.addStopFacility(trastofac);
+			} 
+			else  trastofac = this.schedule.getFacilities().get(facilId);
+			
+			if (!linkList.contains(linkId))
+				trastofac.setLinkId(linkId);
+				TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, 0, 0);
+				linkList.add(linkId);
+				stopList.add(transStop);
 		}
+		
 		return stopList;
 	}	
 	
