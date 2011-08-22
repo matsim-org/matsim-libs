@@ -286,7 +286,7 @@ public class Controller {
 		SocialSparseGraphMLReader graphReader = new SocialSparseGraphMLReader();
 		SocialSparseGraph graph = graphReader.readGraph(graphFile, scenario.getPopulation());
 
-		double k_mean = Degree.getInstance().distribution(graph.getVertices()).getMean();
+		double k_mean = Degree.getInstance().statistics(graph.getVertices()).getMean();
 
 		logger.info("k_mean = " + k_mean);
 

@@ -121,7 +121,7 @@ public class ZoneUtils {
 		Set<Geometry> geometries = new HashSet<Geometry>();
 		for(Zone<Set<SpatialVertex>> zone : layer.getZones()) {
 			if(zone.getAttribute() != null) {
-			double k = Degree.getInstance().distribution(zone.getAttribute()).getMean();
+			double k = Degree.getInstance().statistics(zone.getAttribute()).getMean();
 			colors.put(zone.getGeometry(), k);
 			geometries.add(zone.getGeometry());
 			}

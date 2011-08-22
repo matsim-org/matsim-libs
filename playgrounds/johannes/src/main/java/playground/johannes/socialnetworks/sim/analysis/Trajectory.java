@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 
 /**
@@ -32,9 +33,19 @@ import org.matsim.api.core.v01.population.PlanElement;
  */
 public class Trajectory {
 
-	private List<PlanElement> elements = new ArrayList<PlanElement>(7);
+	private final List<PlanElement> elements = new ArrayList<PlanElement>(7);
 	
-	private List<Double> transitions = new ArrayList<Double>(8);
+	private final List<Double> transitions = new ArrayList<Double>(8);
+	
+	private final Person person;
+	
+	public Trajectory(Person person) {
+		this.person = person;
+	}
+	
+	public Person getPerson() {
+		return person;
+	}
 	
 	public List<PlanElement> getElements() {
 		return elements;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TrajectoryPlanBuilder.java
+ * RingLatticeGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,53 +17,61 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.analysis;
+package playground.johannes.socialnetworks.graph.generators;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class TrajectoryPlanBuilder {
+public class RingLatticeGenerator<G extends Graph, V extends Vertex, E extends Edge> {
 
-	public Set<Trajectory> buildTrajectory(Set<Plan> plans) {
-		Set<Trajectory> trajectories = new HashSet<Trajectory>();
-		for(Plan plan : plans) {
-			if(plan.getPlanElements().size() % 2 == 0) {
-				System.out.println("Invalid plan.");
-			} else {
-			Trajectory t = new Trajectory(plan.getPerson());
-			for(int i = 0; i < plan.getPlanElements().size(); i++) {
-				if(i % 2 == 0) {
-					Activity act = (Activity) plan.getPlanElements().get(i);
-					double endTime = act.getEndTime();
-					if(Double.isInfinite(endTime)) {
-						endTime = 86400;
-						if(i > 0) {
-							endTime = Math.max(t.getTransitions().get(i), 86400);
-						}
-					}
-					t.addElement(act, endTime);
-				} else {
-					Leg leg = (Leg) plan.getPlanElements().get(i);
-					Activity act = (Activity) plan.getPlanElements().get(i + 1);
-					double endTime = act.getStartTime();
-					if(Double.isInfinite(endTime) || endTime == 0)
-						endTime = leg.getDepartureTime() + leg.getTravelTime();
-					
-					t.addElement(leg, endTime);
-				}
-			}
-			trajectories.add(t);
-			}
+	private static final Logger logger = Logger.getLogger(RingLatticeGenerator.class);
+	
+	private final GraphBuilder<G, V, E> builder;
+	
+	public RingLatticeGenerator(GraphBuilder<G, V, E> builder) {
+		this.builder = builder;
+	}
+	
+	public G generate(int N, int k) {
+		if(k >= N)
+			throw new IllegalArgumentException("k must not be >= N!");
+		
+		G graph = builder.createGraph();
+		
+		List<V> vertices = new ArrayList<V>(N);
+		for(int i = 0; i < N; i++) {
+			vertices.add(builder.addVertex(graph));
 		}
 		
-		return trajectories;
+		int doubleEdges = 0;
+		
+		for(int i = 0; i < N; i++) {
+			V source = vertices.get(i);
+			for(int j = 0; j < k; j++) {
+				int idx = i + j + 1;
+				if(idx >= N)
+					idx = idx - N;
+				
+				V target = vertices.get(idx);
+				if(builder.addEdge(graph, source, target) == null)
+					doubleEdges++;
+			}
+		}
+
+		if(doubleEdges > 0)
+			logger.debug(String.format("Rejected %1$s double edges.", doubleEdges));
+		
+		return graph;
 	}
+
 }

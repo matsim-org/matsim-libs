@@ -39,7 +39,6 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.sna.math.Histogram;
 import org.matsim.contrib.sna.math.LinLogDiscretizer;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
@@ -75,27 +74,30 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 		Accessibility access = module;
 //		access.setTargets(destinations);
 
-		destinations = new HashSet<Point>();
+//		destinations = new HashSet<Point>();
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		for (Vertex v : graph.getVertices()) {
 			Point p = ((SpatialVertex) v).getPoint();
 			if (p != null) {
 //				if (boundary.contains(p)) {
 					vertices.add(v);
-					destinations.add(((SpatialVertex) v).getPoint());
+//					destinations.add(((SpatialVertex) v).getPoint());
 //				}
 			}
 		}
-		access.setTargets(destinations);
+//		access.setTargets(destinations);
 		
 		TObjectDoubleHashMap<Vertex> normValues = access.values(vertices);
 //		TObjectDoubleHashMap<Vertex> normValues = ObservedDegree.getInstance().values(vertices);
-		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(normValues.getValues(), 10, 2));
+//		TObjectDoubleHashMap<Vertex> normValues = ObservedAge.getInstance().values(vertices);
+		
+//		AttributePartition partitioner = new AttributePartition(new FixedBordersDiscretizer(normValues.getValues(), new double[]{21.0}));
+		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(normValues.getValues(), 1, 2));
 		TDoubleObjectHashMap<?> partitions = partitioner.partition(normValues);
 		TDoubleObjectIterator<?> it = partitions.iterator();
 
-//		AcceptanceProbability propa = new ObservedAcceptanceProbability();
-		AcceptanceProbability propa = new AcceptanceProbability();
+		AcceptanceProbability propa = new ObservedAcceptanceProbability();
+//		AcceptanceProbability propa = new AcceptanceProbability();
 
 		Map<String, TDoubleDoubleHashMap> histograms = new HashMap<String, TDoubleDoubleHashMap>();
 		double sum = 0;
@@ -104,18 +106,20 @@ public class AcceptancePropaCategoryTask extends ModuleAnalyzerTask<Accessibilit
 			it.advance();
 			double key = it.key();
 			Set<SpatialVertex> partition = (Set<SpatialVertex>) it.value();
-			System.out.println("Partition size = " + partition.size());
+			System.out.println("Partition size = " + partition.size() + "; key = " + key);
 			DescriptiveStatistics distr = propa.distribution(partition, destinations);
 
 			try {
 				double[] values = distr.getValues();
-				
-					TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(values, 200, 50), true);
+				System.out.println("Num samples = " + values.length);
+				if(values.length > 0) {
+					TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, FixedSampleSizeDiscretizer.create(values, 100, 50), true);
 //					Histogram.normalize(hist);
 //					TXTWriter.writeMap(hist, name, "p",
 //							String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length / bins));
 				sum += Histogram.sum(hist);
 				histograms.put(String.format("p_accept-cat%1$.1f", key), hist);
+				}
 //				writeHistograms(distr, String.format("p_accept-cat%1$.1f", key), 500, 200);
 				writeHistograms(distr, new LinLogDiscretizer(1000.0, 2), String.format("p_accept-cat%1$.1f.log", key),
 						true);

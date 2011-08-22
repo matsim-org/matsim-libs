@@ -93,7 +93,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_male.txt");
 //			Distribution.writeHistogram(dStats.absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_male.txt");
 			
-			DescriptiveStatistics kDistr = degree.distribution(vertices);
+			DescriptiveStatistics kDistr = degree.statistics(vertices);
 			stats.put("k_male", kDistr);
 			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0), false), getOutputDirectory() + "/k_male.txt");
 			
@@ -122,7 +122,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_female.txt");
 //			Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_female.txt");
 			
-			kDistr = degree.distribution(vertices);
+			kDistr = degree.statistics(vertices);
 			stats.put("k_female", kDistr);
 			Distribution.writeHistogram(Histogram.createHistogram(kDistr, new LinearDiscretizer(1.0), false), getOutputDirectory() + "/k_female.txt");
 
@@ -186,7 +186,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_income"+att+".txt");
 //				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_income"+att+".txt");
 				
-				kDistr = degree.distribution(vertices);
+				kDistr = degree.statistics(vertices);
 				stats.put("k_income"+att, kDistr);
 				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer, false), getOutputDirectory() + "/k_income"+att+".txt");
 
@@ -221,7 +221,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 				TXTWriter.writeMap(hist, "d", "p", getOutputDirectory()+"/p_acc_cstatus"+att+".txt");
 //				Distribution.writeHistogram(acc.distribution(vertices, choiceSet).absoluteDistributionLog2(1000), getOutputDirectory()+"/p_acc_cstatus"+att+".txt");
 				
-				kDistr = degree.distribution(vertices);
+				kDistr = degree.statistics(vertices);
 				stats.put("k_cstatus"+att, kDistr);
 				Distribution.writeHistogram(Histogram.createHistogram(kDistr, discretizer, false), getOutputDirectory() + "/k_cstatus"+att+".txt");
 

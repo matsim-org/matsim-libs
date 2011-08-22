@@ -68,7 +68,9 @@ public class EdgeLength extends AbstractEdgeProperty {
 						distanceCalculator = DistanceCalculatorFactory.createDistanceCalculator(CRSUtils.getCRS(v_i.getPoint().getSRID()));
 					}
 					
-					values.put(edge, distanceCalculator.distance(v_i.getPoint(), v_j.getPoint()));
+					double d = distanceCalculator.distance(v_i.getPoint(), v_j.getPoint());
+					d = Math.max(d, 300);
+					values.put(edge, d);
 				} else {
 					throw new RuntimeException("Points do not share the same coordinate reference system.");
 				}

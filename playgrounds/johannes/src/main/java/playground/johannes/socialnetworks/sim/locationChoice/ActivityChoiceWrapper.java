@@ -19,18 +19,32 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.locationChoice;
 
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -41,6 +55,8 @@ import playground.johannes.socialnetworks.graph.social.SocialGraph;
  */
 public class ActivityChoiceWrapper extends AbstractMultithreadedModule {
 
+	private static final Logger logger = Logger.getLogger(ActivityChoiceWrapper.class);
+	
 	private final SocialGraph graph;
 	
 	private final Population population;
@@ -55,7 +71,13 @@ public class ActivityChoiceWrapper extends AbstractMultithreadedModule {
 	
 	private final Random random;
 	
-	public ActivityChoiceWrapper(int numOfThreads, SocialGraph graph, Population population, Network network, TravelTime travelTime, Map<Person, Double> desiredArrivalTimes, Map<Person, Double> desiredDurations, Random random) {
+	private final ScenarioImpl scenario;
+	
+	private TObjectDoubleHashMap<Person> constants;
+	
+	final private List<Id> linkIds;
+	
+	public ActivityChoiceWrapper(int numOfThreads, SocialGraph graph, Population population, Network network, TravelTime travelTime, Map<Person, Double> desiredArrivalTimes, Map<Person, Double> desiredDurations, Random random, ScenarioImpl scenario) {
 		super(numOfThreads);
 		
 		this.graph = graph;
@@ -65,6 +87,49 @@ public class ActivityChoiceWrapper extends AbstractMultithreadedModule {
 		this.desiredArrivalTimes = desiredArrivalTimes;
 		this.desiredDurations = desiredDurations;
 		this.random = random;
+		this.scenario = scenario;
+		
+		linkIds = new ArrayList<Id>();
+		
+		
+		for(ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			boolean isLeisure = false;
+			for(ActivityOption option : facility.getActivityOptions().values()) {
+				if(option.getType().equalsIgnoreCase("leisure")) {
+					isLeisure = true;
+					break;
+				}
+			}
+			
+			if(isLeisure) {
+				if(facility.getLinkId() != null)
+					linkIds.add(facility.getLinkId());
+				else {
+					LinkImpl link = ((NetworkImpl)network).getNearestLink(facility.getCoord());
+					if(link != null)
+						linkIds.add(link.getId());
+					else
+						throw new RuntimeException("Unable to obtain link for facility.");
+						
+				}
+			}
+		}
+		
+		logger.info("Calculating norm constants...");
+		Set<Person> persons = desiredArrivalTimes.keySet();
+		constants = new TObjectDoubleHashMap<Person>();
+		for(Person person : persons) {
+			Link source = network.getLinks().get(((Activity)person.getSelectedPlan().getPlanElements().get(0)).getLinkId());
+			double sum = 0;
+			for(int i = 0; i < linkIds.size(); i++) {
+				Link target = network.getLinks().get(linkIds.get(i));
+				if (!source.equals(target)) {
+					double d = CoordUtils.calcDistance(source.getCoord(), target.getCoord());
+					sum += Math.pow(d, -1);
+				}
+			}
+			constants.put(person, sum);
+		}
 	}
 
 	@Override
@@ -78,9 +143,9 @@ public class ActivityChoiceWrapper extends AbstractMultithreadedModule {
 		};
 		LeastCostPathCalculator router = new Dijkstra(network, travelCost, travelTime);
 		ActivityMover mover = new ActivityMover(population.getFactory(), router, network);
-		ActivityChoiceRndAlterHome choice = new ActivityChoiceRndAlterHome(graph, mover, random, desiredArrivalTimes, desiredDurations);
-//		return choice;
-		return null;
+		ActivityChoiceRndFacility choice = new ActivityChoiceRndFacility(network, mover, random, desiredArrivalTimes, desiredDurations, linkIds, constants);
+		return choice;
+//		return null;
 	}
 
 }

@@ -21,8 +21,12 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.util.Set;
 
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -35,18 +39,22 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 	
 	public ObsSpatialAnalyzerTask(Set<Point> points, Geometry boundary) {
 		
+		
 //		addTask(new EpsilonTask(points));
 		
 //		EdgeLengthTask distanceTask = new EdgeLengthTask();
 //		distanceTask.setModule(EdgeLength.getInstance());
 //		addTask(new EdgeLengthTask());
 		
-		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
-		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
-		addTask(acceptTask);
+//		AcceptanceProbabilityTask acceptTask = new AcceptanceProbabilityTask(points);
+//		acceptTask.setModule(ObservedAcceptanceProbability.getInstance());
+//		addTask(acceptTask);
 		
-//		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
-//		access.setTargets(points);
+		Accessibility access = new ObservedAccessibility(new GravityCostFunction(1.4, 0));
+		access.setTargets(points);
+		addTask(new DegreeAccessibilityTask(access));
+		
+		
 //		addTask(new EdgeLengthAccessibilityTask(access));
 //		
 //		addTask(new TripTask());
@@ -68,8 +76,8 @@ public class ObsSpatialAnalyzerTask extends AnalyzerTaskComposite {
 //		kcTask.setModule(norm);
 //		addTask(kcTask);
 		
-//		GravityCostFunction func = new GravityCostFunction(1.6, 0, new CartesianDistanceCalculator());
-//////		
+//		GravityCostFunction func = new GravityCostFunction(1.4, 0, new CartesianDistanceCalculator());
+////////		
 //		SpatialPropertyDegreeTask xkTask = new SpatialPropertyDegreeTask(func, points);
 //		xkTask.setModule(new ObservedDegree());
 //		xkTask.setDiscretizer(new LinearDiscretizer(5.0));

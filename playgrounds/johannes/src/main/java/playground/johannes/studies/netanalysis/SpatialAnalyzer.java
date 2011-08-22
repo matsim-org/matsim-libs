@@ -29,10 +29,8 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 
 /**
  * @author illenberger
@@ -57,8 +55,8 @@ public class SpatialAnalyzer {
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		Accessibility access = new Accessibility(func);
 //		task.addTask(new AcceptancePropaCategoryTask(access));
-		task.addTask(new TransitivityAccessibilityTask(access));
-//		task.addTask(new SpatialAnalyzerTask());
+//		task.addTask(new TransitivityAccessibilityTask(access));
+		task.addTask(new SpatialAnalyzerTask());
 //		task.addTask(new ExtendedSpatialAnalyzerTask());
 //		task.addTask(new AgeAccessibilityTask(func));
 		

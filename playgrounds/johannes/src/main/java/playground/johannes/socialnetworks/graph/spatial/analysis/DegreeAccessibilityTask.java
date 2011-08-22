@@ -21,10 +21,12 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
@@ -53,14 +55,47 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 	
 	@Override
 	public void analyze(Graph g, Map<String, DescriptiveStatistics> statsMap) {
+		SpatialGraph graph = (SpatialGraph) g;
+		
+		TObjectDoubleHashMap<Vertex> xVals = module.values(graph.getVertices());
+		TObjectDoubleHashMap<Vertex> yVals = Degree.getInstance().values(graph.getVertices());
+		
+		double[] xArray = new double[xVals.size()];
+		double[] yArray = new double[xVals.size()];
+		TObjectDoubleIterator<Vertex> it = xVals.iterator();
+		for(int i = 0; i < xVals.size(); i++) {
+			it.advance();
+			xArray[i] = it.value();
+			yArray[i] = yVals.get(it.key());
+		}
+		double r = new PearsonsCorrelation().correlation(xArray, yArray);
+		
+		printStats(singleValueStats("r_ka", r, statsMap), "r_kA");
+		
 		if(outputDirectoryNotNull()) {
-			SpatialGraph graph = (SpatialGraph) g;
 			
-			TObjectDoubleHashMap<Vertex> xVals = module.values(graph.getVertices());
-			TObjectDoubleHashMap<Vertex> yVals = Degree.getInstance().values(graph.getVertices());
-			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
+			
+			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
+//			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, new LinearDiscretizer(5.0));
 			try {
 				TXTWriter.writeMap(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			it = xVals.iterator();
+			for(int i = 0; i < xVals.size(); i++) {
+				it.advance();
+				double A = it.value();
+				double k = yVals.get(it.key());
+				
+				yVals.put(it.key(), k/A);
+			}
+			
+			correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
+
+			try {
+				TXTWriter.writeMap(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

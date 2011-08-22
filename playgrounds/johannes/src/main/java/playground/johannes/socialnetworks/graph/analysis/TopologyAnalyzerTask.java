@@ -28,6 +28,7 @@ import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 
 /**
@@ -38,7 +39,9 @@ public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 
 	public TopologyAnalyzerTask() {
 		addTask(new GraphSizeTask());
-		addTask(new DegreeTask());
+		DegreeTask t = new DegreeTask();
+		t.setModule(ObservedDegree.getInstance());
+		addTask(t);
 		addTask(new TransitivityTask());
 //		addTask(new ComponentsTask());
 	}

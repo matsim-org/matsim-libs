@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TrajectoryPlanBuilder.java
+ * RandomTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,53 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.analysis;
+package playground.johannes.socialnetworks.utils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Random;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
+import org.apache.commons.math.random.BitsStreamGenerator;
+import org.apache.commons.math.random.RandomGenerator;
+import org.apache.commons.math.random.Well512a;
 
 /**
  * @author illenberger
  *
  */
-public class TrajectoryPlanBuilder {
+public class RandomTest {
 
-	public Set<Trajectory> buildTrajectory(Set<Plan> plans) {
-		Set<Trajectory> trajectories = new HashSet<Trajectory>();
-		for(Plan plan : plans) {
-			if(plan.getPlanElements().size() % 2 == 0) {
-				System.out.println("Invalid plan.");
-			} else {
-			Trajectory t = new Trajectory(plan.getPerson());
-			for(int i = 0; i < plan.getPlanElements().size(); i++) {
-				if(i % 2 == 0) {
-					Activity act = (Activity) plan.getPlanElements().get(i);
-					double endTime = act.getEndTime();
-					if(Double.isInfinite(endTime)) {
-						endTime = 86400;
-						if(i > 0) {
-							endTime = Math.max(t.getTransitions().get(i), 86400);
-						}
-					}
-					t.addElement(act, endTime);
-				} else {
-					Leg leg = (Leg) plan.getPlanElements().get(i);
-					Activity act = (Activity) plan.getPlanElements().get(i + 1);
-					double endTime = act.getStartTime();
-					if(Double.isInfinite(endTime) || endTime == 0)
-						endTime = leg.getDepartureTime() + leg.getTravelTime();
-					
-					t.addElement(leg, endTime);
-				}
-			}
-			trajectories.add(t);
-			}
+	public static void main(String args[]) {
+		int samples = 100000000;
+	
+		Random jdkRandom = new Random(4711);
+		long time = System.currentTimeMillis();
+		for(int i = 0; i < samples; i++) {
+			jdkRandom.nextDouble();
 		}
+		time = System.currentTimeMillis() - time;
+		System.out.println(String.format("JDK generator took %1$s msecs.", time));
 		
-		return trajectories;
+		Random well = new XORShiftRandom(4711);
+		well.setSeed(4711);
+		time = System.currentTimeMillis();
+		for(int i = 0; i < samples; i++) {
+				well.nextDouble();
+		}
+		time = System.currentTimeMillis() - time;
+		System.out.println(String.format("XORShift generator took %1$s msecs.", time));
 	}
 }

@@ -62,7 +62,7 @@ public class EstimRelation extends RunLocator<Double> {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(graphFile);
 		
-		estimRelation.targetDistr = Histogram.createHistogram(Degree.getInstance().distribution(graph.getVertices()), new LinearDiscretizer(1.0), false);
+		estimRelation.targetDistr = Histogram.createHistogram(Degree.getInstance().statistics(graph.getVertices()), new LinearDiscretizer(1.0), false);
 		/*
 		 * Locate and load run dirs.
 		 */

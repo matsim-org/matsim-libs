@@ -72,9 +72,9 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 					
 					writer.write(String.valueOf(i));
 					writer.write("\t");
-					writer.write(String.valueOf(module.distribution(male).getMean()));
+					writer.write(String.valueOf(module.statistics(male).getMean()));
 					writer.write("\t");
-					writer.write(String.valueOf(module.distribution(female).getMean()));
+					writer.write(String.valueOf(module.statistics(female).getMean()));
 					writer.newLine();
 				}
 				writer.close();

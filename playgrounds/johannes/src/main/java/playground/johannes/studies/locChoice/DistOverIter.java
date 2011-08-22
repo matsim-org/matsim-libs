@@ -39,7 +39,7 @@ public class DistOverIter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File rootDir = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/locationChoice/runs/run65/output/analysis");
+		File rootDir = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run5/output/analysis");
 		
 		TDoubleArrayList values = new TDoubleArrayList();
 		
@@ -52,6 +52,7 @@ public class DistOverIter {
 			while((line = reader.readLine()) != null) {
 				String[] tokens = line.split("\t");
 				if(tokens[0].equalsIgnoreCase("d_act_leisure")) {
+//				if(tokens[0].equalsIgnoreCase("scores_social")) {
 					double val = Double.parseDouble(tokens[1]);
 					values.add(val);
 				}
@@ -60,6 +61,7 @@ public class DistOverIter {
 		}
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(rootDir.getAbsolutePath() + "/d_act_leisure.txt"));
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(rootDir.getAbsolutePath() + "/scores_social.txt"));
 		writer.write("it\tdist");
 		writer.newLine();
 		for(int i = 0; i < values.size(); i++) {

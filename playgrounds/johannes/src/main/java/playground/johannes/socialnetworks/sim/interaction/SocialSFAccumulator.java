@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.sim.interaction;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -133,5 +134,16 @@ public class SocialSFAccumulator extends ScoringFunctionAccumulator {
 		}
 		
 		return times.toNativeArray();
+	}
+	
+	public double totalSocialScore() {
+		TObjectDoubleHashMap<Person> scores = getSocialScores();
+		TObjectDoubleIterator<Person> it = scores.iterator();
+		double sum = 0;
+		for(int i = 0; i < scores.size(); i++) {
+			it.advance();
+			sum += it.value();
+		}
+		return sum;
 	}
 }

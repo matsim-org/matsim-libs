@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -73,7 +74,8 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 		Trajectory t = trajectories.get(event.getPersonId());
 		int index = indices.get(event.getPersonId());
 		if(t == null) {
-			t = new Trajectory();
+			Person person = population.getPersons().get(event.getPersonId());
+			t = new Trajectory(person);
 			trajectories.put(event.getPersonId(), t);
 			indices.put(event.getPersonId(), 0);
 		}

@@ -168,6 +168,7 @@ public class AcceptanceProbability {
 
 						if (neighbor.getPoint() != null) {
 							double d = distanceCalculator.distance(p1, neighbor.getPoint());
+//							d = Math.max(d, 300);
 							if (d > 0) {
 								double n = n_d.get(discretizer.discretize(d));
 

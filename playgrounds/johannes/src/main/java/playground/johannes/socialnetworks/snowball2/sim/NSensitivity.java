@@ -189,7 +189,7 @@ public class NSensitivity {
 		
 		private void analyze(SampledGraph graph) {
 			estim1Norm.update(graph);
-			k_mean = degree.distribution(graph.getVertices()).getMean();
+			k_mean = degree.statistics(graph.getVertices()).getMean();
 			
 		}
 		

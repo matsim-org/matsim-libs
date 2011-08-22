@@ -142,8 +142,8 @@ public class EducationTask extends ModuleAnalyzerTask<Education> {
 				}
 //				double total = male.size() + female.size();
 				ObservedDegree degree = new ObservedDegree();
-				System.err.println("Degree academic = " + degree.distribution(academic).getMean());
-				System.err.println("Degree nonacademic = " + degree.distribution(nonacademic).getMean());
+				System.err.println("Degree academic = " + degree.statistics(academic).getMean());
+				System.err.println("Degree nonacademic = " + degree.statistics(nonacademic).getMean());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

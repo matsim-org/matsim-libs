@@ -207,7 +207,7 @@ public class EstimatorTest implements SamplerListener {
 
 	private void analyze(Graph graph, String output) throws IOException {
 		final int N = graph.getVertices().size();
-		DescriptiveStatistics k_distr = Degree.getInstance().distribution(graph.getVertices());
+		DescriptiveStatistics k_distr = Degree.getInstance().statistics(graph.getVertices());
 		final int k_max = (int) k_distr.getMax(); 
 		/*
 		 * initialize arrays

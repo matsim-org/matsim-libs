@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EdgeLengthTask.java
+ * XORShiftRandom.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial.analysis;
+package playground.johannes.socialnetworks.utils;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
+import java.util.Random;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class EdgeLengthTask extends AnalyzerTask {
+public class XORShiftRandom extends Random {
 
-	public static final String KEY = "d";
+	private static final long serialVersionUID = 1620841289225382129L;
+	
+	private long seed;
 
-	@Override
-	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		EdgeLength edgeLenght = EdgeLength.getInstance();
-		
-		DescriptiveStatistics stats = edgeLenght.statistics(graph.getEdges());
-		printStats(stats, KEY);
-		statsMap.put(KEY, stats);
-		
-		if(outputDirectoryNotNull()) {
-			try {
-				writeHistograms(stats, new LinearDiscretizer(1000.0), KEY, false);
-				writeHistograms(stats, KEY, 60, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	public XORShiftRandom() {
+		super();
 	}
 
+	public XORShiftRandom(long seed) {
+		super(seed);
+	}
+
+	@Override
+	public void setSeed(long seed) {
+		if (seed == 0)
+			throw new IllegalArgumentException("Zero is not allowd as seed number.");
+		else
+			this.seed = seed;
+
+		super.setSeed(seed);
+	}
+
+	protected int next(int nbits) {
+		long x = this.seed;
+		x ^= (x << 21);
+		x ^= (x >>> 35);
+		x ^= (x << 4);
+		this.seed = x;
+		x &= ((1L << nbits) - 1);
+		return (int) x;
+	}
 }

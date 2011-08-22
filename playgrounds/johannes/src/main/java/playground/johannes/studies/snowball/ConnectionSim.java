@@ -140,7 +140,7 @@ public class ConnectionSim {
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
 		composite.addTask(new GraphSizeTask());
 		composite.addTask(new WaveSizeTask());
-//		composite.addTask(new ComponentsTask());
+		composite.addTask(new ComponentsTask());
 		composite.addTask(new IterationTask());
 //		composite.addTask(new ClosenessSeed2Seed());
 		composite.addTask(new SeedAPLTask());

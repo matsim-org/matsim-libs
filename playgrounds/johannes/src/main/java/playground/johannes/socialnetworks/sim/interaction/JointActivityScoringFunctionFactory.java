@@ -91,9 +91,10 @@ public class JointActivityScoringFunctionFactory extends CharyparNagelScoringFun
 			scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(getParams()));
 			scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(getParams()));
 			
-			for(Person alter : alters) {
-				JointActivityScorer scorer = new JointActivityScorer(plan.getPerson(), alter, tracker, beta_join);
-				scoringFunctionAccumulator.addScoringFunction(scorer, alter);
+//			for(Person alter : alters) {
+			for(SocialVertex alter : ego.getNeighbours()) {
+				JointActivityScorer scorer = new JointActivityScorer(ego, alter, tracker, beta_join);
+				scoringFunctionAccumulator.addScoringFunction(scorer, alter.getPerson().getPerson());
 			}
 			
 			accumulators.put(plan.getPerson(), scoringFunctionAccumulator);
@@ -145,6 +146,15 @@ public class JointActivityScoringFunctionFactory extends CharyparNagelScoringFun
 		for(SocialSFAccumulator accumulator : accumulators.values()) {
 			for(double time : accumulator.joinTimes())
 				stats.addValue(time);
+		}
+		
+		return stats;
+	}
+	
+	public DescriptiveStatistics socialScoreStatistics() {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for(SocialSFAccumulator accumulator : accumulators.values()) {
+			stats.addValue(accumulator.totalSocialScore());
 		}
 		
 		return stats;

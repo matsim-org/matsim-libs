@@ -89,10 +89,10 @@ public class DegreeIterationTask extends ModuleAnalyzerTask<Degree> {
 		
 		for(int it : keys) {
 			Set<SampledVertex> vertices = verticesIt.get(it);
-			kIt.put(it,module.distribution(vertices).getMean());
+			kIt.put(it,module.statistics(vertices).getMean());
 			
 			vertices = verticesItAcc.get(it);
-			kItAcc.put(it, module.distribution(vertices).getMean());
+			kItAcc.put(it, module.statistics(vertices).getMean());
 		}
 		
 		if(getOutputDirectory() == null) {

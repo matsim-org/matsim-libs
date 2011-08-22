@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.locationChoice;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -29,15 +31,14 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * @author illenberger
  *
  */
-public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsListener, IterationEndsListener {
+public class MultiPlanSelector implements IterationStartsListener, IterationEndsListener {
 
-	private static final Logger logger = Logger.getLogger(NegatedGibbsPlanSelector.class);
+	private static final Logger logger = Logger.getLogger(MultiPlanSelector.class);
 	
 	private final double beta;
 	
@@ -63,35 +64,42 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 	
 	private DescriptiveStatistics transitionProbas;
 	
-	public NegatedGibbsPlanSelector(double beta, Random random) {
+	public MultiPlanSelector(double beta, Random random) {
 		this.beta = beta;
 		this.random = random;
 		this.notifyIterationStarts(null);
 	}
 	
-	@Override
-	public Plan selectPlan(Person person) {
+	
+	public Set<Plan> selectPlan(Set<Person> persons) {
 		
-		if(person.getPlans().size() > 2)
-			throw new IllegalArgumentException("Person has more than two plans!");
+//		if(person.getPlans().size() > 2)
+//			throw new IllegalArgumentException("Person has more than two plans!");
 		
-		Plan newPlan;
-		Plan oldPlan;
+		Set<Plan> newPlans = new HashSet<Plan>();
+		Set<Plan> oldPlans = new HashSet<Plan>();
 		
-		if(person.getPlans().get(0).isSelected()) {
-			newPlan = person.getPlans().get(0);
-			oldPlan = person.getPlans().get(1);
-		} else if(person.getPlans().get(1).isSelected()) {
-			newPlan = person.getPlans().get(1);
-			oldPlan = person.getPlans().get(0);
-		} else {
-			throw new IllegalArgumentException("No selected plan!");
+		for (Person person : persons) {
+			if (person.getPlans().get(0).isSelected()) {
+				newPlans.add(person.getPlans().get(0));
+				oldPlans.add(person.getPlans().get(1));
+			} else if (person.getPlans().get(1).isSelected()) {
+				newPlans.add(person.getPlans().get(1));
+				oldPlans.add(person.getPlans().get(0));
+			} else {
+				throw new IllegalArgumentException("No selected plan!");
+			}
 		}
 		
-		double newScore = newPlan.getScore();
-		double oldScore = Double.NEGATIVE_INFINITY;
-		if(oldPlan.getScore() != null)
-			oldScore = oldPlan.getScore();
+		double newScore = 0;
+		for(Plan plan : newPlans)
+			newScore += plan.getScore();
+		
+		double oldScore = 0;
+		for(Plan plan : oldPlans) {
+			if(plan.getScore() != null)
+				oldScore += plan.getScore();
+		}
 		
 		double delta = oldScore - newScore;
 		double p = 1 / (1 + Math.exp(beta * delta));
@@ -106,17 +114,21 @@ public class NegatedGibbsPlanSelector implements PlanSelector, IterationStartsLi
 			 * accept, i.e., remove the old plan
 			 */
 			cntAccept++;
-			scoreAccept += oldPlan.getScore();
-			acceptedScores.addValue(oldPlan.getScore());
-			return oldPlan;
+			for(Plan plan : oldPlans) {
+				scoreAccept += plan.getScore();
+				acceptedScores.addValue(plan.getScore());
+			}
+			return oldPlans;
 		} else {
 			/*
 			 * reject, i.e., remove the new plan
 			 */
 			cntReject++;
-			scoreReject += newPlan.getScore();
-			rejectedScores.addValue(newPlan.getScore());
-			return newPlan;
+			for(Plan plan : newPlans) {
+				scoreReject += plan.getScore();
+				rejectedScores.addValue(plan.getScore());
+			}
+			return newPlans;
 		}
 	}
 

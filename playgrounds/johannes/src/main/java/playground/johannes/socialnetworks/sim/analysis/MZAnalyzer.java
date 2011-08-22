@@ -54,9 +54,9 @@ public class MZAnalyzer {
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/plans/plans.sun.car.xml");
+//		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/plans/plans.sun.car.xml");
 //		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/plans/plans.wday.aggacts.xml");
-//		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/data/plans.init.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/data/plans.sun.14473.xml");
 		
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.leisure.xml");
@@ -74,19 +74,19 @@ public class MZAnalyzer {
 		TrajectoryAnalyzerTaskComposite tComposite = new TrajectoryAnalyzerTaskComposite();
 		tComposite.addTask(new LegDurationTask());
 //		tComposite.addTask(new ActivityDistanceTask(scenario.getNetwork(), 21781, new CartesianDistanceCalculator()));
-		tComposite.addTask(new ActivityDistanceTask(null, 4326, new OrthodromicDistanceCalculator()));
+//		tComposite.addTask(new ActivityDistanceTask(null, 4326, new OrthodromicDistanceCalculator()));
 		tComposite.addTask(new ActivityLoadTask());
 		tComposite.addTask(new ActivityDurationTask());
 		tComposite.addTask(new ActivityStartTimeTask());
 		tComposite.addTask(new LegLoadTask());
-		tComposite.addTask(new TripAcceptanceTask(((ScenarioImpl) scenario).getActivityFacilities()));
+//		tComposite.addTask(new TripAcceptanceTask(((ScenarioImpl) scenario).getActivityFacilities()));
 		System.out.println("Num persons: " + scenario.getPopulation().getPersons().size());
 //		PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), trajectories, composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/aggacts/sun/");
 		
 //		PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/aggacts/wday/");
 //		PlansAnalyzer.analyzeSelectedPlans(scenario.getPopulation(), trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/data/plans.init/");
 		
-		TrajectoryAnalyzer.analyze(trajectories, tComposite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/sun/");
+		TrajectoryAnalyzer.analyze(trajectories, tComposite, "/Users/jillenberger/Work/socialnets/locationChoice/data/plans.sun.14473/");
 
 	}
 

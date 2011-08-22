@@ -124,7 +124,7 @@ public class DegreeGrowth implements SamplerListener {
 	}
 
 	private void dump(Sampler<?,?,?> sampler) {
-		DescriptiveStatistics stats = ObservedDegree.getInstance().distribution(sampler.getSampledGraph().getVertices());
+		DescriptiveStatistics stats = ObservedDegree.getInstance().statistics(sampler.getSampledGraph().getVertices());
 		if (prevStats != null) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, false);
 			TDoubleDoubleHashMap prevHist = Histogram.createHistogram(prevStats, discretizer, false);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityDurationTask.java
+ * ScoreAnalyzerTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,41 +21,52 @@ package playground.johannes.socialnetworks.sim.analysis;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
+
+import playground.johannes.socialnetworks.sim.interaction.JointActivityScoringFunctionFactory;
+import playground.johannes.socialnetworks.sim.locationChoice.MultiPlanSelector;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityDurationTask extends TrajectoryAnalyzerTask {
+public class ScoreAnalyzerTask extends TrajectoryAnalyzerTask {
 
-	public final static String KEY = "dur";
+	private MultiPlanSelector selector;
+	
+	private JointActivityScoringFunctionFactory factory;
+	
+	public ScoreAnalyzerTask(MultiPlanSelector selector, JointActivityScoringFunctionFactory factory) {
+		this.selector = selector;
+		this.factory = factory;
+	}
 	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		ActivityDuration duration = new ActivityDuration();
+		results.put("scores_old", selector.getOldScores());
+		results.put("scores_new", selector.getNewScores());
+		results.put("scores_delta", selector.getDeltaScores());
+		results.put("scores_accepted", selector.getAcceptedScores());
+		results.put("scores_rejected", selector.getRejectedScores());
+		results.put("transitionproba", selector.getTransitionProbas());
 		
-		Map<String, DescriptiveStatistics> map = duration.statistics(trajectories);
-		for(Entry<String, DescriptiveStatistics> entry : map.entrySet()) {
-			String type = entry.getKey();
-			DescriptiveStatistics stats = entry.getValue();
-			
-			String subKey = String.format("%1$s_%2$s", KEY, type);
-			results.put(subKey, stats);
-			
-			if(outputDirectoryNotNull()) {
-				try {
-//					writeHistograms(stats, subKey, 50, 50);
-					writeHistograms(stats, new LinearDiscretizer(60), subKey, false);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		DescriptiveStatistics stats = factory.socialScoreStatistics();
+		results.put("scores_social", stats);
+		
+		try {
+			writeHistograms(selector.getOldScores(), "scores_old", 50, 1);
+			writeHistograms(selector.getNewScores(), "scores_new", 50, 1);
+			writeHistograms(selector.getDeltaScores(), "scores_delta", 50, 1);
+			writeHistograms(selector.getAcceptedScores(), "scores_accepted", 50, 1);
+			writeHistograms(selector.getRejectedScores(), "scores_rejected", 50, 1);
+			writeHistograms(selector.getTransitionProbas(), "transitionproba", 50, 1);
+			writeHistograms(stats, "scores_social", 50, 1);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 }

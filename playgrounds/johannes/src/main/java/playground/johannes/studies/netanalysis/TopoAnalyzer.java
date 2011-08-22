@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.sna.util.MultiThreading;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
@@ -53,6 +54,9 @@ public class TopoAnalyzer {
 		
 		if(output != null)
 			composite.setOutputDirectoy(output);
+		
+		if(args.length > 2)			
+			MultiThreading.setNumAllowedThreads(Integer.parseInt(args[2]));
 		
 		GraphAnalyzer.analyze(graph, composite, output);
 	}
