@@ -86,7 +86,8 @@ public class SfCottbusPtSchedule {
 		for(int nLines = 0; nLines<24; nLines++) {
 			List<String> transitStopIdStrings = new ArrayList<String>();
 			List<String> stopLinkString = new ArrayList<String>();
-			String linesfile = lines[nLines]+".csv";
+			String lineName = lines[nLines];
+			String linesfile = lineName+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
 			if (nLines <=7) cottbus.pt_mode="tram";
 			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
@@ -102,13 +103,15 @@ public class SfCottbusPtSchedule {
 			String[] routes = null;
 			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
 			
+			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
+//			cottbus.addDeparturesToRoute(transRoute, firstDep, lastDep, frequency);
 			
-						
+			TransitLine transLine = cottbus.createTransitLine(transRoute, lineName);
+			
+			cottbus.schedule.addTransitLine(transLine);
 		}
 		
-		
-//		cottbus.schedule.addTransitLine(cottbus.createTransitLine());
-		
+			
 		
 	}
 	
@@ -126,8 +129,8 @@ public class SfCottbusPtSchedule {
 		return lines;
 	}
 	
-	private TransitLine createTransitLine(TransitScheduleFactory stf, TransitRoute transitRoute, String lineId) {
-		TransitLine transitLine = stf.createTransitLine(new IdImpl(lineId));
+	private TransitLine createTransitLine(TransitRoute transitRoute, String lineId) {
+		TransitLine transitLine = this.schedulefactory.createTransitLine(new IdImpl(lineId));
 		transitLine.addRoute(transitRoute);
 		return transitLine;
 	}
@@ -136,8 +139,8 @@ public class SfCottbusPtSchedule {
 		
 	}
 	
-	private TransitRoute createTransitRoute(String transitRouteId, NetworkRoute netRoute, List<TransitRouteStop> stopList, String pt_mode) {
-		TransitRoute transitRoute = this.schedulefactory.createTransitRoute(new IdImpl(transitRouteId), netRoute, stopList, pt_mode);
+	private TransitRoute createTransitRoute(String transitRouteId, NetworkRoute netRoute, List<TransitRouteStop> stopList) {
+		TransitRoute transitRoute = this.schedulefactory.createTransitRoute(new IdImpl(transitRouteId), netRoute, stopList, this.pt_mode);
 		return transitRoute;
 	}
 	
