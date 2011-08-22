@@ -52,6 +52,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
@@ -690,7 +691,27 @@ public class ControlerTest {
 		
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+	}
+	
+	@Test
+	public void testOTFVisSnapshotWriterOnQSim() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.controler().setMobsim("qsim");
+		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		qSimConfigGroup.setSnapshotFormat("otfvis");
+		qSimConfigGroup.setSnapshotPeriod(600);
+		qSimConfigGroup.setSnapshotStyle("equiDist");
+		config.addQSimConfigGroup(qSimConfigGroup);
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -709,7 +730,27 @@ public class ControlerTest {
 		
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "googleearth.kmz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "googleearth.kmz")).exists());
+	}
+	
+	@Test
+	public void testKMLSnapshotWriterOnQSim() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.controler().setMobsim("qsim");
+		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		qSimConfigGroup.setSnapshotFormat("googleearth");
+		qSimConfigGroup.setSnapshotPeriod(600);
+		qSimConfigGroup.setSnapshotStyle("equiDist");
+		config.addQSimConfigGroup(qSimConfigGroup);
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -728,7 +769,27 @@ public class ControlerTest {
 		
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new QueueSimulationFactory());
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
+	}
+	
+	@Test
+	public void testTransimsSnapshotWriterOnQSim() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(2);
+		config.controler().setMobsim("qsim");
+		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		qSimConfigGroup.setSnapshotFormat("transims");
+		qSimConfigGroup.setSnapshotPeriod(600);
+		qSimConfigGroup.setSnapshotStyle("equiDist");
+		config.addQSimConfigGroup(qSimConfigGroup);
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
