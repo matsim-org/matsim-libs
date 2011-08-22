@@ -58,7 +58,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	public PublicTransportNetworkPanel(PublicTransportNetworkWindow window, NetworkPainter networkPainter) {
 		super();
 		this.window = window;
-		layers.add(new Layer(networkPainter));
+		addLayer(new Layer(networkPainter));
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
 		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
@@ -72,7 +72,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)layers.get(0).getPainter()).getNetworkManager().getNetworkLinks()) {
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkManager().getNetworkLinks()) {
 			if(link!=null) {
 				coords.add(link.getFromNode().getCoord());
 				coords.add(link.getToNode().getCoord());
@@ -131,10 +131,10 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 			viewAll();
 			break;
 		case 't':
-			((PublicTransportNetworkPainter)layers.get(0).getPainter()).setWeight(((PublicTransportNetworkPainter)layers.get(0).getPainter()).getWeight()/1.5f);
+			((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).setWeight(((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).getWeight()/1.5f);
 			break;
 		case 'g':
-			((PublicTransportNetworkPainter)layers.get(0).getPainter()).setWeight(((PublicTransportNetworkPainter)layers.get(0).getPainter()).getWeight()*1.5f);
+			((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).setWeight(((PublicTransportNetworkPainter)getPrincipalLayer().getPainter()).getWeight()*1.5f);
 			break;
 		}
 		repaint();

@@ -14,7 +14,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkManager {
 	
 	//Attributes
-	private final Network network;
+	protected final Network network;
 	private Id selectedLinkId;
 	private Id selectedNodeId;
 	
@@ -36,13 +36,10 @@ public class NetworkManager {
 			return network.getNodes().get(selectedNodeId);
 		return null;
 	}
-	public Network getNetwork() {
-		return network;
-	}
 	public Collection<? extends Link> getNetworkLinks() {
 		return network.getLinks().values();
 	}
-	private Id getIdNearestLink(double x, double y) {
+	protected Id getIdNearestLink(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
@@ -62,7 +59,7 @@ public class NetworkManager {
 		}
 		return null;
 	}
-	private Id getIdNearestNode(double x, double y) {
+	protected Id getIdNearestNode(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
@@ -96,4 +93,5 @@ public class NetworkManager {
 	public String refreshNode() {
 		return selectedNodeId==null?"":selectedNodeId.toString();
 	}
+	
 }

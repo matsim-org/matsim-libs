@@ -7,6 +7,7 @@ public class Layer {
 	
 	//Attributes
 	private boolean visible;
+	private final boolean active;
 	private final Painter painter;
 	
 	//Method
@@ -14,6 +15,13 @@ public class Layer {
 		super();
 		this.painter = painter;
 		visible = true;
+		active = true;
+	}
+	public Layer(Painter painter, boolean active) {
+		super();
+		this.painter = painter;
+		visible = true;
+		this.active = active;
 	}
 	public Painter getPainter() {
 		return painter;
@@ -24,6 +32,9 @@ public class Layer {
 	}
 	public void changeVisible() {
 		visible = !visible;
+	}
+	public boolean isActive() {
+		return active;
 	}
 	
 }

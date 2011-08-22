@@ -22,7 +22,7 @@ public abstract class LayersPanel extends JPanel {
 	//Attributes
 	protected Color backgroundColor = Color.WHITE;
 	protected final Camera camera;
-	protected final List<Layer> layers;
+	private final List<Layer> layers;
 	private int width;
 	private int height;
 	private double xMax;
@@ -30,6 +30,8 @@ public abstract class LayersPanel extends JPanel {
 	private double xMin;
 	private double yMin;
 	private int frameSize=20;
+	protected byte activeLayer = 0;
+	protected byte principalLayer = 0;
 	
 	//Methods
 	public LayersPanel() {
@@ -38,6 +40,33 @@ public abstract class LayersPanel extends JPanel {
 	}
 	public Camera getCamera() {
 		return camera;
+	}
+	protected Collection<Layer> getAllLayers() {
+		return layers;
+	}
+	protected void addLayer(Layer layer) {
+		layers.add(layer);
+	}
+	protected Layer getActiveLayer() {
+		return layers.get(activeLayer);
+	}
+	protected void changeActiveLayer() {
+		do {
+			activeLayer++;
+		} while(activeLayer<layers.size() && !layers.get(activeLayer).isActive());
+		if(activeLayer>=layers.size()) {
+			activeLayer = 0;
+			while(!layers.get(activeLayer).isActive())
+				activeLayer++;
+		}
+	}
+	protected Layer getPrincipalLayer() {
+		return layers.get(principalLayer);
+	}
+	protected void swapLayers(int positionA, int positionB) {
+		Layer temporalLayer = layers.get(positionA);
+		layers.set(positionA, layers.get(positionB));
+		layers.set(positionB, temporalLayer);
 	}
 	public void setFrameSize(int frameSize) {
 		this.frameSize = frameSize;

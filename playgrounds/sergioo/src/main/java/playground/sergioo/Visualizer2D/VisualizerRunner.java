@@ -7,7 +7,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleNetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleSelectionNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport.PublicTransportNetworkWindow;
 
@@ -21,7 +21,7 @@ public class VisualizerRunner {
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 		PublicTransportNetworkWindow window = null;
 		if(args.length<3)
-			window = new PublicTransportNetworkWindow(args[0], new SimpleNetworkPainter(scenario.getNetwork()));
+			window = new PublicTransportNetworkWindow(args[0], new SimpleSelectionNetworkPainter(scenario.getNetwork()));
 		else {
 			((ScenarioImpl)scenario).getConfig().scenario().setUseTransit(true);
 			new TransitScheduleReader(scenario).readFile(args[2]);
