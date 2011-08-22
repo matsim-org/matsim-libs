@@ -74,7 +74,7 @@ public class DoubleNetworkWindow extends LayersWindow implements ActionListener 
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkPanel(this, networkPainterA, networkPainterB));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(this, networkPainterA, networkPainterB));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
