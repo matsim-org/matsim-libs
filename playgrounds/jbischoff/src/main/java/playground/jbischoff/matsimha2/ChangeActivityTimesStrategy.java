@@ -42,7 +42,8 @@ public class ChangeActivityTimesStrategy implements PlanStrategy {
 		
 		
 		// Hier wird das (selbst geschriebene) Modul zum Umplanen der Aktivitäten hinzugefügt.
-		ChangeActivityTimesAdvanced mod = new ChangeActivityTimesAdvanced();
+//		ChangeActivityTimesAdvanced mod = new ChangeActivityTimesAdvanced();
+		ChangeActivityTimesEasy mod = new ChangeActivityTimesEasy();
 		addStrategyModule(mod) ;
 
 		// Wenn das Modul mitlesen soll, was auf dem Netz geschieht, muss es als EventHandler

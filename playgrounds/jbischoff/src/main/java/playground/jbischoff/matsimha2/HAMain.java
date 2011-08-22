@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package playground.jbischoff.matsimha2;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
-import playground.jbischoff.BAsignals.controler.JBSignalControllerListenerFactory;
 
 
 /**

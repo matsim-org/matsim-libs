@@ -7,15 +7,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
 public class ChangeActivityTimesEasy implements PlanStrategyModule, ActivityEndEventHandler {
 
 	
 	private double VARIATION;
-public double getVARIATION() {
+	
+	public double getVARIATION() {
 		return VARIATION;
 	}
 

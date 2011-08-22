@@ -2,19 +2,15 @@ package playground.jbischoff.matsimha2;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 
-public class ChangeActivityTimesAdvanced implements PlanStrategyModule, ActivityEndEventHandler, ActivityStartEventHandler {
+public class ChangeActivityTimesAdvanced implements PlanStrategyModule, ActivityEndEventHandler {
 
 	
 	private Map<Id,Double> lastWorkActivitStartTimes;
@@ -40,7 +36,7 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 		Leg legtowork = (Leg) plan.getPlanElements().get(1);
 //		Leg legfromwork = (Leg) plan.getPlanElements().get(3);
 						
-		double offset = workact.getStartTime()-this.getLastWorkActivityEndTime(plan.getPerson().getId());
+		double offset = workact.getEndTime()-this.getLastWorkActivityEndTime(plan.getPerson().getId());
 		System.out.println("Offset for agent:"+plan.getPerson().getId()+" is "+ offset +"with et:"+workact.getEndTime()+" and LET "+this.getLastWorkActivityEndTime(plan.getPerson().getId()));
 		
 		
@@ -74,7 +70,7 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 		
 		if (event.getActType().equals("w")){
 			this.lastWorkActivitStartTimes.put(person, event.getTime());
-//			System.out.println("Event occured");
+			System.out.println("Event occured");
 			
 		}
 	}
@@ -90,21 +86,8 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 	}
 
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		
-		
-		Id person = event.getPersonId();
-		
-//		System.out.println(event.getActType() + " Start Event occured");
-		
-		
-		if (event.getActType().equals("w")){
-			this.lastWorkActivitStartTimes.put(person, event.getTime());
-//			System.out.println("Event occured");
-			
-		}
-	}
+
+	
 
 
 }
