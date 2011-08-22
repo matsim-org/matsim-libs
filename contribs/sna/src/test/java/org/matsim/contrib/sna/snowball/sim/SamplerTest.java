@@ -65,7 +65,7 @@ public class SamplerTest extends TestCase {
 		for (int it = 0; it <= sampler.getIteration(); it++) {
 			Set<? extends SampledVertex> vertices = SnowballPartitions.createSampledPartition(sampler.getSampledGraph()
 					.getVertices(), it);
-			DescriptiveStatistics distr = degree.distribution(vertices);
+			DescriptiveStatistics distr = degree.statistics(vertices);
 
 			String reference = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getPackageInputDirecoty(getClass()), it);
 			String tmp = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getOutputDirectory(), it);

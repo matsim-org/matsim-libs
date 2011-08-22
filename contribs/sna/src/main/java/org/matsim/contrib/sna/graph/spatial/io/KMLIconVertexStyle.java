@@ -49,7 +49,8 @@ import org.matsim.vis.kml.KMZWriter;
  */
 public class KMLIconVertexStyle implements KMLObjectStyle, KMZWriterListener {
 
-	private static final String ICON_HREF = "vertex.png";
+//	private static final String ICON_HREF = "vertex.png";
+	private static final String ICON_HREF = "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png";
 
 	private final ObjectFactory kmlFactory = new ObjectFactory();
 
@@ -133,7 +134,7 @@ public class KMLIconVertexStyle implements KMLObjectStyle, KMZWriterListener {
 		for (Color c : colors) {
 			IconStyleType kmlIconStyle = kmlFactory.createIconStyleType();
 			kmlIconStyle.setIcon(kmlIconLink);
-			kmlIconStyle.setScale(0.5);
+			kmlIconStyle.setScale(0.75);
 			kmlIconStyle.setColor(new byte[] { (byte) c.getAlpha(), (byte) c.getBlue(), (byte) c.getGreen(),
 					(byte) c.getRed() });
 
@@ -182,11 +183,11 @@ public class KMLIconVertexStyle implements KMLObjectStyle, KMZWriterListener {
 	 */
 	@Override
 	public void openWriter(KMZWriter writer) {
-		try {
-			writer.addNonKMLFile(MatsimResource.getAsInputStream(iconName), ICON_HREF);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+////			writer.addNonKMLFile(MatsimResource.getAsInputStream(iconName), ICON_HREF);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 }

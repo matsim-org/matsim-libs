@@ -57,7 +57,7 @@ public class DegreeTest extends TestCase {
 		
 		Degree degree = Degree.getInstance();
 		
-		DescriptiveStatistics stats = degree.distribution(graph.getVertices());
+		DescriptiveStatistics stats = degree.statistics(graph.getVertices());
 		assertEquals(2.33, stats.getMean(), 0.01);
 		assertEquals(2.0, stats.getMin());
 		assertEquals(3.0, stats.getMax());

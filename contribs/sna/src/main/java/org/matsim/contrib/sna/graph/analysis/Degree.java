@@ -54,7 +54,7 @@ public class Degree extends AbstractVertexProperty {
 	 *            
 	 * @return a descriptive statistics object.
 	 */
-	public DescriptiveStatistics distribution(Set<? extends Vertex> vertices) {
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
 		DescriptiveStatistics distribution = new DescriptiveStatistics();
 		for (Vertex v : vertices)
 			distribution.addValue(v.getEdges().size());

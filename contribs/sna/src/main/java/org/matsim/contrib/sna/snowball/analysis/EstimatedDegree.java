@@ -73,7 +73,7 @@ public class EstimatedDegree extends Degree {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public DescriptivePiStatistics distribution(Set<? extends Vertex> vertices) {
+	public DescriptivePiStatistics statistics(Set<? extends Vertex> vertices) {
 		DescriptivePiStatistics stats = factory.newInstance();
 	
 		int p0 = 0;

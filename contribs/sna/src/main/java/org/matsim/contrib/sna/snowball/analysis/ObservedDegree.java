@@ -58,8 +58,8 @@ public class ObservedDegree extends Degree {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public DescriptiveStatistics distribution(Set<? extends Vertex> vertices) {
-		return super.distribution(SnowballPartitions.<SampledVertex> createSampledPartition((Set<SampledVertex>) vertices));
+	public DescriptiveStatistics statistics(Set<? extends Vertex> vertices) {
+		return super.statistics(SnowballPartitions.<SampledVertex> createSampledPartition((Set<SampledVertex>) vertices));
 	}
 
 	/**

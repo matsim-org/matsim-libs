@@ -51,7 +51,7 @@ public class VertexDegreeColorizer implements Colorizable {
 	 */
 	public VertexDegreeColorizer(Graph graph) {
 		Degree degree = Degree.getInstance();
-		DescriptiveStatistics distr = degree.distribution(graph.getVertices());
+		DescriptiveStatistics distr = degree.statistics(graph.getVertices());
 		k_min = (int) distr.getMin();
 		k_max = (int) distr.getMax();
 	}
