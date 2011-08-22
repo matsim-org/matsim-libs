@@ -20,8 +20,10 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -46,6 +48,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String RUNID = "runId";
 	private static final String LINKTOLINK_ROUTING_ENABLED = "enableLinkToLinkRouting";
 	/*package*/ static final String EVENTS_FILE_FORMAT = "eventsFileFormat";
+	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	/*package*/ static final String MOBSIM = "mobsim";
@@ -63,7 +66,7 @@ public class ControlerConfigGroup extends Module {
 
 	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
-
+	private Set<String> snapshotFormat = Collections.emptySet();
 	private String mobsim = null;
 
 	public ControlerConfigGroup() {
@@ -100,7 +103,18 @@ public class ControlerConfigGroup extends Module {
 //			return Integer.toString(getWriteEventsInterval());
 		} else if (MOBSIM.equals(key)) {
 			return getMobsim();
-		} else {
+		} else if (SNAPSHOT_FORMAT.equals(key)) {
+			boolean isFirst = true;
+			StringBuilder str = new StringBuilder();
+			for (String format : this.snapshotFormat) {
+				if (!isFirst) {
+					str.append(',');
+				}
+				str.append(format.toString());
+				isFirst = false;
+			}
+			return str.toString();
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -145,6 +159,16 @@ public class ControlerConfigGroup extends Module {
 			setWritePlansInterval(Integer.parseInt(value));
 		} else if (MOBSIM.equals(key)) {
 			setMobsim(value);
+		} else if (SNAPSHOT_FORMAT.equals(key)) {
+			String[] parts = StringUtils.explode(value, ',');
+			Set<String> formats = new HashSet<String>();
+			for (String part : parts) {
+				String trimmed = part.trim();
+				if (trimmed.length() > 0) {
+					formats.add(trimmed);
+				}
+			}
+			this.snapshotFormat = formats;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -163,6 +187,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(WRITE_EVENTS_INTERVAL, Integer.toString(this.getWriteEventsInterval()) );
 		map.put(WRITE_PLANS_INTERVAL, Integer.toString(this.getWritePlansInterval()) );
 		map.put(MOBSIM, getValue(MOBSIM));
+		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
 		return map;
 	}
 
@@ -177,6 +202,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim");
+		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.") ;
 		return map;
 	}
 
@@ -236,6 +262,21 @@ public class ControlerConfigGroup extends Module {
 
 	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
+	}
+	
+	/** See "getComments()" for options.
+	 *
+	 * @param snapshotFormat
+	 */
+	public void setSnapshotFormat(final Collection<String> snapshotFormat) {
+		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<String>(snapshotFormat));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotFormat()
+	 */
+	public Collection<String> getSnapshotFormat() {
+		return this.snapshotFormat;
 	}
 
 	public int getWriteEventsInterval() {

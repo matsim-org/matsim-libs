@@ -131,8 +131,6 @@ public class OTFVisFromLastIteration {
 		}
 
 		
-		otfVisQSim.setControlerIO(controlerIO);
-		otfVisQSim.setIterationNumber(sc.getConfig().controler().getLastIteration());
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);
 		OTFClientLive.run(config, server);
 		otfVisQSim.run();

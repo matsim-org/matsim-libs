@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.data.fileio;
+package org.matsim.vis.otfvis;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -37,8 +37,8 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis2.SnapshotWriterQuadTree;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The writer is in charge of writing mvi data into a file.
@@ -52,11 +52,7 @@ public final class OTFFileWriter implements SnapshotWriter {
 	private static final int FILE_BUFFERSIZE = 50000000; // ~50MB
 
 	private OTFServerQuadTree quad;
-	private final double interval_s;
-	private double nextTime = -1;
-
 	private ZipOutputStream zos;
-	private DataOutputStream outFile;
 	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private final OTFConnectionManager connect;
 	private String outFileName;
@@ -66,8 +62,7 @@ public final class OTFFileWriter implements SnapshotWriter {
 
 	private final OTFAgentsListHandler.Writer writer;
 
-	public OTFFileWriter(final double intervall_s, Network network, String outfilename) {
-		this.interval_s = intervall_s;
+	public OTFFileWriter(Network network, String outfilename) {
 		this.connect = new OTFConnectionManager();
 		this.connect.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -103,12 +98,12 @@ public final class OTFFileWriter implements SnapshotWriter {
 	private void writeConstData() {
 		try {
 			this.zos.putNextEntry(new ZipEntry("const.bin"));
-			this.outFile = new DataOutputStream(this.zos);
+			DataOutputStream outFile = new DataOutputStream(this.zos);
 			this.buf.position(0);
-			this.outFile.writeDouble(-1.);
+			outFile.writeDouble(-1.);
 			this.quad.writeConstData(this.buf);
-			this.outFile.writeInt(this.buf.position());
-			this.outFile.write(this.buf.array(), 0, this.buf.position());
+			outFile.writeInt(this.buf.position());
+			outFile.write(this.buf.array(), 0, this.buf.position());
 			this.zos.closeEntry();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -122,23 +117,19 @@ public final class OTFFileWriter implements SnapshotWriter {
 	}
 
 	public boolean dump(final int time_s) {
-		if (time_s >= this.nextTime) {
-			writeDynData(time_s);
-			this.nextTime = time_s + this.interval_s;
-			return true;
-		}
-		return false;
+		writeDynData(time_s);
+		return true;
 	}
 
 	private void writeDynData(final int time_s) {
 		try {
 			this.zos.putNextEntry(new ZipEntry("step." + time_s + ".bin"));
-			this.outFile = new DataOutputStream(this.zos);
+			DataOutputStream outFile = new DataOutputStream(this.zos);
 			this.buf.position(0);
-			this.outFile.writeDouble(time_s);
+			outFile.writeDouble(time_s);
 			this.quad.writeDynData(null, this.buf);
-			this.outFile.writeInt(this.buf.position());
-			this.outFile.write(this.buf.array(), 0, this.buf.position());
+			outFile.writeInt(this.buf.position());
+			outFile.write(this.buf.array(), 0, this.buf.position());
 			this.zos.closeEntry();
 		} catch (IOException e) {
 			e.printStackTrace();

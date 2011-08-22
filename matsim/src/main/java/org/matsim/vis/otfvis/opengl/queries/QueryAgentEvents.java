@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
  * 

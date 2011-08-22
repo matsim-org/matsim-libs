@@ -67,7 +67,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
-	private String snapshotFormat = "";
 	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
@@ -93,8 +92,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setTimeStepSize(Time.parseTime(value));
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			setSnapshotPeriod(Time.parseTime(value));
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			setSnapshotFormat(value);
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			setSnapshotStyle(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -133,7 +130,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(END_TIME, Time.writeTime(getEndTime()));
 		map.put(TIME_STEP_SIZE, Time.writeTime(getTimeStepSize()));
 		map.put(SNAPSHOT_PERIOD, Time.writeTime(getSnapshotPeriod()));
-		map.put(SNAPSHOT_FORMAT, getSnapshotFormat());
 		map.put(SNAPSHOT_STYLE, getSnapshotStyle());
 		map.put(FLOW_CAPACITY_FACTOR, String.valueOf(getFlowCapFactor()));
 		map.put(STORAGE_CAPACITY_FACTOR, String.valueOf(getStorageCapFactor()));
@@ -213,17 +209,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
-	}
-
-	/** See "getComments()" for options.
-	 */
-	public void setSnapshotFormat(final String snapshotFormat) {
-		this.snapshotFormat = snapshotFormat;
-	}
-
-	@Override
-	public String getSnapshotFormat() {
-		return this.snapshotFormat;
 	}
 
 	public void setFlowCapFactor(final double flowCapFactor) {

@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisNode;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.

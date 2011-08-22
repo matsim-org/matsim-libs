@@ -21,8 +21,8 @@ package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
 
 /**
  * @author dgrether
@@ -31,14 +31,14 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 public class QueueSimulationFactory implements MobsimFactory {
 
 	@Deprecated // use (new QueueSimulationFactory()).createMobsim(...) instead.  kai, may'10
-  public static QueueSimulation createMobsimStatic(Scenario scenario, EventsManager events) {
+	public static QueueSimulation createMobsimStatic(Scenario scenario, EventsManager events) {
 		// this was introduced so I could to automatic refactoring to protect the constructor.  kai, may'10
 		return (QueueSimulation) (new QueueSimulationFactory()).createMobsim( scenario, events) ;
 	}
 
-@Override
-  public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
-    return new QueueSimulation( sc, eventsManager );
-  }
+	@Override
+	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
+		return new QueueSimulation( sc, eventsManager );
+	}
 
 }

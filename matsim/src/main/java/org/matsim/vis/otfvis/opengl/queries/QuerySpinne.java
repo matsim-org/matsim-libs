@@ -62,10 +62,10 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
-import org.matsim.vis.snapshots.writers.VisNetwork;
-import org.matsim.vis.snapshots.writers.VisVehicle;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 import com.sun.opengl.util.BufferUtil;
 

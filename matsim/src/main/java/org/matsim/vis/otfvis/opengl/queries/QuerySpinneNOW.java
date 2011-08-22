@@ -7,9 +7,9 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisNetwork;
-import org.matsim.vis.snapshots.writers.VisVehicle;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * QuerySpinneNOW is a special case of QuerySpinne, where not all agents passing the link are 

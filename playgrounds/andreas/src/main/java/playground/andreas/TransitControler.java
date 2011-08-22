@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
@@ -49,10 +48,6 @@ public class TransitControler extends Controler {
 			this.events.addHandler(new FixedHeadwayControler(simulation));		
 		}
 
-		if (simulation instanceof IOSimulation){
-			((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-			((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-		}
 		if (simulation instanceof ObservableSimulation){
 			for (SimulationListener l : this.getQueueSimulationListener()) {
 				((ObservableSimulation)simulation).addQueueSimulationListeners(l);

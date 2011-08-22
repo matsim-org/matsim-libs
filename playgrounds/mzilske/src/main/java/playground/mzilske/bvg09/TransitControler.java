@@ -35,7 +35,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -150,10 +149,6 @@ public class TransitControler extends Controler {
 
 //		this.events.addHandler(new LogOutputEventHandler());
 
-		if (sim instanceof IOSimulation){
-			((IOSimulation)sim).setControlerIO(this.getControlerIO());
-			((IOSimulation)sim).setIterationNumber(this.getIterationNumber());
-		}
 		sim.run();
 	}
 

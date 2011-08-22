@@ -20,6 +20,7 @@ package playground.dgrether;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -59,7 +60,7 @@ public class DgEquilController {
 		
 		Controler controler = new Controler(config);
 		if (useQSim){
-		  controler.getConfig().getQSimConfigGroup().setSnapshotFormat("otfvis");
+		  controler.getConfig().controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		  controler.getConfig().getQSimConfigGroup().setSnapshotPeriod(1.0);
 		  controler.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 		  controler.getConfig().getQSimConfigGroup().setWriteSnapshotsInterval(0);

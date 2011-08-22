@@ -20,11 +20,13 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
+import java.util.Arrays;
+
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 public class MyBasicConfig {
@@ -51,13 +53,13 @@ public class MyBasicConfig {
 		config.controler().setWriteEventsInterval(20);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
+		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		config.controler().setOutputDirectory("./output/");
 
 		// Simulation.
 		config.simulation().setStartTime(0);
 		config.simulation().setEndTime(86400);
 		config.simulation().setSnapshotPeriod(0);
-		config.simulation().setSnapshotFormat("googleearth");
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
 
@@ -108,7 +110,6 @@ public class MyBasicConfig {
 		// Parallel QSim
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setNumberOfThreads(2);
-		qsim.setSnapshotFormat("googleearth");
 		qsim.setSnapshotPeriod(900);
 		config.addQSimConfigGroup(qsim);
 	}

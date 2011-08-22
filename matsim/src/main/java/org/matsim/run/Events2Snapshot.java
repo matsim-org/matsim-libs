@@ -21,6 +21,7 @@
 package org.matsim.run;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
@@ -36,9 +37,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.vis.snapshotwriters.KmlSnapshotWriter;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter;
 
 /**
  * Converts  an events file to a snapshot file.
@@ -203,7 +204,7 @@ public class Events2Snapshot {
 			this.visualizer.addSnapshotWriter(this.writer);
 		}
 
-		String snapshotFormat = this.config.getQSimConfigGroup().getSnapshotFormat();
+		Collection<String> snapshotFormat = this.config.controler().getSnapshotFormat();
 
 		if (snapshotFormat.contains("transims")) {
 			String snapshotFile = outputDir + "T.veh";

@@ -43,8 +43,8 @@ import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.VisData;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * @author dstrippgen

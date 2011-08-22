@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -684,7 +685,7 @@ public class ControlerTest {
 	public void testOTFVisSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
-		config.simulation().setSnapshotFormat("otfvis");
+		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotStyle("equiDist");
 		
@@ -703,8 +704,8 @@ public class ControlerTest {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
 		config.controler().setMobsim("qsim");
+		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		qSimConfigGroup.setSnapshotFormat("otfvis");
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 		config.addQSimConfigGroup(qSimConfigGroup);
@@ -723,7 +724,7 @@ public class ControlerTest {
 	public void testKMLSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
-		config.simulation().setSnapshotFormat("googleearth");
+		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotStyle("equiDist");
 		
@@ -742,8 +743,8 @@ public class ControlerTest {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
 		config.controler().setMobsim("qsim");
+		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		qSimConfigGroup.setSnapshotFormat("googleearth");
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 		config.addQSimConfigGroup(qSimConfigGroup);
@@ -762,7 +763,7 @@ public class ControlerTest {
 	public void testTransimsSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
-		config.simulation().setSnapshotFormat("transims");
+		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotStyle("equiDist");
 		
@@ -777,12 +778,27 @@ public class ControlerTest {
 	}
 	
 	@Test
+	public void testOneSnapshotWriterInConfig() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(0);
+		config.simulation().setSnapshotPeriod(10);
+		config.simulation().setSnapshotStyle("equiDist");
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
+	}
+	
+	@Test
 	public void testTransimsSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
 		config.controler().setMobsim("qsim");
+		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		qSimConfigGroup.setSnapshotFormat("transims");
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 		config.addQSimConfigGroup(qSimConfigGroup);

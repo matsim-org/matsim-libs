@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.satellic;
 
+import java.util.Arrays;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -43,7 +45,7 @@ public class DgSatellicWithindayTestStarter {
 
 		config.controler().setLastIteration(0);
 		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		config.getQSimConfigGroup().setSnapshotPeriod(10.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		

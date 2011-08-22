@@ -32,9 +32,9 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * QueryAgentId is an internal query.

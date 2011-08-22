@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SnapshotWriterFactoryRegister
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshots.writers;
+package org.matsim.core.controler;
 
-import org.matsim.api.core.v01.Id;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface AgentSnapshotInfo {
+import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
-	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
-	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
-	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER }
-	// !!! WARNING: See comment above this enum.
+public class SnapshotWriterFactoryRegister {
 
-	Id getId() ;
+	/**
+	 * The global register of snapshot writer factories, keyed by a unique
+	 * identifier.
+	 */
+	private Map<String, SnapshotWriterFactory> factoryMap = new HashMap<String, SnapshotWriterFactory>();
 
-	double getEasting();
+	public SnapshotWriterFactory getInstance(String snapshotWriterType) {
+		if (!factoryMap.containsKey(snapshotWriterType)) {
+			throw new RuntimeException("Snapshot writer type " + snapshotWriterType
+					+ " doesn't exist.");
+		}
+		return factoryMap.get(snapshotWriterType);
+	}
 
-	double getNorthing();
-
-	@Deprecated
-	double getAzimuth();
-
-	double getColorValueBetweenZeroAndOne();
-	void setColorValueBetweenZeroAndOne( double tmp ) ;
-
-	AgentState getAgentState();
-	void setAgentState( AgentState state ) ;
-
-	int getUserDefined() ;
-	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
-
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public int getType();
-
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public void setType(int tmp);
-
+	public void register(String string, SnapshotWriterFactory snapshotWriterFactory) {
+		factoryMap.put(string, snapshotWriterFactory);
+	}
+	
 }

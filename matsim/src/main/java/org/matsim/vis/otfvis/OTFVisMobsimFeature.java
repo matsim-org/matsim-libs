@@ -42,11 +42,11 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListene
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.TeleportationVisData;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.TeleportationVisData;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 public class OTFVisMobsimFeature implements VisMobsimFeature,
 SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {

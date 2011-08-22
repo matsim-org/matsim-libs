@@ -33,9 +33,9 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisNetwork;
-import org.matsim.vis.snapshots.writers.VisNode;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  *

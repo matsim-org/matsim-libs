@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import java.util.Arrays;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -62,7 +64,7 @@ public class FourWaysVisMviTest {
     conf.planCalcScore().addActivityParams(a);
     
     conf.addQSimConfigGroup(new QSimConfigGroup());
-    conf.getQSimConfigGroup().setSnapshotFormat("otfvis");
+    conf.controler().setSnapshotFormat(Arrays.asList("otfvis"));
     conf.getQSimConfigGroup().setSnapshotPeriod(15.0);
     conf.getQSimConfigGroup().setSnapshotStyle("queue");
     conf.getQSimConfigGroup().setStuckTime(100.0);

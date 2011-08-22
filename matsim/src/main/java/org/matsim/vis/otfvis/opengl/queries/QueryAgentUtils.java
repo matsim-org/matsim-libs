@@ -16,8 +16,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 public class QueryAgentUtils {
 

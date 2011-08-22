@@ -6,7 +6,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 public interface SimulationViewForQueries {
 

@@ -21,7 +21,7 @@ package soc.ai.matsim.dbsim;
 
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 /**
  * Interface for methods to provide a visualizer with data.
  * @author dgrether

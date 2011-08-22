@@ -24,8 +24,8 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 public final class OTFVisLiveServer implements OTFLiveServerRemote {
 

@@ -41,11 +41,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
@@ -54,7 +52,6 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
@@ -67,13 +64,10 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
-import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -83,7 +77,7 @@ import org.matsim.vis.snapshots.writers.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements IOSimulation, ObservableSimulation, VisMobsim, Netsim {
+public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -134,9 +128,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 	private boolean useActivityDurations = true;
 
 	private final Set<String> notTeleportedModes = new HashSet<String>();
-
-	private Integer iterationNumber = null;
-	private ControlerIO controlerIO;
 
 	//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
@@ -245,37 +236,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	}
 
-	private void createSnapshotwriter() {
-		// A snapshot period of 0 or less indicates that there should be NO snapshot written
-		if (this.snapshotPeriod > 0 ) {
-			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
-			Integer itNumber = this.iterationNumber;
-			if (this.controlerIO == null) {
-				log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
-				return;
-			}
-			else if (itNumber == null) {
-				log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
-				itNumber = 0;
-			}
-			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh.gz");
-				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
-			}
-			if (snapshotFormat.contains("googleearth")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
-				String coordSystem = this.config.global().getCoordinateSystem();
-				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
-						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-			}
-			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
-				OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, networkLayer, snapshotFile);
-				this.snapshotWriters.add(writer);
-			}
-		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
-	}
-
 	private void prepareNetworkChangeEventsQueue() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
@@ -320,13 +280,7 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(this.simTimer.getSimStartTime());
 
-		createSnapshotwriter();
-
 		prepareNetworkChangeEventsQueue();
-
-		//		for (MobsimFeature queueSimulationFeature : this.queueSimulationFeatures) {
-		//			queueSimulationFeature.afterPrepareSim();
-		//		}
 	}
 
 
@@ -629,17 +583,6 @@ public class QueueSimulation implements IOSimulation, ObservableSimulation, VisM
 
 	public Set<String> getNotTeleportedModes() {
 		return notTeleportedModes;
-	}
-
-
-	@Override
-	public void setIterationNumber(Integer iterationNumber) {
-		this.iterationNumber = iterationNumber;
-	}
-
-	@Override
-	public void setControlerIO(ControlerIO controlerIO) {
-		this.controlerIO = controlerIO;
 	}
 
 	@Override

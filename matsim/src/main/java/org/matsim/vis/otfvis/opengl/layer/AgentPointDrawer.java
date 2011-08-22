@@ -29,8 +29,8 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * yyyy Despite its name, this is not a Drawer but a Receiver. It receives agents 

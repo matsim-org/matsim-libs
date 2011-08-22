@@ -37,10 +37,10 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * OTFLinkAgentsHandler transfers basic agent data as well as the default data

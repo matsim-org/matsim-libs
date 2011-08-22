@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.VisLink;
-import org.matsim.vis.snapshots.writers.VisNetwork;
-import org.matsim.vis.snapshots.writers.VisNode;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.

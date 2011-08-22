@@ -20,14 +20,16 @@
 
 package playground.dgrether.cmcf;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -130,7 +132,7 @@ public class CMCFScenarioGeneratorNoReroute {
 					DgPaths.WSBASE + "testData/output/cmcfNewNoReroute");
 
 		// configure simulation and snapshot writing
-		this.config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		this.config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		this.config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		// configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);

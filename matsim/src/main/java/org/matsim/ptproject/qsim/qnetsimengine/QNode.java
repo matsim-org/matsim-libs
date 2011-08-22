@@ -36,7 +36,7 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.vis.snapshots.writers.VisData;
+import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * Represents a node in the QueueSimulation.

@@ -90,8 +90,6 @@ public class HybridVis {
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
 		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
 		//		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
-		qSim.setControlerIO(controlerIO);
-		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		qSim.run();
 	}
 }

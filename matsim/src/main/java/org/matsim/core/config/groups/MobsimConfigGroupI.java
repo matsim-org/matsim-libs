@@ -35,8 +35,6 @@ public interface MobsimConfigGroupI {
 
 	public abstract double getSnapshotPeriod();
 
-	public abstract String getSnapshotFormat();
-
 	public abstract double getFlowCapFactor();
 
 	public abstract double getStorageCapFactor();

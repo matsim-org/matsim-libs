@@ -58,7 +58,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 import playground.mrieser.pt.analysis.RouteTimeDiagram;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;

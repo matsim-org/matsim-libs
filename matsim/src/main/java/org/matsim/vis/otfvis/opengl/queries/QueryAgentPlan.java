@@ -58,8 +58,8 @@ import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
-import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 import com.sun.opengl.util.BufferUtil;
 

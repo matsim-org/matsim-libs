@@ -1,6 +1,6 @@
 package playground.mzilske.vis;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 import com.sleepycat.bind.EntryBinding;
 import com.sleepycat.bind.serial.ClassCatalog;

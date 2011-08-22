@@ -23,7 +23,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.vis.snapshots.writers.VisVehicle;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
 public interface QVehicle extends Identifiable, VisVehicle, QItem {

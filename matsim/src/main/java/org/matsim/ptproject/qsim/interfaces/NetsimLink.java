@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshotwriters.VisLink;
 
 public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 

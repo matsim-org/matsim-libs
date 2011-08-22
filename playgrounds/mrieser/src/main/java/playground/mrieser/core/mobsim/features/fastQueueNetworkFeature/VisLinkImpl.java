@@ -21,9 +21,9 @@ package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.VisLink;

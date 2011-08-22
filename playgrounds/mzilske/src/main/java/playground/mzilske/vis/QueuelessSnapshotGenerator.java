@@ -40,10 +40,10 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * 

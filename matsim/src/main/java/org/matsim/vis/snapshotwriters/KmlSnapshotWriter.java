@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshots.writers;
+package org.matsim.vis.snapshotwriters;
 
 import java.io.IOException;
 import java.util.TreeMap;

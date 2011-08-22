@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.data.OTFDataXYCoordReceiver;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.snapshots.writers.VisNode;
+import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * OTFDefaultNodeHandler IOs the coordinates of a node. 

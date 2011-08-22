@@ -39,9 +39,9 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.qsim.TransitVehicle;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic

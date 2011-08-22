@@ -33,7 +33,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * @author dgrether

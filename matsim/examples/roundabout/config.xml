@@ -16,6 +16,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="mobsim" value="queueSimulation" />
+		<param name = "snapshotFormat"	value = "otfvis,transims"/>
 	</module>
 
 	<module name="simulation">
@@ -23,8 +24,7 @@
 		<param name="storageCapacityFactor" value="0.5" />
 
 		<param name = "snapshotperiod"	value = "00:01:00"/>
- 		<param name = "snapshotFormat"	value = "otfvis,transims"/>
-	</module>
+ 	</module>
 
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />

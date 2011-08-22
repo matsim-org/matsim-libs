@@ -82,7 +82,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -143,6 +142,8 @@ import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
+import org.matsim.vis.snapshotwriters.VisMobsim;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -335,7 +336,7 @@ public class Controler {
 			if (configFileName == null) {
 				if (config == null) {
 					throw new IllegalArgumentException(
-					"Either the config or the filename of a configfile must be set to initialize the Controler.");
+							"Either the config or the filename of a configfile must be set to initialize the Controler.");
 				}
 				this.config = config;
 			} else {
@@ -394,8 +395,8 @@ public class Controler {
 		// Use a TravelTimeCalculator that buffers the TravelTimes form the previous Iteration.
 		setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
-//		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
-//		setMobsimFactory(mobsimFactory)
+		//		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
+		//		setMobsimFactory(mobsimFactory)
 
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
@@ -703,8 +704,8 @@ public class Controler {
 					// files!
 					throw new RuntimeException(
 							"The output directory "
-							+ this.outputPath
-							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+									+ this.outputPath
+									+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
@@ -851,9 +852,9 @@ public class Controler {
 		// yyyy seems to me that in the following the OccupancyAnalyser could be completely pushed into the PtCountControlerListener.
 		// kai, oct'10
 
-//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 		log.info("Using pt counts.");
-//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
+		//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
 		addControlerListener(new PtCountControlerListener(this.config));
 	}
 
@@ -919,13 +920,20 @@ public class Controler {
 	}
 
 	private void enrichSimulation(final Simulation simulation) {
-		if (simulation instanceof IOSimulation){
-			((IOSimulation)simulation).setControlerIO(this.getControlerIO());
-			((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
-		}
-		if (simulation instanceof ObservableSimulation){
+		if (simulation instanceof ObservableSimulation) {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
 				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+			}
+		}
+		if (simulation instanceof VisMobsim) {
+			SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
+			SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
+			int itNumber = this.getIterationNumber();
+			for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
+				SnapshotWriterFactory snapshotWriterFactory = register.getInstance(snapshotFormat);
+				String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
+				String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
+				snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
 			}
 		}
 	}
@@ -1145,7 +1153,7 @@ public class Controler {
 			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 					this.getLeastCostPathCalculatorFactory(), this.config.transit(), this.transitRouterFactory.createTransitRouter());
 			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, e.g. multimodal simulation, may not work" +
-			"as expected.");
+					"as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory());
@@ -1262,7 +1270,7 @@ public class Controler {
 	 */
 	protected static class CoreControlerListener implements StartupListener {
 
-//		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+		//		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1304,11 +1312,11 @@ public class Controler {
 						event.getControler().setMobsimFactory(new QueueSimulationFactory());
 					} else {
 						log.warn("There is no configuration for a mobility simulation in the config. The Controler " +
-						"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
-						"to avoid this warning");
+								"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
+								"to avoid this warning");
 						c.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 						event.getControler().setMobsimFactory(new QueueSimulationFactory());
-				}
+					}
 				}
 			}
 		}

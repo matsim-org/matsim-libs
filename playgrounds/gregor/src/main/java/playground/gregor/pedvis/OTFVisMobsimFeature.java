@@ -30,9 +30,9 @@ import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.events.XYZEventsHandler;

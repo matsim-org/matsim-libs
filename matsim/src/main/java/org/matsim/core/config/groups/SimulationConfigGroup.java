@@ -38,7 +38,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	private static final String END_TIME = "endTime";
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
-	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -51,7 +50,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
-	private String snapshotFormat = "";
 	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
@@ -74,8 +72,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 			setTimeStepSize(Time.parseTime(value));
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			setSnapshotPeriod(Time.parseTime(value));
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			setSnapshotFormat(value);
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			setSnapshotStyle(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -106,8 +102,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 			return Time.writeTime(getTimeStepSize());
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			return Time.writeTime(getSnapshotPeriod());
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			return getSnapshotFormat();
 		} else if (SNAPSHOT_STYLE.equals(key)) {
 			return getSnapshotStyle();
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -134,7 +128,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 		map.put(END_TIME, getValue(END_TIME));
 		map.put(TIME_STEP_SIZE, getValue(TIME_STEP_SIZE));
 		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
-		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
 		map.put(SNAPSHOT_STYLE, getValue(SNAPSHOT_STYLE));
 		map.put(FLOW_CAPACITY_FACTOR, getValue(FLOW_CAPACITY_FACTOR));
 		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
@@ -151,7 +144,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
-		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		map.put(REMOVE_STUCK_VEHICLES, QSimConfigGroup.REMOVE_STUCK_VEHICLES_STRING ) ;
 		map.put(STUCK_TIME, QSimConfigGroup.STUCK_TIME_STRING ) ;
 		return map ;
@@ -211,22 +203,6 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
-	}
-
-	/** See "getComments()" for options.
-	 *
-	 * @param snapshotFormat
-	 */
-	public void setSnapshotFormat(final String snapshotFormat) {
-		this.snapshotFormat = snapshotFormat;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotFormat()
-	 */
-	@Override
-	public String getSnapshotFormat() {
-		return this.snapshotFormat;
 	}
 
 	public void setFlowCapFactor(final double flowCapFactor) {

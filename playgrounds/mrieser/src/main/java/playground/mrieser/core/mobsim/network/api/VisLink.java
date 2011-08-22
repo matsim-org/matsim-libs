@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.network.api;
 
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 public interface VisLink {
 

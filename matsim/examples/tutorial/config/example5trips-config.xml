@@ -17,20 +17,18 @@
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="queueSimulation" />
-	</module>
-
-
-	<module name="simulation">
-	        <param name="snapshotFormat" value="otfvis" />
+		<param name="snapshotFormat" value="otfvis" />
 <!-- 		Produces visualiser output in the following formats: -->
 <!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
 <!-- 		          () without hardware acceleration.  Simpler, but slower -->
 <!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
 <!--                         scenarios -->
 <!-- 		The visualiser output files are in <outputDirectory>/ITERS/it..../... -->
+	</module>
 
+
+	<module name="simulation">
 		<param name="snapshotperiod" value="00:01:00" />
-
 	</module>
 
 	<module name="planCalcScore" >

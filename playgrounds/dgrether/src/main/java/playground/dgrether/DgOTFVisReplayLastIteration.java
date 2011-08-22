@@ -130,8 +130,6 @@ public class DgOTFVisReplayLastIteration {
 		}
 
 		QSim queueSimulation = otfVisQSim;
-		queueSimulation.setControlerIO(controlerIO);
-		queueSimulation.setIterationNumber(sc.getConfig().controler().getLastIteration());
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, queueSimulation);
 		OTFClientLive.run(sc.getConfig(), server);
 		queueSimulation.run();

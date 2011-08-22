@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFEvent2MVI.java
+ * SnapshotWriterRegistrar
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis;
+package org.matsim.core.controler;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.MobsimConfigGroupI;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.vis.snapshotwriters.KMLSnapshotWriterFactory;
+import org.matsim.vis.snapshotwriters.TransimsSnapshotWriterFactory;
 
-public class OTFEvent2MVI {
 
-	public static void convert(final MobsimConfigGroupI config, Network network, String eventFileName, String outFileName, double interval_s) {
-		OTFFileWriter otfFileWriter = new OTFFileWriter(network, outFileName);
-		EventsManager events = EventsUtils.createEventsManager();
-		SnapshotGenerator visualizer = new SnapshotGenerator(network, interval_s, config);
-		visualizer.addSnapshotWriter(otfFileWriter);
-		events.addHandler(visualizer);
-		new MatsimEventsReader(events).readFile(eventFileName);
-		visualizer.finish();
-		otfFileWriter.finish();
+public class SnapshotWriterRegistrar {
+	
+	SnapshotWriterFactoryRegister register = new SnapshotWriterFactoryRegister();
+
+	public SnapshotWriterRegistrar() {
+		register.register("otfvis", new OTFFileWriterFactory());
+		register.register("googleearth", new KMLSnapshotWriterFactory());
+		register.register("transims", new TransimsSnapshotWriterFactory());
+	}
+	
+	public SnapshotWriterFactoryRegister getFactoryRegister() {
+		return register;
 	}
 
 }

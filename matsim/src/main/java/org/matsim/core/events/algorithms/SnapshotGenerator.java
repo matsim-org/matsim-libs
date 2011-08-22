@@ -46,9 +46,9 @@ import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {

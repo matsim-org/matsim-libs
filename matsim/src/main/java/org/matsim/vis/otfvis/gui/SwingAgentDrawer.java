@@ -25,7 +25,7 @@ import java.awt.geom.Point2D;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 /***
  * Drawer class for drawing agents

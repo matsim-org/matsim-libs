@@ -49,7 +49,6 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
@@ -62,10 +61,10 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.KmlSnapshotWriter;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -75,7 +74,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class DBSimulation implements IOSimulation, ObservableSimulation {
+public class DBSimulation implements ObservableSimulation {
 
 	private int snapshotPeriod = 0;
 
@@ -217,7 +216,7 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	private void createSnapshotwriter() {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
 		if (this.snapshotPeriod > 0 ) {
-			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
+			Collection<String> snapshotFormat =  this.config.controler().getSnapshotFormat();
 			Integer itNumber = this.iterationNumber;
 			if (this.controlerIO == null) {
 				log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
@@ -581,16 +580,5 @@ public class DBSimulation implements IOSimulation, ObservableSimulation {
 	public Integer getIterationNumber() {
 		return iterationNumber;
 	}
-
-	@Override
-	public void setIterationNumber(Integer iterationNumber) {
-		this.iterationNumber = iterationNumber;
-	}
-
-	@Override
-	public void setControlerIO(ControlerIO controlerIO) {
-		this.controlerIO = controlerIO;
-	}
-
 
 }

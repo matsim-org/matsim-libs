@@ -77,7 +77,7 @@ import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.snapshots.writers.VisVehicle;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 public class QueueSimulationTest extends TestCase {
 

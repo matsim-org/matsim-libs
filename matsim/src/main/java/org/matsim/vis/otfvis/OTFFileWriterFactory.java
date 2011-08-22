@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFEvent2MVI.java
+ * OTFFileWriterFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,24 +20,23 @@
 
 package org.matsim.vis.otfvis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.MobsimConfigGroupI;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
-public class OTFEvent2MVI {
+public class OTFFileWriterFactory implements SnapshotWriterFactory {
 
-	public static void convert(final MobsimConfigGroupI config, Network network, String eventFileName, String outFileName, double interval_s) {
-		OTFFileWriter otfFileWriter = new OTFFileWriter(network, outFileName);
-		EventsManager events = EventsUtils.createEventsManager();
-		SnapshotGenerator visualizer = new SnapshotGenerator(network, interval_s, config);
-		visualizer.addSnapshotWriter(otfFileWriter);
-		events.addHandler(visualizer);
-		new MatsimEventsReader(events).readFile(eventFileName);
-		visualizer.finish();
-		otfFileWriter.finish();
+	@Override
+	public SnapshotWriter createSnapshotWriter(String filename, Scenario scenario) {
+		Network network = scenario.getNetwork();
+		OTFFileWriter writer = new OTFFileWriter(network, filename);
+		return writer;
+	}
+
+	@Override
+	public String getPreferredBaseFilename() {
+		return "otfvis.mvi";
 	}
 
 }

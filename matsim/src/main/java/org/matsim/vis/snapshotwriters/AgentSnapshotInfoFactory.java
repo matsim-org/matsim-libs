@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshots.writers;
+package org.matsim.vis.snapshotwriters;
 
 import java.awt.geom.Point2D;
 
@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**

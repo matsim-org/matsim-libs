@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.snapshots.writers.VisLink;
+import org.matsim.vis.snapshotwriters.VisLink;
 
 /**
  * OTFDefaultLinkHandler handles the basic IO of a link.

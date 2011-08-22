@@ -17,11 +17,7 @@
 		<param name="lastIteration" value="0" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="queueSimulation" />
-	</module>
-
-
-	<module name="simulation">
-	        <param name="snapshotFormat" value="googleearth,otfvis" />
+		<param name="snapshotFormat" value="googleearth,otfvis" />
 <!-- 		Produces visualiser output in the following formats: -->
 <!-- 		"googleearth": a *.kml file which can be opened into google earth.  Uncomplicated, but VERRYYY slow. -->
 <!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
@@ -29,6 +25,11 @@
 <!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
 <!--                         scenarios -->
 <!-- 		The visualiser output files are in <outputDirectory>/ITERS/it.0/... -->
+		
+	</module>
+
+
+	<module name="simulation">
 
 		<param name="snapshotperiod" value="00:01:00" />
 

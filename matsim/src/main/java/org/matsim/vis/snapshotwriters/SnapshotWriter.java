@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshots.writers;
+package org.matsim.vis.snapshotwriters;
 
 /**
  * Interface to implement custom snapshot writers. A snapshot contains information

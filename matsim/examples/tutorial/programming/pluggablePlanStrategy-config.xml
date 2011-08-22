@@ -20,6 +20,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="mobsim" value="queueSimulation" />
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="simulation">
@@ -28,7 +29,6 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">

@@ -20,6 +20,7 @@
 
 package playground.dgrether.daganzosignal;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -407,7 +408,7 @@ public class DaganzoScenarioGenerator {
 		// configure simulation and snapshot writing
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		if (this.doOtfOutput){
-			config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+			config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 			config.getQSimConfigGroup().setSnapshotPeriod(10.0);
 //			config.getQSimConfigGroup().setSnapshotStyle("queue");
 		}

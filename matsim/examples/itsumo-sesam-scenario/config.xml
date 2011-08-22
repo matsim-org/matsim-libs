@@ -34,7 +34,6 @@
 		<param name="endTime" value="00:00:00" />
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
- 		<param name = "snapshotFormat"	value = "netvis"/>  
 	</module>
 
 	<module name="planCalcScore">

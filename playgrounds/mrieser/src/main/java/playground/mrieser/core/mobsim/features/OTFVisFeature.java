@@ -22,8 +22,8 @@ package playground.mrieser.core.mobsim.features;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import playground.mrieser.core.mobsim.network.api.VisLink;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;

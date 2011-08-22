@@ -22,6 +22,7 @@ package playground.droeder.Journal2MATSim2Journal;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -379,7 +380,7 @@ public class Journal2Matsim2Journal {
 		c.getQSimConfigGroup().setStartTime(this.startTime);
 		c.getQSimConfigGroup().setEndTime(108000);
 		c.getQSimConfigGroup().setSnapshotPeriod(10);
-		c.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		c.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		
 		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("maxAgentPlanMemorySize", "1");
 		c.getModule(StrategyConfigGroup.GROUP_NAME).addParam("ModuleProbability_1", "1");

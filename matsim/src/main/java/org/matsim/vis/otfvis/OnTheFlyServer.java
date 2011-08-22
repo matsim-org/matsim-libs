@@ -43,7 +43,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
-import org.matsim.vis.snapshots.writers.VisMobsimFeature;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.

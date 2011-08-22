@@ -1,14 +1,13 @@
 /**
  * 
  */
-package org.matsim.vis.snapshots.writers;
+package org.matsim.vis.snapshotwriters;
 
 
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.IOSimulation;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 
@@ -16,7 +15,7 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
  * @author nagel
  *
  */
-public interface VisMobsim extends ObservableSimulation, IOSimulation {
+public interface VisMobsim extends ObservableSimulation {
 
 	VisNetwork getVisNetwork() ;
 	// yyyy one could, possibly, use "getMobsimNetwork", with a superclass return type, that then,

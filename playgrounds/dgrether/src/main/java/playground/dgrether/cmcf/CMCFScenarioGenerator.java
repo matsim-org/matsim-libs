@@ -20,6 +20,8 @@
 
 package playground.dgrether.cmcf;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -122,7 +124,7 @@ public class CMCFScenarioGenerator {
 			this.config.controler().setOutputDirectory(DgPaths.WSBASE + "testData/output/cmcf");
 
 		//configure simulation and snapshot writing
-		this.config.getQSimConfigGroup().setSnapshotFormat("otfvis");
+		this.config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		this.config.getQSimConfigGroup().setSnapshotPeriod(60.0);
 		//configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);

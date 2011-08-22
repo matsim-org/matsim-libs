@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -83,10 +82,10 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.snapshots.writers.AgentSnapshotInfo;
-import org.matsim.vis.snapshots.writers.SnapshotWriter;
-import org.matsim.vis.snapshots.writers.VisMobsim;
-import org.matsim.vis.snapshots.writers.VisNetwork;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * Implementation of a queue-based transport simulation.
@@ -143,13 +142,14 @@ public class QSim implements VisMobsim, Netsim {
 	private final SimulationListenerManager listenerManager;
 	private final Scenario scenario ;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-	private Integer iterationNumber = null;
-	private ControlerIO controlerIO;
-	private QSimSnapshotWriterManager snapshotManager = new QSimSnapshotWriterManager();
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private TransitQSimEngine transitEngine;
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 	private final Map<Id, QVehicleImpl> vehicles = new HashMap<Id, QVehicleImpl>();
+	
+
+
 
 	// everything above this line is private and should remain private.  pls contact me if this is in your way.  kai, oct'10
 	// ============================================================================================================================
@@ -282,23 +282,6 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	@Override
-	public final void setControlerIO(final ControlerIO controlerIO) {
-		if ( !locked ) {
-			this.controlerIO = controlerIO;
-		} else {
-			throw new RuntimeException("too late to set controlerIO; aborting ...") ;
-		}
-	}
-
-	@Override
-	public final void setIterationNumber(final Integer iterationNumber) {
-		if ( !locked ) {
-			this.iterationNumber = iterationNumber;
-		} else {
-			throw new RuntimeException("too late to set iterationNumber; aborting ...") ;
-		}
-	}
 
 	// prepareSim and related:
 
@@ -332,9 +315,7 @@ public class QSim implements VisMobsim, Netsim {
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; // infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
 		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime() / this.snapshotPeriod) * this.snapshotPeriod;
 
-		// Initialize Snapshot file
 		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
-		this.snapshotManager.createSnapshotwriter(this.scenario, this.snapshotPeriod, this.iterationNumber, this.controlerIO);
 		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
@@ -449,7 +430,7 @@ public class QSim implements VisMobsim, Netsim {
 		}
 		this.activityEndsList.clear();
 
-		for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
+		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
 		}
 
@@ -717,7 +698,7 @@ public class QSim implements VisMobsim, Netsim {
 			double diffsim  = time - this.simTimer.getSimStartTime();
 			int nofActiveLinks = this.netEngine.getNumberOfSimulatedLinks();
 			int nofActiveNodes = this.netEngine.getNumberOfSimulatedNodes();
-			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " (it." + this.iterationNumber + "): #Veh=" + this.agentCounter.getLiving()
+			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time) + " : #Veh=" + this.agentCounter.getLiving()
 					+ " lost=" + this.agentCounter.getLost() + " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 
@@ -734,12 +715,12 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	private void doSnapshot(final double time) {
-		if (!this.snapshotManager.getSnapshotWriters().isEmpty()) {
+		if (!this.snapshotWriters.isEmpty()) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 			for (NetsimLink link : this.getNetsimNetwork().getNetsimLinks().values()) {
 				link.getVisData().getVehiclePositions( positions);
 			}
-			for (SnapshotWriter writer : this.snapshotManager.getSnapshotWriters()) {
+			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {
 					writer.addAgent(position);
@@ -783,11 +764,6 @@ public class QSim implements VisMobsim, Netsim {
 		return this.multiModalEngine;
 	}
 
-	Integer getIterationNumber() {
-		return this.iterationNumber;
-	}
-
-
 	@Override
 	public final MobsimTimerI getSimTimer() {
 		return this.simTimer ;
@@ -799,7 +775,7 @@ public class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
-		this.snapshotManager.addSnapshotWriter(snapshotWriter);
+		this.snapshotWriters.add(snapshotWriter);
 	}
 
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {

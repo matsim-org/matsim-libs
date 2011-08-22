@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFEvent2MVI.java
+ * TransimsSnapshotWriterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis;
+package org.matsim.vis.snapshotwriters;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.MobsimConfigGroupI;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.SnapshotGenerator;
+import org.matsim.api.core.v01.Scenario;
 
-public class OTFEvent2MVI {
+public class TransimsSnapshotWriterFactory implements SnapshotWriterFactory {
 
-	public static void convert(final MobsimConfigGroupI config, Network network, String eventFileName, String outFileName, double interval_s) {
-		OTFFileWriter otfFileWriter = new OTFFileWriter(network, outFileName);
-		EventsManager events = EventsUtils.createEventsManager();
-		SnapshotGenerator visualizer = new SnapshotGenerator(network, interval_s, config);
-		visualizer.addSnapshotWriter(otfFileWriter);
-		events.addHandler(visualizer);
-		new MatsimEventsReader(events).readFile(eventFileName);
-		visualizer.finish();
-		otfFileWriter.finish();
+	@Override
+	public SnapshotWriter createSnapshotWriter(String filename,
+			Scenario scenario) {
+		return new TransimsSnapshotWriter(filename);
+	}
+
+	@Override
+	public String getPreferredBaseFilename() {
+		return "T.veh.gz";
 	}
 
 }

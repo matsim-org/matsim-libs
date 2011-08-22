@@ -23,8 +23,9 @@
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name= "writeEventsInterval" value="4" />
+		<param name="writeEventsInterval" value="4" />
 		<param name="mobsim" value="queueSimulation" />
+		<param name="snapshotFormat" value="transims" />
 	</module>
 
 	<module name="simulation">
@@ -33,7 +34,6 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> 
 	</module>
 
 	<module name="planCalcScore">

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * KMLSnapshotWriterFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.controler.ControlerIO;
+package org.matsim.vis.snapshotwriters;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-/**
- * Must be implemented by simulations using the default matsim io.
- * @author dgrether
- *
- */
-public interface IOSimulation extends Simulation {
-  
-  public void setControlerIO(ControlerIO cio);
-  
-  public void setIterationNumber(Integer iterationNumber);
+public class KMLSnapshotWriterFactory implements SnapshotWriterFactory {
+
+	@Override
+	public SnapshotWriter createSnapshotWriter(String filename, Scenario scenario) {
+		String coordSystem = scenario.getConfig().global().getCoordinateSystem();
+		return new KmlSnapshotWriter(filename, TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84));
+	}
+
+	@Override
+	public String getPreferredBaseFilename() {
+		return "googleearth.kmz";
+	}
 
 }

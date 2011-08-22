@@ -242,10 +242,6 @@ public class OTFVis {
 			qSim.addQueueSimulationListeners(engine);
 		}
 		
-		qSim.setControlerIO(controlerIO);
-		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
-		
-		
 		OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
 		OTFClientLive.run(config, server);
 
