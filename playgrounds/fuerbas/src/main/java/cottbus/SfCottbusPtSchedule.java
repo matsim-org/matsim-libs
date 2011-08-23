@@ -21,6 +21,7 @@
 package cottbus;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,6 +82,17 @@ public class SfCottbusPtSchedule {
 
 		SfCottbusPtSchedule cottbus = new SfCottbusPtSchedule();
 		
+		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		Config config = scen.getConfig();
+		config.network().setInputFile(cottbus.NETWORK);
+		ScenarioUtils.loadScenario(scen);		
+		cottbus.network = scen.getNetwork();
+		scen.getConfig().scenario().setUseTransit(true);
+		scen.getConfig().scenario().setUseVehicles(true);
+				
+		cottbus.schedulefactory = new TransitScheduleFactoryImpl();
+		cottbus.schedule = cottbus.schedulefactory.createTransitSchedule();
+		
 //		Linienliste einlesen, Linien als Strings speichern, über alle Linien gleiches Schema ausführen...
 		
 		String[] lines = cottbus.getLineNumbers(cottbus.LINES);
@@ -92,27 +104,43 @@ public class SfCottbusPtSchedule {
 			double firstDep = 0.;
 			double freq = 0.;
 			int counter = 0;
-			String linesfile = lineName+".csv";
+			String linesfile = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
 			if (nLines <=7) cottbus.pt_mode="tram";
-				else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
-				else cottbus.pt_mode="train";
+			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
+			else cottbus.pt_mode="train";
 				
 				while(br.ready()) {
 					String[] lineEntries = br.readLine().split(";");
 					transitStopIdStrings.add(lineEntries[1]);
-					stopLinkString.add(lineEntries[6]);
+					stopLinkString.add(lineEntries[6].replaceAll("\"",""));
 					if (counter==0) {
+						lineEntries[7] = lineEntries[7].replaceAll("\"", "");
 						String[] time = lineEntries[7].split(":");
+						System.out.println("ZEIT: "+lineEntries[7]);
 						firstDep = Double.parseDouble(time[0])*3600 + Double.parseDouble(time[1])*60 + Double.parseDouble(time[2]);
 						freq = Double.parseDouble(lineEntries[8])*60;
 					}
 					counter++;
 				}
+				br.close();
 				
 			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString);
 			
-			String[] routes = null;
+			
+
+			String lineroutes = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+"_links.csv";
+			BufferedReader br2 = new BufferedReader(new FileReader(lineroutes));
+			
+			List<String> routeLinks = new ArrayList<String>();
+			while(br2.ready()) {
+				routeLinks.add(br2.readLine().replaceAll("\"", ""));
+			}
+			br2.close();
+			
+			String[] routes = routeLinks.toArray(new String[routeLinks.size()]);
+
+			
 			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
 			
 			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
@@ -177,6 +205,8 @@ public class SfCottbusPtSchedule {
 			Id facilId = new IdImpl(ids.get(index));
 			Id linkId = new IdImpl(links.get(index));
 			if (!this.schedule.getFacilities().containsKey(facilId)) {
+				System.out.println("FACIL ID: "+facilId);
+				System.out.println("LINK ID: "+linkId);
 				trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
 				facilList.add(trastofac);
 				trastofac.setLinkId(linkId);
