@@ -6,34 +6,58 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkWindow.Label;
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkWindow.Option;
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
+import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
+import playground.sergioo.NetworksMatcher.kernel.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.DoubleNetwork.DoubleNetworkPanel;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkManager;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
 public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements MouseListener, MouseMotionListener, KeyListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	//Attributes
-	private final DoubleNetworkWindow doubleNetworkWindow;
+	private final DoubleNetworkMatchingWindow doubleNetworkWindow;
 	private int iniX;
 	private int iniY;
-	private boolean withNetwork = true;
+	private boolean matchingsAdded = false;
 	
 	//Methods
-	public DoubleNetworkMatchingPanel(DoubleNetworkWindow doubleNetworkWindow, NetworkPainter networkPainterA, NetworkPainter networkPainterB) {
+	public DoubleNetworkMatchingPanel(DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
 		super(networkPainterA, networkPainterB);
 		this.doubleNetworkWindow = doubleNetworkWindow;
-		/*TODO addLayer(new Layer(new MatchingsPainter(), false));*/
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 	}
-	public String getLabelText(Label label) {
+	public DoubleNetworkMatchingPanel(Collection<NodesMatching> nodesMatchings, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
+		super(networkPainterA, networkPainterB);
+		this.doubleNetworkWindow = doubleNetworkWindow;
+		addLayer(new Layer(new MatchingsPainter(nodesMatchings, MatchingOptions.BOTH), false));
+		matchingsAdded = true;
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addKeyListener(this);
+	}
+	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
+		if(!matchingsAdded) {
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings,  MatchingOptions.BOTH), false));
+			matchingsAdded = true;
+		}
+		else {
+			removeLastLayer();
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings, MatchingOptions.BOTH), false));
+		}
+	}
+	public String getLabelText(Labels label) {
 		try {
-			return (String) NetworkManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
+			return (String) NetworkNodesManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -52,25 +76,17 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
-			if(doubleNetworkWindow.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Label.LINK);
+			if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
-			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectLink();
-				doubleNetworkWindow.refreshLabel(Label.LINK);
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
-			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Label.NODE);
-			}
-			else if(doubleNetworkWindow.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectNode();
-				doubleNetworkWindow.refreshLabel(Label.NODE);
-			}
-			else if(doubleNetworkWindow.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
+			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
 				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
-			else if(doubleNetworkWindow.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
+			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
 				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
 		}
 		repaint();
@@ -111,7 +127,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			changeActiveLayer();
 			break;
 		case 'n':
-			withNetwork  = !withNetwork;
+			getActiveLayer().changeVisible();
 			break;
 		case 'm':
 			doubleNetworkWindow.setNetworksSeparated();
