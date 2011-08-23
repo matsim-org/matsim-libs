@@ -37,6 +37,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -61,7 +63,7 @@ public class SfCottbusPtSchedule {
 	private TransitSchedule schedule;
 	private TransitScheduleFactory schedulefactory;
 	private String pt_mode;
-	private String NETWORK = "INPUTFILE_NETWORK";
+	private String NETWORK = "E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml";
 	private String LINES = "E:\\Cottbus\\Cottbus_pt\\lines\\lines.csv";
 	
 	
@@ -87,31 +89,43 @@ public class SfCottbusPtSchedule {
 			List<String> transitStopIdStrings = new ArrayList<String>();
 			List<String> stopLinkString = new ArrayList<String>();
 			String lineName = lines[nLines];
+			double firstDep = 0.;
+			double freq = 0.;
+			int counter = 0;
 			String linesfile = lineName+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
 			if (nLines <=7) cottbus.pt_mode="tram";
-			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
-			else cottbus.pt_mode="train";
-			
-			while(br.ready()) {
-				String[] lineEntries = br.readLine().split(";");
-				transitStopIdStrings.add(lineEntries[1]);
-				stopLinkString.add(lineEntries[6]);
-			}
+				else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
+				else cottbus.pt_mode="train";
+				
+				while(br.ready()) {
+					String[] lineEntries = br.readLine().split(";");
+					transitStopIdStrings.add(lineEntries[1]);
+					stopLinkString.add(lineEntries[6]);
+					if (counter==0) {
+						String[] time = lineEntries[7].split(":");
+						firstDep = Double.parseDouble(time[0])*3600 + Double.parseDouble(time[1])*60 + Double.parseDouble(time[2]);
+						freq = Double.parseDouble(lineEntries[8])*60;
+					}
+					counter++;
+				}
+				
 			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString);
 			
 			String[] routes = null;
 			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
 			
 			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
-//			cottbus.addDeparturesToRoute(transRoute, firstDep, lastDep, frequency);
+			
+			cottbus.addDeparturesToRoute(transRoute, firstDep, freq);
 			
 			TransitLine transLine = cottbus.createTransitLine(transRoute, lineName);
 			
 			cottbus.schedule.addTransitLine(transLine);
 		}
 		
-			
+		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(cottbus.schedule);
+		scheduleWriter.write("E:\\Cottbus\\Cottbus_pt\\lines\\schedule.xml");
 		
 	}
 	
@@ -135,8 +149,14 @@ public class SfCottbusPtSchedule {
 		return transitLine;
 	}
 	
-	private void addDeparturesToRoute (TransitRoute transitRoute, double firstDep, double lastDep, double frequency) {
-		
+	private void addDeparturesToRoute (TransitRoute transitRoute, double firstDep, double frequency) {
+		double lastDep = 22.0 * 3600;
+		double currentDep = firstDep;
+		while (currentDep <= lastDep) {
+			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+currentDep), currentDep);
+			transitRoute.addDeparture(dep);
+			currentDep+=frequency;
+		}
 	}
 	
 	private TransitRoute createTransitRoute(String transitRouteId, NetworkRoute netRoute, List<TransitRouteStop> stopList) {
