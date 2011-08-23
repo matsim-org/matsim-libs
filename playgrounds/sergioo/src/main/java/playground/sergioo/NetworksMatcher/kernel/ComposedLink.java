@@ -13,13 +13,17 @@ public class ComposedLink extends LinkImpl {
 	
 	
 	//Attributes
+	
 	private List<Link> links;
 	
+	
 	//Methods
+	
 	protected ComposedLink(Id id, Node from, Node to, Network network,
 			double length, double freespeed, double capacity, double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 		links = new ArrayList<Link>();
 	}
+	
 	
 }

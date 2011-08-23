@@ -1,6 +1,7 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
@@ -18,6 +19,7 @@ public class MatchingProcess {
 
 	private Network finalNetworkB;
 
+	
 	//Methods
 
 	public MatchingProcess() {
@@ -62,8 +64,16 @@ public class MatchingProcess {
 		for(Link fullLink:fullNetwork.getLinks().values())
 			for(Link emptyLink:emptyNetwork.getLinks().values())
 				if(finalMatchingStep.isMatched(fullLink.getFromNode(),emptyLink.getFromNode()) && finalMatchingStep.isMatched(fullLink.getToNode(),emptyLink.getToNode()))
-					System.out.println();//emptyLink.applyProperties(fullLink);
+					System.out.println();//TODO emptyLink.applyProperties(fullLink);
+	}
+	
+	public Collection<NodesMatching> getMatchings(int stepNumber) {
+		return matchingSteps.get(stepNumber).getNodesMatchings();
 	}
 
+	public Collection<NodesMatching> getFinalMatchings() {
+		return matchingSteps.get(matchingSteps.size()-1).getNodesMatchings();
+	}
 
+	
 }

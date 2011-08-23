@@ -9,7 +9,7 @@ public class NodesMatching {
 	//Attributes
 
 	private final NetworkNode subNetworkNodeA;
-
+	
 	private final NetworkNode subNetworkNodeB;
 
 

@@ -18,7 +18,7 @@ public class MatchingStep {
 
 	private Network networkB;
 
-	private final MatchingAlgorithm algorithm;
+	private final MatchingAlgorithm matchingAlgorithm;
 
 	private Region region;
 
@@ -27,8 +27,8 @@ public class MatchingStep {
 	
 	//Methods
 
-	public MatchingStep(MatchingAlgorithm algorithm) {
-		this.algorithm = algorithm;
+	public MatchingStep(MatchingAlgorithm matchingAlgorithm) {
+		this.matchingAlgorithm = matchingAlgorithm;
 	}
 
 	public Network getNetworkA() {
@@ -51,9 +51,9 @@ public class MatchingStep {
 		this.networkA = networkA;
 		this.networkB = networkB;
 		if(region == null)
-			nodesMatchings = algorithm.execute(networkA, networkB);
+			nodesMatchings = matchingAlgorithm.execute(networkA, networkB);
 		else
-			nodesMatchings = algorithm.execute(networkA, networkB, region);
+			nodesMatchings = matchingAlgorithm.execute(networkA, networkB, region);
 		Network[] networks = new Network[2];
 		networks[0] = NetworkImpl.createNetwork();
 		networks[1] = NetworkImpl.createNetwork();
