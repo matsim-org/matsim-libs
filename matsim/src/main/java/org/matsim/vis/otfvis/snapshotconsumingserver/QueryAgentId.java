@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis2;
+package org.matsim.vis.otfvis.snapshotconsumingserver;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

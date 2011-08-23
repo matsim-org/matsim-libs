@@ -29,6 +29,7 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.QuadTree;
@@ -40,7 +41,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
@@ -56,9 +57,7 @@ import org.matsim.vis.snapshotwriters.VisMobsimFeature;
  * @author dstrippgen
  *
  */
-public class OnTheFlyServer implements OTFLiveServerRemote {
-
-	private static final long serialVersionUID = -4012748585344947013L;
+public class OnTheFlyServer implements OTFLiveServer {
 
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
 
@@ -92,12 +91,15 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	private Semaphore accessToQNetwork = new Semaphore(1);
 
-	public OnTheFlyServer(EventsManager events) {
+	private Scenario scenario;
+
+	OnTheFlyServer(Scenario scenario, EventsManager events) {
+		this.scenario = scenario;
 		this.events = events; 
 	}
 
-	public static OnTheFlyServer createInstance(EventsManager events) {
-		OnTheFlyServer instance = new OnTheFlyServer(events);
+	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events) {
+		OnTheFlyServer instance = new OnTheFlyServer(scenario, events);
 		return instance;
 	}
 
@@ -205,10 +207,9 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 		if (quad != null) {
 			return quad;
 		} else {
-			Config config = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig();
+			Config config = this.scenario.getConfig();
 			String scenarioCRS = config.global().getCoordinateSystem();
 			int maxZoom = config.otfVis().getMaximumZoom();
-	
 			if (config.otfVis().isMapOverlayMode()) {
 				// Transform everything from network coordinates first to WGS84 and then to standard mercator projection as used by OSM tiles and Geoserver.
 				// The user needs to know the maximum zoom level they would like to use beforehand.
@@ -227,8 +228,11 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 				});
 			}
-
-			quad = new LiveServerQuadTree(this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
+			if (this.otfVisQueueSimFeature != null) {
+				quad = new LiveServerQuadTree(this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
+			} else {
+				quad = new SnapshotWriterQuadTree(this.scenario.getNetwork());
+			}
 			quad.initQuadTree(connect);
 			for(OTFDataWriter<?> writer : additionalElements) {
 				log.info("Adding additional element: " + writer.getClass().getName());
@@ -312,11 +316,11 @@ public class OnTheFlyServer implements OTFLiveServerRemote {
 
 	@Override
 	public OTFVisConfigGroup getOTFVisConfig() {
-		OTFVisConfigGroup otfVisConfig = this.otfVisQueueSimFeature.getVisMobsim().getScenario().getConfig().otfVis();
+		OTFVisConfigGroup otfVisConfig = this.scenario.getConfig().otfVis();
 		if (otfVisConfig == null) {
 			otfVisConfig = new OTFVisConfigGroup();
 		}
-		double effLaneWidth = this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork().getNetwork().getEffectiveLaneWidth() ;
+		double effLaneWidth = this.scenario.getNetwork().getEffectiveLaneWidth() ;
 		if ( Double.isNaN(effLaneWidth) ) {
 			otfVisConfig.setEffectiveLaneWidth( null ) ;
 		} else {

@@ -1,4 +1,4 @@
-package org.matsim.vis.otfvis2;
+package org.matsim.vis.otfvis.snapshotconsumingserver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,11 +13,7 @@ public final class QueryServer {
 
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 	
-	private EventsManager events;
-
 	private SimulationViewForQueries queueModel;
-
-	private Scenario scenario;
 
 	public void removeQueries() {
 		activeQueries.clear();
@@ -25,8 +21,6 @@ public final class QueryServer {
 
 	public QueryServer(Scenario scenario, EventsManager events, SimulationViewForQueries queueModel) {
 		super();
-		this.scenario = scenario;
-		this.events = events;
 		this.queueModel = queueModel;
 	}
 

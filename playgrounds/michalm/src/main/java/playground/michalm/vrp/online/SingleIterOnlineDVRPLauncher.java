@@ -26,7 +26,7 @@ import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.*;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.gui.*;
-import org.matsim.vis.otfvis2.*;
+import org.matsim.vis.otfvis.snapshotconsumingserver.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;

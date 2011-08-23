@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
@@ -40,7 +40,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 public final class JXMapOTFVisClient {
 
 
-	public static void run(final Config config, final OTFServerRemote server) {
+	public static void run(final Config config, final OTFServer server) {
 		assertZoomLevel17(config);
 		run(config, server, osmTileFactory());
 	}
@@ -51,12 +51,12 @@ public final class JXMapOTFVisClient {
 		}
 	}
 
-	public static void run(final Config config, final OTFServerRemote server, final WMSService wms) {
+	public static void run(final Config config, final OTFServer server, final WMSService wms) {
 		final TileFactory tf = new MyWMSTileFactory(wms, config.otfVis().getMaximumZoom());
 		run(config, server, tf);
 	}
 
-	private static void run(final Config config, final OTFServerRemote server, final TileFactory tf) {
+	private static void run(final Config config, final OTFServer server, final TileFactory tf) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

@@ -44,7 +44,7 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
@@ -90,9 +90,9 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	 */
 	private PlayOrPause playOrPause = PlayOrPause.PLAY;
 
-	private OTFServerRemote server;
+	private OTFServer server;
 
-	public OTFHostControlBar(OTFServerRemote server)  {
+	public OTFHostControlBar(OTFServer server)  {
 		this.server = server;
 		this.hostControl = new OTFHostControl(server, this);
 		this.setFloatable(false);
@@ -146,7 +146,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		}
 	}
 
-	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime) {
+	private boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {
 		boolean result = hostControl.requestTimeStep(newTime, prefTime);
 		return result;
 	}
@@ -205,21 +205,21 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	private void pressed_STEP_F() {
-		requestTimeStep(hostControl.getSimTime() + 1, OTFServerRemote.TimePreference.LATER);
+		requestTimeStep(hostControl.getSimTime() + 1, OTFServer.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_FF() {
 		int bigStep = OTFClientControl.getInstance().getOTFVisConfig().getBigTimeStep();
-		requestTimeStep(hostControl.getSimTime() + bigStep, OTFServerRemote.TimePreference.LATER);
+		requestTimeStep(hostControl.getSimTime() + bigStep, OTFServer.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_B() {
-		requestTimeStep(hostControl.getSimTime() - 1, OTFServerRemote.TimePreference.EARLIER);
+		requestTimeStep(hostControl.getSimTime() - 1, OTFServer.TimePreference.EARLIER);
 	}
 
 	private void pressed_STEP_BB() {
 		int bigStep = OTFClientControl.getInstance().getOTFVisConfig().getBigTimeStep();
-		requestTimeStep(hostControl.getSimTime() - bigStep, OTFServerRemote.TimePreference.EARLIER);
+		requestTimeStep(hostControl.getSimTime() - bigStep, OTFServer.TimePreference.EARLIER);
 	}
 
 	private void forwardToTime(String newTime) {

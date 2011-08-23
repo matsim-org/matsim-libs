@@ -29,8 +29,8 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 public class OTFHostControl {
 
@@ -46,9 +46,9 @@ public class OTFHostControl {
 
 	private OTFHostControlBar hostControlBar;
 
-	private OTFServerRemote server;
+	private OTFServer server;
 
-	public OTFHostControl(OTFServerRemote server, OTFHostControlBar hostControlBar) {
+	public OTFHostControl(OTFServer server, OTFHostControlBar hostControlBar) {
 		this.server = server;
 		this.hostControlBar = hostControlBar;
 		Collection<Double> steps = getTimeStepsdrawer();
@@ -77,10 +77,10 @@ public class OTFHostControl {
 		stopMovie();
 		if(isLive()) {
 			cancel();
-			requestTimeStep(0, OTFServerRemote.TimePreference.LATER);
+			requestTimeStep(0, OTFServer.TimePreference.LATER);
 			simTime.setValue(0);
 		} else {
-			requestTimeStep(loopStart, OTFServerRemote.TimePreference.LATER);
+			requestTimeStep(loopStart, OTFServer.TimePreference.LATER);
 			log.debug("To start...");
 		}
 	}
@@ -107,9 +107,9 @@ public class OTFHostControl {
 	void gotoTime(int gotoTime, OTFAbortGoto progressBar) {
 		boolean restart = gotoTime < getSimTime();
 		if (restart){
-			requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
-		} else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER)) {
-			requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
+			requestTimeStep(gotoTime, OTFServer.TimePreference.RESTART);
+		} else if (!requestTimeStep(gotoTime, OTFServer.TimePreference.EARLIER)) {
+			requestTimeStep(gotoTime, OTFServer.TimePreference.LATER);
 		}
 		if (progressBar != null) {
 			progressBar.terminate = true;
@@ -122,7 +122,7 @@ public class OTFHostControl {
 		simTime.setValue(server.getLocalTime());
 	}
 
-	boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime) {
+	boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {
 		if (requestNewTime(newTime, prefTime)) {
 			simTime.setValue(server.getLocalTime());
 			return true;
@@ -132,7 +132,7 @@ public class OTFHostControl {
 		}
 	}
 
-	boolean requestNewTime(int newTime, OTFServerRemote.TimePreference prefTime) {
+	boolean requestNewTime(int newTime, OTFServer.TimePreference prefTime) {
 		boolean requestNewTime = server.requestNewTime(newTime, prefTime);
 		return requestNewTime;
 	}
@@ -176,11 +176,11 @@ public class OTFHostControl {
 
 
 	private void pressPlayOnServer() {
-		((OTFLiveServerRemote) server).play();
+		((OTFLiveServer) server).play();
 	}
 
 	private void pressPauseOnServer() {
-		((OTFLiveServerRemote) server).pause();
+		((OTFLiveServer) server).pause();
 	}
 
 	void updateSyncPlay(boolean synchronizedPlay) {
@@ -238,8 +238,8 @@ public class OTFHostControl {
 						
 						@Override
 						public void run() {
-							if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServerRemote.TimePreference.LATER))) {
-								requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
+							if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServer.TimePreference.LATER))) {
+								requestNewTime(loopStart, OTFServer.TimePreference.LATER);
 							}
 							actTime = getSimTime();
 							simTime.setValue(server.getLocalTime());

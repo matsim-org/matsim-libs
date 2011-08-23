@@ -34,7 +34,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 
 /**
@@ -60,7 +60,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	public double offsetEast;
 	public double offsetNorth;
 
-	private final OTFServerRemote host;
+	private final OTFServer host;
 	private OTFConnectionManager connect;
 
 	private final List<OTFDataReader> additionalElements = new LinkedList<OTFDataReader>();
@@ -108,7 +108,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	OTFClientQuadTree(final OTFServerRemote host, final double minX, final double minY, final double maxX, final double maxY) {
+	OTFClientQuadTree(final OTFServer host, final double minX, final double minY, final double maxX, final double maxY) {
 		super(minX, minY, maxX, maxY);
 		this.minEasting = minX;
 		this.maxEasting = maxX;

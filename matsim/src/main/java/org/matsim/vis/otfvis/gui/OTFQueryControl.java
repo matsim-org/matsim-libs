@@ -34,13 +34,13 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -68,7 +68,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private final OTFHostControlBar hostControlBar;
 
-	private final OTFServerRemote server;
+	private final OTFServer server;
 
 	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
 
@@ -88,7 +88,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFServerRemote server, OTFHostControlBar handler, final OTFVisConfigGroup config) {
+	public OTFQueryControl(OTFServer server, OTFHostControlBar handler, final OTFVisConfigGroup config) {
 		this.config = config;
 		this.hostControlBar = handler;
 		this.server = server;
@@ -113,7 +113,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	@Override
 	synchronized public void removeQueries() {
 		if(server.isLive()) {
-			((OTFLiveServerRemote) server).removeQueries();
+			((OTFLiveServer) server).removeQueries();
 		}
 		for (OTFQueryResult query : this.queryEntries.values()) {
 			query.remove();
@@ -181,7 +181,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	@Override
 	public OTFQueryRemote doQuery(final AbstractQuery query) {
-		return ((OTFLiveServerRemote) server).answerQuery(query);
+		return ((OTFLiveServer) server).answerQuery(query);
 	}
 
 	private void handleIdQuery(Collection<String> list, String queryName) {

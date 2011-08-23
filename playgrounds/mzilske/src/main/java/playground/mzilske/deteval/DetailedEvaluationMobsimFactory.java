@@ -31,8 +31,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.vis.otfvis2.OTFVisClient;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
 
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
@@ -104,11 +104,8 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (useOTFVis) {
-			OTFVisLiveServer server = new OTFVisLiveServer(scenario, eventsManager);
-			OTFVisClient client = new OTFVisClient();
-			client.setServer(server);
-			client.setSwing(true);
-			client.run();
+			SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, eventsManager);
+			OTFClientLive.run(scenario.getConfig(), server);
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());
 			planSim.addMobsimFeature(otfvisFeature);

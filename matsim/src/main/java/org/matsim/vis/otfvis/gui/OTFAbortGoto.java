@@ -23,8 +23,8 @@ package org.matsim.vis.otfvis.gui;
 import javax.swing.ProgressMonitor;
 
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.interfaces.OTFServer.TimePreference;
 
 
 /**
@@ -35,11 +35,11 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote.TimePreference;
  */
 public class OTFAbortGoto extends Thread  {
 	public boolean terminate = false;
-	private final OTFServerRemote host;
+	private final OTFServer host;
 	private final int toTime;
 	private ProgressMonitor progressMonitor;
 
-	public OTFAbortGoto(OTFServerRemote host, int toTime, int toIter) {
+	public OTFAbortGoto(OTFServer host, int toTime, int toIter) {
 		this.toTime = toTime;
 		this.host = host;
 	}

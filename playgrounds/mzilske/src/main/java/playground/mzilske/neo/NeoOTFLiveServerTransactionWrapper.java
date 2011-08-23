@@ -6,18 +6,18 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.neo4j.graphdb.Transaction;
 
-public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServerRemote {
+public class NeoOTFLiveServerTransactionWrapper implements OTFLiveServer {
 	
-	private final OTFLiveServerRemote delegate;
+	private final OTFLiveServer delegate;
 	
 	private final NeoScenario scenario;
 
-	public NeoOTFLiveServerTransactionWrapper(OTFLiveServerRemote delegate,
+	public NeoOTFLiveServerTransactionWrapper(OTFLiveServer delegate,
 			NeoScenario scenario) {
 		super();
 		this.delegate = delegate;

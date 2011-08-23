@@ -20,6 +20,8 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="mobsim" value="queueSimulation" />
+		<param name="snapshotFormat" value="otfvis" />
+		
 	</module>
 
 	<module name="simulation">

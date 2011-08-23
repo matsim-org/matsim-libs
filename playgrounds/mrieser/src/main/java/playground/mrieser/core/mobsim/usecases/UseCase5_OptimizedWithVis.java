@@ -27,8 +27,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.vis.otfvis2.OTFVisClient;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
 
 /**
  * @author mrieser
@@ -50,11 +50,8 @@ public class UseCase5_OptimizedWithVis {
 
 		/* **************************************************************** */
 
-		OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
-		OTFVisClient client = new OTFVisClient();
-		client.setServer(server);
-		client.setSwing(true);
-		client.run();
+		SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, events);
+		OTFClientLive.run(config, server);
 
 		OptimizedCarSimFactory simFactory = new OptimizedCarSimFactory(2);
 		simFactory.setTeleportedModes(new String[] {TransportMode.bike, TransportMode.pt, TransportMode.ride, TransportMode.walk});

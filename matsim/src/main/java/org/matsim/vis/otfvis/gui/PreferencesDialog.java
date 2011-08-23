@@ -40,7 +40,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -52,7 +52,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private static final long serialVersionUID = 5778562849300898138L;
 
-	private final OTFServerRemote server;
+	private final OTFServer server;
 	
 	private OTFVisConfigGroup visConfig;
 
@@ -70,7 +70,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private JSpinner delaySpinner = null;
 
-	public PreferencesDialog(final OTFServerRemote server, final OTFFrame frame, final OTFHostControlBar mother) {
+	public PreferencesDialog(final OTFServer server, final OTFFrame frame, final OTFHostControlBar mother) {
 		super(frame);
 		this.server = server;
 		this.host = mother;

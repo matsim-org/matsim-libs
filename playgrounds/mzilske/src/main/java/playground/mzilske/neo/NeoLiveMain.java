@@ -10,8 +10,8 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
-import org.matsim.vis.otfvis2.OTFVisClient;
-import org.matsim.vis.otfvis2.OTFVisLiveServer;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
 import org.neo4j.graphdb.Transaction;
 
 public class NeoLiveMain {
@@ -37,7 +37,7 @@ public class NeoLiveMain {
 				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 
-				final OTFVisLiveServer server = new OTFVisLiveServer(scenario, events);
+				final SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, events);
 				SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
 				snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
 				events.addHandler(snapshotGenerator);
@@ -45,10 +45,7 @@ public class NeoLiveMain {
 
 				NeoOTFLiveServerTransactionWrapper wrappedServer = new NeoOTFLiveServerTransactionWrapper(server, scenario);
 
-				OTFVisClient client = new OTFVisClient();
-				client.setServer(wrappedServer);
-				client.setSwing(false);
-				client.run();
+				OTFClientLive.run(scenario.getConfig(), wrappedServer);
 
 				System.out.println("Reading...");
 				new MatsimEventsReader(events).readFile(eventsFileName);

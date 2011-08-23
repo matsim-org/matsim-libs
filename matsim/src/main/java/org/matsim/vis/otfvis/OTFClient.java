@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 
 /**
@@ -58,7 +58,7 @@ public final class OTFClient {
 
 	private OTFDrawer mainDrawer;
 
-	private OTFServerRemote server;
+	private OTFServer server;
 
 	public OTFClient() {
 		this.frame = new OTFFrame("MATSim OTFVis");
@@ -67,13 +67,13 @@ public final class OTFClient {
 		log.info("created MainFrame");
 	}
 
-	public void setServer(OTFServerRemote server) {
+	public void setServer(OTFServer server) {
 		this.server = server;
 		this.hostControlBar = new OTFHostControlBar(server);
 	}
 
 	@SuppressWarnings("serial")
-	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save, final OTFServerRemote server) {
+	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save, final OTFServer server) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);

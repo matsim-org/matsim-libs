@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
  * @author dstrippgen
  *
  */
-public interface OTFServerRemote {
+public interface OTFServer {
 
 	public enum TimePreference{EARLIER, LATER, RESTART}
 

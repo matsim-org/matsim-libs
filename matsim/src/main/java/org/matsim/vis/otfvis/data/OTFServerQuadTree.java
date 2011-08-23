@@ -34,7 +34,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 
 
@@ -113,7 +113,7 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 		this.additionalElements.add(element);
 	}
 
-	public OTFClientQuadTree convertToClient(final OTFServerRemote host, final OTFConnectionManager connect) {
+	public OTFClientQuadTree convertToClient(final OTFServer host, final OTFConnectionManager connect) {
 		final OTFClientQuadTree client = new OTFClientQuadTree(host, 0., 0.,this.easting, this.northing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;

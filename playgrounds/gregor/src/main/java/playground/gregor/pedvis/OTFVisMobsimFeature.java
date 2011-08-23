@@ -51,7 +51,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getEventsManager());
+		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getScenario(), this.queueSimulation.getEventsManager());
 		this.server.setSimulation(this);
 
 

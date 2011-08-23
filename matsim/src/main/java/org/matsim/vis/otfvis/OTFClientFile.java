@@ -34,13 +34,13 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
-import org.matsim.vis.otfvis2.LinkHandler;
 
 /**
  * This file starts OTFVis using a .mvi file.
@@ -73,10 +73,10 @@ public class OTFClientFile implements Runnable {
 		OTFFileReader otfServer = new OTFFileReader(url);
 		otfClient.setServer(otfServer);
 		OTFConnectionManager connect = new OTFConnectionManager();
-		connect.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
+		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
-		connect.connectReaderToReceiver(LinkHandler.class, OGLSimpleQuadDrawer.class);
+		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();

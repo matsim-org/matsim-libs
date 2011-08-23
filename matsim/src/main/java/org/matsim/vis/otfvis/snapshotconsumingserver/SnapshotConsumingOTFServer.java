@@ -1,4 +1,4 @@
-package org.matsim.vis.otfvis2;
+package org.matsim.vis.otfvis.snapshotconsumingserver;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -17,17 +17,29 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
+import org.matsim.vis.otfvis.SnapshotWriterQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
+import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-public final class OTFVisLiveServer implements OTFLiveServerRemote {
+/**
+ * This is a version of the OTFVis server which doesn't use a "live network" to scrape agents off, but
+ * consumes only Snapshots.
+ * 
+ * Of course, things like "fast forward" are not as fast as with the other server, because the
+ * Simulation (which this Server knows nothing about) will most likely always produce Snapshots 
+ * for the entire network and for each time step.
+ * 
+ * @author michaz
+ *
+ */
+public final class SnapshotConsumingOTFServer implements OTFLiveServer {
 
 	private QueryServer queryServer;
 
@@ -124,7 +136,7 @@ public final class OTFVisLiveServer implements OTFLiveServerRemote {
 
 	}
 
-	public OTFVisLiveServer(Scenario scenario, EventsManager eventsManager) {
+	public SnapshotConsumingOTFServer(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
 		this.agentWriter = new OTFAgentsListHandler.Writer();
 		this.agentWriter.setSrc(this.positions );

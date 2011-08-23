@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.SwingAgentDrawer;
 import org.matsim.vis.otfvis.gui.SwingSimpleQuadDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis2.LinkHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 
 
 
@@ -80,9 +80,9 @@ public class OTFClientSwing implements Runnable {
 		OTFFileReader server = new OTFFileReader(url);
 		otfClient.setServer(server);
 		Gbl.printMemoryUsage();
-		connectionManager.connectWriterToReader(LinkHandler.Writer.class, LinkHandler.class);
+		connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		connectionManager.connectReaderToReceiver(LinkHandler.class, SwingSimpleQuadDrawer.class);
+		connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, SwingSimpleQuadDrawer.class);
 		connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, SwingAgentDrawer.class);
 		connectionManager.connectReceiverToLayer(SwingSimpleQuadDrawer.class, SimpleSceneLayer.class);
 		connectionManager.connectReceiverToLayer(SwingAgentDrawer.class, SimpleSceneLayer.class);
