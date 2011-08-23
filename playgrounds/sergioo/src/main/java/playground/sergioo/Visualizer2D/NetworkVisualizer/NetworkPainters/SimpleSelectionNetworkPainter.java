@@ -49,7 +49,7 @@ public class SimpleSelectionNetworkPainter extends NetworkPainter {
 		if(node!=null)
 			paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodeColor);
 	}
-	public void changeSelected() {
+	public void changeVisibleSelectedElements() {
 		withSelected = !withSelected;
 	}
 	

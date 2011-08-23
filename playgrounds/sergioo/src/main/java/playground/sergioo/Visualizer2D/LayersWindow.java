@@ -15,13 +15,13 @@ public abstract class LayersWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
-	public interface PanelId {
+	public interface PanelIds {
 		public String name();
 	}
-	public interface Option {
+	public interface Options {
 		public String getCaption();
 	}
-	public interface Label {
+	public interface Labels {
 		public String getText();
 	}
 	
@@ -29,14 +29,14 @@ public abstract class LayersWindow extends JFrame {
 	protected static final String READY_TO_EXIT = "exit";
 	
 	//Attributes
-	protected Option option;
+	protected Options option;
 	protected JLabel[] labels;
 	protected JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	protected boolean readyToExit = false;
-	protected final Map<PanelId, LayersPanel> layersPanels = new HashMap<PanelId, LayersPanel>();
+	protected final Map<PanelIds, LayersPanel> layersPanels = new HashMap<PanelIds, LayersPanel>();
 	
 	//Methods
-	public Option getOption() {
+	public Options getOption() {
 		return option;
 	}
 	public boolean isReadyToExit() {

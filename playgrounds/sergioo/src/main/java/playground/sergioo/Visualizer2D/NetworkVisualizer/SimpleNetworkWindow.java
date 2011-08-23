@@ -43,15 +43,15 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	
 	
 	//Enumerations
-	private enum PanelIds implements LayersWindow.PanelId {
+	private enum PanelIds implements LayersWindow.PanelIds {
 		ONE;
 	}
-	public enum Option implements LayersWindow.Option {
+	public enum Options implements LayersWindow.Options {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
 		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		private String caption;
-		private Option(String caption) {
+		private Options(String caption) {
 			this.caption = caption;
 		}
 		@Override
@@ -59,11 +59,11 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 			return caption;
 		}
 	}
-	public enum Label implements LayersWindow.Label {
+	public enum Labels implements LayersWindow.Labels {
 		LINK("Link"),
 		NODE("Node");
 		private String text;
-		private Label(String text) {
+		private Labels(String text) {
 			this.text = text;
 		}
 		@Override
@@ -83,10 +83,10 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		this.setLayout(new BorderLayout()); 
 		layersPanels.put(PanelIds.ONE, new NetworkPanel(this, networkPainter));
 		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
-		option = Option.ZOOM;
+		option = Options.ZOOM;
 		JPanel buttonsPanel = new JPanel();
-		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
-		for(Option option:Option.values()) {
+		buttonsPanel.setLayout(new GridLayout(Options.values().length,1));
+		for(Options option:Options.values()) {
 			JButton optionButton = new JButton(option.getCaption());
 			optionButton.setActionCommand(option.getCaption());
 			optionButton.addActionListener(this);
@@ -100,9 +100,9 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		readyButton.setActionCommand(READY_TO_EXIT);
 		infoPanel.add(readyButton, BorderLayout.WEST);
 		JPanel labelsPanel = new JPanel();
-		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labelsPanel.setLayout(new GridLayout(1,Labels.values().length));
 		labelsPanel.setBorder(new TitledBorder("Information"));
-		labels = new JLabel[Label.values().length];
+		labels = new JLabel[Labels.values().length];
 		labels[0]=new JLabel("");
 		labelsPanel.add(labels[0]);
 		labels[1]=new JLabel("");
@@ -116,12 +116,12 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		this.add(infoPanel, BorderLayout.SOUTH);
 		pack();
 	}
-	public void refreshLabel(Label label) {
+	public void refreshLabel(Labels label) {
 		labels[label.ordinal()].setText(((NetworkPanel)layersPanels.get(PanelIds.ONE)).getLabelText(label));
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		for(Option option:Option.values())
+		for(Options option:Options.values())
 			if(e.getActionCommand().equals(option.getCaption()))
 				this.option = option;
 		if(e.getActionCommand().equals(READY_TO_EXIT)) {

@@ -43,10 +43,10 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 	private static final long serialVersionUID = 1L;
 	
 	//Enumerations
-	private enum PanelIds implements LayersWindow.PanelId {
+	private enum PanelIds implements LayersWindow.PanelIds {
 		ONE;
 	}
-	public enum Option implements LayersWindow.Option {
+	public enum Option implements LayersWindow.Options {
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		private String caption;
 		private Option(String caption) {
@@ -57,7 +57,7 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 			return caption;
 		}
 	}
-	public enum Label implements LayersWindow.Label {
+	public enum Label implements LayersWindow.Labels {
 		LINK("Link"),
 		NODE("Node");
 		private String text;

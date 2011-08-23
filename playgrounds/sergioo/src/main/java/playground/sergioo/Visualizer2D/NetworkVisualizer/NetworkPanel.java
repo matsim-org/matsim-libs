@@ -38,8 +38,8 @@ import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkManager;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleSelectionNetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Label;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Option;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Labels;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Options;
 
 public class NetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, KeyListener {
 	
@@ -52,7 +52,6 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	private final SimpleNetworkWindow window;
 	private int iniX;
 	private int iniY;
-	private boolean withNetwork = true;
 	
 	//Methods
 	public NetworkPanel(SimpleNetworkWindow window, NetworkPainter networkPainter) {
@@ -82,30 +81,30 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
-			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
+			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
-				window.refreshLabel(Label.LINK);
+				window.refreshLabel(Labels.LINK);
 			}
-			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
+			else if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectLink();
-				window.refreshLabel(Label.LINK);
+				window.refreshLabel(Labels.LINK);
 			}
-			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
-				window.refreshLabel(Label.NODE);
+				window.refreshLabel(Labels.NODE);
 			}
-			else if(window.getOption().equals(Option.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectNode();
-				window.refreshLabel(Label.NODE);
+				window.refreshLabel(Labels.NODE);
 			}
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
+			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
 				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
-			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
+			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
 				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
 		}
 		repaint();
 	}
-	public String getLabelText(Label label) {
+	public String getLabelText(Labels label) {
 		try {
 			return (String) NetworkManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
@@ -154,14 +153,14 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
 		case 'n':
-			withNetwork  = !withNetwork;
+			getActiveLayer().changeVisible();
 			break;
 		case 's':
-			((SimpleSelectionNetworkPainter)getPrincipalLayer().getPainter()).changeSelected();
+			((SimpleSelectionNetworkPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
 			break;
 		case 'o':
 			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkManager().selectOppositeLink();
-			window.refreshLabel(Label.LINK);
+			window.refreshLabel(Labels.LINK);
 			break;
 		case 'v':
 			viewAll();

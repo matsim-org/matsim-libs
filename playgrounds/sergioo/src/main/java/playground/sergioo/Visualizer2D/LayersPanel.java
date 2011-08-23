@@ -29,7 +29,7 @@ public abstract class LayersPanel extends JPanel {
 	private double yMax;
 	private double xMin;
 	private double yMin;
-	private int frameSize=20;
+	private int frameSize=10;
 	protected byte activeLayer = 0;
 	protected byte principalLayer = 0;
 	
@@ -46,6 +46,9 @@ public abstract class LayersPanel extends JPanel {
 	}
 	protected void addLayer(Layer layer) {
 		layers.add(layer);
+	}
+	protected void removeLastLayer() {
+		layers.remove(layers.size()-1);
 	}
 	protected Layer getActiveLayer() {
 		return layers.get(activeLayer);
