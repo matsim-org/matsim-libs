@@ -67,16 +67,17 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 		Id linkId=event.getLinkId();
 		Id personId=event.getPersonId();
 		Double enterTime = 0.0;
+		double endOfTimeInterval = 0.0;
+		
+		
+/**accumulated ratio of actual and freeflow travel time per link	**/
+		
 		Link link = this.network.getLinks().get(event.getLinkId());
-		double freeTravelSpeed = link.getFreespeed();
-//		freeTravelSpeed = freeTravelSpeed*3.6;
-		double stopGoSpeed= 15.9152;
+	  	double freeTravelSpeed = link.getFreespeed();
 		double stopGoFraction = 0.0;
-		double stopGoTime = 0.0;
 		double distance = link.getLength(); 
-
-		if(this.linkenter.containsKey(event.getPersonId())){
-			double endOfTimeInterval = 0.0;
+	  
+	  if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
 			double travelTime = event.getTime()-enterTime;
 			double freeflowTime= distance / freeTravelSpeed;
@@ -113,15 +114,17 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 				stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
 				//if(linkId.toString().equals("576273431-592536888"))
 				//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " aggegatedCongestion "+linkId2stopGoFraction);
+				}
 			}
-		}
-	}
+	  }
 	}
 	
 		
-/*	if(this.linkenter.containsKey(event.getPersonId())){
+/**accumulated demand per link	**/
+ 	
+ /*		if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
-			double endOfTimeInterval = 0.0;
+			
 	
 			for(int i = 0; i < noOfTimeBins; i++){
 				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
@@ -151,10 +154,25 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 		}
 	}*/
 				
-/*			enterTime = this.linkenter.get(personId);
-			double travelTime = event.getTime()-enterTime;
-			double averageSpeed=distance/travelTime;
+/**accumulated congestion length per link	**/
+  	
+	/*		Link link = this.network.getLinks().get(event.getLinkId());
+	 		double freeTravelSpeed = link.getFreespeed();
+			double stopGoFraction = 0.0;
+			double distance = link.getLength(); 
+	  		freeTravelSpeed = freeTravelSpeed*3.6;
+ 			double stopGoSpeed= 15.9152;
+ 			double stopGoTime = 0.0;
 
+			
+			
+			
+			 if(this.linkenter.containsKey(event.getPersonId())){
+					enterTime = this.linkenter.get(personId);
+					double travelTime = event.getTime()-enterTime;
+					double averageSpeed=(distance/1000)/(travelTime/3600);
+					
+					
 			if (averageSpeed < stopGoSpeed){
 					stopGoFraction = distance/1000;
 				}
