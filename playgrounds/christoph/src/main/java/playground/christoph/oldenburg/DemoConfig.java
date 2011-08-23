@@ -23,11 +23,12 @@ package playground.christoph.oldenburg;
 public class DemoConfig {
 
 	/*package*/ static int evacuationTime = 3*3600;
-	/*package*/ static int evacuationDeltaTime = 1*3600;
+	/*package*/ static int evacuationDeltaTime = 0*3600;
 	/*package*/ static String activityType = "evacuation";
 	/*package*/ static String evacuationLink = "evac5";
 	
 	/* Config Parameters */
+	/*package*/ static String configFile = "";
 	/*package*/ static double lambda = 5.0;
 	/*package*/ static double multiplier = 100.0;
 }

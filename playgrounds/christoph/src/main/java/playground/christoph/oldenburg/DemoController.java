@@ -20,7 +20,10 @@
 
 package playground.christoph.oldenburg;
 
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -29,6 +32,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -37,6 +41,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -58,7 +63,7 @@ public class DemoController extends WithinDayController implements SimulationIni
 	SimulationBeforeSimStepListener, IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(DemoController.class);
-			
+	
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
@@ -142,6 +147,26 @@ public class DemoController extends WithinDayController implements SimulationIni
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		
+		/*
+		 * This is just a workaround:
+		 * If the free speed of a link is adapted, also the vehicles that are currently
+		 * traveling over this link has to be adapted. We check whether a link has
+		 * been affected by a change event that occurred in the previous time step.
+		 * Imho this should be performed in the recalcTimeVariantAttributes method
+		 * in the NetsimLink class.
+		 */
+		for (NetworkChangeEvent networkChangeEvent : this.getNetwork().getNetworkChangeEvents()) {
+			if(networkChangeEvent.getStartTime() == e.getSimulationTime()) {
+				for (Link link : networkChangeEvent.getLinks()) {
+					LinkedList<QVehicle> vehicles = ((QSim)e.getQueueSimulation()).getNetsimNetwork().getNetsimLink(link.getId()).getVehQueue();
+					for (QVehicle vehicle : vehicles) {
+						double before = vehicle.getEarliestLinkExitTime();
+						vehicle.setEarliestLinkExitTime(e.getSimulationTime() + link.getLength() / link.getFreespeed(e.getSimulationTime()));
+						double after = vehicle.getEarliestLinkExitTime();
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
