@@ -1,32 +1,11 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * SpatialAveragingForLinkCongestion.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 package playground.fhuelsmann.emission.analysis;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -54,33 +33,29 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.events.emissions.ColdPollutant;
-import playground.benjamin.events.emissions.EmissionEventsReader;
 import playground.benjamin.events.emissions.WarmPollutant;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkWarmEventHandler;
-import playground.benjamin.scenarios.munich.analysis.SpatialAveragingForLinkEmissions;
 
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
-public class SpatialAveragingForLinkCongestion {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkCongestion.class);
+public class SpatialAveragingForLinkCongestionScenarioComparison {
+	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkCongestionScenarioComparison.class);
 
-	private final static String runNumber1 = "981";
-	private final static String runDirectory1 = "../../run" + runNumber1 + "/"+ runNumber1+".";
-	private final static String configFile = runDirectory1 + "output_config.xml.gz";
-	private final static Integer lastIteration = getLastIteration(configFile);
-	private final String netFile = runDirectory1 + "output_network.xml.gz";
-	private final String eventsFile = "../../run"+ runNumber1 +"/ITERS/it.1500/"+ runNumber1 +".1500.events.xml.gz";
-	
+	private final String runNumber1 = "981";
+	private final String runNumber2 = "982";
+	private final String runDirectory1 = "../../run" + runNumber1 + "/"+ runNumber1+".";
+	private final String runDirectory2 = "../../run" + runNumber2 + "/"+ runNumber2+".";
+	private final String configFile = runDirectory1 + "output_config.xml.gz";
+	private final String netFile = runDirectory2 + "output_network.xml.gz";
+//	private final String configFile2 = runDirectory2 + "output_config.xml.gz";
+	private final String eventsFile1 = "../../run" + runNumber1 +"/ITERS/it.1500/"+ runNumber1 +".1500.events.xml.gz";
+	private final String eventsFile2 = "../../run" + runNumber2 +"/ITERS/it.1500/"+ runNumber2 +".1500.events.xml.gz";
 
-	private final String outPath = "../../run"+ runNumber1 +"/emissions/" +  "-" + runNumber1 + ".";
+	private final String outPath = "../../run" + runNumber2 +"/emissions/" + runNumber2 + "-" + runNumber1 + ".";
 
 	Scenario scenario;
 	Network network;
@@ -111,13 +86,20 @@ public class SpatialAveragingForLinkCongestion {
 		this.network = this.scenario.getNetwork();
 		initFeatures();
 
-		processCongestion(eventsFile);
-		Map<Double, Map<Id, Double>> time2CongestionTotal = this.congestionHandler.getCongestionPerLinkAndTimeInterval();
-		Map<Double, Map<Id,Double>> time2CongestionTotalFiltered1 = setNonCalculatedCongestionAndFilter(time2CongestionTotal);
+		processCongestion(eventsFile1);
+		Map<Double, Map<Id, Double>> time2CongestionTotal1 = this.congestionHandler.getCongestionPerLinkAndTimeInterval();
+		Map<Double, Map<Id,Double>> time2CongestionTotalFiltered1 = setNonCalculatedCongestionAndFilter(time2CongestionTotal1);
 
-		this.congestionHandler.reset(0);
 		
+		
+		processCongestion(eventsFile2);
+		Map<Double, Map<Id, Double>> time2congestionTotal2 = this.congestionHandler.getCongestionPerLinkAndTimeInterval();
+		
+		Map<Double, Map<Id, Double>> time2CongestionTotalFiltered2 = setNonCalculatedCongestionAndFilter(time2congestionTotal2);
 
+		Map<Double, Map<Id, Double>> time2deltaCongestionTotal = calculateCongestionDifferences(time2CongestionTotalFiltered1, time2CongestionTotalFiltered2);
+		
+		this.congestionHandler.reset(0);
 		
 //		EmissionWriter eWriter = new EmissionWriter();
 //		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "Smoothed.txt");
@@ -125,8 +107,8 @@ public class SpatialAveragingForLinkCongestion {
 
 		Collection<Feature> features = new ArrayList<Feature>();
 
-		for(double endOfTimeInterval : time2CongestionTotalFiltered1.keySet()){
-			Map<Id, Double> deltaCongestionTotal = time2CongestionTotalFiltered1.get(endOfTimeInterval);
+		for(double endOfTimeInterval : time2deltaCongestionTotal.keySet()){
+			Map<Id, Double> deltaCongestionTotal = time2deltaCongestionTotal.get(endOfTimeInterval);
 //			String outFile = outPathStub + (int) endOfTimeInterval + ".txt";
 //			eWriter.writeLinkLocation2Emissions(listOfPollutants, deltaEmissionsTotal, network, outFile);
 
@@ -178,16 +160,16 @@ public class SpatialAveragingForLinkCongestion {
 							} catch (IllegalAttributeException e1) {
 								throw new RuntimeException(e1);
 							}
-						}
-					//}
+					//	}
+					}
 				}
 			}
 		}
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "Smoothed.txt");
 		
-		ShapeFileWriter.writeGeometries(features, outPath + ".movie.congestionlengthPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPath + ".movie.congestionlengthPerLinkSmoothed.shp");
+		ShapeFileWriter.writeGeometries(features, outPath + ".movie.travelTimeRatioPerLinkPerTimePeriodSmoothed.shp");
+		logger.info("Finished writing output to " + outPath + ".movie.travelTimeRatioPerLinkPerTimePeriodSmoothed.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -231,6 +213,32 @@ public class SpatialAveragingForLinkCongestion {
 		if (xCoord <= xMin || xCoord >= xMax) return null; // xHome is not in area of interest
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
+	}
+	
+	
+	private Map<Double, Map<Id,  Double>> calculateCongestionDifferences(
+			Map<Double, Map<Id, Double>> time2CongestionTotal1,
+			Map<Double, Map<Id, Double>> time2CongestionTotal2) {
+
+		Map<Double, Map<Id, Double>> time2delta = new HashMap<Double, Map<Id, Double>>();
+		for(Entry<Double, Map<Id, Double>> entry0 : time2CongestionTotal1.entrySet()){
+			double endOfTimeInterval = entry0.getKey();
+			Map<Id, Double> delta = entry0.getValue();
+
+			for(Entry<Id, Double> entry1 : delta.entrySet()){
+				Id linkId = entry1.getKey();
+				Double congestionDifferenceRatio =0.0;
+				Double congestionBefore = entry1.getValue();
+				Double congestionAfter = time2CongestionTotal2.get(endOfTimeInterval).get(linkId);
+				if (congestionBefore!=0.0){
+				congestionDifferenceRatio = (congestionAfter - congestionBefore)/congestionBefore;}
+				
+				else{congestionDifferenceRatio=0.0;}
+				delta.put(linkId, congestionDifferenceRatio);
+			}
+			time2delta.put(endOfTimeInterval, delta);
+		}
+		return time2delta;
 	}
 
 	private Map<Double, Map<Id, Double>> setNonCalculatedCongestionAndFilter(Map<Double, Map<Id, Double>> time2CongestionTotal) {
@@ -317,7 +325,7 @@ public class SpatialAveragingForLinkCongestion {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingForLinkCongestion().run();
+		new SpatialAveragingForLinkCongestionScenarioComparison().run();
 	}
 
 	private static Integer getLastIteration(String configFile) {
@@ -328,5 +336,6 @@ public class SpatialAveragingForLinkCongestion {
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;
 	}
+
 
 }

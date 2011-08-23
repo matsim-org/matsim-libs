@@ -28,6 +28,7 @@ package playground.fhuelsmann.emission.analysis;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +37,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 
 public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeaveEventHandler {
 	
@@ -67,16 +69,89 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 		Double enterTime = 0.0;
 		Link link = this.network.getLinks().get(event.getLinkId());
 		double freeTravelSpeed = link.getFreespeed();
-		freeTravelSpeed = freeTravelSpeed*3.6;
-		double stopGoSpeed= 12.4;
+//		freeTravelSpeed = freeTravelSpeed*3.6;
+		double stopGoSpeed= 15.9152;
 		double stopGoFraction = 0.0;
 		double stopGoTime = 0.0;
 		double distance = link.getLength(); 
+
+		if(this.linkenter.containsKey(event.getPersonId())){
+			double endOfTimeInterval = 0.0;
+			enterTime = this.linkenter.get(personId);
+			double travelTime = event.getTime()-enterTime;
+			double freeflowTime= distance / freeTravelSpeed;
+
+			if (travelTime <= freeflowTime){
+				stopGoFraction = 0.0;
+				}
+			else {
+				stopGoFraction = travelTime /freeflowTime;
+				//	if(linkId.toString().equals("576273431-592536888"))
+				//	System.out.println("linkId "+linkId+ " stopGoFraction "+stopGoFraction);
+			}
+		
+			for(int i = 0; i < noOfTimeBins; i++){
+				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
+					endOfTimeInterval = (i + 1) * timeBinSize;
+					Map<Id, Double> linkId2stopGoFraction = new HashMap<Id,  Double>();;
+				
+					if(stopGoFractionSum.get(endOfTimeInterval) != null){
+						linkId2stopGoFraction = stopGoFractionSum.get(endOfTimeInterval);
+
+						if(linkId2stopGoFraction.get(linkId) != null){
+							double warmEmissionsSoFar = linkId2stopGoFraction.get(linkId);
+					
+							Double newValue = stopGoFraction + warmEmissionsSoFar;
+						
+							linkId2stopGoFraction.put(linkId, newValue);
+						} else {
+							linkId2stopGoFraction.put(linkId, stopGoFraction);
+						}
+					} else {
+						linkId2stopGoFraction.put(linkId, stopGoFraction);
+				}	
+				stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
+				//if(linkId.toString().equals("576273431-592536888"))
+				//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " aggegatedCongestion "+linkId2stopGoFraction);
+			}
+		}
+	}
+	}
 	
 		
-		if(this.linkenter.containsKey(event.getPersonId())){
+/*	if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
 			double endOfTimeInterval = 0.0;
+	
+			for(int i = 0; i < noOfTimeBins; i++){
+				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
+					endOfTimeInterval = (i + 1) * timeBinSize;
+					Map<Id, Double> counts = new TreeMap<Id,  Double>();
+					
+					if (stopGoFractionSum.get(endOfTimeInterval) !=null){
+						counts = stopGoFractionSum.get(endOfTimeInterval);
+						
+						if(counts.get(linkId) != null){
+							double value = counts.get(linkId);
+							Double newValue = value + 1.0;
+							counts.put(linkId, newValue);
+						}
+						else {
+							counts.put(linkId, 1.0);
+						}
+							
+					} else {
+						counts.put(linkId, 1.0);
+					}
+					stopGoFractionSum.put(endOfTimeInterval, counts);
+				//	if(linkId.toString().equals("576273431-592536888"))
+					//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " counts "+counts);
+				}
+			}
+		}
+	}*/
+				
+/*			enterTime = this.linkenter.get(personId);
 			double travelTime = event.getTime()-enterTime;
 			double averageSpeed=distance/travelTime;
 
@@ -119,7 +194,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 				}
 			}
 		}
-	}
+	}*/
 	
 	public Map<Double, Map<Id, Double>> getCongestionPerLinkAndTimeInterval() {
 		Map<Double, Map<Id, Double>>stopGoFractionSum = new HashMap<Double, Map<Id,Double>>();
