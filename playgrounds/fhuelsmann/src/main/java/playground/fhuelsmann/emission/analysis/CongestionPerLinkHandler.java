@@ -27,20 +27,19 @@ package playground.fhuelsmann.emission.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeaveEventHandler {
-	
+	private static final Logger logger = Logger.getLogger(CongestionPerLinkHandler.class);
 
 	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
 	Map<Double, Map<Id,Double>> stopGoFractionSum = new HashMap<Double, Map<Id,Double>>();
@@ -49,7 +48,6 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 	private final int noOfTimeBins;
 	private final double timeBinSize;
 
-
 	public CongestionPerLinkHandler(final Network network,double simulationEndTime, int noOfTimeBins) {
 		this.network = network;
 		this.noOfTimeBins = noOfTimeBins;
@@ -57,6 +55,8 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 	}
 	
 	public void reset(final int iteration) {
+		this.stopGoFractionSum.clear();
+		logger.info("Resetting warm emission aggregation to " + this.stopGoFractionSum);
 		}
 	
 	public void handleEvent(LinkEnterEvent event) {
@@ -64,98 +64,89 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		Id linkId=event.getLinkId();
-		Id personId=event.getPersonId();
-		Double enterTime = 0.0;
-		double endOfTimeInterval = 0.0;
-		
+		Id linkId = event.getLinkId();
+		Id personId = event.getPersonId();
+		Double enterTime;
+		double endOfTimeInterval;
 		
 /**accumulated ratio of actual and freeflow travel time per link	**/
-		
-		Link link = this.network.getLinks().get(event.getLinkId());
-	  	double freeTravelSpeed = link.getFreespeed();
-		double stopGoFraction = 0.0;
-		double distance = link.getLength(); 
-	  
-	  if(this.linkenter.containsKey(event.getPersonId())){
-			enterTime = this.linkenter.get(personId);
-			double travelTime = event.getTime()-enterTime;
-			double freeflowTime= distance / freeTravelSpeed;
+//		Link link = this.network.getLinks().get(event.getLinkId());
+//	  	double freeTravelSpeed = link.getFreespeed();
+//		double stopGoFraction;
+//		double distance = link.getLength(); 
+//	  
+//		if(this.linkenter.containsKey(event.getPersonId())){
+//			enterTime = this.linkenter.get(personId);
+//			double travelTime = event.getTime() - enterTime;
+//			double freeflowTime = distance / freeTravelSpeed;
+//
+//			if (travelTime <= freeflowTime){
+//				stopGoFraction = 0.0;
+//			} else {
+//				stopGoFraction = travelTime / freeflowTime;
+//				//	if(linkId.toString().equals("576273431-592536888"))
+//				//	System.out.println("linkId "+linkId+ " stopGoFraction "+stopGoFraction);
+//			}
+//
+//			for(int i = 0; i < noOfTimeBins; i++){
+//				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
+//					endOfTimeInterval = (i + 1) * timeBinSize;
+//					Map<Id, Double> linkId2stopGoFraction = new HashMap<Id, Double>();;
+//
+//					if(stopGoFractionSum.get(endOfTimeInterval) != null){
+//						linkId2stopGoFraction = stopGoFractionSum.get(endOfTimeInterval);
+//
+//						if(linkId2stopGoFraction.get(linkId) != null){
+//							double warmEmissionsSoFar = linkId2stopGoFraction.get(linkId);
+//
+//							Double newValue = stopGoFraction + warmEmissionsSoFar;
+//
+//							linkId2stopGoFraction.put(linkId, newValue);
+//						} else {
+//							linkId2stopGoFraction.put(linkId, stopGoFraction);
+//						}
+//					} else {
+//						linkId2stopGoFraction.put(linkId, stopGoFraction);
+//					}	
+//					stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
+//					//if(linkId.toString().equals("576273431-592536888"))
+//					//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " aggegatedCongestion "+linkId2stopGoFraction);
+//				}
+//			}
+//		}
+//	}
 
-			if (travelTime <= freeflowTime){
-				stopGoFraction = 0.0;
-				}
-			else {
-				stopGoFraction = travelTime /freeflowTime;
-				//	if(linkId.toString().equals("576273431-592536888"))
-				//	System.out.println("linkId "+linkId+ " stopGoFraction "+stopGoFraction);
-			}
-		
-			for(int i = 0; i < noOfTimeBins; i++){
-				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
-					endOfTimeInterval = (i + 1) * timeBinSize;
-					Map<Id, Double> linkId2stopGoFraction = new HashMap<Id,  Double>();;
-				
-					if(stopGoFractionSum.get(endOfTimeInterval) != null){
-						linkId2stopGoFraction = stopGoFractionSum.get(endOfTimeInterval);
-
-						if(linkId2stopGoFraction.get(linkId) != null){
-							double warmEmissionsSoFar = linkId2stopGoFraction.get(linkId);
-					
-							Double newValue = stopGoFraction + warmEmissionsSoFar;
-						
-							linkId2stopGoFraction.put(linkId, newValue);
-						} else {
-							linkId2stopGoFraction.put(linkId, stopGoFraction);
-						}
-					} else {
-						linkId2stopGoFraction.put(linkId, stopGoFraction);
-				}	
-				stopGoFractionSum.put(endOfTimeInterval, linkId2stopGoFraction);
-				//if(linkId.toString().equals("576273431-592536888"))
-				//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " aggegatedCongestion "+linkId2stopGoFraction);
-				}
-			}
-	  }
-	}
-	
-		
 /**accumulated demand per link	**/
- 	
- /*		if(this.linkenter.containsKey(event.getPersonId())){
+		if(this.linkenter.containsKey(event.getPersonId())){
 			enterTime = this.linkenter.get(personId);
-			
-	
+
 			for(int i = 0; i < noOfTimeBins; i++){
 				if(enterTime > i * timeBinSize && enterTime <= (i + 1) * timeBinSize){
 					endOfTimeInterval = (i + 1) * timeBinSize;
-					Map<Id, Double> counts = new TreeMap<Id,  Double>();
-					
-					if (stopGoFractionSum.get(endOfTimeInterval) !=null){
+					Map<Id, Double> counts = new TreeMap<Id, Double>();
+
+					if (stopGoFractionSum.get(endOfTimeInterval) != null){
 						counts = stopGoFractionSum.get(endOfTimeInterval);
-						
+
 						if(counts.get(linkId) != null){
-							double value = counts.get(linkId);
-							Double newValue = value + 1.0;
+							double countsSoFar = counts.get(linkId);
+							Double newValue = countsSoFar + 1.0;
 							counts.put(linkId, newValue);
-						}
-						else {
+						} else {
 							counts.put(linkId, 1.0);
 						}
-							
 					} else {
 						counts.put(linkId, 1.0);
 					}
 					stopGoFractionSum.put(endOfTimeInterval, counts);
-				//	if(linkId.toString().equals("576273431-592536888"))
+					//	if(linkId.toString().equals("576273431-592536888"))
 					//	System.out.println("############################endOfTimeInterval "+endOfTimeInterval+ " counts "+counts);
 				}
 			}
 		}
-	}*/
+	}
 				
 /**accumulated congestion length per link	**/
-  	
 	/*		Link link = this.network.getLinks().get(event.getLinkId());
 	 		double freeTravelSpeed = link.getFreespeed();
 			double stopGoFraction = 0.0;

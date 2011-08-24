@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -37,11 +37,17 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.benjamin.events.emissions.ColdPollutant;
+import playground.benjamin.events.emissions.EmissionEventsReader;
+import playground.benjamin.events.emissions.WarmPollutant;
+import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkWarmEventHandler;
+
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
-public class SpatialAveragingForLinkCongestionScenarioComparison {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkCongestionScenarioComparison.class);
+public class SpatialAveragingForLinkEmissionsScenarioComparison {
+	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissionsScenarioComparison.class);
 
 	private final static String runNumber1 = "981";
 	private final static String runNumber2 = "983";
@@ -53,17 +59,18 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
 	private static String configFile2 = runDirectory2 + runNumber2 + ".output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String eventsFile1 = runDirectory1 +"/ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".events.xml.gz";
-	private final String eventsFile2 = runDirectory2 +"/ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".events.xml.gz";
-	
+	private final String emissionFile1 = runDirectory1 + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+
 	Scenario scenario;
 	Network network;
 	private FeatureType featureType;
-	CongestionPerLinkHandler congestionHandler; 
+	EmissionsPerLinkWarmEventHandler warmHandler;
+	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
 
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
-	static int noOfTimeBins = 1;
+	static int noOfTimeBins = 30;
 	double simulationEndTime;
 
 	static double xMin = 4452550.25;
@@ -74,31 +81,42 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 	static int noOfXbins = 80;
 	static int noOfYbins = 60;
 	static int minimumNoOfLinksInCell = 1;
+	static String pollutant = WarmPollutant.NO2.toString();
 
 	// OUTPUT
 	private final String outPathStub = runDirectory1 + "/emissions/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
+	
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
+		defineListOfPollutants();
 		loadScenario(netFile1);
 		this.network = this.scenario.getNetwork();
 		initFeatures();
 
-		processCongestion(eventsFile1);
-		Map<Double, Map<Id, Double>> time2CongestionTotal1 = this.congestionHandler.getCongestionPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Double>> time2CongestionTotalFiltered1 = setNonCalculatedCongestionAndFilter(time2CongestionTotal1);
+		processEmissions(emissionFile1);
+		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
+		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
 
-		this.congestionHandler.reset(0);
-		
-		processCongestion(eventsFile2);
-		Map<Double, Map<Id, Double>> time2congestionTotal2 = this.congestionHandler.getCongestionPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Double>> time2CongestionTotalFiltered2 = setNonCalculatedCongestionAndFilter(time2congestionTotal2);
-		Map<Double, Map<Id, Double>> time2deltaCongestionTotal = calculateCongestionDifferences(time2CongestionTotalFiltered1, time2CongestionTotalFiltered2);
-		
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1 = sumUpEmissions(time2warmEmissionsTotal1, time2coldEmissionsTotal1);
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered1 = setNonCalculatedEmissionsAndFilter(time2EmissionsTotal1);
+
+		this.warmHandler.reset(0);
+		this.coldHandler.reset(0);
+
+		processEmissions(emissionFile2);
+		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal2 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
+		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal2 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
+
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2 = sumUpEmissions(time2warmEmissionsTotal2, time2coldEmissionsTotal2);
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered2 = setNonCalculatedEmissionsAndFilter(time2EmissionsTotal2);
+
+		Map<Double, Map<Id, Map<String, Double>>> time2deltaEmissionsTotal = calcualateEmissionDifferences(time2EmissionsTotalFiltered1, time2EmissionsTotalFiltered2);
+
 		Collection<Feature> features = new ArrayList<Feature>();
 
-		for(double endOfTimeInterval : time2deltaCongestionTotal.keySet()){
-			Map<Id, Double> deltaCongestionTotal = time2deltaCongestionTotal.get(endOfTimeInterval);
+		for(double endOfTimeInterval : time2deltaEmissionsTotal.keySet()){
+			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2deltaEmissionsTotal.get(endOfTimeInterval);
 
 			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
 			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -119,7 +137,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaCongestionTotal.get(linkId);
+							double value = deltaEmissionsTotal.get(linkId).get(pollutant);
 							// TODO: not distance between data points, but distance between
 							// data point and cell centroid is used now; is the former to expensive?
 							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
@@ -133,7 +151,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(noOfLinksInCell[xIndex][yIndex] > minimumNoOfLinksInCell){
-					//	if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
+//						if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
@@ -146,13 +164,16 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 							} catch (IllegalAttributeException e1) {
 								throw new RuntimeException(e1);
 							}
-					//	}
+//						}
 					}
 				}
 			}
 		}
-		ShapeFileWriter.writeGeometries(features, outPathStub + ".movie.congestionIndicatorPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub + ".movie.congestionIndicatorPerLinkSmoothed.shp");
+//		writer.close();
+//		logger.info("Finished writing output to " + outPathStub + "Smoothed.txt");
+		
+		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
+		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -197,39 +218,42 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
-	
-	
-	private Map<Double, Map<Id,  Double>> calculateCongestionDifferences(
-			Map<Double, Map<Id, Double>> time2CongestionTotal1,
-			Map<Double, Map<Id, Double>> time2CongestionTotal2) {
 
-		Map<Double, Map<Id, Double>> time2delta = new HashMap<Double, Map<Id, Double>>();
-		for(Entry<Double, Map<Id, Double>> entry0 : time2CongestionTotal1.entrySet()){
+	private Map<Double, Map<Id, Map<String, Double>>> calcualateEmissionDifferences(
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1,
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2) {
+
+		Map<Double, Map<Id, Map<String, Double>>> time2delta = new HashMap<Double, Map<Id, Map<String, Double>>>();
+		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotal1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Double> delta = entry0.getValue();
+			Map<Id, Map<String, Double>> delta = entry0.getValue();
 
-			for(Entry<Id, Double> entry1 : delta.entrySet()){
+			for(Entry<Id, Map<String, Double>> entry1 : delta.entrySet()){
 				Id linkId = entry1.getKey();
-				Double congestionDifferenceRatio =0.0;
-				Double congestionBefore = entry1.getValue();
-				Double congestionAfter = time2CongestionTotal2.get(endOfTimeInterval).get(linkId);
-				if (congestionBefore!=0.0){
-				congestionDifferenceRatio = (congestionAfter - congestionBefore)/congestionBefore;}
-				
-				else{congestionDifferenceRatio=0.0;}
-				delta.put(linkId, congestionDifferenceRatio);
+				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
+				for(String pollutant : entry1.getValue().keySet()){
+					Double emissionDifferenceRatio =0.0;
+					Double emissionsBefore = entry1.getValue().get(pollutant);
+					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
+					if (emissionsBefore!=0.0){
+						emissionDifferenceRatio = (emissionsAfter - emissionsBefore)/emissionsBefore;}
+						
+						else{emissionDifferenceRatio=0.0;}
+					emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
+				}
+				delta.put(linkId, emissionDifferenceMap);
 			}
 			time2delta.put(endOfTimeInterval, delta);
 		}
 		return time2delta;
 	}
 
-	private Map<Double, Map<Id, Double>> setNonCalculatedCongestionAndFilter(Map<Double, Map<Id, Double>> time2CongestionTotal) {
-		Map<Double, Map<Id, Double>> time2CongestionTotalFiltered = new HashMap<Double, Map<Id, Double>>();
+	private Map<Double, Map<Id, Map<String, Double>>> setNonCalculatedEmissionsAndFilter(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal) {
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<Double, Map<Id, Map<String, Double>>>();
 
-		for(Double endOfTimeInterval : time2CongestionTotal.keySet()){
-			Map<Id, Double> congestionTotal = time2CongestionTotal.get(endOfTimeInterval);
-			Map<Id, Double> congestionTotalFiltered = new HashMap<Id, Double>();
+		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
+			Map<Id, Map<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
+			Map<Id, Map<String, Double>> emissionsTotalFiltered = new HashMap<Id, Map<String, Double>>();
 
 			for(Link link : network.getLinks().values()){
 				Coord linkCoord = link.getCoord();
@@ -239,28 +263,90 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 				if(xLink > xMin && xLink < xMax){
 					if(yLink > yMin && yLink < yMax){
 						Id linkId = link.getId();
-							
-							if(congestionTotal.get(linkId) != null){
-								double congestion = congestionTotal.get(linkId);
-								congestionTotalFiltered.put(linkId, congestion);
-							} else {
-									// setting all congestion values for links that had no congestion on it to 0.0 
-								congestionTotalFiltered.put(linkId, 0.0);
-							}
-					}
-				}
-			}					
-		time2CongestionTotalFiltered.put(endOfTimeInterval, congestionTotalFiltered);
-	}
-	return time2CongestionTotalFiltered;
-}
+						Map<String, Double> emissionType2Value = new HashMap<String, Double>();
 
-	private void processCongestion(String eventsFile) {
+						if(emissionsTotal.get(linkId) != null){
+							for(String pollutant : listOfPollutants){
+								emissionType2Value = emissionsTotal.get(linkId);
+								if(emissionType2Value.get(pollutant) != null){
+									Double originalValue = emissionsTotal.get(linkId).get(pollutant);
+									emissionType2Value.put(pollutant, originalValue);
+								} else {
+									// setting some emission types that are not available for the link to 0.0
+									emissionType2Value.put(pollutant, 0.0);
+								}
+							}
+						} else {
+							for(String pollutant : listOfPollutants){
+								// setting all emission types for links that had no emissions on it to 0.0 
+								emissionType2Value.put(pollutant, 0.0);
+							}
+						}
+						emissionsTotalFiltered.put(linkId, emissionType2Value);
+					}
+				}					
+			}
+			time2EmissionsTotalFiltered.put(endOfTimeInterval, emissionsTotalFiltered);
+		}
+		return time2EmissionsTotalFiltered;
+	}
+
+	private Map<Double, Map<Id, Map<String, Double>>> sumUpEmissions(
+			Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal,
+			Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal) {
+
+		Map<Double, Map<Id, Map<String, Double>>> time2totalEmissions = new HashMap<Double, Map<Id, Map<String, Double>>>();
+
+		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2warmEmissionsTotal.entrySet()){
+			double endOfTimeInterval = entry0.getKey();
+			Map<Id, Map<String, Double>> warmEmissions = entry0.getValue();
+			Map<Id, Map<String, Double>> totalEmissions = new HashMap<Id, Map<String, Double>>();
+
+			for(Entry<Id, Map<String, Double>> entry1 : warmEmissions.entrySet()){
+				Id linkId = entry1.getKey();
+				Map<String, Double> linkSpecificWarmEmissions = entry1.getValue();
+
+				if(time2coldEmissionsTotal.get(endOfTimeInterval) != null){
+					Map<Id, Map<String, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
+
+					if(coldEmissions.get(linkId) != null){
+						Map<String, Double> linkSpecificSumOfEmissions = new HashMap<String, Double>();
+						Map<String, Double> linkSpecificColdEmissions = coldEmissions.get(linkId);
+						Double individualValue;
+
+						for(String pollutant : listOfPollutants){
+							if(linkSpecificWarmEmissions.containsKey(pollutant)){
+								if(linkSpecificColdEmissions.containsKey(pollutant)){
+									individualValue = linkSpecificWarmEmissions.get(pollutant) + linkSpecificColdEmissions.get(pollutant);
+								} else{
+									individualValue = linkSpecificWarmEmissions.get(pollutant);
+								}
+							} else{
+								individualValue = linkSpecificColdEmissions.get(pollutant);
+							}
+							linkSpecificSumOfEmissions.put(pollutant, individualValue);
+						}
+						totalEmissions.put(linkId, linkSpecificSumOfEmissions);
+					} else{
+						totalEmissions.put(linkId, linkSpecificWarmEmissions);
+					}
+				} else {
+					totalEmissions.put(linkId, linkSpecificWarmEmissions);
+				}
+				time2totalEmissions.put(endOfTimeInterval, totalEmissions);
+			}
+		}
+		return time2totalEmissions;
+	}
+
+	private void processEmissions(String emissionFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		this.congestionHandler = new CongestionPerLinkHandler(network, this.simulationEndTime, noOfTimeBins);
-		eventsManager.addHandler(this.congestionHandler );
-		reader.readFile(eventsFile);
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
+		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, noOfTimeBins);
+		eventsManager.addHandler(this.warmHandler);
+		eventsManager.addHandler(this.coldHandler);
+		emissionReader.parse(emissionFile);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -269,13 +355,13 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 				"Point", Point.class, true, null, null, this.targetCRS);
 		AttributeType time = AttributeTypeFactory.newAttributeType(
 				"Time", String.class);
-		AttributeType congestion = AttributeTypeFactory.newAttributeType(
-				"congestion", Double.class);
+		AttributeType deltaEmissions = AttributeTypeFactory.newAttributeType(
+				"deltaEmiss", Double.class);
 		
 		Exception ex;
 		try {
 			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
-			        {point, time, congestion}, "CongestionPoint");
+			        {point, time, deltaEmissions}, "EmissionPoint");
 			return;
 		} catch (FactoryRegistryException e0) {
 			ex = e0;
@@ -294,6 +380,17 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		scenarioLoader.loadScenario() ;
 	}
 
+	private void defineListOfPollutants() {
+		listOfPollutants = new TreeSet<String>();
+		for(WarmPollutant wp : WarmPollutant.values()){
+			listOfPollutants.add(wp.toString());
+		}
+		for(ColdPollutant cp : ColdPollutant.values()){
+			listOfPollutants.add(cp.toString());
+		}
+		logger.info("The following pollutants are considered: " + listOfPollutants);
+	}
+
 	private Double getEndTime(String configfile) {
 		Config config = new Config();
 		config.addCoreModules();
@@ -306,7 +403,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingForLinkCongestionScenarioComparison().run();
+		new SpatialAveragingForLinkEmissionsScenarioComparison().run();
 	}
 
 	private static Integer getLastIteration(String configFile) {
@@ -317,4 +414,5 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;
 	}
+
 }
