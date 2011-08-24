@@ -48,7 +48,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -56,7 +55,6 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 import org.matsim.vis.snapshotwriters.VisNetwork;
@@ -165,8 +163,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	public static class Result implements OTFQueryResult {
 
-		private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
-
 		/*package*/ String agentId;
 		/*package*/ boolean hasPlan = false;
 		protected float[] vertex = null;
@@ -182,12 +178,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private boolean calcOffset = true;
 
 		@Override
-		public void draw(OTFDrawer drawer) {
-			if (drawer instanceof OTFOGLDrawer) {
-				drawWithGLDrawer((OTFOGLDrawer) drawer);
-			} else {
-				log.error("cannot draw query cause no OTFOGLDrawer is used!");
-			}
+		public void draw(OTFOGLDrawer drawer) {
+			drawWithGLDrawer((OTFOGLDrawer) drawer);
 		}
 
 		protected void drawWithGLDrawer(OTFOGLDrawer drawer) {
@@ -198,14 +190,14 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				prepare(gl);
 				createActivityTextsIfNecessary(drawer);
 			}
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getCurrentSceneGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 			Point2D.Double pos = tryToFindAgentPosition(layer);
 			if (pos != null) {
 				// We know where the agent is, so we draw stuff around them.
 				drawArrowFromAgentToTextLabel(pos, gl);
 				drawCircleAroundAgent(pos, gl);
 				createLabelTextIfNecessary(drawer, pos);
-				
+
 			} 
 			unPrepare(gl);
 		}
@@ -244,7 +236,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private float getLineWidth() {
 			return OTFClientControl.getInstance().getOTFVisConfig()
-			.getLinkWidth();
+					.getLinkWidth();
 		}
 
 		private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL gl) {

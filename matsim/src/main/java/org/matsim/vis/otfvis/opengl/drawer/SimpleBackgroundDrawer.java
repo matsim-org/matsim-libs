@@ -26,6 +26,8 @@ import java.awt.geom.Rectangle2D;
 
 import javax.media.opengl.GL;
 
+import org.matsim.vis.otfvis.caching.SceneGraph;
+
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
@@ -74,7 +76,10 @@ public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
         this.picture.disable();
 	}
 
-
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		graph.addItem(this);
+	}
 	
 }
 

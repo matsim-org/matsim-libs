@@ -19,12 +19,10 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -38,9 +36,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.data.OTFClientQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 
 // TODO should not be an OTFDrawer, need to handle invalidate better
 /**
@@ -50,7 +45,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
  * @author dstrippgen
  *
  */
-public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ChangeListener {
+public class OTFTimeLine extends JToolBar implements ActionListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -174,54 +169,5 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public void stateChanged(ChangeEvent e) {
 		hostControl.setNEWTime();
 	}
-
-	@Override
-	public void clearCache() {
-	}
-
-	@Override
-	public Component getComponent() {
-		return null;
-	}
-
-	@Override
-	public OTFClientQuadTree getQuad() {
-		return null;
-	}
-
-	@Override
-	public void handleClick(java.awt.geom.Point2D.Double point, int mouseButton, MouseEvent e) {
-	}
-
-	@Override
-	public void handleClick(Rectangle currentRect, int button) {
-	}
-
-	@Override
-	public void invalidate() {
-
-	}
-
-	@Override
-	public void redraw() {
-	}
-
-	@Override
-	public void setQueryHandler(OTFQueryHandler queryHandler) {
-		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
-	}
-
-	@Override
-	public double getScale() {
-		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
-		return 0;
-	}
-
-	@Override
-	public void setScale(double scale) {
-		// Empty because .. well, because this method implements OTFDrawer although it shouldn't.
-	}
-
-
 
 }

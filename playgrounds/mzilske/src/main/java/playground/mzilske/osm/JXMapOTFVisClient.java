@@ -76,10 +76,9 @@ public final class JXMapOTFVisClient {
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 				OTFTimeLine timeLine = new OTFTimeLine("time", hostControlBar.getOTFHostControl());
 				otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
-				hostControlBar.addDrawer(timeLine);
 				OTFServerQuadTree servQ = server.getQuad(connect);
 				OTFClientQuadTree clientQ = servQ.convertToClient(server, connect);
-				clientQ.createReceiver(connect);
+				clientQ.setConnectionManager(connect);
 				clientQ.getConstData();
 				hostControlBar.updateTimeLabel();
 

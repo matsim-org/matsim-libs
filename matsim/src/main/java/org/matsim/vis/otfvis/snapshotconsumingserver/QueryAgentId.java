@@ -28,13 +28,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
  * QueryAgentId is an internal query.
@@ -126,7 +126,7 @@ public final class QueryAgentId extends AbstractQuery {
 		}
 
 		@Override
-		public void draw(OTFDrawer drawer) {
+		public void draw(OTFOGLDrawer drawer) {
 		}
 
 	}

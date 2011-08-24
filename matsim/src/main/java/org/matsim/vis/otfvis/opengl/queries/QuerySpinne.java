@@ -55,7 +55,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -90,12 +89,6 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		private transient OTFOGLDrawer.FastColorizer colorizer3 = null;
 
 		@Override
-		public void draw(OTFDrawer drawer) {
-			if(drawer instanceof OTFOGLDrawer) {
-				draw((OTFOGLDrawer)drawer);
-			}
-		}
-
 		public void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
 

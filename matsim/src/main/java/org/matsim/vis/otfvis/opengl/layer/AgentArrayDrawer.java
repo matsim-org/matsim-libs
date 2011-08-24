@@ -36,6 +36,7 @@ import javax.media.opengl.GL;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
@@ -168,6 +169,11 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		}
 
 		gl.glDisable(GL.GL_POINT_SPRITE);
+	}
+
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		
 	}
 
 }

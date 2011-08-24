@@ -24,21 +24,18 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 /**
  * OTFAgentsListHandler is responsible for the IO of the
@@ -49,17 +46,13 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
  */
 public class OTFAgentsListHandler extends OTFDataReader {
 
-	private Class<? extends OTFDataSimpleAgentReceiver> agentReceiverClass = null;
-
-	private List<OTFDataSimpleAgentReceiver> agents = new LinkedList<OTFDataSimpleAgentReceiver>();
-
 	static public class Writer extends OTFDataWriter<Collection<? extends AgentSnapshotInfo>> {
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			
+
 		}
 
 		@Override
@@ -96,42 +89,24 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		agInfo.setAgentState( al[int1] ) ;
 		agInfo.setUserDefined( int2 ) ;
 		agInfo.setColorValueBetweenZeroAndOne( float1 ) ;
-		try {
-			OTFDataSimpleAgentReceiver drawer = (OTFDataSimpleAgentReceiver) graph.newInstanceOf(this.agentReceiverClass);
-			drawer.setAgent( agInfo ) ;
-			this.agents.add(drawer);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
+		AgentPointDrawer drawer = graph.getAgentPointDrawer();
+		drawer.setAgent( agInfo ) ;
 	}
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		this.agents.clear();
 		int count = in.getInt();
 		for(int i= 0; i< count; i++) readAgent(in, graph);
 	}
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		
-	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void connect(OTFDataReceiver receiver) {
-		if (receiver instanceof OTFDataSimpleAgentReceiver) {
-			this.agentReceiverClass = (Class<? extends OTFDataSimpleAgentReceiver>) receiver.getClass();
-		}
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		for(OTFDataSimpleAgentReceiver agent : this.agents) {
-			agent.invalidate(graph);
-		}
+
 	}
 
 }

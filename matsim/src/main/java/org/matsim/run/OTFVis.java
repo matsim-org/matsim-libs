@@ -57,8 +57,6 @@ import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFClientLiveSwing;
-import org.matsim.vis.otfvis.OTFClientSwing;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -77,10 +75,10 @@ public class OTFVis {
 		System.out.println("OTFVis");
 		System.out.println("Starts the MATSim OnTheFly-Visualizer.");
 		System.out.println();
-		System.out.println("usage 1: OTFVis [-swing] mvi-file");
+		System.out.println("usage 1: OTFVis mvi-file");
 		System.out.println("usage 2: OTFVis mvi-file1 mvi-file2");
 		System.out.println("usage 3: OTFVis config-file");
-		System.out.println("usage 4: OTFVis [-swing] network-file");
+		System.out.println("usage 4: OTFVis network-file");
 		System.out.println("usage 5: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
 		System.out.println();
 		System.out.println("Usages 1-4: Starts the Visualizer");
@@ -92,9 +90,6 @@ public class OTFVis {
 		System.out.println("config-file:   A complete MATSim config file to run a simulation. In that case,");
 		System.out.println("               a QueueSimulation will be started and visualized in real-time, ");
 		System.out.println("               allowing to interactively query the state of single agents");
-		System.out.println("-swing         Use an alternative GUI built with Swing. This will be slower,");
-		System.out.println("               not support all featuers, and not be able to visualize large");
-		System.out.println("               scenarios.");
 		System.out.println();
 		System.out.println("Usage 6: Convert events into a mvi-file");
 		System.out.println("snapshot-period:  Optional. Specify how often a snapshot should be taken when");
@@ -106,54 +101,32 @@ public class OTFVis {
 	}
 
 	public static void main(final String[] args) {
-		boolean useSwing = false;
 		String [] args2 = args;
-
-		if (args2.length != 0 && "-swing".equalsIgnoreCase(args2[0])) {
-			useSwing = true;
-			// pop that argument from the list
-			String[] tmp = new String[args2.length - 1];
-			System.arraycopy(args, 1, tmp, 0, tmp.length);
-			args2 = tmp;
-		}
-
 		if (args2.length == 0) {
 			String filename = chooseFile();
-			play(filename, useSwing);
+			play(filename);
 		} else if (args2[0].equalsIgnoreCase("-convert")) {
 			convert(args2);
 		} else if (args2.length == 1) {
 			String filename = args2[0];
-			play(filename, useSwing);
+			play(filename);
 		} else {
 			printUsage();
 		}
 
 	}
 
-	private static final void play(String filename, boolean useSwing) {
+	private static final void play(String filename) {
 		String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
 		if (lowerCaseFilename.endsWith(".mvi")) {
-			if (useSwing) {
-				playMVI_Swing(filename);
-			} else {
-				playMVI(filename);
-			}
+			playMVI(filename);
 		} else if ((lowerCaseFilename.endsWith(".xml") || lowerCaseFilename.endsWith(".xml.gz"))) {
 			FileType type;
 			type = new MatsimFileTypeGuesser(filename).getGuessedFileType();
 			if (FileType.Config.equals(type)) {
-				if (useSwing) {
-					playConfig_Swing(filename);
-				} else {
-					playConfig(filename);
-				}
+				playConfig(filename);
 			} else if (FileType.Network.equals(type)) {
-				if (useSwing) {
-					playNetwork_Swing(filename);
-				} else {
-					playNetwork(filename);
-				}
+				playNetwork(filename);
 			} else {
 				printUsage();
 			}
@@ -193,41 +166,8 @@ public class OTFVis {
 		new OTFClientFile(file).run();
 	}
 
-	public static final void playMVI_Swing(String file) {
-		new OTFClientSwing(file).run();
-	}
-
 	public static final void playConfig(final String configFilename){
 		playConfig(new String[]{configFilename});
-	}
-
-	public static final void playConfig_Swing(String configFileName) {
-		Config config = ConfigUtils.loadConfig(configFileName);
-		MatsimRandom.reset(config.global().getRandomSeed());
-		log.info("Complete config dump:");
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(config).writeStream(new PrintWriter(writer));
-		log.info("\n\n" + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-		if (config.getQSimConfigGroup() == null){
-			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
-					"Fixing this by adding default config module for QSim. " +
-					"Please check if default values fit your needs, otherwise correct them in " +
-			"the config given as parameter to get a valid visualization!");
-			config.addQSimConfigGroup(new QSimConfigGroup());
-		}
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
-		if (scenario.getConfig().scenario().isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
-			qSim.addQueueSimulationListeners(engine);
-		}
-		
-		OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
-		OTFClientLiveSwing.run(config, server);
-		
-		qSim.run();
 	}
 
 	public static final void playConfig(final String[] args) {
@@ -242,7 +182,7 @@ public class OTFVis {
 			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
 					"Fixing this by adding default config module for QSim. " +
 					"Please check if default values fit your needs, otherwise correct them in " +
-			"the config given as parameter to get a valid visualization!");
+					"the config given as parameter to get a valid visualization!");
 			config.addQSimConfigGroup(new QSimConfigGroup());
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -252,7 +192,7 @@ public class OTFVis {
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-		
+
 		OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
 		OTFClientLive.run(config, server);
 
@@ -265,15 +205,15 @@ public class OTFVis {
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
 		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
 		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
-		
+
 		server.setSimulation(queueSimulationFeature);
 		server.addAdditionalElement(queueSimulationFeature.getTeleportationWriter());
-		
+
 		if (config.scenario().isUseTransit()) {
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(scenario.getNetwork(), ((ScenarioImpl) scenario).getTransitSchedule(), qSim.getTransitEngine().getAgentTracker());
 			server.addAdditionalElement(facilityWriter);
 		}
-		
+
 		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 			config.otfVis().setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), ((ScenarioImpl) scenario).getLaneDefinitions());
@@ -300,15 +240,6 @@ public class OTFVis {
 		EventsManager events = EventsUtils.createEventsManager();
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		OTFClientLive.run(config, server);
-	}
-
-	public static final void playNetwork_Swing(final String filename) {
-		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(filename);
-		EventsManager events = EventsUtils.createEventsManager();
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-		OTFClientLiveSwing.run(config, server);
 	}
 
 	public static final void convert(final String[] args) {

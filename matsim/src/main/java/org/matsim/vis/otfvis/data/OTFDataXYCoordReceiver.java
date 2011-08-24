@@ -23,7 +23,7 @@
  */
 package org.matsim.vis.otfvis.data;
 
-public interface OTFDataXYCoordReceiver extends OTFDataReceiver{
+public interface OTFDataXYCoordReceiver extends OTFDrawable{
 	// yyyyyy There does not seem to be an implementing class--??? kai, feb'11
 	
 	public void setXYCoord(float x, float y);

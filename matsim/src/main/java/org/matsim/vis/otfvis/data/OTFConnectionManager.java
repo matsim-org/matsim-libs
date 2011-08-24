@@ -130,7 +130,7 @@ public class OTFConnectionManager implements Serializable {
 		connections.add(entry);
 	}
 
-	public void connectReaderToReceiver(Class<? extends OTFDataReader> reader, Class<? extends OTFDataReceiver> receiver) {
+	public void connectReaderToReceiver(Class<? extends OTFDataReader> reader, Class receiver) {
 		Collection<Class<?>> receiverClasses = this.getToEntries(reader);
 		if (receiverClasses.contains(receiver)) {
 			log.warn("Trying to connect the same receiver twice. Ignoring: "+receiver);
@@ -140,7 +140,7 @@ public class OTFConnectionManager implements Serializable {
 		}
 	}
 
-	public void connectReceiverToLayer(Class<? extends OTFDataReceiver> receiver, Class<? extends SceneLayer> layer) {
+	public void connectReceiverToLayer(Class receiver, Class<? extends SceneLayer> layer) {
 		Collection<Class<?>> layerClasses = this.getToEntries(receiver);
 		if (layerClasses.contains(layer)) {
 			log.warn("Trying to connect the same layer twice. Ignoring: "+receiver);
@@ -166,22 +166,6 @@ public class OTFConnectionManager implements Serializable {
 			}
 		}
 		return classList;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Collection<OTFDataReceiver> getReceiversForReader(Class<? extends OTFDataReader> reader, SceneGraph graph) {
-		Collection<Class<?>> classList = getToEntries(reader);
-		Collection<OTFDataReceiver> receivers = new HashSet<OTFDataReceiver>();
-		for(Class<?> entry : classList) {
-			try {
-				receivers.add(graph.newInstanceOf((Class<? extends OTFDataReceiver>) entry));
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-		return receivers;
 	}
 
 	@SuppressWarnings("unchecked")

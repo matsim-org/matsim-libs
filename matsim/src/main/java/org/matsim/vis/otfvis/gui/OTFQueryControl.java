@@ -33,7 +33,6 @@ import java.util.Vector;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
@@ -41,6 +40,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -124,7 +124,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	}
 
 	@Override
-	synchronized public void drawQueries(OTFDrawer drawer) {
+	synchronized public void drawQueries(OTFOGLDrawer drawer) {
 		for (OTFQueryResult queryResult : this.queryEntries.values()) {
 			queryResult.draw(drawer);
 		}

@@ -20,7 +20,7 @@
 package org.matsim.vis.otfvis;
 
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 
 /**
@@ -38,7 +38,7 @@ public final class OTFClientControl {
   
   private static final OTFClientControl instance = new OTFClientControl();
   private OTFVisConfigGroup config;
-  private OTFDrawer mainDrawer;
+  private OTFOGLDrawer mainDrawer;
   
   private OTFClientControl() {}
   
@@ -54,11 +54,11 @@ public final class OTFClientControl {
     return this.config;
   }
 
-  public void setMainOTFDrawer(OTFDrawer mainDrawer) {
+  public void setMainOTFDrawer(OTFOGLDrawer mainDrawer) {
     this.mainDrawer = mainDrawer;
   }
   
-  public OTFDrawer getMainOTFDrawer(){
+  public OTFOGLDrawer getMainOTFDrawer(){
     return this.mainDrawer;
   }
 

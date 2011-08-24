@@ -1,7 +1,7 @@
 package playground.florian.OTFVis;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.vis.otfvis.OTFClientSwing;
+import org.matsim.vis.otfvis.OTFClientFile;
 
 
 public class MviStarter {
@@ -24,7 +24,7 @@ public class MviStarter {
 		movies[1]= mviFile2;
 //		OTFVis.playMVI(movies);
 //		OTFDoubleMVI.main(movies);
-		new OTFClientSwing(mviFile).run();
+		new OTFClientFile(mviFile).run();
 	}
 
 }

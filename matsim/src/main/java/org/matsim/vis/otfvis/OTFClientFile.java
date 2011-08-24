@@ -35,7 +35,6 @@ import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
@@ -85,14 +84,13 @@ public class OTFClientFile implements Runnable {
 		OTFHostControl otfHostControl = hostControlBar.getOTFHostControl();
 		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);
 		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
-		hostControlBar.addDrawer(timeLine);
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
-		clientQ.createReceiver(connect);
+		clientQ.setConnectionManager(connect);
 		clientQ.getConstData();
 		hostControlBar.updateTimeLabel();
 		OTFClientQuadTree clientQuadTree = clientQ;
-		OTFDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));
 		otfClient.show();
 	}

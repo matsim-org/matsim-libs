@@ -19,17 +19,16 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+
+
 public interface OTFQueryResult {
 	
 	/**
 	 * Everytime the display needs to be refreshed this 
 	 * method is called for every active Query.
-	 * 
-	 * @param OTFDrawer drawer The drawer class responsible for 
-	 * refreshing the view. Use this to identify which drawing 
-	 * routines to use
 	 */
-	public void draw(OTFDrawer drawer);
+	public void draw(OTFOGLDrawer drawer);
 
 	/**
 	 * Remove is called when a query is removed, to give the query the option to

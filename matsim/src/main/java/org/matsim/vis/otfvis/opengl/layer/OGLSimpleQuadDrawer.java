@@ -10,7 +10,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 
 import com.sun.opengl.util.texture.TextureCoords;
@@ -18,77 +18,74 @@ import com.sun.opengl.util.texture.TextureCoords;
 /**
  * This sounds like "quad tree", but I think it is in the sense of "polygon with 4 corners".  kai, feb'11  
  */
-public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver implements OTFDataQuadReceiver{
+public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 
-	    protected final Point2D.Float[] quad = new Point2D.Float[4];
-	    protected float coloridx = 0;
-	    protected char[] id;
-	    protected int nrLanes;
+	protected final Point2D.Float[] quad = new Point2D.Float[4];
+	protected float coloridx = 0;
+	protected char[] id;
+	protected int nrLanes;
 
-	    @Override
-		public void onDraw( GL gl) {
-	      final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
-	    		  nrLanes*OGLSimpleStaticNetLayer.getBasicLaneWidth_m());
-	      // (yy this is where the width of the links for drawing is set)
-	      
-	      this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
-	      this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
-	      //Draw quad
-	      TextureCoords co = new TextureCoords(0,0,1,1);
-	      gl.glBegin(GL.GL_QUADS);
-	      gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
-	      gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
-	      gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
-	      gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
-	      gl.glEnd();
-	    }
+	@Override
+	public void onDraw( GL gl) {
+		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
+				nrLanes*OGLSimpleStaticNetLayer.getBasicLaneWidth_m());
+		// (yy this is where the width of the links for drawing is set)
 
-	    public void prepareLinkId(Map<Coord, String> linkIds) {
-	      double alpha = 0.4;
-	      double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
-	      double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
-	      String idstr = "" ;
-	      if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
-	    	  idstr = new String(id);
-	      }
-	      linkIds.put(new CoordImpl(middleX , middleY ), idstr);
-	    }
+		this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+		//Draw quad
+		TextureCoords co = new TextureCoords(0,0,1,1);
+		gl.glBegin(GL.GL_QUADS);
+		gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
+		gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
+		gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
+		gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
+		gl.glEnd();
+	}
 
-//	    public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
-//	      return calcOrtho(start.x, start.y, end.x, end.y, OGLSimpleStaticNetLayer.getBasicLineWidth_m());
-//	    }
-	    // never used.  kai, jan'11
+	public void prepareLinkId(Map<Coord, String> linkIds) {
+		double alpha = 0.4;
+		double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
+		double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
+		String idstr = "" ;
+		if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
+			idstr = new String(id);
+		}
+		linkIds.put(new CoordImpl(middleX , middleY ), idstr);
+	}
 
-	    public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
-	      double dx = endy - starty;
-	      double dy = endx -startx;
-	      double sqr1 = Math.sqrt(dx*dx +dy*dy);
+	public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
+		double dx = endy - starty;
+		double dy = endx -startx;
+		double sqr1 = Math.sqrt(dx*dx +dy*dy);
 
-	      dx = dx*len/sqr1;
-	      dy = -dy*len/sqr1;
+		dx = dx*len/sqr1;
+		dy = -dy*len/sqr1;
 
-	      return new Point2D.Float((float)dx,(float)dy);
-	    }
+		return new Point2D.Float((float)dx,(float)dy);
+	}
 
-	    @Override
-			public void setQuad(float startX, float startY, float endX, float endY) {
-	      setQuad(startX, startY,endX, endY, 1);
-	    }
+	public void setQuad(float startX, float startY, float endX, float endY) {
+		setQuad(startX, startY,endX, endY, 1);
+	}
 
-	    @Override
-			public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
-	      this.quad[0] = new Point2D.Float(startX, startY);
-	      this.quad[1] = new Point2D.Float(endX, endY);
-	      this.nrLanes = nrLanes;
-	    }
+	public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
+		this.quad[0] = new Point2D.Float(startX, startY);
+		this.quad[1] = new Point2D.Float(endX, endY);
+		this.nrLanes = nrLanes;
+	}
 
-	    @Override
-			public void setColor(float coloridx) {
-	      this.coloridx = coloridx;
-	    }
+	public void setColor(float coloridx) {
+		this.coloridx = coloridx;
+	}
 
-	    @Override
-			public void setId(char[] id) {
-	      this.id = id;
-	    }
-	  }
+	public void setId(char[] id) {
+		this.id = id;
+	}
+	
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		graph.addStaticItem(this);
+	}
+	
+}

@@ -2,17 +2,16 @@ package org.matsim.vis.otfvis.data;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
+
 /**
  * The OTFDataReceiver marks classes that can receive Data from the
- * OTFData.Reader The invalidate() method will be called whenever the screen
- * content needs to be updated.
- * <p/>
- * The prime use of invalidate() is that objects outside the screen rectangle are <i>not</i>
- * invalidated and thus not redrawn.  Could also be named "markForRedraw" or similar. kai, feb'11
- *
- * @author dstrippgen
+ * OTFData.Reader 
+ * 
  */
-public interface OTFDataReceiver {
+public interface OTFDrawable {
+
+	public void draw();
+	
 
 	/**
 	 * Marks a graphics element for re-draw.  This is mostly (if not entirely) important because of the viewing rectangle
@@ -21,5 +20,6 @@ public interface OTFDataReceiver {
 	 * invalidate(...) means that they schedule themselves for re-draw with the SceneGraph.
 	 * 
 	 */
-	public void invalidate(SceneGraph graph);
+	public void addToSceneGraph(SceneGraph graph);
+	
 }

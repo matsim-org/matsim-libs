@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import javax.media.opengl.GL;
 
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+import org.matsim.vis.otfvis.data.OTFDrawable;
 
 
 /**

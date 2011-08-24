@@ -20,9 +20,10 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
+import java.awt.geom.Rectangle2D;
 
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 
 /**
@@ -42,7 +43,7 @@ public interface OTFQueryHandler {
 	
 	public void updateQueries();
 	
-	public void drawQueries(OTFDrawer drawer);
+	public void drawQueries(OTFOGLDrawer drawer);
 	
 	public void handleClick(Double point, int mouseButton);
 	

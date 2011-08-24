@@ -96,7 +96,6 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.ValueColorizer;
 import org.matsim.vis.otfvis.gui.ZoomEntry;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
@@ -108,7 +107,7 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
-public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
+public class OTFOGLDrawer implements GLEventListener {
 
 	public static class FastColorizer {
 
@@ -393,7 +392,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		this.changeListeners.add(changeListener);
 	}
 
-	@Override
 	public void clearCache() {
 		this.clientQ.clearCache();
 	}
@@ -557,7 +555,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		}
 	}
 
-	@Override
 	public Component getComponent() {
 		return this.canvas;
 	}
@@ -594,12 +591,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		return new CoordImpl(Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
 	}
 
-	@Override
 	public OTFClientQuadTree getQuad() {
 		return this.clientQ;
 	}
 
-	@Override
 	public double getScale() {
 		return OTFOGLDrawer.this.scale;
 	}
@@ -612,7 +607,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		return viewBounds;
 	}
 
-	@Override
 	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
 			this.current = null;
@@ -669,7 +663,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		if(this.queryHandler != null) this.queryHandler.handleClick(origPoint,mouseButton);
 	}
 
-	@Override
 	public void handleClick(Rectangle currentRect, int button) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
 		if(this.queryHandler != null) this.queryHandler.handleClick(origRect,button);
@@ -727,7 +720,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		return new Rectangle2D.Double(viewBounds.minX, viewBounds.minY, viewBounds.maxX-viewBounds.minX, viewBounds.maxY-viewBounds.minY);
 	}
 
-	@Override
 	public void redraw() {
 		int time = this.hostControlBar.getOTFHostControl().getSimTime();
 		if (time != -1) {
@@ -815,12 +807,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener {
 		gl.glGetIntegerv( GL_VIEWPORT, viewport,0 );
 	}
 
-	@Override
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
 		if(queryHandler != null) this.queryHandler = queryHandler;
 	}
 
-	@Override
 	public void setScale(double scale) {
 		double scaleFactor = scale / this.scale;
 		scaleNetworkRelative(scaleFactor);

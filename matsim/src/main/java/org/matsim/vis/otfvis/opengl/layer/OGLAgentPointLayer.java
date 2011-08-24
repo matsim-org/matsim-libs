@@ -26,7 +26,7 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 import org.matsim.vis.otfvis.caching.SceneLayer;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
+import org.matsim.vis.otfvis.data.OTFDrawable;
 
 
 /**
@@ -68,7 +68,7 @@ public class OGLAgentPointLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
+	public Object newInstanceOf(Class clazz) {
 		return this.pointdrawer;
 	}
 
@@ -91,7 +91,7 @@ public class OGLAgentPointLayer implements SceneLayer {
 	}
 
 	@Override
-	public void addItem(OTFDataReceiver item) {
+	public void addItem(OTFDrawable item) {
 		
 	}
 

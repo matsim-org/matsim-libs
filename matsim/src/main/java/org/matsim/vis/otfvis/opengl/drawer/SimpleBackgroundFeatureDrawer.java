@@ -30,6 +30,7 @@ import javax.media.opengl.GL;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -148,6 +149,11 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 			}
 			this.converted = true;
 		}
+	}
+	
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		graph.addItem(this);
 	}
 
 }

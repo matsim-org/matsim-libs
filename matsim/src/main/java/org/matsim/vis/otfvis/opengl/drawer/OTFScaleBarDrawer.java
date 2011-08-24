@@ -11,6 +11,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
@@ -210,6 +211,11 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		posX = (float)obj_pos[0];
 		posY = (float)obj_pos[1];
 		return new float []{posX, posY};
+	}
+	
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		graph.addItem(this);
 	}
 
 

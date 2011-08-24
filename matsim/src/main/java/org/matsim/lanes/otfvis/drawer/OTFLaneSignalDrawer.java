@@ -31,6 +31,7 @@ import org.matsim.lanes.otfvis.io.OTFLinkWLanes;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
+import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
@@ -73,6 +74,11 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		for (OTFLinkWLanes laneLinkData : this.lanesLinkData.values()){
 			this.drawLinkEndsAndSignals(gl, laneLinkData);
 		}
+	}
+	
+	@Override
+	public void addToSceneGraph(SceneGraph graph) {
+		graph.addItem(this);
 	}
 	
 	private void updateNetList(GL gl){

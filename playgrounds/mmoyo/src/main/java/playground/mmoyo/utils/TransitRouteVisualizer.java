@@ -71,7 +71,7 @@ public class TransitRouteVisualizer {
 		System.out.println(sBuff.toString());
 		String routeNetFile = scenario.getConfig().controler().getOutputDirectory() + "/Net_" + strTrRouteId + ".xml";
 		new NetworkWriter(routeNet).write(routeNetFile );
-		OTFVis.playNetwork_Swing(routeNetFile);
+		OTFVis.playNetwork(routeNetFile);
 	}
 	
 	public static void main(String[] args) {

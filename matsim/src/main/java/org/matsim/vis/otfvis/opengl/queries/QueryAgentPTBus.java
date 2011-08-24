@@ -40,13 +40,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
@@ -69,16 +67,10 @@ public class QueryAgentPTBus extends AbstractQuery {
 		}
 
 		@Override
-		public void draw(OTFDrawer drawer) {
-			if(drawer instanceof OTFOGLDrawer) {
-				draw((OTFOGLDrawer)drawer);
-			}
-		}
-
-		private void draw(OTFOGLDrawer drawer) {
+		public void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
 
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getCurrentSceneGraph().getLayer(AgentPointDrawer.class);
+			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 
 			if( this.calcOffset == true) {
 				float east = (float)drawer.getQuad().offsetEast;

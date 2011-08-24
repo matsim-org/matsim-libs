@@ -21,7 +21,6 @@
 package org.matsim.vis.otfvis.opengl.drawer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 
 
 /**
@@ -35,14 +34,10 @@ import org.matsim.vis.otfvis.data.OTFDataReceiver;
  * </p>
  *
  */
-public abstract class OTFGLAbstractDrawableReceiver extends OTFGLAbstractDrawable implements OTFDataReceiver
+public abstract class OTFGLAbstractDrawableReceiver extends OTFGLAbstractDrawable
 {
 
 	@Override
-	public void invalidate(SceneGraph graph) {
-		// at least for AgentPointDrawer, this method is overwritten by an empty method.  kai, feb'11
-		
-		graph.addItem(this);
-	}
+	public abstract void addToSceneGraph(SceneGraph graph);
 
 }

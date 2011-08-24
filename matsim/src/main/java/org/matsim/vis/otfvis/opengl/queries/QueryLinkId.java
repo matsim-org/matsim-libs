@@ -34,9 +34,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
@@ -67,7 +67,7 @@ public class QueryLinkId extends AbstractQuery {
 		}
 
 		@Override
-		public void draw(OTFDrawer drawer) {
+		public void draw(OTFOGLDrawer drawer) {
 
 		}
 

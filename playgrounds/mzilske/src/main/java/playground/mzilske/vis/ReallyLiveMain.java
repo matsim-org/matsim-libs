@@ -10,7 +10,7 @@ public class ReallyLiveMain {
 	public static void main(String[] args) throws InterruptedException, InvocationTargetException {
 
 		String configFileName = "./examples/tutorial/config/example5-config.xml";
-		OTFVis.playConfig_Swing(configFileName);
+		OTFVis.playConfig(configFileName);
 		
 	}
 

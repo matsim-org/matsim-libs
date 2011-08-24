@@ -28,8 +28,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.gui.OTFDrawable;
+import org.matsim.vis.otfvis.data.OTFDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 
 
@@ -60,8 +59,8 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	private static float basicLineWidth_m = 30.f;
 
 	@Override
-	public void addItem(OTFDataReceiver item) {
-		items.add((OTFDrawable)item);
+	public void addItem(OTFDrawable item) {
+		items.add(item);
 	}
 
 	public OGLSimpleStaticNetLayer() {
@@ -100,9 +99,9 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	@Override
-	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) {
+	public OTFDrawable newInstanceOf(Class clazz) {
 		try {
-			return clazz.newInstance();
+			return (OTFDrawable) clazz.newInstance();
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {

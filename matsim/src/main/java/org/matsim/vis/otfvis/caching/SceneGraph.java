@@ -21,17 +21,17 @@
 package org.matsim.vis.otfvis.caching;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.vis.otfvis.data.OTFDrawable;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 
 
@@ -67,11 +67,15 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 public class SceneGraph {
 
 	private Rect rect;
-	private final Map<Class<?>, SceneLayer> layers = new LinkedHashMap<Class<?>, SceneLayer>();
-	private final List<SceneLayer> drawingLayers = new LinkedList<SceneLayer>();
-
-	private final OTFDrawer drawer;
+	
+	private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
+	private OGLSimpleStaticNetLayer networkLayer = new OGLSimpleStaticNetLayer();
+	private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
+	
+	private final OTFOGLDrawer drawer;
 	private final double time;
+
+	private ArrayList<SceneLayer> drawingLayers;
 
 	/**
 	 * @return the time
@@ -80,16 +84,17 @@ public class SceneGraph {
 		return time;
 	}
 
-	public SceneGraph(Rect rect, double time, OTFConnectionManager connect, OTFDrawer drawer) {
+	public SceneGraph(Rect rect, double time, OTFConnectionManager connect, OTFOGLDrawer drawer) {
 		this.rect = rect;
 		this.drawer = drawer;
 		this.time = time;
-		connect.fillLayerMap(layers);
-		for (SceneLayer layer : layers.values()) {
+		this.drawingLayers = new ArrayList<SceneLayer>();
+		this.drawingLayers.add(miscellaneousLayer);
+		this.drawingLayers.add(networkLayer);
+		this.drawingLayers.add(agentLayer);	
+		for (SceneLayer layer : drawingLayers) {
 			layer.init(time == -1 ? true : false);
-			drawingLayers.add(layer);
 		}
-
 	}
 
 	public Rect getRect() {
@@ -100,36 +105,27 @@ public class SceneGraph {
 		this.rect = rec;
 	}
 
-	public OTFDrawer getDrawer() {
+	public OTFOGLDrawer getDrawer() {
 		return drawer;
 	}
 
-	public OTFDataReceiver newInstanceOf(Class<? extends OTFDataReceiver> clazz) throws InstantiationException, IllegalAccessException {
-		// yyyy imo this should either be a DrawableReceiver, or a Drawer if we keep them separate.  kai, feb'11
-		SceneLayer layer = layers.get(clazz);
-		return layer.newInstanceOf(clazz);
+	public void addItem(OTFDrawable item) {
+		miscellaneousLayer.addItem(item);
 	}
 
-	public void addItem(OTFDataReceiver item) {
-		// If I understand this correctly, in theory every point would arrive here essentially as a self-drawing
-		// item.  In practice, this is completely bypassed for the points (=agents), and the layer
-		// handles it by itself.  kai, feb'11
-		
-		// yyyy imo this should either be a DrawableReceiver, or a Drawer if we keep them separate.  kai, feb'11
-		
-		SceneLayer layer = layers.get(item.getClass());
-		layer.addItem(item);
+	public void addStaticItem(OTFDrawable item) {
+		networkLayer.addItem(item);
 	}
-
+	
 	public void finish() {
 		Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
-		// do finishing action if necessary
-		for (SceneLayer layer : drawingLayers) layer.finish();
+		for (SceneLayer layer : drawingLayers) {
+			layer.finish();
+		}
 	}
-
-	public SceneLayer getLayer(Class clazz) {
-		SceneLayer layer = layers.get(clazz);
-		return layer;
+	
+	public OGLAgentPointLayer getAgentPointLayer() {
+		return agentLayer;
 	}
 
 	public void draw() {
@@ -142,6 +138,10 @@ public class SceneGraph {
 		for (SceneLayer layer : drawingLayers) {
 			layer.glInit();
 		}
+	}
+
+	public AgentPointDrawer getAgentPointDrawer() {
+		return (AgentPointDrawer) agentLayer.newInstanceOf(AgentPointDrawer.class);
 	}
 
 }

@@ -25,8 +25,6 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.awt.Color;
 
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -38,7 +36,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
  * That AgentPointLayer has its own (Array)Drawer.  The class here cannot be renamed because of the 
  * ConnectionManager/mvi issue.  kai, feb'11
  */
-public class AgentPointDrawer implements OTFDataSimpleAgentReceiver {
+public class AgentPointDrawer {
 
 	private final OGLAgentPointLayer oglAgentPointLayer;
 	
@@ -49,7 +47,6 @@ public class AgentPointDrawer implements OTFDataSimpleAgentReceiver {
 		this.oglAgentPointLayer = oglAgentPointLayer;
 	}
 
-	@Override
 	public void setAgent( AgentSnapshotInfo agInfo ) {
 		char[] id = agInfo.getId().toString().toCharArray();
 		
@@ -91,11 +88,6 @@ public class AgentPointDrawer implements OTFDataSimpleAgentReceiver {
 
 		}
 
-	}
-
-	@Override
-	public void invalidate(SceneGraph graph) {
-		
 	}
 
 }

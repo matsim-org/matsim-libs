@@ -38,8 +38,8 @@ import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 
 /**
@@ -56,7 +56,7 @@ public final class OTFClient {
 
 	private JPanel compositePanel;
 
-	private OTFDrawer mainDrawer;
+	private OTFOGLDrawer mainDrawer;
 
 	private OTFServer server;
 
@@ -130,7 +130,7 @@ public final class OTFClient {
 		SwingUtilities.updateComponentTreeUI(frame);
 	}
 
-	public void addDrawerAndInitialize(OTFDrawer mainDrawer, SettingsSaver saver) {
+	public void addDrawerAndInitialize(OTFOGLDrawer mainDrawer, SettingsSaver saver) {
 		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
@@ -144,7 +144,7 @@ public final class OTFClient {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(compositePanel, BorderLayout.CENTER);
 		this.frame.getContentPane().add(panel);
-		hostControlBar.addDrawer(mainDrawer);
+		hostControlBar.setDrawer(mainDrawer);
 	}
 
 	public void show() {

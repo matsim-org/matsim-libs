@@ -38,7 +38,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -107,20 +106,11 @@ public class FacilityDrawer {
 
 	public static class Reader extends OTFDataReader {
 
-		private DataDrawer drawer = null;
-
-		@Override
-		public void connect(OTFDataReceiver receiver) {
-			if (receiver instanceof DataDrawer) {
-				this.drawer = (DataDrawer) receiver;
-			}
-		}
+		private DataDrawer drawer = new DataDrawer();
 
 		@Override
 		public void invalidate(SceneGraph graph) {
-			if (this.drawer != null) {
-				this.drawer.invalidate(graph);
-			}
+			this.drawer.addToSceneGraph(graph);
 		}
 
 		@Override
@@ -170,8 +160,15 @@ public class FacilityDrawer {
 			}
 		}
 
+		@Override
+		public void addToSceneGraph(SceneGraph graph) {	
+			graph.addItem(this);
+		}
+
 
 	}
+
+
 
 	private static class VisBusStop {
 		public double x = 0.0;

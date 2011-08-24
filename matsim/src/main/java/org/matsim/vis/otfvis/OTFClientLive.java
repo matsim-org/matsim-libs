@@ -91,10 +91,9 @@ public class OTFClientLive {
 				OTFClientControl.getInstance().setOTFVisConfig(visconf);
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
-				clientQuadTree.createReceiver(connectionManager);
+				clientQuadTree.setConnectionManager(connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-				hostControlBar.updateTimeLabel();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config.otfVis());
 				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
@@ -102,6 +101,7 @@ public class OTFClientLive {
 				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
+				hostControlBar.updateTimeLabel();
 				otfClient.show();
 			}
 		});

@@ -27,8 +27,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,8 +41,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 public final class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
 
@@ -81,8 +79,8 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	private OTFAbortGoto progressBar = null;
 
 	private static enum PlayOrPause {PLAY, PAUSE};
-
-	private List<OTFDrawer> drawers = new ArrayList<OTFDrawer>();
+	
+	private OTFOGLDrawer drawer;
 
 	/*
 	 * The symbol which the play/pause button currently shows.
@@ -136,14 +134,8 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		log.debug("HostControlBar initialized.");
 	}
 
-	public void addDrawer(OTFDrawer handler) {
-		this.drawers.add(handler);
-	}
-
 	public void redrawDrawers() {
-		for (OTFDrawer drawer : drawers) {
-			drawer.redraw();
-		}
+		drawer.redraw();
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {
@@ -152,9 +144,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void clearCaches() {
-		for (OTFDrawer drawer : drawers) {
-			drawer.clearCache();
-		}
+		drawer.clearCache();
 	}
 
 	private JButton createButton(String altText, String actionCommand, String imageName, final String toolTipText) {
@@ -180,12 +170,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 	}
 
 	public void updateScaleLabel() {
-		double scale = 0.0;
-		for (OTFDrawer drawer : drawers) {
-			if (!(drawer instanceof OTFTimeLine)) {
-				scale = drawer.getScale();
-			}
-		}
+		double scale = drawer.getScale();
 		scale = (float)(Math.round(scale*100))/100;
 		this.scaleField.setText(String.valueOf(scale));
 	}
@@ -236,9 +221,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	private void changed_SCALE(ActionEvent event) {
 		String newScale = ((JFormattedTextField) event.getSource()).getText();
-		for (OTFDrawer drawer : drawers) {
-			drawer.setScale(Float.parseFloat(newScale));
-		}
+		drawer.setScale(Float.parseFloat(newScale));
 	}
 
 	@Override
@@ -315,6 +298,10 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 
 	public boolean isSynchronizedPlay() {
 		return synchronizedPlay;
+	}
+
+	public void setDrawer(OTFOGLDrawer mainDrawer) {
+		this.drawer = mainDrawer;
 	}
 
 }

@@ -90,7 +90,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 				OTFClientControl.getInstance().setOTFVisConfig(visconf);
 				OTFServerQuadTree serverQuadTree = OTFVisMobsimFeature.this.server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(OTFVisMobsimFeature.this.server, connectionManager);
-				clientQuadTree.createReceiver(connectionManager);
+				clientQuadTree.setConnectionManager(connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 				hostControlBar.updateTimeLabel();

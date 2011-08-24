@@ -32,9 +32,9 @@ import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
@@ -54,7 +54,7 @@ public class QueryAgentEvents extends AbstractQuery implements PersonEventHandle
 		private List<String> newEventStrings = new ArrayList<String>();
 		
 		@Override
-		public void draw(OTFDrawer drawer) {
+		public void draw(OTFOGLDrawer drawer) {
 			for(String eventString : newEventStrings) {
 				logger.info(agentId + ": " + eventString);
 			}

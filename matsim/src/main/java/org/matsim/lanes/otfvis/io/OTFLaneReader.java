@@ -30,7 +30,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 
@@ -40,7 +39,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDataReader;
  */
 public class OTFLaneReader extends OTFDataReader {
 	
-	protected OTFLaneSignalDrawer drawer;
+	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
 	public OTFLaneReader(){
 	}
@@ -138,13 +137,8 @@ public class OTFLaneReader extends OTFDataReader {
 	}
 	
 	@Override
-	public void connect(OTFDataReceiver receiver) {
-		this.drawer = (OTFLaneSignalDrawer) receiver;
-	}
-
-	@Override
 	public void invalidate(SceneGraph graph) {
-		this.drawer.invalidate(graph);
+		this.drawer.addToSceneGraph(graph);
 	}
 
 	@Override

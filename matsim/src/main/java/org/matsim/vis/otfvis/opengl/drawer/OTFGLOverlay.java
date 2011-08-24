@@ -83,7 +83,7 @@ class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 	}
 
 	@Override
-	public void invalidate(SceneGraph graph) {
+	public void addToSceneGraph(SceneGraph graph) {
 	}
 
 }

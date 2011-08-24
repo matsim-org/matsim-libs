@@ -33,8 +33,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 
 /**
@@ -126,24 +126,8 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public synchronized void createReceiver(final OTFConnectionManager c) {
+	public void setConnectionManager(final OTFConnectionManager c) {
 		this.connect = c;
-		SceneGraph graph = new SceneGraph(null, -1, connect, null);
-		for (OTFDataReader reader : this.values()) {
-			Collection<OTFDataReceiver> drawers = this.connect.getReceiversForReader(reader.getClass(), graph);
-			for (OTFDataReceiver drawer : drawers) {
-				reader.connect(drawer);
-			}
-		}
-
-		log.info("Connecting additional elements...");
-		for(OTFDataReader element : this.additionalElements) {
-			Collection<OTFDataReceiver> drawers = connect.getReceiversForReader(element.getClass(), graph);
-			for (OTFDataReceiver drawer : drawers) {
-				element.connect(drawer);
-				log.info("  Connected " + element.getClass().getName() + " to " + drawer.getClass().getName());
-			}
-		}
 	}
 
 	public synchronized void getConstData() {
@@ -176,7 +160,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
 	 * 	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
 	 */
-	private SceneGraph createSceneGraph(final int time, Rect rect, final OTFDrawer drawer) {
+	private SceneGraph createSceneGraph(final int time, Rect rect, final OTFOGLDrawer drawer) {
 		List<Rect> rects = new LinkedList<Rect>();
 		/*
 		 * This hack ensures that vehicles on links are drawn even if their center is not visible
@@ -282,7 +266,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
 	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
 	 */
-	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFDrawer drawer) {
+	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFOGLDrawer drawer) {
 		if ((time == -1) && (this.lastGraph != null)) {
 			return this.lastGraph;
 		} else {
