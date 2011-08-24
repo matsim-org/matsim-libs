@@ -1,6 +1,7 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -15,17 +16,34 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class NetworkNode implements Node {
 
 
+	//Enums
+
+	public enum Types {
+		EMPTY,
+		SOURCE,
+		SINK,
+		DEAD_END,
+		ONE_WAY_PASS,
+		TWO_WAY_PASS,
+		ONE_WAY_START,
+		ONE_WAY_END,
+		CROSSING;
+	}
+
+
 	//Attributes
 
 	private Coord coord;
 
 	private final Id id;
 
-	private final Network subNetwork;
-
 	private final Map<Id, Link> inLinks;
 
 	private final Map<Id, Link> outLinks;
+	
+	private final Network subNetwork;
+	
+	private Types type;
 
 
 	//Methods
@@ -34,6 +52,7 @@ public class NetworkNode implements Node {
 		String idText = "";
 		for(Node node:subNetwork.getNodes().values())
 			idText+=node.getId()+"-";
+		idText=idText.substring(0, idText.length()-1);
 		id = new IdImpl(idText);
 		coord = new CoordImpl(0, 0);
 		for(Node node:subNetwork.getNodes().values())
@@ -43,7 +62,7 @@ public class NetworkNode implements Node {
 		inLinks = new HashMap<Id, Link>();
 		outLinks = new HashMap<Id, Link>();
 	}
-
+	
 	@Override
 	public Coord getCoord() {
 		return coord;
@@ -52,10 +71,6 @@ public class NetworkNode implements Node {
 	@Override
 	public Id getId() {
 		return id;
-	}
-
-	public Network getSubNetwork() {
-		return subNetwork;
 	}
 
 	@Override
@@ -79,6 +94,59 @@ public class NetworkNode implements Node {
 	public Map<Id, ? extends Link> getOutLinks() {
 		return outLinks;
 	}
+	
+	public Network getSubNetwork() {
+		return subNetwork;
+	}
 
+	public Types getType() {
+		return type;
+	}
+
+	public void setType() {
+		if(inLinks.size() == 0 && outLinks.size()==0)
+			type = Types.EMPTY;
+		else if(inLinks.size() == 0)
+			type = Types.SOURCE;
+		else if(outLinks.size() == 0)
+			type = Types.SINK;
+		else if(inLinks.size() == 1 && outLinks.size() == 1 && inLinks.values().iterator().next().getFromNode().equals(outLinks.values().iterator().next().getToNode()))
+			type = Types.DEAD_END;
+		else if(inLinks.size() == 1 && outLinks.size() == 1)
+			type = Types.ONE_WAY_PASS;
+		else if(inLinks.size() == 2 && outLinks.size() == 1) {
+			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Link firstInLink = inLinksIterator.next();
+			Link secondInLink = inLinksIterator.next();
+			if(outLinks.values().iterator().next().getFromNode().equals(firstInLink.getToNode()) || outLinks.values().iterator().next().getFromNode().equals(secondInLink.getToNode()))
+				type = Types.ONE_WAY_END;
+			else
+				type = Types.CROSSING;
+		}
+		else if(inLinks.size() == 1 && outLinks.size() == 2) {
+			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Link firstOutLink = outLinksIterator.next();
+			Link secondOutLink = outLinksIterator.next();
+			if(inLinks.values().iterator().next().getFromNode().equals(firstOutLink.getToNode()) || inLinks.values().iterator().next().getFromNode().equals(secondOutLink.getToNode()))
+				type = Types.ONE_WAY_START;
+			else
+				type = Types.CROSSING;
+		}
+		else if(inLinks.size() == 2 && outLinks.size() == 2) {
+			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Link firstInLink = inLinksIterator.next();
+			Link secondInLink = inLinksIterator.next();
+			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Link firstOutLink = outLinksIterator.next();
+			Link secondOutLink = outLinksIterator.next();
+			if((firstInLink.getFromNode().equals(firstOutLink.getToNode()) && secondInLink.getFromNode().equals(secondOutLink.getToNode())) || (firstInLink.getFromNode().equals(secondOutLink.getToNode()) && secondInLink.getFromNode().equals(firstOutLink.getToNode())))
+				type = Types.TWO_WAY_PASS;
+			else
+				type = Types.CROSSING;
+		}
+		else
+			type = Types.CROSSING;
+	}
+	
 
 }

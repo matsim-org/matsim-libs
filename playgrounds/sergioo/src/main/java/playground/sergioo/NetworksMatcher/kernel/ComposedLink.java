@@ -19,10 +19,22 @@ public class ComposedLink extends LinkImpl {
 	
 	//Methods
 	
-	protected ComposedLink(Id id, Node from, Node to, Network network,
-			double length, double freespeed, double capacity, double lanes) {
+	protected ComposedLink(Link link, Network network) {
+		super(link.getId(), link.getFromNode(), link.getToNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+		links = new ArrayList<Link>();
+	}
+	
+	protected ComposedLink(Id id, Node from, Node to, Network network, double length, double freespeed, double capacity, double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 		links = new ArrayList<Link>();
+	}
+
+	public List<Link> getLinks() {
+		return links;
+	}
+
+	public void applyProperties(ComposedLink fullLink) {
+		//TODO
 	}
 	
 	
