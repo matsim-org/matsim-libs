@@ -55,6 +55,9 @@ public class PCCtl extends Controler {
 		// extension = new PCCtlListener();
 		// addControlerListener(extension);
 
+		addCoreControlerListener(new PCLoadScoringFunctionFactory());// ScoringFunctionFactory
+		// TODO make my scoringFunction in constructor of PCPlanssCoring or
+		// other classes
 		strategyManager = PCStrategyManagerCreator.createStrategyManager(this);// like
 																				// setup()/loadStrategyManager()
 		addCoreControlerListener(new PCPlansScoring());// like
@@ -66,6 +69,7 @@ public class PCCtl extends Controler {
 		// extension = new PCCtlListener();
 		// addControlerListener(extension);
 
+		addCoreControlerListener(new PCLoadScoringFunctionFactory());// ScoringFunctionFactory
 		strategyManager = PCStrategyManagerCreator.createStrategyManager(this);// like
 																				// setup()/loadStrategyManager()
 		addCoreControlerListener(new PCPlansScoring());// like

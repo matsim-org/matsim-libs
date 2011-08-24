@@ -41,9 +41,8 @@ public class Run {
 		if (args.length >= 3 && Boolean.parseBoolean(args[2])) {
 			controler.addControlerListener(new CntSimCap4Chart());
 			controler.addControlerListener(new RouteTravelTimeSummary());
-
+			controler.addControlerListener(new QVProfilControlerListener());
 		}
-		controler.addControlerListener(new QVProfilControlerListener());
 		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
 		controler.setOverwriteFiles(true);
 		controler.run();
