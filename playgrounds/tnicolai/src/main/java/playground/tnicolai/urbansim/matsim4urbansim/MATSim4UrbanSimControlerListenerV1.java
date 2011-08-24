@@ -1,4 +1,4 @@
-package playground.tnicolai.urbansim.utils;
+package playground.tnicolai.urbansim.matsim4urbansim;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -36,6 +36,7 @@ import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.toronto.ttimematrix.SpanningTree;
 
@@ -45,8 +46,8 @@ import playground.toronto.ttimematrix.SpanningTree;
  * @author thomas
  *
  */
-public class MyControlerListener implements ShutdownListener {
-	private static final Logger log = Logger.getLogger(MyControlerListener.class);
+public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
+	private static final Logger log = Logger.getLogger(MATSim4UrbanSimControlerListenerV1.class);
 
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl facilities;
@@ -59,7 +60,7 @@ public class MyControlerListener implements ShutdownListener {
 	 * constructor
 	 * @param zones 
 	 */
-	public MyControlerListener( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
+	public MATSim4UrbanSimControlerListenerV1( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
 		this.zones = zones;
 		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
@@ -106,7 +107,7 @@ public class MyControlerListener implements ShutdownListener {
 			long cnt = 0; 
 			long percentDone = 0;
 			
-			// main for loop, dumping out zone2zone impedances (travel times) and workplace accessibility in two seperate files
+			// main for loop, dumping out zone2zone impedances (travel times) and workplace accessibility in two separate files
 			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
 				// progress bar
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) {
@@ -158,8 +159,8 @@ public class MyControlerListener implements ShutdownListener {
 					// double tcost = st.getTravelCostCalulator().getLinkGeneralizedTravelCost(toLink, depatureTime); // .getLinkTravelCost(toLink, depatureTime);
 					
 					// tnicolai: add "single_vehicle_to_work_travel_distance.lf4" to header
-					double distance = getZone2ZoneDistance(fromZone, toZone, network, controler);
-					double meterInMilesFaktor = 0.000621371; // use this to convert distance in meter to distance in miles.
+//					double distance = getZone2ZoneDistance(fromZone, toZone, network, controler);
+//					double meterInMilesFaktor = 0.000621371; // use this to convert distance in meter to distance in miles.
 //					System.out.println("Distance from zone" + fromZone.getId() + " to zone " + toZone.getId() + " in meter : " + distance + " in miles: " + distance*meterInMilesFaktor);
 					
 					travelDataWriter.write ( fromZone.getId().toString()	//origin zone id
@@ -252,7 +253,7 @@ public class MyControlerListener implements ShutdownListener {
 		
 
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips.lf4" ) ; 
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 		travelDataWriter.newLine();
 		return travelDataWriter;
@@ -318,6 +319,9 @@ public class MyControlerListener implements ShutdownListener {
 			
 			boolean isFirstPlanActivity = true;
 			String lastZoneId = null;
+			
+			if(plan.getPlanElements().size() <= 1)
+				continue;
 			
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if ( pe instanceof Activity ) {

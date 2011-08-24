@@ -125,8 +125,8 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 	}
 	
 	/**
-	 * running MATSim with differend configuration files
-	 * @param matsimConfigFileLocation poits to le location of the MATSim config
+	 * running MATSim with different configuration files
+	 * @param matsimConfigFileLocation points to the location of the MATSim config
 	 */
 	private void testRun(String matsimConfigFileLocation){
 		log.info("Starting MATSim4UrbanSim with args = " + matsimConfigFileLocation);

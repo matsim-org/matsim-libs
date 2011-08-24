@@ -36,7 +36,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
+import playground.tnicolai.urbansim.org.matsim.config.MatsimConfigType;
+import playground.tnicolai.urbansim.org.matsim.config.ObjectFactory;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.io.LoadFile;
 import playground.tnicolai.urbansim.utils.io.TempDirectoryUtil;
@@ -68,7 +69,7 @@ public class JAXBUnmaschal {
 		log.info("Staring unmaschalling MATSim configuration from: " + matsimConfigFile );
 		log.info("...");
 		try{
-			JAXBContext jaxbContext = JAXBContext.newInstance(playground.tnicolai.urbansim.com.matsim.config.ObjectFactory.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 			// create an unmaschaller (write xml file)
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
 
@@ -83,7 +84,8 @@ public class JAXBUnmaschal {
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			
 			// tnicolai: for debugging
-			// File file2XSD = new File( "/Users/thomas/Development/workspace/urbansim_trunk/opus_matsim/sustain_city/models/pyxb_xml_parser/MATSim4UrbanSimConfigSchema.xsd" ); 
+			// file2XSD = new File( "/Users/thomas/Development/vspworkspace/matsim/dtd/MATSim4UrbanSimConfigSchema.xsd" );
+			
 			if(file2XSD == null || !file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " not found!!!");
 				return null;

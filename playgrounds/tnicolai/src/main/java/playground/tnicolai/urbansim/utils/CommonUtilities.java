@@ -112,10 +112,39 @@ public class CommonUtilities {
 	@SuppressWarnings("all")
 	public static String getTestMATSimConfigDir(Class classObj){
 		
-		String path = CommonUtilities.getCurrentPath( classObj );
-		String subPath = "matsimTestData/xmlMATSimConfig/";
+//		String path = CommonUtilities.getCurrentPath( classObj );
+//		String subPath = "matsimTestData/xmlMATSimConfig/";
+//		
+//		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
 		
-		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
+		return concatPath(1, "matsimTestData/xmlMATSimConfig/", classObj);
+	}
+	
+	/**
+	 * returns the directory to the UrbanSim input data for MATSim Warm Start
+	 * @return directory to the UrbanSim input data
+	 */
+	@SuppressWarnings("all")
+	public static String getWarmStartUrbanSimInputData(Class classObj){		
+		return concatPath(1, "matsimTestData/warmstart/urbanSimOutput/", classObj);
+	}
+	
+	/**
+	 * returns the directory to the input plans file for MATSim Warm Start
+	 * @return directory to the input plans file
+	 */
+	@SuppressWarnings("all")
+	public static String getWarmStartInputPlansFile(Class classObj){		
+		return concatPath(1, "matsimTestData/warmstart/inputPlan/", classObj);
+	}
+	
+	/**
+	 * returns the directory to the MATSim Warm Start network
+	 * @return directory to the network
+	 */
+	@SuppressWarnings("all")
+	public static String getWarmStartNetwork(Class classObj){		
+		return concatPath(1, "matsimTestData/warmstart/network/", classObj);
 	}
 	
 	/**
@@ -130,9 +159,16 @@ public class CommonUtilities {
 		// int index = currentDir.lastIndexOf("matsimTest");
 		// return currentDir.substring(0, index) + "matsimTestData/urbanSimOutput/";
 		
-		String path = CommonUtilities.getCurrentPath( classObj );
-		String subPath = "matsimTestData/urbanSimOutput/";
+//		String path = CommonUtilities.getCurrentPath( classObj );
+//		String subPath = "matsimTestData/urbanSimOutput/";
+//		
+//		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
 		
+		return concatPath(1, "matsimTestData/urbanSimOutput/", classObj);
+	}
+	
+	public static String concatPath(int depthLevel, String subPath, Class classObj){
+		String path = CommonUtilities.getCurrentPath( classObj );
 		return CommonUtilities.replaceSubPath(1, path, subPath) + "/";
 	}
 }

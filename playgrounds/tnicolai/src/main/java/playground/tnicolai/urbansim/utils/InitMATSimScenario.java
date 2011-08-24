@@ -28,13 +28,14 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.tnicolai.urbansim.com.matsim.config.ConfigType;
-import playground.tnicolai.urbansim.com.matsim.config.Matsim4UrbansimType;
-import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
+import playground.tnicolai.urbansim.org.matsim.config.ConfigType;
+import playground.tnicolai.urbansim.org.matsim.config.Matsim4UrbansimType;
+import playground.tnicolai.urbansim.org.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 
 /**
@@ -75,10 +76,11 @@ public class InitMATSimScenario {
 			
 			initMATSim4UrbanSimParameter(matsim4UrbanSimParameter);
 			initNetwork(matsimParameter);
+			initInputPlansFile(matsimParameter);
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
 			initStrategy();
-			initPopulation(matsimParameter);	// tnicolai: test if this works for warm start ...
+//			initPopulation(matsimParameter);	// tnicolai: test if this works for warm start ...
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -156,6 +158,25 @@ public class InitMATSimScenario {
 		networkCG.setInputFile( networkFile );	// network
 		log.info("... done!");
 		log.info("Network: " + networkCG.getInputFile());
+	}
+	
+	/**
+	 * setting input plans file (for warm start)
+	 * 
+	 * @param matsimParameter
+	 */
+	private void initInputPlansFile(ConfigType matsimParameter){
+		log.info("Setting input plans file to config...");
+		String inputPlansFile = matsimParameter.getInputPlansFile().getInputFile();
+		if(inputPlansFile!=null && !inputPlansFile.equalsIgnoreCase("")){
+			PlansConfigGroup plansCG = (PlansConfigGroup) scenario.getConfig().getModule(PlansConfigGroup.GROUP_NAME);
+			// set values
+			plansCG.setInputFile( inputPlansFile );	// input plans file
+			log.info("... done!");
+			log.info("Input plans file: " + plansCG.getInputFile());
+		}
+		else
+			log.info("Input plans file is empty");
 	}
 	
 	/**

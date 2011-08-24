@@ -120,6 +120,9 @@ public class UpdateXMLBindingClasses {
 			if ( parts[0].equals("--destination") ) {
 				outputDirectory = parts[1];
 			}
+			else if ( parts[0].equals("--xsd") ) {
+				xsdLocation = parts[1];
+			}
 			else if ( parts[0].equals("--package") ) {
 				targetPackage = parts[1];
 			}
@@ -140,14 +143,14 @@ public class UpdateXMLBindingClasses {
 		if(outputDirectory == null){
 			log.warn("Destination not given (optional)...");
 			// set default location
-			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/tnicolai/src/main/java/";
+			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
 			TempDirectoryUtil.createDirectory( outputDirectory );
 			log.warn("Set default destination to: " + outputDirectory);
 		}
 		if(targetPackage == null){
 			log.warn("Package name not given (optional)...");
 			// set default location
-			targetPackage = "playground.tnicolai.urbansim.com.matsim.config";
+			targetPackage = "playground.tnicolai.urbansim.org.matsim.config";
 			log.warn("Set default package name to: " + targetPackage);
 		}
 

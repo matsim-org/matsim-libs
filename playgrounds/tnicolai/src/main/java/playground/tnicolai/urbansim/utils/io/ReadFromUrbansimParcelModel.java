@@ -29,6 +29,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -207,9 +208,9 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @param samplingRate
 	 */
-	public void readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
+	public PopulationCounter readPersons(final Population oldPop, final Population newPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
 
-		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation() ;
+		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation() ; // will contain only new persons (id) that don't exist in warm start pop file
 		PopulationCounter cnt = new PopulationCounter();
 		
 		boolean flag = false;
@@ -242,10 +243,10 @@ public class ReadFromUrbansimParcelModel {
 				Id personId = new IdImpl( parts[ indexPersonID ] ) ;
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
-				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId) ) )
+				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
 					continue ;
 
-				flag = false ;
+				flag = false;
 
 				// get home location id
 				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
@@ -309,6 +310,8 @@ public class ReadFromUrbansimParcelModel {
 		
 		benchmark.stoppMeasurement(rpID);
 		log.info( "Done with reading persons. This took " + benchmark.getDurationInSeconds(rpID) +" seconds.") ;
+		
+		return cnt;
 	}
 
 	/**
@@ -328,6 +331,7 @@ public class ReadFromUrbansimParcelModel {
 				+ " bakPopSize: " + backupPop.getPersons().size() + " NumberUrbansimPersons: " + cnt.NUrbansimPersons );
 		log.warn("why is bakPopSize not approx as large as samplingRate*NumberUrbansimPersons?" );
 		
+		// check if newPop contains less people than our target population size (less than sampleRate*NUrbansimPersons) and add additional persons from backupPop
 		if(newPop.getPersons().size() < samplingRate*cnt.NUrbansimPersons){
 			log.info("Size of new Population (" + newPop.getPersons().size() + ") is smaller than samplingRate*NumberUrbansimPersons (" + Math.round(samplingRate*cnt.NUrbansimPersons) + "). Adding persons, stored in bakPopSize ... .");
 			List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
@@ -346,10 +350,10 @@ public class ReadFromUrbansimParcelModel {
 		
 		log.info("================================================================================");
 		log.info("Population merge overview:");
+		log.info("Total population = " + cnt.populationMergeTotal);
 		log.info("Re-identified persons from old population = " + cnt.identifiedCnt);
-		log.info("New created persons = " + cnt.populationMergeTotal);
-		log.info("Composition of new created Persons:");
-		log.info("		Person Id not found in old population (bakPersons) = " + cnt.notFoundCnt + ". " + cnt.backupCnt + " of them are taken into the new Population.");
+		log.info("Composition of population:");
+		log.info("		Not re-identified persons in old population (bakPersons) = " + cnt.notFoundCnt + ". " + cnt.backupCnt + " of them are taken into the new Population.");
 		log.info("		Employment status changed = " + cnt.employmentChangedCnt);
 		log.info("		Home location changed = " + cnt.homelocationChangedCnt);
 		log.info("		Work location changed = " + cnt.worklocationChangedCnt);
@@ -685,18 +689,18 @@ public class ReadFromUrbansimParcelModel {
 		return this.year;
 	}
 
-	private class PopulationCounter{
+	public class PopulationCounter{
 		
-		public long NUrbansimPersons = 0;
-		public long notFoundCnt = 0;
-		public long identifiedCnt = 0;
-		public long employmentChangedCnt = 0;
-		public long homelocationChangedCnt = 0;
-		public long worklocationChangedCnt = 0;
-		public long unemployedCnt = 0;
-		public long jobLocationIdNullCnt = 0 ;
-		public long backupCnt = 0;
-		public long populationMergeTotal = 0;
+		public long NUrbansimPersons = 0;		// total number of UrbanSim Persons	
+		public long notFoundCnt = 0;			// persons not exists in initial input plans file (new UrbanSim Persons), these are put into backupPop population
+		public long identifiedCnt = 0;			// person exists in initial input plans file
+		public long employmentChangedCnt = 0;	// person exists but employment status changed
+		public long homelocationChangedCnt = 0;	// person exists but home location changed
+		public long worklocationChangedCnt = 0;	// person exists but work location changed
+		public long unemployedCnt = 0;			// person exists but is unemployed (i.e. is handeld as a new Person)
+		public long jobLocationIdNullCnt = 0 ;	// person exists but job not found (i.e. is handeld as a new Person)
+		public long backupCnt = 0;				// counts how much of the backup population moved to newPopulation (to reach the sampleRate)
+		public long populationMergeTotal = 0;	// counts the total number of person in newPopulation
 		
 	}
 	

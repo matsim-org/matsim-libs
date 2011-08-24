@@ -39,11 +39,10 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.tnicolai.urbansim.com.matsim.config.MatsimConfigType;
+import playground.tnicolai.urbansim.org.matsim.config.MatsimConfigType;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.JAXBUnmaschal;
-import playground.tnicolai.urbansim.utils.MyControlerListener;
 import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
@@ -126,6 +125,8 @@ public class MATSim4Urbansim {
 		// scenario.setFacilities(facilities); // tnicolai: suggest to implement method
 
 		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
+		
+		// movePlansFile(); // tnicolai: preparation for hot start
 	}
 	
 	/**
@@ -158,8 +159,8 @@ public class MATSim4Urbansim {
 			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
 			log.info("Persons not found in pre-existing pop file are added; persons no longer in urbansim persons file are removed." ) ;
 			oldPopulation = scenario.getPopulation() ;
-			log.info("Note that the `continuation of iterations' will only work if you set this up via different config files for") ;
-			log.info(" every year and know what you are doing.") ;
+			// log.info("Note that the `continuation of iterations' will only work if you set this up via different config files for") ;
+			// log.info("every year and know what you are doing.") ;
 		}
 		else {
 			log.warn("No population specified in matsim config file; assuming COLD start.");
@@ -201,7 +202,7 @@ public class MATSim4Urbansim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MyControlerListener( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
+		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV2( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
 		
 		// tnicolai todo?: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
@@ -210,6 +211,24 @@ public class MATSim4Urbansim {
 		
 		// run the iterations, including the post-processing:
 		controler.run() ;
+	}
+	
+	void movePlansFile(){
+		
+		Controler controler = new Controler(scenario);
+		String filename = "plans.xml.gz";
+		// get location of new generated plans file (from MATSim output directory)
+		String s = controler.getControlerIO().getIterationFilename(scenario.getConfig().controler().getLastIteration(), filename);
+		File plansFile = new File( s );
+		
+		// set destination
+		File destinationFile = new File( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + filename );
+		
+		// moving plansFile to destinationFile
+		if (plansFile.renameTo( destinationFile ) )
+			try{
+				log.info("Moved " + plansFile.getCanonicalPath() + " to " + destinationFile.getCanonicalPath() + ".");
+			} catch(Exception e){}
 	}
 	
 	/**
