@@ -1,5 +1,7 @@
 package playground.wrashid.artemis.lav;
 
+import playground.wrashid.lib.DebugLib;
+
 public class VehicleTypeLAV {
 
 	public int powerTrainClass;
@@ -24,4 +26,23 @@ public class VehicleTypeLAV {
 		return true;
 	}
 	
+	public void print(){
+		System.out.println("pt:"+powerTrainClass+", fl:"+fuelClass+", pw:"+powerClass+", wt:"+massClass);
+	}
+	
+	public void ifPHEVSwitchToElectricity(){
+		if (powerTrainClass==LAVLib.getPHEVPowerTrainClass()){
+			fuelClass=LAVLib.getElectricityFuelClass();
+		} else {
+			DebugLib.stopSystemAndReportInconsistency("powerTrainClass: " + powerTrainClass);
+		}
+	}
+	
+	public void ifPHEVSwitchToGasolineMode(){
+		if (powerTrainClass==LAVLib.getPHEVPowerTrainClass()){
+			fuelClass=LAVLib.getGasolineFuelClass();
+		} else {
+			DebugLib.stopSystemAndReportInconsistency("powerTrainClass: " + powerTrainClass);
+		}
+	}
 }

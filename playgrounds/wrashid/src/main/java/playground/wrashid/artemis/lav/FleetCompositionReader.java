@@ -8,11 +8,20 @@ public class FleetCompositionReader {
 
 	public static void main(String[] args) {
 	
-		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/data 11. Aug. 2011/scenarien als tabellen/2020_Basic";
-		HashMap<VehicleTypeLAV, Integer> vehicleFleet = getVehicleFleet(fleetCompositionFileName);
+		HashMap<VehicleTypeLAV, Integer> vehicleFleet = getVehicleFleetForTesting();
 		
 		
 		System.out.println(getTotalNumberOfVehicles(vehicleFleet));
+	}
+
+	public static String getFleetCompositionFileNameForTest(){
+		return "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/data 11. Aug. 2011/scenarien als tabellen/2020_Basic";
+	}
+	
+	public static HashMap<VehicleTypeLAV, Integer> getVehicleFleetForTesting() {
+		String fleetCompositionFileName = getFleetCompositionFileNameForTest();
+		HashMap<VehicleTypeLAV, Integer> vehicleFleet = getVehicleFleet(fleetCompositionFileName);
+		return vehicleFleet;
 	}
 	
 	
@@ -35,6 +44,10 @@ public class FleetCompositionReader {
 			vehicleType.powerClass=modelFile.getInteger(i, 2);
 			vehicleType.massClass=modelFile.getInteger(i, 3);
 			int numberOfVehicles=modelFile.getInteger(i, 4);
+			
+			if (numberOfVehicles<1){
+				continue;
+			}
 			
 			// need to only enter one type of PHEVs to avoid counting them twice
 			if (!(vehicleType.powerTrainClass==LAVLib.getPHEVPowerTrainClass() && vehicleType.fuelClass==LAVLib.getGasolineFuelClass())){

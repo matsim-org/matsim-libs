@@ -199,7 +199,7 @@ public class ChargingTimes {
 	public static void writeChargingTimes(HashMap<Id, ChargingTimes> chargingTimes, String outputFilePath) {
 
 		ArrayList<String> list = new ArrayList<String>();
-
+//TODO: use string buffer...
 		list.add("linkId\tagentId\tstartChargingTime\tendChargingTime\tstartSOC\tendSOC");
 
 		for (Id personId : chargingTimes.keySet()) {

@@ -3,6 +3,7 @@ package playground.wrashid.lib.obj.list;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Lists {
 
@@ -72,4 +73,20 @@ public class Lists {
 		return result;
 	}
 
+	public static LinkedList randomizeObjectSequence(LinkedList list){
+		LinkedList tmpList=new LinkedList();
+		LinkedList randomizedList=new LinkedList();
+		Random rand=new Random();
+		
+		tmpList.addAll(list);
+		
+		while (tmpList.size()>0){
+			int index = rand.nextInt(tmpList.size());
+			randomizedList.add(tmpList.get(index));
+			tmpList.remove(index);
+		}
+		
+		return randomizedList;
+	}
+	
 }

@@ -49,4 +49,12 @@ public class LAVLib {
 	public static int getGasolineFuelClass(){
 		return 1;
 	}
+	
+	public static int getElectricityFuelClass(){
+		return 5;
+	}
+	
+	public static int getBatteryElectricPowerTrainClass(){
+		return 4;
+	}
 }
