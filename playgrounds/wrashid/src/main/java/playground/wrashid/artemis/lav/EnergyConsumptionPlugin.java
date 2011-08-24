@@ -195,7 +195,13 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		
 		StringBuffer stringBuffer=new StringBuffer();
 		
-		stringBuffer.append(link.getLength()/timeSpendOnLink);
+		double averageSpeedDriven = link.getLength()/timeSpendOnLink;
+		if (averageSpeedDriven>link.getFreespeed()){
+			// remove artifacts
+			averageSpeedDriven=link.getFreespeed();
+		}
+		
+		stringBuffer.append(averageSpeedDriven);
 		stringBuffer.append("\t");
 		stringBuffer.append(link.getFreespeed());
 		stringBuffer.append("\t");

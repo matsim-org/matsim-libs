@@ -30,64 +30,74 @@ public class EnergyConsumptionMain {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic";
-	
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
-		HashMap<Id, VehicleTypeLAV> agentVehicleMapping= VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName, scenario, fleetCompositionFileName);
-		
-		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update data 16. Aug. 2011/artemis_2.dat";
-		EnergyConsumptionModelLAV_v1 energyConsumptionModel=new EnergyConsumptionModelLAV_v1(energyConsumptionModelFile);
 
-		HashMap<Id,VehicleSOC> agentSocMapping=initializeSOCs(agentVehicleMapping,energyConsumptionModel);
-		
-		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel, agentVehicleMapping, scenario.getNetwork(),agentSocMapping,true);
+		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
+		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
+				scenario, fleetCompositionFileName);
+
+		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update data 16. Aug. 2011/artemis_2.dat";
+		EnergyConsumptionModelLAV_v1 energyConsumptionModel = new EnergyConsumptionModelLAV_v1(energyConsumptionModelFile);
+
+		HashMap<Id, VehicleSOC> agentSocMapping = initializeSOCs(agentVehicleMapping, energyConsumptionModel);
+
+		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,
+				agentVehicleMapping, scenario.getNetwork(), agentSocMapping, true);
 
 		events.addHandler(energyConsumptionPlugin);
 
-		DumbCharger_Basic2020 dumbCharger=new DumbCharger_Basic2020(agentSocMapping, agentVehicleMapping, energyConsumptionModel);
+		DumbCharger_Basic2020 dumbCharger = new DumbCharger_Basic2020(agentSocMapping, agentVehicleMapping,
+				energyConsumptionModel);
 		events.addHandler(dumbCharger);
-		
+
 		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
 
 		reader.readFile(eventsFileName);
-		
+
 		energyConsumptionPlugin.getEnergyConsumptionOfLegs().getKeySet();
-		
+
+		energyConsumptionPlugin.writeOutputLog("c:/tmp/energyConsumptionLogPerLink.txt");
+
 		reportIfEVRanOutOfElectricity(agentSocMapping);
 	}
 
 	private static void reportIfEVRanOutOfElectricity(HashMap<Id, VehicleSOC> agentSocMapping) {
-		boolean reportEVRanOutOfElectricity=false;
-		for (Id personId:agentSocMapping.keySet()){
+		boolean reportEVRanOutOfElectricity = false;
+		for (Id personId : agentSocMapping.keySet()) {
 			VehicleSOC vehicleSOC = agentSocMapping.get(personId);
-			
-			if (vehicleSOC.didRunOutOfBattery()){
+
+			if (vehicleSOC.didRunOutOfBattery()) {
 				System.out.println(personId);
-				reportEVRanOutOfElectricity=true;
+				reportEVRanOutOfElectricity = true;
 			}
 		}
-		
-		if (reportEVRanOutOfElectricity){
+
+		if (reportEVRanOutOfElectricity) {
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
 
 	private static HashMap<Id, VehicleSOC> initializeSOCs(HashMap<Id, VehicleTypeLAV> agentVehicleMapping,
 			EnergyConsumptionModelLAV_v1 energyConsumptionModel) {
-		
-		HashMap<Id, VehicleSOC> vehicleSOCs=new HashMap<Id, VehicleSOC>();
-		
-		for (Id personId:agentVehicleMapping.keySet()){
+
+		HashMap<Id, VehicleSOC> vehicleSOCs = new HashMap<Id, VehicleSOC>();
+
+		for (Id personId : agentVehicleMapping.keySet()) {
+
 			VehicleTypeLAV vehicleType = agentVehicleMapping.get(personId);
-			double dummySpeed=30.0;
-			
-			double socInJoule=energyConsumptionModel.getRegressionModel().getVehicleEnergyConsumptionModel(vehicleType, dummySpeed).getBatteryCapacityInJoule();
-			VehicleSOC vehicleSoc=new VehicleSOC(socInJoule);
-			
-			vehicleSOCs.put(personId, vehicleSoc);
+
+			if (LAVLib.getBatteryElectricPowerTrainClass() == vehicleType.powerTrainClass
+					|| LAVLib.getPHEVPowerTrainClass() == vehicleType.powerTrainClass) {
+				double dummySpeed = 30.0;
+
+				double socInJoule = energyConsumptionModel.getRegressionModel()
+						.getVehicleEnergyConsumptionModel(vehicleType, dummySpeed).getBatteryCapacityInJoule();
+				VehicleSOC vehicleSoc = new VehicleSOC(socInJoule);
+
+				vehicleSOCs.put(personId, vehicleSoc);
+			}
 		}
-		
+
 		return vehicleSOCs;
 	}
-
 
 }

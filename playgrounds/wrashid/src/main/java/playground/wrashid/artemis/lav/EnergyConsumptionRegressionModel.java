@@ -122,7 +122,7 @@ public class EnergyConsumptionRegressionModel {
 		public double getBatteryCapacityInJoule(){
 			double OneWhInJoules=3600;
 			double voltageInVolt=400;
-			return batteryCapacity*voltageInVolt/OneWhInJoules;
+			return batteryCapacity*voltageInVolt*OneWhInJoules;
 		}
 		
 		public double getEnergyConsumptionInJoulePerMeter(

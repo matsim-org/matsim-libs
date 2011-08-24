@@ -2,6 +2,7 @@ package playground.wrashid.artemis.lav;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
 import playground.wrashid.lib.DebugLib;
+import playground.wrashid.lib.MathLib;
 
 public class VehicleSOC {
 
@@ -22,7 +23,8 @@ public class VehicleSOC {
 		socInJoule+=chargeInJoule;
 		
 		double batteryCapacity = energyConsumptionRegressionModel.getBatteryCapacityInJoule();
-		if (socInJoule>batteryCapacity){
+		double epsilon = 0.001;
+		if (!MathLib.equals(socInJoule,batteryCapacity,epsilon) && socInJoule>batteryCapacity){
 			DebugLib.stopSystemAndReportInconsistency("overcharging:" + socInJoule+ "/"+batteryCapacity);
 		}
 	}
