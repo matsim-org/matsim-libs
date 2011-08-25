@@ -123,7 +123,23 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
-			if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
+			if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.LINK);
+			}
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager().unselectLink();
+				doubleNetworkWindow.refreshLabel(Labels.LINK);
+			}
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
+			}
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager().unselectNode();
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
+			}
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
 				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
@@ -177,6 +193,13 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
+		case 's':
+			((NetworkNodesPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
+			break;
+		case 'o':
+			((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkManager().selectOppositeLink();
+			doubleNetworkWindow.refreshLabel(Labels.LINK);
+			break;
 		case 'n':
 			getActiveLayer().changeVisible();
 			break;

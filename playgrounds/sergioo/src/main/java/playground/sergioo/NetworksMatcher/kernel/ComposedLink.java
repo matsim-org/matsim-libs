@@ -14,18 +14,18 @@ public class ComposedLink extends LinkImpl {
 	
 	//Attributes
 	
-	private List<Link> links;
+	private final List<Link> links;
 	
 	
 	//Methods
 	
 	protected ComposedLink(Link link, Network network) {
-		super(link.getId(), link.getFromNode(), link.getToNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
-		links = new ArrayList<Link>();
+		this(link.getId(), link.getFromNode(), link.getToNode(), network);
+		links.add(link);
 	}
 	
-	protected ComposedLink(Id id, Node from, Node to, Network network, double length, double freespeed, double capacity, double lanes) {
-		super(id, from, to, network, length, freespeed, capacity, lanes);
+	protected ComposedLink(Id id, Node from, Node to, Network network) {
+		super(id, from, to, network, 0, 0, 0, 0);
 		links = new ArrayList<Link>();
 	}
 
@@ -36,6 +36,5 @@ public class ComposedLink extends LinkImpl {
 	public void applyProperties(ComposedLink fullLink) {
 		//TODO
 	}
-	
 	
 }

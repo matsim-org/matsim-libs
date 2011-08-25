@@ -37,9 +37,9 @@ public class NetworkNode implements Node {
 
 	private final Id id;
 
-	private final Map<Id, Link> inLinks;
+	private final Map<Id, ComposedLink> inLinks;
 
-	private final Map<Id, Link> outLinks;
+	private final Map<Id, ComposedLink> outLinks;
 	
 	private final Network subNetwork;
 	
@@ -59,8 +59,8 @@ public class NetworkNode implements Node {
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
 		coord.setXY(coord.getX()/subNetwork.getNodes().size(), coord.getY()/subNetwork.getNodes().size());
 		this.subNetwork = subNetwork;
-		inLinks = new HashMap<Id, Link>();
-		outLinks = new HashMap<Id, Link>();
+		inLinks = new HashMap<Id, ComposedLink>();
+		outLinks = new HashMap<Id, ComposedLink>();
 	}
 	
 	@Override
@@ -75,13 +75,13 @@ public class NetworkNode implements Node {
 
 	@Override
 	public boolean addInLink(Link link) {
-		inLinks.put(link.getId(), link);
+		inLinks.put(link.getId(), (ComposedLink)link);
 		return true;
 	}
 
 	@Override
 	public boolean addOutLink(Link link) {
-		outLinks.put(link.getId(), link);
+		outLinks.put(link.getId(), (ComposedLink)link);
 		return false;
 	}
 
@@ -115,7 +115,7 @@ public class NetworkNode implements Node {
 		else if(inLinks.size() == 1 && outLinks.size() == 1)
 			type = Types.ONE_WAY_PASS;
 		else if(inLinks.size() == 2 && outLinks.size() == 1) {
-			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Iterator<ComposedLink> inLinksIterator = inLinks.values().iterator();
 			Link firstInLink = inLinksIterator.next();
 			Link secondInLink = inLinksIterator.next();
 			if(outLinks.values().iterator().next().getFromNode().equals(firstInLink.getToNode()) || outLinks.values().iterator().next().getFromNode().equals(secondInLink.getToNode()))
@@ -124,7 +124,7 @@ public class NetworkNode implements Node {
 				type = Types.CROSSING;
 		}
 		else if(inLinks.size() == 1 && outLinks.size() == 2) {
-			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Iterator<ComposedLink> outLinksIterator = outLinks.values().iterator();
 			Link firstOutLink = outLinksIterator.next();
 			Link secondOutLink = outLinksIterator.next();
 			if(inLinks.values().iterator().next().getFromNode().equals(firstOutLink.getToNode()) || inLinks.values().iterator().next().getFromNode().equals(secondOutLink.getToNode()))
@@ -133,10 +133,10 @@ public class NetworkNode implements Node {
 				type = Types.CROSSING;
 		}
 		else if(inLinks.size() == 2 && outLinks.size() == 2) {
-			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Iterator<ComposedLink> inLinksIterator = inLinks.values().iterator();
 			Link firstInLink = inLinksIterator.next();
 			Link secondInLink = inLinksIterator.next();
-			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Iterator<ComposedLink> outLinksIterator = outLinks.values().iterator();
 			Link firstOutLink = outLinksIterator.next();
 			Link secondOutLink = outLinksIterator.next();
 			if((firstInLink.getFromNode().equals(firstOutLink.getToNode()) && secondInLink.getFromNode().equals(secondOutLink.getToNode())) || (firstInLink.getFromNode().equals(secondOutLink.getToNode()) && secondInLink.getFromNode().equals(firstOutLink.getToNode())))
@@ -146,6 +146,10 @@ public class NetworkNode implements Node {
 		}
 		else
 			type = Types.CROSSING;
+	}
+
+	public void setType(Types type) {
+		this.type = type;
 	}
 	
 
