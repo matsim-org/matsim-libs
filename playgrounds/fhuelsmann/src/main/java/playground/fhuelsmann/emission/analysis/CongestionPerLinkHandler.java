@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -68,6 +69,8 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 		Id personId = event.getPersonId();
 		Double enterTime;
 		double endOfTimeInterval;
+		if(personId.toString().contains("#")){
+			
 		
 /**accumulated ratio of actual and freeflow travel time per link	**/
 //		Link link = this.network.getLinks().get(event.getLinkId());
@@ -144,16 +147,17 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 				}
 			}
 		}
+		}
 	}
 				
 /**accumulated congestion length per link	**/
-	/*		Link link = this.network.getLinks().get(event.getLinkId());
+/*			Link link = this.network.getLinks().get(event.getLinkId());
 	 		double freeTravelSpeed = link.getFreespeed();
-			double stopGoFraction = 0.0;
+			double stopGoFraction;
 			double distance = link.getLength(); 
 	  		freeTravelSpeed = freeTravelSpeed*3.6;
  			double stopGoSpeed= 15.9152;
- 			double stopGoTime = 0.0;
+ 			double stopGoTime;
 
 			
 			
@@ -203,6 +207,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 				}
 			}
 		}
+	}
 	}*/
 	
 	public Map<Double, Map<Id, Double>> getCongestionPerLinkAndTimeInterval() {

@@ -45,8 +45,8 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 
 	private final static String runNumber1 = "981";
 	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+	private final static String runDirectory1 = "../../run" + runNumber1 + "/";
+	private final static String runDirectory2 = "../../run" + runNumber2 + "/";
 	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
 	
 	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
@@ -76,7 +76,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 	static int minimumNoOfLinksInCell = 1;
 
 	// OUTPUT
-	private final String outPathStub = runDirectory1 + "/emissions/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
+	private final String outPathStub = runDirectory2 + "/emissions/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -105,28 +105,34 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 			double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
 			for(Link link : network.getLinks().values()){
-				Id linkId = link.getId();
-				Coord linkCoord = link.getCoord();
-				double xLink = linkCoord.getX();
-				double yLink = linkCoord.getY();
+				
+				if (deltaCongestionTotal.containsKey(link.getId())){
+					
+					Id linkId = link.getId();
+					Coord linkCoord = link.getCoord();
+					double xLink = linkCoord.getX();
+					double yLink = linkCoord.getY();
 
-				Integer xbin = mapXCoordToBin(xLink);
-				Integer ybin = mapYCoordToBin(yLink);
-				if ( xbin != null && ybin != null ){
+					Integer xbin = mapXCoordToBin(xLink);
+					Integer ybin = mapYCoordToBin(yLink);
+					if ( xbin != null && ybin != null ){
 
-					noOfLinksInCell[xbin][ybin] ++;
-
-					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaCongestionTotal.get(linkId);
-							// TODO: not distance between data points, but distance between
-							// data point and cell centroid is used now; is the former to expensive?
-							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
-							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+						noOfLinksInCell[xbin][ybin] ++;
+					
+						for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+							for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+								Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+								double value = deltaCongestionTotal.get(linkId);
+								// TODO: not distance between data points, but distance between
+								// data point and cell centroid is used now; is the former to expensive?
+								double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+								sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+								sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+							}
 						}
 					}
+				}
+				else{//do nothing
 				}
 			}
 			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
@@ -146,13 +152,13 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 							} catch (IllegalAttributeException e1) {
 								throw new RuntimeException(e1);
 							}
-					//	}
-					}
+						}
+				//	}
 				}
 			}
 		}
-		ShapeFileWriter.writeGeometries(features, outPathStub + ".movie.congestionIndicatorPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub + ".movie.congestionIndicatorPerLinkSmoothed.shp");
+		ShapeFileWriter.writeGeometries(features, outPathStub + ".Mid.congestionIndicatorPerLinkSmoothed_filter_demand.shp");
+		logger.info("Finished writing output to " + outPathStub + ".Mid.congestionIndicatorPerLinkSmoothed_filter_demand.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -206,18 +212,20 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		Map<Double, Map<Id, Double>> time2delta = new HashMap<Double, Map<Id, Double>>();
 		for(Entry<Double, Map<Id, Double>> entry0 : time2CongestionTotal1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Double> delta = entry0.getValue();
+			Map<Id, Double> linkId2congestion = entry0.getValue();
+			Map<Id, Double> delta = new HashMap<Id, Double>();
 
-			for(Entry<Id, Double> entry1 : delta.entrySet()){
+			for(Entry<Id, Double> entry1 : linkId2congestion.entrySet()){
 				Id linkId = entry1.getKey();
-				Double congestionDifferenceRatio =0.0;
+				Double congestionDifferenceRatio;
 				Double congestionBefore = entry1.getValue();
 				Double congestionAfter = time2CongestionTotal2.get(endOfTimeInterval).get(linkId);
 				if (congestionBefore!=0.0){
-				congestionDifferenceRatio = (congestionAfter - congestionBefore)/congestionBefore;}
-				
-				else{congestionDifferenceRatio=0.0;}
+				congestionDifferenceRatio = (congestionAfter - congestionBefore)/congestionBefore;
 				delta.put(linkId, congestionDifferenceRatio);
+				} else {
+					//do nothing
+				}
 			}
 			time2delta.put(endOfTimeInterval, delta);
 		}

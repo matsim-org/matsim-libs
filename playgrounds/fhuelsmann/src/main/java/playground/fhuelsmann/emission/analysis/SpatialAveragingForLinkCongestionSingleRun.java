@@ -62,7 +62,7 @@ public class SpatialAveragingForLinkCongestionSingleRun {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkCongestionSingleRun.class);
 
 	private final static String runNumber = "981";
-	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+	private final static String runDirectory = "../../run" + runNumber + "/";
 //	private final static String runDirectory = "../../run" + runNumber + "/"+ runNumber+".";
 	private final static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
 	private final static Integer lastIteration = getLastIteration(configFile);

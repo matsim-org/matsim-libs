@@ -51,8 +51,8 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 
 	private final static String runNumber1 = "981";
 	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+	private final static String runDirectory1 = "../../run" + runNumber1 + "/";
+	private final static String runDirectory2 = "../../run" + runNumber2 + "/";
 	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
 	
 	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
@@ -70,7 +70,7 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 	SortedSet<String> listOfPollutants;
 
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
-	static int noOfTimeBins = 30;
+	static int noOfTimeBins = 1;
 	double simulationEndTime;
 
 	static double xMin = 4452550.25;
@@ -84,7 +84,7 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 	static String pollutant = WarmPollutant.NO2.toString();
 
 	// OUTPUT
-	private final String outPathStub = runDirectory1 + "/emissions/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
+	private final String outPathStub = runDirectory2 + "/emissions/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1;
 	
 
 	private void run() throws IOException{
@@ -123,35 +123,43 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 			double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
 			for(Link link : network.getLinks().values()){
+
 				Id linkId = link.getId();
-				Coord linkCoord = link.getCoord();
-				double xLink = linkCoord.getX();
-				double yLink = linkCoord.getY();
 
-				Integer xbin = mapXCoordToBin(xLink);
-				Integer ybin = mapYCoordToBin(yLink);
-				if ( xbin != null && ybin != null ){
+				if (deltaEmissionsTotal.get(linkId) != null){
 
-					noOfLinksInCell[xbin][ybin] ++;
+					Coord linkCoord = link.getCoord();
+					double xLink = linkCoord.getX();
+					double yLink = linkCoord.getY();
 
-					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaEmissionsTotal.get(linkId).get(pollutant);
-							// TODO: not distance between data points, but distance between
-							// data point and cell centroid is used now; is the former to expensive?
-							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
-							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+					Integer xbin = mapXCoordToBin(xLink);
+					Integer ybin = mapYCoordToBin(yLink);
+					if ( xbin != null && ybin != null ){
+
+						noOfLinksInCell[xbin][ybin] ++;
+
+						for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+							for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+								Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+								double value = deltaEmissionsTotal.get(linkId).
+								get(pollutant);
+								// TODO: not distance between data points, but distance between
+								// data point and cell centroid is used now; is the former to expensive?
+								double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+								sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+								sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+							}
 						}
 					}
+				}
+				else{//do nothing
 				}
 			}
 			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(noOfLinksInCell[xIndex][yIndex] > minimumNoOfLinksInCell){
-//						if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
+					//	if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
@@ -164,16 +172,16 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 							} catch (IllegalAttributeException e1) {
 								throw new RuntimeException(e1);
 							}
-//						}
-					}
+						}
+				//	}
 				}
 			}
 		}
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "Smoothed.txt");
 		
-		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".movie.emissionsPerLinkSmoothed.shp");
+		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant + ".Mid.emissionsPerLinkPerTimePeriodSmoothed_filter_demand.shp");
+		logger.info("Finished writing output to " + outPathStub +  "." + pollutant + ".Mid.emissionsPerLinkPerTimePeriodSmoothed_filter_demand.shp");
 	}
 
 	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
@@ -185,7 +193,7 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 
 	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
 		double distance = Math.abs(Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))); // TODO: need to check if distance > 0 ?!?
-		return Math.exp((-distance * distance) / (1000. * 1000.)); // TODO: what is this normalization for?
+		return Math.exp((-distance * distance) / (2000. * 2000.)); // TODO: what is this normalization for?
 	}
 
 	private double findBinCenterY(int yIndex) {
@@ -226,22 +234,26 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 		Map<Double, Map<Id, Map<String, Double>>> time2delta = new HashMap<Double, Map<Id, Map<String, Double>>>();
 		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotal1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Map<String, Double>> delta = entry0.getValue();
+			Map<Id, Map<String, Double>> linkId2emissions = entry0.getValue();
+			Map<Id, Map<String, Double>> delta = new HashMap<Id, Map<String, Double>>();
 
-			for(Entry<Id, Map<String, Double>> entry1 : delta.entrySet()){
-				Id linkId = entry1.getKey();
-				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
-				for(String pollutant : entry1.getValue().keySet()){
-					Double emissionDifferenceRatio =0.0;
-					Double emissionsBefore = entry1.getValue().get(pollutant);
-					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
-					if (emissionsBefore!=0.0){
-						emissionDifferenceRatio = (emissionsAfter - emissionsBefore)/emissionsBefore;}
-						
-						else{emissionDifferenceRatio=0.0;}
-					emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
+			for(Entry<Id, Map<String, Double>> entry1 : linkId2emissions.entrySet()){
+				if (!entry1.getValue().get(pollutant).toString().equals("0.0")){
+					Id linkId = entry1.getKey();
+					Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
+					for(String pollutant : entry1.getValue().keySet()){
+						Double emissionDifferenceRatio;
+						Double emissionsBefore = entry1.getValue().get(pollutant);
+						Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
+						if (emissionsBefore!=0.0){
+							emissionDifferenceRatio = (emissionsAfter - emissionsBefore)/emissionsBefore;
+							emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
+						}
+					}
+					delta.put(linkId, emissionDifferenceMap);
 				}
-				delta.put(linkId, emissionDifferenceMap);
+				else{//do nothing
+				}
 			}
 			time2delta.put(endOfTimeInterval, delta);
 		}
