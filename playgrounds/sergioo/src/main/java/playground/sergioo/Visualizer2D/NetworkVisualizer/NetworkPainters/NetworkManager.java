@@ -76,7 +76,8 @@ public class NetworkManager {
 		selectedLinkId = getIdNearestLink(x, y);
 	}
 	public void selectOppositeLink() {
-		selectedLinkId = getIdOppositeLink(network.getLinks().get(selectedLinkId));
+		if(selectedLinkId!=null)
+			selectedLinkId = getIdOppositeLink(network.getLinks().get(selectedLinkId));
 	}
 	public void unselectLink() {
 		selectedLinkId = null;
