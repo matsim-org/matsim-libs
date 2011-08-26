@@ -21,7 +21,6 @@ public class ComposedLink extends LinkImpl {
 	
 	protected ComposedLink(Link link, Network network) {
 		this(link.getId(), link.getFromNode(), link.getToNode(), network);
-		links.add(link);
 	}
 	
 	protected ComposedLink(Id id, Node from, Node to, Network network) {

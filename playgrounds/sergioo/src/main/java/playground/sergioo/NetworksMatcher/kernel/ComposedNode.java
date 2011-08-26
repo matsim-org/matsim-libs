@@ -3,17 +3,22 @@ package playground.sergioo.NetworksMatcher.kernel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
-public class NetworkNode implements Node {
+public class ComposedNode implements Node {
+
+
+	//Constants
+
+	public static final String SEPARATOR = "-";
 
 
 	//Enums
@@ -41,28 +46,44 @@ public class NetworkNode implements Node {
 
 	private final Map<Id, ComposedLink> outLinks;
 	
-	private final Network subNetwork;
+	private final Set<Node> nodes;
+	
+	private ComposedNode containerNode;
 	
 	private Types type;
 
 
 	//Methods
-
-	public NetworkNode(Network subNetwork) {
+	
+	public ComposedNode(Set<Node> nodes) {
 		String idText = "";
-		for(Node node:subNetwork.getNodes().values())
-			idText+=node.getId()+"-";
+		for(Node node:nodes)
+			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
 		id = new IdImpl(idText);
 		coord = new CoordImpl(0, 0);
-		for(Node node:subNetwork.getNodes().values())
+		for(Node node:nodes)
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
-		coord.setXY(coord.getX()/subNetwork.getNodes().size(), coord.getY()/subNetwork.getNodes().size());
-		this.subNetwork = subNetwork;
+		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
+		this.nodes = nodes;
 		inLinks = new HashMap<Id, ComposedLink>();
 		outLinks = new HashMap<Id, ComposedLink>();
+		for(Node node:nodes) {
+			if(node.getClass().equals(ComposedNode.class))
+				((ComposedNode)node).setContainerNode(this);
+		}
 	}
 	
+	public ComposedNode getContainerNode() {
+		return containerNode;
+	}
+
+
+	public void setContainerNode(ComposedNode containerNode) {
+		this.containerNode = containerNode;
+	}
+
+
 	@Override
 	public Coord getCoord() {
 		return coord;
@@ -95,8 +116,8 @@ public class NetworkNode implements Node {
 		return outLinks;
 	}
 	
-	public Network getSubNetwork() {
-		return subNetwork;
+	public Set<Node> getNodes() {
+		return nodes;
 	}
 
 	public Types getType() {

@@ -1,18 +1,17 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.sergioo.NetworksMatcher.kernel.NetworkNode.Types;
+import playground.sergioo.NetworksMatcher.kernel.ComposedNode.Types;
 
 
 public class MatchingProcess {
@@ -33,8 +32,8 @@ public class MatchingProcess {
 		matchingSteps = new ArrayList<MatchingStep>();
 	}
 
-	public void addStep(MatchingStep step) {
-		matchingSteps.add(step);
+	public void addStep(MatchingAlgorithm matchingAlgorithm) {
+		matchingSteps.add(new MatchingStep(matchingAlgorithm));
 	}
 
 	public void execute(Network networkA, Network networkB) {
@@ -51,16 +50,16 @@ public class MatchingProcess {
 
 	private Network createDirectedGraph(Network network) {
 		Network directedGraph = NetworkImpl.createNetwork();
-		NetworkFactory networkFactory = new NetworkFactoryImpl(directedGraph);
 		for(Node node:network.getNodes().values()) {
-			Network nodeNetwork = NetworkImpl.createNetwork();
-			nodeNetwork.addNode(networkFactory.createNode(node.getId(), node.getCoord()));
-			directedGraph.addNode(new NetworkNode(nodeNetwork));
+			Set<Node> nodes = new HashSet<Node>();
+			nodes.add(node);
+			directedGraph.addNode(new ComposedNode(nodes));
 		}
 		for(Link link:network.getLinks().values()) {
 			ComposedLink composedLink = new ComposedLink(link, directedGraph);
 			composedLink.setFromNode(directedGraph.getNodes().get(composedLink.getFromNode().getId()));
 			composedLink.setToNode(directedGraph.getNodes().get(composedLink.getToNode().getId()));
+			composedLink.getLinks().add(link);
 			directedGraph.addLink(composedLink);
 		}
 		setNodeTypes(directedGraph);
@@ -70,25 +69,25 @@ public class MatchingProcess {
 	
 	private void setNodeTypes(Network directedGraph) {
 		for(Node node:directedGraph.getNodes().values())
-			((NetworkNode)node).setType();	
+			((ComposedNode)node).setType();
 	}
 
 	private Network nodeReductionProcess(Network directedGraph) {
 		Network reducedDirectedGraph = NetworkImpl.createNetwork();
 		for(Node node:directedGraph.getNodes().values()) {
-			NetworkNode newNode = new NetworkNode(((NetworkNode)node).getSubNetwork());
-			newNode.setType(((NetworkNode)node).getType());
+			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
+			newNode.setType(((ComposedNode)node).getType());
 			reducedDirectedGraph.addNode(newNode);
 		}
 		for(Link link:directedGraph.getLinks().values()) {
-			ComposedLink composedLink = new ComposedLink(link, directedGraph);
+			ComposedLink composedLink = new ComposedLink(link, reducedDirectedGraph);
 			composedLink.setFromNode(reducedDirectedGraph.getNodes().get(composedLink.getFromNode().getId()));
 			composedLink.setToNode(reducedDirectedGraph.getNodes().get(composedLink.getToNode().getId()));
 			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
 			reducedDirectedGraph.addLink(composedLink);
 		}
 		for(Node node:directedGraph.getNodes().values())
-			switch(((NetworkNode)node).getType()) {
+			switch(((ComposedNode)node).getType()) {
 			case EMPTY:
 				reducedDirectedGraph.removeNode(node.getId());
 				break;
@@ -97,9 +96,9 @@ public class MatchingProcess {
 				ComposedLink firstPrevious = (ComposedLink) reducedDirectedGraph.getNodes().get(node.getId()).getInLinks().values().iterator().next();
 				Node next=firstNext.getToNode();
 				Node previous=firstPrevious.getFromNode();
-				while(((NetworkNode)next).getType().equals(Types.ONE_WAY_PASS) && !next.equals(firstPrevious.getToNode()))
+				while(((ComposedNode)next).getType().equals(Types.ONE_WAY_PASS) && !next.equals(firstPrevious.getToNode()))
 					next = next.getOutLinks().values().iterator().next().getToNode();
-				while(((NetworkNode)previous).getType().equals(Types.ONE_WAY_PASS) && !previous.equals(firstNext.getFromNode()))
+				while(((ComposedNode)previous).getType().equals(Types.ONE_WAY_PASS) && !previous.equals(firstNext.getFromNode()))
 					previous = previous.getInLinks().values().iterator().next().getFromNode();
 				if(!next.equals(previous)) {
 					ComposedLink composedLink = new ComposedLink(firstNext.getId(), firstPrevious.getFromNode(), firstNext.getToNode(), reducedDirectedGraph);
@@ -117,7 +116,7 @@ public class MatchingProcess {
 				Node previousA=firstNextA.getFromNode();
 				Node nextB=firstNextB.getToNode();
 				Node previousB=firstNextA.getFromNode();
-				while(((NetworkNode)nextA).getType().equals(Types.TWO_WAY_PASS) && !nextA.equals(firstNextB.getFromNode())){
+				while(((ComposedNode)nextA).getType().equals(Types.TWO_WAY_PASS) && !nextA.equals(firstNextB.getFromNode())){
 					Node oldNextA = nextA;
 					outLinksIterator = (Iterator<ComposedLink>) nextA.getOutLinks().values().iterator();
 					nextA = outLinksIterator.next().getToNode();
@@ -125,7 +124,7 @@ public class MatchingProcess {
 						nextA = outLinksIterator.next().getToNode();
 					previousA = oldNextA;
 				}
-				while(((NetworkNode)nextB).getType().equals(Types.TWO_WAY_PASS) && !nextB.equals(firstNextA.getFromNode())) {
+				while(((ComposedNode)nextB).getType().equals(Types.TWO_WAY_PASS) && !nextB.equals(firstNextA.getFromNode())) {
 					Node oldNextB = nextB;
 					outLinksIterator = (Iterator<ComposedLink>) nextB.getOutLinks().values().iterator();
 					nextB = outLinksIterator.next().getToNode();
@@ -179,13 +178,13 @@ public class MatchingProcess {
 					((ComposedLink)emptyLink).applyProperties((ComposedLink)fullLink);
 	}
 	
-	public Collection<NodesMatching> getMatchings(int stepNumber) {
+	public Set<NodesMatching> getMatchings(int stepNumber) {
 		return matchingSteps.get(stepNumber).getNodesMatchings();
 	}
 
-	public Collection<NodesMatching> getFinalMatchings() {
+	public Set<NodesMatching> getFinalMatchings() {
 		if(matchingSteps.isEmpty())
-			return new ArrayList<NodesMatching>();
+			return new HashSet<NodesMatching>();
 		else
 			return matchingSteps.get(matchingSteps.size()-1).getNodesMatchings();
 	}

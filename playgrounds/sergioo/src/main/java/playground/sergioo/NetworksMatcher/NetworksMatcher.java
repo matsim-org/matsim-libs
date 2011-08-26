@@ -1,6 +1,5 @@
 package playground.sergioo.NetworksMatcher;
 
-import java.awt.Color;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
@@ -24,10 +23,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
-import playground.sergioo.NetworksMatcher.gui.NetworkNodesPainter;
-import playground.sergioo.NetworksMatcher.kernel.LocationAndExternalDirectionsAlgorithm;
+import playground.sergioo.NetworksMatcher.kernel.CrossingReductionAlgorithm;
 import playground.sergioo.NetworksMatcher.kernel.MatchingProcess;
-import playground.sergioo.NetworksMatcher.kernel.MatchingStep;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -55,7 +52,7 @@ public class NetworksMatcher {
 		for(Node node:networkLowResolutionLength.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		MatchingProcess matchingProcess = new MatchingProcess();
-		//matchingProcess.addStep(new MatchingStep(new LocationAndExternalDirectionsAlgorithm()));
+		matchingProcess.addStep(new CrossingReductionAlgorithm(30));
 		matchingProcess.execute(networkHighResolution, networkLowResolutionLength);
 		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", matchingProcess.getFinalMatchings(), new NetworkNodesPainter(networkHighResolution), new NetworkNodesPainter(networkLowResolutionLength, Color.BLACK, Color.CYAN));
 		windowHR.setVisible(true);*/

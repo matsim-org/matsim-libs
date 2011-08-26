@@ -1,8 +1,7 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
-import java.util.Collection;
+import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -22,7 +21,7 @@ public class MatchingStep {
 
 	private Region region;
 
-	private Collection<NodesMatching> nodesMatchings;
+	private Set<NodesMatching> nodesMatchings;
 	
 	
 	//Methods
@@ -39,7 +38,7 @@ public class MatchingStep {
 		return networkB;
 	}
 
-	public Collection<NodesMatching> getNodesMatchings() {
+	public Set<NodesMatching> getNodesMatchings() {
 		return nodesMatchings;
 	}
 
@@ -57,36 +56,110 @@ public class MatchingStep {
 		Network[] networks = new Network[2];
 		networks[0] = NetworkImpl.createNetwork();
 		networks[1] = NetworkImpl.createNetwork();
-		for(Node node:networkA.getNodes().values())
-			networks[0].addNode(node);
-		for(Node node:networkB.getNodes().values())
-			networks[1].addNode(node);
-		for(Link link:networkA.getLinks().values())
-			networks[0].addLink(link);
-		for(Link link:networkB.getLinks().values())
-			networks[1].addLink(link);
+		for(Node node:networkA.getNodes().values()) {
+			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
+			networks[0].addNode(newNode);
+		}
+		for(Node node:networkB.getNodes().values()) {
+			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
+			networks[1].addNode(newNode);
+		}
+		for(Link link:networkA.getLinks().values()) {
+			ComposedLink composedLink = new ComposedLink(link, networks[0]);
+			composedLink.setFromNode(networks[0].getNodes().get(composedLink.getFromNode().getId()));
+			composedLink.setToNode(networks[0].getNodes().get(composedLink.getToNode().getId()));
+			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+			networks[0].addLink(composedLink);
+		}
+		for(Link link:networkB.getLinks().values()) {
+			ComposedLink composedLink = new ComposedLink(link, networks[1]);
+			composedLink.setFromNode(networks[1].getNodes().get(composedLink.getFromNode().getId()));
+			composedLink.setToNode(networks[1].getNodes().get(composedLink.getToNode().getId()));
+			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+			networks[1].addLink(composedLink);
+		}
 		for(NodesMatching matching:nodesMatchings) {
-			NetworkNode networkNodeA = matching.getSubNetworkNodeA();
-			networks[0].addNode(networkNodeA);
-			for(Id linkId:matching.getSubNetworkNodeA().getSubNetwork().getLinks().keySet())
-				networks[0].removeLink(linkId);
-			for(Node node:matching.getSubNetworkNodeA().getSubNetwork().getNodes().values()) {
-				for(Link link:node.getOutLinks().values())
-					link.setFromNode(networkNodeA);
-				for(Link link:node.getInLinks().values())
-					link.setToNode(networkNodeA);
-				networks[0].removeNode(node.getId());
+			ComposedNode composedNodeA = matching.getComposedNodeA();
+			if(composedNodeA.getNodes().size()>1) {
+				networks[0].addNode(composedNodeA);
+				for(Node node:composedNodeA.getNodes()) {
+					networks[0].removeNode(node.getId());
+					for(Link link:node.getInLinks().values()) {
+						boolean insideLink = false;
+						for(Node node2:composedNodeA.getNodes())
+							if(link.getFromNode().getId().equals(node2.getId()))
+								insideLink = true;
+						networks[0].removeLink(link.getId());
+						if(!insideLink) {
+							ComposedLink composedLink = new ComposedLink(link, networks[0]);
+							Node fromNode = networks[0].getNodes().get(composedLink.getFromNode().getId());
+							if(fromNode==null)
+								fromNode = networks[0].getNodes().get(((ComposedNode)composedLink.getFromNode()).getContainerNode().getId());
+							composedLink.setFromNode(fromNode);
+							composedLink.setToNode(composedNodeA);
+							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							networks[0].addLink(composedLink);
+						}
+					}
+					for(Link link:node.getOutLinks().values()) {
+						boolean insideLink = false;
+						for(Node node2:composedNodeA.getNodes())
+							if(link.getToNode().getId().equals(node2.getId()))
+								insideLink = true;
+						networks[0].removeLink(link.getId());
+						if(!insideLink) {
+							ComposedLink composedLink = new ComposedLink(link, networks[0]);
+							composedLink.setFromNode(composedNodeA);
+							Node toNode = networks[0].getNodes().get(composedLink.getToNode().getId());
+							if(toNode==null)
+								toNode = networks[0].getNodes().get(((ComposedNode)composedLink.getToNode()).getContainerNode().getId());
+							composedLink.setToNode(toNode);
+							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							networks[0].addLink(composedLink);
+						}
+					}			
+				}
 			}
-			NetworkNode networkNodeB = matching.getSubNetworkNodeB();
-			networks[1].addNode(networkNodeB);
-			for(Id linkId:matching.getSubNetworkNodeB().getSubNetwork().getLinks().keySet())
-				networks[1].removeLink(linkId);
-			for(Node node:matching.getSubNetworkNodeB().getSubNetwork().getNodes().values()) {
-				for(Link link:node.getOutLinks().values())
-					link.setFromNode(networkNodeB);
-				for(Link link:node.getInLinks().values())
-					link.setToNode(networkNodeB);
-				networks[1].removeNode(node.getId());
+			ComposedNode composedNodeB = matching.getComposedNodeB();
+			if(composedNodeB.getNodes().size()>1) {
+				networks[1].addNode(composedNodeB);
+				for(Node node:composedNodeB.getNodes()) {
+					networks[1].removeNode(node.getId());
+					for(Link link:node.getInLinks().values()) {
+						boolean insideLink = false;
+						for(Node node2:composedNodeB.getNodes())
+							if(link.getFromNode().getId().equals(node2.getId()))
+								insideLink = true;
+						networks[1].removeLink(link.getId());
+						if(!insideLink) {
+							ComposedLink composedLink = new ComposedLink(link, networks[1]);
+							Node fromNode = networks[1].getNodes().get(composedLink.getFromNode().getId());
+							if(fromNode==null)
+								fromNode = networks[1].getNodes().get(((ComposedNode)composedLink.getFromNode()).getContainerNode().getId());
+							composedLink.setFromNode(fromNode);
+							composedLink.setToNode(composedNodeB);
+							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							networks[1].addLink(composedLink);
+						}
+					}
+					for(Link link:node.getOutLinks().values()) {
+						boolean insideLink = false;
+						for(Node node2:composedNodeB.getNodes())
+							if(link.getToNode().getId().equals(node2.getId()))
+								insideLink = true;
+						networks[1].removeLink(link.getId());
+						if(!insideLink) {
+							ComposedLink composedLink = new ComposedLink(link, networks[1]);
+							composedLink.setFromNode(composedNodeB);
+							Node toNode = networks[1].getNodes().get(composedLink.getToNode().getId());
+							if(toNode==null)
+								toNode = networks[1].getNodes().get(((ComposedNode)composedLink.getToNode()).getContainerNode().getId());
+							composedLink.setToNode(toNode);
+							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							networks[1].addLink(composedLink);
+						}
+					}			
+				}
 			}
 		}
 		return networks;
@@ -94,7 +167,7 @@ public class MatchingStep {
 
 	public boolean isMatched(Node nodeA, Node nodeB) {
 		for(NodesMatching nodesMatching:nodesMatchings)
-			if(nodeA.getId().equals(nodesMatching.getSubNetworkNodeA().getId()) && nodeB.getId().equals(nodesMatching.getSubNetworkNodeB().getId()))
+			if(nodeA.getId().equals(nodesMatching.getComposedNodeA().getId()) && nodeB.getId().equals(nodesMatching.getComposedNodeB().getId()))
 				return true;
 		return false;
 	}

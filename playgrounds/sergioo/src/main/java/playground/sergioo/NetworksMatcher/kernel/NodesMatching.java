@@ -1,6 +1,8 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
-import org.matsim.api.core.v01.network.Network;
+import java.util.Set;
+
+import org.matsim.api.core.v01.network.Node;
 
 
 public class NodesMatching {
@@ -8,25 +10,25 @@ public class NodesMatching {
 
 	//Attributes
 
-	private final NetworkNode subNetworkNodeA;
+	private final ComposedNode composedNodeA;
 	
-	private final NetworkNode subNetworkNodeB;
+	private final ComposedNode composedNodeB;
 
 
 	//Methods
 
-	protected NodesMatching(Network subNetworkNodeA, Network subNetworkNodeB) {
+	protected NodesMatching(Set<Node> nodesA, Set<Node> nodesB) {
 		super();
-		this.subNetworkNodeA = new NetworkNode(subNetworkNodeA);
-		this.subNetworkNodeB = new NetworkNode(subNetworkNodeB);
+		this.composedNodeA = new ComposedNode(nodesA);
+		this.composedNodeB = new ComposedNode(nodesB);
 	}
 
-	public NetworkNode getSubNetworkNodeA() {
-		return subNetworkNodeA;
+	public ComposedNode getComposedNodeA() {
+		return composedNodeA;
 	}
 
-	public NetworkNode getSubNetworkNodeB() {
-		return subNetworkNodeB;
+	public ComposedNode getComposedNodeB() {
+		return composedNodeB;
 	}
 
 
