@@ -258,9 +258,10 @@ public class SpatialAveragingForLinkEmissions {
 		Map<Double, Map<Id, Map<String, Double>>> time2delta = new HashMap<Double, Map<Id, Map<String, Double>>>();
 		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotal1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Map<String, Double>> delta = entry0.getValue();
+			Map<Id, Map<String, Double>> linkId2Emissions = entry0.getValue();
+			Map<Id, Map<String, Double>> delta = new HashMap<Id, Map<String, Double>>();
 
-			for(Entry<Id, Map<String, Double>> entry1 : delta.entrySet()){
+			for(Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()){
 				Id linkId = entry1.getKey();
 				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
