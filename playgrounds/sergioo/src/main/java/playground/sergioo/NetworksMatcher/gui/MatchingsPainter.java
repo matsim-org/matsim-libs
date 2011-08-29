@@ -37,7 +37,7 @@ public class MatchingsPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(NodesMatching nodesMatching:nodesMatchings) {
-			Color colorA = new Color((float)Math.random()*0.5f+0.5f,(float)Math.random()*0.5f+0.5f,(float)Math.random()*0.5f+0.5f);
+			Color colorA = new Color((float)Math.random()*0.5f+0.5f,(float)Math.random()*0.5f+0.5f,0*((float)Math.random()*0.5f+0.5f));
 			Color colorB = new Color(colorA.getRed()/2,colorA.getGreen()/2,colorA.getBlue()/2);
 			if(option.equals(MatchingOptions.BOTH) || option.equals(MatchingOptions.A)) {
 				for(Node node:nodesMatching.getComposedNodeA().getNodes())
