@@ -11,7 +11,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.neo4j.graphdb.Transaction;
 
 public class NeoLiveMain {
@@ -37,11 +37,10 @@ public class NeoLiveMain {
 				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 
-				final SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, events);
+				final OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 				SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
 				snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
 				events.addHandler(snapshotGenerator);
-				server.setSnapshotGenerator(snapshotGenerator);
 
 				NeoOTFLiveServerTransactionWrapper wrappedServer = new NeoOTFLiveServerTransactionWrapper(server, scenario);
 

@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * @author mrieser
@@ -50,7 +50,7 @@ public class UseCase5_OptimizedWithVis {
 
 		/* **************************************************************** */
 
-		SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, events);
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		OTFClientLive.run(config, server);
 
 		OptimizedCarSimFactory simFactory = new OptimizedCarSimFactory(2);

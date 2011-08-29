@@ -26,8 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
-
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
@@ -44,7 +43,7 @@ import playground.mrieser.core.mobsim.network.api.VisNetwork;
 public class OptimizedCarSimFactory implements MobsimFactory {
 
 	private final int nOfThreads;
-	private SnapshotConsumingOTFServer otfvisServer = null;
+	private OnTheFlyServer otfvisServer = null;
 	private String[] teleportedModes = null;
 	private double populationWeight = 1.0;
 	private double mobsimStopTime = Double.POSITIVE_INFINITY;
@@ -56,8 +55,8 @@ public class OptimizedCarSimFactory implements MobsimFactory {
 		this.nOfThreads = nOfThreads;
 	}
 
-	public void setOtfvisServer(final SnapshotConsumingOTFServer otfvisServer) {
-		this.otfvisServer = otfvisServer;
+	public void setOtfvisServer(final OnTheFlyServer server) {
+		this.otfvisServer = server;
 	}
 
 	public void setTeleportedModes(final String[] teleportedModes) {

@@ -14,7 +14,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LiveMain {
 	
@@ -45,11 +45,10 @@ public class LiveMain {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		
-		final SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, events);
+		final OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		SnapshotGenerator snapshotGenerator = new SnapshotGenerator(scenario.getNetwork(), (int) snapshotPeriod, simulationConfigGroup); 
 		snapshotGenerator.addSnapshotWriter(server.getSnapshotReceiver());
 		events.addHandler(snapshotGenerator);
-		server.setSnapshotGenerator(snapshotGenerator);
 		
 		
 		OTFClientLive.run(scenario.getConfig(), server);

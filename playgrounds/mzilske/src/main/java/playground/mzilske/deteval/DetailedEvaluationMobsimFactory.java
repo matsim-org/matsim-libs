@@ -32,8 +32,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
-
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
@@ -104,7 +103,7 @@ public class DetailedEvaluationMobsimFactory implements MobsimFactory {
 		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (useOTFVis) {
-			SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, eventsManager);
+			OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, eventsManager);
 			OTFClientLive.run(scenario.getConfig(), server);
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());

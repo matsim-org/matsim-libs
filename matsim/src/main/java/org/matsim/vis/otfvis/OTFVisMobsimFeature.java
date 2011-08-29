@@ -41,7 +41,6 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisLink;
@@ -57,34 +56,9 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	private boolean doVisualizeTeleportedAgents = false;
 
-	private final OTFAgentsListHandler.Writer teleportationWriter;
-
-	public OTFAgentsListHandler.Writer getTeleportationWriter() {
-		return teleportationWriter;
-	}
-
 	private final VisMobsim queueSimulation;
 
-	/** 
-	 * These are agents which are being teleported right now.
-	 * This always has to be maintained, even if "show teleported agents" is off. Because the user might select an agent while
-	 * it is teleporting and then of course it doesn't appear if this map doesn't have it.
-	 * On the other hand, the interpolated coordinates are still only updated when we are interested in them, so the
-	 * performance should be OK, I think.
-	 * michaz feb 11
-	 * 
-	 */
 	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
-
-	/**
-	 * These are agents which should be visualised in addition to the agents which are visualised by the links themselves.
-	 * This is used
-	 * - for teleporting agents
-	 * - for agents tracked by a query, because we want to always see them, no matter if the link decides that 
-	 *   they should not be visualised (e.g. because "show parked cars" is switched off or something).
-	 * michaz feb 11
-	 */
-	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
 
 	private final LinkedHashMap<Id, MobsimAgent> agents = new LinkedHashMap<Id, MobsimAgent>();
 
@@ -93,8 +67,6 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	public OTFVisMobsimFeature(OnTheFlyServer server, VisMobsim queueSimulation) {
 		this.server = server;
 		this.queueSimulation = queueSimulation;
-		this.teleportationWriter = new OTFAgentsListHandler.Writer();
-		this.teleportationWriter.setSrc(visData.values());
 	}
 
 	@Override
@@ -122,18 +94,18 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 	
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent event) {
+		this.server.unblockUpdates();
 		double time = event.getSimulationTime() ;
 		this.updateTeleportedAgents(time);
-		this.visualizeTrackedAndTeleportingAgents();
-		this.server.unblockUpdates();
+		this.visualizeTrackedAndTeleportingAgents(time);
 		this.server.updateStatus(time);
 	}
 
-	private void visualizeTrackedAndTeleportingAgents() {
-		visData.clear();
+	private void visualizeTrackedAndTeleportingAgents(double time) {
+		server.getSnapshotReceiver().beginSnapshot(time);
 		for (TeleportationVisData agentInfo : teleportationData.values()) {
 			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(agentInfo.getId())) {
-				this.visData.put(agentInfo.getId(), agentInfo);
+				server.getSnapshotReceiver().addAgent(agentInfo);
 			}
 		}
 		for (Id personId : trackedAgents) {
@@ -143,10 +115,11 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 			visLink.getVisData().getVehiclePositions(positions);
 			for (AgentSnapshotInfo position : positions) {
 				if (position.getId().equals(personId)) {
-					this.visData.put(position.getId(), position);
+					server.getSnapshotReceiver().addAgent(position);
 				}
 			}
 		}
+		server.getSnapshotReceiver().endSnapshot();
 	}
 
 	@Override

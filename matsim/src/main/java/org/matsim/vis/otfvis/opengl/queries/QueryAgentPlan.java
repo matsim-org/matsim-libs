@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -47,6 +48,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
@@ -57,7 +59,6 @@ import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
-import org.matsim.vis.snapshotwriters.VisNetwork;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -80,9 +81,60 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private transient Result result;
 
-	private transient VisNetwork net;
 
 	private VisMobsimFeature otfVisMobsimFeature;
+
+	@Override
+	public void installQuery(SimulationViewForQueries queueModel) {
+		Network net = queueModel.getNetwork();
+		Plan plan = queueModel.getPlans().get(this.agentId);
+		result = new Result();
+		result.agentId = this.agentId.toString();
+		if (plan != null) {
+			fillResult(net, plan);
+		} else {
+			log.error("No plan found for id " + this.agentId);
+		}
+	}
+
+	@Override
+	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
+		this.otfVisMobsimFeature = queueSimulation;
+		Network net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
+		result = new Result();
+		result.agentId = this.agentId.toString();
+		Plan plan = queueSimulation.findPlan(this.agentId);
+		if (plan != null) {
+			queueSimulation.addTrackedAgent(this.agentId);
+			fillResult(net, plan);
+		} else {
+			log.error("No plan found for id " + this.agentId);
+		}
+	}
+
+	private void fillResult(Network net, Plan plan) {
+		for (PlanElement e : plan.getPlanElements()) {
+			if (e instanceof Activity) {
+				Activity act = (Activity) e;
+				if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
+					continue ; // skip
+				}
+				Coord coord = act.getCoord();
+				if (coord == null) {
+					Link link = net.getLinks().get(act.getLinkId());
+					coord = link.getCoord();
+				}
+				result.acts.add(new MyInfoText((float) coord.getX(),
+						(float) coord.getY(), act.getType()));
+			}
+		}
+		if ( includeRoutes ) {
+			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.ROUTES ); 
+		} else {
+			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.PLANELEMENTS ); 
+		}
+		result.hasPlan = true;
+	}
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -122,43 +174,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
-		this.otfVisMobsimFeature = queueSimulation;
-		this.net = queueSimulation.getVisMobsim().getVisNetwork();
-		result = new Result();
-		result.agentId = this.agentId.toString();
-		Plan plan = queueSimulation.findPlan(this.agentId);
-		if (plan != null) {
-			queueSimulation.addTrackedAgent(this.agentId);
-			for (PlanElement e : plan.getPlanElements()) {
-				if (e instanceof Activity) {
-					Activity act = (Activity) e;
-					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
-						continue ; // skip
-					}
-					Coord coord = act.getCoord();
-					if (coord == null) {
-						Link link = net.getVisLinks().get(act.getLinkId()).getLink();
-						coord = link.getCoord();
-					}
-					result.acts.add(new MyInfoText((float) coord.getX(),
-							(float) coord.getY(), act.getType()));
-				}
-			}
-			if ( includeRoutes ) {
-				QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork(), QueryAgentUtils.Level.ROUTES ); 
-			} else {
-				QueryAgentUtils.buildRoute(plan, result, agentId, net.getNetwork(), QueryAgentUtils.Level.PLANELEMENTS ); 
-			}
-			result.hasPlan = true;
-		} else {
-			log.error("No plan found for id " + this.agentId);
-		}
-	}
-
-	@Override
 	public void uninstall() {
-		otfVisMobsimFeature.removeTrackedAgent(this.agentId);
+		if (otfVisMobsimFeature != null) {
+			otfVisMobsimFeature.removeTrackedAgent(this.agentId);
+		}
 	}
 
 	public static class Result implements OTFQueryResult {

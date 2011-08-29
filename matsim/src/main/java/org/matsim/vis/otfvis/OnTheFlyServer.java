@@ -23,13 +23,20 @@ package org.matsim.vis.otfvis;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.QuadTree;
@@ -40,10 +47,13 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
@@ -59,13 +69,32 @@ import org.matsim.vis.snapshotwriters.VisMobsimFeature;
  */
 public class OnTheFlyServer implements OTFLiveServer {
 
+	private final class CurrentTimeStepView implements SimulationViewForQueries {
+
+		@Override
+		public Collection<AgentSnapshotInfo> getSnapshot() {
+			return visData.values();
+		}
+
+		@Override
+		public Map<Id, Plan> getPlans() {
+			return plans;
+		}
+
+		@Override
+		public Network getNetwork() {
+			return scenario.getNetwork();
+		}
+
+	}
+
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
 
 	private enum Status {
-		UNCONNECTED, PAUSE, PLAY, STEP;
+		PAUSE, PLAY, STEP;
 	}
 
-	private volatile Status status = Status.UNCONNECTED;
+	private volatile Status status = Status.PAUSE;
 
 	private final Object paused = new Object();
 
@@ -89,33 +118,33 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private VisMobsimFeature otfVisQueueSimFeature;
 
+	private final OTFAgentsListHandler.Writer teleportationWriter;
+
+	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
+	
+	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
+
 	private Semaphore accessToQNetwork = new Semaphore(1);
 
 	private Scenario scenario;
 
+	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
+
 	OnTheFlyServer(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
 		this.events = events; 
+		this.teleportationWriter = new OTFAgentsListHandler.Writer();
+		this.teleportationWriter.setSrc(visData.values());
+		addAdditionalElement(teleportationWriter);
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			this.plans.put(person.getId(), plan);
+		}
 	}
 
 	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events) {
 		OnTheFlyServer instance = new OnTheFlyServer(scenario, events);
 		return instance;
-	}
-
-	public void reset() {
-		status = Status.PAUSE;
-		localTime = 0;
-		synchronized (paused) {
-			paused.notifyAll();
-		}
-		if(stepToTime != 0) {
-			status = Status.STEP;
-		} else {
-			synchronized (stepDone) {
-				stepDone.notifyAll();
-			}
-		}
 	}
 
 	public void updateStatus(double time) {
@@ -287,7 +316,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
-		query.installQuery(otfVisQueueSimFeature, events, quad);
+		if (this.otfVisQueueSimFeature == null) {
+			query.installQuery(currentTimeStepView);
+		} else {
+			query.installQuery(otfVisQueueSimFeature, events, quad);
+		}
 		activeQueries.add(query);
 		return query;
 	}
@@ -340,6 +373,37 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	public void unblockUpdates() {
 		accessToQNetwork.release();
+	}
+
+	public SnapshotWriter getSnapshotReceiver() {
+		return new SnapshotWriter() {
+
+			@Override
+			public void beginSnapshot(double time) {
+				visData.clear();
+				localTime = (int) time;
+			}
+
+			@Override
+			public void endSnapshot() {
+				updateStatus(localTime);
+			}
+
+			@Override
+			public void addAgent(AgentSnapshotInfo position) {
+				visData.put(position.getId(), position);
+			}
+
+			@Override
+			public void finish() {
+
+			}
+
+		};
+	}
+
+	public void addAdditionalPlans(Map<Id, Plan> additionalPlans) {
+		this.plans.putAll(additionalPlans);
 	}
 
 }

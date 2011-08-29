@@ -32,8 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.snapshotconsumingserver.SnapshotConsumingOTFServer;
-
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
@@ -109,7 +108,7 @@ public class WIVERMobsimFactory implements MobsimFactory {
 		planSim.addMobsimFeature(netFeature); // order of features is important!
 
 		if (useOTFVis) {
-			SnapshotConsumingOTFServer server = new SnapshotConsumingOTFServer(scenario, eventsManager);
+			OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, eventsManager);
 			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap();
 			server.addAdditionalPlans(freightAgentPlans);
 			OTFClientLive.run(scenario.getConfig(), server);

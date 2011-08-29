@@ -207,7 +207,6 @@ public class OTFVis {
 		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
 
 		server.setSimulation(queueSimulationFeature);
-		server.addAdditionalElement(queueSimulationFeature.getTeleportationWriter());
 
 		if (config.scenario().isUseTransit()) {
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(scenario.getNetwork(), ((ScenarioImpl) scenario).getTransitSchedule(), qSim.getTransitEngine().getAgentTracker());

@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -69,7 +70,33 @@ public class QueryAgentId extends AbstractQuery {
 
 
 	@Override
-  public void installQuery(VisMobsimFeature queueSimulationFeature, EventsManager events, OTFServerQuadTree quad) {
+	public void installQuery(SimulationViewForQueries queueModel) {
+		this.result = new Result();
+		double minDist = Double.POSITIVE_INFINITY;
+		double dist = 0;
+		for(AgentSnapshotInfo info : queueModel.getSnapshot()) {
+			if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
+			double xDist = info.getEasting() - this.x;
+			double yDist = info.getNorthing() - this.y;
+			if (this.width == 0) {
+				// search for NEAREST agent to given POINT
+				dist = Math.sqrt(xDist*xDist + yDist*yDist);
+				if(dist < minDist){
+					minDist = dist;
+					this.result.agentIds.clear();
+					this.result.agentIds.add(info.getId().toString());
+				}
+			} else {
+				// search for all agents in given RECT
+				if( (xDist < this.width) && (yDist < this.height) && (xDist >= 0) && (yDist >= 0) ) {
+					this.result.agentIds.add(info.getId().toString());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void installQuery(VisMobsimFeature queueSimulationFeature, EventsManager events, OTFServerQuadTree quad) {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
@@ -101,12 +128,12 @@ public class QueryAgentId extends AbstractQuery {
 
 
 	@Override
-  public Type getType() {
+	public Type getType() {
 		return OTFQuery.Type.OTHER;
 	}
 
 	@Override
-  public void setId(String id) {
+	public void setId(String id) {
 	}
 
 	@Override
