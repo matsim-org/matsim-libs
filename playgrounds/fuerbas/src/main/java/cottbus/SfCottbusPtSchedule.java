@@ -26,13 +26,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -147,8 +149,21 @@ public class SfCottbusPtSchedule {
 			br2.close();
 			
 			String[] routes = routeLinks.toArray(new String[routeLinks.size()]);
-
 			
+			for (String string : routeLinks) {
+				Id id = new IdImpl(string);
+				String[] allowedModesArray = cottbus.scenario.getNetwork().getLinks().get(id).getAllowedModes().toArray(new String[cottbus.scenario.getNetwork().getLinks().get(id).getAllowedModes().size()]);
+				Set<String> allowedModes = new TreeSet<String>();
+				for (int ii=0; ii<allowedModesArray.length; ii++) {
+					allowedModes.add(allowedModesArray[ii]);
+				}
+				if (!allowedModes.contains(cottbus.pt_mode)) {
+					allowedModes.add(cottbus.pt_mode);
+					cottbus.scenario.getNetwork().getLinks().get(id).setAllowedModes(allowedModes);
+				} 
+				else ;
+			}
+
 			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
 			
 			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
@@ -165,6 +180,11 @@ public class SfCottbusPtSchedule {
 		scheduleWriter.write(outputfile);
 		
 		System.out.println("Schedule written to: "+outputfile);
+		
+		NetworkWriter networkwriter = new NetworkWriter(cottbus.scenario.getNetwork());
+		networkwriter.write("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml");
+		
+		System.out.println("Network written to: "+"E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml");
 		
 	}
 	
