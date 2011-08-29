@@ -21,11 +21,12 @@
 package cottbus;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,18 +65,25 @@ public class SfCottbusPtSchedule {
 	private TransitSchedule schedule;
 	private TransitScheduleFactory schedulefactory;
 	private String pt_mode;
-	private String NETWORK = "E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml";
-	private String LINES = "E:\\Cottbus\\Cottbus_pt\\lines\\lines.csv";
+	private String NETWORK;
+	private String LINES;
+	private HashMap<Id, Id> ptLinkList;
+	private List<Id> ptFacList;
 	
 	
 	public SfCottbusPtSchedule() {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.config = this.scenario.getConfig();;
-		this.config.network().setInputFile(NETWORK);
+		this.config = this.scenario.getConfig();
+		this.LINES = "E:\\Cottbus\\Cottbus_pt\\lines\\lines.csv";
+		this.NETWORK = "E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml";
+		this.config.network().setInputFile(this.NETWORK);
 		ScenarioUtils.loadScenario(this.scenario);
 		this.network = this.scenario.getNetwork();
 		this.schedulefactory = new TransitScheduleFactoryImpl();
 		this.schedule = this.schedulefactory.createTransitSchedule();
+		this.ptLinkList = new HashMap<Id, Id>(); //linkId und facilId
+		this.ptFacList = new ArrayList<Id>();
+
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -153,9 +161,13 @@ public class SfCottbusPtSchedule {
 		}
 		
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(cottbus.schedule);
-		scheduleWriter.write("E:\\Cottbus\\Cottbus_pt\\lines\\schedule.xml");
+		String outputfile = "E:\\Cottbus\\Cottbus_pt\\lines\\schedule.xml";
+		scheduleWriter.write(outputfile);
+		
+		System.out.println("Schedule written to: "+outputfile);
 		
 	}
+	
 	
 	private String[] getLineNumbers(String inputfile) throws IOException {
 		BufferedReader linesReader = new BufferedReader(new FileReader(inputfile));
@@ -181,7 +193,7 @@ public class SfCottbusPtSchedule {
 		double lastDep = 22.0 * 3600;
 		double currentDep = firstDep;
 		while (currentDep <= lastDep) {
-			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+currentDep), currentDep);
+			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+"_"+currentDep), currentDep);
 			transitRoute.addDeparture(dep);
 			currentDep+=frequency;
 		}
@@ -199,20 +211,48 @@ public class SfCottbusPtSchedule {
 		List<TransitStopFacility> facilList = new ArrayList<TransitStopFacility>();
 		TransitStopFacility trastofac = null;
 		
-		for(int index = 0; index<ids.size(); index++)	{
+		
+		for(int index = 0; index<links.size(); index++)	{
 						
 //			eine facility mit mehreren stops erstellen
 			Id facilId = new IdImpl(ids.get(index));
 			Id linkId = new IdImpl(links.get(index));
-			if (!this.schedule.getFacilities().containsKey(facilId)) {
-				System.out.println("FACIL ID: "+facilId);
-				System.out.println("LINK ID: "+linkId);
-				trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
-				facilList.add(trastofac);
-				trastofac.setLinkId(linkId);
-				this.schedule.addStopFacility(trastofac);
-			} 
-			else  trastofac = this.schedule.getFacilities().get(facilId);
+			
+			if (!this.ptLinkList.containsKey(linkId)) {
+				linkList.add(linkId);
+				if (this.ptFacList.contains(facilId)) {
+					System.out.println("FACIL ID vorher: "+facilId);
+					facilId = new IdImpl(facilId+"_b");
+						if (this.ptLinkList.containsValue(facilId)) facilId = new IdImpl(ids.get(index)+"_c");
+						if (this.ptLinkList.containsValue(facilId)) facilId = new IdImpl(ids.get(index)+"_d");
+						if (this.ptLinkList.containsValue(facilId)) facilId = new IdImpl(ids.get(index)+"_e");
+						if (this.ptLinkList.containsValue(facilId)) facilId = new IdImpl(ids.get(index)+"_f");
+					System.out.println("FACIL ID: "+facilId);
+					System.out.println("LINK ID: "+linkId);
+					this.ptLinkList.put(linkId, facilId);
+					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
+					facilList.add(trastofac);
+					trastofac.setLinkId(linkId);
+					this.schedule.addStopFacility(trastofac);
+				}
+				else {
+					this.ptFacList.add(facilId);
+					System.out.println("FACIL ID vorher: "+facilId);
+					facilId = new IdImpl(facilId+"_a");
+					System.out.println("FACIL ID: "+facilId);
+					System.out.println("LINK ID: "+linkId);
+					this.ptLinkList.put(linkId, facilId);
+					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
+					facilList.add(trastofac);
+					trastofac.setLinkId(linkId);
+					this.schedule.addStopFacility(trastofac);
+				}
+			}
+			
+			
+			else  trastofac = this.schedule.getFacilities().get(this.ptLinkList.get(linkId));
+			
+//			System.out.println("FAC LIST: "+this.ptFacList.);
 			
 			if (!linkList.contains(linkId))
 				trastofac.setLinkId(linkId);
