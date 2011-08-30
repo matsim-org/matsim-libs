@@ -107,8 +107,11 @@ public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 		}
 		else
 			for(Link linkSmall:linksSmall)
-				for(int b=0; b<linksBig.size(); b++)
-					if(!indicesBig.contains(b) && getAngle(linkSmall)-getAngle(linksBig.get(b))<minAngle) {
+				for(int b=0; b<linksBig.size(); b++) {
+					double anglesDifference = Math.abs(getAngle(linkSmall)-getAngle(linksBig.get(b)));
+					if(anglesDifference>Math.PI)
+						anglesDifference = 2*Math.PI - anglesDifference;
+					if(!indicesBig.contains(b) && anglesDifference<minAngle) {
 						List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
 						newLinksSmall.remove(linkSmall);
 						List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
@@ -116,6 +119,7 @@ public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 						if(matches(newLinksSmall, linksBig, newIndicesBig))
 							return true;
 					}
+				}
 		return false;
 	}
 
