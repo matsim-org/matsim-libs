@@ -110,7 +110,7 @@ public class ControlerConfigGroup extends Module {
 				if (!isFirst) {
 					str.append(',');
 				}
-				str.append(format.toString());
+				str.append(format);
 				isFirst = false;
 			}
 			return str.toString();
