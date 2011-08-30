@@ -43,17 +43,14 @@ public class NetworksMatcher {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile(args[0]);
-		/*Network networkLowResolutionPolyline = getNetworkFromShapeFilePolyline(args[1]);
-		NetworkWindow windowLRP = new SimpleNetworkWindow("Low Resolution Network Polyline", new SimpleNetworkPainter(networkLowResolutionPolyline));
-		windowLRP.setVisible(true);*/
+		Network networkLowResolution = getNetworkFromShapeFileLength(args[1]);
 		Network networkHighResolution = scenario.getNetwork();
-		Network networkLowResolutionLength = getNetworkFromShapeFileLength(args[1]);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
-		for(Node node:networkLowResolutionLength.getNodes().values())
+		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		MatchingProcess matchingProcess = new MatchingProcess();
-		matchingProcess.addStep(new CrossingReductionAlgorithm(30));
-		matchingProcess.execute(networkHighResolution, networkLowResolutionLength);
+		matchingProcess.addStep(new CrossingReductionAlgorithm(30, Math.PI/18));
+		matchingProcess.execute(networkLowResolution, networkHighResolution);
 		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", matchingProcess.getFinalMatchings(), new NetworkNodesPainter(networkHighResolution), new NetworkNodesPainter(networkLowResolutionLength, Color.BLACK, Color.CYAN));
 		windowHR.setVisible(true);*/
 		LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", matchingProcess);
@@ -65,7 +62,7 @@ public class NetworksMatcher {
 				e.printStackTrace();
 			}
 		matchingProcess.applyProperties(false);
-		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolutionLength.getLinks().size());
+		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolution.getLinks().size());
 	}
 
 

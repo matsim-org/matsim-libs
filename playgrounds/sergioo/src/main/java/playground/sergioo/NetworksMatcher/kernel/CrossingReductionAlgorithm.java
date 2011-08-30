@@ -8,7 +8,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -16,20 +16,32 @@ import playground.sergioo.NetworksMatcher.kernel.ComposedNode.Types;
 
 public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 
-	
+
+	//Constants
+
+	private static final String SEPARATOR = "<->";
+
+
 	//Attributes
-	
+
 	private double radius;
 
-	
+	private double minAngle;
+
+
 	//Methods
-	
-	public CrossingReductionAlgorithm(double radius) {
+
+	public CrossingReductionAlgorithm(double radius, double minAngle) {
 		this.radius = radius;
+		this.minAngle = minAngle;
 	}
-	
+
 	public void setRadius(double radius) {
 		this.radius = radius;
+	}
+
+	public void setMinAngle(double minAngle) {
+		this.minAngle = minAngle;
 	}
 
 	@Override
@@ -72,14 +84,43 @@ public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 				fillNodes(link.getToNode(), nodes, allNodes);
 	}
 
-	private boolean matches(Set<Node> nodeSubsetA, Set<Node> nodeSubsetB) {
-		// TODO Auto-generated method stub
-		return true;
+	private boolean matches(Set<Node> nodeSubsetA, Set<Node> nodeSubsetB, Network networkA, Network networkB) {
+		List<Link> linksSmall = getIncidentLinks(nodeSubsetA, networkA);
+		List<Link> linksBig = getIncidentLinks(nodeSubsetB, networkB);
+		if(linksSmall.size()>linksBig.size()) {
+			List<Link> linksTemp = linksSmall;
+			linksSmall = linksBig;
+			linksBig = linksTemp;
+		}
+		return matches(linksSmall, linksBig, new ArrayList<Integer>());
 	}
-	
+
+	private boolean matches(List<Link> linksSmall, List<Link> linksBig, List<Integer> indicesBig) {
+		if(linksSmall.size() == 0) {
+			int numChanges=0;
+			for(int i=0; i<indicesBig.size()-1; i++)
+				if(indicesBig.get(i)>indicesBig.get(i+1))
+					numChanges++;
+			if(indicesBig.get(indicesBig.size()-1)>indicesBig.get(0))
+				numChanges++;
+			return numChanges==1;
+		}
+		else
+			for(Link linkSmall:linksSmall)
+				for(int b=0; b<linksBig.size(); b++)
+					if(!indicesBig.contains(b) && getAngle(linkSmall)-getAngle(linksBig.get(b))<minAngle) {
+						List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
+						newLinksSmall.remove(linkSmall);
+						List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
+						newIndicesBig.add(b);
+						if(matches(newLinksSmall, linksBig, newIndicesBig))
+							return true;
+					}
+		return false;
+	}
+
 	private List<Link> getIncidentLinks(Set<Node> nodeSubset, Network network) {
-		return null;
-		/*List<Link> incidentLinks = new ArrayList<Link>();
+		List<Link> incidentLinks = new ArrayList<Link>();
 		ComposedNode composedNodeA = new ComposedNode(nodeSubset);
 		if(composedNodeA.getNodes().size()>1)
 			for(Node node:composedNodeA.getNodes()) {
@@ -88,30 +129,30 @@ public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 					for(Node node2:composedNodeA.getNodes())
 						if(link.getFromNode().getId().equals(node2.getId()))
 							insideLink = true;
-					if(!insideLink) {
-						link.setToNode(composedNodeA);
-						incidentLinks.add(new NetworkFactoryImpl(network));
-					}
+					if(!insideLink)
+						incidentLinks.add(new NetworkFactoryImpl(network).createLink(new IdImpl(link.getFromNode().getId()+SEPARATOR+composedNodeA.getId()), link.getFromNode(), composedNodeA));
 				}
 				for(Link link:node.getOutLinks().values()) {
 					boolean insideLink = false;
 					for(Node node2:composedNodeA.getNodes())
 						if(link.getToNode().getId().equals(node2.getId()))
 							insideLink = true;
-					networks[0].removeLink(link.getId());
-					if(!insideLink) {
-						ComposedLink composedLink = new ComposedLink(link, networks[0]);
-						composedLink.setFromNode(composedNodeA);
-						Node toNode = networks[0].getNodes().get(composedLink.getToNode().getId());
-						if(toNode==null)
-							toNode = networks[0].getNodes().get(((ComposedNode)composedLink.getToNode()).getContainerNode().getId());
-						composedLink.setToNode(toNode);
-						composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
-						networks[0].addLink(composedLink);
-					}
+					if(!insideLink)
+						incidentLinks.add(new NetworkFactoryImpl(network).createLink(new IdImpl(composedNodeA.getId()+SEPARATOR+link.getToNode().getId()), composedNodeA, link.getToNode()));
 				}			
 			}
-		}*/
+		for(int i=0; i<incidentLinks.size()-1; i++)
+			for(int j=i+1; j<incidentLinks.size(); j++)
+				if(getAngle(incidentLinks.get(i))<getAngle(incidentLinks.get(j))) {
+					Link temporalLink = incidentLinks.get(i);
+					incidentLinks.set(i, incidentLinks.get(j));
+					incidentLinks.set(j, temporalLink);
+				}
+		return incidentLinks;
+	}
+
+	private double getAngle(Link link) {
+		return Math.atan2(link.getToNode().getCoord().getY()-link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
 	}
 
 	@Override
@@ -138,7 +179,7 @@ public class CrossingReductionAlgorithm implements MatchingAlgorithm {
 								Set<Set<Node>> nodesSubsetsB = getSubsetsOfSize(nearestNodesToB, m);
 								for(Set<Node> nodeSubsetB:nodesSubsetsB)
 									if(isConnected(nodeSubsetB))
-										if(matches(nodeSubsetA, nodeSubsetB)) {
+										if(matches(nodeSubsetA, nodeSubsetB, networkA, networkB)) {
 											matchings.add(new NodesMatching(nodeSubsetA, nodeSubsetB));
 											for(Node nodeMatched:nodeSubsetA)
 												alreadyReducedA.add(nodeMatched);
