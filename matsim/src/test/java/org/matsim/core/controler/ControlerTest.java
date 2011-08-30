@@ -628,6 +628,7 @@ public class ControlerTest {
 	public void test_ExceptionOnMissingPopulationFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.plans().setInputFile("dummy/non-existing/population.xml");
 
@@ -647,6 +648,7 @@ public class ControlerTest {
 	public void test_ExceptionOnMissingNetworkFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.network().setInputFile("dummy/non-existing/network.xml");
 
@@ -666,6 +668,7 @@ public class ControlerTest {
 	public void test_ExceptionOnMissingFacilitiesFile() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
@@ -685,6 +688,8 @@ public class ControlerTest {
 	public void testOTFVisSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotStyle("equiDist");
@@ -703,6 +708,8 @@ public class ControlerTest {
 	public void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
@@ -724,6 +731,8 @@ public class ControlerTest {
 	public void testKMLSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotStyle("equiDist");
@@ -742,6 +751,8 @@ public class ControlerTest {
 	public void testKMLSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
@@ -763,6 +774,8 @@ public class ControlerTest {
 	public void testTransimsSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotStyle("equiDist");
@@ -781,6 +794,8 @@ public class ControlerTest {
 	public void testOneSnapshotWriterInConfig() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotStyle("equiDist");
 		
@@ -796,6 +811,8 @@ public class ControlerTest {
 	public void testTransimsSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
