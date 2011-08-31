@@ -19,14 +19,15 @@
 package playground.andreas.P2;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.PtConstants;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
-import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
@@ -45,14 +46,14 @@ public class PControler{
 		
 		if(args.length == 0){
 			log.info("Arg 1: config.xml");
-			log.info("Arg 2: Number of cooperatives");
-			log.info("Arg 3: Cost per vehicle");
 			System.exit(1);
 		}
 		
-		PBox pBox = new PBox(Integer.parseInt(args[1]), Double.parseDouble(args[2]));
+		Config config = new Config();
+		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
+		ConfigUtils.loadConfig(config, args[0]);
 		
-		PScenarioImpl scenario = new PScenarioImpl(ConfigUtils.loadConfig(args[0]));
+		PScenarioImpl scenario = new PScenarioImpl(config);
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
@@ -63,7 +64,7 @@ public class PControler{
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(pBox, controler);
+		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler);
 		controler.addControlerListener(pFact);		
 		controler.setTransitRouterFactory(pFact);
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));

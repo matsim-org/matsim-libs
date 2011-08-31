@@ -42,6 +42,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
@@ -65,9 +66,9 @@ public class PBox {
 	
 	private final ScorePlansHandler scorePlansHandler;
 	
-	public PBox(int numberOfCooperatives, double costPerVehicle){
-		this.scorePlansHandler = new ScorePlansHandler(0.50 / 1000.0, 0.30 / 1000.0);
-		createCooperatives(numberOfCooperatives, costPerVehicle);
+	public PBox(PConfigGroup pConfig) {
+		this.scorePlansHandler = new ScorePlansHandler(pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, pConfig.getCostPerKilometer() / 1000.0);
+		createCooperatives(pConfig.getNumberOfCooperatives(), pConfig.getCostPerVehicle());
 	}
 
 	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {

@@ -45,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
@@ -66,8 +67,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private PBox pBox;
 	private Controler controler;
 
-	public PTransitRouterImplFactory(PBox pBox, Controler controler) {
-		this.pBox = pBox;
+	public PTransitRouterImplFactory(Controler controler) {
+		this.pBox = new PBox((PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME));
 		this.controler = controler;
 	}
 
