@@ -20,6 +20,7 @@
 package playground.andreas.P2.pbox;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -28,6 +29,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.schedule.PTransitSchedule;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
@@ -42,16 +44,18 @@ public class CreateStopsForAllCarLinks {
 	private final static Logger log = Logger.getLogger(CreateStopsForAllCarLinks.class);
 	
 	private final NetworkImpl net;
+	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
 	
-	public static TransitSchedule createStopsForAllCarLinks(NetworkImpl network){
-		CreateStopsForAllCarLinks cS = new CreateStopsForAllCarLinks(network);
+	public static TransitSchedule createStopsForAllCarLinks(NetworkImpl network, PConfigGroup pConfigGroup){
+		CreateStopsForAllCarLinks cS = new CreateStopsForAllCarLinks(network, pConfigGroup);
 		cS.run();
 		return cS.getTransitSchedule();
 	}
 
-	public CreateStopsForAllCarLinks(NetworkImpl net) {
+	public CreateStopsForAllCarLinks(NetworkImpl net, PConfigGroup pConfigGroup) {
 		this.net = net;
+		this.pConfigGroup = pConfigGroup;
 	}
 
 	private void run(){
@@ -69,6 +73,10 @@ public class CreateStopsForAllCarLinks {
 		if(link == null){
 			return 0;
 		}
+		
+		if(linkToNodeNotInServiceArea(link)){
+			return 0;
+		}
 
 		for (TransitStopFacility stop : this.transitSchedule.getFacilities().values()) {
 			if(stop.getLinkId().toString().equalsIgnoreCase(link.getId().toString())){
@@ -81,6 +89,24 @@ public class CreateStopsForAllCarLinks {
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		
+	}
+
+	private boolean linkToNodeNotInServiceArea(Link link) {
+		Coord toNodeCoord = link.getToNode().getCoord();
+		
+		if(toNodeCoord.getX() < this.pConfigGroup.getMinX()){
+			return true;
+		}
+		if(toNodeCoord.getX() > this.pConfigGroup.getMaxX()){
+			return true;
+		}
+		if(toNodeCoord.getY() < this.pConfigGroup.getMinY()){
+			return true;
+		}
+		if(toNodeCoord.getY() > this.pConfigGroup.getMaxY()){
+			return true;
+		}
+		return false;
 	}
 
 	private TransitSchedule getTransitSchedule() {

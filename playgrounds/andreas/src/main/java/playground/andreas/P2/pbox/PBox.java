@@ -85,7 +85,7 @@ public class PBox {
 		controler.getEvents().addHandler(this.scorePlansHandler);
 		
 		// create stops
-		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork());
+		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME));
 		
 		for (Cooperative cooperative : this.cooperatives) {
 //			cooperative.init(new SimpleBackAndForthScheduleProvider(this.pStopsOnly, controler.getNetwork(), 0));
