@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
-import playground.sergioo.NetworksMatcher.kernel.NodesMatching;
+import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 

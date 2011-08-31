@@ -4,6 +4,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.sergioo.NetworksMatcher.kernel.core.Region;
+
 public class RectangularRegion implements Region {
 
 	

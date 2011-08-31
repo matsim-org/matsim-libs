@@ -3,81 +3,34 @@ package playground.sergioo.NetworksMatcher.kernel;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 
+import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
+import playground.sergioo.NetworksMatcher.kernel.core.ComposedNetwork;
+import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
+import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
+import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
+import playground.sergioo.NetworksMatcher.kernel.core.Region;
 
-public class MatchingStep {
+public class CrossingReductionStep extends NetworksStep {
 
 
 	//Attributes
 
-	private Network networkA;
-
-	private Network networkB;
-
-	private final MatchingAlgorithm matchingAlgorithm;
-
-	private Region region;
-
 	private Set<NodesMatching> nodesMatchings;
-	
-	
+
+
 	//Methods
 
-	public MatchingStep(MatchingAlgorithm matchingAlgorithm) {
-		this.matchingAlgorithm = matchingAlgorithm;
+	
+	public CrossingReductionStep(Region region, Set<NodesMatching> nodesMatchings) {
+		super(region);
+		this.nodesMatchings = nodesMatchings;
 	}
 
-	public Network getNetworkA() {
-		return networkA;
-	}
-
-	public Network getNetworkB() {
-		return networkB;
-	}
-
-	public Set<NodesMatching> getNodesMatchings() {
-		return nodesMatchings;
-	}
-
-	public void setRegion(Region region) {
-		this.region = region;
-	}
-
-	public Network[] execute(Network networkA, Network networkB) {
-		this.networkA = networkA;
-		this.networkB = networkB;
-		if(region == null)
-			nodesMatchings = matchingAlgorithm.execute(networkA, networkB);
-		else
-			nodesMatchings = matchingAlgorithm.execute(networkA, networkB, region);
-		Network[] networks = new Network[2];
-		networks[0] = NetworkImpl.createNetwork();
-		networks[1] = NetworkImpl.createNetwork();
-		for(Node node:networkA.getNodes().values()) {
-			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
-			networks[0].addNode(newNode);
-		}
-		for(Node node:networkB.getNodes().values()) {
-			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
-			networks[1].addNode(newNode);
-		}
-		for(Link link:networkA.getLinks().values()) {
-			ComposedLink composedLink = new ComposedLink(link, networks[0]);
-			composedLink.setFromNode(networks[0].getNodes().get(composedLink.getFromNode().getId()));
-			composedLink.setToNode(networks[0].getNodes().get(composedLink.getToNode().getId()));
-			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
-			networks[0].addLink(composedLink);
-		}
-		for(Link link:networkB.getLinks().values()) {
-			ComposedLink composedLink = new ComposedLink(link, networks[1]);
-			composedLink.setFromNode(networks[1].getNodes().get(composedLink.getFromNode().getId()));
-			composedLink.setToNode(networks[1].getNodes().get(composedLink.getToNode().getId()));
-			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
-			networks[1].addLink(composedLink);
-		}
+	@Override
+	protected ComposedNetwork[] execute() {
+		ComposedNetwork[] networks = new ComposedNetwork[] {networkA.clone(), networkB.clone()};
 		for(NodesMatching matching:nodesMatchings) {
 			ComposedNode composedNodeA = matching.getComposedNodeA();
 			if(composedNodeA.getNodes().size()>1) {
@@ -165,12 +118,5 @@ public class MatchingStep {
 		return networks;
 	}
 
-	public boolean isMatched(Node nodeA, Node nodeB) {
-		for(NodesMatching nodesMatching:nodesMatchings)
-			if(nodeA.getId().equals(nodesMatching.getComposedNodeA().getId()) && nodeB.getId().equals(nodesMatching.getComposedNodeB().getId()))
-				return true;
-		return false;
-	}
-
-
+	
 }

@@ -23,8 +23,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
-import playground.sergioo.NetworksMatcher.kernel.CrossingReductionAlgorithm;
-import playground.sergioo.NetworksMatcher.kernel.MatchingProcess;
+import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
+import playground.sergioo.NetworksMatcher.kernel.InfiniteRegion;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -49,7 +50,7 @@ public class NetworksMatcher {
 		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		MatchingProcess matchingProcess = new MatchingProcess();
-		matchingProcess.addStep(new CrossingReductionAlgorithm(30, Math.PI/18));
+		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/18));
 		matchingProcess.execute(networkLowResolution, networkHighResolution);
 		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", matchingProcess.getFinalMatchings(), new NetworkNodesPainter(networkHighResolution), new NetworkNodesPainter(networkLowResolutionLength, Color.BLACK, Color.CYAN));
 		windowHR.setVisible(true);*/

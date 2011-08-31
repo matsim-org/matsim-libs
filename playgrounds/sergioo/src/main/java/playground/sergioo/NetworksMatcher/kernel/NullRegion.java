@@ -3,6 +3,8 @@ package playground.sergioo.NetworksMatcher.kernel;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.sergioo.NetworksMatcher.kernel.core.Region;
+
 public class NullRegion implements Region {
 
 	

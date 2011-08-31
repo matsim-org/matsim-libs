@@ -1,7 +1,9 @@
-package playground.sergioo.NetworksMatcher.kernel;
+package playground.sergioo.NetworksMatcher.kernel.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +15,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
-public class ComposedNode implements Node {
+
+public class ComposedNode implements Node, Cloneable {
 
 
 	//Constants
@@ -52,6 +55,8 @@ public class ComposedNode implements Node {
 	
 	private Types type;
 
+	private List<Link> incidentLinks;
+
 
 	//Methods
 	
@@ -72,6 +77,39 @@ public class ComposedNode implements Node {
 			if(node.getClass().equals(ComposedNode.class))
 				((ComposedNode)node).setContainerNode(this);
 		}
+	}
+
+	public List<Link> getIncidentLinks() {
+		return incidentLinks;
+	}
+
+	public void setIncidentLinks() {
+		incidentLinks = new ArrayList<Link>();
+		for(Node node:nodes) {
+			for(Link link:node.getInLinks().values()) {
+				boolean insideLink = false;
+				for(Node node2:nodes)
+					if(link.getFromNode().getId().equals(node2.getId()))
+						insideLink = true;
+				if(!insideLink)
+					incidentLinks.add(link);
+			}
+			for(Link link:node.getOutLinks().values()) {
+				boolean insideLink = false;
+				for(Node node2:nodes)
+					if(link.getToNode().getId().equals(node2.getId()))
+						insideLink = true;
+				if(!insideLink)
+					incidentLinks.add(link);
+			}			
+		}
+		for(int i=0; i<incidentLinks.size()-1; i++)
+			for(int j=i+1; j<incidentLinks.size(); j++)
+				if(((ComposedLink)incidentLinks.get(i)).getAngle()>((ComposedLink)incidentLinks.get(j)).getAngle()) {
+					Link temporalLink = incidentLinks.get(i);
+					incidentLinks.set(i, incidentLinks.get(j));
+					incidentLinks.set(j, temporalLink);
+				}
 	}
 	
 	public ComposedNode getContainerNode() {
@@ -173,5 +211,8 @@ public class ComposedNode implements Node {
 		this.type = type;
 	}
 	
+	public ComposedNode clone() {
+		return new ComposedNode(nodes);
+	}
 
 }

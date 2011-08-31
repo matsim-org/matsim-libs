@@ -15,8 +15,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
-import playground.sergioo.NetworksMatcher.kernel.MatchingProcess;
-import playground.sergioo.NetworksMatcher.kernel.NodesMatching;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
+import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Camera;
 import playground.sergioo.Visualizer2D.LayersWindow;
 

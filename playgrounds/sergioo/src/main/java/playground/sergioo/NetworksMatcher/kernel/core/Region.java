@@ -1,4 +1,4 @@
-package playground.sergioo.NetworksMatcher.kernel;
+package playground.sergioo.NetworksMatcher.kernel.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;

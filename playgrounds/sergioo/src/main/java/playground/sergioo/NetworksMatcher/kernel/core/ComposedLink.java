@@ -1,4 +1,4 @@
-package playground.sergioo.NetworksMatcher.kernel;
+package playground.sergioo.NetworksMatcher.kernel.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +19,11 @@ public class ComposedLink extends LinkImpl {
 	
 	//Methods
 	
-	protected ComposedLink(Link link, Network network) {
+	public ComposedLink(Link link, Network network) {
 		this(link.getId(), link.getFromNode(), link.getToNode(), network);
 	}
 	
-	protected ComposedLink(Id id, Node from, Node to, Network network) {
+	public ComposedLink(Id id, Node from, Node to, Network network) {
 		super(id, from, to, network, 0, 0, 0, 0);
 		links = new ArrayList<Link>();
 	}
@@ -36,4 +36,9 @@ public class ComposedLink extends LinkImpl {
 		//TODO
 	}
 	
+	public double getAngle() {
+		return Math.atan2(to.getCoord().getY()-from.getCoord().getY(), to.getCoord().getX()-from.getCoord().getX());
+	}
+
+
 }

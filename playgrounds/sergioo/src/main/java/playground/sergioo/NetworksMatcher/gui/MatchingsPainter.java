@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Node;
 
-import playground.sergioo.NetworksMatcher.kernel.NodesMatching;
+import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.Painter;
 
