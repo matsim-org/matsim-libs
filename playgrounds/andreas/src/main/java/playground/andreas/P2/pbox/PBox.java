@@ -58,6 +58,7 @@ public class PBox {
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
 	private List<Cooperative> cooperatives;
+	private PFranchise franchise;
 
 	TransitSchedule pStopsOnly;
 	TransitSchedule pTransitSchedule;
@@ -68,13 +69,14 @@ public class PBox {
 	
 	public PBox(PConfigGroup pConfig) {
 		this.scorePlansHandler = new ScorePlansHandler(pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, pConfig.getCostPerKilometer() / 1000.0);
+		this.franchise = new PFranchise(pConfig.getUseFranchise());
 		createCooperatives(pConfig.getNumberOfCooperatives(), pConfig.getCostPerVehicle());
 	}
 
 	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i), costPerVehicle);
+			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i), costPerVehicle, this.franchise);
 			cooperatives.add(cooperative);
 		}
 		
@@ -99,7 +101,7 @@ public class PBox {
 	 * @param iteration Number of iteration, zero if initial iteration, otherwise positive 
 	 * @return Transit schedule for paratransit lines valid for the current iteration
 	 */
-	public TransitSchedule getNewSchedule(Controler controler, int iteration){
+	public TransitSchedule replan(Controler controler, int iteration){
 		// Two cases: First "initial iteration", Second "any other one"
 		
 		if(iteration == 0){
@@ -130,6 +132,8 @@ public class PBox {
 				this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
 			}
 		}
+		
+		this.franchise.reset(this.pTransitSchedule);
 				
 		return this.pTransitSchedule;
 	}

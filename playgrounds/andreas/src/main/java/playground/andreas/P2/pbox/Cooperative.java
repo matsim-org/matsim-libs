@@ -40,6 +40,8 @@ public class Cooperative {
 	private final static Logger log = Logger.getLogger(Cooperative.class);
 	
 	private final Id id;
+	
+	private PFranchise franchise;
 	private final double costPerVehicle;
 	private int numberOfRoutesCreated = 0;
 
@@ -50,25 +52,30 @@ public class Cooperative {
 	
 	private double budget;
 	private double lastBudget;
-	
-	public Cooperative(Id id, double costPerVehicle){
+
+	public Cooperative(Id id, double costPerVehicle, PFranchise franchise){
 		this.id = id;
 		this.costPerVehicle = costPerVehicle;
+		this.franchise = franchise;
 	}
 
 	public void init(SimpleCircleScheduleProvider simpleScheduleProvider) {
 		this.budget = 0.0;
 		
-		PPlan plan = new PPlan(new IdImpl("0"));
-		plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
-		plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
-		while(plan.getStartStop() == plan.getEndStop()){
+		PPlan plan;
+		do {
+			plan = new PPlan(new IdImpl("0"));
+			plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
 			plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
-		}
+			while(plan.getStartStop() == plan.getEndStop()){
+				plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
+			}
+			
+			plan.setStartTime(0.0);
+			plan.setEndTime(24.0 * 3600);
+			plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
+		} while (this.franchise.planRejected(plan));
 		
-		plan.setStartTime(0.0);
-		plan.setEndTime(24.0 * 3600);
-		plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
 		this.bestPlan = null;
 		this.testPlan = plan;
 		this.currentTransitLine = simpleScheduleProvider.createEmptyLine(id);
@@ -219,15 +226,19 @@ public class Cooperative {
 //			}
 			
 			// create complete new route
-			PPlan plan = new PPlan(new IdImpl(simpleScheduleProvider.getIteration()));
-			plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
-			plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
-			while(plan.getStartStop() == plan.getEndStop()){
+			PPlan plan;
+			do {
+				plan = new PPlan(new IdImpl(simpleScheduleProvider.getIteration()));
+				plan.setStartStop(simpleScheduleProvider.getRandomTransitStop());
 				plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
-			}
-			plan.setStartTime(0.0);
-			plan.setEndTime(24.0 * 3600);
-			plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
+				while(plan.getStartStop() == plan.getEndStop()){
+					plan.setEndStop(simpleScheduleProvider.getRandomTransitStop());
+				}
+				plan.setStartTime(0.0);
+				plan.setEndTime(24.0 * 3600);
+				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), 1, plan.getStartStop(), plan.getEndStop(), null));
+			} while (this.franchise.planRejected(plan));
+			
 			this.testPlan = plan;
 		}
 		

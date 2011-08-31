@@ -86,7 +86,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		
 		this.routerNetwork = null;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
-		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getNewSchedule(event.getControler(), 0));
+		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.replan(event.getControler(), 0));
 		((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
 		addPVehiclesToOriginalOnes(event.getControler());
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
@@ -101,7 +101,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		} else {
 			this.pBox.reset(event);
 			this.routerNetwork = null;
-			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getNewSchedule(event.getControler(), event.getIteration()));
+			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.replan(event.getControler(), event.getIteration()));
 			((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
 			addPVehiclesToOriginalOnes(event.getControler());
 			

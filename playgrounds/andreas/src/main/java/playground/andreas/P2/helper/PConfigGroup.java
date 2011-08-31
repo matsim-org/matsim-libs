@@ -51,6 +51,7 @@ public class PConfigGroup extends Module{
 	private static final String COST_PER_KILOMETER = "costPerKilometer";
 	private static final String EARNINGS_PER_KILOMETER_AND_PASSENGER = "earningsPerKilometerAndPassenger";
 	private static final String COST_PER_VEHICLE = "costPerVehicle";
+	private static final String USEFRANCHISE = "useFranchise";
 	
 	// Defaults
 	private double minX = Double.MIN_VALUE;	
@@ -60,7 +61,8 @@ public class PConfigGroup extends Module{
 	private int numberOfCooperatives = 1;
 	private double costPerKilometer = 0.30;
 	private double earningsPerKilometerAndPassenger = 0.50;
-	private double costPerVehicle= 1000;
+	private double costPerVehicle = 1000.0;
+	private boolean useFranchise = false;
 	
 	public PConfigGroup(){
 		super(GROUP_NAME);
@@ -88,6 +90,8 @@ public class PConfigGroup extends Module{
 			this.earningsPerKilometerAndPassenger = Double.parseDouble(value);
 		} else if (COST_PER_VEHICLE.equals(key)){
 			this.costPerVehicle = Double.parseDouble(value);
+		} else if (USEFRANCHISE.equals(key)){
+			this.useFranchise = Boolean.parseBoolean(value);
 		}
 	}
 	
@@ -104,7 +108,8 @@ public class PConfigGroup extends Module{
 		map.put(NUMBER_OF_COOPERATIVES, Integer.toString(this.numberOfCooperatives));
 		map.put(COST_PER_KILOMETER, Double.toString(this.costPerKilometer));
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
-		map.put(COST_PER_VEHICLE, Double.toString(costPerVehicle));
+		map.put(COST_PER_VEHICLE, Double.toString(this.costPerVehicle));
+		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		return map;
 	}
 	
@@ -120,6 +125,7 @@ public class PConfigGroup extends Module{
 		map.put(COST_PER_KILOMETER, "cost per vehicle and kilometer travelled");
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
 		map.put(COST_PER_VEHICLE, "cost to purchase or sell a vehicle");
+		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 
 		return map;
 	}
@@ -145,14 +151,18 @@ public class PConfigGroup extends Module{
 	}
 	
 	public double getCostPerKilometer() {
-		return costPerKilometer;
+		return this.costPerKilometer;
 	}
 
 	public double getEarningsPerKilometerAndPassenger() {
-		return earningsPerKilometerAndPassenger;
+		return this.earningsPerKilometerAndPassenger;
 	}
 		
 	public double getCostPerVehicle() {
-		return costPerVehicle;
+		return this.costPerVehicle;
+	}
+	
+	public boolean getUseFranchise() {
+		return this.useFranchise;
 	}	
 }
