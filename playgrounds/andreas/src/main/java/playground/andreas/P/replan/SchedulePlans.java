@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
+@Deprecated
 public class SchedulePlans {
 	private final static Logger log = Logger.getLogger(SchedulePlans.class);
 	

@@ -35,6 +35,7 @@ import playground.andreas.P.init.PConfigGroup;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 import playground.andreas.utils.pt.TransitScheduleCleaner;
 
+@Deprecated
 public class ReplanTimeSchedule {
 	
 	private TreeMap<Id, SchedulePlans> population = new TreeMap<Id, SchedulePlans>();

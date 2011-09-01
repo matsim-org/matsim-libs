@@ -32,6 +32,7 @@ import org.matsim.core.config.Module;
  * @author aneumann
  *
  */
+@Deprecated
 public class PConfigGroup extends Module{
 	
 	/**

@@ -29,6 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
+@Deprecated
 public class CreateStops {
 	
 	private final NetworkImpl net;

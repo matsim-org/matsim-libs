@@ -57,6 +57,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
 
+@Deprecated
 public class CreateInitialTimeSchedule {
 	
 	private NetworkImpl net;

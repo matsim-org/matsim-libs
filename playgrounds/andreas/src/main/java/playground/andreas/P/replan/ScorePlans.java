@@ -30,6 +30,7 @@ import org.matsim.core.events.EventsUtils;
 
 import playground.andreas.P.replan.ScorePlansHandler.ScoreContainer;
 
+@Deprecated
 public class ScorePlans {
 	
 	private final static Logger log = Logger.getLogger(ScorePlans.class);

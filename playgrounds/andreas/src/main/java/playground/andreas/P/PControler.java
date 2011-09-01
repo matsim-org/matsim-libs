@@ -26,6 +26,7 @@ import playground.andreas.P.replan.ReplanTimeSchedule;
 /**
  * @author aneumann
  */
+@Deprecated
 public class PControler extends Controler {
 
 	private final static Logger log = Logger.getLogger(PControler.class);
