@@ -37,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class PPlan {
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PPlan.class);
 	
 	private final Id id;

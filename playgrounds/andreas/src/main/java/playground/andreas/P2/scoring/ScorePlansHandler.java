@@ -40,7 +40,9 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  */
 public class ScorePlansHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
+	
 	private double earningsPerMeterAndPassenger = 0.05;
 	private double expensesPerMeter = 0.03;
 	

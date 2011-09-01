@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class ScoreContainer {
 	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
 	private final Id vehicleId;
