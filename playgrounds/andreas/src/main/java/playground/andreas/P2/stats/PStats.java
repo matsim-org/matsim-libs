@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PBox;
-import playground.andreas.P2.pbox.PPlan;
+import playground.andreas.P2.plan.PPlan;
 
 /**
  * Calculates at the end of each iteration the following statistics:

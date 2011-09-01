@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.P2.pbox;
+package playground.andreas.P2.plan;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -55,6 +55,23 @@ public class PPlan {
 	
 	public PPlan(Id id) {
 		this.id = id;
+	}
+	
+	public PPlan(Id id, TransitStopFacility startStop, TransitStopFacility endStop, double startTime, double endTime){
+		this.id = id;
+		this.startStop = startStop;
+		this.endStop = endStop;
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+	
+	public PPlan(Id id, PPlan oldPlan){
+		this.id = id;
+		this.startStop = oldPlan.getStartStop();
+		this.endStop = oldPlan.getEndStop();
+		this.startTime = oldPlan.getStartTime();
+		this.endTime = oldPlan.getEndTime();
+		this.line = oldPlan.getLine();
 	}
 
 	@Override

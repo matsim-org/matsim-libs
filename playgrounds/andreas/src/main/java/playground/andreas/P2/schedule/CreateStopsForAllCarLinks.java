@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.pbox;
+package playground.andreas.P2.schedule;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -30,7 +30,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.schedule.PTransitSchedule;
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
 /**
