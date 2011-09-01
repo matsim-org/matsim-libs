@@ -49,6 +49,12 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.VehiclesFactoryImpl;
+import org.matsim.vehicles.VehiclesImpl;
 
 /**
  * @author fuerbas
@@ -71,6 +77,7 @@ public class SfCottbusPtSchedule {
 	private String LINES;
 	private HashMap<Id, Id> ptLinkList;
 	private List<Id> ptFacList;
+	private Vehicles vehicles;
 	
 	
 	public SfCottbusPtSchedule() {
@@ -85,7 +92,11 @@ public class SfCottbusPtSchedule {
 		this.schedule = this.schedulefactory.createTransitSchedule();
 		this.ptLinkList = new HashMap<Id, Id>(); //linkId und facilId
 		this.ptFacList = new ArrayList<Id>();
-
+		this.vehicles = new VehiclesImpl();
+		this.vehicles.getVehicleTypes().put(new IdImpl("tram_93pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("tram_93pax")));
+		this.vehicles.getVehicleTypes().put(new IdImpl("bus_90pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_90pax")));
+		this.vehicles.getVehicleTypes().put(new IdImpl("bus_64pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_64pax")));
+		this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax")).setCapacity(new VehicleCapacityImpl());
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -102,6 +113,8 @@ public class SfCottbusPtSchedule {
 				
 		cottbus.schedulefactory = new TransitScheduleFactoryImpl();
 		cottbus.schedule = cottbus.schedulefactory.createTransitSchedule();
+
+		
 		
 //		Linienliste einlesen, Linien als Strings speichern, über alle Linien gleiches Schema ausführen...
 		
@@ -186,6 +199,9 @@ public class SfCottbusPtSchedule {
 		
 		System.out.println("Network written to: "+"E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml");
 		
+		VehicleWriterV1 writer = new VehicleWriterV1(cottbus.vehicles);
+		writer.writeFile("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\transitVehicles.xml");
+		
 	}
 	
 	
@@ -216,6 +232,7 @@ public class SfCottbusPtSchedule {
 			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+"_"+currentDep), currentDep);
 			transitRoute.addDeparture(dep);
 			currentDep+=frequency;
+			if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get("1")));
 		}
 	}
 	
