@@ -159,9 +159,9 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		return button;
 	}
 
-	public void updateTimeLabel() {
-		hostControl.fetchTimeAndStatus();
-		timeField.setText(Time.writeTime(hostControl.getSimTime()));
+	void updateTimeLabel() {
+		String text = Time.writeTime(hostControl.getSimTime());
+		timeField.setText(text);
 	}
 
 	public void stopMovie() {
@@ -245,14 +245,12 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		} else if (command.equals(SCALE)) {
 			changed_SCALE(event);
 		}
-		updateTimeLabel();
 		repaint();
 	}
 
 	private void toStart() {
 		this.hostControl.toStart();
 		if(this.hostControl.isLive()) {
-			updateTimeLabel();
 			repaint();
 		}
 	}

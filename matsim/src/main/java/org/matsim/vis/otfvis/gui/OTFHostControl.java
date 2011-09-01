@@ -68,6 +68,7 @@ public class OTFHostControl {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				invalidateDrawers();
+				OTFHostControl.this.hostControlBar.updateTimeLabel();
 			}
 
 		});
@@ -118,8 +119,9 @@ public class OTFHostControl {
 		hostControlBar.updateTimeLabel();
 	}
 
-	void fetchTimeAndStatus() {
-		simTime.setValue(server.getLocalTime());
+	public void fetchTimeAndStatus() {
+		int localTime = server.getLocalTime();
+		simTime.setValue(localTime);
 	}
 
 	boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {

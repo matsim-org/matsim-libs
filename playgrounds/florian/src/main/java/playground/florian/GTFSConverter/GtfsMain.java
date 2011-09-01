@@ -27,7 +27,8 @@ public class GtfsMain {
 	}
 
 	private static Scenario readScenario() {
-		GtfsConverter gtfs = new GtfsConverter("../../matsim/input/sample-feed", new GeotoolsTransformation("WGS84", CRS));
+		// GtfsConverter gtfs = new GtfsConverter("/Users/zilske/Documents/torino", new GeotoolsTransformation("WGS84", CRS));
+		GtfsConverter gtfs = new GtfsConverter("/Users/zilske/Downloads/sample-feed", new GeotoolsTransformation("WGS84", CRS));
 		gtfs.setCreateShapedNetwork(false);
 		//		gtfs.setDate(20110711);
 		gtfs.convert();
@@ -38,7 +39,7 @@ public class GtfsMain {
 	}
 
 	private static void runScenario(Scenario scenario) {
-		// runWithClassicOTFVis(scenario);
+		 // runWithClassicOTFVis(scenario);
 		runWithOSM(scenario);
 	}
 

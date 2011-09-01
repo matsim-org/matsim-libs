@@ -71,7 +71,6 @@ public class OTFVisConfigGroup extends Module {
 	private boolean drawTransitFacilities = true;
 	private boolean renderImages = false;
 	private boolean modified = false;
-	private boolean cachingAllowed = true;
 	private int delay_ms = 30;
 	private int maximumZoom = 17;
 	private boolean mapOverlayMode = false;
@@ -141,13 +140,7 @@ public class OTFVisConfigGroup extends Module {
 		this.setModified();
 		this.delay_ms = delay_ms;
 	}
-	public boolean isCachingAllowed() {
-		return this.cachingAllowed;
-	}
-	public void setCachingAllowed(final boolean cachingAllowed) {
-		setModified();
-		this.cachingAllowed = cachingAllowed;
-	}
+
 	/**
 	 * @return the modified
 	 */

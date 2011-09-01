@@ -87,7 +87,6 @@ public class OTFClientLive {
 				if (visconf == null) {
 					visconf = server.getOTFVisConfig();
 				}
-				visconf.setCachingAllowed(false); // no use to cache in live mode
 				OTFClientControl.getInstance().setOTFVisConfig(visconf);
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
@@ -101,7 +100,6 @@ public class OTFClientLive {
 				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
-				hostControlBar.updateTimeLabel();
 				otfClient.show();
 			}
 		});

@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -256,7 +255,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 		result.finish();
 
-		if (OTFClientControl.getInstance().getOTFVisConfig().isCachingAllowed()) {
+		if (this.host.isLive() == false) {
 			this.cachedTimes.put(time, result);
 		}
 		return result;

@@ -170,11 +170,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 100, 200, 31);
 			panel.add(synchBox);
-			synchBox = new JCheckBox("allow caching");
-			synchBox.setSelected(visConfig.isCachingAllowed());
-			synchBox.addItemListener(this);
-			synchBox.setBounds(10, 120, 200, 31);
-			panel.add(synchBox);
+			
 			synchBox = new JCheckBox("show scale bar");
 			synchBox.setSelected(visConfig.drawScaleBar());
 			synchBox.addItemListener(this);
@@ -345,9 +341,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		} else if (source.getText().equals("show time GL")) {
 			// toggle draw time in GL
 			visConfig.setDrawTime(!visConfig.drawTime());
-		} else if (source.getText().equals("allow caching")) {
-			// toggle caching allowed
-			visConfig.setCachingAllowed(!visConfig.isCachingAllowed());
 		} else if (source.getText().equals("show scale bar")) {
 			// toggle draw Overlays
 			visConfig.setDrawScaleBar(!visConfig.drawScaleBar());

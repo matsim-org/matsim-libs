@@ -88,7 +88,6 @@ public class OTFClientFile implements Runnable {
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
 		clientQ.setConnectionManager(connect);
 		clientQ.getConstData();
-		hostControlBar.updateTimeLabel();
 		OTFClientQuadTree clientQuadTree = clientQ;
 		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));

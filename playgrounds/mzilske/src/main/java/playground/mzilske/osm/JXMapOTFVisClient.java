@@ -80,7 +80,6 @@ public final class JXMapOTFVisClient {
 				OTFClientQuadTree clientQ = servQ.convertToClient(server, connect);
 				clientQ.setConnectionManager(connect);
 				clientQ.getConstData();
-				hostControlBar.updateTimeLabel();
 
 				final OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, config.otfVis());
 				otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));

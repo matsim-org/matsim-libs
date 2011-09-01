@@ -690,7 +690,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
 		setFrustrum(gl);
 
-		
+
 		for (OTFGLAbstractDrawable item : this.overlayItems) {
 			item.glInit();
 		}
@@ -704,7 +704,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		int zoom = (int) log2(scale);
 		setScale(Math.pow(2, zoom));
 	}
-	
+
 	private static double log2 (double scale) {
 		return Math.log(scale) / Math.log(2);
 	}
@@ -738,12 +738,13 @@ public class OTFOGLDrawer implements GLEventListener {
 			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 		}
 		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
+		this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
 		}
 		hostControlBar.updateScaleLabel();
 		this.canvas.repaint();
-		if (nRedrawn > 0) {
+		if (viewBounds != null) { // has glInit arrived yet? Otherwise we are not yet fully initialized. :-(
 			fireChangeListeners();
 		}
 		++nRedrawn;

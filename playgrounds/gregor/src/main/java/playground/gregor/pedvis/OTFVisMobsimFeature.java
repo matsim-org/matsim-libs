@@ -86,14 +86,12 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 				if (visconf == null) {
 					visconf = OTFVisMobsimFeature.this.server.getOTFVisConfig();
 				}
-				visconf.setCachingAllowed(false); // no use to cache in live mode
 				OTFClientControl.getInstance().setOTFVisConfig(visconf);
 				OTFServerQuadTree serverQuadTree = OTFVisMobsimFeature.this.server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(OTFVisMobsimFeature.this.server, connectionManager);
 				clientQuadTree.setConnectionManager(connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-				hostControlBar.updateTimeLabel();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, visconf);
 				OTFQueryControl queryControl = new OTFQueryControl(OTFVisMobsimFeature.this.server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
