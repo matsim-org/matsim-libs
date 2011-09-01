@@ -137,6 +137,13 @@ public class ERSAControlerListener implements ShutdownListener{
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
 	
 			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
+			
+			List<Node> nodesList = new ArrayList<Node>() ;
+			
+//			for ( JobsObject job : jobObjectMap.values()  ){
+//				Node nearestNode = network.getNearestNode( job.getCoord() ) ;
+//				nodesList.add( nearestNode ) ;
+//			}
 		
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startZoneIterator.hasNext() ){
@@ -156,6 +163,7 @@ public class ERSAControlerListener implements ShutdownListener{
 
 				// go through all jobs and calculate workplace accessibility
 				for(JobsObject job :jobObjectMap.values()){
+//				for ( Node toNode : nodesList ) {
 					
 					assert( job.getCoord() != null );
 					Node toNode = network.getNearestNode( job.getCoord() );
