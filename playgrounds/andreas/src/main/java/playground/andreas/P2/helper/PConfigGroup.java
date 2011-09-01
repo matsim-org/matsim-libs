@@ -52,6 +52,7 @@ public class PConfigGroup extends Module{
 	private static final String EARNINGS_PER_KILOMETER_AND_PASSENGER = "earningsPerKilometerAndPassenger";
 	private static final String COST_PER_VEHICLE = "costPerVehicle";
 	private static final String USEFRANCHISE = "useFranchise";
+	private static final String WRITESTATS = "writeStats";
 	
 	// Defaults
 	private double minX = Double.MIN_VALUE;	
@@ -63,6 +64,7 @@ public class PConfigGroup extends Module{
 	private double earningsPerKilometerAndPassenger = 0.50;
 	private double costPerVehicle = 1000.0;
 	private boolean useFranchise = false;
+	private boolean writeStats = false;
 	
 	public PConfigGroup(){
 		super(GROUP_NAME);
@@ -92,6 +94,8 @@ public class PConfigGroup extends Module{
 			this.costPerVehicle = Double.parseDouble(value);
 		} else if (USEFRANCHISE.equals(key)){
 			this.useFranchise = Boolean.parseBoolean(value);
+		} else if (WRITESTATS.equals(key)){
+			this.writeStats = Boolean.parseBoolean(value);
 		}
 	}
 	
@@ -110,6 +114,7 @@ public class PConfigGroup extends Module{
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
 		map.put(COST_PER_VEHICLE, Double.toString(this.costPerVehicle));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
+		map.put(WRITESTATS, Boolean.toString(this.writeStats));
 		return map;
 	}
 	
@@ -126,6 +131,7 @@ public class PConfigGroup extends Module{
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
 		map.put(COST_PER_VEHICLE, "cost to purchase or sell a vehicle");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
+		map.put(WRITESTATS, "will write statistics if set to true");
 
 		return map;
 	}
@@ -164,5 +170,9 @@ public class PConfigGroup extends Module{
 	
 	public boolean getUseFranchise() {
 		return this.useFranchise;
-	}	
+	}
+	
+	public boolean getWriteStats() {
+		return this.writeStats;
+	}
 }

@@ -194,6 +194,10 @@ public class PBox {
 		return scorePlansHandler;
 	}
 
+	public List<Cooperative> getCooperatives() {
+		return cooperatives;
+	}
+
 	public void reset(IterationStartsEvent event) {
 		log.info("nothing to do, yet.");		
 	}

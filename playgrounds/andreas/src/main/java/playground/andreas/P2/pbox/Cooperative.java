@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.andreas.P2.pbox;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -43,7 +45,6 @@ public class Cooperative {
 	
 	private PFranchise franchise;
 	private final double costPerVehicle;
-	private int numberOfRoutesCreated = 0;
 
 	private PPlan bestPlan;
 	private PPlan testPlan;
@@ -255,6 +256,21 @@ public class Cooperative {
 	
 	public TransitLine getCurrentTransitLine() {		
 		return this.currentTransitLine;		
+	}
+
+	public List<PPlan> getAllPlans(){
+		List<PPlan> plans = new LinkedList<PPlan>();
+		if(this.bestPlan != null){
+			plans.add(this.bestPlan);
+		}
+		if(this.testPlan != null){
+			plans.add(this.testPlan);
+		}		
+		return plans;
+	}
+	
+	public double getBudget(){
+		return this.budget;
 	}
 
 	private void scorePlan(TreeMap<Id, ScoreContainer> driverId2ScoreMap, PPlan plan) {
