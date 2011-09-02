@@ -66,12 +66,12 @@ public class Merge2 {
 			BufferedReader dumpReader;
 			if(constParamKey.equalsIgnoreCase("alpha")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, property)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", dumpKey, constParam, dumpProperty)));
-//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", dumpKey, constParam, dumpProperty)));
+				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, dumpProperty)));
 			} else if(constParamKey.equalsIgnoreCase("seed")) {
 				valueReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, property)));
-				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", constParam, dumpKey, dumpProperty)));
-//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
+//				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", "/Volumes/cluster.math.tu-berlin.de/net/ils/jillenberger/socialnets/snowball/runs/run202/analysis/", constParam, dumpKey, dumpProperty)));
+				dumpReader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, dumpProperty)));
 			} else
 				throw new IllegalArgumentException(String.format("Constant parameter %1$s unknown.", constParamKey));
 			

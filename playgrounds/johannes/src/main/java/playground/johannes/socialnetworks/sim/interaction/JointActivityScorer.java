@@ -69,10 +69,11 @@ public class JointActivityScorer implements BasicScoring {
 	public void finish() {
 		score = 0.0;
 		double time = tracker.timeOverlap(egoPerson, alterPerson);
-		double d = calc.distance(ego.getPoint(), alter.getPoint());
-		d = discretizer.index(d);
-		
-		score = beta_join * d * time;
+//		double d = calc.distance(ego.getPoint(), alter.getPoint());
+//		d = discretizer.index(d);
+//		
+//		score = beta_join * d * time;
+		score = beta_join * time;
 		
 		if(time > 0)
 			jointAgents++;

@@ -30,9 +30,9 @@ public class DistanceCalculatorFactory {
 
 	public static DistanceCalculator createDistanceCalculator(CoordinateReferenceSystem crs) {
 		if(crs.getCoordinateSystem() instanceof DefaultCartesianCS) {
-			return new CartesianDistanceCalculator();
+			return CartesianDistanceCalculator.getInstance();
 		} else {
-			return new OrthodromicDistanceCalculator();
+			return OrthodromicDistanceCalculator.getInstance();
 		}
 	}
 }

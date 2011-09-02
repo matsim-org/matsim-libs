@@ -46,7 +46,7 @@ public class SocialSFAccumulator extends ScoringFunctionAccumulator {
 	
 	private double previousScore;
 	
-	private TObjectDoubleHashMap<Person> previousSocialScors;
+	private TObjectDoubleHashMap<Person> previousSocialScores;
 	
 	private double score;
 	
@@ -54,7 +54,7 @@ public class SocialSFAccumulator extends ScoringFunctionAccumulator {
 		this.alters = alters;
 		
 		functions = new HashMap<Person, JointActivityScorer>(alters.size());
-		previousSocialScors = new TObjectDoubleHashMap<Person>();
+		previousSocialScores = new TObjectDoubleHashMap<Person>();
 	}
 	
 	public void addScoringFunction(JointActivityScorer function, Person alter) {
@@ -83,7 +83,7 @@ public class SocialSFAccumulator extends ScoringFunctionAccumulator {
 			TObjectDoubleHashMap<Person> scores = getSocialScores();
 			
 			if (mode.equals(ScoringMode.ALTER)) {
-				double delta = previousSocialScors.get(ego) - scores.get(ego);
+				double delta = previousSocialScores.get(ego) - scores.get(ego);
 				score = previousScore - delta;
 				
 			} else if (mode.equals(ScoringMode.EGO)){
@@ -94,7 +94,7 @@ public class SocialSFAccumulator extends ScoringFunctionAccumulator {
 				
 			}
 			
-			previousSocialScors = scores;
+			previousSocialScores = scores; // FIXME
 		}
 	}
 	

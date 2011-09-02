@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -44,16 +46,21 @@ public class ActivityMover {
 	
 	private NetworkLegRouter legRouter;
 	
-	public ActivityMover(PopulationFactory factory, LeastCostPathCalculator router, Network network) {
+	private ActivityFacilities facilities;
+	
+	public ActivityMover(PopulationFactory factory, LeastCostPathCalculator router, Network network, ActivityFacilities facilities) {
 		this.factory = factory;
 		netFactory = new NetworkFactoryImpl((NetworkImpl) network);
 		legRouter = new NetworkLegRouter(network, router, netFactory);
+		this.facilities = facilities;
 	}
 	
-	public void moveActivity(Plan plan, int idx, Id newLink, double desiredArrivalTime, double desiredDuration) {
+	public void moveActivity(Plan plan, int idx, Id newFacility, double desiredArrivalTime, double desiredDuration) {
 		Activity act = (Activity) plan.getPlanElements().get(idx);
 		
-		Activity newAct = factory.createActivityFromLinkId(act.getType(), newLink);
+		ActivityFacility facility = facilities.getFacilities().get(newFacility);
+		Activity newAct = factory.createActivityFromLinkId(act.getType(), facility.getLinkId());
+		((ActivityImpl)newAct).setFacilityId(newFacility);
 		
 		if(Double.isInfinite(act.getEndTime())) {
 			act.setEndTime(act.getStartTime() + ((ActivityImpl) act).getMaximumDuration());

@@ -38,7 +38,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -47,11 +48,14 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -62,8 +66,10 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
+import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -82,10 +88,15 @@ import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzer;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryEventsBuilder;
+import playground.johannes.socialnetworks.sim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.socialnetworks.sim.analysis.VisitorAnalyzerTask;
+import playground.johannes.socialnetworks.sim.gis.ActDistFacilityCalculator;
+import playground.johannes.socialnetworks.sim.gis.ActivityDistanceCalculator;
+import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 import playground.johannes.socialnetworks.sim.interaction.JointActivityScorer;
 import playground.johannes.socialnetworks.sim.interaction.JointActivityScoringFunctionFactory;
 import playground.johannes.socialnetworks.sim.interaction.MarkovChain;
+import playground.johannes.socialnetworks.sim.interaction.MarkovChainFacility;
 import playground.johannes.socialnetworks.sim.interaction.PseudoSim;
 import playground.johannes.socialnetworks.sim.interaction.VisitorTracker;
 import playground.johannes.socialnetworks.sim.locationChoice.ActivityMover;
@@ -124,7 +135,9 @@ public class Simulator {
 
 	private TravelTime travelTime;
 	
-	private TrajectoryAnalyzerTask analyzerTask;
+	private TrajectoryAnalyzerTask tAnalyzer;
+	
+	private AnalyzerTask gAnalyzer;
 	
 	private TrajectoryEventsBuilder trajectoryBuilder;
 	
@@ -143,6 +156,8 @@ public class Simulator {
 	private List<SocialEdge> edges;
 	
 	private List<SocialVertex> vertices;
+	
+	private TripDistanceAccessibilityTask tripTask;
 
 	public static void main(String args[]) {
 		Config config = new Config();
@@ -184,6 +199,15 @@ public class Simulator {
 		
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
+		/*
+		 * do some data caching
+		 */
+		personList = new ArrayList<Person>(scenario.getPopulation().getPersons().values());
+		
+		vertexMapping = new HashMap<Person, SocialVertex>();
+		for(SocialVertex vertex : graph.getVertices()) {
+			vertexMapping.put(vertex.getPerson().getPerson(), vertex);
+		}
 		
 		logger.info("Creating home facilities...");
 		createHomeFacilities(population, scenario.getActivityFacilities(), network);
@@ -252,11 +276,16 @@ public class Simulator {
 		};
 		
 		LeastCostPathCalculator router = new Dijkstra(network, travelCost, travelTime);
-		ActivityMover mover = new ActivityMover(population.getFactory(), router, network);
+		ActivityMover mover = new ActivityMover(population.getFactory(), router, network, scenario.getActivityFacilities());
 		
-		markovChain = new MarkovChain(mover, desiredArrivalTimes, desiredDurations, random);
+		String strategy = config.getParam("socialnets", "strategy");
+		if("egosHome".equals(strategy))
+			markovChain = new MarkovChain(mover, desiredArrivalTimes, desiredDurations, random);
+		else if("egosFacilities".equals(strategy))
+			markovChain = new MarkovChainFacility(mover, desiredArrivalTimes, desiredDurations, random, population, scenario.getActivityFacilities(), network);
+		else
+			throw new IllegalArgumentException("Unknown strategy!");
 		
-//		String strategy = config.getParam("socialnets", "strategy");
 //		if("rndAlterHome".equals(strategy))
 //			changeLocation.addStrategyModule(new ActivityChoiceRndAlterHome(graph, mover, random, desiredArrivalTimes, desiredDurations));
 //		else if("rndAlterAct".equals(strategy))
@@ -278,27 +307,25 @@ public class Simulator {
 		/*
 		 * initialize analyzer task
 		 */
-		analyzerTask = new TrajectoryAnalyzerTaskComposite();
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new DepartureTimeTaks());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new LegDurationTask());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new LegLoadTask());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new ActivityStartTimeTask());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new ActivityDurationTask());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new ActivityLoadTask());
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new ActivityDistanceTask(network, srid, distanceCalculator));
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new VisitorAnalyzerTask(scoringFacotry));
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new JoinTimeAnalyzerTask(scoringFacotry));
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new ScoreAnalyzerTask(selector, scoringFacotry));
-		((TrajectoryAnalyzerTaskComposite) analyzerTask).addTask(new HomeVisitTask(tracker, graph));
-		/*
-		 * do some data caching
-		 */
-		personList = new ArrayList<Person>(scenario.getPopulation().getPersons().values());
+		tAnalyzer = new TrajectoryAnalyzerTaskComposite();
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new DepartureTimeTaks());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new LegDurationTask());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new LegLoadTask());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ActivityStartTimeTask());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ActivityDurationTask());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ActivityLoadTask());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ActivityDistanceTask(network, srid, distanceCalculator));
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new VisitorAnalyzerTask(scoringFacotry));
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new JoinTimeAnalyzerTask(scoringFacotry));
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ScoreAnalyzerTask(selector, scoringFacotry));
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new HomeVisitTask(tracker, graph));
+		ActivityDistanceCalculator actDistCalc = new ActDistFacilityCalculator(scenario.getActivityFacilities());
+		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new TripDistanceTask(actDistCalc));
 		
-		vertexMapping = new HashMap<Person, SocialVertex>();
-		for(SocialVertex vertex : graph.getVertices()) {
-			vertexMapping.put(vertex.getPerson().getPerson(), vertex);
-		}
+		gAnalyzer = new AnalyzerTaskComposite();
+		tripTask = new TripDistanceAccessibilityTask(actDistCalc);
+		((AnalyzerTaskComposite)gAnalyzer).addTask(tripTask);
+		
 	}
 	
 	public void run(int iterations) {
@@ -326,7 +353,7 @@ public class Simulator {
 			step(iter);
 			
 			Logger.getRootLogger().setLevel(Level.ALL);
-			if(iter % 1000 == 0) {
+			if(iter % 5000 == 0) {
 				/*
 				 * simulate with the full population and analyze the sample
 				 */
@@ -403,17 +430,17 @@ public class Simulator {
 		Person ego1 = v1.getPerson().getPerson();
 		tmpEgos.add(ego1);
 		
-//		for(SocialVertex v2 : v1.getNeighbours()) {
-//			if(random.nextDouble() < 0.3) {
-//				egoVertices.add(v2);
-//				Person ego2 = v2.getPerson().getPerson();
-//				tmpEgos.add(ego2);
-//			}
-//		}
-		SocialVertex v2 = v1.getNeighbours().get(random.nextInt(v1.getNeighbours().size()));
-		egoVertices.add(v2);
-		Person ego2 = v2.getPerson().getPerson();
-		tmpEgos.add(ego2);
+		for(SocialVertex v2 : v1.getNeighbours()) {
+			if(random.nextDouble() < 0.3) {
+				egoVertices.add(v2);
+				Person ego2 = v2.getPerson().getPerson();
+				tmpEgos.add(ego2);
+			}
+		}
+//		SocialVertex v2 = v1.getNeighbours().get(random.nextInt(v1.getNeighbours().size()));
+//		egoVertices.add(v2);
+//		Person ego2 = v2.getPerson().getPerson();
+//		tmpEgos.add(ego2);
 		
 		for(SocialVertex v : egoVertices) {
 			for(SocialVertex alter : v.getNeighbours()) {
@@ -436,7 +463,7 @@ public class Simulator {
 		 */
 //		logger.warn("Running strategy manager...");
 //		strategyManager.run(tmpPop);
-		if(!markovChain.nextState(tmpEgos))
+		if(!markovChain.nextState(tmpEgos, tmpAlters))
 			return;
 		/*
 		 * after strategy manager is run add also alters to temporarily
@@ -470,7 +497,7 @@ public class Simulator {
 //			}
 //			((PersonImpl) ego).setSelectedPlan(ego.getPlans().get(0));
 //		}
-		Set<Plan> remove = selector.selectPlan(tmpEgos);
+		Set<Plan> remove = selector.selectPlan(tmpEgos, tmpAlters);
 		for(Plan plan : remove) {
 			Person ego = plan.getPerson();
 			if (!ego.getPlans().remove(plan)) {
@@ -541,19 +568,25 @@ public class Simulator {
 		/*
 		 * write plans file
 		 */
-//		PopulationWriter writer = new PopulationWriter(population, scenario.getNetwork());
-//		writer.useCompression(true);
-//		writer.write(String.format("%1$s/%2$s.plans.xml.gz", outputRootDir, iter));
+		if(iter % 50000 == 0) {
+			PopulationWriter writer = new PopulationWriter(population, scenario.getNetwork());
+			writer.useCompression(true);
+			writer.write(String.format("%1$s/%2$s.plans.xml.gz", outputRootDir, iter));
+		}
 		/*
 		 * run analyzers
 		 */
 		String itertOutputDir = String.format("%1$s/analysis/%2$s/", outputRootDir, iter);
 		new File(itertOutputDir).mkdirs();
 		try {
-			TrajectoryAnalyzer.analyze(new HashSet<Trajectory>(trajectories.values()), analyzerTask, itertOutputDir);
+			TrajectoryAnalyzer.analyze(new HashSet<Trajectory>(trajectories.values()), tAnalyzer, itertOutputDir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		tripTask.setTrajectories(trajectories);
+		tripTask.setOutputDirectoy(itertOutputDir);
+		GraphAnalyzer.analyze(graph, gAnalyzer);
 	}
 
 	
@@ -602,10 +635,29 @@ public class Simulator {
 	private void createHomeFacilities(Population population, ActivityFacilitiesImpl facilities, Network network) {
 		int counter = 0;
 		for(Person person : population.getPersons().values()) {
+			/*
+			 * dummy for home
+			 */
 			Activity home = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			Link link = network.getLinks().get(home.getLinkId());
-			ActivityFacility fac = facilities.createFacility(new IdImpl(String.format("tmp%1$s", counter)), link.getCoord());
+			SocialVertex v = vertexMapping.get(person);
+			ActivityFacilityImpl fac = facilities.createFacility(new IdImpl(String.format("home%1$s", counter)), MatsimCoordUtils.pointToCoord(v.getPoint()));
+			fac.setLinkId(link.getId());
+			((ActivityImpl)home).setFacilityId(fac.getId());
 			facilities.getFacilities().put(fac.getId(), fac);
+			
+			home = (Activity) person.getSelectedPlan().getPlanElements().get(4);
+			((ActivityImpl)home).setFacilityId(fac.getId());
+			/*
+			 * dummy for initial leisure activity
+			 */
+			Activity leisure = (Activity) person.getSelectedPlan().getPlanElements().get(2);
+			link = network.getLinks().get(leisure.getLinkId());
+			fac = facilities.createFacility(new IdImpl(String.format("leisure%1$s", counter)), link.getCoord());
+			fac.setLinkId(link.getId());
+			((ActivityImpl)leisure).setFacilityId(fac.getId());
+			facilities.getFacilities().put(fac.getId(), fac);
+			
 			counter++;
 		}
 	}

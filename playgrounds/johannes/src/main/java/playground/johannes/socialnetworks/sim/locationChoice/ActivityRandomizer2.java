@@ -59,11 +59,13 @@ public class ActivityRandomizer2 implements PlanFilter {
 
 	public ActivityRandomizer2(PopulationFactory factory, Network network, LeastCostPathCalculator router, String type,
 			long rndSeed) {
-		mover = new ActivityMover(factory, router, network);
+//		mover = new ActivityMover(factory, router, network);
+		mover = null;
 		random = new Random(rndSeed);
 		this.typePredecate = type;
 
 		links = new ArrayList<Link>(network.getLinks().values());
+		throw new RuntimeException();
 	}
 
 	@Override

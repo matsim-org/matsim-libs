@@ -58,13 +58,12 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 			/*
 			 * add visitor to facility
 			 */
-			// Set<Visitor> facilityVisitors =
-			// visitors.get(event.getFacilityId());
-			Set<Visitor> facilityVisitors = visitors.get(event.getLinkId());
+			Set<Visitor> facilityVisitors = visitors.get(event.getFacilityId());
+//			Set<Visitor> facilityVisitors = visitors.get(event.getLinkId());
 			if (facilityVisitors == null) {
 				facilityVisitors = new HashSet<Visitor>();
-				// visitors.put(event.getFacilityId(), facilityVisitors);
-				visitors.put(event.getLinkId(), facilityVisitors);
+				visitors.put(event.getFacilityId(), facilityVisitors);
+//				visitors.put(event.getLinkId(), facilityVisitors);
 			}
 			facilityVisitors.add(visitor);
 		}
@@ -94,8 +93,8 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 				}
 
 				Visit visit = new Visit();
-				// visit.facility = event.getFacilityId();
-				visit.facility = event.getLinkId();
+				visit.facility = event.getFacilityId();
+//				visit.facility = event.getLinkId();
 				visit.startEvent = visitor.startEvent;
 				visit.endEvent = event;
 

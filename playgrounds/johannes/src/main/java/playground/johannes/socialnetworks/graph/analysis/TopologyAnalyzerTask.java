@@ -23,12 +23,12 @@ import java.io.IOException;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
 import org.matsim.contrib.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
 import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
 
 
 /**
@@ -39,11 +39,9 @@ public class TopologyAnalyzerTask extends AnalyzerTaskComposite {
 
 	public TopologyAnalyzerTask() {
 		addTask(new GraphSizeTask());
-		DegreeTask t = new DegreeTask();
-		t.setModule(ObservedDegree.getInstance());
-		addTask(t);
+		addTask(new DegreeTask());
 		addTask(new TransitivityTask());
-//		addTask(new ComponentsTask());
+		addTask(new ComponentsTask());
 	}
 
 	public static void main(String args[]) throws IOException {

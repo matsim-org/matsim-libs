@@ -39,7 +39,7 @@ public class DistOverIter {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File rootDir = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run5/output/analysis");
+		File rootDir = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run16/output/analysis");
 		
 		TDoubleArrayList values = new TDoubleArrayList();
 		
@@ -65,7 +65,7 @@ public class DistOverIter {
 		writer.write("it\tdist");
 		writer.newLine();
 		for(int i = 0; i < values.size(); i++) {
-			writer.write(String.valueOf(i*100));
+			writer.write(String.valueOf(i*5000));
 			writer.write("\t");
 			writer.write(String.valueOf(values.get(i)));
 			writer.newLine();

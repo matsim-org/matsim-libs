@@ -19,10 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.mz2005;
 
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,6 +67,10 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class PopulationGenerator {
+	
+	TIntIntHashMap numJointTrips = new TIntIntHashMap();
+	
+	TIntDoubleHashMap distJointTrips = new TIntDoubleHashMap();
 	
 	int jointTrpis;
 
@@ -149,9 +158,14 @@ public class PopulationGenerator {
 				jointTrpis++;
 				
 				distJoint += d;
+				
+				numJointTrips.adjustOrPutValue(trip.accompanists, 1, 1);
+				distJointTrips.adjustOrPutValue(trip.accompanists, d, d);
 			} else if(trip.accompanists == 0){
 				singleTrips++;
 				distSingle += d;
+				numJointTrips.adjustOrPutValue(trip.accompanists, 1, 1);
+				distJointTrips.adjustOrPutValue(trip.accompanists, d, d);
 			}
 			}
 		}
@@ -235,23 +249,33 @@ public class PopulationGenerator {
 		
 		logger.info(String.format("Average distance for single trips: %1$s (%3$s), average distance for joint trips: %2$s (%4$s).", generator.distSingle/(double)generator.singleTrips, generator.distJoint/(double)generator.jointTrpis, generator.singleTrips, generator.jointTrpis));
 		logger.info(String.format("Created %1$s persons with at least one leg.", pop.getPersons().size()));
-		PopulationWriter writer = new PopulationWriter(pop, null);
+//		PopulationWriter writer = new PopulationWriter(pop, null);
 //		writer.write(basedir + "/plans.sun.xml");
 		
-		BufferedWriter writer2 = new BufferedWriter(new FileWriter(basedir + "/jointActs.sun.txt"));
-		writer2.write("PersonID\tActIdx");
-		writer2.newLine();
-		for(Entry<Person, Activity> entry : generator.jointActivities.entrySet()) {
-			int idx = entry.getKey().getSelectedPlan().getPlanElements().indexOf(entry.getValue());
-			if(idx == -1)
-				System.err.println("Outch!");
-			else {
-				writer2.write(entry.getKey().getId().toString());
-				writer2.write("\t");
-				writer2.write(String.valueOf(idx));
-				writer2.newLine();
-			}
+		int[] keys = generator.numJointTrips.keys();
+		Arrays.sort(keys);
+//		TIntIntIterator it = generator.numJointTrips.iterator();
+//		for(int i = 0; i < generator.numJointTrips.size(); i++) {
+//			it.advance();
+		for(int key : keys) {
+			int num = generator.numJointTrips.get(key);
+			double dist = generator.distJointTrips.get(key) / (double)num;
+			logger.info(String.format("Average distance for trips with %1$s accompanists: %2$s (%3$s samples).", key, dist, num));
 		}
-		writer2.close();
+//		BufferedWriter writer2 = new BufferedWriter(new FileWriter(basedir + "/jointActs.sun.txt"));
+//		writer2.write("PersonID\tActIdx");
+//		writer2.newLine();
+//		for(Entry<Person, Activity> entry : generator.jointActivities.entrySet()) {
+//			int idx = entry.getKey().getSelectedPlan().getPlanElements().indexOf(entry.getValue());
+//			if(idx == -1)
+//				System.err.println("Outch!");
+//			else {
+//				writer2.write(entry.getKey().getId().toString());
+//				writer2.write("\t");
+//				writer2.write(String.valueOf(idx));
+//				writer2.newLine();
+//			}
+//		}
+//		writer2.close();
 	}
 }

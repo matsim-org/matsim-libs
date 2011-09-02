@@ -27,6 +27,14 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class CartesianDistanceCalculator implements DistanceCalculator {
 
+	private static CartesianDistanceCalculator instance;
+	
+	public static CartesianDistanceCalculator getInstance() {
+		if(instance == null)
+			instance = new CartesianDistanceCalculator();
+		return instance;
+	}
+	
 	public double distance(Point p1, Point p2) {
 		double dx = p1.getCoordinate().x - p2.getCoordinate().x;
 		double dy = p1.getCoordinate().y - p2.getCoordinate().y;

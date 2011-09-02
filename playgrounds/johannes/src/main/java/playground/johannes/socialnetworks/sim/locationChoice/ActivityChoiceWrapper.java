@@ -142,9 +142,10 @@ public class ActivityChoiceWrapper extends AbstractMultithreadedModule {
 			}
 		};
 		LeastCostPathCalculator router = new Dijkstra(network, travelCost, travelTime);
-		ActivityMover mover = new ActivityMover(population.getFactory(), router, network);
-		ActivityChoiceRndFacility choice = new ActivityChoiceRndFacility(network, mover, random, desiredArrivalTimes, desiredDurations, linkIds, constants);
-		return choice;
+		throw new RuntimeException();
+//		ActivityMover mover = new ActivityMover(population.getFactory(), router, network);
+//		ActivityChoiceRndFacility choice = new ActivityChoiceRndFacility(network, mover, random, desiredArrivalTimes, desiredDurations, linkIds, constants);
+//		return choice;
 //		return null;
 	}
 

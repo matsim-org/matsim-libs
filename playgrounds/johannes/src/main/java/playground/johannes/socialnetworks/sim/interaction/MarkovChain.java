@@ -54,17 +54,17 @@ public class MarkovChain {
 		this.random = random;
 	}
 	
-	public boolean nextState(Set<Person> egos) {
+	public boolean nextState(Set<Person> egos, Set<Person> alters) {
 		/*
 		 * create choice set
 		 */
-		List<Id> links = generateChoiceSet(egos);
-		if(links == null)
+		List<Id> facilities = generateChoiceSet(egos);
+		if(facilities == null)
 			return false;
 		/*
 		 * draw link
 		 */
-		Id link = links.get(random.nextInt(links.size()));
+		Id facility = facilities.get(random.nextInt(facilities.size()));
 		/*
 		 * draw arrival time and duration
 		 */
@@ -80,10 +80,16 @@ public class MarkovChain {
 			plans.add(copy);
 		}
 		/*
+		 * copy plan for alters
+		 */
+		for(Person alter : alters) {
+			((PersonImpl)alter).copySelectedPlan();
+		}
+		/*
 		 * move activities
 		 */
 		for(Plan plan : plans)
-			mover.moveActivity(plan, 2, link, arrivalTime, duration);
+			mover.moveActivity(plan, 2, facility, arrivalTime, duration);
 //			mover.moveActivity(plan, 2, link, desiredArrivalTimes.get(plan.getPerson()), desiredDurations.get(plan.getPerson()));
 		
 		return true;
@@ -91,22 +97,22 @@ public class MarkovChain {
 	}
 	
 	protected List<Id> generateChoiceSet(Set<Person> egos) {
-		List<Id> links = new ArrayList<Id>(egos.size());
+		List<Id> facilities = new ArrayList<Id>(egos.size());
 		
 		for(Person ego : egos) {
-			Id homeLink = ((Activity) ego.getSelectedPlan().getPlanElements().get(0)).getLinkId();
-			links.add(homeLink);
+			Id homeFac = ((Activity) ego.getSelectedPlan().getPlanElements().get(0)).getFacilityId();
+			facilities.add(homeFac);
 		}
 		
-		for(int i = 0; i < links.size(); i++) {
-			for(int j = i+1; j < links.size(); j++) {
-				if(links.get(i).equals(links.get(j))) {
-//					System.err.println("Same links in choice set!");
-					return null;
-				}
-			}
-		}
-		return links;
+//		for(int i = 0; i < facilities.size(); i++) {
+//			for(int j = i+1; j < facilities.size(); j++) {
+//				if(facilities.get(i).equals(facilities.get(j))) {
+////					System.err.println("Same links in choice set!");
+//					return null;
+//				}
+//			}
+//		}
+		return facilities;
 	}
 	
 }

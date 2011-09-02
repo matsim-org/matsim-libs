@@ -129,10 +129,11 @@ public class PlansGenerator {
 			threads[i].scenario = scenario;
 			threads[i].homeLocs = homeLocs;
 			threads[i].random = random;
-			threads[i].mover = new ActivityMover(population.getFactory(), router, scenario.getNetwork());
-			threads[i].startAlloc = startAlloc;
-			threads[i].durAlloc = durAlloc;
-			threads[i].links = links;
+//			threads[i].mover = new ActivityMover(population.getFactory(), router, scenario.getNetwork());
+			throw new RuntimeException();
+//			threads[i].startAlloc = startAlloc;
+//			threads[i].durAlloc = durAlloc;
+//			threads[i].links = links;
 		}
 		
 		for(LocalThread thread : threads) {

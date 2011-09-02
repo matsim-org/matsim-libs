@@ -71,32 +71,47 @@ public class MultiPlanSelector implements IterationStartsListener, IterationEnds
 	}
 	
 	
-	public Set<Plan> selectPlan(Set<Person> persons) {
+	public Set<Plan> selectPlan(Set<Person> egos, Set<Person> alters) {
 		
 //		if(person.getPlans().size() > 2)
 //			throw new IllegalArgumentException("Person has more than two plans!");
 		
-		Set<Plan> newPlans = new HashSet<Plan>();
-		Set<Plan> oldPlans = new HashSet<Plan>();
+		Set<Plan> newEgoPlans = new HashSet<Plan>();
+		Set<Plan> oldEgoPlans = new HashSet<Plan>();
 		
-		for (Person person : persons) {
+		for (Person person : egos) {
 			if (person.getPlans().get(0).isSelected()) {
-				newPlans.add(person.getPlans().get(0));
-				oldPlans.add(person.getPlans().get(1));
+				newEgoPlans.add(person.getPlans().get(0));
+				oldEgoPlans.add(person.getPlans().get(1));
 			} else if (person.getPlans().get(1).isSelected()) {
-				newPlans.add(person.getPlans().get(1));
-				oldPlans.add(person.getPlans().get(0));
+				newEgoPlans.add(person.getPlans().get(1));
+				oldEgoPlans.add(person.getPlans().get(0));
+			} else {
+				throw new IllegalArgumentException("No selected plan!");
+			}
+		}
+		
+		Set<Plan> newAlterPlans = new HashSet<Plan>();
+		Set<Plan> oldAlterPlans = new HashSet<Plan>();
+		
+		for (Person person : alters) {
+			if (person.getPlans().get(0).isSelected()) {
+				newAlterPlans.add(person.getPlans().get(0));
+				oldAlterPlans.add(person.getPlans().get(1));
+			} else if (person.getPlans().get(1).isSelected()) {
+				newAlterPlans.add(person.getPlans().get(1));
+				oldAlterPlans.add(person.getPlans().get(0));
 			} else {
 				throw new IllegalArgumentException("No selected plan!");
 			}
 		}
 		
 		double newScore = 0;
-		for(Plan plan : newPlans)
+		for(Plan plan : newEgoPlans)
 			newScore += plan.getScore();
 		
 		double oldScore = 0;
-		for(Plan plan : oldPlans) {
+		for(Plan plan : oldEgoPlans) {
 			if(plan.getScore() != null)
 				oldScore += plan.getScore();
 		}
@@ -114,21 +129,27 @@ public class MultiPlanSelector implements IterationStartsListener, IterationEnds
 			 * accept, i.e., remove the old plan
 			 */
 			cntAccept++;
-			for(Plan plan : oldPlans) {
+			for(Plan plan : oldEgoPlans) {
 				scoreAccept += plan.getScore();
 				acceptedScores.addValue(plan.getScore());
 			}
-			return oldPlans;
+			Set<Plan> plans = new HashSet<Plan>();
+			plans.addAll(oldEgoPlans);
+			plans.addAll(oldAlterPlans);
+			return plans;
 		} else {
 			/*
 			 * reject, i.e., remove the new plan
 			 */
 			cntReject++;
-			for(Plan plan : newPlans) {
+			for(Plan plan : newEgoPlans) {
 				scoreReject += plan.getScore();
 				rejectedScores.addValue(plan.getScore());
 			}
-			return newPlans;
+			Set<Plan> plans = new HashSet<Plan>();
+			plans.addAll(newEgoPlans);
+			plans.addAll(newAlterPlans);
+			return plans;
 		}
 	}
 

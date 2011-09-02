@@ -71,7 +71,7 @@ public class HomeVisitTask extends TrajectoryAnalyzerTask {
 				alters.add(vertex.getPerson().getPerson());
 			}
 			
-			if(home.getLinkId().equals(act.getLinkId())) {
+			if(home.getFacilityId().equals(act.getFacilityId())) {
 				homeActs++;
 				int sum = 0;
 				for(Person alter : alters) {
@@ -89,7 +89,7 @@ public class HomeVisitTask extends TrajectoryAnalyzerTask {
 					if(time > 0) {
 						meet = true;
 						Activity alterHome = (Activity) alter.getSelectedPlan().getPlanElements().get(0);
-						if(act.getLinkId().equals(alterHome.getLinkId())) {
+						if(act.getFacilityId().equals(alterHome.getFacilityId())) {
 							ishome = true;
 						} else {
 							ishome = false;
@@ -112,7 +112,7 @@ public class HomeVisitTask extends TrajectoryAnalyzerTask {
 					if(time > 0) {
 						Activity alterHome = (Activity) alter.getSelectedPlan().getPlanElements().get(0);
 						Activity alterLeisure = (Activity) alter.getSelectedPlan().getPlanElements().get(2);
-						if(alterHome.getLinkId().equals(alterLeisure.getLinkId()))
+						if(alterHome.getFacilityId().equals(alterLeisure.getFacilityId()))
 							visitedHomeAlters++;
 					}
 				}

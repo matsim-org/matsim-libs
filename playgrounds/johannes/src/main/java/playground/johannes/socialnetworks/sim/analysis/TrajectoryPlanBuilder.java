@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
@@ -32,8 +33,8 @@ import org.matsim.api.core.v01.population.Plan;
  */
 public class TrajectoryPlanBuilder {
 
-	public Set<Trajectory> buildTrajectory(Set<Plan> plans) {
-		Set<Trajectory> trajectories = new HashSet<Trajectory>();
+	public Map<Plan, Trajectory> buildTrajectory(Set<Plan> plans) {
+		Map<Plan, Trajectory> trajectories = new HashMap<Plan, Trajectory>();
 		for(Plan plan : plans) {
 			if(plan.getPlanElements().size() % 2 == 0) {
 				System.out.println("Invalid plan.");
@@ -60,7 +61,7 @@ public class TrajectoryPlanBuilder {
 					t.addElement(leg, endTime);
 				}
 			}
-			trajectories.add(t);
+			trajectories.put(plan, t);
 			}
 		}
 		

@@ -27,19 +27,32 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class OrthodromicDistanceCalculator implements DistanceCalculator {
 
+	private static OrthodromicDistanceCalculator instance;
+	
+	public static OrthodromicDistanceCalculator getInstance() {
+		if(instance == null)
+			instance = new OrthodromicDistanceCalculator();
+		return instance;
+	}
+
 	@Override
 	public double distance(Point p1, Point p2) {
-		if(p1.getSRID() == p2.getSRID()) {
-			try {
-				return JTS.orthodromicDistance(p1.getCoordinate(), p2.getCoordinate(), CRSUtils.getCRS(p1.getSRID()));
-			} catch (TransformException e) {
-				e.printStackTrace();
-				return Double.NaN;
-			}			
+		if (p1.getSRID() == p2.getSRID()) {
+			if (p1.getSRID() == 0) {
+				return CartesianDistanceCalculator.getInstance().distance(p1, p2);
+			} else {
+				try {
+					return JTS.orthodromicDistance(p1.getCoordinate(), p2.getCoordinate(),
+							CRSUtils.getCRS(p1.getSRID()));
+				} catch (TransformException e) {
+					e.printStackTrace();
+					return Double.NaN;
+				}
+			}
 		} else {
 			throw new RuntimeException("Incompatible coordinate reference systems.");
 		}
