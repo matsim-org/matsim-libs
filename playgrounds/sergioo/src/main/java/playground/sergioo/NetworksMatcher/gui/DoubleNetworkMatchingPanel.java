@@ -10,7 +10,6 @@ import java.util.Collection;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
-import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.DoubleNetwork.DoubleNetworkPanel;
@@ -39,7 +38,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	public DoubleNetworkMatchingPanel(Collection<NodesMatching> nodesMatchings, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
 		super(networkPainterA, networkPainterB);
 		this.doubleNetworkWindow = doubleNetworkWindow;
-		addLayer(new Layer(new MatchingsPainter(nodesMatchings, MatchingOptions.BOTH), false));
+		addLayer(new Layer(new MatchingsPainter(nodesMatchings), false));
 		matchingsAdded = true;
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -47,12 +46,12 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	}
 	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
 		if(!matchingsAdded) {
-			addLayer(new Layer(new MatchingsPainter(nodesMatchings,  MatchingOptions.BOTH), false));
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings), false));
 			matchingsAdded = true;
 		}
 		else {
 			removeLastLayer();
-			addLayer(new Layer(new MatchingsPainter(nodesMatchings, MatchingOptions.BOTH), false));
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings), false));
 		}
 	}
 	public String getLabelText(Labels label) {

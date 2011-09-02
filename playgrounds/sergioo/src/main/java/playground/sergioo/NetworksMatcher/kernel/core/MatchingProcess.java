@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
 
 
 
@@ -18,9 +17,9 @@ public class MatchingProcess {
 
 	private final List<MatchingStep> matchingSteps;
 
-	private ComposedNetwork finalNetworkA;
+	private MatchingComposedNetwork finalNetworkA;
 
-	private ComposedNetwork finalNetworkB;
+	private MatchingComposedNetwork finalNetworkB;
 
 	
 	//Methods
@@ -33,11 +32,11 @@ public class MatchingProcess {
 		matchingSteps.add(networksStep);
 	}
 
-	public void execute(Network networkA, Network networkB) {
-		ComposedNetwork cNetworkA = ComposedNetwork.convert(networkA);
-		ComposedNetwork cNetworkB = ComposedNetwork.convert(networkB);
+	public void execute(Network networkA, Network networkB, int a) {
+		MatchingComposedNetwork cNetworkA = MatchingComposedNetwork.convert(networkA);
+		MatchingComposedNetwork cNetworkB = MatchingComposedNetwork.convert(networkB);
 		for(NetworksStep step:matchingSteps) {
-			ComposedNetwork[] networks = step.execute(cNetworkA, cNetworkB);
+			MatchingComposedNetwork[] networks = step.execute(cNetworkA, cNetworkB);
 			cNetworkA = networks[0];
 			cNetworkB = networks[1];
 		}
@@ -45,7 +44,17 @@ public class MatchingProcess {
 		finalNetworkB = cNetworkB;
 	}
 
-	
+	public void execute(Network networkA, Network networkB, Set<String> modes) {
+		MatchingComposedNetwork cNetworkA = MatchingComposedNetwork.convert(networkA, modes);
+		MatchingComposedNetwork cNetworkB = MatchingComposedNetwork.convert(networkB, modes);
+		for(NetworksStep step:matchingSteps) {
+			MatchingComposedNetwork[] networks = step.execute(cNetworkA, cNetworkB);
+			cNetworkA = networks[0];
+			cNetworkB = networks[1];
+		}
+		finalNetworkA = cNetworkA;
+		finalNetworkB = cNetworkB;
+	}
 
 	public Network getFinalNetworkA() {
 		return finalNetworkA;
@@ -71,7 +80,7 @@ public class MatchingProcess {
 		for(Link fullLink:fullNetwork.getLinks().values())
 			for(Link emptyLink:emptyNetwork.getLinks().values())
 				if(finalMatchingStep.isMatched(fullLink.getFromNode(),emptyLink.getFromNode()) && finalMatchingStep.isMatched(fullLink.getToNode(),emptyLink.getToNode()))
-					((ComposedLink)emptyLink).applyProperties((ComposedLink)fullLink);
+					((MatchingComposedLink)emptyLink).applyProperties((MatchingComposedLink)fullLink);
 	}
 	
 	public Set<NodesMatching> getMatchings(int stepNumber) {

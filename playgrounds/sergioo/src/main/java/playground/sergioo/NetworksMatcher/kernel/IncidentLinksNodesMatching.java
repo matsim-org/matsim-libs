@@ -69,20 +69,19 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 				return false;
 		}
 		else
-			for(Link linkSmall:linksSmall)
-				for(int b=0; b<linksBig.size(); b++) {
-					double anglesDifference = Math.abs(((ComposedLink)linkSmall).getAngle()-((ComposedLink)linksBig.get(b)).getAngle());
-					if(anglesDifference>Math.PI)
-						anglesDifference = 2*Math.PI - anglesDifference;
-					if(!indicesBig.contains(b) && anglesDifference<minAngle) {
-						List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
-						newLinksSmall.remove(linkSmall);
-						List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
-						newIndicesBig.add(b);
-						if(linksAnglesMatches(newLinksSmall, linksBig, newIndicesBig))
-							return true;
-					}
+			for(int b=0; b<linksBig.size(); b++) {
+				double anglesDifference = Math.abs(((ComposedLink)linksSmall.get(0)).getAngle()-((ComposedLink)linksBig.get(b)).getAngle());
+				if(anglesDifference>Math.PI)
+					anglesDifference = 2*Math.PI - anglesDifference;
+				if(!indicesBig.contains(b) && anglesDifference<minAngle) {
+					List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
+					newLinksSmall.remove(linksSmall.get(0));
+					List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
+					newIndicesBig.add(b);
+					if(linksAnglesMatches(newLinksSmall, linksBig, newIndicesBig))
+						return true;
 				}
+			}
 		return false;
 	}
 

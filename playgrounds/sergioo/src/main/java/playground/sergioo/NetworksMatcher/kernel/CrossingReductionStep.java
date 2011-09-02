@@ -6,8 +6,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
-import playground.sergioo.NetworksMatcher.kernel.core.ComposedNetwork;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedNetwork;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
@@ -29,8 +30,8 @@ public class CrossingReductionStep extends NetworksStep {
 	}
 
 	@Override
-	protected ComposedNetwork[] execute() {
-		ComposedNetwork[] networks = new ComposedNetwork[] {networkA.clone(), networkB.clone()};
+	protected MatchingComposedNetwork[] execute() {
+		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA.clone(), networkB.clone()};
 		for(NodesMatching matching:nodesMatchings) {
 			ComposedNode composedNodeA = matching.getComposedNodeA();
 			if(composedNodeA.getNodes().size()>1) {
@@ -44,7 +45,7 @@ public class CrossingReductionStep extends NetworksStep {
 								insideLink = true;
 						networks[0].removeLink(link.getId());
 						if(!insideLink) {
-							ComposedLink composedLink = new ComposedLink(link, networks[0]);
+							MatchingComposedLink composedLink = new MatchingComposedLink(link, networks[0]);
 							Node fromNode = networks[0].getNodes().get(composedLink.getFromNode().getId());
 							if(fromNode==null)
 								fromNode = networks[0].getNodes().get(((ComposedNode)composedLink.getFromNode()).getContainerNode().getId());
@@ -61,7 +62,7 @@ public class CrossingReductionStep extends NetworksStep {
 								insideLink = true;
 						networks[0].removeLink(link.getId());
 						if(!insideLink) {
-							ComposedLink composedLink = new ComposedLink(link, networks[0]);
+							MatchingComposedLink composedLink = new MatchingComposedLink(link, networks[0]);
 							composedLink.setFromNode(composedNodeA);
 							Node toNode = networks[0].getNodes().get(composedLink.getToNode().getId());
 							if(toNode==null)
@@ -85,7 +86,7 @@ public class CrossingReductionStep extends NetworksStep {
 								insideLink = true;
 						networks[1].removeLink(link.getId());
 						if(!insideLink) {
-							ComposedLink composedLink = new ComposedLink(link, networks[1]);
+							MatchingComposedLink composedLink = new MatchingComposedLink(link, networks[1]);
 							Node fromNode = networks[1].getNodes().get(composedLink.getFromNode().getId());
 							if(fromNode==null)
 								fromNode = networks[1].getNodes().get(((ComposedNode)composedLink.getFromNode()).getContainerNode().getId());
@@ -102,7 +103,7 @@ public class CrossingReductionStep extends NetworksStep {
 								insideLink = true;
 						networks[1].removeLink(link.getId());
 						if(!insideLink) {
-							ComposedLink composedLink = new ComposedLink(link, networks[1]);
+							MatchingComposedLink composedLink = new MatchingComposedLink(link, networks[1]);
 							composedLink.setFromNode(composedNodeB);
 							Node toNode = networks[1].getNodes().get(composedLink.getToNode().getId());
 							if(toNode==null)

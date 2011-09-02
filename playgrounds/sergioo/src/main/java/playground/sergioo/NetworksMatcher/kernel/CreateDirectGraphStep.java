@@ -9,8 +9,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
-import playground.sergioo.NetworksMatcher.kernel.core.ComposedNetwork;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedNetwork;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
@@ -29,19 +30,19 @@ public class CreateDirectGraphStep extends NetworksStep {
 	}
 
 	@Override
-	public ComposedNetwork[] execute() {
-		return new ComposedNetwork[] {createDirectedGraph(networkA), createDirectedGraph(networkB)};
+	public MatchingComposedNetwork[] execute() {
+		return new MatchingComposedNetwork[] {createDirectedGraph(networkA), createDirectedGraph(networkB)};
 	}
 
-	private ComposedNetwork createDirectedGraph(Network network) {
-		ComposedNetwork directedGraph = new ComposedNetwork();
+	private MatchingComposedNetwork createDirectedGraph(Network network) {
+		MatchingComposedNetwork directedGraph = new MatchingComposedNetwork();
 		for(Node node:network.getNodes().values()) {
 			Set<Node> nodes = new HashSet<Node>();
 			nodes.add(node);
 			directedGraph.addNode(new ComposedNode(nodes));
 		}
 		for(Link link:network.getLinks().values()) {
-			ComposedLink composedLink = new ComposedLink(link, directedGraph);
+			MatchingComposedLink composedLink = new MatchingComposedLink(link, directedGraph);
 			composedLink.setFromNode(directedGraph.getNodes().get(composedLink.getFromNode().getId()));
 			composedLink.setToNode(directedGraph.getNodes().get(composedLink.getToNode().getId()));
 			composedLink.getLinks().add(link);
@@ -57,15 +58,15 @@ public class CreateDirectGraphStep extends NetworksStep {
 			((ComposedNode)node).setType();
 	}
 
-	private ComposedNetwork nodeReductionProcess(Network directedGraph) {
-		ComposedNetwork reducedDirectedGraph = new ComposedNetwork();
+	private MatchingComposedNetwork nodeReductionProcess(Network directedGraph) {
+		MatchingComposedNetwork reducedDirectedGraph = new MatchingComposedNetwork();
 		for(Node node:directedGraph.getNodes().values()) {
 			ComposedNode newNode = new ComposedNode(((ComposedNode)node).getNodes());
 			newNode.setType(((ComposedNode)node).getType());
 			reducedDirectedGraph.addNode(newNode);
 		}
 		for(Link link:directedGraph.getLinks().values()) {
-			ComposedLink composedLink = new ComposedLink(link, reducedDirectedGraph);
+			MatchingComposedLink composedLink = new MatchingComposedLink(link, reducedDirectedGraph);
 			composedLink.setFromNode(reducedDirectedGraph.getNodes().get(composedLink.getFromNode().getId()));
 			composedLink.setToNode(reducedDirectedGraph.getNodes().get(composedLink.getToNode().getId()));
 			composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
@@ -86,7 +87,7 @@ public class CreateDirectGraphStep extends NetworksStep {
 				while(((ComposedNode)previous).getType().equals(Types.ONE_WAY_PASS) && !previous.equals(firstNext.getFromNode()))
 					previous = previous.getInLinks().values().iterator().next().getFromNode();
 				if(!next.equals(previous)) {
-					ComposedLink composedLink = new ComposedLink(firstNext.getId(), firstPrevious.getFromNode(), firstNext.getToNode(), reducedDirectedGraph);
+					MatchingComposedLink composedLink = new MatchingComposedLink(firstNext.getId(), firstPrevious.getFromNode(), firstNext.getToNode(), reducedDirectedGraph);
 					composedLink.getLinks().addAll(firstNext.getLinks());
 					composedLink.getLinks().addAll(firstPrevious.getLinks());
 					reducedDirectedGraph.removeNode(node.getId());
@@ -121,10 +122,10 @@ public class CreateDirectGraphStep extends NetworksStep {
 					Iterator<ComposedLink> inLinksIterator = (Iterator<ComposedLink>)reducedDirectedGraph.getNodes().get(node.getId()).getInLinks().values().iterator();
 					ComposedLink firstPreviousA = (ComposedLink) inLinksIterator.next();
 					ComposedLink firstPreviousB = (ComposedLink) inLinksIterator.next();
-					ComposedLink composedLinkA = new ComposedLink(firstNextA.getId(), firstNextB.getToNode(), firstNextA.getToNode(), reducedDirectedGraph);
+					MatchingComposedLink composedLinkA = new MatchingComposedLink(firstNextA.getId(), firstNextB.getToNode(), firstNextA.getToNode(), reducedDirectedGraph);
 					composedLinkA.getLinks().addAll(firstNextA.getLinks());
 					composedLinkA.getLinks().addAll((firstPreviousA.getFromNode().equals(firstNextA.getToNode())?firstPreviousB:firstPreviousA).getLinks());
-					ComposedLink composedLinkB = new ComposedLink(firstNextB.getId(), firstNextA.getToNode(), firstNextB.getToNode(), reducedDirectedGraph);
+					MatchingComposedLink composedLinkB = new MatchingComposedLink(firstNextB.getId(), firstNextA.getToNode(), firstNextB.getToNode(), reducedDirectedGraph);
 					composedLinkB.getLinks().addAll(firstNextB.getLinks());
 					composedLinkB.getLinks().addAll((firstPreviousB.getFromNode().equals(firstNextB.getToNode())?firstPreviousA:firstPreviousB).getLinks());
 					reducedDirectedGraph.removeNode(node.getId());

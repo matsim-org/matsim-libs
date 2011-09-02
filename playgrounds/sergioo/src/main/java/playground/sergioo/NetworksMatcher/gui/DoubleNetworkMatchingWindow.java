@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -122,8 +123,9 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public DoubleNetworkMatchingWindow(String title, Collection<NodesMatching> nodesMatchings, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
 		this(title);
-		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, networkPainterA));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, networkPainterB));
+		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
+		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, networkPainterA, colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, networkPainterB, colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
@@ -139,8 +141,9 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this(title, matchingProcess.getFinalMatchings(), new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN));
 	}
 	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
-		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setMatchings(nodesMatchings, MatchingOptions.A);
-		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).setMatchings(nodesMatchings, MatchingOptions.B);
+		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
+		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setMatchings(nodesMatchings, MatchingOptions.A, colors);
+		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).setMatchings(nodesMatchings, MatchingOptions.B, colors);
 		((DoubleNetworkMatchingPanel)layersPanels.get(PanelIds.DOUBLE)).setMatchings(nodesMatchings);
 	}
 	public void setNetworksSeparated() {

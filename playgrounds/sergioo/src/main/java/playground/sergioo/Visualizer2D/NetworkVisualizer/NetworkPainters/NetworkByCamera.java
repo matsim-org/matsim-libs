@@ -40,7 +40,8 @@ public class NetworkByCamera {
 			for(Link link:network.getLinks().values()) {
 				Coord from = link.getFromNode().getCoord();
 				Coord to = link.getToNode().getCoord();
-				if((xMin<from.getX() && yMin<from.getY() && xMax>from.getX() && yMax>from.getY()) || (xMin<to.getX() && yMin<to.getY() && xMax>to.getX() && yMax>to.getY()))
+				Coord center = link.getCoord();
+				if((xMin<from.getX() && yMin<from.getY() && xMax>from.getX() && yMax>from.getY()) || (xMin<to.getX() && yMin<to.getY() && xMax>to.getX() && yMax>to.getY())|| (xMin<to.getX() && yMin<to.getY() && xMax>to.getX() && yMax>to.getY()))
 					links.add(link);
 			}
 			return links;

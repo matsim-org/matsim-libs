@@ -1,5 +1,7 @@
 package playground.sergioo.NetworksMatcher;
 
+import java.awt.Color;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
@@ -23,6 +25,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
+import playground.sergioo.NetworksMatcher.gui.NetworkNodesPainter;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.InfiniteRegion;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
@@ -49,11 +52,13 @@ public class NetworksMatcher {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
-		MatchingProcess matchingProcess = new MatchingProcess();
-		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/18));
-		matchingProcess.execute(networkLowResolution, networkHighResolution);
-		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", matchingProcess.getFinalMatchings(), new NetworkNodesPainter(networkHighResolution), new NetworkNodesPainter(networkLowResolutionLength, Color.BLACK, Color.CYAN));
+		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", new NetworkNodesPainter(networkHighResolution, Color.BLACK, Color.CYAN), new NetworkNodesPainter(networkLowResolution, Color.BLACK, Color.CYAN));
 		windowHR.setVisible(true);*/
+		MatchingProcess matchingProcess = new MatchingProcess();
+		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/6));
+		Set<String> modes = new HashSet<String>();
+		modes.add("car");
+		matchingProcess.execute(networkLowResolution, networkHighResolution, modes);
 		LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", matchingProcess);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())

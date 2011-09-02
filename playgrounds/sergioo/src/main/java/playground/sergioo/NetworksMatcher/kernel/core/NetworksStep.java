@@ -5,9 +5,9 @@ public abstract class NetworksStep {
 
 	//Attributes
 
-	protected ComposedNetwork networkA;
+	protected MatchingComposedNetwork networkA;
 
-	protected ComposedNetwork networkB;
+	protected MatchingComposedNetwork networkB;
 
 	protected Region region;
 
@@ -17,11 +17,11 @@ public abstract class NetworksStep {
 		this.region = region;
 	}
 
-	public ComposedNetwork getNetworkA() {
+	public MatchingComposedNetwork getNetworkA() {
 		return networkA;
 	}
 
-	public ComposedNetwork getNetworkB() {
+	public MatchingComposedNetwork getNetworkB() {
 		return networkB;
 	}
 	
@@ -29,13 +29,13 @@ public abstract class NetworksStep {
 		
 	}
 
-	public ComposedNetwork[] execute(ComposedNetwork networkA, ComposedNetwork networkB) {
+	public MatchingComposedNetwork[] execute(MatchingComposedNetwork networkA, MatchingComposedNetwork networkB) {
 		this.networkA = networkA;
 		this.networkB = networkB;
 		return execute();
 	}
 
-	protected abstract ComposedNetwork[] execute();
+	protected abstract MatchingComposedNetwork[] execute();
 	
 	
 }

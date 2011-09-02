@@ -2,6 +2,7 @@ package playground.sergioo.NetworksMatcher.kernel.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,11 @@ public class ComposedNode implements Node, Cloneable {
 		ONE_WAY_END,
 		CROSSING;
 	}
-
+	
+	
+	//Static attributes
+	
+	public static double radius;
 
 	//Attributes
 
@@ -110,6 +115,22 @@ public class ComposedNode implements Node, Cloneable {
 					incidentLinks.set(i, incidentLinks.get(j));
 					incidentLinks.set(j, temporalLink);
 				}
+	}
+	
+	public boolean isConnected() {
+		Set<Node> connectedNodes = new HashSet<Node>();
+		fillNodes(nodes.iterator().next(), connectedNodes);
+		return nodes.size()==connectedNodes.size();
+	}
+	
+	private void fillNodes(Node node, Set<Node> connectedNodes) {
+		connectedNodes.add(node);
+		for(Link link:node.getInLinks().values())
+			if(nodes.contains(link.getToNode()) && !connectedNodes.contains(link.getToNode()))
+				fillNodes(link.getFromNode(), connectedNodes);
+		for(Link link:node.getOutLinks().values())
+			if(nodes.contains(link.getToNode()) && !connectedNodes.contains(link.getToNode()))
+				fillNodes(link.getToNode(), connectedNodes);
 	}
 	
 	public ComposedNode getContainerNode() {

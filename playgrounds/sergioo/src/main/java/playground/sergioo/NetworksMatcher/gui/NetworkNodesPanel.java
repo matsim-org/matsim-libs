@@ -20,6 +20,7 @@
 
 package playground.sergioo.NetworksMatcher.gui;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -29,6 +30,7 @@ import java.awt.event.MouseMotionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -67,11 +69,11 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public NetworkNodesPanel(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainter) {
+	public NetworkNodesPanel(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainter, List<Color> colors) {
 		super();
 		this.doubleNetworkWindow = doubleNetworkWindow;
 		addLayer(new Layer(networkPainter));
-		addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption), false));
+		addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption, colors), false));
 		matchingsAdded = true;
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
@@ -81,14 +83,14 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public void setMatchings(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption) {
+	public void setMatchings(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption, List<Color> colors) {
 		if(!matchingsAdded) {
-			addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption), false));
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption, colors), false));
 			matchingsAdded = true;
 		}
 		else {
 			removeLastLayer();
-			addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption), false));
+			addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption, colors), false));
 		}
 	}
 	private void calculateBoundaries() {

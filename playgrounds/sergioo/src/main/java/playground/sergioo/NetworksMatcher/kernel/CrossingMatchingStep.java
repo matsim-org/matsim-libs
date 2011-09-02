@@ -3,11 +3,10 @@ package playground.sergioo.NetworksMatcher.kernel;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.NetworksMatcher.kernel.core.ComposedNetwork;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedNetwork;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
@@ -27,11 +26,13 @@ public class CrossingMatchingStep extends MatchingStep {
 		super(region);
 		nodesMatchings = new HashSet<NodesMatching>();
 		this.radius = radius;
+		ComposedNode.radius = radius;
 		IncidentLinksNodesMatching.minAngle = minAngle;
 	}
 
 	public void setRadius(double radius) {
 		this.radius = radius;
+		ComposedNode.radius = radius;
 	}
 
 	public void setMinAngle(double minAngle) {
@@ -57,25 +58,11 @@ public class CrossingMatchingStep extends MatchingStep {
 		}
 	}
 
-	private boolean isConnected(Set<Node> nodeSubset) {
-		Set<Node> nodes = new HashSet<Node>();
-		fillNodes(nodeSubset.iterator().next(), nodes, nodeSubset);
-		return nodeSubset.size()==nodes.size();
-	}
-	
-	private void fillNodes(Node node, Set<Node> nodes, Set<Node> allNodes) {
-		nodes.add(node);
-		for(Link link:node.getInLinks().values())
-			if(allNodes.contains(link.getToNode()) && !nodes.contains(link.getToNode()))
-				fillNodes(link.getFromNode(), nodes, allNodes);
-		for(Link link:node.getOutLinks().values())
-			if(allNodes.contains(link.getToNode()) && !nodes.contains(link.getToNode()))
-				fillNodes(link.getToNode(), nodes, allNodes);
-	}
-
 	@Override
-	protected ComposedNetwork[] execute() {
-		ComposedNetwork[] networks = new CreateDirectGraphStep(region).execute(networkA, networkB);
+	protected MatchingComposedNetwork[] execute() {
+		System.out.println("Beginning");
+		MatchingComposedNetwork[] networks = new CreateDirectGraphStep(region).execute(networkA, networkB);
+		System.out.println("Types reduction");
 		Set<Node> alreadyReducedA = new HashSet<Node>();
 		Set<Node> alreadyReducedB = new HashSet<Node>();
 		for(Node node:networks[0].getNodes().values())
@@ -89,14 +76,14 @@ public class CrossingMatchingStep extends MatchingStep {
 				for(Node nodeB:networks[1].getNodes().values())
 					if(((ComposedNode)nodeB).getType().equals(Types.CROSSING) && ((CoordImpl)node.getCoord()).calcDistance(nodeB.getCoord())<radius && !alreadyReducedB.contains(nodeB))
 						nearestNodesToB.add(nodeB);
-				for(int n=1; n<=nearestNodesToA.size(); n++) {
+				for(int n=nearestNodesToA.size(); n>=1; n--) {
 					Set<Set<Node>> nodesSubsetsA = getSubsetsOfSize(nearestNodesToA, n);
 					for(Set<Node> nodeSubsetA:nodesSubsetsA)
-						if(isConnected(nodeSubsetA))
-							for(int m=1; m<=nearestNodesToB.size(); m++) {
+						//if(new ComposedNode(nodeSubsetA).isConnected())
+							for(int m=nearestNodesToB.size(); m>=1; m--) {
 								Set<Set<Node>> nodesSubsetsB = getSubsetsOfSize(nearestNodesToB, m);
 								for(Set<Node> nodeSubsetB:nodesSubsetsB)
-									if(isConnected(nodeSubsetB)) {
+									if(true/*new ComposedNode(nodeSubsetB).isConnected()*/) {
 										IncidentLinksNodesMatching nodesMatching = new IncidentLinksNodesMatching(nodeSubsetA, nodeSubsetB);
 										if(nodesMatching.linksAnglesMatches()) {
 											nodesMatchings.add(nodesMatching);
@@ -110,8 +97,11 @@ public class CrossingMatchingStep extends MatchingStep {
 							}
 				}
 			}
+		System.out.println("Matching");
 		networks = new CrossingReductionStep(region, nodesMatchings).execute(networks[0], networks[1]);
+		System.out.println("Matched nodes reduction");
 		networks = new EdgeDeletionStep(region, nodesMatchings).execute(networks[0], networks[1]);
+		System.out.println("Edges reduction");
 		return networks;
 	}
 

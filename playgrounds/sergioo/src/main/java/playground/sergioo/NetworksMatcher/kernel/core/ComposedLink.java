@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 
-public class ComposedLink extends LinkImpl {
+public abstract class ComposedLink extends LinkImpl {
 	
 	
 	//Attributes
@@ -30,10 +30,6 @@ public class ComposedLink extends LinkImpl {
 
 	public List<Link> getLinks() {
 		return links;
-	}
-
-	public void applyProperties(ComposedLink fullLink) {
-		//TODO
 	}
 	
 	public double getAngle() {
