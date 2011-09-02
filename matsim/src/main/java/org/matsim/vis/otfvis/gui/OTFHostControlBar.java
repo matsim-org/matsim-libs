@@ -132,6 +132,7 @@ public final class OTFHostControlBar extends JToolBar implements ActionListener,
 		add( scaleField );
 		scaleField.addActionListener( this );
 		log.debug("HostControlBar initialized.");
+		updateTimeLabel();
 	}
 
 	public void redrawDrawers() {
