@@ -13,10 +13,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.jjoubert.Utilities.ProgressBar;
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.ProgressBar;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

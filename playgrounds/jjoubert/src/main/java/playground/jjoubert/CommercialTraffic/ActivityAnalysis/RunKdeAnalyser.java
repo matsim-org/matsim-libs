@@ -29,8 +29,8 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
-import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.KernelDensityEstimation.MyRaster;
+import playground.jjoubert.Utilities.MyShapefileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

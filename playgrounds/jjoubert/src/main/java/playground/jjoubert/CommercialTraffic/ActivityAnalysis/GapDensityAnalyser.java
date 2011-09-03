@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -38,7 +39,7 @@ public class GapDensityAnalyser {
 	
 	private String studyAreaName;
 	private String root;
-	private ArrayList<SAZone> zoneList;
+	private List<SAZone> zoneList;
 	private QuadTree<SAZone> zoneTree;
 	
 	private String inputFilenameMinor;
@@ -83,7 +84,7 @@ public class GapDensityAnalyser {
 	}
 
 			
-	private void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
+	private void assignActivityToZone(List<SAZone> list, QuadTree<SAZone> tree ){
 		log.info("Start assigning activity locations to GAP mesozones.");
 
 		progressCounter = 0;
@@ -188,7 +189,7 @@ public class GapDensityAnalyser {
 	return zone;
 }
 
-	private void writeZoneStatsToFile(ArrayList<SAZone> zoneList) {
+	private void writeZoneStatsToFile(List<SAZone> zoneList) {
 		log.info("Start writing mesozone statistics to file.");
 		try {
 			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( outputFilenameMinor ) ) );

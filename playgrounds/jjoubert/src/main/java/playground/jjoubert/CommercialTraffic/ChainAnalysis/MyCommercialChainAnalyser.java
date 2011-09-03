@@ -37,9 +37,9 @@ import org.apache.log4j.Logger;
 
 import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
+import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import playground.jjoubert.Utilities.MyVehicleIdentifier;
 import playground.jjoubert.Utilities.MyXmlConverter;
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import cern.colt.matrix.impl.SparseDoubleMatrix3D;
 
 /**

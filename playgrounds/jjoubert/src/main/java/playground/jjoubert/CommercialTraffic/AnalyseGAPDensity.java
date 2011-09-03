@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -66,7 +67,7 @@ public class AnalyseGAPDensity {
 		
 
 		MyGapReader mgr = new MyGapReader(studyAreaName, gapShapefileName);
-		ArrayList<SAZone> zoneList = mgr.getAllZones();
+		List<SAZone> zoneList = mgr.getAllZones();
 		QuadTree<SAZone> zoneTree = mgr.getGapQuadTree();
 
 		assignActivityToZone(zoneList, zoneTree );
@@ -77,7 +78,7 @@ public class AnalyseGAPDensity {
 	}
 
 			
-	private static void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
+	private static void assignActivityToZone(List<SAZone> list, QuadTree<SAZone> tree ){
 		log.info("Start assigning activity locations to GAP mesozones.");
 
 		GeometryFactory gf = new GeometryFactory();
@@ -183,7 +184,7 @@ public class AnalyseGAPDensity {
 	return zone;
 }
 
-	private static void writeZoneStatsToFile(ArrayList<SAZone> zoneList) {
+	private static void writeZoneStatsToFile(List<SAZone> zoneList) {
 		log.info("Start writing mesozone statistics to file.");
 		try {
 			BufferedWriter outputMinor = new BufferedWriter(new FileWriter( new File ( outputFilenameMinor ) ) );

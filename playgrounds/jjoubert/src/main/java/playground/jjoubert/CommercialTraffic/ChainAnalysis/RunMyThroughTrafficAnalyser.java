@@ -26,10 +26,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
-import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.jjoubert.Utilities.MyXmlConverter;
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+import playground.jjoubert.Utilities.MyShapefileReader;
+import playground.jjoubert.Utilities.MyXmlConverter;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
