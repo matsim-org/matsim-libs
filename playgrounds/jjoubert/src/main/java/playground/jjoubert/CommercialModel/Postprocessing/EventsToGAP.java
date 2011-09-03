@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -79,19 +80,19 @@ public class EventsToGAP {
 		String output = OUTPUT_PRE + now + OUTPUT_POST;
 		
 		MyGapReader mgr = new MyGapReader(PROVINCE, GAP_SHAPEFILE);
-		ArrayList<SAZone> zoneList = mgr.getAllZones();	
+		List<SAZone> zoneList = mgr.getAllZones();	
 		QuadTree<SAZone> zoneTree = mgr.getGapQuadTree();
 
 		assignActivityToZone(zoneList, zoneTree );
 		
-		ArrayList<ArrayList<Double>> normalizedList = normalizeZoneCounts( zoneList );
+		List<List<Double>> normalizedList = normalizeZoneCounts( zoneList );
 		
 		writeZoneStatsToFile( normalizedList, output );
 	}
 	
 			
-	private static ArrayList<ArrayList<Double>> normalizeZoneCounts(ArrayList<SAZone> zoneList) {
-		ArrayList<ArrayList<Double>> allZones = new ArrayList<ArrayList<Double>>();
+	private static List<List<Double>> normalizeZoneCounts(List<SAZone> zoneList) {
+		List<List<Double>> allZones = new ArrayList<List<Double>>();
 		
 		System.out.print("Normalizing the minor activity counts... ");
 		double maxActivity = Double.NEGATIVE_INFINITY;
@@ -120,7 +121,7 @@ public class EventsToGAP {
 	}
 
 
-	private static void assignActivityToZone(ArrayList<SAZone> list, QuadTree<SAZone> tree ){
+	private static void assignActivityToZone(List<SAZone> list, QuadTree<SAZone> tree ){
 		log.info("Assigning activity locations to GAP mesozones.");
 
 		GeometryFactory gf = new GeometryFactory();
@@ -166,7 +167,7 @@ public class EventsToGAP {
 		log.info("     ...minor events " + events + ". Done (" + eventsOut + " was outside the study area)");
 	}
 
-	private static SAZone findZoneInArrayList(Point p, ArrayList<SAZone> list ) {
+	private static SAZone findZoneInArrayList(Point p, List<SAZone> list ) {
 	SAZone zone = null;
 	int i = 0;
 	while( (i < list.size() ) && (zone == null) ){
@@ -180,7 +181,7 @@ public class EventsToGAP {
 	return zone;
 	}
 
-	private static void writeZoneStatsToFile(ArrayList<ArrayList<Double>> allZones, String output) {
+	private static void writeZoneStatsToFile(List<List<Double>> allZones, String output) {
 		log.info("Writing mesozone statistics to file... ");
 		BufferedWriter outputMinor;
 		try {
@@ -196,7 +197,7 @@ public class EventsToGAP {
 				outputMinor.write( header );
 				outputMinor.newLine();
 				StringBuffer sb = new StringBuffer();
-				for (ArrayList<Double> thisZone : allZones) {
+				for (List<Double> thisZone : allZones) {
 					/*
 					 * Convert the GAP_ID to integer, and add to output string.
 					 */

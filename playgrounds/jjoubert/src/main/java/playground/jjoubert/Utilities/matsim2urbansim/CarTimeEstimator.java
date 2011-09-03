@@ -100,6 +100,7 @@ public class CarTimeEstimator {
 	 *  		<li> eThekwini: <code>eThekwini_TZ_UTM.shp</code>, field value "1";
 	 *  		<li> Nelson Mandela Bay: <code>NMBM_Zone_SA-Albers.shp</code>, 
 	 *  			field value "6";
+	 *  		<li> Joburg: <code>Joburg_Joburg_TAZ_UTM35S.shp</code>, field value "3"
 	 *    	</ul>
 	 *    <li> <b>hour</b> the hour for which travel time must be estimated, for 
 	 *    		example "6-7";

@@ -63,6 +63,7 @@ public class MyLinkstatComparatorV2 {
 	private List<String> fieldList;
 	private Map<String, Integer> fieldMap;
 	private Map<Id, Map<String, Double>> linkMap;
+	private Network network;
 	private double minimumDifference;
 	private double maximumDifference;
 	private int linkscompared;
@@ -97,8 +98,7 @@ public class MyLinkstatComparatorV2 {
 		
 		/* Find the column index for each provided field. */
 		MyLinkstatComparatorV2 mlc = new MyLinkstatComparatorV2(baselineFilename, comparisonFilename, scaleFactor, statistic);
-		List<String> fields = getAllVolumeFields();
-		mlc.getFields(fields);
+		mlc.getFields();
 		
 		/* Check if outputfile exist, and delete if it does. */
 		File output = new File(outputFile);
@@ -112,7 +112,8 @@ public class MyLinkstatComparatorV2 {
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
 		nr.parse(networkFile);
 		
-		mlc.compare(sc.getNetwork(), minimumLanes, threshold);
+		mlc.network = sc.getNetwork();
+		mlc.compare(minimumLanes, threshold);
 		mlc.writeComparison(outputFile);
 		
 		log.info(String.format("Minimum difference: %5.4f", mlc.minimumDifference));
@@ -144,7 +145,7 @@ public class MyLinkstatComparatorV2 {
 	}
 	
 	
-	public void compare(Network network, Integer minimumLanes, double threshold){
+	public void compare(Integer minimumLanes, double threshold){
 		int counter = 0;
 		int multiplier = 1;
 		
@@ -161,7 +162,7 @@ public class MyLinkstatComparatorV2 {
 					if(!sa1[0].equalsIgnoreCase(sa2[0])){
 						log.error("Two line entries do not have the same link Id.");
 					} else{
-						if(network.getLinks().get(new IdImpl(sa1[0])).getNumberOfLanes() >= minimumLanes){
+						if(this.network.getLinks().get(new IdImpl(sa1[0])).getNumberOfLanes() >= minimumLanes){
 							linkscompared++;
 							
 							boolean exceedsThreshold = false;
@@ -170,8 +171,9 @@ public class MyLinkstatComparatorV2 {
 							Map<String, Double> entry = new TreeMap<String, Double>();
 							for(String field : fieldMap.keySet()){
 								
-								double difference = getStatistic(network, sa1, sa2,	field);
-								if(Math.abs(difference) >= threshold){
+								double difference = getStatistic(sa1, sa2,	field);
+								if(Math.abs(difference)
+										>= threshold){
 									exceedsThreshold = true;
 								}
 								entry.put(field, difference);
@@ -232,6 +234,7 @@ public class MyLinkstatComparatorV2 {
 					bw.write(s);
 					bw.write(",");
 				}
+				bw.write("LaneKm");
 				bw.newLine();
 
 				/* Write entries from linkMap. */
@@ -248,14 +251,12 @@ public class MyLinkstatComparatorV2 {
 							difference = linkMap.get(linkId).get(field);
 						}
 						bw.write(String.format("%2.4f", difference));
-						if(i < fieldList.size()-1){
-							/* All but the last field. */
-							bw.write(",");
-						} else{
-							/* The last field. */
-							bw.newLine();
-						}
+						bw.write(",");
 					}
+					double laneKm = this.network.getLinks().get(linkId).getLength() * this.network.getLinks().get(linkId).getNumberOfLanes() / 1000;
+					bw.write(String.valueOf(laneKm));
+					bw.newLine();
+					
 										
 					/* Report progress. */
 					if(++counter == multiplier){
@@ -353,8 +354,34 @@ public class MyLinkstatComparatorV2 {
 		log.info("   lines written: " + counter + " (Done)");		
 	}
 	
-	private void getFields(List<String> fieldArray){
+	private void getFields(){
 		log.info("Find fields in linkstats files...");
+		
+		List<String> fieldArray = null;
+		switch (statistic) {
+		case 1:
+			/* Calculate the actual difference in the traffic volumes. */
+			fieldArray = getAllVolumeFields();
+			break;
+		case 2:
+			/* Calculate the difference in volume-to-capacity ratio. */
+			fieldArray = getAllVolumeFields();
+			break;
+		case 3:
+			/* Calculate the difference in Average Annual Daily Traffic (AADT) 
+			 * volume-to-capacity ratio. */
+			fieldArray = getAvgTotalVolumeField();
+			break;
+		case 4:
+			/* Calculate the difference in Average Annual Daily Traffic (AADT) 
+			 * volume-to-capacity ratio. */
+			fieldArray = getAvgTotalVolumeField();
+			break;
+		default:
+			break;
+		}
+
+		
 		try {
 			BufferedReader br1 = IOUtils.getBufferedReader(this.baselineFilename);
 			BufferedReader br2 = IOUtils.getBufferedReader(this.comparisonFilename);
@@ -392,10 +419,11 @@ public class MyLinkstatComparatorV2 {
 		}
 	}
 	
-	private double getStatistic(Network network, String[] sa1, String[] sa2, String field){
+	private double getStatistic(String[] sa1, String[] sa2, String field){
 		Double statistic = null;
 		Double baseVolume = null;
 		Double compareVolume = null;
+		Double capacity = null;
 		switch (this.statistic) {
 		case 1:
 			/* Calculate the difference in the traffic volumes - correcting for 
@@ -406,11 +434,68 @@ public class MyLinkstatComparatorV2 {
 			break;
 		case 2:
 			/* Calculate the difference in volume-to-capacity ratio. */
-			double capacity = network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
 			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
 			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
 			statistic = (compareVolume - baseVolume) / capacity;
 			break;
+		case 3:
+			/* Calculate the difference in Average Annual Daily Traffic (AADT) 
+			 * volume-to-capacity ratio. The statistic categorizes the change
+			 * into specified transition classes. */
+			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
+			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
+			double vtc1 = 0.10*baseVolume / capacity;
+			double vtc2 = 0.10*compareVolume / capacity;
+			if(vtc1 <= 0.4 && vtc2 > 0.4 && vtc2 <= 0.62){
+				statistic = 1.0;
+			} else if(vtc1 <= 0.4 && vtc2 > 0.62){
+				statistic = 2.0;
+			} else if(vtc1 > 0.4 && vtc1 <= 0.62 && vtc2 <= 0.4){
+				statistic = 3.0;
+			} else if(vtc1 > 0.4 && vtc1 <= 0.62 && vtc2 > 0.62){
+				statistic = 4.0;
+			} else if(vtc1 > 0.62 && vtc2 > 0.4 && vtc2 <= 0.62){
+				statistic = 5.0;
+			} else if(vtc1 > 0.62 && vtc2 <= 0.4){
+				statistic = 6.0;
+			} else{
+				statistic = 0.0;
+			}
+			break;	
+		case 4:
+			/* Calculate the state-of-congestion, AADT volume-to-capacity ratio,
+			 * for each link. The statistic is similar to `3' above, but allows
+			 * one to identify in exactly which state-of-congestion class a 
+			 * link was before and after toll.
+			 */
+			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
+			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
+			double vtc11 = 0.10*baseVolume / capacity;
+			double vtc22 = 0.10*compareVolume / capacity;
+			if(vtc11 <= 0.4 && vtc22 <= 0.4){
+				statistic = 1.0;
+			} else if(vtc11 <= 0.4 && vtc22 > 0.4 && vtc22 <= 0.62){
+				statistic = 2.0;
+			} else if(vtc11 <= 0.4 && vtc22 > 0.62){
+				statistic = 3.0;
+			} else if(vtc11 > 0.4 && vtc11 <= 0.62 && vtc22 <= 0.4){
+				statistic = 4.0;
+			} else if(vtc11 > 0.4 && vtc11 <= 0.62 && vtc22 > 0.4 && vtc22 <= 0.62){
+				statistic = 5.0;
+			} else if(vtc11 > 0.4 && vtc11 <= 0.62 && vtc22 > 0.62){
+				statistic = 6.0;
+			} else if(vtc11 > 0.62 && vtc22 <= 0.4){
+				statistic = 7.0;
+			} else if(vtc11 > 0.62 && vtc22 > 0.4 && vtc22 <= 0.62){
+				statistic = 8.0;
+			} else if(vtc11 > 0.62 && vtc22 > 0.62){
+				statistic = 9.0;
+			} else{
+				statistic = 0.0;
+			}
 		default:
 			break;
 		}
@@ -421,7 +506,7 @@ public class MyLinkstatComparatorV2 {
 	
 	
 	
-	private static List<String> getAllVolumeFields(){
+	private List<String> getAllVolumeFields(){
 		List<String> fieldList = new ArrayList<String>();
 		fieldList.add("HRS0-1avg"); 
 		fieldList.add("HRS1-2avg"); 
@@ -447,6 +532,12 @@ public class MyLinkstatComparatorV2 {
 		fieldList.add("HRS21-22avg");
 		fieldList.add("HRS22-23avg");
 		fieldList.add("HRS23-24avg");
+		return fieldList;
+	}
+	
+	private List<String> getAvgTotalVolumeField(){
+		List<String> fieldList = new ArrayList<String>();
+		fieldList.add("HRS0-24avg"); 
 		return fieldList;
 	}
 

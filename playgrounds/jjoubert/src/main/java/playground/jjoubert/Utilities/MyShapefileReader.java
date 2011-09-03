@@ -25,7 +25,7 @@ public class MyShapefileReader {
 	 * Constructs a single instance of the <code>MyShapefileReader</code>. The class is
 	 * used to read in a single study area. Should you wish to read in many shapefiles,
 	 * such as the Geospatial Analsysis Platform (GAP) mesozones, rather use the class
-	 * <code>playground.jjoubert.Utilities.MyGapReader</code>. 
+	 * {@link MyGapReader}. 
 	 * @param shapefileName the absolute path and name of the shapefile to be read.
 	 */
 	public MyShapefileReader(String shapefileName){

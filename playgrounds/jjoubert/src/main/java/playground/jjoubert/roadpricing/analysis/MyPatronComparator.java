@@ -94,8 +94,8 @@ public class MyPatronComparator {
 		List<Map<Id,Integer>> baseMaps= mpc.processEventsFile(baseFilename, linkList, breakList);
 		mpc.reportOccurences(baseMaps);
 		log.info("-------------------------------------------------------------------------------");
-		List<Map<Id,Integer>> compareMaps= mpc.processEventsFile(compareFilename, linkList, breakList);
-		mpc.reportOccurences(compareMaps);		
+//		List<Map<Id,Integer>> compareMaps= mpc.processEventsFile(compareFilename, linkList, breakList);
+//		mpc.reportOccurences(compareMaps);		
 		
 		log.info("-------------------------------------------------------------------------------");
 		log.info("                                 Completed");

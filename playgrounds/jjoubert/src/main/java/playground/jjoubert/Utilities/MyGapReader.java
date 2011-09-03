@@ -23,6 +23,7 @@ package playground.jjoubert.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -43,7 +44,7 @@ public class MyGapReader {
 	private String areaName;
 	private int idField;
 	private String shapefile;
-	private ArrayList<SAZone> zones;
+	private List<SAZone> zones;
 	private final Logger log = Logger.getLogger(MyGapReader.class);
 	private QuadTree<SAZone> quadTree;
 
@@ -70,13 +71,15 @@ public class MyGapReader {
 		 *===========================================================
 		 */
 		if(this.areaName.equalsIgnoreCase("Gauteng") ||
-			this.areaName.equalsIgnoreCase("eThekwini")){
+			this.areaName.equalsIgnoreCase("eThekwini") ||
+			this.areaName.equalsIgnoreCase("Tshwane") ||
+			this.areaName.equalsIgnoreCase("Verhoek")){
 			this.idField = 1;
 		} else if(this.areaName.equalsIgnoreCase("KZN") ||
 				  this.areaName.equalsIgnoreCase("WesternCape") ){
 			this.idField = 2;
 		} else{
-			throw new RuntimeException("The given area name does not have a known ID field!!");
+			throw new RuntimeException("The given area `" + areaName + "' does not have a known ID field!!");
 		}
 		
 		File file = new File(filename);
@@ -164,7 +167,7 @@ public class MyGapReader {
 		return result;
 	}
 	
-	public ArrayList<SAZone> getAllZones() {
+	public List<SAZone> getAllZones() {
 		return this.zones;
 	}
 	
