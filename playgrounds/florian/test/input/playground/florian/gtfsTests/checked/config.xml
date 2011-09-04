@@ -22,6 +22,9 @@
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
 		<param name="runId" value="null" />
 
+		<!-- Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'. -->
+		<param name="snapshotFormat" value="" />
+		
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
 		<param name="writeEventsInterval" value="10" />
 
@@ -297,9 +300,6 @@
 
 		<!-- `maxOfStarttimeAndEarliestActivityEnd' (default behavior) or `onlyUseStarttime' -->
 		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
-
-		<!-- Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible. -->
-		<param name="snapshotFormat" value="" />
 
 		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!) -->
 		<param name="snapshotStyle" value="equiDist" />
