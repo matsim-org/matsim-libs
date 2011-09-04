@@ -15,11 +15,12 @@
 		<param name="outputDirectory" value="test/output/Equil_Szenario2" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+		<param name = "snapshotFormat"	value = ""/> <!-- netvis, googleearth, transims -->
 	</module>
 
 	<module name="simulation">
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis, netvis"/> <!-- netvis, googleearth, transims -->
+		
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 		
