@@ -3,9 +3,9 @@
 
 <transitSchedule>
 	<transitStops>
-		<stopFacility id="TEST_STOP_1" x="2946052.0" y="-6537867.0" linkRefId="dL1_TEST_STOP_1" name="GTFS TEST STOP 1"
+		<stopFacility id="TEST_STOP_1" x="-116.784582" y="36.868446" linkRefId="dL1_TEST_STOP_1" name="GTFS TEST STOP 1"
  isBlocking="false"/>
-		<stopFacility id="TEST_STOP_2" x="2947585.0" y="-6535114.0" linkRefId="dL1_TEST_STOP_2" name="GTFS TEST STOP 2"
+		<stopFacility id="TEST_STOP_2" x="-116.751677" y="36.915682" linkRefId="dL1_TEST_STOP_2" name="GTFS TEST STOP 2"
  isBlocking="false"/>
 	</transitStops>
 	<transitLine id="TEST_ROUTE">

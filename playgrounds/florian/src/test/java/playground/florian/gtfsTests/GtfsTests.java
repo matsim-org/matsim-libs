@@ -6,6 +6,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -22,7 +23,7 @@ public class GtfsTests extends MatsimTestCase {
 	
 	
 	public void testGtfsStandardConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToMercator.Project(18));
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new GeotoolsTransformation("WGS84", "WGS84"));
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
@@ -39,7 +40,7 @@ public class GtfsTests extends MatsimTestCase {
 	}
 	
 	public void testGtfsShapedConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new WGS84ToMercator.Project(18));
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new GeotoolsTransformation("WGS84", "WGS84"));
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.setCreateShapedNetwork(true);
