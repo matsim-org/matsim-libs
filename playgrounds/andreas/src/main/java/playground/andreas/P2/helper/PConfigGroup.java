@@ -19,6 +19,7 @@
 
 package playground.andreas.P2.helper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -257,6 +258,14 @@ public class PConfigGroup extends Module{
 
 		public void setId(final Id id) {
 			this.id = id;
+		}
+		
+		public ArrayList<String> getParametersAsArrayList(){
+			ArrayList<String> list = new ArrayList<String>();
+			for (int i = 0; i < this.parameters.length; i++) {
+				list.add(this.parameters[i]);
+			}
+			return list;
 		}
 		
 		public String getParametersAsString() {

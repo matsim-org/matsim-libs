@@ -25,15 +25,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.PPlanStrategy;
-import playground.andreas.P2.replanning.RandomEndTimeAllocator;
-import playground.andreas.P2.replanning.RandomStartTimeAllocator;
+import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.RemoveAllVehiclesButOne;
 import playground.andreas.P2.scoring.ScoreContainer;
 
@@ -70,7 +68,7 @@ public class Cooperative {
 		this.budget = 0.0;
 		
 		PPlan plan;
-		PPlanStrategy strategy = new RemoveAllVehiclesButOne();
+		PPlanStrategy strategy = new RemoveAllVehiclesButOne(null);
 		
 		do {
 			plan = new PPlan(new IdImpl("0"), pRouteProvider.getRandomTransitStop(), pRouteProvider.getRandomTransitStop(), 0.0, 24.0 * 3600); 
@@ -106,7 +104,7 @@ public class Cooperative {
 
 	}
 
-	public void replan(PRouteProvider pRouteProvider) {	
+	public void replan(PRouteProvider pRouteProvider, PStrategyManager pStrategyManager) {	
 		
 		if(this.budget <= 0 && this.bestPlan != null){
 			// decrease number of vehicles
@@ -131,9 +129,6 @@ public class Cooperative {
 		if(this.bestPlan == null){
 			this.bestPlan = this.testPlan;
 			this.testPlan = null;
-//		} else if(this.testPlan.getScore() > this.bestPlan.getScore()){
-//				this.bestPlan = this.testPlan;
-//				this.testPlan = null;
 		} else if (this.testPlan.getScorePerVehicle() > this.bestPlan.getScorePerVehicle()){
 			// apply modification to bestPlan
 			PPlan plan = new PPlan(this.bestPlan.getId(), this.testPlan.getStartStop(), this.testPlan.getEndStop(), this.testPlan.getStartTime(), this.testPlan.getEndTime());
@@ -155,48 +150,12 @@ public class Cooperative {
 		
 		// dumb simple replanning
 		if(bestPlan.getScore() > 0){
-			double rnd = MatsimRandom.getRandom().nextDouble();
-			if( rnd < 0.33){
-				// profitable route, increase vehicle fleet
-				PPlanStrategy strategy = new RemoveAllVehiclesButOne();
-				this.testPlan = strategy.modifyPlan(this.bestPlan, this.id, pRouteProvider);
-			} else if(rnd < 0.66){
-				// profitable route, change startTime
-				PPlanStrategy strategy = new RandomStartTimeAllocator();
-				this.testPlan = strategy.modifyPlan(this.bestPlan, this.id, pRouteProvider);
-				
-			} else {
-				// profitable route, change endTime
-				PPlanStrategy strategy = new RandomEndTimeAllocator();
-				this.testPlan = strategy.modifyPlan(this.bestPlan, this.id, pRouteProvider);
-			}			
-			
+			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
+			this.testPlan = strategy.modifyPlan(this.bestPlan, this.id, pRouteProvider);
 		} else {
-			
-//			if(this.bestPlan.getVehicleIds().size() == 1){
-//				// this plan has become non profitable
-//				this.bestPlan = null;
-////			} else if(this.bestPlan.getTripsServed() == 0){
-//				// plan not used anymore - delete it
-////				this.bestPlan = null;
-//			} else {
-//				// decrease number of vehicles
-//				PPlan plan = new PPlan(this.bestPlan.getId());
-//				plan.setScore(this.bestPlan.getScore());
-//
-//				plan.setStartStop(this.bestPlan.getStartStop());
-//				plan.setEndStop(this.bestPlan.getEndStop());
-//				plan.setStartTime(this.bestPlan.getStartTime());
-//				plan.setEndTime(this.bestPlan.getEndTime());
-//
-//				plan.setLine(simpleScheduleProvider.createBackAndForthTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-//				
-//				this.bestPlan = plan;
-//			}
-			
 			// create complete new route
 			PPlan plan;
-			PPlanStrategy strategy = new RemoveAllVehiclesButOne();
+			PPlanStrategy strategy = new RemoveAllVehiclesButOne(null);
 			
 			do {
 				plan = new PPlan(new IdImpl(pRouteProvider.getIteration()), pRouteProvider.getRandomTransitStop(), pRouteProvider.getRandomTransitStop(), 0.0, 24.0 * 3600); 
@@ -250,11 +209,5 @@ public class Cooperative {
 		
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
-		
-//		for (TransitRoute route : plan.getLine().getRoutes().values()) {
-//			route.setDescription(plan.toString(this.budget));
-//		}
 	}
-	
-
 }

@@ -8,4 +8,6 @@ import playground.andreas.P2.plan.PRouteProvider;
 public interface PPlanStrategy {
 
 	public PPlan modifyPlan(PPlan plan, Id id, PRouteProvider pRouteProvider);
+	
+	public String getName();
 }

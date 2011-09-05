@@ -44,6 +44,7 @@ import org.matsim.vehicles.VehiclesImpl;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
+import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
@@ -68,10 +69,14 @@ public class PBox {
 	TransitSchedule pTransitScheduleArchiv;
 	
 	private final ScorePlansHandler scorePlansHandler;
+
+	private PStrategyManager strategyManager;
 	
 	public PBox(PConfigGroup pConfig) {
 		this.scorePlansHandler = new ScorePlansHandler(pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, pConfig.getCostPerKilometer() / 1000.0);
 		this.franchise = new PFranchise(pConfig.getUseFranchise());
+		this.strategyManager = new PStrategyManager();
+		this.strategyManager.init(pConfig);
 		createCooperatives(pConfig.getNumberOfCooperatives(), pConfig.getCostPerVehicle());
 	}
 
@@ -122,7 +127,7 @@ public class PBox {
 			// any other iteration
 			
 			for (Cooperative cooperative : this.cooperatives) {
-				cooperative.replan(new SimpleCircleScheduleProvider(this.pStopsOnly, controler.getNetwork(), iteration));
+				cooperative.replan(new SimpleCircleScheduleProvider(this.pStopsOnly, controler.getNetwork(), iteration), this.strategyManager);
 			}
 			
 			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
