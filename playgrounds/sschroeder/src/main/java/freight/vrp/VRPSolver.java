@@ -8,8 +8,7 @@ import playground.mzilske.freight.Tour;
 
 public interface VRPSolver {
 
-	public abstract void solve(Collection<Contract> contracts,
-			CarrierVehicle carrierVehicle);
-
 	public abstract Collection<Tour> solve();
+	
+	public void solve(Collection<Contract> contracts, CarrierVehicle carrierVehicle);
 }

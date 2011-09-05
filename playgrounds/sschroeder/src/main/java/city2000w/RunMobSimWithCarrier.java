@@ -8,8 +8,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -20,11 +24,12 @@ import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.freight.CarrierAgent;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.DriverEventWriter;
 import playground.mzilske.freight.api.CarrierAgentFactory;
 import freight.CarrierPlanReader;
 
 
-public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener{
+public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener, ShutdownListener{
 	
 	static class SimpleCarrierAgentFactory implements CarrierAgentFactory {
 
@@ -37,6 +42,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		@Override
 		public CarrierAgent createAgent(CarrierAgentTracker tracker,CarrierImpl carrier) {
 			CarrierAgent agent = new CarrierAgent(tracker, carrier, router);
+			agent.setCarrierAgentTracker(tracker);
 			return agent;
 		}
 		
@@ -51,6 +57,8 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	
 	private CarrierAgentTracker carrierAgentTracker;
 	
+	private DriverEventWriter driverEventWriter;
+	
 	public static void main(String[] args) {
 		RunMobSimWithCarrier mobSim = new RunMobSimWithCarrier();
 		mobSim.run();
@@ -64,7 +72,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.addSimulationConfigGroup(new SimulationConfigGroup());
-		config.simulation().setEndTime(12*3600);
+//		config.simulation().setEndTime(12*3600);
 		scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		Controler controler = new Controler(scenario);
@@ -77,7 +85,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/grid.xml";
+		NETWORK_FILENAME = "/Volumes/projekte/LogoTakt/SaWu/verkehrsangebot/germany_bigroads_fused.xml";
 	}
 
 	private void readNetwork(String networkFilename) {
@@ -86,13 +94,16 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	public void notifyStartup(StartupEvent event) {
 		Collection<CarrierImpl> carrierImpls = new ArrayList<CarrierImpl>();
-		new CarrierPlanReader(carrierImpls).read("../playgrounds/sschroeder/output/testCarriers.xml");
+		new CarrierPlanReader(carrierImpls).read("/Users/stefan/Documents/Spielwiese/data/carrierPlans_Stueckgut_AfterPlanningAndRenaming.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
 		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
+		driverEventWriter = new DriverEventWriter();
+		driverEventWriter.setFilename("/Users/stefan/Documents/Spielwiese/data/driverEvents_stueckgut.txt");
+		carrierAgentTracker.getEventListeners().add(driverEventWriter);
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 	
@@ -100,6 +111,17 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(carrierAgentTracker);
 		carrierAgentTracker.createPlanAgents();
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		driverEventWriter.finish();
+		
+	}
+
+	@Override
+	public void notifyScoring(ScoringEvent event) {
+		carrierAgentTracker.calculateCosts();
 	}
 
 }

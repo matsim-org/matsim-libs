@@ -132,8 +132,8 @@ public class AverageMarginalCostOM implements OfferMaker{
 		}
 
 		@Override
-		public vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer requestService(vrp.algorithms.ruinAndRecreate.basics.Shipment shipment) {
-			Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment);
+		public vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer requestService(vrp.algorithms.ruinAndRecreate.basics.Shipment shipment, double bestKnownPrice) {
+			Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment, bestKnownPrice);
 			if(newTour != null){
 				double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
 				vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer offer = new vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer(this, marginalCosts);
@@ -252,7 +252,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 			Tour bestTour = null;
 			if(isMorning(startPickup)){
 				for(ServiceProviderImpl sP : morningService){
-					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment);
+					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
 					totalCosts += sP.getCostsOfCurrentTour();
 					if(o != null){
 						if(cheapestOffer == null){
@@ -276,7 +276,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 			else{
 				for(ServiceProviderImpl sP : afternoonService){
 					totalCosts += sP.getCostsOfCurrentTour();
-					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment);
+					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
 					if(o != null){
 						if(cheapestOffer == null){
 							cheapestOffer = o;

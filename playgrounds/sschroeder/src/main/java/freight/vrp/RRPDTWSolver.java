@@ -20,6 +20,7 @@ import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
+import vrp.algorithms.ruinAndRecreate.basics.ChartListener;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -31,9 +32,9 @@ import vrp.basics.MultipleDepotsInitialSolutionFactory;
 import vrp.basics.TourActivity;
 import vrp.basics.VehicleType;
 
-public class RRSolver implements VRPSolver{
+public class RRPDTWSolver implements VRPSolver{
 	
-	private static Logger logger = Logger.getLogger(RRSolver.class);
+	private static Logger logger = Logger.getLogger(RRPDTWSolver.class);
 	
 	private int capacity;
 	
@@ -81,7 +82,7 @@ public class RRSolver implements VRPSolver{
 		this.iniSolutionFactory = iniSolutionFactory;
 	}
 
-	public RRSolver(Collection<Shipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
+	public RRPDTWSolver(Collection<Shipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
 		super();
 		this.shipments = shipments;
 		this.vehicles = vehicles;
@@ -108,6 +109,7 @@ public class RRSolver implements VRPSolver{
 
 	@Override
 	public Collection<Tour> solve() {
+		logger.info("start solving");
 		RuinAndRecreate ruinAndRecreate = makeAlgorithm();
 		ruinAndRecreate.run();
 		Collection<Tour> tours = makeVehicleTours(ruinAndRecreate.getSolution());
@@ -161,6 +163,7 @@ public class RRSolver implements VRPSolver{
 	}
 
 	private RuinAndRecreate makeAlgorithm() {
+		logger.info("initialise algorithm");
 		VRPWithMultipleDepotsBuilder vrpBuilder = new VRPWithMultipleDepotsBuilder();
 		for(Id depotLocation : depots){
 			Id depotId = makeDepotId();
@@ -178,7 +181,11 @@ public class RRSolver implements VRPSolver{
 		rrFactory.setWarmUp(nOfWarmupIterations);
 		rrFactory.setIterations(nOfIterations);
 		Collection<vrp.basics.Tour> initialSolution = iniSolutionFactory.createInitialSolution(vrp);
-		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, capacity);
+		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createAlgoWithTimeWindows(vrp, initialSolution, capacity);
+		ChartListener chartListener = new ChartListener();
+		chartListener.setFilename("output/vrpChart.png");
+		ruinAndRecreateAlgo.getListeners().add(chartListener);
+		logger.info("done");
 		return ruinAndRecreateAlgo;
 	}
 

@@ -76,22 +76,25 @@ public class TSPPlanReader extends MatsimXmlParser{
 			currentChainBuilder = new TransportChainBuilder(shipment);
 		}
 		if(name.equals("act")){
-			if(atts.getValue("type").equals("pickup")){
-				Id pickupLocation = makeId(atts.getValue("linkId"));
-				String startTime = atts.getValue("start");
-				Double start = null;
-				TimeWindow tw = null;
-				if(startTime != null){
-					start = Double.parseDouble(startTime);
-					tw = new TimeWindow(start, 24*3600);
-				}
-				else{
-					tw = new TimeWindow(0.0,24*3600);
-				}
-				currentChainBuilder.schedulePickup(pickupLocation, tw);
+			Id location = makeId(atts.getValue("linkId"));
+			String startTime = atts.getValue("start");
+			String endTime = atts.getValue("end");
+			Double start = null;
+			Double end = null;
+			TimeWindow tw = null;
+			if(startTime != null && endTime != null){
+				start = Double.parseDouble(startTime);
+				end = Double.parseDouble(endTime);
+				tw = new TimeWindow(start, end);
+			}
+			else{
+				tw = new TimeWindow(0.0,Double.MAX_VALUE);
+			}
+			if(atts.getValue("type").equals("pickup")){	
+				currentChainBuilder.schedulePickup(location, tw);
 			}
 			if(atts.getValue("type").equals("delivery")){
-				currentChainBuilder.scheduleDelivery(makeId(atts.getValue("linkId")), new TimeWindow(0.0,24*3600));
+				currentChainBuilder.scheduleDelivery(location, tw);
 			}
 		}
 		if(name.equals("leg")){
