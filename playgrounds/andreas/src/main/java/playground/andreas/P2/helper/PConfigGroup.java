@@ -60,6 +60,7 @@ public class PConfigGroup extends Module{
 	private static final String COST_PER_VEHICLE = "costPerVehicle";
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS = "writeStats";
+	private static final String ROUTE_PROVIDER = "routeProvider";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -76,6 +77,7 @@ public class PConfigGroup extends Module{
 	private double costPerVehicle = 1000.0;
 	private boolean useFranchise = false;
 	private boolean writeStats = false;
+	private String routeProvider = "SimpleCircleScheduleProvider";
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -111,6 +113,8 @@ public class PConfigGroup extends Module{
 			this.useFranchise = Boolean.parseBoolean(value);
 		} else if (WRITESTATS.equals(key)){
 			this.writeStats = Boolean.parseBoolean(value);
+		} else if (ROUTE_PROVIDER.equals(key)){
+			this.routeProvider = value;
 		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
@@ -139,6 +143,7 @@ public class PConfigGroup extends Module{
 		map.put(COST_PER_VEHICLE, Double.toString(this.costPerVehicle));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS, Boolean.toString(this.writeStats));
+		map.put(ROUTE_PROVIDER, this.routeProvider);
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -163,6 +168,7 @@ public class PConfigGroup extends Module{
 		map.put(COST_PER_VEHICLE, "cost to purchase or sell a vehicle");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS, "will write statistics if set to true");
+		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -211,6 +217,10 @@ public class PConfigGroup extends Module{
 	
 	public boolean getWriteStats() {
 		return this.writeStats;
+	}
+	
+	public String getRouteProvider(){
+		return this.routeProvider;
 	}
 	
 	public Collection<PStrategySettings> getStrategySettings() {

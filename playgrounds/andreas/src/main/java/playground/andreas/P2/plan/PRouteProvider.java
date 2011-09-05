@@ -10,8 +10,6 @@ public interface PRouteProvider {
 
 	public TransitStopFacility getRandomTransitStop();
 
-	public int getIteration();
-
 	public TransitLine createEmptyLine(Id id);
 
 }

@@ -28,6 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -43,6 +44,8 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.plan.PRouteProvider;
+import playground.andreas.P2.plan.SimpleBackAndForthScheduleProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
@@ -69,15 +72,43 @@ public class PBox {
 	TransitSchedule pTransitScheduleArchiv;
 	
 	private final ScorePlansHandler scorePlansHandler;
-
 	private PStrategyManager strategyManager;
+	private PRouteProvider routeProvider;
 	
 	public PBox(PConfigGroup pConfig) {
 		this.scorePlansHandler = new ScorePlansHandler(pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, pConfig.getCostPerKilometer() / 1000.0);
 		this.franchise = new PFranchise(pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager();
+	}
+
+	public void init(Controler controler){
+		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
+
 		this.strategyManager.init(pConfig);
+		
+		this.scorePlansHandler.init(controler.getNetwork());
+		controler.getEvents().addHandler(this.scorePlansHandler);
+		
+		// create stops
+		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), pConfig);
+		
+		this.routeProvider = getRouteProvider(controler.getNetwork(), pConfig, this.pStopsOnly);	
 		createCooperatives(pConfig.getNumberOfCooperatives(), pConfig.getCostPerVehicle());
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			cooperative.init(this.routeProvider, controler.getFirstIteration());
+		}
+	}	
+	
+	private PRouteProvider getRouteProvider(NetworkImpl network, PConfigGroup pConfig, TransitSchedule pStopsOnly) {
+		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
+			return new SimpleBackAndForthScheduleProvider(pStopsOnly, network, 0);
+		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
+			return new SimpleCircleScheduleProvider(pStopsOnly, network, 0);
+		} else {
+			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
+			return null;
+		}
 	}
 
 	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {
@@ -85,23 +116,9 @@ public class PBox {
 		for (int i = 0; i < numberOfCooperatives; i++) {
 			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i), costPerVehicle, this.franchise);
 			cooperatives.add(cooperative);
-		}
-		
+		}		
 	}
 
-	public void init(Controler controler){
-		this.scorePlansHandler.init(controler.getNetwork());
-		controler.getEvents().addHandler(this.scorePlansHandler);
-		
-		// create stops
-		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME));
-		
-		for (Cooperative cooperative : this.cooperatives) {
-//			cooperative.init(new SimpleBackAndForthScheduleProvider(this.pStopsOnly, controler.getNetwork(), 0));
-			cooperative.init(new SimpleCircleScheduleProvider(this.pStopsOnly, controler.getNetwork(), 0));
-		}
-	}	
-	
 	/**
 	 * Is called whenever a new iteration starts and thus a new schedule can be applied 
 	 * @param controler The current matsim controller
@@ -127,7 +144,7 @@ public class PBox {
 			// any other iteration
 			
 			for (Cooperative cooperative : this.cooperatives) {
-				cooperative.replan(new SimpleCircleScheduleProvider(this.pStopsOnly, controler.getNetwork(), iteration), this.strategyManager);
+				cooperative.replan(this.strategyManager, iteration);
 			}
 			
 			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());

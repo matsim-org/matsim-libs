@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 
@@ -29,10 +30,19 @@ public class RemoveAllVehiclesButOne extends PStrategy implements PPlanStrategy{
 	}
 
 	@Override
-	public PPlan modifyPlan(PPlan oldPlan, Id id, PRouteProvider pRouteProvider) {
+	public PPlan modifyPlan(PPlan oldPlan, Id pLineId, PRouteProvider pRouteProvider, int iteration) {
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(pRouteProvider.getIteration()), oldPlan);
-		newPlan.setLine(pRouteProvider.createTransitLine(id, newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), null));
+		PPlan newPlan = new PPlan(new IdImpl(iteration), oldPlan);
+		newPlan.setLine(pRouteProvider.createTransitLine(pLineId, newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(iteration)));
+
+		return newPlan;
+	}
+	
+	@Override
+	public PPlan modifyBestPlan(Cooperative cooperative) {
+		// profitable route, change startTime
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), cooperative.getBestPlan());
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
 
 		return newPlan;
 	}

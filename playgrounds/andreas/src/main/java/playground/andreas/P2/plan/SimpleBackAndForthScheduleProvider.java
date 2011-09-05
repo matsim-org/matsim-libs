@@ -52,32 +52,23 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	
 	private final static Logger log = Logger.getLogger(SimpleBackAndForthScheduleProvider.class);
+	public final static String NAME = "SimpleBackAndForthScheduleProvider";
 	
 	private NetworkImpl net;
 	private TransitSchedule scheduleWithStopsOnly;
-	private int iteration;
 	
-	public int getIteration() {
-		return iteration;
-	}
-
 	public SimpleBackAndForthScheduleProvider(TransitSchedule scheduleWithStopsOnly, NetworkImpl network, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
-		this.iteration = iteration;
 	}
 
 	@Override
-	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop, Id routeId) {
-		return this.createBackAndForthTransitLine(pLineId, startTime, endTime, numberOfVehicles, startStop, endStop);
-	}
-
-	public TransitLine createBackAndForthTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop){
+	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop, Id routeId){
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
 		
-		TransitRoute transitRoute_H = createRoute(new IdImpl(pLineId + "_" + this.iteration + "_H"), startStop, endStop);
-		TransitRoute transitRoute_R = createRoute(new IdImpl(pLineId + "_" + this.iteration + "_R"), endStop, startStop);
+		TransitRoute transitRoute_H = createRoute(new IdImpl(pLineId + "_" + routeId + "_H"), startStop, endStop);
+		TransitRoute transitRoute_R = createRoute(new IdImpl(pLineId + "_" + routeId + "_R"), endStop, startStop);
 		
 		// register route
 		line.addRoute(transitRoute_H);

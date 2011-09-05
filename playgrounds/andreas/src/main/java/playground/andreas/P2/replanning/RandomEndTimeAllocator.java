@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 
@@ -36,9 +37,9 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 	}
 
 	@Override
-	public PPlan modifyPlan(PPlan oldPlan, Id id, PRouteProvider pRouteProvider) {
+	public PPlan modifyPlan(PPlan oldPlan, Id pLineId, PRouteProvider pRouteProvider, int iteration) {
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(pRouteProvider.getIteration()));
+		PPlan newPlan = new PPlan(new IdImpl(iteration));
 		newPlan.setStartStop(oldPlan.getStartStop());
 		newPlan.setEndStop(oldPlan.getEndStop());
 		newPlan.setStartTime(oldPlan.getStartTime());
@@ -48,7 +49,25 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 		newEndTime = Math.max(newEndTime, oldPlan.getStartTime() + this.minimalOperatingTime);
 		newPlan.setEndTime(newEndTime);
 		
-		newPlan.setLine(pRouteProvider.createTransitLine(id, newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), null));
+		newPlan.setLine(pRouteProvider.createTransitLine(pLineId, newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(iteration)));
+		
+		return newPlan;
+	}
+	
+	@Override
+	public PPlan modifyBestPlan(Cooperative cooperative) {
+		// profitable route, change startTime
+		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
+		newPlan.setStartStop(cooperative.getBestPlan().getStartStop());
+		newPlan.setEndStop(cooperative.getBestPlan().getEndStop());
+		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
+		
+		// get a valid new end time
+		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * this.mutationRange);
+		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + this.minimalOperatingTime);
+		newPlan.setEndTime(newEndTime);
+		
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
 		
 		return newPlan;
 	}

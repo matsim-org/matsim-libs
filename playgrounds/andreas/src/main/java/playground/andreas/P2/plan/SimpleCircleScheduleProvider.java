@@ -52,27 +52,20 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class SimpleCircleScheduleProvider implements PRouteProvider {
 	
 	private final static Logger log = Logger.getLogger(SimpleCircleScheduleProvider.class);
+	public final static String NAME = "SimpleCircleScheduleProvider";
 	
 	private NetworkImpl net;
 	private TransitSchedule scheduleWithStopsOnly;
-	private int iteration;
 	
 	public SimpleCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, NetworkImpl network, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
-		this.iteration = iteration;
 	}
 
 	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop, Id routeId){
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
-		
-		if(routeId == null){
-			routeId = new IdImpl(pLineId + "-" + this.iteration);
-		} else {
-			routeId = new IdImpl(pLineId + "-" + routeId);
-		}
-		
+		routeId = new IdImpl(pLineId + "-" + routeId);
 		TransitRoute transitRoute = createRoute(routeId, startStop, endStop, startTime);
 		
 		// register route
@@ -146,10 +139,6 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, "pt");
 		
 		return transitRoute;
-	}
-	
-	public int getIteration() {
-		return this.iteration;
 	}
 
 	public TransitStopFacility getRandomTransitStop(){
