@@ -38,6 +38,11 @@ public class PFranchise {
 	}
 
 	public boolean planRejected(PPlan plan) {
+		
+		if(!this.activated){
+			return false;
+		}
+		
 		Id startStopId = plan.getStartStop().getId();
 		Id endStopId = plan.getEndStop().getId();
 		
