@@ -16,6 +16,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import com.sleepycat.je.rep.monitor.NewMasterEvent;
+
 import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
@@ -48,6 +50,14 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	private Collection<CarrierTotalCostListener> totalCostListeners = new ArrayList<CarrierTotalCostListener>();
 	
+	private Collection<CarrierEventListener> eventListeners = new ArrayList<CarrierEventListener>();
+
+
+	public Collection<CarrierEventListener> getEventListeners() {
+		return eventListeners;
+	}
+
+
 	public Collection<CarrierTotalCostListener> getTotalCostListeners() {
 		return totalCostListeners;
 	}
@@ -246,11 +256,20 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		}
 		
 	}
+	
 
 	public void informTotalCost(Id id, CarrierCostEvent costEvent) {
 		for(CarrierTotalCostListener l : totalCostListeners ){
 			l.inform(id,costEvent);
 		}
-		
 	}
+	
+	public void processEvents(DriverEvent event){
+		for(CarrierEventListener l : eventListeners){
+			if(l instanceof DriverEventListener){
+				((DriverEventListener)l).processEvent(event);
+			}
+		}
+	}
+	
 }

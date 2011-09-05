@@ -44,15 +44,53 @@ public class CarrierAgent {
 
 	private CarrierAgentTracker tracker;
 
-	private CarrierCostFunction costCalculator;
+	private CarrierCostFunction costCalculator = new CarrierCostFunction(){
+
+		@Override
+		public void init(CarrierImpl carrier) {
+			
+			
+		}
+
+		@Override
+		public double calculateCost(CarrierVehicle carrierVehicle,double distance) {
+			return distance;
+		}
+
+		@Override
+		public double calculateCost(CarrierVehicle carrierVehicle,double distance, double time) {
+			return distance;
+		}
+		
+	};
 
 	private Network network;
 
 	private OfferMaker offerMaker;
 	
-	private CostMemory costMemory;
+	private CostMemory costMemory = new CostMemory(){
+
+		@Override
+		public void memorizeCost(Id from, Id to, int size, double cost) {
+			
+		}
+
+		@Override
+		public Double getCost(Id from, Id to, int size) {
+			return null;
+		}
+		
+	};
 	
-	private CarrierCostCalculator costPerShipmentCalculator;
+	private CarrierCostCalculator costPerShipmentCalculator = new CarrierCostCalculator(){
+
+		@Override
+		public void run(CarrierVehicle carrierVehicle,Collection<Contract> contracts, CostMemory costMemory,
+				Double totalCosts) {
+			
+		}
+		
+	};
 	
 	private CarrierAgentTracker carrierAgentTracker;
 	
@@ -343,6 +381,13 @@ public class CarrierAgent {
 			weightedCapacityUsage += carrierDriverAgent.getCapacityUsage()*carrierDriverAgent.getDistance();
 			performance += carrierDriverAgent.weightedLoad;
 			volume += carrierDriverAgent.totalLoad;
+			DriverEvent driverEvent = new DriverEvent(driverId,carrier.getId(),carrierDriverAgent.getCarrierVehicle().getVehicleId());
+			driverEvent.capacityUsage = carrierDriverAgent.getCapacityUsage();
+			driverEvent.distance = carrierDriverAgent.getDistance();
+			driverEvent.time = carrierDriverAgent.getTime();
+			driverEvent.performance = carrierDriverAgent.weightedLoad;
+			driverEvent.volumes = carrierDriverAgent.totalLoad;
+			carrierAgentTracker.processEvents(driverEvent);
 		}
 		double avgCapacityUsage = weightedCapacityUsage/distance;
 		costPerShipmentCalculator.run(vehicle, carrier.getContracts(), costMemory, cost);
