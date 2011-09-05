@@ -60,8 +60,8 @@ public class BestTourBuilder implements TourBuilder {
 		this.constraints = constraints;
 	}
 	
-	private Tour buildTour(Tour tour, Customer customer){
-		double bestMarginalCost = Double.MAX_VALUE;
+	private Tour buildTour(Tour tour, Customer customer, double bestKnownPrice){
+		double bestMarginalCost = bestKnownPrice;
 		Tour bestTour = null;
 		for(int i=1;i<tour.getActivities().size();i++){	
 				double marginalCost = getCosts(getActLocation(tour, i-1), customer.getLocation()) + 
@@ -104,17 +104,17 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment){
+	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment, double bestKnownPrice){
 		verify();
 		Tour newTour = null;
 		if(isDepot(tour,shipment.getFrom())){
-			newTour = buildTour(tour, shipment.getTo());
+			newTour = buildTour(tour, shipment.getTo(), bestKnownPrice);
 		}
 		else if(isDepot(tour,shipment.getTo())){
-			newTour = buildTour(tour, shipment.getFrom());
+			newTour = buildTour(tour, shipment.getFrom(), bestKnownPrice);
 		}
 		else{
-			newTour = buildTourWithEnRoutePickupAndDelivery(tour,shipment);
+			newTour = buildTourWithEnRoutePickupAndDelivery(tour,shipment,bestKnownPrice);
 		}
 		return newTour;
 	}
@@ -129,10 +129,10 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	private Tour buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment) {
+	private Tour buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment, double bestKnownPrice) {
 		Node fromLocation = shipment.getFrom().getLocation();
 		Node toLocation = shipment.getTo().getLocation();
-		Double bestMarginalCost = Double.MAX_VALUE;
+		Double bestMarginalCost = bestKnownPrice;
 		Tour bestTour = null;
 		for(int i=1;i<tour.getActivities().size();i++){
 			double marginalCostComp1 = getCosts(getActLocation(tour, i-1),fromLocation) + getCosts(fromLocation,getActLocation(tour, i)) - getCosts(getActLocation(tour, i-1),getActLocation(tour, i));

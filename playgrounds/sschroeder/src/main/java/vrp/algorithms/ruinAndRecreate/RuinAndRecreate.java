@@ -86,6 +86,8 @@ public class RuinAndRecreate {
 	
 	private VrpSolution vrpSolution;
 	
+	private int lastPrint = 1;
+	
 	public RuinAndRecreate(VRP vrp, Solution iniSolution, int nOfMutations) {
 		this.vrp = vrp;
 		this.currentSolution = iniSolution;
@@ -124,6 +126,7 @@ public class RuinAndRecreate {
 		logger.info("#customer: " + vrp.getCustomers().values().size());
 		randomWalk(warmUpIterations);
 		logger.info("run mutations");
+		resetIterations();
 		while(currentMutation < nOfMutations){
 			Solution tentativeSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
 			ruinAndRecreate(tentativeSolution);
@@ -135,7 +138,7 @@ public class RuinAndRecreate {
 				isAccepted = true;
 			}
 			informListener(currentMutation,tentativeResult,currentResult, currentThreshold,isAccepted);
-//			print(tentativeSolution);
+			printNoIteration(currentMutation);
 			currentMutation++;
 		}
 		vrpSolution = new VrpSolution(getSolution());
@@ -172,8 +175,10 @@ public class RuinAndRecreate {
 		}
 		logger.info("random walk for threshold determination");
 		Solution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+		resetIterations();
 		double[] results = new double[nOfIterations];
 		for(int i=0;i<nOfIterations;i++){
+			printNoIteration(i);
 			ruinAndRecreate(initialSolution);
 			double result = initialSolution.getResult();
 			results[i]=result;
@@ -183,6 +188,20 @@ public class RuinAndRecreate {
 		initialThreshold = standardDeviation / 2;
 		thresholdFunction.setInitialThreshold(initialThreshold);
 		logger.info("iniThreshold="+initialThreshold);
+	}
+
+	private void printNoIteration(int currentIteration) {
+		if(currentIteration == 0){
+			logger.info(currentIteration + " iterations");
+		}
+		else if((currentIteration%lastPrint) == 0){
+			logger.info(currentIteration + " iterations");
+			lastPrint = currentIteration;
+		}
+	}
+
+	private void resetIterations() {
+		lastPrint = 1;
 	}
 
 	public void informFinish(){

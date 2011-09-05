@@ -10,5 +10,5 @@ import vrp.basics.Tour;
  */
 
 public interface TourBuilder {
-	Tour addShipmentAndGetTour(Tour tour, Shipment shipment);
+	Tour addShipmentAndGetTour(Tour tour, Shipment shipment, double bestKnownPrice);
 }

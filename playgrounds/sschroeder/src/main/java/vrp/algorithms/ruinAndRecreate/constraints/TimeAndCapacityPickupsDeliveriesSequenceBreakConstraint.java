@@ -24,17 +24,36 @@ import vrp.basics.Vehicle;
  * @author stefan schroeder
  *
  */
-public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Constraints {
+public class TimeAndCapacityPickupsDeliveriesSequenceBreakConstraint implements Constraints {
+	
+	public static class Break {
+		static double start = 4*3600;
+		static double end = 14*3600;
+		
+		public static boolean isWithin(double time){
+			double normalisedTime = time%(24*3600);
+			if(normalisedTime >= start && normalisedTime<end){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+	}
 
-	private Logger logger = Logger.getLogger(TimeAndCapacityPickupsDeliveriesSequenceConstraint.class);
+	private Logger logger = Logger.getLogger(TimeAndCapacityPickupsDeliveriesSequenceBreakConstraint.class);
 	
 	private int maxCap;
 	
-	private double maxTime;
+	private int maxTime;
 	
 	private Costs costs;
 	
-	public TimeAndCapacityPickupsDeliveriesSequenceConstraint(int maxCap, double maxTime, Costs costs) {
+	private double breakTimeStart;
+	
+	private double breakTimeEnd;
+	
+	public TimeAndCapacityPickupsDeliveriesSequenceBreakConstraint(int maxCap, int maxTime, Costs costs) {
 		super();
 		this.maxCap = maxCap;
 		this.costs = costs;
@@ -47,9 +66,12 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 		boolean deliveryStarted = false;
 		Set<Id> openCustomers = new HashSet<Id>();
 		double time = 0.0;
+		
 		TourActivity lastAct = null;
+		TourActivity firstAct = null;
 		for(TourActivity tourAct : tour.getActivities()){
 			if(lastAct == null){
+				firstAct = tourAct;
 				lastAct = tourAct;
 			}
 			else{
@@ -89,8 +111,19 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 					return false;
 				}
 			}
+			if(isWithinBreak(tourAct.getEarliestArrTime()) || isWithinBreak(tourAct.getLatestArrTime())){
+				return false;
+			}
 		}
 		return true;
+	}
+
+
+	private boolean isWithinBreak(double time) {
+		if(time >= breakTimeStart && time < breakTimeStart){
+			return true;
+		}
+		return false;
 	}
 
 
@@ -102,7 +135,11 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 		Set<Id> openCustomers = new HashSet<Id>();
 		double time = 0.0;
 		TourActivity lastAct = null;
+		boolean firstPickup = true;
 		for(TourActivity tourAct : tour.getActivities()){
+			if(firstPickup && tourAct instanceof EnRoutePickup){
+				firstPickup = false;
+			}
 			if(lastAct == null){
 				lastAct = tourAct;
 			}
@@ -142,6 +179,9 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				else{
 					return false;
 				}
+			}
+			if(Break.isWithin(tourAct.getEarliestArrTime())){
+				return false;
 			}
 		}
 		return true;

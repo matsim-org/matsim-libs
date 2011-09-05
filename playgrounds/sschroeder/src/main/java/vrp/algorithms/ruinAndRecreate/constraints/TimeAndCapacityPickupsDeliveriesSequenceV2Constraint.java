@@ -24,21 +24,27 @@ import vrp.basics.Vehicle;
  * @author stefan schroeder
  *
  */
-public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Constraints {
+public class TimeAndCapacityPickupsDeliveriesSequenceV2Constraint implements Constraints {
 
-	private Logger logger = Logger.getLogger(TimeAndCapacityPickupsDeliveriesSequenceConstraint.class);
+	private Logger logger = Logger.getLogger(TimeAndCapacityPickupsDeliveriesSequenceV2Constraint.class);
 	
 	private int maxCap;
 	
-	private double maxTime;
+	private double maxTimeOutOfDepot;
+	
+	private double maxTimeOnTheRoad;
+	
+	private int maxNuOfDifferentLocations;
 	
 	private Costs costs;
 	
-	public TimeAndCapacityPickupsDeliveriesSequenceConstraint(int maxCap, double maxTime, Costs costs) {
+	public TimeAndCapacityPickupsDeliveriesSequenceV2Constraint(int maxCap, double maxTimeOutOfDepot, double maxTimeOnTheRoad, int maxNuOfDifferentLocations, Costs costs) {
 		super();
 		this.maxCap = maxCap;
 		this.costs = costs;
-		this.maxTime = maxTime;
+		this.maxTimeOutOfDepot = maxTimeOutOfDepot;
+		this.maxTimeOnTheRoad = maxTimeOnTheRoad;
+		this.maxNuOfDifferentLocations = maxNuOfDifferentLocations;
 	}
 
 	
@@ -47,6 +53,11 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 		boolean deliveryStarted = false;
 		Set<Id> openCustomers = new HashSet<Id>();
 		double time = 0.0;
+		double timeOutOfDepot = tour.getActivities().get(0).getLatestArrTime() - tour.getActivities().getLast().getEarliestArrTime();
+		Set<Id> differentLocations = new HashSet<Id>();
+		if(timeOutOfDepot > maxTimeOutOfDepot){
+			return false;
+		}
 		TourActivity lastAct = null;
 		for(TourActivity tourAct : tour.getActivities()){
 			if(lastAct == null){
@@ -54,8 +65,12 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 			}
 			else{
 				time += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
+			}	
+			differentLocations.add(tourAct.getCustomer().getLocation().getId());
+			if(differentLocations.size() > maxNuOfDifferentLocations){
+				return false;
 			}
-			if(time > maxTime){
+			if(time > maxTimeOutOfDepot){
 				return false;
 			}
 			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
@@ -100,16 +115,26 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 		int currentCap = 0;
 		boolean deliveryStarted = false;
 		Set<Id> openCustomers = new HashSet<Id>();
-		double time = 0.0;
+		Set<Id> differentLocations = new HashSet<Id>();
+		double timeOutOfDepot = tour.getActivities().get(0).getLatestArrTime() - tour.getActivities().getLast().getEarliestArrTime();
+		double timeOnTheRoad = 0.0;
+		
+		if(timeOutOfDepot > maxTimeOutOfDepot){
+			return false;
+		}
 		TourActivity lastAct = null;
 		for(TourActivity tourAct : tour.getActivities()){
 			if(lastAct == null){
 				lastAct = tourAct;
 			}
 			else{
-				time += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
+				timeOnTheRoad += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
 			}
-			if(time > maxTime){
+			differentLocations.add(tourAct.getCustomer().getLocation().getId());
+			if(differentLocations.size() > maxNuOfDifferentLocations){
+				return false;
+			}
+			if(timeOnTheRoad > maxTimeOnTheRoad){
 				return false;
 			}
 			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){

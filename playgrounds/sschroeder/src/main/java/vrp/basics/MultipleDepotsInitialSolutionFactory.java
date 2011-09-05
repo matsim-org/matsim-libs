@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import vrp.api.Customer;
@@ -12,8 +13,11 @@ import vrp.api.VRP;
 
 public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFactory{
 
+	private static Logger logger = Logger.getLogger(MultipleDepotsInitialSolutionFactory.class);
+	
 	@Override
 	public Collection<Tour> createInitialSolution(VRP vrp) {
+		logger.info("create initial solution");
 		Collection<Tour> tours = new ArrayList<Tour>();
 		Set<Id> customersWithService = new HashSet<Id>();
 		for(Customer customer : vrp.getCustomers().values()){
@@ -46,6 +50,7 @@ public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFact
 				tours.add(tour);
 			}
 		}
+		logger.info("done");
 		return tours;
 	}
 	

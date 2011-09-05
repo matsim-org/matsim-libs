@@ -39,7 +39,9 @@ public class RandomRuin implements RuinStrategy {
 	public RandomRuin(VRP vrp) {
 		super();
 		this.vrp = vrp;
+		logger.info("initialise random ruin");
 		makeCustomersWithoutDepot();
+		logger.info("done");
 	}
 
 	private void makeCustomersWithoutDepot() {

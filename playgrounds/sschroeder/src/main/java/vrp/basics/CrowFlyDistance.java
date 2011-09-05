@@ -15,14 +15,16 @@ import vrp.api.Node;
  */
 public class CrowFlyDistance implements Costs{
 	
-	public int speed;
+	public int speed = 1;
+	
+	public double detourFactor = 1.0;
 	
 	public synchronized Double getCost(Node from, Node to) {
-		return CoordUtils.calcDistance(from.getCoord(), to.getCoord());
+		return getDistance(from, to);
 	}
 
 	public synchronized Double getDistance(Node from, Node to) {
-		return getCost(from,to);
+		return CoordUtils.calcDistance(from.getCoord(), to.getCoord())*detourFactor;
 	}
 
 

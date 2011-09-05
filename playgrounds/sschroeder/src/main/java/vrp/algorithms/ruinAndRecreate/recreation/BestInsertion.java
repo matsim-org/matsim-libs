@@ -63,7 +63,14 @@ public class BestInsertion implements RecreationStrategy{
 			assertShipmentIsInCorrectOrder(shipmentWithoutService);
 			Offer bestOffer = null;
 			for(TourAgent agent : tentativeSolution.getTourAgents()){
-				Offer offer = agent.requestService(shipmentWithoutService);
+				double bestKnownPrice;
+				if(bestOffer == null){
+					bestKnownPrice = Double.MAX_VALUE;
+				}
+				else{
+					bestKnownPrice = bestOffer.getPrice();
+				}
+				Offer offer = agent.requestService(shipmentWithoutService,bestKnownPrice);
 				if(offer == null){
 					continue;
 				}

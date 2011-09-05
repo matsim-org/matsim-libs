@@ -14,4 +14,8 @@ public class EnRoutePickup extends TourActivity{
 		super(customer);
 	}
 
+	public String getType(){
+		return "EnRoutePickup";
+	}
+	
 }

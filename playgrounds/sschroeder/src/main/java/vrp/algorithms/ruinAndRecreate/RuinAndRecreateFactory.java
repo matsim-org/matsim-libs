@@ -3,6 +3,8 @@ package vrp.algorithms.ruinAndRecreate;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
@@ -29,6 +31,8 @@ import vrp.basics.VrpUtils;
 
 
 public class RuinAndRecreateFactory {
+	
+	private static Logger logger = Logger.getLogger(RuinAndRecreateFactory.class);
 	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
@@ -67,10 +71,10 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
 		RadialRuin radialRuin = new RadialRuin(vrp);
-		radialRuin.setFractionOfAllNodes(0.3);
+		radialRuin.setFractionOfAllNodes(0.2);
 		
 		RandomRuin randomRuin = new RandomRuin(vrp);
-		randomRuin.setFractionOfAllNodes2beRuined(0.5);
+		randomRuin.setFractionOfAllNodes2beRuined(0.3);
 		
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
@@ -96,6 +100,7 @@ public class RuinAndRecreateFactory {
 	}
 
 	public RuinAndRecreate createAlgoWithTimeWindows(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
+		logger.info("create algo with time windows");
 		RRTourAgentWithTimeWindowFactory tourAgentFactory = new RRTourAgentWithTimeWindowFactory(vrp);
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
@@ -105,6 +110,7 @@ public class RuinAndRecreateFactory {
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
+		recreationStrategy.setInitialSolutionFactory(new MultipleDepotsInitialSolutionFactory());
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
 		RadialRuin radialRuin = new RadialRuin(vrp);
@@ -116,18 +122,20 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
 		ruinAndRecreateAlgo.setThresholdFunction(new SchrimpfsRRThresholdFunction(0.1));
-		
+		logger.info("done");
 		return ruinAndRecreateAlgo;
 	}
 	
 	
 
 	private Solution getInitialSolution(VRP vrp, Collection<Tour> tours, TourAgentFactory tourAgentFactory, int vehicleCapacity) {
+		logger.info("make initial solution");
 		Collection<TourAgent> tourAgents = new ArrayList<TourAgent>();
 		for(Tour tour : tours){
 			Vehicle vehicle = VrpUtils.createVehicle(vehicleCapacity);
 			tourAgents.add(tourAgentFactory.createTourAgent(tour, vehicle));
 		}
+		logger.info("done");
 		return new Solution(tourAgents);
 	}
 

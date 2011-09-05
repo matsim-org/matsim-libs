@@ -14,4 +14,7 @@ public class EnRouteDelivery extends TourActivity{
 		super(customer);
 	}
 
+	public String getType(){
+		return "EnRouteDelivery";
+	}
 }

@@ -67,7 +67,9 @@ public class RadialRuin implements RuinStrategy {
 	public RadialRuin(VRP vrp) {
 		super();
 		this.vrp = vrp;
+		logger.info("intialise radial ruin");
 		makeNodeDataStructure();
+		logger.info("done");
 	}
 
 	public void setFractionOfAllNodes(double fractionOfAllNodes) {
@@ -118,7 +120,7 @@ public class RadialRuin implements RuinStrategy {
 			return;
 		}
 		Customer randomCustomer = pickRandomCustomer();
-		logger.info("randCust: " + randomCustomer);
+		logger.debug("randCust: " + randomCustomer);
 		TreeSet<ReferencedCustomer> tree = distanceNodeTree.get(randomCustomer.getId());
 		Iterator<ReferencedCustomer> descendingIterator = tree.descendingIterator();
 		int counter = 0;
@@ -127,7 +129,7 @@ public class RadialRuin implements RuinStrategy {
 		while(descendingIterator.hasNext() && counter<nOfNodes2BeRemoved){
 			ReferencedCustomer refNode = descendingIterator.next();
 			Customer customer = refNode.getCustomer();
-			logger.info("remCust: " + customer);
+			logger.debug("remCust: " + customer);
 			if(removedCustomers.contains(customer.getId())){
 				continue;
 			}

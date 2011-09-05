@@ -11,7 +11,7 @@ import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 
 public interface ServiceProvider {
 	
-	public abstract Offer requestService(Shipment shipment);
+	public abstract Offer requestService(Shipment shipment, double bestKnownPrice);
 	
 	public abstract void offerGranted(Shipment shipment);
 

@@ -3,7 +3,6 @@ package vrp.algorithms.ruinAndRecreate.api;
 import java.util.Collection;
 
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
-import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.api.Constraints;
 import vrp.api.Customer;
 import vrp.basics.Tour;

@@ -88,8 +88,8 @@ class RRTourAgent implements TourAgent {
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#requestService(core.basic.Node)
 	 */
 	
-	public Offer requestService(Shipment shipment){
-		Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment);
+	public Offer requestService(Shipment shipment, double bestKnownPrice){
+		Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment, bestKnownPrice);
 		if(newTour != null){
 			double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
 			Offer offer = new Offer(this, marginalCosts);

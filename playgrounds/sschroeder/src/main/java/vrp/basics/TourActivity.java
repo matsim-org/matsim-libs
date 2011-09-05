@@ -19,6 +19,20 @@ public class TourActivity {
 	
 	private int currentLoad = 0; //after this activity has occured
 	
+	private double activeTime = 0;
+	
+	public String getType(){
+		return "";
+	}
+	
+	public double getActiveTime() {
+		return activeTime;
+	}
+
+	public void setActiveTime(double activeTime) {
+		this.activeTime = activeTime;
+	}
+
 	public TourActivity(Customer customer) {
 		super();
 		this.customer = customer;
