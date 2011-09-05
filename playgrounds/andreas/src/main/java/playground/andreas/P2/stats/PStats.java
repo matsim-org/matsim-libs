@@ -87,7 +87,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 		if(this.pConfig.getWriteStats()){
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				this.pStatsWriter.write("ITERATION\tavg. MAINLINE\tavg. MAINLINE POSITIVE\tavg. BUDGET\tavg. FLEET SIZE\tavg. SCORE PER VEHICLE\tavg. PASSENGERS SERVED\n");
+				this.pStatsWriter.write("ITERATION\tavg. SCORE\tavg. POSITIVE SCORE\tavg. BUDGET\tavg. FLEET SIZE\tavg. SCORE PER VEHICLE\tavg. PASSENGERS SERVED\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
