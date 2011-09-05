@@ -25,15 +25,14 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
+import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
-import playground.andreas.P2.replanning.RemoveAllVehiclesButOne;
 import playground.andreas.P2.scoring.ScoreContainer;
 
 /**
@@ -55,10 +54,7 @@ public class Cooperative {
 	private PPlan testPlan;
 
 	private TransitLine currentTransitLine;
-	
 	private double budget;
-	private double lastBudget;
-	
 	private PRouteProvider routeProvider;
 	private int currentIteration;
 
@@ -72,20 +68,12 @@ public class Cooperative {
 		this.budget = 0.0;
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
-		
-		PPlan plan;
-		PPlanStrategy strategy = new RemoveAllVehiclesButOne(new ArrayList<String>());
-		
-		do {
-			plan = new PPlan(new IdImpl("0"), this.routeProvider.getRandomTransitStop(), this.routeProvider.getRandomTransitStop(), 0.0, 24.0 * 3600); 
-			while(plan.getStartStop() == plan.getEndStop()){
-				plan.setEndStop(pRouteProvider.getRandomTransitStop());
-			}
-			plan = strategy.modifyPlan(plan, this.id, this.routeProvider, this.currentIteration);				
-		} while (this.franchise.planRejected(plan));
 	
 		this.bestPlan = null;
-		this.testPlan = plan;
+
+		PPlanStrategy strategy = new CreateNewPlan(new ArrayList<String>());
+		this.testPlan = strategy.run(this);
+		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
 		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
 			this.currentTransitLine.addRoute(route);
@@ -93,9 +81,6 @@ public class Cooperative {
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
-		
-		this.lastBudget = budget;
-		
 		if(this.bestPlan != null){
 			scorePlan(driverId2ScoreMap, this.bestPlan);
 			this.budget += this.bestPlan.getScore();
@@ -107,7 +92,6 @@ public class Cooperative {
 		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
 			route.setDescription(this.testPlan.toString(this.budget));
 		}
-
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
@@ -158,21 +142,11 @@ public class Cooperative {
 		// replanning
 		if(bestPlan.getScore() > 0){
 			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
-			this.testPlan = strategy.modifyBestPlan(this);
+			this.testPlan = strategy.run(this);
 		} else {
 			// create complete new route
-			PPlan plan;
-			PPlanStrategy strategy = new RemoveAllVehiclesButOne(new ArrayList<String>());
-			
-			do {
-				plan = new PPlan(new IdImpl(this.currentIteration), this.routeProvider.getRandomTransitStop(), this.routeProvider.getRandomTransitStop(), 0.0, 24.0 * 3600); 
-				while(plan.getStartStop() == plan.getEndStop()){
-					plan.setEndStop(this.routeProvider.getRandomTransitStop());
-				}
-				plan = strategy.modifyPlan(plan, this.id, this.routeProvider, this.currentIteration);				
-			} while (this.franchise.planRejected(plan));
-			
-			this.testPlan = plan;
+			PPlanStrategy strategy = new CreateNewPlan(new ArrayList<String>());
+			this.testPlan = strategy.run(this);
 		}
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
@@ -188,6 +162,10 @@ public class Cooperative {
 	
 	public Id getId() {
 		return this.id;
+	}
+	
+	public PFranchise getFranchise(){
+		return this.franchise;
 	}
 
 	public TransitLine getCurrentTransitLine() {		

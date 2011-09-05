@@ -3,13 +3,11 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
-import playground.andreas.P2.plan.PRouteProvider;
 
 /**
  * 
@@ -36,25 +34,7 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 	}
 
 	@Override
-	public PPlan modifyPlan(PPlan oldPlan, Id pLineId, PRouteProvider pRouteProvider, int iteration) {
-		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(iteration));
-		newPlan.setStartStop(oldPlan.getStartStop());
-		newPlan.setEndStop(oldPlan.getEndStop());
-		
-		// get a valid new start time
-		double newStartTime = Math.max(0.0, oldPlan.getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * this.mutationRange);
-		newStartTime = Math.min(newStartTime, oldPlan.getEndTime() - this.minimalOperatingTime);
-		newPlan.setStartTime(newStartTime);
-		
-		newPlan.setEndTime(oldPlan.getEndTime());
-		newPlan.setLine(pRouteProvider.createTransitLine(pLineId, newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(iteration)));
-
-		return newPlan;
-	}
-
-	@Override
-	public PPlan modifyBestPlan(Cooperative cooperative) {
+	public PPlan run(Cooperative cooperative) {
 		// profitable route, change startTime
 		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()));
 		newPlan.setStartStop(cooperative.getBestPlan().getStartStop());
