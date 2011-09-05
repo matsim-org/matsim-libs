@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripDistanceTask.java
+ * PersonProperty.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,52 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author illenberger
  *
  */
-public class TripDistanceTask extends TrajectoryAnalyzerTask {
+public interface PersonProperty {
 
-	private final ActivityFacilities facilities;
+	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons);
 	
-	public TripDistanceTask(ActivityFacilities facilities) {
-		this.facilities = facilities;
-	}
+	public DescriptiveStatistics statistics(Set<? extends Person> persons);
 	
-	@Override
-	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Set<String> purposes = new HashSet<String>();
-		for(Trajectory t : trajectories) {
-			for(int i = 0; i < t.getElements().size(); i += 2) {
-				purposes.add(((Activity)t.getElements().get(i)).getType());
-			}
-		}
-		
-		for(String purpose : purposes) {
-			TripDistanceSum tripDistance = new TripDistanceSum(purpose, facilities);
-			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
-			
-			String key = "d_trip_" + purpose;
-			results.put(key, stats);
-			try {
-				writeHistograms(stats, key, 50, 50);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		}
-	}
-
 }

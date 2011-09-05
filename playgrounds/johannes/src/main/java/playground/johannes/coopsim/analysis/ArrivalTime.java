@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -32,29 +31,28 @@ import playground.johannes.coopsim.pysical.Trajectory;
  * @author illenberger
  *
  */
-public class ActivityStartTime {
+public class ArrivalTime extends AbstractTrajectoryProperty {
 
-	public Map<String, DescriptiveStatistics> statistics(Set<Trajectory> trajectories) {
-		Map<String, DescriptiveStatistics> map = new HashMap<String, DescriptiveStatistics>();
-
-		for (Trajectory trajectory : trajectories) {
-			if(trajectory.getElements().size() > 0) {
-				for(int i = 0; i < trajectory.getElements().size(); i+=2) {
-					Activity act = (Activity) trajectory.getElements().get(i);
-					String type = act.getType();
-					
-					DescriptiveStatistics stats = map.get(type);
-					if (stats == null) {
-						stats = new DescriptiveStatistics();
-						map.put(type, stats);
-					}
-					
-					stats.addValue(trajectory.getTransitions().get(i));
-					
+	private final String purpose;
+	
+	public ArrivalTime(String purpose) {
+		this.purpose = purpose;
+	}
+	
+	@Override
+	public TObjectDoubleHashMap<Trajectory> values(Set<? extends Trajectory> trajectories) {
+		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
+		
+		for(Trajectory trajectory : trajectories) {
+			for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+				Activity act = (Activity)trajectory.getElements().get(i);
+				
+				if(purpose == null || act.getType().equals(purpose)) {
+					values.put(trajectory, trajectory.getTransitions().get(i));
 				}
 			}
 		}
-
-		return map;
+		
+		return values;
 	}
 }

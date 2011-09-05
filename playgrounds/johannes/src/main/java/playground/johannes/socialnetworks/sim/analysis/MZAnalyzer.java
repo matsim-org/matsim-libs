@@ -106,10 +106,10 @@ public class MZAnalyzer {
 			graphbuilder.addVertex(graph, new SocialPerson((PersonImpl) person), MatsimCoordUtils.coordToPoint(c));
 		}
 		ActivityDistanceCalculator actDistCalc = new ActDistCoordCalculator(new WGS84DistanceCalculator());
-		TripDistanceAccessibilityTask tripTask = new TripDistanceAccessibilityTask(actDistCalc);
-		tripTask.setTrajectories(trajectories);
-		tripTask.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/aggacts/sun/");
-		GraphAnalyzer.analyze(graph, tripTask);
+//		TripDistanceAccessibilityTask tripTask = new TripDistanceAccessibilityTask(actDistCalc);
+//		tripTask.setTrajectories(trajectories);
+//		tripTask.setOutputDirectoy("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/aggacts/sun/");
+//		GraphAnalyzer.analyze(graph, tripTask);
 		
 //		TrajectoryAnalyzer.analyze(new HashSet<Trajectory>(trajectories.values()), tComposite, "/Users/jillenberger/Work/socialnets/locationChoice/data/plans.sun.14473/");
 

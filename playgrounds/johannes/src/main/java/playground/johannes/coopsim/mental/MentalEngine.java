@@ -86,7 +86,8 @@ public class MentalEngine {
 		return egos;
 	}
 	
-	public void acceptRejectState(Set<SocialVertex> egos) {
+	public boolean acceptRejectState(Set<SocialVertex> egos) {
+		boolean accept;
 		/*
 		 * get new and old plans
 		 */
@@ -129,11 +130,13 @@ public class MentalEngine {
 			 */
 			remove = oldState;
 			acceptedStates++;
+			accept = true;
 		} else {
 			/*
 			 * reject state
 			 */
 			remove = newState;
+			accept = false;
 		}
 		/*
 		 * remove plans
@@ -141,6 +144,8 @@ public class MentalEngine {
 		for(Plan plan : remove) {
 			plan.getPerson().getPlans().remove(plan);
 		}
+		
+		return accept;
 	}
 	
 	public int getAcceptedStates() {

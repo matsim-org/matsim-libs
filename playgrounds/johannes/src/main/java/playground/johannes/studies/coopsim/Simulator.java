@@ -26,7 +26,6 @@ import java.util.Random;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.sna.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -46,10 +45,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.SimEngine;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
-import playground.johannes.coopsim.analysis.ActivityStartTimeTask;
+import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.PlansWriterTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.eval.EvalEngine;
 import playground.johannes.coopsim.mental.MentalEngine;
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
@@ -109,6 +109,7 @@ public class Simulator {
 		int iterations = (int) Double.parseDouble(config.getParam("controler", "lastIteration"));
 		double beta = Double.parseDouble(config.getParam("socialnets", "beta_join"));
 		String output = config.getParam("controler", "outputDirectory");
+		int sampleInterval = (int) Double.parseDouble(config.getParam("socialnets", "sampleinterval"));
 		/*
 		 * initialize physical engine
 		 */
@@ -154,6 +155,8 @@ public class Simulator {
 		 */
 		logger.info("Initializing simulation engine...");
 		SimEngine simEngine = new SimEngine(graph, mental, physical, eval);
+		simEngine.setSampleInterval(sampleInterval);
+		simEngine.setLogInerval(500);
 		/*
 		 * initialize analyzer tasks
 		 */
@@ -233,7 +236,7 @@ public class Simulator {
 		/*
 		 * initialize arrival time selector
 		 */
-		UnivariateRealFunction pdf = new LogNormalDistribution(0.3, 10.8, 1165);
+		UnivariateRealFunction pdf = new LogNormalDistribution(0.3, 10.8, 1162);
 		Map<SocialVertex, Double> times = initTimes(pdf, 28800, 86400, random);
 		choiceSelector.addComponent(new ArrivalTimeSelector(times, random));
 		/*
@@ -243,28 +246,41 @@ public class Simulator {
 		times = initTimes(pdf, 0, 43200, random);
 		choiceSelector.addComponent(new DurationSelector(times, random));
 		
+		
 		return choiceSelector;
 	}
 	
 	private static Map<SocialVertex, Double> initTimes(UnivariateRealFunction pdf, int min, int max, Random random) {
-		TimeSampler sampler = new TimeSampler(pdf, min, max, random);
-		
-		ProgressLogger.init(graph.getVertices().size(), 1, 5);
+		TimeSampler sampler = new TimeSampler(pdf, max, random);
 		Map<SocialVertex, Double> map = new HashMap<SocialVertex, Double>(graph.getVertices().size());
+//		BufferedWriter writer;
+//		try {
+//			writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/locationChoice/output/samples.txt"));
+//		ProgressLogger.init(graph.getVertices().size(), 1, 5);
+		
 		for(SocialVertex v : graph.getVertices()) {
-			map.put(v, (double) sampler.nextSample());
-			map.put(v, 27700.0);
-			ProgressLogger.step();
+			double sample =(double) sampler.nextSample();
+//			writer.write(String.valueOf(sample));
+//			writer.newLine();
+			map.put(v, sample);
+//			ProgressLogger.step();
 		}
-
+//		writer.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 		return map;
 	}
 	
 	private static TrajectoryAnalyzerTask initAnalyzerTask() {
 		TrajectoryAnalyzerTaskComposite composite = new TrajectoryAnalyzerTaskComposite();
 		composite.addTask(new PlansWriterTask(network));
-		composite.addTask(new ActivityStartTimeTask());
+		composite.addTask(new ArrivalTimeTask());
 		composite.addTask(new ActivityDurationTask());
+		composite.addTask(new TripDistanceTask(facilities));
+//		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		return composite;
 	}
 }

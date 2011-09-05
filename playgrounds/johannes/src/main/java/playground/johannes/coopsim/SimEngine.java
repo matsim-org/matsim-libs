@@ -21,7 +21,10 @@ package playground.johannes.coopsim;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -42,81 +45,82 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class SimEngine {
-	
+
 	private static final Logger logger = Logger.getLogger(SimEngine.class);
 
 	private final SocialGraph graph;
-	
+
 	private final MentalEngine mentalEngine;
-	
+
 	private final PhysicalEngine physicalEngine;
-	
+
 	private final EvalEngine evalEngine;
-	
+
 	private final EventsManager eventsManager;
-	
+
 	private int sampleInterval = 500;
-	
+
 	private int logInterval = 100;
-	
+
 	private TrajectoryAnalyzerTask analyzerTask;
-	
+
 	private String outpurDirectory;
-	
+
 	public SimEngine(SocialGraph graph, MentalEngine mentalEngine, PhysicalEngine physicalEngine, EvalEngine evalEngine) {
 		this.graph = graph;
 		this.mentalEngine = mentalEngine;
 		this.physicalEngine = physicalEngine;
 		this.evalEngine = evalEngine;
-		
+
 		this.eventsManager = EventsUtils.createEventsManager();
-		
+
 		LoggerUtils.setVerbose(false);
-		for(EventHandler handler : evalEngine.getEventHandler())
+		for (EventHandler handler : evalEngine.getEventHandler())
 			eventsManager.addHandler(handler);
 		LoggerUtils.setVerbose(true);
 	}
-	
+
 	public void setSampleInterval(int interval) {
 		this.sampleInterval = interval;
 	}
-	
+
 	public void setLogInerval(int interval) {
 		this.logInterval = interval;
 	}
-	
+
 	public void setAnalyzerTask(TrajectoryAnalyzerTask task, String output) {
 		this.analyzerTask = task;
 		this.outpurDirectory = output;
 	}
-	
+
 	public void run(int iterations) {
 		logger.info("Drawing initial full sample...");
 		drawSample(0);
-		
+
 		logger.info(String.format("Running markov chain for %1$s iterations.", iterations));
 		mentalEngine.clearStatistics();
-		for(int i = 1; i <= iterations; i++) {
+		for (int i = 1; i <= iterations; i++) {
 			LoggerUtils.setVerbose(false);
 			step();
 			LoggerUtils.setVerbose(true);
-			
-			if(i % logInterval == 0) {
-				double avrTransitionProba = mentalEngine.getTransitionProbaSum()/(double)logInterval;
-				logger.info(String.format("[%1$s] Accepted %2$s states, Average transition probability %3$s.", i, mentalEngine.getAcceptedStates(), avrTransitionProba));
+
+			if (i % logInterval == 0) {
+				double avrTransitionProba = mentalEngine.getTransitionProbaSum() / (double) logInterval;
+				logger.info(String.format("[%1$s] Accepted %2$s states, Average transition probability %3$s.", i,
+						mentalEngine.getAcceptedStates(), avrTransitionProba));
 				mentalEngine.clearStatistics();
 			}
-			
-			if(i % sampleInterval == 0) {
+
+			if (i % sampleInterval == 0) {
 				logger.info("Drawing full sample...");
 				drawSample(i);
 			}
 		}
 	}
-	
+
 	public void step() {
 		/*
 		 * run mental layer
@@ -125,11 +129,20 @@ public class SimEngine {
 		/*
 		 * get alters
 		 */
-		Set<SocialVertex> alters = new HashSet<SocialVertex>();
-		for(SocialVertex ego : egos) {
-			for(SocialVertex alter : ego.getNeighbours()) {
-				if(!egos.contains(alter)) {
-					alters.add(alter);
+		Set<SocialVertex> altersLevel1 = new HashSet<SocialVertex>();
+		for (SocialVertex ego : egos) {
+			for (SocialVertex alter : ego.getNeighbours()) {
+				if (!egos.contains(alter)) {
+					altersLevel1.add(alter);
+				}
+			}
+		}
+
+		Set<SocialVertex> altersLevel2 = new HashSet<SocialVertex>();
+		for (SocialVertex alter : altersLevel1) {
+			for (SocialVertex neighbour : alter.getNeighbours()) {
+				if (!egos.contains(neighbour) && !altersLevel1.contains(neighbour)) {
+					altersLevel2.add(neighbour);
 				}
 			}
 		}
@@ -137,11 +150,23 @@ public class SimEngine {
 		 * get plans for physical layer
 		 */
 		Set<Plan> plans = new HashSet<Plan>();
-		for(SocialVertex ego : egos)
+		for (SocialVertex ego : egos)
 			plans.add(ego.getPerson().getPerson().getSelectedPlan());
-		
-		for(SocialVertex alter : alters)
-			plans.add(alter.getPerson().getPerson().getSelectedPlan());
+
+		Map<Plan, Double> alter1Scores = new HashMap<Plan, Double>(altersLevel1.size());
+		for (SocialVertex alter : altersLevel1) {
+			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
+			plans.add(plan);
+			alter1Scores.put(plan, plan.getScore());
+		}
+
+		Map<Plan, Double> alter2Scores = new HashMap<Plan, Double>(altersLevel2.size());
+		for (SocialVertex alter : altersLevel2) {
+			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
+			plans.add(plan);
+			alter2Scores.put(plan, plan.getScore());
+		}
+
 		/*
 		 * run physical layer
 		 */
@@ -154,31 +179,45 @@ public class SimEngine {
 		/*
 		 * accept/reject state
 		 */
-		mentalEngine.acceptRejectState(egos);
+		boolean accept = mentalEngine.acceptRejectState(egos);
+		/*
+		 * reset scores of level 2 alters
+		 */
+		for(Entry<Plan, Double> entry : alter2Scores.entrySet()) {
+			entry.getKey().setScore(entry.getValue());
+		}
+		/*
+		 * if state rejected, reset scores of level 1 alters
+		 */
+		if(!accept) {
+			for(Entry<Plan, Double> entry : alter1Scores.entrySet()) {
+				entry.getKey().setScore(entry.getValue());
+			}
+		}
 	}
-	
+
 	public void drawSample(int iter) {
 		LoggerUtils.setVerbose(false);
-		
+
 		evalEngine.init();
-		
+
 		Set<Plan> plans = new HashSet<Plan>();
-		for(SocialVertex v : graph.getVertices()) {
+		for (SocialVertex v : graph.getVertices()) {
 			plans.add(v.getPerson().getPerson().getSelectedPlan());
 		}
-		
+
 		TrajectoryEventsBuilder builder = new TrajectoryEventsBuilder(plans);
 		builder.reset(iter);
 		eventsManager.addHandler(builder);
-		
+
 		physicalEngine.run(plans, eventsManager);
-		
+
 		eventsManager.removeHandler(builder);
-		
+
 		Set<Trajectory> trajectories = new HashSet<Trajectory>(builder.getTrajectories().values());
-		
+
 		evalEngine.run();
-		
+
 		LoggerUtils.setVerbose(true);
 		try {
 			String iterDir = String.format("%1$s/%2$s/", outpurDirectory, iter);

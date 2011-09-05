@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityStartTimeTask.java
+ * PersonTrajectoryPropertyAdaptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,45 +19,50 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
+
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.collections.BidiMap;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.socialnetworks.sim.analysis.AbstractPersonProperty;
+
 
 /**
  * @author illenberger
  *
  */
-public class ActivityStartTimeTask extends TrajectoryAnalyzerTask {
+public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
 
-	private final static String KEY = "start";
+	private final BidiMap trajectories;
+	
+	private final TrajectoryProperty delegate;
+	
+	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
+		this.trajectories = trajectories;
+		this.delegate = delegate;
+	}
 	
 	@Override
-	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		ActivityStartTime startTime = new ActivityStartTime();
-		Map<String, DescriptiveStatistics> startTimes = startTime.statistics(trajectories);
-		
-		for(Entry<String, DescriptiveStatistics> entry : startTimes.entrySet()) {
-			String type = entry.getKey();
-			DescriptiveStatistics stats = entry.getValue();
-			
-			String subKey = String.format("%1$s_%2$s", KEY, type);
-			
-			results.put(subKey, stats);
-			
-			if(outputDirectoryNotNull()) {
-				try {
-					writeHistograms(stats, subKey, 50, 50);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
+		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
+		for(Person person : persons) {
+			traj.add((Trajectory) trajectories.get(person));
 		}
-
+	
+		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
+		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
+		
+		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
+		for(int i = 0; i < tValues.size(); i++) {
+			it.advance();
+			pValues.put((Person) trajectories.getKey(it.key()), it.value());
+		}
+		
+		return pValues;
 	}
-
 }

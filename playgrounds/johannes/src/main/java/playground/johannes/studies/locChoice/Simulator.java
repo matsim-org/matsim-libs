@@ -66,6 +66,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
+import playground.johannes.coopsim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
@@ -88,7 +89,6 @@ import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzer;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.socialnetworks.sim.analysis.TrajectoryEventsBuilder;
-import playground.johannes.socialnetworks.sim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.socialnetworks.sim.analysis.VisitorAnalyzerTask;
 import playground.johannes.socialnetworks.sim.gis.ActDistFacilityCalculator;
 import playground.johannes.socialnetworks.sim.gis.ActivityDistanceCalculator;
@@ -320,11 +320,11 @@ public class Simulator {
 		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new ScoreAnalyzerTask(selector, scoringFacotry));
 		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new HomeVisitTask(tracker, graph));
 		ActivityDistanceCalculator actDistCalc = new ActDistFacilityCalculator(scenario.getActivityFacilities());
-		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new TripDistanceTask(actDistCalc));
+//		((TrajectoryAnalyzerTaskComposite) tAnalyzer).addTask(new TripDistanceTask(actDistCalc));
 		
 		gAnalyzer = new AnalyzerTaskComposite();
-		tripTask = new TripDistanceAccessibilityTask(actDistCalc);
-		((AnalyzerTaskComposite)gAnalyzer).addTask(tripTask);
+//		tripTask = new TripDistanceAccessibilityTask(actDistCalc);
+//		((AnalyzerTaskComposite)gAnalyzer).addTask(tripTask);
 		
 	}
 	
@@ -584,8 +584,8 @@ public class Simulator {
 			e.printStackTrace();
 		}
 		
-		tripTask.setTrajectories(trajectories);
-		tripTask.setOutputDirectoy(itertOutputDir);
+//		tripTask.setTrajectories(trajectories);
+//		tripTask.setOutputDirectoy(itertOutputDir);
 		GraphAnalyzer.analyze(graph, gAnalyzer);
 	}
 

@@ -25,26 +25,53 @@ import gnu.trove.TObjectDoubleIterator;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 
-import playground.johannes.socialnetworks.sim.analysis.Trajectory;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public abstract class AbstractTrajectoryProperty implements TrajectoryProperty {
+
+	private static final Logger logger = Logger.getLogger(AbstractTrajectoryProperty.class);
+	
+	public DescriptiveStatistics statistics(Set<? extends Trajectory> trajectories, boolean ignoreZeros) {
+		if (!ignoreZeros)
+			return this.statistics(trajectories);
+		else {
+			TObjectDoubleHashMap<Trajectory> values = values(trajectories);
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+
+			int zeros = 0;
+			TObjectDoubleIterator<Trajectory> it = values.iterator();
+			for (int i = 0; i < values.size(); i++) {
+				it.advance();
+				if(it.value() > 0)
+					stats.addValue(it.value());
+				else
+					zeros++;
+			}
+
+			if(zeros > 0)
+				logger.debug(String.format("Ignored %1$s zero values.", zeros));
+			
+			return stats;
+		}
+	}
 
 	@Override
 	public DescriptiveStatistics statistics(Set<? extends Trajectory> trajectories) {
 		TObjectDoubleHashMap<Trajectory> values = values(trajectories);
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
+
 		TObjectDoubleIterator<Trajectory> it = values.iterator();
-		for(int i = 0; i < values.size(); i++) {
+		for (int i = 0; i < values.size(); i++) {
 			it.advance();
 			stats.addValue(it.value());
 		}
-		
+
 		return stats;
 	}
 

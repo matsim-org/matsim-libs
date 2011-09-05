@@ -32,41 +32,25 @@ public class TimeSampler {
 
 	private final Random random;
 
-	private final int interval;
-
-	private final int min;
+	private final int max;
 
 	private final UnivariateRealFunction pdf;
 
-	private double norm;
-
-	public TimeSampler(UnivariateRealFunction pdf, int min, int max, Random random) {
+	public TimeSampler(UnivariateRealFunction pdf, int max, Random random) {
 		this.pdf = pdf;
 		this.random = random;
-		this.min = min;
-		this.interval = max - min;
-		
-		norm = 0;
-		for(int t = min; t < max; t++) {
-			try {
-				norm += pdf.value(t);
-			} catch (FunctionEvaluationException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		norm = 1.0/norm;
+		this.max = max;
 	}
 	
 	public int nextSample() {
 		while (true) { // for ever
-			int t = random.nextInt(interval);
+			int t = random.nextInt(max);
 
 			try {
-				double p = pdf.value(t) * norm;
+				double p = pdf.value(t);
 
 				if (random.nextDouble() < p)
-					return min + t;
+					return t;
 				
 			} catch (FunctionEvaluationException e) {
 				e.printStackTrace();

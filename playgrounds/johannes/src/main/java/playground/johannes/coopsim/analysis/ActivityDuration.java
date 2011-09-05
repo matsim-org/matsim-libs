@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -33,42 +31,30 @@ import playground.johannes.coopsim.pysical.Trajectory;
  * @author illenberger
  *
  */
-public class ActivityDuration {
+public class ActivityDuration extends AbstractTrajectoryProperty {
 	
-	private static final Logger logger = Logger.getLogger(ActivityDuration.class);
-
-	public Map<String, DescriptiveStatistics> statistics(Set<Trajectory> trajectories) {
-		Map<String, DescriptiveStatistics> map = new HashMap<String, DescriptiveStatistics>();
-		int cnt0 = 0;
-		for (Trajectory trajectory : trajectories) {
-
-			for (int i = 0; i < trajectory.getElements().size(); i += 2) {
+	private final String purpose;
+	
+	public ActivityDuration(String purpose) {
+		this.purpose = purpose;
+	}
+	
+	@Override
+	public TObjectDoubleHashMap<Trajectory> values(Set<? extends Trajectory> trajectories) {
+		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
+		
+		for(Trajectory trajectory : trajectories) {
+			for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+				Activity act = (Activity)trajectory.getElements().get(i);
 				
-					Activity act = (Activity) trajectory.getElements().get(i);
-
-					String type = act.getType();
-					DescriptiveStatistics stats = map.get(type);
-					if (stats == null) {
-						stats = new DescriptiveStatistics();
-						map.put(type, stats);
-					}
+				if(purpose == null || act.getType().equals(purpose)) {
+					double dur = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
 					
-					double start = trajectory.getTransitions().get(i);
-					double end = trajectory.getTransitions().get(i + 1);
-
-					double duration = end - start;
-					
-					if(duration > 0)
-						stats.addValue(duration);
-					else
-						cnt0++;
-				
+					values.put(trajectory, dur);
+				}
 			}
 		}
 		
-		if(cnt0 > 0)
-			logger.debug(String.format("Ignored %1$s activities with duration zero.", cnt0));
-		
-		return map;
+		return values;
 	}
 }

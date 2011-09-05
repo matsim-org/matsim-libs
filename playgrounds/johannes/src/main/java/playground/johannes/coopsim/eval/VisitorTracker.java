@@ -46,9 +46,15 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	private Map<Id, Set<Visitor>> visitors;
 	
+	private String ignoreType = "home";
+	
+	public void setIgnoreType(String type) {
+		this.ignoreType = type;
+	}
+	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().equals("leisure")) {
+		if (!event.getActType().equals(ignoreType)) {
 			Visitor visitor = new Visitor();
 			visitor.person = event.getPersonId();
 			visitor.startEvent = event;
@@ -59,11 +65,9 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 			 * add visitor to facility
 			 */
 			Set<Visitor> facilityVisitors = visitors.get(event.getFacilityId());
-//			Set<Visitor> facilityVisitors = visitors.get(event.getLinkId());
 			if (facilityVisitors == null) {
 				facilityVisitors = new HashSet<Visitor>();
 				visitors.put(event.getFacilityId(), facilityVisitors);
-//				visitors.put(event.getLinkId(), facilityVisitors);
 			}
 			facilityVisitors.add(visitor);
 		}
@@ -79,7 +83,7 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().equals("leisure")) {
+		if (!event.getActType().equals(ignoreType)) {
 			Visitor visitor = startEvents.get(event.getPersonId());
 			if (visitor != null) {
 				visitor.endEvent = event;
@@ -94,7 +98,6 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 
 				Visit visit = new Visit();
 				visit.facility = event.getFacilityId();
-//				visit.facility = event.getLinkId();
 				visit.startEvent = visitor.startEvent;
 				visit.endEvent = event;
 

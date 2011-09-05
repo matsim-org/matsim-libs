@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonProperty.java
+ * EgosFacilities.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.analysis;
+package playground.johannes.coopsim.mental.choice;
 
-import gnu.trove.TObjectDoubleHashMap;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.Id;
+
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public interface PersonProperty {
+public class EgosFacilities implements FacilityChoiceSetGenerator {
 
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons);
+	private final Map<SocialVertex, List<Id>> choiceSets;
 	
-	public DescriptiveStatistics statistics(Set<? extends Person> persons);
+	private final Random random;
 	
+	public EgosFacilities(Map<SocialVertex, List<Id>> choiceSets, Random random) {
+		this.choiceSets = choiceSets;
+		this.random = random;
+	}
+	
+	@Override
+	public ChoiceSet<Id> generate(Set<SocialVertex> egos) {
+		ChoiceSet<Id> choiceSet = new ChoiceSet<Id>(random);
+		
+		for(SocialVertex ego : egos) {
+			List<Id> facilityIds = choiceSets.get(ego);
+			for(Id id : facilityIds)
+				choiceSet.addChoice(id);
+		}
+		
+		return choiceSet;
+	}
+
 }

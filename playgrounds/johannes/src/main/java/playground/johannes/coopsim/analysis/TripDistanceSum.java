@@ -23,11 +23,16 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
-import playground.johannes.socialnetworks.sim.analysis.Trajectory;
-import playground.johannes.socialnetworks.sim.gis.ActivityDistanceCalculator;
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
+import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 
 /**
  * @author illenberger
@@ -35,14 +40,19 @@ import playground.johannes.socialnetworks.sim.gis.ActivityDistanceCalculator;
  */
 public class TripDistanceSum extends AbstractTrajectoryProperty {
 
-	private final static Logger logger = Logger.getLogger(TripDistanceSum.class);
-	
 	private final String purpose;
 	
-	private final ActivityDistanceCalculator calculator;
+	private final DistanceCalculator calculator;
 	
-	public TripDistanceSum(String purpose, ActivityDistanceCalculator calculator) {
+	private final ActivityFacilities facilities;
+	
+	public TripDistanceSum(String purpose, ActivityFacilities facilities) {
+		this(purpose, facilities, OrthodromicDistanceCalculator.getInstance());
+	}
+	
+	public TripDistanceSum(String purpose, ActivityFacilities facilities, DistanceCalculator calculator) {
 		this.purpose = purpose;
+		this.facilities = facilities;
 		this.calculator = calculator;
 	}
 	
@@ -50,26 +60,26 @@ public class TripDistanceSum extends AbstractTrajectoryProperty {
 	public TObjectDoubleHashMap<Trajectory> values(Set<? extends Trajectory> trajectories) {
 		TObjectDoubleHashMap<Trajectory> values = new TObjectDoubleHashMap<Trajectory>(trajectories.size());
 		
-		int zeroDistances = 0;
-		
 		for(Trajectory trajectory : trajectories) {
 			for(int i = 2; i < trajectory.getElements().size(); i += 2) {
 				Activity destination = (Activity) trajectory.getElements().get(i);
+				
 				if(purpose == null || destination.getType().equals(purpose)) {
+					Id id = destination.getFacilityId();
+					Coord dest = facilities.getFacilities().get(id).getCoord();
+					
 					Activity origin = (Activity) trajectory.getElements().get(i - 2);
-					double d = calculator.distance(origin, destination);
-					if(d > 0)
-						values.adjustOrPutValue(trajectory, d, d);
-					else
-						zeroDistances++;
+					id = origin.getFacilityId();
+					ActivityFacility fac = facilities.getFacilities().get(id);
+					Coord source = fac.getCoord();
+					
+					double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
+					values.adjustOrPutValue(trajectory, d, d);
 				}
 				
 			}
 		}
 		
-		if(zeroDistances > 0)
-			logger.debug(String.format("%1$s trips with zero distance.", zeroDistances));
-			
 		return values;
 	}
 

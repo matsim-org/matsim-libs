@@ -25,7 +25,8 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
-import playground.johannes.socialnetworks.sim.analysis.Trajectory;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 
 /**
  * @author illenberger

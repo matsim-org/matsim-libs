@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * VertexPersonPropertyAdaptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.sim.analysis;
+package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.BidiMap;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
 
-import playground.johannes.coopsim.analysis.TrajectoryProperty;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public class VertexPersonPropertyAdaptor extends AbstractVertexProperty {
 
-	private final BidiMap trajectories;
+	private final Map<Person, Vertex> personVertexMap;
 	
-	private final TrajectoryProperty delegate;
+	private final PersonProperty delegate;
 	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
+	public VertexPersonPropertyAdaptor(SocialGraph graph, PersonProperty delegate) {
+		personVertexMap = new HashMap<Person, Vertex>(graph.getVertices().size());
+		for(SocialVertex v : graph.getVertices()) {
+			personVertexMap.put(v.getPerson().getPerson(), v);
+		}
 		this.delegate = delegate;
 	}
 	
 	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
-		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
+	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
+		Set<SocialVertex> socialVertices = (Set<SocialVertex>) vertices;
 		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
+		Set<Person> personSet = new HashSet<Person>(vertices.size());
+		for(SocialVertex v : socialVertices) {
+			personSet.add(v.getPerson().getPerson());
+		}
+		
+		TObjectDoubleHashMap<Person> pValues = delegate.values(personSet);
+		TObjectDoubleHashMap<Vertex> vValues = new TObjectDoubleHashMap<Vertex>(pValues.size());
+		
+		TObjectDoubleIterator<Person> it = pValues.iterator();
+		for(int i = 0; i< pValues.size(); i++) {
 			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
+			vValues.put(personVertexMap.get(it.key()), it.value());
 		}
 		
-		return pValues;
+		return vValues;
 	}
+
 }

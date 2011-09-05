@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripDistanceTask.java
+ * ActivityStartTimeTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,23 +26,15 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
-
 
 /**
  * @author illenberger
  *
  */
-public class TripDistanceTask extends TrajectoryAnalyzerTask {
+public class ArrivalTimeTask extends TrajectoryAnalyzerTask {
 
-	private final ActivityFacilities facilities;
-	
-	public TripDistanceTask(ActivityFacilities facilities) {
-		this.facilities = facilities;
-	}
-	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
@@ -53,18 +45,19 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 		}
 		
 		for(String purpose : purposes) {
-			TripDistanceSum tripDistance = new TripDistanceSum(purpose, facilities);
-			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
+			ArrivalTime startTime = new ArrivalTime(purpose);
+			DescriptiveStatistics stats = startTime.statistics(trajectories, true);
 			
-			String key = "d_trip_" + purpose;
+			String key = "t_arr_" + purpose;
 			results.put(key, stats);
+			
 			try {
 				writeHistograms(stats, key, 50, 50);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
 		}
+
 	}
 
 }

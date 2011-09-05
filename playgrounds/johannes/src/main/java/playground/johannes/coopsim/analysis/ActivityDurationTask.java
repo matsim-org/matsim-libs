@@ -20,11 +20,12 @@
 package playground.johannes.coopsim.analysis;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.sna.math.LinearDiscretizer;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -35,26 +36,27 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class ActivityDurationTask extends TrajectoryAnalyzerTask {
 
-	public final static String KEY = "dur";
-	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		ActivityDuration duration = new ActivityDuration();
+		Set<String> purposes = new HashSet<String>();
+		for(Trajectory t : trajectories) {
+			for(int i = 0; i < t.getElements().size(); i += 2) {
+				purposes.add(((Activity)t.getElements().get(i)).getType());
+			}
+		}
 		
-		Map<String, DescriptiveStatistics> map = duration.statistics(trajectories);
-		for(Entry<String, DescriptiveStatistics> entry : map.entrySet()) {
-			String type = entry.getKey();
-			DescriptiveStatistics stats = entry.getValue();
+		for(String purpose : purposes) {
+			ActivityDuration duration = new ActivityDuration(purpose);
+			DescriptiveStatistics stats = duration.statistics(trajectories, true);
 			
-			String subKey = String.format("%1$s_%2$s", KEY, type);
-			results.put(subKey, stats);
+			String key = "dur_act_" + purpose;
+			results.put(key, stats);
 			
-			if(outputDirectoryNotNull()) {
-				try {
-					writeHistograms(stats, new LinearDiscretizer(60), subKey, false);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
+				writeHistograms(stats, key, 50, 50);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

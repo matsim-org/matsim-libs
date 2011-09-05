@@ -68,7 +68,7 @@ public abstract class TrajectoryAnalyzerTask {
 		if (values.length > 0) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
 			Histogram.normalize(hist);
-			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), name, values.length / bins));
+			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name, values.length / bins));
 		} else {
 			logger.warn("Cannot create histogram. No samples.");
 		}
