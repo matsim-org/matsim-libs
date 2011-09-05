@@ -106,7 +106,7 @@ public class PBox {
 	public TransitSchedule replan(Controler controler, int iteration){
 		// Two cases: First "initial iteration", Second "any other one"
 		
-		if(iteration == 0){
+		if(iteration == controler.getFirstIteration()){
 			// initial iteration
 			
 			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
