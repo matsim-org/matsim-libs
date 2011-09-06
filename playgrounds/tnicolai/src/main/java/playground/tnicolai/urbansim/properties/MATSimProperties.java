@@ -58,7 +58,7 @@ public class MATSimProperties extends Properties{
 	 */
 	private MATSimProperties(){	
 		
-		String matsimProperiesFile = Constants.MATSIM_CONFIG_DIRECTORY + Constants.MATSIM_PROPERTIES_FILE;
+		String matsimProperiesFile = Constants.MATSIM_4_OPUS_CONFIG + Constants.MATSIM_PROPERTIES_FILE;
 		File propertiesFile = new File(matsimProperiesFile);
 		
 		try{
@@ -85,7 +85,7 @@ public class MATSimProperties extends Properties{
 	public void saveMATSimState(){
 		
 		try{
-			this.store(new FileOutputStream(Constants.MATSIM_CONFIG_DIRECTORY + "/matsim.properties", false), "MATSim state file");
+			this.store(new FileOutputStream(Constants.MATSIM_4_OPUS_CONFIG + "/matsim.properties", false), "MATSim state file");
 		}
 		catch(IOException io){
 			io.printStackTrace();

@@ -62,8 +62,8 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		this.zones = zones;
 		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
-		this.travelDataPath = Constants.OPUS_HOME + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "travel_data.csv";
-		this.zonesPath = Constants.OPUS_HOME + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "zones.csv";
+		this.travelDataPath = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP_DIRECTORY) + "travel_data.csv";
+		this.zonesPath = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP_DIRECTORY) + "zones.csv";
 	}
 	
 	/**

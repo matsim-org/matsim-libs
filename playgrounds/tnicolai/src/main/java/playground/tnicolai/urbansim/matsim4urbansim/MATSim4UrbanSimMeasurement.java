@@ -48,7 +48,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.tnicolai.urbansim.constants.Constants;
-import playground.tnicolai.urbansim.utils.InitMATSimScenario;
 import playground.tnicolai.urbansim.utils.helperObjects.MeasurementObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
 import playground.toronto.ttimematrix.SpanningTree;
@@ -70,7 +69,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 	protected void ReadUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, ActivityFacilitiesImpl zones){
 		
 		long startTimeReadFacilities, endTimeReadFacilities, startTimeWriteFacilities, endTimeWriteFacilities;
-		File output = new File(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "locations.xml.gz");
+		File output = new File(Constants.MATSIM_4_OPUS_TEMP + "locations.xml.gz");
 		
 		if(measurements != null){
 			try {
@@ -103,7 +102,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		Population oldPopulation = null;
 		Population newPopulation = null;
 		long startTimeReadPersons, endTimeReadPersons, startTimeWritePersons, endTimeWritePersons;
-		File output = new File(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz");
+		File output = new File(Constants.MATSIM_4_OPUS_TEMP + "pop.xml.gz");
 		
 		if(measurements != null){
 			try {
@@ -186,7 +185,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		public MeasurementControlerListener( ActivityFacilitiesImpl zones ){
 			measurements = MeasurementObject.getInstance();
 			this.zones = zones;
-			this.travelDataPath = Constants.OPUS_HOME + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "travel_data.csv";
+			this.travelDataPath = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP_DIRECTORY) + "travel_data.csv";
 		}
 		
 		public void notifyShutdown(ShutdownEvent event){

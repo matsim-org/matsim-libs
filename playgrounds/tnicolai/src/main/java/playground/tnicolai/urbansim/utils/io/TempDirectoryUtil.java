@@ -157,16 +157,16 @@ public class TempDirectoryUtil {
 		File tempFile = new File(Constants.OPUS_HOME);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.OPUS_MATSIM_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.OPUS_MATSIM_OUTPUT_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_OUTPUT);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_TEMP);
 		tempFile.mkdirs();
 		
-		tempFile = new File(Constants.MATSIM_CONFIG_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_CONFIG);
 		tempFile.mkdirs();
 		log.info("Finished creating temp directories");
 	}
@@ -181,16 +181,16 @@ public class TempDirectoryUtil {
 		File tempFile = new File(Constants.OPUS_HOME);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.OPUS_MATSIM_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.OPUS_MATSIM_OUTPUT_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_OUTPUT);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_TEMP);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(Constants.MATSIM_CONFIG_DIRECTORY);
+		tempFile = new File(Constants.MATSIM_4_OPUS_CONFIG);
 		if(tempFile.exists())
 			deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");

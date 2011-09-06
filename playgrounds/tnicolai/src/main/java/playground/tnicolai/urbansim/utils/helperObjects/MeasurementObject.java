@@ -160,7 +160,7 @@ public class MeasurementObject {
 	    BufferedWriter bstream;
 	    
 		try {
-			logFile = new File( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.MEASUREMENT_LOGFILE );
+			logFile = new File( Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE );
 			if(!logFile.exists()){
 				logFile.createNewFile();
 				log.info("Logfile " + logFile.getCanonicalPath() + " not found. Logfile created.");

@@ -25,23 +25,27 @@ package playground.tnicolai.urbansim.constants;
 
 import org.apache.log4j.Logger;
 
+import playground.tnicolai.urbansim.matsim4urbansim.MATSim4Urbansim;
+
+
 /**
  * @author thomas
  *
  */
 public class Constants {
 	
+	// logger
 	private static final Logger log = Logger.getLogger(Constants.class);
 	
 	/** important system environments */
-	public static String OPUS_HOME;// = System.getenv("OPUS_HOME");			// provided by UrbanSim via the configuration file; this is 
+	public static String OPUS_HOME;
+	public static String OPUS_DATA_PATH;
 	
 	/** subdirectories in OPUS_HOME */
-	public static String OPUS_MATSIM_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/";						// TODO: these paths should be provided by UrbanSim only -> extend MATSim4UrbanSim config
-	public static String MATSIM_CONFIG_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/matsim_config/";		// 		 a method to set those paths is already been implemented (setOpusHomeDirectory)
-	public static String OPUS_MATSIM_OUTPUT_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/output/";
-	public static String OPUS_MATSIM_TEMPORARY_DIRECTORY;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
-	public static String OPUS_DATA_PATH;// = System.getenv("OPUS_HOME")+'/'+"opus_matsim/tmp/";
+	public static String MATSIM_4_OPUS; 		// OPUS_HOME/matsim4opus/
+	public static String MATSIM_4_OPUS_CONFIG;	// OPUS_HOME/matsim4opus/matsim_config/
+	public static String MATSIM_4_OPUS_OUTPUT;	// OPUS_HOME/matsim4opus/output/
+	public static String MATSIM_4_OPUS_TEMP;	// OPUS_HOME/matsim4opus/tmp/
 	
 	/**
 	 * Apply a new root path for the OPUS_HOME directory
@@ -54,18 +58,18 @@ public class Constants {
 		
 		OPUS_HOME = opusHome;
 		OPUS_DATA_PATH = opusHome+"data/";
-		OPUS_MATSIM_DIRECTORY = opusHome+"opus_matsim/";
-		MATSIM_CONFIG_DIRECTORY = opusHome+"opus_matsim/matsim_config/";
-		OPUS_MATSIM_OUTPUT_DIRECTORY = opusHome+"opus_matsim/output/";
-		OPUS_MATSIM_TEMPORARY_DIRECTORY = opusHome+"opus_matsim/tmp/";
+		MATSIM_4_OPUS = opusHome+"opus_matsim/";
+		MATSIM_4_OPUS_CONFIG = opusHome+"opus_matsim/matsim_config/";
+		MATSIM_4_OPUS_OUTPUT = opusHome+"opus_matsim/output/";
+		MATSIM_4_OPUS_TEMP = opusHome+"opus_matsim/tmp/";
 		
 		log.info("");
 		log.info("Set OPUS_HOME to :" + OPUS_HOME);
 		log.info("Set OPUS_DATA_PATH to :" + OPUS_DATA_PATH);
-		log.info("Set OPUS MATSim directory to :" + OPUS_MATSIM_DIRECTORY);
-		log.info("Set MATSim config directory to :" + MATSIM_CONFIG_DIRECTORY);
-		log.info("Set OPUS MATSim output directory to :" + OPUS_MATSIM_OUTPUT_DIRECTORY);
-		log.info("Set OPUS MATSim temp directory to :" + OPUS_MATSIM_TEMPORARY_DIRECTORY);
+		log.info("Set OPUS MATSim directory to :" + MATSIM_4_OPUS);
+		log.info("Set MATSim config directory to :" + MATSIM_4_OPUS_CONFIG);
+		log.info("Set OPUS MATSim output directory to :" + MATSIM_4_OPUS_OUTPUT);
+		log.info("Set OPUS MATSim temp directory to :" + MATSIM_4_OPUS_TEMP);
 		log.info("");
 	}
 	
@@ -152,8 +156,12 @@ public class Constants {
 	public static final String MATSIM_4_URBANSIM = "matsim4urbansim";
 	public static final String IS_TEST_RUN = "isTestRun";
 	public static final String SAMPLING_RATE = "samplingRate";
-	public static final String TEMP_DIRECTORY = "tempDirectory";
 	public static final String OPUS_HOME_DIRECTORY = "opusHomeDirectory";
+	public static final String OPUS_DATA_PATH_DIRECTORY = "opusDataPathDirectory";
+	public static final String MATSIM_4_OPUS_DIRECTORY = "matsim4OpusDirectory";
+	public static final String MATSIM_4_OPUS_CONFIG_DIRECTORY = "matsim4OpusConfigDirectory";
+	public static final String MATSIM_4_OPUS_OUTPUT_DIRECTORY = "matsim4OpusOutputDirectory";
+	public static final String MATSIM_4_OPUS_TEMP_DIRECTORY = "matsim4OpusTempDirectory";
 	public static final String YEAR = "year";
 	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
 	public static final String COMPUTE_LOGSUM = "compute_logsum";

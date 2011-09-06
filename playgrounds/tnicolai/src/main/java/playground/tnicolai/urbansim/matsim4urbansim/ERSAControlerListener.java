@@ -56,8 +56,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -321,7 +321,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 */
 	private BufferedWriter initCSVWriter(Scenario sc)
 			throws FileNotFoundException, IOException {
-		String filename = Constants.OPUS_HOME + sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + "accessibility_indicators_ersa.csv";
+		String filename = sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP) + "accessibility_indicators_ersa.csv";
 		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
 		
 		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );

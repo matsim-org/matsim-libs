@@ -93,7 +93,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		
 		// preparing input test file
 		int dummyYear = 2000;
-		String testFileDirectory = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
+		String testFileDirectory = Constants.MATSIM_4_OPUS_TEMP;
 		String testFileName = null;
 		
 		switch (testNr) {

@@ -208,7 +208,7 @@ public class WarmStartTest extends MatsimTestCase{
 		// create temp directories
 		TempDirectoryUtil.createOPUSDirectories();
 		// set output directory for UrbanSim data to OPUS_HOME/opus_matsim/tmp
-		destinationDir = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
+		destinationDir = Constants.MATSIM_4_OPUS_TEMP;
 
 		// copy UrbanSim data to destination path
 		if( !FileCopy.copyTree(urbanSimDataPath, destinationDir) ){

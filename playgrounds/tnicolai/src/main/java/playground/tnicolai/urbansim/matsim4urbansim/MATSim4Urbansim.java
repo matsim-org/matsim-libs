@@ -222,7 +222,7 @@ public class MATSim4Urbansim {
 		File plansFile = new File( s );
 		
 		// set destination
-		File destinationFile = new File( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + filename );
+		File destinationFile = new File( Constants.MATSIM_4_OPUS_TEMP + filename );
 		
 		// moving plansFile to destinationFile
 		if (plansFile.renameTo( destinationFile ) )

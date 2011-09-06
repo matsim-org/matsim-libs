@@ -99,14 +99,22 @@ public class InitMATSimScenario {
 		log.info("Setting MATSim4UrbanSim parameter to config...");
 		double samplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
 		int year = matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
-		String tempDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getTempDirectory();
-		String opusHomeDirectory = matsim4UrbanSimParameter.getUrbansimParameter().getOpusHOME();
+		String opusHome = matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome();
+		String opusDataPath = matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath();
+		String matsim4Opus = matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus();
+		String matsim4OpusConfig = matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusConfig();
+		String matsim4OpusOutput = matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusOutput();
+		String matsim4OpusTemp = matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp();
 		boolean isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
 		
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.IS_TEST_RUN, isTestRun ? "TRUE" : "FALSE");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE, samplingRate + "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY, tempDirectory);
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY, opusHomeDirectory);
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY, opusHome +"/");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_DATA_PATH_DIRECTORY, opusDataPath +"/");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_DIRECTORY, matsim4Opus +"/");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_CONFIG_DIRECTORY, matsim4OpusConfig +"/");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_OUTPUT_DIRECTORY, matsim4OpusOutput +"/");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP_DIRECTORY, matsim4OpusTemp +"/");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR, year + "");
 		// tnicolai: implement/make configurable the following flags (matsim4urbansim config/JAXB)
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA, 1 + "");
@@ -120,14 +128,25 @@ public class InitMATSimScenario {
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_DISTANCE, 0 + "");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_DISTANCE, 0 + "");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.CUSTOM_PARAMETER, "");
-		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MEASUREMENT_LOGFILE, Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.MEASUREMENT_LOGFILE);
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM, Constants.MEASUREMENT_LOGFILE, Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE);
 		
+		log.info("Setting OPUS paths ...");
 		
-		log.info("... done!");
+		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY);
+		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_DATA_PATH_DIRECTORY);
+		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_DIRECTORY);
+		Constants.MATSIM_4_OPUS_CONFIG = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_CONFIG_DIRECTORY);
+		Constants.MATSIM_4_OPUS_OUTPUT = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_OUTPUT_DIRECTORY);
+		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.MATSIM_4_OPUS_TEMP_DIRECTORY);
+		
 		log.info("MATSim4UrbanSim Parameter -> SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.SAMPLING_RATE) + 
 											 " Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.YEAR) + 
-											 " TempDir: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.TEMP_DIRECTORY) + 
-											 " OPUS_HOME: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.OPUS_HOME_DIRECTORY) + 
+											 " OPUS_HOME: " + Constants.OPUS_HOME + 
+											 " OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH + 
+											 " MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS + 
+											 " MATSIM_4_OPUS_CONIG: " + Constants.MATSIM_4_OPUS_CONFIG +
+											 " MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT + 
+											 " MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP + 
 											 " TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.IS_TEST_RUN) +
 											 " Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA) +
 											 " Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_TRAVEL_TIMES) +
@@ -140,9 +159,7 @@ public class InitMATSimScenario {
 											 " Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_LN_TRAVEL_DISTANCE) +
 											 " Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.BETA_POWER_TRAVEL_DISTANCE) +
 											 " Custom Parameter: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM, Constants.CUSTOM_PARAMETER) );
-		
-		// set opus (sub-)directories
-		setOpusHomeDirectory(opusHomeDirectory);
+		log.info("... done!");
 	}
 	
 	/**
@@ -192,7 +209,7 @@ public class InitMATSimScenario {
 		// set values
 		controlerCG.setFirstIteration( firstIteration );	// controller (first, last iteration)
 		controlerCG.setLastIteration( lastIteration);
-		controlerCG.setOutputDirectory( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY );
+		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
 		log.info("... done!");
 		log.info("Controler FirstIteration: " + controlerCG.getFirstIteration() + " LastIteration: " + controlerCG.getLastIteration() + 
 				          " MATSim output directory: " +  controlerCG.getOutputDirectory());
@@ -267,21 +284,6 @@ public class InitMATSimScenario {
 		else
 			log.warn("No MATSim output directory found (=null). But it is mandatory for \"WARM START\". Threrefore \"WARM START\" can not be used!!!");		
 	}
-	
-	/**
-	 * only for debugging and testing reasons.
-	 * cecks if xml config contains the key word "TEST_DIRECTORY"
-	 * to set OPUS_HOME to that directory.
-	 */
-	private void setOpusHomeDirectory(String opusHomeDirectory ){
-		
-		// update opus home path if needed
-		if( Constants.OPUS_HOME == null || !Constants.OPUS_HOME.equalsIgnoreCase(opusHomeDirectory)){
-			log.info("Setting OPUS_HOME path ...");
-			Constants.setOpusHomeDirectory(opusHomeDirectory);
-		}
-	}
-
 	
 }
 

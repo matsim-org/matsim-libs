@@ -114,7 +114,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		// population size from MATSim output file
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(scenario);
-		populationReader.readFile( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + "pop.xml.gz" );
+		populationReader.readFile( Constants.MATSIM_4_OPUS_TEMP + "pop.xml.gz" );
 //		populationReader.readFile( Constants.OPUS_MATSIM_OUTPUT_DIRECTORY + "output_plans.xml.gz" );
 		outputPopulation = scenario.getPopulation();
 		
@@ -146,7 +146,7 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		// create temp directories
 		TempDirectoryUtil.createOPUSDirectories();
 		// set output directory for UrbanSim data to OPUS_HOME/opus_matsim/tmp
-		destinationDir = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY;
+		destinationDir = Constants.MATSIM_4_OPUS_TEMP;
 
 		// copy UrbanSim data to destination path
 		if( !FileCopy.copyTree(urbanSimDataPath, destinationDir) ){

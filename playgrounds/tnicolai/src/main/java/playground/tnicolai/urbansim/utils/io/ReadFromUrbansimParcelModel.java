@@ -76,7 +76,7 @@ public class ReadFromUrbansimParcelModel {
 	@SuppressWarnings("deprecation")
 	public void readFacilities(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PARCEL_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int rfID = benchmark.addMeasure("Reading Facilities Table", filename, true);
 		
 		log.info( "Starting to read urbansim parcels table from " + filename );
@@ -142,7 +142,7 @@ public class ReadFromUrbansimParcelModel {
 				}
 				pseudoZone.sumXCoordinate += coord.getX();
 				pseudoZone.sumYCoordinate += coord.getY() ;
-				pseudoZone.count ++ ;
+				pseudoZone.count ++ ; // tnicolai: wights from urbansim parcels for homes and workplaces
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -215,7 +215,7 @@ public class ReadFromUrbansimParcelModel {
 		
 		boolean flag = false;
 
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int rpID = benchmark.addMeasure("Reading Persons Table", filename, true);
 		
 		log.info( "Starting to read persons table from " + filename );
@@ -241,12 +241,14 @@ public class ReadFromUrbansimParcelModel {
 
 				// create new person
 				Id personId = new IdImpl( parts[ indexPersonID ] ) ;
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
 					continue ;
 
 				flag = false;
+				
+				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
 				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
@@ -430,7 +432,7 @@ public class ReadFromUrbansimParcelModel {
 	 */
 	public Map<Id,WorkplaceObject> readZoneBasedWorkplaces(){
 		
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int wpID = benchmark.addMeasure("Reading Job Table", filename, true);
 		
 		log.info( "Starting to read jobs table from " + filename );
@@ -494,7 +496,7 @@ public class ReadFromUrbansimParcelModel {
 		Map<Id, JobsObject> jobObjectMap = new HashMap<Id, JobsObject>();
 		List<JobsObject> backupList = new ArrayList<JobsObject>();
 		
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int jmID = benchmark.addMeasure("Reading Job Table", filename, true);
 		
 		if(parcels != null){
@@ -621,7 +623,7 @@ public class ReadFromUrbansimParcelModel {
 	 */
 	public int countPersons(){
 		
-		String filename = Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
 		int cpID = benchmark.addMeasure("Reading Persons Table", filename, true);
 		
 		log.info( "Starting to read persons from " + filename ) ;
