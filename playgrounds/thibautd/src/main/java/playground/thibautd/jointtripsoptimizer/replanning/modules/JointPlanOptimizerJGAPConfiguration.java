@@ -119,20 +119,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.monitor =
 				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup, this.nMembers);
 
-			// selector
-			RestrictedTournamentSelector selector = 
-				new RestrictedTournamentSelector(
-						this,
-						configGroup,
-						(configGroup.getUseOnlyHammingDistanceInRTS() ?
-							 new HammingChromosomeDistanceComparator() :
-							 new DefaultChromosomeDistanceComparator(
-								configGroup.getDiscreteDistanceScale())));
-			this.addNaturalSelector(selector, false);
-
-			// do not try to reintroduce fittest: RTS never eliminates it
-			this.setPreservFittestIndividual(false);
-
 			// Chromosome: construction
 			Gene[] sampleGenes =
 				new Gene[this.numToggleGenes + this.numEpisodes +this.numModeGenes];
@@ -159,7 +145,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// population size: the SPX cross-over requires at least one chromosome
 			// per double dimension.
 			//int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
-			int popSize = configGroup.getPopulationSize();
+			//int popSize = configGroup.getPopulationSize();
+			int popSize = (int) Math.ceil(
+					configGroup.getPopulationIntercept() +
+					configGroup.getPopulationCoef() * sampleGenes.length);
 			//log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 
@@ -179,6 +168,20 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 			// discarded chromosomes are "recycled" rather than suppressed.
 			this.setChromosomePool(new ChromosomePool());
+
+			// selector
+			RestrictedTournamentSelector selector = 
+				new RestrictedTournamentSelector(
+						this,
+						configGroup,
+						(configGroup.getUseOnlyHammingDistanceInRTS() ?
+							 new HammingChromosomeDistanceComparator() :
+							 new DefaultChromosomeDistanceComparator(
+								configGroup.getDiscreteDistanceScale())));
+			this.addNaturalSelector(selector, false);
+
+			// do not try to reintroduce fittest: RTS never eliminates it
+			this.setPreservFittestIndividual(false);
 
 			// genetic operators definitions
 			if (configGroup.getPlotFitness()) {

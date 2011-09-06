@@ -147,6 +147,10 @@ public class JointReplanningConfigGroup extends Module {
 	 * true if only the hamming distance have to be considered in RTS
 	 */
 	public static final String HAMMING_DISTANCE = "useHammingDistanceOnlyInRTS";
+	public static final String POPULATION_COEF = "populationSizeSlope";
+	public static final String POPULATION_INTERCEPT = "populationSizeIntercept";
+	public static final String WINDOW_SIZE_COEF = "windowSizeSlope";
+	public static final String WINDOW_SIZE_INTERCEPT = "windowSizeIntercept";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -160,6 +164,10 @@ public class JointReplanningConfigGroup extends Module {
 	//parameter values, initialized to defaults.
 
 	private int populationSize = 28;
+	private double populationCoef = 1;
+	private double populationIntercept = 20;
+	private double windowSizeCoef = 0.5;
+	private double windowSizeIntercept = 3;
 	private double mutationProb = 0.05929328513354826;
 	private double wholeCrossOverProb = 0.3542456557133803;
 	private double simpleCrossOverProb = 0.8429808963287465;
@@ -292,6 +300,18 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(P_NON_UNIFORM)) {
 			this.setNonUniformMutationProbability(value);
 		}
+		else if (param_name.equals(POPULATION_COEF)) {
+			this.setPopulationCoef(value);
+		}
+		else if (param_name.equals(WINDOW_SIZE_COEF)) {
+			this.setWindowSizeCoef(value);
+		}
+		else if (param_name.equals(POPULATION_INTERCEPT)) {
+			this.setPopulationIntercept(value);
+		}
+		else if (param_name.equals(WINDOW_SIZE_INTERCEPT)) {
+			this.setWindowSizeIntercept(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -388,6 +408,18 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(P_NON_UNIFORM)) {
 			return String.valueOf(this.getNonUniformMutationProbability());
 		}
+		else if (param_name.equals(POPULATION_COEF)) {
+			return String.valueOf(this.getPopulationCoef());
+		}
+		else if (param_name.equals(WINDOW_SIZE_COEF)) {
+			return String.valueOf(this.getWindowSizeCoef());
+		}
+		else if (param_name.equals(POPULATION_INTERCEPT)) {
+			return String.valueOf(this.getPopulationIntercept());
+		}
+		else if (param_name.equals(WINDOW_SIZE_INTERCEPT)) {
+			return String.valueOf(this.getWindowSizeIntercept());
+		}
 
 		return null;
 	}
@@ -422,6 +454,10 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, SIM_LEG_INT);
 		this.addParameterToMap(map, IN_PLACE);
 		this.addParameterToMap(map, P_NON_UNIFORM);
+		this.addParameterToMap(map, POPULATION_COEF);
+		this.addParameterToMap(map, WINDOW_SIZE_COEF);
+		this.addParameterToMap(map, POPULATION_INTERCEPT);
+		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		return map;
 	}
 
@@ -782,6 +818,40 @@ public class JointReplanningConfigGroup extends Module {
 		return this.useOnlyHammingDistance;
 	}
 
+	public void setPopulationCoef(final String value) {
+		populationCoef = Double.parseDouble(value);
+	}
+
+	public double getPopulationCoef() {
+		return populationCoef;
+	}
+
+	public void  setPopulationIntercept(final String value) {
+		populationIntercept = Double.parseDouble(value);
+	}
+
+	public double getPopulationIntercept() {
+		return populationIntercept;
+	}
+
+
+	public void setWindowSizeCoef(final String value) {
+		windowSizeCoef = Double.parseDouble(value);
+	}
+
+	public double getWindowSizeCoef() {
+		return windowSizeCoef;
+	}
+
+	public void setWindowSizeIntercept(final String value) {
+		windowSizeIntercept = Double.parseDouble(value);
+	}
+
+	public double getWindowSizeIntercept() {
+		return windowSizeIntercept;
+	}
+
+
 	// allow setting of GA params "directly"
 	public void setPopulationSize(final int populationSize) {
 		this.populationSize = (populationSize);
@@ -866,6 +936,22 @@ public class JointReplanningConfigGroup extends Module {
 
 	public void setUseOnlyHammingDistanceInRTS(final boolean value) {
 		this.useOnlyHammingDistance = value;
+	}
+
+	public void setPopulationCoef(final double value) {
+		populationCoef = value;
+	}
+
+	public void  setPopulationIntercept(final double value) {
+		populationIntercept = value;
+	}
+
+	public void setWindowSizeCoef(final double value) {
+		windowSizeCoef = value;
+	}
+
+	public void setWindowSizeIntercept(final double value) {
+		windowSizeIntercept = value;
 	}
 }
 

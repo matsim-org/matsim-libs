@@ -58,16 +58,26 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 	private final Configuration jgapConfig;
 	private final ChromosomeDistanceComparator distanceComparator;
 
+	/**
+	 * @param jgapConfig the config used in the optimisation. The sample Chomosome
+	 * and the population size MUST be initialized.
+	 */
 	public RestrictedTournamentSelector(
 			final Configuration jgapConfig,
 			final JointReplanningConfigGroup configGroup,
 			final ChromosomeDistanceComparator distanceComparator
 			) throws InvalidConfigurationException {
 		super(jgapConfig);
+		//this.windowSize = Math.min(
+		//		configGroup.getRtsWindowSize(),
+		//		//jgapConfig.getPopulationSize());
+		//		configGroup.getPopulationSize());
+		int paramWindowSize = (int) Math.ceil(
+				configGroup.getWindowSizeIntercept() +
+				configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
 		this.windowSize = Math.min(
-				configGroup.getRtsWindowSize(),
-				//jgapConfig.getPopulationSize());
-				configGroup.getPopulationSize());
+				paramWindowSize,
+				jgapConfig.getPopulationSize());
 		this.jgapConfig = jgapConfig;
 		this.distanceComparator = distanceComparator;
 	}
