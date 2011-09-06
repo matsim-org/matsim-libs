@@ -300,6 +300,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(P_NON_UNIFORM)) {
 			this.setNonUniformMutationProbability(value);
 		}
+		else if (param_name.equals(HAMMING_DISTANCE)) {
+			this.setUseOnlyHammingDistanceInRTS(value);
+		}
 		else if (param_name.equals(POPULATION_COEF)) {
 			this.setPopulationCoef(value);
 		}
@@ -408,6 +411,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(P_NON_UNIFORM)) {
 			return String.valueOf(this.getNonUniformMutationProbability());
 		}
+		else if (param_name.equals(HAMMING_DISTANCE)) {
+			return String.valueOf(this.getUseOnlyHammingDistanceInRTS());
+		}
 		else if (param_name.equals(POPULATION_COEF)) {
 			return String.valueOf(this.getPopulationCoef());
 		}
@@ -453,6 +459,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, RTS_WINDOW);
 		this.addParameterToMap(map, SIM_LEG_INT);
 		this.addParameterToMap(map, IN_PLACE);
+		this.addParameterToMap(map, HAMMING_DISTANCE);
 		this.addParameterToMap(map, P_NON_UNIFORM);
 		this.addParameterToMap(map, POPULATION_COEF);
 		this.addParameterToMap(map, WINDOW_SIZE_COEF);
