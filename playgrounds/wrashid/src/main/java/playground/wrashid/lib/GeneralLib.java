@@ -67,6 +67,7 @@ import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
 
+	public static final double numberOfSecondsInDay=86400;
 	public static String eclipseLocalTempPath = "C:/eTmp";
 	public static Controler controler;
 

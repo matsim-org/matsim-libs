@@ -91,8 +91,8 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		this.useLog = useLog;
 		outputLogEnergyConsumptionPerLink=new ArrayList<String>();
 		
-		outputLogEnergyConsumptionPerLink.add("averageSpeedDrivenInMetersPerSecond\tMaxSpeedInMetersPerSecond\tenergyConsumptionOnLinkInJoule\tPowerTrain\tFuel\tPower\tWeight");
-		
+		outputLogEnergyConsumptionPerLink.add("averageSpeedDrivenInMetersPerSecond\tMaxSpeedInMetersPerSecond\tenergyConsumptionOnLinkInJoule\tPowerTrain\tFuel\tPower\tWeight\tagentId\tlinkEnterTime\tlinkLengthInMeters");
+	
 		reset(0);
 	}
 	
@@ -143,21 +143,25 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		}
 		
 		double timeSpendOnLink= GeneralLib.getIntervalDuration(linkEnteranceTime, linkLeaveTime);
-		Link link = network.getLinks().get(linkId);
-		
-
-		
-		
-		
-		double energyConsumptionOnLink=getEnergyConsumptionAndHandleSoc(personId,timeSpendOnLink,link);
-		energyConsumptionOfCurrentLeg.incrementBy(personId, energyConsumptionOnLink);
-		
-		
-		
 		resetLinkEnteranceTime(personId);
+		Link link = network.getLinks().get(linkId);
+		double averageSpeedDriven=link.getLength()/timeSpendOnLink;
+		if (timeSpendOnLink==GeneralLib.numberOfSecondsInDay || averageSpeedDriven>link.getFreespeed()){
+			// do not consider events with "zero" travel time and such, which produce higher travel times than
+			// allowed due to artifacts from different simulations, e.g. wait2link, etc.
+			return;
+		}
+		if (averageSpeedDriven<0.1){
+			// avoid too small speeds, which lead to negative number in energy consumption regression model
+			return;
+		}
+				
+		
+		double energyConsumptionOnLink=getEnergyConsumptionAndHandleSoc(personId,timeSpendOnLink,link,linkEnteranceTime);
+		energyConsumptionOfCurrentLeg.incrementBy(personId, energyConsumptionOnLink);
 	}
 	
-	private double getEnergyConsumptionAndHandleSoc(Id personId, double timeSpendOnLink, Link link) {
+	private double getEnergyConsumptionAndHandleSoc(Id personId, double timeSpendOnLink, Link link, Double linkEnteranceTime) {
 		VehicleTypeLAV vehicle=null;
 		if (agentVehicleMapping.containsKey(personId)){
 			vehicle=agentVehicleMapping.get(personId);
@@ -181,13 +185,18 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 			}
 		}
 		
-		updateEnergyConsumptionLog(timeSpendOnLink, link, vehicle, energyConsumptionOnLink);
+		if (energyConsumptionOnLink<0){
+			vehicle.print();
+			DebugLib.stopSystemAndReportInconsistency("energyConsumptionOnLink:"+energyConsumptionOnLink);
+		}
+		
+		updateEnergyConsumptionLog(timeSpendOnLink, link, vehicle, energyConsumptionOnLink, linkEnteranceTime, personId);
 		
 		return energyConsumptionOnLink;
 	}
 
 	private void updateEnergyConsumptionLog(double timeSpendOnLink, Link link, VehicleTypeLAV vehicle,
-			Double energyConsumptionOnLink) {
+			Double energyConsumptionOnLink, Double linkEnteranceTime, Id personId) {
 		
 		if (!useLog){
 			return;
@@ -198,8 +207,13 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		double averageSpeedDriven = link.getLength()/timeSpendOnLink;
 		if (averageSpeedDriven>link.getFreespeed()){
 			// remove artifacts
-			averageSpeedDriven=link.getFreespeed();
+			//averageSpeedDriven=link.getFreespeed();
+			DebugLib.stopSystemAndReportInconsistency();
 		}
+//		
+//		if (averageSpeedDriven<1.0){
+//			DebugLib.emptyFunctionForSettingBreakPoint();
+//		}
 		
 		stringBuffer.append(averageSpeedDriven);
 		stringBuffer.append("\t");
@@ -214,6 +228,12 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		stringBuffer.append(vehicle.powerClass);
 		stringBuffer.append("\t");
 		stringBuffer.append(vehicle.massClass);
+		stringBuffer.append("\t");
+		stringBuffer.append(personId);
+		stringBuffer.append("\t");
+		stringBuffer.append(GeneralLib.projectTimeWithin24Hours(linkEnteranceTime));
+		stringBuffer.append("\t");
+		stringBuffer.append(link.getLength());
 		
 		outputLogEnergyConsumptionPerLink.add(stringBuffer.toString());
 	}
